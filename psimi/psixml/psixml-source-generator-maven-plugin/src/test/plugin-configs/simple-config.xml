@@ -9,7 +9,7 @@
                     <generatedPackage>uk.ac.ebi.intact.psixml.generated</generatedPackage>
                     <sourceGeneratorClass>uk.ac.ebi.intact.psixml.tools.generator.AnnotationSourceGenerator
                     </sourceGeneratorClass>
-                    <project implementation="uk.ac.ebi.intact.psixml.generator.StubProject"/>
+                    <project implementation="uk.ac.ebi.intact.dataexchange.psimi.xml.generator.StubProject"/>
                 </configuration>
             </plugin>
         </plugins>
