@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>uk.ac.ebi.intact.psixml</groupId>
+        <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
         <artifactId>intact-psixml</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -13,7 +13,7 @@
     <artifactId>intact-psixml-exchange</artifactId>
     <packaging>jar</packaging>
 
-    <name>IntAct PSIXML :: Exchange</name>
+    <name>IntAct Data Exchange :: PSI MI :: XML :: Exchange</name>
     <description>Imports PSIXML files to the database or creates PSIXML from the intact database</description>
     <url>http://www.ebi.ac.uk/~intact/devsite/intact-psixml-exchange</url>
 
@@ -42,7 +42,7 @@
                 <version>1.6.0-SNAPSHOT</version>
             </plugin>
             <plugin>
-                <groupId>uk.ac.ebi.intact.psixml</groupId>
+                <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
                 <artifactId>psixml-source-generator-maven-plugin</artifactId>
                 <configuration>
                     <generatedPackage>uk.ac.ebi.intact.psixml.generated</generatedPackage>
@@ -72,16 +72,16 @@
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.intact.psixml</groupId>
+            <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psixml-upload-extensions</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.intact.psixml</groupId>
+            <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psixml-converters</artifactId>
         </dependency>
         <dependency>
-            <groupId>uk.ac.ebi.intact.psixml</groupId>
+            <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psixml-persister</artifactId>
         </dependency>
 

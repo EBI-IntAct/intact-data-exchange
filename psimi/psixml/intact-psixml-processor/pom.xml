@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <project>
     <parent>
-        <groupId>uk.ac.ebi.intact.psixml</groupId>
+        <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
         <artifactId>intact-psixml</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>uk.ac.ebi.intact.psixml</groupId>
+    <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
     <artifactId>intact-psixml-processor</artifactId>
 
     <packaging>jar</packaging>
 
-    <name>IntAct PSIXML :: Processor</name>
+    <name>IntAct Data Exchange :: PSI MI :: XML :: Processor</name>
     <description>Contains the processor generator classes</description>
     <url>http://www.ebi.ac.uk/~intact/devsite/intact-psixml/intact-psixml-processor</url>
 
@@ -39,9 +39,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>uk.ac.ebi.intact</groupId>
+            <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-annotations</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>

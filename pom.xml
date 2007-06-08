@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>uk.ac.ebi.intact.maven</groupId>
@@ -8,14 +9,14 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>uk.ac.ebi.intact.dataexch</groupId>
-    <artifactId>dataexch-master</artifactId>
+    <groupId>uk.ac.ebi.intact.dataexchange</groupId>
+    <artifactId>dataexchange-master</artifactId>
     <packaging>pom</packaging>
-    <version>1.6.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
 
     <name>IntAct Data Exchange</name>
     <description>Data Exchange Master POM</description>
-    <url>http://www.ebi.ac.uk/~intact/devsite/dataexch</url>
+    <url>http://www.ebi.ac.uk/~intact/devsite/dataexchange</url>
 
     <properties>
         <currentVersion>${version}</currentVersion>
@@ -23,7 +24,8 @@
 
     <scm>
         <connection>scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/data-exchange/trunk</connection>
-        <developerConnection>scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/data-exchange/trunk</developerConnection>
+        <developerConnection>scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/data-exchange/trunk
+        </developerConnection>
         <url>http://svn.sourceforge.net/viewcvs.cgi/intact/repo/data-exchange/trunk</url>
     </scm>
 
@@ -33,6 +35,19 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- IntAct dependencies -->
+            <dependency>
+                <groupId>uk.ac.ebi.intact</groupId>
+                <artifactId>intact-core</artifactId>
+                <version>1.6.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.ac.ebi.intact.core</groupId>
+                <artifactId>intact-annotations</artifactId>
+                <version>1.6.0-SNAPSHOT</version>
+            </dependency>
+
+            <!-- Other dependencies -->
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
@@ -48,9 +63,9 @@
 
     <dependencies>
         <dependency>
-             <groupId>junit</groupId>
-             <artifactId>junit</artifactId>
-             <version>4.3.1</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.3.1</version>
         </dependency>
     </dependencies>
 
@@ -84,7 +99,7 @@
         <site>
             <id>intact-site</id>
             <name>Intact site</name>
-            <url>${site.remote.basedir}/dataexch</url>
+            <url>${site.remote.basedir}/dataexchange</url>
         </site>
     </distributionManagement>
 
