@@ -45,7 +45,7 @@
                 <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
                 <artifactId>psixml-source-generator-maven-plugin</artifactId>
                 <configuration>
-                    <generatedPackage>uk.ac.ebi.intact.psixml.generated</generatedPackage>
+                    <generatedPackage>uk.ac.ebi.intact.dataexchange.psimi.xml.generated</generatedPackage>
                 </configuration>
                 <executions>
                     <execution>

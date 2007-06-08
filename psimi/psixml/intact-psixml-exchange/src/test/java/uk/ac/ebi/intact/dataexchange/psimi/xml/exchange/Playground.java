@@ -17,7 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.model.EntrySet;
-import uk.ac.ebi.intact.psixml.generated.EntrySetProcessor;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.generated.EntrySetProcessor;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.PsiProcessReport;
 
 import java.io.InputStream;

@@ -17,9 +17,9 @@ package ${packageName};
 
 import java.util.*;
 import java.lang.reflect.Field;
-import uk.ac.ebi.intact.psixml.tools.*;
-import uk.ac.ebi.intact.psixml.tools.extension.*;
-import uk.ac.ebi.intact.psixml.tools.validator.*;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.*;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.extension.*;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.validator.*;
 
 #foreach( $importedClass in ${mcm.importedClasses} )
 import ${importedClass.name};

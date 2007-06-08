@@ -21,10 +21,10 @@ import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.commons.model.IntactEntry;
-import uk.ac.ebi.intact.psixml.converter.shared.EntryConverter;
-import uk.ac.ebi.intact.psixml.persister.PersisterException;
-import uk.ac.ebi.intact.psixml.persister.PersisterReport;
-import uk.ac.ebi.intact.psixml.persister.shared.EntryPersister;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterReport;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared.EntryPersister;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;

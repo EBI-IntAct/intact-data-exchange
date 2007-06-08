@@ -16,12 +16,12 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.extensions;
 
 import psidev.psi.mi.xml.model.Entry;
-import uk.ac.ebi.intact.psixml.tools.Phase;
-import uk.ac.ebi.intact.psixml.tools.extension.ExtensionContext;
-import uk.ac.ebi.intact.psixml.tools.extension.annotation.PsiExtension;
-import uk.ac.ebi.intact.psixml.tools.extension.annotation.PsiExtensionContext;
-import uk.ac.ebi.intact.psixml.tools.extension.annotation.PsiExtensionMethod;
-import uk.ac.ebi.intact.psixml.tools.validator.ValidationMessage;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.Phase;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.extension.ExtensionContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.extension.annotation.PsiExtension;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.extension.annotation.PsiExtensionContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.extension.annotation.PsiExtensionMethod;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.validator.ValidationMessage;
 
 /**
  * TODO comment this

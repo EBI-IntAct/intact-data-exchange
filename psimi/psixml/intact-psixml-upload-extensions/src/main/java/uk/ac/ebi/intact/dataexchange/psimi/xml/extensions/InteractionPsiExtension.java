@@ -16,10 +16,10 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.extensions;
 
 import psidev.psi.mi.xml.model.Interaction;
-import uk.ac.ebi.intact.psixml.tools.extension.ExtensionContext;
-import uk.ac.ebi.intact.psixml.tools.extension.annotation.PsiExtension;
-import uk.ac.ebi.intact.psixml.tools.extension.annotation.PsiExtensionContext;
-import uk.ac.ebi.intact.psixml.tools.extension.annotation.PsiExtensionMethod;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.extension.ExtensionContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.extension.annotation.PsiExtension;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.extension.annotation.PsiExtensionContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.extension.annotation.PsiExtensionMethod;
 
 /**
  * TODO comment this
