@@ -1,0 +1,98 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>uk.ac.ebi.intact.psixml</groupId>
+        <artifactId>intact-psixml</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>intact-psixml-exchange</artifactId>
+    <packaging>jar</packaging>
+
+    <name>IntAct PSIXML :: Exchange</name>
+    <description>Imports PSIXML files to the database or creates PSIXML from the intact database</description>
+    <url>http://www.ebi.ac.uk/~intact/devsite/intact-psixml-exchange</url>
+
+    <scm>
+        <connection>
+            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/trunk/intact-psixml-exchange
+        </connection>
+        <developerConnection>
+            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/trunk/intact-psixml-exchange
+        </developerConnection>
+        <url>http://svn.sourceforge.net/viewcvs.cgi/intact/repo/intact-psixml/trunk/intact-psixml-exchange</url>
+    </scm>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>uk.ac.ebi.intact.plugins</groupId>
+                <artifactId>dbtest-maven-plugin</artifactId>
+                <version>1.6.0-SNAPSHOT</version>
+            </plugin>
+            <plugin>
+                <groupId>uk.ac.ebi.intact.psixml</groupId>
+                <artifactId>psixml-source-generator-maven-plugin</artifactId>
+                <configuration>
+                    <generatedPackage>uk.ac.ebi.intact.psixml.generated</generatedPackage>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate-processors</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!--
+        h2 database used for testing, with the cvs preloaded
+        -->
+        <dependency>
+            <groupId>uk.ac.ebi.intact.templates</groupId>
+            <artifactId>h2db-with-cv</artifactId>
+            <version>1.6-SNAPSHOT</version>
+            <type>zip</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.intact.psixml</groupId>
+            <artifactId>intact-psixml-upload-extensions</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.intact.psixml</groupId>
+            <artifactId>intact-psixml-converters</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.psixml</groupId>
+            <artifactId>intact-psixml-persister</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <distributionManagement>
+        <site>
+            <id>intact-site</id>
+            <name>Intact site</name>
+            <url>${site.remote.basedir}/intact-psixml-exchange</url>
+        </site>
+    </distributionManagement>
+
+</project>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>uk.ac.ebi.intact.maven</groupId>
+        <artifactId>intact-hibernate-master</artifactId>
+        <version>10</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>uk.ac.ebi.intact.psixml</groupId>
+    <artifactId>intact-psixml</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>IntAct PSIXML :: Master POM</name>
+    <description>PSIXML for IntAct</description>
+    <url>http://www.ebi.ac.uk/~intact/devsite/intact-psixml</url>
+
+    <scm>
+        <connection>scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/trunk</connection>
+        <developerConnection>scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/trunk
+        </developerConnection>
+        <url>http://svn.sourceforge.net/viewcvs.cgi/intact/repo/intact-psixml/trunk/</url>
+    </scm>
+
+    <properties>
+        <currentVersion>1.0-SNAPSHOT</currentVersion>
+    </properties>
+
+    <modules>
+        <module>intact-psixml-commons</module>
+        <module>intact-psixml-processor</module>
+        <module>psixml-source-generator-maven-plugin</module>
+        <module>intact-psixml-converters</module>
+        <module>intact-psixml-persister</module>
+        <module>intact-psixml-upload-extensions</module>
+        <module>intact-psixml-exchange</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>uk.ac.ebi.intact</groupId>
+                <artifactId>intact-core</artifactId>
+                <version>1.6.0-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>psidev.psi.mi</groupId>
+                <artifactId>psi25-xml</artifactId>
+                <version>1.0-beta4-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>uk.ac.ebi.intact.tools</groupId>
+                <artifactId>intact-psi-validator</artifactId>
+                <version>1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>uk.ac.ebi.intact.psixml</groupId>
+                <artifactId>intact-psixml-commons</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.ac.ebi.intact.psixml</groupId>
+                <artifactId>intact-psixml-processor</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.ac.ebi.intact.psixml</groupId>
+                <artifactId>intact-psixml-converters</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.ac.ebi.intact.psixml</groupId>
+                <artifactId>intact-psixml-persister</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.ac.ebi.intact.psixml</groupId>
+                <artifactId>intact-psixml-upload-extensions</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymockclassextension</artifactId>
+                <version>2.2.2</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.3.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymockclassextension</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- EBI repositories -->
+    <repositories>
+        <repository>
+            <id>ebi-repo</id>
+            <name>The EBI internal repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>ebi-repo-snapshots</id>
+            <name>The EBI internal repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo_snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <site>
+            <id>intact-site</id>
+            <name>Intact site</name>
+            <!-- When the archetype plugin supports it (that is when they include the escapeTool in VelocityContext)
+                 the statement below should work:
+
+                 <url>${esc.dollar}{site.remote.basedir}/intact-psixml-exchange</url>
+            -->
+            <url>${site.remote.basedir}/intact-psixml-exchange</url>
+        </site>
+    </distributionManagement>
+
+</project>

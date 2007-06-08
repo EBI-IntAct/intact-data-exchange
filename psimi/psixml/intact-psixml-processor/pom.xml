@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<project>
+    <parent>
+        <groupId>uk.ac.ebi.intact.psixml</groupId>
+        <artifactId>intact-psixml</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>uk.ac.ebi.intact.psixml</groupId>
+    <artifactId>intact-psixml-processor</artifactId>
+
+    <packaging>jar</packaging>
+
+    <name>IntAct PSIXML :: Processor</name>
+    <description>Contains the processor generator classes</description>
+    <url>http://www.ebi.ac.uk/~intact/devsite/intact-psixml/intact-psixml-processor</url>
+
+    <scm>
+        <connection>
+            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/trunk/intact-psixml-processor
+        </connection>
+        <developerConnection>
+            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/trunk/intact-psixml-processor
+        </developerConnection>
+        <url>
+            http://svn.sourceforge.net/viewcvs.cgi/intact/repo/intact-psixml/trunk/intact-psixml-processor
+        </url>
+    </scm>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>uk.ac.ebi.intact</groupId>
+            <artifactId>intact-annotations</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>psidev.psi.mi</groupId>
+            <artifactId>psi25-xml</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>velocity</groupId>
+            <artifactId>velocity-dep</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+    </dependencies>
+
+    <distributionManagement>
+        <site>
+            <id>intact-site</id>
+            <name>Intact site</name>
+            <url>${site.remote.basedir}/maven-plugins/psixml-source-generator-maven-plugin</url>
+        </site>
+    </distributionManagement>
+</project>
