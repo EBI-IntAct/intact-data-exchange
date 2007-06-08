@@ -27,6 +27,10 @@
         <url>http://svn.sourceforge.net/viewcvs.cgi/intact/repo/data-exchange/trunk</url>
     </scm>
 
+    <modules>
+        <module>psimi</module>
+    </modules>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
