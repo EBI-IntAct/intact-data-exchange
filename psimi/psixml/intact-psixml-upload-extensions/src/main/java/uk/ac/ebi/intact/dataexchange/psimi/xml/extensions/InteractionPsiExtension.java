@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.ebi.intact.psixml.exchange.extensions;
+package uk.ac.ebi.intact.dataexchange.psimi.xml.extensions;
 
 import psidev.psi.mi.xml.model.Interaction;
 import uk.ac.ebi.intact.psixml.tools.extension.ExtensionContext;
