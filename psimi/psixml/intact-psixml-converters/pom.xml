@@ -16,16 +16,6 @@
     <name>IntAct Data Exchange :: PSI MI :: XML :: Converters</name>
     <description>Data converters from PSI XML schema objects to the IntAct model objects</description>
 
-    <scm>
-        <connection>
-            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/intact-psixml-converters/trunk
-        </connection>
-        <developerConnection>
-            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/intact-psixml-converters/trunk
-        </developerConnection>
-        <url>http://svn.sourceforge.net/viewcvs.cgi/intact/repo/intact-psixml/intact-psixml-converters/trunk/</url>
-    </scm>
-
     <build>
         <plugins>
             <plugin>

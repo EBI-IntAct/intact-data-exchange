@@ -17,16 +17,6 @@
     <description>Imports PSIXML files to the database or creates PSIXML from the intact database</description>
     <url>http://www.ebi.ac.uk/~intact/devsite/intact-psixml-exchange</url>
 
-    <scm>
-        <connection>
-            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/trunk/intact-psixml-exchange
-        </connection>
-        <developerConnection>
-            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/trunk/intact-psixml-exchange
-        </developerConnection>
-        <url>http://svn.sourceforge.net/viewcvs.cgi/intact/repo/intact-psixml/trunk/intact-psixml-exchange</url>
-    </scm>
-
     <build>
         <resources>
             <resource>
@@ -86,13 +76,5 @@
         </dependency>
 
     </dependencies>
-
-    <distributionManagement>
-        <site>
-            <id>intact-site</id>
-            <name>Intact site</name>
-            <url>${site.remote.basedir}/intact-psixml-exchange</url>
-        </site>
-    </distributionManagement>
 
 </project>

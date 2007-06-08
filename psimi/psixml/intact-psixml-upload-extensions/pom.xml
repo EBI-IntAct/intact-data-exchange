@@ -17,16 +17,6 @@
     <description>Uploads PSIXML files to the database</description>
     <url>http://www.ebi.ac.uk/~intact/devsite/intact-psixml-exchange</url>
 
-    <scm>
-        <connection>
-            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/intact-psixml-exchange/trunk
-        </connection>
-        <developerConnection>
-            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/intact-psixml-exchange/trunk
-        </developerConnection>
-        <url>http://svn.sourceforge.net/viewcvs.cgi/intact/repo/intact-psixml/intact-psixml-exchange/trunk/</url>
-    </scm>
-
     <dependencies>
         <dependency>
             <groupId>uk.ac.ebi.intact</groupId>
@@ -37,13 +27,5 @@
             <artifactId>intact-psixml-processor</artifactId>
         </dependency>
     </dependencies>
-
-    <distributionManagement>
-        <site>
-            <id>intact-site</id>
-            <name>Intact site</name>
-            <url>${site.remote.basedir}/intact-psixml-upload-extensions</url>
-        </site>
-    </distributionManagement>
 
 </project>

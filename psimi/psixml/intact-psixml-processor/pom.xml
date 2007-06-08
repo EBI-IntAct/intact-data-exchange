@@ -16,18 +16,6 @@
     <description>Contains the processor generator classes</description>
     <url>http://www.ebi.ac.uk/~intact/devsite/intact-psixml/intact-psixml-processor</url>
 
-    <scm>
-        <connection>
-            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/trunk/intact-psixml-processor
-        </connection>
-        <developerConnection>
-            scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-psixml/trunk/intact-psixml-processor
-        </developerConnection>
-        <url>
-            http://svn.sourceforge.net/viewcvs.cgi/intact/repo/intact-psixml/trunk/intact-psixml-processor
-        </url>
-    </scm>
-
     <build>
         <resources>
             <resource>
@@ -59,12 +47,5 @@
             <version>1.7.0</version>
         </dependency>
     </dependencies>
-
-    <distributionManagement>
-        <site>
-            <id>intact-site</id>
-            <name>Intact site</name>
-            <url>${site.remote.basedir}/maven-plugins/psixml-source-generator-maven-plugin</url>
-        </site>
-    </distributionManagement>
+    
 </project>
