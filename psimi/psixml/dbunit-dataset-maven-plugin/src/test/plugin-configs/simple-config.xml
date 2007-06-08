@@ -1,0 +1,13 @@
+<project>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>dbunit-dataset-maven-plugin</artifactId>
+                <configuration>
+                    <project implementation="uk.ac.ebi.intact.dataexchange.psimi.xml.unitdataset.StubProject"/>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

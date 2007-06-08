@@ -30,6 +30,7 @@
         <module>intact-psixml-persister</module>
         <module>intact-psixml-upload-extensions</module>
         <module>intact-psixml-exchange</module>
+        <module>dbunit-dataset-maven-plugin</module>
     </modules>
 
     <dependencyManagement>
@@ -69,6 +70,11 @@
             <dependency>
                 <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
                 <artifactId>intact-psixml-upload-extensions</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+             <dependency>
+                <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
+                <artifactId>intact-psixml-exchange</artifactId>
                 <version>${currentVersion}</version>
             </dependency>
             <dependency>
