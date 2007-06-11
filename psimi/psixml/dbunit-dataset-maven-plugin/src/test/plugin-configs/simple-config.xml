@@ -5,6 +5,19 @@
                 <artifactId>dbunit-dataset-maven-plugin</artifactId>
                 <configuration>
                     <project implementation="uk.ac.ebi.intact.dataexchange.psimi.xml.unitdataset.StubProject"/>
+                    <cvConfiguration>
+                        <oboFile>src/test/resources/cv/psi-mi25-4intact.obo</oboFile>
+                        <additionalFile>src/test/resources/cv/intact-unique.csv</additionalFile>
+                        <additionalAnnotationsFile>src/test/resources/cv/additional-annotations.csv</additionalAnnotationsFile>
+                    </cvConfiguration>
+                    <datasets>
+                        <dataset>
+                            <id>test1</id>
+                            <files>
+                                <file>src/test/resources/xml/lala1.xml</file>
+                            </files>
+                        </dataset>
+                    </datasets>
                 </configuration>
             </plugin>
         </plugins>

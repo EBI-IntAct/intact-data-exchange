@@ -15,31 +15,29 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.unitdataset;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
-import org.apache.velocity.VelocityContext;
-import uk.ac.ebi.intact.plugin.IntactAbstractMojo;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.generator.SourceGenerator;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.generator.SourceGeneratorContext;
+import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
+import uk.ac.ebi.intact.plugin.MojoUtils;
+import uk.ac.ebi.intact.plugin.cv.obo.OboImportMojo;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
+import java.io.IOException;
+import java.io.File;
 
 /**
  * Generates a DBUnit-dataset from a set of PSI 2.5 xml files
  *
- * @goal generate-dataset
+ * @goal dataset
  * @phase generate-sources
+ * @requiresDependencyResolution generate-sources
  */
 public class UnitDatasetGeneratorMojo
-        extends IntactAbstractMojo {
+        extends IntactHibernateMojo {
+
+    private static final String HIBERNATE_FILE = "/META-INF/dataset-hibernate.cfg.xml";
 
     /**
      * Project instance
@@ -64,17 +62,64 @@ public class UnitDatasetGeneratorMojo
      * @parameter
      * @required
      */
-    private Collection<Dataset> datasets;
+    private List<Dataset> datasets;
+
+    /**
+     * Cv configuration
+     *
+     * @parameter
+     */
+    private CvConfiguration cvConfiguration;
 
 
     /**
      * Main execution method, which is called after hibernate has been initialized
      */
-    public void execute()
-            throws MojoExecutionException, MojoFailureException {
+    protected void executeIntactMojo() throws MojoExecutionException, MojoFailureException, IOException {
 
         getLog().info("Executing DBUnit dataset generator");
 
+        for (Dataset dataSet : datasets) {
+            System.out.println("DATASET: "+dataSet.getId());
+        }
+
+        if (cvConfiguration != null) {
+            System.out.println("OBO: "+cvConfiguration.getOboFile());
+
+            File oboFile = cvConfiguration.getOboFile();
+            File additionalFile = cvConfiguration.getAdditionalFile();
+            File additionalAnnotationsFile = cvConfiguration.getAdditionalAnnotationsFile();
+
+            checkFile(oboFile);
+
+            OboImportMojo oboImportMojo = new OboImportMojo();
+            //oboImportMojo.setHibernateConfig(getHibernateConfig());
+            oboImportMojo.setImportedOboFile(oboFile);
+
+            if (additionalFile != null) {
+                oboImportMojo.setAdditionalCsvFile(additionalFile);
+            }
+
+            if (additionalAnnotationsFile != null) {
+                oboImportMojo.setAdditionalAnnotationsCsvFile(additionalAnnotationsFile);
+            }
+
+            oboImportMojo.executeIntactMojo();
+
+        } else {
+            getLog().info("No CV configuration found. CVs won't be imported");
+        }
+
+    }
+
+    private void checkFile(File file) throws MojoExecutionException {
+        if (!file.exists()) {
+            throw new MojoExecutionException("File does not exist: "+file);
+        }
+
+        if (file.isDirectory()) {
+            throw new MojoExecutionException("File is a directory: "+file);
+        }
     }
 
     /**
@@ -84,4 +129,8 @@ public class UnitDatasetGeneratorMojo
         return project;
     }
 
+
+    public File getHibernateConfig() {
+        return new File(UnitDatasetGeneratorMojo.class.getResource(HIBERNATE_FILE).getFile());
+    }
 }

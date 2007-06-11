@@ -25,7 +25,7 @@ public class UnitDatasetGeneratorMojoTest extends AbstractMojoTestCase {
     public void testSimpleGeneration() throws Exception {
         File pluginXmlFile = new File(getBasedir(), "src/test/plugin-configs/simple-config.xml");
 
-        UnitDatasetGeneratorMojo mojo = (UnitDatasetGeneratorMojo) lookupMojo("generate-processors", pluginXmlFile);
+        UnitDatasetGeneratorMojo mojo = (UnitDatasetGeneratorMojo) lookupMojo("dataset", pluginXmlFile);
         mojo.setLog(new SystemStreamLog());
 
         mojo.execute();
