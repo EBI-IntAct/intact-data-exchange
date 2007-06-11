@@ -1,0 +1,21 @@
+<project>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>cv-maven-plugin</artifactId>
+                <configuration>
+                    <hibernateConfig>src/test/resources/uk/ac/ebi/intact/plugin/cv/hibernate.h2.cfg.xml</hibernateConfig>
+                    <outputFile>target/myOutput.log</outputFile>
+
+                    <importedOboFile>src/test/resources/uk/ac/ebi/intact/plugin/cv/obo/psi-mi25-4intact.obo</importedOboFile>
+
+                    <createdTermsFile>target/createdTerms.txt</createdTermsFile>
+                    <obsoleteTermsFile>target/obsoleteTerms.txt</obsoleteTermsFile>
+                    <orphanTermsFile>target/orphanTerms.txt</orphanTermsFile>
+                    <ontologyFile>target/ontology.txt</ontologyFile>
+                    <updatedTermsFile>target/updatedTerms.txt</updatedTermsFile>                    
+                </configuration>
+            </plugin>
+        </plugins>
+     </build>
+</project>
