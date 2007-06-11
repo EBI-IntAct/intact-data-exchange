@@ -31,6 +31,7 @@
 
     <modules>
         <module>psimi</module>
+        <module>intact-dbutils</module>
     </modules>
 
     <dependencyManagement>
