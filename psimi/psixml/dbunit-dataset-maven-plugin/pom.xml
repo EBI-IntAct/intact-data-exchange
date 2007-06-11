@@ -54,7 +54,7 @@
             <artifactId>intact-psixml-exchange</artifactId>
         </dependency>
         <dependency>
-            <groupId>uk.ac.ebi.intact.plugins</groupId>
+            <groupId>uk.ac.ebi.intact.dataexchange.plugins</groupId>
             <artifactId>cv-maven-plugin</artifactId>
         </dependency>
 

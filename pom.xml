@@ -30,9 +30,9 @@
     </scm>
 
     <modules>
-        <module>psimi</module>
         <module>intact-dbutils</module>
         <module>cv-maven-plugin</module>
+        <module>psimi</module>
     </modules>
 
     <dependencyManagement>
@@ -56,13 +56,43 @@
 
             <!-- submodules -->
             <dependency>
-                <groupId>uk.ac.ebi.intact.util</groupId>
+                <groupId>uk.ac.ebi.intact.dataexchange</groupId>
                 <artifactId>intact-dbutils</artifactId>
                 <version>${currentVersion}</version>
             </dependency>
             <dependency>
-                <groupId>uk.ac.ebi.intact.plugins</groupId>
+                <groupId>uk.ac.ebi.intact.dataexchange.plugins</groupId>
                 <artifactId>cv-maven-plugin</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
+                <artifactId>intact-psixml-commons</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
+                <artifactId>intact-psixml-processor</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
+                <artifactId>intact-psixml-converters</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
+                <artifactId>intact-psixml-persister</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
+                <artifactId>intact-psixml-upload-extensions</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
+             <dependency>
+                <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
+                <artifactId>intact-psixml-exchange</artifactId>
                 <version>${currentVersion}</version>
             </dependency>
 

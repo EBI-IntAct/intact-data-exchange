@@ -225,7 +225,7 @@ public class OboImportMojo
 
         int created = 0;
 
-        ResultSet rs = Csv.read(additionalCsvFile.toString(), null, "utf-8");
+        ResultSet rs = Csv.getInstance().read(additionalCsvFile.toString(), null, "utf-8");
 
         List<CvObject> allCvs = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getCvObjectDao().getAll();
@@ -283,7 +283,7 @@ public class OboImportMojo
 
     private void importAdditionalAnnotations() throws IOException, SQLException
     {
-        ResultSet rs = Csv.read(additionalAnnotationsCsvFile.toString(), null, "utf-8");
+        ResultSet rs = Csv.getInstance().read(additionalAnnotationsCsvFile.toString(), null, "utf-8");
 
         CvContext cvContext = IntactContext.getCurrentInstance().getCvContext();
 
