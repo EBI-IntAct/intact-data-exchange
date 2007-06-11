@@ -126,6 +126,14 @@ public class OboImportMojo
      */
     private boolean ignoreObsoletionOfObsolete;
 
+    public OboImportMojo() {
+        super();
+    }
+
+    public OboImportMojo(MavenProject project) {
+        this.project = project;
+    }
+
     /**
      * Main execution method, which is called after hibernate has been initialized
      */
@@ -153,6 +161,7 @@ public class OboImportMojo
         }
         catch (PsiLoaderException e)
         {
+            e.printStackTrace();
             throw new MojoExecutionException("Problem importing OBO file", e);
         }
 
@@ -218,6 +227,10 @@ public class OboImportMojo
 
     private void importAdditionalCVs() throws IOException, SQLException
     {
+        if (additionalCreatedFile == null) {
+            additionalCreatedFile = new File(project.getBuild().getDirectory(), "additional-imported.txt");
+        }
+
         MojoUtils.prepareFile(additionalCreatedFile);
         MojoUtils.writeStandardHeaderToFile("Additional terms created", "Terms created from CSV file: "+additionalCsvFile,
                 getProject(), additionalCreatedFile);
@@ -343,6 +356,10 @@ public class OboImportMojo
 
     private void writeUpdatedTermsFile(UpdateCVsReport report) throws IOException
     {
+        if (updatedTermsFile == null) {
+            updatedTermsFile = new File(project.getBuild().getDirectory(), "updated.txt");
+        }
+
         MojoUtils.prepareFile(updatedTermsFile);
         MojoUtils.writeStandardHeaderToFile("Updated terms", "CvObjects updated", getProject(), updatedTermsFile);
 
@@ -360,6 +377,10 @@ public class OboImportMojo
 
     private void writeCreatedTermsFile(UpdateCVsReport report) throws IOException
     {
+        if (createdTermsFile == null) {
+            createdTermsFile = new File(project.getBuild().getDirectory(), "created.txt");
+        }
+
         MojoUtils.prepareFile(createdTermsFile);
         MojoUtils.writeStandardHeaderToFile("Created terms", "New CvObjects from the OBO file that has been created",
                 getProject(), createdTermsFile);
@@ -378,6 +399,10 @@ public class OboImportMojo
 
     private void writeObsoleteTermsFile(UpdateCVsReport report) throws IOException
     {
+        if (obsoleteTermsFile == null) {
+            obsoleteTermsFile = new File(project.getBuild().getDirectory(), "obsolete.txt");
+        }
+
         MojoUtils.prepareFile(obsoleteTermsFile);
         MojoUtils.writeStandardHeaderToFile("Obsolete terms", "Obsolete terms", getProject(), obsoleteTermsFile);
 
@@ -395,6 +420,10 @@ public class OboImportMojo
 
     private void writeInvalidTermsFile(UpdateCVsReport report) throws IOException
     {
+        if (invalidTermsFile == null) {
+            invalidTermsFile = new File(project.getBuild().getDirectory(), "invalid.txt");
+        }
+
         MojoUtils.prepareFile(invalidTermsFile);
         MojoUtils.writeStandardHeaderToFile("Invalid terms", "Invalid terms\"", getProject(), invalidTermsFile);
 
@@ -412,6 +441,10 @@ public class OboImportMojo
     
     private void writeOrphanTermsFile(UpdateCVsReport report) throws IOException
     {
+        if (orphanTermsFile == null) {
+            orphanTermsFile = new File(project.getBuild().getDirectory(), "orphan.txt");
+        }
+
         MojoUtils.prepareFile(orphanTermsFile);
         MojoUtils.writeStandardHeaderToFile("Orphan terms", "The list of terms below could not be added to your IntAct node. " +
                 "These terms are obsolete in PSI-MI and the ontology doesn't keep track of the root of obsolete terms." +
@@ -432,6 +465,10 @@ public class OboImportMojo
 
     private void writeOntologyFile(UpdateCVsReport report) throws IOException
     {
+        if (ontologyFile == null) {
+            ontologyFile = new File(project.getBuild().getDirectory(), "ontology.txt");
+        }
+
         MojoUtils.prepareFile(ontologyFile);
         MojoUtils.writeStandardHeaderToFile("Ontology", "List of terms from the OBO file: "+importedOboFile,
                 getProject(), ontologyFile);

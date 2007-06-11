@@ -22,6 +22,9 @@ import org.apache.maven.project.MavenProjectHelper;
 import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
 import uk.ac.ebi.intact.plugin.MojoUtils;
 import uk.ac.ebi.intact.plugin.cv.obo.OboImportMojo;
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.business.IntactTransactionException;
+import uk.ac.ebi.intact.model.CvObject;
 
 import java.util.*;
 import java.io.IOException;
@@ -79,12 +82,15 @@ public class UnitDatasetGeneratorMojo
 
         getLog().info("Executing DBUnit dataset generator");
 
+        IntactContext context = IntactContext.getCurrentInstance();
+
+        getLog().debug("Datasets to import ("+datasets.size()+"):");
         for (Dataset dataSet : datasets) {
-            System.out.println("DATASET: "+dataSet.getId());
+            getLog().debug("\t"+dataSet.getId());
         }
 
         if (cvConfiguration != null) {
-            System.out.println("OBO: "+cvConfiguration.getOboFile());
+            getLog().debug("Importing CVs from OBO: "+cvConfiguration.getOboFile());
 
             File oboFile = cvConfiguration.getOboFile();
             File additionalFile = cvConfiguration.getAdditionalFile();
@@ -92,8 +98,7 @@ public class UnitDatasetGeneratorMojo
 
             checkFile(oboFile);
 
-            OboImportMojo oboImportMojo = new OboImportMojo();
-            //oboImportMojo.setHibernateConfig(getHibernateConfig());
+            OboImportMojo oboImportMojo = new OboImportMojo(project);
             oboImportMojo.setImportedOboFile(oboFile);
 
             if (additionalFile != null) {
@@ -106,9 +111,20 @@ public class UnitDatasetGeneratorMojo
 
             oboImportMojo.executeIntactMojo();
 
+            try {
+                context.getDataContext().commitTransaction();
+                context.getDataContext().beginTransaction();
+            } catch (IntactTransactionException e) {
+                throw new MojoExecutionException("Problem committing the transaction after importing CVs", e);
+            }
+
         } else {
             getLog().info("No CV configuration found. CVs won't be imported");
         }
+
+        getLog().info("Imported "+context.getDataContext().getDaoFactory().getCvObjectDao().countAll()+" CVs");
+
+        
 
     }
 

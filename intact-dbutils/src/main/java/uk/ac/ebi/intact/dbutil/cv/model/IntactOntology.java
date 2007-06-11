@@ -237,6 +237,14 @@ public class IntactOntology {
      * method should only be called once all CvTerm have been added.
      */
     public void updateMapping() {
+       updateMapping(System.out);
+    }
+
+    /**
+     * Uses the Mapping( CV class -> Array(MI) ) to create an other mapping CV class -> Collection( CvTerm root ). That
+     * method should only be called once all CvTerm have been added.
+     */
+    public void updateMapping(PrintStream output) {
 
         if ( ! intact2psi.isEmpty() ) {
             System.out.println( "WARNING: UpdateMapping requested, clearing existing mapping." );
@@ -271,7 +279,7 @@ public class IntactOntology {
         for ( Iterator iterator = cvTerms.iterator(); iterator.hasNext(); ) {
             CvTerm cvTerm = (CvTerm) iterator.next();
             if ( cvTerm.getChildren().isEmpty() && cvTerm.getParents().isEmpty() ) {
-                System.out.println( "Term " + cvTerm.getId() + " (" + cvTerm.getShortName() + ") is orphan." );
+                output.println( "Term " + cvTerm.getId() + " (" + cvTerm.getShortName() + ") is orphan." );
                 orphanTerms.add( cvTerm );
             }
         }

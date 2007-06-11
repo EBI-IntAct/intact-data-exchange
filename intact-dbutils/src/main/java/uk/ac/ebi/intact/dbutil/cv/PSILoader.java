@@ -352,7 +352,7 @@ public class PSILoader extends AbstractLoader {
         }
 
         // 3. Organise a mapping between IntAct CV classes and PSI-MI Terms.
-        ontology.updateMapping();
+        ontology.updateMapping(output);
 
         return ontology;
     }

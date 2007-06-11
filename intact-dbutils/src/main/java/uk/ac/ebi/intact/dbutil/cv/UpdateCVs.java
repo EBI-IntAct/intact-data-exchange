@@ -6,14 +6,17 @@
 package uk.ac.ebi.intact.dbutil.cv;
 
 import uk.ac.ebi.intact.business.IntactException;
+import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.context.CvContext;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dbutil.cv.model.*;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.persistence.dao.XrefDao;
+import uk.ac.ebi.intact.config.impl.AbstractHibernateDataConfig;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -21,6 +24,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+
+import org.hibernate.Session;
 
 /**
  * Class handling the update of CvObject.
@@ -30,6 +35,11 @@ import java.util.*;
  * @since <pre>16-Oct-2005</pre>
  */
 public class UpdateCVs {
+
+    private static CvDatabase psiMiCvDatabase;
+    private static CvXrefQualifier identityCvXrefQualifier;
+
+    private static CvObjectCache cvCache = new CvObjectCache();
 
     // TODO Check the highest IntAct ID in the CV file and synchronize the sequence.
     //      eg, create a new sequence: id = 51
@@ -167,12 +177,12 @@ public class UpdateCVs {
                     try {
                         ia = SequenceManager.getNextId();
 
-                        CvObjectXref xref = new CvObjectXref(institution, intact, ia, null, null, identity);
+                        CvObjectXref xref = new CvObjectXref(institution, intact, ia, null, null, identityCvXrefQualifier);
                         cvObject.addXref(xref);
                         IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().persist(xref);
                         output.println("\tAdded: " + xref + " to ");
                         output.println("\t\t Created Xref( " + intact.getShortLabel() + ", " +
-                                       identity.getShortLabel() + ", " + xref.getPrimaryId() + " ) (" + cvObject.getShortLabel() + ")");
+                                       identityCvXrefQualifier.getShortLabel() + ", " + xref.getPrimaryId() + " ) (" + cvObject.getShortLabel() + ")");
 
                     } catch (Exception e) {
                         output.println("ERROR: An error occured while add the IntAct id, see exception below:");
@@ -526,7 +536,7 @@ public class UpdateCVs {
         for (Iterator iterator = cvObject.getXrefs().iterator(); iterator.hasNext();) {
             Xref xref = (Xref) iterator.next();
 
-            if (psi.equals(xref.getCvDatabase()) && identity.equals(xref.getCvXrefQualifier())) {
+            if (psiMiCvDatabase.equals(xref.getCvDatabase()) && identityCvXrefQualifier.equals(xref.getCvXrefQualifier())) {
                 return xref.getPrimaryId();
             }
         }
@@ -546,7 +556,7 @@ public class UpdateCVs {
         for (Iterator iterator = cvObject.getXrefs().iterator(); iterator.hasNext();) {
             Xref xref = (Xref) iterator.next();
 
-            if (intact.equals(xref.getCvDatabase()) && identity.equals(xref.getCvXrefQualifier())) {
+            if (intact.equals(xref.getCvDatabase()) && identityCvXrefQualifier.equals(xref.getCvXrefQualifier())) {
                 return xref.getPrimaryId();
             }
         }
@@ -607,7 +617,11 @@ public class UpdateCVs {
         }
 
         // Search by MI
-        CvObject cv = null;
+        CvObject cv = cvCache.get(clazz, shortlabel);
+
+        if (cv != null) {
+            return cv;
+        }
 
         CvContext cvContext = IntactContext.getCurrentInstance().getCvContext();
 
@@ -628,7 +642,7 @@ public class UpdateCVs {
         // if still not found, then create it.
         if (cv == null) {
 
-            output.println("Not found. Then, create it");
+            output.println("Not found. Then, create it: "+shortlabel+" ("+mi+")");
 
             // create it
             try {
@@ -650,33 +664,69 @@ public class UpdateCVs {
                 // create MI Xref if necessary
                 if (mi != null && mi.startsWith("MI:")) {
 
-                    CvDatabase psi = null;
-                    if (mi.equals(CvDatabase.PSI_MI_MI_REF)) {
-                        psi = (CvDatabase) cv;
-                    } else {
-                        psi = (CvDatabase) getCvObject(CvDatabase.class,
-                                                       CvDatabase.PSI_MI,
-                                                       CvDatabase.PSI_MI_MI_REF,
-                                                       CvDatabase.PSI_MI,
-                                                       output, report);
+                    CvDatabase psi = psiMiCvDatabase;
+                    CvXrefQualifier identity = identityCvXrefQualifier;
+
+                    if (psi == null && identity == null) {
+                        if (mi.equals(CvDatabase.PSI_MI_MI_REF)) {
+                            psi = (CvDatabase) cv;
+
+                            if (psi == null) {
+                                psi = (CvDatabase) getCvObject(CvDatabase.class,
+                                                               CvDatabase.PSI_MI,
+                                                               CvDatabase.PSI_MI_MI_REF,
+                                                               CvDatabase.PSI_MI,
+                                                               output, report);
+                            }
+
+
+                        } else if (mi.equals(CvXrefQualifier.IDENTITY_MI_REF)) {
+                            identity = (CvXrefQualifier) cv;
+
+                            if (identity == null) {
+                                identity = (CvXrefQualifier) getCvObject(CvXrefQualifier.class,
+                                                                         CvXrefQualifier.IDENTITY,
+                                                                         CvXrefQualifier.IDENTITY_MI_REF,
+                                                                         "identical object",
+                                                                         output, report);
+                            }
+                        }
                     }
 
-                    CvXrefQualifier identity = null;
-                    if (mi.equals(CvXrefQualifier.IDENTITY_MI_REF)) {
-                        identity = (CvXrefQualifier) cv;
-                    } else {
-                        identity = (CvXrefQualifier) getCvObject(CvXrefQualifier.class,
-                                                                 CvXrefQualifier.IDENTITY,
-                                                                 CvXrefQualifier.IDENTITY_MI_REF,
-                                                                 "identical object",
-                                                                 output, report);
+                    // at this point, if psi or identity are null, they do not exist in the database
+                    // create them
+                    if (psi == null || identity == null) {
+                        if (psi == null) {
+                            output.println("CVDatabase does not exist and will be created: " + CvDatabase.PSI_MI + " (" + CvDatabase.PSI_MI_MI_REF + ")");
+                            psi = CvObjectUtils.createPsiMiCvDatabase(IntactContext.getCurrentInstance());
+                            psi.setFullName(defaultFullName);
+
+                            psiMiCvDatabase = psi;
+
+                           IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                                    .getCvObjectDao(CvDatabase.class).saveOrUpdate(psi);
+                        }
+                        if (identity == null) {
+                            output.println("CvXrefQualifier does not exist and will be created: " + CvXrefQualifier.IDENTITY + " (" + CvXrefQualifier.IDENTITY_MI_REF + ")");
+                            identity = CvObjectUtils.createIdentityCvXrefQualifier(IntactContext.getCurrentInstance());
+                            identity.setFullName(defaultFullName);
+
+                            identityCvXrefQualifier = identity;
+
+                             IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                                    .getCvObjectDao(CvXrefQualifier.class).saveOrUpdate(identity);
+                        }
                     }
 
+                    // add any necessary xref
                     CvObjectXref xref = new CvObjectXref(IntactContext.getCurrentInstance().getInstitution(), psi, mi, null, null, identity);
 
-                    cv.addXref(xref);
-                    IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().persist(xref);
-                    output.println("Added required PSI Xref to " + shortlabel + ": " + mi);
+                    if (!cv.getXrefs().contains(xref)) {
+                        cv.addXref(xref);
+                        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().persist(xref);
+                        output.println("Added required PSI Xref to " + shortlabel + ": " + mi);
+
+                    }
                 }
             } catch (Exception e) {
                 // that's should not happen, but just in case...
@@ -686,8 +736,12 @@ public class UpdateCVs {
             }
         }
 
+        cvCache.put(cv.getClass(), cv.getShortLabel(), cv);
+
         return cv;
     }
+
+    
 
     //////////////////////////////////////////////////
     // Management of unique Annotations and Xrefs
@@ -1321,9 +1375,7 @@ public class UpdateCVs {
         return myAnnotation;
     }
 
-    private static CvDatabase psi;
     private static CvDatabase intact;
-    private static CvXrefQualifier identity;
 
     /**
      * Assures that necessary Controlled vocabulary terms are present prior to manipulation of other terms.
@@ -1337,10 +1389,10 @@ public class UpdateCVs {
         // of psi-mi so they will be updated later.
 
         // CvXrefQualifier( identity )
-        identity = (CvXrefQualifier) getCvObject(CvXrefQualifier.class, CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, "identical object", output, report);
+        //identity = (CvXrefQualifier) getCvObject(CvXrefQualifier.class, CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, "identical object", output, report);
 
         // CvDatabase( psi-mi )
-        psi = (CvDatabase) getCvObject(CvDatabase.class, CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF, output, report);
+        //psi = (CvDatabase) getCvObject(CvDatabase.class, CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF, output, report);
 
         // CvDatabase( psi-mi )
         intact = (CvDatabase) getCvObject(CvDatabase.class, CvDatabase.INTACT, CvDatabase.INTACT_MI_REF, output, report);
@@ -1371,8 +1423,6 @@ public class UpdateCVs {
 
         // CvTopic( obsolete )
         getCvObject(CvTopic.class, CvTopic.OBSOLETE, CvTopic.OBSOLETE_MI_REF, output, report);
-
-        //IntactContext.getCurrentInstance().getDataContext().commitAllActiveTransactions();
     }
 
     /**
@@ -1635,6 +1685,13 @@ public class UpdateCVs {
         output.println("\nCreating necessary vocabulary terms...\n");
         createNecessaryCvTerms(output, report);
 
+        try {
+            IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+            IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+        } catch (IntactTransactionException e) {
+            throw new PsiLoaderException(e);
+        }
+
         // 2.5 update the CVs
         output.println("\nUpdating CVs...\n");
         update(ontology, output, report, config);
@@ -1709,6 +1766,28 @@ public class UpdateCVs {
             result = (mi != null ? mi.hashCode() : 0);
             result = 31 * result + (cv != null ? cv.hashCode() : 0);
             return result;
+        }
+    }
+
+
+    private static class CvObjectCache {
+
+        private Map<String,CvObject> cvMap;
+
+        public CvObjectCache() {
+            cvMap = new HashMap<String,CvObject>();
+        }
+
+        public CvObject get(Class cvClass, String label) {
+            return cvMap.get(toKey(cvClass, label));
+        }
+
+        public void put (Class cvClass, String label, CvObject cv) {
+            cvMap.put(toKey(cvClass, label), cv);
+        }
+
+        private String toKey(Class cvClass, String label) {
+            return cvClass.getSimpleName()+"_"+label;
         }
     }
 }
