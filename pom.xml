@@ -31,7 +31,7 @@
 
     <modules>
         <module>intact-dbutils</module>
-        <module>cv-maven-plugin</module>
+        <module>plugins</module>
         <module>psimi</module>
     </modules>
 
