@@ -1,0 +1,53 @@
+<body bgcolor="white">
+
+Handling of IntAct Controlled Vocabulary
+
+    - Support for both .def/.dag and .obo files
+    - Both parsers will use a Common data model that will be used then create/update the IntAct CVs.
+
+<pre>
+.def/.dag format:
+----------------
+
+    Documentation: http://www.geneontology.org/GO.format.shtml#goflat
+
+    one IntAct CV can come as a single .def file (non hierarchical CV)
+    one IntAct CV can come as a .def + a .dag file (hierarchical CV)
+
+OBO format:
+----------
+
+    Documentation: http://www.geneontology.org/GO.format.shtml#oboflat
+
+    The whole of the IntAct CVs come as a single obo file.
+    note: The root of the OBO hierarchy is PPI (Protein Protein Interaction)
+          Every node under the root is the root of a single IntAct CVs
+          We will maintain a Mapping of MI terms to IntAct CV, including the fact that some PSI-MI CVs are
+          not supported yet in IntAct
+
+          Exhaustive List (as of 2005-09-23)
+
+                MI:0001 (interaction detection method)                 ---->  CvInteraction
+                MI:0002 (participant identification method             ---->  CvIdentification
+                MI:0003 (feature detection)                            ---->  CvFeatureIdentification
+                MI:0116 (feature type)                                 ---->  CvFeatureType
+                MI:0190 (interaction type)                             ---->  CvInteractionType
+                MI:0300 (alias type)                                   ---->  CvAliasType
+                MI:0313 (interactor type)                              ---->  CvInteractorType
+                MI:0333 (feature range status)                         ---->  CvFuzzyType
+                MI:0346 (experimental preparation)                     ---->  ---
+                MI:0353 (cross-reference type)                         ---->  CvXrefQualifier
+                MI:0431 (obsolete)                                     ---->  ---
+                MI:0444 (database citation)                            ---->  CvDatabase
+                MI:0490 (experiment condition)                         ---->  ---
+                MI:0500 (biological role), MI:0495 (experimental role) ---->  CvComponentRole
+                MI:0505 (experimental form)                            ---->  ---
+</pre>
+
+<hr>
+
+<address>
+by Samuel Kerrien, <a href="mailto:afrie@ebi.ac.uk">skerrien@ebi.ac.uk</a>
+</address>
+
+</body>

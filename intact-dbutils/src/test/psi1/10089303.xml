@@ -1,0 +1,186 @@
+<entrySet level="1" version="1" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/xml/src/MIF.xsd">
+    <entry>
+        <source releaseDate="2006-11-24">
+            <names>
+                <shortLabel>European Bioinformatics Institute</shortLabel>
+            </names>
+            <bibref>
+                <xref>
+                    <primaryRef db="pubmed" id="14681455"/>
+                </xref>
+            </bibref>
+            <xref>
+                <primaryRef db="psi-mi" id="MI:0469"/>
+            </xref>
+            <attributeList>
+                <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United
+                    Kingdom
+                </attribute>
+                <attribute name="url">http://www.ebi.ac.uk</attribute>
+            </attributeList>
+        </source>
+        <experimentList>
+            <experimentDescription id="EBI-1027700">
+                <names>
+                    <shortLabel>liang-1999-1</shortLabel>
+                    <fullName>Refined structure of the FKBP12-rapamycin-FRB ternary complex at 2.2 A resolution.
+                    </fullName>
+                </names>
+                <bibref>
+                    <xref>
+                        <primaryRef db="pubmed" id="10089303"/>
+                    </xref>
+                </bibref>
+                <xref>
+                    <primaryRef db="intact" id="EBI-1027700" secondary="liang-1999-1"/>
+                    <secondaryRef db="newt" id="9606" secondary="human"/>
+                </xref>
+                <hostOrganism ncbiTaxId="-1">
+                    <names>
+                        <shortLabel>in vitro</shortLabel>
+                    </names>
+                </hostOrganism>
+                <interactionDetection>
+                    <names>
+                        <shortLabel>x-ray</shortLabel>
+                        <fullName>x-ray crystallography</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0114"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </interactionDetection>
+                <participantDetection>
+                    <names>
+                        <shortLabel>predetermined</shortLabel>
+                        <fullName>predetermined participant</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0396"/>
+                        <secondaryRef db="pubmed" id="7940758"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </participantDetection>
+                <attributeList>
+                    <attribute name="author-list">Liang J., Choi J., Clardy J.</attribute>
+                    <attribute name="journal">Acta Crystallogr. D Biol. Crystallogr. (0907-4449)</attribute>
+                    <attribute name="publication-year">1999</attribute>
+                    <attribute name="dataset">MSD - Data obtained from The Macromolecular Structure Database</attribute>
+                </attributeList>
+            </experimentDescription>
+        </experimentList>
+        <interactorList>
+            <proteinInteractor id="EBI-359260">
+                <names>
+                    <shortLabel>frap_human</shortLabel>
+                    <fullName>FKBP12-rapamycin complex-associated protein</fullName>
+                </names>
+                <xref>
+                    <primaryRef db="uniprotkb" id="P42345" secondary="frap_human" version="SP_47"/>
+                    <secondaryRef db="go" id="GO:0000074" secondary="P:regulation of cell cycle"/>
+                    <secondaryRef db="interpro" id="IPR011989" secondary="ARM-like"/>
+                    <secondaryRef db="interpro" id="IPR003151" secondary="FAT"/>
+                    <secondaryRef db="interpro" id="IPR003152" secondary="FATC"/>
+                    <secondaryRef db="interpro" id="IPR000357" secondary="HEAT"/>
+                    <secondaryRef db="interpro" id="IPR000403" secondary="PI3_PI4_kinase"/>
+                    <secondaryRef db="uniprotkb" id="Q6LE87" secondary="frap_human" version="SP_47"/>
+                    <secondaryRef db="interpro" id="IPR011990" secondary="TPR-like_helical"/>
+                    <secondaryRef db="uniprotkb" id="Q96QG3" secondary="frap_human" version="SP_47"/>
+                    <secondaryRef db="uniprotkb" id="Q9Y4I3" secondary="frap_human" version="SP_47"/>
+                    <secondaryRef db="go" id="GO:0005737" secondary="C:cytoplasm"/>
+                    <secondaryRef db="go" id="GO:0016020" secondary="C:membrane"/>
+                    <secondaryRef db="go" id="GO:0005942" secondary="C:phosphoinositide 3-kinase co"/>
+                    <secondaryRef db="go" id="GO:0016301" secondary="F:kinase activity"/>
+                    <secondaryRef db="go" id="GO:0051219" secondary="F:phosphoprotein binding"/>
+                    <secondaryRef db="go" id="GO:0016049" secondary="P:cell growth"/>
+                    <secondaryRef db="go" id="GO:0016310" secondary="P:phosphorylation"/>
+                    <secondaryRef db="go" id="GO:0030163" secondary="P:protein catabolism"/>
+                    <secondaryRef db="go" id="GO:0006445" secondary="P:regulation of translation"/>
+                    <secondaryRef db="go" id="GO:0007584" secondary="P:response to nutrients"/>
+                    <secondaryRef db="go" id="GO:0007165" secondary="P:signal transduction"/>
+                    <secondaryRef db="intact" id="EBI-359260" secondary="frap_human"/>
+                </xref>
+                <organism ncbiTaxId="9606">
+                    <names>
+                        <shortLabel>human</shortLabel>
+                        <fullName>Homo sapiens</fullName>
+                    </names>
+                </organism>
+                <sequence>
+                    MLGTGPAAATTAATTSSNVSVLQQFASGLKSRNEETRAKAAKELQHYVTMELREMSQEESTRFYDQLNHHIFELVSSSDANERKGGILAIASLIGVEGGNATRIGRFANYLRNLLPSNDPVVMEMASKAIGRLAMAGDTFTAEYVEFEVKRALEWLGADRNEGRRHAAVLVLRELAISVPTFFFQQVQPFFDNIFVAVWDPKQAIREGAVAALRACLILTTQREPKEMQKPQWYRHTFEEAEKGFDETLAKEKGMNRDDRIHGALLILNELVRISSMEGERLREEMEEITQQQLVHDKYCKDLMGFGTKPRHITPFTSFQAVQPQQSNALVGLLGYSSHQGLMGFGTSPSPAKSTLVESRCCRDLMEEKFDQVCQWVLKCRNSKNSLIQMTILNLLPRLAAFRPSAFTDTQYLQDTMNHVLSCVKKEKERTAAFQALGLLSVAVRSEFKVYLPRVLDIIRAALPPKDFAHKRQKAMQVDATVFTCISMLARAMGPGIQQDIKELLEPMLAVGLSPALTAVLYDLSRQIPQLKKDIQDGLLKMLSLVLMHKPLRHPGMPKGLAHQLASPGLTTLPEASDVGSITLALRTLGSFEFEGHSLTQFVRHCADHFLNSEHKEIRMEAARTCSRLLTPSIHLISGHAHVVSQTAVQVVADVLSKLLVVGITDPDPDIRYCVLASLDERFDAHLAQAENLQALFVALNDQVFEIRELAICTVGRLSSMNPAFVMPFLRKMLIQILTELEHSGIGRIKEQSARMLGHLVSNAPRLIRPYMEPILKALILKLKDPDPDPNPGVINNVLATIGELAQVSGLEMRKWVDELFIIIMDMLQDSSLLAKRQVALWTLGQLVASTGYVVEPYRKYPTLLEVLLNFLKTEQNQGTRREAIRVLGLLGALDPYKHKVNIGMIDQSRDASAVSLSESKSSQDSSDYSTSEMLVNMGNLPLDEFYPAVSMVALMRIFRDQSLSHHHTMVVQAITFIFKSLGLKCVQFLPQVMPTFLNVIRVCDGAIREFLFQQLGMLVSFVKSHIRPYMDEIVTLMREFWVMNTSIQSTIILLIEQIVVALGGEFKLYLPQLIPHMLRVFMHDNSPGRIVSIKLLAAIQLFGANLDDYLHLLLPPIVKLFDAPEAPLPSRKAALETVDRLTESLDFTDYASRIIHPIVRTLDQSPELRSTAMDTLSSLVFQLGKKYQIFIPMVNKVLVRHRINHQRYDVLICRIVKGYTLADEEEDPLIYQHRMLRSGQGDALASGPVETGPMKKLHVSTINLQKAWGAARRVSKDDWLEWLRRLSLELLKDSSSPSLRSCWALAQAYNPMARDLFNAAFVSCWSELNEDQQDELIRSIELALTSQDIAEVTQTLLNLAEFMEHSDKGPLPLRDDNGIVLLGERAAKCRAYAKALHYKELEFQKGPTPAILESLISINNKLQQPEAAAGVLEYAMKHFGELEIQATWYEKLHEWEDALVAYDKKMDTNKDDPELMLGRMRCLEALGEWGQLHQQCCEKWTLVNDETQAKMARMAAAAAWGLGQWDSMEEYTCMIPRDTHDGAFYRAVLALHQDLFSLAQQCIDKARDLLDAELTAMAGESYSRAYGAMVSCHMLSELEEVIQYKLVPERREIIRQIWWERLQGCQRIVEDWQKILMVRSLVVSPHEDMRTWLKYASLCGKSGRLALAHKTLVLLLGVDPSRQLDHPLPTVHPQVTYAYMKNMWKSARKIDAFQHMQHFVQTMQQQAQHAIATEDQQHKQELHKLMARCFLKLGEWQLNLQGINESTIPKVLQYYSAATEHDRSWYKAWHAWAVMNFEAVLHYKHQNQARDEKKKLRHASGANITNATTAATTAATATTTASTEGSNSESEAESTENSPTPSPLQKKVTEDLSKTLLMYTVPAVQGFFRSISLSRGNNLQDTLRVLTLWFDYGHWPDVNEALVEGVKAIQIDTWLQVIPQLIARIDTPRPLVGRLIHQLLTDIGRYHPQALIYPLTVASKSTTTARHNAANKILKNMCEHSNTLVQQAMMVSEELIRVAILWHEMWHEGLEEASRLYFGERNVKGMFEVLEPLHAMMERGPQTLKETSFNQAYGRDLMEAQEWCRKYMKSGNVKDLTQAWDLYYHVFRRISKQLPQLTSLELQYVSPKLLMCRDLELAVPGTYDPNQPIIRIQSIAPSLQVITSKQRPRKLTLMGSNGHEFVFLLKGHEDLRQDERVMQLFGLVNTLLANDPTSLRKNLSIQRYAVIPLSTNSGLIGWVPHCDTLHALIRDYREKKKILLNIEHRIMLRMAPDYDHLTLMQKVEVFEHAVNNTAGDDLAKLLWLKSPSSEVWFDRRTNYTRSLAVMSMVGYILGLGDRHPSNLMLDRLSGKILHIDFGDCFEVAMTREKFPEKIPFRLTRMLTNAMEVTGLDGNYRITCHTVMEVLREHKDSVMAVLEAFVYDPLLNWRLMDTNTKGNKRSRTRTDSYSAGQSVEILDGVELGEPAHKKTGTTVPESIHSFIGDGLVKPEALNKKAIQIINRVRDKLTGRDFSHDDTLDVPTQVELLIKQATSHENLCQCYIGWCPFW
+                </sequence>
+            </proteinInteractor>
+            <proteinInteractor id="EBI-1027571">
+                <names>
+                    <shortLabel>fkb1a_human</shortLabel>
+                    <fullName>FK506-binding protein 1A</fullName>
+                </names>
+                <xref>
+                    <primaryRef db="uniprotkb" id="P62942" secondary="fkb1a_human" version="SP_26"/>
+                    <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+                    <secondaryRef db="go" id="GO:0004872" secondary="F:receptor activity"/>
+                    <secondaryRef db="go" id="GO:0043123" secondary="P:positive regulation of I-kap"/>
+                    <secondaryRef db="go" id="GO:0006457" secondary="P:protein folding"/>
+                    <secondaryRef db="interpro" id="IPR001179" secondary="FKBP_PPIase"/>
+                    <secondaryRef db="uniprotkb" id="P20071" secondary="fkb1a_human" version="SP_26"/>
+                    <secondaryRef db="uniprotkb" id="Q6FGD9" secondary="fkb1a_human" version="SP_26"/>
+                    <secondaryRef db="uniprotkb" id="Q6LEU3" secondary="fkb1a_human" version="SP_26"/>
+                    <secondaryRef db="uniprotkb" id="Q9H103" secondary="fkb1a_human" version="SP_26"/>
+                    <secondaryRef db="uniprotkb" id="Q9H566" secondary="fkb1a_human" version="SP_26"/>
+                    <secondaryRef db="intact" id="EBI-1027571" secondary="fkb1a_human"/>
+                </xref>
+                <organism ncbiTaxId="9606">
+                    <names>
+                        <shortLabel>human</shortLabel>
+                        <fullName>Homo sapiens</fullName>
+                    </names>
+                </organism>
+                <sequence>
+                    GVQVETISPGDGRTFPKRGQTCVVHYTGMLEDGKKFDSSRDRNKPFKFMLGKQEVIRGWEEGVAQMSVGQRAKLTISPDYAYGATGHPGIIPPHATLVFDVELLKLE
+                </sequence>
+            </proteinInteractor>
+        </interactorList>
+        <interactionList>
+            <interaction>
+                <names>
+                    <shortLabel>fkbp1a-frap1-1</shortLabel>
+                    <fullName>The structure of the immunophilin-immunosuppressant
+                        fkbp12-(c16)-ethoxy rapamycin complex interacting with human frap
+                    </fullName>
+                </names>
+                <experimentList>
+                    <experimentRef ref="EBI-1027700"/>
+                </experimentList>
+                <participantList>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-359260"/>
+                        <role>neutral</role>
+                    </proteinParticipant>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-1027571"/>
+                        <role>neutral</role>
+                    </proteinParticipant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>aggregation</shortLabel>
+                        <fullName>aggregation</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0407"/>
+                    </xref>
+                </interactionType>
+                <xref>
+                    <primaryRef db="intact" id="EBI-1027706" secondary="fkbp1a-frap1-1"/>
+                    <secondaryRef db="rcsb pdb" id="2FAP"/>
+                </xref>
+                <attributeList>
+                    <attribute name="assembly">monomeric</attribute>
+                    <attribute name="3d-r-factors">working 80.400%, free 73.400%</attribute>
+                    <attribute name="3d-resolution">2.2A</attribute>
+                </attributeList>
+            </interaction>
+        </interactionList>
+    </entry>
+</entrySet>
