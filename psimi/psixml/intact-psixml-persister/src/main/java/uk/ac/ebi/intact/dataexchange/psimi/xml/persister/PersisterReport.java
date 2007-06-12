@@ -15,7 +15,6 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.persister;
 
-import uk.ac.ebi.intact.model.IntactObject;
 import uk.ac.ebi.intact.persistence.util.CgLibUtil;
 
 import java.util.*;
@@ -28,43 +27,43 @@ import java.util.*;
  */
 public class PersisterReport {
 
-    private Map<Class, Collection<IntactObject>> updated;
-    private Map<Class, Collection<IntactObject>> created;
-    private Map<Class, Collection<IntactObject>> ignored;
+    private Map<Class, Collection<ReportedIntactObject>> updated;
+    private Map<Class, Collection<ReportedIntactObject>> created;
+    private Map<Class, Collection<ReportedIntactObject>> ignored;
 
     public PersisterReport() {
     }
 
-    public Map<Class, Collection<IntactObject>> getCreated() {
+    public Map<Class, Collection<ReportedIntactObject>> getCreated() {
         if (created == null) {
-            created = new HashMap<Class, Collection<IntactObject>>();
+            created = new HashMap<Class, Collection<ReportedIntactObject>>();
         }
         return created;
     }
 
-    public void addCreated(IntactObject intactObject) {
+    public void addCreated(ReportedIntactObject intactObject) {
         add(intactObject, getCreated());
     }
 
-    public Map<Class, Collection<IntactObject>> getUpdated() {
+    public Map<Class, Collection<ReportedIntactObject>> getUpdated() {
         if (updated == null) {
-            updated = new HashMap<Class, Collection<IntactObject>>();
+            updated = new HashMap<Class, Collection<ReportedIntactObject>>();
         }
         return updated;
     }
 
-    public void addUpdated(IntactObject intactObject) {
+    public void addUpdated(ReportedIntactObject intactObject) {
         add(intactObject, getUpdated());
     }
 
-    public Map<Class, Collection<IntactObject>> getIgnored() {
+    public Map<Class, Collection<ReportedIntactObject>> getIgnored() {
         if (ignored == null) {
-            ignored = new HashMap<Class, Collection<IntactObject>>();
+            ignored = new HashMap<Class, Collection<ReportedIntactObject>>();
         }
         return ignored;
     }
 
-    public void addIgnored(IntactObject intactObject) {
+    public void addIgnored(ReportedIntactObject intactObject) {
         // a real ignored object cannot be in the created list (this would mean the object has been created just before,
         // so it should be considered as ignored)
         if (!mapContainsIntactObject(getCreated(), intactObject)) {
@@ -72,37 +71,37 @@ public class PersisterReport {
         }
     }
 
-    private void add(IntactObject intactObject, Map<Class, Collection<IntactObject>> map) {
+    private void add(ReportedIntactObject intactObject, Map<Class, Collection<ReportedIntactObject>> map) {
         Class key = CgLibUtil.getRealClassName(intactObject);
 
         if (map.containsKey(key)) {
             map.get(key).add(intactObject);
         } else {
-            Set<IntactObject> intactObjects = new HashSet<IntactObject>();
+            Set<ReportedIntactObject> intactObjects = new HashSet<ReportedIntactObject>();
             intactObjects.add(intactObject);
             map.put(key, intactObjects);
         }
     }
 
     public void mergeWith(PersisterReport mergeReport) {
-        for (Collection<IntactObject> intactObjects : mergeReport.getCreated().values()) {
-            for (IntactObject intactObject : intactObjects) {
+        for (Collection<ReportedIntactObject> intactObjects : mergeReport.getCreated().values()) {
+            for (ReportedIntactObject intactObject : intactObjects) {
                 addCreated(intactObject);
             }
         }
-        for (Collection<IntactObject> intactObjects : mergeReport.getUpdated().values()) {
-            for (IntactObject intactObject : intactObjects) {
+        for (Collection<ReportedIntactObject> intactObjects : mergeReport.getUpdated().values()) {
+            for (ReportedIntactObject intactObject : intactObjects) {
                 addUpdated(intactObject);
             }
         }
-        for (Collection<IntactObject> intactObjects : mergeReport.getIgnored().values()) {
-            for (IntactObject intactObject : intactObjects) {
+        for (Collection<ReportedIntactObject> intactObjects : mergeReport.getIgnored().values()) {
+            for (ReportedIntactObject intactObject : intactObjects) {
                 addIgnored(intactObject);
             }
         }
     }
 
-    private boolean mapContainsIntactObject(Map<Class, Collection<IntactObject>> map, IntactObject intactObject) {
+    private boolean mapContainsIntactObject(Map<Class, Collection<ReportedIntactObject>> map, ReportedIntactObject intactObject) {
         Class key = CgLibUtil.getRealClassName(intactObject);
 
         if (map.containsKey(key)) {
@@ -123,12 +122,12 @@ public class PersisterReport {
         return sb.toString();
     }
 
-    private String mapToString(Map<Class, Collection<IntactObject>> map) {
+    private String mapToString(Map<Class, Collection<ReportedIntactObject>> map) {
         StringBuilder sb = new StringBuilder();
 
         for (Iterator<Class> iterator = map.keySet().iterator(); iterator.hasNext();) {
             Class key = iterator.next();
-            Collection<IntactObject> intactObjects = map.get(key);
+            Collection<ReportedIntactObject> intactObjects = map.get(key);
 
             sb.append(key.getSimpleName()).append("(").append(intactObjects.size()).append(")");
 
@@ -143,4 +142,5 @@ public class PersisterReport {
 
         return sb.toString();
     }
+
 }

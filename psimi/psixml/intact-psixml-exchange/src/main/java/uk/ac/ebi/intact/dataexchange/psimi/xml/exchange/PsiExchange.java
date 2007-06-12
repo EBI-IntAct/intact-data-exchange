@@ -26,7 +26,6 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterReport;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared.EntryPersister;
 
-import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -85,6 +84,8 @@ public class PsiExchange {
             IntactEntry intactEntry = converter.psiToIntact(entry);
             PersisterReport subReport = importIntoIntact(intactEntry, dryRun);
             report.mergeWith(subReport);
+
+            context.getDataContext().flushSession();
         }
 
         return report;

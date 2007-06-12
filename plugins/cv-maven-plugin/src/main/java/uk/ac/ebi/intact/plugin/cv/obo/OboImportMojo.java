@@ -19,25 +19,24 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.h2.tools.Csv;
+import uk.ac.ebi.intact.business.IntactTransactionException;
+import uk.ac.ebi.intact.context.CvContext;
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.dbutil.cv.PsiLoaderException;
+import uk.ac.ebi.intact.dbutil.cv.UpdateCVs;
+import uk.ac.ebi.intact.dbutil.cv.UpdateCVsConfig;
+import uk.ac.ebi.intact.dbutil.cv.UpdateCVsReport;
+import uk.ac.ebi.intact.dbutil.cv.model.CvTerm;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
+import uk.ac.ebi.intact.plugin.MojoUtils;
+import uk.ac.ebi.ook.model.implementation.TermBean;
 
 import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-
-import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
-import uk.ac.ebi.intact.plugin.MojoUtils;
-import uk.ac.ebi.intact.dbutil.cv.UpdateCVs;
-import uk.ac.ebi.intact.dbutil.cv.PsiLoaderException;
-import uk.ac.ebi.intact.dbutil.cv.UpdateCVsReport;
-import uk.ac.ebi.intact.dbutil.cv.UpdateCVsConfig;
-import uk.ac.ebi.intact.dbutil.cv.model.CvTerm;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.context.CvContext;
-import uk.ac.ebi.intact.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.business.IntactTransactionException;
-import uk.ac.ebi.ook.model.implementation.TermBean;
 
 /**
  * Export an OBO file from the provided database in the hibernateConfig file
@@ -322,7 +321,7 @@ public class OboImportMojo
 
             if (cv == null)
             {
-                getLog().error("CVObject not found: " + objclass + ", with label '" + cvType + "'");
+                getLog().error("CVObject not found: " + objclass + ", with label '" + shortLabel + "'");
                 continue;
             }
 

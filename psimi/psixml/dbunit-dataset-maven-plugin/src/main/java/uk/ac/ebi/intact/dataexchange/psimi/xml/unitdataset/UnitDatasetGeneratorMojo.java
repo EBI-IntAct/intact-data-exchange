@@ -119,6 +119,7 @@ public class UnitDatasetGeneratorMojo
 
             commitTransactionAndBegin();
 
+
         } else {
             getLog().info("No CV configuration found. CVs won't be imported");
         }
@@ -135,7 +136,19 @@ public class UnitDatasetGeneratorMojo
             }
         }
 
-        getLog().info("Imported "+context.getDataContext().getDaoFactory().getInteractionDao().countAll()+" Interactions");
+        getLog().info("Imported "+context.getDataContext().getDaoFactory().getInteractionDao().countAll()+" Interactions in "+
+                      context.getDataContext().getDaoFactory().getExperimentDao().countAll() + " Experiments");
+
+
+        // create the dbunit dataset.xml
+        getLog().debug("Creating DBUnit datasets...");
+
+        createDbUnitDatasets();
+
+    }
+
+    public void createDbUnitDatasets() {
+         //for (Dataset da)
     }
 
     private void commitTransactionAndBegin() throws MojoExecutionException {

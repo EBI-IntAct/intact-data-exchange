@@ -16,13 +16,14 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared;
 
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.model.AnnotatedObject;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterReport;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.ReportedIntactObject;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.AnnotatedObjectKey;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.Key;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.service.AbstractService;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.service.AnnotatedObjectService;
+import uk.ac.ebi.intact.model.AnnotatedObject;
 
 /**
  * TODO comment this
@@ -58,7 +59,7 @@ public abstract class AbstractAnnotatedObjectPersister<T extends AnnotatedObject
             ao = intactObject;
             super.persist(ao, report);
         } else {
-            getReport().addIgnored(ao);
+            getReport().addIgnored(new ReportedIntactObject(ao));
         }
 
         intactObject = ao;

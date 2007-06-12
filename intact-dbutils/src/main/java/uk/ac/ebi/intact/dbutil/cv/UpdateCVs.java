@@ -6,7 +6,6 @@
 package uk.ac.ebi.intact.dbutil.cv;
 
 import uk.ac.ebi.intact.business.IntactException;
-import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.context.CvContext;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dbutil.cv.model.*;
@@ -16,7 +15,6 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.persistence.dao.XrefDao;
-import uk.ac.ebi.intact.config.impl.AbstractHibernateDataConfig;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -24,8 +22,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-
-import org.hibernate.Session;
 
 /**
  * Class handling the update of CvObject.
@@ -35,9 +31,6 @@ import org.hibernate.Session;
  * @since <pre>16-Oct-2005</pre>
  */
 public class UpdateCVs {
-
-    private static CvDatabase psiMiCvDatabase;
-    private static CvXrefQualifier identityCvXrefQualifier;
 
     private static CvObjectCache cvCache = new CvObjectCache();
 
@@ -97,7 +90,7 @@ public class UpdateCVs {
             update(ontology, aClass, output, report, config);
 
             // commit tx after updating each class
-            //IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+            IntactContext.getCurrentInstance().getDataContext().flushSession();
         }
     }
 
@@ -143,7 +136,7 @@ public class UpdateCVs {
          * for each
          *     check children and apply hierarchy to IntAct
          */
-        Collection<CvObject> intactTerms = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class).getAll();
+        Collection<CvObject> intactTerms = getDaoFactory().getCvObjectDao(CvObject.class).getAll();
 
         output.println("\t " + intactTerms.size() + " term(s) found in IntAct.");
 
@@ -177,12 +170,12 @@ public class UpdateCVs {
                     try {
                         ia = SequenceManager.getNextId();
 
-                        CvObjectXref xref = new CvObjectXref(institution, intact, ia, null, null, identityCvXrefQualifier);
+                        CvObjectXref xref = new CvObjectXref(institution, intact, ia, null, null, identity);
                         cvObject.addXref(xref);
-                        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().persist(xref);
+                        getDaoFactory().getXrefDao(CvObjectXref.class).persist(xref);
                         output.println("\tAdded: " + xref + " to ");
                         output.println("\t\t Created Xref( " + intact.getShortLabel() + ", " +
-                                       identityCvXrefQualifier.getShortLabel() + ", " + xref.getPrimaryId() + " ) (" + cvObject.getShortLabel() + ")");
+                                       identity.getShortLabel() + ", " + xref.getPrimaryId() + " ) (" + cvObject.getShortLabel() + ")");
 
                     } catch (Exception e) {
                         output.println("ERROR: An error occured while add the IntAct id, see exception below:");
@@ -213,7 +206,7 @@ public class UpdateCVs {
             output.println("----------------------------------------------------------------------------------");
             if (cvObject == null) {
 
-                CvObjectDao<CvObject> cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class);
+                CvObjectDao<CvObject> cvObjectDao = getDaoFactory().getCvObjectDao(CvObject.class);
 
                 String shortLabelName = AnnotatedObjectUtils.prepareShortLabel(cvTerm.getShortName());
 
@@ -315,8 +308,8 @@ public class UpdateCVs {
                     output.println("\t\t Adding Relationship[(" + dagObject.getAc() + ") " + dagObject.getShortLabel() +
                                    " ---child---> (" + intactChild.getAc() + ") " + intactChild.getShortLabel() + "]");
 
-                    IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDagObject.class).persist(dagObject);
-                    IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDagObject.class).persist(intactChild);
+                    getDaoFactory().getCvObjectDao(CvDagObject.class).persist(dagObject);
+                    getDaoFactory().getCvObjectDao(CvDagObject.class).persist(intactChild);
                 }
 
                 allChildren.remove(intactChild);
@@ -327,7 +320,7 @@ public class UpdateCVs {
                 CvDagObject child = (CvDagObject) iterator2.next();
 
                 try {
-                    Connection connection = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().connection();
+                    Connection connection = getDaoFactory().connection();
                     Statement statement = connection.createStatement();
                     statement.execute("DELETE FROM ia_cv2cv " +
                                       "WHERE parent_ac = '" + dagObject.getAc() + "' AND " +
@@ -402,7 +395,7 @@ public class UpdateCVs {
             CvTerm cvTerm = (CvTerm) iterator.next();
 
             String id = cvTerm.getId();
-            CvObject cvObject = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class).getByXref(id);
+            CvObject cvObject = getDaoFactory().getCvObjectDao(CvObject.class).getByXref(id);
 
             if (cvObject == null) {
                 missingTerms.add(cvTerm);
@@ -479,9 +472,9 @@ public class UpdateCVs {
                 // add a new one
                 Annotation annotation = new Annotation(institution, topic);
                 annotation.setAnnotationText(text);
-                IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getAnnotationDao().persist(annotation);
+                getDaoFactory().getAnnotationDao().persist(annotation);
                 cvObject.addAnnotation(annotation);
-                IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class).update(cvObject);
+                getDaoFactory().getCvObjectDao(CvObject.class).update(cvObject);
                 output.println("Added Annotation " + topic.getShortLabel() + " to '" + cvObject.getShortLabel() + "'.");
 
             } else {
@@ -501,7 +494,7 @@ public class UpdateCVs {
                     Annotation annotation = (Annotation) iterator.next();
                     String oldText = annotation.getAnnotationText();
                     annotation.setAnnotationText(text);
-                    IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getAnnotationDao().update(annotation);
+                    getDaoFactory().getAnnotationDao().update(annotation);
                     output.println("Updated " + cvObject.getShortLabel() + ", Annotation(" + topic.getShortLabel() + ")\n" +
                                    "        updated text from '" + oldText + "' to '" + text + "'.");
 
@@ -515,8 +508,8 @@ public class UpdateCVs {
                 Annotation annotation = (Annotation) iterator.next();
                 String _text = annotation.getAnnotationText();
                 cvObject.removeAnnotation(annotation);
-                IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class).update(cvObject);
-                IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getAnnotationDao().delete(annotation);
+                getDaoFactory().getCvObjectDao(CvObject.class).update(cvObject);
+                getDaoFactory().getAnnotationDao().delete(annotation);
                 output.println("Deleted redondant Annotation(" + topic.getShortLabel() +
                                ", '" + _text + "'), we want it unique and there's already one.");
             }
@@ -536,7 +529,7 @@ public class UpdateCVs {
         for (Iterator iterator = cvObject.getXrefs().iterator(); iterator.hasNext();) {
             Xref xref = (Xref) iterator.next();
 
-            if (psiMiCvDatabase.equals(xref.getCvDatabase()) && identityCvXrefQualifier.equals(xref.getCvXrefQualifier())) {
+            if (psi.equals(xref.getCvDatabase()) && identity.equals(xref.getCvXrefQualifier())) {
                 return xref.getPrimaryId();
             }
         }
@@ -556,7 +549,7 @@ public class UpdateCVs {
         for (Iterator iterator = cvObject.getXrefs().iterator(); iterator.hasNext();) {
             Xref xref = (Xref) iterator.next();
 
-            if (intact.equals(xref.getCvDatabase()) && identityCvXrefQualifier.equals(xref.getCvXrefQualifier())) {
+            if (intact.equals(xref.getCvDatabase()) && identity.equals(xref.getCvXrefQualifier())) {
                 return xref.getPrimaryId();
             }
         }
@@ -617,7 +610,7 @@ public class UpdateCVs {
         }
 
         // Search by MI
-        CvObject cv = cvCache.get(clazz, shortlabel);
+        CvObject cv = cvCache.get(clazz, mi, shortlabel);
 
         if (cv != null) {
             return cv;
@@ -655,93 +648,55 @@ public class UpdateCVs {
                 cv.setFullName(defaultFullName);
 
                 // persist it
-                IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                getDaoFactory()
                         .getCvObjectDao(clazz).persist(cv);
                 output.println("Created missing CV Term: " + getShortClassName(clazz) + "( " + cv.getShortLabel() + " - " + cv.getFullName() + " ).");
+
+                cvCache.put(clazz, mi, shortlabel, cv);
+                IntactContext.getCurrentInstance().getDataContext().flushSession();
 
                 report.addCreatedTerm(cv);
 
                 // create MI Xref if necessary
                 if (mi != null && mi.startsWith("MI:")) {
 
-                    CvDatabase psi = psiMiCvDatabase;
-                    CvXrefQualifier identity = identityCvXrefQualifier;
-
-                    if (psi == null && identity == null) {
-                        if (mi.equals(CvDatabase.PSI_MI_MI_REF)) {
-                            psi = (CvDatabase) cv;
-
-                            if (psi == null) {
-                                psi = (CvDatabase) getCvObject(CvDatabase.class,
-                                                               CvDatabase.PSI_MI,
-                                                               CvDatabase.PSI_MI_MI_REF,
-                                                               CvDatabase.PSI_MI,
-                                                               output, report);
-                            }
-
-
-                        } else if (mi.equals(CvXrefQualifier.IDENTITY_MI_REF)) {
-                            identity = (CvXrefQualifier) cv;
-
-                            if (identity == null) {
-                                identity = (CvXrefQualifier) getCvObject(CvXrefQualifier.class,
-                                                                         CvXrefQualifier.IDENTITY,
-                                                                         CvXrefQualifier.IDENTITY_MI_REF,
-                                                                         "identical object",
-                                                                         output, report);
-                            }
-                        }
+                    CvDatabase psi = null;
+                    if (mi.equals(CvDatabase.PSI_MI_MI_REF)) {
+                        psi = (CvDatabase) cv;
+                    } else {
+                        psi = (CvDatabase) getCvObject(CvDatabase.class,
+                                                       CvDatabase.PSI_MI,
+                                                       CvDatabase.PSI_MI_MI_REF,
+                                                       CvDatabase.PSI_MI,
+                                                       output, report);
                     }
 
-                    // at this point, if psi or identity are null, they do not exist in the database
-                    // create them
-                    if (psi == null || identity == null) {
-                        if (psi == null) {
-                            output.println("CVDatabase does not exist and will be created: " + CvDatabase.PSI_MI + " (" + CvDatabase.PSI_MI_MI_REF + ")");
-                            psi = CvObjectUtils.createPsiMiCvDatabase(IntactContext.getCurrentInstance());
-                            psi.setFullName(defaultFullName);
-
-                            psiMiCvDatabase = psi;
-
-                           IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                                    .getCvObjectDao(CvDatabase.class).saveOrUpdate(psi);
-                        }
-                        if (identity == null) {
-                            output.println("CvXrefQualifier does not exist and will be created: " + CvXrefQualifier.IDENTITY + " (" + CvXrefQualifier.IDENTITY_MI_REF + ")");
-                            identity = CvObjectUtils.createIdentityCvXrefQualifier(IntactContext.getCurrentInstance());
-                            identity.setFullName(defaultFullName);
-
-                            identityCvXrefQualifier = identity;
-
-                             IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                                    .getCvObjectDao(CvXrefQualifier.class).saveOrUpdate(identity);
-                        }
+                    CvXrefQualifier identity = null;
+                    if (mi.equals(CvXrefQualifier.IDENTITY_MI_REF)) {
+                        identity = (CvXrefQualifier) cv;
+                    } else {
+                        identity = (CvXrefQualifier) getCvObject(CvXrefQualifier.class,
+                                                                 CvXrefQualifier.IDENTITY,
+                                                                 CvXrefQualifier.IDENTITY_MI_REF,
+                                                                 "identical object",
+                                                                 output, report);
                     }
 
-                    // add any necessary xref
                     CvObjectXref xref = new CvObjectXref(IntactContext.getCurrentInstance().getInstitution(), psi, mi, null, null, identity);
 
-                    if (!cv.getXrefs().contains(xref)) {
-                        cv.addXref(xref);
-                        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().persist(xref);
-                        output.println("Added required PSI Xref to " + shortlabel + ": " + mi);
-
-                    }
+                    cv.addXref(xref);
+                    getDaoFactory().getXrefDao().persist(xref);
+                    output.println("Added required PSI Xref to " + shortlabel + ": " + mi);
                 }
             } catch (Exception e) {
                 // that's should not happen, but just in case...
-                e.printStackTrace();
                 throw new IntactException("Error while creating " + getShortClassName(clazz) + "(" + shortlabel +
                                           ", " + mi + ").", e);
             }
         }
 
-        cvCache.put(cv.getClass(), cv.getShortLabel(), cv);
-
         return cv;
     }
-
-    
 
     //////////////////////////////////////////////////
     // Management of unique Annotations and Xrefs
@@ -957,7 +912,7 @@ public class UpdateCVs {
 
             CvObjectXref xref = new CvObjectXref(institution, psi, id, null, null, identity);
             cvObject.addXref(xref);
-            IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().persist(xref);
+            getDaoFactory().getXrefDao().persist(xref);
             output.println("\t\t Added PSI Xref (" + id + ")");
         }
 
@@ -969,7 +924,7 @@ public class UpdateCVs {
             CvDatabase intact = (CvDatabase) getCvObject(CvDatabase.class, CvDatabase.INTACT, CvDatabase.INTACT_MI_REF, output, report);
             CvXrefQualifier identity = (CvXrefQualifier) getCvObject(CvXrefQualifier.class, CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, output, report);
 
-            Collection conflictingTerms = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class).getByXrefLike(intact, identity, id);
+            Collection conflictingTerms = getDaoFactory().getCvObjectDao(CvObject.class).getByXrefLike(intact, identity, id);
 
             for (Iterator iterator = conflictingTerms.iterator(); iterator.hasNext();) {
                 CvObject conflict = (CvObject) iterator.next();
@@ -981,14 +936,14 @@ public class UpdateCVs {
                     Iterator it = xrefs.iterator();
                     CvObjectXref xref = (CvObjectXref) it.next();
                     xref.setPrimaryId(newId);
-                    IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().update(xref);
+                    getDaoFactory().getXrefDao().update(xref);
                     output.println("Updated Xref (" + id + ") updated to " + newId + " on term '" + conflict.getShortLabel() + "'.");
 
                     while (it.hasNext()) {
                         xref = (CvObjectXref) it.next();
                         conflict.removeXref(xref);
-                        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().delete(xref);
-                        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class).update(conflict);
+                        getDaoFactory().getXrefDao().delete(xref);
+                        getDaoFactory().getCvObjectDao(CvObject.class).update(conflict);
                         output.println("Deleted additional Xref:" + xref);
                     }
                 } else {
@@ -998,12 +953,12 @@ public class UpdateCVs {
 
             CvObjectXref xref = new CvObjectXref(institution, intact, id, null, null, identity);
             cvObject.addXref(xref);
-            IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().persist(xref);
+            getDaoFactory().getXrefDao().persist(xref);
             output.println("\t\t Added IntAct Xref (" + id + ")");
         }
 
         if (needsUpdate) {
-            IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class).update(cvObject);
+            getDaoFactory().getCvObjectDao(CvObject.class).update(cvObject);
         }
 
         // Annotations
@@ -1014,6 +969,10 @@ public class UpdateCVs {
 
         // Aliases
         updateAliases(cvObject, cvTerm, output, report);
+    }
+
+    private static DaoFactory getDaoFactory() {
+        return IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
     }
 
     /**
@@ -1061,7 +1020,7 @@ public class UpdateCVs {
 
             if (topic != null) {
 
-                DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+                DaoFactory daoFactory = getDaoFactory();
 
                 if (uniqueCvTopics.contains(topic)) {
 
@@ -1165,7 +1124,7 @@ public class UpdateCVs {
         dbMapping.put("SO", CvDatabase.SO);
         dbMapping.put("GO", CvDatabase.GO);
 
-        XrefDao xrefDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao();
+        XrefDao xrefDao = getDaoFactory().getXrefDao();
         Institution institution = IntactContext.getCurrentInstance().getInstitution();
 
         // xrefs -- we don't delete any Xrefs, just adding missing ones
@@ -1323,7 +1282,7 @@ public class UpdateCVs {
 
             if (!cvObject.getAliases().contains(alias)) {
                 cvObject.addAlias(alias);
-                IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getAliasDao(CvObjectAlias.class).persist(alias);
+                getDaoFactory().getAliasDao(CvObjectAlias.class).persist(alias);
 
                 output.println("\t\t Created Alias( " + specificType.getShortLabel() + ", '" + synonym.getName() + "' )");
             }
@@ -1368,14 +1327,16 @@ public class UpdateCVs {
             System.out.println("Removing extra annotation: Annotation(" + annotation.getCvTopic().getShortLabel() + ", '" +
                                annotation.getAnnotationText() + "')");
             cvObject.removeAnnotation(annotation);
-            IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class).update(cvObject);
-            IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getAnnotationDao().delete(annotation);
+            getDaoFactory().getCvObjectDao(CvObject.class).update(cvObject);
+            getDaoFactory().getAnnotationDao().delete(annotation);
         }
 
         return myAnnotation;
     }
 
+    private static CvDatabase psi;
     private static CvDatabase intact;
+    private static CvXrefQualifier identity;
 
     /**
      * Assures that necessary Controlled vocabulary terms are present prior to manipulation of other terms.
@@ -1384,15 +1345,34 @@ public class UpdateCVs {
      *
      */
     public static void createNecessaryCvTerms(PrintStream output, UpdateCVsReport report) throws IntactException {
+        IntactContext intactContext = IntactContext.getCurrentInstance();
 
         // Note, these object are being created is they don't exist yet. They are part
         // of psi-mi so they will be updated later.
 
         // CvXrefQualifier( identity )
-        //identity = (CvXrefQualifier) getCvObject(CvXrefQualifier.class, CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, "identical object", output, report);
+        identity = intactContext.getCvContext().getByMiRef(CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF);
+
+        if (identity == null) {
+            identity = CvObjectUtils.createIdentityCvXrefQualifier(IntactContext.getCurrentInstance());
+            identity.setFullName("identical object");
+            intactContext.getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).persist(identity);
+        }
 
         // CvDatabase( psi-mi )
-        //psi = (CvDatabase) getCvObject(CvDatabase.class, CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF, output, report);
+        psi = intactContext.getCvContext().getByMiRef(CvDatabase.class, CvDatabase.PSI_MI_MI_REF);
+
+        if (psi == null) {
+            psi = CvObjectUtils.createPsiMiCvDatabase(IntactContext.getCurrentInstance());
+            psi.setFullName("psi-mi");
+            intactContext.getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).persist(psi);
+        }
+
+       intactContext.getDataContext().flushSession();
+
+        identity = (CvXrefQualifier) getCvObject(CvXrefQualifier.class, CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, "identical object", output, report);
+
+        psi = (CvDatabase) getCvObject(CvDatabase.class, CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF, output, report);
 
         // CvDatabase( psi-mi )
         intact = (CvDatabase) getCvObject(CvDatabase.class, CvDatabase.INTACT, CvDatabase.INTACT_MI_REF, output, report);
@@ -1423,6 +1403,8 @@ public class UpdateCVs {
 
         // CvTopic( obsolete )
         getCvObject(CvTopic.class, CvTopic.OBSOLETE, CvTopic.OBSOLETE_MI_REF, output, report);
+
+        intactContext.getDataContext().flushSession();
     }
 
     /**
@@ -1445,7 +1427,7 @@ public class UpdateCVs {
 
         try {
             try {
-                output.println("Database: " + IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getBaseDao().getDbName());
+                output.println("Database: " + getDaoFactory().getBaseDao().getDbName());
             }
             catch (SQLException e) {
                 e.printStackTrace();
@@ -1490,7 +1472,7 @@ public class UpdateCVs {
                     // find the CvObject
                     CvObject cv = null;
                     if (mi != null && mi.startsWith("MI:")) {
-                        cv = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class).getByXref(mi);
+                        cv = getDaoFactory().getCvObjectDao(CvObject.class).getByXref(mi);
 
                         if (cv == null) {
                             output.println("WARN: Could not find the object by the given reference: '" + mi + "'.");
@@ -1500,7 +1482,7 @@ public class UpdateCVs {
                     if (cv == null) {
                         // wasn't found using MI reference, then try shortlabel
                         if (shorltabel != null && shorltabel.trim().length() > 0) {
-                            cv = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class).getByShortLabel(shorltabel);
+                            cv = getDaoFactory().getCvObjectDao(CvObject.class).getByShortLabel(shorltabel);
                         } else {
                             throw new Exception("Line " + lineCount + ": Neither a valid shortlabel (" + shorltabel + ") " +
                                                 "nor MI ref (" + mi + ") were given, could not find the corresponding " +
@@ -1524,7 +1506,7 @@ public class UpdateCVs {
                         }
 
                         // we have the object, now build the annotation
-                        CvTopic cvTopic = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvTopic.class).getByShortLabel(topic);
+                        CvTopic cvTopic = getDaoFactory().getCvObjectDao(CvTopic.class).getByShortLabel(topic);
                         if (cvTopic == null) {
                             throw new Exception("Line " + lineCount + ": Could not find CvTopic( " + topic + " ). Skip line.");
                         }
@@ -1557,9 +1539,9 @@ public class UpdateCVs {
                             Annotation newAnnotation = new Annotation(institution, cvTopic, reason);
                             if (annot == null) {
                                 // then add the new one
-                                IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getAnnotationDao().persist(newAnnotation);
+                                getDaoFactory().getAnnotationDao().persist(newAnnotation);
                                 aTermToUpdate.addAnnotation(newAnnotation);
-                                IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvObject.class).update(aTermToUpdate);
+                                getDaoFactory().getCvObjectDao(CvObject.class).update(aTermToUpdate);
                                 output.println("\tCREATED new Annotation( " + cvTopic.getShortLabel() + ", '" + reason + "' )");
 
                             } else {
@@ -1572,7 +1554,7 @@ public class UpdateCVs {
 
                                     // do the update.
                                     annot.setAnnotationText(reason);
-                                    IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getAnnotationDao().update(annot);
+                                    getDaoFactory().getAnnotationDao().update(annot);
                                     String myClassName = type.substring(type.lastIndexOf(".") + 1, type.length());
                                     output.println("\tUPDATED Annotation( " + cvTopic.getShortLabel() + ", '" + reason + "' )");
                                 }
@@ -1635,9 +1617,9 @@ public class UpdateCVs {
         }
 
         // 2.1 Connect to the database.
-        String instanceName = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getBaseDao().getDbName();
+        String instanceName = getDaoFactory().getBaseDao().getDbName();
         System.out.println("Database: " + instanceName);
-        System.out.println("User: " + IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getBaseDao().getDbUserName());
+        System.out.println("User: " + getDaoFactory().getBaseDao().getDbUserName());
 
         load(new File(oboFilename), new File(annotFilename), System.out, new UpdateCVsConfig());
 
@@ -1685,16 +1667,11 @@ public class UpdateCVs {
         output.println("\nCreating necessary vocabulary terms...\n");
         createNecessaryCvTerms(output, report);
 
-        try {
-            IntactContext.getCurrentInstance().getDataContext().commitTransaction();
-            IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-        } catch (IntactTransactionException e) {
-            throw new PsiLoaderException(e);
-        }
-
         // 2.5 update the CVs
         output.println("\nUpdating CVs...\n");
         update(ontology, output, report, config);
+
+        IntactContext.getCurrentInstance().getDataContext().flushSession();
 
         // 2.6 Update obsolete terms
         output.println("\nUpdating Obsolete terms...\n");
@@ -1709,6 +1686,9 @@ public class UpdateCVs {
                 e.printStackTrace();
             }
         }
+
+        IntactContext.getCurrentInstance().getDataContext().flushSession();
+
 
         return report;
     }
@@ -1778,16 +1758,16 @@ public class UpdateCVs {
             cvMap = new HashMap<String,CvObject>();
         }
 
-        public CvObject get(Class cvClass, String label) {
-            return cvMap.get(toKey(cvClass, label));
+        public CvObject get(Class cvClass, String label, String mi) {
+            return cvMap.get(toKey(cvClass, mi, label));
         }
 
-        public void put (Class cvClass, String label, CvObject cv) {
-            cvMap.put(toKey(cvClass, label), cv);
+        public void put (Class cvClass, String mi, String label, CvObject cv) {
+            cvMap.put(toKey(cvClass, mi, label), cv);
         }
 
-        private String toKey(Class cvClass, String label) {
-            return cvClass.getSimpleName()+"_"+label;
+        private String toKey(Class cvClass, String mi, String label) {
+            return cvClass.getSimpleName()+"_"+mi+"_"+label;
         }
     }
 }

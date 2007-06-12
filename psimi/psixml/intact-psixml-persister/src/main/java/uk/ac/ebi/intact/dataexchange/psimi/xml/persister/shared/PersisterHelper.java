@@ -18,11 +18,11 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared;
 import net.sf.ehcache.Element;
 import uk.ac.ebi.intact.config.impl.AbstractHibernateDataConfig;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterReport;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.util.CacheContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.util.PersisterConfig;
+import uk.ac.ebi.intact.model.*;
 
 import java.util.Collection;
 
@@ -46,22 +46,26 @@ public class PersisterHelper {
             markAsSynched(intactObject, context);
         }
 
-        for (Xref xref : (Collection<Xref>) intactObject.getXrefs()) {
-            CvDatabase cvDb = (CvDatabase) cvPersister.saveOrUpdate(xref.getCvDatabase());
-            xref.setCvDatabase(cvDb);
+        try {
+            for (Xref xref : (Collection<Xref>) intactObject.getXrefs()) {
+                CvDatabase cvDb = (CvDatabase) cvPersister.saveOrUpdate(xref.getCvDatabase());
+                xref.setCvDatabase(cvDb);
 
-            if (xref.getCvXrefQualifier() != null) {
-                CvXrefQualifier cvXrefQual = (CvXrefQualifier) cvPersister.saveOrUpdate(xref.getCvXrefQualifier());
-                xref.setCvXrefQualifier(cvXrefQual);
+                if (xref.getCvXrefQualifier() != null) {
+                    CvXrefQualifier cvXrefQual = (CvXrefQualifier) cvPersister.saveOrUpdate(xref.getCvXrefQualifier());
+                    xref.setCvXrefQualifier(cvXrefQual);
+                }
             }
-        }
-        for (Alias alias : (Collection<Alias>) intactObject.getAliases()) {
-            CvAliasType cvAliasType = (CvAliasType) cvPersister.saveOrUpdate(alias.getCvAliasType());
-            alias.setCvAliasType(cvAliasType);
-        }
-        for (Annotation annotation : (Collection<Annotation>) intactObject.getAnnotations()) {
-            CvTopic cvTopic = (CvTopic) cvPersister.saveOrUpdate(annotation.getCvTopic());
-            annotation.setCvTopic(cvTopic);
+            for (Alias alias : (Collection<Alias>) intactObject.getAliases()) {
+                CvAliasType cvAliasType = (CvAliasType) cvPersister.saveOrUpdate(alias.getCvAliasType());
+                alias.setCvAliasType(cvAliasType);
+            }
+            for (Annotation annotation : (Collection<Annotation>) intactObject.getAnnotations()) {
+                CvTopic cvTopic = (CvTopic) cvPersister.saveOrUpdate(annotation.getCvTopic());
+                annotation.setCvTopic(cvTopic);
+            }
+        } catch (Throwable t) {
+            throw new PersisterException("Exception syncing: "+intactObject.getShortLabel()+" ("+intactObject.getAc()+")", t);
         }
 
         return cvPersister.getReport();

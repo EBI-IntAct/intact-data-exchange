@@ -16,12 +16,12 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared;
 
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.commons.model.IntactEntry;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.Persister;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterReport;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.util.CacheContext;
+import uk.ac.ebi.intact.model.Interaction;
 
 import java.util.ArrayList;
 import java.util.List;

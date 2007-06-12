@@ -16,11 +16,11 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared;
 
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.CvObjectKey;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.Key;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.service.AbstractService;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.service.CvService;
+import uk.ac.ebi.intact.model.CvObject;
 
 /**
  * TODO comment this
@@ -36,6 +36,10 @@ public class CvPersister<T extends CvObject> extends AbstractAnnotatedObjectPers
 
     @Override
     protected Key generateKey(T intactObject) {
+        if (intactObject == null) {
+            throw new NullPointerException("intactObject");
+        }
+
         return new CvObjectKey(intactObject);
     }
 

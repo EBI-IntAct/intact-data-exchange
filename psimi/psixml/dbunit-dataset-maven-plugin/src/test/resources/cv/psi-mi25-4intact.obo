@@ -5915,7 +5915,7 @@ is_a: MI:0179 ! other modification
 id: MI:0833
 name: autoradiography
 def: "Experimental method by which radiolabel is detected by exposure to a photographic emulsion forming a pattern on the film." [pubmed:14755292 "primary-reference"]
-exact_synonym: "full dna sequence" []
+exact_synonym: "autoradiography" []
 is_a: MI:0078 ! nucleotide sequence identification
 is_a: MI:0659 ! experimental feature detection
 

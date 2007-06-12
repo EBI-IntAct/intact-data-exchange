@@ -17,11 +17,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.service;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.CvObjectKey;
 import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.persistence.dao.AnnotatedObjectDao;
-import uk.ac.ebi.intact.persistence.util.CgLibUtil;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.CvObjectKey;
 
 /**
  * TODO comment this
@@ -30,6 +31,8 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.CvObjectKey;
  * @version $Id$
  */
 public class CvService<T extends CvObject> extends AnnotatedObjectService<T, CvObjectKey> {
+
+    private static final Log log = LogFactory.getLog(CvService.class);
 
     public CvService(IntactContext intactContext) {
         super(intactContext);
@@ -42,16 +45,24 @@ public class CvService<T extends CvObject> extends AnnotatedObjectService<T, CvO
 
     @Override
     protected T fetchFromDb(CvObjectKey key) {
-        CvObject cvObjToFetch = (CvObject) key.getElement().getValue();
+        String miRef = key.getPrimaryId();
+        String label = key.getShortLabel();
+        Class clazz = key.getCvClass();
 
-        String miRef = (String) key.getElement().getKey();
-        Class clazz = CgLibUtil.removeCglibEnhanced(cvObjToFetch.getClass());
-
-        if (miRef == null) {
-            throw new NullPointerException("Trying to fetch a CV with a null PSI MI: " + key.getElement().getValue());
+        T cv;
+        if (miRef != null) {
+            cv = (T) getIntactContext().getCvContext().getByMiRef(clazz, miRef);
+        } else {
+            cv = (T) getIntactContext().getCvContext().getByLabel(clazz, label);
         }
 
-        T cv = (T) getIntactContext().getCvContext().getByMiRef(clazz, miRef);
+        if (log.isDebugEnabled()) {
+            if (cv != null) {
+                log.debug("CvObject Fetched from CvContext: "+cv.getShortLabel()+ "("+miRef+")");
+            } else {
+                log.debug("CvObject not found in CvContext: "+miRef);
+            }
+        }
 
         return cv;
     }

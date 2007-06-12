@@ -18,12 +18,13 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.model.AnnotatedObject;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.Persister;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterReport;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.ReportedIntactObject;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.service.AbstractService;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.util.PersisterConfig;
+import uk.ac.ebi.intact.model.AnnotatedObject;
 
 /**
  * TODO comment this
@@ -53,7 +54,7 @@ public abstract class AbstractPersister<T extends AnnotatedObject> implements Pe
         if (!PersisterConfig.isDryRun(getIntactContext())) {
             getService().persist(intactObject);
         }
-        report.addCreated(intactObject);
+        report.addCreated(new ReportedIntactObject(intactObject));
     }
 
     protected boolean isDryRun() {
