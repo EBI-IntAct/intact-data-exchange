@@ -19,16 +19,18 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
-import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
-import uk.ac.ebi.intact.plugin.MojoUtils;
-import uk.ac.ebi.intact.plugin.cv.obo.OboImportMojo;
-import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.business.IntactTransactionException;
-import uk.ac.ebi.intact.model.CvObject;
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.PsiExchange;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
+import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
+import uk.ac.ebi.intact.plugin.cv.obo.OboImportMojo;
 
-import java.util.*;
-import java.io.IOException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Generates a DBUnit-dataset from a set of PSI 2.5 xml files
@@ -82,6 +84,10 @@ public class UnitDatasetGeneratorMojo
 
         getLog().info("Executing DBUnit dataset generator");
 
+        if (datasets.isEmpty()) {
+            throw new MojoFailureException("No datasets to import");
+        }
+
         IntactContext context = IntactContext.getCurrentInstance();
 
         getLog().debug("Datasets to import ("+datasets.size()+"):");
@@ -111,12 +117,7 @@ public class UnitDatasetGeneratorMojo
 
             oboImportMojo.executeIntactMojo();
 
-            try {
-                context.getDataContext().commitTransaction();
-                context.getDataContext().beginTransaction();
-            } catch (IntactTransactionException e) {
-                throw new MojoExecutionException("Problem committing the transaction after importing CVs", e);
-            }
+            commitTransactionAndBegin();
 
         } else {
             getLog().info("No CV configuration found. CVs won't be imported");
@@ -124,8 +125,36 @@ public class UnitDatasetGeneratorMojo
 
         getLog().info("Imported "+context.getDataContext().getDaoFactory().getCvObjectDao().countAll()+" CVs");
 
-        
+        getLog().debug("Starting to import Datasets...");
 
+        for (Dataset dataset : datasets) {
+            try {
+                importDataset(dataset);
+            } catch (PersisterException e) {
+                throw new MojoExecutionException("Problem importing dataset: "+dataset.getId(), e);
+            }
+        }
+
+        getLog().info("Imported "+context.getDataContext().getDaoFactory().getInteractionDao().countAll()+" Interactions");
+    }
+
+    private void commitTransactionAndBegin() throws MojoExecutionException {
+        IntactContext context = IntactContext.getCurrentInstance();
+         try {
+                context.getDataContext().commitTransaction();
+                context.getDataContext().beginTransaction();
+            } catch (IntactTransactionException e) {
+                throw new MojoExecutionException("Problem committing the transaction after importing CVs", e);
+            }
+    }
+
+    private void importDataset(Dataset dataset) throws FileNotFoundException, PersisterException, MojoExecutionException {
+        for (File psiFile : dataset.getFiles()) {
+            checkFile(psiFile);
+            PsiExchange.importIntoIntact(new FileInputStream(psiFile), false);
+
+            commitTransactionAndBegin();
+        }
     }
 
     private void checkFile(File file) throws MojoExecutionException {

@@ -14,7 +14,7 @@
                         <dataset>
                             <id>test1</id>
                             <files>
-                                <file>src/test/resources/xml/lala1.xml</file>
+                                <file>src/test/resources/xml/intact_2006-07-19.xml</file>
                             </files>
                         </dataset>
                     </datasets>
