@@ -88,15 +88,19 @@ public class UnitDatasetGeneratorMojo
             throw new MojoFailureException("No datasets to import");
         }
 
+        getLog().debug("Datasets to import ("+datasets.size()+"):");
+        for (Dataset dataset : datasets) {
+            getLog().debug("\tProcessing dataset: "+dataset.getId());
+
+            processDataset(dataset);
+        }
+    }
+
+    public void processDataset(Dataset dataset) throws MojoExecutionException, MojoFailureException {
         IntactContext context = IntactContext.getCurrentInstance();
 
-        getLog().debug("Datasets to import ("+datasets.size()+"):");
-        for (Dataset dataSet : datasets) {
-            getLog().debug("\t"+dataSet.getId());
-        }
-
-        if (cvConfiguration != null) {
-            getLog().debug("Importing CVs from OBO: "+cvConfiguration.getOboFile());
+         if (cvConfiguration != null) {
+            getLog().debug("\tImporting CVs from OBO: "+cvConfiguration.getOboFile());
 
             File oboFile = cvConfiguration.getOboFile();
             File additionalFile = cvConfiguration.getAdditionalFile();
@@ -115,9 +119,13 @@ public class UnitDatasetGeneratorMojo
                 oboImportMojo.setAdditionalAnnotationsCsvFile(additionalAnnotationsFile);
             }
 
-            oboImportMojo.executeIntactMojo();
+             try {
+                 oboImportMojo.executeIntactMojo();
+             } catch (IOException e) {
+                 throw new MojoExecutionException("Problems importing CVs", e);
+             }
 
-            commitTransactionAndBegin();
+             commitTransactionAndBegin();
 
 
         } else {
@@ -126,28 +134,26 @@ public class UnitDatasetGeneratorMojo
 
         getLog().info("Imported "+context.getDataContext().getDaoFactory().getCvObjectDao().countAll()+" CVs");
 
-        getLog().debug("Starting to import Datasets...");
+        getLog().debug("\tStarting to import Dataset...");
 
-        for (Dataset dataset : datasets) {
-            try {
-                importDataset(dataset);
-            } catch (PersisterException e) {
-                throw new MojoExecutionException("Problem importing dataset: "+dataset.getId(), e);
-            }
+        try {
+            importDataset(dataset);
+        } catch (Exception e) {
+            throw new MojoExecutionException("Exception importing dataset: "+dataset.getId(),e);
         }
+
 
         getLog().info("Imported "+context.getDataContext().getDaoFactory().getInteractionDao().countAll()+" Interactions in "+
                       context.getDataContext().getDaoFactory().getExperimentDao().countAll() + " Experiments");
 
 
         // create the dbunit dataset.xml
-        getLog().debug("Creating DBUnit datasets...");
+        getLog().debug("\tCreating DBUnit dataset...");
 
-        createDbUnitDatasets();
-
+        createDbUnitForDataset(dataset);
     }
 
-    public void createDbUnitDatasets() {
+    public void createDbUnitForDataset(Dataset dataset) {
          //for (Dataset da)
     }
 
