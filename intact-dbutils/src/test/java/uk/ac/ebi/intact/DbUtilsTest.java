@@ -15,9 +15,11 @@
  */
 package uk.ac.ebi.intact;
 
+import org.junit.Ignore;
+import org.junit.Test;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dbutil.DbUtils;
 import uk.ac.ebi.intact.util.filter.XmlUrlFilter;
-import uk.ac.ebi.intact.context.IntactContext;
 
 import java.net.URL;
 
@@ -29,7 +31,9 @@ import java.net.URL;
  */
 public class DbUtilsTest
 {
-    public static void main(String[] args) throws Exception
+    @Test
+    @Ignore
+    public void generalTest() throws Exception
     {
         //DbUtils.createOrUpdateCvObjects();
 
