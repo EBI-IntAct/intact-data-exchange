@@ -41,6 +41,12 @@ public class Dataset {
     private String type = "xml";
 
     /**
+     * Whether the dataset will contain all the available CVs (from the OBO file)
+     * @parameter default-value="false"
+     */
+    private boolean containsAllCVs = false;
+
+    /**
      * PSI MI 2.5 Xml files to import
      */
     private File[] files;
@@ -71,5 +77,20 @@ public class Dataset {
 
     public void setFiles(File[] files) {
         this.files = files;
+    }
+
+    public boolean isContainsAllCVs()
+    {
+        return containsAllCVs;
+    }
+
+    public void setContainsAllCVs(boolean containsAllCVs)
+    {
+        this.containsAllCVs = containsAllCVs;
+    }
+
+    public String toString()
+    {
+        return id;
     }
 }

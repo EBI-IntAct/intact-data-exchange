@@ -19,18 +19,37 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.VelocityEngine;
+import org.dbunit.database.DatabaseConfig;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.database.QueryDataSet;
+import org.dbunit.dataset.DataSetException;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.ext.hsqldb.HsqldbDataTypeFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
 import uk.ac.ebi.intact.business.IntactTransactionException;
+import uk.ac.ebi.intact.commons.util.TestDataset;
+import uk.ac.ebi.intact.config.impl.AbstractHibernateDataConfig;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.PsiExchange;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
 import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
+import uk.ac.ebi.intact.plugin.MojoUtils;
 import uk.ac.ebi.intact.plugin.cv.obo.OboImportMojo;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Generates a DBUnit-dataset from a set of PSI 2.5 xml files
@@ -43,6 +62,8 @@ public class UnitDatasetGeneratorMojo
         extends IntactHibernateMojo {
 
     private static final String HIBERNATE_FILE = "/META-INF/dataset-hibernate.cfg.xml";
+    private static final String ENUM_NAME = "PsiUnitDataset";
+    private static final String ENUM_TEMPLATE = "PsiUnitDataset.vm";
 
     /**
      * Project instance
@@ -76,6 +97,10 @@ public class UnitDatasetGeneratorMojo
      */
     private CvConfiguration cvConfiguration;
 
+    /**
+     * @parameter default-value="uk.ac.ebi.intact.unitdataset"
+     */
+    private String generatedPackage = "uk.ac.ebi.intact.unitdataset";
 
     /**
      * Main execution method, which is called after hibernate has been initialized
@@ -94,67 +119,169 @@ public class UnitDatasetGeneratorMojo
 
             processDataset(dataset);
         }
+
+        getLog().debug("Creating enum class");
+        try
+        {
+            generateDatasetEnum();
+        }
+        catch (Exception e)
+        {
+            throw new MojoExecutionException("Problem generating enum class", e);
+        }
+
+        // add the resources into the classpath
+        List includes = Collections.singletonList("*/**");
+        List excludes = null;
+        helper.addResource(project, getGeneratedResourcesDir().toString(), includes, excludes);
+    }
+
+    public boolean idIsInvalid(String id) {
+        return (id.contains(" ")
+                || id.contains(",")
+                || id.contains("."));
     }
 
     public void processDataset(Dataset dataset) throws MojoExecutionException, MojoFailureException {
         IntactContext context = IntactContext.getCurrentInstance();
 
-         if (cvConfiguration != null) {
-            getLog().debug("\tImporting CVs from OBO: "+cvConfiguration.getOboFile());
+        if (idIsInvalid(dataset.getId())) {
+            throw new MojoExecutionException("Dataset with invalid id (it must not contain spaces or punctuation - except underscore): "+dataset.getId());
+        }
 
-            File oboFile = cvConfiguration.getOboFile();
-            File additionalFile = cvConfiguration.getAdditionalFile();
-            File additionalAnnotationsFile = cvConfiguration.getAdditionalAnnotationsFile();
+        if (dataset.isContainsAllCVs()) {
+             if (cvConfiguration != null) {
+                getLog().debug("\tImporting CVs from OBO: "+cvConfiguration.getOboFile());
 
-            checkFile(oboFile);
+                File oboFile = cvConfiguration.getOboFile();
+                File additionalFile = cvConfiguration.getAdditionalFile();
+                File additionalAnnotationsFile = cvConfiguration.getAdditionalAnnotationsFile();
 
-            OboImportMojo oboImportMojo = new OboImportMojo(project);
-            oboImportMojo.setImportedOboFile(oboFile);
+                checkFile(oboFile);
 
-            if (additionalFile != null) {
-                oboImportMojo.setAdditionalCsvFile(additionalFile);
+                OboImportMojo oboImportMojo = new OboImportMojo(project);
+                oboImportMojo.setImportedOboFile(oboFile);
+
+                if (additionalFile != null) {
+                    oboImportMojo.setAdditionalCsvFile(additionalFile);
+                }
+
+                if (additionalAnnotationsFile != null) {
+                    oboImportMojo.setAdditionalAnnotationsCsvFile(additionalAnnotationsFile);
+                }
+
+                 try {
+                     oboImportMojo.executeIntactMojo();
+                 } catch (IOException e) {
+                     throw new MojoExecutionException("Problems importing CVs", e);
+                 }
+
+                 commitTransactionAndBegin();
+
+
+            } else {
+                getLog().info("No CV configuration found. CVs won't be imported");
             }
 
-            if (additionalAnnotationsFile != null) {
-                oboImportMojo.setAdditionalAnnotationsCsvFile(additionalAnnotationsFile);
-            }
-
-             try {
-                 oboImportMojo.executeIntactMojo();
-             } catch (IOException e) {
-                 throw new MojoExecutionException("Problems importing CVs", e);
-             }
-
-             commitTransactionAndBegin();
-
-
+            getLog().debug("\t\tImported "+context.getDataContext().getDaoFactory().getCvObjectDao().countAll()+" CVs");
         } else {
-            getLog().info("No CV configuration found. CVs won't be imported");
+            getLog().debug("\tNot importing all CVs");
         }
 
-        getLog().info("Imported "+context.getDataContext().getDaoFactory().getCvObjectDao().countAll()+" CVs");
+        if (dataset.getFiles() != null) {
+            getLog().debug("\tStarting to import dataset files...");
 
-        getLog().debug("\tStarting to import Dataset...");
+            try {
+                importDataset(dataset);
+            } catch (Exception e) {
+                throw new MojoExecutionException("Exception importing dataset: "+dataset.getId(),e);
+            }
+            getLog().debug("\t\tImported "+context.getDataContext().getDaoFactory().getInteractionDao().countAll()+" Interactions in "+
+                    context.getDataContext().getDaoFactory().getExperimentDao().countAll() + " Experiments");
 
-        try {
-            importDataset(dataset);
-        } catch (Exception e) {
-            throw new MojoExecutionException("Exception importing dataset: "+dataset.getId(),e);
+            commitTransactionAndBegin();
+            
+        } else {
+            getLog().debug("\tNo dataset files to import");
         }
-
-
-        getLog().info("Imported "+context.getDataContext().getDaoFactory().getInteractionDao().countAll()+" Interactions in "+
-                      context.getDataContext().getDaoFactory().getExperimentDao().countAll() + " Experiments");
-
 
         // create the dbunit dataset.xml
         getLog().debug("\tCreating DBUnit dataset...");
 
-        createDbUnitForDataset(dataset);
+        try {
+            IDataSet dbUnitDataSet = createDbUnitForDataset(dataset);
+            exportDbUnitDataSetToFile(dbUnitDataSet, getDbUnitFileForDataset(dataset));
+
+            // truncate tables after export, so next datasets have a clean db
+            truncateTables();
+            
+        } catch (Exception e) {
+            throw new MojoExecutionException("Exception creating dbUnit dataset", e);
+        }
     }
 
-    public void createDbUnitForDataset(Dataset dataset) {
-         //for (Dataset da)
+    public IDataSet createDbUnitForDataset(Dataset dataset) throws SQLException {
+        Connection con = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().connection();
+
+        ResultSet tables = con.getMetaData().getTables(null, null, "IA_%", new String[]{"TABLE"});
+        QueryDataSet allTablesDataSet = new QueryDataSet(getDatabaseConnection());
+        while (tables.next())
+        {
+            String tableName = tables.getString(3);
+            allTablesDataSet.addTable(tableName);
+        }
+
+        return allTablesDataSet;
+    }
+
+    public IDatabaseConnection getDatabaseConnection() {
+        IntactContext context = IntactContext.getCurrentInstance();
+
+        Connection con = context.getDataContext().getDaoFactory().connection();
+        IDatabaseConnection connection = new DatabaseConnection(con);
+
+        DatabaseConfig config = connection.getConfig();
+        config.setProperty( DatabaseConfig.PROPERTY_DATATYPE_FACTORY,new HsqldbDataTypeFactory() );
+
+        return connection;
+    }
+
+    public void exportDbUnitDataSetToFile(IDataSet dataset, File file) throws IOException, DataSetException {
+        FlatXmlDataSet.write( dataset, new FileOutputStream(file));
+    }
+
+    public void truncateTables() throws MojoExecutionException {
+        commitTransactionAndBegin();
+        Configuration cfg = ((AbstractHibernateDataConfig)IntactContext.getCurrentInstance().getConfig().getDefaultDataConfig()).getConfiguration();
+        SchemaExport schemaExport = new SchemaExport(cfg);
+        schemaExport.drop(false, true);
+        commitTransactionAndBegin();
+        schemaExport.create(false, true);
+        commitTransactionAndBegin();
+    }
+
+    public void generateDatasetEnum() throws Exception {
+        // create velocity context
+        VelocityContext context = new VelocityContext();
+        context.put("mojo", this);
+        context.put("artifactId", project.getArtifactId());
+        context.put("version", project.getVersion());
+        context.put("classSimpleName", ENUM_NAME);
+        context.put("interfaceName", TestDataset.class.getName());
+        context.put("datasets", datasets);
+
+        Properties props = new Properties();
+        props.setProperty("resource.loader", "class");
+        props.setProperty("class." + VelocityEngine.RESOURCE_LOADER + ".class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+
+        Velocity.init(props);
+
+        Template template = Velocity.getTemplate(ENUM_TEMPLATE);
+
+        // write the resulting file with velocity
+        Writer writer = new FileWriter(getGeneratedEnumFile());
+        template.merge(context, writer);
+        writer.close();
     }
 
     private void commitTransactionAndBegin() throws MojoExecutionException {
@@ -186,6 +313,29 @@ public class UnitDatasetGeneratorMojo
         }
     }
 
+    private File getDbUnitFileForDataset(Dataset dataset) throws IOException {
+        File file = new File(getGeneratePackageFile(), dataset.getId()+".xml");
+        MojoUtils.prepareFile(file);
+        return file;
+    }
+
+    private File getGeneratedResourcesDir() {
+        return new File(project.getBuild().getDirectory(), "datasets/");
+    }
+
+    private File getGeneratePackageFile() throws IOException {
+        String strFile = getGeneratedPackage().replaceAll("\\.", "/");
+        File file = new File(getGeneratedResourcesDir(), strFile+"/");
+        MojoUtils.prepareFile(file);
+        return file;
+    }
+
+    private File getGeneratedEnumFile() throws IOException {
+        File file = new File(getGeneratePackageFile(), ENUM_NAME+".java");
+        MojoUtils.prepareFile(file);
+        return file;
+    }
+
     /**
      * Implementation of abstract method from superclass
      */
@@ -193,8 +343,32 @@ public class UnitDatasetGeneratorMojo
         return project;
     }
 
-
     public File getHibernateConfig() {
         return new File(UnitDatasetGeneratorMojo.class.getResource(HIBERNATE_FILE).getFile());
+    }
+
+    public String getGeneratedPackage()
+    {
+        return generatedPackage;
+    }
+
+    public List<Dataset> getDatasets()
+    {
+        return datasets;
+    }
+
+    public void setDatasets(List<Dataset> datasets)
+    {
+        this.datasets = datasets;
+    }
+
+    public CvConfiguration getCvConfiguration()
+    {
+        return cvConfiguration;
+    }
+
+    public void setCvConfiguration(CvConfiguration cvConfiguration)
+    {
+        this.cvConfiguration = cvConfiguration;
     }
 }

@@ -1,0 +1,29 @@
+package $mojo.generatedPackage;
+
+public enum $classSimpleName implements $interfaceName {
+
+#foreach( $dataset in $mojo.datasets )
+      $dataset ("$dataset")#if ( $velocityCount > 1 ) , #end
+#end
+      ;
+
+      private String id;
+      private boolean allCVs;
+
+      private $classSimpleName(String id, boolean allCVs) {
+          this.id = id;
+          this.allCVs = allCVs;
+      }
+
+      public String getId() {
+          return id;
+      }
+
+      public URL getResource() {
+          return ${classSimpleName}.class.getResource(id+".xml");
+      }
+
+      public boolean containsAllCVs() {
+          return allCVs;
+      }
+}

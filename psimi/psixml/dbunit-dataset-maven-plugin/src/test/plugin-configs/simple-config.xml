@@ -12,9 +12,19 @@
                     </cvConfiguration>
                     <datasets>
                         <dataset>
-                            <id>test1</id>
+                            <id>ALL_CVS</id>
+                            <containsAllCVs>true</containsAllCVs>
+                        </dataset>
+                        <dataset>
+                            <id>INTACT_JUL_06</id>
                             <files>
                                 <file>src/test/resources/xml/intact_2006-07-19.xml</file>
+                            </files>
+                        </dataset>
+                        <dataset>
+                            <id>MINT_JUL_06</id>
+                            <files>
+                                <file>src/test/resources/xml/mint_2006-07-18.xml</file>
                             </files>
                         </dataset>
                     </datasets>
