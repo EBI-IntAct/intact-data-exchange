@@ -29,7 +29,7 @@ import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.commons.model.IntactEntry;
+import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidatorMessage;
