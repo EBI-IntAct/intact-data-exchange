@@ -19,8 +19,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.commons.model.IntactEntry;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.commons.model.IntactEntryFactory;
+import uk.ac.ebi.intact.model.IntactEntry;
+import uk.ac.ebi.intact.persistence.dao.entry.IntactEntryFactory;
 
 import java.io.StringWriter;
 
