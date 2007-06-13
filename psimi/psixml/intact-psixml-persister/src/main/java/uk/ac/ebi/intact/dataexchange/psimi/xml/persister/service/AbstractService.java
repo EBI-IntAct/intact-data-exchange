@@ -17,15 +17,18 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.service;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.model.AnnotatedObject;
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.AnnotatedObjectKey;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.Key;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared.PersisterHelper;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.util.CacheContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.util.PersisterConfig;
+import uk.ac.ebi.intact.model.AnnotatedObject;
+import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.Xref;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -37,6 +40,8 @@ import java.util.Collection;
  * @version $Id$
  */
 public abstract class AbstractService<T extends AnnotatedObject, K extends Key> implements Serializable {
+
+    private static final Log log = LogFactory.getLog(AbstractService.class);
 
     private IntactContext intactContext;
     private CacheContext cacheContext;
@@ -123,4 +128,28 @@ public abstract class AbstractService<T extends AnnotatedObject, K extends Key> 
         }
         return institution;
     }
+
+    protected Element createElement(T object) {
+        return new AnnotatedObjectKey(object).getElement();
+    }
+
+    protected boolean isAlreadyInCache(T annotObject) {
+        Object key = createElement(annotObject).getKey();
+        Cache cache = getCache(annotObject.getClass());
+
+        if (log.isTraceEnabled()) log.trace("\tTrying cache "+cache.getName()+" for key: "+key);
+
+        return (cache.get(key) != null);
+
+    }
+
+    protected void putInCache(T annotObject) {
+        Cache cache = getCache(annotObject.getClass());
+        Element elemenet = createElement(annotObject);
+
+        if (log.isTraceEnabled()) log.trace("\tPutting element in cache "+cache.getName()+" with key: "+elemenet.getKey());
+
+        cache.put(elemenet);
+    }
+    
 }

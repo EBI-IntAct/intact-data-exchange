@@ -44,6 +44,11 @@
                 <version>1.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
+                <groupId>uk.ac.ebi.intact.core</groupId>
+                <artifactId>intact-annotations</artifactId>
+                <version>1.6.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>uk.ac.ebi.intact.commons</groupId>
                 <artifactId>intact-commons</artifactId>
                 <version>2.0.1-SNAPSHOT</version>
@@ -58,11 +63,6 @@
             <dependency>
                 <groupId>uk.ac.ebi.intact.dataexchange.plugins</groupId>
                 <artifactId>cv-maven-plugin</artifactId>
-                <version>${currentVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-                <artifactId>intact-psixml-commons</artifactId>
                 <version>${currentVersion}</version>
             </dependency>
             <dependency>

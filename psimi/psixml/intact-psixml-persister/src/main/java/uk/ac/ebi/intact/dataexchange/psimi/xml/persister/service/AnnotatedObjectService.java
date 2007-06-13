@@ -15,12 +15,15 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.service;
 
-import net.sf.ehcache.Element;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.model.AnnotatedObject;
-import uk.ac.ebi.intact.persistence.dao.AnnotatedObjectDao;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.AnnotatedObjectKey;
+import uk.ac.ebi.intact.model.AnnotatedObject;
+import uk.ac.ebi.intact.model.CvObject;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.persistence.dao.AnnotatedObjectDao;
 
 /**
  * TODO comment this
@@ -30,18 +33,29 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.AnnotatedObjectKey;
  */
 public class AnnotatedObjectService<A extends AnnotatedObject, K extends AnnotatedObjectKey> extends AbstractService<A, K> {
 
+    private static final Log log = LogFactory.getLog(AnnotatedObjectService.class);
+
     public AnnotatedObjectService(IntactContext intactContext) {
         super(intactContext);
     }
 
     public void persist(A objectToPersist) throws PersisterException {
-        getDao(objectToPersist.getClass()).persist(objectToPersist);
+        if (log.isDebugEnabled()) {
+            log.debug("Going to persist: "+objectToPersist.getShortLabel() +
+                      ((objectToPersist instanceof CvObject)? " ("+CvObjectUtils.getPsiMiIdentityXref((CvObject)objectToPersist).getPrimaryId()+")" : ""));
+        }
 
-        getCache(objectToPersist.getClass()).put(createElement(objectToPersist));
-    }
+        // Check if the object to persist is already in cache.
+        // In some race conditions, the same object might have been "marked" to be persisted and
+        // persisting them twice would fail
+        if (!isAlreadyInCache(objectToPersist)) {
+            log.debug("Not in cache. Persisting");
+            getDao(objectToPersist.getClass()).persist(objectToPersist);
 
-    protected Element createElement(A object) {
-        return new AnnotatedObjectKey(object).getElement();
+            putInCache(objectToPersist);
+        } else {
+            if (log.isDebugEnabled()) log.debug("Already in cache. Not persisting");
+        }
     }
 
     protected A fetchFromDb(K key) {

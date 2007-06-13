@@ -15,6 +15,9 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +28,8 @@ import java.util.Map;
  * @version $Id$
  */
 public class ConversionCache {
+
+    private static final Log log = LogFactory.getLog(ConversionCache.class);
 
     private Map<Object, Object> idMap;
 
@@ -48,6 +53,8 @@ public class ConversionCache {
     }
 
     public static void clear() {
+        if (log.isInfoEnabled()) log.info("Clearing Conversion cache");
+        
         instance.get().idMap.clear();
     }
 }

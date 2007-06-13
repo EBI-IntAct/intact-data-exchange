@@ -19,11 +19,11 @@ import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.ExperimentDescription;
 import psidev.psi.mi.xml.model.HasId;
 import psidev.psi.mi.xml.model.Participant;
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.commons.model.IntactEntry;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
+import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.IntactEntry;
+import uk.ac.ebi.intact.model.Interaction;
 
 import java.util.ArrayList;
 import java.util.Collection;

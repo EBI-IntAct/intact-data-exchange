@@ -20,11 +20,12 @@ import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.commons.model.IntactEntry;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterReport;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared.EntryPersister;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.util.CacheContext;
+import uk.ac.ebi.intact.model.IntactEntry;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -85,6 +86,7 @@ public class PsiExchange {
             PersisterReport subReport = importIntoIntact(intactEntry, dryRun);
             report.mergeWith(subReport);
 
+            CacheContext.getInstance(context).clearAll();
             context.getDataContext().flushSession();
         }
 

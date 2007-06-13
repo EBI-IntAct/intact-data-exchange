@@ -36,6 +36,7 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
 import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.commons.util.TestDataset;
 import uk.ac.ebi.intact.config.impl.AbstractHibernateDataConfig;
+import uk.ac.ebi.intact.context.IntactConfigurator;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.PsiExchange;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
@@ -194,6 +195,7 @@ public class UnitDatasetGeneratorMojo
             try {
                 importDataset(dataset);
             } catch (Exception e) {
+                getLog().error(e);
                 throw new MojoExecutionException("Exception importing dataset: "+dataset.getId(),e);
             }
             getLog().debug("\t\tImported "+context.getDataContext().getDaoFactory().getInteractionDao().countAll()+" Interactions in "+
@@ -214,8 +216,11 @@ public class UnitDatasetGeneratorMojo
 
             // truncate tables after export, so next datasets have a clean db
             truncateTables();
-            
+
+            //LogUtils.setPrintSql(true);
+
         } catch (Exception e) {
+            getLog().error(e);
             throw new MojoExecutionException("Exception creating dbUnit dataset", e);
         }
     }
@@ -257,6 +262,9 @@ public class UnitDatasetGeneratorMojo
         schemaExport.drop(false, true);
         commitTransactionAndBegin();
         schemaExport.create(false, true);
+        commitTransactionAndBegin();
+
+        IntactConfigurator.initializeDatabase(IntactContext.getCurrentInstance());
         commitTransactionAndBegin();
     }
 

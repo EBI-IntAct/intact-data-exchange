@@ -16,11 +16,10 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.service;
 
 import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.OrganismKey;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.persistence.dao.BioSourceDao;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.AnnotatedObjectKey;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.key.OrganismKey;
 
 /**
  * TODO comment this
@@ -35,9 +34,11 @@ public class OrganismService extends AbstractService<BioSource, OrganismKey> {
     }
 
     public void persist(BioSource objectToPersist) throws PersisterException {
-        getDao().persist(objectToPersist);
+        if (!isAlreadyInCache(objectToPersist)) {
+            getDao().persist(objectToPersist);
 
-        getCache(objectToPersist.getClass()).put(new AnnotatedObjectKey(objectToPersist).getElement());
+            putInCache(objectToPersist);
+        }
     }
 
     protected BioSource fetchFromDb(OrganismKey key) {

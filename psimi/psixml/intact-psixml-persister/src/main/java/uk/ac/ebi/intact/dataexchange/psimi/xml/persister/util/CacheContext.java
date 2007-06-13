@@ -17,6 +17,8 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.util;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.model.Interactor;
@@ -34,6 +36,8 @@ import java.util.Map;
  * @version $Id$
  */
 public class CacheContext implements Serializable {
+
+    private static final Log log = LogFactory.getLog(CacheContext.class);
 
     private static final String EHCACHE_CONFIG_FILE = "/ehcache-config.xml";
 
@@ -101,6 +105,9 @@ public class CacheContext implements Serializable {
     }
 
     public void clearAll() {
+        if (log.isInfoEnabled()) {
+            log.info("Clearing (eh)Cache context");
+        }
         cacheManager.clearAll();
     }
 
