@@ -19,7 +19,7 @@ public enum $classSimpleName implements $interfaceName {
           return id;
       }
 
-      public URL getResource() {
+      public URL getDbUnitDataset() {
           return ${classSimpleName}.class.getResource(id+".xml");
       }
 
