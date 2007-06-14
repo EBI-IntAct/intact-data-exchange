@@ -16,12 +16,12 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared;
 
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.model.BioSource;
-import uk.ac.ebi.intact.model.CvInteractorType;
-import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.service.AbstractService;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.service.InteractorService;
+import uk.ac.ebi.intact.model.BioSource;
+import uk.ac.ebi.intact.model.CvInteractorType;
+import uk.ac.ebi.intact.model.Interactor;
 
 /**
  * TODO comment this
@@ -58,7 +58,7 @@ public class InteractorPersister<T extends Interactor> extends AbstractAnnotated
             getReport().mergeWith(cvPersister.getReport());
         }
 
-        return intactObject;
+        return super.sync(intactObject);
     }
 
     @Override

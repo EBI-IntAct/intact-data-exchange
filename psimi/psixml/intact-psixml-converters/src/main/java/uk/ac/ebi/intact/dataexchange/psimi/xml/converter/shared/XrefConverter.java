@@ -16,10 +16,10 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.DbReference;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiMiPopulator;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
  * TODO comment this
@@ -67,6 +67,7 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
 
 
         X xref = newXrefInstance(xrefClass, cvDb, primaryId, secondaryId, dbRelease, xrefQual);
+        xref.setOwner(getInstitution());
 
         return xref;
     }

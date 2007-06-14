@@ -56,6 +56,8 @@ public abstract class AbstractAnnotatedObjectPersister<T extends AnnotatedObject
         T ao = (T) getService().get(key);
 
         if (ao == null) {
+            intactObject.setOwner(getIntactContext().getInstitution());
+            intactObject = sync(intactObject);
             ao = intactObject;
             super.persist(ao, report);
         } else {
@@ -64,7 +66,7 @@ public abstract class AbstractAnnotatedObjectPersister<T extends AnnotatedObject
 
         intactObject = ao;
 
-        intactObject = sync(intactObject);
+
 
         PersisterReport aoReport = PersisterHelper.syncAnnotatedObject(intactObject, getIntactContext());
         getReport().mergeWith(aoReport);

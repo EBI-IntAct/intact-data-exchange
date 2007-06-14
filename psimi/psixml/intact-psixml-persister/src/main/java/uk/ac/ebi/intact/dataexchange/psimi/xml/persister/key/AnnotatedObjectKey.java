@@ -35,7 +35,7 @@ public class AnnotatedObjectKey<A extends AnnotatedObject> implements Key {
     }
 
     protected String generateKey(A annotatedObject) {
-        String key = annotatedObject.getShortLabel();
+        String key = annotatedObject.getShortLabel()+"_"+annotatedObject.getClass();
 
         if (key == null) {
             throw new RuntimeException("To generate a key from an annotatedObject the shortLabel is needed: " + annotatedObject);

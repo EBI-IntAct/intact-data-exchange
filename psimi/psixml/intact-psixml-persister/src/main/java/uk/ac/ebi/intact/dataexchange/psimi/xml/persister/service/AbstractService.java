@@ -139,7 +139,7 @@ public abstract class AbstractService<T extends AnnotatedObject, K extends Key> 
 
         if (log.isTraceEnabled()) log.trace("\tTrying cache "+cache.getName()+" for key: "+key);
 
-        return (cache.get(key) != null);
+        return cache.isKeyInCache(key);
 
     }
 

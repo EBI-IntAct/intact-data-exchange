@@ -20,6 +20,7 @@ import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.core.unit.IntactAbstractTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterReport;
 import uk.ac.ebi.intact.model.IntactEntry;
@@ -32,7 +33,7 @@ import java.io.InputStream;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class EntryPersisterTest {
+public class EntryPersisterTest extends IntactAbstractTestCase {
 
     private static final String INTACT_FILE = "/xml/intact_2006-07-19.xml";
     private static final String MINT_FILE = "/xml/mint_2006-07-18.xml";
@@ -42,7 +43,6 @@ public class EntryPersisterTest {
 
     @Test
     public void entryToIntactDefault() throws Exception {
-
         InputStream is = EntryPersisterTest.class.getResourceAsStream(DIP_FILE);
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = reader.read(is);

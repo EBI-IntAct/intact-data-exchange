@@ -90,7 +90,9 @@ public class CvService<T extends CvObject> extends AnnotatedObjectService<T, CvO
 
             if (cv == null) {
                 super.checkTransientValues(annotatedObject);
-                cache.put(new CvObjectKey(annotatedObject).getElement());
+
+                // TODO: maybe should persist first and not persist again for this thread?
+                //cache.put(new CvObjectKey(annotatedObject).getElement());
             }
         }
     }

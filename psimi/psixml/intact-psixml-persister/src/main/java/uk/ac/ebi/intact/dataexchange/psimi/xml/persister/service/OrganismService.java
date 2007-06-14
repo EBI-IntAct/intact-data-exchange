@@ -34,11 +34,7 @@ public class OrganismService extends AbstractService<BioSource, OrganismKey> {
     }
 
     public void persist(BioSource objectToPersist) throws PersisterException {
-        if (!isAlreadyInCache(objectToPersist)) {
-            getDao().persist(objectToPersist);
-
-            putInCache(objectToPersist);
-        }
+        getDao().persist(objectToPersist);
     }
 
     protected BioSource fetchFromDb(OrganismKey key) {

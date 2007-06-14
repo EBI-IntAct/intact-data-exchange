@@ -11,7 +11,7 @@ import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dbutil.cv.model.*;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.CvObjectBuilder;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.persistence.dao.XrefDao;
@@ -1353,8 +1353,10 @@ public class UpdateCVs {
         // CvXrefQualifier( identity )
         identity = intactContext.getCvContext().getByMiRef(CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF);
 
+        CvObjectBuilder cvBuilder = new CvObjectBuilder();
+
         if (identity == null) {
-            identity = CvObjectUtils.createIdentityCvXrefQualifier(IntactContext.getCurrentInstance());
+            identity = cvBuilder.createIdentityCvXrefQualifier(IntactContext.getCurrentInstance());
             identity.setFullName("identical object");
             intactContext.getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).persist(identity);
         }
@@ -1363,7 +1365,7 @@ public class UpdateCVs {
         psi = intactContext.getCvContext().getByMiRef(CvDatabase.class, CvDatabase.PSI_MI_MI_REF);
 
         if (psi == null) {
-            psi = CvObjectUtils.createPsiMiCvDatabase(IntactContext.getCurrentInstance());
+            psi = cvBuilder.createPsiMiCvDatabase(IntactContext.getCurrentInstance());
             psi.setFullName("psi-mi");
             intactContext.getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).persist(psi);
         }

@@ -59,10 +59,12 @@ public class PersisterHelper {
             for (Alias alias : (Collection<Alias>) intactObject.getAliases()) {
                 CvAliasType cvAliasType = (CvAliasType) cvPersister.saveOrUpdate(alias.getCvAliasType());
                 alias.setCvAliasType(cvAliasType);
+                alias.setOwner(context.getInstitution());
             }
             for (Annotation annotation : (Collection<Annotation>) intactObject.getAnnotations()) {
                 CvTopic cvTopic = (CvTopic) cvPersister.saveOrUpdate(annotation.getCvTopic());
                 annotation.setCvTopic(cvTopic);
+                annotation.setOwner(context.getInstitution());
             }
         } catch (Throwable t) {
             throw new PersisterException("Exception syncing: "+intactObject.getShortLabel()+" ("+intactObject.getAc()+")", t);

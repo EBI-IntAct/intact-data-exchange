@@ -16,27 +16,7 @@
     <name>IntAct Data Exchange :: PSI MI :: XML :: Persister</name>
     <description>Synchronizes and persists IntAct model objects</description>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>uk.ac.ebi.intact.plugins</groupId>
-                <artifactId>dbtest-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
-        <!--
-        h2 database used for testing, with the cvs preloaded
-        -->
-        <dependency>
-            <groupId>uk.ac.ebi.intact.templates</groupId>
-            <artifactId>h2db-with-cv</artifactId>
-            <version>1.6-SNAPSHOT</version>
-            <type>zip</type>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>uk.ac.ebi.intact</groupId>
             <artifactId>intact-core</artifactId>
