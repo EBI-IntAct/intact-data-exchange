@@ -22,8 +22,7 @@ import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared.EntryPersister;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.util.CacheContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.standard.EntryPersister;
 import uk.ac.ebi.intact.model.IntactEntry;
 
 import java.io.*;
@@ -51,7 +50,7 @@ public class PsiExchange {
      *
      * @throws PersisterException thrown if there are problems parsing the stream or persisting the data in the intact-model database
      */
-    public static PersisterReport importIntoIntact(InputStream psiXmlStream, boolean dryRun) throws PersisterException {
+    public static void importIntoIntact(InputStream psiXmlStream, boolean dryRun) throws PersisterException {
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = null;
         try {
@@ -60,7 +59,7 @@ public class PsiExchange {
             throw new PersisterException("Exception reading the PSI XML from an InputStream", e);
         }
 
-        return importIntoIntact(entrySet, dryRun);
+         importIntoIntact(entrySet, dryRun);
     }
 
     /**
@@ -73,23 +72,17 @@ public class PsiExchange {
      *
      * @throws PersisterException thrown if there are problems persisting the data in the intact-model database
      */
-    public static PersisterReport importIntoIntact(EntrySet entrySet, boolean dryRun) throws PersisterException {
+    public static void importIntoIntact(EntrySet entrySet, boolean dryRun) throws PersisterException {
         IntactContext context = IntactContext.getCurrentInstance();
-
-        PersisterReport report = new PersisterReport();
 
         EntryConverter converter = new EntryConverter(context.getInstitution());
 
         for (Entry entry : entrySet.getEntries()) {
             IntactEntry intactEntry = converter.psiToIntact(entry);
-            PersisterReport subReport = importIntoIntact(intactEntry, dryRun);
-            report.mergeWith(subReport);
+            importIntoIntact(intactEntry, dryRun);
 
-            CacheContext.getInstance(context).clearAll();
             context.getDataContext().flushSession();
         }
-
-        return report;
     }
 
     /**
@@ -102,13 +95,11 @@ public class PsiExchange {
      *
      * @throws PersisterException thrown if there are problems persisting the data in the intact-model database
      */
-    public static PersisterReport importIntoIntact(IntactEntry entry, boolean dryRun) throws PersisterException {
+    public static void importIntoIntact(IntactEntry entry, boolean dryRun) throws PersisterException {
         IntactContext context = IntactContext.getCurrentInstance();
 
-        EntryPersister entryPersister = new EntryPersister(context, dryRun);
+        EntryPersister entryPersister = EntryPersister.getInstance(dryRun);
         entryPersister.saveOrUpdate(entry);
-
-        return entryPersister.getReport();
     }
 
     /**
