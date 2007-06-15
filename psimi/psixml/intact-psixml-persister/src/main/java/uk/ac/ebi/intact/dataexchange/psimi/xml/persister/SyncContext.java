@@ -48,8 +48,8 @@ public class SyncContext {
 
     private IntactContext intactContext;
 
-    private Map<AnnotObjectKey, CvObject> syncedCvObjects;
-    private Map<AnnotObjectKey, AnnotatedObject> syncedAnnotatedObjects;
+    private Map<String, CvObject> syncedCvObjects;
+    private Map<String, AnnotatedObject> syncedAnnotatedObjects;
 
     public static SyncContext getInstance() {
         return instance.get();
@@ -58,8 +58,8 @@ public class SyncContext {
     private SyncContext(IntactContext intactContext) {
         this.intactContext = intactContext;
 
-        this.syncedCvObjects = new HashMap<AnnotObjectKey, CvObject>();
-        this.syncedAnnotatedObjects = new HashMap<AnnotObjectKey, AnnotatedObject>();
+        this.syncedCvObjects = new HashMap<String, CvObject>();
+        this.syncedAnnotatedObjects = new HashMap<String, AnnotatedObject>();
     }
 
     public void addToSynced(AnnotatedObject ao) {
@@ -78,7 +78,7 @@ public class SyncContext {
     }
 
     public AnnotatedObject get(AnnotatedObject ao) {
-        final AnnotObjectKey key = keyFor(ao);
+        final String key = keyFor(ao);
 
         if (syncedCvObjects.containsKey(key)) {
             return syncedCvObjects.get(key);
@@ -86,39 +86,8 @@ public class SyncContext {
         return syncedAnnotatedObjects.get(key);
     }
 
-    private AnnotObjectKey keyFor(AnnotatedObject ao) {
-        return new AnnotObjectKey(ao);
-    }
-
-    private class AnnotObjectKey {
-
-        private Class annotatedObjectClass;
-        private String shortLabel;
-
-        public AnnotObjectKey(AnnotatedObject annotObject) {
-            this.annotatedObjectClass = annotObject.getClass();
-            this.shortLabel = annotObject.getShortLabel();
-        }
-
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            AnnotObjectKey that = (AnnotObjectKey) o;
-
-            if (annotatedObjectClass != null ? !annotatedObjectClass.equals(that.annotatedObjectClass) : that.annotatedObjectClass != null)
-                return false;
-            if (shortLabel != null ? !shortLabel.equals(that.shortLabel) : that.shortLabel != null) return false;
-
-            return true;
-        }
-
-        public int hashCode() {
-            int result;
-            result = (annotatedObjectClass != null ? annotatedObjectClass.hashCode() : 0);
-            result = 31 * result + (shortLabel != null ? shortLabel.hashCode() : 0);
-            return result;
-        }
+    private String keyFor(AnnotatedObject ao) {
+        return AnnotKeyGenerator.createKey(ao);
     }
 
     public Collection<AnnotatedObject> getSyncedAnnotatedObjects() {

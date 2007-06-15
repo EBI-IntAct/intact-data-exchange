@@ -50,8 +50,8 @@ public class PersistenceContext {
     private IntactContext intactContext;
     private boolean dryRun;
 
-    private Map<AnnotObjectKey, CvObject> cvObjectsToBePersisted;
-    private Map<AnnotObjectKey, AnnotatedObject> annotatedObjectsToBePersisted;
+    private Map<String, CvObject> cvObjectsToBePersisted;
+    private Map<String, AnnotatedObject> annotatedObjectsToBePersisted;
 
     public static PersistenceContext getInstance() {
         return instance.get();
@@ -60,8 +60,8 @@ public class PersistenceContext {
     private PersistenceContext(IntactContext intactContext) {
         this.intactContext = intactContext;
 
-        this.cvObjectsToBePersisted = new HashMap<AnnotObjectKey,CvObject>();
-        this.annotatedObjectsToBePersisted = new HashMap<AnnotObjectKey,AnnotatedObject>();
+        this.cvObjectsToBePersisted = new HashMap<String,CvObject>();
+        this.annotatedObjectsToBePersisted = new HashMap<String,AnnotatedObject>();
     }
 
     public void addToPersist(AnnotatedObject ao) {
@@ -74,7 +74,7 @@ public class PersistenceContext {
 
 
     public boolean contains(AnnotatedObject ao) {
-        final AnnotObjectKey key = keyFor(ao);
+        final String key = keyFor(ao);
 
         if (cvObjectsToBePersisted.containsKey(key)) {
             return true;
@@ -83,7 +83,7 @@ public class PersistenceContext {
     }
 
     public AnnotatedObject get(AnnotatedObject ao) {
-        final AnnotObjectKey key = keyFor(ao);
+        final String key = keyFor(ao);
 
         if (cvObjectsToBePersisted.containsKey(key)) {
             return cvObjectsToBePersisted.get(key);
@@ -115,8 +115,8 @@ public class PersistenceContext {
         getIntactContext().getDataContext().flushSession();
     }
 
-    private AnnotObjectKey keyFor(AnnotatedObject ao) {
-        return new AnnotObjectKey(ao);
+    private String keyFor(AnnotatedObject ao) {
+        return AnnotKeyGenerator.createKey(ao);
     }
 
     private IntactContext getIntactContext() {
@@ -125,37 +125,6 @@ public class PersistenceContext {
 
     private DaoFactory getDaoFactory() {
         return getIntactContext().getDataContext().getDaoFactory();
-    }
-
-    private class AnnotObjectKey {
-
-        private Class annotatedObjectClass;
-        private String shortLabel;
-
-        public AnnotObjectKey(AnnotatedObject annotObject) {
-            this.annotatedObjectClass = annotObject.getClass();
-            this.shortLabel = annotObject.getShortLabel();
-        }
-
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            AnnotObjectKey that = (AnnotObjectKey) o;
-
-            if (annotatedObjectClass != null ? !annotatedObjectClass.equals(that.annotatedObjectClass) : that.annotatedObjectClass != null)
-                return false;
-            if (shortLabel != null ? !shortLabel.equals(that.shortLabel) : that.shortLabel != null) return false;
-
-            return true;
-        }
-
-        public int hashCode() {
-            int result;
-            result = (annotatedObjectClass != null ? annotatedObjectClass.hashCode() : 0);
-            result = 31 * result + (shortLabel != null ? shortLabel.hashCode() : 0);
-            return result;
-        }
     }
 
     public boolean isDryRun() {
