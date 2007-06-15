@@ -1,3 +1,0 @@
-"OBJCLASS","SHORTLABEL","TOPIC_LABEL","DESCRIPTION"
-"uk.ac.ebi.intact.model.CvDatabase","uniprotkb","search-url-ascii","http://www.ebi.uniprot.org/entry/${ac}?format=text&ascii"
-"uk.ac.ebi.intact.model.CvDatabase","uniparc","search-url-ascii","http://www.ebi.uniprot.org/entry/${ac}?format=text&ascii"
