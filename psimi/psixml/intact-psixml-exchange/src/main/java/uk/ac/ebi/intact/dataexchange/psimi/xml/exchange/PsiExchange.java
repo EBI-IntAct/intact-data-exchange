@@ -96,10 +96,9 @@ public class PsiExchange {
      * @throws PersisterException thrown if there are problems persisting the data in the intact-model database
      */
     public static void importIntoIntact(IntactEntry entry, boolean dryRun) throws PersisterException {
-        IntactContext context = IntactContext.getCurrentInstance();
-
         EntryPersister entryPersister = EntryPersister.getInstance(dryRun);
         entryPersister.saveOrUpdate(entry);
+        entryPersister.commit();
     }
 
     /**
