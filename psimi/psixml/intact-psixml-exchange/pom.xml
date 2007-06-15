@@ -27,11 +27,6 @@
 
         <plugins>
             <plugin>
-                <groupId>uk.ac.ebi.intact.plugins</groupId>
-                <artifactId>dbtest-maven-plugin</artifactId>
-                <version>1.6.0-SNAPSHOT</version>
-            </plugin>
-            <plugin>
                 <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
                 <artifactId>psixml-source-generator-maven-plugin</artifactId>
                 <configuration>
@@ -50,29 +45,17 @@
     </build>
 
     <dependencies>
-        <!--
-        h2 database used for testing, with the cvs preloaded
-        -->
         <dependency>
-            <groupId>uk.ac.ebi.intact.templates</groupId>
-            <artifactId>h2db-with-cv</artifactId>
-            <version>1.6-SNAPSHOT</version>
-            <type>zip</type>
-            <scope>provided</scope>
+            <groupId>uk.ac.ebi.intact.core</groupId>
+            <artifactId>intact-persister</artifactId>
         </dependency>
-
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psixml-upload-extensions</artifactId>
         </dependency>
-
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psixml-converters</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-            <artifactId>intact-psixml-persister</artifactId>
         </dependency>
 
     </dependencies>

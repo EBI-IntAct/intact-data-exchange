@@ -20,9 +20,9 @@ import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.core.persister.PersisterException;
+import uk.ac.ebi.intact.core.persister.standard.EntryPersister;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.standard.EntryPersister;
 import uk.ac.ebi.intact.model.IntactEntry;
 
 import java.io.*;

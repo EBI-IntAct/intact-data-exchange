@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.IntactEntry;
@@ -47,6 +48,7 @@ public class PsiExchangeTest {
     }
 
     @Test
+    @Ignore
     public void exportXml() {
 
         IntactEntry entry = IntactEntryFactory.createIntactEntry(context)
