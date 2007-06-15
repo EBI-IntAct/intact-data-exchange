@@ -37,7 +37,21 @@ public abstract class AbstractAnnotatedObjectPersister<T extends AnnotatedObject
 
     @Override
     protected void saveOrUpdateAttributes(T intactObject) throws PersisterException {
-        // nothing by default
+        CvObjectPersister cvPersister = CvObjectPersister.getInstance();
+
+        for (Xref xref : (Collection<Xref>) intactObject.getXrefs()) {
+            cvPersister.saveOrUpdate(xref.getCvDatabase());
+
+            if (xref.getCvXrefQualifier() != null) {
+                cvPersister.saveOrUpdate(xref.getCvXrefQualifier());
+            }
+        }
+        for (Alias alias : (Collection<Alias>) intactObject.getAliases()) {
+            cvPersister.saveOrUpdate(alias.getCvAliasType());
+        }
+        for (Annotation annotation : (Collection<Annotation>) intactObject.getAnnotations()) {
+            cvPersister.saveOrUpdate(annotation.getCvTopic());
+        }
     }
 
     @Override

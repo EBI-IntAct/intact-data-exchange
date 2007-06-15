@@ -95,6 +95,8 @@ public class PersistenceContext {
     public void persistAll() {
         if (log.isDebugEnabled()) {
             log.debug("Persisting all"+ (isDryRun()? " - DRY RUN" : ""));
+            log.debug("\tCvObjects: "+cvObjectsToBePersisted.size());
+            log.debug("\tOther AnnotatedObjects: "+annotatedObjectsToBePersisted.size());
         }
 
         for (CvObject cv : cvObjectsToBePersisted.values()) {

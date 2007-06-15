@@ -17,8 +17,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.persister.standard;
 
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.standard.CvPersister;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.standard.OrganismPersister;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.model.CvIdentification;
 import uk.ac.ebi.intact.model.CvInteraction;

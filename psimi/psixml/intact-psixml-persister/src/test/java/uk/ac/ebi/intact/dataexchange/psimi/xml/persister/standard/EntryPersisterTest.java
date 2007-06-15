@@ -30,7 +30,7 @@ import java.io.InputStream;
  * TODO comment this
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id$
+ * @version $Id:EntryPersisterTest.java 8684 2007-06-15 14:24:35Z baranda $
  */
 public class EntryPersisterTest extends IntactAbstractTestCase {
 
@@ -54,10 +54,16 @@ public class EntryPersisterTest extends IntactAbstractTestCase {
 
             IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
-            uk.ac.ebi.intact.dataexchange.psimi.xml.persister.standard.EntryPersister.getInstance(DRY_RUN).saveOrUpdate(intactEntry);
-            //PersisterReport report = persister.getReport();
+            EntryPersister persister = EntryPersister.getInstance(DRY_RUN);
+            persister.saveOrUpdate(intactEntry);
+            persister.commit();
 
-            //System.out.println("Report: " + report);
+            IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+
+            IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+
+            System.out.println("CVs: "+IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().countAll());
+            System.out.println("Interactions: "+IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getInteractionDao().countAll());
 
             IntactContext.getCurrentInstance().getDataContext().commitTransaction();
         }
