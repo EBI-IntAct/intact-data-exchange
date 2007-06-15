@@ -22,7 +22,6 @@ import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.PersisterReport;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.shared.EntryPersister;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.persister.util.CacheContext;
 import uk.ac.ebi.intact.model.IntactEntry;
