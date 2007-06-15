@@ -17,7 +17,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.persister;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.AnnotatedObject;
 import uk.ac.ebi.intact.model.CvObject;
 
@@ -42,11 +41,9 @@ public class SyncContext {
     private static ThreadLocal<SyncContext> instance = new ThreadLocal<SyncContext>() {
         @Override
         protected SyncContext initialValue() {
-            return new SyncContext(IntactContext.getCurrentInstance());
+            return new SyncContext();
         }
     };
-
-    private IntactContext intactContext;
 
     private Map<String, CvObject> syncedCvObjects;
     private Map<String, AnnotatedObject> syncedAnnotatedObjects;
@@ -55,9 +52,7 @@ public class SyncContext {
         return instance.get();
     }
 
-    private SyncContext(IntactContext intactContext) {
-        this.intactContext = intactContext;
-
+    private SyncContext() {
         this.syncedCvObjects = new HashMap<String, CvObject>();
         this.syncedAnnotatedObjects = new HashMap<String, AnnotatedObject>();
     }
