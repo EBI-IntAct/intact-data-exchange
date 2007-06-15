@@ -24,7 +24,6 @@
         <module>intact-psixml-converters</module>
         <module>intact-psixml-upload-extensions</module>
         <module>intact-psixml-exchange</module>
-        <module>dbunit-dataset-maven-plugin</module>
     </modules>
 
     <dependencyManagement>
