@@ -20,6 +20,7 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 
 /**
  * TODO comment this
@@ -54,6 +55,9 @@ public class ExperimentConverter extends AbstractIntactPsiConverter<Experiment, 
             experiment.setCvIdentification(cvParticipantIdentification);
         }
 
+        Publication publication = createPublication(psiObject);
+        experiment.setPublication(publication);
+
         return experiment;
     }
 
@@ -77,5 +81,20 @@ public class ExperimentConverter extends AbstractIntactPsiConverter<Experiment, 
         expDesc.getHostOrganisms().add(organism);
 
         return expDesc;
+    }
+
+    private Publication createPublication(ExperimentDescription experiment) {
+        String pubId = experiment.getBibref().getXref().getPrimaryRef().getId();
+
+        Publication publication = (Publication) ConversionCache.getElement("pub:"+pubId);
+
+        if (publication != null) {
+            return publication;
+        }
+
+        publication = new Publication(getInstitution(), pubId);
+        ConversionCache.putElement("pub:"+pubId, publication);
+
+        return publication;
     }
 }

@@ -101,6 +101,7 @@ public class PsiMockFactory {
 
     public static ExperimentDescription createMockExperiment() {
         Xref bibrefXref = createXref(CvXrefQualifier.PRIMARY_REFERENCE, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF);
+        bibrefXref.getPrimaryRef().setId("14681455");
         bibrefXref.getSecondaryRef().clear();
         Bibref bibref = new Bibref(bibrefXref);
 

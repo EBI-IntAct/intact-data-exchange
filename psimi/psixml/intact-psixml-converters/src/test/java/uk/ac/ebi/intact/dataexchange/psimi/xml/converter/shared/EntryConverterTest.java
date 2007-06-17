@@ -15,8 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import static org.easymock.classextension.EasyMock.createNiceMock;
@@ -30,6 +29,7 @@ import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
+import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidatorMessage;
@@ -109,6 +109,17 @@ public class EntryConverterTest {
         assertTrue("Document must be valid: " + DIP_FILE, xmlIsValid(new FileInputStream(file)));
 
         roundtripWithStream(new FileInputStream(file));
+    }
+
+    @Test
+    public void publicationConversion() throws Exception {
+        Entry beforeRountripEntry = PsiMockFactory.createMockEntry();
+
+        IntactEntry intactEntry = entryConverter.psiToIntact(beforeRountripEntry);
+
+        for (Experiment exp : intactEntry.getExperiments()) {
+            assertNotNull(exp.getPublication());
+        }
     }
 
     private void roundtripWithStream(InputStream is) throws Exception {
