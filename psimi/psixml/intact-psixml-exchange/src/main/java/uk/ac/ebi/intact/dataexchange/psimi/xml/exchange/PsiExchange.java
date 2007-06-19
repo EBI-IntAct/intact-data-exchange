@@ -15,15 +15,22 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
+import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.core.persister.PersistenceContext;
 import uk.ac.ebi.intact.core.persister.PersisterException;
 import uk.ac.ebi.intact.core.persister.standard.EntryPersister;
+import uk.ac.ebi.intact.core.persister.standard.InteractionPersister;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
 import uk.ac.ebi.intact.model.IntactEntry;
+import uk.ac.ebi.intact.model.Interaction;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -36,6 +43,16 @@ import java.util.Collection;
  * @version $Id$
  */
 public class PsiExchange {
+
+    /**
+     * Sets up a logger for that class.
+     */
+    private static final Log log = LogFactory.getLog(PsiExchange.class);
+
+    /**
+     * Number of Interactions persisted per batch
+     */
+    private static final int IMPORT_BATCH_SIZE = 50;
 
     private PsiExchange() {
     }
@@ -59,7 +76,7 @@ public class PsiExchange {
             throw new PersisterException("Exception reading the PSI XML from an InputStream", e);
         }
 
-         importIntoIntact(entrySet, dryRun);
+        importIntoIntact(entrySet, dryRun);
     }
 
     /**
@@ -75,13 +92,69 @@ public class PsiExchange {
     public static void importIntoIntact(EntrySet entrySet, boolean dryRun) throws PersisterException {
         IntactContext context = IntactContext.getCurrentInstance();
 
-        EntryConverter converter = new EntryConverter(context.getInstitution());
+        if (dryRun) {
+            PersistenceContext.getInstance().setDryRun(dryRun);
+        }
+
+        // check if the transaction is active
+        if (context.getDataContext().isTransactionActive()) {
+            throw new IllegalStateException("To import to intact, the current transaction when calling the method must be inactive");
+        }
+
+        // some time for stats
+        long startTime = System.currentTimeMillis();
+
+        // this will count the interactions and will be used to flush in batches
+        int interactionCount = 0;
+
+        beginTransaction();
+
+        // instead of converting/processing the whole Entry, we process the interactions to avoid memory exceptions
+        InteractionConverter interactionConverter = new InteractionConverter(context.getInstitution());
+
+        // the persister of interactions instance
+        InteractionPersister interactionPersister = InteractionPersister.getInstance();
 
         for (Entry entry : entrySet.getEntries()) {
-            IntactEntry intactEntry = converter.psiToIntact(entry);
-            importIntoIntact(intactEntry, dryRun);
+            for (psidev.psi.mi.xml.model.Interaction psiInteraction : entry.getInteractions()) {
+                Interaction interaction = interactionConverter.psiToIntact(psiInteraction);
 
-            context.getDataContext().flushSession();
+                // mark the interaction to save or update
+                interactionPersister.saveOrUpdate(interaction);
+
+                // commit the interactions in batches into the database
+                if (interactionCount > 0 && interactionCount % IMPORT_BATCH_SIZE == 0) {
+
+                    // commit the persistence
+                    interactionPersister.commit();
+
+                    // restart a transaction
+                    commitTransaction();
+                    beginTransaction();
+                }
+
+                interactionCount++;
+            }
+        }
+
+        // final commit for the last batch
+        interactionPersister.commit();
+        commitTransaction();
+
+        if (log.isDebugEnabled()) {
+            log.debug("Imported: " + interactionCount + " interactions in " + (System.currentTimeMillis() - startTime) + "ms");
+        }
+    }
+
+    private static void beginTransaction() {
+        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+    }
+
+    private static void commitTransaction() throws PersisterException {
+        try {
+            IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+        } catch (IntactTransactionException e) {
+            throw new PersisterException(e);
         }
     }
 
@@ -101,9 +174,12 @@ public class PsiExchange {
         entryPersister.commit();
     }
 
+
     /**
      * Export to PSI XML
+     *
      * @param intactEntries the entries to export
+     *
      * @return an outputstream with the xml
      */
     public static OutputStream exportToPsiXml(IntactEntry... intactEntries) {
@@ -123,8 +199,9 @@ public class PsiExchange {
 
     /**
      * Export to PSI XML
+     *
      * @param intactEntries the entries to export
-     * @param writer the writer to use
+     * @param writer        the writer to use
      */
     public static void exportToPsiXml(Writer writer, IntactEntry... intactEntries) {
         EntrySet entrySet = exportToEntrySet(intactEntries);
@@ -140,8 +217,9 @@ public class PsiExchange {
 
     /**
      * Export to PSI XML
+     *
      * @param intactEntries the entries to export
-     * @param file the file that will contain the xml
+     * @param file          the file that will contain the xml
      */
     public static void exportToPsiXml(File file, IntactEntry... intactEntries) {
         try {

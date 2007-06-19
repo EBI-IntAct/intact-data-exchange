@@ -15,10 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
-import psidev.psi.mi.xml.PsimiXmlReader;
-import psidev.psi.mi.xml.model.EntrySet;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.generated.EntrySetProcessor;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.tools.PsiProcessReport;
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.core.unit.IntactUnit;
 
 import java.io.InputStream;
 
@@ -32,17 +30,20 @@ public class Playground {
 
     public static void main(String[] args) throws Exception {
 
-        InputStream is = Playground.class.getResourceAsStream("/xml/intact_2006-07-19.xml");
+        IntactUnit iu = new IntactUnit();
+        iu.createSchema();
 
-        PsimiXmlReader reader = new PsimiXmlReader();
+        InputStream is = Playground.class.getResourceAsStream("/xml/17353931_ewing-2007-1_01.xml");
+        PsiExchange.importIntoIntact(is, false);
 
-        EntrySet entrySet = reader.read(is);
+        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
-        System.out.println(entrySet.getEntries().iterator().next().getInteractions().size());
+        System.out.println("Interactions DB: "+ IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+        .getInteractionDao().countAll());
+        System.out.println("Experiments DB: "+IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+        .getExperimentDao().countAll());
 
-
-        EntrySetProcessor processor = new EntrySetProcessor();
-        PsiProcessReport report = processor.run(entrySet);
+        IntactContext.getCurrentInstance().getDataContext().commitTransaction();
     }
 
 }
