@@ -221,7 +221,7 @@ public class IntactOntology {
      *
      * @return a Collection of Class. never null.
      */
-    public Collection getTypes() {
+    public Collection<Class> getTypes() {
         Collection types = new ArrayList();
 
         for ( Iterator iterator = class2mi.keySet().iterator(); iterator.hasNext(); ) {
@@ -314,10 +314,10 @@ public class IntactOntology {
      *
      * @return All CvTerms
      */
-    public Set getCvTerms( Class cvObjectClass ) {
+    public Set<CvTerm> getCvTerms( Class cvObjectClass ) {
         Collection roots = (Collection) intact2psi.get( cvObjectClass );
 
-        Set terms = new HashSet();
+        Set<CvTerm> terms = new HashSet<CvTerm>();
 
         for ( Iterator iterator = roots.iterator(); iterator.hasNext(); ) {
             CvTerm root = (CvTerm) iterator.next();
@@ -335,7 +335,7 @@ public class IntactOntology {
      *
      * @return An unmodifiable collection of all CvTerms
      */
-    public Collection getCvTerms() {
+    public Collection<CvTerm> getCvTerms() {
         return Collections.unmodifiableCollection( cvTerms );
     }
 

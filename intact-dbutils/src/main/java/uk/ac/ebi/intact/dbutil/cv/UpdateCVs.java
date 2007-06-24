@@ -1650,6 +1650,8 @@ public class UpdateCVs {
         PSILoader psi = new PSILoader(output);
         IntactOntology ontology = psi.parseOboFile(oboFile, output);
 
+        checkConsistency(ontology);
+
         report.setOntology(ontology);
 
         /////////////////////////////
@@ -1693,6 +1695,27 @@ public class UpdateCVs {
 
 
         return report;
+    }
+
+    private static void checkConsistency(IntactOntology ontology) {
+
+        for (Class cvType : ontology.getTypes())
+        {
+            Collection<CvTerm> termsOfSameType = ontology.getCvTerms(cvType);
+            Set<String> clazzAndLabelSet = new HashSet<String>(termsOfSameType.size());
+
+            for (CvTerm cvTerm : termsOfSameType)
+            {
+                String setItem = cvTerm.getShortName();
+
+                if (clazzAndLabelSet.contains(setItem))
+                {
+                    throw new InvalidOboFormatException("At least two terms of type '"+cvType.getName()+"' with the same label found: '" + setItem + "'");
+                }
+
+                clazzAndLabelSet.add(setItem);
+            }
+        }
     }
 
     private static CvObject getCVWithMi(List<Mi2Cv> cvList, Class cvType, String mi) {
