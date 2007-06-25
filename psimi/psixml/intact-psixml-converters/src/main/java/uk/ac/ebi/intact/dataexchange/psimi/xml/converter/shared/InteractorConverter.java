@@ -17,11 +17,11 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.InteractorType;
 import psidev.psi.mi.xml.model.Organism;
-import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.util.Crc64;
 
 /**
@@ -92,6 +92,8 @@ public class InteractorConverter extends AbstractIntactPsiConverter<Interactor, 
         Interactor interactor = null;
 
         if (interactorTypeLabel.equals(CvInteractorType.PROTEIN)) {
+            interactor = new ProteinImpl(getInstitution(), organism, shortLabel, interactorType);
+        } else if (interactorTypeLabel.equals("peptide")) { // found in dip
             interactor = new ProteinImpl(getInstitution(), organism, shortLabel, interactorType);
         } else if (interactorTypeLabel.equals(CvInteractorType.SMALL_MOLECULE)) {
             interactor = new SmallMoleculeImpl(shortLabel, getInstitution(), interactorType);
