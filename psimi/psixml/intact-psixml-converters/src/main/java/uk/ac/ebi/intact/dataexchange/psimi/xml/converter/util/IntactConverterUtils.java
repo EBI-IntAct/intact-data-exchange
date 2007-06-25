@@ -19,11 +19,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.DbReference;
 import psidev.psi.mi.xml.model.Names;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
 import uk.ac.ebi.intact.model.AnnotatedObject;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.Xref;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
 
 /**
  * TODO comment this
@@ -100,7 +100,7 @@ public class IntactConverterUtils {
         }
 
         if (shortLabel.length() > SHORT_LABEL_LENGTH) {
-            shortLabel = fullName.substring(0, SHORT_LABEL_LENGTH);
+            shortLabel = shortLabel.substring(0, SHORT_LABEL_LENGTH);
             if (log.isWarnEnabled()) log.warn("\tFull name to short label truncated: " + shortLabel);
         }
 
