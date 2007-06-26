@@ -17,5 +17,5 @@
     
     <modules>
        <module>intact-interolog-prediction</module>
-    </module>
+    </modules>
 </project>
