@@ -14,5 +14,8 @@
 
     <name>IntAct Data Exchange :: PSI MI :: TAB</name>
     <description>PSI MI TAB Master POM</description>
-
+    
+    <modules>
+       <module>intact-interolog-prediction</module>
+    </module>
 </project>
