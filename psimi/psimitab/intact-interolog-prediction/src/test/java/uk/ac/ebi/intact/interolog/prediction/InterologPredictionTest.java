@@ -18,6 +18,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
@@ -116,6 +117,7 @@ public class InterologPredictionTest {
 	 * @throws MitabException 
 	 */
 	@Test
+	@Ignore
 	public final void testRun() throws MitabException {
 		
 		// parameters
@@ -135,12 +137,13 @@ public class InterologPredictionTest {
         prediction.setMitab(inputMitab);
         
         Collection<Long> ids = new HashSet<Long>(1);
-		ids.add(41l);
-		prediction.setUserProteomeIdsToDownCast(ids);
+		ids.add(1148l);
+		prediction.setUserTaxidsToDownCast(ids);
 		String extension = ".mitab";
 		prediction.setPredictedinteractionsFileExtension(extension);
 		String name = "clog.predictedInteractions";
 		prediction.setPredictedinteractionsFileName(name);
+		prediction.setDownCastOnAllPresentSpecies(false);
 		prediction.setWriteDownCastHistory(false);
 		prediction.setWriteClogInteractions(false);
 		prediction.setDownCastOnChildren(false);
@@ -159,12 +162,16 @@ public class InterologPredictionTest {
         File resFile = new File(url.getFile());
         
         Collection<BinaryInteraction> interactions = MitabUtils.readMiTab(resFile);
-		assertEquals(interactions.size(), 6);
+        assertNotNull(interactions);
+		assertEquals(interactions.size(), 2);
 		
 		BinaryInteraction interaction1 = buildInteraction("P73479", "P73723", 1148l);
 		assertNotNull(interaction1);
-		
 		assertTrue("interaction1 should be in the results: "+interaction1, interactions.contains(interaction1));
+        
+		BinaryInteraction interaction2 = buildInteraction("P73479", "Q55431", 1148l);
+		assertNotNull(interaction2);
+		assertTrue("interaction2 should be in the results: "+interaction2, interactions.contains(interaction2));
         
 	}
 
