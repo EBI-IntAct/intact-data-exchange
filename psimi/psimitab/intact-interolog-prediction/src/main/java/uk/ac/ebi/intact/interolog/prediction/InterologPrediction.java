@@ -141,10 +141,19 @@ public class InterologPrediction {
 	private Collection<Long> proteomeIdsToDownCast;
 	
 	/**
-	 * List of species for which user wants predict interactions (proteomeIds).
+	 * If we want to put all taxids present in the mitab source file into the list of species
+	 * for which we want to predict interactions.
+	 * Can be useful to remove it if we are only interested in 1 or 2 species.
+	 * 
+	 * Default is true.
+	 */
+	private boolean downCastOnAllPresentSpecies = true;
+	
+	/**
+	 * List of species for which user wants predict interactions (NCBI taxids).
 	 * Are added in the default list.
 	 */
-	private Collection<Long> userProteomeIdsToDownCast;
+	private Collection<Long> userTaxidsToDownCast;
 	
 	/**
 	 * Different sources (mitab and clog data) can be in a different level of specificity in the taxonomy.
@@ -324,13 +333,21 @@ public class InterologPrediction {
 		this.predictedinteractionsFileName = predictedinteractionsFileName;
 	}
 	
-	public Collection<Long> getUserProteomeIdsToDownCast() {
-		return this.userProteomeIdsToDownCast;
+	public boolean isDownCastOnAllPresentSpecies() {
+		return this.downCastOnAllPresentSpecies;
 	}
 
-	public void setUserProteomeIdsToDownCast(
+	public void setDownCastOnAllPresentSpecies(boolean downCastOnAllPresentSpecies) {
+		this.downCastOnAllPresentSpecies = downCastOnAllPresentSpecies;
+	}
+	
+	public Collection<Long> getUserTaxidsToDownCast() {
+		return this.userTaxidsToDownCast;
+	}
+
+	public void setUserTaxidsToDownCast(
 			Collection<Long> userProteomeIdsToDownCast) {
-		this.userProteomeIdsToDownCast = userProteomeIdsToDownCast;
+		this.userTaxidsToDownCast = userProteomeIdsToDownCast;
 	}
 	
 	public boolean isDownCastOnChildren() {
@@ -460,7 +477,7 @@ public class InterologPrediction {
 				downloadClogs();
 			} catch (IOException e) {
 				//throw new InterologPredictionException("Error while downloading clog file",e);
-				throw new InterologPredictionException("You have to put the clog file in the working directory",e);
+				throw new InterologPredictionException("You have to put the clog file toto "+getClog().getAbsolutePath()+" in the working directory "+workingDir.getAbsolutePath(),e);
 			}
 		}
 		
@@ -711,64 +728,78 @@ public class InterologPrediction {
 	 * @throws InterologPredictionException
 	 */
 	@SuppressWarnings("unchecked")
-	private void chooseSpeciesToPredict(int strategy) throws InterologPredictionException {
-		log.warn("choose species for which we will transfer interactions");
+	private void chooseSpeciesToPredict() throws InterologPredictionException {
+		log.info("choose species for which we will transfer interactions");
+		Map<Long, Long> taxid2proteomeIdsToDownCast = new HashMap<Long, Long>();
 		
-		// strategy 1: only on a specific species
-		if (strategy==1) {
-			proteomeIdsToDownCast = new HashSet<Long>(1);
-			Long taxid = 1148l;
-			proteomeIdsToDownCast.add(taxid2proteomeId.get(taxid));
-			log.warn("only taxid "+taxid);
-		}
 		
-		// strategy 2: only taxids present in both mitab and clog data
+		
+		// strategy used: only taxids present in both mitab and clog data
 		// and some strains as well
-		else if (strategy==2) {
-			// taxids from mitab source file
+//		 taxids from mitab source file
+		if (downCastOnAllPresentSpecies) {
 			int noProteome = 0;
-			for (Long long1 : mitabTaxids) {
-				Long proteomeidToAdd = taxid2proteomeId.get(long1);
+			for (Long mitabTaxid : mitabTaxids) {
+				Long proteomeidToAdd = taxid2proteomeId.get(mitabTaxid);
 				if (proteomeidToAdd!=null) {
-					proteomeIdsToDownCast.add(proteomeidToAdd);
+					taxid2proteomeIdsToDownCast.put(mitabTaxid, proteomeidToAdd);
 				} else {
 					noProteome++;
-					log.debug(long1+" has no mapping to a proteome id");
+					log.debug(mitabTaxid+" has no mapping to a proteome id");
 				}
 			}
-			int nbSp = proteomeIdsToDownCast.size();
-			log.warn(nbSp+" taxids from mitab source file are mapped to preoteome ids and added in the list of species");
+			int nbSp = taxid2proteomeIdsToDownCast.size();
+			log.warn(nbSp+" taxids from mitab source file are mapped to proteome ids and added in the list of species");
 			log.info(noProteome+" taxids from mitab source file are not mapped to proteome ids");
+		}
+		
+		// add species asked by user
+		if (userTaxidsToDownCast!=null && !userTaxidsToDownCast.isEmpty()) {
+			for (Long userTaxid : userTaxidsToDownCast) {
+				Long userProteomeId = taxid2proteomeId.get(userTaxid);
+				if (userProteomeId!=null) {
+					taxid2proteomeIdsToDownCast.put(userTaxid, userProteomeId);
+				} else {
+					log.debug("user species "+userTaxid+" can not be mapped to proteome id");
+				}
+			}
 			
-			// we add some strains manually if the parent is in the list
-			// and if the children can be mapped to a proteome id
-			int added = 0;
-			for (Long parentTaxid : taxid2ChildrenTaxids.keySet()) {
-				if (mitabTaxids.contains(parentTaxid)) {
-					Collection<Long> childrenTaxids = taxid2ChildrenTaxids.get(parentTaxid);
-					for (Long childTaxid : childrenTaxids) {
-						Long proteomeIdToAdd = taxid2proteomeId.get(childTaxid);
-						if (proteomeIdToAdd!=null) {
-							added++;
-							proteomeIdsToDownCast.add(proteomeIdToAdd);
-						}
+			log.warn(taxid2proteomeIdsToDownCast.size()+" species given by the user are added to the list for the predictions");
+			log.info("We now have "+taxid2proteomeIdsToDownCast.size()+" proteome ids in the list");
+		}
+		
+		
+		// we add some strains manually if the parent is in the list
+		// and if the children can be mapped to a proteome id
+		int added = 0;
+		for (Long parentTaxid : taxid2ChildrenTaxids.keySet()) {
+			if (taxid2proteomeIdsToDownCast.containsKey(parentTaxid)) {
+				Collection<Long> childrenTaxids = taxid2ChildrenTaxids.get(parentTaxid);
+				for (Long childTaxid : childrenTaxids) {
+					Long proteomeIdToAdd = taxid2proteomeId.get(childTaxid);
+					if (proteomeIdToAdd!=null) {
+						added++;
+						//proteomeIdsToDownCast.add(proteomeIdToAdd);
+						taxid2proteomeIdsToDownCast.put(childTaxid, proteomeIdToAdd);
 					}
 				}
 			}
-			log.warn(added+" proteome ids of specific strains are added in the list of species");
 		}
+		log.info(added+" proteome ids of specific strains are added in the list of species");
 		
-		// strategy 3: try to extend the mapping with NEWT
-		// a bit long
-		else if (strategy==3) {
+		// another strategy more general: try to extend the mapping with NEWT
+		// a bit long and complicated...if you want to continue it... ;-)
+		if (false) {
 			mapTaxids();
 			for (Object long1 : InterologUtils.getAllValues( mitabTaxid2ClogTaxid )) {
 				proteomeIdsToDownCast.add(taxid2proteomeId.get(Long.parseLong( long1.toString() )));
 			}
 			log.warn(proteomeIdsToDownCast.size()+" species");
 		}
-
-		log.info("list of "+proteomeIdsToDownCast.size()+" proteomes for which we will predict interactions");
+		
+		proteomeIdsToDownCast.addAll(taxid2proteomeIdsToDownCast.values());
+		
+		log.warn("list of "+proteomeIdsToDownCast.size()+" proteomes for which we will predict interactions");
 		log.debug(proteomeIdsToDownCast);
 		
 		printMemoryInfo();
@@ -874,9 +905,7 @@ public class InterologPrediction {
 		mapProtein2ItsClog();// -> collect clog taxids list in the same time
 		
 		// chose species for which we want to predict interactions
-		// default strategy = 2 = only species present in the source mitab file
-		// with some strains added for ecoli and pylori
-		chooseSpeciesToPredict(2);
+		chooseSpeciesToPredict();
 		if (false) {
 			testTaxids();
 		}
@@ -1152,14 +1181,7 @@ public class InterologPrediction {
 	 */
 	private void downCast() {
 		log.warn("========== Down-cast ==========");
-		
-		if (userProteomeIdsToDownCast!=null && !userProteomeIdsToDownCast.isEmpty()) {
-			proteomeIdsToDownCast.addAll(userProteomeIdsToDownCast);
-			log.info(userProteomeIdsToDownCast.size()+" species given by the user are added to the list for the predictions");
-			log.info("We now have "+proteomeIdsToDownCast.size()+" proteome ids in the list");
-		}
-		
-		
+				
 		if (isWriteDownCastHistory()) {
 			try {
 				downCastHistory = new PrintStream(new File(workingDir.getAbsolutePath()+"/downCast.history.txt"));
@@ -1265,11 +1287,12 @@ public class InterologPrediction {
 	 */
 	public static void main(String[] args) throws InterologPredictionException, NewtException{
 		
-		File dir = new File("/Users/mmichaut/Documents/EBI/results/clogs/test/");
+		File dir = new File("/Users/mmichaut/Documents/EBI/results/clogs/");
 		InterologPrediction up = new InterologPrediction(dir);
-		//File mitab = new File("/Users/mmichaut/Documents/EBI/data/IntAct/intact.mitab");
-		File mitab = new File("/Users/mmichaut/Documents/EBI/data/PsimiTab/global.mitab");
+		File mitab = new File("/Users/mmichaut/Documents/EBI/data/IntAct/intact.mitab");
+		//File mitab = new File("/Users/mmichaut/Documents/EBI/data/PsimiTab/global.mitab");
 		up.setMitab(mitab);
+		up.setDownCastOnAllPresentSpecies(true);
 		up.setWriteDownCastHistory(true);
 		ClogInteraction.setNB_LINES_MAX(100000);
 		up.setWriteClogInteractions(false);
