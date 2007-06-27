@@ -1,7 +1,7 @@
 /**
  * 
  */
-package test.uk.ac.ebi.intact.interolog.ortholog.clog;
+package uk.ac.ebi.intact.interolog.ortholog.clog;
 
 import static org.junit.Assert.*;
 
