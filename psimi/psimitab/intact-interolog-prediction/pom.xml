@@ -2,19 +2,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <parent>
-        <groupId>uk.ac.ebi.intact.maven</groupId>
-        <artifactId>intact-master</artifactId>
-        <version>8</version>
+   <parent>
+        <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
+        <artifactId>psimi-master</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-interolog-prediction</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
 
-    <name>intact-interolog-prediction Module</name>
+    <name>IntAct Data Exchange :: PSI MI :: Interolog prediction</name>
     <description>Module for IntAct</description>
     <url>http://www.ebi.ac.uk/~intact/devsite/intact-interolog-prediction</url>
 
