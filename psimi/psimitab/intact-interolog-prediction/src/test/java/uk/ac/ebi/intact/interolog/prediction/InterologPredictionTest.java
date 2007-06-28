@@ -143,6 +143,7 @@ public class InterologPredictionTest {
 		prediction.setPredictedinteractionsFileExtension(extension);
 		String name = "clog.predictedInteractions";
 		prediction.setPredictedinteractionsFileName(name);
+		prediction.setClogFormatByProtein(false);
 		prediction.setDownCastOnAllPresentSpecies(false);
 		prediction.setWriteDownCastHistory(false);
 		prediction.setWriteClogInteractions(false);
