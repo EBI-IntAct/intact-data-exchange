@@ -36,6 +36,7 @@ public class IntactConverterUtils {
     private static final Log log = LogFactory.getLog(IntactConverterUtils.class);
 
     private static final int SHORT_LABEL_LENGTH = 20;
+    private static final String TEMP_SHORTLABEL_PREFIX = "ns-";
 
     private IntactConverterUtils() {
     }
@@ -108,7 +109,11 @@ public class IntactConverterUtils {
     }
 
     public static String createTempShortLabel() {
-        return "ns-" + System.currentTimeMillis();
+        return TEMP_SHORTLABEL_PREFIX + System.currentTimeMillis();
+    }
+
+    public static boolean isTempShortLabel(String label) {
+        return label.startsWith(TEMP_SHORTLABEL_PREFIX);
     }
 
 

@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.DbReference;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiMiPopulator;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
@@ -40,6 +41,10 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
         String primaryId = psiObject.getId();
         String secondaryId = psiObject.getSecondary();
         String dbRelease = psiObject.getVersion();
+
+        if (primaryId.length() == 0) {
+            throw new PsiConversionException("Id in DbReference is empty: "+psiObject);
+        }
 
         PsiMiPopulator psiMiPopulator = new PsiMiPopulator();
 
@@ -108,7 +113,7 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
             xref.setDbRelease(dbRelease);
             xref.setCvXrefQualifier(cvXrefQual);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new PsiConversionException(e);
         }
 
         return xref;
