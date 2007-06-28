@@ -875,12 +875,6 @@ public class UpdateCVs {
 
         boolean needsUpdate = false;
 
-        // exceptional case: skip update of CvObject with shortLabel 'obsolete term'
-        if (cvObject.getShortLabel().equals("obsolete term")) {
-            output.println("\t\t[WARN] Ignored 'obsolete term'");
-            return;
-        }
-
         // shortname
         if (!cvObject.getShortLabel().equals(trimmedShortName)) {
             cvObject.setShortLabel(trimmedShortName);
