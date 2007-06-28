@@ -110,6 +110,13 @@ public class InterologPrediction {
 	private File clog;
 	
 	/**
+	 * The new clog format contains one protein by line.
+	 * True by default.
+	 * If false we can use the old parser with one clog by line.
+	 */
+	private boolean clogFormatByProtein = true;
+	
+	/**
 	 * Name of the result file with predicted interactions in mitab format.
 	 */
 	private String predictedinteractionsFileName;
@@ -324,6 +331,14 @@ public class InterologPrediction {
 		this.clog = clog;
 	}
 	
+	public boolean isClogFormatByProtein() {
+		return this.clogFormatByProtein;
+	}
+
+	public void setClogFormatByProtein(boolean clogFormatByProtein) {
+		this.clogFormatByProtein = clogFormatByProtein;
+	}
+	
 	public String getPredictedinteractionsFileName() {
 		return this.predictedinteractionsFileName;
 	}
@@ -477,7 +492,7 @@ public class InterologPrediction {
 				downloadClogs();
 			} catch (IOException e) {
 				//throw new InterologPredictionException("Error while downloading clog file",e);
-				throw new InterologPredictionException("You have to put the clog file toto "+getClog().getAbsolutePath()+" in the working directory "+workingDir.getAbsolutePath(),e);
+				throw new InterologPredictionException("clog file "+getClog().getAbsolutePath()+" not found",e);
 			}
 		}
 		
@@ -812,11 +827,18 @@ public class InterologPrediction {
 	 * .
 	 */
 	private void parseClogs() {
-		log.info("parse clogs...");
+		
 		ClogParser parser = new ClogParser();
 		parser.setClogRepeatFile(getClog());
 		Map<Long, Clog> clogs = null;
-		clogs = parser.parseClog();
+		if (clogFormatByProtein) {
+			log.info("parse clogs (format=one protein by line)...");
+			clogs = parser.parseClogProteinFormat();
+		} else {
+			log.info("parse clogs (format=one clog by line)...");
+			clogs = parser.parseClog();
+		}
+		
 		clogId2Clog = clogs;
 		log.info(clogs.size()+" clogs described in the map");
 		printMemoryInfo();
@@ -1289,10 +1311,15 @@ public class InterologPrediction {
 		
 		File dir = new File("/Users/mmichaut/Documents/EBI/results/clogs/");
 		InterologPrediction up = new InterologPrediction(dir);
-		File mitab = new File("/Users/mmichaut/Documents/EBI/data/IntAct/intact.mitab");
-		//File mitab = new File("/Users/mmichaut/Documents/EBI/data/PsimiTab/global.mitab");
+		//File mitab = new File("/Users/mmichaut/Documents/EBI/data/IntAct/intact.mitab");
+		File mitab = new File("/Users/mmichaut/Documents/EBI/data/PsimiTab/global.mitab");
 		up.setMitab(mitab);
-		up.setDownCastOnAllPresentSpecies(true);
+		up.setClog(new File("/Users/mmichaut/Documents/EBI/data/Integr8/clog/20070630/clog.revised.dat"));
+		up.setDownCastOnAllPresentSpecies(false);
+		up.setClogFormatByProtein(false);
+		Collection<Long> taxids = new HashSet<Long>(1);
+		taxids.add(1148l);
+		up.setUserTaxidsToDownCast(taxids);
 		up.setWriteDownCastHistory(true);
 		ClogInteraction.setNB_LINES_MAX(100000);
 		up.setWriteClogInteractions(false);

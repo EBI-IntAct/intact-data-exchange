@@ -24,8 +24,10 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Parser for clog data file.
  * 
- * The temporary format of clog files may change;
- * This parser will have to be updated;
+ * The temporary format of clog files may change.
+ * This parser will have to be updated.
+ * 2 different formats can be parsed here.
+ * The latest one contains one protein by line and is parsed with parseClogProteinFormat.
  * 
  * @author mmichaut
  * @version $Id$
@@ -83,7 +85,7 @@ public class ClogParser {
 	@Override
 	public String toString() {
 		StrBuilder buf = new StrBuilder();
-		buf.append(this.getClogRepeatFile().getName());
+		buf.append(getClogRepeatFile().getName());
 		return buf.toString();
 	}
 	
@@ -164,16 +166,70 @@ public class ClogParser {
 		return clogId2clog;
 	}
 	
+	/**
+	 * Create the map to describe all clogs (access by their id) using clog file
+	 * Second version for new revised data;
+	 * .
+	 * @param spIds
+	 * @return
+	 */
+	public Map<Long, Clog> parseClogProteinFormat() {
+		Map<Long, Clog> clogId2clog = new HashMap<Long, Clog>();
+		
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader( new FileReader( getClogRepeatFile() ) );
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		String line;
+		int count=0;
+		
+		try {
+			while ( ( line = in.readLine() ) != null ) {
+				count++;
+				// clogid ... proteinAc ... proteomeId
+				String[] columns = line.split("\t");
+				if (columns.length!=8) {
+					throw new IllegalArgumentException("Each line should contains 8 columns separated by a tab not "+columns.length);
+				} else {
+					Long id = Long.parseLong(columns[0]);
+					String proteinAc = columns[4];
+					Long proteomeId = Long.parseLong(columns[6]);
+					
+					if (!clogId2clog.containsKey(id)) {
+						clogId2clog.put(id, new Clog(id));
+					}
+					clogId2clog.get(id).getProteomeId2protein().put(proteomeId, proteinAc);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	     
+	     try {
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		log.info(count+" lines in the file "+getClogRepeatFile().getAbsolutePath());
+		log.info(clogId2clog.size()+" clogs are created");
+		
+		return clogId2clog;
+	}
+	
 
 	/**
 	 * @param args 
 	 */
 	public static void main(String[] args){
 		
-		File clogRepeat  = new File("/Users/mmichaut/Documents/EBI/data/Integr8/clog/20070630/clog.revised.dat");
+		File clogRepeat  = new File("/Users/mmichaut/Documents/EBI/data/Integr8/clog/20070630/clog.revised2.head.dat");
 		ClogParser parser = new ClogParser();
 		parser.setClogRepeatFile(clogRepeat);
-		Map<Long, Clog> clogId2clog = parser.parseClog();
+		Map<Long, Clog> clogId2clog = parser.parseClogProteinFormat();
 		System.out.println(clogId2clog.size());
 		
 	}
