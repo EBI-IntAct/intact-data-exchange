@@ -260,8 +260,8 @@ public class MitabStats implements MitabFiles {
 		MitabUtils.toVennListFormat(MITAB_MINT_CLUSTERED, "MINT", new PrintStream(mintVenn));
 		MitabUtils.toVennListFormat(MITAB_DIP_COMPLETED, "DIP", new PrintStream(dipVenn));
 		
-		//pubmedCollections();
-		//interactionStats();
+		pubmedCollections();
+		interactionStats();
 		
 		//interactionStats(intact1, mint, dip);
 		//describeMitab(buildAllFiles());

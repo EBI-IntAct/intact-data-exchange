@@ -1,0 +1,48 @@
+Order = IntAct, MINT, DIP
+
+f=false=not in
+t=true=in
+
+ttt = intersection
+tff = IntAct only
+ftt = MINT&DIP / IntAct
+
+			interactions	publications
+file ttt: 	inter		15008	52file ttf: 	IntAct&MINT/DIP	32495	234file tft: 	IntAct&DIP/MINT	1690	131file ftt: 	MINT&DIP/IntAct	1263	205file fft: 	DIP/MINT/IntAct	36707	2753file ftf: 	MINT/DIP/IntAct	35025	2869file tff: 	IntAct/MINT/DIP	62835	2050
+
+
+
+3h18
+
+
+[YourKit Java Profiler 6.0.15] Using JVMTI (1.5.0_07-87;"Apple Computer, Inc.";mixed mode, sharing;Mac OS X;32 bit JVM)
+[YourKit Java Profiler 6.0.15] CPU profiling is started
+[YourKit Java Profiler 6.0.15] Profiler agent is listening on port 10001...
+[YourKit Java Profiler 6.0.15] Launching profiler UI (/Applications/YourKit Java Profiler 6.0.15.app/bin/../Contents/MacOS/JavaApplicationStub)
+log4j:WARN No appenders could be found for logger (psidev.psi.mi.tab.converter.txt2tab.MitabLineParser).
+log4j:WARN Please initialize the log4j system properly.
+112028 interactions parsed and 2467 publications
+83791 interactions parsed and 3360 publications
+54669 interactions parsed and 3141 publications
+file publis.ttt: 52
+file publis.ttf: 234
+file publis.tft: 131
+file publis.ftt: 205
+file publis.fft: 2753
+file publis.ftf: 2869
+file publis.tff: 2050
+parse file intact.mitab
+112028 interactions parsed and 112028 twoInteractors
+parse file mint.clustered.mitab
+83791 interactions parsed and 83791 twoInteractors
+parse file dip.clustered.mitab
+54669 interactions parsed and 54669 twoInteractors
+file interactions.ttt: 15008
+file interactions.ttf: 32495
+file interactions.tft: 1690
+file interactions.ftt: 1263
+file interactions.fft: 36707
+file interactions.ftf: 35025
+file interactions.tff: 62835
+[YourKit Java Profiler 6.0.15] CPU snapshot is saved to /Users/mmichaut/Snapshots/PsiMiUtils-2007-06-02-shutdown.cpu
+[YourKit Java Profiler 6.0.15] Telemetry snapshot is saved to /Users/mmichaut/Snapshots/PsiMiUtils-2007-06-02-shutdown.telemetry
