@@ -751,13 +751,13 @@ public class MitabUtils implements MitabFiles {
 		File dir = new File("/Users/mmichaut/Documents/EBI/results/tmp/");
 		File cytos = new File(dir.getAbsolutePath()+"/exp.sif");
 		File venn = new File(dir.getAbsolutePath()+"/exp.list");
-		//File interolog = new File("/Users/mmichaut/Documents/EBI/results/transfer/40/predictions.mitab");
-		//File clog = new File("/Users/mmichaut/Documents/EBI/results/clogs/07.06.10_global_fixType/clog.predictedInteractions.txt");
+		File interolog = new File("/Users/mmichaut/Documents/EBI/results/transfer/10.0_BNRH_70.0/predictions.mitab");
+		File clog = new File("/Users/mmichaut/Documents/EBI/results/clogs/07.06.27_global/clog.predictedInteractions.txt");
 		PrintStream ps = new PrintStream(cytos);
 		PrintStream psV = new PrintStream(venn);
 		toVennList(MITAB_GLOBAL, 1148l, true, "exp", "exp", psV, ps);
-		//toVennListAndCytoscapeFormat(MITAB_PREDICTION_INTEROLOG, 1148l, "interolog", "interolog", psV, ps);
-		//toVennListAndCytoscapeFormat(clog, 1148l, "clog", "clog", psV, ps);
+		toVennList(interolog, 1148l, true, "interolog", "interolog", psV, ps);
+		toVennList(clog, 1148l, true, "clog", "clog", psV, ps);
 		ps.close();
 		psV.close();
 		

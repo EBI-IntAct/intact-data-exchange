@@ -192,7 +192,7 @@ public class ClogParser {
 				// clogid ... proteinAc ... proteomeId
 				String[] columns = line.split("\t");
 				if (columns.length!=8) {
-					throw new IllegalArgumentException("Each line should contains 8 columns separated by a tab not "+columns.length);
+					throw new IllegalArgumentException("Each line should contains 8 columns separated by a tab not "+columns.length+" in line #"+count);
 				} else {
 					Long id = Long.parseLong(columns[0]);
 					String proteinAc = columns[4];
@@ -214,8 +214,8 @@ public class ClogParser {
 			e.printStackTrace();
 		}
 		
-		log.info(count+" lines in the file "+getClogRepeatFile().getAbsolutePath());
-		log.info(clogId2clog.size()+" clogs are created");
+		log.debug(count+" lines in the file "+getClogRepeatFile().getAbsolutePath());
+		log.debug(clogId2clog.size()+" clogs are created");
 		
 		return clogId2clog;
 	}

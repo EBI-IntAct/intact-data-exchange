@@ -117,8 +117,7 @@ public class InterologPredictionTest {
 	 * @throws MitabException 
 	 */
 	@Test
-	@Ignore
-	public final void testRun() throws MitabException {
+	public final void testRunFormat1() throws MitabException {
 		
 		// parameters
 		final String clog = "/test.clog.dat";
@@ -175,5 +174,69 @@ public class InterologPredictionTest {
 		assertTrue("interaction2 should be in the results: "+interaction2, interactions.contains(interaction2));
         
 	}
+	
+	/**
+	 * Test method for {@link uk.ac.ebi.intact.interolog.prediction.InterologPrediction#run()}.
+	 * @throws MitabException 
+	 */
+	@Test
+	public final void testRunFormat2() throws MitabException {
+		
+		// parameters
+		final String clog = "/test.clog.protein.small.dat";
+        URL urlClog = InterologPredictionTest.class.getResource( clog );
+        assertNotNull( "Could not initialize test, file " + clog + " could not be found.", urlClog );
+        File inputClog = new File(urlClog.getFile());
+        
+        final String mitab = "/test.mitab";
+        URL urlMitab = InterologPredictionTest.class.getResource( mitab );
+        assertNotNull( "Could not initialize test, file " + mitab + " could not be found.", urlMitab );
+        File inputMitab = new File(urlMitab.getFile());
+        
+        InterologPrediction prediction = new InterologPrediction(new File("./src/test/resources/"));
+        assertNotNull(prediction);
+        prediction.setClog(inputClog);
+        prediction.setMitab(inputMitab);
+        
+        Collection<Long> ids = new HashSet<Long>(1);
+		ids.add(1148l);
+		prediction.setUserTaxidsToDownCast(ids);
+		String extension = ".mitab";
+		prediction.setPredictedinteractionsFileExtension(extension);
+		String name = "clog.predictedInteractions";
+		prediction.setPredictedinteractionsFileName(name);
+		prediction.setClogFormatByProtein(true);
+		prediction.setDownCastOnAllPresentSpecies(false);
+		prediction.setWriteDownCastHistory(false);
+		prediction.setWriteClogInteractions(false);
+		prediction.setDownCastOnChildren(false);
+		
+		// run prediction process
+		try {
+			prediction.run();
+		} catch (InterologPredictionException e) {
+			System.out.println(e);
+		}
+		
+		// check results
+		final String res = "/"+name+extension;
+        URL url = InterologPredictionTest.class.getResource( res );
+        assertNotNull( "Could not initialize test, file " + res + " could not be found.", url );
+        File resFile = new File(url.getFile());
+        
+        Collection<BinaryInteraction> interactions = MitabUtils.readMiTab(resFile);
+        assertNotNull(interactions);
+		assertEquals(interactions.size(), 2);
+		
+		BinaryInteraction interaction1 = buildInteraction("P73479", "P73723", 1148l);
+		assertNotNull(interaction1);
+		assertTrue("interaction1 should be in the results: "+interaction1, interactions.contains(interaction1));
+        
+		BinaryInteraction interaction2 = buildInteraction("P73479", "Q55431", 1148l);
+		assertNotNull(interaction2);
+		assertTrue("interaction2 should be in the results: "+interaction2, interactions.contains(interaction2));
+        
+	}
+
 
 }
