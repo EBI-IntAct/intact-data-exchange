@@ -189,17 +189,22 @@ public class UpdateCVs {
         // 2. update of the terms' content
         output.println("\nupdate of the terms' content");
 
-        Collection oboTerms = ontology.getCvTerms(cvObjectClass);
+        Collection<CvTerm> oboTerms = ontology.getCvTerms(cvObjectClass);
         oboTerms.addAll(ontology.getObsoleteTerms());
 
         output.println("\t " + oboTerms.size() + " term(s) for " + cvObjectClass + " loaded from definition file.");
-        for (Iterator iterator = oboTerms.iterator(); iterator.hasNext();) {
-            CvTerm cvTerm = (CvTerm) iterator.next();
+
+        for (CvTerm cvTerm : oboTerms) {
 
             CvObject cvObject = getCVWithMi(intactIndex, cvObjectClass, cvTerm.getId());
-
+            
             // if a cvterm is obsolete and its not present in the DB, ignore it
             if (cvObject == null && cvTerm.isObsolete()) {
+                continue;
+            }
+
+            // explicitly ignore the cv term "obsolete"
+            if (cvTerm.getShortName().equals("obsolete")) {
                 continue;
             }
 
@@ -653,6 +658,7 @@ public class UpdateCVs {
                 output.println("Created missing CV Term: " + getShortClassName(clazz) + "( " + cv.getShortLabel() + " - " + cv.getFullName() + " ).");
 
                 cvCache.put(clazz, mi, shortlabel, cv);
+
                 IntactContext.getCurrentInstance().getDataContext().flushSession();
 
                 report.addCreatedTerm(cv);
