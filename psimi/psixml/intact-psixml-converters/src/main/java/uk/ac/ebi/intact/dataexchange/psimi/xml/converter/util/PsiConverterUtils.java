@@ -177,7 +177,13 @@ public class PsiConverterUtils {
         return dbRefs;
     }
 
-    private static DbReference getIdentity(Collection<DbReference> dbRefs) {
+    /**
+     * The primary ref is the one that contains the qualifier 'identity', choosing the one with uniprot accession
+     * if there is more than one "identities"
+     * @param dbRefs
+     * @return
+     */
+    protected static DbReference getIdentity(Collection<DbReference> dbRefs) {
         Collection<DbReference> identityRefs = new HashSet<DbReference>();
 
         for (DbReference dbRef : dbRefs) {
@@ -192,7 +198,15 @@ public class PsiConverterUtils {
         }
 
         if (!identityRefs.isEmpty()) {
-            return identityRefs.iterator().next();
+            // return the one for uniprot, if present. Otherwise return a random one.
+            for (DbReference dbRef : identityRefs) {
+                if (dbRef.getDbAc().equals(CvDatabase.UNIPROT_MI_REF)) {
+
+                    return dbRef;
+                }
+            }
+
+             return identityRefs.iterator().next();
         }
 
         if (!dbRefs.isEmpty()) {

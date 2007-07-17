@@ -204,6 +204,17 @@ public class PsiMockFactory {
         return dbRef;
     }
 
+    public static DbReference createDbReference(String refType, String refTypeAc, String dbType, String dbAc) {
+        DbReference dbRef = new DbReference(nextString("id"), dbType);
+        dbRef.setDbAc(dbAc);
+        dbRef.setRefType(refType);
+        dbRef.setRefTypeAc(refTypeAc);
+        dbRef.setSecondary(nextString("secondary"));
+        dbRef.setVersion(nextString("version"));
+
+        return dbRef;
+    }
+
     private static String nextString() {
         return nextString("str");
     }
