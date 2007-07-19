@@ -43,4 +43,7 @@ public class ComponentEnricher implements Enricher<Component>{
         InteractorEnricher interactorEnricher = InteractorEnricher.getInstance();
         interactorEnricher.enrich(objectToEnrich.getInteractor());
     }
+
+    public void close() {
+    }
 }

@@ -18,13 +18,12 @@ package uk.ac.ebi.intact.plugin.cv.obo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-
+import uk.ac.ebi.intact.dataexchange.cvutils.DownloadCVs;
 import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
 import uk.ac.ebi.intact.plugin.MojoUtils;
-import uk.ac.ebi.intact.dbutil.cv.DownloadCVs;
 
-import java.io.File;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 

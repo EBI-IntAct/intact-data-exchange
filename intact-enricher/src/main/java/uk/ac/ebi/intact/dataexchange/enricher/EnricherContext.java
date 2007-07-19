@@ -15,8 +15,12 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.InputStream;
 
 /**
  * TODO comment this
@@ -25,6 +29,9 @@ import org.apache.commons.logging.LogFactory;
  * @version $Id$
  */
 public class EnricherContext {
+
+    private EnricherConfig config;
+    private CacheManager cacheManager;
 
     /**
      * Sets up a logger for that class.
@@ -43,6 +50,23 @@ public class EnricherContext {
     }
 
     private EnricherContext() {
+        this.config = new EnricherConfig();
+
+
+        InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/ehcache-enricher.xml");
+        this.cacheManager = CacheManager.create(ehcacheConfig);
+    }
+
+    public EnricherConfig getConfig() {
+        return config;
+    }
+
+    public Cache getCache(String name) {
+        return cacheManager.getCache(name);
+    }
+
+    public void loadCvOntology() {
+
     }
 
 }

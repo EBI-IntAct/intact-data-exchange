@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <artifactId>dataexchange-master</artifactId>
@@ -10,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-enricher</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
 
     <name>IntAct Data Exchange :: Enricher</name>
 
@@ -19,6 +20,50 @@
             <groupId>uk.ac.ebi.intact</groupId>
             <artifactId>intact-core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.intact.util</groupId>
+            <artifactId>intact-uniprot</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- IntAct bridges -->
+        <dependency>
+            <groupId>uk.ac.ebi.intact.bridges</groupId>
+            <artifactId>intact-picr</artifactId>
+            <version>2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.bridges</groupId>
+            <artifactId>intact-citexplore</artifactId>
+            <version>2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.bridges</groupId>
+            <artifactId>intact-taxonomy</artifactId>
+            <version>2.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.intact.datasets</groupId>
+            <artifactId>intact-dataset</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Other EBI -->
+        <dependency>
+            <groupId>uk.ac.ebi.pride</groupId>
+            <artifactId>ols-client</artifactId>
+            <version>1.13</version>
+        </dependency>
+
+        <!-- Third party -->
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>1.3.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

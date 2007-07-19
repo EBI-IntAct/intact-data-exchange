@@ -15,6 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
+import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
+import uk.ac.ebi.intact.dataexchange.enricher.fetch.BioSourceFetcher;
 import uk.ac.ebi.intact.model.BioSource;
 
 /**
@@ -40,6 +42,24 @@ public class BioSourceEnricher implements Enricher<BioSource> {
     }
 
     public void enrich(BioSource objectToEnrich) {
-        throw new UnsupportedOperationException();
+
+        // get the taxonomy term from newt
+        int taxId = Integer.valueOf(objectToEnrich.getTaxId());
+        TaxonomyTerm term = BioSourceFetcher.getInstance().fetchByTaxId(taxId);
+
+        String label = term.getCommonName();
+        String fullName = term.getScientificName();
+
+        if (label != null) {
+            label = label.toLowerCase();
+            objectToEnrich.setShortLabel(label);
+        }
+
+        if (fullName != null) {
+            objectToEnrich.setFullName(fullName);
+        }
+    }
+
+    public void close() {
     }
 }

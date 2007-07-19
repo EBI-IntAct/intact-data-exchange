@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.util.InteractionUtils;
 
 /**
  * TODO comment this
@@ -43,6 +44,9 @@ public class InteractionEnricher implements Enricher<Interaction> {
 
     public void enrich(Interaction objectToEnrich) {
 
+        String label = InteractionUtils.calculateShortLabel(objectToEnrich);
+        objectToEnrich.setShortLabel(label);
+
         ExperimentEnricher experimentEnricher = ExperimentEnricher.getInstance();
         
         for (Experiment experiment : objectToEnrich.getExperiments()) {
@@ -54,5 +58,9 @@ public class InteractionEnricher implements Enricher<Interaction> {
         for (Component component : objectToEnrich.getComponents()) {
              componentEnricher.enrich(component);
         }
+    }
+
+
+    public void close() {
     }
 }

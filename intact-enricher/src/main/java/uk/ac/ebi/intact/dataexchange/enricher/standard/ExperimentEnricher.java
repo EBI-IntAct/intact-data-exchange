@@ -44,4 +44,7 @@ public class ExperimentEnricher implements Enricher<Experiment> {
 
         bioSourceEnricher.enrich(objectToEnrich.getBioSource());
     }
+
+    public void close() {
+    }
 }

@@ -34,6 +34,7 @@
         <module>plugins</module>
         <module>psimi</module>
         <module>intact-enricher</module>
+        <module>intact-cvutils</module>
   </modules>
 
     <build>
@@ -71,6 +72,11 @@
             </dependency>
 
             <!-- submodules -->
+            <dependency>
+                <groupId>uk.ac.ebi.intact.dataexchange</groupId>
+                <artifactId>intact-cvutils</artifactId>
+                <version>${currentVersion}</version>
+            </dependency>
             <dependency>
                 <groupId>uk.ac.ebi.intact.dataexchange</groupId>
                 <artifactId>intact-dbutils</artifactId>

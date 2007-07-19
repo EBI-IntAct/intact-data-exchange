@@ -24,4 +24,6 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 public interface Enricher<T> {
 
     void enrich(T objectToEnrich);
+
+    void close();
 }

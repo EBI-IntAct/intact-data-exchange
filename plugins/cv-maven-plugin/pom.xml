@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-            <artifactId>intact-dbutils</artifactId>
+            <artifactId>intact-cvutils</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>

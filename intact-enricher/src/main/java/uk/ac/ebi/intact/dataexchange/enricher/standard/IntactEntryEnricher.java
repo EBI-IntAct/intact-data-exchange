@@ -47,4 +47,7 @@ public class IntactEntryEnricher implements Enricher<IntactEntry> {
             interactionEnricher.enrich(interaction);
         }
     }
+
+    public void close() {
+    }
 }
