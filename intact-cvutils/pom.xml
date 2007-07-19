@@ -1,21 +1,30 @@
-<?xml version="1.0"?><project>
-  <parent>
-    <artifactId>dataexchange-master</artifactId>
-    <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-    <version>2.0.0-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-  <artifactId>intact-cvutils</artifactId>
-  <name>intact-cvutils</name>
-  <version>1.0-SNAPSHOT</version>
-  <url>http://maven.apache.org</url>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+<?xml version="1.0"?>
+<project>
+    <parent>
+        <artifactId>dataexchange-master</artifactId>
+        <groupId>uk.ac.ebi.intact.dataexchange</groupId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>intact-cvutils</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>IntAct Data Exchange :: CV Utils</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>uk.ac.ebi.intact</groupId>
+            <artifactId>intact-core</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.geneontology</groupId>
+            <artifactId>oboedit</artifactId>
+            <version>beta8</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
 </project>
