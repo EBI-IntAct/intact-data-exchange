@@ -5,6 +5,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.cvutils.model;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -14,7 +15,7 @@ import java.util.*;
  * @version $Id$
  * @since <pre>28-Sep-2005</pre>
  */
-public class CvTerm {
+public class CvTerm implements Serializable {
 
     ///////////////////////
     // Instance variables
