@@ -53,7 +53,7 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
 
         CvDatabase cvDb = new CvDatabase(getInstitution(), db);
 
-        if (dbAc != null && dbAc.startsWith("MI")) {
+        if (dbAc != null) {
             psiMiPopulator.populateWithPsiMi(cvDb, dbAc);
         }
 
