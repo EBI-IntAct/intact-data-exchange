@@ -17,15 +17,9 @@ package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
-import uk.ac.ebi.intact.bridges.taxonomy.NewtTaxonomyService;
-import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyService;
-import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
-import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
-import uk.ac.ebi.ook.web.services.Query;
-import uk.ac.ebi.ook.web.services.QueryService;
-import uk.ac.ebi.ook.web.services.QueryServiceLocator;
 
 /**
  * TODO comment this
@@ -46,31 +40,23 @@ public class CvObjectFetcher {
         return instance.get();
     }
 
-    private TaxonomyService taxonomyService;
-
     public CvObjectFetcher() {
-        this.taxonomyService = new NewtTaxonomyService();
     }
 
-    public TaxonomyTerm fetchByTaxId(int taxId) {
+    public CvTerm fetchByTaxId(String termId) {
         Cache cache = EnricherContext.getInstance().getCache("CvObject");
 
-        QueryService queryService = new QueryServiceLocator();
-        Query query = queryService.getOntologyQuery();
+        CvTerm term;
 
-        query.
-
-        TaxonomyTerm term;
-
-        if (cache.isKeyInCache(taxId)) {
-            term = (TaxonomyTerm) cache.get(taxId).getObjectValue();
+        if (cache.isKeyInCache(termId)) {
+            term = (CvTerm) cache.get(termId).getObjectValue();
         } else {
-            try {
-                term = taxonomyService.getTaxonomyTerm(taxId);
-            } catch (TaxonomyServiceException e) {
-                throw new EnricherException(e);
+            IntactOntology ontology = EnricherContext.getInstance().getIntactOntology();
+            term = ontology.search(termId);
+
+            if (term != null) {
+                cache.put(new Element(termId, term));
             }
-            cache.put(new Element(taxId, term));
         }
 
         return term;

@@ -15,7 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
-import uk.ac.ebi.intact.model.Component;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
+import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
+import uk.ac.ebi.intact.model.CvObject;
+import uk.ac.ebi.intact.model.CvObjectXref;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
  * TODO comment this
@@ -23,7 +27,7 @@ import uk.ac.ebi.intact.model.Component;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class CvObjectEnricher implements Enricher<Component> {
+public class CvObjectEnricher implements Enricher<CvObject> {
 
     private static ThreadLocal<CvObjectEnricher> instance = new ThreadLocal<CvObjectEnricher>() {
         @Override
@@ -39,8 +43,14 @@ public class CvObjectEnricher implements Enricher<Component> {
     protected CvObjectEnricher() {
     }
 
-    public void enrich(Component objectToEnrich) {
+    public void enrich(CvObject objectToEnrich) {
+        CvObjectXref identityXref = CvObjectUtils.getPsiMiIdentityXref(objectToEnrich);
 
+        String mi = identityXref.getPrimaryId();
+
+        CvTerm term = CvObjectFetcher.getInstance().fetchByTaxId(mi);
+
+        System.out.println("TERM: "+term.getShortName());
     }
 
     public void close() {

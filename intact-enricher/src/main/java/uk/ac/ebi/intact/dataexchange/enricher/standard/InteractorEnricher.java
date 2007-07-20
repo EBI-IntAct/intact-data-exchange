@@ -16,7 +16,6 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import uk.ac.ebi.intact.model.Interactor;
-import uk.ac.ebi.intact.model.Xref;
 
 /**
  * TODO comment this
@@ -41,8 +40,6 @@ public class InteractorEnricher implements Enricher<Interactor> {
     }
 
     public void enrich(Interactor objectToEnrich) {
-
-        System.out.println("ORG: "+objectToEnrich.getBioSource());
 
         if (objectToEnrich.getBioSource() != null) {
             BioSourceEnricher.getInstance().enrich(objectToEnrich.getBioSource());

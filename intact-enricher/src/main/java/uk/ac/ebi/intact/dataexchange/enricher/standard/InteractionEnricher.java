@@ -58,6 +58,12 @@ public class InteractionEnricher implements Enricher<Interaction> {
         for (Component component : objectToEnrich.getComponents()) {
              componentEnricher.enrich(component);
         }
+
+        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
+        System.out.println("OBJ TO ENRICH: "+objectToEnrich.getCvInteractionType());
+        if (objectToEnrich.getCvInteractionType() != null) {
+            cvObjectEnricher.enrich(objectToEnrich.getCvInteractionType());
+        }
     }
 
 

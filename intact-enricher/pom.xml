@@ -17,6 +17,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>uk.ac.ebi.intact.dataexchange</groupId>
+            <artifactId>intact-cvutils</artifactId>
+        </dependency>
+        <dependency>
             <groupId>uk.ac.ebi.intact</groupId>
             <artifactId>intact-core</artifactId>
         </dependency>

@@ -16,9 +16,9 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.junit.After;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import uk.ac.ebi.intact.core.unit.IntactAbstractTestCase;
 import uk.ac.ebi.intact.core.unit.IntactUnitDataset;
 import uk.ac.ebi.intact.model.Interaction;
@@ -30,7 +30,7 @@ import uk.ac.ebi.intact.unitdataset.PsiTestDatasetProvider;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@IntactUnitDataset(dataset = PsiTestDatasetProvider.DIP_NOV_06, provider = PsiTestDatasetProvider.class)
+@IntactUnitDataset(dataset = PsiTestDatasetProvider.INTACT_JUL_06, provider = PsiTestDatasetProvider.class)
 public class InteractionEnricherTest extends IntactAbstractTestCase {
 
     private InteractionEnricher enricher;

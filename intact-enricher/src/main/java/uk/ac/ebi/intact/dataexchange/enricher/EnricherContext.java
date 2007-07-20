@@ -19,8 +19,13 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.dataexchange.cvutils.PSILoader;
+import uk.ac.ebi.intact.dataexchange.cvutils.PsiLoaderException;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * TODO comment this
@@ -30,13 +35,14 @@ import java.io.InputStream;
  */
 public class EnricherContext {
 
-    private EnricherConfig config;
-    private CacheManager cacheManager;
-
     /**
      * Sets up a logger for that class.
      */
     public static final Log log = LogFactory.getLog(EnricherContext.class);
+
+    private EnricherConfig config;
+    private CacheManager cacheManager;
+    private IntactOntology ontology;
 
     private static ThreadLocal<EnricherContext> instance = new ThreadLocal<EnricherContext>() {
         @Override
@@ -65,8 +71,31 @@ public class EnricherContext {
         return cacheManager.getCache(name);
     }
 
-    public void loadCvOntology() {
 
+    public IntactOntology getIntactOntology() {
+        if (ontology == null) {
+            try {
+                ontology = loadOntology();
+            } catch (PsiLoaderException e) {
+                throw new EnricherException(e);
+            }
+        }
+
+        return ontology;
+    }
+
+    private IntactOntology loadOntology() throws PsiLoaderException {
+        URL url = null;
+        try {
+            url = new URL(getConfig().getOboUrl());
+        } catch (MalformedURLException e) {
+            throw new EnricherException(e);
+        }
+
+        PSILoader loader = new PSILoader();
+        IntactOntology ontology = loader.parseOboFile(url);
+
+        return ontology;
     }
 
 }
