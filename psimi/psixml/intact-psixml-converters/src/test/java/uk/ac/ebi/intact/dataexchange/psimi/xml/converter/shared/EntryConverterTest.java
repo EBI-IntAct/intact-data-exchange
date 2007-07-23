@@ -27,14 +27,15 @@ import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
+import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
-import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidatorMessage;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidatorReport;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -47,13 +48,9 @@ import java.util.HashSet;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class EntryConverterTest {
+public class EntryConverterTest extends AbstractConverterTest {
 
     private static final Log log = LogFactory.getLog(EntryConverterTest.class);
-
-    private static final String INTACT_FILE = "/xml/intact_2006-07-19.xml";
-    private static final String MINT_FILE = "/xml/mint_2006-07-18.xml";
-    private static final String DIP_FILE = "/xml/dip_2006-11-01.xml";
 
     private Entry entry;
     private EntryConverter entryConverter;
@@ -89,24 +86,24 @@ public class EntryConverterTest {
 
     @Test
     public void roundtrip_intact() throws Exception {
-        String file = EntryConverterTest.class.getResource(INTACT_FILE).getFile();
-        assertTrue("Document must be valid: " + INTACT_FILE, xmlIsValid(new FileInputStream(file)));
+        File file = getIntactFile();
+        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         roundtripWithStream(new FileInputStream(file));
     }
 
     @Test
     public void roundtrip_mint() throws Exception {
-        String file = EntryConverterTest.class.getResource(MINT_FILE).getFile();
-        assertTrue("Document must be valid: " + MINT_FILE, xmlIsValid(new FileInputStream(file)));
+        File file = getMintFile();
+        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         roundtripWithStream(new FileInputStream(file));
     }
 
     @Test
     public void roundtrip_dip() throws Exception {
-        String file = EntryConverterTest.class.getResource(DIP_FILE).getFile();
-        assertTrue("Document must be valid: " + DIP_FILE, xmlIsValid(new FileInputStream(file)));
+        File file = getDipFile();
+        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         roundtripWithStream(new FileInputStream(file));
     }
@@ -122,7 +119,7 @@ public class EntryConverterTest {
         }
     }
 
-    private void roundtripWithStream(InputStream is) throws Exception {
+    private static void roundtripWithStream(InputStream is) throws Exception {
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = reader.read(is);
 
@@ -140,12 +137,12 @@ public class EntryConverterTest {
         assertEquals(countInteractorsInEntry(beforeRountripEntry), afterRoundtripEntry.getInteractors().size());
     }
 
-    private boolean xmlIsValid(InputStream xml) throws Exception {
+    private static boolean xmlIsValid(InputStream xml) throws Exception {
         PsiValidatorReport report = PsiValidator.validate(new InputSource(xml));
         return analyzeReport(report);
     }
 
-    private boolean xmlIsValid(Entry entry) throws Exception {
+    private static boolean xmlIsValid(Entry entry) throws Exception {
 
         PsimiXmlWriter writer = new PsimiXmlWriter();
         String xml = writer.getAsString(new EntrySet(Arrays.asList(entry), 2, 5, 3));
@@ -154,7 +151,7 @@ public class EntryConverterTest {
         return analyzeReport(report);
     }
 
-    private boolean analyzeReport(PsiValidatorReport report) throws Exception {
+    private static boolean analyzeReport(PsiValidatorReport report) throws Exception {
         boolean isValid = report.isValid();
 
         if (!isValid && log.isErrorEnabled()) {
@@ -166,7 +163,7 @@ public class EntryConverterTest {
         return isValid;
     }
 
-    private int countExperimentsInEntry(Entry entry) {
+    private static int countExperimentsInEntry(Entry entry) {
         Collection<ExperimentDescription> experiments;
 
         if (entry.getExperiments() != null && !entry.getExperiments().isEmpty()) {
@@ -181,7 +178,7 @@ public class EntryConverterTest {
         return experiments.size();
     }
 
-    private int countInteractorsInEntry(Entry entry) {
+    private static int countInteractorsInEntry(Entry entry) {
         Collection<Interactor> interactors;
 
         if (entry.getInteractors() != null && !entry.getInteractors().isEmpty()) {

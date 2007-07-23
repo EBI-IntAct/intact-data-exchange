@@ -16,9 +16,10 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.*;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
+import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvInteractorType;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
 
 import java.util.Random;
 
@@ -130,7 +131,11 @@ public class PsiMockFactory {
             populateNames((NamesContainer) object);
         }
         if (object instanceof XrefContainer) {
-            populateXref((XrefContainer) object);
+            if (object instanceof CvType) {
+                populateCvXrefs((CvType) object);
+            } else {
+                populateXref((XrefContainer) object);
+            }
         }
     }
 
@@ -146,6 +151,10 @@ public class PsiMockFactory {
         xrefContainer.setXref(createXref());
     }
 
+    private static void populateCvXrefs(CvType xrefContainer) {
+        xrefContainer.setXref(createPsiMiXref());
+    }
+
     public static Names createNames() {
         Names names = new Names();
         names.setShortLabel(nextString());
@@ -155,6 +164,15 @@ public class PsiMockFactory {
 
     public static Xref createXref() {
         return createXref(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF);
+    }
+
+    public static Xref createPsiMiXref() {
+        Xref xref = createXref(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF);
+        xref.getPrimaryRef().setId("MI:"+nextInt());
+        xref.getPrimaryRef().setDb(CvDatabase.PSI_MI);
+        xref.getPrimaryRef().setDbAc(CvDatabase.PSI_MI_MI_REF);
+
+        return xref;
     }
 
     public static Xref createXref(String primaryRefType, String primaryRefTypeAc) {

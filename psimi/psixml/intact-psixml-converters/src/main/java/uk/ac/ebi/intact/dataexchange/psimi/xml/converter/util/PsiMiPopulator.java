@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 import uk.ac.ebi.intact.business.IntactException;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.CvObjectBuilder;
 
 /**
  * TODO comment this
@@ -28,10 +29,11 @@ import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 public class PsiMiPopulator {
 
     private Institution institution;
-    private CvDatabase cvDatabase;
-    private CvXrefQualifier cvXrefQualifier;
+    private CvObjectBuilder cvObjectBuilder;
 
-    public PsiMiPopulator() {
+    public PsiMiPopulator(Institution institution) {
+        this.cvObjectBuilder = new CvObjectBuilder();
+        this.institution = institution;
     }
 
     public <X extends Xref> void populateWithPsiMi(AnnotatedObject annotatedObject, String psiMi) {
@@ -65,30 +67,11 @@ public class PsiMiPopulator {
     }
 
     private CvDatabase createCvDatabase() {
-        if (cvDatabase != null) {
-            return cvDatabase;
-        }
-
-        cvDatabase = new CvDatabase(institution, CvDatabase.PSI_MI);
-
-        CvObjectXref xref = createPsiMiXref(CvObjectXref.class, CvDatabase.PSI_MI_MI_REF);
-        cvDatabase.addXref(xref);
-
-        return cvDatabase;
-
+        return cvObjectBuilder.createPsiMiCvDatabase(institution);
     }
 
     private CvXrefQualifier createIdentityCvXrefQualifier() {
-        if (cvXrefQualifier != null) {
-            return cvXrefQualifier;
-        }
-
-        cvXrefQualifier = new CvXrefQualifier(institution, CvXrefQualifier.IDENTITY);
-
-        CvObjectXref xref = createPsiMiXref(CvObjectXref.class, CvXrefQualifier.IDENTITY_MI_REF);
-        cvXrefQualifier.addXref(xref);
-
-        return cvXrefQualifier;
+        return cvObjectBuilder.createIdentityCvXrefQualifier(institution);
     }
 
 }

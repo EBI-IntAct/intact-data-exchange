@@ -46,7 +46,7 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
             throw new PsiConversionException("Id in DbReference is empty: "+psiObject);
         }
 
-        PsiMiPopulator psiMiPopulator = new PsiMiPopulator();
+        PsiMiPopulator psiMiPopulator = new PsiMiPopulator(getInstitution());
 
         String db = psiObject.getDb();
         String dbAc = psiObject.getDbAc();

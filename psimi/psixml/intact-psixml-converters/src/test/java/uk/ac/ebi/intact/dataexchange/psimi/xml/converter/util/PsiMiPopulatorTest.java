@@ -45,7 +45,7 @@ public class PsiMiPopulatorTest {
 
         replay(mockProtein);
 
-        PsiMiPopulator populator = new PsiMiPopulator();
+        PsiMiPopulator populator = new PsiMiPopulator(new Institution("institution"));
         populator.populateWithPsiMi(mockProtein, mi);
 
         verify(mockProtein);
