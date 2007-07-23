@@ -23,7 +23,7 @@ import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.core.persister.PersistenceContext;
+import uk.ac.ebi.intact.core.persister.PersisterContext;
 import uk.ac.ebi.intact.core.persister.PersisterException;
 import uk.ac.ebi.intact.core.persister.standard.EntryPersister;
 import uk.ac.ebi.intact.core.persister.standard.InteractionPersister;
@@ -93,7 +93,7 @@ public class PsiExchange {
         IntactContext context = IntactContext.getCurrentInstance();
 
         if (dryRun) {
-            PersistenceContext.getInstance().setDryRun(dryRun);
+            PersisterContext.getInstance().setDryRun(dryRun);
         }
 
         // check if the transaction is active
