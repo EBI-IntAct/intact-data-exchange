@@ -15,15 +15,13 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import psidev.psi.mi.xml.model.ExperimentDescription;
-import psidev.psi.mi.xml.model.InteractionType;
-import psidev.psi.mi.xml.model.InteractorType;
-import psidev.psi.mi.xml.model.Participant;
-import uk.ac.ebi.intact.model.*;
+import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Interaction;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,12 +75,14 @@ public class InteractionConverter extends AbstractIntactPsiConverter<Interaction
         for (Experiment exp : intactObject.getExperiments()) {
             ExperimentDescription expDescription = experimentConverter.intactToPsi(exp);
             interaction.getExperiments().add(expDescription);
+            interaction.getExperimentRefs().add(new ExperimentRef(expDescription.getId()));
         }
 
         ParticipantConverter participantConverter = new ParticipantConverter(getInstitution());
         for (Component comp : intactObject.getComponents()) {
             Participant participant = participantConverter.intactToPsi(comp);
             participant.setInteraction(interaction);
+            participant.setInteractionRef(new InteractionRef(interaction.getId()));
             interaction.getParticipants().add(participant);
         }
 

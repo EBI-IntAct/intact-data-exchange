@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.BiologicalRole;
 import psidev.psi.mi.xml.model.ExperimentalRole;
+import psidev.psi.mi.xml.model.InteractorRef;
 import psidev.psi.mi.xml.model.Participant;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
@@ -63,6 +64,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
 
         psidev.psi.mi.xml.model.Interactor interactor = new InteractorConverter(getInstitution()).intactToPsi(intactObject.getInteractor());
         participant.setInteractor(interactor);
+        participant.setInteractorRef(new InteractorRef(interactor.getId()));
 
         return participant;
     }
