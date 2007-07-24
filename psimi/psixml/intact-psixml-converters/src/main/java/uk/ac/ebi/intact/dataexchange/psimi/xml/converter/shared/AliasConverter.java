@@ -47,10 +47,14 @@ public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<
             throw new PsiConversionException("Value in Alias is empty: "+psiObject);
         }
 
-        CvAliasType cvAliasType = new CvAliasType(getInstitution(), aliasType);
+        CvAliasType cvAliasType = null;
 
-        PsiMiPopulator psiMiPopulator = new PsiMiPopulator(getInstitution());
-        psiMiPopulator.populateWithPsiMi(cvAliasType, aliasTypeAc);
+        if (aliasType != null) {
+            cvAliasType = new CvAliasType(getInstitution(), aliasType);
+
+            PsiMiPopulator psiMiPopulator = new PsiMiPopulator(getInstitution());
+            psiMiPopulator.populateWithPsiMi(cvAliasType, aliasTypeAc);
+        }
 
         A alias = newAliasInstance(aliasClass, cvAliasType, name);
         alias.setOwner(getInstitution());
