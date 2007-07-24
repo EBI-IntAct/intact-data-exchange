@@ -31,6 +31,8 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
 
     private Class<? extends A> intactClass;
     private Class<T> psiClass;
+    private boolean newIntactObjectCreated;
+    private boolean newPsiObjectCreated;
 
     public AbstractAnnotatedObjectConverter(Institution institution, Class<? extends A> intactClass, Class<T> psiClass) {
         super(institution);
@@ -42,12 +44,15 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         A intactObject = (A) ConversionCache.getElement(psiElementKey(psiObject));
 
         if (intactObject != null) {
+            newIntactObjectCreated = false;
             return intactObject;
         }
 
         intactObject = newIntactObjectInstance(psiObject);
 
         ConversionCache.putElement(psiElementKey(psiObject), intactObject);
+
+        newIntactObjectCreated = true;
 
         return intactObject;
     }
@@ -56,6 +61,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         T psiObject = (T) ConversionCache.getElement(intactElementKey(intactObject));
 
         if (psiObject != null) {
+            newPsiObjectCreated = false;
             return psiObject;
         }
 
@@ -63,6 +69,8 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         PsiConverterUtils.populate(intactObject, psiObject);
 
         ConversionCache.putElement(intactElementKey(intactObject), psiObject);
+
+        newPsiObjectCreated = true;
 
         return psiObject;
     }
@@ -87,4 +95,12 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
     }
 
     protected abstract String psiElementKey(T psiObject);
+
+    protected boolean isNewIntactObjectCreated() {
+        return newIntactObjectCreated;
+    }
+
+    protected boolean isNewPsiObjectCreated() {
+        return newPsiObjectCreated;
+    }
 }

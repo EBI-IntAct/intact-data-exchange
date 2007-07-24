@@ -17,9 +17,9 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Xref;
-import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AbstractCvConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
+import uk.ac.ebi.intact.model.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -109,6 +109,10 @@ public class PsiConverterUtils {
     }
 
     private static int populateId(HasId hasIdElement) {
+        if (hasIdElement.getId() > 0) {
+            return hasIdElement.getId();
+        }
+        
         int id = IdSequenceGenerator.getInstance().nextId();
         hasIdElement.setId(id);
 

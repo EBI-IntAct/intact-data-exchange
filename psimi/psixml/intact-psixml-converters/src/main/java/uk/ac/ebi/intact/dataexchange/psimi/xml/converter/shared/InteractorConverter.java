@@ -37,6 +37,10 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
     public Interactor psiToIntact(psidev.psi.mi.xml.model.Interactor psiObject) {
         Interactor interactor = super.psiToIntact(psiObject);
 
+        if (!isNewIntactObjectCreated()) {
+            return interactor;
+        }
+
         IntactConverterUtils.populateNames(psiObject.getNames(), interactor);
         IntactConverterUtils.populateXref(psiObject.getXref(), interactor, new XrefConverter<InteractorXref>(getInstitution(), InteractorXref.class));
 
@@ -61,6 +65,10 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
 
     public psidev.psi.mi.xml.model.Interactor intactToPsi(Interactor intactObject) {
         psidev.psi.mi.xml.model.Interactor interactor = super.intactToPsi(intactObject);
+
+        if (!isNewPsiObjectCreated()) {
+            return interactor;
+        }
 
         if (intactObject instanceof Polymer) {
             String sequence = ((Polymer) intactObject).getSequence();

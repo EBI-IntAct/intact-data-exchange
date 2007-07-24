@@ -36,6 +36,10 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
     public Experiment psiToIntact(ExperimentDescription psiObject) {
         Experiment experiment = super.psiToIntact(psiObject);
 
+        if (!isNewIntactObjectCreated()) {
+            return experiment;
+        }
+
         String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
 
         Organism hostOrganism = psiObject.getHostOrganisms().iterator().next();
@@ -68,7 +72,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
     public ExperimentDescription intactToPsi(Experiment intactObject) {
         ExperimentDescription expDesc = super.intactToPsi(intactObject);
 
-        if (expDesc.getBibref() != null) {
+        if (!isNewPsiObjectCreated()) {
             return expDesc;
         }
 

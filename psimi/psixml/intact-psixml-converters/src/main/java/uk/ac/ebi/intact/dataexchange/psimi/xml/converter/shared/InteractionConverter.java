@@ -40,6 +40,10 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     public Interaction psiToIntact(psidev.psi.mi.xml.model.Interaction psiObject) {
         Interaction interaction = super.psiToIntact(psiObject);
 
+        if (!isNewIntactObjectCreated()) {
+            return interaction;
+        }
+
         String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
 
         Collection<Experiment> experiments = getExperiments(psiObject);
@@ -69,6 +73,10 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     public psidev.psi.mi.xml.model.Interaction intactToPsi(Interaction intactObject) {
         psidev.psi.mi.xml.model.Interaction interaction = super.intactToPsi(intactObject);
 
+        if (!isNewPsiObjectCreated()) {
+            return interaction;
+        }
+
         ExperimentConverter experimentConverter = new ExperimentConverter(getInstitution());
         for (Experiment exp : intactObject.getExperiments()) {
             ExperimentDescription expDescription = experimentConverter.intactToPsi(exp);
@@ -95,6 +103,10 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         return "i:"+psiObject.getId();
     }
 
+    @Override
+    protected String intactElementKey(Interaction intactObject) {
+        return intactObject.getShortLabel()+"_"+intactObject.getExperiments().iterator().next().getShortLabel();
+    }
 
     protected Collection<Experiment> getExperiments(psidev.psi.mi.xml.model.Interaction psiInteraction) {
         Collection<ExperimentDescription> expDescriptions = psiInteraction.getExperiments();
