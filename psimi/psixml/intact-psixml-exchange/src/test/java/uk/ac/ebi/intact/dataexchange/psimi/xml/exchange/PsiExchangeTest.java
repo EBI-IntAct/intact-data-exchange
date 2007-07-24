@@ -15,15 +15,19 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import psidev.psi.mi.xml.PsimiXmlReader;
+import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.model.IntactEntry;
-import uk.ac.ebi.intact.persistence.dao.entry.IntactEntryFactory;
+import uk.ac.ebi.intact.core.unit.IntactUnit;
+import uk.ac.ebi.intact.model.CvBiologicalRole;
+import uk.ac.ebi.intact.model.CvObjectXref;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 
-import java.io.StringWriter;
+import java.io.InputStream;
 
 /**
  * TODO comment this
@@ -31,33 +35,70 @@ import java.io.StringWriter;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class PsiExchangeTest {
+public class PsiExchangeTest  {
 
-    private IntactContext context;
+    private static final String INTACT_FILE = "/xml/intact_2006-07-19.xml";
 
-    @Before
-    public void setUp() throws Exception {
-        context = IntactContext.getCurrentInstance();
-        context.getDataContext().beginTransaction();
+    protected InputStream getIntactStream() {
+         return PsiExchangeTest.class.getResourceAsStream(INTACT_FILE);
     }
 
-    @After
-    public void tearDown() throws Exception {
-        context.getDataContext().commitAllActiveTransactions();
-        context = null;
+    protected EntrySet getIntactEntrySet() throws Exception{
+        PsimiXmlReader reader = new PsimiXmlReader();
+        return reader.read(getIntactStream());
+    }
+
+    protected void clearSchema() throws Exception {
+        IntactUnit iu = new IntactUnit();
+        iu.createSchema(false);
+    }
+
+    protected DaoFactory getDaoFactory() {
+         return IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+    }
+
+    protected void beginTransaction() {
+         IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+    }
+
+    protected void commitTransaction() throws Exception {
+         IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+    }
+
+    @Test
+    public void importXml() throws Exception {
+        clearSchema();
+
+        PsiExchange.importIntoIntact(getIntactEntrySet(), false);
+
+        beginTransaction();
+        int count = getDaoFactory().getInteractionDao().countAll();
+        commitTransaction();
+
+        Assert.assertEquals(6, count);
     }
 
     @Test
     @Ignore
-    public void exportXml() {
+    public void checkPsiMiIdentities() throws Exception {
+        commitTransaction();
+        
+        clearSchema();
 
-        IntactEntry entry = IntactEntryFactory.createIntactEntry(context)
-                .addExperimentWithShortLabel("zhang-2006-1");
+        PsiExchange.importIntoIntact(getIntactEntrySet(), false);
 
-        StringWriter writer = new StringWriter();
+        beginTransaction();
+        CvBiologicalRole bioRole = getDaoFactory().getCvObjectDao(CvBiologicalRole.class).getAll(0,1).iterator().next();
 
-        PsiExchange.exportToPsiXml(writer, entry);
+        Assert.assertNotNull(bioRole);
 
-        System.out.println(writer.toString());
+        CvObjectXref identityXref = CvObjectUtils.getPsiMiIdentityXref(bioRole);
+
+        System.out.println(identityXref);
+
+        commitTransaction();
+
+
     }
+
 }
