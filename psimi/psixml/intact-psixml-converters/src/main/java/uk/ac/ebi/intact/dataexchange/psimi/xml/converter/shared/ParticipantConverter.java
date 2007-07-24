@@ -20,9 +20,9 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.BiologicalRole;
 import psidev.psi.mi.xml.model.ExperimentalRole;
 import psidev.psi.mi.xml.model.Participant;
-import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
+import uk.ac.ebi.intact.model.*;
 
 import java.util.Iterator;
 
@@ -51,6 +51,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
     public Participant intactToPsi(Component intactObject) {
         Participant participant = new Participant();
         PsiConverterUtils.populate(intactObject, participant);
+        participant.getNames().setShortLabel(intactObject.getInteractor().getShortLabel());
 
         ExperimentalRole expRole = (ExperimentalRole)
                 PsiConverterUtils.toCvType(intactObject.getCvExperimentalRole(), new ExperimentalRoleConverter(getInstitution()));
