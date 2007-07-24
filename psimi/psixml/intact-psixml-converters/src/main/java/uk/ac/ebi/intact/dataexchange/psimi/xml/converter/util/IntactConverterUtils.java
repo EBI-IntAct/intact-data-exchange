@@ -19,11 +19,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.DbReference;
 import psidev.psi.mi.xml.model.Names;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
-import uk.ac.ebi.intact.model.AnnotatedObject;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.Xref;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+
+import java.util.Collection;
 
 /**
  * TODO comment this
@@ -48,6 +49,11 @@ public class IntactConverterUtils {
         if (names != null) {
             annotatedObject.setFullName(names.getFullName());
         }
+
+        Class<?> aliasClass = AnnotatedObjectUtils.getAliasClassType(annotatedObject.getClass());
+        AliasConverter aliasConverter = new AliasConverter(annotatedObject.getOwner(), aliasClass);
+
+        populateAliases(names.getAliases(), annotatedObject, aliasConverter);
     }
 
     public static <X extends Xref> void populateXref(psidev.psi.mi.xml.model.Xref psiXref, AnnotatedObject<X, ?> annotatedObject, XrefConverter<X> xrefConverter) {
@@ -67,6 +73,17 @@ public class IntactConverterUtils {
     private static <X extends Xref> void addXref(DbReference dbReference, AnnotatedObject<X, ?> annotatedObject, XrefConverter<X> xrefConverter) {
         X xref = xrefConverter.psiToIntact(dbReference);
         annotatedObject.addXref(xref);
+    }
+
+    public static <A extends Alias> void populateAliases(Collection<psidev.psi.mi.xml.model.Alias> psiAliases, AnnotatedObject<?, A> annotatedObject, AliasConverter<A> aliasConverter) {
+        if (psiAliases == null) {
+            return;
+        }
+
+        for (psidev.psi.mi.xml.model.Alias psiAlias : psiAliases) {
+            A alias = aliasConverter.psiToIntact(psiAlias);
+            annotatedObject.addAlias(alias);
+        }
     }
 
     public static CvXrefQualifier createCvXrefQualifier(Institution institution, DbReference dbReference) {

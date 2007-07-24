@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
+import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvInteractorType;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
@@ -159,6 +160,9 @@ public class PsiMockFactory {
         Names names = new Names();
         names.setShortLabel(nextString());
         names.setFullName(nextString());
+
+        names.getAliases().add(createAlias());
+
         return names;
     }
 
@@ -184,6 +188,19 @@ public class PsiMockFactory {
         }
 
         return xref;
+    }
+
+    public static Alias createAlias(String value, String aliasType, String aliasTypeAc) {
+        Alias alias = new Alias();
+        alias.setValue(value);
+        alias.setType(aliasType);
+        alias.setTypeAc(aliasTypeAc);
+
+        return alias;
+    }
+
+    public static Alias createAlias() {
+        return createAlias(nextString("al_"), CvAliasType.GENE_NAME_MI_REF, CvAliasType.GENE_NAME);
     }
 
     private static <C extends CvType> C createCvType(Class<C> cvTypeClass) {

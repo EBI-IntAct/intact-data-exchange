@@ -41,5 +41,7 @@ public class InteractorConverterTest {
 
         CvObjectXref identityXref = CvObjectUtils.getPsiMiIdentityXref(interactor.getCvInteractorType());
         Assert.assertEquals(CvXrefQualifier.IDENTITY, identityXref.getCvXrefQualifier().getShortLabel());
+
+        Assert.assertEquals(psiInteractor.getNames().getAliases().size(), interactor.getAliases().size());
     }
 }
