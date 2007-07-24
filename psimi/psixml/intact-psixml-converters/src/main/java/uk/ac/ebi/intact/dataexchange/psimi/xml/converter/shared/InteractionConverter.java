@@ -16,8 +16,6 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.*;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -33,13 +31,15 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InteractionConverter extends AbstractIntactPsiConverter<Interaction, psidev.psi.mi.xml.model.Interaction> {
+public class InteractionConverter extends AbstractAnnotatedObjectConverter<Interaction, psidev.psi.mi.xml.model.Interaction> {
 
     public InteractionConverter(Institution institution) {
-        super(institution);
+        super(institution, InteractionImpl.class, psidev.psi.mi.xml.model.Interaction.class);
     }
 
     public Interaction psiToIntact(psidev.psi.mi.xml.model.Interaction psiObject) {
+        Interaction interaction = super.psiToIntact(psiObject);
+
         String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
 
         Collection<Experiment> experiments = getExperiments(psiObject);
@@ -50,7 +50,12 @@ public class InteractionConverter extends AbstractIntactPsiConverter<Interaction
         // only gets the first interactor type
         CvInteractorType interactorType = getInteractorType(psiObject);
 
-        Interaction interaction = new InteractionImpl(experiments, interactionType, interactorType, shortLabel, getInstitution());
+        interaction.setShortLabel(shortLabel);
+        interaction.setOwner(getInstitution());
+        interaction.setCvInteractorType(interactorType);
+        interaction.setExperiments(experiments);
+        interaction.setCvInteractionType(interactionType);
+
         IntactConverterUtils.populateNames(psiObject.getNames(), interaction);
         IntactConverterUtils.populateXref(psiObject.getXref(), interaction, new XrefConverter<InteractorXref>(getInstitution(), InteractorXref.class));
 
@@ -62,14 +67,7 @@ public class InteractionConverter extends AbstractIntactPsiConverter<Interaction
     }
 
     public psidev.psi.mi.xml.model.Interaction intactToPsi(Interaction intactObject) {
-        psidev.psi.mi.xml.model.Interaction interaction = (psidev.psi.mi.xml.model.Interaction) ConversionCache.getElement(intactObject.getShortLabel());
-
-        if (interaction != null) {
-            return interaction;
-        }
-
-        interaction = new psidev.psi.mi.xml.model.Interaction();
-        PsiConverterUtils.populate(intactObject, interaction);
+        psidev.psi.mi.xml.model.Interaction interaction = super.intactToPsi(intactObject);
 
         ExperimentConverter experimentConverter = new ExperimentConverter(getInstitution());
         for (Experiment exp : intactObject.getExperiments()) {
@@ -90,9 +88,11 @@ public class InteractionConverter extends AbstractIntactPsiConverter<Interaction
                 PsiConverterUtils.toCvType(intactObject.getCvInteractionType(), new InteractionTypeConverter(getInstitution()));
         interaction.getInteractionTypes().add(interactionType);
 
-        ConversionCache.putElement(intactObject.getShortLabel(), interaction);
-
         return interaction;
+    }
+
+    protected String psiElementKey(psidev.psi.mi.xml.model.Interaction psiObject) {
+        return "i:"+psiObject.getId();
     }
 
 

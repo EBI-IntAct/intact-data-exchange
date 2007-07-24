@@ -17,8 +17,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.InteractorType;
 import psidev.psi.mi.xml.model.Organism;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -30,19 +28,19 @@ import uk.ac.ebi.intact.util.Crc64;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InteractorConverter extends AbstractIntactPsiConverter<Interactor, psidev.psi.mi.xml.model.Interactor> {
+public class InteractorConverter extends AbstractAnnotatedObjectConverter<Interactor, psidev.psi.mi.xml.model.Interactor> {
 
     public InteractorConverter(Institution institution) {
-        super(institution);
+        super(institution, InteractorImpl.class, psidev.psi.mi.xml.model.Interactor.class);
     }
 
     public Interactor psiToIntact(psidev.psi.mi.xml.model.Interactor psiObject) {
-        String shortLabel = psiObject.getNames().getShortLabel();
-        String sequence = psiObject.getSequence();
+        Interactor interactor = super.psiToIntact(psiObject);
 
-        Interactor interactor = newInteractorAccordingToType(psiObject.getOrganism(), shortLabel, psiObject.getInteractorType());
         IntactConverterUtils.populateNames(psiObject.getNames(), interactor);
         IntactConverterUtils.populateXref(psiObject.getXref(), interactor, new XrefConverter<InteractorXref>(getInstitution(), InteractorXref.class));
+
+        String sequence = psiObject.getSequence();
 
         // sequence
         if (sequence != null && interactor instanceof Polymer) {
@@ -54,15 +52,15 @@ public class InteractorConverter extends AbstractIntactPsiConverter<Interactor, 
         return interactor;
     }
 
+    @Override
+    protected Interactor newIntactObjectInstance(psidev.psi.mi.xml.model.Interactor psiObject) {
+        String shortLabel = psiObject.getNames().getShortLabel();
+
+        return newInteractorAccordingToType(psiObject.getOrganism(), shortLabel, psiObject.getInteractorType());
+    }
+
     public psidev.psi.mi.xml.model.Interactor intactToPsi(Interactor intactObject) {
-        psidev.psi.mi.xml.model.Interactor interactor = (psidev.psi.mi.xml.model.Interactor) ConversionCache.getElement(intactObject.getShortLabel());
-
-        if (interactor != null) {
-            return interactor;
-        }
-
-        interactor = new psidev.psi.mi.xml.model.Interactor();
-        PsiConverterUtils.populate(intactObject, interactor);
+        psidev.psi.mi.xml.model.Interactor interactor = super.intactToPsi(intactObject);
 
         if (intactObject instanceof Polymer) {
             String sequence = ((Polymer) intactObject).getSequence();
@@ -73,9 +71,11 @@ public class InteractorConverter extends AbstractIntactPsiConverter<Interactor, 
                 PsiConverterUtils.toCvType(intactObject.getCvInteractorType(), new InteractorTypeConverter(getInstitution()));
         interactor.setInteractorType(interactorType);
 
-        ConversionCache.putElement(intactObject.getShortLabel(), interactor);
-
         return interactor;
+    }
+
+    protected String psiElementKey(psidev.psi.mi.xml.model.Interactor psiObject) {
+        return "ior:"+psiObject.getId();
     }
 
     protected Interactor newInteractorAccordingToType(Organism psiOrganism, String shortLabel, InteractorType psiInteractorType) {

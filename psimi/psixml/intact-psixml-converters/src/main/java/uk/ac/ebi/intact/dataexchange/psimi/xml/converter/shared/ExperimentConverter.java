@@ -16,11 +16,10 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.*;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
+import uk.ac.ebi.intact.model.*;
 
 /**
  * TODO comment this
@@ -28,13 +27,15 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class ExperimentConverter extends AbstractIntactPsiConverter<Experiment, ExperimentDescription> {
+public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experiment, ExperimentDescription> {
 
     public ExperimentConverter(Institution institution) {
-        super(institution);
+        super(institution, Experiment.class, ExperimentDescription.class);
     }
 
     public Experiment psiToIntact(ExperimentDescription psiObject) {
+        Experiment experiment = super.psiToIntact(psiObject);
+
         String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
 
         Organism hostOrganism = psiObject.getHostOrganisms().iterator().next();
@@ -43,7 +44,10 @@ public class ExperimentConverter extends AbstractIntactPsiConverter<Experiment, 
         InteractionDetectionMethod idm = psiObject.getInteractionDetectionMethod();
         CvInteraction cvInteractionDetectionMethod = new InteractionDetectionMethodConverter(getInstitution()).psiToIntact(idm);
 
-        Experiment experiment = new Experiment(getInstitution(), shortLabel, bioSource);
+        experiment.setOwner(getInstitution());
+        experiment.setShortLabel(shortLabel);
+        experiment.setBioSource(bioSource);
+
         IntactConverterUtils.populateNames(psiObject.getNames(), experiment);
         IntactConverterUtils.populateXref(psiObject.getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
         IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
@@ -62,13 +66,21 @@ public class ExperimentConverter extends AbstractIntactPsiConverter<Experiment, 
     }
 
     public ExperimentDescription intactToPsi(Experiment intactObject) {
+        ExperimentDescription expDesc = super.intactToPsi(intactObject);
+
+        if (expDesc.getBibref() != null) {
+            return expDesc;
+        }
+
         Bibref bibref = new Bibref();
         PsiConverterUtils.populate(intactObject, bibref);
 
         InteractionDetectionMethodConverter detMethodConverter = new InteractionDetectionMethodConverter(getInstitution());
         InteractionDetectionMethod detMethod = (InteractionDetectionMethod) PsiConverterUtils.toCvType(intactObject.getCvInteraction(), detMethodConverter);
 
-        ExperimentDescription expDesc = new ExperimentDescription(bibref, detMethod);
+        expDesc.setBibref(bibref);
+        expDesc.setInteractionDetectionMethod(detMethod);
+
         PsiConverterUtils.populate(intactObject, expDesc);
 
         if (intactObject.getCvIdentification() != null) {
@@ -81,6 +93,10 @@ public class ExperimentConverter extends AbstractIntactPsiConverter<Experiment, 
         expDesc.getHostOrganisms().add(organism);
 
         return expDesc;
+    }
+
+    protected String psiElementKey(ExperimentDescription psiObject) {
+        return String.valueOf("exp:"+psiObject.getId());
     }
 
     private Publication createPublication(ExperimentDescription experiment) {

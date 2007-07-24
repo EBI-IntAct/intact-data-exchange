@@ -132,9 +132,9 @@ public class EntryConverterTest extends AbstractConverterTest {
 
         assertTrue("XML created after conversion roundtrip must be valid", xmlIsValid(afterRoundtripEntry));
 
-        assertEquals(beforeRountripEntry.getInteractions().size(), afterRoundtripEntry.getInteractions().size());
-        assertEquals(countExperimentsInEntry(beforeRountripEntry), afterRoundtripEntry.getExperiments().size());
-        assertEquals(countInteractorsInEntry(beforeRountripEntry), afterRoundtripEntry.getInteractors().size());
+        assertEquals("Number of interactions should be the same", beforeRountripEntry.getInteractions().size(), afterRoundtripEntry.getInteractions().size());
+        assertEquals("Number of experiments should be the same",countExperimentsInEntry(beforeRountripEntry), afterRoundtripEntry.getExperiments().size());
+        assertEquals("Number of interactors should be the same",countInteractorsInEntry(beforeRountripEntry), afterRoundtripEntry.getInteractors().size());
        
     }
 
@@ -147,8 +147,6 @@ public class EntryConverterTest extends AbstractConverterTest {
 
         PsimiXmlWriter writer = new PsimiXmlWriter();
         String xml = writer.getAsString(new EntrySet(Arrays.asList(entry), 2, 5, 3));
-
-        System.out.println(xml);
 
         PsiValidatorReport report = PsiValidator.validate(xml);
         return analyzeReport(report);
