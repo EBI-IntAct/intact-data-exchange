@@ -48,12 +48,12 @@ public class IntactConverterUtils {
 
         if (names != null) {
             annotatedObject.setFullName(names.getFullName());
+
+            Class<?> aliasClass = AnnotatedObjectUtils.getAliasClassType(annotatedObject.getClass());
+            AliasConverter aliasConverter = new AliasConverter(annotatedObject.getOwner(), aliasClass);
+
+            populateAliases(names.getAliases(), annotatedObject, aliasConverter);
         }
-
-        Class<?> aliasClass = AnnotatedObjectUtils.getAliasClassType(annotatedObject.getClass());
-        AliasConverter aliasConverter = new AliasConverter(annotatedObject.getOwner(), aliasClass);
-
-        populateAliases(names.getAliases(), annotatedObject, aliasConverter);
     }
 
     public static <X extends Xref> void populateXref(psidev.psi.mi.xml.model.Xref psiXref, AnnotatedObject<X, ?> annotatedObject, XrefConverter<X> xrefConverter) {
