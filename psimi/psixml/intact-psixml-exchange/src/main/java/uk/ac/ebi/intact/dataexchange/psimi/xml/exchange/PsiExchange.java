@@ -29,6 +29,7 @@ import uk.ac.ebi.intact.core.persister.standard.EntryPersister;
 import uk.ac.ebi.intact.core.persister.standard.InteractionPersister;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
 
@@ -136,6 +137,8 @@ public class PsiExchange {
                 interactionCount++;
             }
         }
+
+        ConversionCache.clear();
 
         // final commit for the last batch
         interactionPersister.commit();

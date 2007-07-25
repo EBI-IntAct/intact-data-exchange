@@ -17,11 +17,13 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.util.DebugUtil;
 
 /**
  * TODO comment this
@@ -31,10 +33,16 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
  */
 public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
+    @Before
+    public void prepare() throws Exception {
+        IntactUnit iu = new IntactUnit();
+        iu.createSchema();
+    }
+
 
     @After
     public void closeTest() throws Exception {
-        IntactContext.getCurrentInstance().close();
+        //IntactContext.getCurrentInstance().close();
     }
 
     @Test
@@ -43,6 +51,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
         beginTransaction();
         int count = getDaoFactory().getInteractionDao().countAll();
+        System.out.println(DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll()));
         commitTransaction();
 
         Assert.assertEquals(6, count);
@@ -50,13 +59,15 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
     @Test
     public void importXml_mint() throws Exception {
+
         PsiExchange.importIntoIntact(getMintEntrySet(), false);
 
         beginTransaction();
         int count = getDaoFactory().getInteractionDao().countAll();
+        System.out.println(DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll()));
         commitTransaction();
 
-        Assert.assertEquals(17, count);
+        Assert.assertEquals(11, count);
     }
 
     @Test
@@ -65,23 +76,31 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
         beginTransaction();
         int count = getDaoFactory().getInteractionDao().countAll();
+        System.out.println(DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll()));
         commitTransaction();
 
-        Assert.assertEquals(49, count);
+        Assert.assertEquals(32, count);
     }
 
     @Test
     public void importXml_all() throws Exception {
         PsiExchange.importIntoIntact(getIntactEntrySet(), false);
+
+        beginTransaction();
+        Assert.assertEquals(6, getDaoFactory().getInteractionDao().countAll());
+        commitTransaction();
+
         PsiExchange.importIntoIntact(getMintEntrySet(), false);
+
+        beginTransaction();
+        Assert.assertEquals(17, getDaoFactory().getInteractionDao().countAll());
+        commitTransaction();
+
         PsiExchange.importIntoIntact(getDipEntrySet(), false);
 
         beginTransaction();
-        int count = getDaoFactory().getInteractionDao().countAll();
+        Assert.assertEquals(49, getDaoFactory().getInteractionDao().countAll());
         commitTransaction();
-
-        // TODO: why is it here 73, when 49+17+6=72?
-        Assert.assertEquals(73, count);
 
     }
 
