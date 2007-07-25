@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AbstractConverterTest;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 
@@ -38,27 +37,27 @@ public class AbstractPsiExchangeTest {
     private static final String DIP_FILE = "/xml/dip_2006-11-01.xml";
 
     protected File getIntactFile() {
-        return new File(AbstractConverterTest.class.getResource(INTACT_FILE).getFile());
+        return new File(AbstractPsiExchangeTest.class.getResource(INTACT_FILE).getFile());
     }
 
     protected File getMintFile() {
-        return new File(AbstractConverterTest.class.getResource(MINT_FILE).getFile());
+        return new File(AbstractPsiExchangeTest.class.getResource(MINT_FILE).getFile());
     }
 
     protected File getDipFile() {
-        return new File(AbstractConverterTest.class.getResource(DIP_FILE).getFile());
+        return new File(AbstractPsiExchangeTest.class.getResource(DIP_FILE).getFile());
     }
 
     protected InputStream getIntactStream() {
-         return AbstractConverterTest.class.getResourceAsStream(INTACT_FILE);
+         return AbstractPsiExchangeTest.class.getResourceAsStream(INTACT_FILE);
     }
 
     protected InputStream getMintStream() {
-         return AbstractConverterTest.class.getResourceAsStream(MINT_FILE);
+         return AbstractPsiExchangeTest.class.getResourceAsStream(MINT_FILE);
     }
 
     protected InputStream getDipStream() {
-         return AbstractConverterTest.class.getResourceAsStream(DIP_FILE);
+         return AbstractPsiExchangeTest.class.getResourceAsStream(DIP_FILE);
     }
 
     protected EntrySet getIntactEntrySet() throws Exception{
