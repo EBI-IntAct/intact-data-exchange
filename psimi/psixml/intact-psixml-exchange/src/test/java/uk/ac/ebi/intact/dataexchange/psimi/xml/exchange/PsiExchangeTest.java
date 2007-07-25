@@ -15,13 +15,15 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
+import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.CvObjectXref;
+import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.DebugUtil;
 
@@ -37,12 +39,6 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     public void prepare() throws Exception {
         IntactUnit iu = new IntactUnit();
         iu.createSchema();
-    }
-
-
-    @After
-    public void closeTest() throws Exception {
-        //IntactContext.getCurrentInstance().close();
     }
 
     @Test
@@ -115,7 +111,22 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
         CvObjectXref identityXref = CvObjectUtils.getPsiMiIdentityXref(expRole);
 
-        System.out.println(identityXref);
+        Assert.assertNotNull(identityXref);
+
+        commitTransaction();
+    }
+
+    @Test
+    @Ignore
+    public void checkAliases() throws Exception {
+        PsiExchange.importIntoIntact(getIntactEntrySet(), false);
+
+        beginTransaction();
+        Interactor interactor = getDaoFactory().getInteractorDao().getByShortLabel("fadd_mouse");
+
+        System.out.println("Xrefs: "+interactor.getAliases().iterator().next().getCvAliasType().getXrefs());
+
+        System.out.println(getDaoFactory().getCvObjectDao(CvAliasType.class).getByShortLabel("gene name").getXrefs());
 
         commitTransaction();
     }
