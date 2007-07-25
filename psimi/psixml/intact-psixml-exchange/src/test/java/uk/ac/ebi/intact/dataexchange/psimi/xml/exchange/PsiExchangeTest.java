@@ -18,15 +18,10 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.xml.PsimiXmlReader;
-import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.persistence.dao.DaoFactory;
-
-import java.io.InputStream;
 
 /**
  * TODO comment this
@@ -34,30 +29,8 @@ import java.io.InputStream;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class PsiExchangeTest  {
+public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
-    private static final String INTACT_FILE = "/xml/intact_2006-07-19.xml";
-
-    protected InputStream getIntactStream() {
-         return PsiExchangeTest.class.getResourceAsStream(INTACT_FILE);
-    }
-
-    protected EntrySet getIntactEntrySet() throws Exception{
-        PsimiXmlReader reader = new PsimiXmlReader();
-        return reader.read(getIntactStream());
-    }
-
-    protected DaoFactory getDaoFactory() {
-         return IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
-    }
-
-    protected void beginTransaction() {
-         IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-    }
-
-    protected void commitTransaction() throws Exception {
-         IntactContext.getCurrentInstance().getDataContext().commitTransaction();
-    }
 
     @After
     public void closeTest() throws Exception {
@@ -65,7 +38,7 @@ public class PsiExchangeTest  {
     }
 
     @Test
-    public void importXml() throws Exception {
+    public void importXml_intact() throws Exception {
         PsiExchange.importIntoIntact(getIntactEntrySet(), false);
 
         beginTransaction();
@@ -73,6 +46,43 @@ public class PsiExchangeTest  {
         commitTransaction();
 
         Assert.assertEquals(6, count);
+    }
+
+    @Test
+    public void importXml_mint() throws Exception {
+        PsiExchange.importIntoIntact(getMintEntrySet(), false);
+
+        beginTransaction();
+        int count = getDaoFactory().getInteractionDao().countAll();
+        commitTransaction();
+
+        Assert.assertEquals(17, count);
+    }
+
+    @Test
+    public void importXml_dip() throws Exception {
+        PsiExchange.importIntoIntact(getDipEntrySet(), false);
+
+        beginTransaction();
+        int count = getDaoFactory().getInteractionDao().countAll();
+        commitTransaction();
+
+        Assert.assertEquals(49, count);
+    }
+
+    @Test
+    public void importXml_all() throws Exception {
+        PsiExchange.importIntoIntact(getIntactEntrySet(), false);
+        PsiExchange.importIntoIntact(getMintEntrySet(), false);
+        PsiExchange.importIntoIntact(getDipEntrySet(), false);
+
+        beginTransaction();
+        int count = getDaoFactory().getInteractionDao().countAll();
+        commitTransaction();
+
+        // TODO: why is it here 73, when 49+17+6=72?
+        Assert.assertEquals(73, count);
+
     }
 
     @Test
@@ -89,8 +99,6 @@ public class PsiExchangeTest  {
         System.out.println(identityXref);
 
         commitTransaction();
-
-
     }
 
 }
