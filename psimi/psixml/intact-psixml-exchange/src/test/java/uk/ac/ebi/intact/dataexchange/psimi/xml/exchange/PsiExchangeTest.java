@@ -15,14 +15,13 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.core.unit.IntactUnit;
-import uk.ac.ebi.intact.model.CvBiologicalRole;
+import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
@@ -48,11 +47,6 @@ public class PsiExchangeTest  {
         return reader.read(getIntactStream());
     }
 
-    protected void clearSchema() throws Exception {
-        IntactUnit iu = new IntactUnit();
-        iu.createSchema(false);
-    }
-
     protected DaoFactory getDaoFactory() {
          return IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
     }
@@ -65,10 +59,13 @@ public class PsiExchangeTest  {
          IntactContext.getCurrentInstance().getDataContext().commitTransaction();
     }
 
+    @After
+    public void closeTest() throws Exception {
+        IntactContext.getCurrentInstance().close();
+    }
+
     @Test
     public void importXml() throws Exception {
-        clearSchema();
-
         PsiExchange.importIntoIntact(getIntactEntrySet(), false);
 
         beginTransaction();
@@ -79,20 +76,15 @@ public class PsiExchangeTest  {
     }
 
     @Test
-    @Ignore
     public void checkPsiMiIdentities() throws Exception {
-        commitTransaction();
-        
-        clearSchema();
-
         PsiExchange.importIntoIntact(getIntactEntrySet(), false);
 
         beginTransaction();
-        CvBiologicalRole bioRole = getDaoFactory().getCvObjectDao(CvBiologicalRole.class).getAll(0,1).iterator().next();
+        CvExperimentalRole expRole = getDaoFactory().getCvObjectDao(CvExperimentalRole.class).getAll(0,1).iterator().next();
 
-        Assert.assertNotNull(bioRole);
+        Assert.assertNotNull(expRole);
 
-        CvObjectXref identityXref = CvObjectUtils.getPsiMiIdentityXref(bioRole);
+        CvObjectXref identityXref = CvObjectUtils.getPsiMiIdentityXref(expRole);
 
         System.out.println(identityXref);
 
