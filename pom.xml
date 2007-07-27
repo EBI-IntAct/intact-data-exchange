@@ -31,10 +31,11 @@
 
     <modules>
         <module>intact-dbutils</module>
-        <module>plugins</module>
+        <module>intact-cvutils</module>
         <module>psimi</module>
         <module>intact-enricher</module>
-        <module>intact-cvutils</module>
+        <module>plugins</module>
+        <module>uniprot-export</module>
   </modules>
 
     <build>

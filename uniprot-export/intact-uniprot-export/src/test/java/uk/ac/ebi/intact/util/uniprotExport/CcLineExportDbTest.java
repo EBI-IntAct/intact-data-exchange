@@ -5,9 +5,9 @@
  */
 package uk.ac.ebi.intact.util.uniprotExport;
 
-import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.*;
 import uk.ac.ebi.intact.context.IntactContext;
 
 import java.io.StringWriter;
@@ -21,22 +21,23 @@ import java.util.Collection;
  * @version $Id$
  * @since <pre>24-Aug-2006</pre>
  */
-public class CcLineExportDbTest extends TestCase {
+@Ignore
+public class CcLineExportDbTest {
 
     private static final Log log = LogFactory.getLog(CcLineExportDbTest.class);
 
 
-    @Override
+    @After
     protected void tearDown() throws Exception {
-        super.tearDown();
         IntactContext.getCurrentInstance().getDataContext().commitAllActiveTransactions();
     }
 
-    @Override
+    @Before
     protected void setUp() throws Exception {
         IntactContext.getCurrentInstance().getDataContext().beginTransaction();
     }
 
+    @Test
     public void testGenerateCCLines() throws Exception {
         Collection<String> uniprotIds =
                 CCLineExport.getEligibleProteinsFromFile(CcLineExportDbTest.class.getResource("uniprotlinks.dat").getFile());
@@ -53,8 +54,8 @@ public class CcLineExportDbTest extends TestCase {
 
         ccLineExport.generateCCLines(uniprotIds);
 
-        assertEquals(3, ccLineExport.getCcLineCount());
-        assertEquals(5, ccLineExport.getGoaLineCount());
+        Assert.assertEquals(3, ccLineExport.getCcLineCount());
+        Assert.assertEquals(5, ccLineExport.getGoaLineCount());
 
         System.out.println(ccWriter.toString());
     }

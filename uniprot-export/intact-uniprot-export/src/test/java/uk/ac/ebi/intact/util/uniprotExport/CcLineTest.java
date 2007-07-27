@@ -6,28 +6,20 @@ in the root directory of this distribution.
 
 package uk.ac.ebi.intact.util.uniprotExport;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CcLineTest extends TestCase {
+public class CcLineTest  {
 
     private static final Log log = LogFactory.getLog(CcLineTest.class);
 
-    /**
-     * Returns this test suite. Reflection is used here to add all
-     * the testXXX() methods to the suite.
-     */
-    public static Test suite() {
-        return new TestSuite( CcLineTest.class );
-    }
 
     /////////////////////////////////////////
     // Check on the ordering of the CC lines
@@ -42,6 +34,7 @@ public class CcLineTest extends TestCase {
         }
     }
 
+    @Test
     public void testCCLinesOrdering() {
 
         // create a collection of CC Lines to order
@@ -57,26 +50,26 @@ public class CcLineTest extends TestCase {
         ccLines.add( new CcLine( "blablabla", "aBcdEf", "" ) );
         ccLines.add( new CcLine( "blablabla", "aBCdef", "" ) );
 
-        assertEquals( 6, ccLines.size() );
+        Assert.assertEquals( 6, ccLines.size() );
 
         displayCollection( ccLines, "Before:" );
 
         Collections.sort( ccLines );
 
-        assertEquals( 6, ccLines.size() );
+        Assert.assertEquals( 6, ccLines.size() );
 
         displayCollection( ccLines, "After:" );
 
         // check the ordering
-        assertEquals( "Self", ( ccLines.get( 0 ) ).getGeneName() );
-        assertEquals( "aBCdef", ( ccLines.get( 1 ) ).getGeneName() );
-        assertEquals( "aBcdEf", ( ccLines.get( 2 ) ).getGeneName() );
-        assertEquals( "abCDef", ( ccLines.get( 3 ) ).getGeneName() );
-        assertEquals( "abcdef", ( ccLines.get( 4 ) ).getGeneName() );
-        assertEquals( "fedcba", ( ccLines.get( 5 ) ).getGeneName() );
+        Assert.assertEquals( "Self", ( ccLines.get( 0 ) ).getGeneName() );
+        Assert.assertEquals( "aBCdef", ( ccLines.get( 1 ) ).getGeneName() );
+        Assert.assertEquals( "aBcdEf", ( ccLines.get( 2 ) ).getGeneName() );
+        Assert.assertEquals( "abCDef", ( ccLines.get( 3 ) ).getGeneName() );
+        Assert.assertEquals( "abcdef", ( ccLines.get( 4 ) ).getGeneName() );
+        Assert.assertEquals( "fedcba", ( ccLines.get( 5 ) ).getGeneName() );
     }
 
-
+    @Test
     public void testCCLinesOrdering_2() {
 
         // create a collection of CC Lines to order
@@ -91,22 +84,22 @@ public class CcLineTest extends TestCase {
         ccLines.add( new CcLine( "blablabla", "aBcdEf", "" ) );
         ccLines.add( new CcLine( "blablabla", "aBCdef", "" ) );
 
-        assertEquals( 5, ccLines.size() );
+        Assert.assertEquals( 5, ccLines.size() );
 
         displayCollection( ccLines, "Before:" );
 
         Collections.sort( ccLines );
 
-        assertEquals( 5, ccLines.size() );
+        Assert.assertEquals( 5, ccLines.size() );
 
         displayCollection( ccLines, "After:" );
 
 
         // check the ordering
-        assertEquals( "aBCdef", ( ccLines.get( 0 ) ).getGeneName() );
-        assertEquals( "aBcdEf", ( ccLines.get( 1 ) ).getGeneName() );
-        assertEquals( "abCDef", ( ccLines.get( 2 ) ).getGeneName() );
-        assertEquals( "abcdef", ( ccLines.get( 3 ) ).getGeneName() );
-        assertEquals( "fedcba", ( ccLines.get( 4 ) ).getGeneName() );
+        Assert.assertEquals( "aBCdef", ( ccLines.get( 0 ) ).getGeneName() );
+        Assert.assertEquals( "aBcdEf", ( ccLines.get( 1 ) ).getGeneName() );
+        Assert.assertEquals( "abCDef", ( ccLines.get( 2 ) ).getGeneName() );
+        Assert.assertEquals( "abcdef", ( ccLines.get( 3 ) ).getGeneName() );
+        Assert.assertEquals( "fedcba", ( ccLines.get( 4 ) ).getGeneName() );
     }
 }

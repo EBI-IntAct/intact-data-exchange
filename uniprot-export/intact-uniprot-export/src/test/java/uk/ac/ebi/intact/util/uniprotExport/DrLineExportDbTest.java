@@ -5,9 +5,9 @@
  */
 package uk.ac.ebi.intact.util.uniprotExport;
 
-import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.*;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.ProteinImpl;
 
@@ -18,23 +18,23 @@ import uk.ac.ebi.intact.model.ProteinImpl;
  * @version $Id$
  * @since <pre>24-Aug-2006</pre>
  */
-public class DrLineExportDbTest extends TestCase {
+@Ignore
+public class DrLineExportDbTest {
 
     private static final Log log = LogFactory.getLog(DrLineExportDbTest.class);
 
 
-    @Override
+    @After
     protected void tearDown() throws Exception {
-        super.tearDown();
         IntactContext.getCurrentInstance().getDataContext().commitAllActiveTransactions();
     }
 
-    @Override
+    @Before
     protected void setUp() throws Exception {
-        super.setUp();
         IntactContext.getCurrentInstance().getDataContext().beginTransaction();
     }
 
+    @Test
     public void testIsProteinEligible() throws Exception {
         ProteinImpl prot = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getProteinDao().getByUniprotId("P14712").iterator().next();
@@ -44,7 +44,7 @@ public class DrLineExportDbTest extends TestCase {
 
         DRLineExport export = new DRLineExport(config);
         boolean protEligible = export.isProteinEligible(prot);
-        assertTrue(protEligible);
+        Assert.assertTrue(protEligible);
     }
 
     /*
@@ -55,7 +55,7 @@ public class DrLineExportDbTest extends TestCase {
 
         DRLineExport export = new DRLineExport();
         boolean protEligible = export.isProteinEligible(prot);
-        assertTrue("A protein with isoforms, and one of the isoforms have interactions but not the" +
+        Assert.assertTrue("A protein with isoforms, and one of the isoforms have interactions but not the" +
                 " master protein, should be exported", protEligible);
     }
 
@@ -66,9 +66,12 @@ public class DrLineExportDbTest extends TestCase {
 
         DRLineExport export = new DRLineExport();
         boolean protEligible = export.isProteinEligible(prot);
-        assertTrue(protEligible);
+        Assert.assertTrue(protEligible);
     }
     */
+
+    @Test
+    @Ignore
     public void testIsProteinEligible_() throws Exception {
         ProteinImpl prot = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getProteinDao().getByUniprotId("P14713").iterator().next();
@@ -78,7 +81,7 @@ public class DrLineExportDbTest extends TestCase {
 
         DRLineExport export = new DRLineExport(config);
         boolean protEligible = export.isProteinEligible(prot);
-        assertTrue(protEligible);
+        Assert.assertTrue(protEligible);
     }
 
 
