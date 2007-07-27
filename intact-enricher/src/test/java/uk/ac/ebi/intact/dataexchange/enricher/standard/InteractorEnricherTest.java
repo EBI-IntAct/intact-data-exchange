@@ -19,10 +19,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.unit.IntactAbstractTestCase;
-import uk.ac.ebi.intact.core.unit.IntactUnitDataset;
-import uk.ac.ebi.intact.model.Interactor;
-import uk.ac.ebi.intact.unitdataset.PsiTestDatasetProvider;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.model.BioSource;
+import uk.ac.ebi.intact.model.Protein;
+import uk.ac.ebi.intact.model.util.ProteinUtils;
 
 /**
  * TODO comment this
@@ -30,14 +30,16 @@ import uk.ac.ebi.intact.unitdataset.PsiTestDatasetProvider;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@IntactUnitDataset(dataset = PsiTestDatasetProvider.DIP_NOV_06, provider = PsiTestDatasetProvider.class)
-public class InteractorEnricherTest extends IntactAbstractTestCase {
+
+public class InteractorEnricherTest  {
 
     private InteractorEnricher enricher;
+    private IntactMockBuilder mockBuilder;
 
     @Before
     public void beforeMethod() {
         enricher = InteractorEnricher.getInstance();
+        mockBuilder = new IntactMockBuilder();
     }
 
     @After
@@ -46,13 +48,26 @@ public class InteractorEnricherTest extends IntactAbstractTestCase {
         enricher = null;
     }
 
+
     @Test
-    public void enrich_refSeqPrimary() {
-        Interactor interactor = getDaoFactory().getInteractorDao().getByShortLabel("TusB");
-        Assert.assertNotNull(interactor);
+    public void enrich_uniprot() {
+        BioSource ecoli = mockBuilder.createBioSource(561, "ecoli");
+        Protein protein = mockBuilder.createProtein("P45530", "tusB", ecoli);
 
-        enricher.enrich(interactor);
+        enricher.enrich(protein);
+    }
 
+    @Test
+    public void enrich_alias() {
+        BioSource ecoli = mockBuilder.createBioSource(561, "ecoli");
+        Protein protein = mockBuilder.createProtein("P45530", "myProt", ecoli);
+        protein.getAliases().clear();
+
+        Assert.assertNotSame("tusB", ProteinUtils.getGeneName(protein));
+
+        enricher.enrich(protein);
+
+        Assert.assertEquals("tusB", ProteinUtils.getGeneName(protein));
     }
 
 }

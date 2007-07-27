@@ -59,7 +59,7 @@ public class EnricherContext {
         this.config = new EnricherConfig();
 
 
-        InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/ehcache-enricher.xml");
+        InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/META-INF/ehcache-enricher.xml");
         this.cacheManager = CacheManager.create(ehcacheConfig);
     }
 
@@ -68,7 +68,13 @@ public class EnricherContext {
     }
 
     public Cache getCache(String name) {
-        return cacheManager.getCache(name);
+        Cache cache = cacheManager.getCache(name);
+
+        if (cache == null) {
+            throw new EnricherException("Cache not found: "+name);
+        }
+
+        return cache;
     }
 
 

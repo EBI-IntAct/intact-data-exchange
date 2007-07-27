@@ -15,7 +15,16 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
-import uk.ac.ebi.intact.model.Interactor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.dataexchange.enricher.fetch.InteractorFetcher;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.AliasUtils;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.ProteinUtils;
+import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
+
+import java.util.Collection;
 
 /**
  * TODO comment this
@@ -24,6 +33,8 @@ import uk.ac.ebi.intact.model.Interactor;
  * @version $Id$
  */
 public class InteractorEnricher implements Enricher<Interactor> {
+
+    private static final Log log = LogFactory.getLog(InteractorEnricher.class);
 
     private static ThreadLocal<InteractorEnricher> instance = new ThreadLocal<InteractorEnricher>() {
         @Override
@@ -40,17 +51,64 @@ public class InteractorEnricher implements Enricher<Interactor> {
     }
 
     public void enrich(Interactor objectToEnrich) {
+        if (log.isDebugEnabled()) {
+            log.debug("Enriching Interactor: " + objectToEnrich.getShortLabel());
+        }
 
         if (objectToEnrich.getBioSource() != null) {
             BioSourceEnricher.getInstance().enrich(objectToEnrich.getBioSource());
         }
 
         CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
-        
+
         if (objectToEnrich.getCvInteractorType() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvInteractorType());
         }
 
+        if (objectToEnrich instanceof Protein) {
+            Protein proteinToEnrich = (Protein) objectToEnrich;
+
+            InteractorXref uniprotXref = ProteinUtils.getUniprotXref(proteinToEnrich);
+
+            if (uniprotXref != null) {
+                String uniprotId = uniprotXref.getPrimaryId();
+                int taxId = Integer.valueOf(proteinToEnrich.getBioSource().getTaxId());
+
+                if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein: " + uniprotId + " (taxid:"+taxId+")");
+
+                UniprotProtein uniprotProt = InteractorFetcher.getInstance().fetchInteractorFromUniprot(uniprotId, taxId);
+                updateAliases(proteinToEnrich, uniprotProt);
+            }
+
+        }
+
+    }
+
+    private void updateAliases(Interactor interactor, UniprotProtein uniprotProt) {
+        Alias aliasGeneName = null;
+
+        for (Alias currentAlias : interactor.getAliases()) {
+            String aliasTypePrimaryId = CvObjectUtils.getPsiMiIdentityXref(currentAlias.getCvAliasType()).getPrimaryId();
+
+            if (aliasTypePrimaryId.equals(CvAliasType.GENE_NAME_MI_REF)) {
+                aliasGeneName = currentAlias;
+                break;
+            }
+        }
+
+        Collection<String> uniprotGenes = uniprotProt.getGenes();
+
+        boolean currentGeneNameFound = (aliasGeneName != null) && uniprotGenes.contains(aliasGeneName.getName());
+
+        if (!currentGeneNameFound) {
+
+            for (String geneName : uniprotProt.getGenes()) {
+                if (log.isDebugEnabled()) log.debug("\t\tNew gene name (Alias): " + geneName);
+
+                InteractorAlias alias = AliasUtils.createAliasGeneName(interactor, geneName);
+                interactor.addAlias(alias);
+            }
+        }
     }
 
     public void close() {
