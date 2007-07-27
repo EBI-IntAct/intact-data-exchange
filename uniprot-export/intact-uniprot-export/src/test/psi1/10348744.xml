@@ -1,0 +1,474 @@
+<entrySet level="1" version="1" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/xml/src/MIF.xsd">
+    <entry>
+        <source releaseDate="2007-04-13">
+            <names>
+                <shortLabel>European Bioinformatics Institute</shortLabel>
+            </names>
+            <bibref>
+                <xref>
+                    <primaryRef db="pubmed" id="14681455"/>
+                </xref>
+            </bibref>
+            <xref>
+                <primaryRef db="psi-mi" id="MI:0469"/>
+            </xref>
+            <attributeList>
+                <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United
+                    Kingdom
+                </attribute>
+                <attribute name="url">http://www.ebi.ac.uk</attribute>
+            </attributeList>
+        </source>
+        <experimentList>
+            <experimentDescription id="EBI-626155">
+                <names>
+                    <shortLabel>fankhauser-1999-1</shortLabel>
+                    <fullName>PKS1, a substrate phosphorylated by phytochrome that modulates light signaling in
+                        Arabidopsis.
+                    </fullName>
+                </names>
+                <bibref>
+                    <xref>
+                        <primaryRef db="pubmed" id="10348744"/>
+                    </xref>
+                </bibref>
+                <xref>
+                    <primaryRef db="intact" id="EBI-626155" secondary="fankhauser-1999-1"/>
+                    <secondaryRef db="newt" id="3702" secondary="arath"/>
+                </xref>
+                <hostOrganism ncbiTaxId="4932">
+                    <names>
+                        <shortLabel>yeast</shortLabel>
+                        <fullName>Saccharomyces cerevisiae</fullName>
+                    </names>
+                </hostOrganism>
+                <interactionDetection>
+                    <names>
+                        <shortLabel>two hybrid</shortLabel>
+                        <fullName>two hybrid</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0018"/>
+                        <secondaryRef db="pubmed" id="12634794"/>
+                        <secondaryRef db="pubmed" id="10967325"/>
+                        <secondaryRef db="pubmed" id="1946372"/>
+                    </xref>
+                </interactionDetection>
+                <participantDetection>
+                    <names>
+                        <shortLabel>nucleotide sequence</shortLabel>
+                        <fullName>nucleotide sequence identification</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0078"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </participantDetection>
+                <attributeList>
+                    <attribute name="contact-email">chory@salk.edu</attribute>
+                    <attribute name="author-list">Fankhauser C., Yeh KC., Lagarias JC., Zhang H., Elich TD., Chory J.
+                    </attribute>
+                    <attribute name="publication-year">1999</attribute>
+                    <attribute name="journal">Science (0036-8075)</attribute>
+                </attributeList>
+            </experimentDescription>
+            <experimentDescription id="EBI-626218">
+                <names>
+                    <shortLabel>fankhauser-1999-2</shortLabel>
+                    <fullName>PKS1, a substrate phosphorylated by phytochrome that modulates light signaling in
+                        Arabidopsis.
+                    </fullName>
+                </names>
+                <bibref>
+                    <xref>
+                        <primaryRef db="pubmed" id="10348744"/>
+                    </xref>
+                </bibref>
+                <xref>
+                    <primaryRef db="intact" id="EBI-626218" secondary="fankhauser-1999-2"/>
+                    <secondaryRef db="newt" id="3702" secondary="arath"/>
+                </xref>
+                <hostOrganism ncbiTaxId="4932">
+                    <names>
+                        <shortLabel>yeast</shortLabel>
+                        <fullName>Saccharomyces cerevisiae</fullName>
+                    </names>
+                </hostOrganism>
+                <interactionDetection>
+                    <names>
+                        <shortLabel>two hybrid</shortLabel>
+                        <fullName>two hybrid</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0018"/>
+                        <secondaryRef db="pubmed" id="12634794"/>
+                        <secondaryRef db="pubmed" id="10967325"/>
+                        <secondaryRef db="pubmed" id="1946372"/>
+                    </xref>
+                </interactionDetection>
+                <participantDetection>
+                    <names>
+                        <shortLabel>predetermined</shortLabel>
+                        <fullName>predetermined participant</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0396"/>
+                        <secondaryRef db="pubmed" id="7940758"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </participantDetection>
+                <attributeList>
+                    <attribute name="contact-email">chory@salk.edu</attribute>
+                    <attribute name="figure legend">Figure 1 (a).</attribute>
+                    <attribute name="exp-modification">Direced yeast two hybrid assay.</attribute>
+                    <attribute name="author-list">Fankhauser C., Yeh KC., Lagarias JC., Zhang H., Elich TD., Chory J.
+                    </attribute>
+                    <attribute name="publication-year">1999</attribute>
+                    <attribute name="journal">Science (0036-8075)</attribute>
+                </attributeList>
+            </experimentDescription>
+            <experimentDescription id="EBI-626233">
+                <names>
+                    <shortLabel>fankhauser-1999-3</shortLabel>
+                    <fullName>PKS1, a substrate phosphorylated by phytochrome that modulates light signaling in
+                        Arabidopsis.
+                    </fullName>
+                </names>
+                <bibref>
+                    <xref>
+                        <primaryRef db="pubmed" id="10348744"/>
+                    </xref>
+                </bibref>
+                <xref>
+                    <primaryRef db="intact" id="EBI-626233" secondary="fankhauser-1999-3"/>
+                    <secondaryRef db="newt" id="3702" secondary="arath"/>
+                </xref>
+                <hostOrganism ncbiTaxId="-1">
+                    <names>
+                        <shortLabel>in vitro</shortLabel>
+                    </names>
+                </hostOrganism>
+                <interactionDetection>
+                    <names>
+                        <shortLabel>pull down</shortLabel>
+                        <fullName>pull down</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0096"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </interactionDetection>
+                <participantDetection>
+                    <names>
+                        <shortLabel>predetermined</shortLabel>
+                        <fullName>predetermined participant</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0396"/>
+                        <secondaryRef db="pubmed" id="7940758"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </participantDetection>
+                <attributeList>
+                    <attribute name="contact-email">chory@salk.edu</attribute>
+                    <attribute name="figure legend">Figure 1 (b).</attribute>
+                    <attribute name="author-list">Fankhauser C., Yeh KC., Lagarias JC., Zhang H., Elich TD., Chory J.
+                    </attribute>
+                    <attribute name="publication-year">1999</attribute>
+                    <attribute name="journal">Science (0036-8075)</attribute>
+                </attributeList>
+            </experimentDescription>
+        </experimentList>
+        <interactorList>
+            <proteinInteractor id="EBI-624446">
+                <names>
+                    <shortLabel>phya_arath</shortLabel>
+                    <fullName>Phytochrome A</fullName>
+                </names>
+                <xref>
+                    <primaryRef db="uniprotkb" id="P14712" secondary="phya_arath" version="SP_49"/>
+                    <secondaryRef db="interpro" id="IPR003594" secondary="ATPbind_ATPase"/>
+                    <secondaryRef db="interpro" id="IPR003018" secondary="GAF"/>
+                    <secondaryRef db="interpro" id="IPR003661" secondary="His_kinA_N"/>
+                    <secondaryRef db="interpro" id="IPR005467" secondary="His_kinase"/>
+                    <secondaryRef db="interpro" id="IPR001610" secondary="PAC"/>
+                    <secondaryRef db="interpro" id="IPR000014" secondary="PAS"/>
+                    <secondaryRef db="interpro" id="IPR001294" secondary="Phytochrome"/>
+                    <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+                    <secondaryRef db="interpro" id="IPR012129" secondary="Phytochrome_A-E"/>
+                    <secondaryRef db="intact" id="EBI-624446" secondary="phya_arath"/>
+                </xref>
+                <organism ncbiTaxId="3702">
+                    <names>
+                        <shortLabel>arath</shortLabel>
+                        <fullName>Arabidopsis thaliana</fullName>
+                    </names>
+                </organism>
+                <sequence>
+                    MSGSRPTQSSEGSRRSRHSARIIAQTTVDAKLHADFEESGSSFDYSTSVRVTGPVVENQPPRSDKVTTTYLHHIQKGKLIQPFGCLLALDEKTFKVIAYSENASELLTMASHAVPSVGEHPVLGIGTDIRSLFTAPSASALQKALGFGDVSLLNPILVHCRTSAKPFYAIIHRVTGSIIIDFEPVKPYEVPMTAAGALQSYKLAAKAITRLQSLPSGSMERLCDTMVQEVFELTGYDRVMAYKFHEDDHGEVVSEVTKPGLEPYLGLHYPATDIPQAARFLFMKNKVRMIVDCNAKHARVLQDEKLSFDLTLCGSTLRAPHSCHLQYMANMDSIASLVMAVVVNEEDGEGDAPDATTQPQKRKRLWGLVVCHNTTPRFVPFPLRYACEFLAQVFAIHVNKEVELDNQMVEKNILRTQTLLCDMLMRDAPLGIVSQSPNIMDLVKCDGAALLYKDKIWKLGTTPSEFHLQEIASWLCEYHMDSTGLSTDSLHDAGFPRALSLGDSVCGMAAVRISSKDMIFWFRSHTAGEVRWGGAKHDPDDRDDARRMHPRSSFKAFLEVVKTRSLPWKDYEMDAIHSLQLILRNAFKDSETTDVNTKVIYSKLNDLKIDGIQELEAVTSEMVRLIETATVPILAVDSDGLVNGWNTKIAELTGLSVDEAIGKHFLTLVEDSSVEIVKRMLENALEGTEEQNVQFEIKTHLSRADAGPISLVVNACASRDLHENVVGVCFVAHDLTGQKTVMDKFTRIEGDYKAIIQNPNPLIPPIFGTDEFGWCTEWNPAMSKLTGLKREEVIDKMLLGEVFGTQKSCCRLKNQEAFVNLGIVLNNAVTSQDPEKVSFAFFTRGGKYVECLLCVSKKLDREGVVTGVFCFLQLASHELQQALHVQRLAERTAVKRLKALAYIKRQIRNPLSGIMFTRKMIEGTELGPEQRRILQTSALCQKQLSKILDDSDLESIIEGCLDLEMKEFTLNEVLTASTSQVMMKSNGKSVRITNETGEEVMSDTLYGDSIRLQQVLADFMLMAVNFTPSGGQLTVSASLRKDQLGRSVHLANLEIRLTHTGAGIPEFLLNQMFGTEEDVSEEGLSLMVSRKLVKLMNGDVQYLRQAGKSSFIITAELAAANK
+                </sequence>
+            </proteinInteractor>
+            <proteinInteractor id="EBI-626200">
+                <names>
+                    <shortLabel>pks1_arath</shortLabel>
+                    <fullName>Phytochrome kinase substrate 1</fullName>
+                </names>
+                <xref>
+                    <primaryRef db="uniprotkb" id="Q9SWI1" secondary="pks1_arath" version="SP_48"/>
+                    <secondaryRef db="uniprotkb" id="O80610" secondary="pks1_arath" version="SP_48"/>
+                    <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+                    <secondaryRef db="intact" id="EBI-626200" secondary="pks1_arath"/>
+                </xref>
+                <organism ncbiTaxId="3702">
+                    <names>
+                        <shortLabel>arath</shortLabel>
+                        <fullName>Arabidopsis thaliana</fullName>
+                    </names>
+                </organism>
+                <sequence>
+                    MVTLTPSSASTPKTSFDFMKNNNSHSSLYVSSSSYLSSKEDALVTTKKLMEPSKTLNMSINPKQEEFGDEKKMVKKAPEDPEIGVFGAEKYFNGDMDSDQGSSVLSLTNPEVERTVVDSKQSAKKSTGTPSVRSESSWNSQSVLLQNKLVNSCNSSFKEKKNSNGQIQKVTNNKKSFLANLGCKCACSDGDSVDVEEKTSVKRSADPNISVITMRSSADMNTELIKIQKQEELSQRKSLEVFGSPVAIEKKSSVVQKKLPLPPWKSRTEEDDTKSEGSDSSSDLFEIEGLTGNPKPFLTRQGSDPASPTCYAPSEVSVEWSIVTASAADFSVMSECATSPVRRNRPTQIPRIPITAKSAPQRRKSSSSSGGNGFLMSCKSHKSVMVSGDLDRRSSMNKTQPSYVPRFPMETTKPKSFETRRRISNSSISHTQSSLLYSQ
+                </sequence>
+            </proteinInteractor>
+            <proteinInteractor id="EBI-300727">
+                <names>
+                    <shortLabel>phyb_arath</shortLabel>
+                    <fullName>Phytochrome B</fullName>
+                </names>
+                <xref>
+                    <primaryRef db="uniprotkb" id="P14713" secondary="phyb_arath" version="SP_48"/>
+                    <secondaryRef db="interpro" id="IPR003594" secondary="ATPbind_ATPase"/>
+                    <secondaryRef db="interpro" id="IPR003018" secondary="GAF"/>
+                    <secondaryRef db="interpro" id="IPR005467" secondary="His_kinase"/>
+                    <secondaryRef db="interpro" id="IPR003661" secondary="His_kinA_N"/>
+                    <secondaryRef db="interpro" id="IPR000014" secondary="PAS_domain"/>
+                    <secondaryRef db="interpro" id="IPR001294" secondary="Phytochrome"/>
+                    <secondaryRef db="intact" id="EBI-300727" secondary="phyb_arath"/>
+                </xref>
+                <organism ncbiTaxId="3702">
+                    <names>
+                        <shortLabel>arath</shortLabel>
+                        <fullName>Arabidopsis thaliana</fullName>
+                    </names>
+                </organism>
+                <sequence>
+                    MVSGVGGSGGGRGGGRGGEEEPSSSHTPNNRRGGEQAQSSGTKSLRPRSNTESMSKAIQQYTVDARLHAVFEQSGESGKSFDYSQSLKTTTYGSSVPEQQITAYLSRIQRGGYIQPFGCMIAVDESSFRIIGYSENAREMLGIMPQSVPTLEKPEILAMGTDVRSLFTSSSSILLERAFVAREITLLNPVWIHSKNTGKPFYAILHRIDVGVVIDLEPARTEDPALSIAGAVQSQKLAVRAISQLQALPGGDIKLLCDTVVESVRDLTGYDRVMVYKFHEDEHGEVVAESKRDDLEPYIGLHYPATDIPQASRFLFKQNRVRMIVDCNATPVLVVQDDRLTQSMCLVGSTLRAPHGCHSQYMANMGSIASLAMAVIINGNEDDGSNVASGRSSMRLWGLVVCHHTSSRCIPFPLRYACEFLMQAFGLQLNMELQLALQMSEKRVLRTQTLLCDMLLRDSPAGIVTQSPSIMDLVKCDGAAFLYHGKYYPLGVAPSEVQIKDVVEWLLANHADSTGLSTDSLGDAGYPGAAALGDAVCGMAVAYITKRDFLFWFRSHTAKEIKWGGAKHHPEDKDDGQRMHPRSSFQAFLEVVKSRSQPWETAEMDAIHSLQLILRDSFKESEAAMNSKVVDGVVQPCRDMAGEQGIDELGAVAREMVRLIETATVPIFAVDAGGCINGWNAKIAELTGLSVEEAMGKSLVSDLIYKENEATVNKLLSRALRGDEEKNVEVKLKTFSPELQGKAVFVVVNACSSKDYLNNIVGVCFVGQDVTSQKIVMDKFINIQGDYKAIVHSPNPLIPPIFAADENTCCLEWNMAMEKLTGWSRSEVIGKMIVGEVFGSCCMLKGPDALTKFMIVLHNAIGGQDTDKFPFPFFDRNGKFVQALLTANKRVSLEGKVIGAFCFLQIPSPELQQALAVQRRQDTECFTKAKELAYICQVIKNPLSGMRFANSLLEATDLNEDQKQLLETSVSCEKQISRIVGDMDLESIEDGSFVLKREEFFLGSVINAIVSQAMFLLRDRGLQLIRDIPEEIKSIEVFGDQIRIQQLLAEFLLSIIRYAPSQEWVEIHLSQLSKQMADGFAAIRTEFRMACPGEGLPPELVRDMFHSSRWTSPEGLGLSVCRKILKLMNGEVQYIRESERSYFLIILELPVPRKRPLSTASGSGDMMLMMPY
+                </sequence>
+            </proteinInteractor>
+        </interactorList>
+        <interactionList>
+            <interaction>
+                <names>
+                    <shortLabel>phya-phya-1</shortLabel>
+                    <fullName>Yeast two hybrid reveals homotypic interaction of the PHYA protein.</fullName>
+                </names>
+                <experimentList>
+                    <experimentRef ref="EBI-626155"/>
+                </experimentList>
+                <participantList>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-624446"/>
+                        <role>bait</role>
+                    </proteinParticipant>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-624446"/>
+                        <role>prey</role>
+                    </proteinParticipant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>aggregation</shortLabel>
+                        <fullName>aggregation</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0407"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </interactionType>
+                <xref>
+                    <primaryRef db="intact" id="EBI-626160" secondary="phya-phya-1"/>
+                </xref>
+                <attributeList>
+                    <attribute name="kd">0.0</attribute>
+                </attributeList>
+            </interaction>
+            <interaction>
+                <names>
+                    <shortLabel>phya-pks1</shortLabel>
+                    <fullName>Yeast two hybrid reveals interaction between the PHYA protein and PKS1 protein</fullName>
+                </names>
+                <experimentList>
+                    <experimentRef ref="EBI-626155"/>
+                </experimentList>
+                <participantList>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-626200"/>
+                        <role>prey</role>
+                    </proteinParticipant>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-624446"/>
+                        <role>bait</role>
+                    </proteinParticipant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>aggregation</shortLabel>
+                        <fullName>aggregation</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0407"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </interactionType>
+                <xref>
+                    <primaryRef db="intact" id="EBI-626207" secondary="phya-pks1"/>
+                </xref>
+                <attributeList>
+                    <attribute name="kd">0.0</attribute>
+                </attributeList>
+            </interaction>
+            <interaction>
+                <names>
+                    <shortLabel>phya-pks1-1</shortLabel>
+                    <fullName>Yeast two hybrid reveals interaction between the PHYA protein and PKS1 protein</fullName>
+                </names>
+                <experimentList>
+                    <experimentRef ref="EBI-626218"/>
+                </experimentList>
+                <participantList>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-626200"/>
+                        <role>prey</role>
+                    </proteinParticipant>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-624446"/>
+                        <role>bait</role>
+                    </proteinParticipant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>aggregation</shortLabel>
+                        <fullName>aggregation</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0407"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </interactionType>
+                <xref>
+                    <primaryRef db="intact" id="EBI-626220" secondary="phya-pks1-1"/>
+                </xref>
+                <attributeList>
+                    <attribute name="kd">0.0</attribute>
+                </attributeList>
+            </interaction>
+            <interaction>
+                <names>
+                    <shortLabel>phyb-pks1</shortLabel>
+                    <fullName>Yeast two hybrid reveals interaction between the PHYB protein and PKS1 protein</fullName>
+                </names>
+                <experimentList>
+                    <experimentRef ref="EBI-626218"/>
+                </experimentList>
+                <participantList>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-626200"/>
+                        <role>prey</role>
+                    </proteinParticipant>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-300727"/>
+                        <role>bait</role>
+                    </proteinParticipant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>aggregation</shortLabel>
+                        <fullName>aggregation</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0407"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </interactionType>
+                <xref>
+                    <primaryRef db="intact" id="EBI-626225" secondary="phyb-pks1"/>
+                </xref>
+                <attributeList>
+                    <attribute name="kd">0.0</attribute>
+                </attributeList>
+            </interaction>
+            <interaction>
+                <names>
+                    <shortLabel>phyb-pks1-1</shortLabel>
+                    <fullName>GST pulldown analysis reveals interaction between the PHYB protein and PKS1 protein
+                    </fullName>
+                </names>
+                <experimentList>
+                    <experimentRef ref="EBI-626233"/>
+                </experimentList>
+                <participantList>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-626200"/>
+                        <role>prey</role>
+                    </proteinParticipant>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-300727"/>
+                        <role>bait</role>
+                    </proteinParticipant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>aggregation</shortLabel>
+                        <fullName>aggregation</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0407"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </interactionType>
+                <xref>
+                    <primaryRef db="intact" id="EBI-626235" secondary="phyb-pks1-1"/>
+                </xref>
+                <attributeList>
+                    <attribute name="kd">0.0</attribute>
+                </attributeList>
+            </interaction>
+            <interaction>
+                <names>
+                    <shortLabel>phya-pks1-2</shortLabel>
+                    <fullName>GST pulldown analysis reveals interaction between the PHYA protein and PKS1 protein
+                    </fullName>
+                </names>
+                <experimentList>
+                    <experimentRef ref="EBI-626233"/>
+                </experimentList>
+                <participantList>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-624446"/>
+                        <role>bait</role>
+                    </proteinParticipant>
+                    <proteinParticipant>
+                        <proteinInteractorRef ref="EBI-626200"/>
+                        <role>prey</role>
+                    </proteinParticipant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>aggregation</shortLabel>
+                        <fullName>aggregation</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" id="MI:0407"/>
+                        <secondaryRef db="pubmed" id="14755292"/>
+                    </xref>
+                </interactionType>
+                <xref>
+                    <primaryRef db="intact" id="EBI-626243" secondary="phya-pks1-2"/>
+                </xref>
+                <attributeList>
+                    <attribute name="kd">0.0</attribute>
+                </attributeList>
+            </interaction>
+        </interactionList>
+    </entry>
+</entrySet>
