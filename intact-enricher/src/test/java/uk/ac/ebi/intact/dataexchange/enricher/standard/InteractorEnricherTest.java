@@ -51,16 +51,19 @@ public class InteractorEnricherTest  {
 
     @Test
     public void enrich_uniprot() {
-        BioSource ecoli = mockBuilder.createBioSource(561, "ecoli");
-        Protein protein = mockBuilder.createProtein("P45530", "tusB", ecoli);
+        BioSource human = mockBuilder.createBioSource(9606, "human");
+        Protein protein = mockBuilder.createProtein("P18850", "unknownName", human);
 
         enricher.enrich(protein);
+
+        Assert.assertEquals("atf6a_human", protein.getShortLabel());
+        Assert.assertEquals("Cyclic AMP-dependent transcription factor ATF-6 alpha", protein.getFullName());
     }
 
     @Test
     public void enrich_alias() {
         BioSource ecoli = mockBuilder.createBioSource(561, "ecoli");
-        Protein protein = mockBuilder.createProtein("P45530", "myProt", ecoli);
+        Protein protein = mockBuilder.createProtein("P45530", "tusb_ecoli", ecoli);
         protein.getAliases().clear();
 
         Assert.assertNotSame("tusB", ProteinUtils.getGeneName(protein));

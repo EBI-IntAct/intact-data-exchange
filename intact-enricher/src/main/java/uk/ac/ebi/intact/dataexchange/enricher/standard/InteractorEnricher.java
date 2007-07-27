@@ -78,6 +78,9 @@ public class InteractorEnricher implements Enricher<Interactor> {
 
                 UniprotProtein uniprotProt = InteractorFetcher.getInstance().fetchInteractorFromUniprot(uniprotId, taxId);
                 updateAliases(proteinToEnrich, uniprotProt);
+
+                proteinToEnrich.setShortLabel(uniprotProt.getId().toLowerCase());
+                proteinToEnrich.setFullName(uniprotProt.getDescription());
             }
 
         }
