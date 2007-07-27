@@ -1,0 +1,118 @@
+# PSI 2.5 MI	Shortlabel	PSI 1.0 MI	Shortlabel	Is Tagged			Information loss
+
+MI:0234	131I radiolabeled	MI:0507	tagged-protein	Yes			Details of tag
+MI:0235	14c radiolabeled	MI:0507	tagged-protein	Yes			Details of tag
+MI:0236	32p radiolabeled	MI:0507	tagged-protein	Yes			Details of tag
+MI:0237	33p radiolabeled	MI:0507	tagged-protein	Yes			Details of tag
+MI:0371	35s radiolabeled	MI:0507	tagged-protein	Yes			Details of tag
+MI:0238	3h radiolabeled	MI:0507	tagged-protein	Yes			Details of tag
+MI:0239	biotin tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0518	flag tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0240	fusion protein	MI:0507	tagged-protein	Yes			Details of tag
+MI:0365	enzyme tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0366	alk phosphatase	MI:0507	tagged-protein	Yes			Details of tag
+MI:0241	hrp tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0367	gfp tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0519	gst tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0368	yfp tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0520	ha tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0521	his tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0522	myc tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0523	t7 tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0524	tap tagged	MI:0507	tagged-protein	Yes			Details of tag
+MI:0525	v5 tagged	MI:0507	tagged-protein	Yes			Details of tag
+
+
+
+# Feature Type							
+MI:0429	required to bind	MI:0117	binding site				required/sufficient
+MI:0422	sufficient to bind	MI:0117	binding site				required/sufficient
+MI:0526	acetyllysine	MI:0121	acetylated residue				detail of PTM
+MI:0527	adp-ribosylated	MI:0120	ptm				detail of PTM
+MI:0528	adp-ribosylarginine	MI:0120	ptm				detail of PTM
+MI:0529	adp-ribosylcysteine	MI:0120	ptm				detail of PTM
+MI:0530	adp-ribosylglutamate	MI:0120	ptm				detail of PTM
+MI:0531	adp-ribosylserine	MI:0120	ptm				detail of PTM
+MI:0532	adpribosylasparagine	MI:0120	ptm				detail of PTM
+MI:0533	glycosylated residue	MI:0120	ptm				detail of PTM
+MI:0534	glycosyl-cysteine	MI:0120	ptm				detail of PTM
+MI:0535	glycosyl-serine	MI:0120	ptm				detail of PTM
+MI:0536	glycosyl-threonine	MI:0120	ptm				detail of PTM
+MI:0537	glycosylarginine	MI:0120	ptm				detail of PTM
+MI:0538	glycosylasparagine	MI:0120	ptm				detail of PTM
+MI:0539	gpi anchor residue	MI:0150	lipid modifcation				detail of PTM
+MI:0540	gpi-alanine	MI:0150	lipid modifcation				detail of PTM
+MI:0541	gpi-asparagine	MI:0150	lipid modifcation				detail of PTM
+MI:0542	gpi-aspartate	MI:0150	lipid modifcation				detail of PTM
+MI:0543	gpi-cysteine	MI:0150	lipid modifcation				detail of PTM
+MI:0544	gpi-glycine	MI:0150	lipid modifcation				detail of PTM
+MI:0545	gpi-serine	MI:0150	lipid modifcation				detail of PTM
+MI:0546	gpi-threonine	MI:0150	lipid modifcation				detail of PTM
+MI:0560	mytistoylated aa	MI:0150	lipid modifcation				detail of PTM
+MI:0561	palmitoylated aa	MI:0150	lipid modifcation				detail of PTM
+MI:0547	prenylcysteine	MI:0150	lipid modifcation				detail of PTM
+MI:0562	methylated alanine	MI:0157	methylated residue				detail of PTM
+MI:0563	methylated arginine	MI:0157	methylated residue				detail of PTM
+MI:0564	methylarginine	MI:0157	methylated residue				detail of PTM
+MI:0548	methylatedlysine	MI:0157	methylated residue				detail of PTM
+MI:0549	alkylated cysteine	MI:0179	other modification				detail of PTM
+MI:0550	carboxyglutamic acid	MI:0179	other modification				detail of PTM
+MI:0551	nitro-tyrosine	MI:0179	other modification				detail of PTM
+MI:0552	nitrosylcysteine	MI:0179	other modification				detail of PTM
+MI:0553	sulfotyrosine	MI:0179	other modification				detail of PTM
+MI:0554	sumoylated lysine	MI:0179	other modification				detail of PTM
+MI:0555	phosphoshistidine: phospho-histidine	MI:0170	phosphorylated residue				detail of PTM
+
+# Interaction Detection							
+MI:0362	inference	MI:0001	interaction detection method				all detail
+MI:0363	inferred by author	MI:0001	interaction detection method				all detail
+MI:0364	inferred by curator	MI:0001	interaction detection method				all detail
+MI:0401	biochemical	MI:0045	experimental				very little
+MI:0400	affinity technologies	MI:0045	experimental				detail of technique
+MI:0227	reverse phase chromatography	MI:0091	chromatography technologies				detail of technique
+MI:0405	competition binding	MI:0400	affinity technologies				detail of technique
+MI:0226	ion exchange chromatography	MI:0091	chromatography technologies				detail of technique
+MI:0411	enzyme linked immunosorbent assay	MI:0400	affinity technologies				detail of technique
+MI:0440	saturation binding	MI:0400	affinity technologies				detail of technique
+MI:0415	enzymatic studies	MI:0045	experimental				detail of technique
+MI:0406	deacetylase assay	MI:0045	experimental				detail of technique
+MI:0508	deacetylase radiometric assay	MI:0045	experimental				detail of technique
+MI:0419	gtpase assay	MI:0045	experimental				detail of technique
+MI:0515	methyltransferase assay	MI:0045	experimental				detail of technique
+MI:0516	methyltransferase radiometric assay	MI:0045	experimental				detail of technique
+MI:0434	phosphatase assay	MI:0045	experimental				detail of technique
+MI:0514	in gel phosphatase assay	MI:0045	experimental				detail of technique
+MI:0509	phosphatase homogeneous time resolved fluorescence	MI:0051	fluorescence technologies				detail of technique
+MI:0435	protease assay	MI:0045	experimental				detail of technique
+MI:0513	collagen film assay	MI:0045	experimental				detail of technique
+MI:0511	protease htrf	MI:0051	fluorescence technologies				detail of technique
+MI:0512	zymography	MI:0045	experimental				detail of technique
+MI:0424	protein kinase assay	MI:0045	experimental				detail of technique
+MI:0423	in-gel kinase assay	MI:0045	experimental				detail of technique
+MI:0420	kinase htrf	MI:0051	fluorescence technologies				detail of technique
+MI:0421	kinase spa	MI:0099	scintillation proximity assay				detail of technique
+MI:0417	footprinting	MI:0045	experimental				detail of technique
+MI:0510	htrf	MI:0051	fluorescence technologies				detail of technique
+MI:0228	cytoplasmic compl	MI:0090	complementation				detail of technique
+MI:0230	membrane compl	MI:0090	complementation				detail of technique
+MI:0232	transcription compl	MI:0090	complementation				detail of technique
+MI:0229	gfp complementation	MI:0090	complementation				detail of technique
+MI:0231	mappit	MI:0090	complementation				detail of technique
+MI:0370	toxcat 	MI:0090	complementation				detail of technique
+MI:0369	gallex	MI:0090	complementation				detail of technique
+MI:0428	imaging techniques	MI:0023	coloc visual technol				detail of technique
+MI:0410	electron tomography	MI:0400	electron microscopy				detail of technique
+MI:0416	fluorescence microscopy	MI:0023	coloc visual technol				detail of technique
+MI:0426	light microscopy	MI:0023	coloc visual technol				detail of technique
+MI:0421	antibody detection	MI:0002	participant identification method				detail of technique
+MI:0422	immunostaining	MI:0002	participant identification method				detail of technique
+
+# participant identification							
+MI:0427	mass spectrometry	MI:0002	participant identification method				detail of technique
+MI:0433	partial identification of protein sequence	MI:0093	protein sequence identification				detail of technique
+
+# Feature Detection Method							
+MI:0436	protein footprinting	MI:0003	feature detection method				detail of technique
+
+# Interaction Type							
+*	All existing entries	MI:0191	aggregation				all detail

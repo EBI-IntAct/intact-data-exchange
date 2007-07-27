@@ -1,0 +1,439 @@
+   <entrySet level="1" version="1" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/xml/src/MIF.xsd">
+     <entry>
+       <source releaseDate="2006-11-17">
+         <names>
+           <shortLabel>European Bioinformatics Institute</shortLabel>
+         </names>
+         <bibref>
+           <xref>
+             <primaryRef db="pubmed" id="14681455"/>
+           </xref>
+         </bibref>
+         <xref>
+           <primaryRef db="psi-mi" id="MI:0469"/>
+         </xref>
+         <attributeList>
+           <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom</attribute>
+           <attribute name="url">http://www.ebi.ac.uk</attribute>
+         </attributeList>
+       </source>
+       <experimentList>
+         <experimentDescription id="EBI-625782">
+           <names>
+             <shortLabel>ni-1998-1</shortLabel>
+             <fullName>PIF3, a phytochrome-interacting factor necessary for normal photoinduced signal transduction, is a novel basic helix-loop-helix protein.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="9845368"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-625782" secondary="ni-1998-1"/>
+             <secondaryRef db="newt" id="3702" secondary="arath"/>
+           </xref>
+           <hostOrganism ncbiTaxId="4932">
+             <names>
+               <shortLabel>yeast</shortLabel>
+               <fullName>Saccharomyces cerevisiae</fullName>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>two hybrid</shortLabel>
+               <fullName>two hybrid</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0018"/>
+               <secondaryRef db="pubmed" id="12634794"/>
+               <secondaryRef db="pubmed" id="10967325"/>
+               <secondaryRef db="pubmed" id="1946372"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>nucleotide sequence</shortLabel>
+               <fullName>nucleotide sequence identification</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0078"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="contact-email">quail@nature.berkeley.edu</attribute>
+             <attribute name="library-used">Tissue and developmental stage of source of arabidopsis cDNA library not specified.</attribute>
+             <attribute name="author-list">Ni M., Tepperman JM., Quail PH.</attribute>
+             <attribute name="publication-year">1998</attribute>
+             <attribute name="journal">Cell (0092-8674)</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-625790">
+           <names>
+             <shortLabel>ni-1998-2</shortLabel>
+             <fullName>PIF3, a phytochrome-interacting factor necessary for normal photoinduced signal transduction, is a novel basic helix-loop-helix protein.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="9845368"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-625790" secondary="ni-1998-2"/>
+             <secondaryRef db="newt" id="4530" secondary="orysa-1"/>
+             <secondaryRef db="newt" id="3702" secondary="arath"/>
+           </xref>
+           <hostOrganism ncbiTaxId="4932">
+             <names>
+               <shortLabel>yeast</shortLabel>
+               <fullName>Saccharomyces cerevisiae</fullName>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>two hybrid</shortLabel>
+               <fullName>two hybrid</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0018"/>
+               <secondaryRef db="pubmed" id="12634794"/>
+               <secondaryRef db="pubmed" id="10967325"/>
+               <secondaryRef db="pubmed" id="1946372"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>nucleotide sequence</shortLabel>
+               <fullName>nucleotide sequence identification</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0078"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="contact-email">quail@nature.berkeley.edu</attribute>
+             <attribute name="exp-modification">Directed yeast two hybrid assay. Beta-galactosidase activity measured (Miller units).</attribute>
+             <attribute name="figure legend">Figure 1 (b) and (c).Figure 2 (b) to (d).</attribute>
+             <attribute name="author-list">Ni M., Tepperman JM., Quail PH.</attribute>
+             <attribute name="publication-year">1998</attribute>
+             <attribute name="journal">Cell (0092-8674)</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-625824">
+           <names>
+             <shortLabel>ni-1998-3</shortLabel>
+             <fullName>PIF3, a phytochrome-interacting factor necessary for normal photoinduced signal transduction, is a novel basic helix-loop-helix protein.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="9845368"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-625824" secondary="ni-1998-3"/>
+             <secondaryRef db="newt" id="3702" secondary="arath"/>
+           </xref>
+           <hostOrganism ncbiTaxId="-1">
+             <names>
+               <shortLabel>in vitro</shortLabel>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>anti tag coip</shortLabel>
+               <fullName>anti tag coimmunoprecipitation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0007"/>
+               <secondaryRef db="pubmed" id="7708014"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>predetermined</shortLabel>
+               <fullName>predetermined participant</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0396"/>
+               <secondaryRef db="pubmed" id="7940758"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="contact-email">quail@nature.berkeley.edu</attribute>
+             <attribute name="figure legend">Figure 1 (d).</attribute>
+             <attribute name="author-list">Ni M., Tepperman JM., Quail PH.</attribute>
+             <attribute name="publication-year">1998</attribute>
+             <attribute name="journal">Cell (0092-8674)</attribute>
+           </attributeList>
+         </experimentDescription>
+       </experimentList>
+       <interactorList>
+         <proteinInteractor id="EBI-625701">
+           <names>
+             <shortLabel>pif3_arath</shortLabel>
+             <fullName>Phytochrome-interacting factor 3</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="O80536" secondary="pif3_arath" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR001092" secondary="HLH_basic"/>
+             <secondaryRef db="uniprotkb" id="Q9SBC5" secondary="pif3_arath" version="SP_48"/>
+             <secondaryRef db="intact" id="EBI-625701" secondary="pif3_arath"/>
+           </xref>
+           <organism ncbiTaxId="3702">
+             <names>
+               <shortLabel>arath</shortLabel>
+               <fullName>Arabidopsis thaliana</fullName>
+             </names>
+           </organism>
+           <sequence>MPLFELFRLTKAKLESAQDRNPSPPVDEVVELVWENGQISTQSQSSRSRNIPPPQANSSRAREIGNGSKTTMVDEIPMSVPSLMTGLSQDDDFVPWLNHHPSLDGYCSDFLRDVSSPVTVNEQESDMAVNQTAFPLFQRRKDGNESAPAASSSQYNGFQSHSLYGSDRARDLPSQQTNPDRFTQTQEPLITSNKPSLVNFSHFLRPATFAKTTNNNLHDTKEKSPQSPPNVFQTRVLGAKDSEDKVLNESVASATPKDNQKACLISEDSCRKDQESEKAVVCSSVGSGNSLDGPSESPSLSLKRKHSNIQDIDCHSEDVEEESGDGRKEAGPSRTGLGSKRSRSAEVHNLSERRRRDRINEKMRALQELIPNCNKVDKASMLDEAIEYLKSLQLQVQIMSMASGYYLPPAVMFPPGMGHYPAAAAAMAMGMGMPYAMGLPDLSRGGSSVNHGPQFQVSGMQQQPVAMGIPRVSGGGIFAGSSTIGNGSTRDLSGSKDQTTTNNNSNLKPIKRKQGSSDQFCGSS</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-300727">
+           <names>
+             <shortLabel>phyb_arath</shortLabel>
+             <fullName>Phytochrome B</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P14713" secondary="phyb_arath" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR003594" secondary="ATPbind_ATPase"/>
+             <secondaryRef db="interpro" id="IPR003018" secondary="GAF"/>
+             <secondaryRef db="interpro" id="IPR005467" secondary="His_kinase"/>
+             <secondaryRef db="interpro" id="IPR003661" secondary="His_kinA_N"/>
+             <secondaryRef db="interpro" id="IPR000014" secondary="PAS_domain"/>
+             <secondaryRef db="interpro" id="IPR001294" secondary="Phytochrome"/>
+             <secondaryRef db="intact" id="EBI-300727" secondary="phyb_arath"/>
+           </xref>
+           <organism ncbiTaxId="3702">
+             <names>
+               <shortLabel>arath</shortLabel>
+               <fullName>Arabidopsis thaliana</fullName>
+             </names>
+           </organism>
+           <sequence>MVSGVGGSGGGRGGGRGGEEEPSSSHTPNNRRGGEQAQSSGTKSLRPRSNTESMSKAIQQYTVDARLHAVFEQSGESGKSFDYSQSLKTTTYGSSVPEQQITAYLSRIQRGGYIQPFGCMIAVDESSFRIIGYSENAREMLGIMPQSVPTLEKPEILAMGTDVRSLFTSSSSILLERAFVAREITLLNPVWIHSKNTGKPFYAILHRIDVGVVIDLEPARTEDPALSIAGAVQSQKLAVRAISQLQALPGGDIKLLCDTVVESVRDLTGYDRVMVYKFHEDEHGEVVAESKRDDLEPYIGLHYPATDIPQASRFLFKQNRVRMIVDCNATPVLVVQDDRLTQSMCLVGSTLRAPHGCHSQYMANMGSIASLAMAVIINGNEDDGSNVASGRSSMRLWGLVVCHHTSSRCIPFPLRYACEFLMQAFGLQLNMELQLALQMSEKRVLRTQTLLCDMLLRDSPAGIVTQSPSIMDLVKCDGAAFLYHGKYYPLGVAPSEVQIKDVVEWLLANHADSTGLSTDSLGDAGYPGAAALGDAVCGMAVAYITKRDFLFWFRSHTAKEIKWGGAKHHPEDKDDGQRMHPRSSFQAFLEVVKSRSQPWETAEMDAIHSLQLILRDSFKESEAAMNSKVVDGVVQPCRDMAGEQGIDELGAVAREMVRLIETATVPIFAVDAGGCINGWNAKIAELTGLSVEEAMGKSLVSDLIYKENEATVNKLLSRALRGDEEKNVEVKLKTFSPELQGKAVFVVVNACSSKDYLNNIVGVCFVGQDVTSQKIVMDKFINIQGDYKAIVHSPNPLIPPIFAADENTCCLEWNMAMEKLTGWSRSEVIGKMIVGEVFGSCCMLKGPDALTKFMIVLHNAIGGQDTDKFPFPFFDRNGKFVQALLTANKRVSLEGKVIGAFCFLQIPSPELQQALAVQRRQDTECFTKAKELAYICQVIKNPLSGMRFANSLLEATDLNEDQKQLLETSVSCEKQISRIVGDMDLESIEDGSFVLKREEFFLGSVINAIVSQAMFLLRDRGLQLIRDIPEEIKSIEVFGDQIRIQQLLAEFLLSIIRYAPSQEWVEIHLSQLSKQMADGFAAIRTEFRMACPGEGLPPELVRDMFHSSRWTSPEGLGLSVCRKILKLMNGEVQYIRESERSYFLIILELPVPRKRPLSTASGSGDMMLMMPY</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-625799">
+           <names>
+             <shortLabel>phyb_orysa</shortLabel>
+             <fullName>Phytochrome B</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P25764" secondary="phyb_orysa" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR003594" secondary="ATPbind_ATPase"/>
+             <secondaryRef db="interpro" id="IPR003018" secondary="GAF"/>
+             <secondaryRef db="interpro" id="IPR003661" secondary="His_kinA_N"/>
+             <secondaryRef db="interpro" id="IPR005467" secondary="His_kinase"/>
+             <secondaryRef db="interpro" id="IPR000014" secondary="PAS"/>
+             <secondaryRef db="interpro" id="IPR001294" secondary="Phytochrome"/>
+             <secondaryRef db="interpro" id="IPR012129" secondary="Phytochrome_A-E"/>
+             <secondaryRef db="intact" id="EBI-625799" secondary="phyb_orysa"/>
+           </xref>
+           <organism ncbiTaxId="4530">
+             <names>
+               <shortLabel>orysa-1</shortLabel>
+               <fullName>Oryza sativa</fullName>
+             </names>
+           </organism>
+           <sequence>MASGSRATPTRSPSSARPAAPRHQHHHSQSSGGSTSRAGGGGGGGGGGGGGAAAAESVSKAVAQYTLDARLHAVFEQSGASGRSFDYTQSLRASPTPSSEQQIAAYLSRIQRGGHIQPFGCTLAVADDSSFRLLAYSENTADLLDLSPHHSVPSLDSSAVPPPVSLGADARLLFAPSSAVLLERAFAAREISLLNPLWIHSRVSSKPFYAILHRIDVGVVIDLEPARTEDPALSIAGAVQSQKLAVRAISRLQALPGGDVKLLCDTVVEYVRELTGYDRVMVYRFHEDEHGEVVAESRRNNLEPYIGLHYPATDIPQASRFLFRQNRVRMIADCHAAPVRVIQDPALTQPLCLVGSTLRSPHGCHAQYMANMGSIASLVMAVIISSGGDDDHNISRGSIPSAMKLWGLVVCHHTSPRCIPFPLRYACEFLMQAFGLQLNMELQLAHQLSEKHILRTQTLLCDMLLRDSPTGIVTQSPSIMDLVKCDGAALYYHGKYYPLGVTPTEVQIKDIIEWLTMCHGDSTGLSTDSLADAGYPGAAALGDAVSGMAVAYITPSDYLFWFRSHTAKEIKWGGAKHHPEDKDDGQRMHPRSSFKAFLEVVKSRSLPWENAEMDAIHSLQLILRDSFRDSAEGTSNSKAIVNGQVQLGELELRGIDELSSVAREMVRLIETATVPIFAVDTDGCINGWNAKVAELTGLSVEEAMGKSLVNDLIFKESEETVNKLLSRALRGDEDKNVEIKLKTFGPEQSKGPIFVIVNACSSRDYTKNIVGVCFVGQDVTGQKVVMDKFINIQGDYKAIVHNPNPLIPPIFASDENTCCSEWNTAMEKLTGWSRGEVVGKLLVGEVFGNCCRLKGPDALTKFMIVLHNAIGGQDCEKFPFSFFDKNGKYVQALLTANTRSRMDGEAIGAFCFLQIASPELQQAFEIQRHHEKKCYARMKELAYIYQEIKNPLNGIRFTNSLLEMTDLKDDQRQFLETSTACEKQMSKIVKDASLQSIEDGSLVLEKGEFSLGSVMNAVVSQVMIQLRERDLQLIRDIPDEIKEASAYGDQYRIQQVLCDFLLSMVRFAPAENGWVEIQVRPNIKQNSDGTDTMLFLFRFACPGEGLPPEIVQDMFSNSRWTTQEGIGLSICRKILKLMGGEVQYIRESERSFFHIVLELPQPQQAASRGTS</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-624446">
+           <names>
+             <shortLabel>phya_arath</shortLabel>
+             <fullName>Phytochrome A</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P14712" secondary="phya_arath" version="SP_49"/>
+             <secondaryRef db="interpro" id="IPR003594" secondary="ATPbind_ATPase"/>
+             <secondaryRef db="interpro" id="IPR003018" secondary="GAF"/>
+             <secondaryRef db="interpro" id="IPR003661" secondary="His_kinA_N"/>
+             <secondaryRef db="interpro" id="IPR005467" secondary="His_kinase"/>
+             <secondaryRef db="interpro" id="IPR001610" secondary="PAC"/>
+             <secondaryRef db="interpro" id="IPR000014" secondary="PAS"/>
+             <secondaryRef db="interpro" id="IPR001294" secondary="Phytochrome"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="interpro" id="IPR012129" secondary="Phytochrome_A-E"/>
+             <secondaryRef db="intact" id="EBI-624446" secondary="phya_arath"/>
+           </xref>
+           <organism ncbiTaxId="3702">
+             <names>
+               <shortLabel>arath</shortLabel>
+               <fullName>Arabidopsis thaliana</fullName>
+             </names>
+           </organism>
+           <sequence>MSGSRPTQSSEGSRRSRHSARIIAQTTVDAKLHADFEESGSSFDYSTSVRVTGPVVENQPPRSDKVTTTYLHHIQKGKLIQPFGCLLALDEKTFKVIAYSENASELLTMASHAVPSVGEHPVLGIGTDIRSLFTAPSASALQKALGFGDVSLLNPILVHCRTSAKPFYAIIHRVTGSIIIDFEPVKPYEVPMTAAGALQSYKLAAKAITRLQSLPSGSMERLCDTMVQEVFELTGYDRVMAYKFHEDDHGEVVSEVTKPGLEPYLGLHYPATDIPQAARFLFMKNKVRMIVDCNAKHARVLQDEKLSFDLTLCGSTLRAPHSCHLQYMANMDSIASLVMAVVVNEEDGEGDAPDATTQPQKRKRLWGLVVCHNTTPRFVPFPLRYACEFLAQVFAIHVNKEVELDNQMVEKNILRTQTLLCDMLMRDAPLGIVSQSPNIMDLVKCDGAALLYKDKIWKLGTTPSEFHLQEIASWLCEYHMDSTGLSTDSLHDAGFPRALSLGDSVCGMAAVRISSKDMIFWFRSHTAGEVRWGGAKHDPDDRDDARRMHPRSSFKAFLEVVKTRSLPWKDYEMDAIHSLQLILRNAFKDSETTDVNTKVIYSKLNDLKIDGIQELEAVTSEMVRLIETATVPILAVDSDGLVNGWNTKIAELTGLSVDEAIGKHFLTLVEDSSVEIVKRMLENALEGTEEQNVQFEIKTHLSRADAGPISLVVNACASRDLHENVVGVCFVAHDLTGQKTVMDKFTRIEGDYKAIIQNPNPLIPPIFGTDEFGWCTEWNPAMSKLTGLKREEVIDKMLLGEVFGTQKSCCRLKNQEAFVNLGIVLNNAVTSQDPEKVSFAFFTRGGKYVECLLCVSKKLDREGVVTGVFCFLQLASHELQQALHVQRLAERTAVKRLKALAYIKRQIRNPLSGIMFTRKMIEGTELGPEQRRILQTSALCQKQLSKILDDSDLESIIEGCLDLEMKEFTLNEVLTASTSQVMMKSNGKSVRITNETGEEVMSDTLYGDSIRLQQVLADFMLMAVNFTPSGGQLTVSASLRKDQLGRSVHLANLEIRLTHTGAGIPEFLLNQMFGTEEDVSEEGLSLMVSRKLVKLMNGDVQYLRQAGKSSFIITAELAAANK</sequence>
+         </proteinInteractor>
+       </interactorList>
+       <interactionList>
+         <interaction>
+           <names>
+             <shortLabel>phyb-pif3</shortLabel>
+             <fullName>Yeast 2 hybrid analysis reveals interaction between  PHYB photoreceptor  protein and the PIF3 protein</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-625782"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-625701"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-300727"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-625783" secondary="phyb-pif3"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>phyb-pif3-1</shortLabel>
+             <fullName>Directed yeast 2 hybrid analysis reveals interaction between  PHYB photoreceptor  protein and the PIF3 protein</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-625790"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-300727"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-625701"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-625792" secondary="phyb-pif3-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>phyb-pif3-2</shortLabel>
+             <fullName>Directed yeast 2 hybrid analysis reveals interaction between  PHYB photoreceptor (Orysa sativa) protein and the PIF3 protein</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-625790"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-625799"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-625701"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-625811" secondary="phyb-pif3-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>phya-pif3-3</shortLabel>
+             <fullName>Directed yeast 2 hybrid analysis reveals interaction between  PHYA photoreceptor protein and the PIF3 protein</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-625790"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-625701"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-624446"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-625815" secondary="phya-pif3-3"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>phyb-pif3-3</shortLabel>
+             <fullName>Anti tag coimmunoprecipitation  reveals interaction between  PHYB photoreceptor  protein and the PIF3 protein</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-625824"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-625701"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-300727"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-625826" secondary="phyb-pif3-3"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+       </interactionList>
+     </entry>
+   </entrySet>

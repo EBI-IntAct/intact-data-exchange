@@ -1,0 +1,290 @@
+   <entrySet level="1" version="1" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/xml/src/MIF.xsd">
+     <entry>
+       <source releaseDate="2006-11-17">
+         <names>
+           <shortLabel>European Bioinformatics Institute</shortLabel>
+         </names>
+         <bibref>
+           <xref>
+             <primaryRef db="pubmed" id="14681455"/>
+           </xref>
+         </bibref>
+         <xref>
+           <primaryRef db="psi-mi" id="MI:0469"/>
+         </xref>
+         <attributeList>
+           <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom</attribute>
+           <attribute name="url">http://www.ebi.ac.uk</attribute>
+         </attributeList>
+       </source>
+       <experimentList>
+         <experimentDescription id="EBI-526137">
+           <names>
+             <shortLabel>puthalakath-1999-2</shortLabel>
+             <fullName>The proapoptotic activity of the Bcl-2 family member Bim is regulated by interaction with the dynein motor complex.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="10198631"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-526137" secondary="puthalakath-1999-2"/>
+             <secondaryRef db="intact" id="EBI-526031"/>
+             <secondaryRef db="newt" id="10090" secondary="mouse"/>
+             <secondaryRef db="newt" id="9606" secondary="human"/>
+           </xref>
+           <hostOrganism ncbiTaxId="4932">
+             <names>
+               <shortLabel>yeast</shortLabel>
+               <fullName>Saccharomyces cerevisiae</fullName>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>two hybrid</shortLabel>
+               <fullName>two hybrid</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0018"/>
+               <secondaryRef db="pubmed" id="12634794"/>
+               <secondaryRef db="pubmed" id="10967325"/>
+               <secondaryRef db="pubmed" id="1946372"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>full dna sequence</shortLabel>
+               <fullName>full identification by sequencing</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0833"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="negative">This experiment relates to a negative interaction.</attribute>
+             <attribute name="author-list">Puthalakath H., Huang DC., O&apos;Reilly LA., King SM., Strasser A.</attribute>
+             <attribute name="publication-year">1999</attribute>
+             <attribute name="journal">Mol. Cell (1097-2765)</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-526265">
+           <names>
+             <shortLabel>puthalakath-1999-4</shortLabel>
+             <fullName>The proapoptotic activity of the Bcl-2 family member Bim is regulated by interaction with the dynein motor complex.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="10198631"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-526265" secondary="puthalakath-1999-4"/>
+             <secondaryRef db="intact" id="EBI-526206"/>
+             <secondaryRef db="newt" id="10090" secondary="mouse"/>
+             <secondaryRef db="newt" id="9606" secondary="human"/>
+           </xref>
+           <hostOrganism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human-293t</shortLabel>
+               <fullName>Homo sapiens 293 cells transformed with SV40 large T antigen</fullName>
+             </names>
+             <cellType>
+               <names>
+                 <shortLabel>293t</shortLabel>
+                 <fullName>293 cells expressing SV40 large T antigen.</fullName>
+               </names>
+               <xref>
+                 <primaryRef db="pubmed" id="3031469"/>
+                 <secondaryRef db="cabri" id="ICLC HTL04001"/>
+                 <secondaryRef db="intact" id="IA:0074"/>
+               </xref>
+             </cellType>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>anti tag coip</shortLabel>
+               <fullName>anti tag coimmunoprecipitation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0007"/>
+               <secondaryRef db="pubmed" id="7708014"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>western blot</shortLabel>
+               <fullName>western blot</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0113"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="caution">The source organism for bim sequence is not stated but assumed to be mouse as in previous experiments from the same paper.</attribute>
+             <attribute name="negative">This experiment is related to a negative interaction</attribute>
+             <attribute name="author-list">Puthalakath H., Huang DC., O&apos;Reilly LA., King SM., Strasser A.</attribute>
+             <attribute name="publication-year">1999</attribute>
+             <attribute name="journal">Mol. Cell (1097-2765)</attribute>
+           </attributeList>
+         </experimentDescription>
+       </experimentList>
+       <interactorList>
+         <proteinInteractor id="EBI-372128">
+           <names>
+             <shortLabel>dlc2a_human</shortLabel>
+             <fullName>Dynein light chain 2A, cytoplasmic</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q9NP97" secondary="dlc2a_human" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0005868" secondary="C:cytoplasmic dynein complex"/>
+             <secondaryRef db="go" id="GO:0003777" secondary="F:microtubule motor activity"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" id="GO:0007018" secondary="P:microtubule-based movement"/>
+             <secondaryRef db="go" id="GO:0007632" secondary="P:visual behavior"/>
+             <secondaryRef db="interpro" id="IPR004942" secondary="Robl_LC7"/>
+             <secondaryRef db="uniprotkb" id="Q5TC72" secondary="dlc2a_human" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q96IV3" secondary="dlc2a_human" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0005737" secondary="C:cytoplasm"/>
+             <secondaryRef db="go" id="GO:0008090" secondary="P:retrograde axon cargo transp"/>
+             <secondaryRef db="uniprotkb" id="Q9NQM2" secondary="dlc2a_human" version="SP_48"/>
+             <secondaryRef db="intact" id="EBI-372128" secondary="dlc2a_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>AEVEETLKRLQSQKGVQGIIVVNTEGIPIKSTMDNPTTTQYASLMHSFILKARSTVRDIDPQNDLTFLRIRSKKNEIMVAPDKDYFLIVIQNPTE</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-526084">
+           <names>
+             <shortLabel>o54918-3</shortLabel>
+             <fullName>Bcl-2-like protein 11</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="O54918-3" secondary="bim_mouse" version="SP_51"/>
+             <secondaryRef db="intact" id="EBI-526067" secondary="bim_mouse"/>
+             <secondaryRef db="intact" id="EBI-526084" secondary="o54918-3"/>
+           </xref>
+           <organism ncbiTaxId="10090">
+             <names>
+               <shortLabel>mouse</shortLabel>
+               <fullName>Mus musculus</fullName>
+             </names>
+           </organism>
+           <sequence>MAKQPSDVSSECDREGGQLQPAERPPQLRPGAPTSLQTEPQASIRQSQEEPEDLRPEIRIAQELRRIGDEFNETYTRRVFANDYREAEDHPQMVILQLLRFIFRLVWRRH</sequence>
+         </proteinInteractor>
+       </interactorList>
+       <interactionList>
+         <interaction>
+           <names>
+             <shortLabel>bims-dncl2a-1</shortLabel>
+             <fullName>2 hybrid screening of hela cell library with mouse bim splicevariants</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-526137"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-372128"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-526084"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-526131" secondary="bims-dncl2a-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="negative">The interaction does not occur under these experimental condition</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>dncl2a-bims-2</shortLabel>
+             <fullName>coip of bim splicevariants and dynein</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-526265"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-526084"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-372128"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-526268" secondary="dncl2a-bims-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="negative">The interaction does not occur under these experimental condition</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>bims-dncl2a-2</shortLabel>
+             <fullName>coip of bim splicevariants and dynein</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-526265"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-526084"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-372128"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-526288" secondary="bims-dncl2a-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="negative">The interaction does not occur under these experimental condition</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+       </interactionList>
+     </entry>
+   </entrySet>

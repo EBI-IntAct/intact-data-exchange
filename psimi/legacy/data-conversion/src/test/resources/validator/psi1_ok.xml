@@ -1,0 +1,196 @@
+<entrySet level="1" version="1" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/xml/src/MIF.xsd">
+  <entry>
+    <source releaseDate="2006-07-21">
+      <names>
+        <shortLabel>European Bioinformatics Institute</shortLabel>
+      </names>
+      <bibref>
+        <xref>
+
+          <primaryRef db="pubmed" id="14681455"/>
+        </xref>
+      </bibref>
+      <xref>
+        <primaryRef db="psi-mi" id="MI:0469"/>
+      </xref>
+      <attributeList>
+        <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom</attribute>
+
+        <attribute name="url">http://www.ebi.ac.uk</attribute>
+      </attributeList>
+    </source>
+    <experimentList>
+      <experimentDescription id="EBI-603511">
+        <names>
+          <shortLabel>abdul_manan-1999-1</shortLabel>
+          <fullName>Structure of Cdc42 in complex with the GTPase-binding domain of the &apos;Wiskott-Aldrich syndrome&apos; protein.</fullName>
+
+        </names>
+        <bibref>
+          <xref>
+            <primaryRef db="pubmed" id="10360578"/>
+          </xref>
+        </bibref>
+        <xref>
+          <primaryRef db="intact" id="EBI-603511" secondary="abdul_manan-1999-1"/>
+          <secondaryRef db="newt" id="9606" secondary="human"/>
+
+        </xref>
+        <hostOrganism ncbiTaxId="-1">
+          <names>
+            <shortLabel>in vitro</shortLabel>
+          </names>
+        </hostOrganism>
+        <interactionDetection>
+          <names>
+
+            <shortLabel>nmr</shortLabel>
+            <fullName>nuclear magnetic resonance</fullName>
+          </names>
+          <xref>
+            <primaryRef db="psi-mi" id="MI:0077"/>
+            <secondaryRef db="pubmed" id="12120505"/>
+            <secondaryRef db="pubmed" id="12062432"/>
+          </xref>
+
+        </interactionDetection>
+        <participantDetection>
+          <names>
+            <shortLabel>predetermined</shortLabel>
+            <fullName>predetermined participant</fullName>
+          </names>
+          <xref>
+            <primaryRef db="psi-mi" id="MI:0396"/>
+
+            <secondaryRef db="pubmed" id="7940758"/>
+            <secondaryRef db="pubmed" id="14755292"/>
+          </xref>
+        </participantDetection>
+        <attributeList>
+          <attribute name="author-list">Abdul-Manan N., Aghazadeh B., Liu GA., Majumdar A., Ouerfelli O., Siminovitch KA., Rosen MK.</attribute>
+          <attribute name="publication-year">1999</attribute>
+          <attribute name="journal">Nature (0028-0836)</attribute>
+
+        </attributeList>
+      </experimentDescription>
+    </experimentList>
+    <interactorList>
+      <proteinInteractor id="EBI-346375">
+        <names>
+          <shortLabel>wasp_human</shortLabel>
+          <fullName>Wiskott-Aldrich syndrome protein</fullName>
+
+        </names>
+        <xref>
+          <primaryRef db="uniprotkb" id="P42768" secondary="wasp_human" version="SP_48"/>
+          <secondaryRef db="go" id="GO:0015629" secondary="C:actin cytoskeleton"/>
+          <secondaryRef db="go" id="GO:0005083" secondary="F:small GTPase regulatory/inte"/>
+          <secondaryRef db="go" id="GO:0008154" secondary="P:actin polymerization and/or"/>
+          <secondaryRef db="go" id="GO:0007596" secondary="P:blood coagulation"/>
+          <secondaryRef db="go" id="GO:0006952" secondary="P:defense response"/>
+          <secondaryRef db="go" id="GO:0008544" secondary="P:epidermal differentiation"/>
+
+          <secondaryRef db="go" id="GO:0006461" secondary="P:protein complex assembly"/>
+          <secondaryRef db="interpro" id="IPR000697" secondary="EVH1"/>
+          <secondaryRef db="interpro" id="IPR000095" secondary="PAKbox/Rhobndng"/>
+          <secondaryRef db="interpro" id="IPR011993" secondary="PH_type"/>
+          <secondaryRef db="interpro" id="IPR003124" secondary="WH2"/>
+          <secondaryRef db="uniprotkb" id="Q9BU11" secondary="wasp_human" version="SP_48"/>
+          <secondaryRef db="uniprotkb" id="Q9UNJ9" secondary="wasp_human" version="SP_48"/>
+          <secondaryRef db="go" id="GO:0042802" secondary="F:protein self binding"/>
+          <secondaryRef db="intact" id="EBI-346375" secondary="wasp_human"/>
+
+        </xref>
+        <organism ncbiTaxId="9606">
+          <names>
+            <shortLabel>human</shortLabel>
+            <fullName>Homo sapiens</fullName>
+          </names>
+        </organism>
+        <sequence>SGGPMGGRPGGRGAPAVQQNIPSTLLQDHENQRLFEMLGRKCLTLATAVVQLYLALPPGAEHWTKEHCGAVCFVKDNPQKSYFIRLYGLQAGRLLWEQELYSQLVYSTPTPFFHTFAGDDCQAGLNFADEDEAQAFRALVQEKIQKRNQRQSGDRRQLPPPPTPANEERRGGLPPLPLHPGGDQGGPPVGPLSLGLATVDIQNPDITSSRYRGLPAPGPSPADKKRSGKKKISKADIGAPSGFKHVSHVGWDPQNGFDVNNLDPDLRSLFSRAGISEAQLTDAETSKLIYDFIEDQGGLEAVRQEMRRQEPLPPPPPPSRGGNQLPRPPIVGGNKGRSGPLPPVPLGIAPPPPTPRGPPPPGRGGPPPPPPPATGRSGPLPPPPPGAGGPPMPPPPPPPPPPPSSGNGPAPPPLPPALVPAGGLAPGGGRGALLDQIRQGIQLNKTPGAPESSALQPPPQSSEGLVGALMHVMQKRSRAIHSSDEGEDQAGDEDEDDEWDD</sequence>
+
+      </proteinInteractor>
+      <proteinInteractor id="EBI-81752">
+        <names>
+          <shortLabel>cdc42_human</shortLabel>
+          <fullName>Cell division control protein 42 homolog</fullName>
+        </names>
+        <xref>
+          <primaryRef db="uniprotkb" id="P60953" secondary="cdc42_human" version="SP_49"/>
+
+          <secondaryRef db="interpro" id="IPR003578" secondary="GTPase_Rho"/>
+          <secondaryRef db="interpro" id="IPR001806" secondary="Ras_trnsfrmng"/>
+          <secondaryRef db="interpro" id="IPR005225" secondary="Small_GTP"/>
+          <secondaryRef db="uniprotkb" id="P21181" secondary="cdc42_human" version="SP_49"/>
+          <secondaryRef db="uniprotkb" id="P25763" secondary="cdc42_human" version="SP_49"/>
+          <secondaryRef db="uniprotkb" id="Q7L8R5" secondary="cdc42_human" version="SP_49"/>
+          <secondaryRef db="go" id="GO:0005737" secondary="C:cytoplasm"/>
+          <secondaryRef db="go" id="GO:0030175" secondary="C:filopodium"/>
+          <secondaryRef db="go" id="GO:0003924" secondary="F:GTPase activity"/>
+
+          <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+          <secondaryRef db="go" id="GO:0007015" secondary="P:actin filament organization"/>
+          <secondaryRef db="go" id="GO:0007163" secondary="P:establishment and/or mainten"/>
+          <secondaryRef db="go" id="GO:0030225" secondary="P:macrophage differentiation"/>
+          <secondaryRef db="go" id="GO:0005886" secondary="C:plasma membrane"/>
+          <secondaryRef db="interpro" id="IPR003579" secondary="GTPase_Rab"/>
+          <secondaryRef db="interpro" id="IPR003577" secondary="GTPase_Ras"/>
+          <secondaryRef db="intact" id="EBI-81752" secondary="cdc42_human"/>
+        </xref>
+
+        <organism ncbiTaxId="9606">
+          <names>
+            <shortLabel>human</shortLabel>
+            <fullName>Homo sapiens</fullName>
+          </names>
+        </organism>
+        <sequence>MQTIKCVVVGDGAVGKTCLLISYTTNKFPSEYVPTVFDNYAVTVMIGGEPYTLGLFDTAGQEDYDRLRPLSYPQTDVFLVCFSVVSPSSFENVKEKWVPEITHHCPKTPFLLVGTQIDLRDDPSTIEKLAKNKQKPITPETAEKLARDLKAVKYVECSALTQRGLKNVFDEAILAALEPPETQPKRKCCIF</sequence>
+
+      </proteinInteractor>
+    </interactorList>
+    <interactionList>
+      <interaction>
+        <names>
+          <shortLabel>wasp-cdc42-1</shortLabel>
+          <fullName>RMN: structure of Cdc42 in complex with the effector WASP</fullName>
+        </names>
+
+        <experimentList>
+          <experimentRef ref="EBI-603511"/>
+        </experimentList>
+        <participantList>
+          <proteinParticipant>
+            <proteinInteractorRef ref="EBI-346375"/>
+            <role>neutral</role>
+          </proteinParticipant>
+
+          <proteinParticipant>
+            <proteinInteractorRef ref="EBI-81752"/>
+            <role>neutral</role>
+          </proteinParticipant>
+        </participantList>
+        <interactionType>
+          <names>
+            <shortLabel>aggregation</shortLabel>
+
+            <fullName>aggregation</fullName>
+          </names>
+          <xref>
+            <primaryRef db="psi-mi" id="MI:0191"/>
+          </xref>
+        </interactionType>
+        <xref>
+          <primaryRef db="intact" id="EBI-603513" secondary="wasp-cdc42-1"/>
+
+          <secondaryRef db="pdb" id="1cee"/>
+          <secondaryRef db="go" id="GO:0007015" secondary="actin filament organization"/>
+        </xref>
+        <attributeList>
+          <attribute name="3d-structure">The non hydrolysable GTP analogue GMPPPCP and Mg are bound to Cdc42</attribute>
+          <attribute name="kd">1.0</attribute>
+        </attributeList>
+      </interaction>
+
+    </interactionList>
+  </entry>
+</entrySet>

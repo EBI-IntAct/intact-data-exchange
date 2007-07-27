@@ -1,0 +1,1607 @@
+   <entrySet level="1" version="1" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/xml/src/MIF.xsd">
+     <entry>
+       <source releaseDate="2006-11-17">
+         <names>
+           <shortLabel>European Bioinformatics Institute</shortLabel>
+         </names>
+         <bibref>
+           <xref>
+             <primaryRef db="pubmed" id="14681455"/>
+           </xref>
+         </bibref>
+         <xref>
+           <primaryRef db="psi-mi" id="MI:0469"/>
+         </xref>
+         <attributeList>
+           <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom</attribute>
+           <attribute name="url">http://www.ebi.ac.uk</attribute>
+         </attributeList>
+       </source>
+       <experimentList>
+         <experimentDescription id="EBI-286259">
+           <names>
+             <shortLabel>mahajan-2000-1</shortLabel>
+             <fullName>A new family of nuclear receptor coregulators that integrate nuclear receptor signaling through CREB-binding protein.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="10866662"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-286259" secondary="mahajan-2000-1"/>
+             <secondaryRef db="newt" id="10116" secondary="rat"/>
+             <secondaryRef db="newt" id="9606" secondary="human"/>
+             <secondaryRef db="newt" id="9031" secondary="chick"/>
+           </xref>
+           <hostOrganism ncbiTaxId="4932">
+             <names>
+               <shortLabel>yeast</shortLabel>
+               <fullName>Saccharomyces cerevisiae</fullName>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>two hybrid</shortLabel>
+               <fullName>two hybrid</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0018"/>
+               <secondaryRef db="pubmed" id="12634794"/>
+               <secondaryRef db="pubmed" id="10967325"/>
+               <secondaryRef db="pubmed" id="1946372"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>predetermined</shortLabel>
+               <fullName>predetermined participant</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0396"/>
+               <secondaryRef db="pubmed" id="7940758"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="author-list">Mahajan MA., Samuels HH.</attribute>
+             <attribute name="publication-year">2000</attribute>
+             <attribute name="journal">Mol. Cell. Biol. (0270-7306)</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-286519">
+           <names>
+             <shortLabel>mahajan-2000-2</shortLabel>
+             <fullName>A new family of nuclear receptor coregulators that integrate nuclear receptor signaling through CREB-binding protein.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="10866662"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-286519" secondary="mahajan-2000-2"/>
+             <secondaryRef db="newt" id="10116" secondary="rat"/>
+             <secondaryRef db="newt" id="9606" secondary="human"/>
+           </xref>
+           <hostOrganism ncbiTaxId="-1">
+             <names>
+               <shortLabel>in vitro</shortLabel>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>pull down</shortLabel>
+               <fullName>pull down</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0096"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>predetermined</shortLabel>
+               <fullName>predetermined participant</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0396"/>
+               <secondaryRef db="pubmed" id="7940758"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="author-list">Mahajan MA., Samuels HH.</attribute>
+             <attribute name="publication-year">2000</attribute>
+             <attribute name="journal">Mol. Cell. Biol. (0270-7306)</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-286546">
+           <names>
+             <shortLabel>mahajan-2000-3</shortLabel>
+             <fullName>A new family of nuclear receptor coregulators that integrate nuclear receptor signaling through CREB-binding protein.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="10866662"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-286546" secondary="mahajan-2000-3"/>
+             <secondaryRef db="newt" id="9606" secondary="human"/>
+           </xref>
+           <hostOrganism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human-293</shortLabel>
+               <fullName>Homo sapiens transformed primary embryonal kidney cells</fullName>
+             </names>
+             <cellType>
+               <names>
+                 <shortLabel>293</shortLabel>
+                 <fullName>Transformed human primary embryonal kidney cells.</fullName>
+               </names>
+               <xref>
+                 <primaryRef db="cabri" id="ACC 305"/>
+                 <secondaryRef db="intact" id="IA:0058"/>
+               </xref>
+             </cellType>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>pull down</shortLabel>
+               <fullName>pull down</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0096"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>western blot</shortLabel>
+               <fullName>western blot</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0113"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="author-list">Mahajan MA., Samuels HH.</attribute>
+             <attribute name="publication-year">2000</attribute>
+             <attribute name="journal">Mol. Cell. Biol. (0270-7306)</attribute>
+           </attributeList>
+         </experimentDescription>
+       </experimentList>
+       <interactorList>
+         <proteinInteractor id="EBI-286271">
+           <names>
+             <shortLabel>ncoa6_rat</shortLabel>
+             <fullName>Nuclear receptor coactivator 6</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q9JLI4" secondary="ncoa6_rat" version="SP_47"/>
+             <secondaryRef db="go" id="GO:0046966" secondary="F:thyroid hormone receptor bin"/>
+             <secondaryRef db="go" id="GO:0030099" secondary="P:myeloid blood cell different"/>
+             <secondaryRef db="uniprotkb" id="Q9JIH6" secondary="ncoa6_rat" version="SP_47"/>
+             <secondaryRef db="go" id="GO:0030374" secondary="F:ligand-dependent nuclear rec"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="intact" id="EBI-286271" secondary="ncoa6_rat"/>
+           </xref>
+           <organism ncbiTaxId="10116">
+             <names>
+               <shortLabel>rat</shortLabel>
+               <fullName>Rattus norvegicus</fullName>
+             </names>
+           </organism>
+           <sequence>EQIMTNQMQGNKAQFNSQNQSNVMPGPAQIMRGPTPNMQGNMVQFTGQMSGQMLPQQGPVSNSPSQVMGIQGQVLRPPGPSPHMAQQHTDPATTANNDVNLSQMMPDVSMQQTSMVPPHVQSMQGNSASGSHFSGHGVSFNAPFGGAPNGTQMSCGQNPGFPVNKDVTLTSPLLVNLLQSDISAGHFGVNNKQNNTNANKQKKKKPPRKKKNCHQDLNTPDSRPAGLEEVDQQSLPGEQGINLDNTGPKLPDFSNRPPGYPTQPVEQRPLQQMPPQLMQHVAPPPQPPQQQPQPQLPQQQPQPQPPPPSQPQSQQQQQQQQQQQQQQMMMMLMMQQDPKSIRLPVSQNVHPPRGPLNPDSQRVPMQQSGNVPVMVSLQGPASVPPSPDKQRMPMPVNTPLGSNSRKMVYQESPQNSSS</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-286261">
+           <names>
+             <shortLabel>tha_chick</shortLabel>
+             <fullName>Thyroid hormone receptor alpha</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P04625" secondary="tha_chick" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR000536" secondary="Hormone_rec_lig"/>
+             <secondaryRef db="interpro" id="IPR001723" secondary="Stdhrmn_receptor"/>
+             <secondaryRef db="interpro" id="IPR001628" secondary="Znf_C4steroid"/>
+             <secondaryRef db="interpro" id="IPR001728" secondary="ThyrH_receptor"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="intact" id="EBI-286261" secondary="tha_chick"/>
+           </xref>
+           <organism ncbiTaxId="9031">
+             <names>
+               <shortLabel>chick</shortLabel>
+               <fullName>Gallus gallus</fullName>
+             </names>
+           </organism>
+           <sequence>MEQKPSTLDPLSEPEDTRWLDGKRKRKSSQCLVKSSMSGYIPSYLDKDEQCVVCGDKATGYHYRCITCEGCKGFFRRTIQKNLHPTYSCKYDGCCVIDKITRNQCQLCRFKKCISVGMAMDLVLDDSKRVAKRKLIEENRERRRKEEMIKSLQHRPSPSAEEWELIHVVTEAHRSTNAQGSHWKQKRKFLPEDIGQSPMASMPDGDKVDLEAFSEFTKIITPAITRVVDFAKKLPMFSELPCEDQIILLKGCCMEIMSLRAAVRYDPESETLTLSGEMAVKREQLKNGGLGVVSDAIFDLGKSLSAFNLDDTEVALLQAVLLMSSDRTGLICVDKIEKCQETYLLAFEHYINYRKHNIPHFWPKLLMKVTDLRMIGACHASRFLHMKVECPTELFPPLFLEVFEDQEV</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-286285">
+           <names>
+             <shortLabel>tha_human</shortLabel>
+             <fullName>Thyroid hormone receptor alpha</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P10827" secondary="tha_human" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0004887" secondary="F:thyroid hormone receptor act"/>
+             <secondaryRef db="go" id="GO:0003700" secondary="F:transcription factor activit"/>
+             <secondaryRef db="go" id="GO:0006366" secondary="P:transcription from Pol II pr"/>
+             <secondaryRef db="interpro" id="IPR000536" secondary="Hormone_rec_lig"/>
+             <secondaryRef db="interpro" id="IPR001723" secondary="Stdhrmn_receptor"/>
+             <secondaryRef db="interpro" id="IPR001628" secondary="Znf_C4steroid"/>
+             <secondaryRef db="uniprotkb" id="P21205" secondary="tha_human" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q8N6A1" secondary="tha_human" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q96H73" secondary="tha_human" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR001728" secondary="ThyrH_receptor"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="intact" id="EBI-286285" secondary="tha_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MEQKPSKVECGSDPEENSARSPDGKRKRKNGQCSLKTSMSGYIPSYLDKDEQCVVCGDKATGYHYRCITCEGCKGFFRRTIQKNLHPTYSCKYDSCCVIDKITRNQCQLCRFKKCIAVGMAMDLVLDDSKRVAKRKLIEQNRERRRKEEMIRSLQQRPEPTPEEWDLIHIATEAHRSTNAQGSHWKQRRKFLPDDIGQSPIVSMPDGDKVDLEAFSEFTKIITPAITRVVDFAKKLPMFSELPCEDQIILLKGCCMEIMSLRAAVRYDPESDTLTLSGEMAVKREQLKNGGLGVVSDAIFELGKSLSAFNLDDTEVALLQAVLLMSTDRSGLLCVDKIEKSQEAYLLAFEHYVNHRKHNIPHFWPKLLMKEREVQSSILYKGAAAEGRPGGSLGVHPEGQQLLGMHVVQGPQVRQLEQQLGEAGSLQGPVLQHQSPKSPQQRLLELLHRSGILHARAVCGEDDSSEADSPSSSEEEPEVCEDLAGNAASP</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-78558">
+           <names>
+             <shortLabel>thb1_human</shortLabel>
+             <fullName>Thyroid hormone receptor beta-1</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P10828" secondary="thb1_human" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR001728" secondary="ThyrH_receptor"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" id="GO:0005634" secondary="C:nucleus"/>
+             <secondaryRef db="go" id="GO:0003700" secondary="F:transcription factor activit"/>
+             <secondaryRef db="go" id="GO:0004887" secondary="F:thyroid hormone receptor act"/>
+             <secondaryRef db="go" id="GO:0003714" secondary="F:transcription co-repressor a"/>
+             <secondaryRef db="go" id="GO:0006351" secondary="P:transcription, DNA-dependent"/>
+             <secondaryRef db="interpro" id="IPR000536" secondary="Hormone_rec_lig"/>
+             <secondaryRef db="interpro" id="IPR001723" secondary="Stdhrmn_receptor"/>
+             <secondaryRef db="interpro" id="IPR001628" secondary="Znf_C4steroid"/>
+             <secondaryRef db="uniprotkb" id="Q13986" secondary="thb1_human" version="SP_48"/>
+             <secondaryRef db="intact" id="EBI-78558" secondary="thb1_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MTPNSMTENGLTAWDKPKHCPDREHDWKLVGMSEACLHRKSHSERRSTLKNEQSSPHLIQTTWTSSIFHLDHDDVNDQSVSSAQTFQTEEKKCKGYIPSYLDKDELCVVCGDKATGYHYRCITCEGCKGFFRRTIQKNLHPSYSCKYEGKCVIDKVTRNQCQECRFKKCIYVGMATDLVLDDSKRLAKRKLIEENREKRRREELQKSIGHKPEPTDEEWELIKTVTEAHVATNAQGSHWKQKRKFLPEDIGQAPIVNAPEGGKVDLEAFSHFTKIITPAITRVVDFAKKLPMFCELPCEDQIILLKGCCMEIMSLRAAVRYDPESETLTLNGEMAVTRGQLKNGGLGVVSDAIFDLGMSLSSFNLDDTEVALLQAVLLMSSDRPGLACVERIEKYQDSFLLAFEHYINYRKHHVTHFWPKLLMKVTDLRMIGACHASRFLHMKVECPTELFPPLFLEVFED</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-78598">
+           <names>
+             <shortLabel>rxra_human</shortLabel>
+             <fullName>Retinoic acid receptor RXR-alpha</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P19793" secondary="rxra_human" version="SP_49"/>
+             <secondaryRef db="interpro" id="IPR000003" secondary="RtnoidX_receptor"/>
+             <secondaryRef db="go" id="GO:0007165" secondary="P:signal transduction"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" id="GO:0003677" secondary="F:DNA binding"/>
+             <secondaryRef db="go" id="GO:0004886" secondary="F:retinoid-X receptor activity"/>
+             <secondaryRef db="go" id="GO:0003713" secondary="F:transcription co-activator a"/>
+             <secondaryRef db="go" id="GO:0006766" secondary="P:vitamin metabolism"/>
+             <secondaryRef db="interpro" id="IPR000536" secondary="Hormone_rec_lig"/>
+             <secondaryRef db="interpro" id="IPR001723" secondary="Stdhrmn_receptor"/>
+             <secondaryRef db="interpro" id="IPR001628" secondary="Znf_C4steroid"/>
+             <secondaryRef db="intact" id="EBI-78598" secondary="rxra_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MDTKHFLPLDFSTQVNSSLTSPTGRGSMAAPSLHPSLGPGIGSPGQLHSPISTLSSPINGMGPPFSVISSPMGPHSMSVPTTPTLGFSTGSPQLSSPMNPVSSSEDIKPPLGLNGVLKVPAHPSGNMASFTKHICAICGDRSSGKHYGVYSCEGCKGFFKRTVRKDLTYTCRDNKDCLIDKRQRNRCQYCRYQKCLAMGMKREAVQEERQRGKDRNENEVESTSSANEDMPVERILEAELAVEPKTETYVEANMGLNPSSPNDPVTNICQAADKQLFTLVEWAKRIPHFSELPLDDQVILLRAGWNELLIASFSHRSIAVKDGILLATGLHVHRNSAHSAGVGAIFDRVLTELVSKMRDMQMDKTELGCLRAIVLFNPDSKGLSNPAEVEALREKVYASLEAYCKHKYPEQPGRFAKLLLRLPALRSIGLKCLEHLFFFKLIGDTPIDTFLMEMLEAPHQMT</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-78579">
+           <names>
+             <shortLabel>npm_human</shortLabel>
+             <fullName>Nucleophosmin</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P06748" secondary="npm_human" version="SP_69"/>
+             <secondaryRef db="interpro" id="IPR004301" secondary="Nucleoplasmin"/>
+             <secondaryRef db="uniprotkb" id="Q13441" secondary="npm_human" version="SP_69"/>
+             <secondaryRef db="uniprotkb" id="Q14115" secondary="npm_human" version="SP_69"/>
+             <secondaryRef db="uniprotkb" id="Q6V962" secondary="npm_human" version="SP_69"/>
+             <secondaryRef db="uniprotkb" id="Q8WTW5" secondary="npm_human" version="SP_69"/>
+             <secondaryRef db="uniprotkb" id="Q96AT6" secondary="npm_human" version="SP_69"/>
+             <secondaryRef db="uniprotkb" id="Q96DC4" secondary="npm_human" version="SP_69"/>
+             <secondaryRef db="go" id="GO:0005813" secondary="C:centrosome"/>
+             <secondaryRef db="go" id="GO:0005737" secondary="C:cytoplasm"/>
+             <secondaryRef db="go" id="GO:0005730" secondary="C:nucleolus"/>
+             <secondaryRef db="go" id="GO:0051059" secondary="F:NF-kappaB binding"/>
+             <secondaryRef db="go" id="GO:0046982" secondary="F:protein heterodimerization a"/>
+             <secondaryRef db="go" id="GO:0042803" secondary="F:protein homodimerization act"/>
+             <secondaryRef db="go" id="GO:0003723" secondary="F:RNA binding"/>
+             <secondaryRef db="go" id="GO:0030957" secondary="F:Tat protein binding"/>
+             <secondaryRef db="go" id="GO:0003713" secondary="F:transcription coactivator ac"/>
+             <secondaryRef db="go" id="GO:0051082" secondary="F:unfolded protein binding"/>
+             <secondaryRef db="go" id="GO:0051092" secondary="P:activation of NF-kappaB tran"/>
+             <secondaryRef db="go" id="GO:0007569" secondary="P:cell aging"/>
+             <secondaryRef db="go" id="GO:0007098" secondary="P:centrosome cycle"/>
+             <secondaryRef db="go" id="GO:0006886" secondary="P:intracellular protein transp"/>
+             <secondaryRef db="go" id="GO:0008285" secondary="P:negative regulation of cell"/>
+             <secondaryRef db="go" id="GO:0006913" secondary="P:nucleocytoplasmic transport"/>
+             <secondaryRef db="go" id="GO:0006950" secondary="P:response to stress"/>
+             <secondaryRef db="go" id="GO:0042255" secondary="P:ribosome assembly"/>
+             <secondaryRef db="uniprotkb" id="P08693" secondary="npm_human" version="SP_69"/>
+             <secondaryRef db="uniprotkb" id="Q12826" secondary="npm_human" version="SP_69"/>
+             <secondaryRef db="uniprotkb" id="Q13440" secondary="npm_human" version="SP_69"/>
+             <secondaryRef db="uniprotkb" id="Q96EA5" secondary="npm_human" version="SP_69"/>
+             <secondaryRef db="intact" id="EBI-78579" secondary="npm_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MEDSMDMDMSPLRPQNYLFGCELKADKDYHFKVDNDENEHQLSLRTVSLGAGAKDELHIVEAEAMNYEGSPIKVTLATLKMSVQPTVSLGGFEITPPVVLRLKCGSGPVHISGQHLVAVEEDAESEDEEEEDVKLLSISGKRSAPGGGSKVPQKKVKLAADEDDDDDDEEDDDEDDDDDDFDDEEAEEKAPVKKSIRDTPAKNAQKSNQNGKDSKPSSTPRSKGQESFKKQEKTPKTPKGPSSVEDIKAKMQASIEKGGSLPKVEAKFINYVKNCFRMTDQEAIQDLWQWRKSL</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-78473">
+           <names>
+             <shortLabel>esr1_human</shortLabel>
+             <fullName>Estrogen receptor</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P03372" secondary="esr1_human" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" id="GO:0016585" secondary="C:chromatin remodeling complex"/>
+             <secondaryRef db="go" id="GO:0016020" secondary="C:membrane"/>
+             <secondaryRef db="go" id="GO:0030284" secondary="F:estrogen receptor activity"/>
+             <secondaryRef db="go" id="GO:0030235" secondary="F:nitric-oxide synthase regula"/>
+             <secondaryRef db="go" id="GO:0016049" secondary="P:cell growth"/>
+             <secondaryRef db="go" id="GO:0030520" secondary="P:estrogen receptor signaling"/>
+             <secondaryRef db="go" id="GO:0045839" secondary="P:negative regulation of mitos"/>
+             <secondaryRef db="go" id="GO:0006355" secondary="P:regulation of transcription,"/>
+             <secondaryRef db="go" id="GO:0007165" secondary="P:signal transduction"/>
+             <secondaryRef db="interpro" id="IPR000536" secondary="Hormone_rec_lig"/>
+             <secondaryRef db="interpro" id="IPR001292" secondary="Oestrgn_receptor"/>
+             <secondaryRef db="interpro" id="IPR001723" secondary="Stdhrmn_receptor"/>
+             <secondaryRef db="interpro" id="IPR012239" secondary="Oestrogen_recept"/>
+             <secondaryRef db="interpro" id="IPR001628" secondary="Znf_C4steroid"/>
+             <secondaryRef db="uniprotkb" id="Q13511" secondary="esr1_human" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q14276" secondary="esr1_human" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q9NU51" secondary="esr1_human" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q9UDZ7" secondary="esr1_human" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q9UIS7" secondary="esr1_human" version="SP_48"/>
+             <secondaryRef db="intact" id="EBI-78473" secondary="esr1_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MTMTLHTKASGMALLHQIQGNELEPLNRPQLKIPLERPLGEVYLDSSKPAVYNYPEGAAYEFNAAAAANAQVYGQTGLPYGPGSEAAAFGSNGLGGFPPLNSVSPSPLMLLHPPPQLSPFLQPHGQQVPYYLENEPSGYTVREAGPPAFYRPNSDNRRQGGRERLASTNDKGSMAMESAKETRYCAVCNDYASGYHYGVWSCEGCKAFFKRSIQGHNDYMCPATNQCTIDKNRRKSCQACRLRKCYEVGMMKGGIRKDRRGGRMLKHKRQRDDGEGRGEVGSAGDMRAANLWPSPLMIKRSKKNSLALSLTADQMVSALLDAEPPILYSEYDPTRPFSEASMMGLLTNLADRELVHMINWAKRVPGFVDLTLHDQVHLLECAWLEILMIGLVWRSMEHPGKLLFAPNLLLDRNQGKCVEGMVEIFDMLLATSSRFRMMNLQGEEFVCLKSIILLNSGVYTFLSSTLKSLEEKDHIHRVLDKITDTLIHLMAKAGLTLQQQHQRLAQLLLILSHIRHMSNKGMEHLYSMKCKNVVPLYDLLLEMLDAHRLHAPTSRGGASVEETDQSHLATAGSTSSHSLQKYYITGEAEGFPATV</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-78670">
+           <names>
+             <shortLabel>ncoa6_human</shortLabel>
+             <fullName>Nuclear receptor coactivator 6</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q14686" secondary="ncoa6_human" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0030374" secondary="F:ligand-dependent nuclear rec"/>
+             <secondaryRef db="go" id="GO:0006310" secondary="P:DNA recombination"/>
+             <secondaryRef db="go" id="GO:0006281" secondary="P:DNA repair"/>
+             <secondaryRef db="go" id="GO:0006260" secondary="P:DNA replication"/>
+             <secondaryRef db="go" id="GO:0030520" secondary="P:estrogen receptor signaling"/>
+             <secondaryRef db="go" id="GO:0042921" secondary="P:glucocorticoid receptor sign"/>
+             <secondaryRef db="go" id="GO:0045944" secondary="P:positive regulation of trans"/>
+             <secondaryRef db="go" id="GO:0009725" secondary="P:response to hormone stimulus"/>
+             <secondaryRef db="huge" id="KIAA0181"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" id="GO:0005634" secondary="C:nucleus"/>
+             <secondaryRef db="go" id="GO:0005667" secondary="C:transcription factor complex"/>
+             <secondaryRef db="go" id="GO:0003682" secondary="F:chromatin binding"/>
+             <secondaryRef db="go" id="GO:0030331" secondary="F:estrogen receptor binding"/>
+             <secondaryRef db="go" id="GO:0046965" secondary="F:retinoid X receptor binding"/>
+             <secondaryRef db="go" id="GO:0046966" secondary="F:thyroid hormone receptor bin"/>
+             <secondaryRef db="go" id="GO:0016563" secondary="F:transcriptional activator ac"/>
+             <secondaryRef db="go" id="GO:0007420" secondary="P:brain development"/>
+             <secondaryRef db="go" id="GO:0001701" secondary="P:embryonic development (sensu"/>
+             <secondaryRef db="go" id="GO:0007507" secondary="P:heart development"/>
+             <secondaryRef db="go" id="GO:0030099" secondary="P:myeloid blood cell different"/>
+             <secondaryRef db="go" id="GO:0006367" secondary="P:transcription initiation fro"/>
+             <secondaryRef db="uniprotkb" id="Q9NTZ9" secondary="ncoa6_human" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q9UH74" secondary="ncoa6_human" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q9UK86" secondary="ncoa6_human" version="SP_48"/>
+             <secondaryRef db="intact" id="EBI-78670" secondary="ncoa6_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MVLDDLPNLEDIYTSLCSSTMEDSEMDFDSGLEDDDTKSDSILEDSTIFVAFKGNIDDKDFKWKLDAILKNVPNLLHMESSKLKVQKVEPWNSVRVTFNIPREAAERLRILAQSNNQQLRDLGILSVQIEGEGAINLALAQNRSQDVRMNGPMGAGNSVRMEAGFPMASGPGIIRMNNPATVMIPPGGNVSSSMMAPGPNPELQPRTPRPASQSDAMDPLLSGLHIQQQSHPSGSLAPPHHPMQPVSVNRQMNPANFPQLQQQQQQQQQQQQQQQQQQQQQQQQQLQARPPQQHQQQQPQGIRPQFTAPTQVPVPPGWNQLPSGALQPPPAQGSLGTMTANQGWKKAPLPGPMQQQLQARPSLATVQTPSHPPPPYPFGSQQASQAHTNFPQMSNPGQFTAPQMKSLQGGPSRVPTPLQQPHLTNKSPASSPSSFQQGSPASSPTVNQTQQQMGPRPPQNNPLPQGFQQPVSSPGRNPMVQQGNVPPNFMVMQQQPPNQGPQSLHPGLGGMPKRLPPGFSAGQANPNFMQGQVPSTTATTPGNSGAPQLQANQNVQHAGGQGAGPPQNQMQVSHGPPNMMQPSLMGIHGNMNNQQAGTSGVPQVNLSNMQGQPQQGPPSQLMGMHQQIVPSQGQMVQQQGTLNPQNPMILSRAQLMPQGQMMVNPPSQNLGPSPQRMTPPKQMLSQQGPQMMAPHNQMMGPQGQVLLQQNPMIEQIMTNQMQGNKQQFNTQNQSNVMPGPAQIMRGPTPNMQGNMVQFTGQMSGQMLPQQGPVNNSPSQVMGIQGQVLRPPGPSPHMAQQHGDPATTANNDVSLSQMMPDVSIQQTNMVPPHVQAMQGNSASGNHFSGHGMSFNAPFSGAPNGNQMSCGQNPGFPVNKDVTLTSPLLVNLLQSDISAGHFGVNNKQNNTNANKPKKKKPPRKKKNSQQDLNTPDTRPAGLEEADQPPLPGEQGISLDNSGPKLPEFSNRPPGYPSQPVEQRPLQQMPPQLMQHVAPPPQPPQQQPQPQLPQQQQPPPPSQPQSQQQQQQQQQMMMMLMMQQDPKSVRLPVSQNVHPPRGPLNPDSQRMPMQQSGSVPVMVSLQGPASVPPSPDKQRMPMPVNTPLGSNSRKMVYQESPQNPSSSPLAEMASLPEASGSEAPSVPGGPNNMPSHVVLPQNQLMMTGPKPGPSPLSATQGATPQQPPVNSLPSSHGHHFPNVAAPTQTSRPKTPNRASPRPYYPQTPNNRPPSTEPSEISLSPERLNASIAGLFPPQINIPLPPRPNLNRGFDQQGLNPTTLKAIGQAPSNLTMNPSNFATPQTHKLDSVVVNSGKQSNSGATKRASPSNSRRSSPGSSRKTTPSPGRQNSKAPKLTLASQTNAALLQNVELPRNVLVSPTPLANPPVPGSFPNNSGLNPQNSTVSVAAVGGVVEDNKESLNVPQDSDCQNSQSRKEQVNIELKAVPAQEVKMVVPEDQSKKDGQPSDPNKLPSVEENKNLVSPAMREAPTSLSQLLDNSGAPNVTIKPPGLTDLEVTPPVVSGEDLKKASVIPTLQDLSSSKEPSNSLNLPHSNELCSSLVHPELSEVSSNVAPSIPPVMSRPVSSSSISTPLPPNQITVFVTSNPITTSANTSAALPTHLQSALMSTVVTMPNAGSKVMVSEGQSAAQSNARPQFITPVFINSSSIIQVMKGSQPSTIPAAPLTTNSGLMPPSVAVVGPLHIPQNIKFSSAPVPPNALSSSPAPNIQTGRPLVLSSRATPVQLPSPPCTSSPVVPSHPPVQQVKELNPDEASPQVNTSADQNTLPSSQSTTMVSPLLTNSPGSSGNRRSPVSSSKGKGKVDKIGQILLTKACKKVTGSLEKGEEQYGADGETEGQGLDTTAPGLMGTEQLSTELDSKTPTPPAPTLLKMTSSPVGPGTASAGPSLPGGALPTSVRSIVTTLVPSELISAVPTTKSNHGGIASESLAGGLVEEKVGSHPELLPSIAPSQNLVSKETSTTALQASVARPELEVNAAIVSGQSSEPKEIVEKSKIPGRRNSRTEEPTVASESVENGHRKRSSRPASASSSTKDITSAVQSKRRKSK</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-286316">
+           <names>
+             <shortLabel>ghr_human</shortLabel>
+             <fullName>Growth hormone receptor precursor</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P10912" secondary="ghr_human" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0005887" secondary="C:integral to plasma membrane"/>
+             <secondaryRef db="go" id="GO:0004903" secondary="F:growth hormone receptor acti"/>
+             <secondaryRef db="go" id="GO:0040007" secondary="P:growth"/>
+             <secondaryRef db="go" id="GO:0001501" secondary="P:skeletal development"/>
+             <secondaryRef db="interpro" id="IPR002996" secondary="CR1A"/>
+             <secondaryRef db="interpro" id="IPR003961" secondary="FN_III"/>
+             <secondaryRef db="interpro" id="IPR003528" secondary="Hemtopoptn_L_F1"/>
+             <secondaryRef db="uniprotkb" id="Q9HCX2" secondary="ghr_human" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="intact" id="EBI-286316" secondary="ghr_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MDLWQLLLTLALAGSSDAFSGSEATAAILSRAPWSLQSVNPGLKTNSSKEPKFTKCRSPERETFSCHWTDEVHHGTKNLGPIQLFYTRRNTQEWTQEWKECPDYVSAGENSCYFNSSFTSIWIPYCIKLTSNGGTVDEKCFSVDEIVQPDPPIALNWTLLNVSLTGIHADIQVRWEAPRNADIQKGWMVLEYELQYKEVNETKWKMMDPILTTSVPVYSLKVDKEYEVRVRSKQRNSGNYGEFSEVLYVTLPQMSQFTCEEDFYFPWLLIIIFGIFGLTVMLFVFLFSKQQRIKMLILPPVPVPKIKGIDPDLLKEGKLEEVNTILAIHDSYKPEFHSDDSWVEFIELDIDEPDEKTEESDTDRLLSSDHEKSHSNLGVKDGDSGRTSCCEPDILETDFNANDIHEGTSEVAQPQRLKGEADLLCLDQKNQNNSPYHDACPATQQPSVIQAEKNKPQPLPTEGAESTHQAAHIQLSNPSSLSNIDFYAQVSDITPAGSVVLSPGQKNKAGMSQCDMHPEMVSLCQENFLMDNAYFCEADAKKCIPVAPHIKVESHIQPSLNQEDIYITTESLTTAAGRPGTGEHVPGSEMPVPDYTSIHIVQSPQGLILNATALPLPDKEFLSSCGYVSTDQLNKIMP</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-286357">
+           <names>
+             <shortLabel>vdr_human</shortLabel>
+             <fullName>Vitamin D3 receptor</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P11473" secondary="vdr_human" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0003677" secondary="F:DNA binding"/>
+             <secondaryRef db="go" id="GO:0008434" secondary="F:vitamin D3 receptor activity"/>
+             <secondaryRef db="go" id="GO:0007165" secondary="P:signal transduction"/>
+             <secondaryRef db="interpro" id="IPR000536" secondary="Hormone_rec_lig"/>
+             <secondaryRef db="interpro" id="IPR001723" secondary="Stdhrmn_receptor"/>
+             <secondaryRef db="interpro" id="IPR001628" secondary="Znf_C4steroid"/>
+             <secondaryRef db="interpro" id="IPR000324" secondary="VitD_receptor"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="intact" id="EBI-286357" secondary="vdr_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MEAMAASTSLPDPGDFDRNVPRICGVCGDRATGFHFNAMTCEGCKGFFRRSMKRKALFTCPFNGDCRITKDNRRHCQACRLKRCVDIGMMKEFILTDEEVQRKREMILKRKEEEALKDSLRPKLSEEQQRIIAILLDAHHKTYDPTYSDFCQFRPPVRVNDGGGSHPSRPNSRHTPSFSGDSSSSCSDHCITSSDMMDSSSFSNLDLSEEDSDDPSVTLELSQLSMLPHLADLVSYSIQKVIGFAKMIPGFRDLTSEDQIVLLKSSAIEVIMLRSNESFTMDDMSWTCGNQDYKYRVSDVTKAGHSLELIEPLIKFQVGLKKLNLHEEEHVLLMAICIVSPDRPGVQDAALIEAIQDRLSNTLQTYIRCRHPPPGSHLLYAKMIQKLADLRSLNEEHSKQYRCLSFQPECSMKLTPLVLEVFGNEIS</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-81215">
+           <names>
+             <shortLabel>cbp_human</shortLabel>
+             <fullName>CREB-binding protein</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q92793" secondary="cbp_human" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR010303" secondary="DUF902"/>
+             <secondaryRef db="interpro" id="IPR009255" secondary="DUF906"/>
+             <secondaryRef db="go" id="GO:0042592" secondary="P:homeostasis"/>
+             <secondaryRef db="go" id="GO:0001666" secondary="P:response to hypoxia"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" id="GO:0005737" secondary="C:cytoplasm"/>
+             <secondaryRef db="go" id="GO:0005634" secondary="C:nucleus"/>
+             <secondaryRef db="go" id="GO:0004871" secondary="F:signal transducer activity"/>
+             <secondaryRef db="go" id="GO:0003713" secondary="F:transcription co-activator a"/>
+             <secondaryRef db="go" id="GO:0003700" secondary="F:transcription factor activit"/>
+             <secondaryRef db="go" id="GO:0006461" secondary="P:protein complex assembly"/>
+             <secondaryRef db="go" id="GO:0006355" secondary="P:regulation of transcription,"/>
+             <secondaryRef db="go" id="GO:0007165" secondary="P:signal transduction"/>
+             <secondaryRef db="interpro" id="IPR001487" secondary="Bromodomain"/>
+             <secondaryRef db="interpro" id="IPR003101" secondary="KIX"/>
+             <secondaryRef db="interpro" id="IPR000197" secondary="TAZ_finger"/>
+             <secondaryRef db="interpro" id="IPR000433" secondary="Znf_ZZ"/>
+             <secondaryRef db="uniprotkb" id="O00147" secondary="cbp_human" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q16376" secondary="cbp_human" version="SP_48"/>
+             <secondaryRef db="intact" id="EBI-81215" secondary="cbp_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MAENLLDGPPNPKRAKLSSPGFSANDSTDFGSLFDLENDLPDELIPNGGELGLLNSGNLVPDAASKHKQLSELLRGGSGSSINPGIGNVSASSPVQQGLGGQAQGQPNSANMASLSAMGKSPLSQGDSSAPSLPKQAASTSGPTPAASQALNPQAQKQVGLATSSPATSQTGPGICMNANFNQTHPGLLNSNSGHSLINQASQGQAQVMNGSLGAAGRGRGAGMPYPTPAMQGASSSVLAETLTQVSPQMTGHAGLNTAQAGGMAKMGITGNTSPFGQPFSQAGGQPMGATGVNPQLASKQSMVNSLPTFPTDIKNTSVTNVPNMSQMQTSVGIVPTQAIATGPTADPEKRKLIQQQLVLLLHAHKCQRREQANGEVRACSLPHCRTMKNVLNHMTHCQAGKACQVAHCASSRQIISHWKNCTRHDCPVCLPLKNASDKRNQQTILGSPASGIQNTIGSVGTGQQNATSLSNPNPIDPSSMQRAYAALGLPYMNQPQTQLQPQVPGQQPAQPQTHQQMRTLNPLGNNPMNIPAGGITTDQQPPNLISESALPTSLGATNPLMNDGSNSGNIGTLSTIPTAAPPSSTGVRKGWHEHVTQDLRSHLVHKLVQAIFPTPDPAALKDRRMENLVAYAKKVEGDMYESANSRDEYYHLLAEKIYKIQKELEEKRRSRLHKQGILGNQPALPAPGAQPPVIPQAQPVRPPNGPLSLPVNRMQVSQGMNSFNPMSLGNVQLPQAPMGPRAASPMNHSVQMNSMGSVPGMAISPSRMPQPPNMMGAHTNNMMAQAPAQSQFLPQNQFPSSSGAMSVGMGQPPAQTGVSQGQVPGAALPNPLNMLGPQASQLPCPPVTQSPLHPTPPPASTAAGMPSLQHTTPPGMTPPQPAAPTQPSTPVSSSGQTPTPTPGSVPSATQTQSTPTVQAAAQAQVTPQPQTPVQPPSVATPQSSQQQPTPVHAQPPGTPLSQAAASIDNRVPTPSSVASAETNSQQPGPDVPVLEMKTETQAEDTEPDPGESKGEPRSEMMEEDLQGASQVKEETDIAEQKSEPMEVDEKKPEVKVEVKEEEESSSNGTASQSTSPSQPRKKIFKPEELRQALMPTLEALYRQDPESLPFRQPVDPQLLGIPDYFDIVKNPMDLSTIKRKLDTGQYQEPWQYVDDVWLMFNNAWLYNRKTSRVYKFCSKLAEVFEQEIDPVMQSLGYCCGRKYEFSPQTLCCYGKQLCTIPRDAAYYSYQNRYHFCEKCFTEIQGENVTLGDDPSQPQTTISKDQFEKKKNDTLDPEPFVDCKECGRKMHQICVLHYDIIWPSGFVCDNCLKKTGRPRKENKFSAKRLQTTRLGNHLEDRVNKFLRRQNHPEAGEVFVRVVASSDKTVEVKPGMKSRFVDSGEMSESFPYRTKALFAFEEIDGVDVCFFGMHVQEYGSDCPPPNTRRVYISYLDSIHFFRPRCLRTAVYHEILIGYLEYVKKLGYVTGHIWACPPSEGDDYIFHCHPPDQKIPKPKRLQEWYKKMLDKAFAERIIHDYKDIFKQATEDRLTSAKELPYFEGDFWPNVLEESIKELEQEEEERKKEESTAASETTEGSQGDSKNAKKKNNKKTNKNKSSISRANKKKPSMPNVSNDLSQKLYATMEKHKEVFFVIHLHAGPVINTLPPIVDPDPLLSCDLMDGRDAFLTLARDKHWEFSSLRRSKWSTLCMLVELHTQGQDRFVYTCNECKHHVETRWHCTVCEDYDLCINCYNTKSHAHKMVKWGLGLDDEGSSQGEPQSKSPQESRRVSIQRCIQSLVHACQCRNANCSLPSCQKMKRVVQHTKGCKRKTNGGCPVCKQLIALCCYHAKHCQENKCPVPFCLNIKHKLRQQQIQHRLQQAQLMRRRMATMNTRNVPQQSLPSPTSAPPGTPTQQPSTPQTPQPPAQPQPSPVSMSPAGFPSVARTQPPTTVSTGKPTSQVPAPPPPAQPPPAAVEAARQIEREAQQQQHLYRVNINNSMPPGRTGMGTPGSQMAPVSLNVPRPNQVSGPVMPSMPPGQWQQAPLPQQQPMPGLPRPVISMQAQAAVAGPRMPSVQPPRSISPSALQDLLRTLKSPSSPQQQQQVLNILKSNPQLMAAFIKQRTAKYVANQPGMQPQPGLQSQPGMQPQPGMHQQPSLQNLNAMQAGVPRPGVPPQQQAMGGLNPQGQALNIMNPGHNPNMASMNPQYREMLRRQLLQQQQQQQQQQQQQQQQQQGSAGMAGGMAGHGQFQQPQGPGGYPPAMQQQQRMQQHLPLQGSSMGQMAAQMGQLGQMGQPGLGADSTPNIQQALQQRILQQQQMKQQIGSPGQPNPMSPQQHMLSGQPQASHLPGQQIATSLSNQVRSPAPVQSPRPQSQPPHSSPSPRIQPQPSPHHVSPQTGSPHPGLAVTMASSIDQGHLGNPEQSAMLPQLNTPSRSALSSELSLVGDTTGDTLEKFVEGL</sequence>
+         </proteinInteractor>
+       </interactorList>
+       <interactionList>
+         <interaction>
+           <names>
+             <shortLabel>thra-ncoa6-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286261"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286282" secondary="thra-ncoa6-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">Partial sequence of rat NCOA6 recovered and verified by sequencing.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>thra-ncoa6-2</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286285"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286301" secondary="thra-ncoa6-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">LXXLL motif of rNCOA6 important in the interaction.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>thrb-ncoa6-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78558"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286304" secondary="thrb-ncoa6-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">LXXLL motif of rNCOA6 important in the interaction.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>rxra-ncoa6-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78598"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286307" secondary="rxra-ncoa6-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">LXXLL motif of rNCOA6 important in the interaction.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>rara-ncoa6-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78579"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286310" secondary="rara-ncoa6-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">LXXLL motif of rNCOA6 important in the interaction.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>esr1-ncoa6-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78473"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286313" secondary="esr1-ncoa6-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">LXXLL motif of rNCOA6 important in the interaction.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ghr-ncoa6-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286316"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286327" secondary="ghr-ncoa6-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ghr-ncoa6-2</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286316"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286330" secondary="ghr-ncoa6-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">LXXLL motif of rNCOA6 important in the interaction.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-thra-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286285"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286336" secondary="ncoa6-thra-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-thrb-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78558"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286339" secondary="ncoa6-thrb-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-rara-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78579"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286342" secondary="ncoa6-rara-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-rxra-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78598"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286345" secondary="ncoa6-rxra-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-esr1-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78473"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286348" secondary="ncoa6-esr1-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-vdr-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286357"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286369" secondary="ncoa6-vdr-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>vdr-ncoa6-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286357"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286372" secondary="vdr-ncoa6-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">LXXLL motif of rNCOA6 important in the interaction.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-thra-2</shortLabel>
+             <fullName>Regions of hNCOA6 important for interactions determined by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286285"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286377" secondary="ncoa6-thra-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">AA 771-1986 of NCOA6 containing the LXXLL-1 motif, the AD2 the LXXLL-2 important in the interactions.
+</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-thrb-2</shortLabel>
+             <fullName>Regions of hNCOA6 important for interactions determined by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78558"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286380" secondary="ncoa6-thrb-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">AA 771-1986 of NCOA6 containing the LXXLL-1 motif, the AD2 the LXXLL-2 important in the interactions.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-rara-2</shortLabel>
+             <fullName>Regions of hNCOA6 important for interactions determined by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78579"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286389" secondary="ncoa6-rara-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">AA 771-1986 of NCOA6 containing the LXXLL-1 motif, the AD2 the LXXLL-2 important in the interactions.
+</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-rxra-2</shortLabel>
+             <fullName>Regions of hNCOA6 important for interactions determined by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78598"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286394" secondary="ncoa6-rxra-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">AA 771-1986 of NCOA6 containing the LXXLL-1 motif, the AD2 the LXXLL-2 important in the interactions.
+</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-esr1-2</shortLabel>
+             <fullName>Regions of hNCOA6 important for interactions determined by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78473"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286402" secondary="ncoa6-esr1-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">AA 771-1986 containing the LXXLL-1 motif, the AD2 the LXXLL-2 of NCOA6 is important in the interactions.
+</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-ghr-2</shortLabel>
+             <fullName>Regions of hNCOA6 important for interactions determined by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286316"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286407" secondary="ncoa6-ghr-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">AA 771-1986 of NCOA6 containing the LXXLL-1 motif, the AD2 the LXXLL-2 of NCOA6 is important in the interactions.
+</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-vdr-2</shortLabel>
+             <fullName>Regions of hNCOA6 important for interactions determined by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286357"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286412" secondary="ncoa6-vdr-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">AA 771-1986 containing the LXXLL-1 motif, the AD2 the LXXLL-2 of NCOA6 is important in the interactions.
+</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-ncoa6-1</shortLabel>
+             <fullName>Interaction detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286474" secondary="ncoa6-ncoa6-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">AA 771-1046 are involved in the homodimerisation.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-ncoa6-2</shortLabel>
+             <fullName>Homodimerisation detected by Y2H.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286259"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286477" secondary="ncoa6-ncoa6-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-thra-3</shortLabel>
+             <fullName>Interaction detection by GST Pull Down.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286519"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286285"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286522" secondary="ncoa6-thra-3"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">rNCOA6 was GST labled. Interaction enhanced in the presence of the ligand.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-rxra-3</shortLabel>
+             <fullName>Interaction detection by GST Pull Down.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286519"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78598"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286526" secondary="ncoa6-rxra-3"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">rNCOA6 was GST labled. Interaction enhanced in the presence of the ligand.
+</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-rara-3</shortLabel>
+             <fullName>Interaction detection by GST Pull Down</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286519"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78598"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286530" secondary="ncoa6-rara-3"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">rNCOA6 was GST labled. Interaction enhanced in the presence of the ligand.
+</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-esr1-3</shortLabel>
+             <fullName>Interaction detection by GST Pull Down.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286519"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78473"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286534" secondary="ncoa6-esr1-3"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">rNCOA6 was GST labled. Interaction enhanced in the presence of the ligand.
+</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-ghr-3</shortLabel>
+             <fullName>Interaction detection by GST Pull Down.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286519"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286316"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286538" secondary="ncoa6-ghr-3"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">rNCOA6 was GST labled. Interaction enhanced in the presence of the ligand.
+</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-vdr-3</shortLabel>
+             <fullName>Interaction detection by GST Pull Down.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286519"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286357"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-286271"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286542" secondary="ncoa6-vdr-3"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">rNCOA6 was GST labled. Interaction enhanced in the presence of the ligand.
+</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>ncoa6-crebbp-1</shortLabel>
+             <fullName>Interaction detected by GST pull down assay.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-286546"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-81215"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-78670"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>aggregation</shortLabel>
+               <fullName>aggregation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-286550" secondary="ncoa6-crebbp-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+       </interactionList>
+     </entry>
+   </entrySet>

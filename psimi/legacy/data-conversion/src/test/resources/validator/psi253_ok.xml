@@ -1,0 +1,244 @@
+   <entrySet level="2" minorVersion="3" version="5" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
+     <entry>
+       <source releaseDate="2006-08-25">
+         <names>
+           <shortLabel>European Bioinformatics Institute</shortLabel>
+         </names>
+         <bibref>
+           <xref>
+             <primaryRef db="pubmed" dbAc="MI:0446" id="14681455" refType="primary-reference" refTypeAc="MI:0358"/>
+           </xref>
+         </bibref>
+         <xref>
+           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0469" refType="primary-reference" refTypeAc="MI:0358"/>
+         </xref>
+         <attributeList>
+           <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom</attribute>
+           <attribute name="url">http://www.ebi.ac.uk</attribute>
+         </attributeList>
+       </source>
+       <experimentList>
+         <experimentDescription id="2">
+           <names>
+             <shortLabel>torok-2001-1</shortLabel>
+             <fullName>Synechocystis HSP17 is an amphitropic protein that stabilizes heat-stressed membranes and binds denatured proteins for subsequent chaperone-mediated refolding.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" dbAc="MI:0446" id="11248038" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-905507" secondary="torok-2001-1"/>
+             <secondaryRef db="newt" dbAc="MI:0247" id="9823" refType="target-species" secondary="pig"/>
+             <secondaryRef db="newt" dbAc="MI:0247" id="1148" refType="target-species" secondary="syny3"/>
+           </xref>
+           <hostOrganismList>
+             <hostOrganism ncbiTaxId="-1">
+               <names>
+                 <shortLabel>in vitro</shortLabel>
+               </names>
+             </hostOrganism>
+           </hostOrganismList>
+           <interactionDetectionMethod>
+             <names>
+               <shortLabel>comigration in gel</shortLabel>
+               <fullName>comigration in non denaturing gel electrophoresis</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0404" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionDetectionMethod>
+           <participantIdentificationMethod>
+             <names>
+               <shortLabel>western blot</shortLabel>
+               <fullName>western blot</fullName>
+               <alias>Immuno blot</alias>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0113" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </participantIdentificationMethod>
+           <attributeList>
+             <attribute name="author-list">Torok Z., Goloubinoff P., Horvath I., Tsvetkova NM., Glatz A., Balogh G., Varvasovszki V., Los DA., Vierling E., Crowe JH., Vigh L.</attribute>
+             <attribute name="publication-year">2001</attribute>
+             <attribute name="dataset">Dataset on Cyanobacteria and related species</attribute>
+             <attribute name="exp-modification">The comigration in gel is run at 47 degres under non denaturing conditions to test the ability of HSP17 to bind heat-denaturing proteins.</attribute>
+             <attribute name="figure legend">Fig. 1</attribute>
+             <attribute name="contact-email">vigh@nucleus.szbk.u-szeged.hu</attribute>
+             <attribute name="journal">Proc. Natl. Acad. Sci. U.S.A. (0027-8424)</attribute>
+           </attributeList>
+         </experimentDescription>
+       </experimentList>
+       <interactorList>
+         <interactor id="4">
+           <names>
+             <shortLabel>p72977_syny3</shortLabel>
+             <fullName>16.6 kDa small heat shock protein, molecular chaperon</fullName>
+             <alias type="gene name" typeAc="MI:0301">hsp17</alias>
+             <alias type="locus name" typeAc="MI:0305">sll1514</alias>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="P72977" refType="identity" refTypeAc="MI:0356" secondary="p72977_syny3" version="TrEMBL_31"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0006457" secondary="P:protein folding"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0006986" secondary="P:response to unfolded protein"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR002068" secondary="Hsp20"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-905512" secondary="p72977_syny3"/>
+           </xref>
+           <interactorType>
+             <names>
+               <shortLabel>protein</shortLabel>
+               <fullName>protein</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+               <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+             </xref>
+           </interactorType>
+           <organism ncbiTaxId="1148">
+             <names>
+               <shortLabel>syny3</shortLabel>
+               <fullName>Synechocystis sp. (strain PCC 6803)</fullName>
+             </names>
+           </organism>
+           <sequence>MSLILYNPLREMDNFQQQMNQLFEEVFVPTDRHGDRQGFNPKAELTETEEAYVLKLELPGMDPDNLDIQAARDAVTVSGDRQDTHSTEKDGVRRTEFRYGSFRRVIPVPGAIQNTEVKANYDAGILTLTLPKVEEAKNKVVKVQLS</sequence>
+         </interactor>
+         <interactor id="6">
+           <names>
+             <shortLabel>mdhm_pig</shortLabel>
+             <fullName>Malate dehydrogenase, mitochondrial precursor</fullName>
+             <alias type="gene name" typeAc="MI:0301">MDH2</alias>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="P00346" refType="identity" refTypeAc="MI:0356" secondary="mdhm_pig" version="SP_59"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001557" secondary="L_LDH_MDH"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001236" secondary="lact_mal_DH"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001252" secondary="MDH_AS"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR010097" secondary="MDH_euk_g_bac"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q95308" refType="secondary-ac" refTypeAc="MI:0360" secondary="mdhm_pig" version="SP_59"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-905520" secondary="mdhm_pig"/>
+           </xref>
+           <interactorType>
+             <names>
+               <shortLabel>protein</shortLabel>
+               <fullName>protein</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+               <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+             </xref>
+           </interactorType>
+           <organism ncbiTaxId="9823">
+             <names>
+               <shortLabel>pig</shortLabel>
+               <fullName>Sus scrofa</fullName>
+             </names>
+           </organism>
+           <sequence>MLSALARPAGAALRRSFSTSXQNNAKVAVLGASGGIGQPLSLLLKNSPLVSRLTLYDIAHTPGVAADLSHIETRATVKGYLGPEQLPDCLKGCDVVVIPAGVPRKPGMTRDDLFNTNATIVATLTAACAQHCPDAMICIISNPVNSTIPITAEVFKKHGVYNPNKIFGVTTLDIVRANAFVAELKGLDPARVSVPVIGGHAGKTIIPLISQCTPKVDFPQDQLSTLTGRIQEAGTEVVKAKAGAGSATLSMAYAGARFVFSLVDAMNGKEGVVECSFVKSQETDCPYFSTPLLLGKKGIEKNLGIGKISPFEEKMIAEAIPELKASIKKGEEFVKNMK</sequence>
+         </interactor>
+       </interactorList>
+       <interactionList>
+         <interaction id="1">
+           <names>
+             <shortLabel>hsp17-mdh-1</shortLabel>
+             <fullName>co-migration in gel of the chaperon HSP17 and heat denaturated MDH</fullName>
+           </names>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-905529" secondary="hsp17-mdh-1"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0006457" refType="process" refTypeAc="MI:0359" secondary="protein folding"/>
+           </xref>
+           <experimentList>
+             <experimentRef>2</experimentRef>
+           </experimentList>
+           <participantList>
+             <participant id="3">
+               <interactorRef>4</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>neutral component</shortLabel>
+                     <fullName>neutral component</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0497" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+               <hostOrganismList>
+                 <hostOrganism ncbiTaxId="1148">
+                   <names>
+                     <shortLabel>syny3</shortLabel>
+                     <fullName>Synechocystis sp. (strain PCC 6803)</fullName>
+                   </names>
+                 </hostOrganism>
+               </hostOrganismList>
+             </participant>
+             <participant id="5">
+               <interactorRef>6</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>neutral component</shortLabel>
+                     <fullName>neutral component</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0497" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+               <hostOrganismList>
+                 <hostOrganism ncbiTaxId="9823">
+                   <names>
+                     <shortLabel>pig</shortLabel>
+                     <fullName>Sus scrofa</fullName>
+                   </names>
+                 </hostOrganism>
+               </hostOrganismList>
+             </participant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>direct interaction</shortLabel>
+               <fullName>direct interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0407" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionType>
+           <attributeList>
+             <attribute name="comment">HSP17 assists the complete refolding of heat denaturated MDH in presence of E. coli DnaK, DnaJ, GrpE, GroEL, GroES (see fig.2).</attribute>
+             <attribute name="sample-process">P72977 purified</attribute>
+             <attribute name="sample-process">P00346 purified</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+       </interactionList>
+     </entry>
+   </entrySet>
