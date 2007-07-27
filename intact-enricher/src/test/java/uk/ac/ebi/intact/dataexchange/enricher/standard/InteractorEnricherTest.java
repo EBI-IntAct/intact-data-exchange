@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactAbstractTestCase;
@@ -47,7 +48,8 @@ public class InteractorEnricherTest extends IntactAbstractTestCase {
 
     @Test
     public void enrich_refSeqPrimary() {
-        Interactor interactor = getDaoFactory().getInteractorDao().getByShortLabel("Profilin");
+        Interactor interactor = getDaoFactory().getInteractorDao().getByShortLabel("TusB");
+        Assert.assertNotNull(interactor);
 
         enricher.enrich(interactor);
 

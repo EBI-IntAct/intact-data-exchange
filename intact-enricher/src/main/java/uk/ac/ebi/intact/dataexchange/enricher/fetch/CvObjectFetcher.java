@@ -43,7 +43,7 @@ public class CvObjectFetcher {
     public CvObjectFetcher() {
     }
 
-    public CvTerm fetchByTaxId(String termId) {
+    public CvTerm fetchByTermId(String termId) {
         Cache cache = EnricherContext.getInstance().getCache("CvObject");
 
         CvTerm term;

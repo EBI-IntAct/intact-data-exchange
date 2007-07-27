@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
@@ -44,9 +45,6 @@ public class InteractionEnricher implements Enricher<Interaction> {
 
     public void enrich(Interaction objectToEnrich) {
 
-        String label = InteractionUtils.calculateShortLabel(objectToEnrich);
-        objectToEnrich.setShortLabel(label);
-
         ExperimentEnricher experimentEnricher = ExperimentEnricher.getInstance();
         
         for (Experiment experiment : objectToEnrich.getExperiments()) {
@@ -60,9 +58,14 @@ public class InteractionEnricher implements Enricher<Interaction> {
         }
 
         CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
-        System.out.println("OBJ TO ENRICH: "+objectToEnrich.getCvInteractionType());
+        
         if (objectToEnrich.getCvInteractionType() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvInteractionType());
+        }
+
+        if (EnricherContext.getInstance().getConfig().isUpdateInteractionShortLabels()) {
+            String label = InteractionUtils.calculateShortLabel(objectToEnrich);
+            objectToEnrich.setShortLabel(label);
         }
     }
 

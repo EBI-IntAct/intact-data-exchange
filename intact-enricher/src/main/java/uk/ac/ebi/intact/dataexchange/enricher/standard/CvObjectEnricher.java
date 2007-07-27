@@ -48,11 +48,13 @@ public class CvObjectEnricher implements Enricher<CvObject> {
 
         String mi = identityXref.getPrimaryId();
 
-        CvTerm term = CvObjectFetcher.getInstance().fetchByTaxId(mi);
+        CvTerm term = CvObjectFetcher.getInstance().fetchByTermId(mi);
 
-        System.out.println("TERM: "+term.getShortName());
+        objectToEnrich.setShortLabel(term.getShortName());
+        objectToEnrich.setFullName(term.getFullName());
     }
 
     public void close() {
     }
+
 }

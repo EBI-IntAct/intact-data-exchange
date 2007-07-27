@@ -45,6 +45,12 @@ public class InteractorEnricher implements Enricher<Interactor> {
             BioSourceEnricher.getInstance().enrich(objectToEnrich.getBioSource());
         }
 
+        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
+        
+        if (objectToEnrich.getCvInteractorType() != null) {
+            cvObjectEnricher.enrich(objectToEnrich.getCvInteractorType());
+        }
+
     }
 
     public void close() {
