@@ -2,28 +2,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>uk.ac.ebi.intact.maven</groupId>
-        <artifactId>intact-hibernate-master</artifactId>
-        <version>9</version>
+        <groupId>uk.ac.ebi.intact.dataexchange.psimi.legacy</groupId>
+    	<artifactId>legacy-master</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>uk.ac.ebi.intact.util</groupId>
     <artifactId>data-conversion</artifactId>
     <packaging>jar</packaging>
     <version>1.6.0-SNAPSHOT</version>
 
-    <name>Data conversions</name>
+    <name>IntAct Data Exchange :: PSI MI :: Legacy :: Data Conversion</name>
     <description>Import/Exports from/to PSI files</description>
-    <url>http://www.ebi.ac.uk/~intact/devsite/${artifactId}</url>
-
-    <scm>
-        <connection>scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/data-conversion/trunk</connection>
-        <developerConnection>scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/data-conversion/trunk
-        </developerConnection>
-        <url>http://svn.sourceforge.net/viewcvs.cgi/intact/repo/data-conversion/trunk</url>
-    </scm>
+ 
+    <properties>
+       <maven.test.skip>true</maven.test.skip>
+    </properties>
 
     <build>
         <!--TODO this doesn't answer to -Dmaven.test.skip !! how come ?! -->
@@ -58,7 +53,6 @@
         <dependency>
             <groupId>uk.ac.ebi.intact</groupId>
             <artifactId>intact-core</artifactId>
-            <version>1.6.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.intact.app</groupId>
@@ -116,13 +110,5 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
-    <distributionManagement>
-        <site>
-            <id>intact-site</id>
-            <name>Intact site</name>
-            <url>${site.remote.basedir}/${artifactId}</url>
-        </site>
-    </distributionManagement>
 
 </project>
