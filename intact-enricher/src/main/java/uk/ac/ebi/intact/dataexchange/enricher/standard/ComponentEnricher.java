@@ -42,6 +42,14 @@ public class ComponentEnricher implements Enricher<Component>{
     public void enrich(Component objectToEnrich) {
         InteractorEnricher interactorEnricher = InteractorEnricher.getInstance();
         interactorEnricher.enrich(objectToEnrich.getInteractor());
+
+        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
+        if (objectToEnrich.getCvBiologicalRole() != null) {
+            cvObjectEnricher.enrich(objectToEnrich.getCvBiologicalRole());
+        }
+        if (objectToEnrich.getCvExperimentalRole() != null) {
+            cvObjectEnricher.enrich(objectToEnrich.getCvExperimentalRole());
+        }
     }
 
     public void close() {

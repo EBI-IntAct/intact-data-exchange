@@ -43,6 +43,14 @@ public class ExperimentEnricher implements Enricher<Experiment> {
         BioSourceEnricher bioSourceEnricher = BioSourceEnricher.getInstance();
 
         bioSourceEnricher.enrich(objectToEnrich.getBioSource());
+
+        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
+        if (objectToEnrich.getCvIdentification() != null) {
+            cvObjectEnricher.enrich(objectToEnrich.getCvIdentification());
+        }
+        if (objectToEnrich.getCvInteraction() != null) {
+            cvObjectEnricher.enrich(objectToEnrich.getCvInteraction());
+        }
     }
 
     public void close() {

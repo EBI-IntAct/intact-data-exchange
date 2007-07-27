@@ -58,6 +58,14 @@ public class BioSourceEnricher implements Enricher<BioSource> {
         if (fullName != null) {
             objectToEnrich.setFullName(fullName);
         }
+
+        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
+        if (objectToEnrich.getCvCellType() != null) {
+            cvObjectEnricher.enrich(objectToEnrich.getCvCellType());
+        }
+        if (objectToEnrich.getCvTissue() != null) {
+            cvObjectEnricher.enrich(objectToEnrich.getCvTissue());
+        }
     }
 
     public void close() {
