@@ -26,16 +26,16 @@ public class CvTerm implements Serializable {
     private String fullName;
 
     private String definition;
-    private Collection xrefs = new HashSet( 2 ); // <CvTermXref>
+    private Collection<CvTermXref> xrefs = new HashSet<CvTermXref>( 2 ); // <CvTermXref>
 
-    private Collection synonyms = new HashSet( 2 ); // <String>
-    private Collection parents = new HashSet( 2 );  // <CvTerm>
-    private Collection children = new HashSet( 2 ); // <CvTerm>
+    private Collection<CvTermSynonym> synonyms = new HashSet<CvTermSynonym>( 2 ); // <String>
+    private Collection<CvTerm> parents = new HashSet<CvTerm>( 2 );  // <CvTerm>
+    private Collection<CvTerm> children = new HashSet<CvTerm>( 2 ); // <CvTerm>
 
     private boolean obsolete = false;
     private String obsoleteMessage;
 
-    private Collection annotations = new ArrayList( 2 ); // <CvTermAnnotation>
+    private Collection<CvTermAnnotation> annotations = new ArrayList<CvTermAnnotation>( 2 ); // <CvTermAnnotation>
 
     /////////////////////////////
     // Constructor
@@ -67,19 +67,19 @@ public class CvTerm implements Serializable {
         return definition;
     }
 
-    public Collection getXrefs() {
+    public Collection<CvTermXref> getXrefs() {
         return xrefs;
     }
 
-    public Collection getSynonyms() {
+    public Collection<CvTermSynonym> getSynonyms() {
         return synonyms;
     }
 
-    public Collection getParents() {
+    public Collection<CvTerm> getParents() {
         return parents;
     }
 
-    public Collection getChildren() {
+    public Collection<CvTerm> getChildren() {
         return children;
     }
 
@@ -91,7 +91,7 @@ public class CvTerm implements Serializable {
         return obsoleteMessage;
     }
 
-    public Collection getAnnotations() {
+    public Collection<? extends CvTermAnnotation> getAnnotations() {
         return annotations;
     }
 
@@ -164,18 +164,18 @@ public class CvTerm implements Serializable {
      * @param term
      * @param children
      */
-    private void getAllChildren( CvTerm term, Collection children ) {
+    private void getAllChildren( CvTerm term, Collection<CvTerm> children ) {
 
         children.add( term );
 
-        for ( Iterator iterator = term.getChildren().iterator(); iterator.hasNext(); ) {
-            CvTerm child = (CvTerm) iterator.next();
+        for ( Iterator<CvTerm> iterator = term.getChildren().iterator(); iterator.hasNext(); ) {
+            CvTerm child = iterator.next();
             getAllChildren( child, children );
         }
     }
 
-    public Set getAllChildren() {
-        Set children = new HashSet();
+    public Set<CvTerm> getAllChildren() {
+        Set<CvTerm> children = new HashSet<CvTerm>();
         getAllChildren( this, children );
         return children;
     }
@@ -226,7 +226,7 @@ public class CvTerm implements Serializable {
             throw new NullPointerException();
         }
 
-        List diffs = new LinkedList();
+        List<String> diffs = new LinkedList<String>();
 
         if ( annotations != null ? !annotations.equals( cvTerm.annotations ) : cvTerm.annotations != null ) {
             diffs.add( "annotations" );
@@ -278,33 +278,33 @@ public class CvTerm implements Serializable {
         sb.append( "       definition='" ).append( definition ).append( '\'' ).append( NEW_LINE );
 
         sb.append( "xrefs=" ).append( NEW_LINE );
-        for ( Iterator iterator = xrefs.iterator(); iterator.hasNext(); ) {
-            CvTermXref xref = (CvTermXref) iterator.next();
+        for ( Iterator<CvTermXref> iterator = xrefs.iterator(); iterator.hasNext(); ) {
+            CvTermXref xref = iterator.next();
             sb.append( "\t" ).append( xref ).append( NEW_LINE );
 
         }
 
         sb.append( "synonyms=" ).append( NEW_LINE );
-        for ( Iterator iterator = synonyms.iterator(); iterator.hasNext(); ) {
-            CvTermSynonym syn = (CvTermSynonym) iterator.next();
+        for ( Iterator<CvTermSynonym> iterator = synonyms.iterator(); iterator.hasNext(); ) {
+            CvTermSynonym syn = iterator.next();
             sb.append( "\t" ).append( syn ).append( NEW_LINE );
         }
 
         sb.append( "annotations=" ).append( NEW_LINE );
-        for ( Iterator iterator = annotations.iterator(); iterator.hasNext(); ) {
-            CvTermAnnotation annot = (CvTermAnnotation) iterator.next();
+        for ( Iterator<CvTermAnnotation> iterator = annotations.iterator(); iterator.hasNext(); ) {
+            CvTermAnnotation annot = iterator.next();
             sb.append( "\t" ).append( annot ).append( NEW_LINE );
         }
 
         sb.append( "parents=" );
-        for ( Iterator iterator = parents.iterator(); iterator.hasNext(); ) {
-            CvTerm cvTerm = (CvTerm) iterator.next();
+        for ( Iterator<CvTerm> iterator = parents.iterator(); iterator.hasNext(); ) {
+            CvTerm cvTerm = iterator.next();
             sb.append( "\t" ).append( cvTerm.getShortName() ).append( "(" ).append( cvTerm.getId() ).append( ")" ).append( NEW_LINE );
         }
 
         sb.append( "children=" );
-        for ( Iterator iterator = children.iterator(); iterator.hasNext(); ) {
-            CvTerm cvTerm = (CvTerm) iterator.next();
+        for ( Iterator<CvTerm> iterator = children.iterator(); iterator.hasNext(); ) {
+            CvTerm cvTerm = iterator.next();
             sb.append( "\t" ).append( cvTerm.getShortName() ).append( "(" ).append( cvTerm.getId() ).append( ")" ).append( NEW_LINE );
         }
 
