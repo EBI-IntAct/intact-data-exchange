@@ -16,6 +16,7 @@
     <description>PSI MI TAB Master POM</description>
     
     <modules>
+       <module>intact-psimitab</module>
        <module>intact-interolog-prediction</module>
     </modules>
 </project>

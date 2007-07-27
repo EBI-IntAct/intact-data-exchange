@@ -93,11 +93,11 @@ public class ConvertXml2Tab {
     ////////////////////////
     // Getters and Setters
 
-    public void setInteractorPairCluctering(boolean enabled) {
+    public void setInteractorPairClustering(boolean enabled) {
         this.interactorPairCluctering = enabled;
     }
 
-    public boolean isInteractorPairCluctering() {
+    public boolean isInteractorPairClustering() {
         return interactorPairCluctering;
     }
 
