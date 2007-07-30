@@ -81,6 +81,10 @@ public class InteractorEnricher implements Enricher<Interactor> {
 
                 proteinToEnrich.setShortLabel(uniprotProt.getId().toLowerCase());
                 proteinToEnrich.setFullName(uniprotProt.getDescription());
+            } else {
+                if (log.isWarnEnabled()) log.warn("\tUniprot id not found for protein: "+proteinToEnrich.getShortLabel());
+
+                
             }
 
         }

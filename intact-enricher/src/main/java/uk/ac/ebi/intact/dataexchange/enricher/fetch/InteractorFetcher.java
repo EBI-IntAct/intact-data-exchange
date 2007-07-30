@@ -15,18 +15,16 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
-import uk.ac.ebi.intact.uniprot.service.UniprotRemoteService;
-import uk.ac.ebi.intact.uniprot.service.UniprotService;
-import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
-import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
-import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
-
-import java.util.Collection;
-
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
+import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
+import uk.ac.ebi.intact.uniprot.service.UniprotRemoteService;
+import uk.ac.ebi.intact.uniprot.service.UniprotService;
+
+import java.util.Collection;
 
 /**
  * TODO comment this
@@ -35,6 +33,8 @@ import net.sf.ehcache.Element;
  * @version $Id$
  */
 public class InteractorFetcher {
+
+    private static final Log log = LogFactory.getLog(InteractorFetcher.class);
 
     private static ThreadLocal<InteractorFetcher> instance = new ThreadLocal<InteractorFetcher>() {
         @Override
@@ -58,6 +58,8 @@ public class InteractorFetcher {
         if (interactorCache.isKeyInCache(cacheKey(uniprotId,taxId))) {
             uniprotProtein = (UniprotProtein) interactorCache.get(cacheKey(uniprotId, taxId)).getObjectValue();
         } else {
+            if (log.isDebugEnabled()) log.debug("\t\tRemotely retrieving protein: "+uniprotId+" (taxid:"+taxId+")");
+
             UniprotService service = new UniprotRemoteService();
             Collection<UniprotProtein> uniprotProteins = service.retrieve(uniprotId);
 
@@ -68,11 +70,12 @@ public class InteractorFetcher {
                  for (UniprotProtein candidate : uniprotProteins) {
                     if (candidate.getOrganism().getTaxid() == taxId) {
                         uniprotProtein = candidate;
-                        interactorCache.put(new Element(cacheKey(uniprotId, taxId), uniprotProtein));
                         break;
                     }
                 }
             }
+
+            interactorCache.put(new Element(cacheKey(uniprotId, taxId), uniprotProtein));
         }
 
         return uniprotProtein;

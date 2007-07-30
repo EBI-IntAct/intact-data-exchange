@@ -67,6 +67,10 @@ public class EnricherContext {
         return config;
     }
 
+    public void setConfig(EnricherConfig config) {
+        this.config = config;
+    }
+
     public Cache getCache(String name) {
         Cache cache = cacheManager.getCache(name);
 
