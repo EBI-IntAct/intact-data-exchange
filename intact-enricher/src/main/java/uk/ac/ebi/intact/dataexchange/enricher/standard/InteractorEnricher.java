@@ -88,9 +88,9 @@ public class InteractorEnricher implements Enricher<Interactor> {
     }
 
     private void updateAliases(Interactor interactor, UniprotProtein uniprotProt) {
-        Alias aliasGeneName = null;
+        InteractorAlias aliasGeneName = null;
 
-        for (Alias currentAlias : interactor.getAliases()) {
+        for (InteractorAlias currentAlias : interactor.getAliases()) {
             String aliasTypePrimaryId = CvObjectUtils.getPsiMiIdentityXref(currentAlias.getCvAliasType()).getPrimaryId();
 
             if (aliasTypePrimaryId.equals(CvAliasType.GENE_NAME_MI_REF)) {
@@ -101,9 +101,14 @@ public class InteractorEnricher implements Enricher<Interactor> {
 
         Collection<String> uniprotGenes = uniprotProt.getGenes();
 
+        // this boolean defines if the gene name is found in the uniprotGenes list
         boolean currentGeneNameFound = (aliasGeneName != null) && uniprotGenes.contains(aliasGeneName.getName());
 
         if (!currentGeneNameFound) {
+            // if not found, remove the existing alias with gene name
+            if (aliasGeneName != null) {
+                interactor.removeAlias(aliasGeneName);
+            }
 
             for (String geneName : uniprotProt.getGenes()) {
                 if (log.isDebugEnabled()) log.debug("\t\tNew gene name (Alias): " + geneName);

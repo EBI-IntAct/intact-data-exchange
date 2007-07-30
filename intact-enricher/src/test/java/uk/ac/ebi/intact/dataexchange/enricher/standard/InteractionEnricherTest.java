@@ -16,13 +16,17 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.junit.After;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.unit.IntactAbstractTestCase;
-import uk.ac.ebi.intact.core.unit.IntactUnitDataset;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
+import uk.ac.ebi.intact.model.BioSource;
+import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.unitdataset.PsiTestDatasetProvider;
+import uk.ac.ebi.intact.model.Interactor;
+
+import java.util.Collections;
 
 /**
  * TODO comment this
@@ -30,14 +34,15 @@ import uk.ac.ebi.intact.unitdataset.PsiTestDatasetProvider;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@IntactUnitDataset(dataset = PsiTestDatasetProvider.INTACT_JUL_06, provider = PsiTestDatasetProvider.class)
-public class InteractionEnricherTest extends IntactAbstractTestCase {
+public class InteractionEnricherTest {
 
     private InteractionEnricher enricher;
+    private IntactMockBuilder mockBuilder;
 
     @Before
     public void beforeMethod() {
         enricher = InteractionEnricher.getInstance();
+        mockBuilder = new IntactMockBuilder();
     }
 
     @After
@@ -47,13 +52,40 @@ public class InteractionEnricherTest extends IntactAbstractTestCase {
     }
 
     @Test
-    public void enrich() {
-        Interaction interaction = getDaoFactory().getInteractionDao().getAll(0,1).iterator().next();
+    public void enrich_default() {
+        BioSource ecoli = mockBuilder.createBioSource(562, "lala");
+        Interactor interactor1 = mockBuilder.createProtein("P45531", "unk1", ecoli);
+        Interactor interactor2 = mockBuilder.createProtein("P45532", "unk2", ecoli);
+        Experiment experiment = mockBuilder.createExperimentEmpty("myExperiment");
 
-        assertNotNull("This interaction must exist", interaction);
+        Interaction interaction = mockBuilder.createInteraction("myInteraction", interactor1, interactor2, experiment);
 
         enricher.enrich(interaction);
 
+        Assert.assertEquals("myInteraction", interaction.getShortLabel());
+        Assert.assertEquals("562", interactor1.getBioSource().getTaxId());
+        Assert.assertEquals("ecoli", interactor1.getBioSource().getShortLabel());
+        Assert.assertEquals("tusd_ecoli", interactor2.getShortLabel());
     }
 
+    @Test
+    public void enrich_updateLabel() {
+        BioSource ecoli = mockBuilder.createBioSource(562, "lala");
+        
+        Interactor interactor1 = mockBuilder.createProtein("P45531", "unk1", ecoli);
+        Interactor interactor2 = mockBuilder.createProtein("P45532", "unk2", ecoli);
+
+        Experiment experiment = mockBuilder.createExperimentEmpty("myExperiment");
+
+        Interaction interaction = mockBuilder.createInteraction("myInteraction", interactor1, interactor2, experiment);
+
+        EnricherContext.getInstance().getConfig().setUpdateInteractionShortLabels(true);
+
+        enricher.enrich(interaction);
+
+        Assert.assertEquals("tusc-tusd", interaction.getShortLabel());
+        Assert.assertEquals("562", interactor2.getBioSource().getTaxId());
+        Assert.assertEquals("ecoli", interactor2.getBioSource().getShortLabel());
+        Assert.assertEquals("tusc_ecoli", interactor1.getShortLabel());
+    }
 }
