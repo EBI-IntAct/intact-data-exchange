@@ -16,6 +16,11 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import uk.ac.ebi.intact.model.Experiment;
+import uk.ac.ebi.intact.model.util.ExperimentUtils;
+import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
+import uk.ac.ebi.intact.util.cdb.PublicationNotFoundException;
+import uk.ac.ebi.intact.util.cdb.UnexpectedException;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 
 /**
  * TODO comment this
@@ -51,8 +56,21 @@ public class ExperimentEnricher implements Enricher<Experiment> {
         if (objectToEnrich.getCvInteraction() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvInteraction());
         }
+
+        String pubmedId = ExperimentUtils.getPubmedId(objectToEnrich);
+        try {
+            populateExperiment(objectToEnrich, pubmedId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void close() {
+    }
+
+    protected void populateExperiment(Experiment experiment, String pubmedId) throws Exception {
+        ExperimentAutoFill autoFill = new ExperimentAutoFill(pubmedId);
+        experiment.setShortLabel(autoFill.getShortlabel(false));
+        experiment.setFullName(autoFill.getFullname());
     }
 }

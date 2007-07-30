@@ -42,6 +42,11 @@
             <version>${bridges.version}</version>
         </dependency>
         <dependency>
+            <groupId>uk.ac.ebi.intact.bridges.coredep</groupId>
+            <artifactId>intact-cdb</artifactId>
+            <version>${bridges.version}</version>
+        </dependency>
+        <dependency>
             <groupId>uk.ac.ebi.intact.bridges</groupId>
             <artifactId>intact-taxonomy</artifactId>
             <version>${bridges.version}</version>
