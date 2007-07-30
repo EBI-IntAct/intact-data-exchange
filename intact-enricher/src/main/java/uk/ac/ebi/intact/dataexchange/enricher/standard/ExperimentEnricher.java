@@ -18,9 +18,6 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.util.ExperimentUtils;
 import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
-import uk.ac.ebi.intact.util.cdb.PublicationNotFoundException;
-import uk.ac.ebi.intact.util.cdb.UnexpectedException;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 
 /**
  * TODO comment this
@@ -28,7 +25,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class ExperimentEnricher implements Enricher<Experiment> {
+public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
 
      private static ThreadLocal<ExperimentEnricher> instance = new ThreadLocal<ExperimentEnricher>() {
         @Override
@@ -63,6 +60,8 @@ public class ExperimentEnricher implements Enricher<Experiment> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        super.enrich(objectToEnrich);
     }
 
     public void close() {

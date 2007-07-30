@@ -27,7 +27,7 @@ import uk.ac.ebi.intact.model.util.InteractionUtils;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InteractionEnricher implements Enricher<Interaction> {
+public class InteractionEnricher extends AnnotatedObjectEnricher<Interaction> {
 
     private static ThreadLocal<InteractionEnricher> instance = new ThreadLocal<InteractionEnricher>() {
         @Override
@@ -67,6 +67,8 @@ public class InteractionEnricher implements Enricher<Interaction> {
             String label = InteractionUtils.calculateShortLabel(objectToEnrich);
             objectToEnrich.setShortLabel(label);
         }
+
+        super.enrich(objectToEnrich);
     }
 
 

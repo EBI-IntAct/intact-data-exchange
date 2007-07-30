@@ -25,7 +25,7 @@ import uk.ac.ebi.intact.model.BioSource;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class BioSourceEnricher implements Enricher<BioSource> {
+public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
 
      private static ThreadLocal<BioSourceEnricher> instance = new ThreadLocal<BioSourceEnricher>() {
         @Override
@@ -66,6 +66,8 @@ public class BioSourceEnricher implements Enricher<BioSource> {
         if (objectToEnrich.getCvTissue() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvTissue());
         }
+
+        super.enrich(objectToEnrich);
     }
 
     public void close() {

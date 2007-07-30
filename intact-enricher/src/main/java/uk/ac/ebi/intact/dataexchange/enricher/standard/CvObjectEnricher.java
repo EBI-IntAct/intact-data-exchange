@@ -27,7 +27,7 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class CvObjectEnricher implements Enricher<CvObject> {
+public class CvObjectEnricher extends AnnotatedObjectEnricher<CvObject> {
 
     private static ThreadLocal<CvObjectEnricher> instance = new ThreadLocal<CvObjectEnricher>() {
         @Override

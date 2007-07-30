@@ -32,7 +32,7 @@ import java.util.Collection;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InteractorEnricher implements Enricher<Interactor> {
+public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
 
     private static final Log log = LogFactory.getLog(InteractorEnricher.class);
 
@@ -84,10 +84,12 @@ public class InteractorEnricher implements Enricher<Interactor> {
             } else {
                 if (log.isWarnEnabled()) log.warn("\tUniprot id not found for protein: "+proteinToEnrich.getShortLabel());
 
-                
+
             }
 
         }
+
+        super.enrich(objectToEnrich);
 
     }
 
