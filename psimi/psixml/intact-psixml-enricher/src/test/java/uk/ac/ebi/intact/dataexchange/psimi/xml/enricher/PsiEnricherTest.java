@@ -41,7 +41,7 @@ public class PsiEnricherTest {
         EnricherConfig config = new EnricherConfig();
         config.setUpdateInteractionShortLabels(true);
 
-        PsiEnricher.enrichPsi(is, writer, config);
+        PsiEnricher.enrichPsiXml(is, writer, config);
 
         System.out.println(writer.toString());
     }

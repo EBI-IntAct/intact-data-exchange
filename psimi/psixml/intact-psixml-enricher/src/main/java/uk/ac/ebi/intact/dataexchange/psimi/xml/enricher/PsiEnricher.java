@@ -35,7 +35,7 @@ import java.io.*;
  */
 public class PsiEnricher {
 
-    public static void enrichPsi(File sourcePsiFile, File destinationPsiFile, EnricherConfig config) throws IOException {
+    public static void enrichPsiXml(File sourcePsiFile, File destinationPsiFile, EnricherConfig config) throws IOException {
         EntrySet entrySet = readEntrySet(new FileInputStream(sourcePsiFile));
         entrySet = enrichEntrySet(entrySet, config);
 
@@ -44,7 +44,7 @@ public class PsiEnricher {
         writer.close();
     }
 
-    public static void enrichPsi(InputStream sourcePsi, Writer enrichedPsiWriter, EnricherConfig config) throws IOException {
+    public static void enrichPsiXml(InputStream sourcePsi, Writer enrichedPsiWriter, EnricherConfig config) throws IOException {
         EntrySet entrySet = readEntrySet(sourcePsi);
         entrySet = enrichEntrySet(entrySet, config);
         writeEntrySet(entrySet, enrichedPsiWriter);
@@ -75,6 +75,7 @@ public class PsiEnricher {
         enricher.enrich(intactEntry);
 
         Entry enrichedEntry = converter.intactToPsi(intactEntry);
+        enrichedEntry.setSource(entry.getSource());
         
         return enrichedEntry;
 
