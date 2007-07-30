@@ -19,8 +19,10 @@ import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.standard.IntactEntryEnricher;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.model.IntactEntry;
 
 import java.io.*;
@@ -33,39 +35,41 @@ import java.io.*;
  */
 public class PsiEnricher {
 
-    public static void enrichPsi(File sourcePsiFile, File destinationPsiFile) throws IOException {
+    public static void enrichPsi(File sourcePsiFile, File destinationPsiFile, EnricherConfig config) throws IOException {
         EntrySet entrySet = readEntrySet(new FileInputStream(sourcePsiFile));
-        entrySet = enrichEntrySet(entrySet);
+        entrySet = enrichEntrySet(entrySet, config);
 
         FileWriter writer = new FileWriter(destinationPsiFile);
         writeEntrySet(entrySet, writer);
         writer.close();
     }
 
-    public static void enrichPsi(InputStream sourcePsi, Writer enrichedPsiWriter) throws IOException {
+    public static void enrichPsi(InputStream sourcePsi, Writer enrichedPsiWriter, EnricherConfig config) throws IOException {
         EntrySet entrySet = readEntrySet(sourcePsi);
-        entrySet = enrichEntrySet(entrySet);
+        entrySet = enrichEntrySet(entrySet, config);
         writeEntrySet(entrySet, enrichedPsiWriter);
     }
 
-    public static EntrySet enrichEntrySet(EntrySet entrySet) {
+    public static EntrySet enrichEntrySet(EntrySet entrySet, EnricherConfig config) {
         EntrySet enrichedSet = new EntrySet();
         enrichedSet.setLevel(entrySet.getLevel());
         enrichedSet.setVersion(enrichedSet.getVersion());
         enrichedSet.setMinorVersion(entrySet.getMinorVersion());
 
         for (Entry entry : entrySet.getEntries()) {
-            Entry enrichedEntry = enrichEntry(entry);
+            Entry enrichedEntry = enrichEntry(entry, config);
             enrichedSet.getEntries().add(enrichedEntry);
         }
 
         return enrichedSet;
     }
 
-    public static Entry enrichEntry(Entry entry) {
+    public static Entry enrichEntry(Entry entry, EnricherConfig config) {
 
         EntryConverter converter = new EntryConverter(null);
         IntactEntry intactEntry = converter.psiToIntact(entry);
+
+        EnricherContext.getInstance().setConfig(config);
 
         IntactEntryEnricher enricher = IntactEntryEnricher.getInstance();
         enricher.enrich(intactEntry);
