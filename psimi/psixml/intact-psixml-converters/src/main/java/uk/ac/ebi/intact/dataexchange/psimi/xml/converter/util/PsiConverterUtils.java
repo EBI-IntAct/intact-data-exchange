@@ -19,6 +19,7 @@ import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Xref;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AbstractCvConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConverter;
 import uk.ac.ebi.intact.model.*;
 
 import java.util.Collection;
@@ -48,6 +49,10 @@ public class PsiConverterUtils {
 
         if (objectToPopulate instanceof XrefContainer) {
             populateXref(annotatedObject, (XrefContainer) objectToPopulate);
+        }
+
+        if (objectToPopulate instanceof AttributeContainer) {
+            populateAttributes(annotatedObject, (AttributeContainer) objectToPopulate);
         }
     }
 
@@ -117,6 +122,15 @@ public class PsiConverterUtils {
         hasIdElement.setId(id);
 
         return id;
+    }
+
+    private static void populateAttributes(AnnotatedObject<?, ?> annotatedObject, AttributeContainer attributeContainer) {
+        AnnotationConverter annotationConverter = new AnnotationConverter(annotatedObject.getOwner());
+
+        for (Annotation annotation : annotatedObject.getAnnotations()) {
+            Attribute attribute = annotationConverter.intactToPsi(annotation);
+            attributeContainer.getAttributes().add(attribute);
+        }
     }
 
     public static CvType toCvType(CvObject cvObject, AbstractCvConverter converter) {

@@ -21,6 +21,7 @@ import psidev.psi.mi.xml.model.HasId;
 import psidev.psi.mi.xml.model.Participant;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
@@ -52,6 +53,7 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         }
 
         IntactEntry ientry = new IntactEntry(interactions);
+        IntactConverterUtils.populateAnnotations(psiObject, ientry, getInstitution());
 
         ConversionCache.clear();
 

@@ -17,9 +17,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.xml.model.Attribute;
+import psidev.psi.mi.xml.model.AttributeContainer;
 import psidev.psi.mi.xml.model.DbReference;
 import psidev.psi.mi.xml.model.Names;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
@@ -83,6 +86,17 @@ public class IntactConverterUtils {
         for (psidev.psi.mi.xml.model.Alias psiAlias : psiAliases) {
             A alias = aliasConverter.psiToIntact(psiAlias);
             annotatedObject.addAlias(alias);
+        }
+    }
+
+    public static void populateAnnotations(AttributeContainer attributeContainer, Annotated annotated, Institution institution) {
+        AnnotationConverter annotationConverter = new AnnotationConverter(institution);
+
+        if (attributeContainer.hasAttributes()) {
+            for (Attribute attribute : attributeContainer.getAttributes()) {
+                Annotation annotation = annotationConverter.psiToIntact(attribute);
+                annotated.getAnnotations().add(annotation);
+            }
         }
     }
 

@@ -55,6 +55,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         IntactConverterUtils.populateNames(psiObject.getNames(), experiment);
         IntactConverterUtils.populateXref(psiObject.getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
         IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
+        IntactConverterUtils.populateAnnotations(psiObject, experiment, getInstitution());
+        
         experiment.setCvInteraction(cvInteractionDetectionMethod);
 
         ParticipantIdentificationMethod pim = psiObject.getParticipantIdentificationMethod();

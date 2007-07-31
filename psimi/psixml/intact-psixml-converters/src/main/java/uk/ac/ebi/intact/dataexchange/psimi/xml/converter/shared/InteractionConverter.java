@@ -62,6 +62,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         IntactConverterUtils.populateNames(psiObject.getNames(), interaction);
         IntactConverterUtils.populateXref(psiObject.getXref(), interaction, new XrefConverter<InteractorXref>(getInstitution(), InteractorXref.class));
+        IntactConverterUtils.populateAnnotations(psiObject, interaction, getInstitution());
 
         // components, created after the interaction, as we need the interaction to create them
         Collection<Component> components = getComponents(interaction, psiObject);

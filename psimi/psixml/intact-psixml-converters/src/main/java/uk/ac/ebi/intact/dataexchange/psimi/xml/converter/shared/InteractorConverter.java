@@ -43,6 +43,7 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
 
         IntactConverterUtils.populateNames(psiObject.getNames(), interactor);
         IntactConverterUtils.populateXref(psiObject.getXref(), interactor, new XrefConverter<InteractorXref>(getInstitution(), InteractorXref.class));
+        IntactConverterUtils.populateAnnotations(psiObject, interactor, getInstitution());
 
         String sequence = psiObject.getSequence();
 
