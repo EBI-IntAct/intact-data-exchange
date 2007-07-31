@@ -25,7 +25,7 @@ import uk.ac.ebi.intact.model.Institution;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class ParticipantIdentificationMethodConverter extends AbstractCvConverter<CvIdentification, ParticipantIdentificationMethod> {
+public class ParticipantIdentificationMethodConverter extends CvObjectConverter<CvIdentification, ParticipantIdentificationMethod> {
 
     public ParticipantIdentificationMethodConverter(Institution institution) {
         super(institution, CvIdentification.class, ParticipantIdentificationMethod.class);

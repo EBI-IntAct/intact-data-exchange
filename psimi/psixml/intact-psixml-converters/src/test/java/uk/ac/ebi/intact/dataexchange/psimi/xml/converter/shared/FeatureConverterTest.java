@@ -17,15 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.xml.model.Entry;
-import psidev.psi.mi.xml.model.EntrySet;
-import psidev.psi.mi.xml.model.Interaction;
-import psidev.psi.mi.xml.model.Participant;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.CvExperimentalRole;
-import uk.ac.ebi.intact.model.CvObjectXref;
-import uk.ac.ebi.intact.model.Feature;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import psidev.psi.mi.xml.model.*;
 
 /**
  * TODO comment this
@@ -33,10 +25,10 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class ComponentConverterTest extends AbstractConverterTest {
+public class FeatureConverterTest extends AbstractConverterTest {
 
     @Test
-    public void cvXrefQualIdentityConversion() throws Exception {
+    public void psiToIntact_default() throws Exception {
         EntrySet entrySet = getIntactEntrySet();
 
         Entry entry = entrySet.getEntries().iterator().next();
@@ -52,15 +44,17 @@ public class ComponentConverterTest extends AbstractConverterTest {
             }
         }
 
+        FeatureConverter featureConverter = new FeatureConverter(getMockInstitution());
 
-        ParticipantConverter participantConverter = new ParticipantConverter(getMockInstitution());
-        Component component = participantConverter.psiToIntact(participant);
+        for (Feature psiFeature : participant.getFeatures()) {
+            uk.ac.ebi.intact.model.Feature feature = featureConverter.psiToIntact(psiFeature);
 
-        Assert.assertNotNull(component);
-        Assert.assertNotNull(component.getCvExperimentalRole());
+            Assert.assertNotNull(feature);
+            Assert.assertNotNull(feature.getOwner());
+            Assert.assertEquals(psiFeature.getNames().getShortLabel(), feature.getShortLabel());
+            Assert.assertEquals(psiFeature.getFeatureType().getNames().getShortLabel(), feature.getCvFeatureType().getShortLabel());
+            Assert.assertEquals(psiFeature.getRanges().size(), feature.getRanges().size());
+        }
 
-        CvObjectXref identity = CvObjectUtils.getPsiMiIdentityXref(component.getCvExperimentalRole());
-        Assert.assertEquals(CvExperimentalRole.PREY_PSI_REF, identity.getPrimaryId());
-        Assert.assertEquals(2, component.getBindingDomains().size());
     }
 }

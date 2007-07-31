@@ -22,8 +22,8 @@ import psidev.psi.mi.xml.model.ExperimentalRole;
 import psidev.psi.mi.xml.model.InteractorRef;
 import psidev.psi.mi.xml.model.Participant;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 
 import java.util.Iterator;
@@ -47,6 +47,13 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
 
         Component component = newComponent(getInstitution(), psiObject, interaction);
         IntactConverterUtils.populateAnnotations(psiObject, component, getInstitution());
+
+        FeatureConverter featureConverter = new FeatureConverter(getInstitution());
+
+        for (psidev.psi.mi.xml.model.Feature psiFeature : psiObject.getFeatures()) {
+            Feature feature = featureConverter.psiToIntact(psiFeature);
+            component.addBindingDomain(feature);
+        }
 
         return component;
     }

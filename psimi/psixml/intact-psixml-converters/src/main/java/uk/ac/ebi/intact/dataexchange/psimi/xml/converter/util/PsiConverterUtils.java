@@ -17,7 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Xref;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AbstractCvConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.CvObjectConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConverter;
 import uk.ac.ebi.intact.model.*;
@@ -133,7 +133,7 @@ public class PsiConverterUtils {
         }
     }
 
-    public static CvType toCvType(CvObject cvObject, AbstractCvConverter converter) {
+    public static CvType toCvType(CvObject cvObject, CvObjectConverter converter) {
         if (cvObject == null) {
             throw new NullPointerException("cvObject");
         }

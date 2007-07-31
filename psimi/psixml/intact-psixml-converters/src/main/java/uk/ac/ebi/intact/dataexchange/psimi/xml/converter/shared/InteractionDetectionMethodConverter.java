@@ -25,7 +25,7 @@ import uk.ac.ebi.intact.model.Institution;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InteractionDetectionMethodConverter extends AbstractCvConverter<CvInteraction, InteractionDetectionMethod> {
+public class InteractionDetectionMethodConverter extends CvObjectConverter<CvInteraction, InteractionDetectionMethod> {
 
     public InteractionDetectionMethodConverter(Institution institution) {
         super(institution, CvInteraction.class, InteractionDetectionMethod.class);

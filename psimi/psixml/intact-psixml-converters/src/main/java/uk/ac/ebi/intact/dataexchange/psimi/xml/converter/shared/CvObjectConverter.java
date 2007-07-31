@@ -30,12 +30,12 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class AbstractCvConverter<C extends CvObject, T extends CvType> extends AbstractIntactPsiConverter<C, T> {
+public class CvObjectConverter<C extends CvObject, T extends CvType> extends AbstractIntactPsiConverter<C, T> {
 
     private Class<C> intactCvClass;
     private Class<T> psiCvClass;
 
-    public AbstractCvConverter(Institution institution, Class<C> intactCvClass, Class<T> psiCvClass) {
+    public CvObjectConverter(Institution institution, Class<C> intactCvClass, Class<T> psiCvClass) {
         super(institution);
         this.intactCvClass = intactCvClass;
         this.psiCvClass = psiCvClass;

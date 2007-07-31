@@ -25,7 +25,7 @@ import uk.ac.ebi.intact.model.Institution;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InteractionTypeConverter extends AbstractCvConverter<CvInteractionType, InteractionType> {
+public class InteractionTypeConverter extends CvObjectConverter<CvInteractionType, InteractionType> {
 
     public InteractionTypeConverter(Institution institution) {
         super(institution, CvInteractionType.class, InteractionType.class);

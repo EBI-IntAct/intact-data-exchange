@@ -17,15 +17,15 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.mi.xml.model.Attribute;
-import psidev.psi.mi.xml.model.AttributeContainer;
-import psidev.psi.mi.xml.model.DbReference;
-import psidev.psi.mi.xml.model.Names;
+import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
+import uk.ac.ebi.intact.model.Alias;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.util.Collection;
 

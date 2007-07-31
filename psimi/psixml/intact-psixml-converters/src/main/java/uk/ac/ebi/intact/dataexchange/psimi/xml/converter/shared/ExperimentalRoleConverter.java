@@ -25,7 +25,7 @@ import uk.ac.ebi.intact.model.Institution;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class ExperimentalRoleConverter extends AbstractCvConverter<CvExperimentalRole, ExperimentalRole> {
+public class ExperimentalRoleConverter extends CvObjectConverter<CvExperimentalRole, ExperimentalRole> {
 
     public ExperimentalRoleConverter(Institution institution) {
         super(institution, CvExperimentalRole.class, ExperimentalRole.class);
