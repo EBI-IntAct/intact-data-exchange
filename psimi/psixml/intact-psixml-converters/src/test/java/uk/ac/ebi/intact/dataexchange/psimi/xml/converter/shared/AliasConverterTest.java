@@ -23,6 +23,7 @@ import psidev.psi.mi.xml.model.EntrySet;
 import psidev.psi.mi.xml.model.Interactor;
 import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.model.InteractorAlias;
+import uk.ac.ebi.intact.model.Protein;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
@@ -34,7 +35,7 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 public class AliasConverterTest extends AbstractConverterTest {
 
     @Test
-    public void cvAliasTypeCreation() throws Exception {
+    public void psiToIntact_cvTypeNotNull() throws Exception {
         EntrySet entrySet = getIntactEntrySet();
 
         Entry entry = entrySet.getEntries().iterator().next();
@@ -68,5 +69,52 @@ public class AliasConverterTest extends AbstractConverterTest {
         Assert.assertNotNull(intactAlias.getCvAliasType());
         Assert.assertEquals(CvAliasType.GENE_NAME_MI_REF, CvObjectUtils.getPsiMiIdentityXref(intactAlias.getCvAliasType()).getPrimaryId());
 
+    }
+
+    @Test
+    public void psiToIntact_cvTypeNull() throws Exception {
+        Alias alias = PsiMockFactory.createAlias("alias1", null, null);
+
+        AliasConverter<InteractorAlias> aliasConverter = new AliasConverter<InteractorAlias>(getMockInstitution(), InteractorAlias.class);
+        uk.ac.ebi.intact.model.Alias intactAlias = aliasConverter.psiToIntact(alias);
+
+        Assert.assertNotNull(intactAlias);
+        Assert.assertNull(intactAlias.getCvAliasType());
+        Assert.assertEquals("alias1", intactAlias.getName());
+    }
+
+    @Test
+    public void intactToPsi_cvTypeNotNull() throws Exception {
+        Protein protein = getIntactMockBuilder().createProteinRandom();
+
+        Assert.assertFalse(protein.getAliases().isEmpty());
+
+        InteractorAlias interactorAlias = protein.getAliases().iterator().next();
+
+        AliasConverter<InteractorAlias> aliasConverter = new AliasConverter<InteractorAlias>(getMockInstitution(), InteractorAlias.class);
+        Alias alias = aliasConverter.intactToPsi(interactorAlias);
+
+        Assert.assertNotNull(alias);
+        Assert.assertEquals(interactorAlias.getName(), alias.getValue());
+        Assert.assertEquals(CvAliasType.GENE_NAME_MI_REF, alias.getTypeAc());
+        Assert.assertEquals(CvAliasType.GENE_NAME, alias.getType());
+    }
+
+    @Test
+    public void intactToPsi_cvTypeNull() throws Exception {
+        Protein protein = getIntactMockBuilder().createProteinRandom();
+
+        Assert.assertFalse(protein.getAliases().isEmpty());
+
+        InteractorAlias interactorAlias = protein.getAliases().iterator().next();
+        interactorAlias.setCvAliasType(null);
+
+        AliasConverter<InteractorAlias> aliasConverter = new AliasConverter<InteractorAlias>(getMockInstitution(), InteractorAlias.class);
+        Alias alias = aliasConverter.intactToPsi(interactorAlias);
+
+        Assert.assertNotNull(alias);
+        Assert.assertEquals(interactorAlias.getName(), alias.getValue());
+        Assert.assertNull(alias.getTypeAc());
+        Assert.assertNull(alias.getType());
     }
 }
