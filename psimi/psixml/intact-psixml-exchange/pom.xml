@@ -24,24 +24,6 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-
-        <plugins>
-            <plugin>
-                <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-                <artifactId>psixml-source-generator-maven-plugin</artifactId>
-                <configuration>
-                    <generatedPackage>uk.ac.ebi.intact.dataexchange.psimi.xml.generated</generatedPackage>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>generate-processors</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 
     <dependencies>
