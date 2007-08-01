@@ -8,7 +8,6 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>uk.ac.ebi.intact.util</groupId>
     <artifactId>intact-uniprot-export</artifactId>
     <packaging>jar</packaging>
     <version>2.0.0-SNAPSHOT</version>
