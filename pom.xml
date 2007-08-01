@@ -20,7 +20,7 @@
 
     <properties>
         <currentVersion>${version}</currentVersion>
-        <version.core>1.6.1-SNAPSHOT</version.core>
+        <version.core>1.6.1</version.core>
     </properties>
 
     <scm>
@@ -102,7 +102,7 @@
             </dependency>
             <dependency>
                 <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-                <artifactId>intact-psixml-persister</artifactId>
+                <artifactId>intact-psixml-enricher</artifactId>
                 <version>${currentVersion}</version>
             </dependency>
             <dependency>
@@ -160,7 +160,7 @@
             <dependency>
                 <groupId>uk.ac.ebi.intact.plugins</groupId>
                 <artifactId>intact-plugin</artifactId>
-                <version>2.0.0-SNAPSHOT</version>
+                <version>1.6.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
@@ -193,7 +193,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.3.1</version>
+            <version>4.3.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
