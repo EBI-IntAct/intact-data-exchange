@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>imex</artifactId>
+        <groupId>uk.ac.ebi.intact.dataexchange.imex</groupId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>intact-imex-import</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
+
+    <name>IntAct Data Exchange :: IMEx :: Import</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>uk.ac.ebi.intact</groupId>
+            <artifactId>intact-persister</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
+            <artifactId>intact-psixml-enricher</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

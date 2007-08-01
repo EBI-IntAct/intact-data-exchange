@@ -18,10 +18,14 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.DebugUtil;
+
+import java.io.StringWriter;
+import java.util.Arrays;
 
 /**
  * TODO comment this
@@ -128,6 +132,22 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         Assert.assertEquals(CvAliasType.GENE_NAME_MI_REF, aliasTypeIdentXref.getPrimaryId());
 
         commitTransaction();
+    }
+
+    @Test
+    public void export() throws Exception {
+
+        IntactMockBuilder mockBuilder = new IntactMockBuilder();
+        Interaction mockInteraction = mockBuilder.createInteractionRandomBinary();
+        Experiment exp = mockInteraction.getExperiments().iterator().next();
+        exp.addXref(mockBuilder.createPrimaryReferenceXref(exp, "1234567"));
+
+        IntactEntry entry = new IntactEntry(Arrays.asList(mockInteraction));
+
+        StringWriter writer = new StringWriter();
+        PsiExchange.exportToPsiXml(writer, entry);
+
+        System.out.println(writer);
     }
 
 }
