@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.dbutil.predict;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactAbstractTestCase;
 import uk.ac.ebi.intact.core.unit.IntactUnitDataset;
@@ -12,6 +13,7 @@ import uk.ac.ebi.intact.unitdataset.PsiTestDatasetProvider;
  * @version 1.0
  * @since <pre>11/15/2006</pre>
  */
+@Ignore
 public class FillPredictTablesTest extends IntactAbstractTestCase {
 
     @Test
