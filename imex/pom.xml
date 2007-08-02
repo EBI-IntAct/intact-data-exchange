@@ -19,6 +19,7 @@
 
     <modules>
        <module>intact-imex-import</module>
-    </modules>
+    <module>intact-imex-repository</module>
+  </modules>
 
 </project>
