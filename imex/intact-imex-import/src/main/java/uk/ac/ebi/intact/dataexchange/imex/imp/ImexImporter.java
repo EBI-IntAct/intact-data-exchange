@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.ebi.intact.dataexchange.imex.
+package uk.ac.ebi.intact.dataexchange.imex.imp;
 
-import;
+
 
 /**
  * TODO comment this
