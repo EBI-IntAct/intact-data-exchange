@@ -1324,6 +1324,7 @@ public class InterologPrediction {
 		ClogInteraction.setNB_LINES_MAX(100000);
 		up.setWriteClogInteractions(false);
 		up.setDownCastOnChildren(false);
+		
 		up.run();
 	}
 	
