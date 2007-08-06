@@ -45,7 +45,7 @@ public class Repository {
         this.repositoryDir = repositoryDir;
     }
 
-    public void addEntry(File entryXml, String providerName) throws IOException {
+    public void storeEntrySet(File entryXml, String providerName) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug("Adding entry: "+entryXml+" (Provider: "+providerName+")");
         }

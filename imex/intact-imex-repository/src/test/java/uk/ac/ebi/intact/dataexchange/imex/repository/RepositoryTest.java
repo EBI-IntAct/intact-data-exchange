@@ -15,7 +15,10 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository;
 
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
+import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
+import org.junit.Test;
+import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ProviderService;
 
 import java.io.File;
 
@@ -25,19 +28,21 @@ import java.io.File;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class RepositoryHelper {
+public class RepositoryTest {
 
-    private Repository repository;
+    @Test
+    public void storeFile_default() throws Exception{
+        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo/");
+        FileUtils.deleteDirectory(tempDir);
 
-    public RepositoryHelper(Repository repository) {
-        this.repository = repository;
-    }
+        Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
 
-    public File getEntrySetFile(EntrySet entrySet) {
-        return getEntrySetFile(entrySet.getName());
-    }
+        File empty = new File(RepositoryTest.class.getResource("/xml/dip_2006-11-01.xml").getFile());
+        repo.storeEntrySet(empty, "dip");
 
-    public File getEntrySetFile(String name) {
-        return new File(repository.getOriginalEntrySetDir(), name);
+        RepositoryHelper helper = new RepositoryHelper(repo);
+        File expectedFile = helper.getEntrySetFile("dip_2006-11-01.xml");
+
+        Assert.assertTrue(expectedFile.exists());
     }
 }

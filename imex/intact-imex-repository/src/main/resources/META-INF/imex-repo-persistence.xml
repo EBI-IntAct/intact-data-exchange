@@ -13,7 +13,7 @@
             <!--<property name="hibernate.connection.url" value="jdbc:h2:/tmp/imex-repo"/>-->
             <property name="hibernate.max_fetch_depth" value="3"/>
 
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
         </properties>
     </persistence-unit>
 
