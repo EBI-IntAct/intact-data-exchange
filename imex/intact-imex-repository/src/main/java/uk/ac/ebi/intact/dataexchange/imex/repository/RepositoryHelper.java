@@ -27,6 +27,8 @@ import java.io.File;
  */
 public class RepositoryHelper {
 
+    private static final String FILE_EXTENSION = ".xml";
+
     private Repository repository;
 
     public RepositoryHelper(Repository repository) {
@@ -38,6 +40,6 @@ public class RepositoryHelper {
     }
 
     public File getEntrySetFile(String name) {
-        return new File(repository.getOriginalEntrySetDir(), name);
+        return new File(repository.getOriginalEntrySetDir(), name + FILE_EXTENSION);
     }
 }

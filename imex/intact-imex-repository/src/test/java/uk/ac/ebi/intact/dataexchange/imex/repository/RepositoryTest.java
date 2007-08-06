@@ -41,7 +41,7 @@ public class RepositoryTest {
         repo.storeEntrySet(empty, "dip");
 
         RepositoryHelper helper = new RepositoryHelper(repo);
-        File expectedFile = helper.getEntrySetFile("dip_2006-11-01.xml");
+        File expectedFile = helper.getEntrySetFile("dip_2006-11-01");
 
         Assert.assertTrue(expectedFile.exists());
     }

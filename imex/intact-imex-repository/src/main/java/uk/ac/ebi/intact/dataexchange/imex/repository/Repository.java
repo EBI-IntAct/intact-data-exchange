@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.repository;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
@@ -57,7 +58,8 @@ public class Repository {
             throw new RepoEntityNotFoundException("No provider found with name: " + providerName);
         }
 
-        String name = entryXml.getName();
+        String entryName = entryXml.getName();
+        String name = FilenameUtils.removeExtension(entryName);
 
         EntrySet entrySet = new EntrySet(provider, name);
 
