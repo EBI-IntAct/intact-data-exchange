@@ -43,7 +43,7 @@ public class ImexRepositoryContext {
         return instance.get();
     }
 
-    public static void openRepository(String repositoryDir) {
+    public static Repository openRepository(String repositoryDir) {
         Repository repository = RepositoryFactory.createFileSystemRepository(repositoryDir, true);
 
         instance.set(new ImexRepositoryContext(repository));
@@ -51,6 +51,8 @@ public class ImexRepositoryContext {
         // check if the main providers exist (intact, mint and dip)
         // and create them otherwise
         checkMainProviders();
+
+        return repository;
     }
 
 

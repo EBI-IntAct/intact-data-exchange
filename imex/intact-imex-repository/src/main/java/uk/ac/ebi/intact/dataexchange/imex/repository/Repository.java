@@ -15,10 +15,15 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntityNotFoundException;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * TODO comment this
@@ -28,9 +33,11 @@ import java.io.File;
  */
 public class Repository {
 
-   private final static String CONFIG_DIR_NAME = ".config";
-    private final static String ORIGINAL_DIR_NAME = "original";
-    private final static String ENTRIES_DIR_NAME = "entries";
+    private static final Log log = LogFactory.getLog(Repository.class);
+
+    private static final String CONFIG_DIR_NAME = ".config";
+    private static final String ORIGINAL_DIR_NAME = "original";
+    private static final String ENTRIES_DIR_NAME = "entries";
 
     private File repositoryDir;
 
@@ -38,17 +45,35 @@ public class Repository {
         this.repositoryDir = repositoryDir;
     }
 
-    public void addEntry(File entryXml, String providerName) {
-        Provider provider = ImexRepositoryContext.getInstance().getImexServiceProvider().getProviderService().findByName(providerName);
+    public void addEntry(File entryXml, String providerName) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug("Adding entry: "+entryXml+" (Provider: "+providerName+")");
+        }
+
+        ImexRepositoryContext context = ImexRepositoryContext.getInstance();
+        Provider provider = context.getImexServiceProvider().getProviderService().findByName(providerName);
 
         if (provider == null) {
-            throw new RepoEntityNotFoundException("No provider found with name: "+providerName);
+            throw new RepoEntityNotFoundException("No provider found with name: " + providerName);
         }
 
         String name = entryXml.getName();
-        
 
-        throw new UnsupportedOperationException();
+        EntrySet entrySet = new EntrySet(provider, name);
+
+        RepositoryHelper repoHelper = new RepositoryHelper(this);
+        File newFile = repoHelper.getEntrySetFile(entrySet);
+
+        // copy the physical file
+        if (log.isDebugEnabled()) {
+            log.debug("Copying file to: "+newFile);
+        }
+        FileUtils.copyFile(entryXml, newFile);
+
+        // create the record in the database
+        context.getImexPersistence().beginTransaction();
+        context.getImexServiceProvider().getEntrySetService().saveEntrySet(entrySet);
+        context.getImexPersistence().commitTransaction();
     }
 
 

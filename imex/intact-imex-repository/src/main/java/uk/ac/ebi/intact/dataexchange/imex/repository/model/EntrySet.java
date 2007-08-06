@@ -39,8 +39,9 @@ public class EntrySet extends RepoEntity {
     public EntrySet() {
     }
 
-    public EntrySet(Provider provider) {
+    public EntrySet(Provider provider, String name) {
         this.provider = provider;
+        this.name = name;
     }
 
     /////////////////////////

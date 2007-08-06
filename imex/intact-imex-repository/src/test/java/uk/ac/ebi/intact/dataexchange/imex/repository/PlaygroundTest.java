@@ -15,8 +15,10 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository;
 
+import org.junit.Test;
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ProviderService;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
+
+import java.io.File;
 
 /**
  * TODO comment this
@@ -24,25 +26,20 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class Playground {
+public class PlaygroundTest {
 
-    public static void main(String[] args) {
-        ImexRepositoryContext.openRepository("/tmp/myRepo");
+    @Test
+    public void myTest() throws Exception{
+        Repository repo = ImexRepositoryContext.openRepository("/tmp/myRepo");
 
-        ImexPersistence imexPersistence = ImexRepositoryContext.getInstance().getImexPersistence();
         ProviderService providerService = ImexRepositoryContext.getInstance().getImexServiceProvider().getProviderService();
 
-        //providerService.saveProvider(new Provider());
-        //ProviderDao providerDao = (ProviderDao) ImexRepositoryContext.getInstance().getBeanFactory().getBean("providerDao");
-         /*
-        Provider provider = new Provider();
-        provider.setName("intact");
-
-        imexPersistence.beginTransaction();
-        providerService.saveProvider(provider);
-        imexPersistence.commitTransaction(); */
 
         System.out.println("Providers: "+providerService.findAllProviders());
+
+        File empty = new File(PlaygroundTest.class.getResource("/xml/empty.xml").getFile());
+        repo.addEntry(empty, "mint");
+
         
     }
 }

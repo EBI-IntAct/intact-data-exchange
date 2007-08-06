@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.ebi.intact.dataexchange.imex.repository.dao;
+package uk.ac.ebi.intact.dataexchange.imex.repository;
 
-import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
+
+import java.io.File;
 
 /**
  * TODO comment this
@@ -23,19 +25,15 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class ImexServiceProvider {
+public class RepositoryHelper {
 
-    private ImexRepositoryContext context;
+    private Repository repository;
 
-    public ImexServiceProvider(ImexRepositoryContext context) {
-        this.context = context;
+    public RepositoryHelper(Repository repository) {
+        this.repository = repository;
     }
 
-    public ProviderService getProviderService() {
-        return (ProviderService) context.getBeanFactory().getBean(ProviderService.NAME);
-    }
-
-    public EntrySetService getEntrySetService() {
-        return (EntrySetService) context.getBeanFactory().getBean(EntrySetService.NAME);
+    public File getEntrySetFile(EntrySet entrySet) {
+        return new File(repository.getOriginalEntrySetDir(), entrySet.getName());
     }
 }
