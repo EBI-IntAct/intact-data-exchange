@@ -13,11 +13,17 @@
             p:entityManagerFactory-ref="entityManagerFactory"/>
 
     <!-- DAOs and Services -->
+    <!-- Provider -->
     <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaProviderDao" id="providerDao"
             p:imexPersistence-ref="imexPersistence"/>
-
     <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaProviderService" id="providerService"
           p:providerDao-ref="providerDao"/>
+
+    <!-- EntrySet -->
+    <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaEntrySetDao" id="entrysetDao"
+            p:imexPersistence-ref="imexPersistence"/>
+    <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaEntrySetService" id="entrySetService"
+          p:entrySetDao-ref="entrysetDao"/>
 
     <!-- JPA annotations bean post processor -->
     <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>

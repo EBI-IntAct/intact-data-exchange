@@ -16,10 +16,14 @@
 package uk.ac.ebi.intact.dataexchange.imex.repository;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ImexServiceProvider;
+import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ProviderService;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
 
 import java.io.File;
 
@@ -31,6 +35,8 @@ import java.io.File;
  */
 public class ImexRepositoryContext {
 
+    private static final Log log = LogFactory.getLog(ImexRepositoryContext.class);
+
     private static ThreadLocal<ImexRepositoryContext> instance = new ThreadLocal<ImexRepositoryContext>();
 
     public static ImexRepositoryContext getInstance() {
@@ -41,6 +47,10 @@ public class ImexRepositoryContext {
         Repository repository = RepositoryFactory.createFileSystemRepository(repositoryDir, true);
 
         instance.set(new ImexRepositoryContext(repository));
+
+        // check if the main providers exist (intact, mint and dip)
+        // and create them otherwise
+        checkMainProviders();
     }
 
 
@@ -55,6 +65,35 @@ public class ImexRepositoryContext {
 
         BasicDataSource dataSource = (BasicDataSource) beanFactory.getBean("dataSource");
         dataSource.setUrl("jdbc:h2:"+new File(repository.getConfigDir(), "imex-repo").getAbsolutePath());
+    }
+
+    private static void checkMainProviders() {
+        checkProvider("intact");
+        checkProvider("mint");
+        checkProvider("dip");
+    }
+
+    private static void checkProvider(String name) {
+        if (log.isInfoEnabled()) log.info("Checking provider: "+name);
+
+        ImexRepositoryContext context = instance.get();
+        ProviderService providerService = context.getImexServiceProvider().getProviderService();
+        Provider provider = providerService.findByName(name);
+
+        if (provider == null) {
+            createProvider(name, context);
+        }
+    }
+
+    private static void createProvider(String name, ImexRepositoryContext context) {
+        ProviderService providerService = context.getImexServiceProvider().getProviderService();
+        ImexPersistence imexPersistence = context.getImexPersistence();
+
+        Provider provider = new Provider(name);
+
+        imexPersistence.beginTransaction();
+        providerService.saveProvider(provider);
+        imexPersistence.commitTransaction();
     }
 
     public BeanFactory getBeanFactory() {

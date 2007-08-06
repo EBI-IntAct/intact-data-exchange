@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.ebi.intact.dataexchange.imex.repository.model;
+package uk.ac.ebi.intact.dataexchange.imex.repository.dao;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
+
+import java.util.List;
 
 /**
  * TODO comment this
@@ -26,21 +26,17 @@ import javax.persistence.GenerationType;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Entity
-public class EnrichedEntry extends Entry {
+public interface EntrySetDao {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    void save(EntrySet entrySet);
 
-    public EnrichedEntry() {
-    }
+    //void remove(Provider provider);
 
-    public long getId() {
-        return id;
-    }
+    //void update(Provider provider);
 
-    public void setId(long id) {
-        this.id = id;
-    }
+    List<EntrySet> findAll();
+
+    //Provider findById(Long id);
+
+    EntrySet findByName(String name);
 }

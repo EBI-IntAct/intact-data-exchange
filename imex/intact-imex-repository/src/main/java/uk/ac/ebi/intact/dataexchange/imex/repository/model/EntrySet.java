@@ -15,13 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
-import org.hibernate.annotations.Index;
-
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.NamedQuery;
-import javax.persistence.Column;
-import java.util.Collection;
+import javax.persistence.*;
+import java.util.List;
 
 /**
  * TODO comment this
@@ -30,21 +25,22 @@ import java.util.Collection;
  * @version $Id$
  */
 @Entity
-@NamedQuery(name = "providerByName", query="select p from Provider p where p.name = :name")
-public class Provider extends RepoEntity {
+@NamedQuery(name = "entrySetByName", query="select es from EntrySet es where es.name = :name")
+public class EntrySet extends RepoEntity {
 
-    @Index(name="provider_name_idx")
-    @Column(unique = true)
-    public String name;
+    private String name;
+
+    @ManyToOne
+    private Provider provider;
 
     @OneToMany
-    private Collection<ProviderProperty> properties;
+    private List<Entry> entries;
 
-    public Provider() {
+    public EntrySet() {
     }
 
-    public Provider(String name) {
-        this.name = name;
+    public EntrySet(Provider provider) {
+        this.provider = provider;
     }
 
     /////////////////////////
@@ -58,16 +54,19 @@ public class Provider extends RepoEntity {
         this.name = name;
     }
 
-    public Collection<ProviderProperty> getProperties() {
-        return properties;
+    public List<Entry> getEntries() {
+        return entries;
     }
 
-    public void setProperties(Collection<ProviderProperty> properties) {
-        this.properties = properties;
+    public void setEntries(List<Entry> entries) {
+        this.entries = entries;
     }
 
-    @Override
-    public String toString() {
-        return "Provider{name="+getName()+", created="+getCreated()+"}";
+    public Provider getProvider() {
+        return provider;
+    }
+
+    public void setProvider(Provider provider) {
+        this.provider = provider;
     }
 }

@@ -15,8 +15,9 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
+import org.hibernate.validator.NotNull;
+
 import javax.persistence.*;
-import java.util.Collection;
 
 /**
  * TODO comment this
@@ -25,20 +26,55 @@ import java.util.Collection;
  * @version $Id$
  */
 @Entity
-public class ProviderProperty {
+public class ProviderProperty extends RepoEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @NotNull
+    private String name;
+
+    @NotNull
+    private String value;
 
     public ProviderProperty() {
     }
 
-    public long getId() {
-        return id;
+    /////////////////////////
+    // Getters and Setters
+
+    public String getName() {
+        return name;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    //////////////////////////
+    // Equality
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ProviderProperty that = (ProviderProperty) o;
+
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result;
+        result = (name != null ? name.hashCode() : 0);
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
     }
 }

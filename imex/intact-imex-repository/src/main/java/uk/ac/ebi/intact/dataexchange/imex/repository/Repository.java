@@ -15,11 +15,10 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntityNotFoundException;
+
 import java.io.File;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * TODO comment this
@@ -39,7 +38,16 @@ public class Repository {
         this.repositoryDir = repositoryDir;
     }
 
-    public void addEntry(File entryXml) {
+    public void addEntry(File entryXml, String providerName) {
+        Provider provider = ImexRepositoryContext.getInstance().getImexServiceProvider().getProviderService().findByName(providerName);
+
+        if (provider == null) {
+            throw new RepoEntityNotFoundException("No provider found with name: "+providerName);
+        }
+
+        String name = entryXml.getName();
+        
+
         throw new UnsupportedOperationException();
     }
 

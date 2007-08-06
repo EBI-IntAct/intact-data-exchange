@@ -47,6 +47,10 @@ public class ImexPersistence {
         return entityManager;
     }
 
+    public void joinTransaction() {
+        getEntityManager().joinTransaction();
+    }
+
     public void beginTransaction() {
         getEntityManager().getTransaction().begin();
     }

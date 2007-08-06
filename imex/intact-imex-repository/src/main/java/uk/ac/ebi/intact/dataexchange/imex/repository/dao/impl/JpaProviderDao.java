@@ -15,16 +15,13 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl;
 
-import org.springframework.orm.jpa.support.JpaDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ProviderDao;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import java.util.List;
 
 /**
@@ -40,13 +37,16 @@ public class JpaProviderDao extends JpaImexDaoSupport implements ProviderDao {
     private final String QUERY_ALL = "select p from Provider p";
 
     public void save(Provider provider) {
-        //EntityManager em = getJpaTemplate().getEntityManagerFactory().createEntityManager();
-        //em.getTransaction().begin();
         getEntityManager().persist(provider);
-        //em.getTransaction().commit();
     }
 
-    public List<Provider> queryAll() {
+    public List<Provider> findAll() {
         return getEntityManager().createQuery(QUERY_ALL).getResultList();
+    }
+
+    public Provider findByName(String name) {
+        Query query = getEntityManager().createNamedQuery("providerByName");
+        query.setParameter("name", name);
+        return (Provider) query.getSingleResult();
     }
 }

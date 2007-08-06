@@ -23,21 +23,20 @@ import javax.persistence.*;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@MappedSuperclass
-public class Entry {
+@Entity
+public class Entry extends RepoEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @ManyToOne
+    public EntrySet entrySet;
 
     public Entry() {
     }
 
-    public long getId() {
-        return id;
+    public EntrySet getEntrySet() {
+        return entrySet;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setEntrySet(EntrySet entrySet) {
+        this.entrySet = entrySet;
     }
 }

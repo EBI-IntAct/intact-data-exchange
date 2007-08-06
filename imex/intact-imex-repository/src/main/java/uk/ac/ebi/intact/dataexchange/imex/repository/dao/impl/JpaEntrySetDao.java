@@ -15,12 +15,14 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl;
 
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ProviderDao;
-import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ProviderService;
+import uk.ac.ebi.intact.dataexchange.imex.repository.dao.EntrySetDao;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
 
+import javax.persistence.Query;
 import java.util.List;
 
 /**
@@ -29,28 +31,23 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class JpaProviderService implements ProviderService {
+@Repository
+@Transactional(propagation = Propagation.SUPPORTS)
+public class JpaEntrySetDao extends JpaImexDaoSupport implements EntrySetDao {
 
-    private ProviderDao providerDao;
+    private final String QUERY_ALL = "select e from EntrySet e";
 
-    public void setProviderDao(ProviderDao providerDao) {
-        this.providerDao = providerDao;
+    public void save(EntrySet entrySet) {
+        getEntityManager().persist(entrySet);
     }
 
-    public List<Provider> findAllProviders() {
-        return providerDao.findAll();
+    public List<EntrySet> findAll() {
+        return getEntityManager().createQuery(QUERY_ALL).getResultList();
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void saveProvider(Provider provider) {
-        providerDao.save(provider);
-    }
-
-    public Provider findByName(String name) {
-        try {
-            return providerDao.findByName(name);
-        } catch (Exception e) {
-            return null;
-        }
+    public EntrySet findByName(String name) {
+        Query query = getEntityManager().createNamedQuery("entrySetByName");
+        query.setParameter("name", name);
+        return (EntrySet) query.getSingleResult();
     }
 }

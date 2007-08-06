@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.ebi.intact.dataexchange.imex.repository.dao;
-
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
-
-import java.util.List;
+package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
 /**
  * TODO comment this
@@ -25,17 +21,21 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public interface ProviderDao {
+public class RepoEntityNotFoundException extends java.lang.RuntimeException{
 
-    void save(Provider provider);
+    public RepoEntityNotFoundException() {
+        super();
+    }
 
-    //void remove(Provider provider);
+    public RepoEntityNotFoundException(Throwable cause) {
+        super(cause);
+    }
 
-    //void update(Provider provider);
+    public RepoEntityNotFoundException(String message) {
+        super(message);
+    }
 
-    List<Provider> findAll();
-
-    //Provider findById(Long id);
-
-    Provider findByName(String name);
+    public RepoEntityNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

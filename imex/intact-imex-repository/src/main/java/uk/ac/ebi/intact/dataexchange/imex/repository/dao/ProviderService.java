@@ -35,5 +35,7 @@ public interface ProviderService {
 
     //void updateProvider(Provider provider);
 
-    List<Provider> queryAllProviders();
+    List<Provider> findAllProviders();
+
+    Provider findByName(String name);
 }

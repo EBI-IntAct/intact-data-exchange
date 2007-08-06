@@ -16,9 +16,6 @@
 package uk.ac.ebi.intact.dataexchange.imex.repository;
 
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ProviderService;
-import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ProviderDao;
-import uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaProviderService;
-import uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaProviderDao;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
 
 /**
@@ -37,15 +34,15 @@ public class Playground {
 
         //providerService.saveProvider(new Provider());
         //ProviderDao providerDao = (ProviderDao) ImexRepositoryContext.getInstance().getBeanFactory().getBean("providerDao");
-
+         /*
         Provider provider = new Provider();
         provider.setName("intact");
 
         imexPersistence.beginTransaction();
         providerService.saveProvider(provider);
-        imexPersistence.commitTransaction();
+        imexPersistence.commitTransaction(); */
 
-        System.out.println("Providers: "+providerService.queryAllProviders());
+        System.out.println("Providers: "+providerService.findAllProviders());
         
     }
 }

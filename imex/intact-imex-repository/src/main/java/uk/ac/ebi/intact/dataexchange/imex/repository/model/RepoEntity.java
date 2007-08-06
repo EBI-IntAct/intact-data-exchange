@@ -15,10 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * TODO comment this
@@ -26,15 +24,36 @@ import javax.persistence.GenerationType;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Entity
-public class OriginalEntrySet {
+@MappedSuperclass
+public class RepoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    public OriginalEntrySet() {
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updated;
+
+    //////////////////////////
+    // Callback methods
+
+    @PreUpdate
+    public void setUpdatedDate() {
+        setUpdated(new Date());
     }
+
+    @PrePersist
+    public void setCreatedDate() {
+        Date date = new Date();
+        setCreated(date);
+        setUpdated(date);
+    }
+
+    /////////////////////////
+    // Getters and Setters
 
     public long getId() {
         return id;
@@ -42,5 +61,21 @@ public class OriginalEntrySet {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public Date getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
     }
 }

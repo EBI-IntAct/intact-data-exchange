@@ -17,9 +17,9 @@ package uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ProviderDao;
-import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ProviderService;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
+import uk.ac.ebi.intact.dataexchange.imex.repository.dao.EntrySetDao;
+import uk.ac.ebi.intact.dataexchange.imex.repository.dao.EntrySetService;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
 
 import java.util.List;
 
@@ -29,28 +29,24 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class JpaProviderService implements ProviderService {
+public class JpaEntrySetService implements EntrySetService {
 
-    private ProviderDao providerDao;
+    private EntrySetDao entrySetDao;
 
-    public void setProviderDao(ProviderDao providerDao) {
-        this.providerDao = providerDao;
+    public void setEntrySetDao(EntrySetDao entrySetDao) {
+        this.entrySetDao = entrySetDao;
     }
 
-    public List<Provider> findAllProviders() {
-        return providerDao.findAll();
+    public List<EntrySet> findAllEntrySets() {
+        return entrySetDao.findAll();
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveProvider(Provider provider) {
-        providerDao.save(provider);
+    public void saveEntrySet(EntrySet entrySet) {
+        entrySetDao.save(entrySet);
     }
 
-    public Provider findByName(String name) {
-        try {
-            return providerDao.findByName(name);
-        } catch (Exception e) {
-            return null;
-        }
+    public EntrySet findByName(String name) {
+        return entrySetDao.findByName(name);
     }
 }
