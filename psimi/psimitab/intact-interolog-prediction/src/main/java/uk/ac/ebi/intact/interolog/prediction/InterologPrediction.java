@@ -1102,6 +1102,14 @@ public class InterologPrediction {
 		StrBuilder history = new StrBuilder();
 		history.append("clog interaction ").append(clogInteraction.getClogA().getId()).append(" - ").append(clogInteraction.getClogB().getId()).append("\n");
 		
+		StrBuilder scenario = new StrBuilder();
+		scenario.append(clogInteraction.getClogA().getId()).append("\t");
+		scenario.append(clogInteraction.getClogB().getId()).append("\t");
+		scenario.append(clogInteraction.getClogA().getProteomeId2protein().size()).append("\t");
+		scenario.append(clogInteraction.getClogB().getProteomeId2protein().size()).append("\t");
+		scenario.append(clogInteraction.getSourceInteractions().size()).append("\t");
+		int inference = 0;
+		
 		Collection<BinaryInteraction> interactions = new ArrayList<BinaryInteraction>();
 		Collection<Long> speciesA = clogInteraction.getClogA().getProteomeId2protein().keySet();
 		Collection<Long> speciesB = clogInteraction.getClogB().getProteomeId2protein().keySet();
@@ -1155,6 +1163,7 @@ public class InterologPrediction {
 			        
 			        
 					BinaryInteraction interaction = new BinaryInteraction(iA, iB);
+					inference++;
 					
 					// authors
 					List<Author> authors = new ArrayList<Author>(1);
@@ -1187,8 +1196,11 @@ public class InterologPrediction {
 			
 		}
 		
+		scenario.append(inference);
+		
 		if (isWriteDownCastHistory()) {
-			downCastHistory.append(history.toString()).append("\n");
+			//downCastHistory.append(history.toString()).append("\n");
+			downCastHistory.append(scenario.toString()).append("\n");
 		}
 		
 		return interactions;
@@ -1207,6 +1219,7 @@ public class InterologPrediction {
 		if (isWriteDownCastHistory()) {
 			try {
 				downCastHistory = new PrintStream(new File(workingDir.getAbsolutePath()+"/downCast.history.txt"));
+				downCastHistory.append("clogA\tclogB\tprot1\tprot2\tsources\tinferences\n");
 			} catch (FileNotFoundException e) {
 				log.warn("down cast history is redirecting on System.out");
 				downCastHistory = System.out;
@@ -1324,7 +1337,6 @@ public class InterologPrediction {
 		ClogInteraction.setNB_LINES_MAX(100000);
 		up.setWriteClogInteractions(false);
 		up.setDownCastOnChildren(false);
-		
 		up.run();
 	}
 	
