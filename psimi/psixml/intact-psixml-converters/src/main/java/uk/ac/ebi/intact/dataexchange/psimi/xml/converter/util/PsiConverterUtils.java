@@ -63,7 +63,7 @@ public class PsiConverterUtils {
         }
     }
 
-    private static void populateNames( AnnotatedObject<?, ?> annotatedObject, NamesContainer namesContainer ) {
+    protected static void populateNames( AnnotatedObject<?, ?> annotatedObject, NamesContainer namesContainer ) {
         Names names = namesContainer.getNames();
 
         if ( names == null ) {
@@ -76,7 +76,7 @@ public class PsiConverterUtils {
         names.setShortLabel( shortLabel );
         names.setFullName( fullName );
 
-        if ( ConverterContext.getInstance().getInteractorConfig().isExcludeInteractorAliases() ) {
+        if ( !ConverterContext.getInstance().getInteractorConfig().isExcludeInteractorAliases() ) {
             AliasConverter aliasConverter = new AliasConverter( annotatedObject.getOwner(),
                                                                 AnnotatedObjectUtils.getAliasClassType( annotatedObject.getClass() ) );
             for ( Alias alias : annotatedObject.getAliases() ) {

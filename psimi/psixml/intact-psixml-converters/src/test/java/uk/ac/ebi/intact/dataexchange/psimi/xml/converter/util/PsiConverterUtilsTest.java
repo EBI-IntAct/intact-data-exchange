@@ -15,12 +15,19 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
-import static org.junit.Assert.*;
+import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.DbReference;
+import psidev.psi.mi.xml.model.Interactor;
+import psidev.psi.mi.xml.model.NamesContainer;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.PsiMockFactory;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.model.Protein;
 
 import java.util.Arrays;
 import java.util.List;
@@ -63,5 +70,33 @@ public class PsiConverterUtilsTest {
 
         assertNotNull(identityRef);
         assertEquals(dbRefUniprot.getDb(), identityRef.getDb());
+    }
+
+    @Test
+    public void populateNames() {
+        IntactMockBuilder mockBuilder = new IntactMockBuilder( );
+        Protein protein = mockBuilder.createProteinRandom();
+        Assert.assertEquals( 1, protein.getAliases().size() );
+
+        NamesContainer psiInteractor = new Interactor();
+        PsiConverterUtils.populateNames( protein, psiInteractor );
+        Assert.assertNotNull( psiInteractor.getNames() );
+        Assert.assertNotNull( psiInteractor.getNames().getAliases() );
+        Assert.assertEquals( 1, psiInteractor.getNames().getAliases().size() );
+    }
+
+    @Test
+    public void populateNames_filter_aliases() {
+        ConverterContext.getInstance().getInteractorConfig().setExcludeInteractorAliases( true );
+
+        IntactMockBuilder mockBuilder = new IntactMockBuilder( );
+        Protein protein = mockBuilder.createProteinRandom();
+        Assert.assertEquals( 1, protein.getAliases().size() );
+
+        NamesContainer psiInteractor = new Interactor();
+        PsiConverterUtils.populateNames( protein, psiInteractor );
+        Assert.assertNotNull( psiInteractor.getNames() );
+        Assert.assertNotNull( psiInteractor.getNames().getAliases() );
+        Assert.assertEquals( 0, psiInteractor.getNames().getAliases().size() );
     }
 }
