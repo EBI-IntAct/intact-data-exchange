@@ -76,6 +76,12 @@ public class Repository {
         context.getImexPersistence().beginTransaction();
         context.getImexServiceProvider().getEntrySetService().saveEntrySet(entrySet);
         context.getImexPersistence().commitTransaction();
+
+        // TODO init the split and enrichment
+    }
+
+    public EntrySet retrieveEntrySet(String name) {
+        throw new UnsupportedOperationException();
     }
 
 
