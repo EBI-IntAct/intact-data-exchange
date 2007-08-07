@@ -36,7 +36,7 @@ public class DownloadCVs {
 
     public static final String ONTOLOGY_NAME = "intact";
 
-    private static final String NEW_LINE = System.getProperty( "line.separator" );
+    private static final String NEW_LINE = System.getProperty("line.separator");
 
     private static final String TIME;
 
@@ -46,38 +46,38 @@ public class DownloadCVs {
     public CvTopic definitionTopic = null;
     public CvTopic obsolete = null;
 
-    public DownloadCVs( ) throws IntactException {
+    public DownloadCVs() throws IntactException {
 
         // Initialises required vocabularies...
-        psi = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByXref( CvDatabase.PSI_MI_MI_REF );
-        if ( psi == null ) {
-            throw new IllegalArgumentException( "Could not find PSI via MI reference: " + CvDatabase.PSI_MI_MI_REF );
+        psi = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByXref(CvDatabase.PSI_MI_MI_REF);
+        if (psi == null) {
+            throw new IllegalArgumentException("Could not find PSI via MI reference: " + CvDatabase.PSI_MI_MI_REF);
         }
 
-        intact = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByXref( CvDatabase.INTACT_MI_REF );
-        if ( intact == null ) {
-            throw new IllegalArgumentException( "Could not find IntAct via MI reference: " + CvDatabase.INTACT_MI_REF );
+        intact = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByXref(CvDatabase.INTACT_MI_REF);
+        if (intact == null) {
+            throw new IllegalArgumentException("Could not find IntAct via MI reference: " + CvDatabase.INTACT_MI_REF);
         }
 
-        identity = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).getByXref( CvXrefQualifier.IDENTITY_MI_REF );
-        if ( identity == null ) {
-            throw new IllegalArgumentException( "Could not find identity via MI reference: " + CvXrefQualifier.IDENTITY_MI_REF );
+        identity = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).getByXref(CvXrefQualifier.IDENTITY_MI_REF);
+        if (identity == null) {
+            throw new IllegalArgumentException("Could not find identity via MI reference: " + CvXrefQualifier.IDENTITY_MI_REF);
         }
 
-        definitionTopic = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvTopic.class).getByShortLabel(CvTopic.DEFINITION );
-        if ( definitionTopic == null ) {
-            throw new IllegalArgumentException( "Could not find definition by its name: " + CvTopic.DEFINITION );
+        definitionTopic = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvTopic.class).getByShortLabel(CvTopic.DEFINITION);
+        if (definitionTopic == null) {
+            throw new IllegalArgumentException("Could not find definition by its name: " + CvTopic.DEFINITION);
         }
 
-        obsolete = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvTopic.class).getByXref( CvTopic.OBSOLETE_MI_REF );
-        if ( obsolete == null ) {
-            throw new IllegalArgumentException( "Could not find definition via MI reference: " + CvTopic.OBSOLETE_MI_REF );
+        obsolete = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvTopic.class).getByXref(CvTopic.OBSOLETE_MI_REF);
+        if (obsolete == null) {
+            throw new IllegalArgumentException("Could not find definition via MI reference: " + CvTopic.OBSOLETE_MI_REF);
         }
     }
 
     static {
-        SimpleDateFormat formatter = new SimpleDateFormat( "yyyy-MM-dd@HH_mm" );
-        TIME = formatter.format( new Date() );
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd@HH_mm");
+        TIME = formatter.format(new Date());
         formatter = null;
     }
 
@@ -90,18 +90,18 @@ public class DownloadCVs {
      *
      * @return the updated StringBuffer.
      */
-    private static StringBuffer replace( StringBuffer buffer, String from, String to ) {
+    private static StringBuffer replace(StringBuffer buffer, String from, String to) {
 
-        int index = buffer.indexOf( from );
+        int index = buffer.indexOf(from);
 
-        while ( index != -1 ) {
+        while (index != -1) {
             int start = index;
             int stop = start + from.length();
-            buffer.replace( start, stop, to );
+            buffer.replace(start, stop, to);
 
             // we don't search what before where we just inserted. That also prevent infinite loops
             int fromIndex = start + to.length();
-            index = buffer.indexOf( from, fromIndex );
+            index = buffer.indexOf(from, fromIndex);
         }
 
         return buffer;
@@ -114,9 +114,9 @@ public class DownloadCVs {
      *
      * @return the excaped text
      */
-    public static String escapeCharacter( String text ) {
+    public static String escapeCharacter(String text) {
 
-        if ( text == null ) {
+        if (text == null) {
             return "";
         }
         /*
@@ -134,33 +134,33 @@ public class DownloadCVs {
         */
 
         // we would insert 1 new character per replacement, 15 if not likely to be ever reached.
-        StringBuffer sb = new StringBuffer( text.length() + 15 );
-        sb.append( text );
+        StringBuffer sb = new StringBuffer(text.length() + 15);
+        sb.append(text);
 
-        replace( sb, "\\", "\\\\" );
+        replace(sb, "\\", "\\\\");
 
         // http://en.wikipedia.org/wiki/Newline
-        replace( sb, "\r\n", " " ); // Windows  style ... has to be done before Unix Style
-        replace( sb, "\n", " " );   // Unix/Mac style
+        replace(sb, "\r\n", " "); // Windows  style ... has to be done before Unix Style
+        replace(sb, "\n", " ");   // Unix/Mac style
 
 //        replace( sb, "\r\n", "\\n" ); // Windows  style ... has to be done before Unix Style
 //        replace( sb, "\n", "\\n" );   // Unix/Mac style
 //
-        replace( sb, "\t", "\\t" );
-        replace( sb, ":", "\\:" );
-        replace( sb, ",", "\\," );
-        replace( sb, "\"", "\\\"" );
+        replace(sb, "\t", "\\t");
+        replace(sb, ":", "\\:");
+        replace(sb, ",", "\\,");
+        replace(sb, "\"", "\\\"");
 
         // This is adviced on the OBO web site but not respected by oboedit.
 //        replace( sb, "(", "\\(" );
 //        replace( sb, ")", "\\)" );
 
-        replace( sb, "[", "\\[" );
-        replace( sb, "]", "\\]" );
-        replace( sb, "{", "\\{" );
-        replace( sb, "}", "\\}" );
+        replace(sb, "[", "\\[");
+        replace(sb, "]", "\\]");
+        replace(sb, "{", "\\{");
+        replace(sb, "}", "\\}");
 
-        replace( sb, "  ", " " );
+        replace(sb, "  ", " ");
 
 
         return sb.toString();
@@ -174,221 +174,225 @@ public class DownloadCVs {
     /**
      * Format a CvObject into an OBO record.
      *
-     * @param cvObject
+     * @param cvObjectsWithSameMi
      *
      * @return
      */
-    private String formatToObo( CvObject cvObject, CvObject root ) throws IntactException {
-        StringBuffer sb = new StringBuffer( maxBufferLength );
+    private String formatToObo(List<CvObject> cvObjectsWithSameMi, List<CvObject> roots) throws IntactException {
 
-        String id = getIdentifier( cvObject );
+        // just get the first object for the details
+        CvObject cvObject = cvObjectsWithSameMi.iterator().next();
 
-        log.info( "Processing " + cvObject.getShortLabel() + " (" + id + ")" );
-        if ( id == null ) {
-            log.warn( "That term (" + cvObject.getShortLabel() + ") doesn't have an id, skip it." );
+        StringBuffer sb = new StringBuffer(maxBufferLength);
+
+        String id = getIdentifier(cvObject);
+
+        log.info("Processing " + cvObject.getShortLabel() + " (" + id + ")");
+        if (id == null) {
+            log.warn("That term (" + cvObject.getShortLabel() + ") doesn't have an id, skip it.");
             return null;
         }
 
-        sb.append( "[Term]" ).append( NEW_LINE );
+        sb.append("[Term]").append(NEW_LINE);
 
         /////////////////////
         // 1. ID handling
-        sb.append( "id: " ).append( id ).append( NEW_LINE );
+        sb.append("id: ").append(id).append(NEW_LINE);
 
         //////////////////////
         // 2. Name Handling
         String name = cvObject.getFullName();
-        if ( name == null || name.trim().length() == 0 ) {
+        if (name == null || name.trim().length() == 0) {
             name = cvObject.getShortLabel();
         }
-        sb.append( "name: " ).append( escapeCharacter( name ) ).append( NEW_LINE );
+        sb.append("name: ").append(escapeCharacter(name)).append(NEW_LINE);
 
         //////////////////////////////
         // 2. Xrefs handling
-        StringBuffer allXrefs = new StringBuffer( 200 );
-        List sortedXrefs = new ArrayList( cvObject.getXrefs() );
+        StringBuffer allXrefs = new StringBuffer(200);
+        List sortedXrefs = new ArrayList(cvObject.getXrefs());
 
         // filter out all psi / intact Xref
-        for ( Iterator iterator = sortedXrefs.iterator(); iterator.hasNext(); ) {
+        for (Iterator iterator = sortedXrefs.iterator(); iterator.hasNext();) {
             Xref xref = (Xref) iterator.next();
             CvDatabase db = xref.getCvDatabase();
-            if ( intact.equals( db ) || psi.equals( db ) ) {
+            if (intact.equals(db) || psi.equals(db)) {
                 iterator.remove();
             }
         }
 
         // Sort remaining Xrefs
-        Collections.sort( sortedXrefs, new Comparator() {
+        Collections.sort(sortedXrefs, new Comparator() {
 
             // Order Xrefs by CvDatabase and primaryId
-            public int compare( Object o1, Object o2 ) {
+            public int compare(Object o1, Object o2) {
                 Xref x1 = (Xref) o1;
                 Xref x2 = (Xref) o2;
 
                 CvDatabase db1 = x1.getCvDatabase();
                 CvDatabase db2 = x2.getCvDatabase();
 
-                if ( db1.equals( db2 ) ) {
+                if (db1.equals(db2)) {
                     // sort by primaryId
-                    return x1.getPrimaryId().compareTo( x2.getPrimaryId() );
+                    return x1.getPrimaryId().compareTo(x2.getPrimaryId());
                 } else {
-                    return db1.getShortLabel().compareTo( db2.getShortLabel() );
+                    return db1.getShortLabel().compareTo(db2.getShortLabel());
                 }
             }
-        } );
+        });
 
-        for ( Iterator iterator = sortedXrefs.iterator(); iterator.hasNext(); ) {
+        for (Iterator iterator = sortedXrefs.iterator(); iterator.hasNext();) {
             Xref xref = (Xref) iterator.next();
 
             String db = xref.getCvDatabase().getShortLabel();
 
             // Skip IntAct and PSI
 
-            if ( psi.equals( xref.getCvDatabase() ) ) {
+            if (psi.equals(xref.getCvDatabase())) {
                 continue;
-            } else if ( intact.equals( xref.getCvDatabase() ) ) {
+            } else if (intact.equals(xref.getCvDatabase())) {
                 continue;
             }
 
-            allXrefs.append( db ).append( ":" ).append( xref.getPrimaryId() );
+            allXrefs.append(db).append(":").append(xref.getPrimaryId());
 
-            allXrefs.append( " \"" );
-            if ( xref.getCvXrefQualifier() != null ) {
-                allXrefs.append( xref.getCvXrefQualifier().getShortLabel() );
+            allXrefs.append(" \"");
+            if (xref.getCvXrefQualifier() != null) {
+                allXrefs.append(xref.getCvXrefQualifier().getShortLabel());
             }
-            allXrefs.append( "\"" );
+            allXrefs.append("\"");
 
-            if ( iterator.hasNext() ) {
-                allXrefs.append( ", " );
+            if (iterator.hasNext()) {
+                allXrefs.append(", ");
             }
         }
 
         /////////////////////////
         // Definition handling
-        Annotation definition = getDefinition( cvObject );
+        Annotation definition = getDefinition(cvObject);
 
-        sb.append( "def: " ).append( '"' );
+        sb.append("def: ").append('"');
 
-        if ( definition != null ) {
-            sb.append( escapeCharacter( definition.getAnnotationText() ) );
+        if (definition != null) {
+            sb.append(escapeCharacter(definition.getAnnotationText()));
         }
 
-        sb.append( '"' );
-        if ( allXrefs != null ) {
-            sb.append( ' ' ).append( '[' ).append( allXrefs.toString() ).append( ']' );
+        sb.append('"');
+        if (allXrefs != null) {
+            sb.append(' ').append('[').append(allXrefs.toString()).append(']');
         }
-        sb.append( NEW_LINE );
+        sb.append(NEW_LINE);
 
         ////////////////////////////
         // exact_synonym handling
-        sb.append( "exact_synonym: \"" ).append( cvObject.getShortLabel() ).append( "\" []" ).append( NEW_LINE );
+        sb.append("exact_synonym: \"").append(cvObject.getShortLabel()).append("\" []").append(NEW_LINE);
 
         ////////////////////////////
         // 3. Aliases handling
-        List synonyms = new ArrayList( cvObject.getAliases() );
-        Collections.sort( synonyms, new Comparator() {
+        List synonyms = new ArrayList(cvObject.getAliases());
+        Collections.sort(synonyms, new Comparator() {
 
             // compare by
-            public int compare( Object o1, Object o2 ) {
+            public int compare(Object o1, Object o2) {
                 Alias a1 = (Alias) o1;
                 Alias a2 = (Alias) o2;
 
-                String name1 = ( a1.getName() == null ? "" : a1.getName() );
-                String name2 = ( a2.getName() == null ? "" : a2.getName() );
+                String name1 = (a1.getName() == null ? "" : a1.getName());
+                String name2 = (a2.getName() == null ? "" : a2.getName());
 
                 CvAliasType t1 = a1.getCvAliasType();
                 CvAliasType t2 = a2.getCvAliasType();
 
-                if ( t1 != null && t2 != null ) {
-                    if ( t1.equals( t2 ) ) {
-                        return name1.compareTo( name2 );
+                if (t1 != null && t2 != null) {
+                    if (t1.equals(t2)) {
+                        return name1.compareTo(name2);
                     } else {
-                        return t1.getShortLabel().compareTo( t2.getShortLabel() );
+                        return t1.getShortLabel().compareTo(t2.getShortLabel());
                     }
                 } else {
-                    return name1.compareTo( name2 );
+                    return name1.compareTo(name2);
                 }
             }
-        } );
-        for ( Iterator iterator = synonyms.iterator(); iterator.hasNext(); ) {
+        });
+        for (Iterator iterator = synonyms.iterator(); iterator.hasNext();) {
             Alias alias = (Alias) iterator.next();
-            sb.append( "xref_analog: " );
-            if ( alias.getCvAliasType() != null ) {
-                sb.append( alias.getCvAliasType().getShortLabel() );
+            sb.append("xref_analog: ");
+            if (alias.getCvAliasType() != null) {
+                sb.append(alias.getCvAliasType().getShortLabel());
             } else {
-                log.info( "WARNING: Term " + id + " has an Alias without a CvAliasType" );
-                sb.append( "type_not_specified" );
+                log.info("WARNING: Term " + id + " has an Alias without a CvAliasType");
+                sb.append("type_not_specified");
             }
-            sb.append( ":" );
-            sb.append( escapeCharacter( alias.getName() ) );
-            sb.append( " \"" );
-            sb.append( "ALIAS" );
-            sb.append( "\"" );
-            sb.append( NEW_LINE );
+            sb.append(":");
+            sb.append(escapeCharacter(alias.getName()));
+            sb.append(" \"");
+            sb.append("ALIAS");
+            sb.append("\"");
+            sb.append(NEW_LINE);
         }
 
         /////////////////////////////
         // 4. Annotation handling
-        List annotations = new ArrayList( cvObject.getAnnotations() );
-        Collections.sort( annotations, new Comparator() {
+        List annotations = new ArrayList(cvObject.getAnnotations());
+        Collections.sort(annotations, new Comparator() {
 
             // compare by
-            public int compare( Object o1, Object o2 ) {
+            public int compare(Object o1, Object o2) {
                 Annotation a1 = (Annotation) o1;
                 Annotation a2 = (Annotation) o2;
 
-                String annot1 = ( a1.getAnnotationText() == null ? "" : a1.getAnnotationText() );
-                String annot2 = ( a2.getAnnotationText() == null ? "" : a2.getAnnotationText() );
+                String annot1 = (a1.getAnnotationText() == null ? "" : a1.getAnnotationText());
+                String annot2 = (a2.getAnnotationText() == null ? "" : a2.getAnnotationText());
 
                 CvTopic t1 = a1.getCvTopic();
                 CvTopic t2 = a2.getCvTopic();
 
-                if ( t1 != null && t2 != null ) {
-                    if ( t1.equals( t2 ) ) {
-                        return annot1.compareTo( annot2 );
+                if (t1 != null && t2 != null) {
+                    if (t1.equals(t2)) {
+                        return annot1.compareTo(annot2);
                     } else {
-                        return t1.getShortLabel().compareTo( t2.getShortLabel() );
+                        return t1.getShortLabel().compareTo(t2.getShortLabel());
                     }
                 } else {
-                    return annot1.compareTo( annot2 );
+                    return annot1.compareTo(annot2);
                 }
             }
-        } );
-        for ( Iterator iterator = annotations.iterator(); iterator.hasNext(); ) {
+        });
+        for (Iterator iterator = annotations.iterator(); iterator.hasNext();) {
             Annotation annot = (Annotation) iterator.next();
 
             // filter out definition as it has been already exported!
-            if ( annot.equals( definition ) ) {
+            if (annot.equals(definition)) {
                 continue;
             }
 
-            if ( definitionTopic.equals( annot.getCvTopic() ) ) {
-                log.info( "WARNING - more than one definition available in the current CV Term." );
-                log.info( "          1) \"" + definition.getAnnotationText() + "\"" );
-                log.info( "          2) \"" + annot.getAnnotationText() + "\"" );
+            if (definitionTopic.equals(annot.getCvTopic())) {
+                log.info("WARNING - more than one definition available in the current CV Term.");
+                log.info("          1) \"" + definition.getAnnotationText() + "\"");
+                log.info("          2) \"" + annot.getAnnotationText() + "\"");
             }
 
-            sb.append( "xref_analog: " );
-            if ( annot.getCvTopic() != null ) {
-                sb.append( annot.getCvTopic().getShortLabel() );
+            sb.append("xref_analog: ");
+            if (annot.getCvTopic() != null) {
+                sb.append(annot.getCvTopic().getShortLabel());
             } else {
-                log.info( "WARNING: Term " + id + " has an Annotation without a CvTopic" );
-                sb.append( "type_not_specified" );
+                log.info("WARNING: Term " + id + " has an Annotation without a CvTopic");
+                sb.append("type_not_specified");
             }
-            sb.append( ":" );
+            sb.append(":");
 
-            sb.append( escapeCharacter( annot.getAnnotationText() ) );
-            sb.append( " \"" );
-            sb.append( "ANNOTATION" );
-            sb.append( "\"" );
-            sb.append( NEW_LINE );
+            sb.append(escapeCharacter(annot.getAnnotationText()));
+            sb.append(" \"");
+            sb.append("ANNOTATION");
+            sb.append("\"");
+            sb.append(NEW_LINE);
         }
 
         // 5. obsolete handling
-        Annotation obsolete = getObsolete( cvObject );
-        if ( obsolete != null ) {
+        Annotation obsolete = getObsolete(cvObject);
+        if (obsolete != null) {
             // the comment has already been exported in the xref_analog
-            sb.append( "is_obsolete: true" ).append( NEW_LINE );
+            sb.append("is_obsolete: true").append(NEW_LINE);
         }
 
         // 6. DAG handling
@@ -396,81 +400,86 @@ public class DownloadCVs {
         //       same MI ref but different concrete classes.
 
         // this is not a DAG, generate a root if there is one given as param
-        if ( root != null ) {
-            String rootMi = getIdentifier( root );
-            String childMi = getIdentifier( cvObject );
+        if (roots != null) {
 
-            // when root is MI:0000 the way to describe the relationship is: relationship: part_of MI:0000 ! ...
-            // otherwise is_a: MI:xxxx ! ...
 
-            if ( ! rootMi.equals( childMi ) ) {
+            for (CvObject root : roots) {
 
-                if ( rootMi.equals( "MI:0000" ) ) {
-                    sb.append( "relationship: part_of " );
-                } else {
-                    sb.append( "is_a: " );
+                String rootMi = getIdentifier(root);
+                String childMi = getIdentifier(cvObject);
+
+                // when root is MI:0000 the way to describe the relationship is: relationship: part_of MI:0000 ! ...
+                // otherwise is_a: MI:xxxx ! ...
+
+                if (!rootMi.equals(childMi)) {
+
+                    if (rootMi.equals("MI:0000")) {
+                        sb.append("relationship: part_of ");
+                    } else {
+                        sb.append("is_a: ");
+                    }
+
+                    sb.append(rootMi).append(' ').append('!').append(' ');
+                    sb.append(escapeCharacter(root.getShortLabel()));
+                    sb.append(NEW_LINE);
                 }
-
-                sb.append( rootMi ).append( ' ' ).append( '!' ).append( ' ' );
-                sb.append( escapeCharacter( root.getShortLabel() ) );
-                sb.append( NEW_LINE );
             }
         }
 
         // process parents if the object is a dag element
-        if ( CvDagObject.class.isAssignableFrom( cvObject.getClass() ) ) {
+        if (CvDagObject.class.isAssignableFrom(cvObject.getClass())) {
             // this is a DAG object, may have parents to mention here
-            Collection otherTypes = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDagObject.class)
+            Collection<CvDagObject> otherTypes = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDagObject.class)
                     .getByXrefLike(id);
-            Set alreadyExported = new HashSet( 4 );
+            Set<String> alreadyExported = new HashSet<String>(4);
 
             // keeps a mapping MI -> CvObject to allow later ordering my MI reference.
             Map mi2parents = new HashMap();
 
             // add the remaining parents to the current definition
-            for ( Iterator iterator = otherTypes.iterator(); iterator.hasNext(); ) {
-                CvDagObject dag = (CvDagObject) iterator.next();
+            for (Iterator<CvDagObject> iterator = otherTypes.iterator(); iterator.hasNext();) {
+                CvDagObject dag = iterator.next();
 
-                if ( ! dag.getParents().isEmpty() ) {
+                if (!dag.getParents().isEmpty()) {
 
-                    for ( Iterator iterator2 = dag.getParents().iterator(); iterator2.hasNext(); ) {
-                        CvDagObject parent = (CvDagObject) iterator2.next();
-                        String mi = getIdentifier( parent );
+                    for (Iterator<CvDagObject> iterator2 = dag.getParents().iterator(); iterator2.hasNext();) {
+                        CvDagObject parent = iterator2.next();
+                        String mi = getIdentifier(parent);
 
-                        if ( alreadyExported.contains( mi ) ) {
+                        if (alreadyExported.contains(mi)) {
                             // avoid the same term from appearing multiple times
                             continue;
                         }
 
-                        alreadyExported.add( mi );
+                        alreadyExported.add(mi);
 
-                        mi2parents.put( mi, parent );
+                        mi2parents.put(mi, parent);
                     }
                 }
             } // loop otherType
 
-            List parents = new ArrayList( mi2parents.keySet() );
-            Collections.sort( parents ); // sort MI references by alphabetical order
+            List parents = new ArrayList(mi2parents.keySet());
+            Collections.sort(parents); // sort MI references by alphabetical order
 
             // print out all sorted parents
-            for ( Iterator iterator = parents.iterator(); iterator.hasNext(); ) {
+            for (Iterator iterator = parents.iterator(); iterator.hasNext();) {
                 String mi = (String) iterator.next();
-                CvDagObject parent = (CvDagObject) mi2parents.get( mi );
+                CvDagObject parent = (CvDagObject) mi2parents.get(mi);
 
-                sb.append( "is_a: " ).append( mi ).append( ' ' ).append( '!' ).append( ' ' );
-                sb.append( escapeCharacter( parent.getShortLabel() ) );
-                if ( parent.getFullName() != null
-                     &&
-                     ! parent.getShortLabel().equals( parent.getFullName() ) ) {
-                    sb.append( ':' ).append( ' ' ).append( escapeCharacter( parent.getFullName() ) );
+                sb.append("is_a: ").append(mi).append(' ').append('!').append(' ');
+                sb.append(escapeCharacter(parent.getShortLabel()));
+                if (parent.getFullName() != null
+                    &&
+                    !parent.getShortLabel().equals(parent.getFullName())) {
+                    sb.append(':').append(' ').append(escapeCharacter(parent.getFullName()));
                 }
 
-                sb.append( NEW_LINE );
+                sb.append(NEW_LINE);
             }
 
         } // end of CvDagObject processing
 
-        if ( sb.length() > maxBufferLength ) {
+        if (sb.length() > maxBufferLength) {
             maxBufferLength = sb.length();
         }
 
@@ -484,10 +493,10 @@ public class DownloadCVs {
      *
      * @return a String that can be null.
      */
-    private Annotation getDefinition( CvObject cvObject ) {
-        for ( Iterator iterator = cvObject.getAnnotations().iterator(); iterator.hasNext(); ) {
-            Annotation annotation = (Annotation) iterator.next();
-            if ( definitionTopic.equals( annotation.getCvTopic() ) ) {
+    private Annotation getDefinition(CvObject cvObject) {
+        for (Iterator<Annotation> iterator = cvObject.getAnnotations().iterator(); iterator.hasNext();) {
+            Annotation annotation = iterator.next();
+            if (definitionTopic.equals(annotation.getCvTopic())) {
                 return annotation;
             }
         }
@@ -501,19 +510,19 @@ public class DownloadCVs {
      *
      * @return an Annotation object if it can be found, otherwise null.
      */
-    private Annotation getObsolete( CvObject cvObject ) {
-        for ( Iterator iterator = cvObject.getAnnotations().iterator(); iterator.hasNext(); ) {
-            Annotation annotation = (Annotation) iterator.next();
-            if ( obsolete.equals( annotation.getCvTopic() ) ) {
+    private Annotation getObsolete(CvObject cvObject) {
+        for (Iterator<Annotation> iterator = cvObject.getAnnotations().iterator(); iterator.hasNext();) {
+            Annotation annotation = iterator.next();
+            if (obsolete.equals(annotation.getCvTopic())) {
                 return annotation;
             }
         }
         return null;
     }
 
-    private boolean isObsolete( CvObject cvObject ) {
-        Annotation obsolete = getObsolete( cvObject );
-        if ( obsolete != null ) {
+    private boolean isObsolete(CvObject cvObject) {
+        Annotation obsolete = getObsolete(cvObject);
+        if (obsolete != null) {
             return true;
         }
         return false;
@@ -526,35 +535,35 @@ public class DownloadCVs {
      *
      * @return an mi reference or an intact reference or null if none is found.
      */
-    private String getIdentifier( CvObject cvObject ) {
+    private String getIdentifier(CvObject cvObject) {
         String mi = null;
         String ia = null;
 
         // TODO check that only one has identity !!
 
-        for ( Iterator iterator = cvObject.getXrefs().iterator(); iterator.hasNext() && mi == null; ) {
-            Xref xref = (Xref) iterator.next();
-            if ( identity.equals( xref.getCvXrefQualifier() ) ) {
-                if ( psi.equals( xref.getCvDatabase() ) ) {
+        for (Iterator<CvObjectXref> iterator = cvObject.getXrefs().iterator(); iterator.hasNext() && mi == null;) {
+            Xref xref = iterator.next();
+            if (identity.equals(xref.getCvXrefQualifier())) {
+                if (psi.equals(xref.getCvDatabase())) {
                     mi = xref.getPrimaryId();
-                } else if ( intact.equals( xref.getCvDatabase() ) ) {
+                } else if (intact.equals(xref.getCvDatabase())) {
                     ia = xref.getPrimaryId();
-                    if ( ! ia.startsWith( "IA:" ) ) {
-                        log.info( "WARNING: CV Term '" + cvObject.getShortLabel() + "' has an intact identity malformed: " + ia );
+                    if (!ia.startsWith("IA:")) {
+                        log.info("WARNING: CV Term '" + cvObject.getShortLabel() + "' has an intact identity malformed: " + ia);
                     }
                 }
             }
         }
 
-        return ( mi != null ? mi : ia );
+        return (mi != null ? mi : ia);
     }
 
-    private String getMiIdentifier( CvObject cvObject ) {
+    private String getMiIdentifier(CvObject cvObject) {
         String mi = null;
 
-        for ( Iterator iterator = cvObject.getXrefs().iterator(); iterator.hasNext() && mi == null; ) {
-            Xref xref = (Xref) iterator.next();
-            if ( psi.equals( xref.getCvDatabase() ) ) {
+        for (Iterator<CvObjectXref> iterator = cvObject.getXrefs().iterator(); iterator.hasNext() && mi == null;) {
+            Xref xref = iterator.next();
+            if (psi.equals(xref.getCvDatabase())) {
                 mi = xref.getPrimaryId();
             }
         }
@@ -563,14 +572,14 @@ public class DownloadCVs {
         return mi;
     }
 
-    private boolean hasReference( CvObject cvObject, String identifier ) {
+    private boolean hasReference(CvObject cvObject, String identifier) {
 
-        if ( identifier == null ) {
-            throw new IllegalArgumentException( "The MI given must be not null." );
+        if (identifier == null) {
+            throw new IllegalArgumentException("The MI given must be not null.");
         }
 
-        String cvid = getIdentifier( cvObject );
-        if ( identifier.equals( cvid ) ) {
+        String cvid = getIdentifier(cvObject);
+        if (identifier.equals(cvid)) {
             return true;
         }
         return false;
@@ -588,77 +597,78 @@ public class DownloadCVs {
         //auto-generated-by: DAG-Edit 1.419 rev 3
         //default-namespace: psi-mi25.dag
 
-        StringBuffer sb = new StringBuffer( 128 );
+        StringBuffer sb = new StringBuffer(128);
 
-        sb.append( "format-version: 1.0" ).append( NEW_LINE );
+        sb.append("format-version: 1.0").append(NEW_LINE);
 
-        SimpleDateFormat formatter = new SimpleDateFormat( "dd:MM:yyyy HH:mm" );
-        String date = formatter.format( new Date() );
-        sb.append( "date: " ).append( date ).append( NEW_LINE );
+        SimpleDateFormat formatter = new SimpleDateFormat("dd:MM:yyyy HH:mm");
+        String date = formatter.format(new Date());
+        sb.append("date: ").append(date).append(NEW_LINE);
 
-        sb.append( "saved-by: " ).append( System.getProperty("user.name") ).append( NEW_LINE );
+        sb.append("saved-by: ").append(System.getProperty("user.name")).append(NEW_LINE);
 
-        sb.append( "auto-generated-by: IntAct - " ).append( getClass().getName() );
-        sb.append( " - v" ).append( VERSION ).append( NEW_LINE );
+        sb.append("auto-generated-by: IntAct - ").append(getClass().getName());
+        sb.append(" - v").append(VERSION).append(NEW_LINE);
 
         return sb.toString();
     }
 
     public String generateFooter() {
 
-        StringBuffer sb = new StringBuffer( 128 );
+        StringBuffer sb = new StringBuffer(128);
 
-        sb.append( "[Typedef]" ).append( NEW_LINE );
-        sb.append( "id: part_of" ).append( NEW_LINE );
-        sb.append( "name: part of" ).append( NEW_LINE );
-        sb.append( "is_transitive: true" ).append( NEW_LINE );
+        sb.append("[Typedef]").append(NEW_LINE);
+        sb.append("id: part_of").append(NEW_LINE);
+        sb.append("name: part of").append(NEW_LINE);
+        sb.append("is_transitive: true").append(NEW_LINE);
 
         return sb.toString();
     }
 
     private class VirtualCvRoot extends CvObject {
-        public VirtualCvRoot( Institution owner, String shortLabel ) {
-            super( owner, shortLabel );
+
+        public VirtualCvRoot(Institution owner, String shortLabel) {
+            super(owner, shortLabel);
         }
 
-        public VirtualCvRoot( Institution owner, String shortLabel, String mi ) {
-            super( owner, shortLabel );
+        public VirtualCvRoot(Institution owner, String shortLabel, String mi) {
+            super(owner, shortLabel);
 
-            if ( mi == null ) {
-                throw new IllegalArgumentException( "mi must not be null" );
+            if (mi == null) {
+                throw new IllegalArgumentException("mi must not be null");
             }
 
             // add PSI Xref
-            addXref( new CvObjectXref( owner, psi, mi, null, null, identity ) );
+            addXref(new CvObjectXref(owner, psi, mi, null, null, identity));
         }
     }
 
-    public void download( BufferedWriter out ) throws IOException, IntactException {
+    public void download(BufferedWriter out) throws IOException, IntactException {
         download(out, false);
     }
 
-    public void download( BufferedWriter out, boolean isDryRun ) throws IOException, IntactException {
+    public void download(BufferedWriter out, boolean isDryRun) throws IOException, IntactException {
 
         // 1. Get all CvObject
-        log.info( "Loading all IntAct CVs ... " );
-        Collection cvObjects = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().getAll();
-        log.info( cvObjects.size() + " found." );
+        log.info("Loading all IntAct CVs ... ");
+        Collection<CvObject> cvObjects = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().getAll();
+        log.info(cvObjects.size() + " found.");
 
         // creating the root of all CVs
-        final VirtualCvRoot superRoot = new VirtualCvRoot( new Institution( "tmp" ), "molecular interaction", "MI:0000" );
-        superRoot.setFullName( "Controlled vocabularies originally created for protein protein interactions, extended to other molecules interactions." );
+        final VirtualCvRoot superRoot = new VirtualCvRoot(new Institution("tmp"), "molecular interaction", "MI:0000");
+        superRoot.setFullName("Controlled vocabularies originally created for protein protein interactions, extended to other molecules interactions.");
 
         // collecting all available types of CVs
-        Set allCvClasses = new HashSet();
-        for ( Iterator iterator = cvObjects.iterator(); iterator.hasNext(); ) {
-            CvObject cvObject = (CvObject) iterator.next();
-            allCvClasses.add( CgLibUtil.removeCglibEnhanced(cvObject.getClass()) );
+        Set<Class> allCvClasses = new HashSet<Class>();
+        for (Iterator<CvObject> iterator = cvObjects.iterator(); iterator.hasNext();) {
+            CvObject cvObject = iterator.next();
+            allCvClasses.add(CgLibUtil.removeCglibEnhanced(cvObject.getClass()));
         }
 
-        Map typeMapping = IntactOntology.getTypeMapping( true ); // incl. DAGs and non DAGs
-        Map mi2name = IntactOntology.getNameMapping();
-        Map cvClass2root = new HashMap( allCvClasses.size() );
-        HashSet rootsOfType = new HashSet();
+        Map<Class, String[]> typeMapping = IntactOntology.getTypeMapping(true); // incl. DAGs and non DAGs
+        Map<String, String> mi2name = IntactOntology.getNameMapping();
+        Map<Class, CvObject> cvClass2root = new HashMap<Class, CvObject>(allCvClasses.size());
+        HashSet<CvObject> rootsOfType = new HashSet<CvObject>();
 
         // 2. Add potentially missing non Dag root. These missing roots are materialized as VirtualCvRoot
         //    If a PSI root term is missing in IntAct we simulate it with a virtual node, so the exported file
@@ -668,210 +678,211 @@ public class DownloadCVs {
         // The IntactOntology should contain all necessary mappings.
         // if a root term is missing, we create it.
         // along the way, we create a mapping CvObject Class --> CvObject (the root)
-        for ( Iterator iterator = allCvClasses.iterator(); iterator.hasNext(); ) {
+        for (Iterator iterator = allCvClasses.iterator(); iterator.hasNext();) {
             Class aCvClass = (Class) iterator.next();
 
-            if ( typeMapping.containsKey( aCvClass ) ) {
-                String[] miRefs = (String[]) typeMapping.get( aCvClass );
-                log.info( aCvClass + " maps to " );
-                for ( int i = 0; i < miRefs.length; i++ ) {
-                    String miRef = miRefs[ i ];
-                    log.info( miRef );
+            if (typeMapping.containsKey(aCvClass)) {
+                String[] miRefs = typeMapping.get(aCvClass);
+                log.info(aCvClass + " maps to ");
+                for (int i = 0; i < miRefs.length; i++) {
+                    String miRef = miRefs[i];
+                    log.info(miRef);
 
                     // look up in the database
                     CvObject root = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().getByXref(miRef);
 
-                    if ( root == null && !isDryRun) {
+                    if (root == null && !isDryRun) {
                         // doesn't exist yet, then create it
                         try {
-                            Constructor constructor = aCvClass.getDeclaredConstructor( new Class[]{ Institution.class, String.class } );
-                            if ( constructor != null ) {
-                                String name = (String) mi2name.get( miRef );
-                                root = (CvObject) constructor.newInstance( new Object[]{ IntactContext.getCurrentInstance().getInstitution(), name } );
+                            Constructor constructor = aCvClass.getDeclaredConstructor(new Class[]{Institution.class, String.class});
+                            if (constructor != null) {
+                                String name = mi2name.get(miRef);
+                                root = (CvObject) constructor.newInstance(new Object[]{IntactContext.getCurrentInstance().getInstitution(), name});
 
-                                IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().persist( root );
+                                IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().persist(root);
 
                                 // add Xref
                                 String database = null;
-                                if ( miRef.startsWith( "MI:" ) ) {
+                                if (miRef.startsWith("MI:")) {
                                     database = CvDatabase.PSI_MI_MI_REF;
-                                } else if ( miRef.startsWith( "IA:" ) ) {
+                                } else if (miRef.startsWith("IA:")) {
                                     database = CvDatabase.INTACT_MI_REF;
                                 } else {
                                     throw new IllegalArgumentException();
                                 }
                                 // TODO [ intact | psi | identity ] need to exist before hand.
-                                CvDatabase db = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByXref( database );
+                                CvDatabase db = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByXref(database);
                                 CvXrefQualifier q = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).getByXref(CvXrefQualifier.IDENTITY_MI_REF);
 
-                                CvObjectXref xref = new CvObjectXref( IntactContext.getCurrentInstance().getInstitution(), db, miRef, null, null, q );
-                                root.addXref( xref );
-                                IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().persist( xref );
+                                CvObjectXref xref = new CvObjectXref(IntactContext.getCurrentInstance().getInstitution(), db, miRef, null, null, q);
+                                root.addXref(xref);
+                                IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().persist(xref);
 
                                 // add it to the list of all CVs so it gets processed later on.
-                                cvObjects.add( root );
+                                cvObjects.add(root);
 
-                                log.info( " ( Node created [" + db.getShortLabel() + ", " + miRef + "] )" );
+                                log.info(" ( Node created [" + db.getShortLabel() + ", " + miRef + "] )");
                             }
-                        } catch ( Exception e ) {
-                            throw new IntactException( "Failed to create CV term (" + miRef + "), cf. nested errors.", e );
+                        } catch (Exception e) {
+                            throw new IntactException("Failed to create CV term (" + miRef + "), cf. nested errors.", e);
                         }
                     } // root was not found
-                    else
-                    {
-                         if (log.isDebugEnabled())
+                    else {
+                        if (log.isDebugEnabled())
                             log.debug("DRY RUN: root CV would have been created");
                     }
 
                     // if not done yet, add mapping CV class to the specific root
-                    if ( cvClass2root.containsKey( aCvClass ) ) {
-                        CvObject cv = (CvObject) cvClass2root.get( aCvClass );
-                        log.info( "\nWARNING: Trying to overwrite root ( " + cv.getShortLabel() + " ) with " + root.getShortLabel() );
-                        log.info( "         Skipping " + cv.getShortLabel() + "." );
+                    if (cvClass2root.containsKey(aCvClass)) {
+                        CvObject cv = cvClass2root.get(aCvClass);
+                        log.info("\nWARNING: Trying to overwrite root ( " + cv.getShortLabel() + " ) with " + root.getShortLabel());
+                        log.info("         Skipping " + cv.getShortLabel() + ".");
                     } else {
-                        cvClass2root.put( aCvClass, root );
+                        cvClass2root.put(aCvClass, root);
                     }
 
-                    if ( ( i + 1 ) < miRefs.length ) {
-                        log.info( ", " );
+                    if ((i + 1) < miRefs.length) {
+                        log.info(", ");
                     }
 
                     // keep track of all root of CVs
-                    if ( root != null ) {
-                        rootsOfType.add( root );
+                    if (root != null) {
+                        rootsOfType.add(root);
                     }
 
                 } // CV IDs
-                log.info( "." );
+                log.info(".");
 
             } else {
 
                 String msg = "WARNING: " + aCvClass + " is not mapped, please update the mapping in IntactOntology.";
-                throw new IllegalStateException( msg );
+                throw new IllegalStateException(msg);
             }
         } // allCvClasses
 
         // now that the classification is done, we add the super root to the list (VirtualCvRoot cannot be classified)
-        cvObjects.add( superRoot );
-        log.info( "Identifier of Super Root is: " + getMiIdentifier( superRoot ) );
-        log.info( "Adding Super Root into the collection of all CV Terms: " + cvObjects.contains( superRoot ) );
+        cvObjects.add(superRoot);
+        log.info("Identifier of Super Root is: " + getMiIdentifier(superRoot));
+        log.info("Adding Super Root into the collection of all CV Terms: " + cvObjects.contains(superRoot));
 
         // 3. Sort terms by MI reference
-        Map mi2cvObject = new HashMap( cvObjects.size() );
-        Collection noMiTerms = new ArrayList();
-        for ( Iterator iterator = cvObjects.iterator(); iterator.hasNext(); ) {
-            CvObject cvObject = (CvObject) iterator.next();
-
-            String mi = getMiIdentifier( cvObject );
-            if ( mi != null ) {
-                mi2cvObject.put( mi, cvObject );
+        Map<String, List<CvObject>> mi2cvObject = new HashMap<String, List<CvObject>>(cvObjects.size());
+        Collection<CvObject> noMiTerms = new ArrayList<CvObject>();
+        for (CvObject cvObject : cvObjects) {
+            String mi = getMiIdentifier(cvObject);
+            if (mi != null) {
+                if (mi2cvObject.containsKey(mi)) {
+                    List<CvObject> cvs = mi2cvObject.get(mi);
+                    cvs.add(cvObject);
+                    mi2cvObject.put(mi, cvs);
+                } else {
+                    mi2cvObject.put(mi, new ArrayList<CvObject>(Arrays.asList(cvObject)));
+                }
             } else {
                 // store it under a special flag
-                noMiTerms.add( cvObject );
+                noMiTerms.add(cvObject);
             }
         }
-        log.info( "Found " + noMiTerms.size() + " terms without MI reference" );
-        List allMiReferences = new ArrayList( mi2cvObject.keySet() );
-        Collections.sort( allMiReferences );
+        log.info("Found " + noMiTerms.size() + " terms without MI reference");
+        List<String> allMiReferences = new ArrayList<String>(mi2cvObject.keySet());
+        Collections.sort(allMiReferences);
 
         // 4. include header
-        out.write( generateHeader() );
-        out.write( NEW_LINE );
+        out.write(generateHeader());
+        out.write(NEW_LINE);
 
         // 5. Process term that have an MI reference in order
-        for ( Iterator iterator = allMiReferences.iterator(); iterator.hasNext(); ) {
-            String ref = (String) iterator.next();
-            CvObject cvObject = (CvObject) mi2cvObject.get( ref );
+        for (String ref : allMiReferences) {
+            List<CvObject> cvObjectsWithSameMi = mi2cvObject.get(ref);
 
-            CvObject root = null;
+            List<CvObject> roots = new ArrayList<CvObject>(cvObjectsWithSameMi.size());
 
+            for (CvObject cvObject : cvObjectsWithSameMi) {
 
-            log.info( "------------------------------" );
-            log.info( "Term: " + ref );
+                log.info("------------------------------");
+                log.info("Term: " + ref);
 
-            // if super root, give no root
-            // if root of type, give super root
-            // else give classified root.
-            if ( cvObject == superRoot ) {
-                log.info( "Super root, give no root" );
-                root = null;
-            } else if ( rootsOfType.contains( cvObject ) ) {
-                log.info( "Simple root, give MI:0000 as root" );
-                root = superRoot;
-            } else if ( CvDagObject.class.isAssignableFrom( cvObject.getClass() ) ) {
+                // if super root, give no root
+                // if root of type, give super root
+                // else give classified root.
+                if (cvObject == superRoot) {
+                    log.info("Super root, give no root");
+                } else if (rootsOfType.contains(cvObject)) {
+                    log.info("Simple root, give MI:0000 as root");
+                    roots.add(superRoot);
+                } else if (CvDagObject.class.isAssignableFrom(cvObject.getClass())) {
 
-                log.info( "Simple term (assignable from CvDagObject), give root: " );
-                // if the term doesn't have parents, we need to attach it to a root, otherwise we won't know its type.
-                CvDagObject cvDagObject = (CvDagObject) cvObject;
-                if ( cvDagObject.getParents().isEmpty() ) {
-                    log.info( "Current CvDagObject doesn't have any parent" );
-                    root = (CvObject) cvClass2root.get( cvObject.getClass() );
+                    log.info("Simple term (assignable from CvDagObject), give root: ");
+                    // if the term doesn't have parents, we need to attach it to a root, otherwise we won't know its type.
+                    CvDagObject cvDagObject = (CvDagObject) cvObject;
+                    if (cvDagObject.getParents().isEmpty()) {
+                        log.info("Current CvDagObject doesn't have any parent");
+                        roots.add(cvClass2root.get(cvObject.getClass()));
+                    } else {
+                        log.info("Current CvDagObject has " + cvDagObject.getParents().size() + " parent(s), we DO NOT give root.");
+                    }
                 } else {
-                    log.info( "Current CvDagObject has " + cvDagObject.getParents().size() + " parent(s), we DO NOT give root." );
+                    log.info("Simple CV Term (CvObject, not a DAG), give root according to class type (" + cvObject.getClass() + ").");
+                    // if not a CvDagObject, there is not hierarchy, so we need to give a parent
+                    roots.add(cvClass2root.get(cvObject.getClass()));
                 }
-            } else {
-                log.info( "Simple CV Term (CvObject, not a DAG), give root according to class type (" + cvObject.getClass() + ")." );
-                // if not a CvDagObject, there is not hierarchy, so we need to give a parent
-                root = (CvObject) cvClass2root.get( cvObject.getClass() );
+
+                Set<String> rootRefs = new HashSet<String>(roots.size());
+                if (!roots.isEmpty()) {
+                    for (CvObject root : roots) {
+                        String rootRef = getIdentifier(root);
+                        if (rootRef == null) {
+                            log.info("ERROR - could not find an identifier for CV Term: " + root.getShortLabel() + " (" + root.getAc() + ")");
+                        } else {
+                            rootRefs.add(rootRef);
+                        }
+                    }
+                }
             }
 
-            String rootRef = null;
-            if ( root != null ) {
-                rootRef = getIdentifier( root );
-                if ( rootRef == null ) {
-                    log.info( "ERROR - could not find an identifier for CV Term: " + root.getShortLabel() + " (" + root.getAc() + ")" );
-                }
-            }
-
-            String term = formatToObo( cvObject, root );
-            if ( term != null ) {
-                out.write( term );
-                out.write( NEW_LINE );
+            String term = formatToObo(cvObjectsWithSameMi, roots);
+            if (term != null) {
+                out.write(term);
+                out.write(NEW_LINE);
                 out.flush();
             }
         }
 
         // 6. Process terms that don't have an MI reference
-        log.info( "--------------------------------------------------" );
-        log.info( "Processing term having no MI reference." );
+        log.info("--------------------------------------------------");
+        log.info("Processing term having no MI reference.");
 
         // update all terms having no IA:xxxx so they get one.
-        for ( Iterator iterator = noMiTerms.iterator(); iterator.hasNext(); ) {
+        for (Iterator iterator = noMiTerms.iterator(); iterator.hasNext();) {
             CvObject cvObject = (CvObject) iterator.next();
 
-            String id = getIdentifier( cvObject );
+            String id = getIdentifier(cvObject);
 
-            if ( id == null) {
+            if (id == null) {
                 // neither an IA:xxxx or MI:xxxx available ...
                 try {
                     String localId;
 
-                    if (!isDryRun)
-                    {
-                        localId = SequenceManager.getNextId( );
-                    }
-                    else
-                    {
-                        localId = "IA-DR:"+System.currentTimeMillis();
+                    if (!isDryRun) {
+                        localId = SequenceManager.getNextId();
+                    } else {
+                        localId = "IA-DR:" + System.currentTimeMillis();
                     }
 
-                    CvObjectXref xref = new CvObjectXref( IntactContext.getCurrentInstance().getInstitution(), intact, localId, null, null, identity );
+                    CvObjectXref xref = new CvObjectXref(IntactContext.getCurrentInstance().getInstitution(), intact, localId, null, null, identity);
 
-                    if (!isDryRun)
-                    {
-                        cvObject.addXref( xref );
-                        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().persist( xref );
+                    if (!isDryRun) {
+                        cvObject.addXref(xref);
+                        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao().persist(xref);
 
-                    }
-                    else
-                    {
-                        log.info("A new xref would have been added to: "+cvObject.getShortLabel()+" ("+cvObject.getAc()+")");
+                    } else {
+                        log.info("A new xref would have been added to: " + cvObject.getShortLabel() + " (" + cvObject.getAc() + ")");
                     }
 
                     id = localId;
-                    log.debug( "Added new Xref to '" + cvObject.getShortLabel() + "': " + id );
+                    log.debug("Added new Xref to '" + cvObject.getShortLabel() + "': " + id);
 
-                } catch ( IntactException e ) {
+                } catch (IntactException e) {
                     e.printStackTrace();
                 }
             }
@@ -880,12 +891,9 @@ public class DownloadCVs {
         // Sort terms by identity
         List sortedCVs = new ArrayList(noMiTerms);
 
-        if (!isDryRun)
-        {
-            Collections.sort(sortedCVs, new Comparator()
-            {
-                public int compare(Object o1, Object o2)
-                {
+        if (!isDryRun) {
+            Collections.sort(sortedCVs, new Comparator() {
+                public int compare(Object o1, Object o2) {
                     CvObject cv1 = (CvObject) o1;
                     CvObject cv2 = (CvObject) o2;
 
@@ -896,47 +904,45 @@ public class DownloadCVs {
                 }
             });
 
-        }
-        else
-        {
+        } else {
             log.debug("DRY RUN: Terms would have been sorted by its identifier");
         }
 
         // export terms
-        for ( Iterator iterator = sortedCVs.iterator(); iterator.hasNext(); ) {
+        for (Iterator iterator = sortedCVs.iterator(); iterator.hasNext();) {
             CvObject cvObject = (CvObject) iterator.next();
 
-            log.info( "------------------------------" );
-            log.info( "Term: " + getIdentifier( cvObject ) );
+            log.info("------------------------------");
+            log.info("Term: " + getIdentifier(cvObject));
 
             CvObject root = null;
 
-            if ( cvObject == superRoot ) {
+            if (cvObject == superRoot) {
                 root = null;
-            } else if ( rootsOfType.contains( cvObject ) ) {
+            } else if (rootsOfType.contains(cvObject)) {
                 root = superRoot;
-            } else if ( CvDagObject.class.isAssignableFrom( cvObject.getClass() ) ) {
+            } else if (CvDagObject.class.isAssignableFrom(cvObject.getClass())) {
 
                 // if the term doesn't have parents, we need to attach it to a root, otherwise we won't know its type.
                 CvDagObject cvDagObject = (CvDagObject) cvObject;
-                if ( cvDagObject.getParents().isEmpty() ) {
-                    root = (CvObject) cvClass2root.get( cvObject.getClass() );
+                if (cvDagObject.getParents().isEmpty()) {
+                    root = cvClass2root.get(cvObject.getClass());
                 }
             } else {
                 // if not a CvDagObject, there is not hierarchy, so we need to give a parent
-                root = (CvObject) cvClass2root.get( cvObject.getClass() );
+                root = cvClass2root.get(cvObject.getClass());
             }
 
-            String term = formatToObo( cvObject, root );
-            if ( term != null ) {
-                out.write( term );
-                out.write( NEW_LINE );
+            String term = formatToObo(Arrays.asList(cvObject), Arrays.asList(root));
+            if (term != null) {
+                out.write(term);
+                out.write(NEW_LINE);
                 out.flush();
             }
         }
 
         // 7. Generate the Footer
-        out.write( generateFooter() );
+        out.write(generateFooter());
     }
 
     /**
@@ -944,39 +950,36 @@ public class DownloadCVs {
      *
      * @throws IntactException
      */
-    public static void main( String[] args ) throws IntactException {
+    public static void main(String[] args) throws IntactException {
 
         String outputFilename = null;
-        if ( args.length > 0 ) {
-            outputFilename = args[ 0 ];
+        if (args.length > 0) {
+            outputFilename = args[0];
         } else {
             // assign default filename
             outputFilename = "CvDownload-" + TIME + ".obo";
         }
 
         try {
-            BufferedWriter out = new BufferedWriter( new FileWriter( outputFilename ) );
+            BufferedWriter out = new BufferedWriter(new FileWriter(outputFilename));
 
-            if (log.isInfoEnabled())
-            {
-                try
-                {
-                    log.info( "Database: " + IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getBaseDao().getDbName() );
+            if (log.isInfoEnabled()) {
+                try {
+                    log.info("Database: " + IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getBaseDao().getDbName());
                 }
-                catch (SQLException e)
-                {
+                catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
 
-                DownloadCVs downloadCVs = new DownloadCVs();
-                downloadCVs.download( out );
+            DownloadCVs downloadCVs = new DownloadCVs();
+            downloadCVs.download(out);
 
 
             out.flush();
             out.close();
-            log.info( "Closing " + outputFilename );
-        } catch ( IOException e ) {
+            log.info("Closing " + outputFilename);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -25,12 +25,12 @@ public class IntactOntology {
     ///////////////////////////////
     // Static variable
 
-    private static Map mi2name = new HashMap();
+    private static Map<String, String> mi2name = new HashMap<String, String>();
 
     /**
      * Maps which IntAct CV maps to which CV root (by one to many MI reference) Contains: Class -> String[]
      */
-    private static Map class2mi = new HashMap();
+    private static Map<Class,String[]> class2mi = new HashMap<Class,String[]>();
 
     static {
 
@@ -129,8 +129,8 @@ public class IntactOntology {
      *
      * @return a copy of the Mapping IntAct CV to MI roots
      */
-    public static Map getTypeMapping() {
-        return new HashMap( class2mi );
+    public static Map<Class,String[]> getTypeMapping() {
+        return new HashMap<Class,String[]>( class2mi );
     }
 
     /**
@@ -138,8 +138,8 @@ public class IntactOntology {
      *
      * @return a copy of the Mapping IntAct CV to MI roots
      */
-    public static Map getTypeMapping( boolean includeDags ) {
-        Map map = getTypeMapping();
+    public static Map<Class,String[]> getTypeMapping( boolean includeDags ) {
+        Map<Class,String[]> map = getTypeMapping();
 
         // if requested, filter out CvDagObject
         if ( ! includeDags ) {
@@ -154,8 +154,8 @@ public class IntactOntology {
         return map;
     }
 
-    public static Map getNameMapping() {
-        return new HashMap( mi2name );
+    public static Map<String, String> getNameMapping() {
+        return new HashMap<String, String>( mi2name );
     }
 
     /**
@@ -277,8 +277,8 @@ public class IntactOntology {
         }
 
         // update the list of orphan terms
-        for ( Iterator iterator = cvTerms.iterator(); iterator.hasNext(); ) {
-            CvTerm cvTerm = (CvTerm) iterator.next();
+        for ( Iterator<CvTerm> iterator = cvTerms.iterator(); iterator.hasNext(); ) {
+            CvTerm cvTerm = iterator.next();
             if ( cvTerm.getChildren().isEmpty() && cvTerm.getParents().isEmpty() ) {
                 output.println( "Term " + cvTerm.getId() + " (" + cvTerm.getShortName() + ") is orphan." );
                 orphanTerms.add( cvTerm );
@@ -345,7 +345,7 @@ public class IntactOntology {
      *
      * @return all CvTerms not linked to an IntAct type
      */
-    public Collection getOrphanTerms() {
+    public Collection<CvTerm> getOrphanTerms() {
 
         return orphanTerms;
     }
@@ -366,12 +366,12 @@ public class IntactOntology {
      *
      * @return a non null Collection of obsolete term.
      */
-    public Collection getObsoleteTerms() {
+    public Collection<CvTerm> getObsoleteTerms() {
 
-        Collection obsoleteTerms = new ArrayList();
+        Collection<CvTerm> obsoleteTerms = new ArrayList<CvTerm>();
 
-        for ( Iterator iterator = getCvTerms().iterator(); iterator.hasNext(); ) {
-            CvTerm cvTerm = (CvTerm) iterator.next();
+        for ( Iterator<CvTerm> iterator = getCvTerms().iterator(); iterator.hasNext(); ) {
+            CvTerm cvTerm = iterator.next();
 
             if ( cvTerm.isObsolete() ) {
                 obsoleteTerms.add( cvTerm );
@@ -417,8 +417,8 @@ public class IntactOntology {
     private void print( CvTerm term, String indent, PrintStream ps ) {
 
         ps.println( indent + term.getId() + "   " + term.getShortName() + " (" + term.getFullName() + ")" );
-        for ( Iterator iterator = term.getChildren().iterator(); iterator.hasNext(); ) {
-            CvTerm cvTerm = (CvTerm) iterator.next();
+        for ( Iterator<CvTerm> iterator = term.getChildren().iterator(); iterator.hasNext(); ) {
+            CvTerm cvTerm = iterator.next();
             print( cvTerm, indent + "  ", ps );
         }
     }
@@ -432,7 +432,7 @@ public class IntactOntology {
         System.out.println( "------------------------------------------------" );
         System.out.println( clazz.getName() );
         System.out.println( "------------------------------------------------" );
-        Collection roots = (Collection) this.getRoots( clazz );
+        Collection roots = this.getRoots( clazz );
         if ( roots != null ) {
             for ( Iterator iterator = roots.iterator(); iterator.hasNext(); ) {
                 CvTerm cvTerm = (CvTerm) iterator.next();

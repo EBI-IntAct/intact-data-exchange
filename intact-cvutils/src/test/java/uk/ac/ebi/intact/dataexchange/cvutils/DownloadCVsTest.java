@@ -68,6 +68,8 @@ public class DownloadCVsTest extends IntactBasicTestCase {
 
         String oboOutput = writer.toString();
 
+        System.out.println(oboOutput);
+
         commitTransaction();
 
         beginTransaction();
