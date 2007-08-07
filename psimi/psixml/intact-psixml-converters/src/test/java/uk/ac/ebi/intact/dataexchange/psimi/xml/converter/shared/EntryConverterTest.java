@@ -21,12 +21,14 @@ import org.apache.commons.logging.LogFactory;
 import static org.easymock.classextension.EasyMock.createNiceMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.InputSource;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Institution;
@@ -41,6 +43,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.ArrayList;
 
 /**
  * TODO comment this
@@ -59,6 +62,8 @@ public class EntryConverterTest extends AbstractConverterTest {
     public void setUp() throws Exception {
         entry = createNiceMock(Entry.class);
         entryConverter = new EntryConverter(createNiceMock(Institution.class));
+        ConversionCache.clear();
+        output = false;
     }
 
     @After
@@ -92,17 +97,27 @@ public class EntryConverterTest extends AbstractConverterTest {
         roundtripWithStream(new FileInputStream(file));
     }
 
+    static boolean output = false;
+
     @Test
-    public void roundtrip_mint() throws Exception {
-        File file = getMintFile();
+    public void roundtrip_dip() throws Exception {
+
+        System.out.println( "====================================================================" );
+        System.out.println( "" );
+        System.out.println( "                           DIP TEST" );
+        System.out.println( "" );
+        System.out.println( "====================================================================" );
+
+        File file = getDipFile();
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
+        output = true;
         roundtripWithStream(new FileInputStream(file));
     }
 
     @Test
-    public void roundtrip_dip() throws Exception {
-        File file = getDipFile();
+    public void roundtrip_mint() throws Exception {
+        File file = getMintFile();
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         roundtripWithStream(new FileInputStream(file));
@@ -127,8 +142,24 @@ public class EntryConverterTest extends AbstractConverterTest {
 
         Entry beforeRountripEntry = entrySet.getEntries().iterator().next();
 
+        if( output ) {
+            Collection<Entry> entries = new ArrayList<Entry>( );
+            entries.add( beforeRountripEntry );
+            EntrySet es = new EntrySet( entries, 2, 5, 3 );
+            PsimiXmlWriter writer = new PsimiXmlWriter();
+            writer.write( es, new File("C:\\DIP-beforeRountripEntry.xml") );
+        }
+
         IntactEntry intactEntry = entryConverter.psiToIntact(beforeRountripEntry);
         Entry afterRoundtripEntry = entryConverter.intactToPsi(intactEntry);
+
+        if( output ) {
+            Collection<Entry> entries = new ArrayList<Entry>( );
+            entries.add( afterRoundtripEntry );
+            EntrySet es = new EntrySet( entries, 2, 5, 3 );
+            PsimiXmlWriter writer = new PsimiXmlWriter();
+            writer.write( es, new File("C:\\DIP-afterRoundtripEntry.xml") );
+        }
 
         assertTrue("XML created after conversion roundtrip must be valid", xmlIsValid(afterRoundtripEntry));
 
@@ -167,6 +198,8 @@ public class EntryConverterTest extends AbstractConverterTest {
     private static int countExperimentsInEntry(Entry entry) {
         Collection<ExperimentDescription> experiments;
 
+        System.out.println( "=======================================================" );
+
         if (entry.getExperiments() != null && !entry.getExperiments().isEmpty()) {
             experiments = entry.getExperiments();
         } else {
@@ -175,6 +208,7 @@ public class EntryConverterTest extends AbstractConverterTest {
                 experiments.addAll(i.getExperiments());
             }
         }
+
 
         return experiments.size();
     }
