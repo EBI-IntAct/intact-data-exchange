@@ -210,7 +210,7 @@ public class DownloadCVs {
         //////////////////////////////
         // 2. Xrefs handling
         StringBuffer allXrefs = new StringBuffer(200);
-        List sortedXrefs = new ArrayList(cvObject.getXrefs());
+        List<CvObjectXref> sortedXrefs = new ArrayList<CvObjectXref>(cvObject.getXrefs());
 
         // filter out all psi / intact Xref
         for (Iterator iterator = sortedXrefs.iterator(); iterator.hasNext();) {
@@ -222,13 +222,10 @@ public class DownloadCVs {
         }
 
         // Sort remaining Xrefs
-        Collections.sort(sortedXrefs, new Comparator() {
+        Collections.sort(sortedXrefs, new Comparator<CvObjectXref>() {
 
             // Order Xrefs by CvDatabase and primaryId
-            public int compare(Object o1, Object o2) {
-                Xref x1 = (Xref) o1;
-                Xref x2 = (Xref) o2;
-
+            public int compare(CvObjectXref x1, CvObjectXref x2) {
                 CvDatabase db1 = x1.getCvDatabase();
                 CvDatabase db2 = x2.getCvDatabase();
 
@@ -289,14 +286,11 @@ public class DownloadCVs {
 
         ////////////////////////////
         // 3. Aliases handling
-        List synonyms = new ArrayList(cvObject.getAliases());
-        Collections.sort(synonyms, new Comparator() {
+        List<CvObjectAlias> synonyms = new ArrayList<CvObjectAlias>(cvObject.getAliases());
+        Collections.sort(synonyms, new Comparator<CvObjectAlias>() {
 
             // compare by
-            public int compare(Object o1, Object o2) {
-                Alias a1 = (Alias) o1;
-                Alias a2 = (Alias) o2;
-
+            public int compare(CvObjectAlias a1, CvObjectAlias a2) {
                 String name1 = (a1.getName() == null ? "" : a1.getName());
                 String name2 = (a2.getName() == null ? "" : a2.getName());
 
@@ -314,8 +308,7 @@ public class DownloadCVs {
                 }
             }
         });
-        for (Iterator iterator = synonyms.iterator(); iterator.hasNext();) {
-            Alias alias = (Alias) iterator.next();
+        for (CvObjectAlias alias : synonyms) {
             sb.append("xref_analog: ");
             if (alias.getCvAliasType() != null) {
                 sb.append(alias.getCvAliasType().getShortLabel());
@@ -333,14 +326,11 @@ public class DownloadCVs {
 
         /////////////////////////////
         // 4. Annotation handling
-        List annotations = new ArrayList(cvObject.getAnnotations());
-        Collections.sort(annotations, new Comparator() {
+        List<Annotation> annotations = new ArrayList<Annotation>(cvObject.getAnnotations());
+        Collections.sort(annotations, new Comparator<Annotation>() {
 
             // compare by
-            public int compare(Object o1, Object o2) {
-                Annotation a1 = (Annotation) o1;
-                Annotation a2 = (Annotation) o2;
-
+            public int compare(Annotation a1, Annotation a2) {
                 String annot1 = (a1.getAnnotationText() == null ? "" : a1.getAnnotationText());
                 String annot2 = (a2.getAnnotationText() == null ? "" : a2.getAnnotationText());
 
@@ -358,8 +348,7 @@ public class DownloadCVs {
                 }
             }
         });
-        for (Iterator iterator = annotations.iterator(); iterator.hasNext();) {
-            Annotation annot = (Annotation) iterator.next();
+        for (Annotation annot : annotations) {
 
             // filter out definition as it has been already exported!
             if (annot.equals(definition)) {
@@ -402,7 +391,6 @@ public class DownloadCVs {
         // this is not a DAG, generate a root if there is one given as param
         if (roots != null) {
 
-
             for (CvObject root : roots) {
 
                 String rootMi = getIdentifier(root);
@@ -434,7 +422,7 @@ public class DownloadCVs {
             Set<String> alreadyExported = new HashSet<String>(4);
 
             // keeps a mapping MI -> CvObject to allow later ordering my MI reference.
-            Map mi2parents = new HashMap();
+            Map<String,CvObject> mi2parents = new HashMap<String,CvObject>();
 
             // add the remaining parents to the current definition
             for (Iterator<CvDagObject> iterator = otherTypes.iterator(); iterator.hasNext();) {
@@ -458,12 +446,11 @@ public class DownloadCVs {
                 }
             } // loop otherType
 
-            List parents = new ArrayList(mi2parents.keySet());
+            List<String> parents = new ArrayList<String>(mi2parents.keySet());
             Collections.sort(parents); // sort MI references by alphabetical order
 
             // print out all sorted parents
-            for (Iterator iterator = parents.iterator(); iterator.hasNext();) {
-                String mi = (String) iterator.next();
+            for (String mi : parents) {
                 CvDagObject parent = (CvDagObject) mi2parents.get(mi);
 
                 sb.append("is_a: ").append(mi).append(' ').append('!').append(' ');

@@ -32,6 +32,7 @@ import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.util.CvObjectBuilder;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.context.IntactContext;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -68,8 +69,6 @@ public class DownloadCVsTest extends IntactBasicTestCase {
 
         String oboOutput = writer.toString();
 
-        System.out.println(oboOutput);
-
         commitTransaction();
 
         beginTransaction();
@@ -77,7 +76,7 @@ public class DownloadCVsTest extends IntactBasicTestCase {
         Assert.assertEquals(21, getDaoFactory().getCvObjectDao().countAll());
 
         for (CvObject cv : getDaoFactory().getCvObjectDao().getAll()) {
-            System.out.println(cv.getShortLabel()+" ("+cv.getObjClass()+") - Xrefs: "+cv.getXrefs());
+            Assert.assertFalse(cv.getXrefs().isEmpty());
         }
 
         commitTransaction();
@@ -87,6 +86,26 @@ public class DownloadCVsTest extends IntactBasicTestCase {
 
         Assert.assertEquals(21, ontology.getCvTerms().size());
     }
+
+//    public static void main(String[] args) throws Exception {
+//
+//        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+//
+//        System.out.println("Total CVs: "+ IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().countAll());
+//
+//        StringWriter writer = new StringWriter();
+//        BufferedWriter bufWriter = new BufferedWriter(writer);
+//
+//        DownloadCVs downloadCVs = new DownloadCVs();
+//        downloadCVs.download(bufWriter);
+//
+//        bufWriter.flush();
+//
+//
+//
+//        IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+//
+//    }
 
     private class DownloadCvPrimer extends SmallCvPrimer {
 
