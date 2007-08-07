@@ -20,6 +20,10 @@
             <groupId>uk.ac.ebi.intact.commons</groupId>
             <artifactId>intact-commons</artifactId>
         </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
+            <artifactId>intact-psixml-enricher</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>

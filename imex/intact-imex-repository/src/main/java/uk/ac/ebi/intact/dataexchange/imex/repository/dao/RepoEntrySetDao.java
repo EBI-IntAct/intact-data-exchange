@@ -15,8 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.dao;
 
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
 
 import java.util.List;
 
@@ -26,17 +25,18 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public interface EntrySetService {
+public interface RepoEntrySetDao
+{
 
-    static final String NAME = "entrySetService";
+    void save(RepoEntrySet entrySet);
 
-    void saveEntrySet(EntrySet entrySet);
+    //void remove(Provider provider);
 
-    //void removeProvider(Provider provider);
+    //void update(Provider provider);
 
-    //void updateProvider(Provider provider);
+    List<RepoEntrySet> findAll();
 
-    List<EntrySet> findAllEntrySets();
+    //Provider findById(Long id);
 
-    EntrySet findByName(String name);
+    RepoEntrySet findByName(String name);
 }

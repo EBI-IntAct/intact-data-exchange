@@ -15,7 +15,10 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import java.util.List;
 
 /**
@@ -25,8 +28,8 @@ import java.util.List;
  * @version $Id$
  */
 @Entity
-@NamedQuery(name = "entrySetByName", query="select es from EntrySet es where es.name = :name")
-public class EntrySet extends RepoEntity {
+@NamedQuery(name = "repoEntrySetByName", query="select es from RepoEntrySet es where es.name = :name")
+public class RepoEntrySet extends RepoEntity {
 
     private String name;
 
@@ -34,12 +37,12 @@ public class EntrySet extends RepoEntity {
     private Provider provider;
 
     @OneToMany
-    private List<Entry> entries;
+    private List<RepoEntry> repoEntries;
 
-    public EntrySet() {
+    public RepoEntrySet() {
     }
 
-    public EntrySet(Provider provider, String name) {
+    public RepoEntrySet(Provider provider, String name) {
         this.provider = provider;
         this.name = name;
     }
@@ -55,12 +58,12 @@ public class EntrySet extends RepoEntity {
         this.name = name;
     }
 
-    public List<Entry> getEntries() {
-        return entries;
+    public List<RepoEntry> getRepoEntries() {
+        return repoEntries;
     }
 
-    public void setEntries(List<Entry> entries) {
-        this.entries = entries;
+    public void setRepoEntries(List<RepoEntry> repoEntries) {
+        this.repoEntries = repoEntries;
     }
 
     public Provider getProvider() {

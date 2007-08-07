@@ -17,9 +17,9 @@ package uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.dataexchange.imex.repository.dao.EntrySetDao;
-import uk.ac.ebi.intact.dataexchange.imex.repository.dao.EntrySetService;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
+import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntrySetDao;
+import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntrySetService;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
 
 import java.util.List;
 
@@ -29,24 +29,25 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class JpaEntrySetService implements EntrySetService {
+public class JpaRepoEntrySetService implements RepoEntrySetService
+{
 
-    private EntrySetDao entrySetDao;
+    private RepoEntrySetDao entrySetDao;
 
-    public void setEntrySetDao(EntrySetDao entrySetDao) {
+    public void setEntrySetDao(RepoEntrySetDao entrySetDao) {
         this.entrySetDao = entrySetDao;
     }
 
-    public List<EntrySet> findAllEntrySets() {
+    public List<RepoEntrySet> findAllRepoEntrySets() {
         return entrySetDao.findAll();
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveEntrySet(EntrySet entrySet) {
+    public void saveRepoEntrySet(RepoEntrySet entrySet) {
         entrySetDao.save(entrySet);
     }
 
-    public EntrySet findByName(String name) {
+    public RepoEntrySet findByName(String name) {
         return entrySetDao.findByName(name);
     }
 }

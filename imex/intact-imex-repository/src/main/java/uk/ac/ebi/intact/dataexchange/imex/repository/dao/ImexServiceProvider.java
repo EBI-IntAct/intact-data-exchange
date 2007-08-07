@@ -35,7 +35,11 @@ public class ImexServiceProvider {
         return (ProviderService) context.getBeanFactory().getBean(ProviderService.NAME);
     }
 
-    public EntrySetService getEntrySetService() {
-        return (EntrySetService) context.getBeanFactory().getBean(EntrySetService.NAME);
+    public RepoEntrySetService getRepoEntrySetService() {
+        return (RepoEntrySetService) context.getBeanFactory().getBean(RepoEntrySetService.NAME);
+    }
+
+    public RepoEntryService getRepoEntryService() {
+        return (RepoEntryService) context.getBeanFactory().getBean(RepoEntryService.NAME);
     }
 }

@@ -19,11 +19,17 @@
     <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaProviderService" id="providerService"
           p:providerDao-ref="providerDao"/>
 
-    <!-- EntrySet -->
-    <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaEntrySetDao" id="entrysetDao"
+    <!-- RepoEntrySet -->
+    <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaRepoEntrySetDao" id="repoEntrySetDao"
             p:imexPersistence-ref="imexPersistence"/>
-    <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaEntrySetService" id="entrySetService"
-          p:entrySetDao-ref="entrysetDao"/>
+    <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaRepoEntrySetService" id="repoEntrySetService"
+          p:entrySetDao-ref="repoEntrySetDao"/>
+
+    <!-- RepoEntry -->
+    <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaRepoEntryDao" id="repoEntryDao"
+            p:imexPersistence-ref="imexPersistence"/>
+    <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaRepoEntryService" id="repoEntryService"
+          p:entrySetDao-ref="repoEntryDao"/>
 
     <!-- JPA annotations bean post processor -->
     <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>

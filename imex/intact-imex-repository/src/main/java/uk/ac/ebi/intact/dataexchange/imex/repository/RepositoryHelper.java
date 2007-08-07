@@ -15,7 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository;
 
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
 
 import java.io.File;
 
@@ -28,6 +29,8 @@ import java.io.File;
 public class RepositoryHelper {
 
     private static final String FILE_EXTENSION = ".xml";
+    private static final String FILE_EXTENSION_ENRICHED = ".enriched.xml";
+    private static final String FILE_EXTENSION_RAW = ".raw.xml";
 
     private Repository repository;
 
@@ -35,11 +38,25 @@ public class RepositoryHelper {
         this.repository = repository;
     }
 
-    public File getEntrySetFile(EntrySet entrySet) {
+    public File getEntrySetFile(RepoEntrySet entrySet) {
         return getEntrySetFile(entrySet.getName());
     }
 
     public File getEntrySetFile(String name) {
         return new File(repository.getOriginalEntrySetDir(), name + FILE_EXTENSION);
+    }
+
+    public File getEntryFile(RepoEntry entry) {
+        return getEntryFile(entry.getName(), entry.isEnriched());
+    }
+
+    public File getEntryFile(String name, boolean enriched) {
+        File entryFile;
+        if (enriched) {
+            entryFile = new File(repository.getEntriesDir(), name + FILE_EXTENSION_ENRICHED);
+        } else {
+            entryFile = new File(repository.getEntriesDir(), name + FILE_EXTENSION_RAW);
+        }
+        return entryFile;
     }
 }

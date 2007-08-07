@@ -18,9 +18,8 @@ package uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.dataexchange.imex.repository.dao.EntrySetDao;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
+import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntrySetDao;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
 
 import javax.persistence.Query;
 import java.util.List;
@@ -33,21 +32,22 @@ import java.util.List;
  */
 @Repository
 @Transactional(propagation = Propagation.SUPPORTS)
-public class JpaEntrySetDao extends JpaImexDaoSupport implements EntrySetDao {
+public class JpaRepoEntrySetDao extends JpaImexDaoSupport implements RepoEntrySetDao
+{
 
-    private final String QUERY_ALL = "select e from EntrySet e";
+    private final String QUERY_ALL = "select e from RepoEntrySet e";
 
-    public void save(EntrySet entrySet) {
+    public void save(RepoEntrySet entrySet) {
         getEntityManager().persist(entrySet);
     }
 
-    public List<EntrySet> findAll() {
+    public List<RepoEntrySet> findAll() {
         return getEntityManager().createQuery(QUERY_ALL).getResultList();
     }
 
-    public EntrySet findByName(String name) {
-        Query query = getEntityManager().createNamedQuery("entrySetByName");
+    public RepoEntrySet findByName(String name) {
+        Query query = getEntityManager().createNamedQuery("repoEntrySetByName");
         query.setParameter("name", name);
-        return (EntrySet) query.getSingleResult();
+        return (RepoEntrySet) query.getSingleResult();
     }
 }

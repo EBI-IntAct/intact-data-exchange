@@ -19,12 +19,18 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.EntrySet;
+import uk.ac.ebi.intact.dataexchange.imex.repository.enrich.EntryEnricher;
+import uk.ac.ebi.intact.dataexchange.imex.repository.enrich.impl.DefaultEntryEnricher;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntityNotFoundException;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
+import uk.ac.ebi.intact.dataexchange.imex.repository.split.EntrySetSplitter;
+import uk.ac.ebi.intact.dataexchange.imex.repository.split.impl.DefaultEntrySetSplitter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * TODO comment this
@@ -61,10 +67,10 @@ public class Repository {
         String entryName = entryXml.getName();
         String name = FilenameUtils.removeExtension(entryName);
 
-        EntrySet entrySet = new EntrySet(provider, name);
+        RepoEntrySet repoEntrySet = new RepoEntrySet(provider, name);
 
         RepositoryHelper repoHelper = new RepositoryHelper(this);
-        File newFile = repoHelper.getEntrySetFile(entrySet);
+        File newFile = repoHelper.getEntrySetFile(repoEntrySet);
 
         // copy the physical file
         if (log.isDebugEnabled()) {
@@ -73,17 +79,37 @@ public class Repository {
         FileUtils.copyFile(entryXml, newFile);
 
         // create the record in the database
-        context.getImexPersistence().beginTransaction();
-        context.getImexServiceProvider().getEntrySetService().saveEntrySet(entrySet);
-        context.getImexPersistence().commitTransaction();
+        beginTransaction();
+        context.getImexServiceProvider().getRepoEntrySetService().saveRepoEntrySet(repoEntrySet);
+        commitTransaction();
 
-        // TODO init the split and enrichment
+        // split the file
+        beginTransaction();
+        EntrySetSplitter splitter = new DefaultEntrySetSplitter();
+        List<RepoEntry> splittedEntries = splitter.splitRepoEntrySet(repoEntrySet);
+        commitTransaction();
+
+        // enrich the splitted files
+        EntryEnricher enricher = new DefaultEntryEnricher();
+
+        for (RepoEntry repoEntry : splittedEntries) {
+            beginTransaction();
+            enricher.enrichEntry(repoEntry);
+            commitTransaction();
+        }
     }
 
-    public EntrySet retrieveEntrySet(String name) {
+    private void beginTransaction() {
+        ImexRepositoryContext.getInstance().getImexPersistence().beginTransaction();
+    }
+
+    private void commitTransaction() {
+        ImexRepositoryContext.getInstance().getImexPersistence().commitTransaction();
+    }
+
+    public RepoEntrySet retrieveEntrySet(String name) {
         throw new UnsupportedOperationException();
     }
-
 
     public File getRepositoryDir() {
         return repositoryDir;
