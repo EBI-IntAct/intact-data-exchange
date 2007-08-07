@@ -18,6 +18,12 @@
             <groupId>uk.ac.ebi.intact</groupId>
             <artifactId>intact-core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.intact.core</groupId>
+            <artifactId>intact-persister</artifactId>
+            <scope>test</scope>
+        </dependency>
         
         <dependency>
             <groupId>org.geneontology</groupId>
@@ -30,6 +36,8 @@
             <artifactId>ols</artifactId>
             <version>1.6</version>
         </dependency>
+
+
     </dependencies>
 
 </project>

@@ -596,7 +596,7 @@ public class DownloadCVs {
         String date = formatter.format( new Date() );
         sb.append( "date: " ).append( date ).append( NEW_LINE );
 
-        sb.append( "saved-by: samuel" ).append( NEW_LINE );
+        sb.append( "saved-by: " ).append( System.getProperty("user.name") ).append( NEW_LINE );
 
         sb.append( "auto-generated-by: IntAct - " ).append( getClass().getName() );
         sb.append( " - v" ).append( VERSION ).append( NEW_LINE );
