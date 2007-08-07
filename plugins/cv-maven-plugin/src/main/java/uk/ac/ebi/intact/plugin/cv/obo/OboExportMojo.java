@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import uk.ac.ebi.intact.core.util.LogUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.DownloadCVs;
 import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
 import uk.ac.ebi.intact.plugin.MojoUtils;
@@ -103,7 +102,6 @@ public class OboExportMojo
         return exportedOboFile;
     }
 
-    @Override
     protected Appender getLogAppender() throws IOException {
         Appender appender = super.getLogAppender();
 
