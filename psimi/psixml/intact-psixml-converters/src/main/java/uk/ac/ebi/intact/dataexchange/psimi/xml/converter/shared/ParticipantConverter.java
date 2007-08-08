@@ -84,16 +84,18 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             }
         }
 
-        Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getExpressedIn());
-        if (organism != null) {
-            HostOrganism hostOrganism = new HostOrganism();
-            hostOrganism.setNcbiTaxId(organism.getNcbiTaxId());
-            hostOrganism.setNames(organism.getNames());
-            hostOrganism.setCellType(organism.getCellType());
-            hostOrganism.setCompartment(organism.getCompartment());
-            hostOrganism.setTissue(organism.getTissue());
-            
-            participant.getHostOrganisms().add(hostOrganism);
+        if (intactObject.getExpressedIn() != null) {
+            Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getExpressedIn());
+            if (organism != null) {
+                HostOrganism hostOrganism = new HostOrganism();
+                hostOrganism.setNcbiTaxId(organism.getNcbiTaxId());
+                hostOrganism.setNames(organism.getNames());
+                hostOrganism.setCellType(organism.getCellType());
+                hostOrganism.setCompartment(organism.getCompartment());
+                hostOrganism.setTissue(organism.getTissue());
+
+                participant.getHostOrganisms().add(hostOrganism);
+            }
         }
 
         return participant;
