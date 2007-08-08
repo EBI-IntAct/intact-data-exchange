@@ -30,7 +30,9 @@ public abstract class AnnotatedObjectEnricher<T extends AnnotatedObject<?,?>> im
         CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
 
         for (Xref xref : objectToEnrich.getXrefs()) {
-            cvObjectEnricher.enrich(xref.getCvXrefQualifier());
+            if (xref.getCvXrefQualifier() != null) {
+                cvObjectEnricher.enrich(xref.getCvXrefQualifier());
+            }
             cvObjectEnricher.enrich(xref.getCvDatabase());
         }
     }
