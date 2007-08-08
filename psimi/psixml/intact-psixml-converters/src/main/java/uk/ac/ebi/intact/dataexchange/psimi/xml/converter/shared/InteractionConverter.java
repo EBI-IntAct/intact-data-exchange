@@ -20,6 +20,8 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUti
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,6 +50,10 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         Collection<Experiment> experiments = getExperiments(psiObject);
 
+        // imexId
+        String imexId = psiObject.getImexId();
+        interaction.addXref(createImexXref(interaction, imexId));
+
         // only gets the first interaction type
         CvInteractionType interactionType = getInteractionType(psiObject);
 
@@ -71,11 +77,33 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         return interaction;
     }
 
+    private InteractorXref createImexXref(Interaction interaction, String imexId) {
+        CvDatabase cvImex = CvObjectUtils.createCvObject(interaction.getOwner(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
+        cvImex.setFullName(CvDatabase.IMEX);
+
+        return XrefUtils.createIdentityXref(interaction, imexId, null, cvImex);
+    }
+
     public psidev.psi.mi.xml.model.Interaction intactToPsi(Interaction intactObject) {
         psidev.psi.mi.xml.model.Interaction interaction = super.intactToPsi(intactObject);
 
         if (!isNewPsiObjectCreated()) {
             return interaction;
+        }
+
+        // imexId
+        InteractorXref imexXref = null;
+
+        for (InteractorXref xref : intactObject.getXrefs()) {
+            String primaryId = CvObjectUtils.getPsiMiIdentityXref(xref.getCvDatabase()).getPrimaryId();
+            if (primaryId.equals(CvDatabase.IMEX_MI_REF)) {
+                imexXref = xref;
+                break;
+            }
+        }
+
+        if (imexXref != null) {
+            interaction.setImexId(imexXref.getPrimaryId());
         }
 
         ExperimentConverter experimentConverter = new ExperimentConverter(getInstitution());

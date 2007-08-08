@@ -124,6 +124,28 @@ public class EntryConverterTest extends AbstractConverterTest {
     }
 
     @Test
+    @Ignore
+    public void rountrip_small() throws Exception {
+        File sourceFile = new File(EntryConverterTest.class.getResource("/xml/16531241.dip.raw.xml").getFile());
+        File destFile = new File("/homes/baranda/projects/intact-current/data-exchange/psimi/psixml/intact-psixml-converters/src/test/resources/xml/16531241.dip.enriched.xml");
+
+        PsimiXmlReader reader = new PsimiXmlReader();
+        EntrySet entrySet = reader.read(new FileInputStream(sourceFile));
+
+        Entry beforeRountripEntry = entrySet.getEntries().iterator().next();
+        EntryConverter entryConverter = new EntryConverter(IntactContext.getCurrentInstance().getInstitution());
+
+        IntactEntry intactEntry = entryConverter.psiToIntact(beforeRountripEntry);
+        Entry afterRoundtripEntry = entryConverter.intactToPsi(intactEntry);
+        afterRoundtripEntry.setSource(beforeRountripEntry.getSource());
+
+        PsimiXmlWriter writer = new PsimiXmlWriter();
+        writer.write(new EntrySet(Arrays.asList(afterRoundtripEntry), entrySet.getLevel(), entrySet.getVersion(), entrySet.getMinorVersion()), destFile);
+
+        System.out.println("Written: "+destFile);
+    }
+
+    @Test
     public void publicationConversion() throws Exception {
         Entry beforeRountripEntry = PsiMockFactory.createMockEntry();
 
