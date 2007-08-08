@@ -73,6 +73,14 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
         psidev.psi.mi.xml.model.Feature psiFeature = new psidev.psi.mi.xml.model.Feature();
         PsiConverterUtils.populate(intactObject, psiFeature);
 
+        CvObjectConverter<CvFeatureType,FeatureType> featureTypeConverter =
+                new CvObjectConverter<CvFeatureType,FeatureType>(getInstitution(), CvFeatureType.class, FeatureType.class);
+
+        if (intactObject.getCvFeatureType() != null) {
+            FeatureType featureType = featureTypeConverter.intactToPsi(intactObject.getCvFeatureType());
+            psiFeature.setFeatureType(featureType);
+        }
+
         RangeConverter rangeConverter = new RangeConverter(getInstitution());
 
         for (Range intactRange : intactObject.getRanges()) {
