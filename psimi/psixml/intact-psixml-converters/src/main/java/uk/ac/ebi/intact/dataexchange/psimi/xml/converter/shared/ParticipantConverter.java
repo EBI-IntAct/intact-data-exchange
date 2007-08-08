@@ -17,15 +17,17 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.mi.xml.model.BiologicalRole;
-import psidev.psi.mi.xml.model.ExperimentalRole;
-import psidev.psi.mi.xml.model.InteractorRef;
-import psidev.psi.mi.xml.model.Participant;
+import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Feature;
+import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.Interactor;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -46,14 +48,6 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         Interaction interaction = new InteractionConverter(getInstitution()).psiToIntact(psiObject.getInteraction());
 
         Component component = newComponent(getInstitution(), psiObject, interaction);
-        IntactConverterUtils.populateAnnotations(psiObject, component, getInstitution());
-
-        FeatureConverter featureConverter = new FeatureConverter(getInstitution());
-
-        for (psidev.psi.mi.xml.model.Feature psiFeature : psiObject.getFeatures()) {
-            Feature feature = featureConverter.psiToIntact(psiFeature);
-            component.addBindingDomain(feature);
-        }
 
         return component;
     }
@@ -74,6 +68,33 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         psidev.psi.mi.xml.model.Interactor interactor = new InteractorConverter(getInstitution()).intactToPsi(intactObject.getInteractor());
         participant.setInteractor(interactor);
         participant.setInteractorRef(new InteractorRef(interactor.getId()));
+
+        if (intactObject.getParticipantIdentification() != null) {
+            ParticipantIdentificationMethodConverter pimConverter = new ParticipantIdentificationMethodConverter(getInstitution());
+            ParticipantIdentificationMethod participantIdentificationMethod = pimConverter.intactToPsi(intactObject.getParticipantIdentification());
+
+            participant.getParticipantIdentificationMethods().add(participantIdentificationMethod);
+        }
+
+        if (!intactObject.getBindingDomains().isEmpty()) {
+            FeatureConverter featureConverter = new FeatureConverter(getInstitution());
+
+            for (Feature feature : intactObject.getBindingDomains()) {
+                participant.getFeatures().add(featureConverter.intactToPsi(feature));
+            }
+        }
+
+        Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getExpressedIn());
+        if (organism != null) {
+            HostOrganism hostOrganism = new HostOrganism();
+            hostOrganism.setNcbiTaxId(organism.getNcbiTaxId());
+            hostOrganism.setNames(organism.getNames());
+            hostOrganism.setCellType(organism.getCellType());
+            hostOrganism.setCompartment(organism.getCompartment());
+            hostOrganism.setTissue(organism.getTissue());
+            
+            participant.getHostOrganisms().add(hostOrganism);
+        }
 
         return participant;
     }
@@ -112,6 +133,43 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         CvExperimentalRole experimentalRole = new ExperimentalRoleConverter(institution).psiToIntact(role);
 
         Component component = new Component(institution, interaction, interactor, experimentalRole, biologicalRole);
+
+        IntactConverterUtils.populateAnnotations(participant, component, institution);
+
+        FeatureConverter featureConverter = new FeatureConverter(institution);
+
+        for (psidev.psi.mi.xml.model.Feature psiFeature : participant.getFeatures()) {
+            Feature feature = featureConverter.psiToIntact(psiFeature);
+            component.addBindingDomain(feature);
+        }
+
+        Collection<ParticipantIdentificationMethod> participantIdentificationMethods = participant.getParticipantIdentificationMethods();
+
+        if (participantIdentificationMethods.size() > 1) {
+            throw new PsiConversionException("Cannot convert particiant with more than one identification methods");
+        }
+
+        if (!participantIdentificationMethods.isEmpty()) {
+            ParticipantIdentificationMethodConverter pimConverter = new ParticipantIdentificationMethodConverter(institution);
+            ParticipantIdentificationMethod participantIdentificationMethod = participantIdentificationMethods.iterator().next();
+
+            CvIdentification cvIdentification = pimConverter.psiToIntact(participantIdentificationMethod);
+            component.setParticipantIdentification(cvIdentification);
+
+        }
+
+        if (!participant.getHostOrganisms().isEmpty()) {
+            HostOrganism hostOrganism = participant.getHostOrganisms().iterator().next();
+            Organism organism = new Organism();
+            organism.setNcbiTaxId(hostOrganism.getNcbiTaxId());
+            organism.setNames(hostOrganism.getNames());
+            organism.setCellType(hostOrganism.getCellType());
+            organism.setCompartment(hostOrganism.getCompartment());
+            organism.setTissue(hostOrganism.getTissue());
+
+            BioSource bioSource = new OrganismConverter(institution).psiToIntact(organism);
+            component.setExpressedIn(bioSource);
+        }
 
         return component;
     }
