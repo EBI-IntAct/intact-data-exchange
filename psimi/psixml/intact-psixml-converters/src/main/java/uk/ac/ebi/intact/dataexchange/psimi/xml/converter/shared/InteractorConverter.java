@@ -42,6 +42,13 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             return interactor;
         }
 
+        Organism organism = psiObject.getOrganism();
+
+        if (organism != null) {
+            BioSource bioSource = new OrganismConverter(getInstitution()).psiToIntact(organism);
+            interactor.setBioSource(bioSource);
+        }
+
         IntactConverterUtils.populateNames( psiObject.getNames(), interactor );
         IntactConverterUtils.populateXref( psiObject.getXref(), interactor, new XrefConverter<InteractorXref>( getInstitution(), InteractorXref.class ) );
         IntactConverterUtils.populateAnnotations( psiObject, interactor, getInstitution() );
@@ -83,6 +90,9 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
                 PsiConverterUtils.toCvType( intactObject.getCvInteractorType(),
                                             new InteractorTypeConverter( getInstitution() ) );
         interactor.setInteractorType( interactorType );
+
+        Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getBioSource());
+        interactor.setOrganism(organism);
 
         return interactor;
     }
