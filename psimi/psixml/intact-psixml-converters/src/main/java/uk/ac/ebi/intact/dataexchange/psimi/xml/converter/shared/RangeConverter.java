@@ -82,11 +82,15 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         psiRange.setBegin(new Position(beginIntervalFrom));
         psiRange.setEnd(new Position(endIntervalTo));
 
-        Interval beginInterval = new Interval(beginIntervalFrom, beginIntervalTo);
-        Interval endInterval = new Interval(endIntervalFrom, endIntervalTo);
+        if (beginIntervalTo > beginIntervalFrom) {
+            Interval beginInterval = new Interval(beginIntervalFrom, beginIntervalTo);
+            psiRange.setBeginInterval(beginInterval);
+        }
 
-        psiRange.setBeginInterval(beginInterval);
-        psiRange.setEndInterval(endInterval);
+        if (endIntervalTo > endIntervalFrom) {
+            Interval endInterval = new Interval(endIntervalFrom, endIntervalTo);
+            psiRange.setEndInterval(endInterval);
+        }
 
         CvObjectConverter<CvFuzzyType,RangeStatus> fuzzyTypeConverter =
                         new CvObjectConverter<CvFuzzyType,RangeStatus>(getInstitution(), CvFuzzyType.class, RangeStatus.class);
@@ -95,7 +99,7 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         psiRange.setStartStatus(startStatus);
 
         RangeStatus endStatus = fuzzyTypeConverter.intactToPsi(intactObject.getToCvFuzzyType());
-        psiRange.setStartStatus(endStatus);
+        psiRange.setEndStatus(endStatus);
 
 
         return psiRange;
