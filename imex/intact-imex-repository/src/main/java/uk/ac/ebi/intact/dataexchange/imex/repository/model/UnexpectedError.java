@@ -25,7 +25,7 @@ import java.io.StringWriter;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Entity
+@Entity (name = "error")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class UnexpectedError extends RepoEntity{
 

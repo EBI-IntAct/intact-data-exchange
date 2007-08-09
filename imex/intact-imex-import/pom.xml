@@ -20,8 +20,8 @@
             <artifactId>intact-persister</artifactId>
         </dependency>
         <dependency>
-            <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-            <artifactId>intact-psixml-enricher</artifactId>
+            <groupId>uk.ac.ebi.intact.dataexchange.imex</groupId>
+            <artifactId>intact-imex-repository</artifactId>
         </dependency>
     </dependencies>
 

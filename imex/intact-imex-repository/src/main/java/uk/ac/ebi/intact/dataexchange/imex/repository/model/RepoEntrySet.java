@@ -33,7 +33,7 @@ public class RepoEntrySet extends RepoEntity {
     @ManyToOne
     private Provider provider;
 
-    @OneToMany (mappedBy = "repoEntrySet")
+    @OneToMany (mappedBy = "repoEntrySet", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<RepoEntry> repoEntries;
 
     public RepoEntrySet() {

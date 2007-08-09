@@ -37,7 +37,7 @@ public class Provider extends RepoEntity {
     @Column(unique = true)
     public String name;
 
-    @OneToMany
+    @OneToMany (mappedBy = "provider")
     private Collection<ProviderProperty> properties;
 
     public Provider() {

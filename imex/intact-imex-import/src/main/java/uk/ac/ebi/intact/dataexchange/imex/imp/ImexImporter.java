@@ -21,8 +21,10 @@ package uk.ac.ebi.intact.dataexchange.imex.imp;
  * TODO comment this
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id$
+ * @version $Id:ImexImporter.java 9285 2007-08-02 10:33:06Z baranda $
  */
 public class ImexImporter {
+
+    
 
 }
