@@ -15,9 +15,9 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQuery;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO comment this
@@ -26,7 +26,7 @@ import javax.persistence.NamedQuery;
  * @version $Id$
  */
 @Entity
-@NamedQuery(name = "repoEntryByName", query="select re from RepoEntrySet re where re.name = :name")
+@NamedQuery(name = "repoEntryByName", query="select re from RepoEntry re where re.name = :name")
 public class RepoEntry extends RepoEntity {
 
     @ManyToOne
@@ -35,6 +35,13 @@ public class RepoEntry extends RepoEntity {
     private String name;
 
     private boolean enriched;
+
+    private boolean valid;
+
+    private boolean importable;
+
+    @OneToMany (mappedBy = "repoEntry", cascade = CascadeType.ALL)
+    private List<UnexpectedError> errors;
 
     public RepoEntry() {
     }
@@ -68,5 +75,40 @@ public class RepoEntry extends RepoEntity {
     public void setEnriched(boolean enriched)
     {
         this.enriched = enriched;
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    public List<UnexpectedError> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<UnexpectedError> errors) {
+        this.errors = errors;
+    }
+
+    public void addError(UnexpectedError error) {
+        if (errors == null) {
+            errors = new ArrayList<UnexpectedError>();
+        }
+        errors.add(error);
+        error.setRepoEntry(this);
+        
+        valid = false;
+        importable = false;
+    }
+
+    public boolean isImportable() {
+        return importable;
+    }
+
+    public void setImportable(boolean importable) {
+        this.importable = importable;
     }
 }

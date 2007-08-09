@@ -4,17 +4,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
-import psidev.psi.mi.xml.model.Entry;
-import psidev.psi.mi.xml.model.EntrySet;
-import psidev.psi.mi.xml.model.Interaction;
-import psidev.psi.mi.xml.model.Participant;
+import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
 import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryException;
 import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryHelper;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
+import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.*;
 import uk.ac.ebi.intact.dataexchange.imex.repository.split.EntrySetSplitter;
+import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
+import uk.ac.ebi.intact.util.psivalidator.PsiValidatorReport;
+import uk.ac.ebi.intact.util.psivalidator.PsiValidatorMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +69,19 @@ public class DefaultEntrySetSplitter implements EntrySetSplitter
                 if (log.isDebugEnabled()) log.debug("\tCreated splitted: "+splittedFile);
 
                 writer.write(entrySetToWrite, splittedFile);
+
+                PsiValidatorReport report = PsiValidator.validate(splittedFile);
+                repoEntry.setValid(report.isValid());
+
+                if (!report.isValid()) {
+                    for (PsiValidatorMessage psiValidatorMessage : report.getMessages()) {
+                        ValidationError validationError = new ValidationError();
+                        validationError.setMessage(psiValidatorMessage.toString());
+                        repoEntry.addError(validationError);
+                    }
+
+                    RepoEntryUtils.failEntry(repoEntry, "Failed PSI Validation", report.toString());
+                }
  
                 ImexRepositoryContext.getInstance().getImexServiceProvider()
                         .getRepoEntryService().saveRepoEntry(repoEntry);
@@ -77,7 +90,9 @@ public class DefaultEntrySetSplitter implements EntrySetSplitter
             }
             catch (Exception e)
             {
-                throw new RepositoryException("Problem splitting file, while writing XML", e);
+                if (log.isErrorEnabled()) log.error("Problem splitting file, while writing XML", e);
+
+                RepoEntryUtils.failEntry(repoEntry, "Problem splitting file, while writing XML", e);
             }
         }
 
@@ -87,7 +102,12 @@ public class DefaultEntrySetSplitter implements EntrySetSplitter
     private void normalizeEntry(Entry entry) {
         if (entry.getExperiments().isEmpty()) {
             for (Interaction interaction : entry.getInteractions()) {
-                entry.getExperiments().addAll(interaction.getExperiments());
+                interaction.getExperimentRefs().clear();
+
+                for (ExperimentDescription exp : interaction.getExperiments()) {
+                    entry.getExperiments().add(exp);
+                    interaction.getExperimentRefs().add(new ExperimentRef(exp.getId()));
+                }  
             }
         }
 

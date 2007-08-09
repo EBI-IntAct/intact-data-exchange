@@ -15,10 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 /**
@@ -36,7 +33,7 @@ public class RepoEntrySet extends RepoEntity {
     @ManyToOne
     private Provider provider;
 
-    @OneToMany
+    @OneToMany (mappedBy = "repoEntrySet")
     private List<RepoEntry> repoEntries;
 
     public RepoEntrySet() {

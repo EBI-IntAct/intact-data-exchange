@@ -93,9 +93,11 @@ public class Repository {
         EntryEnricher enricher = new DefaultEntryEnricher();
 
         for (RepoEntry repoEntry : splittedEntries) {
+            if (repoEntry.isValid()) {
             beginTransaction();
             enricher.enrichEntry(repoEntry);
             commitTransaction();
+            }
         }
     }
 

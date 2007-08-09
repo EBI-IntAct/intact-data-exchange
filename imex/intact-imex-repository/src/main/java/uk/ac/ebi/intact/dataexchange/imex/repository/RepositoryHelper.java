@@ -31,6 +31,7 @@ public class RepositoryHelper {
     private static final String FILE_EXTENSION = ".xml";
     private static final String FILE_EXTENSION_ENRICHED = ".enriched.xml";
     private static final String FILE_EXTENSION_RAW = ".raw.xml";
+    private static final String FILE_EXTENSION_ERROR = ".error.txt";
 
     private Repository repository;
 
@@ -58,5 +59,13 @@ public class RepositoryHelper {
             entryFile = new File(repository.getEntriesDir(), name + FILE_EXTENSION_RAW);
         }
         return entryFile;
+    }
+
+    public File getEntryErrorFile(RepoEntry repoEntry) {
+        return getEntryErrorFile(repoEntry.getName());
+    }
+
+    public File getEntryErrorFile(String name) {
+        return new File(repository.getEntriesDir(), name + FILE_EXTENSION_ERROR);
     }
 }

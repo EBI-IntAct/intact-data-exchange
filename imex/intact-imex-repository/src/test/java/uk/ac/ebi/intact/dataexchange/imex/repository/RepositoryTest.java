@@ -31,7 +31,7 @@ import java.io.File;
 public class RepositoryTest {
 
     @Test
-    public void storeFile_default() throws Exception{
+    public void storeFile_dip() throws Exception{
         File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo/");
         FileUtils.deleteDirectory(tempDir);
 
@@ -42,6 +42,22 @@ public class RepositoryTest {
 
         RepositoryHelper helper = new RepositoryHelper(repo);
         File expectedFile = helper.getEntrySetFile("dip_2006-11-01");
+
+        Assert.assertTrue(expectedFile.exists());
+    }
+
+    @Test
+    public void storeFile_mint() throws Exception{
+        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo/");
+        FileUtils.deleteDirectory(tempDir);
+
+        Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
+
+        File empty = new File(RepositoryTest.class.getResource("/xml/mint_2006-07-18.xml").getFile());
+        repo.storeEntrySet(empty, "mint");
+
+        RepositoryHelper helper = new RepositoryHelper(repo);
+        File expectedFile = helper.getEntrySetFile("mint_2006-07-18");
 
         Assert.assertTrue(expectedFile.exists());
     }
