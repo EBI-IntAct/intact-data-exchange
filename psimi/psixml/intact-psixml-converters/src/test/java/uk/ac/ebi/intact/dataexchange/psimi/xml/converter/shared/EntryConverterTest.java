@@ -100,18 +100,13 @@ public class EntryConverterTest extends AbstractConverterTest {
     static boolean output = false;
 
     @Test
+    @Ignore
     public void roundtrip_dip() throws Exception {
-
-        System.out.println( "====================================================================" );
-        System.out.println( "" );
-        System.out.println( "                           DIP TEST" );
-        System.out.println( "" );
-        System.out.println( "====================================================================" );
 
         File file = getDipFile();
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
-        output = true;
+        //output = true;
         roundtripWithStream(new FileInputStream(file));
     }
 
@@ -132,17 +127,18 @@ public class EntryConverterTest extends AbstractConverterTest {
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = reader.read(new FileInputStream(sourceFile));
 
-        Entry beforeRountripEntry = entrySet.getEntries().iterator().next();
-        EntryConverter entryConverter = new EntryConverter(IntactContext.getCurrentInstance().getInstitution());
+        for (Entry beforeRountripEntry : entrySet.getEntries())  {
+
+        EntryConverter entryConverter = new EntryConverter();
 
         IntactEntry intactEntry = entryConverter.psiToIntact(beforeRountripEntry);
         Entry afterRoundtripEntry = entryConverter.intactToPsi(intactEntry);
-        afterRoundtripEntry.setSource(beforeRountripEntry.getSource());
 
         PsimiXmlWriter writer = new PsimiXmlWriter();
         writer.write(new EntrySet(Arrays.asList(afterRoundtripEntry), entrySet.getLevel(), entrySet.getVersion(), entrySet.getMinorVersion()), destFile);
 
         System.out.println("Written: "+destFile);
+        }
     }
 
     @Test
@@ -160,34 +156,18 @@ public class EntryConverterTest extends AbstractConverterTest {
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = reader.read(is);
 
-        EntryConverter entryConverter = new EntryConverter(IntactContext.getCurrentInstance().getInstitution());
+        EntryConverter entryConverter = new EntryConverter();
 
-        Entry beforeRountripEntry = entrySet.getEntries().iterator().next();
+        for (Entry beforeRountripEntry : entrySet.getEntries())  {
+            IntactEntry intactEntry = entryConverter.psiToIntact(beforeRountripEntry);
+            Entry afterRoundtripEntry = entryConverter.intactToPsi(intactEntry);
 
-        if( output ) {
-            Collection<Entry> entries = new ArrayList<Entry>( );
-            entries.add( beforeRountripEntry );
-            EntrySet es = new EntrySet( entries, 2, 5, 3 );
-            PsimiXmlWriter writer = new PsimiXmlWriter();
-            writer.write( es, new File("C:\\DIP-beforeRountripEntry.xml") );
+            assertTrue("XML created after conversion roundtrip must be valid", xmlIsValid(afterRoundtripEntry));
+
+            assertEquals("Number of interactions should be the same", beforeRountripEntry.getInteractions().size(), afterRoundtripEntry.getInteractions().size());
+            assertEquals("Number of experiments should be the same",countExperimentsInEntry(beforeRountripEntry), afterRoundtripEntry.getExperiments().size());
+            assertEquals("Number of interactors should be the same",countInteractorsInEntry(beforeRountripEntry), afterRoundtripEntry.getInteractors().size());
         }
-
-        IntactEntry intactEntry = entryConverter.psiToIntact(beforeRountripEntry);
-        Entry afterRoundtripEntry = entryConverter.intactToPsi(intactEntry);
-
-        if( output ) {
-            Collection<Entry> entries = new ArrayList<Entry>( );
-            entries.add( afterRoundtripEntry );
-            EntrySet es = new EntrySet( entries, 2, 5, 3 );
-            PsimiXmlWriter writer = new PsimiXmlWriter();
-            writer.write( es, new File("C:\\DIP-afterRoundtripEntry.xml") );
-        }
-
-        assertTrue("XML created after conversion roundtrip must be valid", xmlIsValid(afterRoundtripEntry));
-
-        assertEquals("Number of interactions should be the same", beforeRountripEntry.getInteractions().size(), afterRoundtripEntry.getInteractions().size());
-        assertEquals("Number of experiments should be the same",countExperimentsInEntry(beforeRountripEntry), afterRoundtripEntry.getExperiments().size());
-        assertEquals("Number of interactors should be the same",countInteractorsInEntry(beforeRountripEntry), afterRoundtripEntry.getInteractors().size());
        
     }
 

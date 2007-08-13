@@ -49,6 +49,8 @@ public class PsiMockFactory {
     public static Entry createMockEntry() {
         Entry entry = new Entry();
 
+        entry.setSource(createMockSource());
+
         for (int i = 0; i < childRandom(); i++) {
             Interaction interaction = createMockInteraction();
             entry.getInteractions().add(interaction);
@@ -64,6 +66,42 @@ public class PsiMockFactory {
 
         return entry;
     }
+
+    public static Source createMockSource() {
+        Source source = new Source();
+
+        Names names = new Names();
+        source.setNames(names);
+
+        names.setShortLabel("ebi");
+        names.setFullName("European Bioinformatics Institute");
+
+        source.setXref(createSourceXref(CvDatabase.INTACT_MI_REF));
+
+        source.setBibref(createSourceBibref());
+
+        return source;
+    }
+
+    private static Xref createSourceXref(String dbMiRef) {
+        DbReference dbReference = new DbReference(dbMiRef, CvDatabase.PSI_MI);
+        dbReference.setDbAc(CvDatabase.PSI_MI_MI_REF);
+        dbReference.setRefType(CvXrefQualifier.PRIMARY_REFERENCE);
+        dbReference.setRefTypeAc(CvXrefQualifier.PRIMARY_REFERENCE_MI_REF);
+
+        return new Xref(dbReference);
+    }
+
+    private static Bibref createSourceBibref() {
+        DbReference dbReference = new DbReference("14681455", CvDatabase.PUBMED);
+        dbReference.setDbAc(CvDatabase.PUBMED_MI_REF);
+        dbReference.setRefType(CvXrefQualifier.PRIMARY_REFERENCE);
+        dbReference.setRefTypeAc(CvXrefQualifier.PRIMARY_REFERENCE_MI_REF);
+
+        Xref xref = new Xref(dbReference);
+
+        return new Bibref(xref);
+     }
 
     public static Interaction createMockInteraction() {
         Interaction interaction = new Interaction();

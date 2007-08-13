@@ -91,8 +91,10 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
                                             new InteractorTypeConverter( getInstitution() ) );
         interactor.setInteractorType( interactorType );
 
-        Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getBioSource());
-        interactor.setOrganism(organism);
+        if (intactObject.getBioSource() != null) {
+            Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getBioSource());
+            interactor.setOrganism(organism);
+        }
 
         return interactor;
     }

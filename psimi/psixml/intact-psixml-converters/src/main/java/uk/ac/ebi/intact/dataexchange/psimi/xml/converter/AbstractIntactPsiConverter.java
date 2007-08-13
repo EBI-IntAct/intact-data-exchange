@@ -20,4 +20,8 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
         return institution;
     }
 
+    protected void setInstitution(Institution institution)
+    {
+        this.institution = institution;
+    }
 }

@@ -37,12 +37,21 @@ import java.util.Collection;
  */
 public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entry> {
 
+    public EntryConverter() {
+        super(null);
+    }
+
+    @Deprecated
     public EntryConverter(Institution institution) {
         super(institution);
     }
 
     public IntactEntry psiToIntact(Entry psiObject) {
+        InstitutionConverter institutionConverter = new InstitutionConverter();
+        Institution institution = institutionConverter.psiToIntact(psiObject.getSource());
 
+        super.setInstitution(institution);
+ 
         Collection<Interaction> interactions = new ArrayList<Interaction>();
 
         InteractionConverter interactionConverter = new InteractionConverter(getInstitution());
@@ -62,6 +71,14 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
 
     public Entry intactToPsi(IntactEntry intactObject) {
         Entry entry = new Entry();
+
+        Interaction firstInteraction = intactObject.getInteractions().iterator().next();
+        Institution institution = firstInteraction.getOwner();
+
+        super.setInstitution(firstInteraction.getOwner());
+
+        InstitutionConverter institutionConverter = new InstitutionConverter();
+        entry.setSource(institutionConverter.intactToPsi(institution));
 
         InteractionConverter interactionConverter = new InteractionConverter(getInstitution());
 
