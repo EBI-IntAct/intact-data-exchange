@@ -19,7 +19,9 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
 import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.model.CvObjectXref;
+import uk.ac.ebi.intact.model.util.CvObjectBuilder;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 /**
  * TODO comment this
@@ -39,19 +41,33 @@ public class CvObjectEnricher extends AnnotatedObjectEnricher<CvObject> {
     public static CvObjectEnricher getInstance() {
         return instance.get();
     }
-
+    
     protected CvObjectEnricher() {
     }
 
     public void enrich(CvObject objectToEnrich) {
         CvObjectXref identityXref = CvObjectUtils.getPsiMiIdentityXref(objectToEnrich);
 
-        String mi = identityXref.getPrimaryId();
+        CvTerm term;
 
-        CvTerm term = CvObjectFetcher.getInstance().fetchByTermId(mi);
+        if (identityXref != null) {
+            String mi = identityXref.getPrimaryId();
+            term = CvObjectFetcher.getInstance().fetchByTermId(mi);
+        } else {
+            term = CvObjectFetcher.getInstance().fetchByShortLabel(objectToEnrich.getClass(), objectToEnrich.getShortLabel());
 
-        objectToEnrich.setShortLabel(term.getShortName());
-        objectToEnrich.setFullName(term.getFullName());
+            // create PSI MI Xref
+            if (term != null) {
+                CvObjectXref xref = XrefUtils.createIdentityXrefPsiMi(objectToEnrich, term.getId());
+                objectToEnrich.addXref(xref);
+            }
+        }
+
+        if (term != null) {
+            objectToEnrich.setShortLabel(term.getShortName());
+            objectToEnrich.setFullName(term.getFullName());
+        }
+
     }
 
     public void close() {

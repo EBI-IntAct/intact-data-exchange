@@ -20,6 +20,7 @@ import net.sf.ehcache.Element;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
+import uk.ac.ebi.intact.model.CvObject;
 
 /**
  * TODO comment this
@@ -56,6 +57,37 @@ public class CvObjectFetcher {
 
             if (term != null) {
                 cache.put(new Element(termId, term));
+            }
+        }
+
+        return term;
+    }
+
+    public CvTerm fetchByShortLabel(Class<? extends CvObject> cvClass, String label) {
+        if (cvClass == null || label == null) {
+            return null;
+        }
+        
+        Cache cache = EnricherContext.getInstance().getCache("CvObject");
+
+        String key = cvClass+"_"+label;
+
+        CvTerm term = null;
+
+        if (cache.isKeyInCache(key)) {
+            term = (CvTerm) cache.get(label).getObjectValue();
+        } else {
+            IntactOntology ontology = EnricherContext.getInstance().getIntactOntology();
+
+            for (CvTerm candidateTerm : ontology.getCvTerms(cvClass)) {
+                if (candidateTerm.getShortName().equals(label)) {
+                    term = candidateTerm;
+                }
+            }
+
+            if (term != null) {
+                cache.put(new Element(key, term));
+                cache.put(new Element(term.getId(), term));
             }
         }
 

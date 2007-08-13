@@ -20,6 +20,7 @@ import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.model.CvBiologicalRole;
 import uk.ac.ebi.intact.model.CvIdentification;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
  * TODO comment this
@@ -58,8 +59,25 @@ public class CvObjectEnricherTest {
         cvObjectEnricher.enrich(cvIdentification);
 
         Assert.assertNotNull(cvIdentification.getShortLabel());
-        System.out.println(cvIdentification.getShortLabel());
         Assert.assertEquals(CvIdentification.PREDETERMINED, cvIdentification.getShortLabel());
+    }
+
+    @Test
+    public void enrich_noXrefs() throws Exception {
+        IntactMockBuilder mockBuilder = new IntactMockBuilder();
+
+        CvBiologicalRole cvBiologicalRole = mockBuilder.createCvObject(CvBiologicalRole.class, CvBiologicalRole.ENZYME_PSI_REF, CvBiologicalRole.ENZYME);
+        cvBiologicalRole.getXrefs().clear();
+
+        Assert.assertNull(CvObjectUtils.getPsiMiIdentityXref(cvBiologicalRole));
+
+        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
+        cvObjectEnricher.enrich(cvBiologicalRole);
+
+        Assert.assertNotNull(cvBiologicalRole.getShortLabel());
+        Assert.assertNotNull(cvBiologicalRole.getFullName());
+        Assert.assertEquals(CvBiologicalRole.ENZYME, cvBiologicalRole.getShortLabel());
+        Assert.assertEquals(CvBiologicalRole.ENZYME_PSI_REF, CvObjectUtils.getPsiMiIdentityXref(cvBiologicalRole).getPrimaryId());
     }
 
 }
