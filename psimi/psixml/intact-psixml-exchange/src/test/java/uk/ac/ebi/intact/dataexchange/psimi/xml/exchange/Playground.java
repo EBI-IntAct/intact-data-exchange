@@ -33,7 +33,7 @@ public class Playground {
         IntactUnit iu = new IntactUnit();
         iu.createSchema();
 
-        InputStream is = Playground.class.getResourceAsStream("/xml/dip_2007-02-15.xml");
+        InputStream is = Playground.class.getResourceAsStream("/xml/branch.xml");
         PsiExchange.importIntoIntact(is, false);
 
         IntactContext.getCurrentInstance().getDataContext().beginTransaction();
