@@ -52,7 +52,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         // imexId
         String imexId = psiObject.getImexId();
-        interaction.addXref(createImexXref(interaction, imexId));
+        if (imexId != null) {
+            interaction.addXref(createImexXref(interaction, imexId));
+        }
 
         // only gets the first interaction type
         CvInteractionType interactionType = getInteractionType(psiObject);
