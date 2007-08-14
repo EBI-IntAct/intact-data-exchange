@@ -16,7 +16,7 @@
     <name>IntAct Data Exchange :: Enricher</name>
 
     <properties>
-        <bridges.version>2.0-beta-5</bridges.version>
+        <bridges.version>2.0-beta-6-SNAPSHOT</bridges.version>
     </properties>
 
     <dependencies>
