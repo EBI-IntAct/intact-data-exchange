@@ -75,7 +75,7 @@ public class CvObjectFetcher {
         CvTerm term = null;
 
         if (cache.isKeyInCache(key)) {
-            term = (CvTerm) cache.get(label).getObjectValue();
+            term = (CvTerm) cache.get(key).getObjectValue();
         } else {
             IntactOntology ontology = EnricherContext.getInstance().getIntactOntology();
 
