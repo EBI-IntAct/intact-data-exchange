@@ -53,7 +53,7 @@ public class InteractionEnricherTest {
 
     @Test
     public void enrich_default() {
-        BioSource ecoli = mockBuilder.createBioSource(562, "lala");
+        BioSource ecoli = mockBuilder.createBioSource(83333, "lala");
         Interactor interactor1 = mockBuilder.createProtein("P45531", "unk1", ecoli);
         Interactor interactor2 = mockBuilder.createProtein("P45532", "unk2", ecoli);
         Experiment experiment = mockBuilder.createExperimentEmpty("myExperiment");
@@ -63,14 +63,14 @@ public class InteractionEnricherTest {
         enricher.enrich(interaction);
 
         Assert.assertEquals("myInteraction", interaction.getShortLabel());
-        Assert.assertEquals("562", interactor1.getBioSource().getTaxId());
+        Assert.assertEquals("83333", interactor1.getBioSource().getTaxId());
         Assert.assertEquals("ecoli", interactor1.getBioSource().getShortLabel());
         Assert.assertEquals("tusd_ecoli", interactor2.getShortLabel());
     }
 
     @Test
     public void enrich_updateLabel() {
-        BioSource ecoli = mockBuilder.createBioSource(562, "lala");
+        BioSource ecoli = mockBuilder.createBioSource(83333, "lala");
         
         Interactor interactor1 = mockBuilder.createProtein("P45531", "unk1", ecoli);
         Interactor interactor2 = mockBuilder.createProtein("P45532", "unk2", ecoli);
@@ -84,7 +84,7 @@ public class InteractionEnricherTest {
         enricher.enrich(interaction);
 
         Assert.assertEquals("tusc-tusd", interaction.getShortLabel());
-        Assert.assertEquals("562", interactor2.getBioSource().getTaxId());
+        Assert.assertEquals("83333", interactor2.getBioSource().getTaxId());
         Assert.assertEquals("ecoli", interactor2.getBioSource().getShortLabel());
         Assert.assertEquals("tusc_ecoli", interactor1.getShortLabel());
     }
