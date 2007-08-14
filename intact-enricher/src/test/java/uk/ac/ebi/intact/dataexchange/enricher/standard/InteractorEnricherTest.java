@@ -58,6 +58,7 @@ public class InteractorEnricherTest  {
 
         Assert.assertEquals("atf6a_human", protein.getShortLabel());
         Assert.assertEquals("Cyclic AMP-dependent transcription factor ATF-6 alpha", protein.getFullName());
+        Assert.assertNotNull(protein.getSequence());
     }
 
     @Test
