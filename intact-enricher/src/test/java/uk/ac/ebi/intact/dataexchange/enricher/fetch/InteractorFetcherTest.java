@@ -38,6 +38,8 @@ public class InteractorFetcherTest {
 
     @Test
     public void fetchFromUniprot() throws Exception {
+        CacheManager.getInstance().getCache("Interactor").getStatistics().clearStatistics();
+        
         UniprotProtein uniprotProtein = fetcher.fetchInteractorFromUniprot("MK01_HUMAN", 9606);
         Assert.assertNotNull(uniprotProtein);
         Assert.assertEquals("P28482", uniprotProtein.getPrimaryAc());
