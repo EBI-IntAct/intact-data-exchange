@@ -19,12 +19,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.InteractorFetcher;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.AliasUtils;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.ProteinUtils;
+import uk.ac.ebi.intact.model.util.*;
 import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
 
 import java.util.Collection;
+
+import com.sun.xml.ws.addressing.ProblemHeaderQName;
 
 /**
  * TODO comment this
@@ -68,23 +68,32 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         if (objectToEnrich instanceof Protein) {
             Protein proteinToEnrich = (Protein) objectToEnrich;
 
+            UniprotProtein uniprotProt = null;
+
+            int taxId = Integer.valueOf(proteinToEnrich.getBioSource().getTaxId());
             InteractorXref uniprotXref = ProteinUtils.getUniprotXref(proteinToEnrich);
 
             if (uniprotXref != null) {
                 String uniprotId = uniprotXref.getPrimaryId();
-                int taxId = Integer.valueOf(proteinToEnrich.getBioSource().getTaxId());
 
                 if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein: " + uniprotId + " (taxid:"+taxId+")");
 
-                UniprotProtein uniprotProt = InteractorFetcher.getInstance().fetchInteractorFromUniprot(uniprotId, taxId);
+                uniprotProt = InteractorFetcher.getInstance().fetchInteractorFromUniprot(uniprotId, taxId);
+
+            } else  {
+                if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein by shortLabel: "+proteinToEnrich.getShortLabel());
+
+                if (proteinToEnrich.getShortLabel() != null) {
+                    uniprotProt = InteractorFetcher.getInstance().fetchInteractorFromUniprot(proteinToEnrich.getShortLabel(), taxId);
+                }
+            }
+
+            if (uniprotProt != null) {
+                updateXrefs(proteinToEnrich, uniprotProt);
                 updateAliases(proteinToEnrich, uniprotProt);
 
                 proteinToEnrich.setShortLabel(uniprotProt.getId().toLowerCase());
                 proteinToEnrich.setFullName(uniprotProt.getDescription());
-            } else {
-                if (log.isWarnEnabled()) log.warn("\tUniprot id not found for protein: "+proteinToEnrich.getShortLabel());
-
-
             }
 
         }
@@ -122,6 +131,19 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                 InteractorAlias alias = AliasUtils.createAliasGeneName(interactor, geneName);
                 interactor.addAlias(alias);
             }
+        }
+    }
+
+    private void updateXrefs(Protein protein, UniprotProtein uniprotProt) {
+        InteractorXref uniprotXref = ProteinUtils.getUniprotXref(protein);
+
+        if (uniprotXref == null) {
+            CvObjectBuilder cvObjectBuilder = new CvObjectBuilder();
+            CvXrefQualifier identityQual = cvObjectBuilder.createIdentityCvXrefQualifier(protein.getOwner());
+            CvDatabase uniprotDb = CvObjectUtils.createCvObject(protein.getOwner(), CvDatabase.class, CvDatabase.UNIPROT_MI_REF, CvDatabase.UNIPROT);
+
+            InteractorXref xref = XrefUtils.createIdentityXref(protein, uniprotProt.getPrimaryAc(), identityQual, uniprotDb);
+            protein.addXref(xref);
         }
     }
 

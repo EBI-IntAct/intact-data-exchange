@@ -61,6 +61,20 @@ public class InteractorEnricherTest  {
     }
 
     @Test
+    public void enrich_uniprot_noXrefs() {
+        BioSource human = mockBuilder.createBioSource(9606, "human");
+        Protein protein = mockBuilder.createProtein("P18850", "atf6a_human", human);
+        protein.getXrefs().clear();
+
+        enricher.enrich(protein);
+
+        Assert.assertEquals("atf6a_human", protein.getShortLabel());
+        Assert.assertEquals("Cyclic AMP-dependent transcription factor ATF-6 alpha", protein.getFullName());
+
+        Assert.assertFalse(protein.getXrefs().isEmpty());
+    }
+
+    @Test
     public void enrich_alias() {
         BioSource ecoli = mockBuilder.createBioSource(561, "ecoli");
         Protein protein = mockBuilder.createProtein("P45530", "tusb_ecoli", ecoli);
