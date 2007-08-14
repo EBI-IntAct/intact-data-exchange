@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
+import net.sf.ehcache.CacheManager;
 
 /**
  * TODO comment this
@@ -44,5 +45,7 @@ public class InteractorFetcherTest {
         uniprotProtein = fetcher.fetchInteractorFromUniprot("MK01_HUMAN", 9606);
         Assert.assertNotNull(uniprotProtein);
         Assert.assertEquals("P28482", uniprotProtein.getPrimaryAc());
+
+        Assert.assertEquals(1, CacheManager.getInstance().getCache("Interactor").getStatistics().getInMemoryHits());
     }
 }
