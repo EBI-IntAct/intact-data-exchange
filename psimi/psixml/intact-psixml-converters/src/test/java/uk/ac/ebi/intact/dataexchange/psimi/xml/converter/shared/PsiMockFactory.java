@@ -21,6 +21,7 @@ import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvInteractorType;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 
 import java.util.Random;
 
@@ -103,6 +104,17 @@ public class PsiMockFactory {
         return new Bibref(xref);
      }
 
+    private static Bibref createExperimentBibref() {
+        DbReference dbReference = new DbReference("14681455", CvDatabase.PUBMED);
+        dbReference.setDbAc(CvDatabase.PUBMED_MI_REF);
+        dbReference.setRefType(CvXrefQualifier.PRIMARY_REFERENCE);
+        dbReference.setRefTypeAc(CvXrefQualifier.PRIMARY_REFERENCE_MI_REF);
+
+        Xref xref = new Xref(dbReference);
+
+        return new Bibref(xref);
+     }
+
     public static Interaction createMockInteraction() {
         Interaction interaction = new Interaction();
         populate(interaction);
@@ -140,16 +152,14 @@ public class PsiMockFactory {
 
 
     public static ExperimentDescription createMockExperiment() {
-        Xref bibrefXref = createXref(CvXrefQualifier.PRIMARY_REFERENCE, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF);
-        bibrefXref.getPrimaryRef().setId("14681455");
-        bibrefXref.getSecondaryRef().clear();
-        Bibref bibref = new Bibref(bibrefXref);
+        Bibref bibref = createExperimentBibref();
 
         InteractionDetectionMethod idm = createCvType(InteractionDetectionMethod.class);
 
         ExperimentDescription experiment = new ExperimentDescription(bibref, idm);
         populate(experiment);
         experiment.getHostOrganisms().add(createMockOrganism());
+        experiment.setBibref(bibref);
 
         return experiment;
     }
@@ -289,7 +299,7 @@ public class PsiMockFactory {
     }
 
     private static String nextString() {
-        return nextString("str");
+        return new IntactMockBuilder().randomString(childRandom(5,10));
     }
 
     private static String nextString(String prefix) {
@@ -313,6 +323,4 @@ public class PsiMockFactory {
 
         return new Random().nextInt(max - min) + min;
     }
-
-
 }

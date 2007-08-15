@@ -106,16 +106,18 @@ public class PsiConverterUtils {
             DbReference primaryRef = getPrimaryReference( dbRefs );
             xref.setPrimaryRef( primaryRef );
         } else {
-            DbReference primaryRef = getIdentity( dbRefs );
-            xref.setPrimaryRef( primaryRef );
-
-            // remove the primary ref and the bibref (primary-ref) in case of being an experiment
-            // from the collection and add the rest as secondary refs
-            dbRefs.remove( primaryRef );
-
+            // remove the primary ref from the collection if it is a experiment
+            // so we don't have the same ref in the bibref and the xref sections
             if ( annotatedObject instanceof Experiment ) {
                 dbRefs.remove( getPrimaryReference( dbRefs ) );
             }
+
+            DbReference primaryRef = getIdentity( dbRefs );
+            xref.setPrimaryRef( primaryRef );
+
+            // remove the primary ref 
+            // from the collection and add the rest as secondary refs
+            dbRefs.remove( primaryRef );
 
             for ( DbReference secDbRef : dbRefs ) {
                 if ( !xref.getSecondaryRef().contains( secDbRef ) ) {
@@ -124,7 +126,9 @@ public class PsiConverterUtils {
             }
         }
 
-        xrefContainer.setXref( xref );
+        if (xref.getPrimaryRef() != null) {
+            xrefContainer.setXref( xref );
+        }
     }
 
     private static int populateId( HasId hasIdElement ) {
