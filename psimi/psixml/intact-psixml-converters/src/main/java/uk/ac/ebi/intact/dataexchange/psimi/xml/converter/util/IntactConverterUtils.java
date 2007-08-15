@@ -41,7 +41,7 @@ public class IntactConverterUtils {
     private static final Log log = LogFactory.getLog(IntactConverterUtils.class);
 
     private static final int SHORT_LABEL_LENGTH = 20;
-    private static final String TEMP_SHORTLABEL_PREFIX = "ia_ns_";
+    private static final String TEMP_SHORTLABEL_PREFIX = "unk-unk-";
 
     private IntactConverterUtils() {
     }
@@ -141,7 +141,7 @@ public class IntactConverterUtils {
     }
 
     public static String createTempShortLabel() {
-        return TEMP_SHORTLABEL_PREFIX + new Random().nextInt();
+        return TEMP_SHORTLABEL_PREFIX + Math.abs(new Random().nextInt());
     }
 
     public static boolean isTempShortLabel(String label) {
