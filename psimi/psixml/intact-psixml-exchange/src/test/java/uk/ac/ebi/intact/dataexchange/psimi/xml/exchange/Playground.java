@@ -23,6 +23,7 @@ import uk.ac.ebi.intact.context.impl.StandaloneSession;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.enricher.PsiEnricher;
+import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.util.DebugUtil;
 
 import java.io.*;
@@ -52,7 +53,13 @@ public class Playground {
         IntactUnit iu = new IntactUnit();
         iu.createSchema();
 
-        for (File file : getPsiMiFilesInFolder(new File("/ebi/sp/pro6/intact/local/data/curation-material/bantscheff-2007/hela"))) {
+        EnricherConfig enricherConfig = new EnricherConfig();
+        enricherConfig.setUpdateInteractionShortLabels(true);
+
+        final File helaFolder = new File("/ebi/sp/pro6/intact/local/data/curation-material/bantscheff-2007/hela");
+        final File k652Folder = new File("/ebi/sp/pro6/intact/local/data/curation-material/bantscheff-2007/k652");
+
+        for (File file : getPsiMiFilesInFolder(k652Folder)) {
 
             System.out.println("Importing: "+file);
 
@@ -60,9 +67,11 @@ public class Playground {
 
              StringWriter writer = new StringWriter();
 
-            PsiEnricher.enrichPsiXml(is, writer, new EnricherConfig());
+            PsiEnricher.enrichPsiXml(is, writer, enricherConfig);
 
             writer.flush();
+
+            System.out.println(writer.toString());
 
             InputStream enricherInput = new ByteArrayInputStream(writer.toString().getBytes());
 
@@ -79,7 +88,14 @@ public class Playground {
                 .getExperimentDao().countAll() +" - "+ IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getExperimentDao().getAll());
 
+        Experiment exp = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                .getExperimentDao().getAll().iterator().next();
+
+        System.out.println("Experiment Xrefs: "+exp.getXrefs());
+        System.out.println("BioSource: "+exp.getBioSource());
+
         IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+
     }
 
     private static File[] getPsiMiFilesInFolder(File folder) throws IOException {
