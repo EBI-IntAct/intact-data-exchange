@@ -40,6 +40,9 @@ public class ComponentEnricher implements Enricher<Component>{
     }
 
     public void enrich(Component objectToEnrich) {
+        BioSourceEnricher bioSourceEnricher = BioSourceEnricher.getInstance();
+        bioSourceEnricher.enrich(objectToEnrich.getExpressedIn());
+
         InteractorEnricher interactorEnricher = InteractorEnricher.getInstance();
         interactorEnricher.enrich(objectToEnrich.getInteractor());
 

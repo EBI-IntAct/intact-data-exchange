@@ -43,7 +43,6 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
 
     public void enrich(Experiment objectToEnrich) {
         BioSourceEnricher bioSourceEnricher = BioSourceEnricher.getInstance();
-
         bioSourceEnricher.enrich(objectToEnrich.getBioSource());
 
         CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
