@@ -61,9 +61,11 @@ public class EntryConverterTest extends AbstractConverterTest {
     @Before
     public void setUp() throws Exception {
         entry = createNiceMock(Entry.class);
-        entryConverter = new EntryConverter(createNiceMock(Institution.class));
+        entryConverter = new EntryConverter();
         ConversionCache.clear();
         output = false;
+
+        IdSequenceGenerator.getInstance().reset();
     }
 
     @After
@@ -76,7 +78,6 @@ public class EntryConverterTest extends AbstractConverterTest {
 
     @Test
     public void mockRountrip() throws Exception {
-
         Entry beforeRountripEntry = PsiMockFactory.createMockEntry();
 
         int idNum = IdSequenceGenerator.getInstance().currentId();

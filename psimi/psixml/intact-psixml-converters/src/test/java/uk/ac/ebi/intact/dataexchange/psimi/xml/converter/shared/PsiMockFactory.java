@@ -321,6 +321,6 @@ public class PsiMockFactory {
     private static int childRandom(int min, int max) {
         if (min == max) return max;
 
-        return new Random().nextInt(max - min) + min;
+        return new Random().nextInt(Math.max(1,(max - min))) + min;
     }
 }
