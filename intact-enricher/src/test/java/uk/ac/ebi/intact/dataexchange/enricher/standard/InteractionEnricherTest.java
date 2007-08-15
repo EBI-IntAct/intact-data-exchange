@@ -19,14 +19,12 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
-
-import java.util.Collections;
 
 /**
  * TODO comment this
@@ -34,15 +32,13 @@ import java.util.Collections;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InteractionEnricherTest {
+public class InteractionEnricherTest extends IntactBasicTestCase {
 
     private InteractionEnricher enricher;
-    private IntactMockBuilder mockBuilder;
 
     @Before
     public void beforeMethod() {
         enricher = InteractionEnricher.getInstance();
-        mockBuilder = new IntactMockBuilder();
     }
 
     @After
@@ -53,12 +49,12 @@ public class InteractionEnricherTest {
 
     @Test
     public void enrich_default() {
-        BioSource ecoli = mockBuilder.createBioSource(83333, "lala");
-        Interactor interactor1 = mockBuilder.createProtein("P45531", "unk1", ecoli);
-        Interactor interactor2 = mockBuilder.createProtein("P45532", "unk2", ecoli);
-        Experiment experiment = mockBuilder.createExperimentEmpty("myExperiment");
+        BioSource ecoli = getMockBuilder().createBioSource(83333, "lala");
+        Interactor interactor1 = getMockBuilder().createProtein("P45531", "unk1", ecoli);
+        Interactor interactor2 = getMockBuilder().createProtein("P45532", "unk2", ecoli);
+        Experiment experiment = getMockBuilder().createExperimentEmpty("myExperiment");
 
-        Interaction interaction = mockBuilder.createInteraction("myInteraction", interactor1, interactor2, experiment);
+        Interaction interaction = getMockBuilder().createInteraction("myInteraction", interactor1, interactor2, experiment);
 
         enricher.enrich(interaction);
 
@@ -70,14 +66,14 @@ public class InteractionEnricherTest {
 
     @Test
     public void enrich_updateLabel() {
-        BioSource ecoli = mockBuilder.createBioSource(83333, "lala");
+        BioSource ecoli = getMockBuilder().createBioSource(83333, "lala");
         
-        Interactor interactor1 = mockBuilder.createProtein("P45531", "unk1", ecoli);
-        Interactor interactor2 = mockBuilder.createProtein("P45532", "unk2", ecoli);
+        Interactor interactor1 = getMockBuilder().createProtein("P45531", "unk1", ecoli);
+        Interactor interactor2 = getMockBuilder().createProtein("P45532", "unk2", ecoli);
 
-        Experiment experiment = mockBuilder.createExperimentEmpty("myExperiment");
+        Experiment experiment = getMockBuilder().createExperimentEmpty("myExperiment");
 
-        Interaction interaction = mockBuilder.createInteraction("myInteraction", interactor1, interactor2, experiment);
+        Interaction interaction = getMockBuilder().createInteraction("myInteraction", interactor1, interactor2, experiment);
 
         EnricherContext.getInstance().getConfig().setUpdateInteractionShortLabels(true);
 

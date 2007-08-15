@@ -15,9 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.CvBiologicalRole;
 import uk.ac.ebi.intact.model.CvIdentification;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
@@ -28,19 +30,29 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class CvObjectEnricherTest {
+public class CvObjectEnricherTest extends IntactBasicTestCase {
+
+    private CvObjectEnricher enricher;
+
+    @Before
+    public void beforeMethod() {
+        enricher = CvObjectEnricher.getInstance();
+    }
+
+    @After
+    public void afterMethod() {
+        enricher.close();
+        enricher = null;
+    }
 
     @Test
     public void enrich_noShortLabel() throws Exception {
-        IntactMockBuilder mockBuilder = new IntactMockBuilder();
-
-        CvBiologicalRole bioRole = mockBuilder.createCvObject(CvBiologicalRole.class, CvBiologicalRole.UNSPECIFIED_PSI_REF, null);
+        CvBiologicalRole bioRole = getMockBuilder().createCvObject(CvBiologicalRole.class, CvBiologicalRole.UNSPECIFIED_PSI_REF, null);
         bioRole.setFullName("unspecified role");
 
         Assert.assertNull(bioRole.getShortLabel());
 
-        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
-        cvObjectEnricher.enrich(bioRole);
+        enricher.enrich(bioRole);
 
         Assert.assertNotNull(bioRole.getShortLabel());
         Assert.assertEquals(CvBiologicalRole.UNSPECIFIED, bioRole.getShortLabel());
@@ -48,15 +60,13 @@ public class CvObjectEnricherTest {
 
     @Test
     public void enrich_noShortLabel_cropped() throws Exception {
-        IntactMockBuilder mockBuilder = new IntactMockBuilder();
 
-        CvIdentification cvIdentification = mockBuilder.createCvObject(CvIdentification.class, CvIdentification.PREDETERMINED_MI_REF, null);
+        CvIdentification cvIdentification = getMockBuilder().createCvObject(CvIdentification.class, CvIdentification.PREDETERMINED_MI_REF, null);
         cvIdentification.setFullName("predetermined participant");
 
         Assert.assertNull(cvIdentification.getShortLabel());
 
-        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
-        cvObjectEnricher.enrich(cvIdentification);
+        enricher.enrich(cvIdentification);
 
         Assert.assertNotNull(cvIdentification.getShortLabel());
         Assert.assertEquals(CvIdentification.PREDETERMINED, cvIdentification.getShortLabel());
@@ -64,15 +74,12 @@ public class CvObjectEnricherTest {
 
     @Test
     public void enrich_noXrefs() throws Exception {
-        IntactMockBuilder mockBuilder = new IntactMockBuilder();
-
-        CvBiologicalRole cvBiologicalRole = mockBuilder.createCvObject(CvBiologicalRole.class, CvBiologicalRole.ENZYME_PSI_REF, CvBiologicalRole.ENZYME);
+        CvBiologicalRole cvBiologicalRole = getMockBuilder().createCvObject(CvBiologicalRole.class, CvBiologicalRole.ENZYME_PSI_REF, CvBiologicalRole.ENZYME);
         cvBiologicalRole.getXrefs().clear();
 
         Assert.assertNull(CvObjectUtils.getPsiMiIdentityXref(cvBiologicalRole));
 
-        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
-        cvObjectEnricher.enrich(cvBiologicalRole);
+        enricher.enrich(cvBiologicalRole);
 
         Assert.assertNotNull(cvBiologicalRole.getShortLabel());
         Assert.assertNotNull(cvBiologicalRole.getFullName());

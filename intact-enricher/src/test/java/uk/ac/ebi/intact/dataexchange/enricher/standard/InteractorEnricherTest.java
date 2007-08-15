@@ -19,7 +19,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.model.Protein;
 import uk.ac.ebi.intact.model.util.ProteinUtils;
@@ -31,15 +31,13 @@ import uk.ac.ebi.intact.model.util.ProteinUtils;
  * @version $Id$
  */
 
-public class InteractorEnricherTest  {
+public class InteractorEnricherTest extends IntactBasicTestCase {
 
     private InteractorEnricher enricher;
-    private IntactMockBuilder mockBuilder;
 
     @Before
     public void beforeMethod() {
         enricher = InteractorEnricher.getInstance();
-        mockBuilder = new IntactMockBuilder();
     }
 
     @After
@@ -51,8 +49,8 @@ public class InteractorEnricherTest  {
 
     @Test
     public void enrich_uniprot() {
-        BioSource human = mockBuilder.createBioSource(9606, "human");
-        Protein protein = mockBuilder.createProtein("P18850", "unknownName", human);
+        BioSource human = getMockBuilder().createBioSource(9606, "human");
+        Protein protein = getMockBuilder().createProtein("P18850", "unknownName", human);
 
         enricher.enrich(protein);
 
@@ -63,8 +61,8 @@ public class InteractorEnricherTest  {
 
     @Test
     public void enrich_uniprot_noXrefs() {
-        BioSource human = mockBuilder.createBioSource(9606, "human");
-        Protein protein = mockBuilder.createProtein("P18850", "atf6a_human", human);
+        BioSource human = getMockBuilder().createBioSource(9606, "human");
+        Protein protein = getMockBuilder().createProtein("P18850", "atf6a_human", human);
         protein.getXrefs().clear();
 
         enricher.enrich(protein);
@@ -77,8 +75,8 @@ public class InteractorEnricherTest  {
 
     @Test
     public void enrich_alias() {
-        BioSource ecoli = mockBuilder.createBioSource(561, "ecoli");
-        Protein protein = mockBuilder.createProtein("P45530", "tusb_ecoli", ecoli);
+        BioSource ecoli = getMockBuilder().createBioSource(561, "ecoli");
+        Protein protein = getMockBuilder().createProtein("P45530", "tusb_ecoli", ecoli);
         protein.getAliases().clear();
 
         Assert.assertNotSame("tusB", ProteinUtils.getGeneName(protein));

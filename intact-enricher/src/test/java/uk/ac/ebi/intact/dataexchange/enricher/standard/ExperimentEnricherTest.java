@@ -19,12 +19,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
-import uk.ac.ebi.intact.model.BioSource;
-import uk.ac.ebi.intact.model.Protein;
-import uk.ac.ebi.intact.model.Publication;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.model.util.ProteinUtils;
+import uk.ac.ebi.intact.model.Publication;
 
 /**
  * TODO comment this
@@ -33,15 +30,13 @@ import uk.ac.ebi.intact.model.util.ProteinUtils;
  * @version $Id$
  */
 
-public class ExperimentEnricherTest {
+public class ExperimentEnricherTest extends IntactBasicTestCase {
 
     private ExperimentEnricher enricher;
-    private IntactMockBuilder mockBuilder;
 
     @Before
     public void beforeMethod() {
         enricher = ExperimentEnricher.getInstance();
-        mockBuilder = new IntactMockBuilder();
     }
 
     @After
@@ -52,11 +47,11 @@ public class ExperimentEnricherTest {
 
 
     @Test
-    public void enrich_default() {
+    public void enrich_pub() {
         final String pubmedId = "15733859";
 
-        Publication publication = mockBuilder.createPublication(pubmedId);
-        Experiment experiment = mockBuilder.createExperimentEmpty("myExp");
+        Publication publication = getMockBuilder().createPublication(pubmedId);
+        Experiment experiment = getMockBuilder().createExperimentEmpty();
         experiment.setPublication(publication);
 
         enricher.enrich(experiment);
@@ -65,5 +60,14 @@ public class ExperimentEnricherTest {
         Assert.assertEquals("The flexible loop of Bcl-2 is required for molecular interaction with immunosuppressant FK-506 binding protein 38 (FKBP38).", experiment.getFullName());
     }
 
+    @Test
+    public void enrich_hostOrganism() {
+        Experiment experiment = getMockBuilder().createExperimentEmpty();
+        experiment.getBioSource().setTaxId("83333");
+
+        enricher.enrich(experiment);
+
+        Assert.assertEquals("ecoli", experiment.getBioSource().getShortLabel());
+    }
 
 }
