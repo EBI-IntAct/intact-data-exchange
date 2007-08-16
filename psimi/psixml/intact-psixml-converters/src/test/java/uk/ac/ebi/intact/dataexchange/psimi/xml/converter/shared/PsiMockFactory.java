@@ -16,13 +16,15 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.*;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
 import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvInteractorType;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -138,6 +140,10 @@ public class PsiMockFactory {
         participant.setInteractor(createMockInteractor());
         participant.setBiologicalRole(createCvType(BiologicalRole.class));
         participant.getExperimentalRoles().add(createCvType(ExperimentalRole.class));
+
+        for (int i=0; i<childRandom(); i++) {
+            participant.getFeatures().add(createFeature());
+        }
 
         return participant;
     }
@@ -296,6 +302,61 @@ public class PsiMockFactory {
         dbRef.setVersion(nextString("version"));
 
         return dbRef;
+    }
+
+    public static DbReference createDbReferencePsiMi(String psiMiRef) {
+        DbReference ref = createDbReference(CvXrefQualifier.IDENTITY_MI_REF, CvXrefQualifier.IDENTITY, CvDatabase.PSI_MI_MI_REF, CvDatabase.PSI_MI);
+        ref.setId(psiMiRef);
+
+        return ref;
+    }
+
+    public static DbReference createDbReferencePrimaryRef(String psiMiRef) {
+        DbReference ref = createDbReference(CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE, CvDatabase.PUBMED_MI_REF, CvDatabase.PUBMED);
+        ref.setId(psiMiRef);
+
+        return ref;
+    }
+
+    public static Feature createFeature() {
+        Feature feature = new Feature(nextId(), new ArrayList<Range>(Arrays.asList(createRange())));
+
+        Names names = new Names();
+        names.setShortLabel("enzyme");
+        names.setFullName("enzyme");
+        feature.setNames(names);
+
+        DbReference primaryRef = createDbReferencePsiMi("MI:0501");
+        DbReference secondaryRef = createDbReferencePrimaryRef("14755292");
+
+        FeatureType featureType = new FeatureType();
+        featureType.setNames(names);
+        featureType.setXref(new Xref(primaryRef, new ArrayList(Arrays.asList(secondaryRef))));
+
+        feature.setFeatureType(featureType);
+
+        feature.getRanges().add(createRange());
+
+        return feature;
+    }
+
+    public static Range createRange() {
+        RangeStatus rangeStatus = new RangeStatus();
+
+        Names names = new Names();
+        names.setShortLabel("certain");
+
+        rangeStatus.setNames(names);
+
+        DbReference rangeDbRef = createDbReferencePsiMi("MI:0335");
+
+        rangeStatus.setXref(new Xref(rangeDbRef));
+
+        Position begin = new Position(1);
+        Position end = new Position(5);
+
+        Range range = new Range(rangeStatus, begin, rangeStatus, end);
+        return range;
     }
 
     private static String nextString() {
