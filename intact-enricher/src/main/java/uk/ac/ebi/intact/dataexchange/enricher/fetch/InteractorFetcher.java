@@ -16,10 +16,10 @@
 package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
 import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
 import uk.ac.ebi.intact.uniprot.service.UniprotRemoteService;
 import uk.ac.ebi.intact.uniprot.service.UniprotService;
@@ -51,13 +51,29 @@ public class InteractorFetcher {
     }
 
     public UniprotProtein fetchInteractorFromUniprot(String uniprotId, int taxId) {
-        Cache interactorCache = EnricherContext.getInstance().getCache("Interactor");
+        if (uniprotId == null) {
+            throw new NullPointerException("Trying to fetch a protein with null uniprotId");
+        }
+
+        Cache interactorCache = CacheManager.getInstance().getCache("Interactor");
+
+        if (interactorCache == null) {
+            throw new IllegalStateException("Interactor cache was not found, when fetching: "+uniprotId);
+        }
 
         UniprotProtein uniprotProtein = null;
 
-        if (interactorCache.isKeyInCache(cacheKey(uniprotId,taxId))) {
-            uniprotProtein = (UniprotProtein) interactorCache.get(cacheKey(uniprotId, taxId)).getObjectValue();
-        } else {
+        String cacheKey = cacheKey(uniprotId, taxId);
+
+        if (interactorCache.isKeyInCache(cacheKey)) {
+            try {
+                uniprotProtein = (UniprotProtein) interactorCache.get(cacheKey).getObjectValue();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (uniprotProtein == null) {
             if (log.isDebugEnabled()) log.debug("\t\tRemotely retrieving protein: "+uniprotId+" (taxid:"+taxId+")");
 
             UniprotService service = new UniprotRemoteService();
@@ -75,7 +91,9 @@ public class InteractorFetcher {
                 }
             }
 
-            interactorCache.put(new Element(cacheKey(uniprotId, taxId), uniprotProtein));
+            if (uniprotProtein != null) {
+                interactorCache.put(new Element(cacheKey(uniprotId, taxId), uniprotProtein));
+            }
         }
 
         return uniprotProtein;

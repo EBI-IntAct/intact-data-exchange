@@ -24,8 +24,6 @@ import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
 
 import java.util.Collection;
 
-import com.sun.xml.ws.addressing.ProblemHeaderQName;
-
 /**
  * TODO comment this
  *
@@ -76,12 +74,12 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
             if (uniprotXref != null) {
                 String uniprotId = uniprotXref.getPrimaryId();
 
-                if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein: " + uniprotId + " (taxid:"+taxId+")");
+                if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein: " + uniprotId + " (taxid:"+taxId+")"+" (taxid:"+taxId+")");
 
                 uniprotProt = InteractorFetcher.getInstance().fetchInteractorFromUniprot(uniprotId, taxId);
 
             } else  {
-                if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein by shortLabel: "+proteinToEnrich.getShortLabel());
+                if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein by shortLabel: "+proteinToEnrich.getShortLabel()+" (taxid:"+taxId+")");
 
                 if (proteinToEnrich.getShortLabel() != null) {
                     uniprotProt = InteractorFetcher.getInstance().fetchInteractorFromUniprot(proteinToEnrich.getShortLabel(), taxId);
