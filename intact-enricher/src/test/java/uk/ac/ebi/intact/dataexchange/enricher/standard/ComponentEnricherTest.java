@@ -46,6 +46,16 @@ public class ComponentEnricherTest extends IntactBasicTestCase {
 
     @Test
     public void enrich_default() throws Exception {
+        Component comp = getMockBuilder().createInteractionRandomBinary().getComponents().iterator().next();
+        comp.setExpressedIn(null);
+
+        enricher.enrich(comp);
+
+        Assert.assertNull(comp.getExpressedIn());
+    }
+
+    @Test
+    public void enrich_expressedIn() throws Exception {
         BioSource human = getMockBuilder().createBioSource(9606, "unknown");
         Component comp = getMockBuilder().createInteractionRandomBinary().getComponents().iterator().next();
         comp.setExpressedIn(human);
