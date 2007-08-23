@@ -20,7 +20,7 @@
 
     <properties>
         <currentVersion>${version}</currentVersion>
-        <version.core>1.6.2-SNAPSHOT</version.core>
+        <version.core>1.6.2</version.core>
     </properties>
 
     <scm>
@@ -160,7 +160,7 @@
             <dependency>
                 <groupId>uk.ac.ebi.intact.plugins</groupId>
                 <artifactId>intact-plugin</artifactId>
-                <version>1.6.2</version>
+                <version>1.6.3</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
