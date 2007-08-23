@@ -12,6 +12,7 @@ import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.persistence.util.CgLibUtil;
+import uk.ac.ebi.intact.util.DebugUtil;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -649,7 +650,13 @@ public class DownloadCVs {
         Set<Class> allCvClasses = new HashSet<Class>();
         for (Iterator<CvObject> iterator = cvObjects.iterator(); iterator.hasNext();) {
             CvObject cvObject = iterator.next();
-            allCvClasses.add(CgLibUtil.removeCglibEnhanced(cvObject.getClass()));
+
+            if (!cvObject.getXrefs().isEmpty()) {
+                allCvClasses.add(CgLibUtil.removeCglibEnhanced(cvObject.getClass()));
+            } else {
+                log.warn("Ignoring CvObject without xrefs: "+cvObject);
+                iterator.remove();
+            }
         }
 
         Map<Class, String[]> typeMapping = IntactOntology.getTypeMapping(true); // incl. DAGs and non DAGs
@@ -676,7 +683,7 @@ public class DownloadCVs {
                     log.info(miRef);
 
                     // look up in the database
-                    CvObject root = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().getByXref(miRef);
+                    CvObject root = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().getByPsiMiRef(miRef);
 
                     if (root == null && !isDryRun) {
                         // doesn't exist yet, then create it
@@ -715,8 +722,8 @@ public class DownloadCVs {
                         }
                     } // root was not found
                     else {
-                        if (log.isDebugEnabled())
-                            log.debug("DRY RUN: root CV would have been created");
+                        if (log.isDebugEnabled() && isDryRun)
+                            log.debug("DRY RUN: root CV would have been created: "+miRef);
                     }
 
                     // if not done yet, add mapping CV class to the specific root
@@ -770,7 +777,7 @@ public class DownloadCVs {
                 noMiTerms.add(cvObject);
             }
         }
-        log.info("Found " + noMiTerms.size() + " terms without MI reference");
+        log.info("Found " + noMiTerms.size() + " terms without MI reference: "+ DebugUtil.labelList(noMiTerms));
         List<String> allMiReferences = new ArrayList<String>(mi2cvObject.keySet());
         Collections.sort(allMiReferences);
 

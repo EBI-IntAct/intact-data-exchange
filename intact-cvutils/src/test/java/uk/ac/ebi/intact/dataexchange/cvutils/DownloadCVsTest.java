@@ -25,10 +25,7 @@ import uk.ac.ebi.intact.core.persister.standard.CvObjectPersister;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
-import uk.ac.ebi.intact.model.CvBiologicalRole;
-import uk.ac.ebi.intact.model.CvExperimentalRole;
-import uk.ac.ebi.intact.model.CvObject;
-import uk.ac.ebi.intact.model.CvTopic;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectBuilder;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
@@ -87,25 +84,44 @@ public class DownloadCVsTest extends IntactBasicTestCase {
         Assert.assertEquals(21, ontology.getCvTerms().size());
     }
 
-//    public static void main(String[] args) throws Exception {
-//
-//        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-//
-//        System.out.println("Total CVs: "+ IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().countAll());
-//
-//        StringWriter writer = new StringWriter();
-//        BufferedWriter bufWriter = new BufferedWriter(writer);
-//
-//        DownloadCVs downloadCVs = new DownloadCVs();
-//        downloadCVs.download(bufWriter);
-//
-//        bufWriter.flush();
-//
-//
-//
-//        IntactContext.getCurrentInstance().getDataContext().commitTransaction();
-//
-//    }
+    @Test
+    public void download_unexpectedCV() throws Exception {
+        CvDatabase wrongDb = getMockBuilder().createCvObject(CvDatabase.class, "no", "uniprot");
+        wrongDb.getXrefs().clear();
+
+        beginTransaction();
+        CvObjectPersister.getInstance().saveOrUpdate(wrongDb);
+        CvObjectPersister.getInstance().commit();
+        commitTransaction();
+        
+        // --- testing
+
+        StringWriter writer = new StringWriter();
+        BufferedWriter bufWriter = new BufferedWriter(writer);
+
+        beginTransaction();
+
+        DownloadCVs downloadCVs = new DownloadCVs();
+        downloadCVs.download(bufWriter);
+
+        bufWriter.flush();
+
+        String oboOutput = writer.toString();
+
+        commitTransaction();
+
+        beginTransaction();
+
+        Assert.assertEquals(22, getDaoFactory().getCvObjectDao().countAll());
+
+        commitTransaction();
+
+        PSILoader loader = new PSILoader(System.out);
+        IntactOntology ontology = loader.parseOboFile(new ByteArrayInputStream(oboOutput.getBytes()));
+
+        Assert.assertEquals(21, ontology.getCvTerms().size());
+    }
+
 
     private class DownloadCvPrimer extends SmallCvPrimer {
 
@@ -115,15 +131,17 @@ public class DownloadCVsTest extends IntactBasicTestCase {
 
         @Override
         public void createCVs() {
-            // FIXME: creating identity and database CVs won't be necessary when using
-            // intact-core > 1.6.1
+            // this first block can be removed when using intact-core > 1.6.3-SNAPSHOT
             beginTransaction();
-            
-            CvObjectBuilder builder = new CvObjectBuilder();
-            getDaoFactory().getCvObjectDao().persist(builder.createIdentityCvXrefQualifier(getIntactContext().getInstitution()));
-            getDaoFactory().getCvObjectDao().persist(builder.createPsiMiCvDatabase(getIntactContext().getInstitution()));
-
+            try {
+                CvObjectPersister.getInstance().saveOrUpdate(getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.GO_DEFINITION_REF_MI_REF, CvXrefQualifier.GO_DEFINITION_REF));
+                CvObjectPersister.getInstance().commit();
+            } catch (PersisterException e) {
+                e.printStackTrace();
+            }
             commitTransaction();
+            // end of possible remove
+            
             beginTransaction();
 
             // create the default CVs from the SmallCvPrimer
@@ -136,21 +154,23 @@ public class DownloadCVsTest extends IntactBasicTestCase {
             CvObjectPersister cvPersister = CvObjectPersister.getInstance();
 
             CvObject definition = CvObjectUtils.createCvObject(getIntactContext().getInstitution(), CvTopic.class, "IA:0241", CvTopic.DEFINITION);
-            CvExperimentalRole expRole = CvObjectUtils.createCvObject(getIntactContext().getInstitution(), CvExperimentalRole.class,
+            CvExperimentalRole expRoleUnspecified = CvObjectUtils.createCvObject(getIntactContext().getInstitution(), CvExperimentalRole.class,
                                                                       CvExperimentalRole.UNSPECIFIED_PSI_REF, CvExperimentalRole.UNSPECIFIED);
-            CvBiologicalRole bioRole = CvObjectUtils.createCvObject(getIntactContext().getInstitution(), CvBiologicalRole.class,
+            CvBiologicalRole bioRoleUnspecified = CvObjectUtils.createCvObject(getIntactContext().getInstitution(), CvBiologicalRole.class,
                                                                       CvBiologicalRole.UNSPECIFIED_PSI_REF, CvBiologicalRole.UNSPECIFIED);
 
             try {
                 cvPersister.saveOrUpdate(definition);
-                cvPersister.saveOrUpdate(expRole);
-                cvPersister.saveOrUpdate(bioRole);
+                cvPersister.saveOrUpdate(expRoleUnspecified);
+                cvPersister.saveOrUpdate(bioRoleUnspecified);
                 cvPersister.commit();
             } catch (PersisterException e) {
                 e.printStackTrace();
             }
 
             commitTransaction();
+
+
 
         }
     }
