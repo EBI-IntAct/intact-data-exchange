@@ -523,7 +523,7 @@ public class DownloadCVs {
      *
      * @return an mi reference or an intact reference or null if none is found.
      */
-    private String getIdentifier(CvObject cvObject) {
+    protected String getIdentifier(CvObject cvObject) {
         String mi = null;
         String ia = null;
 
@@ -646,17 +646,22 @@ public class DownloadCVs {
         final VirtualCvRoot superRoot = new VirtualCvRoot(new Institution("tmp"), "molecular interaction", "MI:0000");
         superRoot.setFullName("Controlled vocabularies originally created for protein protein interactions, extended to other molecules interactions.");
 
+        List<CvObject> cvObjectsWithoutXrefs = new ArrayList<CvObject>();
+
         // collecting all available types of CVs
         Set<Class> allCvClasses = new HashSet<Class>();
-        for (Iterator<CvObject> iterator = cvObjects.iterator(); iterator.hasNext();) {
-            CvObject cvObject = iterator.next();
-
-            if (!cvObject.getXrefs().isEmpty()) {
-                allCvClasses.add(CgLibUtil.removeCglibEnhanced(cvObject.getClass()));
-            } else {
-                log.warn("Ignoring CvObject without xrefs: "+cvObject);
-                iterator.remove();
+        for (CvObject cvObject : cvObjects) {
+            if (cvObject.getXrefs().isEmpty()) {
+                cvObjectsWithoutXrefs.add(cvObject);
             }
+
+            allCvClasses.add(CgLibUtil.removeCglibEnhanced(cvObject.getClass()));
+        }
+
+        if (IntactContext.getCurrentInstance().getConfig().isReadOnlyApp() && !cvObjectsWithoutXrefs.isEmpty())
+        {
+            throw new IntactException ("Some CvObjects without Xrefs have been found and the application is running in read-only mode, " +
+                                       "so it cannot create new xrefs for them: "+DebugUtil.labelList(cvObjectsWithoutXrefs));
         }
 
         Map<Class, String[]> typeMapping = IntactOntology.getTypeMapping(true); // incl. DAGs and non DAGs
