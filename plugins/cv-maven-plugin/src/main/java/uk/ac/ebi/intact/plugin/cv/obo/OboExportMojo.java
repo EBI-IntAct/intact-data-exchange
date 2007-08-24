@@ -15,13 +15,11 @@
  */
 package uk.ac.ebi.intact.plugin.cv.obo;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.Category;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import uk.ac.ebi.intact.core.util.LogUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.DownloadCVs;
 import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
 import uk.ac.ebi.intact.plugin.MojoUtils;
@@ -102,17 +100,10 @@ public class OboExportMojo
         return exportedOboFile;
     }
 
-    protected Appender getLogAppender() throws IOException {
-        Appender appender = super.getLogAppender();
-
-        Category cat1 = Logger.getLogger("org.hibernate.SQL");
-        cat1.setLevel(Level.DEBUG);
-        cat1.addAppender(appender);
-
-        Category cat2 = Logger.getLogger("org.hibernate.type");
-        cat2.setLevel(Level.DEBUG);
-        cat2.addAppender(appender);
-
-        return appender;
+    @Override
+    protected Priority getLogPriority()
+    {
+        LogUtils.setPrintSql(false);
+        return Priority.DEBUG;
     }
 }
