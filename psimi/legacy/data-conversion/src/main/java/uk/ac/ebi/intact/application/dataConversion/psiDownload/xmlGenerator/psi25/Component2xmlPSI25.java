@@ -172,7 +172,7 @@ public class Component2xmlPSI25 implements Component2xmlI {
         }
 
         // 12. Generating hostOrganismList ...
-        if ( component.getExpressedIn() != null ) {
+        if ( component.getExpressedIn() != null && component.getInteractor().getBioSource() != null) {
             Element hostOrganismList = session.createElement( "hostOrganismList" );
             element.appendChild( hostOrganismList );
             BioSource2xmlFactory.getInstance( session ).createHostOrganism( session, hostOrganismList, interactor.getBioSource() );
