@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
@@ -52,6 +53,10 @@ public class InteractionEnricher extends AnnotatedObjectEnricher<Interaction> {
         }
 
         ComponentEnricher componentEnricher = ComponentEnricher.getInstance();
+
+        if (objectToEnrich.getComponents() == null) {
+            throw new EnricherException("Interaction without components: "+objectToEnrich.getShortLabel());
+        }
 
         for (Component component : objectToEnrich.getComponents()) {
              componentEnricher.enrich(component);
