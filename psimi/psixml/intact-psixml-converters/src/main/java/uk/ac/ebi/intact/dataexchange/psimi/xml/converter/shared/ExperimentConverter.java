@@ -40,7 +40,13 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             return experiment;
         }
 
-        String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
+        String shortLabel;
+
+        if (psiObject.getNames() != null) {
+           shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
+        } else {
+           shortLabel = IntactConverterUtils.createExperimentTempShortLabel(); 
+        }
 
         Organism hostOrganism = psiObject.getHostOrganisms().iterator().next();
         BioSource bioSource = new OrganismConverter(getInstitution()).psiToIntact(hostOrganism);

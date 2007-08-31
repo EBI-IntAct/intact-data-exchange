@@ -23,8 +23,6 @@ import uk.ac.ebi.intact.context.impl.StandaloneSession;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.enricher.PsiEnricher;
-import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.util.DebugUtil;
 
 import java.io.*;
 import java.util.Properties;
@@ -44,14 +42,14 @@ public class Playground {
 
         IntactSession intactSession = new StandaloneSession();
         
-        File hibernateFile = new File(Playground.class.getResource("/playground-hibernate.cfg.xml").getFile());
+        File hibernateFile = new File(Playground.class.getResource("/zpro-hibernate.cfg.xml").getFile());
 
         CustomCoreDataConfig dataConfig = new CustomCoreDataConfig("custom", hibernateFile, intactSession);
 
         IntactContext.initContext(dataConfig, intactSession);
 
-        IntactUnit iu = new IntactUnit();
-        iu.createSchema();
+        //IntactUnit iu = new IntactUnit();
+        //iu.createSchema();
 
         EnricherConfig enricherConfig = new EnricherConfig();
         enricherConfig.setUpdateInteractionShortLabels(true);
@@ -59,40 +57,33 @@ public class Playground {
         final File helaFolder = new File("/ebi/sp/pro6/intact/local/data/curation-material/bantscheff-2007/hela");
         final File k652Folder = new File("/ebi/sp/pro6/intact/local/data/curation-material/bantscheff-2007/k652");
 
-        for (File file : getPsiMiFilesInFolder(k652Folder)) {
+        File[] foldersToImport = new File[] {helaFolder, k652Folder};
 
-            System.out.println("Importing: "+file);
+        for (File folderToImport : foldersToImport) {
+            for (File file : getPsiMiFilesInFolder(folderToImport)) {
 
-            InputStream is = new FileInputStream(file);
+                System.out.println("Importing: "+file);
 
-             StringWriter writer = new StringWriter();
+                InputStream is = new FileInputStream(file);
 
-            PsiEnricher.enrichPsiXml(is, writer, enricherConfig);
+                 StringWriter writer = new StringWriter();
 
-            writer.flush();
+                PsiEnricher.enrichPsiXml(is, writer, enricherConfig);
 
-            System.out.println(writer.toString());
+                writer.flush();
 
-            InputStream enricherInput = new ByteArrayInputStream(writer.toString().getBytes());
+                InputStream enricherInput = new ByteArrayInputStream(writer.toString().getBytes());
 
-            PsiExchange.importIntoIntact(enricherInput, false);
+                PsiExchange.importIntoIntact(enricherInput, false);
+            }
         }
 
         IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
         System.out.println("Interactions DB: " + IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getInteractionDao().countAll() +" - "+ DebugUtil.labelList(
-        IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getInteractionDao().getAll()));
+                .getInteractionDao().countAll());
         System.out.println("Experiments DB: " + IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getExperimentDao().countAll() +" - "+ IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getExperimentDao().getAll());
-
-        Experiment exp = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getExperimentDao().getAll().iterator().next();
-
-        System.out.println("Experiment Xrefs: "+exp.getXrefs());
-        System.out.println("BioSource: "+exp.getBioSource());
+                .getExperimentDao().countAll());
 
         IntactContext.getCurrentInstance().getDataContext().commitTransaction();
 
@@ -129,6 +120,8 @@ public class Playground {
                        "          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
                        "          xsi:schemaLocation=\"net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd\">";
             }
+
+            line = line.replaceAll(">unspecified<", ">unspecified role<");
 
             sb.append(line).append("\n");
         }

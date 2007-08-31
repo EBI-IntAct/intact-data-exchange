@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.StringUtils;
 import psidev.psi.mi.xml.model.Attribute;
 import psidev.psi.mi.xml.model.AttributeContainer;
 import psidev.psi.mi.xml.model.DbReference;
@@ -26,6 +27,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConver
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 
 import java.util.Collection;
 import java.util.Random;
@@ -48,6 +50,11 @@ public class IntactConverterUtils {
 
     public static void populateNames(Names names, AnnotatedObject<?, ?> annotatedObject) {
         String shortLabel = getShortLabelFromNames(names);
+
+        if (names == null && (annotatedObject instanceof Experiment) ) {
+            shortLabel = createExperimentTempShortLabel();
+        }
+
         annotatedObject.setShortLabel(shortLabel);
 
         if (names != null) {
@@ -142,6 +149,10 @@ public class IntactConverterUtils {
 
     public static String createTempShortLabel() {
         return TEMP_SHORTLABEL_PREFIX + Math.abs(new Random().nextInt());
+    }
+
+    public static String createExperimentTempShortLabel() {
+        return new IntactMockBuilder().randomString(5)+"-0000";
     }
 
     public static boolean isTempShortLabel(String label) {

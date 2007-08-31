@@ -20,6 +20,7 @@ import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 
 import java.io.File;
 import java.io.InputStream;
@@ -30,7 +31,7 @@ import java.io.InputStream;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class AbstractPsiExchangeTest {
+public class AbstractPsiExchangeTest extends IntactBasicTestCase {
 
     private static final String INTACT_FILE = "/xml/intact_2006-07-19.xml";
     private static final String MINT_FILE = "/xml/mint_2006-07-18.xml";
@@ -75,19 +76,4 @@ public class AbstractPsiExchangeTest {
         return reader.read(getDipStream());
     }
 
-    protected Institution getMockInstitution() {
-        return new Institution("testInstitution");
-    }
-
-    protected DaoFactory getDaoFactory() {
-         return IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
-    }
-
-    protected void beginTransaction() {
-         IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-    }
-
-    protected void commitTransaction() throws Exception {
-         IntactContext.getCurrentInstance().getDataContext().commitTransaction();
-    }
 }

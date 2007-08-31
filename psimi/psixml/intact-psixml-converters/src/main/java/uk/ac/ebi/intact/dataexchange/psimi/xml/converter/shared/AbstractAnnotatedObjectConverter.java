@@ -42,7 +42,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
 
     public A psiToIntact(T psiObject) {
         A intactObject = (A) ConversionCache.getElement(psiElementKey(psiObject));
-
+        
         if (intactObject != null) {
             newIntactObjectCreated = false;
             return intactObject;

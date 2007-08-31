@@ -42,6 +42,19 @@ public class ExperimentConverterTest extends IntactBasicTestCase {
     }
 
     @Test
+    public void psiToIntact_noLabel() {
+        ExperimentDescription expDesc = PsiMockFactory.createMockExperiment();
+        expDesc.setNames(null);
+        expDesc.setXref(null);
+
+        ExperimentConverter converter = new ExperimentConverter(new Institution("testInst"));
+        Experiment exp = converter.psiToIntact(expDesc);
+        
+
+        Assert.assertEquals(1, exp.getXrefs().size());
+    }
+
+    @Test
     public void intactToPsi_default() {
         Experiment exp = getMockBuilder().createExperimentRandom(1);
         exp.getXrefs().clear();
@@ -49,6 +62,22 @@ public class ExperimentConverterTest extends IntactBasicTestCase {
 
         ExperimentConverter converter = new ExperimentConverter(new Institution("testInst"));
         ExperimentDescription expDesc = converter.intactToPsi(exp);
+
+        Assert.assertNotNull(expDesc.getBibref());
+        Assert.assertNull(expDesc.getXref());
+    }
+
+    @Test
+    public void intactToPsi_noLabel() {
+        Experiment exp = getMockBuilder().createExperimentRandom(1);
+        exp.setShortLabel(null);
+        exp.getXrefs().clear();
+        exp.addXref(getMockBuilder().createPrimaryReferenceXref(exp, "1234567"));
+
+        ExperimentConverter converter = new ExperimentConverter(new Institution("testInst"));
+        ExperimentDescription expDesc = converter.intactToPsi(exp);
+
+        System.out.println(exp.getShortLabel());
 
         Assert.assertNotNull(expDesc.getBibref());
         Assert.assertNull(expDesc.getXref());

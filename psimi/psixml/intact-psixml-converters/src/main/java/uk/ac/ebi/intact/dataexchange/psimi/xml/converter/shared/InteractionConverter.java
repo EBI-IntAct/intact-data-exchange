@@ -46,6 +46,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             return interaction;
         }
 
+        // This has to be before anything else (e.g. when creating xrefs)
+        interaction.setOwner(getInstitution());
+
         String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
 
         Collection<Experiment> experiments = getExperiments(psiObject);
@@ -63,7 +66,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         CvInteractorType interactorType = getInteractorType(psiObject);
 
         interaction.setShortLabel(shortLabel);
-        interaction.setOwner(getInstitution());
         interaction.setCvInteractorType(interactorType);
         interaction.setExperiments(experiments);
         interaction.setCvInteractionType(interactionType);

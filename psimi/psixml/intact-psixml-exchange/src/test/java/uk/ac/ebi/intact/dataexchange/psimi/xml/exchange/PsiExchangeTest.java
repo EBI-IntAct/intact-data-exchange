@@ -15,12 +15,16 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Alias;
+import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.DebugUtil;
 
@@ -41,9 +45,25 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         iu.createSchema();
     }
 
+    @After
+    public void endTest() throws Exception {
+        commitTransaction();
+    }
+
     @Test
     public void importXml_intact() throws Exception {
-        PsiExchange.importIntoIntact(getIntactEntrySet(), false);
+        EntrySet set = getIntactEntrySet();
+        /*
+        for (Entry entry : set.getEntries()) {
+            for (psidev.psi.mi.xml.model.Interaction interaction : entry.getInteractions()) {
+                for (Participant p : interaction.getParticipants()) {
+                    p.getFeatures().clear();
+                }
+            }
+        }  */
+
+        PsiExchange.importIntoIntact(set, false);
+
 
         beginTransaction();
         int count = getDaoFactory().getInteractionDao().countAll();
@@ -63,6 +83,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         System.out.println(DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll()));
         commitTransaction();
 
+        
         Assert.assertEquals(11, count);
     }
 
@@ -137,10 +158,9 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     @Test
     public void export() throws Exception {
 
-        IntactMockBuilder mockBuilder = new IntactMockBuilder();
-        Interaction mockInteraction = mockBuilder.createInteractionRandomBinary();
+        Interaction mockInteraction = getMockBuilder().createInteractionRandomBinary();
         Experiment exp = mockInteraction.getExperiments().iterator().next();
-        exp.addXref(mockBuilder.createPrimaryReferenceXref(exp, "1234567"));
+        exp.addXref(getMockBuilder().createPrimaryReferenceXref(exp, "1234567"));
 
         IntactEntry entry = new IntactEntry(Arrays.asList(mockInteraction));
 
