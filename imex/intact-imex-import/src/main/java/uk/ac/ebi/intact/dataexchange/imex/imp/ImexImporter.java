@@ -15,7 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.imp;
 
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
+import uk.ac.ebi.intact.persistence.dao.ImexObjectDao;
 
+import java.util.List;
 
 /**
  * TODO comment this
@@ -25,6 +29,17 @@ package uk.ac.ebi.intact.dataexchange.imex.imp;
  */
 public class ImexImporter {
 
-    
+    private Repository repository;
+
+    public ImexImporter(Repository repository) {
+        this.repository = repository;
+    }
+
+    public ImportReport reimportFailed() {
+        ImexObjectDao imexObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getImexObjectDao();
+        List<String> failedPubmeds = imexObjectDao.getFailedPubmedIds();
+        
+        return null;
+    }
 
 }
