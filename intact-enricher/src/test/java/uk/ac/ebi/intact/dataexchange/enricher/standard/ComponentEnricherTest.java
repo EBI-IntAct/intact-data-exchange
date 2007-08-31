@@ -22,6 +22,7 @@ import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.model.Component;
+import uk.ac.ebi.intact.model.CvExperimentalPreparation;
 
 /**
  * TODO comment this
@@ -63,5 +64,22 @@ public class ComponentEnricherTest extends IntactBasicTestCase {
         enricher.enrich(comp);
 
         Assert.assertEquals("human", comp.getExpressedIn().getShortLabel());
+    }
+
+    @Test
+    public void enrich_cvs() throws Exception {
+        Component comp = getMockBuilder().createComponentRandom();
+        comp.getParticipantDetectionMethods().clear();
+        comp.getExperimentalPreparations().clear();
+
+        CvExperimentalPreparation cvExperimentalPrep = getMockBuilder().createCvObject(CvExperimentalPreparation.class, CvExperimentalPreparation.PURIFIED_REF, "nothing");
+        cvExperimentalPrep.setFullName("nothing");
+
+        comp.getExperimentalPreparations().add(cvExperimentalPrep);
+
+        enricher.enrich(comp);
+
+        CvExperimentalPreparation enrichedExperimentalPreparation = comp.getExperimentalPreparations().iterator().next();
+        Assert.assertEquals(CvExperimentalPreparation.PURIFIED, enrichedExperimentalPreparation.getShortLabel());
     }
 }

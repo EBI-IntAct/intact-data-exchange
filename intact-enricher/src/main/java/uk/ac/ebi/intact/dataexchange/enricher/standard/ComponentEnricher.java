@@ -16,6 +16,8 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import uk.ac.ebi.intact.model.Component;
+import uk.ac.ebi.intact.model.CvExperimentalPreparation;
+import uk.ac.ebi.intact.model.CvIdentification;
 
 /**
  * TODO comment this
@@ -54,6 +56,12 @@ public class ComponentEnricher implements Enricher<Component>{
         }
         if (objectToEnrich.getCvExperimentalRole() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvExperimentalRole());
+        }
+        for (CvExperimentalPreparation experimentalPreparation : objectToEnrich.getExperimentalPreparations()) {
+            cvObjectEnricher.enrich(experimentalPreparation);
+        }
+        for (CvIdentification participantDetectionMethods : objectToEnrich.getParticipantDetectionMethods()) {
+            cvObjectEnricher.enrich(participantDetectionMethods);
         }
     }
 
