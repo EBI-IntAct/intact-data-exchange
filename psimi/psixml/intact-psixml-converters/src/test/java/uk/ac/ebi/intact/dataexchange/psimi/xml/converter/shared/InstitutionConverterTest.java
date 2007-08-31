@@ -32,26 +32,27 @@ public class InstitutionConverterTest extends AbstractConverterTest {
     public void psiToIntact_intact() throws Exception {
         Source source = PsiMockFactory.createMockSource();
 
-        Assert.assertEquals("ebi", source.getNames().getShortLabel());
+        Assert.assertEquals(Institution.INTACT, source.getNames().getShortLabel());
 
         InstitutionConverter institutionConverter = new InstitutionConverter();
         Institution institution = institutionConverter.psiToIntact(source);
 
         Assert.assertNotNull(institution);
-        Assert.assertEquals("ebi", institution.getShortLabel());
+        Assert.assertEquals(Institution.INTACT, institution.getShortLabel());
     }
 
     @Test
     public void intactToPsi_intact() throws Exception {
-        Institution institution = new Institution("ebi");
+        Institution institution = getMockBuilder().createInstitution(Institution.MINT_REF, Institution.MINT);
 
-        Assert.assertEquals("ebi", institution.getShortLabel());
+        Assert.assertEquals(Institution.MINT, institution.getShortLabel());
 
         InstitutionConverter institutionConverter = new InstitutionConverter();
         Source source = institutionConverter.intactToPsi(institution);
 
         Assert.assertNotNull(source);
-        Assert.assertEquals("ebi", source.getNames().getShortLabel());
+        Assert.assertEquals(Institution.MINT, source.getNames().getShortLabel());
+        Assert.assertEquals(Institution.MINT_REF, source.getXref().getPrimaryRef().getId());
     }
 
 }

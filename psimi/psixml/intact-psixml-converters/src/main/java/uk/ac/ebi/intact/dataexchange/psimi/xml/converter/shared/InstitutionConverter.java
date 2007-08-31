@@ -1,10 +1,10 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.*;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.Institution;
+import psidev.psi.mi.xml.model.Xref;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
+import uk.ac.ebi.intact.model.*;
 
 import java.util.Date;
 
@@ -14,35 +14,22 @@ import java.util.Date;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InstitutionConverter extends AbstractIntactPsiConverter<Institution, Source>
+public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Institution, Source>
 {
     public InstitutionConverter()
     {
-        super(null);
+        super(new Institution(), Institution.class, Source.class);
     }
 
     public Institution psiToIntact(Source psiObject)
     {
-        Institution institution = null;
+        Institution institution = getInstitution();
 
-        if (psiObject.getXref() != null) {
-            String primaryId = psiObject.getXref().getPrimaryRef().getId();
-
-            if (primaryId.equals("MI:0469")) {
-                institution = new Institution("ebi");
-                institution.setFullName("European Bioinformatics Institute");
-            }
-        }
-
-        if (institution == null) {
-            if (psiObject.getNames() != null) {
-                institution = new Institution(psiObject.getNames().getShortLabel());
-                institution.setFullName(psiObject.getNames().getFullName());
-            } else {
-               institution = new Institution("Unknown");
-            }
-        }
-
+        IntactConverterUtils.populateNames(psiObject.getNames(), institution);
+        IntactConverterUtils.populateXref(psiObject.getXref(), institution, new XrefConverter<InstitutionXref>(getInstitution(), InstitutionXref.class));
+        IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), institution, new XrefConverter<InstitutionXref>(getInstitution(), InstitutionXref.class));
+        IntactConverterUtils.populateAnnotations(psiObject, institution, getInstitution());
+  
         for (Attribute attribute : psiObject.getAttributes()) {
             String attributeName = attribute.getName();
 
@@ -59,8 +46,10 @@ public class InstitutionConverter extends AbstractIntactPsiConverter<Institution
     public Source intactToPsi(Institution intactObject)
     {
         Source source = new Source();
-        source.setReleaseDate(new Date());
+        PsiConverterUtils.populate(intactObject, source);
 
+        source.setReleaseDate(new Date());
+       /*
         String label = intactObject.getShortLabel();
 
         Names names = new Names();
@@ -88,8 +77,12 @@ public class InstitutionConverter extends AbstractIntactPsiConverter<Institution
         if (bibref != null) {
             source.setBibref(bibref);
         }
-
+           */
         return source;
+    }
+
+    protected String psiElementKey(Source psiObject) {
+        return String.valueOf("source:"+psiObject.getNames().getShortLabel());
     }
 
     private Xref createXref(String dbMiRef) {

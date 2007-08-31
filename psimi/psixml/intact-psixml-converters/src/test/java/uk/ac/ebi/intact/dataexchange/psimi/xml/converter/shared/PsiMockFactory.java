@@ -76,7 +76,7 @@ public class PsiMockFactory {
         Names names = new Names();
         source.setNames(names);
 
-        names.setShortLabel("ebi");
+        names.setShortLabel("intact");
         names.setFullName("European Bioinformatics Institute");
 
         source.setXref(createSourceXref(CvDatabase.INTACT_MI_REF));

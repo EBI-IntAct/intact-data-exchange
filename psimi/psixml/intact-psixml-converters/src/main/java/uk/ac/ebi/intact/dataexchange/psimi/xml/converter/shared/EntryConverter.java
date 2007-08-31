@@ -64,6 +64,10 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         IntactEntry ientry = new IntactEntry(interactions);
         IntactConverterUtils.populateAnnotations(psiObject, ientry, getInstitution());
 
+        if (psiObject.getSource().getReleaseDate() != null) {
+            ientry.setReleasedDate(psiObject.getSource().getReleaseDate());
+        }
+
         ConversionCache.clear();
 
         return ientry;
