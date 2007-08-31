@@ -65,6 +65,7 @@ public class DefaultEntrySetSplitter implements EntrySetSplitter
             try
             {
                 File splittedFile = helper.getEntryFile(repoEntry);
+                splittedFile.getParentFile().mkdirs();
 
                 if (log.isDebugEnabled()) log.debug("\tCreated splitted: "+splittedFile);
 

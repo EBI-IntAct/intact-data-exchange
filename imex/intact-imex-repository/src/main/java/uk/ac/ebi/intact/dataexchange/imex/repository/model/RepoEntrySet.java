@@ -25,7 +25,9 @@ import java.util.List;
  * @version $Id$
  */
 @Entity
-@NamedQuery(name = "repoEntrySetByName", query="select es from RepoEntrySet es where es.name = :name")
+@NamedQueries (value = {
+    @NamedQuery(name = "repoEntrySetByName", query="select es from RepoEntrySet es where es.name = :name")
+    })
 public class RepoEntrySet extends RepoEntity {
 
     private String name;

@@ -47,25 +47,33 @@ public class RepositoryHelper {
         return new File(repository.getOriginalEntrySetDir(), name + FILE_EXTENSION);
     }
 
-    public File getEntryFile(RepoEntry entry) {
-        return getEntryFile(entry.getName(), entry.isEnriched());
+    public File getEntrySetDir(RepoEntrySet entrySet) {
+        return new File(repository.getOriginalEntrySetDir(), entrySet.getName());
     }
 
-    public File getEntryFile(String name, boolean enriched) {
+    public File getEntrySetDir(String name) {
+        return new File(repository.getEntriesDir(), name);
+    }
+
+    public File getEntryFile(RepoEntry entry) {
+        return getEntryFile(entry.getName(), entry.getRepoEntrySet().getName(), entry.isEnriched());
+    }
+
+    public File getEntryFile(String name, String entrySetName, boolean enriched) {
         File entryFile;
         if (enriched) {
-            entryFile = new File(repository.getEntriesDir(), name + FILE_EXTENSION_ENRICHED);
+            entryFile = new File(getEntrySetDir(entrySetName), name + FILE_EXTENSION_ENRICHED);
         } else {
-            entryFile = new File(repository.getEntriesDir(), name + FILE_EXTENSION_RAW);
+            entryFile = new File(getEntrySetDir(entrySetName), name + FILE_EXTENSION_RAW);
         }
         return entryFile;
     }
 
     public File getEntryErrorFile(RepoEntry repoEntry) {
-        return getEntryErrorFile(repoEntry.getName());
+        return getEntryErrorFile(repoEntry.getName(), repoEntry.getRepoEntrySet().getName());
     }
 
-    public File getEntryErrorFile(String name) {
-        return new File(repository.getEntriesDir(), name + FILE_EXTENSION_ERROR);
+    public File getEntryErrorFile(String name, String entrySetName) {
+        return new File(getEntrySetDir(entrySetName), name + FILE_EXTENSION_ERROR);
     }
 }

@@ -47,8 +47,8 @@ public class DefaultEntryEnricher implements EntryEnricher
         Repository repository = ImexRepositoryContext.getInstance().getRepository();
         RepositoryHelper helper = new RepositoryHelper(repository);
 
-        File entryBeforeEnrichFile = helper.getEntryFile(repoEntry.getName(), false);
-        File entryAfterEnrichFile = helper.getEntryFile(repoEntry.getName(), true);
+        File entryBeforeEnrichFile = helper.getEntryFile(repoEntry.getName(), repoEntry.getRepoEntrySet().getName(), false);
+        File entryAfterEnrichFile = helper.getEntryFile(repoEntry.getName(), repoEntry.getRepoEntrySet().getName(), true);
 
         try {
             PsiEnricher.enrichPsiXml(entryBeforeEnrichFile, entryAfterEnrichFile, new DefaultEnricherConfig());

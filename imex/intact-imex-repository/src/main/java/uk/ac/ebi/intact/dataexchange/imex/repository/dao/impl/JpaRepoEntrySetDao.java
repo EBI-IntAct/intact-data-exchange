@@ -50,4 +50,9 @@ public class JpaRepoEntrySetDao extends JpaImexDaoSupport implements RepoEntrySe
         query.setParameter("name", name);
         return (RepoEntrySet) query.getSingleResult();
     }
+
+    public List<String> findAllPubmedIds() {
+        Query query = getEntityManager().createQuery("select es.pubmedId from RepoEntrySet es");
+        return query.getResultList();
+    }
 }

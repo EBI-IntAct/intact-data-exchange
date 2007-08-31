@@ -36,7 +36,7 @@ public interface RepoEntrySetDao
 
     List<RepoEntrySet> findAll();
 
-    //Provider findById(Long id);
-
     RepoEntrySet findByName(String name);
+
+    List<String> findAllPubmedIds();
 }

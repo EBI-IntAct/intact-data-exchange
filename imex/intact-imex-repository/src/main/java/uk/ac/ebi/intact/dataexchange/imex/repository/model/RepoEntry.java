@@ -27,6 +27,7 @@ import java.util.List;
  */
 @Entity
 @NamedQuery(name = "repoEntryByName", query="select re from RepoEntry re where re.name = :name")
+@NamedQuery(name = "repoEntryValid", query="select re from RepoEntry re where re.valid = true")
 public class RepoEntry extends RepoEntity {
 
     @ManyToOne
