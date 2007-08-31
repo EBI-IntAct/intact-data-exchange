@@ -26,8 +26,14 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
         Institution institution = getInstitution();
 
         IntactConverterUtils.populateNames(psiObject.getNames(), institution);
-        IntactConverterUtils.populateXref(psiObject.getXref(), institution, new XrefConverter<InstitutionXref>(getInstitution(), InstitutionXref.class));
-        IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), institution, new XrefConverter<InstitutionXref>(getInstitution(), InstitutionXref.class));
+
+        if (psiObject.getXref() != null) {
+            IntactConverterUtils.populateXref(psiObject.getXref(), institution, new XrefConverter<InstitutionXref>(getInstitution(), InstitutionXref.class));
+        }
+
+        if (psiObject.getBibref() != null) {
+            IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), institution, new XrefConverter<InstitutionXref>(getInstitution(), InstitutionXref.class));
+        }
         IntactConverterUtils.populateAnnotations(psiObject, institution, getInstitution());
   
         for (Attribute attribute : psiObject.getAttributes()) {
