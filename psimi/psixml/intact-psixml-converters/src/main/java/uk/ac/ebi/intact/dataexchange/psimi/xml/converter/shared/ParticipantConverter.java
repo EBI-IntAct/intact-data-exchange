@@ -48,7 +48,6 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         Interaction interaction = new InteractionConverter(getInstitution()).psiToIntact(psiObject.getInteraction());
 
         Component component = newComponent(getInstitution(), psiObject, interaction);
-
         return component;
     }
 
@@ -69,11 +68,19 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         participant.setInteractor(interactor);
         participant.setInteractorRef(new InteractorRef(interactor.getId()));
 
-        if (intactObject.getParticipantIdentification() != null) {
+        for (CvIdentification participantDetectionMethod : intactObject.getParticipantDetectionMethods()) {
             ParticipantIdentificationMethodConverter pimConverter = new ParticipantIdentificationMethodConverter(getInstitution());
-            ParticipantIdentificationMethod participantIdentificationMethod = pimConverter.intactToPsi(intactObject.getParticipantIdentification());
+            ParticipantIdentificationMethod participantIdentificationMethod = pimConverter.intactToPsi(participantDetectionMethod);
 
             participant.getParticipantIdentificationMethods().add(participantIdentificationMethod);
+        }
+
+        for (CvExperimentalPreparation experimentalPreparation : intactObject.getExperimentalPreparations()) {
+            CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation> epConverter =
+                    new CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation>(getInstitution(), CvExperimentalPreparation.class, ExperimentalPreparation.class);
+            ExperimentalPreparation expPrep = epConverter.intactToPsi(experimentalPreparation);
+
+            participant.getExperimentalPreparations().add(expPrep);
         }
 
         if (!intactObject.getBindingDomains().isEmpty()) {
@@ -101,16 +108,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         return participant;
     }
 
-    /**
-     * Only uses the first one
-     */
-    protected CvExperimentalRole getExperimentalRole(Participant psiObject) {
-        ExperimentalRole role = psiObject.getExperimentalRoles().iterator().next();
-
-        return new ExperimentalRoleConverter(getInstitution()).psiToIntact(role);
-    }
-
-    static Component newComponent(Institution institution, Participant participant, Interaction interaction) {
+    protected static Component newComponent(Institution institution, Participant participant, Interaction interaction) {
         Interactor interactor = new InteractorConverter(institution).psiToIntact(participant.getInteractor());
 
         BiologicalRole psiBioRole = participant.getBiologicalRole();
@@ -118,6 +116,10 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             psiBioRole = PsiConverterUtils.createUnspecifiedBiologicalRole();
         }
         CvBiologicalRole biologicalRole = new BiologicalRoleConverter(institution).psiToIntact(psiBioRole);
+
+        if (participant.getExperimentalRoles().size() > 1) {
+            throw new PsiConversionException("Cannot convert participants with more than one expeirmental role: "+participant);
+        }
 
         // only the first experimental role
         ExperimentalRole role;
@@ -145,19 +147,17 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             component.addBindingDomain(feature);
         }
 
-        Collection<ParticipantIdentificationMethod> participantIdentificationMethods = participant.getParticipantIdentificationMethods();
-
-        if (participantIdentificationMethods.size() > 1) {
-            throw new PsiConversionException("Cannot convert particiant with more than one identification methods");
+        for (ParticipantIdentificationMethod pim : participant.getParticipantIdentificationMethods()) {
+            ParticipantIdentificationMethodConverter pimConverter = new ParticipantIdentificationMethodConverter(institution);
+            CvIdentification cvIdentification = pimConverter.psiToIntact(pim);
+            component.getParticipantDetectionMethods().add(cvIdentification);
         }
 
-        if (!participantIdentificationMethods.isEmpty()) {
-            ParticipantIdentificationMethodConverter pimConverter = new ParticipantIdentificationMethodConverter(institution);
-            ParticipantIdentificationMethod participantIdentificationMethod = participantIdentificationMethods.iterator().next();
-
-            CvIdentification cvIdentification = pimConverter.psiToIntact(participantIdentificationMethod);
-            component.setParticipantIdentification(cvIdentification);
-
+        for (ExperimentalPreparation expPrep : participant.getExperimentalPreparations()) {
+            CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation> epConverter =
+                    new CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation>(institution, CvExperimentalPreparation.class, ExperimentalPreparation.class);
+            CvExperimentalPreparation cvExpPrep = epConverter.psiToIntact(expPrep);
+            component.getExperimentalPreparations().add(cvExpPrep);
         }
 
         if (!participant.getHostOrganisms().isEmpty()) {

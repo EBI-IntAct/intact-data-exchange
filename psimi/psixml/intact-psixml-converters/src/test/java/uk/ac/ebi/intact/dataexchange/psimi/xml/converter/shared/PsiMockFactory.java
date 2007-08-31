@@ -141,6 +141,9 @@ public class PsiMockFactory {
         participant.setBiologicalRole(createCvType(BiologicalRole.class));
         participant.getExperimentalRoles().add(createCvType(ExperimentalRole.class));
 
+        participant.getExperimentalPreparations().add(createCvType(ExperimentalPreparation.class));
+        participant.getParticipantIdentificationMethods().add(createCvType(ParticipantIdentificationMethod.class));
+
         for (int i=0; i<childRandom(); i++) {
             participant.getFeatures().add(createFeature());
         }
