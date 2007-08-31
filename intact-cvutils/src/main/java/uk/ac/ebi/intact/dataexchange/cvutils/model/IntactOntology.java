@@ -43,6 +43,7 @@ public class IntactOntology {
         class2mi.put( CvFeatureIdentification.class, new String[]{ "MI:0003" } );
         class2mi.put( CvFeatureType.class, new String[]{ "MI:0116" } );
         class2mi.put( CvInteractorType.class, new String[]{ "MI:0313" } );
+        class2mi.put( CvExperimentalPreparation.class, new String[]{ "MI:0346" } );
 
         // Non DAG
         class2mi.put( CvFuzzyType.class, new String[]{ "MI:0333" } );
@@ -66,6 +67,7 @@ public class IntactOntology {
         mi2name.put( "MI:0495", "experimental role" );
         mi2name.put( "MI:0500", "biological role" );
         mi2name.put( "MI:0590", "attribute name" );
+        mi2name.put( "MI:0346", "experimental preparation" );
 
         mi2name.put( "IA:0001", "cell type" );
         mi2name.put( "IA:0002", "tissue" );

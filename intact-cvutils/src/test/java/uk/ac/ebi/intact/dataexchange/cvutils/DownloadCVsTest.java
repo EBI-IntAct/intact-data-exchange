@@ -24,6 +24,7 @@ import uk.ac.ebi.intact.config.CvPrimer;
 import uk.ac.ebi.intact.config.impl.SmallCvPrimer;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterException;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.persister.standard.CvObjectPersister;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
@@ -74,11 +75,13 @@ public class DownloadCVsTest extends IntactBasicTestCase {
 
         String oboOutput = writer.toString();
 
+        System.out.println( oboOutput );
+
         commitTransaction();
 
         beginTransaction();
 
-        Assert.assertEquals(21, getDaoFactory().getCvObjectDao().countAll());
+        Assert.assertEquals(24, getDaoFactory().getCvObjectDao().countAll());
 
         for (CvObject cv : getDaoFactory().getCvObjectDao().getAll()) {
             Assert.assertFalse(cv.getXrefs().isEmpty());
@@ -89,7 +92,7 @@ public class DownloadCVsTest extends IntactBasicTestCase {
         PSILoader loader = new PSILoader(System.out);
         IntactOntology ontology = loader.parseOboFile(new ByteArrayInputStream(oboOutput.getBytes()));
 
-        Assert.assertEquals(21, ontology.getCvTerms().size());
+        Assert.assertEquals(24, ontology.getCvTerms().size());
     }
 
     @Test
@@ -120,14 +123,14 @@ public class DownloadCVsTest extends IntactBasicTestCase {
 
         beginTransaction();
 
-        Assert.assertEquals(22, getDaoFactory().getCvObjectDao().countAll());
+        Assert.assertEquals(25, getDaoFactory().getCvObjectDao().countAll());
 
         commitTransaction();
 
         PSILoader loader = new PSILoader(System.out);
         IntactOntology ontology = loader.parseOboFile(new ByteArrayInputStream(oboOutput.getBytes()));
 
-        Assert.assertEquals(22, ontology.getCvTerms().size());
+        Assert.assertEquals(25, ontology.getCvTerms().size());
     }
 
     @Test (expected = IntactException.class)
@@ -202,20 +205,18 @@ public class DownloadCVsTest extends IntactBasicTestCase {
                                                                       CvExperimentalRole.UNSPECIFIED_PSI_REF, CvExperimentalRole.UNSPECIFIED);
             CvBiologicalRole bioRoleUnspecified = CvObjectUtils.createCvObject(getIntactContext().getInstitution(), CvBiologicalRole.class,
                                                                       CvBiologicalRole.UNSPECIFIED_PSI_REF, CvBiologicalRole.UNSPECIFIED);
+            CvExperimentalPreparation endogeneous = CvObjectUtils.createCvObject(getIntactContext().getInstitution(), CvExperimentalPreparation.class,
+                                                                           CvExperimentalPreparation.ENDOGENOUS_LEVEL_REF, CvExperimentalPreparation.ENDOGENOUS_LEVEL);
+            CvExperimentalPreparation purified = CvObjectUtils.createCvObject(getIntactContext().getInstitution(), CvExperimentalPreparation.class,
+                                                                           CvExperimentalPreparation.PURIFIED_REF, CvExperimentalPreparation.PURIFIED);
 
             try {
-                cvPersister.saveOrUpdate(definition);
-                cvPersister.saveOrUpdate(expRoleUnspecified);
-                cvPersister.saveOrUpdate(bioRoleUnspecified);
-                cvPersister.commit();
+                PersisterHelper.saveOrUpdate( endogeneous, purified, definition, expRoleUnspecified, bioRoleUnspecified);
             } catch (PersisterException e) {
                 e.printStackTrace();
             }
 
             commitTransaction();
-
-
-
         }
     }
 }
