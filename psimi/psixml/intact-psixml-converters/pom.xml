@@ -16,14 +16,14 @@
     <name>IntAct Data Exchange :: PSI MI :: XML :: Converters</name>
     <description>Data converters from PSI XML schema objects to the IntAct model objects</description>
 
-    <build>
+<!--    <build>
         <plugins>
             <plugin>
                 <groupId>uk.ac.ebi.intact.plugins</groupId>
                 <artifactId>dbtest-maven-plugin</artifactId>
             </plugin>
         </plugins>
-    </build>
+    </build>-->
 
     <dependencies>
         <!--

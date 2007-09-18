@@ -40,8 +40,6 @@ import java.util.HashSet;
  */
 public class PsiConverterUtils {
 
-    private static final String UNSPEFICIED_ROLE = "unspeficied role";
-
     private PsiConverterUtils() {
     }
 
@@ -180,14 +178,14 @@ public class PsiConverterUtils {
         }
 
         Names names = new Names();
-        names.setShortLabel( UNSPEFICIED_ROLE );
-        names.setFullName( UNSPEFICIED_ROLE );
+        names.setShortLabel(CvExperimentalRole.UNSPECIFIED);
+        names.setFullName(CvExperimentalRole.UNSPECIFIED);
 
         role.setNames( names );
 
         Xref xref = new Xref();
 
-        String unspecifiedRoleMiRef = "MI:0499";
+        String unspecifiedRoleMiRef = CvExperimentalRole.UNSPECIFIED_PSI_REF;
 
         DbReference dbRef = new DbReference( unspecifiedRoleMiRef, CvDatabase.PSI_MI );
         dbRef.setRefType( CvXrefQualifier.IDENTITY );
