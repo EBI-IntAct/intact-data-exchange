@@ -50,7 +50,7 @@ public class JpaRepoEntryDao extends JpaImexDaoSupport implements RepoEntryDao
         return (RepoEntry) query.getSingleResult();
     }
 
-    public RepoEntry findImportable() {
-        return getEntityManager().createNamedQuery("repoEntryValid");
+    public List<RepoEntry> findImportable() {
+        return getEntityManager().createNamedQuery("repoEntryValid").getResultList();
     }
 }

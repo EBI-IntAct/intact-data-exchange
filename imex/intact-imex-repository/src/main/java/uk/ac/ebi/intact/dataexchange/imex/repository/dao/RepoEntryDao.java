@@ -40,5 +40,5 @@ public interface RepoEntryDao
 
     RepoEntry findByName(String name);
 
-    RepoEntry findImportable();
+    List<RepoEntry> findImportable();
 }
