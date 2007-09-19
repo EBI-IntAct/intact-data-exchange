@@ -38,17 +38,19 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
     public Feature psiToIntact(psidev.psi.mi.xml.model.Feature psiObject) {
         String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
 
-        CvObjectConverter<CvFeatureType,FeatureType> featureTypeConverter =
-                new CvObjectConverter<CvFeatureType,FeatureType>(getInstitution(), CvFeatureType.class, FeatureType.class);
-
-        CvFeatureType featureType = featureTypeConverter.psiToIntact(psiObject.getFeatureType());
-
         // using the empty constructor because we don't have a Component instance to pass
         // to the standard parametrized constructor
         Feature feature = new Feature();
         feature.setOwner(getInstitution());
         feature.setShortLabel(shortLabel);
-        feature.setCvFeatureType(featureType);
+
+        if (psiObject.getFeatureType() != null) {
+            CvObjectConverter<CvFeatureType,FeatureType> featureTypeConverter =
+                new CvObjectConverter<CvFeatureType,FeatureType>(getInstitution(), CvFeatureType.class, FeatureType.class);
+
+            CvFeatureType featureType = featureTypeConverter.psiToIntact(psiObject.getFeatureType());
+            feature.setCvFeatureType(featureType);
+        }
 
         FeatureDetectionMethod featureDetMethod = psiObject.getFeatureDetectionMethod();
         if (featureDetMethod != null) {
