@@ -94,9 +94,9 @@ public class Repository {
 
         for (RepoEntry repoEntry : splittedEntries) {
             if (repoEntry.isValid()) {
-            beginTransaction();
-            enricher.enrichEntry(repoEntry);
-            commitTransaction();
+                beginTransaction();
+                enricher.enrichEntry(repoEntry);
+                commitTransaction();
             }
         }
     }
@@ -109,8 +109,9 @@ public class Repository {
         ImexRepositoryContext.getInstance().getImexPersistence().commitTransaction();
     }
 
-    public RepoEntrySet retrieveEntrySet(String name) {
-        throw new UnsupportedOperationException();
+    public RepoEntry findRepoEntryByPmid(String name) {
+        ImexRepositoryContext context = ImexRepositoryContext.getInstance();
+        return context.getImexServiceProvider().getRepoEntryService().findByName(name);
     }
 
     public File getRepositoryDir() {

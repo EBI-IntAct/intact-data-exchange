@@ -41,7 +41,7 @@ public class RepoEntry extends RepoEntity {
 
     private boolean valid;
 
-    private boolean importable;
+    private boolean importable = true;
 
     @OneToMany (mappedBy = "repoEntry", cascade = CascadeType.ALL)
     private List<UnexpectedError> errors;
@@ -86,9 +86,14 @@ public class RepoEntry extends RepoEntity {
 
     public void setValid(boolean valid) {
         this.valid = valid;
+
+        if (!valid) importable = false;
     }
 
     public List<UnexpectedError> getErrors() {
+        if (errors == null) {
+           errors = new ArrayList<UnexpectedError>();
+        }
         return errors;
     }
 
@@ -97,10 +102,7 @@ public class RepoEntry extends RepoEntity {
     }
 
     public void addError(UnexpectedError error) {
-        if (errors == null) {
-            errors = new ArrayList<UnexpectedError>();
-        }
-        errors.add(error);
+        getErrors().add(error);
         error.setRepoEntry(this);
         
         valid = false;

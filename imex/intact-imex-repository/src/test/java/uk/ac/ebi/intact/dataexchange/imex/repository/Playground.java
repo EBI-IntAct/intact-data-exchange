@@ -31,22 +31,22 @@ import java.io.File;
 public class Playground {
 
     public static void main(String[] args) throws Exception {
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo2/");
+        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo/");
         FileUtils.deleteDirectory(tempDir);
 
         Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
 
-        File empty = new File("/homes/baranda/projects/temp/2007-07-05.dip.xml");
-        repo.storeEntrySet(empty, "dip");
+        //File empty = new File("/homes/baranda/projects/temp/2007-07-05.dip.xml");
+        //repo.storeEntrySet(empty, "dip");
 
-        /**
-         * File psiMi = new File(Playground.class.getResource("/xml/mint_2006-07-18.xml").getFile());
+        File psiMi = new File(Playground.class.getResource("/xml/mint_2006-07-18.xml").getFile());
         repo.storeEntrySet(psiMi, "mint");
-         */
+
 
         RepoEntryService repoEntryService = ImexRepositoryContext.getInstance().getImexServiceProvider().getRepoEntryService();
         for (RepoEntry repoEntry : repoEntryService.findAllRepoEntries()) {
-            System.out.println(repoEntry.getName()+" - "+repoEntry.getRepoEntrySet().getProvider().getName()+" - "+(repoEntry.isValid()? "OK" : "ERROR"));
+            System.out.println(repoEntry.getName()+" - "+repoEntry.getRepoEntrySet().getProvider().getName()+" - "+(repoEntry.isValid()? "OK" : "ERROR")+
+            (repoEntry.isImportable()? " - IMPORTABLE" : ""));
 
             if (!repoEntry.isValid()) {
                 for (UnexpectedError error : repoEntry.getErrors()) {
