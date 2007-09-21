@@ -52,7 +52,7 @@ public class Repository {
         this.repositoryDir = repositoryDir;
     }
 
-    public void storeEntrySet(File entryXml, String providerName) throws IOException {
+    public void storeEntrySet(File entryXml, String providerName)  {
         if (log.isDebugEnabled()) {
             log.debug("Adding entry: "+entryXml+" (Provider: "+providerName+")");
         }
@@ -76,7 +76,11 @@ public class Repository {
         if (log.isDebugEnabled()) {
             log.debug("Copying file to: "+newFile);
         }
-        FileUtils.copyFile(entryXml, newFile);
+        try {
+            FileUtils.copyFile(entryXml, newFile);
+        } catch (IOException e) {
+            throw new RepositoryException(e);
+        }
 
         // create the record in the database
         beginTransaction();
@@ -86,7 +90,12 @@ public class Repository {
         // split the file
         beginTransaction();
         EntrySetSplitter splitter = new DefaultEntrySetSplitter();
-        List<RepoEntry> splittedEntries = splitter.splitRepoEntrySet(repoEntrySet);
+        List<RepoEntry> splittedEntries = null;
+        try {
+            splittedEntries = splitter.splitRepoEntrySet(repoEntrySet);
+        } catch (IOException e) {
+            throw new RepositoryException(e);
+        }
         commitTransaction();
 
         // enrich the splitted files
@@ -95,7 +104,11 @@ public class Repository {
         for (RepoEntry repoEntry : splittedEntries) {
             if (repoEntry.isValid()) {
                 beginTransaction();
-                enricher.enrichEntry(repoEntry);
+                try {
+                    enricher.enrichEntry(repoEntry);
+                } catch (IOException e) {
+                    throw new RepositoryException(e);
+                }
                 commitTransaction();
             }
         }
