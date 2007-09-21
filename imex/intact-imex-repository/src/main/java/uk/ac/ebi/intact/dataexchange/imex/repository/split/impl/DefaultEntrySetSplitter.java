@@ -9,12 +9,14 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
 import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryException;
 import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryHelper;
-import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.*;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.ValidationError;
 import uk.ac.ebi.intact.dataexchange.imex.repository.split.EntrySetSplitter;
+import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
-import uk.ac.ebi.intact.util.psivalidator.PsiValidatorReport;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidatorMessage;
+import uk.ac.ebi.intact.util.psivalidator.PsiValidatorReport;
 
 import java.io.File;
 import java.io.IOException;
@@ -129,7 +131,7 @@ public class DefaultEntrySetSplitter implements EntrySetSplitter
 
         String name = entry.getExperiments().iterator().next()
                 .getBibref().getXref().getPrimaryRef().getId();
-        repoEntry.setName(name);
+        repoEntry.setPmid(name);
 
         return repoEntry;
     }

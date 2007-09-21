@@ -37,5 +37,7 @@ public interface RepoEntryService
 
     List<RepoEntry> findAllRepoEntries();
 
-    RepoEntry findByName(String name);
+    RepoEntry findByPmid(String name);
+
+    List<RepoEntry> findImportableExcluding(List<String> pmids);
 }

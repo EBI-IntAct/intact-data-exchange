@@ -44,13 +44,13 @@ public class JpaRepoEntryDao extends JpaImexDaoSupport implements RepoEntryDao
         return getEntityManager().createQuery(QUERY_ALL).getResultList();
     }
 
-    public RepoEntry findByName(String name) {
-        Query query = getEntityManager().createNamedQuery("repoEntryByName");
-        query.setParameter("name", name);
+    public RepoEntry findByPmid(String pmid) {
+        Query query = getEntityManager().createNamedQuery("repoEntryByPmid");
+        query.setParameter("pmid", pmid);
         return (RepoEntry) query.getSingleResult();
     }
 
     public List<RepoEntry> findImportable() {
-        return getEntityManager().createNamedQuery("repoEntryValid").getResultList();
+        return getEntityManager().createNamedQuery("repoEntryImportable").getResultList();
     }
 }

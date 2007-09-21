@@ -2,15 +2,14 @@ package uk.ac.ebi.intact.dataexchange.imex.repository.enrich.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
 import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryHelper;
-import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
 import uk.ac.ebi.intact.dataexchange.imex.repository.enrich.EntryEnricher;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.enricher.PsiEnricher;
+import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.enricher.PsiEnricher;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,19 +35,19 @@ public class DefaultEntryEnricher implements EntryEnricher
         }
 
         if (repoEntry.isEnriched()) {
-            throw new IllegalStateException("Entry is already enriched: "+repoEntry.getName());
+            throw new IllegalStateException("Entry is already enriched: "+repoEntry.getPmid());
         }
 
         if (!repoEntry.isValid()) {
-            if (log.isWarnEnabled()) log.warn("Entry not enriched because is not valid: "+repoEntry.getName());
+            if (log.isWarnEnabled()) log.warn("Entry not enriched because is not valid: "+repoEntry.getPmid());
             return;
         }
 
         Repository repository = ImexRepositoryContext.getInstance().getRepository();
         RepositoryHelper helper = new RepositoryHelper(repository);
 
-        File entryBeforeEnrichFile = helper.getEntryFile(repoEntry.getName(), repoEntry.getRepoEntrySet().getName(), false);
-        File entryAfterEnrichFile = helper.getEntryFile(repoEntry.getName(), repoEntry.getRepoEntrySet().getName(), true);
+        File entryBeforeEnrichFile = helper.getEntryFile(repoEntry.getPmid(), repoEntry.getRepoEntrySet().getName(), false);
+        File entryAfterEnrichFile = helper.getEntryFile(repoEntry.getPmid(), repoEntry.getRepoEntrySet().getName(), true);
 
         try {
             PsiEnricher.enrichPsiXml(entryBeforeEnrichFile, entryAfterEnrichFile, new DefaultEnricherConfig());

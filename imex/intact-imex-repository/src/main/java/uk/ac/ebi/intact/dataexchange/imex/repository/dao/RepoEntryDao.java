@@ -38,7 +38,7 @@ public interface RepoEntryDao
 
     //Provider findById(Long id);
 
-    RepoEntry findByName(String name);
+    RepoEntry findByPmid(String name);
 
     List<RepoEntry> findImportable();
 }

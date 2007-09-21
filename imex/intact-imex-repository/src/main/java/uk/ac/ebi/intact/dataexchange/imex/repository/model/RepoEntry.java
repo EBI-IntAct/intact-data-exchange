@@ -27,15 +27,15 @@ import java.util.List;
  */
 @Entity
 @NamedQueries(value = {
-    @NamedQuery(name = "repoEntryByName", query="select re from RepoEntry re where re.name = :name"),
-    @NamedQuery(name = "repoEntryValid", query="select re from RepoEntry re where re.valid = true")
+    @NamedQuery(name = "repoEntryByPmid", query="select re from RepoEntry re where re.pmid = :pmid"),
+    @NamedQuery(name = "repoEntryImportable", query="select re from RepoEntry re where re.valid = true")
 })
 public class RepoEntry extends RepoEntity {
 
     @ManyToOne
     private RepoEntrySet repoEntrySet;
 
-    private String name;
+    private String pmid;
 
     private boolean enriched;
 
@@ -49,6 +49,10 @@ public class RepoEntry extends RepoEntity {
     public RepoEntry() {
     }
 
+    public RepoEntry(String pmid) {
+        this.pmid = pmid;
+    }
+
     /////////////////////////////
     // Getters and Setters
 
@@ -60,14 +64,14 @@ public class RepoEntry extends RepoEntity {
         this.repoEntrySet = repoEntrySet;
     }
 
-    public String getName()
+    public String getPmid()
     {
-        return name;
+        return pmid;
     }
 
-    public void setName(String name)
+    public void setPmid(String pmid)
     {
-        this.name = name;
+        this.pmid = pmid;
     }
 
     public boolean isEnriched()

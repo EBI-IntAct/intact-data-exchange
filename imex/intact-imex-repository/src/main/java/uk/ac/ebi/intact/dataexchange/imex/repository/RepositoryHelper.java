@@ -56,7 +56,7 @@ public class RepositoryHelper {
     }
 
     public File getEntryFile(RepoEntry entry) {
-        return getEntryFile(entry.getName(), entry.getRepoEntrySet().getName(), entry.isEnriched());
+        return getEntryFile(entry.getPmid(), entry.getRepoEntrySet().getName(), entry.isEnriched());
     }
 
     public File getEntryFile(String name, String entrySetName, boolean enriched) {
@@ -70,7 +70,7 @@ public class RepositoryHelper {
     }
 
     public File getEntryErrorFile(RepoEntry repoEntry) {
-        return getEntryErrorFile(repoEntry.getName(), repoEntry.getRepoEntrySet().getName());
+        return getEntryErrorFile(repoEntry.getPmid(), repoEntry.getRepoEntrySet().getName());
     }
 
     public File getEntryErrorFile(String name, String entrySetName) {

@@ -124,7 +124,17 @@ public class Repository {
 
     public RepoEntry findRepoEntryByPmid(String name) {
         ImexRepositoryContext context = ImexRepositoryContext.getInstance();
-        return context.getImexServiceProvider().getRepoEntryService().findByName(name);
+        return context.getImexServiceProvider().getRepoEntryService().findByPmid(name);
+    }
+
+    /**
+     * Gets a list of RepoEntries excluding the pmids in the passed list
+     * @param pmidsToExclude
+     * @return
+     */
+    public List<RepoEntry> findRepoEntriesByPmidExcluding(List<String> pmidsToExclude) {
+        ImexRepositoryContext context = ImexRepositoryContext.getInstance();
+        return context.getImexServiceProvider().getRepoEntryService().findImportableExcluding(pmidsToExclude);
     }
 
     public File getRepositoryDir() {

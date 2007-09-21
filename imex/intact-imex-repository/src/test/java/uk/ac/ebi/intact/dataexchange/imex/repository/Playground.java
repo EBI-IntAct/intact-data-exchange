@@ -45,7 +45,7 @@ public class Playground {
 
         RepoEntryService repoEntryService = ImexRepositoryContext.getInstance().getImexServiceProvider().getRepoEntryService();
         for (RepoEntry repoEntry : repoEntryService.findAllRepoEntries()) {
-            System.out.println(repoEntry.getName()+" - "+repoEntry.getRepoEntrySet().getProvider().getName()+" - "+(repoEntry.isValid()? "OK" : "ERROR")+
+            System.out.println(repoEntry.getPmid()+" - "+repoEntry.getRepoEntrySet().getProvider().getName()+" - "+(repoEntry.isValid()? "OK" : "ERROR")+
             (repoEntry.isImportable()? " - IMPORTABLE" : ""));
 
             if (!repoEntry.isValid()) {

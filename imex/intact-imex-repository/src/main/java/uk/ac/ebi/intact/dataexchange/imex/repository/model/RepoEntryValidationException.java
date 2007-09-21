@@ -29,7 +29,7 @@ public class RepoEntryValidationException extends RuntimeException{
     private PsiValidatorReport report;
 
     public RepoEntryValidationException(RepoEntry repoEntry, PsiValidatorReport report) {
-        super("Entry contains invalid PSI XML: "+repoEntry.getName()+"\n"+report);
+        super("Entry contains invalid PSI XML: "+repoEntry.getPmid()+"\n"+report);
         this.repoEntry = repoEntry;
         this.report = report;
 

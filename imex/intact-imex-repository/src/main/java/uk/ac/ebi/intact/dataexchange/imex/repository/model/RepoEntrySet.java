@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public class RepoEntrySet extends RepoEntity {
 
     private String name;
 
-    @ManyToOne
+    @ManyToOne 
     private Provider provider;
 
     @OneToMany (mappedBy = "repoEntrySet", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
@@ -58,6 +59,9 @@ public class RepoEntrySet extends RepoEntity {
     }
 
     public List<RepoEntry> getRepoEntries() {
+        if (repoEntries == null) {
+            repoEntries = new ArrayList<RepoEntry>();
+        }
         return repoEntries;
     }
 

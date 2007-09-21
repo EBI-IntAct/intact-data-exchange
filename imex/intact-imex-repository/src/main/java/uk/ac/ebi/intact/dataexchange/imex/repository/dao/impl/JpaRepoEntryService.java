@@ -21,6 +21,7 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntryDao;
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntryService;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -46,7 +47,26 @@ public class JpaRepoEntryService implements RepoEntryService
         entrySetDao.save(repoEntry);
     }
 
-    public RepoEntry findByName(String name) {
-        return entrySetDao.findByName(name);
+    public RepoEntry findByPmid(String pmid) {
+        return entrySetDao.findByPmid(pmid);
+    }
+
+    /**
+     * Retrieves the importable RepoEntries that are not in the passed list
+     * @param pmids the PMIDs to exclude
+     * @return
+     */
+    public List<RepoEntry> findImportableExcluding(List<String> pmids) {
+        List<RepoEntry> importables = entrySetDao.findImportable();
+
+        for (Iterator<RepoEntry> repoEntryIterator = importables.iterator(); repoEntryIterator.hasNext();) {
+            RepoEntry repoEntry = repoEntryIterator.next();
+
+            if (pmids.contains(repoEntry.getPmid())) {
+                 repoEntryIterator.remove();
+             }
+        }
+
+        return importables;
     }
 }
