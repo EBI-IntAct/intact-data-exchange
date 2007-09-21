@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-            <artifactId>intact-psixml-enricher</artifactId>
+            <artifactId>intact-psixml-exchange</artifactId>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.imex</groupId>

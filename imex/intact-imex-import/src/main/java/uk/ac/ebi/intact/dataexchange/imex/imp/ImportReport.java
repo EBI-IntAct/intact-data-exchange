@@ -15,10 +15,10 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.imp;
 
-import uk.ac.ebi.intact.model.meta.ImexObject;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Summarises an import
@@ -28,25 +28,36 @@ import java.util.List;
  */
 public class ImportReport {
 
-    private List<String> pubmedsNotFoundInRepo;
-    private List<ImexObject> failedImexObjects;
-    private List<ImexObject> successfullImexObjects;
+    private List<String> pmidsNotFoundInRepo;
+    private Map<String,Throwable> failedPmids;
+    private List<String> sucessfullPmids;
 
     public ImportReport() {
-        this.pubmedsNotFoundInRepo = new ArrayList<String>();
-        this.failedImexObjects = new ArrayList<ImexObject>();
-        this.successfullImexObjects = new ArrayList<ImexObject>();
+        this.pmidsNotFoundInRepo = new ArrayList<String>();
+        this.failedPmids = new HashMap<String,Throwable>();
+        this.sucessfullPmids = new ArrayList<String>();
     }
 
-    public List<ImexObject> getFailedImexObjects() {
-        return failedImexObjects;
+    public Map<String,Throwable> getFailedPmids() {
+        return failedPmids;
     }
 
-    public List<String> getPubmedsNotFoundInRepo() {
-        return pubmedsNotFoundInRepo;
+    public List<String> getPmidsNotFoundInRepo() {
+        return pmidsNotFoundInRepo;
     }
 
-    public List<ImexObject> getSuccessfullImexObjects() {
-        return successfullImexObjects;
+    public List<String> getSucessfullPmids() {
+        return sucessfullPmids;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Import Report:\n");
+        sb.append("\tPmids successfully imported (").append(sucessfullPmids.size()).append("): ").append(sucessfullPmids).append("\n");
+        sb.append("\tPmids failed (").append(failedPmids.size()).append("): ").append(failedPmids.keySet()).append("\n");
+        sb.append("\tPmids not found in repo (").append(pmidsNotFoundInRepo.size()).append("): ").append(pmidsNotFoundInRepo);
+
+        return sb.toString();
     }
 }
