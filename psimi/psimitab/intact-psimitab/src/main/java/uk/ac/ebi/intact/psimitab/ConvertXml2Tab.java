@@ -22,7 +22,7 @@ import psidev.psi.mi.tab.converter.xml2tab.TabConvertionException;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.BinaryExpansionStrategy;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 import psidev.psi.mi.xml.converter.ConverterException;
 
@@ -172,7 +172,7 @@ public class ConvertXml2Tab {
         Xml2Tab x2t = new Xml2Tab();
 
         // Makes sure the database source is well set.
-        x2t.addOverrideSourceDatabase(new CrossReference("MI", "0469", "intact"));
+        x2t.addOverrideSourceDatabase(new CrossReferenceImpl("MI", "0469", "intact"));
 
         x2t.setExpansionStrategy(expansionStragegy);
 
