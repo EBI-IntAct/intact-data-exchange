@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.dataexchange.imex.repository.enrich.EntryEnricher;
 import uk.ac.ebi.intact.dataexchange.imex.repository.enrich.impl.DefaultEntryEnricher;
+import uk.ac.ebi.intact.dataexchange.imex.repository.ftp.ImexFTPFile;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntityNotFoundException;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
@@ -50,6 +51,10 @@ public class Repository {
 
     public Repository(File repositoryDir) {
         this.repositoryDir = repositoryDir;
+    }
+
+    public void storeEntrySet(ImexFTPFile entryXml, String providerName) throws IOException {
+        storeEntrySet(entryXml.toFile(), providerName);
     }
 
     public void storeEntrySet(File entryXml, String providerName)  {

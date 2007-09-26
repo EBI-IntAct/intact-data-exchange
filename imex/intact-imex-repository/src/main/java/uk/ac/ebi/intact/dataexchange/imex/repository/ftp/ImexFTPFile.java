@@ -17,8 +17,7 @@ package uk.ac.ebi.intact.dataexchange.imex.repository.ftp;
 
 import org.apache.commons.net.ftp.FTPFile;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
@@ -51,6 +50,21 @@ public class ImexFTPFile {
 
     public InputStream openStream() throws IOException {
         return new GZIPInputStream(url.openStream());
+    }
+
+    public File toFile() throws IOException {
+        File tempFile = File.createTempFile(ftpFile.getName()+"-", ".xml");
+        FileWriter writer = new FileWriter(tempFile);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(openStream()));
+        String line;
+        while ((line = in.readLine()) != null) {
+            writer.write(line + "\n");
+        }
+
+        writer.close();
+
+        return tempFile;
     }
 
     ////////////////////////////////////
