@@ -55,6 +55,9 @@ public class ImexRepositoryContext {
         return repository;
     }
 
+    public static void closeRepository() {
+        instance.set(null);
+    }
 
     private BeanFactory beanFactory;
     private Repository repository;

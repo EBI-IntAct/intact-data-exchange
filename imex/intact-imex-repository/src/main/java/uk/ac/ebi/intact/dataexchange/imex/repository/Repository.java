@@ -137,6 +137,10 @@ public class Repository {
         return context.getImexServiceProvider().getRepoEntryService().findImportableExcluding(pmidsToExclude);
     }
 
+    public void close() {
+        ImexRepositoryContext.closeRepository();
+    }
+
     public File getRepositoryDir() {
         return repositoryDir;
     }

@@ -35,6 +35,7 @@ public class RepoEntry extends RepoEntity {
     @ManyToOne
     private RepoEntrySet repoEntrySet;
 
+    @Column (unique = true)
     private String pmid;
 
     private boolean enriched;
