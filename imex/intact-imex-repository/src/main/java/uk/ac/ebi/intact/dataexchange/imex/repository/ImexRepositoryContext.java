@@ -44,6 +44,8 @@ public class ImexRepositoryContext {
     }
 
     public static Repository openRepository(String repositoryDir) {
+        if (log.isDebugEnabled()) log.debug("Starting ImexRepositoryContext, with repository: "+repositoryDir);
+
         Repository repository = RepositoryFactory.createFileSystemRepository(repositoryDir, true);
 
         instance.set(new ImexRepositoryContext(repository));
@@ -56,6 +58,8 @@ public class ImexRepositoryContext {
     }
 
     public static void closeRepository() {
+        if (log.isDebugEnabled()) log.debug("Closing ImexRepositoryContext");
+
         instance.set(null);
     }
 
