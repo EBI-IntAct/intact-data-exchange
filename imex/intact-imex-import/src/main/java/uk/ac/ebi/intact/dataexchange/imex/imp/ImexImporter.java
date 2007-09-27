@@ -140,6 +140,8 @@ public class ImexImporter {
         RepositoryHelper helper = new RepositoryHelper(repository);
         File entryFile = helper.getEntryFile(repoEntry);
 
+        imexObject.setOriginalFilename(entryFile.getName());
+
         final String pmid = repoEntry.getPmid();
 
         try {
