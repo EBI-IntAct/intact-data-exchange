@@ -169,6 +169,8 @@ public class InterologPrediction {
 	
 	/**
 	 * If you want to search mitab taxid children in the taxonomy to transfer on these species too.
+	 * 
+	 * Default is false.
 	 */
 	private boolean downCastOnChildren = false;
 	
@@ -290,6 +292,14 @@ public class InterologPrediction {
 		return FILE_RESULT_CLOG_INTERACTIONS;
 	}
 	
+	public static File getFILE_DATA_PROTEOME() {
+		return FILE_DATA_PROTEOME;
+	}
+
+	public static void setFILE_DATA_PROTEOME(File file_data_proteome) {
+		FILE_DATA_PROTEOME = file_data_proteome;
+	}
+
 	public static String getUNIPROTKB() {
 		return UNIPROTKB;
 	}
@@ -477,6 +487,7 @@ public class InterologPrediction {
 	 */
 	private void checkFiles () throws InterologPredictionException {
 		if (!FILE_DATA_PROTEOME.exists()) {
+			log.info("proteome report file "+getFILE_DATA_PROTEOME().getAbsolutePath()+" is not found. It will be automatically downloaded.");
 			try {
 				downloadProteome();
 			} catch (IOException e) {
@@ -747,25 +758,24 @@ public class InterologPrediction {
 		log.info("choose species for which we will transfer interactions");
 		Map<Long, Long> taxid2proteomeIdsToDownCast = new HashMap<Long, Long>();
 		
-		
+		Collection<Long> taxidsNotMappedToProteomeId = new HashSet<Long>();
 		
 		// strategy used: only taxids present in both mitab and clog data
 		// and some strains as well
-//		 taxids from mitab source file
+		// taxids from mitab source file
 		if (downCastOnAllPresentSpecies) {
-			int noProteome = 0;
 			for (Long mitabTaxid : mitabTaxids) {
 				Long proteomeidToAdd = taxid2proteomeId.get(mitabTaxid);
 				if (proteomeidToAdd!=null) {
 					taxid2proteomeIdsToDownCast.put(mitabTaxid, proteomeidToAdd);
 				} else {
-					noProteome++;
+					taxidsNotMappedToProteomeId.add(mitabTaxid);
 					log.debug(mitabTaxid+" has no mapping to a proteome id");
 				}
 			}
 			int nbSp = taxid2proteomeIdsToDownCast.size();
 			log.warn(nbSp+" taxids from mitab source file are mapped to proteome ids and added in the list of species");
-			log.info(noProteome+" taxids from mitab source file are not mapped to proteome ids");
+			log.info(taxidsNotMappedToProteomeId.size()+" taxids from mitab source file are not mapped to proteome ids");
 		}
 		
 		// add species asked by user
@@ -775,6 +785,7 @@ public class InterologPrediction {
 				if (userProteomeId!=null) {
 					taxid2proteomeIdsToDownCast.put(userTaxid, userProteomeId);
 				} else {
+					taxidsNotMappedToProteomeId.add(userTaxid);
 					log.debug("user species "+userTaxid+" can not be mapped to proteome id");
 				}
 			}
@@ -786,21 +797,29 @@ public class InterologPrediction {
 		
 		// we add some strains manually if the parent is in the list
 		// and if the children can be mapped to a proteome id
-		int added = 0;
-		for (Long parentTaxid : taxid2ChildrenTaxids.keySet()) {
-			if (taxid2proteomeIdsToDownCast.containsKey(parentTaxid)) {
-				Collection<Long> childrenTaxids = taxid2ChildrenTaxids.get(parentTaxid);
-				for (Long childTaxid : childrenTaxids) {
-					Long proteomeIdToAdd = taxid2proteomeId.get(childTaxid);
-					if (proteomeIdToAdd!=null) {
-						added++;
-						//proteomeIdsToDownCast.add(proteomeIdToAdd);
-						taxid2proteomeIdsToDownCast.put(childTaxid, proteomeIdToAdd);
+		if (isDownCastOnChildren()) {
+			int added = 0;
+			
+			Collection<Long> allTaxidsToTest = new HashSet<Long>(taxid2proteomeIdsToDownCast.size() + taxidsNotMappedToProteomeId.size());
+			allTaxidsToTest.addAll(taxid2proteomeIdsToDownCast.keySet());
+			allTaxidsToTest.addAll(taxidsNotMappedToProteomeId);
+			
+			for (Long parentTaxid : taxid2ChildrenTaxids.keySet()) {
+				if (allTaxidsToTest.contains(parentTaxid)) {
+					Collection<Long> childrenTaxids = taxid2ChildrenTaxids.get(parentTaxid);
+					for (Long childTaxid : childrenTaxids) {
+						Long proteomeIdToAdd = taxid2proteomeId.get(childTaxid);
+						if (proteomeIdToAdd!=null) {
+							added++;
+							//proteomeIdsToDownCast.add(proteomeIdToAdd);
+							taxid2proteomeIdsToDownCast.put(childTaxid, proteomeIdToAdd);
+						}
 					}
 				}
 			}
+			log.info(added+" proteome ids of specific strains are added in the list of species");
 		}
-		log.info(added+" proteome ids of specific strains are added in the list of species");
+		
 		
 		// another strategy more general: try to extend the mapping with NEWT
 		// a bit long and complicated...if you want to continue it... ;-)
