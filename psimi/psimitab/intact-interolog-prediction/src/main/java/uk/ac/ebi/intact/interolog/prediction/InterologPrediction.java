@@ -1302,7 +1302,7 @@ public class InterologPrediction {
 		map.put(562l, Arrays.asList( coliTab ));
 		
 		// pylori
-		Long[] pyloriTab = new Long[] {85963l, 102617l, 85962l};
+		Long[] pyloriTab = new Long[] {85963l, 102617l, 85962l, 357544l, 102618l, 102619l};
 		map.put(210l, Arrays.asList( pyloriTab ));
 		
 		return map;
