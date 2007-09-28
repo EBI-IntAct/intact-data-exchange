@@ -27,7 +27,6 @@ import uk.ac.ebi.intact.model.Feature;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
 
-import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -144,7 +143,8 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
 
         for (psidev.psi.mi.xml.model.Feature psiFeature : participant.getFeatures()) {
             Feature feature = featureConverter.psiToIntact(psiFeature);
-            component.addBindingDomain(feature);
+            component.getBindingDomains().add(feature);
+            feature.setComponent(component);
         }
 
         for (ParticipantIdentificationMethod pim : participant.getParticipantIdentificationMethods()) {
