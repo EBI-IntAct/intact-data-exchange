@@ -1088,7 +1088,15 @@ public class LineExport {
 
             Comparator<Alias> c = new Comparator<Alias>() {
                 public int compare(Alias alias1, Alias alias2) {
-                    return alias1.getName().compareTo(alias2.getName());
+                    String s1 = alias1.getName();
+                    String s2 = alias2.getName();
+
+                    if( s1 == null && s2 == null ) return 0;
+
+                    if( s1 == null ) return Integer.MIN_VALUE;
+                    if( s2 == null ) return Integer.MAX_VALUE;
+
+                    return s1.compareTo( s2 );
                 }
             };
 
