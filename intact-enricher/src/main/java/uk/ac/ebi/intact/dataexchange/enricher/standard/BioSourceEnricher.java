@@ -47,7 +47,7 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
         // get the taxonomy term from newt
         int taxId = Integer.valueOf(objectToEnrich.getTaxId());
 
-        if (taxId <= 0) {
+        if (taxId == 0) {
             throw new EnricherException("Biosource has an invalid taxid: "+taxId+" ("+objectToEnrich.getFullName()+")");
         }
 
