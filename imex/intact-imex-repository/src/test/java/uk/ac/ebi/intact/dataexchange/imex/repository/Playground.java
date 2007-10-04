@@ -19,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntryService;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.UnexpectedError;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 
 import java.io.File;
 
@@ -31,16 +32,16 @@ import java.io.File;
 public class Playground {
 
     public static void main(String[] args) throws Exception {
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo/");
+        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-dip2/");
         FileUtils.deleteDirectory(tempDir);
 
         Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
+        
+        File empty = new File("/homes/baranda/projects/temp/2007-07-05.dip.xml");
+        repo.storeEntrySet(empty, "dip");
 
-        //File empty = new File("/homes/baranda/projects/temp/2007-07-05.dip.xml");
-        //repo.storeEntrySet(empty, "dip");
-
-        File psiMi = new File(Playground.class.getResource("/xml/mint_2006-07-18.xml").getFile());
-        repo.storeEntrySet(psiMi, "mint");
+        //File psiMi = new File(Playground.class.getResource("/xml/mint_2006-07-18.xml").getFile());
+        //repo.storeEntrySet(psiMi, "mint");
 
 
         RepoEntryService repoEntryService = ImexRepositoryContext.getInstance().getImexServiceProvider().getRepoEntryService();

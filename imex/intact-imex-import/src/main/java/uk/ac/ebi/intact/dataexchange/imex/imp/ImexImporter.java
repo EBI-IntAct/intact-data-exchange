@@ -26,9 +26,9 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.PsiExchange;
 import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.meta.ImexObject;
-import uk.ac.ebi.intact.model.meta.ImexObjectStatus;
-import uk.ac.ebi.intact.persistence.dao.ImexObjectDao;
+import uk.ac.ebi.intact.model.meta.ImexImport;
+import uk.ac.ebi.intact.model.meta.ImexImportStatus;
+import uk.ac.ebi.intact.persistence.dao.ImexImportDao;
 
 import javax.persistence.NoResultException;
 import java.io.File;
@@ -61,27 +61,32 @@ public class ImexImporter {
 
     public ImportReport importNewAndFailed() {
         ImportReport report = importFailed();
+        report = importNew(report);
 
-        ImexObjectDao imexObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getImexObjectDao();
+        return report;
+    }
 
-        beginTransaction();
-        List<String> pmidsOk = imexObjectDao.getAllOkPmids();
-        commitTransaction();
+    protected ImportReport importNew(ImportReport report) {
+        ImexImportDao imexObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getImexImportDao();
 
-        List<RepoEntry> newRepoEntries = ImexRepositoryContext.getInstance().getImexServiceProvider().getRepoEntryService().findImportableExcluding(pmidsOk);
+                beginTransaction();
+                List<String> pmidsOk = imexObjectDao.getAllOkPmids();
+                commitTransaction();
 
-        for (RepoEntry repoEntry : newRepoEntries) {
-            ImexObject imexObject = new ImexObject(getInstitution(repoEntry.getRepoEntrySet().getProvider()), repoEntry.getPmid(), ImexObjectStatus.OK);
-            importRepoEntry(repoEntry, report, imexObject);
+                List<RepoEntry> newRepoEntries = ImexRepositoryContext.getInstance().getImexServiceProvider().getRepoEntryService().findImportableExcluding(pmidsOk);
 
-            if (imexObject.getStatus().equals(ImexObjectStatus.OK)) {
-                report.getNewPmisImported().add(repoEntry.getPmid());
-            }
+                for (RepoEntry repoEntry : newRepoEntries) {
+                    ImexImport imexObject = new ImexImport(getInstitution(repoEntry.getRepoEntrySet().getProvider()), repoEntry.getPmid(), ImexImportStatus.OK);
+                    importRepoEntry(repoEntry, report, imexObject);
 
-            beginTransaction();
-            imexObjectDao.persist(imexObject);
-            commitTransaction();
-        }
+                    if (imexObject.getStatus().equals(ImexImportStatus.OK)) {
+                        report.getNewPmisImported().add(repoEntry.getPmid());
+                    }
+
+                    beginTransaction();
+                    imexObjectDao.persist(imexObject);
+                    commitTransaction();
+                }
 
         return report;
     }
@@ -92,19 +97,19 @@ public class ImexImporter {
      * @return a report of the import
      */
     public ImportReport importFailed() {
-        ImexObjectDao imexObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getImexObjectDao();
+        ImexImportDao imexObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getImexImportDao();
 
         beginTransaction();
-        List<ImexObject> failedImexObjects = imexObjectDao.getFailed();
+        List<ImexImport> failedImexImports = imexObjectDao.getFailed();
         commitTransaction();
 
         if (log.isDebugEnabled()) {
-            log.debug("Found " + failedImexObjects.size() + " pubmed IDs that have failed previously. Will try to import them.");
+            log.debug("Found " + failedImexImports.size() + " pubmed IDs that have failed previously. Will try to import them.");
         }
 
         ImportReport report = new ImportReport();
 
-        for (ImexObject imexObject : failedImexObjects) {
+        for (ImexImport imexObject : failedImexImports) {
             String pmid = imexObject.getPmid();
 
             if (log.isInfoEnabled()) log.info("Importing (previously failed) PMID: " + pmid);
@@ -128,13 +133,13 @@ public class ImexImporter {
         return report;
     }
 
-    protected void importRepoEntry(RepoEntry repoEntry, ImportReport report, ImexObject imexObject) {
+    protected void importRepoEntry(RepoEntry repoEntry, ImportReport report, ImexImport imexObject) {
         if (report == null) {
             throw new NullPointerException("An ImportReport instance is needed");
         }
 
         if (imexObject == null) {
-            throw new NullPointerException("An ImexObject instance is needed");
+            throw new NullPointerException("An ImexImport instance is needed");
         }
 
         RepositoryHelper helper = new RepositoryHelper(repository);
@@ -148,12 +153,13 @@ public class ImexImporter {
             PsiExchange.importIntoIntact(new FileInputStream(entryFile), false);
             report.getSucessfullPmids().add(pmid);
 
-            imexObject.setStatus(ImexObjectStatus.OK);
+            imexObject.setStatus(ImexImportStatus.OK);
 
         } catch (Exception e) {
             if (log.isErrorEnabled()) log.error("Entry with pmid '" + pmid + "' failed to be imported");
+            e.printStackTrace();
             report.getFailedPmids().put(pmid, e);
-            imexObject.setStatus(ImexObjectStatus.ERROR);
+            imexObject.setStatus(ImexImportStatus.ERROR);
         }
     }
 

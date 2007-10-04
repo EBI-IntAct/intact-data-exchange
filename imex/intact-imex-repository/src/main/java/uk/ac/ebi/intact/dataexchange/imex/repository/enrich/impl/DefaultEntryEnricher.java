@@ -10,6 +10,7 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.enricher.PsiEnricher;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +43,8 @@ public class DefaultEntryEnricher implements EntryEnricher
             if (log.isWarnEnabled()) log.warn("Entry not enriched because is not valid: "+repoEntry.getPmid());
             return;
         }
+
+        EnricherContext.getInstance().getConfig().setUpdateInteractionShortLabels(true);
 
         Repository repository = ImexRepositoryContext.getInstance().getRepository();
         RepositoryHelper helper = new RepositoryHelper(repository);

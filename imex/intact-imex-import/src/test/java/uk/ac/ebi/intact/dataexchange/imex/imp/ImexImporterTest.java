@@ -25,8 +25,8 @@ import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
 import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.meta.ImexObject;
-import uk.ac.ebi.intact.model.meta.ImexObjectStatus;
+import uk.ac.ebi.intact.model.meta.ImexImport;
+import uk.ac.ebi.intact.model.meta.ImexImportStatus;
 
 import java.io.File;
 import java.util.List;
@@ -59,8 +59,8 @@ public class ImexImporterTest extends IntactBasicTestCase {
     @Test
     public void importNewAndFailed() throws Exception {
         Institution mint = new Institution("mint");
-        persistImexObject(mint, "15733859", ImexObjectStatus.OK);
-        persistImexObject(mint, "15733864", ImexObjectStatus.ERROR);
+        persistImexImport(mint, "15733859", ImexImportStatus.OK);
+        persistImexImport(mint, "15733864", ImexImportStatus.ERROR);
 
         ImexImporter imexImporter = new ImexImporter(repository);
         ImportReport report = imexImporter.importNewAndFailed();
@@ -74,16 +74,16 @@ public class ImexImporterTest extends IntactBasicTestCase {
     @Test
     public void importFailed() throws Exception {
         Institution mint = new Institution("mint");
-        persistImexObject(mint, "15733859", ImexObjectStatus.OK);
-        persistImexObject(mint, "15733864", ImexObjectStatus.ERROR);
-        persistImexObject(mint, "15757671", ImexObjectStatus.ERROR);
+        persistImexImport(mint, "15733859", ImexImportStatus.OK);
+        persistImexImport(mint, "15733864", ImexImportStatus.ERROR);
+        persistImexImport(mint, "15757671", ImexImportStatus.ERROR);
 
         commitTransaction();
 
         beginTransaction();
-        Assert.assertEquals(ImexObjectStatus.OK, getDaoFactory().getImexObjectDao().getByPmid("15733859").getStatus());
-        Assert.assertEquals(ImexObjectStatus.ERROR, getDaoFactory().getImexObjectDao().getByPmid("15733864").getStatus());
-        Assert.assertEquals(ImexObjectStatus.ERROR, getDaoFactory().getImexObjectDao().getByPmid("15757671").getStatus());
+        Assert.assertEquals(ImexImportStatus.OK, getDaoFactory().getImexImportDao().getByPmid("15733859").getStatus());
+        Assert.assertEquals(ImexImportStatus.ERROR, getDaoFactory().getImexImportDao().getByPmid("15733864").getStatus());
+        Assert.assertEquals(ImexImportStatus.ERROR, getDaoFactory().getImexImportDao().getByPmid("15757671").getStatus());
         commitTransaction();
 
         ImexImporter imexImporter = new ImexImporter(repository);
@@ -96,9 +96,9 @@ public class ImexImporterTest extends IntactBasicTestCase {
 
         beginTransaction();
 
-        for (ImexObject imexObject : (List<ImexObject>)getDaoFactory().getImexObjectDao().getAll()) {
+        for (ImexImport imexObject : (List<ImexImport>)getDaoFactory().getImexImportDao().getAll()) {
 
-            Assert.assertEquals(ImexObjectStatus.OK,imexObject.getStatus());
+            Assert.assertEquals(ImexImportStatus.OK,imexObject.getStatus());
         }
 
         commitTransaction();
@@ -107,7 +107,7 @@ public class ImexImporterTest extends IntactBasicTestCase {
     @Test
     public void importFailed_notFound() throws Exception {
         Institution mint = new Institution("mint");
-        persistImexObject(mint, "0", ImexObjectStatus.ERROR);
+        persistImexImport(mint, "0", ImexImportStatus.ERROR);
 
         commitTransaction();
 
@@ -120,7 +120,7 @@ public class ImexImporterTest extends IntactBasicTestCase {
         Assert.assertEquals(1, report.getPmidsNotFoundInRepo().size());
 
         beginTransaction();
-        Assert.assertEquals(ImexObjectStatus.ERROR, getDaoFactory().getImexObjectDao().getByPmid("0").getStatus());
+        Assert.assertEquals(ImexImportStatus.ERROR, getDaoFactory().getImexImportDao().getByPmid("0").getStatus());
         commitTransaction();
     }
 
@@ -142,9 +142,9 @@ public class ImexImporterTest extends IntactBasicTestCase {
         return repo;
     }
 
-    private void persistImexObject(Institution institution, String pmid, ImexObjectStatus status) {
+    private void persistImexImport(Institution institution, String pmid, ImexImportStatus status) {
         getDaoFactory().getInstitutionDao().saveOrUpdate(institution);
-        getDaoFactory().getImexObjectDao().persist(
-                new ImexObject(institution, pmid, status));
+        getDaoFactory().getImexImportDao().persist(
+                new ImexImport(institution, pmid, status));
     }
 }

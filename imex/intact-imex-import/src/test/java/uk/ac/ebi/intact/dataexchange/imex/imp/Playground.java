@@ -16,8 +16,14 @@
 package uk.ac.ebi.intact.dataexchange.imex.imp;
 
 import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
+import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.InstitutionXref;
+import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.io.File;
 
@@ -32,20 +38,32 @@ public class Playground {
     public static void main(String[] args) throws Exception{
 
         IntactContext.initStandaloneContext(new File(Playground.class.getResource("/d003-hibernate.cfg.xml").getFile()));
+        /*
+        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
-//        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-//        Institution institution = new Institution("dip");
-//        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(institution);
-//        IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+        CvXrefQualifier qual = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).getByPsiMiRef(CvXrefQualifier.IDENTITY_MI_REF);
+        CvDatabase psiMi = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByPsiMiRef(CvDatabase.PSI_MI_MI_REF);
 
-        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-dip/");
+        Institution dip = new Institution("dip");
+        InstitutionXref xref = XrefUtils.createIdentityXref(dip, "MI:0465", qual, psiMi);
+        dip.addXref(xref);
+
+        Institution mint = new Institution("mint");
+        InstitutionXref mintXref = XrefUtils.createIdentityXref(dip, "MI:0471", qual, psiMi);
+        mint.addXref(mintXref);
+        
+        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(dip);
+        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(mint);
+        IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+        */
+        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-dip2/");
         Repository repo = ImexRepositoryContext.openRepository(repoDir.toString());
 
         ImexImporter importer = new ImexImporter(repo);
-        importer.importNewAndFailed();
+        importer.importNew(new ImportReport());
 
         repo.close();
-
+                  
         IntactContext.getCurrentInstance().close();
     }
 
