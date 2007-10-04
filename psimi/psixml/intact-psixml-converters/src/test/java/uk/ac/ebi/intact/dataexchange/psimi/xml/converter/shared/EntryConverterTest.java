@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import static org.easymock.classextension.EasyMock.createNiceMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.InputSource;
@@ -91,7 +92,7 @@ public class EntryConverterTest extends AbstractConverterTest {
         File file = getIntactFile();
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
-        roundtripWithStream(new FileInputStream(file));
+        roundtripWithStream(new FileInputStream(file), "European Bioinformat");
     }
 
     static boolean output = false;
@@ -103,7 +104,7 @@ public class EntryConverterTest extends AbstractConverterTest {
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         //output = true;
-        roundtripWithStream(new FileInputStream(file));
+        roundtripWithStream(new FileInputStream(file), "DIP");
     }
 
     @Test
@@ -111,7 +112,7 @@ public class EntryConverterTest extends AbstractConverterTest {
         File file = getMintFile();
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
-        roundtripWithStream(new FileInputStream(file));
+        roundtripWithStream(new FileInputStream(file), "MINT");
     }
 
     @Test
@@ -125,7 +126,7 @@ public class EntryConverterTest extends AbstractConverterTest {
         }
     }
 
-    private static void roundtripWithStream(InputStream is) throws Exception {
+    private static void roundtripWithStream(InputStream is, String institutionShortLabel) throws Exception {
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = reader.read(is);
 
@@ -136,6 +137,11 @@ public class EntryConverterTest extends AbstractConverterTest {
             Entry afterRoundtripEntry = entryConverter.intactToPsi(intactEntry);
 
             assertTrue("XML created after conversion roundtrip must be valid", xmlIsValid(afterRoundtripEntry));
+
+            Assert.assertEquals(institutionShortLabel, intactEntry.getInstitution().getShortLabel());
+            Assert.assertEquals(institutionShortLabel, intactEntry.getInteractions().iterator().next().getOwner().getShortLabel());
+            Assert.assertEquals(institutionShortLabel, intactEntry.getExperiments().iterator().next().getOwner().getShortLabel());
+            Assert.assertEquals(institutionShortLabel, intactEntry.getInteractors().iterator().next().getOwner().getShortLabel());
 
             assertEquals("Number of interactions should be the same", beforeRountripEntry.getInteractions().size(), afterRoundtripEntry.getInteractions().size());
             assertEquals("Number of experiments should be the same",countExperimentsInEntry(beforeRountripEntry), afterRoundtripEntry.getExperiments().size());
