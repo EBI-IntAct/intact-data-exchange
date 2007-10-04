@@ -51,4 +51,13 @@ public class BioSourceEnricherTest extends IntactBasicTestCase {
 
         Assert.assertEquals("human", human.getShortLabel());
     }
+
+    @Test
+    public void enrich_noCommonName() throws Exception {
+        BioSource unculturedBacterium = getMockBuilder().createBioSource(77133, "unknown");
+
+        enricher.enrich(unculturedBacterium);
+
+        Assert.assertEquals("uncultured bacterium", unculturedBacterium.getShortLabel());
+    }
 }

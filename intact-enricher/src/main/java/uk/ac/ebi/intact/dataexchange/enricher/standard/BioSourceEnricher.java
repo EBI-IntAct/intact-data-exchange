@@ -50,6 +50,10 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
         String label = term.getCommonName();
         String fullName = term.getScientificName();
 
+        if (label == null || label.length() == 0) {
+            label = fullName;
+        }
+
         if (label != null) {
             label = label.toLowerCase();
             objectToEnrich.setShortLabel(label);
