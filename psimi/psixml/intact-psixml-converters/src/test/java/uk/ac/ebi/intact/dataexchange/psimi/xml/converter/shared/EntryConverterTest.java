@@ -21,17 +21,14 @@ import org.apache.commons.logging.LogFactory;
 import static org.easymock.classextension.EasyMock.createNiceMock;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.InputSource;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.*;
-import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
 import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidatorMessage;
@@ -43,7 +40,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.ArrayList;
 
 /**
  * TODO comment this
@@ -101,7 +97,6 @@ public class EntryConverterTest extends AbstractConverterTest {
     static boolean output = false;
 
     @Test
-    @Ignore
     public void roundtrip_dip() throws Exception {
 
         File file = getDipFile();
@@ -117,29 +112,6 @@ public class EntryConverterTest extends AbstractConverterTest {
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         roundtripWithStream(new FileInputStream(file));
-    }
-
-    @Test
-    @Ignore
-    public void rountrip_small() throws Exception {
-        File sourceFile = new File(EntryConverterTest.class.getResource("/xml/16531241.dip.raw.xml").getFile());
-        File destFile = new File("/homes/baranda/projects/intact-current/data-exchange/psimi/psixml/intact-psixml-converters/src/test/resources/xml/16531241.dip.enriched.xml");
-
-        PsimiXmlReader reader = new PsimiXmlReader();
-        EntrySet entrySet = reader.read(new FileInputStream(sourceFile));
-
-        for (Entry beforeRountripEntry : entrySet.getEntries())  {
-
-        EntryConverter entryConverter = new EntryConverter();
-
-        IntactEntry intactEntry = entryConverter.psiToIntact(beforeRountripEntry);
-        Entry afterRoundtripEntry = entryConverter.intactToPsi(intactEntry);
-
-        PsimiXmlWriter writer = new PsimiXmlWriter();
-        writer.write(new EntrySet(Arrays.asList(afterRoundtripEntry), entrySet.getLevel(), entrySet.getVersion(), entrySet.getMinorVersion()), destFile);
-
-        System.out.println("Written: "+destFile);
-        }
     }
 
     @Test
@@ -225,7 +197,16 @@ public class EntryConverterTest extends AbstractConverterTest {
             interactors = new HashSet<Interactor>();
             for (Interaction i : entry.getInteractions()) {
                 for (Participant p : i.getParticipants()) {
-                    interactors.add(p.getInteractor());
+
+                    boolean found = false;
+
+                    for (Interactor interactor : interactors) {
+                        if (interactor.getNames().getShortLabel().equals(p.getInteractor().getNames().getShortLabel())) {
+                            found = true;
+                        }
+                    }
+
+                    if (!found) interactors.add(p.getInteractor());
                 }
             }
         }
