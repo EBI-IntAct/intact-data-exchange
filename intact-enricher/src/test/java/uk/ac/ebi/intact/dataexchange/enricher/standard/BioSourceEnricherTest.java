@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.BioSource;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 
 /**
  * TODO comment this
@@ -59,5 +60,11 @@ public class BioSourceEnricherTest extends IntactBasicTestCase {
         enricher.enrich(unculturedBacterium);
 
         Assert.assertEquals("uncultured bacterium", unculturedBacterium.getShortLabel());
+    }
+
+    @Test (expected = EnricherException.class)
+    public void enrich_invalidTaxid() throws Exception {
+        BioSource invalidBioSource = getMockBuilder().createBioSource(0, "NONE");
+         enricher.enrich(invalidBioSource);
     }
 }

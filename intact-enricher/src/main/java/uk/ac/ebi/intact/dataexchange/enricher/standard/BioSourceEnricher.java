@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.BioSourceFetcher;
 import uk.ac.ebi.intact.model.BioSource;
 
@@ -45,6 +46,11 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
 
         // get the taxonomy term from newt
         int taxId = Integer.valueOf(objectToEnrich.getTaxId());
+
+        if (taxId <= 0) {
+            throw new EnricherException("Biosource has an invalid taxid: "+taxId+" ("+objectToEnrich.getFullName()+")");
+        }
+
         TaxonomyTerm term = BioSourceFetcher.getInstance().fetchByTaxId(taxId);
 
         String label = term.getCommonName();
