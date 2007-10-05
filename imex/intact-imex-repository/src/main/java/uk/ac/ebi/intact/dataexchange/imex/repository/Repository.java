@@ -16,7 +16,6 @@
 package uk.ac.ebi.intact.dataexchange.imex.repository;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.dataexchange.imex.repository.enrich.EntryEnricher;
@@ -32,6 +31,8 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.split.impl.DefaultEntrySetS
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * TODO comment this
@@ -70,7 +71,7 @@ public class Repository {
         }
 
         String entryName = entryXml.getName();
-        String name = FilenameUtils.removeExtension(entryName);
+        String name = fileDate(entryName);
 
         RepoEntrySet repoEntrySet = new RepoEntrySet(provider, name);
 
@@ -158,7 +159,28 @@ public class Repository {
         return new File(getRepositoryDir(), ORIGINAL_DIR_NAME);
     }
 
+    public File getOriginalEntrySetDir(String providerName) {
+        return new File(getOriginalEntrySetDir(), providerName);
+    }
+
     public File getEntriesDir() {
         return new File(getRepositoryDir(), ENTRIES_DIR_NAME);
+    }
+
+    public File getEntriesDir(String providerName) {
+        return new File(getEntriesDir(), providerName);
+    }
+
+    protected static String fileDate(String entryName) {
+        Pattern p = Pattern.compile(".*(\\d{4}-\\d{2}\\-\\d{2}).*");
+
+        String fileDate = entryName;
+
+        Matcher m = p.matcher(entryName);
+        if (m.matches()) {
+            fileDate = m.group(1);
+        }
+
+        return fileDate;
     }
 }

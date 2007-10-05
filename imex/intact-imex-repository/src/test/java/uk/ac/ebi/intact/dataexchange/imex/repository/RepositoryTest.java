@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.dataexchange.imex.repository;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ProviderService;
 
 import java.io.File;
 
@@ -41,7 +40,7 @@ public class RepositoryTest {
         repo.storeEntrySet(empty, "dip");
 
         RepositoryHelper helper = new RepositoryHelper(repo);
-        File expectedFile = helper.getEntrySetFile("dip_2006-11-01");
+        File expectedFile = helper.getEntrySetFile("2006-11-01", "dip");
 
         Assert.assertTrue(expectedFile.exists());
     }
@@ -57,7 +56,7 @@ public class RepositoryTest {
         repo.storeEntrySet(empty, "mint");
 
         RepositoryHelper helper = new RepositoryHelper(repo);
-        File expectedFile = helper.getEntrySetFile("mint_2006-07-18");
+        File expectedFile = helper.getEntrySetFile("2006-07-18", "mint");
 
         Assert.assertTrue(expectedFile.exists());
     }

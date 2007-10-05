@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.dataexchange.imex.repository.enrich.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
 import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryHelper;
@@ -10,7 +11,6 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.enricher.PsiEnricher;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,8 +49,10 @@ public class DefaultEntryEnricher implements EntryEnricher
         Repository repository = ImexRepositoryContext.getInstance().getRepository();
         RepositoryHelper helper = new RepositoryHelper(repository);
 
-        File entryBeforeEnrichFile = helper.getEntryFile(repoEntry.getPmid(), repoEntry.getRepoEntrySet().getName(), false);
-        File entryAfterEnrichFile = helper.getEntryFile(repoEntry.getPmid(), repoEntry.getRepoEntrySet().getName(), true);
+        File entryBeforeEnrichFile = helper.getEntryFile(repoEntry.getPmid(), repoEntry.getRepoEntrySet().getName(),
+                                                         repoEntry.getRepoEntrySet().getProvider().getName(), false);
+        File entryAfterEnrichFile = helper.getEntryFile(repoEntry.getPmid(), repoEntry.getRepoEntrySet().getName(),
+                                                        repoEntry.getRepoEntrySet().getProvider().getName(), true);
 
         try {
             PsiEnricher.enrichPsiXml(entryBeforeEnrichFile, entryAfterEnrichFile, new DefaultEnricherConfig());

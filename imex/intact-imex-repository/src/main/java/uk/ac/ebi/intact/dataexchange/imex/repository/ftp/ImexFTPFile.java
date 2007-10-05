@@ -55,7 +55,7 @@ public class ImexFTPFile {
     }
 
     public File toFile() throws IOException {
-        File tempFile = File.createTempFile(ftpFile.getName()+"-", ".xml");
+        File tempFile = File.createTempFile(ftpFile.getName()+"__", ".xml");
         FileWriter writer = new FileWriter(tempFile);
 
         BufferedReader in = new BufferedReader(new InputStreamReader(openStream()));
