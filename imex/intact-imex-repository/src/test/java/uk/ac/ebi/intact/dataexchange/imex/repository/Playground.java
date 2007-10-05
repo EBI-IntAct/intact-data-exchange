@@ -17,9 +17,10 @@ package uk.ac.ebi.intact.dataexchange.imex.repository;
 
 import org.apache.commons.io.FileUtils;
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntryService;
+import uk.ac.ebi.intact.dataexchange.imex.repository.ftp.ImexFTPClientFactory;
+import uk.ac.ebi.intact.dataexchange.imex.repository.ftp.ImexFTPFile;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.UnexpectedError;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 
 import java.io.File;
 
@@ -36,9 +37,10 @@ public class Playground {
         FileUtils.deleteDirectory(tempDir);
 
         Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
-        
-        File empty = new File("/homes/baranda/projects/temp/2007-07-05.dip.xml");
-        repo.storeEntrySet(empty, "dip");
+
+        for (ImexFTPFile ftpFile : ImexFTPClientFactory.createDipClient().listFiles()) {
+            repo.storeEntrySet(ftpFile, "dip");
+        }
 
         //File psiMi = new File(Playground.class.getResource("/xml/mint_2006-07-18.xml").getFile());
         //repo.storeEntrySet(psiMi, "mint");
@@ -52,6 +54,7 @@ public class Playground {
             if (!repoEntry.isValid()) {
                 for (UnexpectedError error : repoEntry.getErrors()) {
                     System.out.println("\tError: "+error.getMessage());
+                    System.out.println(error.getStackTrace());
                 }
             }
         }

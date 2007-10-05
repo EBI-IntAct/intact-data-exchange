@@ -34,7 +34,7 @@ public class ImexFTPFile {
     private FTPFile ftpFile;
     private URL url;
 
-    ImexFTPFile(FTPFile ftpFile, String host, String folder, int year) {
+    protected ImexFTPFile(FTPFile ftpFile, String host, String folder, int year) {
         this.ftpFile = ftpFile;
 
         try {
@@ -166,6 +166,7 @@ public class ImexFTPFile {
         ftpFile.setUser(s);
     }
 
+    @Override
     public String toString() {
         return ftpFile.toString();
     }

@@ -39,7 +39,7 @@ public final class ImexFTPClientFactory {
     }
 
     public static ImexFTPClient createMintClient() {
-        return new ImexFTPClient(MINT_HOST, MINT_FOLDER);
+        return new ImexMintFTPClient(MINT_HOST, MINT_FOLDER);
     }
 
     public static ImexFTPClient createIntactClient() {

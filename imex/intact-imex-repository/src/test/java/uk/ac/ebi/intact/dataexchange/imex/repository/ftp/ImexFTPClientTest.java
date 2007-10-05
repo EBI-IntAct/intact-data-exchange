@@ -20,6 +20,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
+
 /**
  * TODO comment this
  *
@@ -45,5 +47,22 @@ public class ImexFTPClientTest {
     @Test
     public void listFiles() throws Exception {
         Assert.assertFalse(ftpClient.listFiles().isEmpty());
+    }
+
+    @Test
+    public void listFiles_mint() throws Exception {
+        final ImexFTPClient imexFTPClient = ImexFTPClientFactory.createMintClient();
+        imexFTPClient.connect();
+
+        final List<ImexFTPFile> ftpFiles = imexFTPClient.listFiles();
+
+        System.out.println("Files: "+ftpFiles.size());
+
+        for (ImexFTPFile file : ftpFiles) {
+            System.out.println(file);
+        }
+        Assert.assertFalse(ftpFiles.isEmpty());
+
+        imexFTPClient.disconnect();
     }
 }

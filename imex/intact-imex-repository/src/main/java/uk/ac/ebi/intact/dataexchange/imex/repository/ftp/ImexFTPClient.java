@@ -41,7 +41,7 @@ public class ImexFTPClient {
     private String host;
     private String folder;
 
-    ImexFTPClient(String host, String folder) {
+    protected ImexFTPClient(String host, String folder) {
         this.host = host;
         this.folder = normalizeFolder(folder);
 
@@ -120,5 +120,17 @@ public class ImexFTPClient {
         if (!isConnected()) {
             throw new IllegalStateException("FTPClient is not connected to the FTP host. Call FTPClient.connect() first");
         }
+    }
+
+    protected String getFolder() {
+        return folder;
+    }
+
+    protected FTPClient getFtpClient() {
+        return ftpClient;
+    }
+
+    protected String getHost() {
+        return host;
     }
 }
