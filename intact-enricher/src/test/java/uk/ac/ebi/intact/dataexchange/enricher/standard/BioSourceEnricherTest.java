@@ -67,4 +67,13 @@ public class BioSourceEnricherTest extends IntactBasicTestCase {
         BioSource invalidBioSource = getMockBuilder().createBioSource(0, "NONE");
          enricher.enrich(invalidBioSource);
     }
+
+    @Test
+    public void enrich_longShortLabel() throws Exception {
+        BioSource organism = getMockBuilder().createBioSource(224325, "Unknown");
+        enricher.enrich(organism);
+
+        Assert.assertEquals("archaeoglobus fulgid", organism.getShortLabel());
+        Assert.assertEquals("Archaeoglobus fulgidus DSM 4304", organism.getFullName());
+    }
 }

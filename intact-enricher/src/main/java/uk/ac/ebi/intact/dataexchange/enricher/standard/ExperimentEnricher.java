@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.util.ExperimentUtils;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
 
 /**
@@ -68,7 +69,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
 
     protected void populateExperiment(Experiment experiment, String pubmedId) throws Exception {
         ExperimentAutoFill autoFill = new ExperimentAutoFill(pubmedId);
-        experiment.setShortLabel(autoFill.getShortlabel(false));
+        experiment.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(autoFill.getShortlabel(false)));
         experiment.setFullName(autoFill.getFullname());
     }
 }

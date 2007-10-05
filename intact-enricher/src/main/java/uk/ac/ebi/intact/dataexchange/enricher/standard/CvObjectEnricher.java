@@ -22,6 +22,7 @@ import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.util.CvObjectBuilder;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
 /**
  * TODO comment this
@@ -64,7 +65,7 @@ public class CvObjectEnricher extends AnnotatedObjectEnricher<CvObject> {
         }
 
         if (term != null) {
-            objectToEnrich.setShortLabel(term.getShortName());
+            objectToEnrich.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(term.getShortName()));
             objectToEnrich.setFullName(term.getFullName());
         }
 

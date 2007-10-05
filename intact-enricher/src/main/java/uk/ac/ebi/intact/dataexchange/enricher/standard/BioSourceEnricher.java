@@ -19,6 +19,7 @@ import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.BioSourceFetcher;
 import uk.ac.ebi.intact.model.BioSource;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
 /**
  * TODO comment this
@@ -61,7 +62,7 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
         }
 
         if (label != null) {
-            label = label.toLowerCase();
+            label = AnnotatedObjectUtils.prepareShortLabel(label.toLowerCase());
             objectToEnrich.setShortLabel(label);
         }
 

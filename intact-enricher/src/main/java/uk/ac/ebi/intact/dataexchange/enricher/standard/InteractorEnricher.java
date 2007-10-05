@@ -91,7 +91,7 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                 updateAliases(proteinToEnrich, uniprotProt);
                 proteinToEnrich.setSequence(uniprotProt.getSequence());
 
-                proteinToEnrich.setShortLabel(uniprotProt.getId().toLowerCase());
+                proteinToEnrich.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(uniprotProt.getId().toLowerCase()));
                 proteinToEnrich.setFullName(uniprotProt.getDescription());
             }
 

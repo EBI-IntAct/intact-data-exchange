@@ -21,6 +21,7 @@ import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
 /**
  * TODO comment this
@@ -70,7 +71,7 @@ public class InteractionEnricher extends AnnotatedObjectEnricher<Interaction> {
 
         if (EnricherContext.getInstance().getConfig().isUpdateInteractionShortLabels()) {
             String label = InteractionUtils.calculateShortLabel(objectToEnrich);
-            objectToEnrich.setShortLabel(label);
+            objectToEnrich.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(label));
         }
 
         super.enrich(objectToEnrich);
