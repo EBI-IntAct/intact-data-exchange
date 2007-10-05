@@ -117,7 +117,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         CvBiologicalRole biologicalRole = new BiologicalRoleConverter(institution).psiToIntact(psiBioRole);
 
         if (participant.getExperimentalRoles().size() > 1) {
-            throw new PsiConversionException("Cannot convert participants with more than one expeirmental role: "+participant);
+            throw new PsiConversionException("Cannot convert participants with more than one experimental role: "+participant);
         }
 
         // only the first experimental role
@@ -131,7 +131,6 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
 
             role = PsiConverterUtils.createUnspecifiedExperimentalRole();
         }
-
 
         CvExperimentalRole experimentalRole = new ExperimentalRoleConverter(institution).psiToIntact(role);
 
