@@ -34,11 +34,13 @@ public class ImexFTPFile {
     private FTPFile ftpFile;
     private URL url;
 
-    protected ImexFTPFile(FTPFile ftpFile, String host, String folder, int year) {
+    protected ImexFTPFile(FTPFile ftpFile, String host, String folder, Integer year) {
         this.ftpFile = ftpFile;
 
+        String strYear = (year != null)? String.valueOf(year)+"/" : "";
+
         try {
-            this.url = new URL("ftp://"+host+folder+year+"/"+ftpFile.getName());
+            this.url = new URL("ftp://"+host+folder+strYear+ftpFile.getName());
         } catch (MalformedURLException e) {
             throw new ImexFTPException(e);
         }

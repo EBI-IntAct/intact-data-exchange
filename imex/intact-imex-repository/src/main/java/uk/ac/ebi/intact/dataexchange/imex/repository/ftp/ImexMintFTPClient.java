@@ -81,7 +81,7 @@ public class ImexMintFTPClient extends ImexFTPClient {
         for (FTPFile ftpFile : baseFiles) {
             final String filename = ftpFile.getName();
             if (filename.startsWith(String.valueOf(year))) {
-                ImexFTPFile imexFtpFile = new ImexFTPFile(ftpFile, getHost(), getFolder(), year);
+                ImexFTPFile imexFtpFile = new ImexFTPFile(ftpFile, getHost(), getFolder(), null);
 
                 if (imexFtpFile.isFile() && imexFtpFile.getName().endsWith(".xml.gz") ) {
                     files.add(imexFtpFile);

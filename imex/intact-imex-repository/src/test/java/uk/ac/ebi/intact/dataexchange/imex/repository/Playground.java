@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.imex.repository;
 
 import org.apache.commons.io.FileUtils;
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntryService;
+import uk.ac.ebi.intact.dataexchange.imex.repository.ftp.ImexFTPClient;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ftp.ImexFTPClientFactory;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ftp.ImexFTPFile;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
@@ -38,13 +39,23 @@ public class Playground {
 
         Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
 
-        for (ImexFTPFile ftpFile : ImexFTPClientFactory.createDipClient().listFiles()) {
+        final ImexFTPClient mintClient = ImexFTPClientFactory.createMintClient();
+        mintClient.connect();
+        for (ImexFTPFile ftpFile : mintClient.listFiles()) {
+            try {
+                repo.storeEntrySet(ftpFile, "mint");
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+        mintClient.disconnect();
+
+        final ImexFTPClient dipClient = ImexFTPClientFactory.createDipClient();
+        dipClient.connect();
+        for (ImexFTPFile ftpFile : dipClient.listFiles()) {
             repo.storeEntrySet(ftpFile, "dip");
         }
-
-        //File psiMi = new File(Playground.class.getResource("/xml/mint_2006-07-18.xml").getFile());
-        //repo.storeEntrySet(psiMi, "mint");
-
+        dipClient.disconnect();
 
         RepoEntryService repoEntryService = ImexRepositoryContext.getInstance().getImexServiceProvider().getRepoEntryService();
         for (RepoEntry repoEntry : repoEntryService.findAllRepoEntries()) {
