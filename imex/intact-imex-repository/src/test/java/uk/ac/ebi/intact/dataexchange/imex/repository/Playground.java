@@ -32,7 +32,7 @@ import java.io.File;
 public class Playground {
 
     public static void main(String[] args) throws Exception {
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-dip2/");
+        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-dip3/");
         FileUtils.deleteDirectory(tempDir);
 
         Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());

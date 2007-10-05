@@ -79,6 +79,8 @@ public class PsiMockFactory {
         names.setShortLabel("intact");
         names.setFullName("European Bioinformatics Institute");
 
+        names.getAliases().add(createAlias("ebi", CvAliasType.GO_SYNONYM, CvAliasType.GO_SYNONYM_MI_REF));
+
         source.setXref(createSourceXref(CvDatabase.INTACT_MI_REF));
 
         source.setBibref(createSourceBibref());
@@ -155,6 +157,8 @@ public class PsiMockFactory {
         Interactor interactor = new Interactor();
         populate(interactor);
         interactor.setInteractorType(createInteractorType());
+
+        interactor.setOrganism(createMockOrganism());
 
         return interactor;
     }
@@ -279,6 +283,11 @@ public class PsiMockFactory {
         intType.getNames().setShortLabel(CvInteractorType.PROTEIN);
 
         return intType;
+    }
+
+    public static Attribute createAttribute() {
+        Attribute attr = new Attribute("name", nextString());
+        return attr;
     }
 
     public static DbReference createDbReference() {

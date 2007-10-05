@@ -199,4 +199,30 @@ public class ConvertXml2TabTest extends TestCase {
         assertTrue( logFile.exists() );
         assertTrue( logFile.length() > 0 );
     }
+
+    public void testConvert3() throws ConverterException, IOException, TabConvertionException {
+        File file = new File( ConvertXml2TabTest.class.getResource( "/xml-samples/16603238.xml" ).getFile() );
+        ConvertXml2Tab x2t = new ConvertXml2Tab();
+        x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
+        x2t.setInteractorPairClustering( true );
+        x2t.setOverwriteOutputFile( true );
+
+        File logFile = new File( file.getParentFile(), "16603238.log" );
+        Writer logWriter = new BufferedWriter( new FileWriter( logFile ) );
+        x2t.setLogWriter( logWriter );
+
+        Collection<File> inputFiles = new ArrayList<File>();
+        inputFiles.add( file );
+        x2t.setXmlFilesToConvert( inputFiles );
+
+        x2t.setOutputFile( new File( file.getAbsolutePath() + ".xls" ) );
+
+        x2t.convert();
+
+        logWriter.flush();
+        logWriter.close();
+
+        assertTrue( logFile.exists() );
+        assertTrue( logFile.length() > 0 );
+    }
 }

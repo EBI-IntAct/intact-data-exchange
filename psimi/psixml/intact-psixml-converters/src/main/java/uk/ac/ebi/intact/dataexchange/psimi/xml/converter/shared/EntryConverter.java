@@ -54,7 +54,7 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
  
         Collection<Interaction> interactions = new ArrayList<Interaction>();
 
-        InteractionConverter interactionConverter = new InteractionConverter(getInstitution());
+        InteractionConverter interactionConverter = new InteractionConverter(institution);
 
         for (psidev.psi.mi.xml.model.Interaction psiInteraction : psiObject.getInteractions()) {
             Interaction interaction = interactionConverter.psiToIntact(psiInteraction);
@@ -64,7 +64,7 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         IntactEntry ientry = new IntactEntry(interactions);
         ientry.setInstitution(getInstitution());
         
-        IntactConverterUtils.populateAnnotations(psiObject, ientry, getInstitution());
+        IntactConverterUtils.populateAnnotations(psiObject, ientry, institution);
 
         if (psiObject.getSource().getReleaseDate() != null) {
             ientry.setReleasedDate(psiObject.getSource().getReleaseDate());

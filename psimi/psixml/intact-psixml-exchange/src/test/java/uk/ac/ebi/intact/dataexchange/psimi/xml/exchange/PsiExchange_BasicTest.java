@@ -17,9 +17,15 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.model.Experiment;
+import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
+import uk.ac.ebi.intact.model.CvTopic;
 
 /**
  * TODO comment this
@@ -29,10 +35,25 @@ import uk.ac.ebi.intact.model.IntactEntry;
  */
 public class PsiExchange_BasicTest extends IntactBasicTestCase {
 
+    @Before
+    public void prepare() throws Exception {
+        IntactUnit iu = new IntactUnit();
+        iu.createSchema();
+    }
+
+    @After
+    public void endTest() throws Exception {
+        commitTransaction();
+    }
+
     @Test
     public void importIntoIntact_default() throws Exception {
-        Experiment experiment = getMockBuilder().createExperimentRandom(3);
+        Institution institution = getMockBuilder().createInstitution("IA:0000", "lalaInstitution");
+        institution.getAnnotations().add(getMockBuilder().createAnnotation("nowhere", CvTopic.CONTACT_EMAIL_MI_REF, CvTopic.CONTACT_EMAIL));
+
+        Experiment experiment = new IntactMockBuilder(institution).createExperimentRandom(3);
         IntactEntry entry = new IntactEntry(experiment.getInteractions());
+        entry.setInstitution(institution);
 
         beginTransaction();
         PsiExchange.importIntoIntact(entry, false);

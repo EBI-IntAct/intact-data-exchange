@@ -31,6 +31,7 @@ public class InstitutionConverterTest extends AbstractConverterTest {
     @Test
     public void psiToIntact_intact() throws Exception {
         Source source = PsiMockFactory.createMockSource();
+        source.getAttributes().add(PsiMockFactory.createAttribute());
 
         Assert.assertEquals(Institution.INTACT, source.getNames().getShortLabel());
 
@@ -39,6 +40,9 @@ public class InstitutionConverterTest extends AbstractConverterTest {
 
         Assert.assertNotNull(institution);
         Assert.assertEquals(Institution.INTACT, institution.getShortLabel());
+        Assert.assertNotNull(institution.getXrefs().iterator().next().getOwner().getShortLabel());
+        Assert.assertNotNull(institution.getAliases().iterator().next().getOwner().getShortLabel());
+        Assert.assertNotNull(institution.getAnnotations().iterator().next().getOwner().getShortLabel());
     }
 
     @Test

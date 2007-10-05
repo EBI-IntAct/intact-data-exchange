@@ -179,7 +179,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         List<Component> components = new ArrayList<Component>(psiInteraction.getParticipants().size());
 
         for (Participant participant : psiInteraction.getParticipants()) {
-            Component component = ParticipantConverter.newComponent(getInstitution(), participant, interaction);
+            Component component = ParticipantConverter.newComponent(interaction.getOwner(), participant, interaction);
             components.add(component);
         }
 

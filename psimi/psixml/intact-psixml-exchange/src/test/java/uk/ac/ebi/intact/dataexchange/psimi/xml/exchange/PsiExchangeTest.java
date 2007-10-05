@@ -27,6 +27,7 @@ import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.DebugUtil;
+import uk.ac.ebi.intact.context.IntactContext;
 
 import java.io.StringWriter;
 import java.util.Arrays;

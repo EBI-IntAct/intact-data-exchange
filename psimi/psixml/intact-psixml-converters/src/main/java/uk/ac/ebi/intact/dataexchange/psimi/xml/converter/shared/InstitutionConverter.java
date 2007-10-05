@@ -1,12 +1,12 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import psidev.psi.mi.xml.model.*;
-import psidev.psi.mi.xml.model.Xref;
+import psidev.psi.mi.xml.model.Attribute;
+import psidev.psi.mi.xml.model.Source;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Interactor;
+import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.InstitutionXref;
 
 import java.util.Date;
 
@@ -31,9 +31,9 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
             return institution;
         }
 
-        institution = getInstitution();
-
         IntactConverterUtils.populateNames(psiObject.getNames(), institution);
+
+        setInstitution(institution);
 
         if (psiObject.getXref() != null) {
             IntactConverterUtils.populateXref(psiObject.getXref(), institution, new XrefConverter<InstitutionXref>(getInstitution(), InstitutionXref.class));
@@ -42,7 +42,7 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
         if (psiObject.getBibref() != null) {
             IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), institution, new XrefConverter<InstitutionXref>(getInstitution(), InstitutionXref.class));
         }
-        IntactConverterUtils.populateAnnotations(psiObject, institution, getInstitution());
+        IntactConverterUtils.populateAnnotations(psiObject, institution, institution);
   
         for (Attribute attribute : psiObject.getAttributes()) {
             String attributeName = attribute.getName();

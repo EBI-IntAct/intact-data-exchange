@@ -16,14 +16,8 @@
 package uk.ac.ebi.intact.dataexchange.imex.imp;
 
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.InstitutionXref;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.io.File;
 
@@ -37,7 +31,10 @@ public class Playground {
 
     public static void main(String[] args) throws Exception{
 
+
+
         IntactContext.initStandaloneContext(new File(Playground.class.getResource("/d003-hibernate.cfg.xml").getFile()));
+
         /*
         IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
@@ -56,15 +53,21 @@ public class Playground {
         IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(mint);
         IntactContext.getCurrentInstance().getDataContext().commitTransaction();
         */
+
+
+
         File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-dip2/");
         Repository repo = ImexRepositoryContext.openRepository(repoDir.toString());
 
         ImexImporter importer = new ImexImporter(repo);
-        importer.importNew(new ImportReport());
+        ImportReport report = importer.importNewAndFailed();
 
         repo.close();
                   
         IntactContext.getCurrentInstance().close();
+
+        System.out.println(report);
+        
     }
 
 }

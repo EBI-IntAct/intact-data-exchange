@@ -17,17 +17,18 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
 import psidev.psi.mi.xml.model.Attribute;
 import psidev.psi.mi.xml.model.AttributeContainer;
 import psidev.psi.mi.xml.model.DbReference;
 import psidev.psi.mi.xml.model.Names;
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.model.util.InteractionUtils;
 
 import java.util.Collection;
 import java.util.Random;
@@ -43,7 +44,6 @@ public class IntactConverterUtils {
     private static final Log log = LogFactory.getLog(IntactConverterUtils.class);
 
     private static final int SHORT_LABEL_LENGTH = 20;
-    private static final String TEMP_SHORTLABEL_PREFIX = "unk-unk-";
 
     private IntactConverterUtils() {
     }
@@ -61,7 +61,7 @@ public class IntactConverterUtils {
             annotatedObject.setFullName(names.getFullName());
 
             Class<?> aliasClass = AnnotatedObjectUtils.getAliasClassType(annotatedObject.getClass());
-            AliasConverter aliasConverter = new AliasConverter(annotatedObject.getOwner(), aliasClass);
+            AliasConverter aliasConverter = new AliasConverter(getInstitution(annotatedObject), aliasClass);
 
             populateAliases(names.getAliases(), annotatedObject, aliasConverter);
         }
@@ -84,6 +84,10 @@ public class IntactConverterUtils {
     private static <X extends Xref> void addXref(DbReference dbReference, AnnotatedObject<X, ?> annotatedObject, XrefConverter<X> xrefConverter) {
         X xref = xrefConverter.psiToIntact(dbReference);
         annotatedObject.addXref(xref);
+
+        if (annotatedObject instanceof Institution) {
+            xref.setOwner((Institution)annotatedObject);
+        }
     }
 
     public static <A extends Alias> void populateAliases(Collection<psidev.psi.mi.xml.model.Alias> psiAliases, AnnotatedObject<?, A> annotatedObject, AliasConverter<A> aliasConverter) {
@@ -94,6 +98,10 @@ public class IntactConverterUtils {
         for (psidev.psi.mi.xml.model.Alias psiAlias : psiAliases) {
             A alias = aliasConverter.psiToIntact(psiAlias);
             annotatedObject.addAlias(alias);
+
+            if (annotatedObject instanceof Institution) {
+                alias.setOwner((Institution) annotatedObject);
+            }
         }
     }
 
@@ -103,6 +111,7 @@ public class IntactConverterUtils {
         if (attributeContainer.hasAttributes()) {
             for (Attribute attribute : attributeContainer.getAttributes()) {
                 Annotation annotation = annotationConverter.psiToIntact(attribute);
+                annotation.setOwner(institution);
                 annotated.getAnnotations().add(annotation);
             }
         }
@@ -148,16 +157,23 @@ public class IntactConverterUtils {
     }
 
     public static String createTempShortLabel() {
-        return TEMP_SHORTLABEL_PREFIX + Math.abs(new Random().nextInt());
+        return InteractionUtils.INTERACTION_TEMP_LABEL_PREFIX + Math.abs(new Random().nextInt());
     }
 
     public static String createExperimentTempShortLabel() {
         return new IntactMockBuilder().randomString(5)+"-0000";
     }
 
+    @Deprecated
     public static boolean isTempShortLabel(String label) {
-        return label.startsWith(TEMP_SHORTLABEL_PREFIX);
+        return InteractionUtils.isTemporaryLabel(label);
     }
 
-
+    protected static Institution getInstitution(AnnotatedObject ao) {
+        if (ao instanceof Institution) {
+            return IntactContext.getCurrentInstance().getInstitution();
+        } else {
+            return ao.getOwner();
+        }
+    }
 }

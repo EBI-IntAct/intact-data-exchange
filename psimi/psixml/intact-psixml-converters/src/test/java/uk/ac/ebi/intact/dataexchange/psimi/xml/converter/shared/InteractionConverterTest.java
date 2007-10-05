@@ -17,7 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.xml.model.Interactor;
+import psidev.psi.mi.xml.model.Interaction;
 import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.Institution;
@@ -29,20 +29,16 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InteractorConverterTest {
+public class InteractionConverterTest {
 
     @Test
     public void psiToIntact_default() throws Exception {
-        Interactor psiInteractor = PsiMockFactory.createMockInteractor();
+        Interaction psiInteraction = PsiMockFactory.createMockInteraction();
 
-        InteractorConverter interactorConverter = new InteractorConverter(new Institution("testInstitution"));
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
 
-        uk.ac.ebi.intact.model.Interactor interactor = interactorConverter.psiToIntact(psiInteractor);
-
-        CvObjectXref identityXref = CvObjectUtils.getPsiMiIdentityXref(interactor.getCvInteractorType());
-        Assert.assertEquals(CvXrefQualifier.IDENTITY, identityXref.getCvXrefQualifier().getShortLabel());
-
-        Assert.assertEquals(psiInteractor.getNames().getAliases().size(), interactor.getAliases().size());
-        Assert.assertNotNull(interactor.getOwner());
+        Assert.assertNotNull(interaction.getComponents().iterator().next().getInteractor().getOwner());
+        Assert.assertEquals("testInstitution", interaction.getComponents().iterator().next().getInteractor().getOwner().getShortLabel());
     }
 }

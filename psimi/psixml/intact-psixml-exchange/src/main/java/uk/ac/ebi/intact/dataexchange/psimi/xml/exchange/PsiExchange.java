@@ -29,9 +29,11 @@ import uk.ac.ebi.intact.core.persister.standard.EntryPersister;
 import uk.ac.ebi.intact.core.persister.standard.InteractionPersister;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.Institution;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -110,13 +112,24 @@ public class PsiExchange {
 
         beginTransaction();
 
-        // instead of converting/processing the whole Entry, we process the interactions to avoid memory exceptions
-        InteractionConverter interactionConverter = new InteractionConverter(context.getInstitution());
+
 
         // the persister of interactions instance
         InteractionPersister interactionPersister = InteractionPersister.getInstance();
 
         for (Entry entry : entrySet.getEntries()) {
+            InstitutionConverter institutionConverter = new InstitutionConverter();
+            Institution institution;
+
+            if (entry.getSource() != null) {
+                institution = institutionConverter.psiToIntact(entry.getSource());
+            } else {
+                institution = context.getInstitution();
+            }
+
+            // instead of converting/processing the whole Entry, we process the interactions to avoid memory exceptions
+            InteractionConverter interactionConverter = new InteractionConverter(institution);
+
             for (psidev.psi.mi.xml.model.Interaction psiInteraction : entry.getInteractions()) {
                 Interaction interaction = interactionConverter.psiToIntact(psiInteraction);
 
@@ -232,12 +245,10 @@ public class PsiExchange {
         }
     }
 
-    public static EntrySet exportToEntrySet(IntactEntry... intactEntries) {
-        IntactContext context = IntactContext.getCurrentInstance();
-
+    public static EntrySet exportToEntrySet(IntactEntry... intactEntries) { 
         Collection<Entry> psiEntries = new ArrayList<Entry>();
 
-        EntryConverter entryConverter = new EntryConverter(context.getInstitution());
+        EntryConverter entryConverter = new EntryConverter();
 
         for (IntactEntry intactEntry : intactEntries) {
             Entry psiEntry = entryConverter.intactToPsi(intactEntry);
@@ -250,5 +261,6 @@ public class PsiExchange {
     private static EntrySet createEntrySet(Collection<Entry> entry) {
         return new EntrySet(entry, 2, 5, 3);
     }
+
 
 }

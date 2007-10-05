@@ -45,7 +45,7 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         Organism organism = psiObject.getOrganism();
 
         if (organism != null) {
-            BioSource bioSource = new OrganismConverter(getInstitution()).psiToIntact(organism);
+            BioSource bioSource = new OrganismConverter(interactor.getOwner()).psiToIntact(organism);
             interactor.setBioSource(bioSource);
         }
 

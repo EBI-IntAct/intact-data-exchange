@@ -50,6 +50,10 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
 
         intactObject = newIntactObjectInstance(psiObject);
 
+        if (!(intactObject instanceof Institution)) {
+            intactObject.setOwner(getInstitution());
+        }
+
         ConversionCache.putElement(psiElementKey(psiObject), intactObject);
 
         newIntactObjectCreated = true;
