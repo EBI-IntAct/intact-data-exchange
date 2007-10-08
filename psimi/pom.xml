@@ -21,7 +21,6 @@
         <module>psixml</module>
         <module>psimitab</module>
         <module>legacy</module>
-        <module>intact-xmltab-converter</module>
   </modules>
 
 </project>
