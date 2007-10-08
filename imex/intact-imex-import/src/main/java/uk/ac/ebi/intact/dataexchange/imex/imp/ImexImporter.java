@@ -172,14 +172,18 @@ public class ImexImporter {
         beginTransaction();
 
         Institution institution = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getInstitutionDao().getByShortLabel(providerName);
+                .getInstitutionDao().getByShortLabel(providerName, true);
 
         commitTransaction();
 
         if (institution != null) {
             institutions.put(providerName, institution);
         } else {
-            throw new RuntimeException("Institution not found for provider: "+ providerName);
+            beginTransaction();
+            List<String> institutionsAvailable = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                .getInstitutionDao().getShortLabelsLike("%");
+            commitTransaction();
+            throw new RuntimeException("Institution not found for provider: "+ providerName+". Available: "+institutionsAvailable);
         }
 
         return institution;

@@ -15,11 +15,12 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.imp;
 
+import uk.ac.ebi.intact.context.DataContext;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
-import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
+import uk.ac.ebi.intact.model.Feature;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * TODO comment this
@@ -31,32 +32,38 @@ public class Playground {
 
     public static void main(String[] args) throws Exception{
 
-
-
-        IntactContext.initStandaloneContext(new File(Playground.class.getResource("/d003-hibernate.cfg.xml").getFile()));
+        IntactContext.initStandaloneContext(new File(Playground.class.getResource("/temph2-hibernate.cfg.xml").getFile()));
 
         /*
-        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+        getDataContext().beginTransaction();
 
-        CvXrefQualifier qual = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).getByPsiMiRef(CvXrefQualifier.IDENTITY_MI_REF);
-        CvDatabase psiMi = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByPsiMiRef(CvDatabase.PSI_MI_MI_REF);
+        SmallCvPrimer primer = new SmallCvPrimer(getDataContext().getDaoFactory());
+        primer.createCVs();
 
-        Institution dip = new Institution("dip");
+        CvXrefQualifier qual = getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).getByPsiMiRef(CvXrefQualifier.IDENTITY_MI_REF);
+        CvDatabase psiMi = getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByPsiMiRef(CvDatabase.PSI_MI_MI_REF);
+
+        Institution dip = new Institution("DIP");
         InstitutionXref xref = XrefUtils.createIdentityXref(dip, "MI:0465", qual, psiMi);
         dip.addXref(xref);
 
-        Institution mint = new Institution("mint");
+        Institution mint = new Institution("MINT");
         InstitutionXref mintXref = XrefUtils.createIdentityXref(dip, "MI:0471", qual, psiMi);
         mint.addXref(mintXref);
         
-        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(dip);
-        IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(mint);
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction();
-        */
+        getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(dip);
+        getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(mint);
+        getDataContext().commitTransaction();
+         */
+
+        /*
+        getDataContext().beginTransaction();
+        System.out.println("Institutions: "+ getDataContext().getDaoFactory()
+                .getInstitutionDao().getShortLabelsLike("%"));
+         getDataContext().commitTransaction();
 
 
-
-        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-dip2/");
+        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all/");
         Repository repo = ImexRepositoryContext.openRepository(repoDir.toString());
 
         ImexImporter importer = new ImexImporter(repo);
@@ -67,7 +74,51 @@ public class Playground {
         IntactContext.getCurrentInstance().close();
 
         System.out.println(report);
-        
+        */
+
+        //printStats();
+
+        getDataContext().beginTransaction();
+
+        List<Feature> features = getDataContext().getDaoFactory().getBaseDao().getSession()
+                .createQuery("from Feature where cvFeatureType = null").list();
+
+        for (Feature feature : features) {
+            System.out.println(feature.getShortLabel());
+        }
+
+        getDataContext().commitTransaction();
+
+        //SanityReport report = SanityChecker.executeSanityCheck();
+        //System.out.println("Sanity check: "+report.getSanityResult().size() + " issues");
+         
+    }
+
+    protected static void printStats() throws Exception {
+        getDataContext().beginTransaction();
+
+        System.out.println("\nDatabase counts:\n");
+        System.out.println("\tPublications: "+getDataContext().getDaoFactory().getPublicationDao().countAll());
+        System.out.println("\tExperiments: "+getDataContext().getDaoFactory().getExperimentDao().countAll());
+        System.out.println("\tInteractions: "+getDataContext().getDaoFactory().getInteractionDao().countAll());
+        System.out.println("\tComponents: "+getDataContext().getDaoFactory().getComponentDao().countAll());
+        System.out.println("\tProteins: "+getDataContext().getDaoFactory().getProteinDao().countAll());
+        System.out.println("\tFeatures: "+getDataContext().getDaoFactory().getFeatureDao().countAll());
+
+        List<Object[]> l = getDataContext().getDaoFactory().getBaseDao().getSession().createQuery("select i.owner, count(i.owner) from InteractionImpl i group by i.owner").list();
+
+        System.out.println("\nInteractions by Institution:\n");
+
+        for (Object[] o : l) {
+            System.out.println(o[0]+": "+o[1]);
+        }
+
+
+        getDataContext().commitTransaction();
+    }
+
+    protected static DataContext getDataContext() {
+        return IntactContext.getCurrentInstance().getDataContext();
     }
 
 }
