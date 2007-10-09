@@ -30,7 +30,7 @@
             <dependency>
                 <groupId>psidev.psi.mi</groupId>
                 <artifactId>psi25-xml</artifactId>
-                <version>1.0-rc1-SNAPSHOT</version>
+                <version>1.0-rc1</version>
             </dependency>
 
             <dependency>
