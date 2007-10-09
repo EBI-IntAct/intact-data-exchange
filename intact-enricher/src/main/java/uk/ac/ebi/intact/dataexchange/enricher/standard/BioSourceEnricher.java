@@ -19,7 +19,13 @@ import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.BioSourceFetcher;
 import uk.ac.ebi.intact.model.BioSource;
+import uk.ac.ebi.intact.model.BioSourceXref;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.XrefUtils;
+import uk.ac.ebi.intact.model.util.CvObjectBuilder;
 
 /**
  * TODO comment this
@@ -78,7 +84,31 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
             cvObjectEnricher.enrich(objectToEnrich.getCvTissue());
         }
 
+        // check if it has a newt xref
+        checkNewtXref(objectToEnrich);
+
         super.enrich(objectToEnrich);
+    }
+
+    protected void checkNewtXref(BioSource organism) {
+        boolean hasNewt = false;
+
+        for (BioSourceXref xref : organism.getXrefs()) {
+            if (CvObjectUtils.getPsiMiIdentityXref(xref.getCvDatabase()).getPrimaryId()
+                    .equals(CvDatabase.NEWT_MI_REF)) {
+                hasNewt = true;
+                break;
+            }
+        }
+
+        if (!hasNewt) {
+            CvObjectBuilder cvObjectBuilder = new CvObjectBuilder();
+            CvXrefQualifier identityQual = cvObjectBuilder.createIdentityCvXrefQualifier(organism.getOwner());
+            CvDatabase newtDb = CvObjectUtils.createCvObject(organism.getOwner(), CvDatabase.class, CvDatabase.NEWT_MI_REF, CvDatabase.UNIPROT);
+
+            BioSourceXref newtXref = XrefUtils.createIdentityXref(organism, organism.getTaxId(), identityQual, newtDb);
+            organism.getXrefs().add(newtXref);
+        }
     }
 
     public void close() {

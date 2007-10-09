@@ -20,8 +20,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
+import uk.ac.ebi.intact.model.BioSource;
+import uk.ac.ebi.intact.model.BioSourceXref;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
  * TODO comment this
@@ -60,6 +63,20 @@ public class BioSourceEnricherTest extends IntactBasicTestCase {
         enricher.enrich(unculturedBacterium);
 
         Assert.assertEquals("uncultured bacterium", unculturedBacterium.getShortLabel());
+    }
+
+    @Test
+    public void enrich_noNewtXref() throws Exception {
+        BioSource unculturedBacterium = getMockBuilder().createBioSource(77133, "unknown");
+        unculturedBacterium.getXrefs().clear();
+
+        enricher.enrich(unculturedBacterium);
+
+        Assert.assertEquals(1, unculturedBacterium.getXrefs().size());
+
+        final BioSourceXref newtXref = unculturedBacterium.getXrefs().iterator().next();
+        Assert.assertEquals(String.valueOf(77133), newtXref.getPrimaryId());
+        Assert.assertEquals(CvDatabase.NEWT_MI_REF, CvObjectUtils.getPsiMiIdentityXref(newtXref.getCvDatabase()).getPrimaryId());
     }
 
     @Test (expected = EnricherException.class)
