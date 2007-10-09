@@ -7,7 +7,7 @@ package uk.ac.ebi.intact.dataexchange.cvutils.model;
 
 
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.ook.model.implementation.TermBean;
+import uk.ac.ebi.ook.model.ojb.TermBean;
 
 import java.io.PrintStream;
 import java.util.*;

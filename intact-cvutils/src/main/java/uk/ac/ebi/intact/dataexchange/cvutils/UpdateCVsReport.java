@@ -18,7 +18,7 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.model.CvObject;
-import uk.ac.ebi.ook.model.implementation.TermBean;
+import uk.ac.ebi.ook.model.ojb.TermBean;
 
 import java.io.Serializable;
 import java.util.ArrayList;

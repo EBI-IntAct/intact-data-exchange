@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <parent>
         <artifactId>dataexchange-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
@@ -18,7 +21,6 @@
             <groupId>uk.ac.ebi.intact</groupId>
             <artifactId>intact-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-persister</artifactId>
@@ -34,10 +36,8 @@
         <dependency>
             <groupId>uk.ac.ebi</groupId>
             <artifactId>ols</artifactId>
-            <version>1.6</version>
+            <version>1.14</version>
         </dependency>
-
-
     </dependencies>
 
 </project>

@@ -38,7 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 
 /**
- * TODO comment this
+ * DownloadCVs tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$

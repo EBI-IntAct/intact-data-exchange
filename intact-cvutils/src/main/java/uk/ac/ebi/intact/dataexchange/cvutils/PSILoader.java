@@ -12,10 +12,10 @@ import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.ook.loader.impl.AbstractLoader;
 import uk.ac.ebi.ook.loader.parser.OBOFormatParser;
-import uk.ac.ebi.ook.model.implementation.AnnotationBean;
-import uk.ac.ebi.ook.model.implementation.DbXrefBean;
-import uk.ac.ebi.ook.model.implementation.TermBean;
-import uk.ac.ebi.ook.model.implementation.TermSynonymBean;
+import uk.ac.ebi.ook.model.ojb.AnnotationBean;
+import uk.ac.ebi.ook.model.ojb.DbXrefBean;
+import uk.ac.ebi.ook.model.ojb.TermBean;
+import uk.ac.ebi.ook.model.ojb.TermSynonymBean;
 import uk.ac.ebi.ook.model.interfaces.DbXref;
 import uk.ac.ebi.ook.model.interfaces.TermRelationship;
 
@@ -64,7 +64,6 @@ public class PSILoader extends AbstractLoader {
         ONTOLOGY_DEFINITION = "PSI MI";
         FULL_NAME = "PSI Molecular Interactions";
         SHORT_NAME = "PSI-MI";
-        FQCN = PSILoader.class.getName();
     }
 
     protected void parse( Object params ) {
@@ -311,8 +310,8 @@ public class PSILoader extends AbstractLoader {
                 for ( Iterator itAnnot = term.getAnnotations().iterator(); itAnnot.hasNext(); ) {
                     AnnotationBean annot = (AnnotationBean) itAnnot.next();
 
-                    CvTermAnnotation annotation = new CvTermAnnotation( escapeXMLTags( annot.getAnnotationName() ),
-                                                                        escapeXMLTags( annot.getAnnotationValue() ) );
+                    CvTermAnnotation annotation = new CvTermAnnotation( escapeXMLTags( annot.getAnnotationType() ),
+                                                                        escapeXMLTags( annot.getAnnotationStringValue() ) );
                     cvTerm.addAnnotation( annotation );
                 }
             }
