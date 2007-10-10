@@ -3,30 +3,11 @@
  */
 package uk.ac.ebi.intact.interolog.prediction;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.text.StrBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import psidev.psi.mi.tab.PsimiTabWriter;
-import psidev.psi.mi.tab.model.Author;
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.InteractionDetectionMethod;
-import psidev.psi.mi.tab.model.Interactor;
-import psidev.psi.mi.tab.model.Organism;
+import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.utils.PsiCollectionUtils;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.intact.interolog.download.Sucker;
@@ -41,6 +22,12 @@ import uk.ac.ebi.intact.interolog.proteome.integr8.ProteomeReportParser;
 import uk.ac.ebi.intact.interolog.util.InterologUtils;
 import uk.ac.ebi.intact.interolog.util.NewtException;
 import uk.ac.ebi.intact.interolog.util.NewtUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.*;
 
 /**
  * @author mmichaut
@@ -750,7 +737,6 @@ public class InterologPrediction {
 	}
 	
 	/**
-	 * @param strategy
 	 * @throws InterologPredictionException
 	 */
 	@SuppressWarnings("unchecked")
@@ -1112,9 +1098,7 @@ public class InterologPrediction {
 	
 	/**
 	 * Down-cast all clog interactions into protein-protein interaction for all considered species.
-	 * .
-	 * @param clogA
-	 * @param clogB
+	 * 
 	 * @return
 	 */
 	private Collection<BinaryInteraction> downCast(ClogInteraction clogInteraction) {
@@ -1159,15 +1143,15 @@ public class InterologPrediction {
 					
 					
 					int taxid = id.intValue();
-					Organism o = new Organism(taxid);
+					Organism o = new OrganismImpl(taxid);
 					
 					Collection<CrossReference> identifiersA = new ArrayList<CrossReference>(1);
-			        identifiersA.add( new CrossReference( getUNIPROTKB(), uniprotIdA ));
+			        identifiersA.add( new CrossReferenceImpl( getUNIPROTKB(), uniprotIdA ) );
 			        Interactor iA = new Interactor( identifiersA );
 			        iA.setOrganism(o);
 			        
 			        Collection<CrossReference> identifiersB = new ArrayList<CrossReference>(1);
-			        identifiersB.add( new CrossReference( getUNIPROTKB(), uniprotIdB ) );
+			        identifiersB.add( new CrossReferenceImpl( getUNIPROTKB(), uniprotIdB ) );
 			        Interactor iB = new Interactor( identifiersB );
 			        iB.setOrganism(o);
 			        
@@ -1181,19 +1165,19 @@ public class InterologPrediction {
 			        
 			        
 			        
-					BinaryInteraction interaction = new BinaryInteraction(iA, iB);
+					BinaryInteraction interaction = new BinaryInteractionImpl(iA, iB);
 					inference++;
 					
 					// authors
 					List<Author> authors = new ArrayList<Author>(1);
-					Author me = new Author();
+					Author me = new AuthorImpl();
 					me.setName("Magali Michaut");
 					authors.add(me);
 					interaction.setAuthors(authors);
 					
 					// detection method = interologs mapping
 					List <InteractionDetectionMethod> methods = new ArrayList<InteractionDetectionMethod>(1);
-					InteractionDetectionMethod interologsMapping = new InteractionDetectionMethod();
+					InteractionDetectionMethod interologsMapping = new InteractionDetectionMethodImpl();
 					interologsMapping.setDatabase("MI");
 					interologsMapping.setIdentifier("0064");
 					interologsMapping.setText("interologs mapping");

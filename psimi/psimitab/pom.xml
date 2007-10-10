@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
@@ -14,9 +16,25 @@
 
     <name>IntAct Data Exchange :: PSI MI :: TAB</name>
     <description>PSI MI TAB Master POM</description>
-    
+
+    <properties>
+        <currentVersion>${version}</currentVersion>
+        <psimitab.version>1.0-rc2</psimitab.version>
+    </properties>
+
     <modules>
-       <module>intact-psimitab</module>
-       <module>intact-interolog-prediction</module>
+        <module>intact-psimitab</module>
+        <module>intact-interolog-prediction</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- IntAct dependencies -->
+            <dependency>
+                <groupId>psidev.psi.mi</groupId>
+                <artifactId>psimitab</artifactId>
+                <version>${psimitab.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

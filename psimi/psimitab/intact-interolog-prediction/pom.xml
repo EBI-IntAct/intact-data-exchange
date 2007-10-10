@@ -20,7 +20,6 @@
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psimitab</artifactId>
-            <version>1.0-beta7</version>
         </dependency>
 
         <dependency>
@@ -47,6 +46,30 @@
 
     </dependencies>
 
- <!-- EBI repositories -->    <repositories>        <repository>            <id>ebi-repo</id>            <name>The EBI internal repository</name>            <url>http://www.ebi.ac.uk/~maven/m2repo</url>            <releases>                <enabled>true</enabled>            </releases>            <snapshots>                <enabled>false</enabled>            </snapshots>        </repository>        <repository>            <id>ebi-repo-snapshots</id>            <name>The EBI internal repository</name>            <url>http://www.ebi.ac.uk/~maven/m2repo_snapshots</url>            <releases>                <enabled>false</enabled>            </releases>            <snapshots>                <enabled>true</enabled>            </snapshots>        </repository>    </repositories>
+ <!-- EBI repositories -->
+    <repositories>
+        <repository>
+            <id>ebi-repo</id>
+            <name>The EBI internal repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>ebi-repo-snapshots</id>
+            <name>The EBI internal repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo_snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>
