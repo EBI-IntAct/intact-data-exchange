@@ -3,6 +3,7 @@ package uk.ac.ebi.intact.psimitab;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.junit.Assert;
 import psidev.psi.mi.tab.converter.xml2tab.TabConvertionException;
 import psidev.psi.mi.tab.expansion.SpokeExpansion;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
@@ -148,7 +149,7 @@ public class ConvertXml2TabTest extends TestCase {
         logWriter.flush();
         logWriter.close();
 
-        assertTrue( file.exists() );
+        Assert.assertTrue( file.exists() );
         
         assertTrue( logFile.exists() );
 
@@ -201,13 +202,13 @@ public class ConvertXml2TabTest extends TestCase {
     }
 
     public void testConvert3() throws ConverterException, IOException, TabConvertionException {
-        File file = new File( ConvertXml2TabTest.class.getResource( "/xml-samples/16603238.xml" ).getFile() );
+        File file = new File( ConvertXml2TabTest.class.getResource( "/xml-samples/9070862.xml" ).getFile() );
         ConvertXml2Tab x2t = new ConvertXml2Tab();
         x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         x2t.setInteractorPairClustering( true );
         x2t.setOverwriteOutputFile( true );
 
-        File logFile = new File( file.getParentFile(), "16603238.log" );
+        File logFile = new File( file.getParentFile(), "7568142.log" );
         Writer logWriter = new BufferedWriter( new FileWriter( logFile ) );
         x2t.setLogWriter( logWriter );
 
@@ -223,6 +224,6 @@ public class ConvertXml2TabTest extends TestCase {
         logWriter.close();
 
         assertTrue( logFile.exists() );
-        assertTrue( logFile.length() > 0 );
+        assertEquals( 0, logFile.length() );
     }
 }

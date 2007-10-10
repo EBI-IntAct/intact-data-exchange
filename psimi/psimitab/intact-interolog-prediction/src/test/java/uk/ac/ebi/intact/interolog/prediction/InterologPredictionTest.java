@@ -3,9 +3,11 @@
  */
 package uk.ac.ebi.intact.interolog.prediction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import org.junit.Test;
+import psidev.psi.mi.tab.model.*;
+import uk.ac.ebi.intact.interolog.mitab.MitabException;
+import uk.ac.ebi.intact.interolog.mitab.MitabUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -13,22 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.Confidence;
-import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.InteractionDetectionMethod;
-import psidev.psi.mi.tab.model.InteractionType;
-import psidev.psi.mi.tab.model.Interactor;
-import psidev.psi.mi.tab.model.Organism;
-import uk.ac.ebi.intact.interolog.mitab.MitabException;
-import uk.ac.ebi.intact.interolog.mitab.MitabUtils;
 
 /**
  * @author mmichaut
@@ -38,43 +24,14 @@ import uk.ac.ebi.intact.interolog.mitab.MitabUtils;
 public class InterologPredictionTest {
 
 	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-	}
-	
-	
-	/**
 	 * @param proteinAc
 	 * @param taxid
 	 * @return
 	 */
 	private Interactor buildInteractor(String proteinAc, Long taxid) {
 		Collection<CrossReference> identifiers = new ArrayList<CrossReference>();
-        identifiers.add( new CrossReference( InterologPrediction.getUNIPROTKB(), proteinAc ));
-        Organism o = new Organism(taxid.intValue());
+        identifiers.add( new CrossReferenceImpl( InterologPrediction.getUNIPROTKB(), proteinAc ) );
+        Organism o = new OrganismImpl(taxid.intValue());
 		Interactor interactor = new Interactor( identifiers );
 		interactor.setOrganism(o);
 		return interactor;
@@ -90,10 +47,10 @@ public class InterologPredictionTest {
 		
 		Interactor a = buildInteractor(proteinAcA, taxid);
 		Interactor b = buildInteractor(proteinAcB, taxid);
-		BinaryInteraction interaction = new BinaryInteraction(a, b);
+		BinaryInteraction interaction = new BinaryInteractionImpl(a, b);
 		
 		List <InteractionDetectionMethod> methods = new ArrayList<InteractionDetectionMethod>(1);
-		InteractionDetectionMethod interologsMapping = new InteractionDetectionMethod();
+		InteractionDetectionMethod interologsMapping = new InteractionDetectionMethodImpl();
 		interologsMapping.setDatabase("MI");
 		interologsMapping.setIdentifier("0064");
 		interologsMapping.setText("interologs mapping");
@@ -106,8 +63,7 @@ public class InterologPredictionTest {
 		interaction.setPublications(new ArrayList<CrossReference>());//necessary otherwise interactions are different
 		interaction.setSourceDatabases(new ArrayList<CrossReference>());
 		interaction.setConfidenceValues(new ArrayList<Confidence>());
-		
-		
+
 		return interaction;
 	}
 
@@ -236,6 +192,4 @@ public class InterologPredictionTest {
 		assertTrue("interaction2 should be in the results: "+interaction2, interactions.contains(interaction2));
         
 	}
-
-
 }

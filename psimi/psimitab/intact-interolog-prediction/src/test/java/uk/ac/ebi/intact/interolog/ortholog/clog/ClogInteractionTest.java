@@ -16,9 +16,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.intact.interolog.ortholog.clog.Clog;
 import uk.ac.ebi.intact.interolog.ortholog.clog.ClogInteraction;
 
@@ -71,17 +69,17 @@ public class ClogInteractionTest {
 	
 	public Interactor buildInteractor(String id) {
 		Collection<CrossReference> identifiers = new ArrayList<CrossReference>();
-        identifiers.add( new CrossReference( "uniprotkb", id ));
+        identifiers.add( new CrossReferenceImpl( "uniprotkb", id ) );
         return new Interactor( identifiers );
 	}
 	
 	public BinaryInteraction buildInteractionAB() {
-		BinaryInteraction interaction = new BinaryInteraction(buildInteractor("A"), buildInteractor("B"));
+		BinaryInteraction interaction = new BinaryInteractionImpl(buildInteractor("A"), buildInteractor("B"));
 		return interaction;
 	}
 	
 	public BinaryInteraction buildInteractionCD() {
-		BinaryInteraction interaction = new BinaryInteraction(buildInteractor("C"), buildInteractor("D"));
+		BinaryInteraction interaction = new BinaryInteractionImpl(buildInteractor("C"), buildInteractor("D"));
 		return interaction;
 	}
 
