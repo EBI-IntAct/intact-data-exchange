@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.*;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -62,11 +63,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         // only gets the first interaction type
         CvInteractionType interactionType = getInteractionType(psiObject);
 
-        // only gets the first interactor type
-        CvInteractorType interactorType = getInteractorType(psiObject);
-
         interaction.setShortLabel(shortLabel);
-        interaction.setCvInteractorType(interactorType);
         interaction.setExperiments(experiments);
         interaction.setCvInteractionType(interactionType);
 
@@ -160,19 +157,19 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
      * Get the first interaction type only
      */
     protected CvInteractionType getInteractionType(psidev.psi.mi.xml.model.Interaction psiInteraction) {
-        InteractionType psiInteractionType = psiInteraction.getInteractionTypes().iterator().next();
+        final Collection<InteractionType> interactionTypes = psiInteraction.getInteractionTypes();
+        
+        if (interactionTypes == null || interactionTypes.isEmpty()) {
+            throw new PsiConversionException("Interaction without Interaction Type: "+psiInteraction);
+        }
+
+        if (interactionTypes.size() > 1) {
+            throw new PsiConversionException("Interaction with more than one Interaction Type: "+psiInteraction);
+        }
+
+        InteractionType psiInteractionType = interactionTypes.iterator().next();
 
         return new InteractionTypeConverter(getInstitution()).psiToIntact(psiInteractionType);
-    }
-
-
-    /**
-     * Gets the interactor type from the first participant only
-     */
-    protected CvInteractorType getInteractorType(psidev.psi.mi.xml.model.Interaction psiInteraction) {
-        InteractorType psiInteractorType = psiInteraction.getParticipants().iterator().next().getInteractor().getInteractorType();
-
-        return new InteractorTypeConverter(getInstitution()).psiToIntact(psiInteractorType);
     }
 
     protected Collection<Component> getComponents(Interaction interaction, psidev.psi.mi.xml.model.Interaction psiInteraction) {

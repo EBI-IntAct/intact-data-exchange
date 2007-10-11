@@ -18,10 +18,8 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.Interaction;
-import uk.ac.ebi.intact.model.CvObjectXref;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
  * TODO comment this
@@ -38,7 +36,18 @@ public class InteractionConverterTest {
         InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
         uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
 
+        Assert.assertNotNull(interaction.getCvInteractionType());
+        Assert.assertNull(interaction.getCvInteractorType());
         Assert.assertNotNull(interaction.getComponents().iterator().next().getInteractor().getOwner());
         Assert.assertEquals("testInstitution", interaction.getComponents().iterator().next().getInteractor().getOwner().getShortLabel());
+    }
+
+    @Test (expected = PsiConversionException.class)
+    public void psiToIntact_noInteractionType() throws Exception {
+        Interaction psiInteraction = PsiMockFactory.createMockInteraction();
+        psiInteraction.getInteractionTypes().clear();
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
     }
 }
