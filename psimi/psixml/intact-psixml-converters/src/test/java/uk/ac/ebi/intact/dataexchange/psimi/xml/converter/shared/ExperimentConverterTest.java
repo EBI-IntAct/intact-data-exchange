@@ -39,6 +39,7 @@ public class ExperimentConverterTest extends IntactBasicTestCase {
         Experiment exp = converter.psiToIntact(expDesc);
 
         Assert.assertEquals(1, exp.getXrefs().size());
+        Assert.assertNotNull(exp.getPublication());
         Assert.assertNotNull(exp.getBioSource().getOwner());
     }
 
