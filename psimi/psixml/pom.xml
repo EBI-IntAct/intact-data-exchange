@@ -17,11 +17,8 @@
     <description>PSIXML for IntAct</description>
 
     <modules>
-        <module>intact-psixml-processor</module>
-        <module>psixml-source-generator-maven-plugin</module>
         <module>intact-psixml-converters</module>
         <module>intact-psixml-enricher</module>
-        <module>intact-psixml-upload-extensions</module>
         <module>intact-psixml-exchange</module>
     </modules>
 
