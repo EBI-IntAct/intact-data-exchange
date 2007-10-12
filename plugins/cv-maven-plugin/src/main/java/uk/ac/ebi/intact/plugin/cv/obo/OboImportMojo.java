@@ -31,7 +31,7 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
 import uk.ac.ebi.intact.plugin.MojoUtils;
-import uk.ac.ebi.ook.model.implementation.TermBean;
+import uk.ac.ebi.ook.model.ojb.TermBean;
 
 import java.io.*;
 import java.sql.ResultSet;
