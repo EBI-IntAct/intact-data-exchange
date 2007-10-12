@@ -18,10 +18,12 @@ package uk.ac.ebi.intact.psimitab;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.PsimiTabWriter;
+import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
 import psidev.psi.mi.tab.converter.xml2tab.TabConvertionException;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.BinaryExpansionStrategy;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 import psidev.psi.mi.xml.converter.ConverterException;
@@ -83,6 +85,22 @@ public class ConvertXml2Tab {
      * Where warning messages are going to be writtet to.
      */
     private Writer logWriter;
+    
+    /**
+     * Class that is going to hold the data. An extension of BinaryInteractionImpl could be used to hold extra columns that
+     * the ColumnsHandler fill up.
+     *
+     * @see ColumnHandler
+     */
+    private Class binaryInteractionClass = BinaryInteractionImpl.class;
+
+    /**
+     * Allows to tweak the production of the columns and also to add extra columns.
+     * The ColumnHandler has to be specific to a BinaryInteractionImpl.
+     *
+     * @See BinaryInteractionImpl
+     */
+    private ColumnHandler columnHandler;
 
     ////////////////////////
     // Constructor
@@ -141,6 +159,31 @@ public class ConvertXml2Tab {
         this.logWriter = logWriter;
     }
 
+    /**
+     * Setter for property 'binaryInteractionClass'.
+     *
+     * @param binaryInteractionClass Value to set for property 'binaryInteractionClass'.
+     */
+    public void setBinaryInteractionClass( Class binaryInteractionClass ) {
+        if ( binaryInteractionClass == null ) {
+            throw new IllegalArgumentException( "You must give a non null Class." );
+        }
+
+        if ( !BinaryInteractionImpl.class.isAssignableFrom( binaryInteractionClass ) ) {
+            throw new IllegalArgumentException( "You must give a Class extending BinaryInteractionImpl." );
+        }
+
+        this.binaryInteractionClass = binaryInteractionClass;
+    }
+    
+    /**
+     * Setter for property 'columnHandler'.
+     *
+     * @param columnHandler Value to set for property 'columnHandler'.
+     */
+    public void setColumnHandler( ColumnHandler columnHandler ) {
+        this.columnHandler = columnHandler;
+    }
     ///////////////////////////
     // Convertion
 
@@ -170,6 +213,8 @@ public class ConvertXml2Tab {
 
         // now start conversion
         Xml2Tab x2t = new Xml2Tab();
+        x2t.setBinaryInteractionClass(binaryInteractionClass);
+        x2t.setColumnHandler(columnHandler);
 
         // Makes sure the database source is well set.
         x2t.addOverrideSourceDatabase(new CrossReferenceImpl("MI", "0469", "intact"));
@@ -183,7 +228,7 @@ public class ConvertXml2Tab {
         }
 
         Collection<BinaryInteraction> interactions = x2t.convert(xmlFilesToConvert);
-
+       
         if (interactions.isEmpty()) {
             if (logWriter != null) {
                 logWriter.write("The following file(s) didn't yield any binary interactions:" + NEW_LINE);
@@ -198,6 +243,9 @@ public class ConvertXml2Tab {
         } else {
             // Writing file on disk
             PsimiTabWriter writer = new PsimiTabWriter();
+            
+            writer.setBinaryInteractionClass( binaryInteractionClass );
+            writer.setColumnHandler(columnHandler);
             writer.write(interactions, outputFile);
         }
     }
