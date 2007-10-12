@@ -207,9 +207,6 @@ public class ConvertXml2TabTest extends TestCase {
         assertTrue( logFile.length() > 0 );
     }
 
-    
-
-    
     public void testConvert3() throws IOException, ConverterException, TabConvertionException {
 
         File intputDir = new File( ConvertXml2TabTest.class.getResource( "/xml-samples" ).getFile() );
@@ -281,5 +278,4 @@ public class ConvertXml2TabTest extends TestCase {
 		
 		return outputDir;
 	}
-
 }
