@@ -1,5 +1,15 @@
 package uk.ac.ebi.intact.psimitab;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -8,10 +18,6 @@ import psidev.psi.mi.tab.converter.xml2tab.TabConvertionException;
 import psidev.psi.mi.tab.expansion.SpokeExpansion;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
 import psidev.psi.mi.xml.converter.ConverterException;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * ConvertXml2Tab Tester.
@@ -177,6 +183,7 @@ public class ConvertXml2TabTest extends TestCase {
 
     public void testConvert2() throws ConverterException, IOException, TabConvertionException {
         File file = new File( ConvertXml2TabTest.class.getResource( "/xml-samples/11230133.xml" ).getFile() );
+    	
         ConvertXml2Tab x2t = new ConvertXml2Tab();
         x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         x2t.setInteractorPairClustering( true );
@@ -191,7 +198,6 @@ public class ConvertXml2TabTest extends TestCase {
         x2t.setXmlFilesToConvert( inputFiles );
 
         x2t.setOutputFile( new File( file.getAbsolutePath() + ".xls" ) );
-
         x2t.convert();
 
         logWriter.flush();
@@ -201,29 +207,79 @@ public class ConvertXml2TabTest extends TestCase {
         assertTrue( logFile.length() > 0 );
     }
 
-    public void testConvert3() throws ConverterException, IOException, TabConvertionException {
-        File file = new File( ConvertXml2TabTest.class.getResource( "/xml-samples/9070862.xml" ).getFile() );
-        ConvertXml2Tab x2t = new ConvertXml2Tab();
-        x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
-        x2t.setInteractorPairClustering( true );
-        x2t.setOverwriteOutputFile( true );
+    
 
-        File logFile = new File( file.getParentFile(), "7568142.log" );
-        Writer logWriter = new BufferedWriter( new FileWriter( logFile ) );
-        x2t.setLogWriter( logWriter );
+    
+    public void testConvert3() throws IOException, ConverterException, TabConvertionException {
 
+        File intputDir = new File( ConvertXml2TabTest.class.getResource( "/xml-samples" ).getFile() );
+
+        ConvertXml2Tab converter = new ConvertXml2Tab();
+        converter.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        converter.setColumnHandler( new IntActColumnHandler() );
+        converter.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
+        converter.setInteractorPairClustering( true );
+        converter.setOverwriteOutputFile( true );
+        
+        File outputFile = new File(getTargetDirectory(), "test.txt");
+        outputFile.createNewFile();
+        converter.setOutputFile(outputFile);
+
+        // collect input files and directories
         Collection<File> inputFiles = new ArrayList<File>();
-        inputFiles.add( file );
-        x2t.setXmlFilesToConvert( inputFiles );
+        inputFiles.add( intputDir );
 
-        x2t.setOutputFile( new File( file.getAbsolutePath() + ".xls" ) );
+        // configure the converter
+        converter.setXmlFilesToConvert( inputFiles );
 
-        x2t.convert();
+        File logFile = new File( intputDir, "mitab.log" );
+        Writer logWriter = new BufferedWriter( new FileWriter( logFile ) );
+        converter.setLogWriter( logWriter );
+  
+        // run the conversion
+        converter.convert();
 
         logWriter.flush();
         logWriter.close();
 
+        assertTrue( outputFile.exists() );
+        
         assertTrue( logFile.exists() );
-        assertEquals( 0, logFile.length() );
+
+        // empty as other files yielded data, so the converter doesn't output.
+        assertTrue( logFile.length() == 0 );
+
+        // count the lines, we expect 4 of'em
+        try {
+            BufferedReader in = new BufferedReader( new FileReader( outputFile ) );
+            int count = 0;
+
+            String line = in.readLine(); // skip the header.
+            
+            while ( ( line = in.readLine() ) != null ) {
+                // process line here
+                count++;
+            }
+            in.close();
+
+            assertEquals( 4, count );
+
+        } catch ( IOException e ) {
+            fail();
+        }
     }
+    
+	private File getTargetDirectory() {
+		String outputDirPath = ConvertXml2TabTest.class.getResource("/").getFile();
+		assertNotNull(outputDirPath);
+		File outputDir = new File(outputDirPath);
+		// we are in test-classes, move one up
+		outputDir = outputDir.getParentFile();
+		assertNotNull(outputDir);
+		assertTrue(outputDir.isDirectory());
+		assertEquals("target", outputDir.getName());
+		
+		return outputDir;
+	}
+
 }
