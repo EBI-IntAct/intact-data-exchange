@@ -24,6 +24,7 @@
             <plugin>
                 <groupId>uk.ac.ebi.intact.plugins</groupId>
                 <artifactId>dbtest-maven-plugin</artifactId>
+                <version>1.6.0-SNAPSHOT</version>
             </plugin>
         </plugins>
     </build>
@@ -41,7 +42,7 @@
             <artifactId>intact-plugin</artifactId>
         </dependency>
         <dependency>
-            <groupId>uk.ac.ebi.intact</groupId>
+            <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>
         </dependency>
         <dependency>

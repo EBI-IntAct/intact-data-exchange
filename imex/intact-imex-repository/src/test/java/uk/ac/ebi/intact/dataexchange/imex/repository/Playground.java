@@ -34,11 +34,11 @@ import java.io.File;
 public class Playground {
 
     public static void main(String[] args) throws Exception {
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all/");
+        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all2/");
         FileUtils.deleteDirectory(tempDir);
 
         Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
-
+           
         final ImexFTPClient mintClient = ImexFTPClientFactory.createMintClient();
         mintClient.connect();
         for (ImexFTPFile ftpFile : mintClient.listFiles()) {

@@ -17,9 +17,15 @@ package uk.ac.ebi.intact.dataexchange.imex.imp;
 
 import uk.ac.ebi.intact.context.DataContext;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.model.Feature;
+import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
+import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
+import uk.ac.ebi.intact.sanity.check.SanityChecker;
+import uk.ac.ebi.intact.sanity.commons.SanityReport;
+import uk.ac.ebi.intact.sanity.commons.rules.report.ReportWriter;
+import uk.ac.ebi.intact.sanity.commons.rules.report.SimpleReportWriter;
 
 import java.io.File;
+import java.io.StringWriter;
 import java.util.List;
 
 /**
@@ -34,7 +40,7 @@ public class Playground {
 
         IntactContext.initStandaloneContext(new File(Playground.class.getResource("/temph2-hibernate.cfg.xml").getFile()));
 
-        /*
+           /*
         getDataContext().beginTransaction();
 
         SmallCvPrimer primer = new SmallCvPrimer(getDataContext().getDaoFactory());
@@ -56,41 +62,36 @@ public class Playground {
         getDataContext().commitTransaction();
          */
 
-        /*
+
         getDataContext().beginTransaction();
         System.out.println("Institutions: "+ getDataContext().getDaoFactory()
                 .getInstitutionDao().getShortLabelsLike("%"));
          getDataContext().commitTransaction();
 
 
-        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all/");
+        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all2/");
         Repository repo = ImexRepositoryContext.openRepository(repoDir.toString());
 
         ImexImporter importer = new ImexImporter(repo);
-        ImportReport report = importer.importNewAndFailed();
+        ImportReport imexReport = importer.importNewAndFailed();
 
         repo.close();
                   
         IntactContext.getCurrentInstance().close();
 
-        System.out.println(report);
-        */
+        System.out.println(imexReport);
+        
 
         //printStats();
 
-        getDataContext().beginTransaction();
+        SanityReport report = SanityChecker.executeSanityCheck();
+        System.out.println("Sanity check: "+report.getSanityResult().size() + " issues");
 
-        List<Feature> features = getDataContext().getDaoFactory().getBaseDao().getSession()
-                .createQuery("from Feature where cvFeatureType = null").list();
+        StringWriter w = new StringWriter();
+        ReportWriter writer = new SimpleReportWriter(w);
+        writer.write(report);
 
-        for (Feature feature : features) {
-            System.out.println(feature.getShortLabel());
-        }
-
-        getDataContext().commitTransaction();
-
-        //SanityReport report = SanityChecker.executeSanityCheck();
-        //System.out.println("Sanity check: "+report.getSanityResult().size() + " issues");
+        System.out.println(w.toString());
          
     }
 
@@ -104,7 +105,7 @@ public class Playground {
         System.out.println("\tComponents: "+getDataContext().getDaoFactory().getComponentDao().countAll());
         System.out.println("\tProteins: "+getDataContext().getDaoFactory().getProteinDao().countAll());
         System.out.println("\tFeatures: "+getDataContext().getDaoFactory().getFeatureDao().countAll());
-
+        /*
         List<Object[]> l = getDataContext().getDaoFactory().getBaseDao().getSession().createQuery("select i.owner, count(i.owner) from InteractionImpl i group by i.owner").list();
 
         System.out.println("\nInteractions by Institution:\n");
@@ -112,7 +113,7 @@ public class Playground {
         for (Object[] o : l) {
             System.out.println(o[0]+": "+o[1]);
         }
-
+         */
 
         getDataContext().commitTransaction();
     }

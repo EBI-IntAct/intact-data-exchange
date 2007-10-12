@@ -19,9 +19,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>uk.ac.ebi.intact</groupId>
+            <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>
-            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.intact.commons</groupId>

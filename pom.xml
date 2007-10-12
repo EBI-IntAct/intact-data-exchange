@@ -20,7 +20,7 @@
 
     <properties>
         <currentVersion>${version}</currentVersion>
-        <version.core>1.7.0</version.core>
+        <version.core>1.7.1</version.core>
     </properties>
 
     <scm>
@@ -54,7 +54,7 @@
         <dependencies>
             <!-- IntAct dependencies -->
             <dependency>
-                <groupId>uk.ac.ebi.intact</groupId>
+                <groupId>uk.ac.ebi.intact.core</groupId>
                 <artifactId>intact-core</artifactId>
                 <version>${version.core}</version>
             </dependency>
