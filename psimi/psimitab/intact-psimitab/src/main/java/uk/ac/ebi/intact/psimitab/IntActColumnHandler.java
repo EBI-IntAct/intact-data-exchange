@@ -5,15 +5,9 @@
  */
 package uk.ac.ebi.intact.psimitab;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import psidev.psi.mi.tab.PsimitabHeader;
 import psidev.psi.mi.tab.converter.tab2xml.XmlConvertionException;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
@@ -21,22 +15,15 @@ import psidev.psi.mi.tab.converter.txt2tab.MitabLineParserUtils;
 import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
 import psidev.psi.mi.tab.converter.xml2tab.CrossReferenceConverter;
 import psidev.psi.mi.tab.formatter.TabulatedLineFormatter;
-import psidev.psi.mi.tab.model.Author;
-import psidev.psi.mi.tab.model.AuthorImpl;
-import psidev.psi.mi.tab.model.BinaryInteractionImpl;
-import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.CrossReferenceImpl;
+import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.column.Column;
-import psidev.psi.mi.xml.model.DbReference;
-import psidev.psi.mi.xml.model.ExperimentDescription;
-import psidev.psi.mi.xml.model.ExperimentalRole;
-import psidev.psi.mi.xml.model.Interaction;
+import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Interactor;
-import psidev.psi.mi.xml.model.InteractorType;
-import psidev.psi.mi.xml.model.Names;
 import psidev.psi.mi.xml.model.Organism;
-import psidev.psi.mi.xml.model.Participant;
-import psidev.psi.mi.xml.model.Xref;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -216,21 +203,33 @@ public class IntActColumnHandler implements ColumnHandler {
 	
 				}
 			}
-		}        
-        
+		}
+
         List<Author> authors = new ArrayList<Author>();
         for (ExperimentDescription experiment : interaction.getExperiments()){
-        	final StringBuilder sb = new StringBuilder();
-        	sb.append(experiment.getNames().getShortLabel().split("-")[0]);
-        	sb.append(" et al ");
-        	sb.append("(");
-        	sb.append(experiment.getNames().getShortLabel().split("-")[1]);
-        	sb.append(")");
-        	String authorname = sb.substring(0,1).toUpperCase().toString().concat(sb.substring(1));
-        	authors.add(new AuthorImpl(authorname));
-        	
-        	dbi.setAuthors(authors);
+            final String label = experiment.getNames().getShortLabel();
+            if( isWellFormattedExperimentShortlabel( label ) ) {
+                final StringBuilder sb = new StringBuilder();
+                final String[] values = label.split( "-" );
+                sb.append( StringUtils.capitalize( values[0] ));
+                sb.append(" et al. ");
+                sb.append('(');
+                sb.append(values[1]);
+                sb.append(')');
+
+                authors.add(new AuthorImpl( sb.toString() ));
+                dbi.setAuthors(authors);
+            }
         }
+    }
+
+    private static final Pattern EXPERIMENT_LABEL_PATTERN = Pattern.compile( "[a-z-_]+-\\d{4}[a-z]?-\\d+" );
+
+    private boolean isWellFormattedExperimentShortlabel( String label ) {
+        if( label == null ) {
+            return false;
+        }
+        return EXPERIMENT_LABEL_PATTERN.matcher( label ).matches();
     }
 
     /**

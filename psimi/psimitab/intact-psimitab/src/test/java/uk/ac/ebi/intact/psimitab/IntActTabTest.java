@@ -153,7 +153,7 @@ public class IntActTabTest extends TestCase {
         assertTrue( interaction instanceof IntActBinaryInteraction );
 
         IntActBinaryInteraction ibi = ( IntActBinaryInteraction ) interaction;
-        assertTrue( ibi.getAuthors().get( 0 ).getName().contains( "Liu" ) );
+        assertTrue( ibi.getAuthors().get( 0 ).getName().contains( "Liu et al." ) );
 
         assertTrue( ibi.getHostOrganism().size() == 2 );
         for ( CrossReference o : ibi.getHostOrganism() ) {
