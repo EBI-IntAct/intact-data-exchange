@@ -14,7 +14,7 @@ import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
 
 /**
  * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
- * @version $Id: DefaultDocumentBuilder.java 
+ * @version $Id: IntActDocumentBuilder.java 
  */
 public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 
@@ -70,7 +70,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 	}
 	
     /**
-     * Creates a BinaryInteraction from a lucene document
+     * Creates a BinaryInteraction from a lucene document using the new version of psimitab with extra columns
      * @param doc the Document to use
      * @return the binary interaction
      * @throws MitabLineException thrown if there are syntax or other problems parsing the document/line
@@ -82,6 +82,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         MitabLineParser parser = new MitabLineParser();
         parser.setBinaryInteractionClass(IntActBinaryInteraction.class);
         parser.setColumnHandler(new IntActColumnHandler());
+        
         return parser.parse(line);
     }
 	
