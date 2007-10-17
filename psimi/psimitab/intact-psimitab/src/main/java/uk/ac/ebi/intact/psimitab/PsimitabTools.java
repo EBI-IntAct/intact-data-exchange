@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.psimitab;
 
 import org.apache.lucene.store.Directory;
 import psidev.psi.mi.search.Searcher;
+import psidev.psi.mi.search.index.AbstractIndexWriter;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.xml.converter.ConverterException;
 
@@ -50,6 +51,13 @@ public class PsimitabTools {
      */
     public static Directory buildIndex(File indexDirectory, File psimiTabData, boolean createIndex, boolean hasHeader) throws IOException, ConverterException, MitabLineException {
         return Searcher.buildIndex(indexDirectory, psimiTabData, createIndex, hasHeader);
+    }
+    
+    /**
+     * Builds a Lucene index from the PSIMITAB file, delegating the work to the <code>psidev.psi.mi.search.Searcher</code> class
+     */
+    public static Directory buildIndex(File indexDirectory, File psimiTabData, boolean createIndex, boolean hasHeader, AbstractIndexWriter indexwriter) throws IOException, ConverterException, MitabLineException {
+        return Searcher.buildIndex(indexDirectory, psimiTabData, createIndex, hasHeader, indexwriter);
     }
 
     /**
