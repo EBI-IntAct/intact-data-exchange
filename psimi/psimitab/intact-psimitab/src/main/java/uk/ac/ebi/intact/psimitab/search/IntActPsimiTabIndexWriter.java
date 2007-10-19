@@ -18,6 +18,8 @@ import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.xml.converter.ConverterException;
 
 /**
+ * TODO comment this!
+ *
  * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
  * @version $Id: IntActPsimitTabIndexWriter.java 
  */
@@ -30,7 +32,6 @@ public class IntActPsimiTabIndexWriter extends AbstractIndexWriter
     {
     }
 
-    @Override
     public  void index(IndexWriter indexWriter, InputStream is, boolean hasHeaderLine) throws IOException, ConverterException, MitabLineException {
         if (log.isInfoEnabled()) log.info("Starting index creation: "+indexWriter.getDirectory());
         long startTime = System.currentTimeMillis();
@@ -46,7 +47,7 @@ public class IntActPsimiTabIndexWriter extends AbstractIndexWriter
         while ((line = reader.readLine()) != null)
         {
             if (log.isTraceEnabled()) log.trace("\tIndexing: "+line);
-
+            
             indexWriter.addDocument(createDocument(line));
         }
 
