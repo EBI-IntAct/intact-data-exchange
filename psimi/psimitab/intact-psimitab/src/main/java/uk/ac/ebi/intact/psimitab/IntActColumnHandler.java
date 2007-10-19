@@ -5,9 +5,17 @@
  */
 package uk.ac.ebi.intact.psimitab;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import psidev.psi.mi.tab.PsimitabHeader;
 import psidev.psi.mi.tab.converter.tab2xml.XmlConvertionException;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
@@ -15,15 +23,22 @@ import psidev.psi.mi.tab.converter.txt2tab.MitabLineParserUtils;
 import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
 import psidev.psi.mi.tab.converter.xml2tab.CrossReferenceConverter;
 import psidev.psi.mi.tab.formatter.TabulatedLineFormatter;
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.tab.model.Author;
+import psidev.psi.mi.tab.model.AuthorImpl;
+import psidev.psi.mi.tab.model.BinaryInteractionImpl;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.model.column.Column;
-import psidev.psi.mi.xml.model.*;
+import psidev.psi.mi.xml.model.DbReference;
+import psidev.psi.mi.xml.model.ExperimentDescription;
+import psidev.psi.mi.xml.model.ExperimentalRole;
+import psidev.psi.mi.xml.model.Interaction;
 import psidev.psi.mi.xml.model.Interactor;
+import psidev.psi.mi.xml.model.InteractorType;
+import psidev.psi.mi.xml.model.Names;
 import psidev.psi.mi.xml.model.Organism;
-
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import psidev.psi.mi.xml.model.Participant;
+import psidev.psi.mi.xml.model.Xref;
 
 /**
  *
@@ -400,7 +415,7 @@ public class IntActColumnHandler implements ColumnHandler {
 	        String field21 = st.nextToken();
 	        dbi.setInteractorTypeB( MitabLineParserUtils.parseCrossReference( field21 ) );
 	        
-			// InteractorType of B
+			// HostOrganism
 	        if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 22 + " must not be empty." );
 	        String field22 = st.nextToken();
 	        dbi.setHostOrganism( MitabLineParserUtils.parseCrossReference( field22 ) );
