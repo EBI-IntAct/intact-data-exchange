@@ -36,7 +36,8 @@ public class IntActSearchQuery extends SearchQuery{
         	"roles",
         	"properties",
         	"interactor_types",
-        	IntActColumnSet.HOSTORGANISM.getShortName()};
+        	IntActColumnSet.HOSTORGANISM.getShortName(),
+        	IntActColumnSet.EXPANSION_METHOD.getShortName()};
 
     private String[] fields = DEFAULT_FIELDS;
     

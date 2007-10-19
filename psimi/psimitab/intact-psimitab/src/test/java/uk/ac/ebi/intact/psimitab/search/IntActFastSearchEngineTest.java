@@ -22,6 +22,7 @@ import org.apache.lucene.store.Directory;
 
 import psidev.psi.mi.search.SearchResult;
 import psidev.psi.mi.search.query.SearchQuery;
+import psidev.psi.mi.tab.PsimiTabWriter;
 import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
 
 /**
@@ -40,7 +41,7 @@ public class IntActFastSearchEngineTest extends TestCase {
 
         SearchQuery searchQuery = new IntActSearchQuery("properties:GO0006928");        
         SearchResult go_result = searchEngine.search(searchQuery, null, null);
-        assertEquals(23, go_result.getInteractions().size());
+        assertEquals(8, go_result.getInteractions().size());
 
         searchQuery = new IntActSearchQuery("GO*");
         SearchResult result = searchEngine.search(searchQuery, 50, 10);
@@ -48,7 +49,11 @@ public class IntActFastSearchEngineTest extends TestCase {
        
         searchQuery = new IntActSearchQuery("Bantscheff");
         SearchResult author_result = searchEngine.search(searchQuery, null, null);
-        assertEquals(760, author_result.getInteractions().size());
+        assertEquals(199, author_result.getInteractions().size());
+        
+        searchQuery = new IntActSearchQuery("expansion:spoke");
+        SearchResult expansion_result = searchEngine.search(searchQuery, null, null);
+        assertEquals(199, expansion_result.getInteractions().size());
     }
 
     public void testSearchSort() throws Exception {
@@ -65,7 +70,7 @@ public class IntActFastSearchEngineTest extends TestCase {
         result = searchEngine.search(new SearchQuery("properties:GO*"), 50, 10, sort);        
         assertEquals(10, result.getInteractions().size());
         IntActBinaryInteraction interactions = (IntActBinaryInteraction)result.getInteractions().iterator().next();
-        assertEquals("P78527", interactions.getInteractorB().getIdentifiers().iterator().next().getIdentifier());
+        assertEquals("P16591", interactions.getInteractorB().getIdentifiers().iterator().next().getIdentifier());
     }
     
 

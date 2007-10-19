@@ -26,6 +26,7 @@ public class IntActColumnSet extends DefaultColumnSet implements ColumnSet {
 	public static final PsimiTabColumn INTERACTOR_TYPE_A = new PsimiTabColumn(20, "interactorType of A", "type_A");
 	public static final PsimiTabColumn INTERACTOR_TYPE_B = new PsimiTabColumn(21, "interactorType of B", "type_B");
 	public static final PsimiTabColumn HOSTORGANISM = new PsimiTabColumn(22, "hostOrganism", "hostOrganism");
+	public static final PsimiTabColumn EXPANSION_METHOD = new PsimiTabColumn(23, "expansion method", "expansion");
 
 	
 	
@@ -39,7 +40,8 @@ public class IntActColumnSet extends DefaultColumnSet implements ColumnSet {
 		psimiTabColumns.add(PROPERTIES_B);
 		psimiTabColumns.add(INTERACTOR_TYPE_A);
 		psimiTabColumns.add(INTERACTOR_TYPE_B);
-		psimiTabColumns.add(HOSTORGANISM);		
+		psimiTabColumns.add(HOSTORGANISM);	
+		psimiTabColumns.add(EXPANSION_METHOD);
 	}
 
 }
