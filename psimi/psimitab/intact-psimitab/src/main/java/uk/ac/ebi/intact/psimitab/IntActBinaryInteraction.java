@@ -31,10 +31,12 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
     
     private List<CrossReference> hostOrganism;
     
+    private String expansionMethod;
+    
 	private Interactor interactorA;
 	private Interactor interactorB;
 
-    private int expectedColumnCount = 22;
+    private int expectedColumnCount = 23;
     
 
     public IntActBinaryInteraction( Interactor interactorA, Interactor interactorB ) {
@@ -130,6 +132,18 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
 		this.hostOrganism = hostOrganism;
 	}
 	
+	public String getExpansionMethod() {
+		return expansionMethod;
+	}
+
+	public void setExpansionMethod(String expansionMethode) {
+		this.expansionMethod = expansionMethode;
+	}
+	
+	public boolean hasExpansionMethod(){
+		return expansionMethod != null;
+	}
+	
 	/**
      * Getter of the number of expected columns
      * 
@@ -164,6 +178,7 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
         sb.append( ", InteractorType of A=" ).append( interactorTypeA );
         sb.append( ", InteractorType of B=" ).append( interactorTypeB );
         sb.append( ", HostOrganismn" ).append( hostOrganism );
+        sb.append( ", ExpansionMethod").append( expansionMethod );
         sb.append( '}' );
         return sb.toString();
     }

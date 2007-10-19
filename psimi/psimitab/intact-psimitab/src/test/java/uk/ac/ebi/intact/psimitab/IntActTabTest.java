@@ -1,10 +1,15 @@
 package uk.ac.ebi.intact.psimitab;
 
+import java.io.File;
+import java.util.Collection;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
@@ -14,9 +19,6 @@ import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceFactory;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
-
-import java.io.File;
-import java.util.Collection;
 
 public class IntActTabTest extends TestCase {
 
@@ -171,6 +173,39 @@ public class IntActTabTest extends TestCase {
 
         assertTrue( ibi.hasPropertiesA() );
         assertTrue( ibi.hasPropertiesB() );
-
     }
+    
+	public void testExpansionMethod() throws Exception {
+
+		File xmlFile = new File(IntActTabTest.class.getResource("/psi25-testset/bantscheff.xml").getFile());
+		assertTrue(xmlFile.canRead());
+
+		// convert into Tab object model
+		Xml2Tab xml2tab = new Xml2Tab();
+
+		xml2tab.setBinaryInteractionClass(IntActBinaryInteraction.class);
+		xml2tab.setColumnHandler(new IntActColumnHandler());
+		xml2tab.setExpansionStrategy(new SpokeWithoutBaitExpansion());
+		xml2tab.addOverrideSourceDatabase(CrossReferenceFactory.getInstance().build("MI", "0469", "intact"));
+		xml2tab.setPostProcessor(new ClusterInteractorPairProcessor());
+
+		Collection<BinaryInteraction> interactions = xml2tab.convert(xmlFile,false);
+		
+		IntActBinaryInteraction interaction = (IntActBinaryInteraction)interactions.iterator().next();
+		assertEquals("spoke", interaction.getExpansionMethod());
+		
+		
+		
+		xml2tab = new Xml2Tab();
+		
+		xml2tab.setBinaryInteractionClass(IntActBinaryInteraction.class);
+		xml2tab.setColumnHandler(new IntActColumnHandler());
+		xml2tab.addOverrideSourceDatabase(CrossReferenceFactory.getInstance().build("MI", "0469", "intact"));
+		xml2tab.setPostProcessor(new ClusterInteractorPairProcessor());
+		
+		interactions = xml2tab.convert(xmlFile,false);
+		
+		interaction = (IntActBinaryInteraction)interactions.iterator().next();
+		assertEquals("none", interaction.getExpansionMethod());
+	}
 }

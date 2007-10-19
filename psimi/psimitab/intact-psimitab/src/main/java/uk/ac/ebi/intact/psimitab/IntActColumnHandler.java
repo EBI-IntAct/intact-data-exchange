@@ -58,6 +58,14 @@ public class IntActColumnHandler implements ColumnHandler {
 	 */
 	private CrossReferenceConverter xConverter = new CrossReferenceConverter();
     
+	/**
+	 * Information about ExpansionMethod
+	 */
+	private String expansionMethod;
+	
+	public void setExpansionMethod(String method) {
+		this.expansionMethod = method;
+	}
 	
 	
     public void process( BinaryInteractionImpl bi, Interaction interaction ) {
@@ -219,6 +227,12 @@ public class IntActColumnHandler implements ColumnHandler {
 				}
 			}
 		}
+        
+        if(expansionMethod != null){
+        	dbi.setExpansionMethod(expansionMethod);
+        } else {
+        	dbi.setExpansionMethod("none");
+        }
 
         List<Author> authors = new ArrayList<Author>();
         for (ExperimentDescription experiment : interaction.getExperiments()){
@@ -263,6 +277,7 @@ public class IntActColumnHandler implements ColumnHandler {
     	
     	header.appendColumnName("hostOrganism");
     	
+    	header.appendColumnName("expansion method");
     }
     
     /**
@@ -320,6 +335,13 @@ public class IntActColumnHandler implements ColumnHandler {
         if (!dbi.hasHostOrganism()){
         	log.warn("No hostOrganism found for " + dbi.getInteractionAcs());
         }
+        
+        // field 23 - expansion method
+        sb.append( dbi.getExpansionMethod() );
+        sb.append( '\t' );
+        if (!dbi.hasExpansionMethod()){
+        	log.warn("No expansionMethod found for " + dbi.getInteractionAcs());
+        }
 
     }
     /**
@@ -372,6 +394,12 @@ public class IntActColumnHandler implements ColumnHandler {
 				String field22 = iterator.next().getData();
 				dbi.setHostOrganism( MitabLineParserUtils.parseCrossReference(field22 ) );
 			}
+			
+			if (iterator.hasNext()){
+				// Expansion method
+				String field23 = iterator.next().getData();
+				dbi.setExpansionMethod( field23 );
+			}
 
 		} catch (MitabLineException e) {
 			e.printStackTrace();
@@ -419,6 +447,11 @@ public class IntActColumnHandler implements ColumnHandler {
 	        if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 22 + " must not be empty." );
 	        String field22 = st.nextToken();
 	        dbi.setHostOrganism( MitabLineParserUtils.parseCrossReference( field22 ) );
+	        
+			// Expansion method
+	        if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 23 + " must not be empty." );
+	        String field23 = st.nextToken();
+	        dbi.setExpansionMethod( field23 );
 	
 		} catch (MitabLineException e) {
 			e.printStackTrace();
