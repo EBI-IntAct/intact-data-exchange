@@ -14,8 +14,10 @@ import org.junit.Test;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 
 /**
- * @author Nadin
- *
+ * TODO comment this!
+ * 
+ * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
+ * @version $Id: IntActDocumentBuilderTest.java 
  */
 public class IntActDocumentBuilderTest {
 
@@ -43,7 +45,7 @@ public class IntActDocumentBuilderTest {
 //			Field field = (Field)doc.getFields().get(i);
 //			System.out.print(field.name() +"\t");
 //		}
-		Assert.assertEquals(34+14, doc.getFields().size());
+		Assert.assertEquals(34+14+4, doc.getFields().size());
 	}
 	
 	

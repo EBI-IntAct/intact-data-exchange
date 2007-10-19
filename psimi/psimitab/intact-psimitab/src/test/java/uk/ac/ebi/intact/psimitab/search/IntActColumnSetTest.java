@@ -12,8 +12,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author Nadin
- *
+ * TODO comment this!
+ * 
+ * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
+ * @version $Id: IntActColumnSetTest.java  *
  */
 public class IntActColumnSetTest {
 
