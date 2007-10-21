@@ -6,7 +6,9 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import uk.ac.ebi.intact.business.IntactException;
+import uk.ac.ebi.intact.config.impl.SmallCvPrimer;
 import uk.ac.ebi.intact.context.CvContext;
+import uk.ac.ebi.intact.context.DataContext;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.*;
 import uk.ac.ebi.intact.model.*;
@@ -530,6 +532,13 @@ public class UpdateCVs {
      * @return a PSI ID or null is none is found.
      */
     private static String getPsiId(CvObject cvObject) {
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+        if (psi == null) {
+            psi = daoFactory.getCvObjectDao(CvDatabase.class).getByPsiMiRef(CvDatabase.PSI_MI_MI_REF);
+        }
+        if (identity == null) {
+            identity = daoFactory.getCvObjectDao(CvXrefQualifier.class).getByPsiMiRef(CvXrefQualifier.IDENTITY_MI_REF);
+        }
 
         for (Iterator iterator = cvObject.getXrefs().iterator(); iterator.hasNext();) {
             Xref xref = (Xref) iterator.next();
@@ -550,6 +559,10 @@ public class UpdateCVs {
      * @return a PSI ID or null is none is found.
      */
     private static String getIntactId(CvObject cvObject) {
+        if (intact == null) {
+            final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+            intact = daoFactory.getCvObjectDao(CvDatabase.class).getByPsiMiRef(CvDatabase.INTACT_MI_REF);
+        }
 
         for (Iterator iterator = cvObject.getXrefs().iterator(); iterator.hasNext();) {
             Xref xref = (Xref) iterator.next();
@@ -1675,13 +1688,15 @@ public class UpdateCVs {
 
         // 2.4 Create required vocabulary terms
         output.println("\nCreating necessary vocabulary terms...\n");
-        createNecessaryCvTerms(output, report);
+        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+        SmallCvPrimer cvPrimer = new SmallCvPrimer(dataContext.getDaoFactory());
+        cvPrimer.createCVs();
 
         // 2.5 update the CVs
         output.println("\nUpdating CVs...\n");
         update(ontology, output, report, config);
 
-        IntactContext.getCurrentInstance().getDataContext().flushSession();
+        dataContext.flushSession();
 
         // 2.6 Update obsolete terms
         output.println("\nUpdating Obsolete terms...\n");
@@ -1697,7 +1712,7 @@ public class UpdateCVs {
             }
         }
 
-        IntactContext.getCurrentInstance().getDataContext().flushSession();
+        dataContext.flushSession();
 
 
         return report;
