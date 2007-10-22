@@ -9,7 +9,10 @@ import uk.ac.ebi.intact.application.dataConversion.psiDownload.UserSessionDownlo
 import uk.ac.ebi.intact.application.dataConversion.psiDownload.xmlGenerator.AbstractXref2Xml;
 import uk.ac.ebi.intact.application.dataConversion.psiDownload.xmlGenerator.Xref2xmlFactory;
 import uk.ac.ebi.intact.application.dataConversion.psiDownload.xmlGenerator.util.ToolBox;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 
 /**
  * Convert an IntAct Xref to PSI XML.
@@ -54,7 +57,6 @@ public class Xref2xmlPSI2 extends AbstractXref2Xml {
      * @param session
      * @param parent  the parent Element to which we will attach the primaryRef
      * @param object  the object from which we generate the IntAct primaryRef, based on its AC.
-     *
      * @return a newly created primaryRef, or null if no AC available.
      */
     public Element createIntactReference( UserSessionDownload session, Element parent, AnnotatedObject object ) {
@@ -67,51 +69,53 @@ public class Xref2xmlPSI2 extends AbstractXref2Xml {
 
                 Xref xref;
 
-                if (object instanceof Experiment)
-                {
+                DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+                final CvObjectDao<CvXrefQualifier> qualifierDao = daoFactory.getCvObjectDao( CvXrefQualifier.class );
+                final CvXrefQualifier identity = qualifierDao.getByPsiMiRef( CvXrefQualifier.IDENTITY_MI_REF );
+
+                if ( object instanceof Experiment ) {
+
                     xref = new ExperimentXref( object.getOwner(),
-                                      session.getSourceDatabase(),
-                                      object.getAc(),
-                                      object.getShortLabel(),
-                                      null, null );
-                }
-                else if (object instanceof Interactor)
-                {
+                                               session.getSourceDatabase(),
+                                               object.getAc(),
+                                               object.getShortLabel(),
+                                               null, identity );
+
+                } else if ( object instanceof Interactor ) {
+
                     xref = new InteractorXref( object.getOwner(),
-                                      session.getSourceDatabase(),
-                                      object.getAc(),
-                                      object.getShortLabel(),
-                                      null, null );
-                }
-                else if (object instanceof BioSource)
-                {
+                                               session.getSourceDatabase(),
+                                               object.getAc(),
+                                               object.getShortLabel(),
+                                               null, identity );
+
+                } else if ( object instanceof BioSource ) {
+
                     xref = new BioSourceXref( object.getOwner(),
-                                      session.getSourceDatabase(),
-                                      object.getAc(),
-                                      object.getShortLabel(),
-                                      null, null );
-                }
-                else if (object instanceof Feature)
-                {
+                                              session.getSourceDatabase(),
+                                              object.getAc(),
+                                              object.getShortLabel(),
+                                              null, identity );
+
+                } else if ( object instanceof Feature ) {
+
                     xref = new FeatureXref( object.getOwner(),
-                                      session.getSourceDatabase(),
-                                      object.getAc(),
-                                      object.getShortLabel(),
-                                      null, null );
-                }
-                else if (object instanceof Publication)
-                {
+                                            session.getSourceDatabase(),
+                                            object.getAc(),
+                                            object.getShortLabel(),
+                                            null, identity );
+
+                } else if ( object instanceof Publication ) {
+                    
                     xref = new PublicationXref( object.getOwner(),
-                                      session.getSourceDatabase(),
-                                      object.getAc(),
-                                      object.getShortLabel(),
-                                      null, null );
-                }
-                else
-                {
-                    throw new RuntimeException("Not Xref type found for this object: "+object.getClass()+
-                            " ; Maybe it is a new Xref type and Xref2xmlPSI2 is not yet implemented for it" +
-                            "This might happen for Xref2xmlPSI1 too");
+                                                session.getSourceDatabase(),
+                                                object.getAc(),
+                                                object.getShortLabel(),
+                                                null, identity );
+                } else {
+                    throw new RuntimeException( "Not Xref type found for this object: " + object.getClass() +
+                                                " ; Maybe it is a new Xref type and Xref2xmlPSI2 is not yet implemented for it" +
+                                                "This might happen for Xref2xmlPSI1 too" );
                 }
 
                 if ( parent.getChildNodes().getLength() == 0 ) {
@@ -135,6 +139,8 @@ public class Xref2xmlPSI2 extends AbstractXref2Xml {
                 element.setAttribute( XREF_DB_AC, "MI:0469" );
                 element.setAttribute( XREF_ID, object.getAc() );
                 element.setAttribute( XREF_SECONDARY, object.getShortLabel() );
+                element.setAttribute( XREF_REFTYPE, CvXrefQualifier.IDENTITY );
+                element.setAttribute( XREF_REFTYPE_AC, CvXrefQualifier.IDENTITY_MI_REF );
             }
         }
 
@@ -187,12 +193,12 @@ public class Xref2xmlPSI2 extends AbstractXref2Xml {
         element.setAttribute( XREF_ID, xref.getPrimaryId() );
 
         String sSecondary = xref.getSecondaryId();
-        if ( null != sSecondary && sSecondary.length() > 0) {
+        if ( null != sSecondary && sSecondary.length() > 0 ) {
             element.setAttribute( XREF_SECONDARY, sSecondary );
         }
 
         String sVersion = xref.getDbRelease();
-        if ( null != sVersion && sVersion.length() > 0) {
+        if ( null != sVersion && sVersion.length() > 0 ) {
             element.setAttribute( XREF_VERSION, sVersion );
         }
 
