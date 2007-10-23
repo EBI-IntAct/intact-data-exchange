@@ -29,6 +29,8 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 
 	private static final String DEFAULT_COL_SEPARATOR = "\t";
 	
+	private static Document doc;
+	
 	
 	public static Document createDocumentFromPsimiTabLine(String psiMiTabLine) throws MitabLineException
 	{
@@ -44,7 +46,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 		String hostOrganism = tokens[IntActColumnSet.HOSTORGANISM.getOrder()];
 		String expansion = tokens[IntActColumnSet.EXPANSION_METHOD.getOrder()];
 		
-		Document doc = DefaultDocumentBuilder.createDocumentFromPsimiTabLine(psiMiTabLine);
+		doc = DefaultDocumentBuilder.createDocumentFromPsimiTabLine(psiMiTabLine);
 		
 		doc.add(new Field("roles", isolateBracket(roleA) + " " + isolateBracket(roleB),
 				Field.Store.NO,
@@ -52,8 +54,8 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 		
 		DefaultDocumentBuilder.addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_A, roleA);
 		DefaultDocumentBuilder.addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_B, roleB);
-
-		doc.add(new Field("properties", isolateValue(propertiesA) + " " + isolateValue(propertiesB),
+		String value = isolateValues(propertiesA) + isolateValues(propertiesB);
+		doc.add(new Field("properties", value,
 				Field.Store.NO,
 				Field.Index.TOKENIZED));
 
@@ -70,7 +72,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 		createHostOrganismField(doc, psiMiTabLine);
 		
 		DefaultDocumentBuilder.addTokenizedAndSortableField(doc, IntActColumnSet.EXPANSION_METHOD, expansion);
-
+		
 		return doc;
 	}
 	
@@ -117,7 +119,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
      * @param column
      * @return
      */
-    public static String isolateValue(String column)
+    public static String isolateValues(String column)
     {
         String[] values = column.split("\\|");
 
@@ -125,11 +127,12 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 
         for (String v : values) {
             if (v.contains("go")) {
-                v = "GO".concat(v.split("\\:")[1]);
-            	//v = v.toUpperCase();
+            	v = v.split("\\:")[1];
+            	createGoField(v);
+        		v = "GO".concat(v);
             }
             
-            if (v.contains(":") && !v.contains("GO") && !v.contains("go")) {
+            if (v.contains(":")) {
                 v = v.split("\\:")[1];
             }
             
@@ -141,11 +144,36 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         }
 
         sb.trimToSize();
-
+        
         return sb.toString();
     }
 
-    public static String isolateBracket(String column)
+    private static void createGoField(String v) {
+    	String value = null;
+    	if (doc.getField("GO") == null) {
+    		value = v;
+    	} else {
+    		String []stringValues = doc.getField("GO").stringValue().split(" ");
+    		boolean contains = false;
+    		for (int i = 0; i < stringValues.length; i++){
+    			if (stringValues[i].equals(v)){
+    				contains = true;
+    				break;
+    			}
+    		}
+    		if (contains == false){
+        		value = doc.getField("GO").stringValue().concat(" " + v);
+        		doc.removeField("GO");            			
+    		}
+    	}
+    	if (value != null){
+    		doc.add(new Field("GO",value,				
+    				Field.Store.NO,
+    				Field.Index.TOKENIZED));
+    	}
+	}
+
+	public static String isolateBracket(String column)
     {
         String[] values = column.split("\\|");
 
@@ -166,6 +194,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         return sb.toString();
     }
     
+    
     public static void addTokenizedAndSortableField(Document doc, PsimiTabColumn column, String columnValue)
     {
          doc.add(new Field(column.getShortName(),
@@ -174,7 +203,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
                 Field.Index.TOKENIZED));
         
         doc.add(new Field(column.getSortableColumnName(),
-                isolateValue(columnValue),
+        		isolateValues(columnValue),
                 Field.Store.NO,
                 Field.Index.UN_TOKENIZED));
     }
@@ -197,19 +226,13 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
     }
     
     private static void createHostOrganismField(Document doc, String line) throws MitabLineException {
-    	MitabLineParser parser = new MitabLineParser();
     	
+    	MitabLineParser parser = new MitabLineParser();
     	parser.setBinaryInteractionClass(IntActBinaryInteraction.class);
     	parser.setColumnHandler(new IntActColumnHandler());
     	
         IntActBinaryInteraction binaryInteraction = (IntActBinaryInteraction)parser.parse(line);
-
-        List<String> hostOrganism = hostOrganism(binaryInteraction.getHostOrganism());
-
-        doc.add(new Field("hostOrganisms",
-                listToString(hostOrganism),
-                Field.Store.NO,
-                Field.Index.TOKENIZED));
+        List<String> hostOrganism = hostOrganism(binaryInteraction.getHostOrganism());      
         
         String[] tokens = line.split(DEFAULT_COL_SEPARATOR);
         String organism = tokens[IntActColumnSet.HOSTORGANISM.getOrder()];
@@ -220,7 +243,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
                 Field.Index.TOKENIZED));
         
         doc.add(new Field(IntActColumnSet.HOSTORGANISM.getSortableColumnName(),
-                organism,
+        		listToString(hostOrganism),
                 Field.Store.NO,
                 Field.Index.UN_TOKENIZED));
     }
