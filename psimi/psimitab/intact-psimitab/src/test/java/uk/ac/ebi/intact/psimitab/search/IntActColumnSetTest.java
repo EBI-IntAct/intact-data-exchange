@@ -41,10 +41,19 @@ public class IntActColumnSetTest {
 		IntActColumnSet columnSet = new IntActColumnSet();
 		
 		assertNotNull(columnSet.getPsimiTabColumns());
-		assertEquals(22, columnSet.getPsimiTabColumns().size());
+		assertEquals(23, columnSet.getPsimiTabColumns().size());
 		
 		assertEquals("experimentalRole interactor A", columnSet.getbyOrder(16).getColumnName());
+		assertEquals("experimentalRole interactor B", columnSet.getbyOrder(17).getColumnName());
+		
+		assertEquals("properties interactor A", columnSet.getbyOrder(18).getColumnName());
+		assertEquals("properties interactor B", columnSet.getbyOrder(19).getColumnName());
+
+		assertEquals("interactorType of A", columnSet.getbyOrder(20).getColumnName());
+		assertEquals("interactorType of B", columnSet.getbyOrder(21).getColumnName());
+
 		assertEquals("hostOrganism", columnSet.getbyOrder(22).getColumnName());
 
+		assertEquals("expansion method", columnSet.getbyOrder(23).getColumnName());
 	}
 }

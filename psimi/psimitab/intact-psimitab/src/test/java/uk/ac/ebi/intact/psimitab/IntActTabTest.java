@@ -1,14 +1,16 @@
 package uk.ac.ebi.intact.psimitab;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Collection;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.PsimiTabWriter;
@@ -20,26 +22,18 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceFactory;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 
-public class IntActTabTest extends TestCase {
+public class IntActTabTest {
 
     public static final Log log = LogFactory.getLog( IntActTabTest.class );
 
-    public IntActTabTest( String name ) {
-        super( name );
-    }
 
     public void setUp() throws Exception {
-        super.setUp();
     }
 
     public void tearDown() throws Exception {
-        super.tearDown();
     }
 
-    public static Test suite() {
-        return new TestSuite( IntActTabTest.class );
-    }
-
+    @Test
     public void testBinaryInteractionHandler() throws Exception {
 
         File xmlFile = new File( IntActTabTest.class.getResource( "/psi25-testset/bantscheff.xml" ).getFile() );
@@ -71,6 +65,7 @@ public class IntActTabTest extends TestCase {
 
     }
 
+    @Test
     public void testPsimiTabReader() throws Exception {
 
         File tabFile = new File( IntActTabTest.class.getResource( "/mitab-testset/bantscheff_expanded.txt" ).getFile() );
@@ -124,6 +119,7 @@ public class IntActTabTest extends TestCase {
         return outputDir;
     }
 
+    @Test
     public void testExpansion() throws Exception {
 
         File xmlFile = new File( IntActTabTest.class.getResource( "/psi25-testset/simple.xml" ).getFile() );
@@ -175,6 +171,7 @@ public class IntActTabTest extends TestCase {
         assertTrue( ibi.hasPropertiesB() );
     }
     
+    @Test
 	public void testExpansionMethod() throws Exception {
 
 		File xmlFile = new File(IntActTabTest.class.getResource("/psi25-testset/bantscheff.xml").getFile());

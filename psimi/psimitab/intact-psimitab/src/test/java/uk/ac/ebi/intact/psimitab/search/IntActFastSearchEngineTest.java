@@ -15,15 +15,14 @@
  */
 package uk.ac.ebi.intact.psimitab.search;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.store.Directory;
+import org.junit.Test;
 
 import psidev.psi.mi.search.SearchResult;
 import psidev.psi.mi.search.query.SearchQuery;
-import psidev.psi.mi.tab.PsimiTabWriter;
-import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
 
 /**
  * TODO comment this!
@@ -31,47 +30,101 @@ import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
  * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
  * @version $Id: IntActFastSearchEngineTest.java$
  */
-public class IntActFastSearchEngineTest extends TestCase {
+public class IntActFastSearchEngineTest {
 
-    public void testSearch() throws Exception {
-        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.xls");
-
-        IntActFastSearchEngine searchEngine = new IntActFastSearchEngine(indexDirectory);
-
-
-        SearchQuery searchQuery = new IntActSearchQuery("properties:GO0006928");        
-        SearchResult go_result = searchEngine.search(searchQuery, null, null);
-        assertEquals(8, go_result.getInteractions().size());
-
-        searchQuery = new IntActSearchQuery("GO*");
-        SearchResult result = searchEngine.search(searchQuery, 50, 10);
-        assertEquals(10, result.getInteractions().size());
-       
-        searchQuery = new IntActSearchQuery("Bantscheff");
-        SearchResult author_result = searchEngine.search(searchQuery, null, null);
-        assertEquals(199, author_result.getInteractions().size());
+	@Test 
+	public void testExperimentalRole() throws Exception {
+			
+		Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.xls");
+		IntActFastSearchEngine searchEngine = new IntActFastSearchEngine(indexDirectory);
+		
+		SearchQuery searchQuery = new IntActSearchQuery("roleA:bait");        
+        SearchResult result = searchEngine.search(searchQuery, null, null);
+        assertEquals(185, result.getInteractions().size());
         
-        searchQuery = new IntActSearchQuery("expansion:spoke");
-        SearchResult expansion_result = searchEngine.search(searchQuery, null, null);
-        assertEquals(199, expansion_result.getInteractions().size());
-    }
+		searchQuery = new IntActSearchQuery("roles:\"unspecified role\"");  
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(10+4, result.getInteractions().size());
 
-    public void testSearchSort() throws Exception {
-    	
-        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.xls");
-        IntActFastSearchEngine searchEngine = new IntActFastSearchEngine(indexDirectory);
-        
-        Sort sort = new Sort(IntActColumnSet.ID_A.getSortableColumnName());
-        SearchResult result = searchEngine.search(new IntActSearchQuery("id:P*"), 50, 10, sort);        
+        Sort sort = new Sort(IntActColumnSet.EXPERIMENTAL_ROLE_B.getSortableColumnName());
+        result = searchEngine.search(new IntActSearchQuery("roleB:prey"), 20, 10, sort);        
         assertEquals(10, result.getInteractions().size());
-        assertEquals("P42345", result.getInteractions().iterator().next().getInteractorB().getIdentifiers().iterator().next().getIdentifier());
+        assertEquals("P41240", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());     
+	}
+	
+	@Test 
+	public void testProperties() throws Exception {
+			
+		Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.xls");
+		IntActFastSearchEngine searchEngine = new IntActFastSearchEngine(indexDirectory);
+		
+		SearchQuery searchQuery = new IntActSearchQuery("GO:0006928");        
+        SearchResult result = searchEngine.search(searchQuery, null, null);
+        assertEquals(8, result.getInteractions().size());
         
-        sort = new Sort(IntActColumnSet.PROPERTIES_B.getSortableColumnName());
-        result = searchEngine.search(new SearchQuery("properties:GO*"), 50, 10, sort);        
+		searchQuery = new IntActSearchQuery("GO*");        
+        result = searchEngine.search(searchQuery, null, 10);
         assertEquals(10, result.getInteractions().size());
-        IntActBinaryInteraction interactions = (IntActBinaryInteraction)result.getInteractions().iterator().next();
-        assertEquals("P16591", interactions.getInteractorB().getIdentifiers().iterator().next().getIdentifier());
-    }
-    
+        
+		searchQuery = new IntActSearchQuery("propertiesB:interpro");        
+        result = searchEngine.search(searchQuery, null, 10);
+        assertEquals(10, result.getInteractions().size());
 
+        Sort sort = new Sort(IntActColumnSet.PROPERTIES_B.getSortableColumnName());
+        result = searchEngine.search(new IntActSearchQuery("properties:IPR008271"), 20, 10, sort);        
+        assertEquals(10, result.getInteractions().size());
+        assertEquals("Q9Y6R4", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());     
+	}
+	
+	@Test 
+	public void testInteractorType() throws Exception {
+			
+		Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.xls");
+		IntActFastSearchEngine searchEngine = new IntActFastSearchEngine(indexDirectory);
+		
+		SearchQuery searchQuery = new IntActSearchQuery("typeA:\"small molecule\"");        
+        SearchResult result = searchEngine.search(searchQuery, null, null);
+        assertEquals(195, result.getInteractions().size());
+        
+		searchQuery = new IntActSearchQuery("typeB:protein");        
+        result = searchEngine.search(searchQuery, null, 10);
+        assertEquals(10, result.getInteractions().size());
+
+        Sort sort = new Sort(IntActColumnSet.INTERACTOR_TYPE_B.getSortableColumnName());
+        result = searchEngine.search(new IntActSearchQuery("interactor_types:\"small molecule\""), 10, 20, sort);        
+        assertEquals(20, result.getInteractions().size());
+        assertEquals("Q13535", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());     
+	}
+	
+	@Test 
+	public void testHostorganism() throws Exception {
+			
+		Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.xls");
+		IntActFastSearchEngine searchEngine = new IntActFastSearchEngine(indexDirectory);
+		
+		SearchQuery searchQuery = new IntActSearchQuery("hostOrganism:\"in vitro\"");        
+        SearchResult result = searchEngine.search(searchQuery, null, null);
+        assertEquals(14, result.getInteractions().size());
+        
+        Sort sort = new Sort(IntActColumnSet.HOSTORGANISM.getSortableColumnName());
+        result = searchEngine.search(new IntActSearchQuery("in*"), 50, 20, sort);
+        assertEquals(20, result.getInteractions().size());
+        assertEquals("P78527", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());     
+	}
+	
+	@Test 
+	public void testExpansionMethod() throws Exception {
+			
+		Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.xls");
+		IntActFastSearchEngine searchEngine = new IntActFastSearchEngine(indexDirectory);
+		
+		SearchQuery searchQuery = new IntActSearchQuery("expansion:spoke");        
+        SearchResult result = searchEngine.search(searchQuery, null, null);
+        assertEquals(199, result.getInteractions().size());
+        
+        Sort sort = new Sort(IntActColumnSet.EXPANSION_METHOD.getSortableColumnName());
+        result = searchEngine.search(new IntActSearchQuery("spoke"), 50, 20, sort);        
+        assertEquals(20, result.getInteractions().size());
+        assertEquals("Q86VS1", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());     
+	}
 }
