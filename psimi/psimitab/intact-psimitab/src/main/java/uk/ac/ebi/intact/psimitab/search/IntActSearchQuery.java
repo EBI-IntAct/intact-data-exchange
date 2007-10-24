@@ -13,8 +13,8 @@ import psidev.psi.mi.search.query.SearchQuery;
  * @version $Id: IntActSearchQuery.java 
  */
 public class IntActSearchQuery extends SearchQuery{
-
-	public IntActSearchQuery(String query){
+    
+    public IntActSearchQuery(String query){
 		super(query);
 	}
 	
@@ -33,14 +33,13 @@ public class IntActSearchQuery extends SearchQuery{
         	DefaultColumnSet.INTERACTION_TYPES.getShortName(),
         	DefaultColumnSet.INTER_DETECTION_METHODS.getShortName(),
         	DefaultColumnSet.INTERACTION_ID.getShortName(),
-        	"roles",
         	"properties",
-        	"interactor_types",
         	IntActColumnSet.HOSTORGANISM.getShortName(),
         	IntActColumnSet.EXPANSION_METHOD.getShortName()};
 
     private String[] fields = DEFAULT_FIELDS;
     
+    @Override
     public String[] getFields() {
         return fields;
     }
