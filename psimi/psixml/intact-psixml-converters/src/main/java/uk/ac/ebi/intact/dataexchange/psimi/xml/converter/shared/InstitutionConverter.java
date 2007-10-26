@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.Attribute;
 import psidev.psi.mi.xml.model.Source;
-import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.Institution;
@@ -74,6 +74,19 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
     }
 
     protected String psiElementKey(Source psiObject) {
-        return String.valueOf("source:"+psiObject.getNames().getShortLabel());
+        String key;
+
+        if (psiObject.getNames() != null) {
+            key = "source:"+psiObject.getNames().getShortLabel();
+        } else if (psiObject.getXref() != null) {
+            key = "source:xref:"+psiObject.getXref().getPrimaryRef().getId();
+        } else if (psiObject.getBibref() != null) {
+            key = "source:bibref:"+psiObject.getBibref().getXref().getPrimaryRef().getId();
+        } else {
+            throw new PsiConversionException("Could not create key to cache the source: "+psiObject);
+        }
+
+        return key;
+
     }
 }
