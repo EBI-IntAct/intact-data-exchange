@@ -22,6 +22,7 @@ import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.model.Protein;
+import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.util.ProteinUtils;
 
 /**
@@ -84,6 +85,18 @@ public class InteractorEnricherTest extends IntactBasicTestCase {
         enricher.enrich(protein);
 
         Assert.assertEquals("tusB", ProteinUtils.getGeneName(protein));
+    }
+
+    @Test
+    public void enrich_invalidLabel() {
+        BioSource human = getMockBuilder().createBioSource(9606, "human");
+        Protein protein = getMockBuilder().createProtein("EBI-12345", "EBI-12345", human);
+        protein.getXrefs().iterator().next().setCvDatabase(
+                getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT));
+
+        enricher.enrich(protein);
+
+        Assert.assertEquals("EBI_12345", protein.getShortLabel());
     }
 
 }

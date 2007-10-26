@@ -57,6 +57,9 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
             BioSourceEnricher.getInstance().enrich(objectToEnrich.getBioSource());
         }
 
+        // replace short label invalid chars
+        objectToEnrich.setShortLabel(replaceLabelInvalidChars(objectToEnrich.getShortLabel()));
+
         CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
 
         if (objectToEnrich.getCvInteractorType() != null) {
@@ -147,5 +150,10 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
     }
 
     public void close() {
+    }
+
+    protected String replaceLabelInvalidChars(String label) {
+        label = label.replaceAll("-", "_");
+        return label;
     }
 }
