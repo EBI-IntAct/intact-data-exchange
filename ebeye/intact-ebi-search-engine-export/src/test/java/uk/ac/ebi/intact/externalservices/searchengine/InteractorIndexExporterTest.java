@@ -2,10 +2,7 @@ package uk.ac.ebi.intact.externalservices.searchengine;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.persister.standard.InteractorPersister;
-import uk.ac.ebi.intact.core.persister.standard.InteractionPersister;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.model.Interactor;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.model.Interaction;
 
 import java.io.StringWriter;
@@ -24,7 +21,7 @@ public class InteractorIndexExporterTest extends AbstractIndexExporterTestCase {
     public void testBuildIndex() throws Exception {
         Interaction interaction = getMockBuilder().createInteractionRandomBinary();
 
-        persistInteraction(interaction);
+        PersisterHelper.saveOrUpdate(interaction);
 
         Writer writer = new StringWriter();
 

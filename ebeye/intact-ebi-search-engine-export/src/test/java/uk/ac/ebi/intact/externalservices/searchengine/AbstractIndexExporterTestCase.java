@@ -43,11 +43,4 @@ public abstract class AbstractIndexExporterTestCase extends IntactBasicTestCase 
         commitTransaction();
     }
 
-    protected void persistInteraction(Interaction interaction) throws Exception {
-        beginTransaction();
-        InteractionPersister.getInstance().saveOrUpdate(interaction);
-        InteractionPersister.getInstance().commit();
-        commitTransaction();
-    }
-
 }
