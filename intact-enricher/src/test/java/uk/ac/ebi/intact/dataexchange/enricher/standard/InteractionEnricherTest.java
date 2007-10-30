@@ -84,4 +84,27 @@ public class InteractionEnricherTest extends IntactBasicTestCase {
         Assert.assertEquals("ecoli", interactor2.getBioSource().getShortLabel());
         Assert.assertEquals("tusc_ecoli", interactor1.getShortLabel());
     }
+
+    @Test
+    public void enrich_updateLabel2() {
+        BioSource ecoli = getMockBuilder().createBioSource(83333, "lala");
+
+        Interactor interactor1 = getMockBuilder().createProtein("P45531", "unk1", ecoli);
+        Interactor interactor2 = getMockBuilder().createProtein("EBI-12345", "EBI-12345", ecoli);
+
+        Experiment experiment = getMockBuilder().createExperimentEmpty("myExperiment");
+
+        Interaction interaction = getMockBuilder().createInteraction("myInteraction", interactor1, interactor2, experiment);
+
+        EnricherContext.getInstance().getConfig().setUpdateInteractionShortLabels(true);
+
+        enricher.enrich(interaction);
+
+        System.out.println(interaction.getShortLabel());
+
+        Assert.assertEquals("tusc-ebi_12345", interaction.getShortLabel());
+        Assert.assertEquals("83333", interactor2.getBioSource().getTaxId());
+        Assert.assertEquals("ecoli", interactor2.getBioSource().getShortLabel());
+        Assert.assertEquals("tusc_ecoli", interactor1.getShortLabel());
+    }
 }
