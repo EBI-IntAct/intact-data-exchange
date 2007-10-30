@@ -1,0 +1,7 @@
+1. add first author family name as a field to get around the 'gavin' vs 'gavin*' problem.
+   exporting Annotation(CvTopic(  author-list & journal )) could also alleviate this problem ;)
+
+2. newt cross reference are not showing up in the definition of interactors
+   though they do as target-species in experiments.
+   This should be added.
+
