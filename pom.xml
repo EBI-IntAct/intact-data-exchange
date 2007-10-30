@@ -38,6 +38,7 @@
         <module>imex</module>
         <module>plugins</module>
         <module>uniprot-export</module>
+        <module>eb-eye</module>
   </modules>
 
     <build>
