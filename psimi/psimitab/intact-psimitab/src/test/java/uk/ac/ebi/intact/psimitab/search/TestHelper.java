@@ -25,13 +25,13 @@ import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.xml.converter.ConverterException;
 
 /**
- * TODO comment this!
+ * PSIMITAB Test Helper.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id: TestHelper.java 801 2007-10-09 14:01:14Z skerrien $
  */
-public abstract class TestHelper
-{
+public abstract class TestHelper {
+
     public static Directory createIndexFromResource(String resourcePath) throws IOException, ConverterException, MitabLineException {
         InputStream is = TestHelper.class.getResourceAsStream(resourcePath);
        

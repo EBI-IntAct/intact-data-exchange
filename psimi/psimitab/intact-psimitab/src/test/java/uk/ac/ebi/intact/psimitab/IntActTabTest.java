@@ -22,16 +22,9 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceFactory;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 
-public class IntActTabTest {
+public class IntActTabTest extends AbstractPsimitabTestCase {
 
     public static final Log log = LogFactory.getLog( IntActTabTest.class );
-
-
-    public void setUp() throws Exception {
-    }
-
-    public void tearDown() throws Exception {
-    }
 
     @Test
     public void testBinaryInteractionHandler() throws Exception {
@@ -106,19 +99,6 @@ public class IntActTabTest {
         }
     }
 
-    private File getTargetDirectory() {
-        String outputDirPath = IntActTabTest.class.getResource( "/" ).getFile();
-        assertNotNull( outputDirPath );
-        File outputDir = new File( outputDirPath );
-        // we are in test-classes, move one up
-        outputDir = outputDir.getParentFile();
-        assertNotNull( outputDir );
-        assertTrue( outputDir.isDirectory() );
-        assertEquals( "target", outputDir.getName() );
-
-        return outputDir;
-    }
-
     @Test
     public void testExpansion() throws Exception {
 
@@ -170,7 +150,7 @@ public class IntActTabTest {
         assertTrue( ibi.hasPropertiesA() );
         assertTrue( ibi.hasPropertiesB() );
     }
-    
+
     @Test
 	public void testExpansionMethod() throws Exception {
 
@@ -187,21 +167,21 @@ public class IntActTabTest {
 		xml2tab.setPostProcessor(new ClusterInteractorPairProcessor());
 
 		Collection<BinaryInteraction> interactions = xml2tab.convert(xmlFile,false);
-		
+
 		IntActBinaryInteraction interaction = (IntActBinaryInteraction)interactions.iterator().next();
 		assertEquals("spoke", interaction.getExpansionMethod());
-		
-		
-		
+
+
+
 		xml2tab = new Xml2Tab();
-		
+
 		xml2tab.setBinaryInteractionClass(IntActBinaryInteraction.class);
 		xml2tab.setColumnHandler(new IntActColumnHandler());
 		xml2tab.addOverrideSourceDatabase(CrossReferenceFactory.getInstance().build("MI", "0469", "intact"));
 		xml2tab.setPostProcessor(new ClusterInteractorPairProcessor());
-		
+
 		interactions = xml2tab.convert(xmlFile,false);
-		
+
 		interaction = (IntActBinaryInteraction)interactions.iterator().next();
 		assertEquals("none", interaction.getExpansionMethod());
 	}

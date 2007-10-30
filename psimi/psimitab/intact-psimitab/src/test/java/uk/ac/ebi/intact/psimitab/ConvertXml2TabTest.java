@@ -1,23 +1,13 @@
 package uk.ac.ebi.intact.psimitab;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.junit.Assert;
-import psidev.psi.mi.tab.converter.xml2tab.TabConvertionException;
+import org.junit.Test;
 import psidev.psi.mi.tab.expansion.SpokeExpansion;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
-import psidev.psi.mi.xml.converter.ConverterException;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * ConvertXml2Tab Tester.
@@ -26,78 +16,65 @@ import psidev.psi.mi.xml.converter.ConverterException;
  * @version 1.0
  * @since <pre>01/04/2007</pre>
  */
-public class ConvertXml2TabTest extends TestCase {
+public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
     public static final String SLASH = File.separator;
     public static final String TMP_DIR = System.getProperty( "java.io.tmpdir" );
 
-    public ConvertXml2TabTest( String name ) {
-        super( name );
-    }
-
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public static Test suite() {
-        return new TestSuite( ConvertXml2TabTest.class );
-    }
-
-    ////////////////////
-    // Tests
-
+    @Test
     public void testSetGetInteractorPairCluctering() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
 
         converter.setInteractorPairClustering( false );
-        assertFalse( converter.isInteractorPairClustering() );
+        Assert.assertFalse( converter.isInteractorPairClustering() );
 
         converter.setInteractorPairClustering( true );
-        assertTrue( converter.isInteractorPairClustering() );
+        Assert.assertTrue( converter.isInteractorPairClustering() );
     }
 
+    @Test
     public void testSetGetExpansionStrategy() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
 
-        assertNull( converter.getExpansionStragegy() );
+        Assert.assertNull( converter.getExpansionStragegy() );
 
         SpokeExpansion spoke = new SpokeExpansion();
         converter.setExpansionStrategy( spoke );
 
-        assertEquals( spoke, converter.getExpansionStragegy() );
+        Assert.assertEquals( spoke, converter.getExpansionStragegy() );
     }
 
+    @Test
     public void testSetGetOutputFile() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
         File file = new File( "" );
         converter.setOutputFile( file );
-        assertEquals( file, converter.getOutputFile() );
+        Assert.assertEquals( file, converter.getOutputFile() );
     }
 
+    @Test
     public void testSetGetXmlFilesToConvert() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
         Collection<File> files = new ArrayList<File>();
         files.add( new File( "a" ) );
         files.add( new File( "b" ) );
         converter.setXmlFilesToConvert( files );
-        assertEquals( files, converter.getXmlFilesToConvert() );
+        Assert.assertEquals( files, converter.getXmlFilesToConvert() );
     }
 
+    @Test
     public void testSetOverwriteOutputFile() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
 
         converter.setOverwriteOutputFile( false );
-        assertFalse( converter.isOverwriteOutputFile() );
+        Assert.assertFalse( converter.isOverwriteOutputFile() );
 
         converter.setOverwriteOutputFile( true );
-        assertTrue( converter.isOverwriteOutputFile() );
+        Assert.assertTrue( converter.isOverwriteOutputFile() );
     }
 
-    public void testOverwriteOutputCheck() throws IOException {
+    @Test
+    public void testOverwriteOutputCheck() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
         converter.setOverwriteOutputFile( false );
         File file = new File( TMP_DIR + SLASH + "testOutputPsimitab.csv" );
@@ -115,16 +92,17 @@ public class ConvertXml2TabTest extends TestCase {
 
         try {
             converter.convert();
-            fail( "Overwriting of output should have been prevented." );
+            Assert.fail( "Overwriting of output should have been prevented." );
         } catch ( RuntimeException rte ) {
             // ok
         } catch ( Exception e ) {
             e.printStackTrace();
-            fail();
+            Assert.fail();
         }
     }
 
-    public void testConvert() throws IOException, ConverterException, TabConvertionException {
+    @Test
+    public void testConvert() throws Exception {
 
         File intputDir = new File( ConvertXml2TabTest.class.getResource( "/xml-samples" ).getFile() );
 
@@ -157,10 +135,10 @@ public class ConvertXml2TabTest extends TestCase {
 
         Assert.assertTrue( file.exists() );
         
-        assertTrue( logFile.exists() );
+        Assert.assertTrue( logFile.exists() );
 
         // empty as other files yielded data, so the converter doesn't output.
-        assertTrue( logFile.length() == 0 );
+        Assert.assertTrue( logFile.length() == 0 );
 
         // count the lines, we expect 4 of'em
         try {
@@ -174,14 +152,15 @@ public class ConvertXml2TabTest extends TestCase {
             }
             in.close();
 
-            assertEquals( 4, count );
+            Assert.assertEquals( 4, count );
 
         } catch ( IOException e ) {
-            fail();
+            Assert.fail();
         }
     }
 
-    public void testConvert2() throws ConverterException, IOException, TabConvertionException {
+    @Test
+    public void testConvert2() throws Exception {
         File file = new File( ConvertXml2TabTest.class.getResource( "/xml-samples/11230133.xml" ).getFile() );
     	
         ConvertXml2Tab x2t = new ConvertXml2Tab();
@@ -203,11 +182,12 @@ public class ConvertXml2TabTest extends TestCase {
         logWriter.flush();
         logWriter.close();
 
-        assertTrue( logFile.exists() );
-        assertTrue( logFile.length() > 0 );
+        Assert.assertTrue( logFile.exists() );
+        Assert.assertTrue( logFile.length() > 0 );
     }
 
-    public void testConvert3() throws IOException, ConverterException, TabConvertionException {
+    @Test
+    public void testConvert3() throws Exception {
 
         File intputDir = new File( ConvertXml2TabTest.class.getResource( "/xml-samples" ).getFile() );
 
@@ -239,12 +219,12 @@ public class ConvertXml2TabTest extends TestCase {
         logWriter.flush();
         logWriter.close();
 
-        assertTrue( outputFile.exists() );
+        Assert.assertTrue( outputFile.exists() );
         
-        assertTrue( logFile.exists() );
+        Assert.assertTrue( logFile.exists() );
 
         // empty as other files yielded data, so the converter doesn't output.
-        assertTrue( logFile.length() == 0 );
+        Assert.assertTrue( logFile.length() == 0 );
 
         // count the lines, we expect 4 of'em
         try {
@@ -259,23 +239,10 @@ public class ConvertXml2TabTest extends TestCase {
             }
             in.close();
 
-            assertEquals( 4, count );
+            Assert.assertEquals( 4, count );
 
         } catch ( IOException e ) {
-            fail();
+            Assert.fail();
         }
     }
-    
-	private File getTargetDirectory() {
-		String outputDirPath = ConvertXml2TabTest.class.getResource("/").getFile();
-		assertNotNull(outputDirPath);
-		File outputDir = new File(outputDirPath);
-		// we are in test-classes, move one up
-		outputDir = outputDir.getParentFile();
-		assertNotNull(outputDir);
-		assertTrue(outputDir.isDirectory());
-		assertEquals("target", outputDir.getName());
-		
-		return outputDir;
-	}
 }

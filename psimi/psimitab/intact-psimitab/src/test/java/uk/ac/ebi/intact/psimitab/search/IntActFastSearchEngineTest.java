@@ -25,7 +25,7 @@ import psidev.psi.mi.search.SearchResult;
 import psidev.psi.mi.search.query.SearchQuery;
 
 /**
- * TODO comment this!
+ * IntActFastSearchEngine Tester.
  *
  * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
  * @version $Id: IntActFastSearchEngineTest.java$
