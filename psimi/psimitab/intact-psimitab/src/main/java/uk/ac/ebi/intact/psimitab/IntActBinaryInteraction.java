@@ -38,6 +38,8 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
 
     private int expectedColumnCount = 23;
     
+    //////////////////
+    // Constructors
 
     public IntActBinaryInteraction( Interactor interactorA, Interactor interactorB ) {
         super( interactorA, interactorB );
@@ -48,7 +50,10 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
     public IntActBinaryInteraction( ) {
     	super( );
     }
-    
+
+    ///////////////////////////
+    // Getters and Setters
+
     public boolean hasExperimentalRolesInteractorA(){
     	return experimentalRoleA != null;
     }
@@ -80,7 +85,8 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
     public boolean hasPropertiesB(){
     	return propertiesB != null;
     }
-	public void setPropertiesA( List <CrossReference> propertiesA ) {
+
+    public void setPropertiesA( List <CrossReference> propertiesA ) {
 		this.propertiesA = propertiesA;
 	}
 
@@ -156,11 +162,15 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
 	/**
 	 * Setter of the number of expected columns
 	 * 
-	 * @param number of expected columns
+	 * @param expectedColumnCount of expected columns
 	 */
 	public void setExpectedColumnCount(int expectedColumnCount) {
 		this.expectedColumnCount = expectedColumnCount;
 	}
+
+    ////////////////////////
+    // Object's override
+
     /**
      * {@inheritDoc}
      */
@@ -182,7 +192,4 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
         sb.append( '}' );
         return sb.toString();
     }
-
-
-
 }

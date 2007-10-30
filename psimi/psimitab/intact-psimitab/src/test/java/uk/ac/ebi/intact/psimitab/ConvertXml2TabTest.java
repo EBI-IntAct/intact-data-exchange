@@ -2,8 +2,13 @@ package uk.ac.ebi.intact.psimitab;
 
 import org.junit.Assert;
 import org.junit.Test;
+import psidev.psi.mi.tab.converter.xml2tab.IsExpansionStrategyAware;
+import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.SpokeExpansion;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.CrossReferenceFactory;
+import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -134,7 +139,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         logWriter.close();
 
         Assert.assertTrue( file.exists() );
-        
+
         Assert.assertTrue( logFile.exists() );
 
         // empty as other files yielded data, so the converter doesn't output.
@@ -162,7 +167,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     @Test
     public void convert2() throws Exception {
         File file = new File( ConvertXml2TabTest.class.getResource( "/xml-samples/11230133.xml" ).getFile() );
-    	
+
         ConvertXml2Tab x2t = new ConvertXml2Tab();
         x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         x2t.setInteractorPairClustering( true );
@@ -197,10 +202,10 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         converter.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         converter.setInteractorPairClustering( true );
         converter.setOverwriteOutputFile( true );
-        
-        File outputFile = new File(getTargetDirectory(), "test.txt");
+
+        File outputFile = new File( getTargetDirectory(), "test.txt" );
         outputFile.createNewFile();
-        converter.setOutputFile(outputFile);
+        converter.setOutputFile( outputFile );
 
         // collect input files and directories
         Collection<File> inputFiles = new ArrayList<File>();
@@ -212,7 +217,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         File logFile = new File( intputDir, "mitab.log" );
         Writer logWriter = new BufferedWriter( new FileWriter( logFile ) );
         converter.setLogWriter( logWriter );
-  
+
         // run the conversion
         converter.convert();
 
@@ -220,7 +225,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         logWriter.close();
 
         Assert.assertTrue( outputFile.exists() );
-        
+
         Assert.assertTrue( logFile.exists() );
 
         // empty as other files yielded data, so the converter doesn't output.
@@ -232,7 +237,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
             int count = 0;
 
             String line = in.readLine(); // skip the header.
-            
+
             while ( ( line = in.readLine() ) != null ) {
                 // process line here
                 count++;
@@ -278,5 +283,53 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         Assert.assertTrue( outputFile.length() > 0 );
         Assert.assertTrue( logFile.exists() );
         Assert.assertTrue( logFile.length() == 0 );
+    }
+
+    @Test
+    public void expansionMethod_nary_interaction_2() throws Exception {
+
+        File xmlFile = new File( ConvertXml2TabTest.class.getResource( "/psi25-testset/single-nary-interaction.xml" ).getFile() );
+        Assert.assertTrue( xmlFile.canRead() );
+
+        // convert into Tab object model
+        Xml2Tab xml2tab = new Xml2Tab();
+
+        xml2tab.setBinaryInteractionClass( IntActBinaryInteraction.class );
+
+        // this column handler IS aware of the the expansion strategy
+        final IntActColumnHandler columnHandler = new IntActColumnHandler();
+        Assert.assertTrue( columnHandler instanceof IsExpansionStrategyAware );
+        xml2tab.setColumnHandler( columnHandler );
+
+        xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
+        xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
+        xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
+
+        Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
+
+        IntActBinaryInteraction interaction = ( IntActBinaryInteraction ) interactions.iterator().next();
+        Assert.assertNotNull( interaction.getExpansionMethod() );
+        Assert.assertEquals( SpokeExpansion.EXPANSION_NAME, interaction.getExpansionMethod() );
+    }
+
+    @Test
+    public void expansionMethod_binary_interaction() throws Exception {
+
+        File xmlFile = new File( ConvertXml2TabTest.class.getResource( "/psi25-testset/single-interaction.xml" ).getFile() );
+        Assert.assertTrue( xmlFile.canRead() );
+
+        // convert into Tab object model
+        Xml2Tab xml2tab = new Xml2Tab();
+
+        xml2tab.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        xml2tab.setColumnHandler( new IntActColumnHandler() );
+        xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
+        xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
+        xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
+
+        Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
+
+        IntActBinaryInteraction interaction = ( IntActBinaryInteraction ) interactions.iterator().next();
+        Assert.assertEquals( null, interaction.getExpansionMethod() );
     }
 }

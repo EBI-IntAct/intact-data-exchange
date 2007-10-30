@@ -55,7 +55,6 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         for ( BinaryInteraction interaction : interactions ) {
             assertTrue( interaction instanceof IntActBinaryInteraction );
         }
-
     }
 
     @Test
@@ -126,7 +125,6 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         writer.write( interactions, tabFile );
         assertEquals( 2, interactions.size() );
 
-
         BinaryInteraction interaction = ( BinaryInteraction ) interactions.toArray()[1];
         assertTrue( interaction instanceof IntActBinaryInteraction );
 
@@ -137,7 +135,6 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         for ( CrossReference o : ibi.getHostOrganism() ) {
             assertTrue( o.getDatabase().contains( "yeast" ) );
         }
-
 
         assertTrue( ibi.getExperimentalRolesInteractorA().size() == 2 );
         assertTrue( ibi.getExperimentalRolesInteractorB().size() == 2 );
@@ -150,39 +147,4 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         assertTrue( ibi.hasPropertiesA() );
         assertTrue( ibi.hasPropertiesB() );
     }
-
-    @Test
-	public void testExpansionMethod() throws Exception {
-
-		File xmlFile = new File(IntActTabTest.class.getResource("/psi25-testset/bantscheff.xml").getFile());
-		assertTrue(xmlFile.canRead());
-
-		// convert into Tab object model
-		Xml2Tab xml2tab = new Xml2Tab();
-
-		xml2tab.setBinaryInteractionClass(IntActBinaryInteraction.class);
-		xml2tab.setColumnHandler(new IntActColumnHandler());
-		xml2tab.setExpansionStrategy(new SpokeWithoutBaitExpansion());
-		xml2tab.addOverrideSourceDatabase(CrossReferenceFactory.getInstance().build("MI", "0469", "intact"));
-		xml2tab.setPostProcessor(new ClusterInteractorPairProcessor());
-
-		Collection<BinaryInteraction> interactions = xml2tab.convert(xmlFile,false);
-
-		IntActBinaryInteraction interaction = (IntActBinaryInteraction)interactions.iterator().next();
-		assertEquals("spoke", interaction.getExpansionMethod());
-
-
-
-		xml2tab = new Xml2Tab();
-
-		xml2tab.setBinaryInteractionClass(IntActBinaryInteraction.class);
-		xml2tab.setColumnHandler(new IntActColumnHandler());
-		xml2tab.addOverrideSourceDatabase(CrossReferenceFactory.getInstance().build("MI", "0469", "intact"));
-		xml2tab.setPostProcessor(new ClusterInteractorPairProcessor());
-
-		interactions = xml2tab.convert(xmlFile,false);
-
-		interaction = (IntActBinaryInteraction)interactions.iterator().next();
-		assertEquals("none", interaction.getExpansionMethod());
-	}
 }
