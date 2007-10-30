@@ -22,7 +22,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     public static final String TMP_DIR = System.getProperty( "java.io.tmpdir" );
 
     @Test
-    public void testSetGetInteractorPairCluctering() throws Exception {
+    public void setGetInteractorPairCluctering() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
 
         converter.setInteractorPairClustering( false );
@@ -33,7 +33,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     }
 
     @Test
-    public void testSetGetExpansionStrategy() throws Exception {
+    public void setGetExpansionStrategy() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
 
         Assert.assertNull( converter.getExpansionStragegy() );
@@ -45,7 +45,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     }
 
     @Test
-    public void testSetGetOutputFile() throws Exception {
+    public void setGetOutputFile() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
         File file = new File( "" );
         converter.setOutputFile( file );
@@ -53,7 +53,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     }
 
     @Test
-    public void testSetGetXmlFilesToConvert() throws Exception {
+    public void setGetXmlFilesToConvert() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
         Collection<File> files = new ArrayList<File>();
         files.add( new File( "a" ) );
@@ -63,7 +63,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     }
 
     @Test
-    public void testSetOverwriteOutputFile() throws Exception {
+    public void setOverwriteOutputFile() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
 
         converter.setOverwriteOutputFile( false );
@@ -74,7 +74,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     }
 
     @Test
-    public void testOverwriteOutputCheck() throws Exception {
+    public void overwriteOutputCheck() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
         converter.setOverwriteOutputFile( false );
         File file = new File( TMP_DIR + SLASH + "testOutputPsimitab.csv" );
@@ -102,7 +102,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     }
 
     @Test
-    public void testConvert() throws Exception {
+    public void convert() throws Exception {
 
         File intputDir = new File( ConvertXml2TabTest.class.getResource( "/xml-samples" ).getFile() );
 
@@ -160,7 +160,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     }
 
     @Test
-    public void testConvert2() throws Exception {
+    public void convert2() throws Exception {
         File file = new File( ConvertXml2TabTest.class.getResource( "/xml-samples/11230133.xml" ).getFile() );
     	
         ConvertXml2Tab x2t = new ConvertXml2Tab();
@@ -187,7 +187,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     }
 
     @Test
-    public void testConvert3() throws Exception {
+    public void convert3() throws Exception {
 
         File intputDir = new File( ConvertXml2TabTest.class.getResource( "/xml-samples" ).getFile() );
 
@@ -244,5 +244,39 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         } catch ( IOException e ) {
             Assert.fail();
         }
+    }
+
+    @Test
+    public void convert4() throws Exception {
+        File file = new File( ConvertXml2TabTest.class.getResource( "/psi25-testset/9971739.xml" ).getFile() );
+        Assert.assertNotNull( file );
+
+        ConvertXml2Tab converter = new ConvertXml2Tab();
+        converter.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        converter.setColumnHandler( new IntActColumnHandler() );
+        converter.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
+        converter.setInteractorPairClustering( true );
+        converter.setOverwriteOutputFile( true );
+
+        File logFile = new File( file.getParentFile(), "9971739.log" );
+        Writer logWriter = new BufferedWriter( new FileWriter( logFile ) );
+        converter.setLogWriter( logWriter );
+
+        Collection<File> inputFiles = new ArrayList<File>();
+        inputFiles.add( file );
+        converter.setXmlFilesToConvert( inputFiles );
+
+        final File outputFile = new File( file.getAbsolutePath() + ".txt" );
+        converter.setOutputFile( outputFile );
+        converter.convert();
+
+        logWriter.flush();
+        logWriter.close();
+
+        Assert.assertTrue( outputFile.exists() );
+        System.out.println( outputFile.getAbsolutePath() );
+        Assert.assertTrue( outputFile.length() > 0 );
+        Assert.assertTrue( logFile.exists() );
+        Assert.assertTrue( logFile.length() == 0 );
     }
 }
