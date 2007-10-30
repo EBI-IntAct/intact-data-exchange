@@ -1,45 +1,35 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>uk.ac.ebi.intact.plugins</groupId>
-        <artifactId>plugins-miscel</artifactId>
-        <version>1.6.0-SNAPSHOT</version>
+        <groupId>uk.ac.ebi.intact.dataexchange.ebeye</groupId>
+        <artifactId>ebeye</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     
-    <groupId>uk.ac.ebi.intact</groupId>
     <artifactId>intact-ebi-search-engine-export</artifactId>
-    <packaging>jar</packaging>
-    <version>1.6.0-SNAPSHOT</version>
 
-    <name>Plugin - EB-eye export</name>
+    <packaging>jar</packaging>
+    <version>2.0.0-SNAPSHOT</version>
+
+    <name>IntAct Data Exchange :: EB-eye :: Export</name>
+
     <description>Module allowing to export IntAct data in a format that can be used by EBI External Services to index
         our database content.
     </description>
-    <url>http://www.ebi.ac.uk/~intact/devsite/${artifactId}</url>
-
-    <scm>
-        <connection>scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-ebi-search-engine-export/trunk</connection>
-        <developerConnection>scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/intact-ebi-search-engine-export/trunk</developerConnection>
-        <url>http://fisheye4.cenqua.com/browse/intact/repo/intact-ebi-search-engine-export/trunk/</url>
-    </scm>
 
      <dependencies>
-
         <dependency>
             <groupId>uk.ac.ebi.intact.commons</groupId>
             <artifactId>intact-commons</artifactId>
-            <version>2.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-persister</artifactId>
-            <version>1.6.2</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <!-- EBI repositories -->
