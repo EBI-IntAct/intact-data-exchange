@@ -1,6 +1,6 @@
    <entrySet level="2" minorVersion="3" version="5" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
      <entry>
-       <source releaseDate="2006-10-26">
+       <source releaseDate="2007-10-26">
          <names>
            <shortLabel>European Bioinformatics Institute</shortLabel>
          </names>
@@ -29,7 +29,7 @@
              </xref>
            </bibref>
            <xref>
-             <primaryRef db="intact" dbAc="MI:0469" id="EBI-79486" secondary="miyake-1998-1"/>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-79486" refType="identity" refTypeAc="MI:0356" secondary="miyake-1998-1"/>
              <secondaryRef db="newt" dbAc="MI:0247" id="10090" refType="target-species" secondary="mouse"/>
            </xref>
            <hostOrganismList>
@@ -44,6 +44,14 @@
              <names>
                <shortLabel>coip</shortLabel>
                <fullName>coimmunoprecipitation</fullName>
+               <alias>co-immunoprecipitation</alias>
+               <alias>Co-IP</alias>
+               <alias>immunoprecipitation</alias>
+               <alias>CoIp</alias>
+               <alias>co-immunoprecipitation</alias>
+               <alias>Co-IP</alias>
+               <alias>CoIp</alias>
+               <alias>immunoprecipitation</alias>
              </names>
              <xref>
                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0019" refType="identity" refTypeAc="MI:0356"/>
@@ -55,6 +63,7 @@
                <shortLabel>western blot</shortLabel>
                <fullName>western blot</fullName>
                <alias>Immuno blot</alias>
+               <alias>Immuno blot</alias>
              </names>
              <xref>
                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0113" refType="identity" refTypeAc="MI:0356"/>
@@ -64,7 +73,7 @@
            <attributeList>
              <attribute name="contact-email">miyake@post.saga-med.ac.jp</attribute>
              <attribute name="author-list">Miyake K., Shimazu R., Kondo J., Niki T., Akashi S., Ogata H., Yamashita Y., Miura Y., Kimoto M.</attribute>
-             <attribute name="publication-year">1998</attribute>
+             <attribute name="publication year">1998</attribute>
              <attribute name="journal">J. Immunol. (0022-1767)</attribute>
            </attributeList>
          </experimentDescription>
@@ -78,11 +87,11 @@
              <alias type="gene name synonym" typeAc="MI:0302">Md1</alias>
            </names>
            <xref>
-             <primaryRef db="uniprotkb" dbAc="MI:0486" id="O88188" refType="identity" refTypeAc="MI:0356" secondary="ly86_mouse" version="SP_47"/>
-             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR003172" secondary="E1_DerP2_DerF2"/>
-             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005615" secondary="C:extracellular space"/>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="O88188" refType="identity" refTypeAc="MI:0356" version="SP_46"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0005515" secondary="F:protein binding"/>
-             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-79494" secondary="ly86_mouse"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR003172" secondary="E1_DerP2_DerF2"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSMUSG00000021423"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-79494" refType="identity" refTypeAc="MI:0356" secondary="ly86_mouse"/>
            </xref>
            <interactorType>
              <names>
@@ -112,13 +121,12 @@
              <alias type="gene name synonym" typeAc="MI:0302">Ly78</alias>
            </names>
            <xref>
-             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q62192" refType="identity" refTypeAc="MI:0356" secondary="cd180_mouse" version="SP_48"/>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q62192" refType="identity" refTypeAc="MI:0356" version="SP_60"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005515" secondary="F:protein binding"/>
              <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001611" secondary="LRR"/>
              <secondaryRef db="interpro" dbAc="MI:0449" id="IPR000483" secondary="LRR_Cterm"/>
-             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005615" secondary="C:extracellular space"/>
-             <secondaryRef db="go" dbAc="MI:0448" id="GO:0016021" secondary="C:integral to membrane"/>
-             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005515" secondary="F:protein binding"/>
-             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-79487" secondary="cd180_mouse"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSMUSG00000021624"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-79487" refType="identity" refTypeAc="MI:0356" secondary="cd180_mouse"/>
            </xref>
            <interactorType>
              <names>
@@ -146,7 +154,7 @@
              <shortLabel>md1-ly78-1</shortLabel>
            </names>
            <xref>
-             <primaryRef db="intact" dbAc="MI:0469" id="EBI-79501" secondary="md1-ly78-1"/>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-79501" refType="identity" refTypeAc="MI:0356" secondary="md1-ly78-1"/>
            </xref>
            <experimentList>
              <experimentRef>2</experimentRef>
@@ -207,6 +215,7 @@
              <names>
                <shortLabel>physical interaction</shortLabel>
                <fullName>physical interaction</fullName>
+               <alias>aggregation</alias>
                <alias>aggregation</alias>
              </names>
              <xref>

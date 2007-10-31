@@ -1,6 +1,6 @@
    <entrySet level="2" minorVersion="3" version="5" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
      <entry>
-       <source releaseDate="2006-10-26">
+       <source releaseDate="2007-10-26">
          <names>
            <shortLabel>European Bioinformatics Institute</shortLabel>
          </names>
@@ -29,7 +29,7 @@
              </xref>
            </bibref>
            <xref>
-             <primaryRef db="intact" dbAc="MI:0469" id="EBI-80342" secondary="song-1997-1"/>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-80342" refType="identity" refTypeAc="MI:0356" secondary="song-1997-1"/>
              <secondaryRef db="newt" dbAc="MI:0247" id="10090" refType="target-species" secondary="mouse"/>
            </xref>
            <hostOrganismList>
@@ -42,16 +42,25 @@
            </hostOrganismList>
            <interactionDetectionMethod>
              <names>
-               <shortLabel>two hybrid</shortLabel>
+               <shortLabel>2 hybrid</shortLabel>
                <fullName>two hybrid</fullName>
                <alias>2H</alias>
                <alias>two-hybrid</alias>
                <alias>2h</alias>
+               <alias>2H</alias>
+               <alias>two-hybrid</alias>
+               <alias>2h</alias>
+               <alias>classical two hybrid</alias>
+               <alias>yeast two hybrid</alias>
+               <alias>2-hybrid</alias>
+               <alias>classical two hybrid</alias>
+               <alias>yeast two hybrid</alias>
+               <alias>2-hybrid</alias>
              </names>
              <xref>
                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0018" refType="identity" refTypeAc="MI:0356"/>
-               <secondaryRef db="pubmed" dbAc="MI:0446" id="10967325" refType="primary-reference" refTypeAc="MI:0358"/>
                <secondaryRef db="pubmed" dbAc="MI:0446" id="12634794" refType="method reference" refTypeAc="MI:0357"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="10967325" refType="primary-reference" refTypeAc="MI:0358"/>
                <secondaryRef db="pubmed" dbAc="MI:0446" id="1946372" refType="method reference" refTypeAc="MI:0357"/>
              </xref>
            </interactionDetectionMethod>
@@ -68,7 +77,7 @@
            </participantIdentificationMethod>
            <attributeList>
              <attribute name="author-list">Song WJ., Chung SH., Kurnit DM.</attribute>
-             <attribute name="publication-year">1997</attribute>
+             <attribute name="publication year">1997</attribute>
              <attribute name="journal">Biochem. Biophys. Res. Commun. (0006-291X)</attribute>
            </attributeList>
          </experimentDescription>
@@ -77,15 +86,23 @@
          <interactor id="4">
            <names>
              <shortLabel>dyr1a_mouse</shortLabel>
-             <fullName>Dual-specificity tyrosine-phosphorylation regulated kinase 1A</fullName>
+             <fullName>Dual specificity tyrosine-phosphorylation-regulated kinase 1A</fullName>
              <alias type="gene name" typeAc="MI:0301">Dyrk1a</alias>
              <alias type="gene name synonym" typeAc="MI:0302">Dyrk</alias>
            </names>
            <xref>
-             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q61214" refType="identity" refTypeAc="MI:0356" secondary="dyr1a_mouse" version="SP_48"/>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q61214" refType="identity" refTypeAc="MI:0356" version="SP_70"/>
              <secondaryRef db="interpro" dbAc="MI:0449" id="IPR000719" secondary="Prot_kinase"/>
              <secondaryRef db="interpro" dbAc="MI:0449" id="IPR008271" secondary="Ser_thr_pkin_AS"/>
-             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-80344" secondary="dyr1a_mouse"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR002290"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0016607"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0043621"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0004674"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0004713"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0018108"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0046777"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSMUSG00000022897"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-80344" refType="identity" refTypeAc="MI:0356" secondary="dyr1a_mouse"/>
            </xref>
            <interactorType>
              <names>
@@ -113,7 +130,7 @@
              <shortLabel>dyrk1a-dyrk1a-1</shortLabel>
            </names>
            <xref>
-             <primaryRef db="intact" dbAc="MI:0469" id="EBI-80352" secondary="dyrk1a-dyrk1a-1"/>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-80352" refType="identity" refTypeAc="MI:0356" secondary="dyrk1a-dyrk1a-1"/>
            </xref>
            <experimentList>
              <experimentRef>2</experimentRef>
@@ -174,6 +191,7 @@
              <names>
                <shortLabel>physical interaction</shortLabel>
                <fullName>physical interaction</fullName>
+               <alias>aggregation</alias>
                <alias>aggregation</alias>
              </names>
              <xref>

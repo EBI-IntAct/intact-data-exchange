@@ -1,6 +1,6 @@
    <entrySet level="2" minorVersion="3" version="5" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
      <entry>
-       <source releaseDate="2006-10-26">
+       <source releaseDate="2007-10-26">
          <names>
            <shortLabel>European Bioinformatics Institute</shortLabel>
          </names>
@@ -29,7 +29,7 @@
              </xref>
            </bibref>
            <xref>
-             <primaryRef db="intact" dbAc="MI:0469" id="EBI-79996" secondary="sargiacomo-1995-1"/>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-79996" refType="identity" refTypeAc="MI:0356" secondary="sargiacomo-1995-1"/>
              <secondaryRef db="newt" dbAc="MI:0247" id="9615" refType="target-species" secondary="canfa"/>
            </xref>
            <hostOrganismList>
@@ -54,6 +54,7 @@
                <shortLabel>western blot</shortLabel>
                <fullName>western blot</fullName>
                <alias>Immuno blot</alias>
+               <alias>Immuno blot</alias>
              </names>
              <xref>
                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0113" refType="identity" refTypeAc="MI:0356"/>
@@ -62,7 +63,7 @@
            </participantIdentificationMethod>
            <attributeList>
              <attribute name="author-list">Sargiacomo M., Scherer PE., Tang Z., Kubler E., Song KS., Sanders MC., Lisanti MP.</attribute>
-             <attribute name="publication-year">1995</attribute>
+             <attribute name="publication year">1995</attribute>
              <attribute name="journal">Proc. Natl. Acad. Sci. U.S.A. (0027-8424)</attribute>
            </attributeList>
          </experimentDescription>
@@ -76,12 +77,15 @@
              <alias type="gene name synonym" typeAc="MI:0302">CAV</alias>
            </names>
            <xref>
-             <primaryRef db="uniprotkb" dbAc="MI:0486" id="P33724" refType="identity" refTypeAc="MI:0356" secondary="cav1_canfa" version="SP_47"/>
-             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001612" secondary="Caveolin"/>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="P33724" refType="identity" refTypeAc="MI:0356" version="SP_67"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0016599" secondary="C:caveolar membrane"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0005198" secondary="F:structural molecule activity"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0042802" secondary="F:protein self binding"/>
-             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-79998" secondary="cav1_canfa"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001612" secondary="Caveolin"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSCAFG00000003404"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR015504"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="A0M8U8" refType="secondary-ac" refTypeAc="MI:0360" version="SP_67"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-79998" refType="identity" refTypeAc="MI:0356" secondary="cav1_canfa"/>
            </xref>
            <interactorType>
              <names>
@@ -109,7 +113,7 @@
              <shortLabel>cav1-cav1-1</shortLabel>
            </names>
            <xref>
-             <primaryRef db="intact" dbAc="MI:0469" id="EBI-80007" secondary="cav1-cav1-1"/>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-80007" refType="identity" refTypeAc="MI:0356" secondary="cav1-cav1-1"/>
            </xref>
            <experimentList>
              <experimentRef>2</experimentRef>
@@ -148,6 +152,7 @@
                      <names>
                        <shortLabel>gst tag</shortLabel>
                        <fullName>glutathione s tranferase tag</fullName>
+                       <alias>glutathione S-tranferase tag</alias>
                        <alias>glutathione S-tranferase tag</alias>
                      </names>
                      <xref>
@@ -222,6 +227,7 @@
              <names>
                <shortLabel>physical interaction</shortLabel>
                <fullName>physical interaction</fullName>
+               <alias>aggregation</alias>
                <alias>aggregation</alias>
              </names>
              <xref>

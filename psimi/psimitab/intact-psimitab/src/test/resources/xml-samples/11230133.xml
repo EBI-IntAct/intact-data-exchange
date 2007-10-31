@@ -1,6 +1,6 @@
    <entrySet level="2" minorVersion="3" version="5" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
      <entry>
-       <source releaseDate="2007-01-12">
+       <source releaseDate="2007-10-26">
          <names>
            <shortLabel>European Bioinformatics Institute</shortLabel>
          </names>
@@ -29,7 +29,7 @@
              </xref>
            </bibref>
            <xref>
-             <primaryRef db="intact" dbAc="MI:0469" id="EBI-77206" secondary="shani-2001-1"/>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-77206" refType="identity" refTypeAc="MI:0356" secondary="shani-2001-1"/>
              <secondaryRef db="newt" dbAc="MI:0247" id="9606" refType="target-species" secondary="human"/>
            </xref>
            <hostOrganismList>
@@ -57,6 +57,9 @@
                <alias>Gel Filtration</alias>
                <alias>Siezing column</alias>
                <alias>Size Exclusion Chromatography</alias>
+               <alias>Siezing column</alias>
+               <alias>Size Exclusion Chromatography</alias>
+               <alias>Gel Filtration</alias>
              </names>
              <xref>
                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0071" refType="identity" refTypeAc="MI:0356"/>
@@ -75,7 +78,7 @@
            </participantIdentificationMethod>
            <attributeList>
              <attribute name="author-list">Shani G., Henis-Korenblit S., Jona G., Gileadi O., Eisenstein M., Ziv T., Admon A., Kimchi A.</attribute>
-             <attribute name="publication-year">2001</attribute>
+             <attribute name="publication year">2001</attribute>
              <attribute name="journal">EMBO J. (0261-4189)</attribute>
            </attributeList>
          </experimentDescription>
@@ -88,10 +91,9 @@
              <alias type="gene name" typeAc="MI:0301">DAPK2</alias>
            </names>
            <xref>
-             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q9UIK4" refType="identity" refTypeAc="MI:0356" secondary="dapk2_human" version="SP_48"/>
-             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="O75892" refType="secondary-ac" refTypeAc="MI:0360" secondary="dapk2_human" version="SP_48"/>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q9UIK4" refType="identity" refTypeAc="MI:0356" version="SP_66"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0005737" secondary="C:cytoplasm"/>
-             <secondaryRef db="go" dbAc="MI:0448" id="GO:0004685" secondary="F:calcium/calmodulin-dependent"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0004683"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0005516" secondary="F:calmodulin binding"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0006917" secondary="P:induction of apoptosis"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0007243" secondary="P:protein kinase cascade"/>
@@ -100,7 +102,16 @@
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0006468" secondary="P:protein amino acid phosphory"/>
              <secondaryRef db="interpro" dbAc="MI:0449" id="IPR000719" secondary="Prot_kinase"/>
              <secondaryRef db="interpro" dbAc="MI:0449" id="IPR008271" secondary="Ser_thr_pkin_AS"/>
-             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-77154" secondary="dapk2_human"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="O75892" refType="secondary-ac" refTypeAc="MI:0360" version="SP_66"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q24JS1" refType="secondary-ac" refTypeAc="MI:0360" version="SP_66"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSG00000035664"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1WMK"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1WRZ"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1Z9X"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1ZWS"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2A2A"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR002290"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-77154" refType="identity" refTypeAc="MI:0356" secondary="dapk2_human"/>
            </xref>
            <interactorType>
              <names>
@@ -129,7 +140,7 @@
              <fullName>Homodimerization of DAPK2</fullName>
            </names>
            <xref>
-             <primaryRef db="intact" dbAc="MI:0469" id="EBI-77215" secondary="dapk2-dapk2-3"/>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-77215" refType="identity" refTypeAc="MI:0356" secondary="dapk2-dapk2-3"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0006917" refType="process" refTypeAc="MI:0359" secondary="induction of apoptosis"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0016506" refType="function" refTypeAc="MI:0355" secondary="apoptosis activator activity"/>
            </xref>
@@ -171,7 +182,10 @@
                        <shortLabel>flag tag</shortLabel>
                        <fullName>flag tag</fullName>
                        <alias>FLAG-tagged</alias>
+                       <alias>DYKDDDDKV epitope tag</alias>
                        <alias>FLAG</alias>
+                       <alias>FLAG</alias>
+                       <alias>FLAG-tagged</alias>
                        <alias>DYKDDDDKV epitope tag</alias>
                      </names>
                      <xref>
@@ -260,6 +274,7 @@
              <names>
                <shortLabel>physical interaction</shortLabel>
                <fullName>physical interaction</fullName>
+               <alias>aggregation</alias>
                <alias>aggregation</alias>
              </names>
              <xref>

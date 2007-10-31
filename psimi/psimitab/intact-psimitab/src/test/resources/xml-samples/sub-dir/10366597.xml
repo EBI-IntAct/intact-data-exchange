@@ -1,6 +1,6 @@
    <entrySet level="2" minorVersion="3" version="5" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
      <entry>
-       <source releaseDate="2006-10-26">
+       <source releaseDate="2007-10-26">
          <names>
            <shortLabel>European Bioinformatics Institute</shortLabel>
          </names>
@@ -29,7 +29,7 @@
              </xref>
            </bibref>
            <xref>
-             <primaryRef db="intact" dbAc="MI:0469" id="EBI-79957" secondary="rodal-1999-1"/>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-79957" refType="identity" refTypeAc="MI:0356" secondary="rodal-1999-1"/>
              <secondaryRef db="newt" dbAc="MI:0247" id="4932" refType="target-species" secondary="yeast"/>
            </xref>
            <hostOrganismList>
@@ -42,16 +42,25 @@
            </hostOrganismList>
            <interactionDetectionMethod>
              <names>
-               <shortLabel>two hybrid</shortLabel>
+               <shortLabel>2 hybrid</shortLabel>
                <fullName>two hybrid</fullName>
                <alias>2H</alias>
                <alias>two-hybrid</alias>
                <alias>2h</alias>
+               <alias>2H</alias>
+               <alias>two-hybrid</alias>
+               <alias>2h</alias>
+               <alias>classical two hybrid</alias>
+               <alias>yeast two hybrid</alias>
+               <alias>2-hybrid</alias>
+               <alias>classical two hybrid</alias>
+               <alias>yeast two hybrid</alias>
+               <alias>2-hybrid</alias>
              </names>
              <xref>
                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0018" refType="identity" refTypeAc="MI:0356"/>
-               <secondaryRef db="pubmed" dbAc="MI:0446" id="10967325" refType="primary-reference" refTypeAc="MI:0358"/>
                <secondaryRef db="pubmed" dbAc="MI:0446" id="12634794" refType="method reference" refTypeAc="MI:0357"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="10967325" refType="primary-reference" refTypeAc="MI:0358"/>
                <secondaryRef db="pubmed" dbAc="MI:0446" id="1946372" refType="method reference" refTypeAc="MI:0357"/>
              </xref>
            </interactionDetectionMethod>
@@ -68,7 +77,7 @@
            </participantIdentificationMethod>
            <attributeList>
              <attribute name="author-list">Rodal AA., Tetreault JW., Lappalainen P., Drubin DG., Amberg DC.</attribute>
-             <attribute name="publication-year">1999</attribute>
+             <attribute name="publication year">1999</attribute>
              <attribute name="journal">J. Cell Biol. (0021-9525)</attribute>
            </attributeList>
          </experimentDescription>
@@ -83,16 +92,19 @@
              <alias type="orf name" typeAc="MI:0306">YM9582.17C</alias>
            </names>
            <xref>
-             <primaryRef db="uniprotkb" dbAc="MI:0486" id="P46680" refType="identity" refTypeAc="MI:0356" secondary="aip1_yeast" version="SP_48"/>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="P46680" refType="identity" refTypeAc="MI:0356" version="SP_68"/>
+             <secondaryRef db="cygd" dbAc="MI:0464" id="YMR092c"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1PGU"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1PI6"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="YMR092C"/>
              <secondaryRef db="sgd" dbAc="MI:0484" id="S000004698" secondary="AIP1"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0030479" secondary="C:actin cortical patch"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0005634" secondary="C:nucleus"/>
-             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0003779"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0030042" secondary="P:actin filament depolymerizat"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0006970" secondary="P:response to osmotic stress"/>
              <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001680" secondary="WD40"/>
-             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005737" secondary="C:cytoplasm"/>
-             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-2406" secondary="aip1_yeast"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-2406" refType="identity" refTypeAc="MI:0356" secondary="aip1_yeast"/>
            </xref>
            <interactorType>
              <names>
@@ -119,17 +131,25 @@
              <fullName>Cofilin</fullName>
              <alias type="gene name" typeAc="MI:0301">COF1</alias>
              <alias type="locus name" typeAc="MI:0305">YLL050C</alias>
+             <alias type="orf name" typeAc="MI:0306">L0596</alias>
            </names>
            <xref>
-             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q03048" refType="identity" refTypeAc="MI:0356" secondary="cofi_yeast" version="SP_48"/>
-             <secondaryRef db="sgd" dbAc="MI:0484" id="S000003973" secondary="COF1"/>
-             <secondaryRef db="go" dbAc="MI:0448" id="GO:0030479" secondary="C:actin cortical patch"/>
-             <secondaryRef db="go" dbAc="MI:0448" id="GO:0030042" secondary="P:actin filament depolymerizat"/>
-             <secondaryRef db="go" dbAc="MI:0448" id="GO:0007015" secondary="P:actin filament organization"/>
-             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR002108" secondary="Actbind_cofln"/>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q03048" refType="identity" refTypeAc="MI:0356" version="SP_72"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0005515" secondary="F:protein binding"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0051014" secondary="P:actin filament severing"/>
-             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-4853" secondary="cofi_yeast"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0007015" secondary="P:actin filament organization"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0030479" secondary="C:actin cortical patch"/>
+             <secondaryRef db="sgd" dbAc="MI:0484" id="S000003973" secondary="COF1"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0030042" secondary="P:actin filament depolymerizat"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR002108" secondary="Actbind_cofln"/>
+             <secondaryRef db="cygd" dbAc="MI:0464" id="YLL050c"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1CFY"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1COF"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1QPV"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="YLL050C"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q05307" refType="secondary-ac" refTypeAc="MI:0360" version="SP_72"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q2XN65" refType="secondary-ac" refTypeAc="MI:0360" version="SP_72"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-4853" refType="identity" refTypeAc="MI:0356" secondary="cofi_yeast"/>
            </xref>
            <interactorType>
              <names>
@@ -157,7 +177,7 @@
              <shortLabel>cof1-aip1-1</shortLabel>
            </names>
            <xref>
-             <primaryRef db="intact" dbAc="MI:0469" id="EBI-79959" secondary="cof1-aip1-1"/>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-79959" refType="identity" refTypeAc="MI:0356" secondary="cof1-aip1-1"/>
            </xref>
            <experimentList>
              <experimentRef>2</experimentRef>
@@ -218,6 +238,7 @@
              <names>
                <shortLabel>physical interaction</shortLabel>
                <fullName>physical interaction</fullName>
+               <alias>aggregation</alias>
                <alias>aggregation</alias>
              </names>
              <xref>

@@ -104,7 +104,7 @@
              <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2B5N"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0005515"/>
              <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSG00000167986"/>
-             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-350322" secondary="ddb1_human"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-350322" refType="identity" refTypeAc="MI:0356" secondary="ddb1_human"/>
            </xref>
            <interactorType>
              <names>
@@ -144,7 +144,7 @@
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0042802" secondary="F:protein self binding"/>
              <secondaryRef db="interpro" dbAc="MI:0449" id="IPR011422" secondary="BRAP2"/>
              <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSG00000089234"/>
-             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-349900" secondary="brap_human"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-349900" refType="identity" refTypeAc="MI:0356" secondary="brap_human"/>
            </xref>
            <interactorType>
              <names>
@@ -183,7 +183,7 @@
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0009416"/>
              <secondaryRef db="go" dbAc="MI:0448" id="GO:0007165"/>
              <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSG00000141030"/>
-             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-350590" secondary="csn3_human"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-350590" refType="identity" refTypeAc="MI:0356" secondary="csn3_human"/>
            </xref>
            <interactorType>
              <names>
