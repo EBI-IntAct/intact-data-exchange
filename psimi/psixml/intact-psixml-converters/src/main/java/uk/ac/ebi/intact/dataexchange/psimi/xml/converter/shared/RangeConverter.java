@@ -37,27 +37,41 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
 
 
     public Range psiToIntact(psidev.psi.mi.xml.model.Range psiObject) {
-        int from = Long.valueOf(psiObject.getBegin().getPosition()).intValue();
-        int to = Long.valueOf(psiObject.getEnd().getPosition()).intValue();
-        String seq = null;
+        Integer beginIntervalFrom = null;
+        Integer beginIntervalTo = null;
+        Integer endIntervalFrom = null;
+        Integer endIntervalTo = null;
 
-        Range range = new Range(getInstitution(), from, to, seq);
+        if (psiObject.getBegin() != null) {
+            final int begin = Long.valueOf(psiObject.getBegin().getPosition()).intValue();
+            beginIntervalFrom = begin;
+            beginIntervalTo = begin;
+        }
+        if (psiObject.getEnd() != null) {
+            final int end = Long.valueOf(psiObject.getEnd().getPosition()).intValue();
+            endIntervalFrom = end;
+            endIntervalTo = end;
+        }
 
         Interval beginInterval = psiObject.getBeginInterval();
         if (beginInterval != null) {
-            int intervalFrom = Long.valueOf(beginInterval.getBegin()).intValue();
-            int intervalTo = Long.valueOf(beginInterval.getEnd()).intValue();
-            range.setFromIntervalStart(intervalFrom);
-            range.setFromIntervalEnd(intervalTo);
+            beginIntervalFrom = Long.valueOf(beginInterval.getBegin()).intValue();
+            beginIntervalTo = Long.valueOf(beginInterval.getEnd()).intValue();
         }
 
         Interval endInterval = psiObject.getEndInterval();
         if (endInterval != null) {
-            int intervalFrom = Long.valueOf(endInterval.getBegin()).intValue();
-            int intervalTo = Long.valueOf(endInterval.getEnd()).intValue();
-            range.setToIntervalStart(intervalFrom);
-            range.setToIntervalEnd(intervalTo);
+            endIntervalFrom = Long.valueOf(endInterval.getBegin()).intValue();
+            endIntervalTo = Long.valueOf(endInterval.getEnd()).intValue();
         }
+
+        String seq = null;
+
+        Range range = new Range(getInstitution(), beginIntervalFrom, endIntervalTo, seq);
+        range.setFromIntervalStart(beginIntervalFrom);
+        range.setFromIntervalEnd(beginIntervalTo);
+        range.setToIntervalStart(endIntervalFrom);
+        range.setToIntervalEnd(endIntervalTo);
 
         CvObjectConverter<CvFuzzyType,RangeStatus> fuzzyTypeConverter =
                 new CvObjectConverter<CvFuzzyType,RangeStatus>(getInstitution(), CvFuzzyType.class, RangeStatus.class);
