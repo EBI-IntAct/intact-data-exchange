@@ -3,17 +3,18 @@
  */
 package uk.ac.ebi.intact.psimitab.search;
 
-import java.util.List;
-
 import psidev.psi.mi.search.column.ColumnSet;
 import psidev.psi.mi.search.column.DefaultColumnSet;
 import psidev.psi.mi.search.column.PsimiTabColumn;
+
+import java.util.List;
 
 /**
  * TODO comment this!
  * 
  * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
- * @version $Id: IntActColumnSet.java 
+ * @version $Id$
+ * @since 2.0.0
  */
 public class IntActColumnSet extends DefaultColumnSet implements ColumnSet {
 

@@ -3,13 +3,8 @@
  */
 package uk.ac.ebi.intact.psimitab.search;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-
 import psidev.psi.mi.search.column.PsimiTabColumn;
 import psidev.psi.mi.search.util.DefaultDocumentBuilder;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
@@ -19,41 +14,46 @@ import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * TODO comment this!
  *
  * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
- * @version $Id: IntActDocumentBuilder.java 
+ * @version $Id$
+ * @since 2.0.0
  */
 public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 
 	private static final String DEFAULT_COL_SEPARATOR = "\t";
 	
-	private static Document doc;
+	private Document doc;
 	
 	
-	public static Document createDocumentFromPsimiTabLine(String psiMiTabLine) throws MitabLineException
+	public Document createDocumentFromPsimiTabLine(String psiMiTabLine) throws MitabLineException
 	{
 		String[] tokens = psiMiTabLine.split(DEFAULT_COL_SEPARATOR);
 			
 		// raw fields
-		String roleA = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_A.getOrder()];
-		String roleB = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_B.getOrder()];
-		String propertiesA = tokens[IntActColumnSet.PROPERTIES_A.getOrder()];
-		String propertiesB = tokens[IntActColumnSet.PROPERTIES_B.getOrder()];
-		String typeA = tokens[IntActColumnSet.INTERACTOR_TYPE_A.getOrder()];
-		String typeB = tokens[IntActColumnSet.INTERACTOR_TYPE_B.getOrder()];
-		String hostOrganism = tokens[IntActColumnSet.HOSTORGANISM.getOrder()];
-		String expansion = tokens[IntActColumnSet.EXPANSION_METHOD.getOrder()];
-		
-		doc = DefaultDocumentBuilder.createDocumentFromPsimiTabLine(psiMiTabLine);
+		String roleA = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_A.getOrder()-1];
+		String roleB = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_B.getOrder()-1];
+		String propertiesA = tokens[IntActColumnSet.PROPERTIES_A.getOrder()-1];
+		String propertiesB = tokens[IntActColumnSet.PROPERTIES_B.getOrder()-1];
+		String typeA = tokens[IntActColumnSet.INTERACTOR_TYPE_A.getOrder()-1];
+		String typeB = tokens[IntActColumnSet.INTERACTOR_TYPE_B.getOrder()-1];
+		String expansion = tokens[IntActColumnSet.EXPANSION_METHOD.getOrder()-1];
+
+        DefaultDocumentBuilder builder = new DefaultDocumentBuilder();
+        doc = builder.createDocumentFromPsimiTabLine(psiMiTabLine);
 		
 		doc.add(new Field("roles", isolateBracket(roleA) + " " + isolateBracket(roleB),
 				Field.Store.NO,
 				Field.Index.TOKENIZED));
 		
-		DefaultDocumentBuilder.addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_A, roleA);
-		DefaultDocumentBuilder.addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_B, roleB);
+		builder.addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_A, roleA);
+		builder.addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_B, roleB);
 		String value = isolateValues(propertiesA) + isolateValues(propertiesB);
 		doc.add(new Field("properties", value,
 				Field.Store.NO,
@@ -66,17 +66,17 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 				Field.Store.NO,
 				Field.Index.TOKENIZED));
 		
-		DefaultDocumentBuilder.addTokenizedAndSortableField(doc, IntActColumnSet.INTERACTOR_TYPE_A, typeA);
-		DefaultDocumentBuilder.addTokenizedAndSortableField(doc, IntActColumnSet.INTERACTOR_TYPE_B, typeB);
+		builder.addTokenizedAndSortableField(doc, IntActColumnSet.INTERACTOR_TYPE_A, typeA);
+		builder.addTokenizedAndSortableField(doc, IntActColumnSet.INTERACTOR_TYPE_B, typeB);
 		
 		createHostOrganismField(doc, psiMiTabLine);
 		
-		DefaultDocumentBuilder.addTokenizedAndSortableField(doc, IntActColumnSet.EXPANSION_METHOD, expansion);
+		builder.addTokenizedAndSortableField(doc, IntActColumnSet.EXPANSION_METHOD, expansion);
 		
 		return doc;
 	}
 	
-	public static String createPsimiTabLine(Document doc)
+	public String createPsimiTabLine(Document doc)
 	{
     	if (doc == null)
     	{
@@ -84,7 +84,8 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
     	}
     	
 		StringBuffer sb = new StringBuffer(256);
-		sb.append(DefaultDocumentBuilder.createPsimiTabLine(doc));
+        DefaultDocumentBuilder builder = new DefaultDocumentBuilder();
+        sb.append(builder.createPsimiTabLine(doc));
 		sb.append(doc.get(IntActColumnSet.EXPERIMENTAL_ROLE_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
 		sb.append(doc.get(IntActColumnSet.EXPERIMENTAL_ROLE_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
 		sb.append(doc.get(IntActColumnSet.PROPERTIES_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
@@ -103,14 +104,14 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
      * @return the binary interaction
      * @throws MitabLineException thrown if there are syntax or other problems parsing the document/line
      */
-    public static BinaryInteraction createBinaryInteraction(Document doc) throws MitabLineException
+    public BinaryInteraction createBinaryInteraction(Document doc) throws MitabLineException
     {
         String line = createPsimiTabLine(doc);
 
         MitabLineParser parser = new MitabLineParser();
         parser.setBinaryInteractionClass(IntActBinaryInteraction.class);
         parser.setColumnHandler(new IntActColumnHandler());
-  
+
         return parser.parse(line);
     }
     
@@ -119,7 +120,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
      * @param column
      * @return
      */
-    public static String isolateValues(String column)
+    public String isolateValues(String column)
     {
         String[] values = column.split("\\|");
 
@@ -148,7 +149,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         return sb.toString();
     }
 
-    private static void createGoField(String v) {
+    private void createGoField(String v) {
     	String value = null;
     	if (doc.getField("GO") == null) {
     		value = v;
@@ -173,7 +174,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
     	}
 	}
 
-	public static String isolateBracket(String column)
+	public String isolateBracket(String column)
     {
         String[] values = column.split("\\|");
 
@@ -195,7 +196,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
     }
     
     
-    public static void addTokenizedAndSortableField(Document doc, PsimiTabColumn column, String columnValue)
+    public void addTokenizedAndSortableField(Document doc, PsimiTabColumn column, String columnValue)
     {
          doc.add(new Field(column.getShortName(),
                 columnValue,
@@ -213,7 +214,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
      * @param organism 
      * @return the list with the hostorganism
      */
-    private static List<String> hostOrganism(Collection<CrossReference> organism)
+    private List<String> hostOrganism(Collection<CrossReference> organism)
     {
         List<String> hostOrganisms = new ArrayList<String>(organism.size());
 
@@ -225,7 +226,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         return hostOrganisms;
     }
     
-    private static void createHostOrganismField(Document doc, String line) throws MitabLineException {
+    private void createHostOrganismField(Document doc, String line) throws MitabLineException {
     	
     	MitabLineParser parser = new MitabLineParser();
     	parser.setBinaryInteractionClass(IntActBinaryInteraction.class);
@@ -235,7 +236,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         List<String> hostOrganism = hostOrganism(binaryInteraction.getHostOrganism());      
         
         String[] tokens = line.split(DEFAULT_COL_SEPARATOR);
-        String organism = tokens[IntActColumnSet.HOSTORGANISM.getOrder()];
+        String organism = tokens[IntActColumnSet.HOSTORGANISM.getOrder()-1];
         
         doc.add(new Field(IntActColumnSet.HOSTORGANISM.getShortName(),
         		organism,

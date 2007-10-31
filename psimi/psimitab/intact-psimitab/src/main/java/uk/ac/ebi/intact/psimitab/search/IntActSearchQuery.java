@@ -8,9 +8,10 @@ import psidev.psi.mi.search.query.SearchQuery;
 
 /**
  * TODO comment this
- * 
+ *
  * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
- * @version $Id: IntActSearchQuery.java 
+ * @version $Id$
+ * @since 1.5.0
  */
 public class IntActSearchQuery extends SearchQuery{
     
