@@ -96,7 +96,7 @@ public class InteractorEnricherTest extends IntactBasicTestCase {
 
         enricher.enrich(protein);
 
-        Assert.assertEquals("EBI_12345", protein.getShortLabel());
+        Assert.assertEquals("EBI12345", protein.getShortLabel());
     }
 
 }
