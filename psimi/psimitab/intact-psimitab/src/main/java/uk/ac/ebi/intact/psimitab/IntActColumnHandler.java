@@ -85,7 +85,6 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             CrossReferenceImpl experimentalRoleA = new CrossReferenceImpl( db, id, text );
 
             if ( dbi.hasExperimentalRolesInteractorA() ) {
-                //System.out.println(interaction.getXref().getPrimaryRef().getId() + "has more than one experimentalRole");
                 dbi.getExperimentalRolesInteractorA().add( experimentalRoleA );
             } else {
                 List<CrossReference> xrefs = new ArrayList<CrossReference>();
@@ -275,53 +274,67 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         IntActBinaryInteraction dbi = ( IntActBinaryInteraction ) bi;
 
         // field 16 - experimentalRole of interactorA
-        sb.append( TabulatedLineFormatter.formatCv( dbi.getExperimentalRolesInteractorA() ) );
-        sb.append( '\t' );
-        if ( !dbi.hasExperimentalRolesInteractorA() ) {
+        if ( dbi.hasExperimentalRolesInteractorA() ) {
+            sb.append( TabulatedLineFormatter.formatCv( dbi.getExperimentalRolesInteractorA() ) );
+        } else {
+            sb.append( LineFormatter.NONE );
             log.warn( "No experimentalRole for Interactor A found for " + dbi.getInteractionAcs() );
         }
+        sb.append( '\t' );
 
         // field 17 - experimentalRole of interactorB
-        sb.append( TabulatedLineFormatter.formatCv( dbi.getExperimentalRolesInteractorB() ) );
-        sb.append( '\t' );
-        if ( !dbi.hasExperimentalRolesInteractorB() ) {
+        if ( dbi.hasExperimentalRolesInteractorB() ) {
+            sb.append( TabulatedLineFormatter.formatCv( dbi.getExperimentalRolesInteractorB() ) );
+        } else {
+            sb.append( LineFormatter.NONE );
             log.warn( "No experimentalRole for Interactor B found for " + dbi.getInteractionAcs() );
         }
+        sb.append( '\t' );
 
         // field 18 - properties of interactorA
-        sb.append( TabulatedLineFormatter.formatCv( dbi.getPropertiesA() ) );
-        sb.append( '\t' );
-        if ( !dbi.hasPropertiesA() ) {
+        if ( dbi.hasPropertiesA() ) {
+            sb.append( TabulatedLineFormatter.formatCv( dbi.getPropertiesA() ) );
+        } else {
+            sb.append( LineFormatter.NONE );
             log.warn( "No properties for Interactor A found for " + dbi.getInteractionAcs() );
         }
+        sb.append( '\t' );
 
         // field 19 - properties of interactorB
-        sb.append( TabulatedLineFormatter.formatCv( dbi.getPropertiesB() ) );
-        sb.append( '\t' );
-        if ( !dbi.hasPropertiesB() ) {
+        if ( dbi.hasPropertiesB() ) {
+            sb.append( TabulatedLineFormatter.formatCv( dbi.getPropertiesB() ) );
+        } else {
+            sb.append( LineFormatter.NONE );
             log.warn( "No properties for Interactor B found for " + dbi.getInteractionAcs() );
         }
+        sb.append( '\t' );
 
         // field 20 - interactorType of A
-        sb.append( TabulatedLineFormatter.formatCv( dbi.getInteractorTypeA() ) );
-        sb.append( '\t' );
-        if ( !dbi.hasInteractorTypeA() ) {
+        if ( dbi.hasInteractorTypeA() ) {
+            sb.append( TabulatedLineFormatter.formatCv( dbi.getInteractorTypeA() ) );
+        } else {
+            sb.append( LineFormatter.NONE );
             log.warn( "No interactorType for A found for " + dbi.getInteractionAcs() );
         }
+        sb.append( '\t' );
 
         // field 21 - interactorType of B
-        sb.append( TabulatedLineFormatter.formatCv( dbi.getInteractorTypeB() ) );
-        sb.append( '\t' );
-        if ( !dbi.hasInteractorTypeB() ) {
+        if ( dbi.hasInteractorTypeB() ){
+            sb.append( TabulatedLineFormatter.formatCv( dbi.getInteractorTypeB() ) );
+        } else {
+            sb.append( LineFormatter.NONE );
             log.warn( "No interactorType for B found for " + dbi.getInteractionAcs() );
         }
+        sb.append( '\t' );
 
         // field 22 - interactorType of B
-        sb.append( TabulatedLineFormatter.formatCv( dbi.getHostOrganism() ) );
-        sb.append( '\t' );
-        if ( !dbi.hasHostOrganism() ) {
+        if ( dbi.hasHostOrganism() ){
+            sb.append( TabulatedLineFormatter.formatCv( dbi.getHostOrganism() ) );
+        } else {
+            sb.append( LineFormatter.NONE );
             log.warn( "No hostOrganism found for " + dbi.getInteractionAcs() );
         }
+        sb.append( '\t' );
 
         // field 23 - expansion method
         if ( dbi.hasExpansionMethod() ) {
@@ -331,7 +344,6 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             log.warn( "No expansionMethod found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
-
     }
 
     /**
@@ -464,32 +476,8 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             // delete default ExperimentalRoles
             pA.getExperimentalRoles().clear();
 
-            // now create the new ExperimentalRoles
-            String roleA = dbi.getExperimentalRolesInteractorA().get( index ).getText();
-            String dbA = dbi.getExperimentalRolesInteractorA().get( index ).getDatabase().concat( ":".concat( dbi.getExperimentalRolesInteractorA().get( 0 ).getIdentifier() ) );
-
-            Names names = new Names();
-            if ( roleA == null ) {
-                names.setShortLabel( "unspecified role" );
-                names.setFullName( "unspecified role" );
-            } else {
-                names.setShortLabel( roleA );
-                names.setFullName( roleA );
-            }
-
-            DbReference dbRef = new DbReference();
-            dbRef.setDb( "psi-mi" );
-            if ( dbA == null ) {
-                dbRef.setId( "MI:0499" );
-            } else {
-                dbRef.setId( dbA );
-            }
-            dbRef.setDbAc( "MI:0488" );
-            dbRef.setRefType( "identity" );
-            dbRef.setRefTypeAc( "MI:0356" );
-
-            Xref experimentalXref = new Xref( dbRef );
-            ExperimentalRole experimentalRole = new ExperimentalRole( names, experimentalXref );
+            // create new ExperimentalRoles
+            ExperimentalRole experimentalRole = updateExperimentalRoles( dbi.getExperimentalRolesInteractorA(), index );
 
             // add new ExperimentalRoles
             if ( !pA.getExperimentalRoles().add( experimentalRole ) ) {
@@ -501,38 +489,13 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             // delete default ExperimentalRoles
             pB.getExperimentalRoles().clear();
 
-            // now create the new ExperimentalRoles
-            String roleB = dbi.getExperimentalRolesInteractorB().get( index ).getText();
-            String dbB = dbi.getExperimentalRolesInteractorB().get( index ).getDatabase().concat( ":".concat( dbi.getExperimentalRolesInteractorB().get( 0 ).getIdentifier() ) );
-
-            Names names = new Names();
-            if ( roleB == null ) {
-                names.setShortLabel( "unspecified role" );
-                names.setFullName( "unspecified role" );
-            } else {
-                names.setShortLabel( roleB );
-                names.setFullName( roleB );
-            }
-
-            DbReference dbRef = new DbReference();
-            dbRef.setDb( "psi-mi" );
-            if ( dbB == null ) {
-                dbRef.setId( "MI:0499" );
-            } else {
-                dbRef.setId( dbB );
-            }
-            dbRef.setDbAc( "MI:0488" );
-            dbRef.setRefType( "identity" );
-            dbRef.setRefTypeAc( "MI:0356" );
-
-            Xref experimentalXref = new Xref( dbRef );
-            ExperimentalRole experimentalRole = new ExperimentalRole( names, experimentalXref );
+            // create new ExperimentalRoles
+            ExperimentalRole experimentalRole = updateExperimentalRoles( dbi.getExperimentalRolesInteractorB(), index );
 
             // add new ExperimentalRoles
-            if ( !pA.getExperimentalRoles().add( experimentalRole ) ) {
+            if ( !pB.getExperimentalRoles().add( experimentalRole ) ) {
                 log.warn( "ExperimentalRole couldn't add to the participant" );
             }
-
         }
 
         try {
@@ -547,65 +510,77 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             }
 
             if ( dbi.hasPropertiesA() ) {
-                for ( CrossReference property : dbi.getPropertiesA() ) {
-                    DbReference secDbRef = new DbReference();
-                    secDbRef.setDb( property.getDatabase() );
-                    if ( property.getDatabase().equalsIgnoreCase( "GO" ) ) {
-                        secDbRef.setId( property.getDatabase().concat( ":".concat( property.getIdentifier() ) ) );
-                        secDbRef.setDbAc( "MI:0448" );
-                    } else {
-                        secDbRef.setId( property.getIdentifier() );
-                        if ( property.getDatabase().equals( "interpro" ) ) {
-                            secDbRef.setDbAc( "MI:0449" );
-                        }
-                        if ( property.getDatabase().equals( "intact" ) ) {
-                            secDbRef.setDbAc( "MI:0469" );
-                        }
-                        if ( property.getDatabase().equals( "uniprotkb" ) ) {
-                            secDbRef.setDbAc( "MI:0486" );
-                        }
-                    }
-
-                    if ( property.hasText() ) {
-                        secDbRef.setSecondary( property.getText() );
-                    }
-
-                    iA.getXref().getSecondaryRef().add( secDbRef );
-                }
+                Collection<DbReference> secDbRef = getSecondaryRefs(dbi.getPropertiesA());
+                iA.getXref().getSecondaryRef().addAll( secDbRef );
             }
 
             if ( dbi.hasPropertiesB() ) {
-                for ( CrossReference property : dbi.getPropertiesB() ) {
-                    DbReference secDbRef = new DbReference();
-                    secDbRef.setDb( property.getDatabase() );
-                    if ( property.getDatabase().equalsIgnoreCase( "GO" ) ) {
-                        secDbRef.setId( property.getDatabase().concat( ":".concat( property.getIdentifier() ) ) );
-                        secDbRef.setDbAc( "MI:0448" );
-                    } else {
-                        secDbRef.setId( property.getIdentifier() );
-                        if ( property.getDatabase().equals( "interpro" ) ) {
-                            secDbRef.setDbAc( "MI:0449" );
-                        }
-                        if ( property.getDatabase().equals( "intact" ) ) {
-                            secDbRef.setDbAc( "MI:0469" );
-                        }
-                        if ( property.getDatabase().equals( "uniprotkb" ) ) {
-                            secDbRef.setDbAc( "MI:0486" );
-                        }
-
-                    }
-
-                    if ( property.hasText() ) {
-                        secDbRef.setSecondary( property.getText() );
-                    }
-
-                    iB.getXref().getSecondaryRef().add( secDbRef );
-                }
+                Collection<DbReference> secDbRef = getSecondaryRefs(dbi.getPropertiesB());
+                iB.getXref().getSecondaryRef().addAll( secDbRef );
             }
 
         } catch ( XmlConvertionException e ) {
             e.printStackTrace();
         }
+    }
+
+    private ExperimentalRole updateExperimentalRoles( List<CrossReference> experimentalRoles, int index ) {
+        // now create the new ExperimentalRoles
+        String roleA = experimentalRoles.get( index ).getText();
+        String dbA = experimentalRoles.get( index ).getDatabase().concat( ":".concat( experimentalRoles.get( 0 ).getIdentifier() ) );
+
+        Names names = new Names();
+        if ( roleA == null ) {
+            names.setShortLabel( "unspecified role" );
+            names.setFullName( "unspecified role" );
+        } else {
+            names.setShortLabel( roleA );
+            names.setFullName( roleA );
+        }
+
+        DbReference dbRef = new DbReference();
+        dbRef.setDb( "psi-mi" );
+        if ( dbA == null ) {
+            dbRef.setId( "MI:0499" );
+        } else {
+            dbRef.setId( dbA );
+        }
+
+        dbRef.setDbAc( "MI:0488" );
+        dbRef.setRefType( "identity" );
+        dbRef.setRefTypeAc( "MI:0356" );
+
+        Xref experimentalXref = new Xref( dbRef );
+
+        return new ExperimentalRole( names, experimentalXref );
+    }
+
+    private Collection<DbReference> getSecondaryRefs( List<CrossReference> properties ) {
+        Collection<DbReference> refs = new ArrayList();
+        for ( CrossReference property : properties ) {
+            DbReference secDbRef = new DbReference();
+            secDbRef.setDb( property.getDatabase() );
+            if ( property.getDatabase().equalsIgnoreCase( "GO" ) ) {
+                secDbRef.setId( property.getDatabase().concat( ":".concat( property.getIdentifier() ) ) );
+                secDbRef.setDbAc( "MI:0448" );
+            } else {
+                secDbRef.setId( property.getIdentifier() );
+                if ( property.getDatabase().equals( "interpro" ) ) {
+                    secDbRef.setDbAc( "MI:0449" );
+                }
+                if ( property.getDatabase().equals( "intact" ) ) {
+                    secDbRef.setDbAc( "MI:0469" );
+                }
+                if ( property.getDatabase().equals( "uniprotkb" ) ) {
+                    secDbRef.setDbAc( "MI:0486" );
+                }
+            }
+            if ( property.hasText() ) {
+                secDbRef.setSecondary( property.getText() );
+            }
+            refs.add(secDbRef);
+        }
+        return refs;
     }
 
     /**
