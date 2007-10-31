@@ -15,17 +15,17 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
-import uk.ac.ebi.intact.config.impl.CustomCoreDataConfig;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.context.IntactEnvironment;
-import uk.ac.ebi.intact.context.IntactSession;
-import uk.ac.ebi.intact.context.impl.StandaloneSession;
-import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.enricher.PsiEnricher;
+import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.Component;
 
 import java.io.*;
 import java.util.Properties;
+import java.util.Iterator;
 
 /**
  * TODO comment this
@@ -36,103 +36,65 @@ import java.util.Properties;
 public class Playground {
 
     public static void main(String[] args) throws Exception {
+        File fileToImport = new File("/ebi/sp/pro6/intact/local/data/curation-material/whitworth-2007/whitworth2007.xml");
+
         Properties props = new Properties();
         props.put(IntactEnvironment.INSTITUTION_LABEL.getFqn(), "ebi");
         props.put(IntactEnvironment.AC_PREFIX_PARAM_NAME.getFqn(), "EBI");
 
-        IntactSession intactSession = new StandaloneSession();
-        
-        File hibernateFile = new File(Playground.class.getResource("/zpro-hibernate.cfg.xml").getFile());
+        File hibernateFile = new File(Playground.class.getResource("/playground-hibernate.cfg.xml").getFile());
 
-        CustomCoreDataConfig dataConfig = new CustomCoreDataConfig("custom", hibernateFile, intactSession);
-
-        IntactContext.initContext(dataConfig, intactSession);
-
-        //IntactUnit iu = new IntactUnit();
-        //iu.createSchema();
+        IntactContext.initStandaloneContext(hibernateFile);
+        IntactContext.getCurrentInstance().getUserContext().setUserId("BARANDA");
 
         EnricherConfig enricherConfig = new EnricherConfig();
         enricherConfig.setUpdateInteractionShortLabels(true);
 
-        final File helaFolder = new File("/ebi/sp/pro6/intact/local/data/curation-material/bantscheff-2007/hela");
-        final File k652Folder = new File("/ebi/sp/pro6/intact/local/data/curation-material/bantscheff-2007/k652");
+        EnricherContext.getInstance().getConfig().setUpdateInteractionShortLabels(true);
 
-        File[] foldersToImport = new File[] {helaFolder, k652Folder};
+        System.out.println("Importing: " + fileToImport);
 
-        for (File folderToImport : foldersToImport) {
-            for (File file : getPsiMiFilesInFolder(folderToImport)) {
+        InputStream is = new FileInputStream(fileToImport);
 
-                System.out.println("Importing: "+file);
+        StringWriter writer = new StringWriter();
 
-                InputStream is = new FileInputStream(file);
+        PsiEnricher.enrichPsiXml(is, writer, enricherConfig);
 
-                 StringWriter writer = new StringWriter();
+        writer.flush();
 
-                PsiEnricher.enrichPsiXml(is, writer, enricherConfig);
+        InputStream enricherInput = new ByteArrayInputStream(writer.toString().getBytes());
 
-                writer.flush();
-
-                InputStream enricherInput = new ByteArrayInputStream(writer.toString().getBytes());
-
-                PsiExchange.importIntoIntact(enricherInput, false);
-            }
-        }
-
-        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+        PsiExchange.importIntoIntact(enricherInput, false);
 
         System.out.println("Interactions DB: " + IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getInteractionDao().countAll());
         System.out.println("Experiments DB: " + IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getExperimentDao().countAll());
 
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction();
 
     }
 
-    private static File[] getPsiMiFilesInFolder(File folder) throws IOException {
-        File[] files = folder.listFiles(new FilenameFilter() {
+    private static void printInteractions() {
+        for (Interaction interaction : IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                .getInteractionDao().getAll()) {
+                    Iterator<Component> compIterator = interaction.getComponents().iterator();
 
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".xml");
-            }
-        });
+                    Component c1 = compIterator.next();
+                    Component c2;
+                    String p1 = c1.getInteractor().getXrefs().iterator().next().getPrimaryId();
+                    String p2;
 
+                    if (compIterator.hasNext()) {
+                        c2 = compIterator.next();
+                        p2 = c2.getInteractor().getXrefs().iterator().next().getPrimaryId();
+                    } else {
+                        p2 = p1;
+                        c2 = c1;
+                    }
 
-        // modify entrySet line
-        for (File file : files) {
-            file = modifyRoot(file);
-        }
-
-        return files;
+                   System.out.println("\t" + interaction.getShortLabel() + " -> " + p1 + "(" + c1.getCvExperimentalRole().getShortLabel() + ")-" + p2 + "(" + c2.getCvExperimentalRole().getShortLabel() + ")");
+                }
     }
 
-    private static File modifyRoot(File file) throws IOException {
-        StringBuilder sb = new StringBuilder();
-
-        BufferedReader bufReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-
-        String line = null;
-
-        while ((line = bufReader.readLine()) != null) {
-
-            if (line.startsWith("<entrySet")) {
-                line = "<entrySet level=\"2\" minorVersion=\"3\" version=\"5\" xmlns=\"net:sf:psidev:mi\"" +
-                       "          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
-                       "          xsi:schemaLocation=\"net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd\">";
-            }
-
-            line = line.replaceAll(">unspecified<", ">unspecified role<");
-
-            sb.append(line).append("\n");
-        }
-
-        bufReader.close();
-
-        FileWriter writer = new FileWriter(file);
-        writer.write(sb.toString());
-        writer.close();
-
-        return file;
-    }
 
 }

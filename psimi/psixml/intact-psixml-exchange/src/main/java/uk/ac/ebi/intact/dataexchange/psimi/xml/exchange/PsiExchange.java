@@ -28,16 +28,17 @@ import uk.ac.ebi.intact.core.persister.PersisterException;
 import uk.ac.ebi.intact.core.persister.standard.EntryPersister;
 import uk.ac.ebi.intact.core.persister.standard.InteractionPersister;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
+import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Institution;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Imports/exports data between an IntAct-model database and PSI XML
@@ -55,7 +56,7 @@ public class PsiExchange {
     /**
      * Number of Interactions persisted per batch
      */
-    private static final int IMPORT_BATCH_SIZE = 50;
+    private static final int IMPORT_BATCH_SIZE = 100;
 
     private PsiExchange() {
     }
@@ -112,8 +113,6 @@ public class PsiExchange {
 
         beginTransaction();
 
-
-
         // the persister of interactions instance
         InteractionPersister interactionPersister = InteractionPersister.getInstance();
 
@@ -130,11 +129,36 @@ public class PsiExchange {
             // instead of converting/processing the whole Entry, we process the interactions to avoid memory exceptions
             InteractionConverter interactionConverter = new InteractionConverter(institution);
 
+            // We use the following list to store the labels of the interactions between commits (when
+            // the data is actually saved in the database).
+            // If when processing a label, the label is already found in the list, a commit will be forced
+            // so the interaction can be properly synced and get the corresponding prefix XXX-2
+            List<String> interactionLabelsToCommit = new ArrayList<String>();
+
             for (psidev.psi.mi.xml.model.Interaction psiInteraction : entry.getInteractions()) {
                 Interaction interaction = interactionConverter.psiToIntact(psiInteraction);
 
+                if (interactionLabelsToCommit.contains(interaction.getShortLabel())) {
+                    // commit the persistence
+                    interactionPersister.commit();
+
+                    // restart a transaction
+                    commitTransaction();
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Forced commit due to a label already existing in this commit page: "+interaction.getShortLabel());
+                    }
+
+                    beginTransaction();
+
+                    interactionLabelsToCommit.clear();
+                }
+
                 // mark the interaction to save or update
+                if (log.isDebugEnabled()) log.debug("Marking to save or update: "+interaction.getShortLabel());
                 interactionPersister.saveOrUpdate(interaction);
+
+                interactionLabelsToCommit.add(interaction.getShortLabel());
 
                 // commit the interactions in batches into the database
                 if (interactionCount > 0 && interactionCount % IMPORT_BATCH_SIZE == 0) {
@@ -142,9 +166,12 @@ public class PsiExchange {
                     // commit the persistence
                     interactionPersister.commit();
 
-                    // restart a transaction
                     commitTransaction();
+
+                    // restart a transaction
                     beginTransaction();
+
+                    interactionLabelsToCommit.clear();
                 }
 
                 interactionCount++;
@@ -158,7 +185,7 @@ public class PsiExchange {
         commitTransaction();
 
         if (log.isDebugEnabled()) {
-            log.debug("Imported: " + interactionCount + " interactions in " + (System.currentTimeMillis() - startTime) + "ms");
+            log.debug("Imported: " + interactionCount + " interactions (less if duplicates were found) in " + (System.currentTimeMillis() - startTime) + "ms");
         }
     }
 
