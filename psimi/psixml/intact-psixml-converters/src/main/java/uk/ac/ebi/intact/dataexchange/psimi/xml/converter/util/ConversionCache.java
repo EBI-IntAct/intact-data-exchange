@@ -45,11 +45,15 @@ public class ConversionCache {
     };
 
     public static Object getElement(Object id) {
+        if (id == null) return null;
+
         return instance.get().idMap.get(id);
     }
 
     public static void putElement(Object key, Object element) {
-        instance.get().idMap.put(key, element);
+        if (key != null) {
+            instance.get().idMap.put(key, element);
+        }
     }
 
     public static void clear() {

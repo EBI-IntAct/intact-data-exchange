@@ -135,7 +135,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
     @Override
     protected String intactElementKey(Interaction intactObject) {
-        return intactObject.getShortLabel()+"_"+intactObject.getExperiments().iterator().next().getShortLabel()+"_"+System.currentTimeMillis();
+        // no caching of interactions
+        return null;
     }
 
     protected Collection<Experiment> getExperiments(psidev.psi.mi.xml.model.Interaction psiInteraction) {
