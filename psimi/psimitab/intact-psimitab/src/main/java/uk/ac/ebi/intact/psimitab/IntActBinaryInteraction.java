@@ -5,18 +5,18 @@
  */
 package uk.ac.ebi.intact.psimitab;
 
-import java.util.List;
-
 import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
+
+import java.util.List;
 
 /**
  * IntAct extension of a BinaryInteractionImpl.
  *
  * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
  * @version $Id$
- * @since <pre>26-Jan-2007</pre>
+ * @since 2.0.0
  */
 public class IntActBinaryInteraction extends BinaryInteractionImpl {
 
@@ -32,11 +32,13 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
     private List<CrossReference> hostOrganism;
     
     private String expansionMethod;
+
+    private List <String> dataset;
     
-	private Interactor interactorA;
+    private Interactor interactorA;
 	private Interactor interactorB;
 
-    private int expectedColumnCount = 23;
+    private int expectedColumnCount = 24;
     
     //////////////////
     // Constructors
@@ -54,82 +56,54 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
     ///////////////////////////
     // Getters and Setters
 
-    public boolean hasExperimentalRolesInteractorA(){
-    	return experimentalRoleA != null;
-    }
-    
-    public boolean hasExperimentalRolesInteractorB(){
-    	return experimentalRoleB != null;
-    }
-    
     public List<CrossReference> getExperimentalRolesInteractorA() {
         return experimentalRoleA;
+    }
+
+    public void setExperimentalRolesInteractorA( List<CrossReference> experimentalRoles ) {
+        this.experimentalRoleA = experimentalRoles;
     }
 
     public List<CrossReference> getExperimentalRolesInteractorB() {
         return experimentalRoleB;
     }
-    
-    public void setExperimentalRolesInteractorA( List<CrossReference> experimentalRoles ) {
-        this.experimentalRoleA = experimentalRoles;
-    }
-    
+
     public void setExperimentalRolesInteractorB( List<CrossReference> experimentalRoles ) {
         this.experimentalRoleB = experimentalRoles;
     }
     
-    public boolean hasPropertiesA(){
-    	return propertiesA != null;
-    }
-    
-    public boolean hasPropertiesB(){
-    	return propertiesB != null;
-    }
+	public List<CrossReference> getPropertiesA() {
+		return propertiesA;
+	}
 
     public void setPropertiesA( List <CrossReference> propertiesA ) {
 		this.propertiesA = propertiesA;
-	}
-
-	public void setPropertiesB( List<CrossReference> propertiesB ) {
-		this.propertiesB = propertiesB;
-	}
-
-	public List<CrossReference> getPropertiesA() {
-		return propertiesA;
 	}
 
 	public List<CrossReference> getPropertiesB() {
 		return propertiesB;
 	}
 
-	public boolean hasInteractorTypeA(){
-		return interactorTypeA != null;
-	}
-
-	public boolean hasInteractorTypeB(){
-		return interactorTypeB != null;
-	}
-
-	public void setInteractorTypeA( List<CrossReference> interactorType ){
-		this.interactorTypeA = interactorType;
-	}
-
-	public void setInteractorTypeB( List<CrossReference> interactorType ){
-		this.interactorTypeB = interactorType;
+    public void setPropertiesB( List<CrossReference> propertiesB ) {
+		this.propertiesB = propertiesB;
 	}
 
 	public List<CrossReference> getInteractorTypeA() {
 		return interactorTypeA;
 	}
-	
+
+    public void setInteractorTypeA( List<CrossReference> interactorType ){
+		this.interactorTypeA = interactorType;
+	}
+
 	public List<CrossReference> getInteractorTypeB() {
 		return interactorTypeB;
 	}
-	
-	public boolean hasHostOrganism(){
-		return hostOrganism != null;
+
+    public void setInteractorTypeB( List<CrossReference> interactorType ){
+		this.interactorTypeB = interactorType;
 	}
-	
+
 	public List<CrossReference> getHostOrganism() {
 		return hostOrganism;
 	}
@@ -146,14 +120,52 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
 		this.expansionMethod = expansionMethode;
 	}
 	
+    public List<String> getDataset() {
+        return dataset;
+    }
+
+    public void setDataset( List<String> dataset ) {
+        this.dataset = dataset;
+    }
+
+    public boolean hasExperimentalRolesInteractorA(){
+    	return experimentalRoleA != null;
+    }
+
+    public boolean hasExperimentalRolesInteractorB(){
+    	return experimentalRoleB != null;
+    }
+
+    public boolean hasPropertiesA(){
+    	return propertiesA != null;
+    }
+
+    public boolean hasPropertiesB(){
+    	return propertiesB != null;
+    }
+
+	public boolean hasInteractorTypeA(){
+		return interactorTypeA != null;
+	}
+
+	public boolean hasInteractorTypeB(){
+		return interactorTypeB != null;
+	}
+
+	public boolean hasHostOrganism(){
+		return hostOrganism != null;
+	}
+
 	public boolean hasExpansionMethod(){
 		return expansionMethod != null;
 	}
-	
-	/**
-     * Getter of the number of expected columns
-     * 
-     * @return
+
+    public boolean hasDatasetName() {
+        return dataset != null;
+    }
+    
+    /**
+     * @return number of expected columns
      */
 	public int getExpectedColumnCount() {
 		return expectedColumnCount;
@@ -189,6 +201,7 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
         sb.append( ", InteractorType of B=" ).append( interactorTypeB );
         sb.append( ", HostOrganismn" ).append( hostOrganism );
         sb.append( ", ExpansionMethod").append( expansionMethod );
+        sb.append( ", dataset").append( dataset );
         sb.append( '}' );
         return sb.toString();
     }

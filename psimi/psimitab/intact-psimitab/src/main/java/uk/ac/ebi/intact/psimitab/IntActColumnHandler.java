@@ -46,12 +46,13 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
     /**
      * CrossReference Converter
      */
-    private CrossReferenceConverter xConverter = new CrossReferenceConverter();
+    private final CrossReferenceConverter xConverter = new CrossReferenceConverter();
 
     /**
      * Information about ExpansionMethod
      */
     private String expansionMethod;
+
 
     //////////////////
     // Constructors
@@ -59,9 +60,16 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
     public IntActColumnHandler() {
     }
 
+
+    /////////////////
+    // Getter & Setter
+
     public void setExpansionMethod( String method ) {
         this.expansionMethod = method;
     }
+
+    /////////////////
+    //
 
     public void process( BinaryInteractionImpl bi, Interaction interaction ) {
 
@@ -78,11 +86,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         if ( pA.getExperimentalRoles().size() != 1 ) {
             log.warn( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
         } else {
-            ExperimentalRole roleA = pA.getExperimentalRoles().iterator().next();
-            String id = roleA.getXref().getPrimaryRef().getId().split( ":" )[1];
-            String db = roleA.getXref().getPrimaryRef().getId().split( ":" )[0];
-            String text = roleA.getNames().getShortLabel();
-            CrossReferenceImpl experimentalRoleA = new CrossReferenceImpl( db, id, text );
+            CrossReference experimentalRoleA = extractExperimentalRole( pA );
 
             if ( dbi.hasExperimentalRolesInteractorA() ) {
                 dbi.getExperimentalRolesInteractorA().add( experimentalRoleA );
@@ -96,11 +100,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         if ( pB.getExperimentalRoles().size() != 1 ) {
             log.warn( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
         } else {
-            ExperimentalRole roleB = pB.getExperimentalRoles().iterator().next();
-            String id = roleB.getXref().getPrimaryRef().getId().split( ":" )[1];
-            String db = roleB.getXref().getPrimaryRef().getId().split( ":" )[0];
-            String text = roleB.getNames().getShortLabel();
-            CrossReferenceImpl experimentalRoleB = new CrossReferenceImpl( db, id, text );
+            CrossReference experimentalRoleB = extractExperimentalRole( pB );
 
             if ( dbi.hasExperimentalRolesInteractorB() ) {
                 dbi.getExperimentalRolesInteractorB().add( experimentalRoleB );
@@ -114,16 +114,13 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         if ( pA.getInteractor().getInteractorType() == null ) {
             log.warn( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
         } else {
-            String id = pA.getInteractor().getInteractorType().getXref().getPrimaryRef().getId().split( ":" )[1];
-            String db = pA.getInteractor().getInteractorType().getXref().getPrimaryRef().getId().split( ":" )[0];
-            String text = pA.getInteractor().getInteractorType().getNames().getShortLabel();
-            CrossReferenceImpl interactorType = new CrossReferenceImpl( db, id, text );
+            CrossReference typeA  = extractInteractorType( pA );
 
             if ( dbi.hasInteractorTypeA() ) {
-                dbi.getInteractorTypeA().add( interactorType );
+                dbi.getInteractorTypeA().add( typeA );
             } else {
                 List<CrossReference> xrefs = new ArrayList<CrossReference>();
-                xrefs.add( interactorType );
+                xrefs.add( typeA );
                 dbi.setInteractorTypeA( xrefs );
             }
         }
@@ -131,80 +128,37 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         if ( pB.getInteractor().getInteractorType() == null ) {
             log.warn( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
         } else {
-            String id = pB.getInteractor().getInteractorType().getXref().getPrimaryRef().getId().split( ":" )[1];
-            String db = pB.getInteractor().getInteractorType().getXref().getPrimaryRef().getId().split( ":" )[0];
-            String text = pB.getInteractor().getInteractorType().getNames().getShortLabel();
-            CrossReferenceImpl interactorType = new CrossReferenceImpl( db, id, text );
+            CrossReference typeB  = extractInteractorType( pB );
 
             if ( dbi.hasInteractorTypeB() ) {
-                dbi.getInteractorTypeB().add( interactorType );
+                dbi.getInteractorTypeB().add( typeB );
             } else {
                 List<CrossReference> xrefs = new ArrayList<CrossReference>();
-                xrefs.add( interactorType );
+                xrefs.add( typeB );
                 dbi.setInteractorTypeB( xrefs );
             }
         }
 
         if ( pA.getInteractor().getXref().getSecondaryRef() != null && !pA.getInteractor().getXref().getSecondaryRef().isEmpty() ) {
-            for ( DbReference dbrefA : pA.getInteractor().getXref().getSecondaryRef() ) {
-
-                String id, db;
-
-                if ( dbrefA.getId().contains( ":" ) ) {
-                    id = dbrefA.getId().split( ":" )[1].toLowerCase();
-                    db = dbrefA.getId().split( ":" )[0].toLowerCase();
-                } else {
-                    id = dbrefA.getId();
-                    db = dbrefA.getDb();
-                }
-                CrossReferenceImpl xrefA = new CrossReferenceImpl( db, id );
-                //String text = dbrefA.getSecondary();
-                //xrefA.setText(text);
-
-                if ( dbi.hasPropertiesA() ) {
-                    dbi.getPropertiesA().add( xrefA );
-                } else {
-                    List<CrossReference> xrefs = new ArrayList<CrossReference>();
-                    xrefs.add( xrefA );
-                    dbi.setPropertiesA( xrefs );
-                }
-            }
+            List<CrossReference> propertiesA = extractProperties( pA );
+            if ( !dbi.hasPropertiesA() ) dbi.setPropertiesA( new ArrayList<CrossReference>() );
+            dbi.getPropertiesA().addAll( propertiesA );
         }
 
 
         if ( pB.getInteractor().getXref().getSecondaryRef() != null && !pB.getInteractor().getXref().getSecondaryRef().isEmpty() ) {
-            for ( DbReference dbrefB : pB.getInteractor().getXref().getSecondaryRef() ) {
+            List<CrossReference> propertiesB = extractProperties( pB );
+            if ( !dbi.hasPropertiesB() ) dbi.setPropertiesB( new ArrayList<CrossReference>() );
+            dbi.getPropertiesB().addAll( propertiesB );
 
-                String id, db;
-                if ( dbrefB.getId().contains( ":" ) ) {
-                    id = dbrefB.getId().split( ":" )[1].toLowerCase();
-                    db = dbrefB.getId().split( ":" )[0].toLowerCase();
-                } else {
-                    id = dbrefB.getId();
-                    db = dbrefB.getDb();
-                }
-                CrossReferenceImpl xrefB = new CrossReferenceImpl( db, id );
-                //String text = dbrefB.getSecondary();
-                //xrefB.setText(text);
-
-                if ( dbi.hasPropertiesB() ) {
-                    dbi.getPropertiesB().add( xrefB );
-                } else {
-                    List<CrossReference> xrefs = new ArrayList<CrossReference>();
-                    xrefs.add( xrefB );
-                    dbi.setPropertiesB( xrefs );
-                }
-            }
         }
 
-        if ( !interaction.getExperiments().isEmpty() ) {
+        if ( interaction.getExperiments() != null && !interaction.getExperiments().isEmpty() ) {
             for ( ExperimentDescription description : interaction.getExperiments() ) {
-
                 if ( description.hasHostOrganisms() ) {
-
                     Organism hostOrganism = description.getHostOrganisms().iterator().next();
 
-                    String id = new Integer( hostOrganism.getNcbiTaxId() ).toString();
+                    String id = Integer.toString( hostOrganism.getNcbiTaxId());
                     String db = hostOrganism.getNames().getShortLabel();
                     CrossReference organismRef = new CrossReferenceImpl( db, id );
                     //String text = hostOrganism.getNames().getFullName();
@@ -218,6 +172,22 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
                         dbi.setHostOrganism( hos );
                     }
 
+                }
+            }
+        }
+
+        for ( ExperimentDescription experiment : interaction.getExperiments() ){
+            for ( Attribute attribute : experiment.getAttributes() ) {
+                if( attribute.getName().equals( "dataset" ) ) {
+                    String dataset = attribute.getValue();
+
+                    if ( dbi.hasDatasetName() ) {
+                        dbi.getDataset().add( dataset );
+                    } else {
+                        List<String> datasets = new ArrayList<String>();
+                        datasets.add( dataset );
+                        dbi.setDataset( datasets );
+                    }
                 }
             }
         }
@@ -248,6 +218,59 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
     }
 
     /**
+     * Extracts the relevant information for the psimitab experimental role.
+     *
+     * @param participant
+     * @return experimental role
+     */
+    private CrossReference extractExperimentalRole( Participant participant ) {
+
+        ExperimentalRole role = participant.getExperimentalRoles().iterator().next();
+        String id = role.getXref().getPrimaryRef().getId().split( ":" )[1];
+        String db = role.getXref().getPrimaryRef().getId().split( ":" )[0];
+        String text = role.getNames().getShortLabel();
+
+        return new CrossReferenceImpl( db, id, text );
+    }
+
+    /**
+     * Extracts the relevant informations for the psimitab interactor type.
+     * 
+     * @param participant
+     * @return interactor type
+     */
+    private CrossReference extractInteractorType( Participant participant ) {
+        String id = participant.getInteractor().getInteractorType().getXref().getPrimaryRef().getId().split( ":" )[1];
+        String db = participant.getInteractor().getInteractorType().getXref().getPrimaryRef().getId().split( ":" )[0];
+        String text = participant.getInteractor().getInteractorType().getNames().getShortLabel();
+
+        return new CrossReferenceImpl( db, id, text );
+    }
+
+    /**
+     * Extracts the relevant informations for the psimitab propterties.
+     *
+     * @param participant
+     * @return list of properties
+     */
+    private List<CrossReference> extractProperties( Participant participant ) {
+        List<CrossReference> properties = new ArrayList<CrossReference>();
+        for ( DbReference dbref : participant.getInteractor().getXref().getSecondaryRef() ){
+            String id, db;
+
+            if ( dbref.getId().contains( ":" ) ) {
+                id = dbref.getId().split( ":" )[1].toLowerCase();
+                db = dbref.getId().split( ":" )[0].toLowerCase();
+            } else {
+                id = dbref.getId();
+                db = dbref.getDb();
+            }
+            properties.add( new CrossReferenceImpl( db, id ));
+        }
+        return properties;
+    }
+
+    /**
      * Gets the additional information of the BinaryInteraction.
      */
     public void updateHeader( PsimitabHeader header ) {
@@ -264,6 +287,8 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         header.appendColumnName( "hostOrganism" );
 
         header.appendColumnName( "expansion method" );
+
+        header.appendColumnName( "dataset" );
     }
 
     /**
@@ -344,6 +369,30 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             log.warn( "No expansionMethod found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
+
+        //field 24 - dataset name
+        if ( dbi.hasDatasetName() ) {
+            sb.append( formatStringList( dbi.getDataset() )  );
+        } else {
+            sb.append( LineFormatter.NONE );
+            log.warn( "No dataset name found for " + dbi.getInteractionAcs() );
+        }
+        sb.append( '\t' );
+    }
+
+    private String formatStringList( List<String> field ) {
+        StringBuffer sb = new StringBuffer( 64 );
+        if ( field != null && !field.isEmpty()) {
+            for ( Iterator<String> iterator = field.iterator(); iterator.hasNext(); ) {
+
+                sb.append( iterator.next() );
+
+                if ( iterator.hasNext() ) {
+                    sb.append( LineFormatter.PIPE );
+                }
+            }
+        }
+        return sb.toString();
     }
 
     /**
@@ -403,6 +452,12 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
                 dbi.setExpansionMethod( field23 );
             }
 
+            if ( iterator.hasNext() ) {
+                // dataset name
+                String field24 = iterator.next().getData();
+                dbi.setDataset( parseStringList( field24 ) );
+            }
+
         } catch ( MitabLineException e ) {
             e.printStackTrace();
         }
@@ -445,20 +500,34 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             String field21 = st.nextToken();
             dbi.setInteractorTypeB( MitabLineParserUtils.parseCrossReference( field21 ) );
 
-            // HostOrganism
+            // hostOrganism
             if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 22 + " must not be empty." );
             String field22 = st.nextToken();
             dbi.setHostOrganism( MitabLineParserUtils.parseCrossReference( field22 ) );
 
-            // Expansion method
+            // expansion method
             if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 23 + " must not be empty." );
             String field23 = st.nextToken();
             dbi.setExpansionMethod( field23 );
 
+            // dataset name
+            if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 24 + " must not be empty.");
+            String field24 = st.nextToken() ;
+            dbi.setDataset( parseStringList( field24 ));
+
         } catch ( MitabLineException e ) {
             e.printStackTrace();
         }
+    }
 
+    private List<String> parseStringList( String field ) throws MitabLineException {
+
+        if ( !MitabLineParserUtils.isFieldEmpty( field ) ) {
+            String[] strings = field.split( MitabLineParserUtils.PIPE );
+
+            return Arrays.asList( strings );
+        }
+        return null;
     }
 
     /**
@@ -602,66 +671,59 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         }
     }
 
+    /**
+     * Merge a Collection
+     *
+     * @param interaction
+     * @param targets
+     */
     public void mergeCollection( BinaryInteractionImpl interaction, BinaryInteractionImpl targets ) {
-        IntActBinaryInteraction s = ( IntActBinaryInteraction ) interaction;
-        IntActBinaryInteraction t = ( IntActBinaryInteraction ) targets;
+        
+        IntActBinaryInteraction source =  (IntActBinaryInteraction) interaction;
+        IntActBinaryInteraction target =  (IntActBinaryInteraction) targets;
 
-        Collection<CrossReference> hostorganismsource = s.getHostOrganism();
-        Collection<CrossReference> hostorganismtarget = t.getHostOrganism();
+        if ( source.hasExperimentalRolesInteractorA() )
+            mergeCrossReference( source.getExperimentalRolesInteractorA(), target.getExperimentalRolesInteractorA());
 
-        if ( hostorganismsource == null ) {
-            throw new IllegalArgumentException( "Source collection must not be null." );
-        }
+        if ( source.hasExperimentalRolesInteractorB() )
+            mergeCrossReference( source.getExperimentalRolesInteractorB(), target.getExperimentalRolesInteractorB());
 
-        if ( hostorganismtarget == null ) {
-            throw new IllegalArgumentException( "Target collection must not be null." );
-        }
+        if ( source.hasHostOrganism() )
+            mergeCrossReference( source.getHostOrganism(), target.getHostOrganism());
 
-        if ( hostorganismsource == hostorganismtarget ) throw new IllegalStateException();
-
-        for ( CrossReference o : hostorganismsource ) {
-            // Repeat of objects are a necessity (eg. for detection method across multiple publications)
-            hostorganismtarget.add( o );
-        }
-
-        Collection<CrossReference> roleAsource = s.getExperimentalRolesInteractorA();
-        Collection<CrossReference> roleAtarget = t.getExperimentalRolesInteractorA();
-
-        if ( roleAsource == null ) {
-            throw new IllegalArgumentException( "Source collection must not be null." );
-        }
-
-        if ( roleAtarget == null ) {
-            throw new IllegalArgumentException( "Target collection must not be null." );
-        }
-
-        if ( roleAsource == roleAtarget ) throw new IllegalStateException();
-
-        for ( CrossReference o : roleAsource ) {
-            // Repeat of objects are a necessity (eg. for detection method across multiple publications)
-            roleAtarget.add( o );
-        }
-
-        Collection<CrossReference> roleBsource = s.getExperimentalRolesInteractorB();
-        Collection<CrossReference> roleBtarget = t.getExperimentalRolesInteractorB();
-
-        if ( roleBsource == null ) {
-            throw new IllegalArgumentException( "Source collection must not be null." );
-        }
-
-        if ( roleBtarget == null ) {
-            throw new IllegalArgumentException( "Target collection must not be null." );
-        }
-
-        if ( roleBsource == roleBtarget ) throw new IllegalStateException();
-
-        for ( CrossReference o : roleBsource ) {
-            // Repeat of objects are a necessity (eg. for detection method across multiple publications)
-            roleBtarget.add( o );
+        if ( source.hasDatasetName() && target.hasDatasetName() ){
+            mergeString( source.getDataset(), target.getDataset());
         }
 
     }
 
+    private void mergeCrossReference(Collection<CrossReference> source, Collection<CrossReference> target ){
+
+        if ( source == null ) throw new IllegalArgumentException( "Source collection must not be null." );
+
+        if ( target == null ) throw new IllegalArgumentException( "Target collection must not be null." );
+
+        if ( source == target ) throw new IllegalStateException( );
+
+        for ( CrossReference s : source) {
+            // Repeat of objects are a necessity (eg. for detection method across multiple publications)
+            target.add( s );
+        }
+    }
+
+    private void mergeString(Collection<String> source, Collection<String> target ){
+
+        if ( source == null ) throw new IllegalArgumentException( "Source collection must not be null." );
+
+        if ( target == null ) throw new IllegalArgumentException( "Target collection must not be null." );
+
+        if ( source == target ) throw new IllegalStateException( );
+
+        for ( String s : source) {
+            // Repeat of objects are a necessity (eg. for detection method across multiple publications)
+            target.add( s );
+        }
+    }
     ///////////////////////////////
     // IsExpansionStrategyAware
 

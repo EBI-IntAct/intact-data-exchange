@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.psimitab;
 
 import org.junit.Assert;
 import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 import psidev.psi.mi.tab.converter.xml2tab.IsExpansionStrategyAware;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.SpokeExpansion;
@@ -331,5 +332,32 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
         IntActBinaryInteraction interaction = ( IntActBinaryInteraction ) interactions.iterator().next();
         Assert.assertEquals( null, interaction.getExpansionMethod() );
+    }
+
+    @Test
+    public void datasetName () throws Exception {
+
+        File xmlFile = new File( ConvertXml2TabTest.class.getResource( "/psi25-testset/17292829.xml" ).getFile() );
+        Assert.assertTrue( xmlFile.canRead() );
+
+        // convert into Tab object model
+        Xml2Tab xml2tab = new Xml2Tab();
+
+        xml2tab.setBinaryInteractionClass( IntActBinaryInteraction.class );
+
+        // this column handler IS aware of the the expansion strategy
+        final IntActColumnHandler columnHandler = new IntActColumnHandler();
+        Assert.assertTrue( columnHandler instanceof IsExpansionStrategyAware );
+        xml2tab.setColumnHandler( columnHandler );
+
+        xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
+        xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
+        xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
+
+        Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
+
+        IntActBinaryInteraction interaction = ( IntActBinaryInteraction ) interactions.iterator().next();
+        Assert.assertNotNull( interaction.getDataset() );
+        Assert.assertTrue( interaction.getDataset().get( 0 ).startsWith( "Cancer" ));
     }
 }
