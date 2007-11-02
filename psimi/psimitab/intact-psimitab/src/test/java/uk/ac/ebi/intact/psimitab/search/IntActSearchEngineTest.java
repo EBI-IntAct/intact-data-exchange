@@ -15,12 +15,10 @@
  */
 package uk.ac.ebi.intact.psimitab.search;
 
-import static org.junit.Assert.assertEquals;
-
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.store.Directory;
+import static org.junit.Assert.*;
 import org.junit.Test;
-
 import psidev.psi.mi.search.SearchResult;
 import psidev.psi.mi.search.query.SearchQuery;
 
@@ -35,13 +33,13 @@ public class IntActSearchEngineTest {
 
 	@Test 
 	public void testExperimentalRole() throws Exception {
-			
+
 		Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.xls");
 		IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
 		
 		SearchQuery searchQuery = new IntActSearchQuery("roleA:bait");        
         SearchResult result = searchEngine.search(searchQuery, null, null);
-        assertEquals(185, result.getInteractions().size());
+        assertEquals(186, result.getInteractions().size());
         
 		searchQuery = new IntActSearchQuery("roles:\"unspecified role\"");  
         result = searchEngine.search(searchQuery, null, null);
@@ -85,7 +83,7 @@ public class IntActSearchEngineTest {
 		
 		SearchQuery searchQuery = new IntActSearchQuery("typeA:\"small molecule\"");        
         SearchResult result = searchEngine.search(searchQuery, null, null);
-        assertEquals(195, result.getInteractions().size());
+        assertEquals(196, result.getInteractions().size());
         
 		searchQuery = new IntActSearchQuery("typeB:protein");        
         result = searchEngine.search(searchQuery, null, 10);
@@ -121,11 +119,30 @@ public class IntActSearchEngineTest {
 		
 		SearchQuery searchQuery = new IntActSearchQuery("expansion:spoke");        
         SearchResult result = searchEngine.search(searchQuery, null, null);
-        assertEquals(185, result.getInteractions().size());
+        assertEquals(186, result.getInteractions().size());
         
         Sort sort = new Sort(IntActColumnSet.EXPANSION_METHOD.getSortableColumnName());
         result = searchEngine.search(new IntActSearchQuery("spoke"), 50, 20, sort);        
         assertEquals(20, result.getInteractions().size());
         assertEquals("P78527", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());     
 	}
+
+	@Test
+	public void testDataSet() throws Exception {
+
+		Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.xls");
+		IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
+
+		SearchQuery searchQuery = new IntActSearchQuery("dataset:Cancer");
+        SearchResult result = searchEngine.search(searchQuery, null, null);
+        assertEquals( 0, result.getInteractions().size() );
+
+ 		indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/17292829.txt");
+		searchEngine = new IntActSearchEngine(indexDirectory);
+
+        //searchQuery = new IntActSearchQuery("dataset:\"Cancer - Interactions investigated in the context of cancer\"");
+        searchQuery = new IntActSearchQuery("dataset:Cancer");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getInteractions().size());
+    }
 }

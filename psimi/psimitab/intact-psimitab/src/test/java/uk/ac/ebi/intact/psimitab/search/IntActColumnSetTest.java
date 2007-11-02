@@ -6,16 +6,14 @@ package uk.ac.ebi.intact.psimitab.search;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * IntActColumnSet Tester.
  * 
  * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
- * @version $Id: IntActColumnSetTest.java  *
+ * @version $Id$
+ * @since 2.0.0
  */
 public class IntActColumnSetTest {
 
@@ -24,7 +22,7 @@ public class IntActColumnSetTest {
 		IntActColumnSet columnSet = new IntActColumnSet();
 		
 		assertNotNull(columnSet.getPsimiTabColumns());
-		assertEquals(23, columnSet.getPsimiTabColumns().size());
+		assertEquals(24, columnSet.getPsimiTabColumns().size());
 		
 		assertEquals("experimentalRole interactor A", columnSet.getbyOrder(16).getColumnName());
 		assertEquals("experimentalRole interactor B", columnSet.getbyOrder(17).getColumnName());
@@ -38,5 +36,7 @@ public class IntActColumnSetTest {
 		assertEquals("hostOrganism", columnSet.getbyOrder(22).getColumnName());
 
 		assertEquals("expansion method", columnSet.getbyOrder(23).getColumnName());
-	}
+
+        assertEquals("dataset", columnSet.getbyOrder(24).getColumnName());
+    }
 }

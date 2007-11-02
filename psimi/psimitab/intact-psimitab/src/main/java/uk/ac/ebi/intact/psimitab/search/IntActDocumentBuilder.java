@@ -44,6 +44,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 		String typeA = tokens[IntActColumnSet.INTERACTOR_TYPE_A.getOrder()-1];
 		String typeB = tokens[IntActColumnSet.INTERACTOR_TYPE_B.getOrder()-1];
 		String expansion = tokens[IntActColumnSet.EXPANSION_METHOD.getOrder()-1];
+        String dataset = tokens[IntActColumnSet.DATASET.getOrder()-1];
 
         DefaultDocumentBuilder builder = new DefaultDocumentBuilder();
         doc = builder.createDocumentFromPsimiTabLine(psiMiTabLine);
@@ -72,8 +73,9 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 		createHostOrganismField(doc, psiMiTabLine);
 		
 		builder.addTokenizedAndSortableField(doc, IntActColumnSet.EXPANSION_METHOD, expansion);
-		
-		return doc;
+        builder.addTokenizedAndSortableField(doc, IntActColumnSet.DATASET, dataset);
+
+        return doc;
 	}
 	
 	public String createPsimiTabLine(Document doc)
@@ -94,8 +96,9 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 		sb.append(doc.get(IntActColumnSet.INTERACTOR_TYPE_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
 		sb.append(doc.get(IntActColumnSet.HOSTORGANISM.getShortName())).append(DEFAULT_COL_SEPARATOR);
 		sb.append(doc.get(IntActColumnSet.EXPANSION_METHOD.getShortName())).append(DEFAULT_COL_SEPARATOR);
-		
-		return  sb.toString();
+        sb.append(doc.get(IntActColumnSet.DATASET.getShortName())).append(DEFAULT_COL_SEPARATOR);
+
+        return  sb.toString();
 	}
 	
     /**

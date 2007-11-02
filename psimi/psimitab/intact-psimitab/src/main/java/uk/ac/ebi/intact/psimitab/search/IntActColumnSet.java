@@ -28,21 +28,22 @@ public class IntActColumnSet extends DefaultColumnSet implements ColumnSet {
 	public static final PsimiTabColumn INTERACTOR_TYPE_B = new PsimiTabColumn(21, "interactorType of B", "typeB");
 	public static final PsimiTabColumn HOSTORGANISM = new PsimiTabColumn(22, "hostOrganism", "hostOrganism");
 	public static final PsimiTabColumn EXPANSION_METHOD = new PsimiTabColumn(23, "expansion method", "expansion");
-
+    public static final PsimiTabColumn DATASET = new PsimiTabColumn( 24, "dataset", "dataset");
 	
 	
 	public IntActColumnSet(){
 		super();
 		psimiTabColumns = super.getPsimiTabColumns();
 		
-		psimiTabColumns.add(EXPERIMENTAL_ROLE_A);
-		psimiTabColumns.add(EXPERIMENTAL_ROLE_B);
-		psimiTabColumns.add(PROPERTIES_A);
-		psimiTabColumns.add(PROPERTIES_B);
-		psimiTabColumns.add(INTERACTOR_TYPE_A);
-		psimiTabColumns.add(INTERACTOR_TYPE_B);
-		psimiTabColumns.add(HOSTORGANISM);	
-		psimiTabColumns.add(EXPANSION_METHOD);
-	}
+		psimiTabColumns.add( EXPERIMENTAL_ROLE_A );
+		psimiTabColumns.add( EXPERIMENTAL_ROLE_B );
+		psimiTabColumns.add( PROPERTIES_A );
+		psimiTabColumns.add( PROPERTIES_B );
+		psimiTabColumns.add( INTERACTOR_TYPE_A );
+		psimiTabColumns.add( INTERACTOR_TYPE_B );
+		psimiTabColumns.add( HOSTORGANISM );
+		psimiTabColumns.add( EXPANSION_METHOD );
+        psimiTabColumns.add( DATASET );
+    }
 
 }

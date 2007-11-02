@@ -15,15 +15,13 @@
  */
 package uk.ac.ebi.intact.psimitab.search;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.apache.lucene.store.Directory;
-
 import psidev.psi.mi.search.Searcher;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.xml.converter.ConverterException;
 
+import java.io.IOException;
+import java.io.InputStream;
 /**
  * PSIMITAB Test Helper.
  *
@@ -34,7 +32,6 @@ public abstract class TestHelper {
 
     public static Directory createIndexFromResource(String resourcePath) throws IOException, ConverterException, MitabLineException {
         InputStream is = TestHelper.class.getResourceAsStream(resourcePath);
-       
         return Searcher.buildIndexInMemory(is, true, true, new IntActPsimiTabIndexWriter());
     }
 }

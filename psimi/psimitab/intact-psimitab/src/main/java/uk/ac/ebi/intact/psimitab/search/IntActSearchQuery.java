@@ -36,7 +36,8 @@ public class IntActSearchQuery extends SearchQuery{
         	DefaultColumnSet.INTERACTION_ID.getShortName(),
         	"properties",
         	IntActColumnSet.HOSTORGANISM.getShortName(),
-        	IntActColumnSet.EXPANSION_METHOD.getShortName()};
+        	IntActColumnSet.EXPANSION_METHOD.getShortName(),
+            IntActColumnSet.DATASET.getShortName()};
 
     private String[] fields = DEFAULT_FIELDS;
     
