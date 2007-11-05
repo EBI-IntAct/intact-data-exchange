@@ -57,7 +57,7 @@ public class ConversionCache {
     }
 
     public static void clear() {
-        if (log.isInfoEnabled()) log.info("Clearing Conversion cache");
+        if (log.isDebugEnabled()) log.debug("Clearing Conversion cache");
         
         instance.get().idMap.clear();
     }
