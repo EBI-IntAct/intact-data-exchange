@@ -15,6 +15,9 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -32,23 +35,23 @@ public class RepoEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date created;
+    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime created;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updated;
+    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime updated;
 
     //////////////////////////
     // Callback methods
 
     @PreUpdate
     public void setUpdatedDate() {
-        setUpdated(new Date());
+        setUpdated(new DateTime());
     }
 
     @PrePersist
     public void setCreatedDate() {
-        Date date = new Date();
+        DateTime date = new DateTime();
         setCreated(date);
         setUpdated(date);
     }
@@ -64,19 +67,19 @@ public class RepoEntity implements Serializable {
         this.id = id;
     }
 
-    public Date getCreated() {
+    public DateTime getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(DateTime created) {
         this.created = created;
     }
 
-    public Date getUpdated() {
+    public DateTime getUpdated() {
         return updated;
     }
 
-    public void setUpdated(Date updated) {
+    public void setUpdated(DateTime updated) {
         this.updated = updated;
     }
 }

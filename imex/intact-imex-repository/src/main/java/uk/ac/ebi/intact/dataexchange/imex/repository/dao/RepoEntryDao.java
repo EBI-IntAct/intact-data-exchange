@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.dao;
 
+import org.joda.time.DateTime;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 
 import java.util.List;
@@ -41,4 +42,6 @@ public interface RepoEntryDao
     RepoEntry findByPmid(String name);
 
     List<RepoEntry> findImportable();
+
+    List<RepoEntry> findModifiedAfter(DateTime dateTime);
 }

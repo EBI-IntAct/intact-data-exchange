@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.joda.time.DateTime;
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntryDao;
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntryService;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
@@ -68,5 +69,9 @@ public class JpaRepoEntryService implements RepoEntryService
         }
 
         return importables;
+    }
+
+    public List<RepoEntry> findModifiedAfter(DateTime dateTime) {
+        return entrySetDao.findModifiedAfter(dateTime);
     }
 }

@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.imex.repository;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.joda.time.DateTime;
 import uk.ac.ebi.intact.dataexchange.imex.repository.enrich.EntryEnricher;
 import uk.ac.ebi.intact.dataexchange.imex.repository.enrich.impl.DefaultEntryEnricher;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ftp.ImexFTPFile;
@@ -120,14 +121,6 @@ public class Repository {
         }
     }
 
-    private void beginTransaction() {
-        ImexRepositoryContext.getInstance().getImexPersistence().beginTransaction();
-    }
-
-    private void commitTransaction() {
-        ImexRepositoryContext.getInstance().getImexPersistence().commitTransaction();
-    }
-
     public RepoEntry findRepoEntryByPmid(String name) {
         ImexRepositoryContext context = ImexRepositoryContext.getInstance();
         return context.getImexServiceProvider().getRepoEntryService().findByPmid(name);
@@ -141,6 +134,16 @@ public class Repository {
     public List<RepoEntry> findRepoEntriesByPmidExcluding(List<String> pmidsToExclude) {
         ImexRepositoryContext context = ImexRepositoryContext.getInstance();
         return context.getImexServiceProvider().getRepoEntryService().findImportableExcluding(pmidsToExclude);
+    }
+
+    /**
+     * Gets a list of RepoEntries created or updated after the passed date
+     * @param dateTime
+     * @return
+     */
+    public List<RepoEntry> findRepoEntriesModifiedAfter(DateTime dateTime) {
+        ImexRepositoryContext context = ImexRepositoryContext.getInstance();
+        return context.getImexServiceProvider().getRepoEntryService().findModifiedAfter(dateTime);
     }
 
     public void close() {
@@ -182,5 +185,13 @@ public class Repository {
         }
 
         return fileDate;
+    }
+
+    private void beginTransaction() {
+        ImexRepositoryContext.getInstance().getImexPersistence().beginTransaction();
+    }
+
+    private void commitTransaction() {
+        ImexRepositoryContext.getInstance().getImexPersistence().commitTransaction();
     }
 }

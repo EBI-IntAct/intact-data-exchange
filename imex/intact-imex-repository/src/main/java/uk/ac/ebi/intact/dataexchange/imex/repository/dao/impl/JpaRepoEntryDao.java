@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.joda.time.DateTime;
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntryDao;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 
@@ -52,5 +53,11 @@ public class JpaRepoEntryDao extends JpaImexDaoSupport implements RepoEntryDao
 
     public List<RepoEntry> findImportable() {
         return getEntityManager().createNamedQuery("repoEntryImportable").getResultList();
+    }
+
+    public List<RepoEntry> findModifiedAfter(DateTime dateTime) {
+        Query query = getEntityManager().createNamedQuery("repoEntryModifiedAfter");
+        query.setParameter("date", dateTime);
+        return query.getResultList();
     }
 }
