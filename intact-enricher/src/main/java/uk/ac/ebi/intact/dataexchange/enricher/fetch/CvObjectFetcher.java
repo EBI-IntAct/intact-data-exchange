@@ -17,6 +17,8 @@ package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
@@ -29,6 +31,11 @@ import uk.ac.ebi.intact.model.CvObject;
  * @version $Id$
  */
 public class CvObjectFetcher {
+
+    /**
+     * Sets up a logger for that class.
+     */
+    private static final Log log = LogFactory.getLog(CvObjectFetcher.class);
 
     private static ThreadLocal<CvObjectFetcher> instance = new ThreadLocal<CvObjectFetcher>() {
         @Override
@@ -47,11 +54,21 @@ public class CvObjectFetcher {
     public CvTerm fetchByTermId(String termId) {
         Cache cache = EnricherContext.getInstance().getCache("CvObject");
 
-        CvTerm term;
+        CvTerm term = null;
 
         if (cache.isKeyInCache(termId)) {
-            term = (CvTerm) cache.get(termId).getObjectValue();
-        } else {
+            final Element element = cache.get(termId);
+
+            if (element != null) {
+                term = (CvTerm) element.getObjectValue();
+            } else {
+                if (log.isDebugEnabled())
+                    log.debug("Term was found in the cache but the element returned was null: "+termId);
+            }
+            
+        }
+
+        if (term == null) {
             IntactOntology ontology = EnricherContext.getInstance().getIntactOntology();
             term = ontology.search(termId);
 

@@ -17,6 +17,8 @@ package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.bridges.taxonomy.NewtTaxonomyService;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyService;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
@@ -31,6 +33,11 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
  * @version $Id$
  */
 public class BioSourceFetcher {
+
+    /**
+     * Sets up a logger for that class.
+     */
+    public static final Log log = LogFactory.getLog(BioSourceFetcher.class);
 
     private static ThreadLocal<BioSourceFetcher> instance = new ThreadLocal<BioSourceFetcher>() {
         @Override
@@ -52,11 +59,20 @@ public class BioSourceFetcher {
     public TaxonomyTerm fetchByTaxId(int taxId) {
         Cache bioSourceCache = EnricherContext.getInstance().getCache("BioSource");
 
-        TaxonomyTerm term;
+        TaxonomyTerm term = null;
 
         if (bioSourceCache.isKeyInCache(taxId)) {
-            term = (TaxonomyTerm) bioSourceCache.get(taxId).getObjectValue();
-        } else {
+            final Element element = bioSourceCache.get(taxId);
+
+            if (element != null) {
+                term = (TaxonomyTerm) element.getObjectValue();
+            } else {
+               if (log.isDebugEnabled())
+                    log.debug("TaxId was found in the cache but the element returned was null: "+taxId);
+            }
+        }
+
+        if (term == null) {
             try {
                 term = taxonomyService.getTaxonomyTerm(taxId);
             } catch (TaxonomyServiceException e) {

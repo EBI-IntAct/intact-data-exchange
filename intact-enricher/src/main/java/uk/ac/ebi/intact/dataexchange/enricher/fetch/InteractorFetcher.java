@@ -66,11 +66,13 @@ public class InteractorFetcher {
         String cacheKey = cacheKey(uniprotId, taxId);
 
         if (interactorCache.isKeyInCache(cacheKey)) {
-            try {
-                uniprotProtein = (UniprotProtein) interactorCache.get(cacheKey).getObjectValue();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
+            final Element element = interactorCache.get(cacheKey);
+
+            if (element != null) {
+                uniprotProtein = (UniprotProtein) element.getObjectValue();
+            } else {
+                if (log.isDebugEnabled())
+                    log.debug("Interactor was found in the cache but the element returned was null: "+uniprotId);            }
         }
 
         if (uniprotProtein == null) {
