@@ -19,6 +19,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.joda.time.DateTime;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.model.*;
@@ -31,6 +32,7 @@ import uk.ac.ebi.intact.context.IntactContext;
 
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * TODO comment this
@@ -54,14 +56,6 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     @Test
     public void importXml_intact() throws Exception {
         EntrySet set = getIntactEntrySet();
-        /*
-        for (Entry entry : set.getEntries()) {
-            for (psidev.psi.mi.xml.model.Interaction interaction : entry.getInteractions()) {
-                for (Participant p : interaction.getParticipants()) {
-                    p.getFeatures().clear();
-                }
-            }
-        }  */
 
         PsiExchange.importIntoIntact(set, false);
 
@@ -79,13 +73,10 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
         PsiExchange.importIntoIntact(getMintEntrySet(), false);
 
-        beginTransaction();
         int count = getDaoFactory().getInteractionDao().countAll();
         System.out.println(DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll()));
-        commitTransaction();
 
-        
-        Assert.assertEquals(11, count);
+        Assert.assertEquals(16, count);
     }
 
     @Test
@@ -111,13 +102,13 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         PsiExchange.importIntoIntact(getMintEntrySet(), false);
 
         beginTransaction();
-        Assert.assertEquals(17, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(22, getDaoFactory().getInteractionDao().countAll());
         commitTransaction();
 
         PsiExchange.importIntoIntact(getDipEntrySet(), false);
 
         beginTransaction();
-        Assert.assertEquals(49, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(54, getDaoFactory().getInteractionDao().countAll());
         commitTransaction();
 
     }
@@ -169,6 +160,17 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         PsiExchange.exportToPsiXml(writer, entry);
 
         System.out.println(writer);
+    }
+
+    @Test
+    public void getReleaseDates() throws Exception {
+        final List<DateTime> releaseDates = PsiExchange.getReleaseDates(PsiExchangeTest.class.getResourceAsStream("/xml/dip_2006-11-01.xml"));
+
+        Assert.assertEquals(26, releaseDates.size());
+
+        for (DateTime releaseDate : releaseDates) {
+            Assert.assertEquals(releaseDate, new DateTime("2006-11-01"));
+        }
     }
 
 }

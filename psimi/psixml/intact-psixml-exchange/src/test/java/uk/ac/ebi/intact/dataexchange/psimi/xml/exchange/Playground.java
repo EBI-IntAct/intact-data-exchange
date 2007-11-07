@@ -42,7 +42,7 @@ public class Playground {
         props.put(IntactEnvironment.INSTITUTION_LABEL.getFqn(), "ebi");
         props.put(IntactEnvironment.AC_PREFIX_PARAM_NAME.getFqn(), "EBI");
 
-        File hibernateFile = new File(Playground.class.getResource("/playground-hibernate.cfg.xml").getFile());
+        File hibernateFile = new File(Playground.class.getResource("/d003-hibernate.cfg.xml").getFile());
 
         IntactContext.initStandaloneContext(hibernateFile);
         IntactContext.getCurrentInstance().getUserContext().setUserId("BARANDA");
@@ -64,12 +64,20 @@ public class Playground {
 
         InputStream enricherInput = new ByteArrayInputStream(writer.toString().getBytes());
 
+        int interactionsBefore = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                .getInteractionDao().countAll();
+        int experimentsBefore = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                .getExperimentDao().countAll();
+
         PsiExchange.importIntoIntact(enricherInput, false);
 
-        System.out.println("Interactions DB: " + IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getInteractionDao().countAll());
-        System.out.println("Experiments DB: " + IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getExperimentDao().countAll());
+        int interactionsAfter = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                .getInteractionDao().countAll();
+        int experimentsAfter = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                .getExperimentDao().countAll();
+
+        System.out.println("Interactions Created: " + (interactionsAfter-interactionsBefore));
+        System.out.println("Experiments Created: " + (experimentsAfter-experimentsBefore));
 
 
     }

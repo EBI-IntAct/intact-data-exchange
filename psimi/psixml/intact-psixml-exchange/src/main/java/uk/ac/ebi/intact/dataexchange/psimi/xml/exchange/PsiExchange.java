@@ -17,11 +17,19 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.parsers.SAXParser;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.business.IntactTransactionException;
+import uk.ac.ebi.intact.business.IntactException;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterContext;
 import uk.ac.ebi.intact.core.persister.PersisterException;
@@ -272,7 +280,7 @@ public class PsiExchange {
         }
     }
 
-    public static EntrySet exportToEntrySet(IntactEntry... intactEntries) { 
+    public static EntrySet exportToEntrySet(IntactEntry... intactEntries) {
         Collection<Entry> psiEntries = new ArrayList<Entry>();
 
         EntryConverter entryConverter = new EntryConverter();
@@ -289,5 +297,45 @@ public class PsiExchange {
         return new EntrySet(entry, 2, 5, 3);
     }
 
+
+    /**
+     * Gets the release dates from a PSI-MI XML file
+     * @param xmlFile
+     * @return
+     */
+    public static List<DateTime> getReleaseDates(File xmlFile) throws IOException {
+        return getReleaseDates(new FileInputStream(xmlFile));
+    }
+
+    /**
+     * Gets the release dates from a PSI-MI XML InputStream
+     * @param xmlFile
+     * @return
+     */
+    public static List<DateTime> getReleaseDates(InputStream is) throws IOException {
+        final List<DateTime> releaseDates = new ArrayList<DateTime>();
+
+        DefaultHandler handler = new DefaultHandler() {
+
+            @Override
+            public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+                if (localName.equals("source")) {
+                    DateTime releaseDate = new DateTime(attributes.getValue("releaseDate"));
+                    releaseDates.add(releaseDate);
+                }
+            }
+        };
+
+        SAXParser parser = new SAXParser();
+        parser.setContentHandler(handler);
+
+        try {
+            parser.parse(new InputSource(is));
+        } catch (SAXException e) {
+            throw new IntactException(e);
+        }
+
+        return releaseDates;
+    }
 
 }
