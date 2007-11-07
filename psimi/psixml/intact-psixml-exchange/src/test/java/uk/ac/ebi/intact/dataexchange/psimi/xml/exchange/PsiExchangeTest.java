@@ -173,4 +173,13 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         }
     }
 
+    @Test
+    public void toDateTime() throws Exception {
+        String date1 = "Wed Sep 20 11:54:49 PDT 2006";
+        String date2 = "2006-09-20";
+
+        Assert.assertEquals(new DateTime("2006-09-20T11:54:49.000"), PsiExchange.toDateTime(date1));
+        Assert.assertEquals(new DateTime("2006-09-20"), PsiExchange.toDateTime(date2));
+    }
+
 }

@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xerces.parsers.SAXParser;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -28,8 +29,9 @@ import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
-import uk.ac.ebi.intact.business.IntactTransactionException;
+import psidev.psi.mi.xml.model.Source;
 import uk.ac.ebi.intact.business.IntactException;
+import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterContext;
 import uk.ac.ebi.intact.core.persister.PersisterException;
@@ -309,7 +311,7 @@ public class PsiExchange {
 
     /**
      * Gets the release dates from a PSI-MI XML InputStream
-     * @param xmlFile
+     * @param is
      * @return
      */
     public static List<DateTime> getReleaseDates(InputStream is) throws IOException {
@@ -320,7 +322,8 @@ public class PsiExchange {
             @Override
             public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
                 if (localName.equals("source")) {
-                    DateTime releaseDate = new DateTime(attributes.getValue("releaseDate"));
+                    final String releaseDateStr = attributes.getValue("releaseDate");
+                    DateTime releaseDate = toDateTime(releaseDateStr);
                     releaseDates.add(releaseDate);
                 }
             }
@@ -338,4 +341,33 @@ public class PsiExchange {
         return releaseDates;
     }
 
+    public static DateTime getReleaseDate(Entry entry) {
+        DateTime releaseDate = null;
+        Source source = entry.getSource();
+
+        if (source != null) {
+            releaseDate = new DateTime(source.getReleaseDate());
+        }
+
+        return releaseDate;
+    }
+
+    protected static DateTime toDateTime(String dateStr) {
+        DateTime dateTime;
+        try {
+            if (dateStr.length() > 10) {
+                //e.g. Wed Sep 20 11:54:49 PDT 2006
+                String dateWithoutTimezone = dateStr.replaceAll("PDT ", "");
+                DateTimeFormatter fmt = DateTimeFormat.forPattern("EEE MMM dd hh:mm:ss yyyy");
+                dateTime = fmt.parseDateTime(dateWithoutTimezone);
+            } else {
+                //e.g. 2007-12-27
+                dateTime = new DateTime(dateStr);
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IllegalDateFormat("Illegal date format: "+dateStr, e);
+        }
+
+        return dateTime;
+    }
 }
