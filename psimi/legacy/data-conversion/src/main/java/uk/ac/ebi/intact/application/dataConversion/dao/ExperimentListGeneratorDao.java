@@ -11,7 +11,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.ebi.intact.application.dataConversion.SimpleDataset;
-import uk.ac.ebi.intact.config.impl.AbstractHibernateDataConfig;
+import uk.ac.ebi.intact.config.DataConfig;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.AnnotatedObjectImpl;
 import uk.ac.ebi.intact.model.CvDatabase;
@@ -216,7 +216,6 @@ public class ExperimentListGeneratorDao {
     }
 
     private static Session getSession() {
-        AbstractHibernateDataConfig dataConfig = (AbstractHibernateDataConfig) IntactContext.getCurrentInstance().getConfig().getDefaultDataConfig();
-        return dataConfig.getSessionFactory().getCurrentSession();
+        return IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCurrentSession();
     }
 }
