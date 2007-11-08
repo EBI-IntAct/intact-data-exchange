@@ -41,6 +41,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
@@ -146,7 +147,12 @@ public class PsiExchange {
             List<String> interactionLabelsToCommit = new ArrayList<String>();
 
             for (psidev.psi.mi.xml.model.Interaction psiInteraction : entry.getInteractions()) {
-                Interaction interaction = interactionConverter.psiToIntact(psiInteraction);
+                Interaction interaction = null;
+                try {
+                    interaction = interactionConverter.psiToIntact(psiInteraction);
+                } catch (PsiConversionException e) {
+                    throw new PersisterException("Problem converting PSI interaction: "+psiInteraction, e);
+                } 
 
                 if (interactionLabelsToCommit.contains(interaction.getShortLabel())) {
                     // commit the persistence
