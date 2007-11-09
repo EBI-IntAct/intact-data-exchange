@@ -35,7 +35,7 @@ public class IntActDocumentBuilderTest {
         DocumentBuilder builder = new IntActDocumentBuilder();
         Document doc = builder.createDocumentFromPsimiTabLine(psiMiTabLine);
 
-        BinaryInteraction interaction = builder.createBinaryInteraction(doc);
+        BinaryInteraction interaction = (BinaryInteraction) builder.createBinaryInteraction(doc);
 		Assert.assertNotNull(interaction);
 	}
 }
