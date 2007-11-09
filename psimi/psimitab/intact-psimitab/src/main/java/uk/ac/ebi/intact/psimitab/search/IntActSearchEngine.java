@@ -23,29 +23,19 @@ import java.io.IOException;
 public class IntActSearchEngine extends FastSearchEngine {
 
     private static final Log log = LogFactory.getLog( IntActSearchEngine.class);
-    private static final String WILDCARD = "*";
-    private Directory indexDirectory;
-	
 
-    public IntActSearchEngine(Directory indexDirectory) throws IOException
-    {
-    	super(indexDirectory);
-        this.indexDirectory = indexDirectory;
-    }
-
-    public IntActSearchEngine(String indexDirectory) throws IOException
-    {
-    	super(indexDirectory);
-        this.indexDirectory = FSDirectory.getDirectory(indexDirectory);
-    }
-
-
-    public IntActSearchEngine(File indexDirectory) throws IOException
-    {
+    public IntActSearchEngine(Directory indexDirectory) throws IOException {
         super(indexDirectory);
-    	this.indexDirectory = FSDirectory.getDirectory(indexDirectory);
     }
-    
+
+    public IntActSearchEngine(File indexDirectory) throws IOException {
+        super(indexDirectory);
+    }
+
+    public IntActSearchEngine(String indexDirectory) throws IOException {
+        super(indexDirectory);
+    }
+
     @Override
     protected DocumentBuilder createDocumentBuilder() {
         DocumentBuilder builder = new IntActDocumentBuilder();

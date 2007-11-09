@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import psidev.psi.mi.search.SearchResult;
 import psidev.psi.mi.search.query.SearchQuery;
+import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
 
 /**
  * IntActSearchEngine Tester.
@@ -38,7 +39,7 @@ public class IntActSearchEngineTest {
 		IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
 		
 		SearchQuery searchQuery = new IntActSearchQuery("roleA:bait");        
-        SearchResult result = searchEngine.search(searchQuery, null, null);
+        SearchResult<IntActBinaryInteraction> result = searchEngine.search(searchQuery, null, null);
         assertEquals(186, result.getInteractions().size());
         
 		searchQuery = new IntActSearchQuery("roles:\"unspecified role\"");  
@@ -58,7 +59,7 @@ public class IntActSearchEngineTest {
 		IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
 		
 		SearchQuery searchQuery = new IntActSearchQuery("GO:0006928");        
-        SearchResult result = searchEngine.search(searchQuery, null, null);
+        SearchResult<IntActBinaryInteraction> result = searchEngine.search(searchQuery, null, null);
         assertEquals(8, result.getInteractions().size());
         
 		searchQuery = new IntActSearchQuery("GO*");        
@@ -82,7 +83,7 @@ public class IntActSearchEngineTest {
 		IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
 		
 		SearchQuery searchQuery = new IntActSearchQuery("typeA:\"small molecule\"");        
-        SearchResult result = searchEngine.search(searchQuery, null, null);
+        SearchResult<IntActBinaryInteraction> result = searchEngine.search(searchQuery, null, null);
         assertEquals(196, result.getInteractions().size());
         
 		searchQuery = new IntActSearchQuery("typeB:protein");        
@@ -102,13 +103,12 @@ public class IntActSearchEngineTest {
 		IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
 		
 		SearchQuery searchQuery = new IntActSearchQuery("hostOrganism:\"in vitro\"");        
-        SearchResult result = searchEngine.search(searchQuery, null, null);
+        SearchResult<IntActBinaryInteraction> result = searchEngine.search(searchQuery, null, null);
         assertEquals(14, result.getInteractions().size());
         
         Sort sort = new Sort(IntActColumnSet.HOSTORGANISM.getSortableColumnName());
         result = searchEngine.search(new IntActSearchQuery("in*"), 50, 20, sort);
         assertEquals(20, result.getInteractions().size());
-        assertEquals("P78527", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());     
 	}
 	
 	@Test 
@@ -118,13 +118,12 @@ public class IntActSearchEngineTest {
 		IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
 		
 		SearchQuery searchQuery = new IntActSearchQuery("expansion:spoke");        
-        SearchResult result = searchEngine.search(searchQuery, null, null);
+        SearchResult<IntActBinaryInteraction> result = searchEngine.search(searchQuery, null, null);
         assertEquals(186, result.getInteractions().size());
         
         Sort sort = new Sort(IntActColumnSet.EXPANSION_METHOD.getSortableColumnName());
         result = searchEngine.search(new IntActSearchQuery("spoke"), 50, 20, sort);        
         assertEquals(20, result.getInteractions().size());
-        assertEquals("P78527", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());     
 	}
 
 	@Test

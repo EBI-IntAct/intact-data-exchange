@@ -24,19 +24,19 @@ public class IntActColumnSetTest {
 		assertNotNull(columnSet.getPsimiTabColumns());
 		assertEquals(24, columnSet.getPsimiTabColumns().size());
 		
-		assertEquals("experimentalRole interactor A", columnSet.getbyOrder(16).getColumnName());
-		assertEquals("experimentalRole interactor B", columnSet.getbyOrder(17).getColumnName());
+		assertEquals("experimentalRole interactor A", columnSet.getByOrder(15).getColumnName());
+		assertEquals("experimentalRole interactor B", columnSet.getByOrder(16).getColumnName());
 		
-		assertEquals("properties interactor A", columnSet.getbyOrder(18).getColumnName());
-		assertEquals("properties interactor B", columnSet.getbyOrder(19).getColumnName());
+		assertEquals("properties interactor A", columnSet.getByOrder(17).getColumnName());
+		assertEquals("properties interactor B", columnSet.getByOrder(18).getColumnName());
 
-		assertEquals("interactorType of A", columnSet.getbyOrder(20).getColumnName());
-		assertEquals("interactorType of B", columnSet.getbyOrder(21).getColumnName());
+		assertEquals("interactorType of A", columnSet.getByOrder(19).getColumnName());
+		assertEquals("interactorType of B", columnSet.getByOrder(20).getColumnName());
 
-		assertEquals("hostOrganism", columnSet.getbyOrder(22).getColumnName());
+		assertEquals("hostOrganism", columnSet.getByOrder(21).getColumnName());
 
-		assertEquals("expansion method", columnSet.getbyOrder(23).getColumnName());
+		assertEquals("expansion method", columnSet.getByOrder(22).getColumnName());
 
-        assertEquals("dataset", columnSet.getbyOrder(24).getColumnName());
+        assertEquals("dataset", columnSet.getByOrder(23).getColumnName());
     }
 }
