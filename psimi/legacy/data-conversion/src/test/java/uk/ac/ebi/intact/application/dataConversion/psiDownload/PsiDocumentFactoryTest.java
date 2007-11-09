@@ -66,9 +66,9 @@ public class PsiDocumentFactoryTest extends PsiDownloadTest {
         Element names = (Element) list.item( 0 );
         assertNotNull( names );
 
-        assertEquals( 1, names.getChildNodes().getLength() );
+        assertEquals( 2, names.getChildNodes().getLength() );
 
-        assertHasShortlabel( names, "European Bioinformatics Institute" );
+        assertHasShortlabel( names, "EBI" );
 
         // check attributeList
         Element attributeListElement = (Element) source.getElementsByTagName( Annotation2xml.ATTRIBUTE_LIST_NODE_NAME ).item( 0 );

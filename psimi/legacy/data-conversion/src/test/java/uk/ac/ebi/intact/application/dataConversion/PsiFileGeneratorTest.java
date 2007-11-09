@@ -7,6 +7,8 @@ package uk.ac.ebi.intact.application.dataConversion;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import uk.ac.ebi.intact.application.dataConversion.psiDownload.CvMapping;
 import uk.ac.ebi.intact.application.dataConversion.util.DisplayXML;
@@ -26,6 +28,7 @@ public class PsiFileGeneratorTest extends DataConversionAbstractTest {
     private static final Log log = LogFactory.getLog( PsiFileGeneratorTest.class );
 
 
+    @Test
     public void testGenerateListMahajan() throws Exception {
 
         File reverseMappingFile = new File( PsiFileGeneratorTest.class.getResource( "/reverseMapping.txt" ).getFile() );
@@ -50,7 +53,7 @@ public class PsiFileGeneratorTest extends DataConversionAbstractTest {
         String xmlDoc = writer.toString();
         //assertEquals(59420, xmlDoc.length());
 
-        assertNotNull( xmlDoc );
+        Assert.assertNotNull( xmlDoc );
 
         final File target = new File( PsiFileGeneratorTest.class.getResource( "/" ).getFile() ).getParentFile();
 
@@ -74,7 +77,7 @@ public class PsiFileGeneratorTest extends DataConversionAbstractTest {
         System.out.println( xmlDoc.length() );
         //assertEquals(128563, xmlDoc.length());
 
-        assertNotNull( xmlDoc );
+        Assert.assertNotNull( xmlDoc );
 
         // TODO check the xml output
         writer.close();

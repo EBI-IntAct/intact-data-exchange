@@ -5,9 +5,8 @@
  */
 package uk.ac.ebi.intact.application.dataConversion;
 
-import junit.framework.TestCase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -19,20 +18,19 @@ import java.io.FileFilter;
  * @version $Id$
  * @since <pre>18-Aug-2006</pre>
  */
-public class ZipFileGeneratorTest extends TestCase
+public class ZipFileGeneratorTest
 {
 
-    private static final Log log = LogFactory.getLog(ZipFileGeneratorTest.class);
-
+    @Test
     public void testClusterAllXmlFilesFromDirectory()
     {
         File baseDir = new File(ZipFileGeneratorTest.class.getResource("/zip/base").getFile());
-        assertTrue(baseDir.isDirectory());
+        Assert.assertTrue(baseDir.isDirectory());
 
         ZipFileGenerator.clusterAllXmlFilesFromDirectory(baseDir, true);
 
         File targetDir = new File(baseDir, "pmid/2006");
-        assertTrue(targetDir.isDirectory());
+        Assert.assertTrue(targetDir.isDirectory());
 
         File[] zipFiles = targetDir.listFiles(new FileFilter()
         {
@@ -42,6 +40,6 @@ public class ZipFileGeneratorTest extends TestCase
             }
         });
 
-        assertEquals(3, zipFiles.length);
+        Assert.assertEquals(3, zipFiles.length);
     }
 }

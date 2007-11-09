@@ -7,6 +7,7 @@ package uk.ac.ebi.intact.application.dataConversion.psiDownload.model;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Institution;
+import org.junit.Ignore;
 
 /**
  * Allow to creatre an Experiment to which we can set an AC.
@@ -14,6 +15,7 @@ import uk.ac.ebi.intact.model.Institution;
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id$
  */
+@Ignore
 public class TestableExperiment extends Experiment {
 
 //    public TestableExperiment( Institution owner, String shortLabel, BioSource source ) {

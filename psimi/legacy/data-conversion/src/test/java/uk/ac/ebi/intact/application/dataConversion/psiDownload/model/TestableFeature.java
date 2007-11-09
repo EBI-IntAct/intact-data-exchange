@@ -8,6 +8,7 @@ import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvFeatureType;
 import uk.ac.ebi.intact.model.Feature;
 import uk.ac.ebi.intact.model.Institution;
+import org.junit.Ignore;
 
 /**
  * Allow to creatre an Experiment to which we can set an AC.
@@ -15,6 +16,7 @@ import uk.ac.ebi.intact.model.Institution;
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id$
  */
+@Ignore
 public class TestableFeature extends Feature {
 
     public TestableFeature() {

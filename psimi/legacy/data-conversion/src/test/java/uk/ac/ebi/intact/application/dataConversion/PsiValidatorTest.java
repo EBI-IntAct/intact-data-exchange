@@ -5,9 +5,8 @@
  */
 package uk.ac.ebi.intact.application.dataConversion;
 
-import junit.framework.TestCase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.io.File;
 
@@ -18,11 +17,10 @@ import java.io.File;
  * @version $Id$
  * @since <pre>18-Aug-2006</pre>
  */
-public class PsiValidatorTest extends TestCase
+public class PsiValidatorTest
 {
 
-    private static final Log log = LogFactory.getLog(PsiValidatorTest.class);
-
+    @Test
     public void testValidate_Error() throws Exception
     {
         File xmlWithError = new File(PsiValidatorTest.class.getResource("/validator/psi1_error.xml").getFile());
@@ -34,6 +32,7 @@ public class PsiValidatorTest extends TestCase
         assertEquals(1, report.getMessages().size());
     }
 
+    @Test
     public void testValidate_Ok() throws Exception
     {
         File xmlOk = new File(PsiValidatorTest.class.getResource("/validator/psi1_ok.xml").getFile());
@@ -44,6 +43,7 @@ public class PsiValidatorTest extends TestCase
         assertEquals(0, report.getMessages().size());
     }
 
+    @Test
     public void testValidate253_Ok() throws Exception
     {
         File xmlOk = new File(PsiValidatorTest.class.getResource("/validator/psi253_ok.xml").getFile());

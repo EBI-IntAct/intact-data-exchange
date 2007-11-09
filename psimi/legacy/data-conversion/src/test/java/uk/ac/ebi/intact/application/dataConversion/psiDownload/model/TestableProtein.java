@@ -5,6 +5,7 @@
 package uk.ac.ebi.intact.application.dataConversion.psiDownload.model;
 
 import uk.ac.ebi.intact.model.*;
+import org.junit.Ignore;
 
 /**
  * Allow to create a Protein to which we can set an AC.
@@ -12,6 +13,7 @@ import uk.ac.ebi.intact.model.*;
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id$
  */
+@Ignore
 public class TestableProtein extends ProteinImpl {
 
     public TestableProtein() {

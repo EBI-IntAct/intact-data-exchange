@@ -15,11 +15,22 @@
  */
 package uk.ac.ebi.intact.application.dataConversion;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.BeforeClass;
+import uk.ac.ebi.intact.config.impl.SmallCvPrimer;
+import uk.ac.ebi.intact.context.DataContext;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.plugins.targetspecies.UpdateTargetSpecies;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.model.Component;
+import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.model.Experiment;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.plugins.dbupdate.targetspecies.UpdateTargetSpecies;
 
 import java.io.File;
+import java.util.Iterator;
 
 /**
  * TODO comment this!
@@ -27,36 +38,58 @@ import java.io.File;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public abstract class DataConversionAbstractTest extends TestCase
-{
+public abstract class DataConversionAbstractTest extends IntactBasicTestCase {
 
-    private static boolean prepared = false;
 
-    @Override
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+    @After
+    public void tearDown() throws Exception {
     }
 
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
+    @BeforeClass
+    public static void prepare() throws Exception {
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+        dataContext.beginTransaction();
+        DataConversionCvPrimer primer = new DataConversionCvPrimer(dataContext.getDaoFactory());
+        primer.createCVs();
+        dataContext.commitTransaction();
 
-        if (!prepared)
-        {
-            // update target species
-            IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-            UpdateTargetSpecies.update(System.out, false);
-            IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+        IntactMockBuilder mockBuilder = new IntactMockBuilder();
 
-            File file = new File("reverseMapping.txt.ser");
-            if (file.exists()) file.delete();
+        Experiment exp1 = mockBuilder.createDeterministicExperiment();
+        exp1.setShortLabel("mahajan-2000-1");
+        exp1.addInteraction(mockBuilder.createInteractionRandomBinary());
+
+        PersisterHelper.saveOrUpdate(exp1);
+
+        Experiment exp2 = mockBuilder.createExperimentEmpty("ni-1998-2", "1234");
+        exp2.addInteraction(mockBuilder.createInteractionRandomBinary());
+        Iterator<Component> compIter = exp2.getInteractions().iterator().next().getComponents().iterator();
+        Component c1 = compIter.next();
+        Component c2 = compIter.next();
+
+        c1.setExpressedIn(mockBuilder.createBioSource(9606, "human"));
+        c2.setExpressedIn(mockBuilder.createBioSource(-1, "in vitro"));
+
+        PersisterHelper.saveOrUpdate(exp2);
+
+        // update target species
+        new UpdateTargetSpecies().updateAllExperiments();
+
+        File file = new File("reverseMapping.txt.ser");
+        if (file.exists()) file.delete();
+    }
+
+    private static class DataConversionCvPrimer extends SmallCvPrimer {
+
+        public DataConversionCvPrimer(DaoFactory daoFactory) {
+            super(daoFactory);
         }
 
-        prepared = true;
+        @Override
+        public void createCVs() {
+            super.createCVs();
 
-        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+            getCvObject(CvXrefQualifier.class, CvXrefQualifier.TARGET_SPECIES);
+        }
     }
 }

@@ -6,9 +6,9 @@
 
 package uk.ac.ebi.intact.application.dataConversion;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +20,7 @@ import java.util.List;
  * @version $Id$
  * @since 08/10/2006
  */
-public class ExperimentListItemTest extends TestCase {
-
-    public ExperimentListItemTest( String name ) {
-        super( name );
-    }
+public class ExperimentListItemTest {
 
     private static final String LABEL_1 = "test-2006-1";
     private static final String LABEL_2 = "test-2006-2";
@@ -33,8 +29,8 @@ public class ExperimentListItemTest extends TestCase {
     private ExperimentListItem mockWithOneLabelLarge;
     private ExperimentListItem mockWithManyLabels;
 
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
 
         List<String> labels = new ArrayList<String>();
         labels.add( LABEL_1 );
@@ -48,10 +44,7 @@ public class ExperimentListItemTest extends TestCase {
         mockWithManyLabels = new ExperimentListItem( labels2, "manylabel", "species", false, 3, null );
     }
 
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testStaticParseString() throws Exception {
         ExperimentListItem experimentListItem = ExperimentListItem.parseString( "species/humt-_small.xml kanamori-2003-4" );
         assertEquals( "species/humt-_small.xml", experimentListItem.getFilename() );
@@ -77,56 +70,65 @@ public class ExperimentListItemTest extends TestCase {
         assertEquals( "pmid/2007/unassigned1.xml", experimentListItem.getFilename() );
     }
 
-
+    @Test
     public void testGetFilename() throws Exception {
         assertEquals( "species" + FileHelper.SLASH + "onelabel_negative.xml", mockWithOneLabel.getFilename() );
         assertEquals( "pmid" + FileHelper.SLASH + "2006" + FileHelper.SLASH + "onelabellarge_test-2006-1_02.xml", mockWithOneLabelLarge.getFilename() );
         assertEquals( "species" + FileHelper.SLASH + "manylabel-03.xml", mockWithManyLabels.getFilename() );
     }
 
+    @Test
     public void testGetPattern() throws Exception {
         assertEquals( "test-2006-1", mockWithOneLabel.getPattern() );
         assertEquals( "test-2006-1", mockWithOneLabelLarge.getPattern() );
         assertEquals( "test-2006-1,test-2006-2", mockWithManyLabels.getPattern() );
     }
 
+    @Test
     public void testGetChunkNumber() throws Exception {
         assertNull( mockWithOneLabel.getChunkNumber() );
         assertEquals( Integer.valueOf( 3 ), mockWithManyLabels.getChunkNumber() );
     }
 
+    @Test
     public void testGetLargeScaleChunkSize() throws Exception {
         assertNull( mockWithOneLabel.getLargeScaleChunkSize() );
         assertEquals( Integer.valueOf( 2000 ), mockWithOneLabelLarge.getLargeScaleChunkSize() );
     }
 
+    @Test
     public void testGetName() throws Exception {
         assertEquals( "onelabel", mockWithOneLabel.getName() );
         assertEquals( "manylabel", mockWithManyLabels.getName() );
     }
 
+    @Test
     public void testGetExperimentLabels() throws Exception {
         assertEquals( 1, mockWithOneLabel.getExperimentLabels().size() );
         assertEquals( 2, mockWithManyLabels.getExperimentLabels().size() );
     }
 
+    @Test
     public void testGetInteractionRange() throws Exception {
         assertEquals( "", mockWithOneLabel.getInteractionRange() );
         assertEquals( "[2001,4000]", mockWithOneLabelLarge.getInteractionRange() );
     }
 
+    @Test
     public void testGetParentFolders() throws Exception {
         assertEquals( "species", mockWithOneLabel.getParentFolders() );
         assertEquals( "pmid" + FileHelper.SLASH + "2006", mockWithOneLabelLarge.getParentFolders() );
         assertEquals( "species", mockWithManyLabels.getParentFolders() );
     }
 
+    @Test
     public void testToString() throws Exception {
         assertEquals( "species" + FileHelper.SLASH + "onelabel_negative.xml test-2006-1", mockWithOneLabel.toString() );
         assertEquals( "pmid" + FileHelper.SLASH + "2006" + FileHelper.SLASH + "onelabellarge_test-2006-1_02.xml test-2006-1 [2001,4000]", mockWithOneLabelLarge.toString() );
         assertEquals( "species" + FileHelper.SLASH + "manylabel-03.xml test-2006-1,test-2006-2", mockWithManyLabels.toString() );
     }
 
+    @Test
     public void testParseString() throws Exception {
         assertEquals( mockWithOneLabel, ExperimentListItem.parseString( mockWithOneLabel.toString() ) );
         assertEquals( mockWithOneLabelLarge, ExperimentListItem.parseString( mockWithOneLabelLarge.toString() ) );
@@ -146,11 +148,5 @@ public class ExperimentListItemTest extends TestCase {
         assertEquals( "", e.getInteractionRange() );
         assertEquals( null, e.getLargeScaleChunkSize() );
         assertEquals( "li-2006b-1,li-2006b-2,li-2006b-3,li-2006b-4", e.getPattern() );
-
-
-    }
-
-    public static Test suite() {
-        return new TestSuite( ExperimentListItemTest.class );
     }
 }

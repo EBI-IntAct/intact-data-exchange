@@ -15,11 +15,6 @@
 
     <name>IntAct Data Exchange :: PSI MI :: Legacy :: Data Conversion</name>
     <description>Import/Exports from/to PSI files</description>
- 
-    <properties>
-       <maven.test.skip>true</maven.test.skip>
-    </properties>
-
 
     <dependencies>
         <dependency>
@@ -57,6 +52,12 @@
             <groupId>uk.ac.ebi.intact.plugins</groupId>
             <artifactId>dbupdate-maven-plugin</artifactId>
             <version>1.6.0-SNAPSHOT</version>
+            <exclusions>
+               <exclusion>
+                   <groupId>uk.ac.ebi.intact</groupId>
+                   <artifactId>intact-core</artifactId>
+               </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

@@ -4,6 +4,7 @@
 
 package uk.ac.ebi.intact.application.dataConversion.psiDownload.model;
 
+import org.junit.Ignore;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.model.Institution;
 
@@ -13,6 +14,7 @@ import uk.ac.ebi.intact.model.Institution;
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id$
  */
+@Ignore
 public class TestableBioSource extends BioSource {
 
     public TestableBioSource() {
