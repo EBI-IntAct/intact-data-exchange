@@ -76,7 +76,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         IntActBinaryInteraction dbi = ( IntActBinaryInteraction ) bi;
 
         if ( interaction.getParticipants().size() != 2 ) {
-            log.warn( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 2 participants." );
+            if (log.isDebugEnabled()) log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 2 participants." );
         }
 
         Iterator<Participant> pi = interaction.getParticipants().iterator();
@@ -84,7 +84,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         Participant pB = pi.next();
 
         if ( pA.getExperimentalRoles().size() != 1 ) {
-            log.warn( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
+            if (log.isDebugEnabled()) log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
         } else {
             CrossReference experimentalRoleA = extractExperimentalRole( pA );
 
@@ -98,7 +98,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         }
 
         if ( pB.getExperimentalRoles().size() != 1 ) {
-            log.warn( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
+            if (log.isDebugEnabled()) log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
         } else {
             CrossReference experimentalRoleB = extractExperimentalRole( pB );
 
@@ -112,7 +112,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         }
 
         if ( pA.getInteractor().getInteractorType() == null ) {
-            log.warn( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
+            if (log.isDebugEnabled()) log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
         } else {
             CrossReference typeA  = extractInteractorType( pA );
 
@@ -126,7 +126,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         }
 
         if ( pB.getInteractor().getInteractorType() == null ) {
-            log.warn( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
+            if (log.isDebugEnabled()) log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
         } else {
             CrossReference typeB  = extractInteractorType( pB );
 
@@ -303,7 +303,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             sb.append( TabulatedLineFormatter.formatCv( dbi.getExperimentalRolesInteractorA() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            log.warn( "No experimentalRole for Interactor A found for " + dbi.getInteractionAcs() );
+            if (log.isDebugEnabled()) log.debug( "No experimentalRole for Interactor A found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
@@ -312,7 +312,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             sb.append( TabulatedLineFormatter.formatCv( dbi.getExperimentalRolesInteractorB() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            log.warn( "No experimentalRole for Interactor B found for " + dbi.getInteractionAcs() );
+            if (log.isDebugEnabled()) log.debug( "No experimentalRole for Interactor B found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
@@ -321,7 +321,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             sb.append( TabulatedLineFormatter.formatCv( dbi.getPropertiesA() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            log.warn( "No properties for Interactor A found for " + dbi.getInteractionAcs() );
+            if (log.isDebugEnabled()) log.debug( "No properties for Interactor A found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
@@ -330,7 +330,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             sb.append( TabulatedLineFormatter.formatCv( dbi.getPropertiesB() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            log.warn( "No properties for Interactor B found for " + dbi.getInteractionAcs() );
+            if (log.isDebugEnabled()) log.debug( "No properties for Interactor B found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
@@ -339,7 +339,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             sb.append( TabulatedLineFormatter.formatCv( dbi.getInteractorTypeA() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            log.warn( "No interactorType for A found for " + dbi.getInteractionAcs() );
+            if (log.isDebugEnabled()) log.debug( "No interactorType for A found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
@@ -348,7 +348,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             sb.append( TabulatedLineFormatter.formatCv( dbi.getInteractorTypeB() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            log.warn( "No interactorType for B found for " + dbi.getInteractionAcs() );
+            if (log.isDebugEnabled()) log.debug( "No interactorType for B found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
@@ -357,7 +357,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             sb.append( TabulatedLineFormatter.formatCv( dbi.getHostOrganism() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            log.warn( "No hostOrganism found for " + dbi.getInteractionAcs() );
+            if (log.isDebugEnabled()) log.debug( "No hostOrganism found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
@@ -366,7 +366,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             sb.append( dbi.getExpansionMethod() );
         } else {
             sb.append( LineFormatter.NONE );
-            log.warn( "No expansionMethod found for " + dbi.getInteractionAcs() );
+            if (log.isDebugEnabled()) log.debug( "No expansionMethod found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
@@ -375,7 +375,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             sb.append( formatStringList( dbi.getDataset() )  );
         } else {
             sb.append( LineFormatter.NONE );
-            log.warn( "No dataset name found for " + dbi.getInteractionAcs() );
+            if (log.isDebugEnabled()) log.debug( "No dataset name found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
     }
@@ -550,7 +550,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
 
             // add new ExperimentalRoles
             if ( !pA.getExperimentalRoles().add( experimentalRole ) ) {
-                log.warn( "ExperimentalRole couldn't add to the participant" );
+                if (log.isDebugEnabled()) log.debug( "ExperimentalRole couldn't add to the participant" );
             }
         }
 
@@ -563,7 +563,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
 
             // add new ExperimentalRoles
             if ( !pB.getExperimentalRoles().add( experimentalRole ) ) {
-                log.warn( "ExperimentalRole couldn't add to the participant" );
+                if (log.isDebugEnabled()) log.debug( "ExperimentalRole couldn't add to the participant" );
             }
         }
 
