@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class ExperimentListGeneratorTest extends DataConversionAbstractTest
 {
-
+    @Test (expected = IntactException.class)
     public void testSearchPatternWithCommas() throws Exception
     {
         ExperimentListGenerator gen = new ExperimentListGenerator("jin-2000-3,jin-2000-5,jin-2000-4,jin-2000-2,jin-2000-1");
