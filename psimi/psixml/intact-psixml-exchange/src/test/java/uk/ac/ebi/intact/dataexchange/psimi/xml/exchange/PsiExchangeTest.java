@@ -15,23 +15,20 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.joda.time.DateTime;
-import psidev.psi.mi.xml.model.*;
+import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Alias;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.DebugUtil;
-import uk.ac.ebi.intact.context.IntactContext;
 
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -74,9 +71,10 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         PsiExchange.importIntoIntact(getMintEntrySet(), false);
 
         int count = getDaoFactory().getInteractionDao().countAll();
-        System.out.println(DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll()));
+        final List<String> labels = DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll());
+        System.out.println(labels);
 
-        Assert.assertEquals(16, count);
+        Assert.assertEquals(18, count);
     }
 
     @Test
@@ -102,7 +100,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         PsiExchange.importIntoIntact(getMintEntrySet(), false);
 
         beginTransaction();
-        Assert.assertEquals(22, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(24, getDaoFactory().getInteractionDao().countAll());
         commitTransaction();
 
         PsiExchange.importIntoIntact(getDipEntrySet(), false);
