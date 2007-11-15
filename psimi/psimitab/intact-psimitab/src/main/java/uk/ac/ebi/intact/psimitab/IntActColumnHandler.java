@@ -43,6 +43,8 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
 
     private static final Pattern EXPERIMENT_LABEL_PATTERN = Pattern.compile( "[a-z-_]+-\\d{4}[a-z]?-\\d+" );
 
+    private static final String IDENTITY_MI_REF = "MI:0356";
+
     /**
      * CrossReference Converter
      */
@@ -265,7 +267,14 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
                 id = dbref.getId();
                 db = dbref.getDb();
             }
-            properties.add( new CrossReferenceImpl( db, id ));
+
+            if ( dbref.getRefTypeAc() == null ) {
+                properties.add( new CrossReferenceImpl( db, id ));
+            } else {
+                if ( !dbref.getRefTypeAc().equals( IDENTITY_MI_REF )) {
+                    properties.add( new CrossReferenceImpl( db, id ));    
+                }
+            }
         }
         return properties;
     }
