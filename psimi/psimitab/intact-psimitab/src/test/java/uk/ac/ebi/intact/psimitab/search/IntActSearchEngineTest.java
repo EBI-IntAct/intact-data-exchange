@@ -17,7 +17,7 @@ package uk.ac.ebi.intact.psimitab.search;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.store.Directory;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import psidev.psi.mi.search.SearchResult;
 import psidev.psi.mi.search.query.SearchQuery;

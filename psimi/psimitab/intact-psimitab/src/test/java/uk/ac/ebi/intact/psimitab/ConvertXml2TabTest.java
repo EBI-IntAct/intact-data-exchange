@@ -2,7 +2,6 @@ package uk.ac.ebi.intact.psimitab;
 
 import org.junit.Assert;
 import org.junit.Test;
-import static org.junit.Assert.assertTrue;
 import psidev.psi.mi.tab.converter.xml2tab.IsExpansionStrategyAware;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.SpokeExpansion;
@@ -110,7 +109,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     @Test
     public void convert() throws Exception {
 
-        File intputDir = new File( ConvertXml2TabTest.class.getResource( "/xml-samples" ).getFile() );
+        File intputDir = getFileByResources("/xml-samples", ConvertXml2TabTest.class);
 
         ConvertXml2Tab converter = new ConvertXml2Tab();
 
@@ -167,7 +166,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
     @Test
     public void convert2() throws Exception {
-        File file = new File( ConvertXml2TabTest.class.getResource( "/xml-samples/11230133.xml" ).getFile() );
+        File file = getFileByResources("/xml-samples/11230133.xml", ConvertXml2TabTest.class);
 
         ConvertXml2Tab x2t = new ConvertXml2Tab();
         x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
@@ -195,7 +194,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     @Test
     public void convert3() throws Exception {
 
-        File intputDir = new File( ConvertXml2TabTest.class.getResource( "/xml-samples" ).getFile() );
+        File intputDir = getFileByResources("/xml-samples", ConvertXml2TabTest.class);
 
         ConvertXml2Tab converter = new ConvertXml2Tab();
         converter.setBinaryInteractionClass( IntActBinaryInteraction.class );
@@ -254,7 +253,8 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
     @Test
     public void convert4() throws Exception {
-        File file = new File( ConvertXml2TabTest.class.getResource( "/psi25-testset/9971739.xml" ).getFile() );
+
+        File file = getFileByResources("/psi25-testset/9971739.xml", ConvertXml2TabTest.class);
         Assert.assertNotNull( file );
 
         ConvertXml2Tab converter = new ConvertXml2Tab();
@@ -280,7 +280,6 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         logWriter.close();
 
         Assert.assertTrue( outputFile.exists() );
-        System.out.println( outputFile.getAbsolutePath() );
         Assert.assertTrue( outputFile.length() > 0 );
         Assert.assertTrue( logFile.exists() );
         Assert.assertTrue( logFile.length() == 0 );
@@ -289,7 +288,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     @Test
     public void expansionMethod_nary_interaction_2() throws Exception {
 
-        File xmlFile = new File( ConvertXml2TabTest.class.getResource( "/psi25-testset/single-nary-interaction.xml" ).getFile() );
+        File xmlFile = getFileByResources("/psi25-testset/single-nary-interaction.xml", ConvertXml2TabTest.class);
         Assert.assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
@@ -316,7 +315,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     @Test
     public void expansionMethod_binary_interaction() throws Exception {
 
-        File xmlFile = new File( ConvertXml2TabTest.class.getResource( "/psi25-testset/single-interaction.xml" ).getFile() );
+        File xmlFile = getFileByResources("/psi25-testset/single-interaction.xml", ConvertXml2TabTest.class);
         Assert.assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
@@ -337,7 +336,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
     @Test
     public void datasetName () throws Exception {
 
-        File xmlFile = new File( ConvertXml2TabTest.class.getResource( "/psi25-testset/17292829.xml" ).getFile() );
+        File xmlFile = getFileByResources( "/psi25-testset/17292829.xml", ConvertXml2TabTest.class);
         Assert.assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model

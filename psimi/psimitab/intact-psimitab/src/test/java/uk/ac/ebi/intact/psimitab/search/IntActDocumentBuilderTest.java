@@ -6,7 +6,6 @@ package uk.ac.ebi.intact.psimitab.search;
 
 import junit.framework.Assert;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.junit.Test;
 import psidev.psi.mi.search.util.DocumentBuilder;
 import psidev.psi.mi.tab.model.BinaryInteraction;

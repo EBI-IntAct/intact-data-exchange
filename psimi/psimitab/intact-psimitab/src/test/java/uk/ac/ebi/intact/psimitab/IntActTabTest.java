@@ -1,16 +1,10 @@
 package uk.ac.ebi.intact.psimitab;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.util.Collection;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
@@ -21,6 +15,9 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceFactory;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 
+import java.io.File;
+import java.util.Collection;
+
 public class IntActTabTest extends AbstractPsimitabTestCase {
 
     public static final Log log = LogFactory.getLog( IntActTabTest.class );
@@ -28,7 +25,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
     @Test
     public void testBinaryInteractionHandler() throws Exception {
 
-        File xmlFile = new File( IntActTabTest.class.getResource( "/psi25-testset/bantscheff.xml" ).getFile() );
+        File xmlFile = getFileByResources("/psi25-testset/bantscheff.xml", IntActTabTest.class);
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
@@ -59,7 +56,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
     @Test
     public void testPsimiTabReader() throws Exception {
 
-        File tabFile = new File( IntActTabTest.class.getResource( "/mitab-testset/bantscheff_expanded.txt" ).getFile() );
+        File tabFile = getFileByResources("/mitab-testset/bantscheff_expanded.txt", IntActTabTest.class );
         assertTrue( tabFile.canRead() );
 
         boolean hasHeaderLine = true;
@@ -70,7 +67,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
 
         Collection<BinaryInteraction> bis = reader.read( tabFile );
 
-        File xmlFile = new File( IntActTabTest.class.getResource( "/psi25-testset/bantscheff.xml" ).getFile() );
+        File xmlFile = getFileByResources("/psi25-testset/bantscheff.xml", IntActTabTest.class);
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
@@ -79,8 +76,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         xml2tab.setBinaryInteractionClass( IntActBinaryInteraction.class );
         xml2tab.setColumnHandler( new IntActColumnHandler() );
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
-        xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance()
-                .build( "MI", "0469", "intact" ) );
+        xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
         xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
@@ -100,7 +96,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
     @Test
     public void testExpansion() throws Exception {
 
-        File xmlFile = new File( IntActTabTest.class.getResource( "/psi25-testset/simple.xml" ).getFile() );
+        File xmlFile = getFileByResources( "/psi25-testset/simple.xml", IntActTabTest.class);
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model

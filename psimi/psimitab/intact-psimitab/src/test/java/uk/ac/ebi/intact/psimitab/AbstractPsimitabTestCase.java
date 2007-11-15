@@ -18,6 +18,8 @@ package uk.ac.ebi.intact.psimitab;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 /**
  * PSIMITAB Test Case.
@@ -28,8 +30,9 @@ import java.io.File;
  */
 public abstract class AbstractPsimitabTestCase {
 
-    protected File getTargetDirectory() {
-        String outputDirPath = IntActTabTest.class.getResource( "/" ).getFile();
+    protected File getTargetDirectory() throws UnsupportedEncodingException {
+        String outputDirPath = getFileByResources( "/", IntActTabTest.class).getAbsolutePath();
+        //String outputDirPath = IntActTabTest.class.getResource( "/" ).getFile();
         assertNotNull( outputDirPath );
         File outputDir = new File( outputDirPath );
         // we are in test-classes, move one up
@@ -39,5 +42,10 @@ public abstract class AbstractPsimitabTestCase {
         assertEquals( "target", outputDir.getName() );
 
         return outputDir;
+    }
+
+        public static File getFileByResources(String fileName, Class clazz) throws UnsupportedEncodingException {
+        String strFile = clazz.getResource( fileName ).getFile();
+        return new File( URLDecoder.decode( strFile, "utf-8" ));
     }
 }
