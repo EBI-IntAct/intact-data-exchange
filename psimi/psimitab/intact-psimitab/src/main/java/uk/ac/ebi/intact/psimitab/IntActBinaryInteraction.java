@@ -129,39 +129,39 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
     }
 
     public boolean hasExperimentalRolesInteractorA(){
-    	return experimentalRoleA != null;
+        return !( experimentalRoleA == null || experimentalRoleA.isEmpty() );
     }
 
     public boolean hasExperimentalRolesInteractorB(){
-    	return experimentalRoleB != null;
+        return !( experimentalRoleB == null || experimentalRoleB.isEmpty() );
     }
 
     public boolean hasPropertiesA(){
-    	return propertiesA != null;
+        return !( propertiesA == null || propertiesA.isEmpty() );
     }
 
     public boolean hasPropertiesB(){
-    	return propertiesB != null;
+        return !( propertiesB == null || propertiesB.isEmpty() );
     }
 
 	public boolean hasInteractorTypeA(){
-		return interactorTypeA != null;
-	}
+        return !( interactorTypeA == null || interactorTypeA.isEmpty() );
+    }
 
 	public boolean hasInteractorTypeB(){
-		return interactorTypeB != null;
-	}
+        return !( interactorTypeB == null || interactorTypeB.isEmpty() );
+    }
 
 	public boolean hasHostOrganism(){
-		return hostOrganism != null;
-	}
+        return !( hostOrganism == null || hostOrganism.isEmpty() );
+    }
 
 	public boolean hasExpansionMethod(){
 		return expansionMethod != null;
 	}
 
     public boolean hasDatasetName() {
-        return dataset != null;
+        return !( dataset == null || dataset.isEmpty() );
     }
     
     /**
