@@ -18,8 +18,8 @@ package uk.ac.ebi.intact.psimitab.converters.expansion;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.InteractionUtils;
 
 import java.util.*;
 

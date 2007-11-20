@@ -1,14 +1,13 @@
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.Interaction;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * MatrixExpansion Tester.

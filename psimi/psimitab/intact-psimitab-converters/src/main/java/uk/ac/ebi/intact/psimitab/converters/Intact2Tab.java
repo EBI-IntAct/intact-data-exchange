@@ -42,6 +42,8 @@ public class Intact2Tab {
 
     private Class binaryInteractionClass;
 
+    private BinaryInteractionHandler biHandler;
+
     //private PostProssesorStrategy postProssesorStrategy;
 
     /////////////////////
@@ -64,6 +66,14 @@ public class Intact2Tab {
         this.binaryInteractionClass = binaryInteractionClass;
     }
 
+    public BinaryInteractionHandler getBinaryInteractionHandler() {
+        return biHandler;
+    }
+
+    public void setBinaryInteractionHandler( BinaryInteractionHandler biHandler ) {
+        this.biHandler = biHandler;
+    }
+
     //////////////////////
     // Construtor
 
@@ -79,6 +89,8 @@ public class Intact2Tab {
             if ( binaryInteractionClass != null ) {
                 interactionConverter.setBinaryInteractionClass( binaryInteractionClass );
             }
+
+            interactionConverter.setBinaryInteractionHandler( biHandler );
 
             if ( expansionStrategy != null ) {
                 Collection<Interaction> expandedInteractions = expansionStrategy.expand( interaction );

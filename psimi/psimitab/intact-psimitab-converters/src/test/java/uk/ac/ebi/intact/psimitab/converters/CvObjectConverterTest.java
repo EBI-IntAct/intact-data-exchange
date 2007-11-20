@@ -14,7 +14,7 @@ import uk.ac.ebi.intact.model.CvInteractionType;
 /**
  * CvObjectConverter Tester.
  *
- * @author <Authors name>
+ * @author Nadin Neuhauser
  * @version 1.0
  * @since <pre>11/13/2007</pre>
  */

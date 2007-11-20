@@ -77,11 +77,11 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
     public void expandTest_4() {
 
         // generate a interaction with only one Component
-        Component preyComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
-        preyComponent.getCvExperimentalRole().setShortLabel(CvExperimentalRole.SELF);
-        preyComponent.getCvExperimentalRole().getXrefs().iterator().next().setPrimaryId(CvExperimentalRole.SELF_PSI_REF);
-        preyComponent.setStoichiometry( 2 );
-        Component selfComponent = preyComponent;
+        Component selfComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
+        selfComponent.getCvExperimentalRole().setShortLabel(CvExperimentalRole.SELF);
+        selfComponent.getCvExperimentalRole().getXrefs().iterator().next().setPrimaryId(CvExperimentalRole.SELF_PSI_REF);
+        selfComponent.setStoichiometry( 2 );
+
         Interaction interaction = getMockBuilder().createInteractionRandomBinary( );
         for (Component component : interaction.getComponents() ){
             interaction.removeComponent(component);

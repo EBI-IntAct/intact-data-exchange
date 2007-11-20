@@ -13,34 +13,28 @@
  * See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package uk.ac.ebi.intact.psimitab.converters.expansion;
+package uk.ac.ebi.intact.psimitab.converters;
 
+import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import uk.ac.ebi.intact.model.Interaction;
 
-import java.util.Collection;
-
 /**
- * ExpansionStrategy
+ * Defines how to process an interaction and alter the creating of a binary interaction. If the
+ * BinaryInteractionImpl given is an extension of the class, it becomes possible to populate
+ * additional columns.
  *
  * @author Nadin Neuhauser
  * @version $Id$
  * @since 2.0.0
  */
-public interface ExpansionStrategy {
+public interface BinaryInteractionHandler <T extends BinaryInteractionImpl> {
 
     /**
-     * Expand an interaction into a
+     * Does the extra processing on the BinaryInteractionImpl.
      *
-     * @param interaction  interaction which should be expanded
-     * @return a non null collection of interaction, in case the expansion is not possible, we may return an empty
-     *         collection.
+     * @param bi          Binary interaction to be processed.
+     * @param interaction Source interaction.
      */
-    public Collection<Interaction> expand( Interaction interaction );
+    public void process( T bi, Interaction interaction ) throws Intact2TabException;
 
-    /**
-     * Gets the method of the ExpansionStrategy
-     *
-     * @return spoke, matrix or none
-     */
-    public String getName();
 }

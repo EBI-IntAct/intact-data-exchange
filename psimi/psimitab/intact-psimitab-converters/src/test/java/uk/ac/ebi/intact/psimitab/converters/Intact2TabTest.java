@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.psimitab.converters;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
@@ -20,31 +21,14 @@ import java.util.Iterator;
 /**
  * Intact2Tab Tester.
  *
- * @author <Authors name>
+ * @author Nadin Neuhauser
  * @version 1.0
  * @since <pre>11/13/2007</pre>
  */
 public class Intact2TabTest extends IntactBasicTestCase {
 
     @Test
-    public void convertIntact2TabTest() throws Exception {
-        Intact2Tab i2t = new Intact2Tab();
-        i2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
-        Collection<Interaction> interactions = new ArrayList<Interaction>();
-        for ( int i = 0; i < 3; i++ ) {
-            Interaction interaction = getMockBuilder().createInteractionRandomBinary();
-            interaction.setAc( "EBI-zzzzzzz" );
-            Iterator<Component> iter = interaction.getComponents().iterator();
-            iter.next().getInteractor().setAc( "EBI-xxxxxxx" );
-            iter.next().getInteractor().setAc( "EBI-yyyyyyy" );
-
-            interactions.add( interaction );
-        }
-        assertEquals( 3, interactions.size() );
-    }
-
-    @Test
-    public void convertIntact2TabTest_WithSeveralExpermeriments() throws Exception {
+    public void convertIntact2TabTest_BinaryInteractionImpl() throws Exception {
 
         Intact2Tab i2t = new Intact2Tab();
         i2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
@@ -60,14 +44,53 @@ public class Intact2TabTest extends IntactBasicTestCase {
             interactions.add( interaction );
         }
         assertEquals( 3, interactions.size() );
+
+        Collection<BinaryInteraction> bis = i2t.convert( interactions );
+        assertNotNull(bis);
+
+        File file = new File( TestHelper.getTargetDirectory(), "test_1.txt");
+        PsimiTabWriter writer = new PsimiTabWriter();
+        writer.write( bis, file );
     }
 
     @Test
-    public void convertIntact2TabTest_WithSeveralInteractions() throws Exception {
+    public void convertIntact2TabTest_IntactBinaryInteraction() throws Exception {
 
         Intact2Tab i2t = new Intact2Tab();
         i2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         i2t.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        i2t.setBinaryInteractionHandler( new IntactBinaryInteractionHandler() );
+        final Experiment e = getMockBuilder().createExperimentRandom( 3 );
+
+        Collection<Interaction> interactions = new ArrayList<Interaction>();
+        for ( Interaction interaction : e.getInteractions() ) {
+            interaction.setAc( "EBI-zzzzzzz" );
+            Iterator<Component> iter = interaction.getComponents().iterator();
+            iter.next().getInteractor().setAc( "EBI-xxxxxxx" );
+            iter.next().getInteractor().setAc( "EBI-yyyyyyy" );
+
+            interactions.add( interaction );
+        }
+        assertEquals( 3, interactions.size() );
+
+        Collection<BinaryInteraction> bis = i2t.convert( interactions );
+        assertNotNull(bis);
+
+        File file = new File( TestHelper.getTargetDirectory(), "test_2.txt");
+        PsimiTabWriter writer = new PsimiTabWriter();
+        writer.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        writer.setColumnHandler( new IntActColumnHandler() );
+        writer.write( bis, file );
+    }
+
+ /*
+    @Test
+    public void convertIntact2TabTest_1() throws Exception {
+
+        Intact2Tab i2t = new Intact2Tab();
+        i2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
+        i2t.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        i2t.setBinaryInteractionHandler( new IntactBinaryInteractionHandler() );
 
         Collection<Interaction> interactions = new ArrayList<Interaction>();
 
@@ -82,14 +105,56 @@ public class Intact2TabTest extends IntactBasicTestCase {
         interaction1.setAc( "EBI-1" );
         interactions.add( interaction1 );
 
-        baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
+        Collection<BinaryInteraction> bis = i2t.convert( interactions );
+        assertNotNull(bis);
+        assertEquals( 2, bis.size() );
+
+        File file = new File( TestHelper.getTargetDirectory(), "test1.txt");
+        PsimiTabWriter writer = new PsimiTabWriter();
+        writer.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        writer.setColumnHandler( new IntActColumnHandler() );
+        writer.write( bis, file );
+    }
+
+    @Test
+    public void convertIntact2TabTest_2() throws Exception {
+
+        Intact2Tab i2t = new Intact2Tab();
+        i2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
+        i2t.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        i2t.setBinaryInteractionHandler( new IntactBinaryInteractionHandler() );
+
+        Collection<Interaction> interactions = new ArrayList<Interaction>();
+
+        Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
         baitComponent.getInteractor().setAc( "baitA" );
-        preyComponent1 = getMockBuilder().createComponentPrey( getMockBuilder().createProteinRandom() );
+        Component preyComponent1 = getMockBuilder().createComponentPrey( getMockBuilder().createProteinRandom() );
         preyComponent1.getInteractor().setAc( "preyA" );
 
         Interaction interaction2 = getMockBuilder().createInteraction( baitComponent, preyComponent1 );
         interaction2.setAc( "EBI-2" );
         interactions.add( interaction2 );
+
+        Collection<BinaryInteraction> bis = i2t.convert( interactions );
+        assertNotNull(bis);
+        assertEquals( 1, bis.size() );
+
+        File file = new File( TestHelper.getTargetDirectory(), "test2.txt");
+        PsimiTabWriter writer = new PsimiTabWriter();
+        writer.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        writer.setColumnHandler( new IntActColumnHandler() );
+        writer.write( bis, file );
+    }
+
+    @Test
+    public void convertIntact2TabTest_3() throws Exception {
+
+        Intact2Tab i2t = new Intact2Tab();
+        i2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
+        i2t.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        i2t.setBinaryInteractionHandler( new IntactBinaryInteractionHandler() );
+
+        Collection<Interaction> interactions = new ArrayList<Interaction>();
 
         Interaction interaction3 = getMockBuilder().createInteraction( "neutral1", "neutral2", "neutral3" );
         int i = 1;
@@ -100,16 +165,16 @@ public class Intact2TabTest extends IntactBasicTestCase {
         interaction3.setAc( "EBI-3" );
         interactions.add( interaction3 );
 
+        Collection<BinaryInteraction> bis = i2t.convert( interactions );
+        assertNotNull(bis);
+        assertEquals( 2, bis.size() );
 
-        assertEquals( 3, interactions.size() );
-
-        File file = new File( "C:\\Documents and Settings\\nneuhaus\\Desktop\\test.txt" );
+        File file = new File( TestHelper.getTargetDirectory(), "test3.txt");
         PsimiTabWriter writer = new PsimiTabWriter();
         writer.setBinaryInteractionClass( IntActBinaryInteraction.class );
         writer.setColumnHandler( new IntActColumnHandler() );
-        Collection<BinaryInteraction> bis = i2t.convert( interactions );
         writer.write( bis, file );
     }
-
+*/
 
 }

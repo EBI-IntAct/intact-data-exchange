@@ -15,32 +15,28 @@
  */
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
+import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import uk.ac.ebi.intact.model.Interaction;
-
-import java.util.Collection;
+import uk.ac.ebi.intact.psimitab.converters.Intact2TabException;
 
 /**
- * ExpansionStrategy
+ * Is the implementor aware of any expansion strategy Class.
  *
  * @author Nadin Neuhauser
  * @version $Id$
  * @since 2.0.0
  */
-public interface ExpansionStrategy {
+
+
+public interface IsExpansionStrategyAware <T extends BinaryInteractionImpl>{
 
     /**
-     * Expand an interaction into a
+     * Does the extra processing on the BinaryInteractionImpl.
      *
-     * @param interaction  interaction which should be expanded
-     * @return a non null collection of interaction, in case the expansion is not possible, we may return an empty
-     *         collection.
+     * @param bi          Binary interaction to be processed.
+     * @param interaction Source interaction.
+     * @param expansionStrategy strategy of expansion.
+     * @throws uk.ac.ebi.intact.psimitab.converters.Intact2TabException
      */
-    public Collection<Interaction> expand( Interaction interaction );
-
-    /**
-     * Gets the method of the ExpansionStrategy
-     *
-     * @return spoke, matrix or none
-     */
-    public String getName();
+    public void process( T bi, Interaction interaction, ExpansionStrategy expansionStrategy ) throws Intact2TabException;
 }

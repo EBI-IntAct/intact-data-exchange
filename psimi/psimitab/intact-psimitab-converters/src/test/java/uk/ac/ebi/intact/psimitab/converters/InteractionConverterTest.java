@@ -13,7 +13,7 @@ import java.util.Iterator;
 /**
  * InteractionConverter Tester.
  *
- * @author <Authors name>
+ * @author Nadin Neuhauser
  * @version 1.0
  * @since <pre>11/12/2007</pre>
  */
@@ -38,6 +38,7 @@ public class InteractionConverterTest extends IntactBasicTestCase {
     public void convertToIntactMitab() throws Exception {
         InteractionConverter interactionConverter = new InteractionConverter();
         interactionConverter.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        interactionConverter.setBinaryInteractionHandler( new IntactBinaryInteractionHandler() );
 
         final Interaction interaction = getMockBuilder().createInteractionRandomBinary();
         Iterator<Component> i = interaction.getComponents().iterator();

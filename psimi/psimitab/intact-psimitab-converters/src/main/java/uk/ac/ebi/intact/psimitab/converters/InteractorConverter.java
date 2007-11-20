@@ -15,18 +15,16 @@
  */
 package uk.ac.ebi.intact.psimitab.converters;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.tab.model.Alias;
 import psidev.psi.mi.tab.model.*;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.CvAliasType;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.InteractorAlias;
+import psidev.psi.mi.tab.model.Interactor;
+import uk.ac.ebi.intact.model.*;
+import static uk.ac.ebi.intact.model.CvAliasType.*;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Interactor Converter.
@@ -37,16 +35,19 @@ import java.util.List;
  */
 public class InteractorConverter {
 
-    private static final Log logger = LogFactory.getLog( InteractorConverter.class );
+    private CrossReferenceConverter<InteractorXref> xRefConverter = new CrossReferenceConverter<InteractorXref>();
 
-    private CrossReferenceConverter xRefConverter = new CrossReferenceConverter();
+    private static final ArrayList<String> uniprotKeys;
 
-    private static final List<String> uniprotKeys = new ArrayList( Arrays.asList( new String[]
-            {"gene name", "gene name synonym, isoform synonym, ordered locus name, open reading frame name"} ) );
+    static {
+        uniprotKeys = new ArrayList<String>( Arrays.asList( GENE_NAME_MI_REF, GENE_NAME_SYNONYM_MI_REF,
+                                                            ISOFORM_SYNONYM_MI_REF, LOCUS_NAME_MI_REF,
+                                                            ORF_NAME_MI_REF ) );
+    }
 
 
     public Interactor toMitab( uk.ac.ebi.intact.model.Interactor intactInteractor ) {
-        if (intactInteractor == null){
+        if ( intactInteractor == null ) {
             throw new IllegalArgumentException( "Interactor must not be null" );
         }
 
@@ -62,24 +63,34 @@ public class InteractorConverter {
             Collection<CrossReference> altIds = new ArrayList<CrossReference>();
             Collection<Alias> tabAliases = new ArrayList<Alias>();
             for ( InteractorAlias alias : intactInteractor.getAliases() ) {
-                String text = alias.getCvAliasType().getShortLabel();
                 String id = alias.getName();
-                String db;
-                if ( uniprotKeys.contains( text ) ) {
-                    db = CvDatabase.UNIPROT;
-                } else {
-                    db = CvDatabase.INTACT;
+                String db = null;
+                String mi = null;
+                if ( alias.getCvAliasType() != null ) {
+                    CvObjectXref idxref = CvObjectUtils.getPsiMiIdentityXref( alias.getCvAliasType() );
+                    mi = idxref.getPrimaryId();
+                    if ( uniprotKeys.contains( mi ) ) {
+                        db = CvDatabase.UNIPROT;
+                    } else {
+                        db = CvDatabase.INTACT;
+                    }
                 }
-
                 if ( id != null && db != null ) {
-                    if ( text.equals( CvAliasType.GENE_NAME ) ) {
-                        CrossReference altId = CrossReferenceFactory.getInstance().build( db, id, text );
-                        altIds.add( altId );
+                    if ( alias.getCvAliasType() != null ) {
+                        String text = alias.getCvAliasType().getShortLabel();
+                        if ( text != null && mi.equals( GENE_NAME_MI_REF ) ) {
+                            CrossReference altId = CrossReferenceFactory.getInstance().build( db, id, text );
+                            altIds.add( altId );
+                        } else {
+                            Alias tabAlias = new AliasImpl( db, id );
+                            tabAliases.add( tabAlias );
+                        }
                     } else {
                         Alias tabAlias = new AliasImpl( db, id );
                         tabAliases.add( tabAlias );
                     }
                 }
+
             }
             tabInteractor.setAlternativeIdentifiers( altIds );
             tabInteractor.setAliases( tabAliases );
@@ -97,7 +108,7 @@ public class InteractorConverter {
     }
 
 
-    public Component fromMitab( Interactor interactor ) {
-        return null;
+    public Component fromMitab() {
+        throw new UnsupportedOperationException();
     }
 }

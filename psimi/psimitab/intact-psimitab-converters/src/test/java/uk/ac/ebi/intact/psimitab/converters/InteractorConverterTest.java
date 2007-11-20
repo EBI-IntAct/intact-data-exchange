@@ -9,7 +9,7 @@ import uk.ac.ebi.intact.model.Component;
 /**
  * InteractorConverter Tester.
  *
- * @author <Authors name>
+ * @author Nadin Neuhauser
  * @version 1.0
  * @since <pre>11/12/2007</pre>
  */

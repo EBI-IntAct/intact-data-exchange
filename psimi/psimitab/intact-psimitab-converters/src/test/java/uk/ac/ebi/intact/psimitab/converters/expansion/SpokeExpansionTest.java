@@ -7,10 +7,10 @@ import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.Interaction;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * SpokeExpansion Tester.
@@ -76,11 +76,10 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
     @Test
     public void expandTest_4() {
 
-        Component preyComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
-        preyComponent.getCvExperimentalRole().setShortLabel(CvExperimentalRole.SELF);
-        preyComponent.getCvExperimentalRole().getXrefs().iterator().next().setPrimaryId(CvExperimentalRole.SELF_PSI_REF);
-        preyComponent.setStoichiometry( 2 );
-        Component selfComponent = preyComponent;
+        Component selfComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
+        selfComponent.getCvExperimentalRole().setShortLabel(CvExperimentalRole.SELF);
+        selfComponent.getCvExperimentalRole().getXrefs().iterator().next().setPrimaryId(CvExperimentalRole.SELF_PSI_REF);
+        selfComponent.setStoichiometry( 2 );
 
         Interaction interaction = getMockBuilder().createInteractionRandomBinary( );
 
