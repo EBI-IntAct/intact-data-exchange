@@ -44,7 +44,7 @@ public abstract class AbstractPsimitabTestCase {
         return outputDir;
     }
 
-        public static File getFileByResources(String fileName, Class clazz) throws UnsupportedEncodingException {
+    public static File getFileByResources(String fileName, Class clazz) throws UnsupportedEncodingException {
         String strFile = clazz.getResource( fileName ).getFile();
         return new File( URLDecoder.decode( strFile, "utf-8" ));
     }

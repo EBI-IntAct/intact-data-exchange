@@ -10,13 +10,8 @@ import psidev.psi.mi.search.util.DefaultDocumentBuilder;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineParser;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * TODO comment this!
@@ -141,7 +136,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
                 v = v.split("\\(")[0];
             }
 
-            sb.append(v+" ");
+            sb.append( v ).append( " " );
         }
 
         sb.trimToSize();
@@ -156,13 +151,13 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
     	} else {
     		String []stringValues = doc.getField("GO").stringValue().split(" ");
     		boolean contains = false;
-    		for (int i = 0; i < stringValues.length; i++){
-    			if (stringValues[i].equals(v)){
-    				contains = true;
-    				break;
-    			}
-    		}
-    		if (contains == false){
+            for ( String stringValue : stringValues ) {
+                if ( stringValue.equals( v ) ) {
+                    contains = true;
+                    break;
+                }
+            }
+    		if ( !contains ){
         		value = doc.getField("GO").stringValue().concat(" " + v);
         		doc.removeField("GO");            			
     		}
@@ -187,7 +182,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
                 v = v.split("\\)")[0];
             }
 
-            sb.append(v+" ");
+            sb.append( v ).append( " " );
         }
 
         sb.trimToSize();

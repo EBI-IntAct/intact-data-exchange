@@ -24,8 +24,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
 
     @Test
     public void testBinaryInteractionHandler() throws Exception {
-
-        File xmlFile = getFileByResources("/psi25-testset/bantscheff.xml", IntActTabTest.class);
+        File xmlFile = getFileByResources("/psi25-testset/9971739.xml", IntActTabTest.class);
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
@@ -43,10 +42,10 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         writer.setColumnHandler( new IntActColumnHandler() );
         writer.setBinaryInteractionClass( IntActBinaryInteraction.class );
 
-        File tabFile = new File( getTargetDirectory(), "bantscheff_expanded.txt" );
+        File tabFile = new File( getTargetDirectory(), "9971739_expanded.txt" );
         assertTrue( tabFile.getParentFile().canWrite() );
         writer.write( interactions, tabFile );
-        assertEquals( 760, interactions.size() );
+        assertEquals( 3, interactions.size() );
 
         for ( BinaryInteraction interaction : interactions ) {
             assertTrue( interaction instanceof IntActBinaryInteraction );
@@ -56,7 +55,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
     @Test
     public void testPsimiTabReader() throws Exception {
 
-        File tabFile = getFileByResources("/mitab-testset/bantscheff_expanded.txt", IntActTabTest.class );
+        File tabFile = getFileByResources("/mitab-testset/9971739_expanded.txt", IntActTabTest.class );
         assertTrue( tabFile.canRead() );
 
         boolean hasHeaderLine = true;
@@ -67,7 +66,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
 
         Collection<BinaryInteraction> bis = reader.read( tabFile );
 
-        File xmlFile = getFileByResources("/psi25-testset/bantscheff.xml", IntActTabTest.class);
+        File xmlFile = getFileByResources("/psi25-testset/9971739.xml", IntActTabTest.class);
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
@@ -84,7 +83,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
 
         for ( BinaryInteraction bi : bis ) {
             IntActBinaryInteraction dbi = ( IntActBinaryInteraction ) bi;
-            assertTrue( dbi.getAuthors().get( 0 ).getName().contains( "Bantscheff" ) );
+            assertTrue( dbi.getAuthors().get( 0 ).getName().contains( "Leung" ) );
             assertTrue( dbi.hasExperimentalRolesInteractorA() );
             assertTrue( dbi.hasExperimentalRolesInteractorB() );
             assertTrue( dbi.hasPropertiesA() );
