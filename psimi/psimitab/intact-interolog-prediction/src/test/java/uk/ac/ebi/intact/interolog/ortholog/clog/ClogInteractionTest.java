@@ -3,7 +3,8 @@
  */
 package uk.ac.ebi.intact.interolog.ortholog.clog;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,9 +17,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.BinaryInteractionImpl;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.interolog.ortholog.clog.Clog;
-import uk.ac.ebi.intact.interolog.ortholog.clog.ClogInteraction;
 
 /**
  * @author mmichaut

@@ -3,11 +3,9 @@
  */
 package uk.ac.ebi.intact.interolog.prediction;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
-import psidev.psi.mi.tab.model.*;
-import uk.ac.ebi.intact.interolog.mitab.MitabException;
-import uk.ac.ebi.intact.interolog.mitab.MitabUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
@@ -15,6 +13,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+
+import org.junit.Test;
+
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.BinaryInteractionImpl;
+import psidev.psi.mi.tab.model.Confidence;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
+import psidev.psi.mi.tab.model.InteractionDetectionMethod;
+import psidev.psi.mi.tab.model.InteractionDetectionMethodImpl;
+import psidev.psi.mi.tab.model.InteractionType;
+import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.Organism;
+import psidev.psi.mi.tab.model.OrganismImpl;
+import uk.ac.ebi.intact.interolog.mitab.MitabException;
+import uk.ac.ebi.intact.interolog.mitab.MitabUtils;
 
 /**
  * @author mmichaut

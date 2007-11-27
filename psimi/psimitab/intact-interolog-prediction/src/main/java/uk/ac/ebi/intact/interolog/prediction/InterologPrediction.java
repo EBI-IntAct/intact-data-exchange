@@ -3,11 +3,37 @@
  */
 package uk.ac.ebi.intact.interolog.prediction;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.text.StrBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.PropertyConfigurator;
+
+
 import psidev.psi.mi.tab.PsimiTabWriter;
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.tab.model.Author;
+import psidev.psi.mi.tab.model.AuthorImpl;
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.BinaryInteractionImpl;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
+import psidev.psi.mi.tab.model.InteractionDetectionMethod;
+import psidev.psi.mi.tab.model.InteractionDetectionMethodImpl;
+import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.Organism;
+import psidev.psi.mi.tab.model.OrganismImpl;
 import psidev.psi.mi.tab.utils.PsiCollectionUtils;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.intact.interolog.download.Sucker;
@@ -22,12 +48,6 @@ import uk.ac.ebi.intact.interolog.proteome.integr8.ProteomeReportParser;
 import uk.ac.ebi.intact.interolog.util.InterologUtils;
 import uk.ac.ebi.intact.interolog.util.NewtException;
 import uk.ac.ebi.intact.interolog.util.NewtUtils;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.*;
 
 /**
  * This is the main part of the prediction process.
@@ -49,7 +69,7 @@ public class InterologPrediction {
 	
 	/*----------------------STATIC-----------------------*/
 	
-	public static final Log log = LogFactory.getLog(InterologPrediction.class);
+	public static Log log = LogFactory.getLog(InterologPrediction.class);
 	
 	/**
 	 * Integr8 ftp proteome report file is used to link proteome id to NCBI taxid.
@@ -123,7 +143,7 @@ public class InterologPrediction {
 	/**
 	 * Extension used for the mitab file generated with predicted interactions.
 	 */
-	private String predictedinteractionsFileExtension = ".txt";
+	private String predictedinteractionsFileExtension = ".mitab";
 	
 	
 	/**
@@ -153,7 +173,7 @@ public class InterologPrediction {
 	 * 
 	 * Default is true.
 	 */
-	private boolean downCastOnAllPresentSpecies = true;
+	private boolean downCastOnAllPresentSpecies = false;
 	
 	/**
 	 * List of species for which user wants predict interactions (NCBI taxids).
@@ -216,7 +236,7 @@ public class InterologPrediction {
 	/**
 	 * We can specify if we want to print the trace of the down-cast process in a file.
 	 */
-	private boolean writeDownCastHistory = false;
+	private boolean writeDownCastHistory = true;
 	
 	/**
 	 * We can specify if we want to print porc interactions in a file.
@@ -472,7 +492,7 @@ public class InterologPrediction {
 		FILE_DATA_PROTEOME = new File(workingDir.getAbsolutePath()+"/proteome_report.txt");
 		FILE_HISTORY_DOWN_CAST = new File(workingDir.getAbsolutePath()+"/downCast.history.txt");
 		FILE_RESULT_PORC_INTERACTIONS = new File(workingDir.getAbsolutePath()+"/clog.interactions.txt");
-		predictedinteractionsFileName = "clog.predictedInteractions";
+		predictedinteractionsFileName = "InteroPorc.predictedInteractions";
 		
 	}
 	
@@ -1332,6 +1352,16 @@ public class InterologPrediction {
 	}
 	
 	/**
+	 * @param propFileName
+	 * @return
+	 */
+	public static Log initLog(String propFileName) {
+		PropertyConfigurator.configure(propFileName);
+		return LogFactory.getLog(InterologPrediction.class);
+	}
+	
+	
+	/**
 	 * @param args
 	 * @throws InterologPredictionException 
 	 * @throws NewtException 
@@ -1339,21 +1369,28 @@ public class InterologPrediction {
 	 */
 	public static void main(String[] args) throws InterologPredictionException, NewtException{
 		
-		File dir = new File("/Users/mmichaut/Documents/EBI/results/clogs/");
-		InterologPrediction up = new InterologPrediction(dir);
+		File dir = new File("/Users/mmichaut/Documents/These/Results/Inference/interoPorc/test/");
+		
 		//File mitab = new File("/Users/mmichaut/Documents/EBI/data/IntAct/intact.mitab");
 		File mitab = new File("/Users/mmichaut/Documents/EBI/data/PsimiTab/global.mitab");
+		
+		//File porcFileOldFormat = new File("/Users/mmichaut/Documents/EBI/data/Integr8/clog/20070630/clog.revised.dat");
+		File porcFile = new File("/Users/mmichaut/Documents/Data/integr8/PORC/porc_gene.dat");
+		
+		InterologPrediction up = new InterologPrediction(dir);
 		up.setMitab(mitab);
-		up.setPorc(new File("/Users/mmichaut/Documents/EBI/data/Integr8/clog/20070630/clog.revised.dat"));
-		up.setDownCastOnAllPresentSpecies(false);
-		up.setClassicPorcFormat(false);
+		up.setPorc(porcFile);
 		Collection<Long> taxids = new HashSet<Long>(1);
 		taxids.add(1148l);
 		up.setUserTaxidsToDownCast(taxids);
-		up.setWriteDownCastHistory(true);
-		ClogInteraction.setNB_LINES_MAX(100000);
-		up.setWritePorcInteractions(false);
-		up.setDownCastOnChildren(false);
+		
+		//up.setDownCastOnAllPresentSpecies(false);
+		//up.setClassicPorcFormat(false);
+		//up.setWriteDownCastHistory(true);
+		//ClogInteraction.setNB_LINES_MAX(100000);
+		//up.setWritePorcInteractions(false);
+		//up.setDownCastOnChildren(false);
+		
 		up.run();
 	}
 	
