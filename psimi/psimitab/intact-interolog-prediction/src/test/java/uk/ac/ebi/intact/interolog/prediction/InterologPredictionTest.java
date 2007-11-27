@@ -87,7 +87,7 @@ public class InterologPredictionTest {
         
         InterologPrediction prediction = new InterologPrediction(new File("./src/test/resources/"));
         assertNotNull(prediction);
-        prediction.setClog(inputClog);
+        prediction.setPorc(inputClog);
         prediction.setMitab(inputMitab);
         
         Collection<Long> ids = new HashSet<Long>(1);
@@ -97,10 +97,10 @@ public class InterologPredictionTest {
 		prediction.setPredictedinteractionsFileExtension(extension);
 		String name = "clog.predictedInteractions";
 		prediction.setPredictedinteractionsFileName(name);
-		prediction.setClogFormatByProtein(false);
+		prediction.setClassicPorcFormat(false);
 		prediction.setDownCastOnAllPresentSpecies(false);
 		prediction.setWriteDownCastHistory(false);
-		prediction.setWriteClogInteractions(false);
+		prediction.setWritePorcInteractions(false);
 		prediction.setDownCastOnChildren(false);
 		
 		// run prediction process
@@ -150,7 +150,7 @@ public class InterologPredictionTest {
         
         InterologPrediction prediction = new InterologPrediction(new File("./src/test/resources/"));
         assertNotNull(prediction);
-        prediction.setClog(inputClog);
+        prediction.setPorc(inputClog);
         prediction.setMitab(inputMitab);
         
         Collection<Long> ids = new HashSet<Long>(1);
@@ -160,10 +160,10 @@ public class InterologPredictionTest {
 		prediction.setPredictedinteractionsFileExtension(extension);
 		String name = "clog.predictedInteractions";
 		prediction.setPredictedinteractionsFileName(name);
-		prediction.setClogFormatByProtein(true);
+		prediction.setClassicPorcFormat(true);
 		prediction.setDownCastOnAllPresentSpecies(false);
 		prediction.setWriteDownCastHistory(false);
-		prediction.setWriteClogInteractions(false);
+		prediction.setWritePorcInteractions(false);
 		prediction.setDownCastOnChildren(false);
 		
 		// run prediction process
