@@ -15,6 +15,8 @@ public class ConverterContext {
     public static final Log log = LogFactory.getLog(ConverterContext.class);
 
     private InteractorConverterConfig configInteractor;
+    
+    private AnnotationConverterConfig configAnnotation;
 
     private static ThreadLocal<ConverterContext> instance = new ThreadLocal<ConverterContext>() {
         @Override
@@ -29,12 +31,27 @@ public class ConverterContext {
 
     private ConverterContext() {
         this.configInteractor = new InteractorConverterConfig();
+        this.configAnnotation = new AnnotationConverterConfig();
     }
 
     public InteractorConverterConfig getInteractorConfig() {
         return configInteractor;
     }
 
+
+    public AnnotationConverterConfig getAnnotationConfig() {
+        return configAnnotation;
+    }
+
+    public void setInteractorConfig( InteractorConverterConfig configInteractor ) {
+        this.configInteractor = configInteractor;
+    }
+    
+    public void setAnnotationConfig( AnnotationConverterConfig configAnnotation ) {
+        this.configAnnotation = configAnnotation;
+    }
+    
+    @Deprecated
     public void setConfig( InteractorConverterConfig configInteractor ) {
         this.configInteractor = configInteractor;
     }

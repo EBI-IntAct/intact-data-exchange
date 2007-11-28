@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Xref;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AnnotationConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.InteractorConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
@@ -143,9 +144,13 @@ public class PsiConverterUtils {
     private static void populateAttributes( AnnotatedObject<?, ?> annotatedObject, AttributeContainer attributeContainer ) {
         AnnotationConverter annotationConverter = new AnnotationConverter( annotatedObject.getOwner() );
 
+        AnnotationConverterConfig configAnnotation = ConverterContext.getInstance().getAnnotationConfig(); 
+        
         for ( Annotation annotation : annotatedObject.getAnnotations() ) {
-            Attribute attribute = annotationConverter.intactToPsi( annotation );
-            attributeContainer.getAttributes().add( attribute );
+        	if (false == configAnnotation.isExcluded(annotation.getCvTopic())) {
+        		Attribute attribute = annotationConverter.intactToPsi( annotation );
+        		attributeContainer.getAttributes().add( attribute );
+        	}
         }
     }
 
