@@ -30,11 +30,6 @@
             <artifactId>intact-core</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>uk.ac.ebi.intact.core</groupId>
-            <artifactId>intact-persister</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <!-- EBI repositories -->

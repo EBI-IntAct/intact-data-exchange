@@ -17,7 +17,7 @@
     <description>EB-eye Master POM</description>
 
     <modules>
-        <!--<module>intact-uniprot-export</module>-->
+        <module>intact-ebi-search-engine-export</module>
     </modules>
 
 </project>

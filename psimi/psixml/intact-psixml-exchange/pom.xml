@@ -28,10 +28,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>uk.ac.ebi.intact.core</groupId>
-            <artifactId>intact-persister</artifactId>
-        </dependency>
-        <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psixml-upload-extensions</artifactId>
         </dependency>

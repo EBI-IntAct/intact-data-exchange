@@ -42,5 +42,5 @@ public interface RepoEntryService
 
     List<RepoEntry> findImportableExcluding(List<String> pmids);
 
-    List<RepoEntry> findModifiedAfter(DateTime dateTime);
+    List<RepoEntry> findImportableModifiedAfter(DateTime dateTime);
 }

@@ -18,6 +18,8 @@ package uk.ac.ebi.intact.dataexchange.imex.repository;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
 import java.io.File;
 
@@ -27,19 +29,15 @@ import java.io.File;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class RepositoryTest {
+public class RepositoryTest extends AbstractRepositoryTestCase {
 
     @Test
     public void storeFile_dip() throws Exception{
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo/");
-        FileUtils.deleteDirectory(tempDir);
-
-        Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
 
         File empty = new File(RepositoryTest.class.getResource("/xml/dip_2006-11-01.xml").getFile());
-        repo.storeEntrySet(empty, "dip");
+        getRepository().storeEntrySet(empty, "dip");
 
-        RepositoryHelper helper = new RepositoryHelper(repo);
+        RepositoryHelper helper = new RepositoryHelper(getRepository());
         File expectedFile = helper.getEntrySetFile("2006-11-01", "dip");
 
         Assert.assertTrue(expectedFile.exists());
@@ -47,15 +45,10 @@ public class RepositoryTest {
 
     @Test
     public void storeFile_mint() throws Exception{
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo/");
-        FileUtils.deleteDirectory(tempDir);
-
-        Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
-
         File empty = new File(RepositoryTest.class.getResource("/xml/mint_2006-07-18.xml").getFile());
-        repo.storeEntrySet(empty, "mint");
+        getRepository().storeEntrySet(empty, "mint");
 
-        RepositoryHelper helper = new RepositoryHelper(repo);
+        RepositoryHelper helper = new RepositoryHelper(getRepository());
         File expectedFile = helper.getEntrySetFile("2006-07-18", "mint");
 
         Assert.assertTrue(expectedFile.exists());

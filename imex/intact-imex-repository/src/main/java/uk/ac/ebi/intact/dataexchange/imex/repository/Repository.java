@@ -143,7 +143,7 @@ public class Repository {
      */
     public List<RepoEntry> findRepoEntriesModifiedAfter(DateTime dateTime) {
         ImexRepositoryContext context = ImexRepositoryContext.getInstance();
-        return context.getImexServiceProvider().getRepoEntryService().findModifiedAfter(dateTime);
+        return context.getImexServiceProvider().getRepoEntryService().findImportableModifiedAfter(dateTime);
     }
 
     public void close() {

@@ -15,17 +15,15 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.dao;
 
-import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
+import uk.ac.ebi.intact.dataexchange.imex.repository.AbstractRepositoryTestCase;
 import uk.ac.ebi.intact.dataexchange.imex.repository.mock.RepoMockBuilder;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,21 +33,8 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class RepoEntryServiceTest {
-
-    private static final File TEMP_REPO_DIR = new File(System.getProperty("java.io.tmpdir"), "imex-repo-test/");
-
-    @Before
-    public void before() throws Exception {
-        FileUtils.deleteDirectory(TEMP_REPO_DIR);
-        ImexRepositoryContext.openRepository(TEMP_REPO_DIR.getAbsolutePath());
-    }
-
-    @Before
-    public void after() throws Exception {
-        FileUtils.deleteDirectory(TEMP_REPO_DIR);
-    }
-
+public class RepoEntryServiceTest extends AbstractRepositoryTestCase {
+    
     @Test
     public void findImportablesExcluding() throws Exception {
         persistRepoEntrySet();
@@ -75,8 +60,8 @@ public class RepoEntryServiceTest {
         entries.iterator().next().setPmid("555");
         commitTransaction();
 
-        Assert.assertEquals(1, repoEntryService.findModifiedAfter(dateTime).size());
-        Assert.assertEquals("555", repoEntryService.findModifiedAfter(dateTime).iterator().next().getPmid());
+        Assert.assertEquals(1, repoEntryService.findImportableModifiedAfter(dateTime).size());
+        Assert.assertEquals("555", repoEntryService.findImportableModifiedAfter(dateTime).iterator().next().getPmid());
 
     }
 

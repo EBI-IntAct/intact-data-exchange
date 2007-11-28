@@ -34,7 +34,7 @@ import java.io.File;
 public class Playground {
 
     public static void main(String[] args) throws Exception {
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all2/");
+        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all3/");
         FileUtils.deleteDirectory(tempDir);
 
         Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
@@ -56,6 +56,13 @@ public class Playground {
             repo.storeEntrySet(ftpFile, "dip");
         }
         dipClient.disconnect();
+
+        final ImexFTPClient intactClient = ImexFTPClientFactory.createIntactClient();
+        intactClient.connect();
+        for (ImexFTPFile ftpFile : intactClient.listFiles()) {
+            repo.storeEntrySet(ftpFile, "intact");
+        }
+        intactClient.disconnect();
 
         RepoEntryService repoEntryService = ImexRepositoryContext.getInstance().getImexServiceProvider().getRepoEntryService();
         for (RepoEntry repoEntry : repoEntryService.findAllRepoEntries()) {

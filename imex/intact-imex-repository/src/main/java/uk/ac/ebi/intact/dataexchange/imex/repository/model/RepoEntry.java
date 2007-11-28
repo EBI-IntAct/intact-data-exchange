@@ -15,6 +15,9 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +32,7 @@ import java.util.List;
 @NamedQueries(value = {
     @NamedQuery(name = "repoEntryByPmid", query="select re from RepoEntry re where re.pmid = :pmid"),
     @NamedQuery(name = "repoEntryImportable", query="select re from RepoEntry re where re.valid = true"),
-    @NamedQuery(name = "repoEntryModifiedAfter", query="select re from RepoEntry re where re.updated  > :date")
+    @NamedQuery(name = "repoEntryModifiedAfter", query="select re from RepoEntry re where re.updated  > :date and re.importable = true")
 })
 public class RepoEntry extends RepoEntity {
 
@@ -45,14 +48,18 @@ public class RepoEntry extends RepoEntity {
 
     private boolean importable = true;
 
+    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime releaseDate;
+
     @OneToMany (mappedBy = "repoEntry", cascade = CascadeType.ALL)
     private List<UnexpectedError> errors;
 
     public RepoEntry() {
     }
 
-    public RepoEntry(String pmid) {
+    public RepoEntry(String pmid, DateTime releaseDate) {
         this.pmid = pmid;
+        this.releaseDate = releaseDate;
     }
 
     /////////////////////////////
@@ -121,5 +128,13 @@ public class RepoEntry extends RepoEntity {
 
     public void setImportable(boolean importable) {
         this.importable = importable;
+    }
+
+    public DateTime getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(DateTime releaseDate) {
+        this.releaseDate = releaseDate;
     }
 }

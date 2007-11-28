@@ -15,6 +15,9 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
+import org.joda.time.DateTime;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;

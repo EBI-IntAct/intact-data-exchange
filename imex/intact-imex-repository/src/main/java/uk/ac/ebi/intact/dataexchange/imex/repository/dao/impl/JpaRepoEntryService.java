@@ -71,7 +71,7 @@ public class JpaRepoEntryService implements RepoEntryService
         return importables;
     }
 
-    public List<RepoEntry> findModifiedAfter(DateTime dateTime) {
-        return entrySetDao.findModifiedAfter(dateTime);
+    public List<RepoEntry> findImportableModifiedAfter(DateTime dateTime) {
+        return entrySetDao.findImportableModifierAfter(dateTime);
     }
 }

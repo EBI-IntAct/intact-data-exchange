@@ -17,9 +17,9 @@ package uk.ac.ebi.intact.dataexchange.imex.imp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.joda.time.DateTime;
 import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
 import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryHelper;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
@@ -27,12 +27,17 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.PsiExchange;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.meta.ImexImport;
-import uk.ac.ebi.intact.model.meta.ImexImportStatus;
+import uk.ac.ebi.intact.model.meta.ImexImportActivationType;
+import uk.ac.ebi.intact.model.meta.ImexImportPublication;
+import uk.ac.ebi.intact.model.meta.ImexImportPublicationStatus;
 import uk.ac.ebi.intact.persistence.dao.ImexImportDao;
+import uk.ac.ebi.intact.persistence.dao.ImexImportPublicationDao;
 
 import javax.persistence.NoResultException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,44 +56,43 @@ public class ImexImporter {
     private static final Log log = LogFactory.getLog(ImexImporter.class);
 
     private Repository repository;
-    private Map<String,Institution> institutions;
+    private Map<String, Institution> institutions;
 
     public ImexImporter(Repository repository) {
         this.repository = repository;
 
-        institutions = new HashMap<String,Institution>();
+        institutions = new HashMap<String, Institution>();
     }
 
-    public ImportReport importNewAndFailed() {
-        ImportReport report = importFailed();
-        report = importNew(report);
-
-        return report;
-    }
-
-    protected ImportReport importNew(ImportReport report) {
+    protected ImexImport importNew() {
         ImexImportDao imexObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getImexImportDao();
 
-                beginTransaction();
-                List<String> pmidsOk = imexObjectDao.getAllOkPmids();
-                commitTransaction();
+        DateTime lastUpdateTime = imexObjectDao.getLatestUpdate(ImexImportActivationType.DATE_BASED);
 
-                List<RepoEntry> newRepoEntries = ImexRepositoryContext.getInstance().getImexServiceProvider().getRepoEntryService().findImportableExcluding(pmidsOk);
+        if (lastUpdateTime == null) {
+            lastUpdateTime = new DateTime(1);
+        }
 
-                for (RepoEntry repoEntry : newRepoEntries) {
-                    ImexImport imexObject = new ImexImport(getInstitution(repoEntry.getRepoEntrySet().getProvider()), repoEntry.getPmid(), ImexImportStatus.OK);
-                    importRepoEntry(repoEntry, report, imexObject);
+        ImexImport imexImport = new ImexImport(repository.getRepositoryDir().getAbsolutePath(),
+                                               ImexImportActivationType.DATE_BASED);
 
-                    if (imexObject.getStatus().equals(ImexImportStatus.OK)) {
-                        report.getNewPmisImported().add(repoEntry.getPmid());
-                    }
+        List<RepoEntry> newRepoEntries = repository.findRepoEntriesModifiedAfter(lastUpdateTime);
 
-                    beginTransaction();
-                    imexObjectDao.persist(imexObject);
-                    commitTransaction();
-                }
+        for (RepoEntry repoEntry : newRepoEntries) {
+            ImexImportPublication imexImportPublication =
+                    new ImexImportPublication(imexImport, repoEntry.getPmid(), getInstitution(repoEntry.getRepoEntrySet().getProvider()), ImexImportPublicationStatus.OK);
+            imexImportPublication.setReleaseDate(repoEntry.getReleaseDate());
+            importRepoEntry(repoEntry, imexImportPublication);
 
-        return report;
+            imexImport.getImexImportPublications().add(imexImportPublication);
+
+        }
+
+        beginTransaction();
+        imexObjectDao.persist(imexImport);
+        commitTransaction();
+
+        return imexImport;
     }
 
     /**
@@ -96,21 +100,27 @@ public class ImexImporter {
      *
      * @return a report of the import
      */
-    public ImportReport importFailed() {
-        ImexImportDao imexObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getImexImportDao();
+    public ImexImport importFailed() {
+        ImexImportDao imexImportDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getImexImportDao();
+        ImexImportPublicationDao imexImportPublicationDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getImexImportPublicationDao();
 
-        beginTransaction();
-        List<ImexImport> failedImexImports = imexObjectDao.getFailed();
-        commitTransaction();
+        List<ImexImportPublication> failedImexImports = imexImportPublicationDao.getFailed();
 
         if (log.isDebugEnabled()) {
             log.debug("Found " + failedImexImports.size() + " pubmed IDs that have failed previously. Will try to import them.");
         }
 
-        ImportReport report = new ImportReport();
+        ImexImport imexImport = new ImexImport(repository.getRepositoryDir().getAbsolutePath(),
+                                               ImexImportActivationType.ONLY_FAILED);
 
-        for (ImexImport imexObject : failedImexImports) {
-            String pmid = imexObject.getPmid();
+        for (ImexImportPublication imexImportPublication : failedImexImports) {
+            // we evict the entity as we are going to change its pk, to generate another entity from it
+            imexImportPublicationDao.evict(imexImportPublication);
+
+            // the new ImexImport object
+            imexImportPublication.setImexImport(imexImport);
+
+            String pmid = imexImportPublication.getPmid();
 
             if (log.isInfoEnabled()) log.info("Importing (previously failed) PMID: " + pmid);
 
@@ -119,47 +129,66 @@ public class ImexImporter {
                 repoEntry = repository.findRepoEntryByPmid(pmid);
             } catch (NoResultException e) {
                 if (log.isErrorEnabled()) log.error("Entry with pmid '" + pmid + "' not found in the Repository");
-                report.getPmidsNotFoundInRepo().add(pmid);
+
+                imexImportPublication.setStatus(ImexImportPublicationStatus.NOT_FOUND);
+                imexImportPublication.setMessage("Publication entry not found in repository");
+                imexImport.getImexImportPublications().add(imexImportPublication);
+
                 continue;
             }
 
-            importRepoEntry(repoEntry, report, imexObject);
+            importRepoEntry(repoEntry, imexImportPublication);
 
-            beginTransaction();
-            imexObjectDao.merge(imexObject);
-            commitTransaction();
+            if (imexImportPublication.getStatus() == ImexImportPublicationStatus.OK) {
+                imexImportPublication.setMessage("This import had failed previously");
+            }
+
+            imexImport.getImexImportPublications().add(imexImportPublication);
+
         }
 
-        return report;
+        beginTransaction();
+        imexImportDao.persist(imexImport);
+        commitTransaction();
+
+        return imexImport;
     }
 
-    protected void importRepoEntry(RepoEntry repoEntry, ImportReport report, ImexImport imexObject) {
-        if (report == null) {
-            throw new NullPointerException("An ImportReport instance is needed");
-        }
-
-        if (imexObject == null) {
+    protected void importRepoEntry(RepoEntry repoEntry, ImexImportPublication imexImportPublication) {
+        if (imexImportPublication == null) {
             throw new NullPointerException("An ImexImport instance is needed");
         }
 
         RepositoryHelper helper = new RepositoryHelper(repository);
         File entryFile = helper.getEntryFile(repoEntry);
 
-        imexObject.setOriginalFilename(entryFile.getName());
+        imexImportPublication.setOriginalFilename(entryFile.getName());
 
         final String pmid = repoEntry.getPmid();
 
         try {
             PsiExchange.importIntoIntact(new FileInputStream(entryFile), false);
-            report.getSucessfullPmids().add(pmid);
 
-            imexObject.setStatus(ImexImportStatus.OK);
+            imexImportPublication.setStatus(ImexImportPublicationStatus.OK);
 
-        } catch (Exception e) {
-            if (log.isErrorEnabled()) log.error("Entry with pmid '" + pmid + "' failed to be imported");
-            e.printStackTrace();
-            report.getFailedPmids().put(pmid, e);
-            imexObject.setStatus(ImexImportStatus.ERROR);
+        } catch (Throwable e) {
+            if (log.isErrorEnabled()) log.error("Entry with pmid '" + pmid + "' failed to be imported", e);
+            imexImportPublication.setStatus(ImexImportPublicationStatus.ERROR);
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            pw.close();
+
+            imexImportPublication.setMessage(sw.toString());
+
+            if (IntactContext.getCurrentInstance().getDataContext().isTransactionActive()) {
+                try {
+                    IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().rollback();
+                } catch (Throwable t) {
+                    log.error("Error rollbacking transaction: ", t);
+                }
+            }
         }
     }
 
@@ -181,9 +210,9 @@ public class ImexImporter {
         } else {
             beginTransaction();
             List<String> institutionsAvailable = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getInstitutionDao().getShortLabelsLike("%");
+                    .getInstitutionDao().getShortLabelsLike("%");
             commitTransaction();
-            throw new RuntimeException("Institution not found for provider: "+ providerName+". Available: "+institutionsAvailable);
+            throw new RuntimeException("Institution not found for provider: " + providerName + ". Available: " + institutionsAvailable);
         }
 
         return institution;

@@ -14,6 +14,7 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.ValidationError;
 import uk.ac.ebi.intact.dataexchange.imex.repository.split.EntrySetSplitter;
 import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.PsiExchange;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidatorMessage;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidatorReport;
@@ -132,6 +133,8 @@ public class DefaultEntrySetSplitter implements EntrySetSplitter
         String name = entry.getExperiments().iterator().next()
                 .getBibref().getXref().getPrimaryRef().getId();
         repoEntry.setPmid(name);
+
+        repoEntry.setReleaseDate(PsiExchange.getReleaseDate(entry));
 
         return repoEntry;
     }

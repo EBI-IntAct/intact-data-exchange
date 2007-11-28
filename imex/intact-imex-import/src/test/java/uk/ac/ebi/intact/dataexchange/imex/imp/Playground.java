@@ -15,18 +15,20 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.imp;
 
+import uk.ac.ebi.intact.config.impl.SmallCvPrimer;
 import uk.ac.ebi.intact.context.DataContext;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
-import uk.ac.ebi.intact.sanity.check.SanityChecker;
-import uk.ac.ebi.intact.sanity.commons.SanityReport;
-import uk.ac.ebi.intact.sanity.commons.rules.report.ReportWriter;
-import uk.ac.ebi.intact.sanity.commons.rules.report.SimpleReportWriter;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.InstitutionXref;
+import uk.ac.ebi.intact.model.meta.ImexImport;
+import uk.ac.ebi.intact.model.meta.ImexImportPublication;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.io.File;
-import java.io.StringWriter;
-import java.util.List;
 
 /**
  * TODO comment this
@@ -38,9 +40,9 @@ public class Playground {
 
     public static void main(String[] args) throws Exception{
 
-        IntactContext.initStandaloneContext(new File(Playground.class.getResource("/temph2-hibernate.cfg.xml").getFile()));
+        IntactContext.initStandaloneContext(new File(Playground.class.getResource("/postgres-hibernate.cfg.xml").getFile()));
 
-           /*
+        
         getDataContext().beginTransaction();
 
         SmallCvPrimer primer = new SmallCvPrimer(getDataContext().getDaoFactory());
@@ -49,18 +51,23 @@ public class Playground {
         CvXrefQualifier qual = getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).getByPsiMiRef(CvXrefQualifier.IDENTITY_MI_REF);
         CvDatabase psiMi = getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByPsiMiRef(CvDatabase.PSI_MI_MI_REF);
 
+        Institution intact = new Institution("INTACT");
+        InstitutionXref intactXref = XrefUtils.createIdentityXref(intact, CvDatabase.INTACT_MI_REF, qual, psiMi);
+        intact.addXref(intactXref);
+
         Institution dip = new Institution("DIP");
-        InstitutionXref xref = XrefUtils.createIdentityXref(dip, "MI:0465", qual, psiMi);
-        dip.addXref(xref);
+        InstitutionXref dipXref = XrefUtils.createIdentityXref(dip, CvDatabase.DIP_MI_REF, qual, psiMi);
+        dip.addXref(dipXref);
 
         Institution mint = new Institution("MINT");
-        InstitutionXref mintXref = XrefUtils.createIdentityXref(dip, "MI:0471", qual, psiMi);
+        InstitutionXref mintXref = XrefUtils.createIdentityXref(dip, CvDatabase.MINT_MI_REF, qual, psiMi);
         mint.addXref(mintXref);
         
+        getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(intact);
         getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(dip);
         getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(mint);
         getDataContext().commitTransaction();
-         */
+
 
 
         getDataContext().beginTransaction();
@@ -69,21 +76,18 @@ public class Playground {
          getDataContext().commitTransaction();
 
 
-        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all2/");
+        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all3/");
         Repository repo = ImexRepositoryContext.openRepository(repoDir.toString());
 
         ImexImporter importer = new ImexImporter(repo);
-        ImportReport imexReport = importer.importNewAndFailed();
+        ImexImport imexImport = importer.importNew();
 
         repo.close();
-                  
-        IntactContext.getCurrentInstance().close();
 
-        System.out.println(imexReport);
-        
 
-        //printStats();
 
+        printStats();
+         /*
         SanityReport report = SanityChecker.executeSanityCheck();
         System.out.println("Sanity check: "+report.getSanityResult().size() + " issues");
 
@@ -91,13 +95,11 @@ public class Playground {
         ReportWriter writer = new SimpleReportWriter(w);
         writer.write(report);
 
-        System.out.println(w.toString());
+        System.out.println(w.toString());      */
          
     }
 
     protected static void printStats() throws Exception {
-        getDataContext().beginTransaction();
-
         System.out.println("\nDatabase counts:\n");
         System.out.println("\tPublications: "+getDataContext().getDaoFactory().getPublicationDao().countAll());
         System.out.println("\tExperiments: "+getDataContext().getDaoFactory().getExperimentDao().countAll());
@@ -105,17 +107,18 @@ public class Playground {
         System.out.println("\tComponents: "+getDataContext().getDaoFactory().getComponentDao().countAll());
         System.out.println("\tProteins: "+getDataContext().getDaoFactory().getProteinDao().countAll());
         System.out.println("\tFeatures: "+getDataContext().getDaoFactory().getFeatureDao().countAll());
-        /*
-        List<Object[]> l = getDataContext().getDaoFactory().getBaseDao().getSession().createQuery("select i.owner, count(i.owner) from InteractionImpl i group by i.owner").list();
 
-        System.out.println("\nInteractions by Institution:\n");
+        System.out.println("\nIMEx publications:");
+        System.out.println("-------------------");
 
-        for (Object[] o : l) {
-            System.out.println(o[0]+": "+o[1]);
+        for (ImexImport ii : getDataContext().getDaoFactory().getImexImportDao().getAll()) {
+            System.out.println("Import: "+ii.getCreated()+" ("+ii.getActivationType()+") - Total="+ii.getCountTotal()+", Failed="+ii.getCountFailed()+", Not found="+ii.getCountNotFound());
         }
-         */
+        System.out.println("");
 
-        getDataContext().commitTransaction();
+        for (ImexImportPublication iip : getDataContext().getDaoFactory().getImexImportPublicationDao().getAll()) {
+            System.out.println("\t"+iip.getPmid()+"\t"+iip.getProvider().getShortLabel()+"\t"+iip.getReleaseDate()+"\t"+iip.getOriginalFilename()+"\t"+iip.getMessage());
+        }
     }
 
     protected static DataContext getDataContext() {

@@ -55,7 +55,7 @@ public class JpaRepoEntryDao extends JpaImexDaoSupport implements RepoEntryDao
         return getEntityManager().createNamedQuery("repoEntryImportable").getResultList();
     }
 
-    public List<RepoEntry> findModifiedAfter(DateTime dateTime) {
+    public List<RepoEntry> findImportableModifierAfter(DateTime dateTime) {
         Query query = getEntityManager().createNamedQuery("repoEntryModifiedAfter");
         query.setParameter("date", dateTime);
         return query.getResultList();

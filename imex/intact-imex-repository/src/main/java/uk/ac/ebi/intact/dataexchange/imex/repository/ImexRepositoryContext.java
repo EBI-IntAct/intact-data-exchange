@@ -19,6 +19,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.ImexServiceProvider;
@@ -59,6 +60,9 @@ public class ImexRepositoryContext {
 
     public static void closeRepository() {
         if (log.isDebugEnabled()) log.debug("Closing ImexRepositoryContext");
+
+        getInstance().getImexPersistence().getEntityManagerFactory().close();
+        ((ConfigurableListableBeanFactory)getInstance().getBeanFactory()).destroySingletons();
 
         instance.set(null);
     }

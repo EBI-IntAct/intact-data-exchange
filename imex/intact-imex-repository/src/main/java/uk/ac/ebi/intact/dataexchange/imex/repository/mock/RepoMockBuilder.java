@@ -19,6 +19,7 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.UnexpectedError;
+import org.joda.time.DateTime;
 
 /**
  * TODO comment this
@@ -51,7 +52,7 @@ public class RepoMockBuilder {
     }
 
     public RepoEntry createRepoEntry(String pmid, boolean importable) {
-        RepoEntry repoEntry = new RepoEntry(pmid);
+        RepoEntry repoEntry = new RepoEntry(pmid, new DateTime());
 
         if (importable) {
             repoEntry.setValid(true);

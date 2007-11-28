@@ -20,13 +20,15 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.joda.time.DateTime;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.meta.ImexImport;
-import uk.ac.ebi.intact.model.meta.ImexImportStatus;
+import uk.ac.ebi.intact.model.meta.ImexImportPublication;
+import uk.ac.ebi.intact.model.meta.ImexImportPublicationStatus;
 
 import java.io.File;
 import java.util.List;
@@ -44,84 +46,98 @@ public class ImexImporterTest extends IntactBasicTestCase {
     @Before
     public void before() throws Exception {
         new IntactUnit().createSchema();
-        beginTransaction();
 
         repository = createRepositoryWithMint();
     }
 
     @After
     public void after() throws Exception {
-        commitTransaction();
-
         repository.close();
     }
 
     @Test
-    public void importNewAndFailed() throws Exception {
+    public void importNew() throws Exception {
         Institution mint = new Institution("mint");
-        persistImexImport(mint, "15733859", ImexImportStatus.OK);
-        persistImexImport(mint, "15733864", ImexImportStatus.ERROR);
+
+        ImexImport imexImport = new ImexImport();
+        imexImport.setImportDate(new DateTime().minusDays(1));
+
+        imexImport.getImexImportPublications().add(
+                new ImexImportPublication(imexImport, "0", mint, ImexImportPublicationStatus.OK));
+        imexImport.getImexImportPublications().add(
+                new ImexImportPublication(imexImport, "1", mint, ImexImportPublicationStatus.ERROR));
+        persistImexImport(imexImport);
 
         ImexImporter imexImporter = new ImexImporter(repository);
-        ImportReport report = imexImporter.importNewAndFailed();
 
-        Assert.assertEquals(2, report.getSucessfullPmids().size());
-        Assert.assertEquals(1, report.getNewPmisImported().size());
-        Assert.assertEquals(0, report.getFailedPmids().size());
-        Assert.assertEquals(0, report.getPmidsNotFoundInRepo().size());
+        ImexImport imexImportLoaded = imexImporter.importNew();
+
+        Assert.assertEquals(3, imexImportLoaded.getCountTotal());
+        Assert.assertEquals(0, imexImportLoaded.getCountFailed());
     }
 
     @Test
     public void importFailed() throws Exception {
         Institution mint = new Institution("mint");
-        persistImexImport(mint, "15733859", ImexImportStatus.OK);
-        persistImexImport(mint, "15733864", ImexImportStatus.ERROR);
-        persistImexImport(mint, "15757671", ImexImportStatus.ERROR);
 
-        commitTransaction();
+        ImexImport imexImport = new ImexImport();
+        imexImport.getImexImportPublications().add(
+                new ImexImportPublication(imexImport, "15733859", mint, ImexImportPublicationStatus.OK));
+        imexImport.getImexImportPublications().add(
+                new ImexImportPublication(imexImport, "15733864", mint, ImexImportPublicationStatus.ERROR));
+        imexImport.getImexImportPublications().add(
+                new ImexImportPublication(imexImport, "15757671", mint, ImexImportPublicationStatus.ERROR));
+        persistImexImport(imexImport);
 
-        beginTransaction();
-        Assert.assertEquals(ImexImportStatus.OK, getDaoFactory().getImexImportDao().getByPmid("15733859").getStatus());
-        Assert.assertEquals(ImexImportStatus.ERROR, getDaoFactory().getImexImportDao().getByPmid("15733864").getStatus());
-        Assert.assertEquals(ImexImportStatus.ERROR, getDaoFactory().getImexImportDao().getByPmid("15757671").getStatus());
-        commitTransaction();
+        Assert.assertEquals(ImexImportPublicationStatus.OK, getDaoFactory().getImexImportPublicationDao().getByPmid("15733859").get(0).getStatus());
+        Assert.assertEquals(ImexImportPublicationStatus.ERROR, getDaoFactory().getImexImportPublicationDao().getByPmid("15733864").get(0).getStatus());
+        Assert.assertEquals(ImexImportPublicationStatus.ERROR, getDaoFactory().getImexImportPublicationDao().getByPmid("15757671").get(0).getStatus());
 
         ImexImporter imexImporter = new ImexImporter(repository);
-        ImportReport report = imexImporter.importFailed();
 
-        Assert.assertEquals(2, report.getSucessfullPmids().size());
-        Assert.assertEquals(0, report.getNewPmisImported().size());
-        Assert.assertEquals(0, report.getFailedPmids().size());
-        Assert.assertEquals(0, report.getPmidsNotFoundInRepo().size());
+        // first import - should import the two failed
+        ImexImport imexImportLoaded = imexImporter.importFailed();
 
-        beginTransaction();
+        Assert.assertEquals(2, imexImportLoaded.getCountTotal());
+        Assert.assertEquals(0, imexImportLoaded.getCountFailed());
 
-        for (ImexImport imexObject : (List<ImexImport>)getDaoFactory().getImexImportDao().getAll()) {
+        // a second import of failed - should not import anything
+        ImexImport imexImportLoaded2 = imexImporter.importFailed();
 
-            Assert.assertEquals(ImexImportStatus.OK,imexObject.getStatus());
+        Assert.assertEquals(0, imexImportLoaded2.getCountTotal());
+        Assert.assertEquals(0, imexImportLoaded2.getCountFailed());
+
+        int totalCount = 0;
+        int totalFailed = 0;
+
+        for (ImexImportPublication imexImportPublication : getDaoFactory().getImexImportPublicationDao().getAll()) {
+            totalCount++;
+
+            if (imexImportPublication.getStatus() == ImexImportPublicationStatus.ERROR) {
+                totalFailed++;
+            }
         }
 
-        commitTransaction();
+        Assert.assertEquals(5, totalCount);
+        Assert.assertEquals(2, totalFailed);
     }
 
     @Test
     public void importFailed_notFound() throws Exception {
         Institution mint = new Institution("mint");
-        persistImexImport(mint, "0", ImexImportStatus.ERROR);
 
-        commitTransaction();
+        ImexImport imexImport = new ImexImport();
+        imexImport.getImexImportPublications().add(
+                new ImexImportPublication(imexImport, "0", mint, ImexImportPublicationStatus.ERROR));
+        persistImexImport(imexImport);
 
         ImexImporter imexImporter = new ImexImporter(repository);
-        ImportReport report = imexImporter.importFailed();
 
-        Assert.assertEquals(0, report.getSucessfullPmids().size());
-        Assert.assertEquals(0, report.getNewPmisImported().size());
-        Assert.assertEquals(0, report.getFailedPmids().size());
-        Assert.assertEquals(1, report.getPmidsNotFoundInRepo().size());
+        ImexImport imexImportLoaded = imexImporter.importFailed();
 
-        beginTransaction();
-        Assert.assertEquals(ImexImportStatus.ERROR, getDaoFactory().getImexImportDao().getByPmid("0").getStatus());
-        commitTransaction();
+        Assert.assertEquals(1, imexImportLoaded.getCountTotal());
+        Assert.assertEquals(0, imexImportLoaded.getCountFailed());
+        Assert.assertEquals(1, imexImportLoaded.getCountNotFound());
     }
 
     /**
@@ -142,9 +158,12 @@ public class ImexImporterTest extends IntactBasicTestCase {
         return repo;
     }
 
-    private void persistImexImport(Institution institution, String pmid, ImexImportStatus status) {
-        getDaoFactory().getInstitutionDao().saveOrUpdate(institution);
-        getDaoFactory().getImexImportDao().persist(
-                new ImexImport(institution, pmid, status));
+    private void persistImexImport(ImexImport imexImport) {
+        for (ImexImportPublication iip : imexImport.getImexImportPublications()) {
+            getDaoFactory().getInstitutionDao().saveOrUpdate(iip.getProvider());
+        }
+        beginTransaction();
+        getDaoFactory().getImexImportDao().persist(imexImport);
+        commitTransaction();
     }
 }
