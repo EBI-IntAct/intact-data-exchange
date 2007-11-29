@@ -52,6 +52,7 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
         String dbAc = psiObject.getDbAc();
 
         CvDatabase cvDb = new CvDatabase(getInstitution(), db);
+        cvDb.setMiIdentifier(dbAc);
 
         if (dbAc != null) {
             psiMiPopulator.populateWithPsiMi(cvDb, dbAc);
@@ -64,6 +65,7 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
 
         if (refType != null) {
             xrefQual = new CvXrefQualifier(getInstitution(), refType);
+            xrefQual.setMiIdentifier(refTypeAc);
 
             if (refTypeAc != null) {
                 psiMiPopulator.populateWithPsiMi(xrefQual, refTypeAc);

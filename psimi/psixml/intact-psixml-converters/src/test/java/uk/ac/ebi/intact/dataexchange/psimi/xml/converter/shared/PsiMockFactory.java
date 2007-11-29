@@ -278,6 +278,14 @@ public class PsiMockFactory {
         return cv;
     }
 
+    public static <C extends CvType> C createCvType(Class<C> cvTypeClass, String miRef, String label) {
+        C cv = createCvType(cvTypeClass);
+        cv.getNames().setShortLabel(label);
+        cv.getXref().setPrimaryRef(createDbReferencePsiMi(miRef));
+
+        return cv;
+    }
+
     private static InteractorType createInteractorType() {
         InteractorType intType = createCvType(InteractorType.class);
         intType.getNames().setShortLabel(CvInteractorType.PROTEIN);
@@ -317,14 +325,14 @@ public class PsiMockFactory {
     }
 
     public static DbReference createDbReferencePsiMi(String psiMiRef) {
-        DbReference ref = createDbReference(CvXrefQualifier.IDENTITY_MI_REF, CvXrefQualifier.IDENTITY, CvDatabase.PSI_MI_MI_REF, CvDatabase.PSI_MI);
+        DbReference ref = createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF);
         ref.setId(psiMiRef);
 
         return ref;
     }
 
     public static DbReference createDbReferencePrimaryRef(String psiMiRef) {
-        DbReference ref = createDbReference(CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE, CvDatabase.PUBMED_MI_REF, CvDatabase.PUBMED);
+        DbReference ref = createDbReference(CvXrefQualifier.PRIMARY_REFERENCE, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, CvDatabase.PUBMED, CvDatabase.PUBMED_MI_REF);
         ref.setId(psiMiRef);
 
         return ref;

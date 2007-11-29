@@ -42,6 +42,13 @@ public class PsiMiPopulator {
         Class<? extends Xref> xrefClass = AnnotatedObjectUtils.getXrefClassType(annotatedObject.getClass());
 
         X xref = (X) createPsiMiXref(xrefClass, psiMi);
+        xref.setParent(annotatedObject);
+
+        if (xref instanceof CvObjectXref) {
+            if (((CvObject)annotatedObject).getMiIdentifier() == null) {
+                ((CvObjectXref)xref).prepareParentMi();
+            }
+        }
 
         annotatedObject.getXrefs().add(xref);
 

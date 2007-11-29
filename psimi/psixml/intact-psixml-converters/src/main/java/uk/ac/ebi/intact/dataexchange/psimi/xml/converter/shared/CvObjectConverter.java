@@ -46,7 +46,7 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
         cv.setOwner(getInstitution());
         IntactConverterUtils.populateNames(psiObject.getNames(), cv);
         IntactConverterUtils.populateXref(psiObject.getXref(), cv, new XrefConverter<CvObjectXref>(getInstitution(), CvObjectXref.class));
-
+        
         return cv;
     }
 
