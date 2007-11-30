@@ -33,10 +33,8 @@ import psidev.psi.mi.xml.model.Source;
 import uk.ac.ebi.intact.business.IntactException;
 import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.core.persister.PersisterContext;
 import uk.ac.ebi.intact.core.persister.PersisterException;
-import uk.ac.ebi.intact.core.persister.standard.EntryPersister;
-import uk.ac.ebi.intact.core.persister.standard.InteractionPersister;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
@@ -45,6 +43,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.util.InteractionUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -67,22 +66,24 @@ public class PsiExchange {
     /**
      * Number of Interactions persisted per batch
      */
-    private static final int IMPORT_BATCH_SIZE = 100;
+    private static int importBatchSize = 100;
 
     private PsiExchange() {
+    }
+
+    public static void setImportBatchSize(int batchSize) {
+        importBatchSize = batchSize;
     }
 
     /**
      * Imports a stream containing PSI XML
      *
      * @param psiXmlStream the stream to read and import
-     * @param dryRun       if true, don't modify the database (but simulate the upload and return the report)
-     *
      * @return report of the import
      *
      * @throws PersisterException thrown if there are problems parsing the stream or persisting the data in the intact-model database
      */
-    public static void importIntoIntact(InputStream psiXmlStream, boolean dryRun) throws PersisterException {
+    public static void importIntoIntact(InputStream psiXmlStream) throws PersisterException {
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = null;
         try {
@@ -91,25 +92,19 @@ public class PsiExchange {
             throw new PersisterException("Exception reading the PSI XML from an InputStream", e);
         }
 
-        importIntoIntact(entrySet, dryRun);
+        importIntoIntact(entrySet);
     }
 
     /**
      * Imports an EntrySet into intact
      *
      * @param entrySet the psi set of entries to import
-     * @param dryRun   if true, don't modify the database (but simulate the upload and return the report)
-     *
      * @return report of the import
      *
      * @throws PersisterException thrown if there are problems persisting the data in the intact-model database
      */
-    public static void importIntoIntact(EntrySet entrySet, boolean dryRun) throws PersisterException {
+    public static void importIntoIntact(EntrySet entrySet) throws PersisterException {
         IntactContext context = IntactContext.getCurrentInstance();
-
-        if (dryRun) {
-            PersisterContext.getInstance().setDryRun(dryRun);
-        }
 
         // check if the transaction is active
         if (context.getDataContext().isTransactionActive()) {
@@ -123,9 +118,6 @@ public class PsiExchange {
         int interactionCount = 0;
 
         beginTransaction();
-
-        // the persister of interactions instance
-        InteractionPersister interactionPersister = InteractionPersister.getInstance();
 
         for (Entry entry : entrySet.getEntries()) {
             InstitutionConverter institutionConverter = new InstitutionConverter();
@@ -144,6 +136,7 @@ public class PsiExchange {
             // the data is actually saved in the database).
             // If when processing a label, the label is already found in the list, a commit will be forced
             // so the interaction can be properly synced and get the corresponding prefix XXX-2
+            List<Interaction> interactionsToCommit = new ArrayList<Interaction>();
             List<String> interactionLabelsToCommit = new ArrayList<String>();
 
             for (psidev.psi.mi.xml.model.Interaction psiInteraction : entry.getInteractions()) {
@@ -156,53 +149,64 @@ public class PsiExchange {
 
                 if (interactionLabelsToCommit.contains(interaction.getShortLabel())) {
                     // commit the persistence
-                    interactionPersister.commit();
-
-                    // restart a transaction
-                    commitTransaction();
+                    persistAndClear(interactionsToCommit, interactionLabelsToCommit);
 
                     if (log.isDebugEnabled()) {
                         log.debug("Forced commit due to a label already existing in this commit page: "+interaction.getShortLabel());
                     }
 
                     beginTransaction();
-
-                    interactionLabelsToCommit.clear();
                 }
 
                 // mark the interaction to save or update
                 if (log.isDebugEnabled()) log.debug("Marking to save or update: "+interaction.getShortLabel());
-                interactionPersister.saveOrUpdate(interaction);
 
+                interactionsToCommit.add(interaction);
                 interactionLabelsToCommit.add(interaction.getShortLabel());
 
                 // commit the interactions in batches into the database
-                if (interactionCount > 0 && interactionCount % IMPORT_BATCH_SIZE == 0) {
-
-                    // commit the persistence
-                    interactionPersister.commit();
-
-                    commitTransaction();
+                if (interactionCount > 0 && interactionCount % importBatchSize == 0) {
+                    persistAndClear(interactionsToCommit, interactionLabelsToCommit);
 
                     // restart a transaction
                     beginTransaction();
-
-                    interactionLabelsToCommit.clear();
                 }
 
                 interactionCount++;
             }
+
+            // final persistence for the last batch
+            persistAndClear(interactionsToCommit, interactionLabelsToCommit);
+
         }
 
         ConversionCache.clear();
 
-        // final commit for the last batch
-        interactionPersister.commit();
-        commitTransaction();
 
         if (log.isDebugEnabled()) {
             log.debug("Imported: " + interactionCount + " interactions (less if duplicates were found) in " + (System.currentTimeMillis() - startTime) + "ms");
         }
+    }
+
+    private static void persistAndClear(List<Interaction> interactionsToCommit, List<String> interactionLabelsToCommit) {
+        // commit the persistence
+        try {
+            PersisterHelper.saveOrUpdate(interactionsToCommit.toArray(new Interaction[interactionsToCommit.size()]));
+        } catch (PersisterException e) {
+            List<String> infoLabels = new ArrayList<String>(interactionsToCommit.size());
+
+            for (Interaction interactionToCommit : interactionsToCommit) {
+                final String imexId = InteractionUtils.getImexIdentifier(interactionToCommit);
+                infoLabels.add(interactionToCommit.getShortLabel()+ (imexId != null? " ("+ imexId +")" : ""));
+            }
+
+            throw new ImportException("Problem persisting this set of interactions: "+infoLabels, e);
+        } finally {
+            interactionsToCommit.clear();
+            interactionLabelsToCommit.clear();
+        }
+
+        commitTransaction();
     }
 
     private static void beginTransaction() {
@@ -221,16 +225,13 @@ public class PsiExchange {
      * Imports an IntactEntry into intact
      *
      * @param entry  the intact entry to import
-     * @param dryRun if true, don't modify the database (but simulate the upload and return the report)
-     *
+     * 
      * @return report of the import
      *
      * @throws PersisterException thrown if there are problems persisting the data in the intact-model database
      */
-    public static void importIntoIntact(IntactEntry entry, boolean dryRun) throws PersisterException {
-        EntryPersister entryPersister = EntryPersister.getInstance(dryRun);
-        entryPersister.saveOrUpdate(entry);
-        entryPersister.commit();
+    public static void importIntoIntact(IntactEntry entry) throws PersisterException {
+        PersisterHelper.saveOrUpdate(entry);
     }
 
 

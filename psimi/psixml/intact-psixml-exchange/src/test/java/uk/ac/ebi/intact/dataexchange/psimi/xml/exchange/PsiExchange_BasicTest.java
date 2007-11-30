@@ -35,17 +35,6 @@ import uk.ac.ebi.intact.model.CvTopic;
  */
 public class PsiExchange_BasicTest extends IntactBasicTestCase {
 
-    @Before
-    public void prepare() throws Exception {
-        IntactUnit iu = new IntactUnit();
-        iu.createSchema();
-    }
-
-    @After
-    public void endTest() throws Exception {
-        commitTransaction();
-    }
-
     @Test
     public void importIntoIntact_default() throws Exception {
         Institution institution = getMockBuilder().createInstitution("IA:0000", "lalaInstitution");
@@ -56,7 +45,7 @@ public class PsiExchange_BasicTest extends IntactBasicTestCase {
         entry.setInstitution(institution);
 
         beginTransaction();
-        PsiExchange.importIntoIntact(entry, false);
+        PsiExchange.importIntoIntact(entry);
         commitTransaction();
         
         beginTransaction();

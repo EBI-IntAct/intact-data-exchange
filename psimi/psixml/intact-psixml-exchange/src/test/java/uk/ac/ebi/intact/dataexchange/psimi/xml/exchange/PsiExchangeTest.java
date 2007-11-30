@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.EntrySet;
+import psidev.psi.mi.xml.PsimiXmlReader;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
@@ -39,83 +40,74 @@ import java.util.List;
  */
 public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
-    @Before
-    public void prepare() throws Exception {
-        IntactUnit iu = new IntactUnit();
-        iu.createSchema();
-    }
-
-    @After
-    public void endTest() throws Exception {
-        commitTransaction();
-    }
-
     @Test
     public void importXml_intact() throws Exception {
         EntrySet set = getIntactEntrySet();
 
-        PsiExchange.importIntoIntact(set, false);
+        PsiExchange.importIntoIntact(set);
 
-
-        beginTransaction();
         int count = getDaoFactory().getInteractionDao().countAll();
         System.out.println(DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll()));
-        commitTransaction();
 
         Assert.assertEquals(6, count);
     }
 
     @Test
     public void importXml_mint() throws Exception {
-
-        PsiExchange.importIntoIntact(getMintEntrySet(), false);
+        PsiExchange.importIntoIntact(getMintEntrySet());
 
         int count = getDaoFactory().getInteractionDao().countAll();
         final List<String> labels = DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll());
         System.out.println(labels);
 
-        Assert.assertEquals(18, count);
+        // there are 18 interactions in the file, but 2 seem duplicated
+        Assert.assertEquals(16, count);
+    }
+
+    @Test
+    public void importXml_mint_simplified() throws Exception {
+        PsimiXmlReader reader = new PsimiXmlReader();
+        EntrySet entrySet = reader.read(PsiExchangeTest.class.getResourceAsStream("/xml/mint_2006-07-18_simplified.xml"));
+        PsiExchange.importIntoIntact(entrySet);
+
+        int count = getDaoFactory().getInteractionDao().countAll();
+        final List<String> labels = DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll());
+        System.out.println(labels);
+
+        Assert.assertEquals(2, count);
     }
 
     @Test
     public void importXml_dip() throws Exception {
-        PsiExchange.importIntoIntact(getDipEntrySet(), false);
+        PsiExchange.importIntoIntact(getDipEntrySet());
 
-        beginTransaction();
         int count = getDaoFactory().getInteractionDao().countAll();
         System.out.println(DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll()));
-        commitTransaction();
 
         Assert.assertEquals(32, count);
     }
 
     @Test
     public void importXml_all() throws Exception {
-        PsiExchange.importIntoIntact(getIntactEntrySet(), false);
+        PsiExchange.importIntoIntact(getIntactEntrySet());
 
-        beginTransaction();
         Assert.assertEquals(6, getDaoFactory().getInteractionDao().countAll());
-        commitTransaction();
 
-        PsiExchange.importIntoIntact(getMintEntrySet(), false);
+        PsiExchange.importIntoIntact(getMintEntrySet());
 
-        beginTransaction();
-        Assert.assertEquals(24, getDaoFactory().getInteractionDao().countAll());
-        commitTransaction();
+        // the mint file contains 2 duplicated interactions
+        Assert.assertEquals(22, getDaoFactory().getInteractionDao().countAll());
 
-        PsiExchange.importIntoIntact(getDipEntrySet(), false);
+        PsiExchange.importIntoIntact(getDipEntrySet());
 
-        beginTransaction();
         Assert.assertEquals(54, getDaoFactory().getInteractionDao().countAll());
-        commitTransaction();
 
     }
 
     @Test
     public void checkPsiMiIdentities() throws Exception {
-        PsiExchange.importIntoIntact(getIntactEntrySet(), false);
+        PsiExchange.importIntoIntact(getIntactEntrySet());
 
-        beginTransaction();
         CvExperimentalRole expRole = getDaoFactory().getCvObjectDao(CvExperimentalRole.class).getAll(0,1).iterator().next();
 
         Assert.assertNotNull(expRole);
@@ -124,14 +116,12 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
         Assert.assertNotNull(identityXref);
 
-        commitTransaction();
     }
 
     @Test
     public void checkAliases() throws Exception {
-        PsiExchange.importIntoIntact(getIntactEntrySet(), false);
+        PsiExchange.importIntoIntact(getIntactEntrySet());
 
-        beginTransaction();
         Interactor interactor = getDaoFactory().getInteractorDao().getByShortLabel("fadd_mouse");
 
         Alias alias = interactor.getAliases().iterator().next();
@@ -142,7 +132,6 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         Assert.assertNotNull(aliasTypeIdentXref);
         Assert.assertEquals(CvAliasType.GENE_NAME_MI_REF, aliasTypeIdentXref.getPrimaryId());
 
-        commitTransaction();
     }
 
     @Test

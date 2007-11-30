@@ -69,7 +69,7 @@ public class Playground {
         int experimentsBefore = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getExperimentDao().countAll();
 
-        PsiExchange.importIntoIntact(enricherInput, false);
+        PsiExchange.importIntoIntact(enricherInput);
 
         int interactionsAfter = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getInteractionDao().countAll();
@@ -80,28 +80,6 @@ public class Playground {
         System.out.println("Experiments Created: " + (experimentsAfter-experimentsBefore));
 
 
-    }
-
-    private static void printInteractions() {
-        for (Interaction interaction : IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getInteractionDao().getAll()) {
-                    Iterator<Component> compIterator = interaction.getComponents().iterator();
-
-                    Component c1 = compIterator.next();
-                    Component c2;
-                    String p1 = c1.getInteractor().getXrefs().iterator().next().getPrimaryId();
-                    String p2;
-
-                    if (compIterator.hasNext()) {
-                        c2 = compIterator.next();
-                        p2 = c2.getInteractor().getXrefs().iterator().next().getPrimaryId();
-                    } else {
-                        p2 = p1;
-                        c2 = c1;
-                    }
-
-                   System.out.println("\t" + interaction.getShortLabel() + " -> " + p1 + "(" + c1.getCvExperimentalRole().getShortLabel() + ")-" + p2 + "(" + c2.getCvExperimentalRole().getShortLabel() + ")");
-                }
     }
 
 

@@ -2622,7 +2622,7 @@
                                   secondary="ccr5_human" version="SP_52"/>
                     <secondaryRef db="uniprotkb" dbAc="MI:0486" id="O14696" refType="secondary-ac" refTypeAc="MI:0360"
                                   secondary="ccr5_human" version="SP_52"/>
-                    <secondaryRef db="uniprotkb" dbAc="MI:0486" id="O14695" refType="secondary-ac" refTypeAc="MI:0360"
+                    <secfkbp8-bcl2ondaryRef db="uniprotkb" dbAc="MI:0486" id="O14695" refType="secondary-ac" refTypeAc="MI:0360"
                                   secondary="ccr5_human" version="SP_52"/>
                     <secondaryRef db="uniprotkb" dbAc="MI:0486" id="O14693" refType="secondary-ac" refTypeAc="MI:0360"
                                   secondary="ccr5_human" version="SP_52"/>
