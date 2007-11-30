@@ -24,6 +24,7 @@ import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.converter.txt2tab.behaviour.IgnoreAndPrintUnparseableLine;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.InteractionDetectionMethod;
 import psidev.psi.mi.tab.model.InteractionType;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 import psidev.psi.mi.tab.utils.PsimiTabFileMerger;
@@ -106,6 +107,55 @@ public class MitabUtils implements MitabFiles {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Get species taxid of proteinA in a psimi interaction.
+	 * null if it does not exist.
+	 * 
+	 * @param interaction
+	 * @return
+	 */
+	public static String getSpeciesTaxidA(BinaryInteraction interaction) {
+		return interaction.getInteractorA().getOrganism().getTaxid();
+	}
+	
+	/**
+	 * Get species taxid of proteinB in a psimi interaction.
+	 * null if it does not exist.
+	 * 
+	 * @param interaction
+	 * @return
+	 */
+	public static String getSpeciesTaxidB(BinaryInteraction interaction) {
+		return interaction.getInteractorB().getOrganism().getTaxid();
+	}
+	
+	
+	/**
+	 * Get the names of all detection methods used for this interaction (the text of all cross ref).
+	 * @param interaction
+	 * @return
+	 */
+	public static Collection<String> getDetectionMethodsNames(BinaryInteraction interaction) {
+		Collection<String> names = new ArrayList<String>();
+		for (InteractionDetectionMethod dmethod : interaction.getDetectionMethods()) {
+			names.add(dmethod.getText());
+		}
+		return names;
+	}
+	
+	/**
+	 * Get the ids of all detection methods used for this interaction (the id of all cross ref).
+	 * @param interaction
+	 * @return
+	 */
+	public static Collection<String> getDetectionMethodsIds(BinaryInteraction interaction) {
+		Collection<String> names = new ArrayList<String>();
+		for (InteractionDetectionMethod dmethod : interaction.getDetectionMethods()) {
+			names.add(dmethod.getIdentifier());
+		}
+		return names;
 	}
 	
 	/**

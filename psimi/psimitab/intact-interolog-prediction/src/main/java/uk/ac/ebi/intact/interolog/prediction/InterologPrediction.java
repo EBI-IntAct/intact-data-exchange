@@ -71,6 +71,8 @@ public class InterologPrediction {
 	
 	public static Log log = LogFactory.getLog(InterologPrediction.class);
 	
+	private final static String SEP = "\t";
+	
 	/**
 	 * Integr8 ftp proteome report file is used to link proteome id to NCBI taxid.
 	 */
@@ -967,14 +969,46 @@ public class InterologPrediction {
 	 * @return
 	 */
 	private static StrBuilder printAllInformation(ClogInteraction porcInteraction, String uniprotAcA, String uniprotAcB) {
-		final String SEP = "\t";
+		
 		StrBuilder buf = new StrBuilder();
 		for (BinaryInteraction src : porcInteraction.getSourceInteractions()) {
 			buf.append(uniprotAcA).append(SEP);
 			buf.append(uniprotAcB).append(SEP);
-			buf.append(src.toString()).append("\n");
+			//buf.append(src.toString()).append("\n");
+			buf.append(printMitabInteraction(src)).append("\n");
 		}
 		
+		return buf;
+	}
+	
+	/**
+	 * @return
+	 */
+	public static StrBuilder getMitabHeaders() {
+		StrBuilder buf = new StrBuilder();
+		buf.append("UniprotA").append(SEP);
+		buf.append("UniprotB").append(SEP);
+		buf.append("Taxid").append(SEP);
+		buf.append("DetectionMethodIds").append(SEP);
+		buf.append("DetctionMethodNames");
+		return buf;
+	}
+	
+	/**
+	 * @param interaction
+	 * @return
+	 */
+	private static StrBuilder printMitabInteraction(BinaryInteraction interaction) {
+		StrBuilder buf = new StrBuilder();
+		buf.append(MitabUtils.getUniprotAcA(interaction)).append(SEP);
+		buf.append(MitabUtils.getUniprotAcB(interaction)).append(SEP);
+		String spId = MitabUtils.getSpeciesTaxidA(interaction);
+		if (!spId.equals(MitabUtils.getSpeciesTaxidB(interaction))) {
+			System.out.println("A inter-species interaction has been used here as a source interaction"+ interaction);
+		}
+		buf.append(spId).append(SEP);
+		buf.appendWithSeparators(MitabUtils.getDetectionMethodsIds(interaction), ";").append(SEP);
+		buf.appendWithSeparators(MitabUtils.getDetectionMethodsNames(interaction), ";");
 		return buf;
 	}
 
@@ -1314,6 +1348,7 @@ public class InterologPrediction {
 			try {
 				downCastHistory = new PrintStream(getFILE_HISTORY_DOWN_CAST());
 				downCastHistory.append("porcA\tporcB\tprot1\tprot2\tsources\tinferences\n");
+				log.warn("Create file "+getFILE_HISTORY_DOWN_CAST());
 			} catch (FileNotFoundException e) {
 				log.warn("down cast history is redirecting on System.out");
 				downCastHistory = System.out;
@@ -1323,7 +1358,9 @@ public class InterologPrediction {
 		if (isWriteSrcInteractions()) {
 			try {
 				srcInteractions = new PrintStream(getFILE_SOURCE_INTERACTIONS());
-				srcInteractions.append("ProteinAcA\tProteinAcB\tmitabHeaders\n");
+				srcInteractions.append("ProteinAcA\tProteinAcB\t");
+				srcInteractions.append(getMitabHeaders().toString()).append("\n");
+				log.warn("Create file "+getFILE_SOURCE_INTERACTIONS());
 			} catch (FileNotFoundException e) {
 				log.warn("down source interactions printstream is redirecting on System.out");
 				srcInteractions = System.out;
@@ -1455,12 +1492,13 @@ public class InterologPrediction {
 		taxids.add(1148l);
 		up.setUserTaxidsToDownCast(taxids);
 		
-		//up.setDownCastOnAllPresentSpecies(false);
-		//up.setClassicPorcFormat(false);
-		//up.setWriteDownCastHistory(true);
-		//ClogInteraction.setNB_LINES_MAX(100000);
-		//up.setWritePorcInteractions(false);
-		//up.setDownCastOnChildren(false);
+		up.setDownCastOnAllPresentSpecies(false);
+		up.setClassicPorcFormat(false);
+		up.setWriteDownCastHistory(true);
+		up.setWriteSrcInteractions(true);
+		ClogInteraction.setNB_LINES_MAX(100000);
+		up.setWritePorcInteractions(false);
+		up.setDownCastOnChildren(false);
 		
 		up.run();
 	}

@@ -1,16 +1,17 @@
 
-###############################
-#                                                                                       #
+####################################
+#                                  #
 # INTEROPORC PREDICTION PROGRAMME  #
-#                                                                                       #
-###############################
+#                                  #
+####################################
 
 Magali Michaut
 magali.michaut@cea.fr
 mmichaut@ebi.ac.uk
 --
-created 07/06/20
-last update 07/11/26
+07/06/20 created
+07/11/26 added a simple run for one species predictions
+07/11/30 added a result file with all source interactions used in the process
 --
 
 You can find information on EBI website: http://www.ebi.ac.uk/~mmichaut/
@@ -19,12 +20,13 @@ but it may not be updated... ;-)
 
 
 HOW TO USE THE PROGRAMME?
-=======================
+=========================
 
+>>> With an independant JAR (including all dependancies)
 Here is described a simple way to use this programme to predict interactions for one species. You can also import the jar lib and use more options.
 http://www.ebi.ac.uk/~maven/m2repo_snapshots/uk/ac/ebi/intact/dataexchange/psimi/intact-interolog-prediction/2.0.0-SNAPSHOT/
 
-If you have a jar with dependencies -->interologPrediction.jar:
+If you have a jar with all dependencies -->interologPrediction.jar:
 1) create a directory for the predictions --> DIR
 2) put the jar in it
 3) put a mitab file in it with all interactions you want to use as source interactions from other species --> sourceInteractions.mitab
@@ -37,8 +39,31 @@ Then, execute this command in the directory DIR with your taxid (instead of 1148
 java -ms500m -mx1000m -cp interologPrediction.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies . sourceInteractions.mitab porc_gene.dat 1148 interologPrediction.log4j.properties
 
 
+>>> With the JAR available on EBI maven repos (http://www.ebi.ac.uk/~maven/m2repo/uk/ac/ebi/intact/dataexchange/psimi/intact-interolog-prediction/)
+You have to create an instance of InterologPrediction with the required working directory.
+Then you can change some parameters if needed and finally just run it. An example is given below:
+
+  InterologPrediction p = new InterologPrediction(workingDir);
+  p.setClog(clogFile);
+  p.setMitab(mitabFile);
+  p.setPredictedinteractionsFileExtension(".mitab");
+  p.setWriteDownCastHistory(true);
+  
+  p.setDownCastOnAllPresentSpecies(false);
+  p.setClassicPorcFormat(false);
+  p.setWriteDownCastHistory(true);
+  p.setWriteSrcInteractions(true);
+  ClogInteraction.setNB_LINES_MAX(100000);
+  p.setWritePorcInteractions(false);
+  p.setDownCastOnChildren(false);
+  
+  p.run();
+
+Be aware that this program needs some space. I am used to running it with extended arguments to the VM (-ms500m -mx900m). On the other hand, it does not take too much time.
+Running it on the global mitab file (merge of all Intact, MINT and DIP) and predicting interactions for all species present in it will take less than 5 minutes.
+
 RESULTS
-======
+========
 1) predicted interactions are described in InteroPorc.predictedInteractions.mitab in mitab format
 2) some information about the constructed porc interactions are in the tabulated text file downCast.history.txt
 porcA=id from the porc data
@@ -47,8 +72,9 @@ prot1=number of proteins in cluster porcA
 prot2=number of proteins in cluster porcB
 sources=number of source interactions used to construct this porc interaction
 inferences=number of interaction predicted thanks to this porc interaction
-3) comments are written in the interologPrediction.log file during the process if you have configured the log4j property file
-4) the proteome_report.txt file is downloaded and used during the process. You can remove it or keep it in the directory so that it is not downloaded again next time.
+3) all source interactions used dureing the process are describe in the srcInteractionsUsed.txt file
+4) comments are written in the interologPrediction.log file during the process if you have configured the log4j property file
+5) the proteome_report.txt file is downloaded and used during the process. You can remove it or keep it in the directory so that it is not downloaded again next time.
 
 
 If it is not clear, don't hesitate to contact me.
@@ -58,7 +84,7 @@ Have fun! :-)
 
 
 LOG4J PROPERTY FILE EXAMPLE
-=======================
+===========================
 
 log4j.rootCategory=DEBUG, R, A
 
