@@ -87,6 +87,11 @@ public class InterologPrediction {
 	private static File FILE_HISTORY_DOWN_CAST;
 	
 	/**
+	 * File used to print the source interactions used.
+	 */
+	private static File FILE_SOURCE_INTERACTIONS;
+	
+	/**
 	 * File used to print all clog interactions if asked.
 	 */
 	private static File FILE_RESULT_PORC_INTERACTIONS;
@@ -239,6 +244,11 @@ public class InterologPrediction {
 	private boolean writeDownCastHistory = true;
 	
 	/**
+	 * We can specify if we want to print all source interactions used in a file.
+	 */
+	private boolean writeSrcInteractions = true;
+	
+	/**
 	 * We can specify if we want to print porc interactions in a file.
 	 */
 	private boolean writePorcInteractions = false;
@@ -247,6 +257,11 @@ public class InterologPrediction {
 	 * Used to print the history of the down-cast process.
 	 */
 	private PrintStream downCastHistory;
+	
+	/**
+	 * Used to print the source interactions used.
+	 */
+	private PrintStream srcInteractions;
 	
 	/**
 	 * Time when the process begins.
@@ -309,6 +324,14 @@ public class InterologPrediction {
 
 	public static File getFILE_RESULT_PORC_INTERACTIONS() {
 		return FILE_RESULT_PORC_INTERACTIONS;
+	}
+	
+	public static File getFILE_SOURCE_INTERACTIONS() {
+		return FILE_SOURCE_INTERACTIONS;
+	}
+
+	public static void setFILE_SOURCE_INTERACTIONS(File file_source_interactions) {
+		FILE_SOURCE_INTERACTIONS = file_source_interactions;
 	}
 	
 	public static File getFILE_DATA_PROTEOME() {
@@ -470,6 +493,14 @@ public class InterologPrediction {
 		this.writeDownCastHistory = writeClog;
 	}
 	
+	public boolean isWriteSrcInteractions() {
+		return this.writeSrcInteractions;
+	}
+
+	public void setWriteSrcInteractions(boolean writeSrcInteractions) {
+		this.writeSrcInteractions = writeSrcInteractions;
+	}
+	
 
 	public File getWorkingDir() {
 		return this.workingDir;
@@ -489,9 +520,11 @@ public class InterologPrediction {
 		}
 		
 		
-		FILE_DATA_PROTEOME = new File(workingDir.getAbsolutePath()+"/proteome_report.txt");
-		FILE_HISTORY_DOWN_CAST = new File(workingDir.getAbsolutePath()+"/downCast.history.txt");
+		FILE_DATA_PROTEOME            = new File(workingDir.getAbsolutePath()+"/proteome_report.txt");
+		FILE_HISTORY_DOWN_CAST        = new File(workingDir.getAbsolutePath()+"/downCast.history.txt");
+		FILE_SOURCE_INTERACTIONS      = new File(workingDir.getAbsolutePath()+"/srcInteractionsUsed.txt");
 		FILE_RESULT_PORC_INTERACTIONS = new File(workingDir.getAbsolutePath()+"/clog.interactions.txt");
+		
 		predictedinteractionsFileName = "InteroPorc.predictedInteractions";
 		
 	}
@@ -927,7 +960,23 @@ public class InterologPrediction {
 		log.info(protein2porc.size()+ " proteins in the map");
 	}
 	
-	
+	/**
+	 * @param porcInteraction
+	 * @param uniprotAcA
+	 * @param uniprotAcB
+	 * @return
+	 */
+	private static StrBuilder printAllInformation(ClogInteraction porcInteraction, String uniprotAcA, String uniprotAcB) {
+		final String SEP = "\t";
+		StrBuilder buf = new StrBuilder();
+		for (BinaryInteraction src : porcInteraction.getSourceInteractions()) {
+			buf.append(uniprotAcA).append(SEP);
+			buf.append(uniprotAcB).append(SEP);
+			buf.append(src.toString()).append("\n");
+		}
+		
+		return buf;
+	}
 
 	/**
 	 * @param mitab
@@ -1147,6 +1196,8 @@ public class InterologPrediction {
 		scenario.append(porcInteraction.getSourceInteractions().size()).append("\t");
 		int inference = 0;
 		
+		StrBuilder srcInteractionsLocal = new StrBuilder();
+		
 		Collection<BinaryInteraction> interactions = new ArrayList<BinaryInteraction>();
 		Collection<Long> speciesA = porcInteraction.getClogA().getProteomeId2protein().keySet();
 		Collection<Long> speciesB = porcInteraction.getClogB().getProteomeId2protein().keySet();
@@ -1227,6 +1278,8 @@ public class InterologPrediction {
 					interactions.add(interaction);
 					history.append(" -> predicted\n");
 					
+					srcInteractionsLocal.append(printAllInformation(porcInteraction, uniprotIdA, uniprotIdB));
+					
 				}
 				
 			}
@@ -1238,6 +1291,10 @@ public class InterologPrediction {
 		if (isWriteDownCastHistory()) {
 			//downCastHistory.append(history.toString()).append("\n");
 			downCastHistory.append(scenario.toString()).append("\n");
+		}
+		
+		if (isWriteSrcInteractions()) {
+			srcInteractions.append(srcInteractionsLocal.toString());
 		}
 		
 		return interactions;
@@ -1255,11 +1312,21 @@ public class InterologPrediction {
 				
 		if (isWriteDownCastHistory()) {
 			try {
-				downCastHistory = new PrintStream(new File(workingDir.getAbsolutePath()+"/downCast.history.txt"));
+				downCastHistory = new PrintStream(getFILE_HISTORY_DOWN_CAST());
 				downCastHistory.append("porcA\tporcB\tprot1\tprot2\tsources\tinferences\n");
 			} catch (FileNotFoundException e) {
 				log.warn("down cast history is redirecting on System.out");
 				downCastHistory = System.out;
+			}
+		}
+		
+		if (isWriteSrcInteractions()) {
+			try {
+				srcInteractions = new PrintStream(getFILE_SOURCE_INTERACTIONS());
+				srcInteractions.append("ProteinAcA\tProteinAcB\tmitabHeaders\n");
+			} catch (FileNotFoundException e) {
+				log.warn("down source interactions printstream is redirecting on System.out");
+				srcInteractions = System.out;
 			}
 		}
 		
@@ -1276,6 +1343,10 @@ public class InterologPrediction {
 		
 		if (isWriteDownCastHistory()) {
 			downCastHistory.close();
+		}
+		
+		if (isWriteSrcInteractions()) {
+			srcInteractions.close();
 		}
 		
 		printMemoryInfo();
