@@ -167,7 +167,7 @@ public class ImexImporter {
         final String pmid = repoEntry.getPmid();
 
         try {
-            PsiExchange.importIntoIntact(new FileInputStream(entryFile), false);
+            PsiExchange.importIntoIntact(new FileInputStream(entryFile));
 
             imexImportPublication.setStatus(ImexImportPublicationStatus.OK);
 
