@@ -107,7 +107,7 @@ public class PsiExchange {
         IntactContext context = IntactContext.getCurrentInstance();
 
         // check if the transaction is active
-        if (context.getDataContext().isTransactionActive()) {
+        if (IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().isActive()) {
             throw new IllegalStateException("To import to intact, the current transaction when calling the method must be inactive");
         }
 
