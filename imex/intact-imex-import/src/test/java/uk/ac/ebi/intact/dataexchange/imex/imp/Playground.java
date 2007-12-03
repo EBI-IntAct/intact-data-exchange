@@ -27,6 +27,8 @@ import uk.ac.ebi.intact.model.InstitutionXref;
 import uk.ac.ebi.intact.model.meta.ImexImport;
 import uk.ac.ebi.intact.model.meta.ImexImportPublication;
 import uk.ac.ebi.intact.model.util.XrefUtils;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import uk.ac.ebi.intact.core.util.SchemaUtils;
 
 import java.io.File;
 
@@ -41,12 +43,13 @@ public class Playground {
     public static void main(String[] args) throws Exception{
 
         IntactContext.initStandaloneContext(new File(Playground.class.getResource("/postgres-hibernate.cfg.xml").getFile()));
-
         
         getDataContext().beginTransaction();
 
         SmallCvPrimer primer = new SmallCvPrimer(getDataContext().getDaoFactory());
         primer.createCVs();
+
+        getDataContext().commitTransaction();
 
         CvXrefQualifier qual = getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).getByPsiMiRef(CvXrefQualifier.IDENTITY_MI_REF);
         CvDatabase psiMi = getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByPsiMiRef(CvDatabase.PSI_MI_MI_REF);
@@ -62,21 +65,14 @@ public class Playground {
         Institution mint = new Institution("MINT");
         InstitutionXref mintXref = XrefUtils.createIdentityXref(dip, CvDatabase.MINT_MI_REF, qual, psiMi);
         mint.addXref(mintXref);
-        
-        getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(intact);
-        getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(dip);
-        getDataContext().getDaoFactory().getInstitutionDao().saveOrUpdate(mint);
-        getDataContext().commitTransaction();
 
+        PersisterHelper.saveOrUpdate(intact, dip, mint);
 
-
-        getDataContext().beginTransaction();
         System.out.println("Institutions: "+ getDataContext().getDaoFactory()
                 .getInstitutionDao().getShortLabelsLike("%"));
-         getDataContext().commitTransaction();
 
 
-        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all3/");
+        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all/");
         Repository repo = ImexRepositoryContext.openRepository(repoDir.toString());
 
         ImexImporter importer = new ImexImporter(repo);
