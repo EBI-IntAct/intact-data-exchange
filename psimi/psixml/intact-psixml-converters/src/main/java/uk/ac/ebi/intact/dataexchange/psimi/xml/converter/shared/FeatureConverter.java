@@ -93,7 +93,7 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
         return psiFeature;
     }
 
-    protected String psiElementKey(psidev.psi.mi.xml.model.Feature psiObject) {
+    protected Object psiElementKey(psidev.psi.mi.xml.model.Feature psiObject) {
         throw new UnsupportedOperationException();
     }
 

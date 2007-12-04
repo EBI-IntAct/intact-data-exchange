@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.collections.map.IdentityMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,10 +32,10 @@ public class ConversionCache {
 
     private static final Log log = LogFactory.getLog(ConversionCache.class);
 
-    private Map<Object, Object> idMap;
+    private Map idMap;
 
     public ConversionCache() {
-        this.idMap = new HashMap<Object, Object>();
+        this.idMap = new IdentityMap();
     }
 
     public static ThreadLocal<ConversionCache> instance = new ThreadLocal<ConversionCache>() {

@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import static junit.framework.Assert.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.collections.map.IdentityMap;
 import static org.easymock.classextension.EasyMock.createNiceMock;
 import org.junit.After;
 import org.junit.Assert;
@@ -41,6 +42,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * TODO comment this
@@ -131,17 +133,13 @@ public class EntryConverterTest extends AbstractConverterTest {
 
     @Test
     public void roundtrip_similarExperiments() throws Exception {
-        File file = new File(EntryConverterTest.class.getResource("/xml/similarExp.dip.raw.xml").getFile());
+        final String resource = "/xml/similarExperiments.dip.raw.xml";
+        InputStream is = EntryConverterTest.class.getResourceAsStream(resource);
+        
+        File file = new File(EntryConverterTest.class.getResource(resource).getFile());
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
-        PsimiXmlReader reader = new PsimiXmlReader();
-        EntrySet entrySet = reader.read(new FileInputStream(file));
-
-        EntryConverter entryConverter = new EntryConverter();
-        IntactEntry intactEntry = entryConverter.psiToIntact(entrySet.getEntries().iterator().next());
-
-        Assert.assertEquals(3, intactEntry.getExperiments().size());
-        Assert.assertEquals(3, intactEntry.getInteractions().size());
+        roundtripWithStream(is, "DIP");
     }
 
     @Test
@@ -195,8 +193,8 @@ public class EntryConverterTest extends AbstractConverterTest {
             Assert.assertEquals(institutionShortLabel, intactEntry.getInteractors().iterator().next().getOwner().getShortLabel());
 
             assertEquals("Number of interactions should be the same", beforeRountripEntry.getInteractions().size(), afterRoundtripEntry.getInteractions().size());
-            assertEquals("Number of experiments should be the same",countExperimentsInEntry(beforeRountripEntry), afterRoundtripEntry.getExperiments().size());
-            assertEquals("Number of interactors should be the same",countInteractorsInEntry(beforeRountripEntry), afterRoundtripEntry.getInteractors().size());
+            assertEquals("Number of experiments should be the same", countUniqueExperimentsInEntry(beforeRountripEntry), afterRoundtripEntry.getExperiments().size());
+            assertEquals("Number of interactors should be the same", countUniqueInteractorsInEntry(beforeRountripEntry), afterRoundtripEntry.getInteractors().size());
         }
        
     }
@@ -227,17 +225,17 @@ public class EntryConverterTest extends AbstractConverterTest {
         return isValid;
     }
 
-    private static int countExperimentsInEntry(Entry entry) {
-        Collection<ExperimentDescription> experiments;
-
-        System.out.println( "=======================================================" );
+    private static int countUniqueExperimentsInEntry(Entry entry) {
+        Map<ExperimentDescription, ?> experiments;
 
         if (entry.getExperiments() != null && !entry.getExperiments().isEmpty()) {
-            experiments = entry.getExperiments();
+            return entry.getExperiments().size();
         } else {
-            experiments = new HashSet<ExperimentDescription>();
+            experiments = new IdentityMap();
             for (Interaction i : entry.getInteractions()) {
-                experiments.addAll(i.getExperiments());
+                for (ExperimentDescription exp : i.getExperiments()) {
+                    experiments.put(exp, null);
+                }
             }
         }
 
@@ -245,25 +243,17 @@ public class EntryConverterTest extends AbstractConverterTest {
         return experiments.size();
     }
 
-    private static int countInteractorsInEntry(Entry entry) {
-        Collection<Interactor> interactors;
+    private static int countUniqueInteractorsInEntry(Entry entry) {
+        Map<Interactor,?> interactors;
 
         if (entry.getInteractors() != null && !entry.getInteractors().isEmpty()) {
-            interactors = entry.getInteractors();
+            return entry.getInteractors().size();
         } else {
-            interactors = new HashSet<Interactor>();
+            interactors = new IdentityMap();
             for (Interaction i : entry.getInteractions()) {
                 for (Participant p : i.getParticipants()) {
-
-                    boolean found = false;
-
-                    for (Interactor interactor : interactors) {
-                        if (interactor.getNames().getShortLabel().equals(p.getInteractor().getNames().getShortLabel())) {
-                            found = true;
-                        }
-                    }
-
-                    if (!found) interactors.add(p.getInteractor());
+                    Interactor interactor = p.getInteractor();
+                    interactors.put(interactor, null);
                 }
             }
         }

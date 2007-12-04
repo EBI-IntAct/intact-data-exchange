@@ -99,10 +99,6 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         return interactor;
     }
 
-    protected String psiElementKey( psidev.psi.mi.xml.model.Interactor psiObject ) {
-        return "ior:" + psiObject.getId();
-    }
-
     protected Interactor newInteractorAccordingToType( Organism psiOrganism, String shortLabel, InteractorType psiInteractorType ) {
         BioSource organism = new OrganismConverter( getInstitution() ).psiToIntact( psiOrganism );
         CvInteractorType interactorType = new InteractorTypeConverter( getInstitution() ).psiToIntact( psiInteractorType );

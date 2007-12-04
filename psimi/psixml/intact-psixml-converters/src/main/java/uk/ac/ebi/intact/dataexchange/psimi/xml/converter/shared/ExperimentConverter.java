@@ -107,10 +107,6 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         return expDesc;
     }
 
-    protected String psiElementKey(ExperimentDescription psiObject) {
-        return String.valueOf("exp:"+psiObject.getId());
-    }
-
     private Publication createPublication(ExperimentDescription experiment) {
         String pubId = experiment.getBibref().getXref().getPrimaryRef().getId();
 

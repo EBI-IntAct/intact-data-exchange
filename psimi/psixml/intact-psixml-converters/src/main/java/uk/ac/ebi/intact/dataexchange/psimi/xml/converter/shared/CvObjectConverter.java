@@ -65,6 +65,7 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
         return cvType;
     }
 
+
     private static <C> C newCvInstance(Class<C> cvClass) {
         C cv = null;
         try {
@@ -77,6 +78,6 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
     }
 
     private String elementKey(C intactObject) {
-        return intactObject.getShortLabel() + "_" + intactObject.getClass();
+        return intactObject.getMiIdentifier() + "_" + intactObject.getClass();
     }
 }

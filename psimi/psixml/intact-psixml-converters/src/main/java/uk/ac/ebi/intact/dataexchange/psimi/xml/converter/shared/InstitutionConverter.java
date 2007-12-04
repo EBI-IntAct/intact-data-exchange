@@ -73,7 +73,7 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
         return source;
     }
 
-    protected String psiElementKey(Source psiObject) {
+    protected Object psiElementKey(Source psiObject) {
         String key;
 
         if (psiObject.getNames() != null) {

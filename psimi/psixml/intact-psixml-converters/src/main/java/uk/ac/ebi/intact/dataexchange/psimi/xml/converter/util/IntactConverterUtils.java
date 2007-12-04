@@ -173,7 +173,7 @@ public class IntactConverterUtils {
 
     protected static Institution getInstitution(AnnotatedObject ao) {
         if (ao instanceof Institution) {
-            return IntactContext.getCurrentInstance().getInstitution();
+            return (Institution)ao;
         } else {
             return ao.getOwner();
         }

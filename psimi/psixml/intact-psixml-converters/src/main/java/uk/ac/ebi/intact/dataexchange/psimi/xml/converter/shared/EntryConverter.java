@@ -20,6 +20,8 @@ import psidev.psi.mi.xml.model.ExperimentDescription;
 import psidev.psi.mi.xml.model.HasId;
 import psidev.psi.mi.xml.model.Participant;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.InconsistentConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.model.Institution;
@@ -72,6 +74,8 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
 
         ConversionCache.clear();
 
+        failIfInconsistentConversion(ientry, psiObject);
+
         return ientry;
     }
 
@@ -108,6 +112,8 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
 
         ConversionCache.clear();
 
+        failIfInconsistentConversion(intactObject, entry);
+
         return entry;
 
     }
@@ -119,6 +125,12 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
             }
         }
         return false;
+    }
+
+    protected void failIfInconsistentConversion(IntactEntry intactEntry, Entry psiEntry) {
+        failIfInconsistentCollectionSize("interaction", intactEntry.getInteractions(), psiEntry.getInteractions());
+        failIfInconsistentCollectionSize("experiment", intactEntry.getExperiments(), psiEntry.getExperiments());
+        failIfInconsistentCollectionSize("interactor", intactEntry.getInteractors(), psiEntry.getInteractors());
     }
 
 }

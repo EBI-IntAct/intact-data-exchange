@@ -75,6 +75,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         Collection<Component> components = getComponents(interaction, psiObject);
         interaction.setComponents(components);
 
+        failIfInconsistentConversion(interaction, psiObject);
+
         return interaction;
     }
 
@@ -126,17 +128,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                 PsiConverterUtils.toCvType(intactObject.getCvInteractionType(), new InteractionTypeConverter(getInstitution()));
         interaction.getInteractionTypes().add(interactionType);
 
+        failIfInconsistentConversion(intactObject, interaction);
+
         return interaction;
-    }
-
-    protected String psiElementKey(psidev.psi.mi.xml.model.Interaction psiObject) {
-        return "i:"+psiObject.getId();
-    }
-
-    @Override
-    protected String intactElementKey(Interaction intactObject) {
-        // no caching of interactions
-        return null;
     }
 
     protected Collection<Experiment> getExperiments(psidev.psi.mi.xml.model.Interaction psiInteraction) {
@@ -186,5 +180,10 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
 
         return components;
+    }
+
+    protected void failIfInconsistentConversion(Interaction intact, psidev.psi.mi.xml.model.Interaction psi) {
+        failIfInconsistentCollectionSize("experiment", intact.getExperiments(), psi.getExperiments());
+        failIfInconsistentCollectionSize("participant", intact.getComponents(), psi.getParticipants());
     }
 }

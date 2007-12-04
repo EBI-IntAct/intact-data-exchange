@@ -20,6 +20,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.AnnotatedObject;
 import uk.ac.ebi.intact.model.Institution;
+import psidev.psi.mi.xml.model.HasId;
 
 /**
  * TODO comment this
@@ -94,11 +95,25 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         return instance;
     }
 
-    protected String intactElementKey(A intactObject) {
-        return intactObject.getShortLabel() + "_" + intactObject.getClass();
+    protected Object intactElementKey(A intactObject) {
+        return intactObject;
+        /*
+        if (intactObject.getAc() != null) {
+            return intactObject.getAc();
+        }
+        // no caching by default
+        return null;  */
     }
 
-    protected abstract String psiElementKey(T psiObject);
+    protected Object psiElementKey(T psiObject) {
+        return psiObject;
+       /* if (psiObject instanceof HasId) {
+            return psiObject.getClass().getSimpleName()+":"+((HasId) psiObject).getId();
+        }
+        
+        // no caching by default
+        return null;     */
+    }
 
     protected boolean isNewIntactObjectCreated() {
         return newIntactObjectCreated;
