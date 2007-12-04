@@ -16,11 +16,16 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.enricher;
 
 import org.junit.Test;
+import org.junit.Assert;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+
+import psidev.psi.mi.xml.PsimiXmlReader;
+import psidev.psi.mi.xml.model.EntrySet;
+import psidev.psi.mi.xml.model.Entry;
 
 /**
  * TODO comment this
@@ -44,5 +49,38 @@ public class PsiEnricherTest {
         PsiEnricher.enrichPsiXml(is, writer, config);
 
         System.out.println(writer.toString());
+    }
+
+    @Test
+    public void enrichFile_similarExp() throws Exception {
+        final String pathToXml = "/xml/similarExperiments.dip.raw.xml";
+
+        PsimiXmlReader reader = new PsimiXmlReader();
+        EntrySet originalSet = reader.read(PsiEnricherTest.class.getResourceAsStream(pathToXml));
+
+        Assert.assertEquals(1, originalSet.getEntries().size());
+        Entry originalEntry = originalSet.getEntries().iterator().next();
+
+        Assert.assertEquals(3, originalEntry.getInteractions().size());
+        Assert.assertEquals(3, originalEntry.getExperiments().size());
+        Assert.assertEquals(3, originalEntry.getInteractors().size());
+
+        Writer writer = new StringWriter();
+
+        EnricherConfig config = new EnricherConfig();
+        config.setUpdateInteractionShortLabels(true);
+
+        PsiEnricher.enrichPsiXml(PsiEnricherTest.class.getResourceAsStream(pathToXml), writer, config);
+
+        reader = new PsimiXmlReader();
+        EntrySet enrichedSet = reader.read(writer.toString());
+
+        Entry entry = enrichedSet.getEntries().iterator().next();
+        
+        Assert.assertEquals(3, entry.getInteractions().size());
+        Assert.assertEquals(3, entry.getExperiments().size());
+        Assert.assertEquals(3, entry.getInteractors().size());
+
+
     }
 }
