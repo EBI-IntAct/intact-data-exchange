@@ -89,7 +89,7 @@ public class PsiEnricher {
         if (interactionCount != interactionCountAfter) {
             throw new PsiEnricherException("The number of interactions after enrichment has changed: "+interactionCount+" -> "+interactionCountAfter);
         }
-        if (experimentCountAfter != experimentCountAfter) {
+        if (experimentCount != experimentCountAfter) {
             throw new PsiEnricherException("The number of experiments after enrichment has changed: "+interactionCount+" -> "+experimentCountAfter);
         }
         if (interactorCount != interactorCountAfter) {
