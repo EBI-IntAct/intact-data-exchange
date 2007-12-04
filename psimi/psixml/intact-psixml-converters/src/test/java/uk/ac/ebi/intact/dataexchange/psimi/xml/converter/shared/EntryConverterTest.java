@@ -130,6 +130,21 @@ public class EntryConverterTest extends AbstractConverterTest {
     }
 
     @Test
+    public void roundtrip_similarExperiments() throws Exception {
+        File file = new File(EntryConverterTest.class.getResource("/xml/similarExp.dip.raw.xml").getFile());
+        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
+
+        PsimiXmlReader reader = new PsimiXmlReader();
+        EntrySet entrySet = reader.read(new FileInputStream(file));
+
+        EntryConverter entryConverter = new EntryConverter();
+        IntactEntry intactEntry = entryConverter.psiToIntact(entrySet.getEntries().iterator().next());
+
+        Assert.assertEquals(3, intactEntry.getExperiments().size());
+        Assert.assertEquals(3, intactEntry.getInteractions().size());
+    }
+
+    @Test
     public void roundtrip_similarInteractions_sameLabel() throws Exception {
         File file = new File(EntryConverterTest.class.getResource("/xml/dupes.xml").getFile());
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
