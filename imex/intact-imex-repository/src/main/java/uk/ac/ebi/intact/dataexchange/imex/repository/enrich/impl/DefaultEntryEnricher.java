@@ -44,8 +44,6 @@ public class DefaultEntryEnricher implements EntryEnricher
             return;
         }
 
-        EnricherContext.getInstance().getConfig().setUpdateInteractionShortLabels(true);
-
         Repository repository = ImexRepositoryContext.getInstance().getRepository();
         RepositoryHelper helper = new RepositoryHelper(repository);
 

@@ -8,6 +8,10 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class DefaultEnricherConfig extends EnricherConfig
-{
+public class DefaultEnricherConfig extends EnricherConfig {
+
+    @Override
+    public boolean isUpdateInteractionShortLabels() {
+        return true;
+    }
 }
