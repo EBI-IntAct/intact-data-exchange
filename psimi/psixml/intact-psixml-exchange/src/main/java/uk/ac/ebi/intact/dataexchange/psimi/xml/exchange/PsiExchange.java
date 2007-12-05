@@ -107,8 +107,9 @@ public class PsiExchange {
         IntactContext context = IntactContext.getCurrentInstance();
 
         // check if the transaction is active
-        if (IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().isActive()) {
-            throw new IllegalStateException("To import to intact, the current transaction when calling the method must be inactive");
+        if (!IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().isActive()) {
+            log.warn("Started a new transaction as there was not transaction active");
+            IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().begin();
         }
 
         // some time for stats
@@ -116,8 +117,6 @@ public class PsiExchange {
 
         // this will count the interactions and will be used to flush in batches
         int interactionCount = 0;
-
-        beginTransaction();
 
         for (Entry entry : entrySet.getEntries()) {
             InstitutionConverter institutionConverter = new InstitutionConverter();
@@ -140,6 +139,8 @@ public class PsiExchange {
             List<String> interactionLabelsToCommit = new ArrayList<String>();
 
             for (psidev.psi.mi.xml.model.Interaction psiInteraction : entry.getInteractions()) {
+                ConversionCache.clear();
+                
                 Interaction interaction = null;
                 try {
                     interaction = interactionConverter.psiToIntact(psiInteraction);
@@ -206,6 +207,7 @@ public class PsiExchange {
             interactionLabelsToCommit.clear();
         }
 
+        ConversionCache.clear();
         commitTransaction();
     }
 
