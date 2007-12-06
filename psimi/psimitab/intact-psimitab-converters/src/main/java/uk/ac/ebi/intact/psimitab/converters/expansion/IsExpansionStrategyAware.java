@@ -28,15 +28,16 @@ import uk.ac.ebi.intact.psimitab.converters.Intact2TabException;
  */
 
 
-public interface IsExpansionStrategyAware <T extends BinaryInteractionImpl>{
+public interface IsExpansionStrategyAware<T extends BinaryInteractionImpl> {
 
     /**
      * Does the extra processing on the BinaryInteractionImpl.
      *
-     * @param bi          Binary interaction to be processed.
-     * @param interaction Source interaction.
+     * @param bi                Binary interaction to be processed.
+     * @param interaction       Source interaction.
      * @param expansionStrategy strategy of expansion.
      * @throws uk.ac.ebi.intact.psimitab.converters.Intact2TabException
+     *
      */
     public void process( T bi, Interaction interaction, ExpansionStrategy expansionStrategy ) throws Intact2TabException;
 }

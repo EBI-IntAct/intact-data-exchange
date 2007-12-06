@@ -31,7 +31,7 @@ public interface ExpansionStrategy {
     /**
      * Expand an interaction into a
      *
-     * @param interaction  interaction which should be expanded
+     * @param interaction interaction which should be expanded
      * @return a non null collection of interaction, in case the expansion is not possible, we may return an empty
      *         collection.
      */

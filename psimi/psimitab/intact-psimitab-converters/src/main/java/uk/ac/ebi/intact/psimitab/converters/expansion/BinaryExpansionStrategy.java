@@ -36,9 +36,8 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
      * <br/> Components are replaced by the two given ones.
      *
      * @param interaction the interaction template.
-     * @param c1 component to add to the newly created interaction.
-     * @param c2 component to add to the newly created interaction.
-     *
+     * @param c1          component to add to the newly created interaction.
+     * @param c2          component to add to the newly created interaction.
      * @return a new interaction having c1 and c2 as component.
      */
     protected Interaction buildInteraction( Interaction interaction, Component c1, Component c2 ) {
@@ -64,8 +63,7 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
      * <br/> Components are both replaced by the one given ones.
      *
      * @param interaction the interaction template.
-     * @param c1 component to add to the newly created interaction.
-     *
+     * @param c1          component to add to the newly created interaction.
      * @return a new interaction having c1 and c1 as component.
      */
     protected Interaction buildSingleInteraction( Interaction interaction, Component c1 ) {

@@ -27,7 +27,7 @@ import uk.ac.ebi.intact.model.Interaction;
  * @version $Id$
  * @since 2.0.0
  */
-public interface BinaryInteractionHandler <T extends BinaryInteractionImpl> {
+public interface BinaryInteractionHandler<T extends BinaryInteractionImpl> {
 
     /**
      * Does the extra processing on the BinaryInteractionImpl.
@@ -36,5 +36,13 @@ public interface BinaryInteractionHandler <T extends BinaryInteractionImpl> {
      * @param interaction Source interaction.
      */
     public void process( T bi, Interaction interaction ) throws Intact2TabException;
+
+	/**
+	 * This method merge could called in ClusterInteractorPairProssesor to write the correct format of lists.
+	 *
+	 * @param interaction
+	 * @param target
+	 */
+	public void mergeCollection(T interaction, T target);    
 
 }

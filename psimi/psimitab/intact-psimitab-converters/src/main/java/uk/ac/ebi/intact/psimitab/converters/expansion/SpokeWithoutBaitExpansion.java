@@ -34,7 +34,7 @@ import java.util.*;
  */
 public class SpokeWithoutBaitExpansion extends SpokeExpansion {
 
-     /**
+    /**
      * Sets up a logger for that class.
      */
     public static final Log logger = LogFactory.getLog( SpokeWithoutBaitExpansion.class );
@@ -57,11 +57,11 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
         if ( InteractionUtils.isBinaryInteraction( interaction ) ) {
 
             logger.debug( "Interaction was binary, no further processing involved." );
-            if ( interaction.getComponents().size() == 1 ){
+            if ( interaction.getComponents().size() == 1 ) {
                 // single Interaction
                 Component singleComponent = components.iterator().next();
-                CvObjectXref idRef = CvObjectUtils.getPsiMiIdentityXref( singleComponent.getCvExperimentalRole() );                
-                if (idRef.getPrimaryId().equals( CvExperimentalRole.SELF_PSI_REF)) {
+                CvObjectXref idRef = CvObjectUtils.getPsiMiIdentityXref( singleComponent.getCvExperimentalRole() );
+                if ( idRef.getPrimaryId().equals( CvExperimentalRole.SELF_PSI_REF ) ) {
                     Interaction newSelfInteraction = buildSingleInteraction( interaction, singleComponent );
                     interactions.add( newSelfInteraction );
                 }

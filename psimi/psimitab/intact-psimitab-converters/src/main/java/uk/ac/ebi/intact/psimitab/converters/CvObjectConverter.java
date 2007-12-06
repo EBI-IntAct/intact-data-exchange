@@ -37,11 +37,11 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
 
     public T toMitab( Class<T> clazz, O cvObject ) throws Intact2TabException {
         if ( cvObject == null ) {
-            throw new IllegalArgumentException( "CvObject must not be null. ");
+            throw new IllegalArgumentException( "CvObject must not be null. " );
         }
 
         if ( clazz == null ) {
-            throw new IllegalArgumentException( "Class must not be null. ");
+            throw new IllegalArgumentException( "Class must not be null. " );
         }
 
         String text = cvObject.getShortLabel();

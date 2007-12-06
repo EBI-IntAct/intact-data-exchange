@@ -40,12 +40,12 @@ public class CrossReferenceConverter<T extends Xref> {
     /**
      * Converts a Collection of Xrefs into a suitable format for PSIMITAB
      *
-     * @param xrefs is a Collection of intact.model.Xref
+     * @param xrefs        is a Collection of intact.model.Xref
      * @param onlyIdentity if is true only CrossReferences with CvXrefQualifier equals identiy will be returned
      *                     if is false all CrossReferences without CvXrefQualifier equals identiy will be returned
      * @return List of CrossReferences sorted by CvXrefQualifier
      */
-    public List<CrossReference> toMitab( Collection<T> xrefs, boolean onlyIdentity ) {
+    public List<CrossReference> toMitab( Collection<T> xrefs, boolean onlyIdentity, boolean withText ) {
         if ( xrefs == null ) {
             throw new IllegalArgumentException( "Xref must not be null. " );
         }
@@ -60,22 +60,32 @@ public class CrossReferenceConverter<T extends Xref> {
             if ( id != null && db != null ) {
 
                 try {
-                    String text = xref.getCvXrefQualifier().getShortLabel();
+                    String qualifier = xref.getCvXrefQualifier().getShortLabel();
+                    CrossReference ref;
+                    if ( withText && xref.getSecondaryId() != null ) {
+                        ref = CrossReferenceFactory.getInstance().build( db, id, xref.getSecondaryId() );
+                    } else {
+                        ref = CrossReferenceFactory.getInstance().build( db, id );
+                    }
 
-                    CrossReference ref = CrossReferenceFactory.getInstance().build( db, id, text );
                     if ( onlyIdentity ) {
-                        if ( text.equals( CvXrefQualifier.IDENTITY ) ) {
+                        if ( qualifier.equals( CvXrefQualifier.IDENTITY ) ) {
                             crossReferences.add( ref );
                         }
                     } else {
-                        if ( !text.equals( CvXrefQualifier.IDENTITY ) ) {
+                        if ( !qualifier.equals( CvXrefQualifier.IDENTITY ) ) {
                             crossReferences.add( ref );
                         }
                     }
 
                 } catch ( Exception e ) {
-                    if( !onlyIdentity ) {
-                        CrossReference ref = CrossReferenceFactory.getInstance().build( db, id );
+                    if ( !onlyIdentity ) {
+                        CrossReference ref;
+                        if ( withText && xref.getSecondaryId() != null) {
+                            ref = CrossReferenceFactory.getInstance().build( db, id, xref.getSecondaryId() );
+                        } else {
+                            ref = CrossReferenceFactory.getInstance().build( db, id );
+                        }
                         crossReferences.add( ref );
                     }
                 }

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
-  * Process an interaction and expand it using the matrix model.
+ * Process an interaction and expand it using the matrix model.
  *
  * @author Nadin Neuhauser
  * @version $Id$
@@ -44,7 +44,6 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
      * components.
      *
      * @param interaction the interaction to expand.
-     *
      * @return a non null collection of interaction, in case the expansion is not possible, we may return an empty
      *         collection.
      */

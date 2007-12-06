@@ -18,8 +18,12 @@ package uk.ac.ebi.intact.psimitab.converters;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.processor.PostProcessorStrategy;
+import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
+
+//import uk.ac.ebi.intact.psimitab.converters.processor.PostProcessorStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,7 +48,7 @@ public class Intact2Tab {
 
     private BinaryInteractionHandler biHandler;
 
-    //private PostProssesorStrategy postProssesorStrategy;
+    private PostProcessorStrategy postProcessor;
 
     /////////////////////
     // Getters & Setters
@@ -55,7 +59,6 @@ public class Intact2Tab {
 
     public void setExpansionStrategy( ExpansionStrategy expansionStrategy ) {
         this.expansionStrategy = expansionStrategy;
-
     }
 
     public Class getBinaryInteractionClass() {
@@ -74,11 +77,19 @@ public class Intact2Tab {
         this.biHandler = biHandler;
     }
 
+    public PostProcessorStrategy getPostProssesorStrategy() {
+        return postProcessor;
+    }
+
+    public void setPostProssesorStrategy( PostProcessorStrategy postProssesorStrategy ) {
+        this.postProcessor = postProssesorStrategy;
+    }
+
     //////////////////////
     // Construtor
 
     public Collection<BinaryInteraction> convert( Collection<Interaction> interactions ) throws Intact2TabException {
-        if (interactions == null ){
+        if ( interactions == null ) {
             throw new IllegalArgumentException( "Interaction(s) must not be null" );
         }
 
@@ -114,6 +125,40 @@ public class Intact2Tab {
             }
         }
 
+        result = doPostProcessing( result );
+        
         return result;
+    }
+
+
+    /**
+     * Apply post processing to the given collecition of interactions. if no processing was requested, the given
+     * collection is returned.
+     *
+     * @param interactions the collection of interaction on which to apply post processing.
+     * @return a non null collection of interactions.
+     */
+    private Collection<BinaryInteraction> doPostProcessing( final Collection<BinaryInteraction> interactions ) {
+
+        if ( interactions == null ) {
+            throw new IllegalArgumentException( "Interaction cannot be null." );
+        }
+
+        Collection<BinaryInteraction> processedInteraction = null;
+
+        // Run post processing (if requested)
+        if ( postProcessor != null ) {
+            if ( logger.isDebugEnabled() ) {
+                logger.debug( "Running " + postProcessor.getClass().getSimpleName() + "..." );
+            }
+            postProcessor.setColumnHandler((ColumnHandler) biHandler );
+            processedInteraction = postProcessor.process( interactions );
+            logger.debug( "Post processing completed." );
+        } else {
+            logger.debug( "No post processing requested." );
+            processedInteraction = interactions;
+        }
+
+        return processedInteraction;
     }
 }

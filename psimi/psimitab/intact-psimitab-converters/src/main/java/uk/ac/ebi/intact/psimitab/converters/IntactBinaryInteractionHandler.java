@@ -19,11 +19,13 @@ import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceFactory;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
+import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.IsExpansionStrategyAware;
+import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,7 +38,7 @@ import java.util.List;
  * @version $Id$
  * @since 2.0.0
  */
-public class IntactBinaryInteractionHandler implements BinaryInteractionHandler, IsExpansionStrategyAware {
+public class IntactBinaryInteractionHandler extends IntActColumnHandler implements BinaryInteractionHandler, IsExpansionStrategyAware {
 
     private CrossReferenceConverter<InteractorXref> xConverter = new CrossReferenceConverter<InteractorXref>();
     private CvObjectConverter<CrossReferenceImpl, CvObject> cvObjectConverter = new CvObjectConverter<CrossReferenceImpl, CvObject>();
@@ -51,11 +53,11 @@ public class IntactBinaryInteractionHandler implements BinaryInteractionHandler,
         uk.ac.ebi.intact.model.Interactor intactInteractorB = iterator.next().getInteractor();
 
         // set properties of interactor A
-        List<CrossReference> propertiesA = xConverter.toMitab( intactInteractorA.getXrefs(), false );
+        List<CrossReference> propertiesA = xConverter.toMitab( intactInteractorA.getXrefs(), false, true );
         ibi.setPropertiesA( propertiesA );
 
         // set properties of interactor B
-        List<CrossReference> propertiesB = xConverter.toMitab( intactInteractorB.getXrefs(), false );
+        List<CrossReference> propertiesB = xConverter.toMitab( intactInteractorB.getXrefs(), false, true );
         ibi.setPropertiesB( propertiesB );
 
         // set type of interactor A
@@ -79,41 +81,33 @@ public class IntactBinaryInteractionHandler implements BinaryInteractionHandler,
         }
         ibi.setHostOrganism( hostOrganisms );
 
-        // set expermimental role of interactor A
+        // set expermimental role of interactor A and B
         List<CrossReference> experimentRolesA = new ArrayList<CrossReference>();
-        for ( Component activeInstance : intactInteractorA.getActiveInstances() ) {
-            experimentRolesA.add( cvObjectConverter.toMitab( activeInstance.getCvExperimentalRole() ) );
+        List<CrossReference> experimentRolesB = new ArrayList<CrossReference>();
+        for ( Component component : interaction.getComponents() ){
+            if (component.getInteractor().equals( intactInteractorA )){
+                experimentRolesA.add( cvObjectConverter.toMitab( component.getCvExperimentalRole()));
+            }
+            if (component.getInteractor().equals( intactInteractorB )){
+                experimentRolesB.add( cvObjectConverter.toMitab( component.getCvExperimentalRole()));
+            }
         }
         ibi.setExperimentalRolesInteractorA( experimentRolesA );
-
-        // set expermimental role of interactor B
-        List<CrossReference> experimentRolesB = new ArrayList<CrossReference>();
-        for ( Component activeInstance : intactInteractorB.getActiveInstances() ) {
-            experimentRolesB.add( cvObjectConverter.toMitab( activeInstance.getCvExperimentalRole() ) );
-        }
         ibi.setExperimentalRolesInteractorB( experimentRolesB );
-
-/*            // set expansion method
-            if ( isExpanded ) {
-                ibi.setExpansionMethod( expansionStrategy.getName() );
-            } else {
-                ibi.setExpansionMethod( null );
-            }*/
 
         // set dataset
         if ( interaction.getExperiments() != null ) {
             List<String> datasets = new ArrayList<String>();
             for ( Experiment experiment : interaction.getExperiments() ) {
                 for ( Annotation annotation : experiment.getAnnotations() ) {
-                    CvObjectXref idXref = CvObjectUtils.getPsiMiIdentityXref(annotation.getCvTopic());
-                    if ( idXref.getPrimaryId().equals( CvTopic.DATASET_MI_REF ) ) {
-                        datasets.add( annotation.getCvTopic().getShortLabel() );
+                    CvObjectXref idXref = CvObjectUtils.getPsiMiIdentityXref( annotation.getCvTopic() );
+                    if ( idXref != null && idXref.getPrimaryId() != null && idXref.getPrimaryId().equals( CvTopic.DATASET_MI_REF ) ) {
+                        datasets.add( annotation.getAnnotationText() );
                     }
                 }
             }
             ibi.setDataset( datasets );
         }
-
 
     }
 

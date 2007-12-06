@@ -52,6 +52,8 @@ public class InteractionConverter {
 
     private BinaryInteractionHandler biHandler;
 
+    private CrossReference defaultSourceDatabase = CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" );
+
     ///////////////////////////
     // Getters &  Setters
 
@@ -63,7 +65,7 @@ public class InteractionConverter {
         this.binaryInteractionClass = binaryInteractionClass;
     }
 
-    public void setBinaryInteractionHandler(BinaryInteractionHandler handler){
+    public void setBinaryInteractionHandler( BinaryInteractionHandler handler ) {
         this.biHandler = handler;
     }
 
@@ -103,8 +105,11 @@ public class InteractionConverter {
             for ( Experiment experiment : interaction.getExperiments() ) {
                 for ( Annotation a : experiment.getAnnotations() ) {
                     CvObjectXref idXref = CvObjectUtils.getPsiMiIdentityXref( a.getCvTopic() );
-                    if ( CvTopic.AUTHOR_LIST_MI_REF.equals( idXref.getPrimaryId() ) )
-                        authors.add( new AuthorImpl( a.getCvTopic().getShortLabel() ) );
+                    if (idXref != null && idXref.getPrimaryId() != null) {
+                        if ( CvTopic.AUTHOR_LIST_MI_REF.equals( idXref.getPrimaryId() ) ) {
+                            authors.add( new AuthorImpl( a.getAnnotationText().split(" ")[0] + " et al." ) );
+                        }
+                    }
                 }
             }
         }
@@ -114,7 +119,7 @@ public class InteractionConverter {
         List<InteractionDetectionMethod> detectionMethods = new ArrayList<InteractionDetectionMethod>();
         if ( interaction.getExperiments() != null ) {
             for ( Experiment experiment : interaction.getExperiments() ) {
-                if (experiment.getCvInteraction() != null) {
+                if ( experiment.getCvInteraction() != null ) {
                     detectionMethods.add( ( InteractionDetectionMethod ) cvObjectConverter.
                             toMitab( InteractionDetectionMethodImpl.class, experiment.getCvInteraction() ) );
                 }
@@ -130,7 +135,7 @@ public class InteractionConverter {
         }
 
         // set interaction type list
-        if( interaction.getCvInteractionType() != null ) {
+        if ( interaction.getCvInteractionType() != null ) {
             List<InteractionType> interactionTypes = new ArrayList<InteractionType>();
             interactionTypes.add( ( InteractionType ) cvObjectConverter.toMitab( InteractionTypeImpl.class,
                                                                                  interaction.getCvInteractionType() ) );
@@ -141,11 +146,11 @@ public class InteractionConverter {
         List<CrossReference> publications = new ArrayList<CrossReference>();
         if ( interaction.getExperiments() != null ) {
             for ( Experiment experiment : interaction.getExperiments() ) {
-                if ( experiment.getXrefs() != null ){
+                if ( experiment.getXrefs() != null ) {
                     for ( Xref xref : experiment.getXrefs() ) {
-                        if ( xref.getCvXrefQualifier() != null && xref.getCvDatabase().getShortLabel() != null ){
+                        if ( xref.getCvXrefQualifier() != null && xref.getCvDatabase().getShortLabel() != null ) {
                             CvObjectXref idref = CvObjectUtils.getPsiMiIdentityXref( xref.getCvXrefQualifier() );
-                            if( idref.getPrimaryId().equals( CvXrefQualifier.PRIMARY_REFERENCE_MI_REF)){
+                            if ( idref != null && idref.getPrimaryId() != null && idref.getPrimaryId().equals( CvXrefQualifier.PRIMARY_REFERENCE_MI_REF ) ) {
                                 CrossReference publication = CrossReferenceFactory.getInstance()
                                         .build( xref.getCvDatabase().getShortLabel(), xref.getPrimaryId() );
                                 publications.add( publication );
@@ -158,11 +163,14 @@ public class InteractionConverter {
         bi.setPublications( publications );
 
         // set source database list
-        if (interaction.getOwner() != null && interaction.getOwner().getXrefs() != null) {
-            List<CrossReference> sourceDatabases = xConverter.toMitab( interaction.getOwner().getXrefs(), true );
-            bi.setSourceDatabases( sourceDatabases );
+        if ( interaction.getOwner() != null && interaction.getOwner().getXrefs() != null ) {
+            List<CrossReference> sourceDatabases = xConverter.toMitab( interaction.getOwner().getXrefs(), true, false );
+            if ( !sourceDatabases.isEmpty() ){
+                bi.setSourceDatabases( sourceDatabases );
+            } else {
+                bi.getSourceDatabases().add( defaultSourceDatabase );
+            }            
         }
-
 
         // process extra columns
         if ( biHandler != null ) {
@@ -170,20 +178,20 @@ public class InteractionConverter {
                 logger.debug( "Starting to extra process: " + biHandler.getClass().getSimpleName() );
             }
 
-            if( biHandler instanceof IsExpansionStrategyAware ) {
-                if( isExpanded ) {
+            if ( biHandler instanceof IsExpansionStrategyAware ) {
+                if ( isExpanded ) {
                     if ( logger.isDebugEnabled() ) {
                         logger.debug( "Using an expansion stategy aware column handler" );
                     }
 
-                    (( IsExpansionStrategyAware )biHandler).process( (BinaryInteractionImpl) bi,
-                                                                       interaction,
-                                                                       expansionStrategy );
+                    ( ( IsExpansionStrategyAware ) biHandler ).process( ( BinaryInteractionImpl ) bi,
+                                                                        interaction,
+                                                                        expansionStrategy );
                 } else {
-                    biHandler.process( (BinaryInteractionImpl) bi, interaction );
+                    biHandler.process( ( BinaryInteractionImpl ) bi, interaction );
                 }
             } else {
-                biHandler.process( (BinaryInteractionImpl) bi, interaction );
+                biHandler.process( ( BinaryInteractionImpl ) bi, interaction );
             }
 
         }

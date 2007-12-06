@@ -54,7 +54,7 @@ public class InteractorConverter {
         Interactor tabInteractor = new Interactor();
 
         // set identifiers of interactor
-        Collection<CrossReference> identifiers = xRefConverter.toMitab( intactInteractor.getXrefs(), true );
+        Collection<CrossReference> identifiers = xRefConverter.toMitab( intactInteractor.getXrefs(), true, false );
         identifiers.add( CrossReferenceFactory.getInstance().build( CvDatabase.INTACT, intactInteractor.getAc() ) );
         tabInteractor.setIdentifiers( identifiers );
 
@@ -78,16 +78,21 @@ public class InteractorConverter {
                 if ( id != null && db != null ) {
                     if ( alias.getCvAliasType() != null ) {
                         String text = alias.getCvAliasType().getShortLabel();
-                        if ( text != null && mi.equals( GENE_NAME_MI_REF ) ) {
-                            CrossReference altId = CrossReferenceFactory.getInstance().build( db, id, text );
-                            altIds.add( altId );
-                        } else {
+                        if ( mi.equals( GENE_NAME_MI_REF ) ) {
                             Alias tabAlias = new AliasImpl( db, id );
                             tabAliases.add( tabAlias );
+                        } else {
+                            if ( text != null ) {
+                                CrossReference altId = CrossReferenceFactory.getInstance().build( db, id, text );
+                                altIds.add( altId );
+                            } else {
+                                CrossReference altId = CrossReferenceFactory.getInstance().build( db, id );
+                                altIds.add( altId );
+                            }
                         }
                     } else {
-                        Alias tabAlias = new AliasImpl( db, id );
-                        tabAliases.add( tabAlias );
+                        CrossReference altId = CrossReferenceFactory.getInstance().build( db, id );
+                        altIds.add( altId );
                     }
                 }
 
