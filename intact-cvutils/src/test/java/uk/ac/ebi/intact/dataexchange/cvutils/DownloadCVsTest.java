@@ -25,7 +25,6 @@ import uk.ac.ebi.intact.config.impl.SmallCvPrimer;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterException;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
-import uk.ac.ebi.intact.core.persister.standard.CvObjectPersister;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
@@ -100,10 +99,7 @@ public class DownloadCVsTest extends IntactBasicTestCase {
         CvDatabase wrongDb = getMockBuilder().createCvObject(CvDatabase.class, "no", "uniprot");
         wrongDb.getXrefs().clear();
 
-        beginTransaction();
-        CvObjectPersister.getInstance().saveOrUpdate(wrongDb);
-        CvObjectPersister.getInstance().commit();
-        commitTransaction();
+        PersisterHelper.saveOrUpdate(wrongDb);
         
         // --- testing
 
@@ -121,11 +117,9 @@ public class DownloadCVsTest extends IntactBasicTestCase {
 
         commitTransaction();
 
-        beginTransaction();
 
         Assert.assertEquals(25, getDaoFactory().getCvObjectDao().countAll());
 
-        commitTransaction();
 
         PSILoader loader = new PSILoader(System.out);
         IntactOntology ontology = loader.parseOboFile(new ByteArrayInputStream(oboOutput.getBytes()));
@@ -151,10 +145,7 @@ public class DownloadCVsTest extends IntactBasicTestCase {
         CvDatabase wrongDb = getMockBuilder().createCvObject(CvDatabase.class, "no", "uniprot");
         wrongDb.getXrefs().clear();
 
-        beginTransaction();
-        CvObjectPersister.getInstance().saveOrUpdate(wrongDb);
-        CvObjectPersister.getInstance().commit();
-        commitTransaction();
+        PersisterHelper.saveOrUpdate(wrongDb);
 
         // --- testing
 
@@ -178,16 +169,16 @@ public class DownloadCVsTest extends IntactBasicTestCase {
 
         @Override
         public void createCVs() {
-            // this first block can be removed when using intact-core > 1.6.3-SNAPSHOT
-            beginTransaction();
-            try {
-                CvObjectPersister.getInstance().saveOrUpdate(getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.GO_DEFINITION_REF_MI_REF, CvXrefQualifier.GO_DEFINITION_REF));
-                CvObjectPersister.getInstance().commit();
-            } catch (PersisterException e) {
-                e.printStackTrace();
-            }
-            commitTransaction();
-            // end of possible remove
+//            // this first block can be removed when using intact-core > 1.6.3-SNAPSHOT
+//            beginTransaction();
+//            try {
+//                CvObjectPersister.getInstance().saveOrUpdate(getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.GO_DEFINITION_REF_MI_REF, CvXrefQualifier.GO_DEFINITION_REF));
+//                CvObjectPersister.getInstance().commit();
+//            } catch (PersisterException e) {
+//                e.printStackTrace();
+//            }
+//            commitTransaction();
+//            // end of possible remove
             
             beginTransaction();
 
@@ -195,11 +186,8 @@ public class DownloadCVsTest extends IntactBasicTestCase {
             super.createCVs();
 
             commitTransaction();
-            beginTransaction();
 
             // create additional CVs needed by DownloadCVs
-            CvObjectPersister cvPersister = CvObjectPersister.getInstance();
-
             CvObject definition = CvObjectUtils.createCvObject(getIntactContext().getInstitution(), CvTopic.class, "IA:0241", CvTopic.DEFINITION);
             CvExperimentalRole expRoleUnspecified = CvObjectUtils.createCvObject(getIntactContext().getInstitution(), CvExperimentalRole.class,
                                                                       CvExperimentalRole.UNSPECIFIED_PSI_REF, CvExperimentalRole.UNSPECIFIED);
@@ -215,8 +203,6 @@ public class DownloadCVsTest extends IntactBasicTestCase {
             } catch (PersisterException e) {
                 e.printStackTrace();
             }
-
-            commitTransaction();
         }
     }
 }
