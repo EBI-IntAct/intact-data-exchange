@@ -48,6 +48,8 @@ public class CvUpdater {
     public CvUpdaterStatistics createOrUpdateCVs() {
         stats = new CvUpdaterStatistics();
 
+        List<CvObject> rootsAndOrphans = new ArrayList<CvObject>();
+
         final Collection<Class> ontologyTypes = ontology.getTypes();
         if (log.isDebugEnabled()) log.debug("Ontology types ("+ ontologyTypes.size()+"): "+ ontologyTypes);
 
@@ -59,19 +61,12 @@ public class CvUpdater {
                 if (log.isDebugEnabled()) log.debug("\tProcessing root: "+root.getShortName()+" ("+root.getId()+")");
 
                 CvObject cvObjectRoot = toCvObject(type, root);
-
-                PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate(cvObjectRoot);
-                addCvObjectsToUpdaterStats(persisterStats, stats);
-                
-                if (log.isDebugEnabled()) {
-                    log.debug("Persisted root: "+cvObjectRoot.getMiIdentifier()+
-                        " ("+cvObjectRoot.getShortLabel()+") "+ persisterStats);
-                }
+                rootsAndOrphans.add(cvObjectRoot);
             }
         }
 
         // handle orphans - create a CvTopic for each
-        if (log.isDebugEnabled()) log.debug("Persisting orphan terms...");
+        if (log.isDebugEnabled()) log.debug("Processing orphan terms...");
 
         List<CvTopic> orphanCvs = new ArrayList<CvTopic>(ontology.getOrphanTerms().size());
 
@@ -88,16 +83,18 @@ public class CvUpdater {
                 CvTopic cvOrphan = toCvObject(CvTopic.class, orphan);
                 orphanCvs.add(cvOrphan);
                 stats.addOrphanCv(cvOrphan);
+
+                rootsAndOrphans.add(cvOrphan);
             } else {
                 stats.getInvalidTerms().put(orphan.getId(), orphan.getShortName());
             }
         }
 
-        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate(orphanCvs.toArray(new CvTopic[orphanCvs.size()]));
+        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate(rootsAndOrphans.toArray(new CvObject[rootsAndOrphans.size()]));
         addCvObjectsToUpdaterStats(persisterStats, stats);
 
         if (log.isDebugEnabled()) {
-            log.debug("Persisted orphans: " + persisterStats);
+            log.debug("Persisted: " + persisterStats);
         }
 
         if (log.isDebugEnabled()) {
@@ -197,6 +194,7 @@ public class CvUpdater {
 
         if (primaryId.startsWith("MI")) {
             idXref = XrefUtils.createIdentityXrefPsiMi(parent, cvTerm.getId());
+            idXref.prepareParentMi();
         } else {
             idXref = XrefUtils.createIdentityXref(parent, cvTerm.getId(), nonMiCvDatabase);
         }
@@ -246,8 +244,9 @@ public class CvUpdater {
                 topic = CvObjectUtils.createCvObject(owner, CvTopic.class, CvTopic.XREF_VALIDATION_REGEXP_MI_REF, CvTopic.XREF_VALIDATION_REGEXP);
             } else if (CvTopic.COMMENT.equals(termAnnot.getTopic())) {
                 topic = CvObjectUtils.createCvObject(owner, CvTopic.class, CvTopic.COMMENT_MI_REF, CvTopic.COMMENT);
-            } else if (CvTopic.OBSOLETE.equals(termAnnot.getTopic())) {
+            } else if (CvTopic.OBSOLETE.equals(termAnnot.getTopic()) || CvTopic.OBSOLETE_OLD.equals(termAnnot.getTopic())) {
                 topic = CvObjectUtils.createCvObject(owner, CvTopic.class, CvTopic.OBSOLETE_MI_REF, CvTopic.OBSOLETE);
+                topic.setFullName(CvTopic.OBSOLETE);
             } else {
                 log.error("Unexpected topic found on annotation: "+termAnnot.getTopic());
                 return null;
@@ -257,7 +256,7 @@ public class CvUpdater {
         return new Annotation(owner, topic, termAnnot.getAnnotation());
     }
 
-    protected <T extends CvObject> T getCvObjectByLabel(Class<T> cvObjectClass, String label) {
+    protected <T extends CvObject> T getCvObjectByLabel(Class<T> cvObjectClass, String label) {  
         for (CvObject cvObject : processed.values()) {
             if (cvObjectClass.isAssignableFrom(cvObject.getClass()) && label.equals(cvObject.getShortLabel())) {
                 return (T) cvObject;
