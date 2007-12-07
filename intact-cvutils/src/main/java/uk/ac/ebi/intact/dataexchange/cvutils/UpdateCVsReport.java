@@ -30,6 +30,7 @@ import java.util.Collection;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
+@Deprecated
 public class UpdateCVsReport implements Serializable
 {
     private IntactOntology ontology;

@@ -11,6 +11,7 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
+@Deprecated
 public class UpdateCVsConfig {
 
     private boolean ignoreObsoletionOfObsolete;

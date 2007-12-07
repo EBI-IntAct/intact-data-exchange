@@ -88,7 +88,7 @@ public class DownloadCVsTest extends IntactBasicTestCase {
 
         commitTransaction();
         
-        PSILoader loader = new PSILoader(System.out);
+        PSILoader loader = new PSILoader();
         IntactOntology ontology = loader.parseOboFile(new ByteArrayInputStream(oboOutput.getBytes()));
 
         Assert.assertEquals(24, ontology.getCvTerms().size());
@@ -121,7 +121,7 @@ public class DownloadCVsTest extends IntactBasicTestCase {
         Assert.assertEquals(25, getDaoFactory().getCvObjectDao().countAll());
 
 
-        PSILoader loader = new PSILoader(System.out);
+        PSILoader loader = new PSILoader();
         IntactOntology ontology = loader.parseOboFile(new ByteArrayInputStream(oboOutput.getBytes()));
 
         Assert.assertEquals(25, ontology.getCvTerms().size());

@@ -6,6 +6,8 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.*;
 import uk.ac.ebi.intact.model.CvTopic;
@@ -18,6 +20,7 @@ import uk.ac.ebi.ook.model.ojb.TermBean;
 import uk.ac.ebi.ook.model.ojb.TermSynonymBean;
 import uk.ac.ebi.ook.model.interfaces.DbXref;
 import uk.ac.ebi.ook.model.interfaces.TermRelationship;
+import uk.ac.ebi.ook.model.interfaces.Ontology;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -35,16 +38,10 @@ import java.util.regex.Pattern;
  */
 public class PSILoader extends AbstractLoader {
 
-    private PrintStream output;
+    private static final Log log = LogFactory.getLog(PSILoader.class);
 
     public PSILoader()
     {
-        this(System.out);
-    }
-
-    public PSILoader(PrintStream output)
-    {
-        this.output = output;
     }
 
     /////////////////////////////
@@ -148,13 +145,6 @@ public class PSILoader extends AbstractLoader {
         return synonym;
     }
 
-    private static final Pattern ID_PATTERN = Pattern.compile( "(MI|IA):\\d+" ); // Matches MI:0835, IA:0075
-
-    private boolean isIdentifierValid( TermBean term ) {
-        Matcher matcher = ID_PATTERN.matcher( term.getIdentifier() );
-        return matcher.matches();
-    }
-
     /**
      * XML character escaper.
      *
@@ -169,7 +159,7 @@ public class PSILoader extends AbstractLoader {
         return StringEscapeUtils.unescapeXml( input );
     }
 
-    private IntactOntology buildIntactOntology(PrintStream output) throws PsiLoaderException {
+    private IntactOntology buildIntactOntology() throws PsiLoaderException {
 
         IntactOntology ontology = new IntactOntology();
 
@@ -178,19 +168,19 @@ public class PSILoader extends AbstractLoader {
             TermBean term = (TermBean) it_term.next();
 
             String id = escapeXMLTags( term.getIdentifier() );
-
+            /*
             if ( ! isIdentifierValid( term ) ) {
                 // Skip any term that is not MI:xxxx of IA:xxxx
                 ontology.getInvalidTerms().add(term);
                 continue;
             }
-
+            */
             // try to split the name into short and long name
             String shortlabel = escapeXMLTags( getExactSynonym( term ) );
             if ( shortlabel == null ) {
                 shortlabel = escapeXMLTags( term.getName() );
                 if ( shortlabel != null && shortlabel.length() > 20 ) {
-                    output.println( "NOTE: term " + id +
+                    if (log.isDebugEnabled()) log.debug( "NOTE: term " + id +
                                         " has its name longer than 20 chars. it should have an exact_synonym." );
                 }
             }
@@ -210,7 +200,7 @@ public class PSILoader extends AbstractLoader {
                 cvTerm.setDefinition( definition );
             }
 
-            output.println("Term: "+id+" ("+shortlabel+")");
+            if (log.isDebugEnabled()) log.debug("Term: "+id+" ("+shortlabel+")");
 
             // check for Xrefs: pubmed, resid...
             if ( term.getXrefs() != null ) {
@@ -229,7 +219,7 @@ public class PSILoader extends AbstractLoader {
                     String accession = escapeXMLTags( dbXref.getAccession() );
                     String desc = escapeXMLTags( dbXref.getDescription() );
 
-                    output.println("\tType: "+type+"; Accession: "+accession+"; Desc: "+desc+"; Xref type: "+dbXref.getXrefType());
+                    if (log.isDebugEnabled()) log.debug("\tType: "+type+"; Accession: "+accession+"; Desc: "+desc+"; Xref type: "+dbXref.getXrefType());
 
                     switch ( dbXref.getXrefType() ) {
 
@@ -349,7 +339,7 @@ public class PSILoader extends AbstractLoader {
         }
 
         // 3. Organise a mapping between IntAct CV classes and PSI-MI Terms.
-        ontology.updateMapping(output);
+        ontology.updateMapping();
 
         return ontology;
     }
@@ -365,6 +355,7 @@ public class PSILoader extends AbstractLoader {
      *
      * @throws PsiLoaderException
      */
+    @Deprecated
     public IntactOntology loadLatestPsiMiFromSourceforge() throws PsiLoaderException {
         try {
             return parseOboFile( new URL( SOURCEFORGE_URL ) );
@@ -458,17 +449,6 @@ public class PSILoader extends AbstractLoader {
         return parseOboFile( url, false );
     }
 
-    /**
-     * Parse the given OBO file and build a representation of the DAG into an IntactOntology.
-     *
-     * @param file the input file. It has to exist and to be readable, otherwise it will break.
-     *
-     * @return a non null IntactOntology.
-     */
-    public IntactOntology parseOboFile( File file ) throws PsiLoaderException, IOException {
-        return parseOboFile(new FileInputStream(file), System.out);
-    }
-
      /**
      * Parse the given OBO file and build a representation of the DAG into an IntactOntology.
      *
@@ -476,7 +456,7 @@ public class PSILoader extends AbstractLoader {
      *
      * @return a non null IntactOntology.
      */
-    public IntactOntology parseOboFile( File file, PrintStream output ) throws PsiLoaderException, IOException {
+    public IntactOntology parseOboFile( File file ) throws PsiLoaderException, IOException {
 
         if ( !file.exists() ) {
             throw new IllegalArgumentException( file.getAbsolutePath() + " doesn't exist." );
@@ -486,7 +466,7 @@ public class PSILoader extends AbstractLoader {
             throw new IllegalArgumentException( file.getAbsolutePath() + " could not be read." );
         }
 
-        return parseOboFile(new FileInputStream(file), output);
+        return parseOboFile(new FileInputStream(file));
     }
 
     /**
@@ -497,17 +477,6 @@ public class PSILoader extends AbstractLoader {
      * @return a non null IntactOntology.
      */
     public IntactOntology parseOboFile( InputStream stream ) throws PsiLoaderException, IOException {
-        return parseOboFile(stream, output);
-    }
-
-    /**
-     * Parse the given OBO file and build a representation of the DAG into an IntactOntology.
-     *
-     * @param stream the input file. It has to exist and to be readable, otherwise it will break.
-     *
-     * @return a non null IntactOntology.
-     */
-    public IntactOntology parseOboFile( InputStream stream, PrintStream output ) throws PsiLoaderException, IOException {
 
         File file = File.createTempFile("oboFile_", String.valueOf(System.currentTimeMillis()));
         file.deleteOnExit();
@@ -527,13 +496,13 @@ public class PSILoader extends AbstractLoader {
         configure();
 
         //parse obo file
-        output.println( "Reading " + file.getAbsolutePath() );
+        if (log.isDebugEnabled()) log.debug( "Reading " + file.getAbsolutePath() );
 
         parse( file.getAbsolutePath() );
 
         //process into relations
         process();
 
-        return buildIntactOntology(output);
+        return buildIntactOntology();
     }
 }

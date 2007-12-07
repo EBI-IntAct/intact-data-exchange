@@ -14,9 +14,11 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.*;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectBuilder;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.persistence.dao.XrefDao;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -24,6 +26,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.net.URL;
 
 /**
  * Class handling the update of CvObject.
@@ -31,7 +34,11 @@ import java.util.*;
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id$
  * @since <pre>16-Oct-2005</pre>
+ *
+ * @deprecated use CvUpdater
  */
+@SuppressWarnings("unchecked")
+@Deprecated
 public class UpdateCVs {
 
     private static CvObjectCache cvCache = new CvObjectCache();
@@ -634,12 +641,14 @@ public class UpdateCVs {
             return cv;
         }
 
-        CvContext cvContext = IntactContext.getCurrentInstance().getCvContext();
+        //CvContext cvContext = IntactContext.getCurrentInstance().getCvContext();
+        CvObjectDao<?> dao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                .getCvObjectDao(clazz);
 
         // if an MI is available, search using it
         if (mi != null) {
             output.println("Looking up term by mi: " + mi);
-            cv = cvContext.getByMiRef(clazz, mi);
+            cv = dao.getByPsiMiRef(mi);
         }
 
         // if not found by MI, then search by shortlabel
@@ -647,7 +656,7 @@ public class UpdateCVs {
             // Search by Name
             output.println("Not found. Now, looking up term by short label: " + shortlabel);
 
-            cv = cvContext.getByLabel(clazz, shortlabel);
+            cv = dao.getByShortLabel(clazz, shortlabel);
         }
 
         // if still not found, then create it.
@@ -658,55 +667,23 @@ public class UpdateCVs {
             // create it
             try {
 
-                // create a new object using refection
-                Constructor constructor = clazz.getConstructor(new Class[]{Institution.class, String.class});
-                cv = (CvObject) constructor.newInstance(IntactContext.getCurrentInstance().getInstitution(), shortlabel);
+                if (mi == null) {
+                    output.println("CvObject without MI: "+shortlabel);
+                    throw new NullPointerException();
+                }
+
+                cv = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), clazz, mi, shortlabel);
 
                 // by default add the shortLabel as fullName
                 cv.setFullName(defaultFullName);
 
-                // persist it
-                getDaoFactory()
-                        .getCvObjectDao(clazz).persist(cv);
                 output.println("Created missing CV Term: " + getShortClassName(clazz) + "( " + cv.getShortLabel() + " - " + cv.getFullName() + " ).");
 
+                report.addCreatedTerm(cv);
                 cvCache.put(clazz, mi, shortlabel, cv);
 
-                IntactContext.getCurrentInstance().getDataContext().flushSession();
+                PersisterHelper.saveOrUpdate(cv);
 
-                report.addCreatedTerm(cv);
-
-                // create MI Xref if necessary
-                if (mi != null && mi.startsWith("MI:")) {
-
-                    CvDatabase psi = null;
-                    if (mi.equals(CvDatabase.PSI_MI_MI_REF)) {
-                        psi = (CvDatabase) cv;
-                    } else {
-                        psi = (CvDatabase) getCvObject(CvDatabase.class,
-                                                       CvDatabase.PSI_MI,
-                                                       CvDatabase.PSI_MI_MI_REF,
-                                                       CvDatabase.PSI_MI,
-                                                       output, report);
-                    }
-
-                    CvXrefQualifier identity = null;
-                    if (mi.equals(CvXrefQualifier.IDENTITY_MI_REF)) {
-                        identity = (CvXrefQualifier) cv;
-                    } else {
-                        identity = (CvXrefQualifier) getCvObject(CvXrefQualifier.class,
-                                                                 CvXrefQualifier.IDENTITY,
-                                                                 CvXrefQualifier.IDENTITY_MI_REF,
-                                                                 "identical object",
-                                                                 output, report);
-                    }
-
-                    CvObjectXref xref = new CvObjectXref(IntactContext.getCurrentInstance().getInstitution(), psi, mi, null, null, identity);
-
-                    cv.addXref(xref);
-                    getDaoFactory().getXrefDao().persist(xref);
-                    output.println("Added required PSI Xref to " + shortlabel + ": " + mi);
-                }
             } catch (Exception e) {
                 // that's should not happen, but just in case...
                 throw new IntactException("Error while creating " + getShortClassName(clazz) + "(" + shortlabel +
@@ -943,10 +920,9 @@ public class UpdateCVs {
             CvDatabase intact = (CvDatabase) getCvObject(CvDatabase.class, CvDatabase.INTACT, CvDatabase.INTACT_MI_REF, output, report);
             CvXrefQualifier identity = (CvXrefQualifier) getCvObject(CvXrefQualifier.class, CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, output, report);
 
-            Collection conflictingTerms = getDaoFactory().getCvObjectDao(CvObject.class).getByXrefLike(intact, identity, id);
+            Collection<CvObject> conflictingTerms = getDaoFactory().getCvObjectDao(CvObject.class).getByXrefLike(intact, identity, id);
 
-            for (Iterator iterator = conflictingTerms.iterator(); iterator.hasNext();) {
-                CvObject conflict = (CvObject) iterator.next();
+            for (CvObject conflict : conflictingTerms) {
                 output.println("WARN: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 output.println("WARN: Found a CV term using the same IntAct Xref: " + id + " replacing id...");
                 Collection xrefs = select(conflict.getXrefs(), intact, identity);
@@ -965,7 +941,8 @@ public class UpdateCVs {
                         getDaoFactory().getCvObjectDao(CvObject.class).update(conflict);
                         output.println("Deleted additional Xref:" + xref);
                     }
-                } else {
+                }
+                else {
                     output.println("ERROR: no matching Xref found in that term.");
                 }
             }
@@ -1646,6 +1623,18 @@ public class UpdateCVs {
 
     }
 
+    public static UpdateCVsReport loadDefaultCVs() throws PsiLoaderException, IOException {
+        return loadDefaultCVs(System.out, new UpdateCVsConfig());
+    }
+
+    public static UpdateCVsReport loadDefaultCVs(PrintStream output, UpdateCVsConfig config) throws PsiLoaderException, IOException {
+        return load(new URL("http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/psi-mi25-4intact.obo"), output, config);
+    }
+
+    public static UpdateCVsReport load(URL url, PrintStream output, UpdateCVsConfig config) throws PsiLoaderException, IOException {
+        File oboFile = createFileFromURL(url);
+        return load(oboFile, output, config);
+    }
 
     public static UpdateCVsReport load(File oboFile, PrintStream output, UpdateCVsConfig config) throws PsiLoaderException, IOException {
         return load(new FileInputStream(oboFile), null, output, config);
@@ -1666,8 +1655,8 @@ public class UpdateCVs {
         // 1. Parsing
         output.println("Parsing OBO File...\n");
 
-        PSILoader psi = new PSILoader(output);
-        IntactOntology ontology = psi.parseOboFile(oboFile, output);
+        PSILoader psi = new PSILoader();
+        IntactOntology ontology = psi.parseOboFile(oboFile);
 
         checkConsistency(ontology);
 
@@ -1815,5 +1804,22 @@ public class UpdateCVs {
         private String toKey(Class cvClass, String mi, String label) {
             return cvClass.getSimpleName()+"_"+mi+"_"+label;
         }
+    }
+
+    private static File createFileFromURL(URL url) throws IOException {
+        File tempFile = File.createTempFile("oboFile", ".obo");
+
+        PrintStream ps = new PrintStream(tempFile);
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            ps.println(line);
+        }
+
+        ps.close();
+
+        return tempFile;
     }
 }

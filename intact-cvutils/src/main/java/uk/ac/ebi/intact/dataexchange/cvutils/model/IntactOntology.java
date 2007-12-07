@@ -44,8 +44,6 @@ public class IntactOntology {
         class2mi.put( CvFeatureType.class, new String[]{ "MI:0116" } );
         class2mi.put( CvInteractorType.class, new String[]{ "MI:0313" } );
         class2mi.put( CvExperimentalPreparation.class, new String[]{ "MI:0346" } );
-
-        // Non DAG
         class2mi.put( CvFuzzyType.class, new String[]{ "MI:0333" } );
         class2mi.put( CvXrefQualifier.class, new String[]{ "MI:0353" } );
         class2mi.put( CvDatabase.class, new String[]{ "MI:0444" } );
@@ -53,6 +51,8 @@ public class IntactOntology {
         class2mi.put( CvBiologicalRole.class, new String[]{ "MI:0500" } );
         class2mi.put( CvAliasType.class, new String[]{ "MI:0300" } );
         class2mi.put( CvTopic.class, new String[]{ "MI:0590" } );
+        class2mi.put( CvParameterType.class, new String[]{ "MI:0640" } );
+        class2mi.put( CvParameterUnit.class, new String[]{ "MI:0647" } );
 
         // we map here all CVs that are not supported in PSI-MI
         // we use the range IA:0001 to IA:0050 for these
@@ -91,12 +91,12 @@ public class IntactOntology {
     /**
      * Mapping of all CvTerm by their ID (String -> CvTerm).
      */
-    private Map mi2cvTerm = new HashMap( 1024 );
+    private Map<String,CvTerm> mi2cvTerm = new HashMap<String,CvTerm>( 1024 );
 
     /**
      * Maps IntAct CV Class to Ontology Terms. node One IntAct CV can have multiple roots.
      */
-    private Map intact2psi = new HashMap();
+    private Map<Class,Collection<CvTerm>> intact2psi = new HashMap<Class,Collection<CvTerm>>();
 
     private Collection<TermBean> invalidTerms = new ArrayList<TermBean>();
 
@@ -306,8 +306,8 @@ public class IntactOntology {
      *
      * @return Root terms
      */
-    public Collection getRoots( Class cvObjectClass ) {
-        return (Collection) intact2psi.get( cvObjectClass );
+    public Collection<CvTerm> getRoots( Class cvObjectClass ) {
+        return intact2psi.get( cvObjectClass );
     }
 
     /**
