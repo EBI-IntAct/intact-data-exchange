@@ -1,16 +1,18 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
-import uk.ac.ebi.intact.dataexchange.cvutils.model.*;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.XrefUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.core.persister.stats.StatsUnit;
-import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.business.IntactException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTermAnnotation;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTermXref;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.util.*;
 
@@ -34,7 +36,6 @@ public class CvUpdater {
 
     public CvUpdater(IntactOntology ontology) {
         this.ontology = ontology;
-        this.processed = new HashMap<String,CvObject>();
 
         this.nonMiCvDatabase = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(),
                 CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT);
@@ -46,6 +47,8 @@ public class CvUpdater {
      * @return An object containing some statistics about the update
      */
     public CvUpdaterStatistics createOrUpdateCVs() {
+        this.processed = new HashMap<String,CvObject>();
+
         stats = new CvUpdaterStatistics();
 
         List<CvObject> rootsAndOrphans = new ArrayList<CvObject>();
@@ -131,7 +134,7 @@ public class CvUpdater {
 
         if (log.isTraceEnabled()) log.trace("\t\t"+cvClass.getSimpleName()+": "+cvTerm.getId()+" ("+cvTerm.getShortName()+")");
 
-        final String processedKey = cvClass.getSimpleName() + ":" + primaryId;
+        final String processedKey = cvKey(cvClass, primaryId);
         
         if (processed.containsKey(processedKey)) {
             return (T) processed.get(processedKey);
@@ -174,6 +177,10 @@ public class CvUpdater {
         }
 
         return cvObject;
+    }
+
+    private <T extends CvObject> String cvKey(Class<T> cvClass, String primaryId) {
+        return cvClass.getSimpleName() + ":" + primaryId;
     }
 
     protected String calculateShortLabel(CvTerm cvTerm) {
@@ -225,7 +232,7 @@ public class CvUpdater {
                 log.error("Unexpected combination qualifier-database found on xref: " + termXref.getQualifier() + " - " + termXref.getDatabase());
                 return null;
             }
-        } 
+        }
 
         return XrefUtils.createIdentityXref(parent, termXref.getId(), qualifier, database);
     }
@@ -251,12 +258,12 @@ public class CvUpdater {
                 log.error("Unexpected topic found on annotation: "+termAnnot.getTopic());
                 return null;
             }
-        }
+        } 
 
         return new Annotation(owner, topic, termAnnot.getAnnotation());
     }
 
-    protected <T extends CvObject> T getCvObjectByLabel(Class<T> cvObjectClass, String label) {  
+    protected <T extends CvObject> T getCvObjectByLabel(Class<T> cvObjectClass, String label) {
         for (CvObject cvObject : processed.values()) {
             if (cvObjectClass.isAssignableFrom(cvObject.getClass()) && label.equals(cvObject.getShortLabel())) {
                 return (T) cvObject;
