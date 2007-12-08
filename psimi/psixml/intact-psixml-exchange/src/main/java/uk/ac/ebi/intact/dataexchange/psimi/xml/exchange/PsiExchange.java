@@ -35,6 +35,7 @@ import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterException;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
@@ -43,6 +44,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.InteractionImpl;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
 
 import java.io.*;
@@ -118,6 +120,9 @@ public class PsiExchange {
         // this will count the interactions and will be used to flush in batches
         int interactionCount = 0;
 
+        int interactionsPersisted = 0;
+        int interactionsDuplicated = 0;
+
         for (Entry entry : entrySet.getEntries()) {
             InstitutionConverter institutionConverter = new InstitutionConverter();
             Institution institution;
@@ -150,7 +155,10 @@ public class PsiExchange {
 
                 if (interactionLabelsToCommit.contains(interaction.getShortLabel())) {
                     // commit the persistence
-                    persistAndClear(interactionsToCommit, interactionLabelsToCommit);
+                    PersisterStatistics stats = persistAndClear(interactionsToCommit, interactionLabelsToCommit);
+
+                    interactionsPersisted += stats.getPersistedCount(InteractionImpl.class, false);
+                    interactionsDuplicated += stats.getDuplicatesCount(InteractionImpl.class, false);
 
                     if (log.isDebugEnabled()) {
                         log.debug("Forced commit due to a label already existing in this commit page: "+interaction.getShortLabel());
@@ -167,7 +175,10 @@ public class PsiExchange {
 
                 // commit the interactions in batches into the database
                 if (interactionCount > 0 && interactionCount % importBatchSize == 0) {
-                    persistAndClear(interactionsToCommit, interactionLabelsToCommit);
+                    PersisterStatistics stats = persistAndClear(interactionsToCommit, interactionLabelsToCommit);
+
+                    interactionsPersisted += stats.getPersistedCount(InteractionImpl.class, false);
+                    interactionsDuplicated += stats.getDuplicatesCount(InteractionImpl.class, false);
 
                     // restart a transaction
                     beginTransaction();
@@ -177,22 +188,26 @@ public class PsiExchange {
             }
 
             // final persistence for the last batch
-            persistAndClear(interactionsToCommit, interactionLabelsToCommit);
+            PersisterStatistics stats = persistAndClear(interactionsToCommit, interactionLabelsToCommit);
 
+            interactionsPersisted += stats.getPersistedCount(InteractionImpl.class, false);
+            interactionsDuplicated += stats.getDuplicatesCount(InteractionImpl.class, false);
         }
 
         ConversionCache.clear();
 
-
         if (log.isDebugEnabled()) {
-            log.debug("Imported: " + interactionCount + " interactions (less if duplicates were found) in " + (System.currentTimeMillis() - startTime) + "ms");
+            log.debug("Processed " + interactionCount+" interactions ("+interactionsPersisted + " persisted, "+interactionsDuplicated+" duplicated (ignored)) in "+
+                    (System.currentTimeMillis() - startTime) + "ms");
         }
     }
 
-    private static void persistAndClear(List<Interaction> interactionsToCommit, List<String> interactionLabelsToCommit) {
+    private static PersisterStatistics persistAndClear(List<Interaction> interactionsToCommit, List<String> interactionLabelsToCommit) {
+        PersisterStatistics stats = null;
+
         // commit the persistence
         try {
-            PersisterHelper.saveOrUpdate(interactionsToCommit.toArray(new Interaction[interactionsToCommit.size()]));
+            stats = PersisterHelper.saveOrUpdate(interactionsToCommit.toArray(new Interaction[interactionsToCommit.size()]));
         } catch (PersisterException e) {
             List<String> infoLabels = new ArrayList<String>(interactionsToCommit.size());
 
@@ -209,6 +224,8 @@ public class PsiExchange {
 
         ConversionCache.clear();
         commitTransaction();
+
+        return stats;
     }
 
     private static void beginTransaction() {

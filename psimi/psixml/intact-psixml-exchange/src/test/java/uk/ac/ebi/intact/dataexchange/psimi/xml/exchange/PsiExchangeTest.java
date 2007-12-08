@@ -60,8 +60,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         final List<String> labels = DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll());
         System.out.println(labels);
 
-        // there are 18 interactions in the file, but 2 seem duplicated
-        Assert.assertEquals(16, count);
+        Assert.assertEquals(18, count);
     }
 
     @Test
@@ -78,13 +77,26 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    public void importXml_dupes() throws Exception {
+        PsimiXmlReader reader = new PsimiXmlReader();
+        EntrySet entrySet = reader.read(PsiExchangeTest.class.getResourceAsStream("/xml/dupes.xml"));
+        PsiExchange.importIntoIntact(entrySet);
+
+        int count = getDaoFactory().getInteractionDao().countAll();
+        final List<String> labels = DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll());
+
+        // there are 8 interactions in the file, but 1 is a duplicate
+        Assert.assertEquals(7, count);
+    }
+
+    @Test
     public void importXml_dip() throws Exception {
         PsiExchange.importIntoIntact(getDipEntrySet());
 
         int count = getDaoFactory().getInteractionDao().countAll();
         System.out.println(DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll()));
 
-        Assert.assertEquals(32, count);
+        Assert.assertEquals(74, count);
     }
 
     @Test
@@ -96,11 +108,11 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         PsiExchange.importIntoIntact(getMintEntrySet());
 
         // the mint file contains 2 duplicated interactions
-        Assert.assertEquals(22, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(24, getDaoFactory().getInteractionDao().countAll());
 
         PsiExchange.importIntoIntact(getDipEntrySet());
 
-        Assert.assertEquals(54, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(98, getDaoFactory().getInteractionDao().countAll());
 
     }
 
