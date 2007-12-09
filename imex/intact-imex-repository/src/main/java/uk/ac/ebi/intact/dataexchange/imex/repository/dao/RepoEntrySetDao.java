@@ -39,4 +39,6 @@ public interface RepoEntrySetDao
     RepoEntrySet findByName(String name);
 
     List<String> findAllPubmedIds();
+
+    Long countAll();
 }

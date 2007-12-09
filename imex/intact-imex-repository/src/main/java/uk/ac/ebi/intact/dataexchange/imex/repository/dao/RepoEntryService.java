@@ -43,4 +43,6 @@ public interface RepoEntryService
     List<RepoEntry> findImportableExcluding(List<String> pmids);
 
     List<RepoEntry> findImportableModifiedAfter(DateTime dateTime);
+
+    Long countAll();
 }

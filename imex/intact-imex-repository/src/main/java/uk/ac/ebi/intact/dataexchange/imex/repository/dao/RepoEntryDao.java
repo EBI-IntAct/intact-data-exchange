@@ -44,4 +44,6 @@ public interface RepoEntryDao
     List<RepoEntry> findImportable();
 
     List<RepoEntry> findImportableModifierAfter(DateTime dateTime);
+
+    Long countAll();
 }

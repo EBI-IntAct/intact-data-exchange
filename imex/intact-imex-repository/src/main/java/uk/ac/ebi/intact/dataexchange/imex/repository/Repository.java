@@ -50,9 +50,11 @@ public class Repository {
     private static final String ENTRIES_DIR_NAME = "entries";
 
     private File repositoryDir;
+    private boolean open;
 
     public Repository(File repositoryDir) {
         this.repositoryDir = repositoryDir;
+        this.open = true;
     }
 
     public void storeEntrySet(ImexFTPFile entryXml, String providerName) throws IOException {
@@ -147,7 +149,12 @@ public class Repository {
     }
 
     public void close() {
+        this.open = false;
         ImexRepositoryContext.closeRepository();
+    }
+
+    public boolean isOpen() {
+       return open;
     }
 
     public File getRepositoryDir() {

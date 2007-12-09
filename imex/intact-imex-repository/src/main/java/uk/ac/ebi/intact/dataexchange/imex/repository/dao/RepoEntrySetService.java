@@ -39,4 +39,6 @@ public interface RepoEntrySetService
     List<RepoEntrySet> findAllRepoEntrySets();
 
     RepoEntrySet findByName(String name);
+
+    Long countAll();
 }

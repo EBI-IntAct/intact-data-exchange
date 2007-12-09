@@ -42,6 +42,7 @@ public class RepoEntryServiceTest extends AbstractRepositoryTestCase {
         RepoEntryService repoEntryService = ImexRepositoryContext.getInstance().getImexServiceProvider().getRepoEntryService();
 
         Assert.assertEquals(7, repoEntryService.findAllRepoEntries().size());
+        Assert.assertEquals(7, repoEntryService.countAll());
         Assert.assertEquals(5, repoEntryService.findImportableExcluding(Arrays.asList("1","2")).size());
     }
 

@@ -74,4 +74,8 @@ public class JpaRepoEntryService implements RepoEntryService
     public List<RepoEntry> findImportableModifiedAfter(DateTime dateTime) {
         return entrySetDao.findImportableModifierAfter(dateTime);
     }
+
+    public Long countAll() {
+        return entrySetDao.countAll();
+    }
 }

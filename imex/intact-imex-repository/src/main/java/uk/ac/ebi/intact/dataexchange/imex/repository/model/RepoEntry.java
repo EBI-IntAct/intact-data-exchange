@@ -32,6 +32,7 @@ import java.util.List;
 @NamedQueries(value = {
     @NamedQuery(name = "repoEntryByPmid", query="select re from RepoEntry re where re.pmid = :pmid"),
     @NamedQuery(name = "repoEntryImportable", query="select re from RepoEntry re where re.valid = true"),
+    @NamedQuery(name = "repoEntryCountAll", query="select count(re) from RepoEntry re"),
     @NamedQuery(name = "repoEntryModifiedAfter", query="select re from RepoEntry re where re.updated  > :date and re.importable = true")
 })
 public class RepoEntry extends RepoEntity {

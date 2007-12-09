@@ -30,7 +30,8 @@ import java.util.List;
  */
 @Entity
 @NamedQueries (value = {
-    @NamedQuery(name = "repoEntrySetByName", query="select es from RepoEntrySet es where es.name = :name")
+    @NamedQuery(name = "repoEntrySetByName", query="select es from RepoEntrySet es where es.name = :name"),
+    @NamedQuery(name = "repoEntrySetCountAll", query="select count(es) from RepoEntrySet es")
     })
 public class RepoEntrySet extends RepoEntity {
 

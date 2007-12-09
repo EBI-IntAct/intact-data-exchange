@@ -60,4 +60,8 @@ public class JpaRepoEntryDao extends JpaImexDaoSupport implements RepoEntryDao
         query.setParameter("date", dateTime);
         return query.getResultList();
     }
+
+    public Long countAll() {
+        return (Long) getEntityManager().createNamedQuery("repoEntryCountAll").getSingleResult();
+    }
 }

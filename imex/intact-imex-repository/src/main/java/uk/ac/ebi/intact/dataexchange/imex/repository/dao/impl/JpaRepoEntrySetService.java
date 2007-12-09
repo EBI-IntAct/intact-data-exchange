@@ -50,4 +50,8 @@ public class JpaRepoEntrySetService implements RepoEntrySetService
     public RepoEntrySet findByName(String name) {
         return entrySetDao.findByName(name);
     }
+
+    public Long countAll() {
+        return entrySetDao.countAll();
+    }
 }

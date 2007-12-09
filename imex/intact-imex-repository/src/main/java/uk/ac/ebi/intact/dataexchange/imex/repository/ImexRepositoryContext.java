@@ -69,7 +69,12 @@ public class ImexRepositoryContext {
 
     private BeanFactory beanFactory;
     private Repository repository;
+    private RepositoryStatistics repositoryStatistics;
 
+    /**
+     * Constructor
+     * @param repository The repository to use
+     */
     public ImexRepositoryContext(Repository repository) {
         this.repository = repository;
 
@@ -78,6 +83,8 @@ public class ImexRepositoryContext {
 
         BasicDataSource dataSource = (BasicDataSource) beanFactory.getBean("dataSource");
         dataSource.setUrl("jdbc:h2:"+new File(repository.getConfigDir(), "imex-repo").getAbsolutePath());
+
+        this.repositoryStatistics = new RepositoryStatistics(this);
     }
 
     private static void checkMainProviders() {
@@ -123,5 +130,9 @@ public class ImexRepositoryContext {
 
     public ImexServiceProvider getImexServiceProvider() {
         return new ImexServiceProvider(this);
+    }
+
+    public RepositoryStatistics getRepositoryStatistics() {
+        return repositoryStatistics;
     }
 }
