@@ -15,15 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import psidev.psi.mi.xml.model.Entry;
-import psidev.psi.mi.xml.model.ExperimentDescription;
-import psidev.psi.mi.xml.model.HasId;
-import psidev.psi.mi.xml.model.Participant;
+import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.InconsistentConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
@@ -129,8 +125,8 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
 
     protected void failIfInconsistentConversion(IntactEntry intactEntry, Entry psiEntry) {
         failIfInconsistentCollectionSize("interaction", intactEntry.getInteractions(), psiEntry.getInteractions());
-        failIfInconsistentCollectionSize("experiment", intactEntry.getExperiments(), psiEntry.getExperiments());
-        failIfInconsistentCollectionSize("interactor", intactEntry.getInteractors(), psiEntry.getInteractors());
+        failIfInconsistentCollectionSize("experiment", intactEntry.getExperiments(), PsiConverterUtils.nonRedundantExperimentsFromPsiEntry(psiEntry));
+        failIfInconsistentCollectionSize("interactor", intactEntry.getInteractors(), PsiConverterUtils.nonRedundantInteractorsFromPsiEntry(psiEntry));
     }
 
 }

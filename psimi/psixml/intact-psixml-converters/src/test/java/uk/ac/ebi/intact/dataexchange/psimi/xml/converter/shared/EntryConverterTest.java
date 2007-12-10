@@ -30,6 +30,7 @@ import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
@@ -143,6 +144,17 @@ public class EntryConverterTest extends AbstractConverterTest {
     }
 
     @Test
+    public void roundtrip_intact_redundantExperiments() throws Exception {
+        final String resource = "/xml/16267818.intact.raw.xml";
+        InputStream is = EntryConverterTest.class.getResourceAsStream(resource);
+        
+        File file = new File(EntryConverterTest.class.getResource(resource).getFile());
+        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
+
+        roundtripWithStream(is, "European Bioinformat");
+    }
+
+    @Test
     public void roundtrip_similarInteractions_sameLabel() throws Exception {
         File file = new File(EntryConverterTest.class.getResource("/xml/dupes.xml").getFile());
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
@@ -193,8 +205,8 @@ public class EntryConverterTest extends AbstractConverterTest {
             Assert.assertEquals(institutionShortLabel, intactEntry.getInteractors().iterator().next().getOwner().getShortLabel());
 
             assertEquals("Number of interactions should be the same", beforeRountripEntry.getInteractions().size(), afterRoundtripEntry.getInteractions().size());
-            assertEquals("Number of experiments should be the same", countUniqueExperimentsInEntry(beforeRountripEntry), afterRoundtripEntry.getExperiments().size());
-            assertEquals("Number of interactors should be the same", countUniqueInteractorsInEntry(beforeRountripEntry), afterRoundtripEntry.getInteractors().size());
+            assertEquals("Number of experiments should be the same", PsiConverterUtils.nonRedundantExperimentsFromPsiEntry(beforeRountripEntry).size(), afterRoundtripEntry.getExperiments().size());
+            assertEquals("Number of interactors should be the same", PsiConverterUtils.nonRedundantInteractorsFromPsiEntry(beforeRountripEntry).size(), afterRoundtripEntry.getInteractors().size());
         }
        
     }
@@ -225,39 +237,4 @@ public class EntryConverterTest extends AbstractConverterTest {
         return isValid;
     }
 
-    private static int countUniqueExperimentsInEntry(Entry entry) {
-        Map<ExperimentDescription, ?> experiments;
-
-        if (entry.getExperiments() != null && !entry.getExperiments().isEmpty()) {
-            return entry.getExperiments().size();
-        } else {
-            experiments = new IdentityMap();
-            for (Interaction i : entry.getInteractions()) {
-                for (ExperimentDescription exp : i.getExperiments()) {
-                    experiments.put(exp, null);
-                }
-            }
-        }
-
-
-        return experiments.size();
-    }
-
-    private static int countUniqueInteractorsInEntry(Entry entry) {
-        Map<Interactor,?> interactors;
-
-        if (entry.getInteractors() != null && !entry.getInteractors().isEmpty()) {
-            return entry.getInteractors().size();
-        } else {
-            interactors = new IdentityMap();
-            for (Interaction i : entry.getInteractions()) {
-                for (Participant p : i.getParticipants()) {
-                    Interactor interactor = p.getInteractor();
-                    interactors.put(interactor, null);
-                }
-            }
-        }
-
-        return interactors.size();
-    }
 }

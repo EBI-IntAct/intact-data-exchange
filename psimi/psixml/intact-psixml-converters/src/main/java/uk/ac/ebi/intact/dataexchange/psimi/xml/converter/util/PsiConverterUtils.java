@@ -32,6 +32,8 @@ import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * PSI converter utilities.
@@ -171,6 +173,39 @@ public class PsiConverterUtils {
 
     public static ExperimentalRole createUnspecifiedExperimentalRole() {
         return createUnspecifiedRole( ExperimentalRole.class );
+    }
+
+    public static Collection<ExperimentDescription> nonRedundantExperimentsFromPsiEntry(Entry psiEntry) {
+        Map<Integer,ExperimentDescription> nonRedundantExps = new HashMap<Integer,ExperimentDescription>();
+
+        for (ExperimentDescription expDesc : psiEntry.getExperiments()) {
+            nonRedundantExps.put(expDesc.getId(), expDesc);
+        }
+
+        for (psidev.psi.mi.xml.model.Interaction interaction : psiEntry.getInteractions()) {
+            for (ExperimentDescription exp : interaction.getExperiments()) {
+                nonRedundantExps.put(exp.getId(), exp);
+            }
+        }
+
+        return nonRedundantExps.values();
+    }
+
+    public static Collection<psidev.psi.mi.xml.model.Interactor> nonRedundantInteractorsFromPsiEntry(Entry psiEntry) {
+        Map<Integer, psidev.psi.mi.xml.model.Interactor> nonRedundantInteractors = new HashMap<Integer, psidev.psi.mi.xml.model.Interactor>();
+
+        for (psidev.psi.mi.xml.model.Interactor interactor : psiEntry.getInteractors()) {
+            nonRedundantInteractors.put(interactor.getId(), interactor);
+        }
+
+        // iterate to get the unique experiments/interactors
+        for (psidev.psi.mi.xml.model.Interaction interaction : psiEntry.getInteractions()) {
+            for (Participant participant : interaction.getParticipants()) {
+                nonRedundantInteractors.put(participant.getInteractor().getId(), participant.getInteractor());
+            }
+        }
+
+        return nonRedundantInteractors.values();
     }
 
     private static <T extends CvType> T createUnspecifiedRole( Class<T> roleClass ) {
