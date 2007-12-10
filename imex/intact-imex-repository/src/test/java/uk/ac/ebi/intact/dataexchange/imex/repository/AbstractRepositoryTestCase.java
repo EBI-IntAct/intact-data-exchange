@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.Before;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -43,7 +44,12 @@ public class AbstractRepositoryTestCase {
     @After
     public final void after() throws Exception {
         ImexRepositoryContext.closeRepository();
-        FileUtils.deleteDirectory(TEMP_REPO_DIR);
+        try {
+            FileUtils.deleteDirectory(TEMP_REPO_DIR);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
         repository = null;
     }
 

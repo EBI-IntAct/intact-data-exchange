@@ -15,11 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 
 import java.io.File;
 
@@ -50,6 +47,17 @@ public class RepositoryTest extends AbstractRepositoryTestCase {
 
         RepositoryHelper helper = new RepositoryHelper(getRepository());
         File expectedFile = helper.getEntrySetFile("2006-07-18", "mint");
+
+        Assert.assertTrue(expectedFile.exists());
+    }
+
+    @Test
+    public void storeFile_intact() throws Exception{
+        File empty = new File(RepositoryTest.class.getResource("/xml/intact_2006-05-19.xml").getFile());
+        getRepository().storeEntrySet(empty, "intact");
+
+        RepositoryHelper helper = new RepositoryHelper(getRepository());
+        File expectedFile = helper.getEntrySetFile("2006-07-19", "intact");
 
         Assert.assertTrue(expectedFile.exists());
     }
