@@ -122,14 +122,9 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         StringBuilder sb = new StringBuilder();
 
         for (String v : values) {
-            if (v.contains("go")) {
-            	v = v.split("\\:")[1];
-            	createGoField(v);
-        		v = "GO".concat(v);
-            }
-            
             if (v.contains(":")) {
-                v = v.split("\\:")[1];
+                int colonIndex = v.indexOf(":");
+                v = v.substring(colonIndex+1);
             }
             
             if (v.contains("(")) {
@@ -143,31 +138,6 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         
         return sb.toString();
     }
-
-    private void createGoField(String v) {
-    	String value = null;
-    	if (doc.getField("GO") == null) {
-    		value = v;
-    	} else {
-    		String []stringValues = doc.getField("GO").stringValue().split(" ");
-    		boolean contains = false;
-            for ( String stringValue : stringValues ) {
-                if ( stringValue.equals( v ) ) {
-                    contains = true;
-                    break;
-                }
-            }
-    		if ( !contains ){
-        		value = doc.getField("GO").stringValue().concat(" " + v);
-        		doc.removeField("GO");            			
-    		}
-    	}
-    	if (value != null){
-    		doc.add(new Field("GO",value,				
-    				Field.Store.NO,
-    				Field.Index.TOKENIZED));
-    	}
-	}
 
 	public String isolateBracket(String column)
     {

@@ -57,7 +57,7 @@ public class IntActSearchEngineTest {
         Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
         IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
 
-        String searchQuery = ("GO:0006928");
+        String searchQuery = "\"GO:0006928\"";
         SearchResult<?> result = searchEngine.search(searchQuery, null, null);
         assertEquals(8, result.getInteractions().size());
 
@@ -80,7 +80,7 @@ public class IntActSearchEngineTest {
         Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
         IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
 
-        SearchResult<?> result = Searcher.search("GO:0006928", searchEngine);
+        SearchResult<?> result = Searcher.search("GO\\:0006928", searchEngine);
         assertEquals(8, result.getInteractions().size());
     }
 
