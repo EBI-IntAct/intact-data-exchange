@@ -18,7 +18,9 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.Interaction;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.model.Institution;
 
 /**
@@ -40,6 +42,13 @@ public class InteractionConverterTest {
         Assert.assertNull(interaction.getCvInteractorType());
         Assert.assertNotNull(interaction.getComponents().iterator().next().getInteractor().getOwner());
         Assert.assertEquals("testInstitution", interaction.getComponents().iterator().next().getInteractor().getOwner().getShortLabel());
+        Assert.assertEquals( 1, interaction.getConfidences().size());
+
+        Confidence conf = interaction.getConfidences().iterator().next();
+        Assert.assertNotNull( conf.getCvConfidenceType());
+        Assert.assertEquals("intact conf score", conf.getCvConfidenceType().getShortLabel());
+        Assert.assertEquals( "0.8", conf.getValue());
+        Assert.assertEquals( interaction, conf.getInteraction());
     }
 
     @Test (expected = PsiConversionException.class)
@@ -49,5 +58,19 @@ public class InteractionConverterTest {
 
         InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
         uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
+    }
+
+
+    @Test
+    public void intactTopsi_default() throws Exception {
+        uk.ac.ebi.intact.model.Interaction intactInteraction = new IntactMockBuilder().createDeterministicInteraction();
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        Interaction psiInteraction = converter.intactToPsi( intactInteraction);
+
+        Assert.assertEquals( 1, psiInteraction.getConfidences().size());
+        Assert.assertNotNull( psiInteraction.getConfidences().iterator().next().getUnit());
+        Assert.assertEquals( intactInteraction.getConfidences().iterator().next().getValue(),  psiInteraction.getConfidences().iterator().next().getValue());
+        Assert.assertEquals( intactInteraction.getConfidences().iterator().next().getCvConfidenceType().getShortLabel(), psiInteraction.getConfidences().iterator().next().getUnit().getNames().getShortLabel());
     }
 }

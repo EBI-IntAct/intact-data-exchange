@@ -132,6 +132,10 @@ public class PsiMockFactory {
             interaction.getExperiments().add(createMockExperiment());
         }
 
+        for (int i=0; i< childRandom( 1, 2); i++){
+            interaction.getConfidences().add(createMockConfidence());
+        }
+
         return interaction;
     }
 
@@ -176,6 +180,11 @@ public class PsiMockFactory {
 
         return experiment;
     }
+
+    public static Confidence createMockConfidence(){
+        Unit unit = createCvType( Unit.class, "IA:10001","intact conf score");
+       return new Confidence(unit, "0.8");
+    }   
 
     public static Organism createMockOrganism() {
         Organism organism = new Organism();

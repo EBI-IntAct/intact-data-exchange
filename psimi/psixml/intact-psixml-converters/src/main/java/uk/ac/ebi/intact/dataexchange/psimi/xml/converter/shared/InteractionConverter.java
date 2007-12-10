@@ -20,6 +20,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
@@ -75,6 +76,13 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         Collection<Component> components = getComponents(interaction, psiObject);
         interaction.setComponents(components);
 
+        //TODO:test      
+        ConfidenceConverter confConverter= new ConfidenceConverter( getInstitution());
+        for (psidev.psi.mi.xml.model.Confidence psiConfidence :  psiObject.getConfidences()){
+           Confidence confidence = confConverter.psiToIntact( psiConfidence );
+            interaction.addConfidence( confidence);
+        }
+
         failIfInconsistentConversion(interaction, psiObject);
 
         return interaction;
@@ -127,6 +135,13 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         InteractionType interactionType = (InteractionType)
                 PsiConverterUtils.toCvType(intactObject.getCvInteractionType(), new InteractionTypeConverter(getInstitution()));
         interaction.getInteractionTypes().add(interactionType);
+
+        //TODO: test
+        ConfidenceConverter confidenceConverter = new ConfidenceConverter( getInstitution());
+        for (Confidence conf : intactObject.getConfidences()){
+            psidev.psi.mi.xml.model.Confidence confidence = confidenceConverter.intactToPsi( conf);
+            interaction.getConfidences().add( confidence);
+        }
 
         failIfInconsistentConversion(intactObject, interaction);
 
@@ -181,9 +196,10 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         return components;
     }
-
+    
     protected void failIfInconsistentConversion(Interaction intact, psidev.psi.mi.xml.model.Interaction psi) {
         failIfInconsistentCollectionSize("experiment", intact.getExperiments(), psi.getExperiments());
         failIfInconsistentCollectionSize("participant", intact.getComponents(), psi.getParticipants());
+        failIfInconsistentCollectionSize( "confidence", intact.getConfidences(), psi.getConfidences());
     }
 }
