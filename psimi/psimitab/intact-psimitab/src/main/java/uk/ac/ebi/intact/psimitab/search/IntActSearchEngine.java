@@ -10,6 +10,8 @@ import psidev.psi.mi.search.util.DocumentBuilder;
 import java.io.File;
 import java.io.IOException;
 
+import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
+
 /**
  * A Search Engine based on lucene
  *
@@ -17,7 +19,7 @@ import java.io.IOException;
  * @version $Id$
  * @since 2.0.0
  */
-public class IntActSearchEngine extends FastSearchEngine {
+public class IntActSearchEngine extends FastSearchEngine<IntActBinaryInteraction> {
 
     public IntActSearchEngine(Directory indexDirectory) throws IOException {
         super(indexDirectory);
