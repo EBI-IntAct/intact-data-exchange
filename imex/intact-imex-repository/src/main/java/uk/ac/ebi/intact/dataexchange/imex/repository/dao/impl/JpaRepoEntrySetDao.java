@@ -57,6 +57,6 @@ public class JpaRepoEntrySetDao extends JpaImexDaoSupport implements RepoEntrySe
     }
 
     public Long countAll() {
-        return (Long) getEntityManager().createNamedQuery("repoEntryCountAll").getSingleResult();
+        return (Long) getEntityManager().createNamedQuery("repoEntrySetCountAll").getSingleResult();
     }
 }

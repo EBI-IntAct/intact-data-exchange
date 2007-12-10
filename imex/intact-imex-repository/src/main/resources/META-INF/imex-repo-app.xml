@@ -31,7 +31,7 @@
     <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaRepoEntryDao" id="repoEntryDao"
             p:imexPersistence-ref="imexPersistence"/>
     <bean class="uk.ac.ebi.intact.dataexchange.imex.repository.dao.impl.JpaRepoEntryService" id="repoEntryService"
-          p:entrySetDao-ref="repoEntryDao"/>
+          p:entryDao-ref="repoEntryDao"/>
 
     <!-- JPA annotations bean post processor -->
     <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>

@@ -33,23 +33,23 @@ import java.util.List;
  */
 public class JpaRepoEntryService implements RepoEntryService
 {
-    private RepoEntryDao entrySetDao;
+    private RepoEntryDao entryDao;
 
-    public void setEntrySetDao(RepoEntryDao entrySetDao) {
-        this.entrySetDao = entrySetDao;
+    public void setEntryDao(RepoEntryDao entryDao) {
+        this.entryDao = entryDao;
     }
 
     public List<RepoEntry> findAllRepoEntries() {
-        return entrySetDao.findAll();
+        return entryDao.findAll();
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveRepoEntry(RepoEntry repoEntry) {
-        entrySetDao.save(repoEntry);
+        entryDao.save(repoEntry);
     }
 
     public RepoEntry findByPmid(String pmid) {
-        return entrySetDao.findByPmid(pmid);
+        return entryDao.findByPmid(pmid);
     }
 
     /**
@@ -58,7 +58,7 @@ public class JpaRepoEntryService implements RepoEntryService
      * @return
      */
     public List<RepoEntry> findImportableExcluding(List<String> pmids) {
-        List<RepoEntry> importables = entrySetDao.findImportable();
+        List<RepoEntry> importables = entryDao.findImportable();
 
         for (Iterator<RepoEntry> repoEntryIterator = importables.iterator(); repoEntryIterator.hasNext();) {
             RepoEntry repoEntry = repoEntryIterator.next();
@@ -72,10 +72,10 @@ public class JpaRepoEntryService implements RepoEntryService
     }
 
     public List<RepoEntry> findImportableModifiedAfter(DateTime dateTime) {
-        return entrySetDao.findImportableModifierAfter(dateTime);
+        return entryDao.findImportableModifierAfter(dateTime);
     }
 
     public Long countAll() {
-        return entrySetDao.countAll();
+        return entryDao.countAll();
     }
 }
