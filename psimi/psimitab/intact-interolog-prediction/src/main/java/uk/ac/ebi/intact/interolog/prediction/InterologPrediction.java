@@ -1480,25 +1480,26 @@ public class InterologPrediction {
 		File dir = new File("/Users/mmichaut/Documents/These/Results/Inference/interoPorc/test/");
 		
 		//File mitab = new File("/Users/mmichaut/Documents/EBI/data/IntAct/intact.mitab");
-		File mitab = new File("/Users/mmichaut/Documents/EBI/data/PsimiTab/global.mitab");
+		File mitab = new File("/Users/mmichaut/Documents/EBI/data/PsimiTab/global_only7speciesWithStrains.mitab");
+		//File mitab = new File("/Users/mmichaut/Documents/EBI/data/PsimiTab/global.mitab");
 		
-		//File porcFileOldFormat = new File("/Users/mmichaut/Documents/EBI/data/Integr8/clog/20070630/clog.revised.dat");
-		File porcFile = new File("/Users/mmichaut/Documents/Data/integr8/PORC/porc_gene.dat");
+		File porcFileOldFormat = new File("/Users/mmichaut/Documents/EBI/data/Integr8/clog/20070630/clog.revised2.dat");
+		//File porcFile = new File("/Users/mmichaut/Documents/Data/integr8/PORC/porc_gene.dat");
 		
 		InterologPrediction up = new InterologPrediction(dir);
 		up.setMitab(mitab);
-		up.setPorc(porcFile);
+		up.setPorc(porcFileOldFormat);
 		Collection<Long> taxids = new HashSet<Long>(1);
 		taxids.add(1148l);
 		up.setUserTaxidsToDownCast(taxids);
 		
 		up.setDownCastOnAllPresentSpecies(false);
-		up.setClassicPorcFormat(false);
+		up.setClassicPorcFormat(true);
 		up.setWriteDownCastHistory(true);
 		up.setWriteSrcInteractions(true);
 		ClogInteraction.setNB_LINES_MAX(100000);
 		up.setWritePorcInteractions(false);
-		up.setDownCastOnChildren(false);
+		up.setDownCastOnChildren(true);
 		
 		up.run();
 	}
