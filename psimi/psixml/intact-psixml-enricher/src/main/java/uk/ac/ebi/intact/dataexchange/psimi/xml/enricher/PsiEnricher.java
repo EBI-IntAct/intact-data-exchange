@@ -67,10 +67,6 @@ public class PsiEnricher {
     public static Entry enrichEntry(Entry entry, EnricherConfig config) {
         // this counts will help to check the integrity of the entriy after enriching it,
         // the numbers should be the same
-        int interactionCount = entry.getInteractions().size();
-        int experimentCount = entry.getExperiments().size();
-        int interactorCount = entry.getInteractors().size();
-
         EntryConverter converter = new EntryConverter();
         IntactEntry intactEntry = converter.psiToIntact(entry);
 
@@ -81,20 +77,6 @@ public class PsiEnricher {
 
         Entry enrichedEntry = converter.intactToPsi(intactEntry);
         enrichedEntry.setSource(entry.getSource());
-
-        int interactionCountAfter = enrichedEntry.getInteractions().size();
-        int experimentCountAfter = enrichedEntry.getExperiments().size();
-        int interactorCountAfter = enrichedEntry.getInteractors().size();
-
-        if (interactionCount != interactionCountAfter) {
-            throw new PsiEnricherException("The number of interactions after enrichment has changed: "+interactionCount+" -> "+interactionCountAfter);
-        }
-        if (experimentCount != experimentCountAfter) {
-            throw new PsiEnricherException("The number of experiments after enrichment has changed: "+interactionCount+" -> "+experimentCountAfter);
-        }
-        if (interactorCount != interactorCountAfter) {
-            throw new PsiEnricherException("The number of interactors after enrichment has changed: "+interactorCount+" -> "+interactorCountAfter);
-        }
 
         return enrichedEntry;
 
