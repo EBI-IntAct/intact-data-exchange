@@ -66,7 +66,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         try {
             populateExperiment(objectToEnrich, pubmedId);
         } catch (InvalidPubmedException pe) {
-           log.error("Experiment with invalid pubmed cannot be enriched: "+pubmedId); 
+           log.error("Experiment with invalid pubmed cannot be enriched from citeXplore: "+pubmedId); 
         } catch (Exception e) {
             e.printStackTrace();
         }
