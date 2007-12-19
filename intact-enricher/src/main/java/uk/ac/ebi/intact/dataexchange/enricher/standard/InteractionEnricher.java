@@ -22,6 +22,8 @@ import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * TODO comment this
@@ -30,6 +32,11 @@ import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
  * @version $Id$
  */
 public class InteractionEnricher extends AnnotatedObjectEnricher<Interaction> {
+
+    /**
+     * Sets up a logger for that class.
+     */
+    private static final Log log = LogFactory.getLog(InteractionEnricher.class);
 
     private static ThreadLocal<InteractionEnricher> instance = new ThreadLocal<InteractionEnricher>() {
         @Override
@@ -70,8 +77,12 @@ public class InteractionEnricher extends AnnotatedObjectEnricher<Interaction> {
         }
 
         if (EnricherContext.getInstance().getConfig().isUpdateInteractionShortLabels()) {
-            String label = InteractionUtils.calculateShortLabel(objectToEnrich);
-            objectToEnrich.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(label));
+            try {
+                String label = InteractionUtils.calculateShortLabel(objectToEnrich);
+                objectToEnrich.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(label));
+            } catch (Exception e) {
+                log.error("Label for interaction could not be calculated: "+objectToEnrich.getShortLabel(), e);
+            }
         }
 
         super.enrich(objectToEnrich);

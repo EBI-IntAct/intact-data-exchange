@@ -19,6 +19,9 @@ import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.util.ExperimentUtils;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
+import uk.ac.ebi.intact.util.cdb.InvalidPubmedException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * TODO comment this
@@ -27,6 +30,11 @@ import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
  * @version $Id$
  */
 public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
+
+    /**
+     * Sets up a logger for that class.
+     */
+    private static final Log log = LogFactory.getLog(ExperimentEnricher.class);
 
      private static ThreadLocal<ExperimentEnricher> instance = new ThreadLocal<ExperimentEnricher>() {
         @Override
@@ -57,6 +65,8 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         String pubmedId = ExperimentUtils.getPubmedId(objectToEnrich);
         try {
             populateExperiment(objectToEnrich, pubmedId);
+        } catch (InvalidPubmedException pe) {
+           log.error("Experiment with invalid pubmed cannot be enriched: "+pubmedId); 
         } catch (Exception e) {
             e.printStackTrace();
         }

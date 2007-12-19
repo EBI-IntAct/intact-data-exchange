@@ -22,6 +22,8 @@ import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Publication;
+import uk.ac.ebi.intact.model.CvInteraction;
+import uk.ac.ebi.intact.model.clone.IntactCloner;
 
 /**
  * TODO comment this
