@@ -55,6 +55,12 @@ public class IntactConverterUtils {
             shortLabel = createExperimentTempShortLabel();
         }
 
+        if ( ! ( annotatedObject instanceof Institution ) ) {
+            if ( shortLabel != null ) {
+                shortLabel = shortLabel.toLowerCase();
+            }
+        }
+
         annotatedObject.setShortLabel(shortLabel);
 
         if (names != null) {
