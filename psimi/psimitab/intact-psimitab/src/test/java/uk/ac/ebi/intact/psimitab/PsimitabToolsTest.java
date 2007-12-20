@@ -29,11 +29,12 @@ import psidev.psi.mi.search.index.AbstractIndexWriter;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class PsimitabToolsTest {
+public class PsimitabToolsTest extends AbstractPsimitabTestCase{
 
     @Test
     public void buildIndex() throws Exception {
-       File psimitabFile = new File(PsimitabToolsTest.class.getResource("/mitab_samples/intact.sample-extra.txt").getFile());
+       File psimitabFile = getFileByResources("/mitab_samples/intact.sample-extra.txt", PsimitabToolsTest.class );
+//       File psimitabFile = new File(PsimitabToolsTest.class.getResource("/mitab_samples/intact.sample-extra.txt").getFile());
        File indexDirectory = new File(System.getProperty("java.io.tmpdir"), "PsimitabToolsTest");
 
        AbstractIndexWriter indexWriter = new IntActPsimiTabIndexWriter();

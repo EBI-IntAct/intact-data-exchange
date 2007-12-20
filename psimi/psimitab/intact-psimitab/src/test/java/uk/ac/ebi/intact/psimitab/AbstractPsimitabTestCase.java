@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URL;
 
 /**
  * PSIMITAB Test Case.
@@ -45,7 +46,8 @@ public abstract class AbstractPsimitabTestCase {
     }
 
     public static File getFileByResources(String fileName, Class clazz) throws UnsupportedEncodingException {
-        String strFile = clazz.getResource( fileName ).getFile();
+        URL url = clazz.getResource( fileName );
+        String strFile = url.getFile();
         return new File( URLDecoder.decode( strFile, "utf-8" ));
     }
 }

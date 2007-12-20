@@ -2,10 +2,15 @@ package uk.ac.ebi.intact.psimitab;
 
 import org.junit.Assert;
 import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
 import psidev.psi.mi.tab.converter.xml2tab.IsExpansionStrategyAware;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.SpokeExpansion;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
+import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReferenceFactory;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
@@ -31,22 +36,22 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         ConvertXml2Tab converter = new ConvertXml2Tab();
 
         converter.setInteractorPairClustering( false );
-        Assert.assertFalse( converter.isInteractorPairClustering() );
+        assertFalse( converter.isInteractorPairClustering() );
 
         converter.setInteractorPairClustering( true );
-        Assert.assertTrue( converter.isInteractorPairClustering() );
+        assertTrue( converter.isInteractorPairClustering() );
     }
 
     @Test
     public void setGetExpansionStrategy() throws Exception {
         ConvertXml2Tab converter = new ConvertXml2Tab();
 
-        Assert.assertNull( converter.getExpansionStragegy() );
+        assertNull( converter.getExpansionStragegy() );
 
         SpokeExpansion spoke = new SpokeExpansion();
         converter.setExpansionStrategy( spoke );
 
-        Assert.assertEquals( spoke, converter.getExpansionStragegy() );
+        assertEquals( spoke, converter.getExpansionStragegy() );
     }
 
     @Test
@@ -54,7 +59,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         ConvertXml2Tab converter = new ConvertXml2Tab();
         File file = new File( "" );
         converter.setOutputFile( file );
-        Assert.assertEquals( file, converter.getOutputFile() );
+        assertEquals( file, converter.getOutputFile() );
     }
 
     @Test
@@ -64,7 +69,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         files.add( new File( "a" ) );
         files.add( new File( "b" ) );
         converter.setXmlFilesToConvert( files );
-        Assert.assertEquals( files, converter.getXmlFilesToConvert() );
+        assertEquals( files, converter.getXmlFilesToConvert() );
     }
 
     @Test
@@ -72,10 +77,10 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         ConvertXml2Tab converter = new ConvertXml2Tab();
 
         converter.setOverwriteOutputFile( false );
-        Assert.assertFalse( converter.isOverwriteOutputFile() );
+        assertFalse( converter.isOverwriteOutputFile() );
 
         converter.setOverwriteOutputFile( true );
-        Assert.assertTrue( converter.isOverwriteOutputFile() );
+        assertTrue( converter.isOverwriteOutputFile() );
     }
 
     @Test
@@ -128,7 +133,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         converter.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         converter.setInteractorPairClustering( true );
 
-        File logFile = new File( intputDir, "mitab.log" );
+        File logFile = new File( intputDir, "mitab.logger" );
         Writer logWriter = new BufferedWriter( new FileWriter( logFile ) );
         converter.setLogWriter( logWriter );
 
@@ -138,12 +143,12 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         logWriter.flush();
         logWriter.close();
 
-        Assert.assertTrue( file.exists() );
+        assertTrue( file.exists() );
 
-        Assert.assertTrue( logFile.exists() );
+        assertTrue( logFile.exists() );
 
         // empty as other files yielded data, so the converter doesn't output.
-        Assert.assertTrue( logFile.length() == 0 );
+        assertTrue( logFile.length() == 0 );
 
         // count the lines, we expect 4 of'em
         try {
@@ -157,7 +162,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
             }
             in.close();
 
-            Assert.assertEquals( 4, count );
+            assertEquals( 4, count );
 
         } catch ( IOException e ) {
             Assert.fail();
@@ -173,7 +178,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         x2t.setInteractorPairClustering( true );
         x2t.setOverwriteOutputFile( true );
 
-        File logFile = new File( file.getParentFile(), "11230133.log" );
+        File logFile = new File( file.getParentFile(), "11230133.logger" );
         Writer logWriter = new BufferedWriter( new FileWriter( logFile ) );
         x2t.setLogWriter( logWriter );
 
@@ -187,8 +192,8 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         logWriter.flush();
         logWriter.close();
 
-        Assert.assertTrue( logFile.exists() );
-        Assert.assertTrue( logFile.length() > 0 );
+        assertTrue( logFile.exists() );
+        assertTrue( logFile.length() > 0 );
     }
 
     @Test
@@ -214,7 +219,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         // configure the converter
         converter.setXmlFilesToConvert( inputFiles );
 
-        File logFile = new File( intputDir, "mitab.log" );
+        File logFile = new File( intputDir, "mitab.logger" );
         Writer logWriter = new BufferedWriter( new FileWriter( logFile ) );
         converter.setLogWriter( logWriter );
 
@@ -224,12 +229,12 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         logWriter.flush();
         logWriter.close();
 
-        Assert.assertTrue( outputFile.exists() );
+        assertTrue( outputFile.exists() );
 
-        Assert.assertTrue( logFile.exists() );
+        assertTrue( logFile.exists() );
 
         // empty as other files yielded data, so the converter doesn't output.
-        Assert.assertTrue( logFile.length() == 0 );
+        assertTrue( logFile.length() == 0 );
 
         // count the lines, we expect 4 of'em
         try {
@@ -244,7 +249,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
             }
             in.close();
 
-            Assert.assertEquals( 4, count );
+            assertEquals( 4, count );
 
         } catch ( IOException e ) {
             Assert.fail();
@@ -264,7 +269,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         converter.setInteractorPairClustering( true );
         converter.setOverwriteOutputFile( true );
 
-        File logFile = new File( file.getParentFile(), "9971739.log" );
+        File logFile = new File( file.getParentFile(), "9971739.logger" );
         Writer logWriter = new BufferedWriter( new FileWriter( logFile ) );
         converter.setLogWriter( logWriter );
 
@@ -279,17 +284,17 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         logWriter.flush();
         logWriter.close();
 
-        Assert.assertTrue( outputFile.exists() );
-        Assert.assertTrue( outputFile.length() > 0 );
-        Assert.assertTrue( logFile.exists() );
-        Assert.assertTrue( logFile.length() == 0 );
+        assertTrue( outputFile.exists() );
+        assertTrue( outputFile.length() > 0 );
+        assertTrue( logFile.exists() );
+        assertTrue( logFile.length() == 0 );
     }
 
     @Test
     public void expansionMethod_nary_interaction_2() throws Exception {
 
         File xmlFile = getFileByResources("/psi25-testset/single-nary-interaction.xml", ConvertXml2TabTest.class);
-        Assert.assertTrue( xmlFile.canRead() );
+        assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
         Xml2Tab xml2tab = new Xml2Tab();
@@ -298,7 +303,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
         // this column handler IS aware of the the expansion strategy
         final IntActColumnHandler columnHandler = new IntActColumnHandler();
-        Assert.assertTrue( columnHandler instanceof IsExpansionStrategyAware );
+        assertTrue( columnHandler instanceof IsExpansionStrategyAware );
         xml2tab.setColumnHandler( columnHandler );
 
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
@@ -309,14 +314,14 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
         IntActBinaryInteraction interaction = ( IntActBinaryInteraction ) interactions.iterator().next();
         Assert.assertNotNull( interaction.getExpansionMethod() );
-        Assert.assertEquals( SpokeExpansion.EXPANSION_NAME, interaction.getExpansionMethod() );
+        assertEquals( SpokeExpansion.EXPANSION_NAME, interaction.getExpansionMethod() );
     }
 
     @Test
     public void expansionMethod_binary_interaction() throws Exception {
 
         File xmlFile = getFileByResources("/psi25-testset/single-interaction.xml", ConvertXml2TabTest.class);
-        Assert.assertTrue( xmlFile.canRead() );
+        assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
         Xml2Tab xml2tab = new Xml2Tab();
@@ -330,14 +335,14 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
         IntActBinaryInteraction interaction = ( IntActBinaryInteraction ) interactions.iterator().next();
-        Assert.assertEquals( null, interaction.getExpansionMethod() );
+        assertEquals( null, interaction.getExpansionMethod() );
     }
 
     @Test
     public void datasetName () throws Exception {
 
         File xmlFile = getFileByResources( "/psi25-testset/17292829.xml", ConvertXml2TabTest.class);
-        Assert.assertTrue( xmlFile.canRead() );
+        assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
         Xml2Tab xml2tab = new Xml2Tab();
@@ -346,7 +351,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
         // this column handler IS aware of the the expansion strategy
         final IntActColumnHandler columnHandler = new IntActColumnHandler();
-        Assert.assertTrue( columnHandler instanceof IsExpansionStrategyAware );
+        assertTrue( columnHandler instanceof IsExpansionStrategyAware );
         xml2tab.setColumnHandler( columnHandler );
 
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
@@ -357,6 +362,6 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
         IntActBinaryInteraction interaction = ( IntActBinaryInteraction ) interactions.iterator().next();
         Assert.assertNotNull( interaction.getDataset() );
-        Assert.assertTrue( interaction.getDataset().get( 0 ).startsWith( "Cancer" ));
+        assertTrue( interaction.getDataset().get( 0 ).startsWith( "Cancer" ));
     }
 }

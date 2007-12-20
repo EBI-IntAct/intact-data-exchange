@@ -37,18 +37,38 @@ public class IntActSearchEngineTest {
         Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
         IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
 
-        String searchQuery = ("roleA:bait");
+        String searchQuery = ("experimentalRoleA:bait");
         SearchResult<?> result = searchEngine.search(searchQuery, null, null);
-        assertEquals(186, result.getInteractions().size());
+        assertEquals(183, result.getInteractions().size());
 
         searchQuery = ("roles:\"unspecified role\"");
         result = searchEngine.search(searchQuery, null, null);
-        assertEquals(10 + 4, result.getInteractions().size());
+        assertEquals(200, result.getInteractions().size());
 
         Sort sort = new Sort(IntActColumnSet.EXPERIMENTAL_ROLE_B.getSortableColumnName());
-        result = searchEngine.search(("roleB:prey"), 20, 10, sort);
+        result = searchEngine.search(("experimentalRoleB:prey"), 20, 10, sort);
         assertEquals(10, result.getInteractions().size());
-        assertEquals("P41240", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());
+        assertEquals("Q16659", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());
+    }
+
+    @Test
+    public void testBiologicalRole() throws Exception {
+
+        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
+        IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
+
+        String searchQuery = ("biologicalRoleA:bait");
+        SearchResult<?> result = searchEngine.search(searchQuery, null, null);
+        assertEquals(0, result.getInteractions().size());
+
+        searchQuery = ("roles:\"unspecified role\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(200, result.getInteractions().size());
+
+        Sort sort = new Sort(IntActColumnSet.BIOLOGICAL_ROLE_B.getSortableColumnName());
+        result = searchEngine.search(("biologicalRoleB:\"unspecified role\""), 20, 10, sort);
+        assertEquals(10, result.getInteractions().size());
+        assertEquals("Q13554", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());
     }
 
     @Test
@@ -59,7 +79,7 @@ public class IntActSearchEngineTest {
 
         String searchQuery = "\"GO:0006928\"";
         SearchResult<?> result = searchEngine.search(searchQuery, null, null);
-        assertEquals(8, result.getInteractions().size());
+        assertEquals(4, result.getInteractions().size());
 
         searchQuery = ("GO*");
         result = searchEngine.search(searchQuery, null, 10);
@@ -72,7 +92,7 @@ public class IntActSearchEngineTest {
         Sort sort = new Sort(IntActColumnSet.PROPERTIES_B.getSortableColumnName());
         result = searchEngine.search(("properties:IPR008271"), 20, 10, sort);
         assertEquals(10, result.getInteractions().size());
-        assertEquals("Q9Y6R4", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());
+        assertEquals("Q13557", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());
     }
 
     @Test
@@ -81,7 +101,7 @@ public class IntActSearchEngineTest {
         IntActSearchEngine searchEngine = new IntActSearchEngine(indexDirectory);
 
         SearchResult<?> result = Searcher.search("GO\\:0006928", searchEngine);
-        assertEquals(8, result.getInteractions().size());
+        assertEquals(4, result.getInteractions().size());
     }
 
     @Test
@@ -92,7 +112,7 @@ public class IntActSearchEngineTest {
 
         String searchQuery = ("typeA:\"small molecule\"");
         SearchResult<?> result = searchEngine.search(searchQuery, null, null);
-        assertEquals(196, result.getInteractions().size());
+        assertEquals(194, result.getInteractions().size());
 
         searchQuery = ("typeB:protein");
         result = searchEngine.search(searchQuery, null, 10);
@@ -101,7 +121,7 @@ public class IntActSearchEngineTest {
         Sort sort = new Sort(IntActColumnSet.INTERACTOR_TYPE_B.getSortableColumnName());
         result = searchEngine.search(("interactor_types:\"small molecule\""), 10, 20, sort);
         assertEquals(20, result.getInteractions().size());
-        assertEquals("Q13535", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());
+        assertEquals("A2RQD6", result.getInteractions().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());
     }
 
     @Test
@@ -112,7 +132,7 @@ public class IntActSearchEngineTest {
 
         String searchQuery = ("hostOrganism:\"in vitro\"");
         SearchResult<?> result = searchEngine.search(searchQuery, null, null);
-        assertEquals(14, result.getInteractions().size());
+        assertEquals(28, result.getInteractions().size());
 
         Sort sort = new Sort(IntActColumnSet.HOSTORGANISM.getSortableColumnName());
         result = searchEngine.search(("in*"), 50, 20, sort);
@@ -127,7 +147,7 @@ public class IntActSearchEngineTest {
 
         String searchQuery = ("expansion:spoke");
         SearchResult<?> result = searchEngine.search(searchQuery, null, null);
-        assertEquals(186, result.getInteractions().size());
+        assertEquals(184, result.getInteractions().size());
 
         Sort sort = new Sort(IntActColumnSet.EXPANSION_METHOD.getSortableColumnName());
         result = searchEngine.search(("spoke"), 50, 20, sort);
