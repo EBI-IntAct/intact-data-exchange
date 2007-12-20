@@ -20,6 +20,7 @@ import psidev.psi.mi.xml.model.Xref;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AnnotationConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.InteractorConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.CvObjectConverter;
@@ -104,13 +105,23 @@ public class PsiConverterUtils {
         // normally the primary reference is the identity reference, but for bibliographic references
         // it is the primary-reference and it does not contain secondary refs
         if ( xrefContainer instanceof Bibref ) {
-            DbReference primaryRef = getPrimaryReference( dbRefs );
-            xref.setPrimaryRef( primaryRef );
+            final DbReference primaryRef = getPrimaryReference( dbRefs, CvDatabase.PUBMED_MI_REF);
+
+            if (primaryRef != null) {
+                xref.setPrimaryRef( primaryRef );
+            } else {
+                throw new UnsupportedConversionException("No primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
+                                                         "to Pubmed (dbAc="+ CvDatabase.PUBMED_MI_REF+") could be found in "+xrefContainer.getClass().getSimpleName());
+            }
         } else {
             // remove the primary ref from the collection if it is a experiment
             // so we don't have the same ref in the bibref and the xref sections
             if ( annotatedObject instanceof Experiment ) {
-                dbRefs.remove( getPrimaryReference( dbRefs ) );
+                final DbReference bibref = getPrimaryReference(dbRefs, CvDatabase.PUBMED_MI_REF);
+
+                if (bibref != null) {
+                    dbRefs.remove(bibref);
+                }
             }
 
             DbReference primaryRef = getIdentity( dbRefs );
@@ -333,13 +344,23 @@ public class PsiConverterUtils {
     }
 
     private static DbReference getPrimaryReference( Collection<DbReference> dbRefs ) {
+        return getPrimaryReference(dbRefs, null);
+    }
+
+    private static DbReference getPrimaryReference( Collection<DbReference> dbRefs, String dbAc ) {
         for ( DbReference dbRef : dbRefs ) {
             if ( dbRef.getRefTypeAc() != null && dbRef.getRefTypeAc().equals( CvXrefQualifier.PRIMARY_REFERENCE_MI_REF ) ) {
-                return dbRef;
+                if (dbAc != null) {
+                    if (dbAc.equals(dbRef.getDbAc())) {
+                        return dbRef;
+                    }
+                } else {
+                    return dbRef;
+                }
             }
         }
 
-        if ( !dbRefs.isEmpty() ) {
+        if ( dbAc == null && !dbRefs.isEmpty() ) {
             return dbRefs.iterator().next();
         }
 

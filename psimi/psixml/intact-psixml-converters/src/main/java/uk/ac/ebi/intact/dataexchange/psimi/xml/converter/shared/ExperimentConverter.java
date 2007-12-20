@@ -76,6 +76,16 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         IntactConverterUtils.populateNames(psiObject.getNames(), experiment);
         IntactConverterUtils.populateXref(psiObject.getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
+
+        // fail if the primary reference does not point to Pubmed and primary-reference
+        final DbReference primaryRef = psiObject.getBibref().getXref().getPrimaryRef();
+        if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(primaryRef.getRefTypeAc()) ||
+            !CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())) {
+            throw new UnsupportedConversionException("Bibref in ExperimentDescription [PSI Id="+psiObject.getId()+"] " +
+                                                     "should be a primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
+                                                     "with points to Pubmed (dbAc="+ CvDatabase.PUBMED_MI_REF+"): "+primaryRef);
+        }
+
         IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
         IntactConverterUtils.populateAnnotations(psiObject, experiment, getInstitution());
         
@@ -101,7 +111,12 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         }
 
         Bibref bibref = new Bibref();
-        PsiConverterUtils.populate(intactObject, bibref);
+
+        try {
+            PsiConverterUtils.populate(intactObject, bibref);
+        } catch (UnsupportedConversionException e) {
+            throw new UnsupportedConversionException("No Bibref could be found for Experiment with Xrefs: "+intactObject.getXrefs(), e);
+        }
 
         InteractionDetectionMethodConverter detMethodConverter = new InteractionDetectionMethodConverter(getInstitution());
         InteractionDetectionMethod detMethod = (InteractionDetectionMethod) PsiConverterUtils.toCvType(intactObject.getCvInteraction(), detMethodConverter);
@@ -124,7 +139,15 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
     }
 
     private Publication createPublication(ExperimentDescription experiment) {
-        String pubId = experiment.getBibref().getXref().getPrimaryRef().getId();
+        final DbReference primaryRef = experiment.getBibref().getXref().getPrimaryRef();
+
+        if (!CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())) {
+            throw new UnsupportedConversionException("The bibref (bibliographic xref) of the experiment is not pointing to Pubmed " +
+                                                     "(dbAc="+ CvDatabase.PUBMED_MI_REF+"). Experiment PSI Id: "+experiment.getId()+", ref found: " +
+                                                     "db="+primaryRef.getDb()+", dbAc="+primaryRef.getDbAc()+", id="+primaryRef.getId());
+        }
+
+        String pubId = primaryRef.getId();
 
         Publication publication = (Publication) ConversionCache.getElement("pub:"+pubId);
 

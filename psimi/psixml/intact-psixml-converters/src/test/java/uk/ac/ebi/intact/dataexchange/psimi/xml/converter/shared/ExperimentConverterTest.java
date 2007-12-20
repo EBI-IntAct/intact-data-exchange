@@ -18,9 +18,13 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.ExperimentDescription;
+import psidev.psi.mi.xml.model.DbReference;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 
 /**
  * TODO comment this
@@ -54,6 +58,18 @@ public class ExperimentConverterTest extends IntactBasicTestCase {
         
 
         Assert.assertEquals(1, exp.getXrefs().size());
+    }
+
+    @Test (expected = UnsupportedConversionException.class)
+    public void psiToIntact_incorrectBibref() {
+        ExperimentDescription expDesc = PsiMockFactory.createMockExperiment();
+        final DbReference primaryRef = PsiMockFactory.createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.DIP, CvDatabase.DIP_MI_REF);
+        primaryRef.setId("dip:x12345");
+
+        expDesc.getBibref().getXref().setPrimaryRef(primaryRef);
+
+        ExperimentConverter converter = new ExperimentConverter(new Institution("testInst"));
+        Experiment exp = converter.psiToIntact(expDesc);
     }
 
     @Test
