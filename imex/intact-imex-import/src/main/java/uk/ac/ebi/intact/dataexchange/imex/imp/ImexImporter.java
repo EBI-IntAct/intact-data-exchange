@@ -182,13 +182,15 @@ public class ImexImporter {
 
             imexImportPublication.setMessage(sw.toString());
 
-            if (IntactContext.getCurrentInstance().getDataContext().isTransactionActive()) {
+            if (IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().isActive()) {
                 try {
                     IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().rollback();
                 } catch (Throwable t) {
                     log.error("Error rollbacking transaction: ", t);
                 }
             }
+
+            IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().begin();
         }
     }
 

@@ -20,6 +20,9 @@ import uk.ac.ebi.intact.context.DataContext;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
+import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
+import uk.ac.ebi.intact.dataexchange.cvutils.CvUpdater;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.Institution;
@@ -43,13 +46,9 @@ public class Playground {
     public static void main(String[] args) throws Exception{
 
         IntactContext.initStandaloneContext(new File(Playground.class.getResource("/postgres-hibernate.cfg.xml").getFile()));
-        
-        getDataContext().beginTransaction();
 
-        SmallCvPrimer primer = new SmallCvPrimer(getDataContext().getDaoFactory());
-        primer.createCVs();
-
-        getDataContext().commitTransaction();
+        IntactOntology ontology = OboUtils.createOntologyFromOboLatestPsiMi();
+        new CvUpdater(ontology).createOrUpdateCVs();
 
         CvXrefQualifier qual = getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).getByPsiMiRef(CvXrefQualifier.IDENTITY_MI_REF);
         CvDatabase psiMi = getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByPsiMiRef(CvDatabase.PSI_MI_MI_REF);
@@ -72,7 +71,7 @@ public class Playground {
                 .getInstitutionDao().getShortLabelsLike("%"));
 
 
-        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all/");
+        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all-with-intact/");
         Repository repo = ImexRepositoryContext.openRepository(repoDir.toString());
 
         ImexImporter importer = new ImexImporter(repo);
