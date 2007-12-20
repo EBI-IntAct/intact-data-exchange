@@ -167,7 +167,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                     for (CvIdentification partDetMethod : component.getParticipantDetectionMethods()) {
                         if (experiment.getCvIdentification() != null && !experiment.getCvIdentification().getMiIdentifier().equals(partDetMethod.getMiIdentifier())) {
                             throw new UnsupportedConversionException("Cannot convert an experiment that does not have participant " +
-                                  "detection method defined and its participants have different detection methods: Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"'");
+                                  "detection method defined and its participants have different detection methods: Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"', Det. Methods: "+component.getParticipantDetectionMethods());
                         } else {
                             experiment.setCvIdentification(partDetMethod);
                         }
@@ -175,7 +175,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                 }
 
                 if (experiment.getCvIdentification() == null) {
-                    log.error("Experiment without CvIdentification (participant detection method): Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"'");
+                    throw new UnsupportedConversionException("Experiment without CvIdentification (participant detection method) and its participants do not have one either: Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"'");
                 }
             }
         }
