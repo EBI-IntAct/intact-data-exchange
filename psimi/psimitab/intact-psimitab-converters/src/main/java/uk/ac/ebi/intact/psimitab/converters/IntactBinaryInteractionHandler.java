@@ -19,13 +19,12 @@ import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceFactory;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
-import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.IsExpansionStrategyAware;
-import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -84,16 +83,22 @@ public class IntactBinaryInteractionHandler extends IntActColumnHandler implemen
         // set expermimental role of interactor A and B
         List<CrossReference> experimentRolesA = new ArrayList<CrossReference>();
         List<CrossReference> experimentRolesB = new ArrayList<CrossReference>();
-        for ( Component component : interaction.getComponents() ){
-            if (component.getInteractor().equals( intactInteractorA )){
-                experimentRolesA.add( cvObjectConverter.toMitab( component.getCvExperimentalRole()));
+        List<CrossReference> biologicalRolesA = new ArrayList<CrossReference>();
+        List<CrossReference> biologicalRolesB = new ArrayList<CrossReference>();
+        for ( Component component : interaction.getComponents() ) {
+            if ( component.getInteractor().equals( intactInteractorA ) ) {
+                biologicalRolesA.add( cvObjectConverter.toMitab( component.getCvBiologicalRole() ) );
+                experimentRolesA.add( cvObjectConverter.toMitab( component.getCvExperimentalRole() ) );
             }
-            if (component.getInteractor().equals( intactInteractorB )){
-                experimentRolesB.add( cvObjectConverter.toMitab( component.getCvExperimentalRole()));
+            if ( component.getInteractor().equals( intactInteractorB ) ) {
+                biologicalRolesB.add( cvObjectConverter.toMitab( component.getCvBiologicalRole() ) );
+                experimentRolesB.add( cvObjectConverter.toMitab( component.getCvExperimentalRole() ) );
             }
         }
         ibi.setExperimentalRolesInteractorA( experimentRolesA );
         ibi.setExperimentalRolesInteractorB( experimentRolesB );
+        ibi.setBiologicalRolesInteractorA( biologicalRolesA );
+        ibi.setBiologicalRolesInteractorB( biologicalRolesB );
 
         // set dataset
         if ( interaction.getExperiments() != null ) {
