@@ -11,6 +11,8 @@ import psidev.psi.mi.tab.model.Interactor;
 
 import java.util.List;
 
+import org.apache.commons.lang.time.DateUtils;
+
 /**
  * IntAct extension of a BinaryInteractionImpl.
  *
@@ -22,6 +24,9 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
 
     private List<CrossReference> experimentalRoleA;
     private List<CrossReference> experimentalRoleB;
+
+    private List<CrossReference> biologicalRoleA;
+    private List<CrossReference> biologicalRoleB;
     
     private List<CrossReference> propertiesA;
     private List<CrossReference> propertiesB;
@@ -30,7 +35,7 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
     private List<CrossReference> interactorTypeB;
     
     private List<CrossReference> hostOrganism;
-    
+
     private String expansionMethod;
 
     private List <String> dataset;
@@ -39,7 +44,8 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
 	private Interactor interactorB;
 
     private int expectedColumnCount = 24;
-    
+
+
     //////////////////
     // Constructors
 
@@ -71,8 +77,24 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
     public void setExperimentalRolesInteractorB( List<CrossReference> experimentalRoles ) {
         this.experimentalRoleB = experimentalRoles;
     }
-    
-	public List<CrossReference> getPropertiesA() {
+
+    public List<CrossReference> getBiologicalRolesInteractorA() {
+        return biologicalRoleA;
+    }
+
+    public void setBiologicalRolesInteractorA( List<CrossReference> biologicalRoles ) {
+        this.biologicalRoleA = biologicalRoles;
+    }
+
+    public List<CrossReference> getBiologicalRolesInteractorB() {
+        return biologicalRoleB;
+    }
+
+    public void setBiologicalRolesInteractorB( List<CrossReference> biologicalRoles ) {
+        this.biologicalRoleB = biologicalRoles;
+    }
+
+    public List<CrossReference> getPropertiesA() {
 		return propertiesA;
 	}
 
@@ -163,6 +185,14 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
     public boolean hasDatasetName() {
         return !( dataset == null || dataset.isEmpty() );
     }
+
+    public boolean hasBiologicalRolesInteractorA() {
+        return !( biologicalRoleA == null || biologicalRoleA.isEmpty() );
+    }
+
+    public boolean hasBiologicalRolesInteractorB() {
+        return !( biologicalRoleB == null || biologicalRoleB.isEmpty() );
+    }
     
     /**
      * @return number of expected columns
@@ -193,8 +223,10 @@ public class IntActBinaryInteraction extends BinaryInteractionImpl {
         sb.append( "BinaryInteractionImpl" );
         sb.append( "{interactorA=" ).append( interactorA );
         sb.append( ", interactorB=" ).append( interactorB );
-        sb.append( ", ExperimentalRoleInteractorA=" ).append( experimentalRoleA);
-        sb.append( ", ExperimentalRoleInteractorB=" ).append( experimentalRoleB);
+        sb.append( ", ExperimentalRoleInteractorA=" ).append( experimentalRoleA );
+        sb.append( ", ExperimentalRoleInteractorB=" ).append( experimentalRoleB );
+        sb.append( ", BiologicalRoleInteractorA=" ).append( biologicalRoleA );
+        sb.append( ", BiologicalRoleInteractorB=" ).append( biologicalRoleB );
         sb.append( ", PropertiesA=" ).append( propertiesA );
         sb.append( ", PropertiesB=" ).append( propertiesB );
         sb.append( ", InteractorType of A=" ).append( interactorTypeA );

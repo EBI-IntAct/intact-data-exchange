@@ -29,9 +29,11 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 		String[] tokens = psiMiTabLine.split(DEFAULT_COL_SEPARATOR);
 			
 		// raw fields
-		String roleA = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_A.getOrder()];
-		String roleB = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_B.getOrder()];
-		String propertiesA = tokens[IntActColumnSet.PROPERTIES_A.getOrder()];
+		String experimentRoleA = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_A.getOrder()];
+		String experimentRoleB = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_B.getOrder()];
+        String biologicalRoleA = tokens[IntActColumnSet.BIOLOGICAL_ROLE_A.getOrder()];
+        String biologicalRoleB = tokens[IntActColumnSet.BIOLOGICAL_ROLE_B.getOrder()];
+        String propertiesA = tokens[IntActColumnSet.PROPERTIES_A.getOrder()];
 		String propertiesB = tokens[IntActColumnSet.PROPERTIES_B.getOrder()];
 		String typeA = tokens[IntActColumnSet.INTERACTOR_TYPE_A.getOrder()];
 		String typeB = tokens[IntActColumnSet.INTERACTOR_TYPE_B.getOrder()];
@@ -41,13 +43,17 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 
         doc = super.createDocumentFromPsimiTabLine(psiMiTabLine);
 		
-		doc.add(new Field("roles", isolateBracket(roleA) + " " + isolateBracket(roleB),
+		doc.add(new Field("roles", isolateBracket( experimentRoleA ) + " " + isolateBracket( experimentRoleB )
+                + " " + isolateBracket( biologicalRoleA ) + " " + isolateBracket( biologicalRoleB),
 				Field.Store.NO,
 				Field.Index.TOKENIZED));
 		
-		addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_A, roleA);
-		addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_B, roleB);
-		String value = isolateValues(propertiesA) + isolateValues(propertiesB);
+		addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_A, experimentRoleA);
+		addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_B, experimentRoleB);
+		addTokenizedAndSortableField(doc, IntActColumnSet.BIOLOGICAL_ROLE_A, biologicalRoleA);
+		addTokenizedAndSortableField(doc, IntActColumnSet.BIOLOGICAL_ROLE_B, biologicalRoleB);
+
+        String value = isolateValues(propertiesA) + isolateValues(propertiesB);
 		doc.add(new Field("properties", value,
 				Field.Store.NO,
 				Field.Index.TOKENIZED));
@@ -82,7 +88,9 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         sb.append(builder.createPsimiTabLine(doc));
 		sb.append(doc.get(IntActColumnSet.EXPERIMENTAL_ROLE_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
 		sb.append(doc.get(IntActColumnSet.EXPERIMENTAL_ROLE_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
-		sb.append(doc.get(IntActColumnSet.PROPERTIES_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
+		sb.append(doc.get(IntActColumnSet.BIOLOGICAL_ROLE_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
+		sb.append(doc.get(IntActColumnSet.BIOLOGICAL_ROLE_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
+        sb.append(doc.get(IntActColumnSet.PROPERTIES_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
 		sb.append(doc.get(IntActColumnSet.PROPERTIES_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
 		sb.append(doc.get(IntActColumnSet.INTERACTOR_TYPE_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
 		sb.append(doc.get(IntActColumnSet.INTERACTOR_TYPE_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
@@ -139,7 +147,12 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         return sb.toString();
     }
 
-	public String isolateBracket(String column)
+    /**
+     * Gets only the value part surround with brackets
+     * @param column
+     * @return
+     */
+    public String isolateBracket(String column)
     {
         String[] values = column.split("\\|");
 

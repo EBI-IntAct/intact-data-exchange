@@ -18,15 +18,17 @@ import java.util.List;
  */
 public class IntActColumnSet extends DefaultColumnSet implements ColumnSet {
 	
-	public static final PsimiTabColumn EXPERIMENTAL_ROLE_A = new PsimiTabColumn(15, "experimentalRole interactor A", "roleA");
-	public static final PsimiTabColumn EXPERIMENTAL_ROLE_B = new PsimiTabColumn(16, "experimentalRole interactor B", "roleB");
-	public static final PsimiTabColumn PROPERTIES_A = new PsimiTabColumn(17, "properties interactor A", "propertiesA");
-	public static final PsimiTabColumn PROPERTIES_B = new PsimiTabColumn(18, "properties interactor B", "propertiesB");
-	public static final PsimiTabColumn INTERACTOR_TYPE_A = new PsimiTabColumn(19, "interactorType of A", "typeA");
-	public static final PsimiTabColumn INTERACTOR_TYPE_B = new PsimiTabColumn(20, "interactorType of B", "typeB");
-	public static final PsimiTabColumn HOSTORGANISM = new PsimiTabColumn(21, "hostOrganism", "hostOrganism");
-	public static final PsimiTabColumn EXPANSION_METHOD = new PsimiTabColumn(22, "expansion method", "expansion");
-    public static final PsimiTabColumn DATASET = new PsimiTabColumn( 23, "dataset", "dataset");
+	public static final PsimiTabColumn EXPERIMENTAL_ROLE_A = new PsimiTabColumn(15, "experimentalRole interactor A", "experimentalRoleA");
+	public static final PsimiTabColumn EXPERIMENTAL_ROLE_B = new PsimiTabColumn(16, "experimentalRole interactor B", "experimentalRoleB");
+    public static final PsimiTabColumn BIOLOGICAL_ROLE_A = new PsimiTabColumn(17, "biologicalRole interactor A", "biologicalRoleA");
+    public static final PsimiTabColumn BIOLOGICAL_ROLE_B = new PsimiTabColumn(18, "biologicalRole interactor B", "biologicalRoleB");
+    public static final PsimiTabColumn PROPERTIES_A = new PsimiTabColumn(19, "properties interactor A", "propertiesA");
+	public static final PsimiTabColumn PROPERTIES_B = new PsimiTabColumn(20, "properties interactor B", "propertiesB");
+	public static final PsimiTabColumn INTERACTOR_TYPE_A = new PsimiTabColumn(21, "interactorType of A", "typeA");
+	public static final PsimiTabColumn INTERACTOR_TYPE_B = new PsimiTabColumn(22, "interactorType of B", "typeB");
+	public static final PsimiTabColumn HOSTORGANISM = new PsimiTabColumn(23, "hostOrganism", "hostOrganism");
+	public static final PsimiTabColumn EXPANSION_METHOD = new PsimiTabColumn(24, "expansion method", "expansion");
+    public static final PsimiTabColumn DATASET = new PsimiTabColumn( 25, "dataset", "dataset");
 	
 	
 	public IntActColumnSet(){
@@ -35,7 +37,9 @@ public class IntActColumnSet extends DefaultColumnSet implements ColumnSet {
 		
 		psimiTabColumns.add( EXPERIMENTAL_ROLE_A );
 		psimiTabColumns.add( EXPERIMENTAL_ROLE_B );
-		psimiTabColumns.add( PROPERTIES_A );
+		psimiTabColumns.add( BIOLOGICAL_ROLE_A );
+		psimiTabColumns.add( BIOLOGICAL_ROLE_B );
+        psimiTabColumns.add( PROPERTIES_A );
 		psimiTabColumns.add( PROPERTIES_B );
 		psimiTabColumns.add( INTERACTOR_TYPE_A );
 		psimiTabColumns.add( INTERACTOR_TYPE_B );

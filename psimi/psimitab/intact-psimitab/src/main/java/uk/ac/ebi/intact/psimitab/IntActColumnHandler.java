@@ -23,7 +23,15 @@ import psidev.psi.mi.tab.model.column.Column;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Interactor;
 import psidev.psi.mi.xml.model.Organism;
+import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
+import uk.ac.ebi.intact.util.ols.OlsClient;
+import uk.ac.ebi.ook.web.services.Query;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.rmi.RemoteException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -39,11 +47,19 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
     /**
      * Sets up a logger for that class.
      */
-    public static final Log log = LogFactory.getLog( IntActColumnHandler.class );
+    public static final Log logger = LogFactory.getLog( IntActColumnHandler.class );
 
     private static final Pattern EXPERIMENT_LABEL_PATTERN = Pattern.compile( "[a-z-_]+-\\d{4}[a-z]?-\\d+" );
 
     private static final String IDENTITY_MI_REF = "MI:0356";
+
+    private Boolean goTerm_Name_AutoCompletion = Boolean.TRUE;
+
+    private Boolean interpro_Name_AutoCompletion = Boolean.TRUE;
+
+    private Query query;
+
+    private InterproNameHandler handler;
 
     /**
      * CrossReference Converter
@@ -55,19 +71,30 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
      */
     private String expansionMethod;
 
-
     //////////////////
     // Constructors
 
     public IntActColumnHandler() {
     }
 
+    public IntActColumnHandler( boolean goTerm_Name_AutoCompletion, boolean interpro_Name_AutoCompletion ) {
+        this.goTerm_Name_AutoCompletion = goTerm_Name_AutoCompletion;
+        this.interpro_Name_AutoCompletion = interpro_Name_AutoCompletion;
+    }
 
     /////////////////
     // Getter & Setter
 
     public void setExpansionMethod( String method ) {
         this.expansionMethod = method;
+    }
+
+    public void setGoTermNameAutoCompletion( Boolean autocompletion ) {
+        this.goTerm_Name_AutoCompletion = autocompletion;
+    }
+
+    public void setInterproNameAutoCompletion( Boolean autocompletion ) {
+        this.interpro_Name_AutoCompletion = autocompletion;
     }
 
     /////////////////
@@ -78,15 +105,17 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         IntActBinaryInteraction dbi = ( IntActBinaryInteraction ) bi;
 
         if ( interaction.getParticipants().size() != 2 ) {
-            if (log.isDebugEnabled()) log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 2 participants." );
+            if ( logger.isDebugEnabled() )
+                logger.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 2 participants." );
         }
 
         Iterator<Participant> pi = interaction.getParticipants().iterator();
         Participant pA = pi.next();
         Participant pB = pi.next();
 
-        if ( pA.getExperimentalRoles().size() != 1 ) {
-            if (log.isDebugEnabled()) log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
+        if ( pA.getExperimentalRoles() != null && pA.getExperimentalRoles().size() != 1 ) {
+            if ( logger.isDebugEnabled() )
+                logger.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
         } else {
             CrossReference experimentalRoleA = extractExperimentalRole( pA );
 
@@ -99,8 +128,9 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             }
         }
 
-        if ( pB.getExperimentalRoles().size() != 1 ) {
-            if (log.isDebugEnabled()) log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
+        if ( pB.getExperimentalRoles() != null && pB.getExperimentalRoles().size() != 1 ) {
+            if ( logger.isDebugEnabled() )
+                logger.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
         } else {
             CrossReference experimentalRoleB = extractExperimentalRole( pB );
 
@@ -113,10 +143,41 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             }
         }
 
-        if ( pA.getInteractor().getInteractorType() == null ) {
-            if (log.isDebugEnabled()) log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
+        if ( pA.getBiologicalRole() == null ) {
+            if ( logger.isDebugEnabled() )
+                logger.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have a biologicalRole." );
         } else {
-            CrossReference typeA  = extractInteractorType( pA );
+            CrossReference biologicalRoleA = extractBiologicalRole( pA );
+
+            if ( dbi.hasBiologicalRolesInteractorA() ) {
+                dbi.getBiologicalRolesInteractorA().add( biologicalRoleA );
+            } else {
+                List<CrossReference> xrefs = new ArrayList<CrossReference>();
+                xrefs.add( biologicalRoleA );
+                dbi.setBiologicalRolesInteractorA( xrefs );
+            }
+        }
+
+        if ( pB.getBiologicalRole() == null ) {
+            if ( logger.isDebugEnabled() )
+                logger.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have a biologicalRole." );
+        } else {
+            CrossReference biologicalRoleB = extractBiologicalRole( pB );
+
+            if ( dbi.hasBiologicalRolesInteractorB() ) {
+                dbi.getBiologicalRolesInteractorB().add( biologicalRoleB );
+            } else {
+                List<CrossReference> xrefs = new ArrayList<CrossReference>();
+                xrefs.add( biologicalRoleB );
+                dbi.setBiologicalRolesInteractorB( xrefs );
+            }
+        }
+
+        if ( pA.getInteractor().getInteractorType() == null ) {
+            if ( logger.isDebugEnabled() )
+                logger.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
+        } else {
+            CrossReference typeA = extractInteractorType( pA );
 
             if ( dbi.hasInteractorTypeA() ) {
                 dbi.getInteractorTypeA().add( typeA );
@@ -128,9 +189,10 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         }
 
         if ( pB.getInteractor().getInteractorType() == null ) {
-            if (log.isDebugEnabled()) log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
+            if ( logger.isDebugEnabled() )
+                logger.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
         } else {
-            CrossReference typeB  = extractInteractorType( pB );
+            CrossReference typeB = extractInteractorType( pB );
 
             if ( dbi.hasInteractorTypeB() ) {
                 dbi.getInteractorTypeB().add( typeB );
@@ -160,7 +222,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
                 if ( description.hasHostOrganisms() ) {
                     Organism hostOrganism = description.getHostOrganisms().iterator().next();
 
-                    String id = Integer.toString( hostOrganism.getNcbiTaxId());
+                    String id = Integer.toString( hostOrganism.getNcbiTaxId() );
                     String db = hostOrganism.getNames().getShortLabel();
                     CrossReference organismRef = new CrossReferenceImpl( db, id );
                     //String text = hostOrganism.getNames().getFullName();
@@ -173,14 +235,13 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
                         hos.add( organismRef );
                         dbi.setHostOrganism( hos );
                     }
-
                 }
             }
         }
 
-        for ( ExperimentDescription experiment : interaction.getExperiments() ){
+        for ( ExperimentDescription experiment : interaction.getExperiments() ) {
             for ( Attribute attribute : experiment.getAttributes() ) {
-                if( attribute.getName().equals( "dataset" ) ) {
+                if ( attribute.getName().equals( "dataset" ) ) {
                     String dataset = attribute.getValue();
 
                     if ( dbi.hasDatasetName() ) {
@@ -236,8 +297,24 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
     }
 
     /**
+     * Extracts the relevant information for the psimitab biological role.
+     *
+     * @param participant
+     * @return experimental role
+     */
+    private CrossReference extractBiologicalRole( Participant participant ) {
+
+        BiologicalRole role = participant.getBiologicalRole();
+        String id = role.getXref().getPrimaryRef().getId().split( ":" )[1];
+        String db = role.getXref().getPrimaryRef().getId().split( ":" )[0];
+        String text = role.getNames().getShortLabel();
+
+        return new CrossReferenceImpl( db, id, text );
+    }
+
+    /**
      * Extracts the relevant informations for the psimitab interactor type.
-     * 
+     *
      * @param participant
      * @return interactor type
      */
@@ -257,26 +334,60 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
      */
     private List<CrossReference> extractProperties( Participant participant ) {
         List<CrossReference> properties = new ArrayList<CrossReference>();
-        for ( DbReference dbref : participant.getInteractor().getXref().getSecondaryRef() ){
-            String id, db;
+        for ( DbReference dbref : participant.getInteractor().getXref().getSecondaryRef() ) {
+            String id, db, text = null;
 
-            if ( dbref.getId().contains( ":" ) ) {
-                id = dbref.getId().split( ":" )[1].toLowerCase();
-                db = dbref.getId().split( ":" )[0].toLowerCase();
-            } else {
-                id = dbref.getId();
-                db = dbref.getDb();
+            id = dbref.getId();
+            db = dbref.getDb();
+
+            if ( goTerm_Name_AutoCompletion && dbref.getDb().equalsIgnoreCase( "GO" ) ) {
+                if ( dbref.hasSecondary() ) {
+                    text = dbref.getSecondary();
+                } else {
+                    text = fetchGoNameFromWebservice( id );
+                }
+            }
+            if ( interpro_Name_AutoCompletion && dbref.getDb().equalsIgnoreCase( "Interpro" ) ) {
+                if ( dbref.hasSecondary() ) {
+                    text = dbref.getSecondary();
+                } else {
+                    text = fetchInterproNameFromInterproNameHandler( id );
+                }
             }
 
             if ( dbref.getRefTypeAc() == null ) {
-                properties.add( new CrossReferenceImpl( db, id ));
+                properties.add( new CrossReferenceImpl( db, id, text ) );
             } else {
-                if ( !dbref.getRefTypeAc().equals( IDENTITY_MI_REF )) {
-                    properties.add( new CrossReferenceImpl( db, id ));    
+                if ( !dbref.getRefTypeAc().equals( IDENTITY_MI_REF ) ) {
+                    properties.add( new CrossReferenceImpl( db, id, text ) );
                 }
             }
         }
         return properties;
+    }
+
+    private String fetchGoNameFromWebservice( String id ) {
+        try {
+            if ( query == null ) {
+                query = new OlsClient().getOntologyQuery();
+            }
+            return query.getTermById( id, "GO" );
+        } catch ( RemoteException e ) {
+            logger.info( "No Description for " + id + " found." );
+            return null;
+        }
+    }
+
+    private String fetchInterproNameFromInterproNameHandler( String id ) {
+        try {
+            if ( handler == null ) {
+                handler = new InterproNameHandler( getFileByResources( "/interpro-entry-local.txt", InterproNameHandler.class ) );
+            }
+            return handler.getNameById( id );
+        } catch ( NameNotFoundException e ) {
+            logger.info( "No Description for " + id + "found." );
+            return null;
+        }
     }
 
     /**
@@ -286,6 +397,9 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
 
         header.appendColumnName( "experimentalRole interactor A" );
         header.appendColumnName( "experimentalRole interactor B" );
+
+        header.appendColumnName( "biologicalRole interactor A" );
+        header.appendColumnName( "biologicalRole interactor B" );
 
         header.appendColumnName( "properties interactor A" );
         header.appendColumnName( "properties interactor B" );
@@ -312,7 +426,8 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             sb.append( TabulatedLineFormatter.formatCv( dbi.getExperimentalRolesInteractorA() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if (log.isDebugEnabled()) log.debug( "No experimentalRole for Interactor A found for " + dbi.getInteractionAcs() );
+            if ( logger.isDebugEnabled() )
+                logger.debug( "No experimentalRole for Interactor A found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
@@ -321,77 +436,103 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             sb.append( TabulatedLineFormatter.formatCv( dbi.getExperimentalRolesInteractorB() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if (log.isDebugEnabled()) log.debug( "No experimentalRole for Interactor B found for " + dbi.getInteractionAcs() );
+            if ( logger.isDebugEnabled() )
+                logger.debug( "No experimentalRole for Interactor B found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
-        // field 18 - properties of interactorA
-        if ( dbi.hasPropertiesA() ) {
-            sb.append( TabulatedLineFormatter.formatCv( dbi.getPropertiesA() ) );
+        // field 18 - biologicalRole of interactorA
+        if ( dbi.hasBiologicalRolesInteractorA() ) {
+            sb.append( TabulatedLineFormatter.formatCv( dbi.getBiologicalRolesInteractorA() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if (log.isDebugEnabled()) log.debug( "No properties for Interactor A found for " + dbi.getInteractionAcs() );
+            if ( logger.isDebugEnabled() )
+                logger.debug( "No biologicalRole for Interactor A found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
-        // field 19 - properties of interactorB
+        // field 19 - biologicalRole of interactorB
+        if ( dbi.hasBiologicalRolesInteractorB() ) {
+            sb.append( TabulatedLineFormatter.formatCv( dbi.getBiologicalRolesInteractorB() ) );
+        } else {
+            sb.append( LineFormatter.NONE );
+            if ( logger.isDebugEnabled() )
+                logger.debug( "No biologicalRole for Interactor B found for " + dbi.getInteractionAcs() );
+        }
+        sb.append( '\t' );
+
+        // field 19 - properties of interactorA
+        if ( dbi.hasPropertiesA() ) {
+            String formatedText = TabulatedLineFormatter.formatCv( dbi.getPropertiesA() );
+            sb.append( formatedText );
+        } else {
+            sb.append( LineFormatter.NONE );
+            if ( logger.isDebugEnabled() )
+                logger.debug( "No properties for Interactor A found for " + dbi.getInteractionAcs() );
+        }
+        sb.append( '\t' );
+
+        // field 20 - properties of interactorB
         if ( dbi.hasPropertiesB() ) {
             sb.append( TabulatedLineFormatter.formatCv( dbi.getPropertiesB() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if (log.isDebugEnabled()) log.debug( "No properties for Interactor B found for " + dbi.getInteractionAcs() );
+            if ( logger.isDebugEnabled() )
+                logger.debug( "No properties for Interactor B found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
-        // field 20 - interactorType of A
+        // field 21 - interactorType of A
         if ( dbi.hasInteractorTypeA() ) {
             sb.append( TabulatedLineFormatter.formatCv( dbi.getInteractorTypeA() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if (log.isDebugEnabled()) log.debug( "No interactorType for A found for " + dbi.getInteractionAcs() );
-        }
-        sb.append( '\t' );
-
-        // field 21 - interactorType of B
-        if ( dbi.hasInteractorTypeB() ){
-            sb.append( TabulatedLineFormatter.formatCv( dbi.getInteractorTypeB() ) );
-        } else {
-            sb.append( LineFormatter.NONE );
-            if (log.isDebugEnabled()) log.debug( "No interactorType for B found for " + dbi.getInteractionAcs() );
+            if ( logger.isDebugEnabled() )
+                logger.debug( "No interactorType for A found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
         // field 22 - interactorType of B
-        if ( dbi.hasHostOrganism() ){
-            sb.append( TabulatedLineFormatter.formatCv( dbi.getHostOrganism() ) );
+        if ( dbi.hasInteractorTypeB() ) {
+            sb.append( TabulatedLineFormatter.formatCv( dbi.getInteractorTypeB() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if (log.isDebugEnabled()) log.debug( "No hostOrganism found for " + dbi.getInteractionAcs() );
+            if ( logger.isDebugEnabled() )
+                logger.debug( "No interactorType for B found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
-        // field 23 - expansion method
+        // field 23 - interactorType of B
+        if ( dbi.hasHostOrganism() ) {
+            sb.append( TabulatedLineFormatter.formatCv( dbi.getHostOrganism() ) );
+        } else {
+            sb.append( LineFormatter.NONE );
+            if ( logger.isDebugEnabled() ) logger.debug( "No hostOrganism found for " + dbi.getInteractionAcs() );
+        }
+        sb.append( '\t' );
+
+        // field 24 - expansion method
         if ( dbi.hasExpansionMethod() ) {
             sb.append( dbi.getExpansionMethod() );
         } else {
             sb.append( LineFormatter.NONE );
-            if (log.isDebugEnabled()) log.debug( "No expansionMethod found for " + dbi.getInteractionAcs() );
+            if ( logger.isDebugEnabled() ) logger.debug( "No expansionMethod found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
 
-        //field 24 - dataset name
+        //field 25 - dataset name
         if ( dbi.hasDatasetName() ) {
-            sb.append( formatStringList( dbi.getDataset() )  );
+            sb.append( formatStringList( dbi.getDataset() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if (log.isDebugEnabled()) log.debug( "No dataset name found for " + dbi.getInteractionAcs() );
+            if ( logger.isDebugEnabled() ) logger.debug( "No dataset name found for " + dbi.getInteractionAcs() );
         }
         sb.append( '\t' );
     }
 
     private String formatStringList( List<String> field ) {
         StringBuffer sb = new StringBuffer( 64 );
-        if ( field != null && !field.isEmpty()) {
+        if ( field != null && !field.isEmpty() ) {
             for ( Iterator<String> iterator = field.iterator(); iterator.hasNext(); ) {
 
                 sb.append( iterator.next() );
@@ -410,61 +551,72 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
     public void parseColumn( BinaryInteractionImpl bi, Iterator columnIterator ) {
 
         IntActBinaryInteraction dbi = ( IntActBinaryInteraction ) bi;
-        Iterator<Column> iterator = columnIterator;
 
         try {
-            if ( iterator.hasNext() ) {
+            if ( ( ( Iterator<Column> ) columnIterator ).hasNext() ) {
                 // Experimental role of Interactor A
-                String field16 = iterator.next().getData();
+                String field16 = ( ( Iterator<Column> ) columnIterator ).next().getData();
                 dbi.setExperimentalRolesInteractorA( MitabLineParserUtils.parseCrossReference( field16 ) );
             }
 
-            if ( iterator.hasNext() ) {
+            if ( ( ( Iterator<Column> ) columnIterator ).hasNext() ) {
                 // Experimental role of Interactor B
-                String field17 = iterator.next().getData();
+                String field17 = ( ( Iterator<Column> ) columnIterator ).next().getData();
                 dbi.setExperimentalRolesInteractorB( MitabLineParserUtils.parseCrossReference( field17 ) );
             }
 
-            if ( iterator.hasNext() ) {
+            if ( ( ( Iterator<Column> ) columnIterator ).hasNext() ) {
+                // Biological role of Interactor A
+                String field18 = ( ( Iterator<Column> ) columnIterator ).next().getData();
+                dbi.setBiologicalRolesInteractorA( MitabLineParserUtils.parseCrossReference( field18 ) );
+            }
+
+            if ( ( ( Iterator<Column> ) columnIterator ).hasNext() ) {
+                // Biological role of Interactor B
+                String field19 = ( ( Iterator<Column> ) columnIterator ).next().getData();
+                dbi.setBiologicalRolesInteractorB( MitabLineParserUtils.parseCrossReference( field19 ) );
+            }
+
+            if ( ( ( Iterator<Column> ) columnIterator ).hasNext() ) {
                 // Properties of Interactor A
-                String field18 = iterator.next().getData();
-                dbi.setPropertiesA( MitabLineParserUtils.parseCrossReference( field18 ) );
+                String field20 = ( ( Iterator<Column> ) columnIterator ).next().getData();
+                dbi.setPropertiesA( MitabLineParserUtils.parseCrossReference( field20 ) );
             }
 
-            if ( iterator.hasNext() ) {
+            if ( ( ( Iterator<Column> ) columnIterator ).hasNext() ) {
                 // Properties of Interactor B
-                String field19 = iterator.next().getData();
-                dbi.setPropertiesB( MitabLineParserUtils.parseCrossReference( field19 ) );
+                String field21 = ( ( Iterator<Column> ) columnIterator ).next().getData();
+                dbi.setPropertiesB( MitabLineParserUtils.parseCrossReference( field21 ) );
             }
 
-            if ( iterator.hasNext() ) {
+            if ( ( ( Iterator<Column> ) columnIterator ).hasNext() ) {
                 // InteractorType of A
-                String field20 = iterator.next().getData();
-                dbi.setInteractorTypeA( MitabLineParserUtils.parseCrossReference( field20 ) );
+                String field22 = ( ( Iterator<Column> ) columnIterator ).next().getData();
+                dbi.setInteractorTypeA( MitabLineParserUtils.parseCrossReference( field22 ) );
             }
 
-            if ( iterator.hasNext() ) {
+            if ( ( ( Iterator<Column> ) columnIterator ).hasNext() ) {
                 // InteractorType of B
-                String field21 = iterator.next().getData();
-                dbi.setInteractorTypeB( MitabLineParserUtils.parseCrossReference( field21 ) );
+                String field23 = ( ( Iterator<Column> ) columnIterator ).next().getData();
+                dbi.setInteractorTypeB( MitabLineParserUtils.parseCrossReference( field23 ) );
             }
 
-            if ( iterator.hasNext() ) {
+            if ( ( ( Iterator<Column> ) columnIterator ).hasNext() ) {
                 // HostOrganism
-                String field22 = iterator.next().getData();
-                dbi.setHostOrganism( MitabLineParserUtils.parseCrossReference( field22 ) );
+                String field24 = ( ( Iterator<Column> ) columnIterator ).next().getData();
+                dbi.setHostOrganism( MitabLineParserUtils.parseCrossReference( field24 ) );
             }
 
-            if ( iterator.hasNext() ) {
+            if ( ( ( Iterator<Column> ) columnIterator ).hasNext() ) {
                 // Expansion method
-                String field23 = iterator.next().getData();
-                dbi.setExpansionMethod( field23 );
+                String field25 = ( ( Iterator<Column> ) columnIterator ).next().getData();
+                dbi.setExpansionMethod( field25 );
             }
 
-            if ( iterator.hasNext() ) {
+            if ( ( ( Iterator<Column> ) columnIterator ).hasNext() ) {
                 // dataset name
-                String field24 = iterator.next().getData();
-                dbi.setDataset( parseStringList( field24 ) );
+                String field26 = ( ( Iterator<Column> ) columnIterator ).next().getData();
+                dbi.setDataset( parseStringList( field26 ) );
             }
 
         } catch ( MitabLineException e ) {
@@ -489,40 +641,50 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             String field17 = st.nextToken();
             dbi.setExperimentalRolesInteractorB( MitabLineParserUtils.parseCrossReference( field17 ) );
 
-            // Properties of Interactor A
+            // Biological role of Interactor A
             if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 18 + " must not be empty." );
             String field18 = st.nextToken();
-            dbi.setPropertiesA( MitabLineParserUtils.parseCrossReference( field18 ) );
+            dbi.setBiologicalRolesInteractorA( MitabLineParserUtils.parseCrossReference( field18 ) );
 
-            // Properties of Interactor B
+            // Biological role of Interactor B
             if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 19 + " must not be empty." );
             String field19 = st.nextToken();
-            dbi.setPropertiesB( MitabLineParserUtils.parseCrossReference( field19 ) );
+            dbi.setBiologicalRolesInteractorB( MitabLineParserUtils.parseCrossReference( field19 ) );
 
-            // InteractorType of A
+            // Properties of Interactor A
             if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 20 + " must not be empty." );
             String field20 = st.nextToken();
-            dbi.setInteractorTypeA( MitabLineParserUtils.parseCrossReference( field20 ) );
+            dbi.setPropertiesA( MitabLineParserUtils.parseCrossReference( field20 ) );
 
-            // InteractorType of B
+            // Properties of Interactor B
             if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 21 + " must not be empty." );
             String field21 = st.nextToken();
-            dbi.setInteractorTypeB( MitabLineParserUtils.parseCrossReference( field21 ) );
+            dbi.setPropertiesB( MitabLineParserUtils.parseCrossReference( field21 ) );
 
-            // hostOrganism
+            // InteractorType of A
             if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 22 + " must not be empty." );
             String field22 = st.nextToken();
-            dbi.setHostOrganism( MitabLineParserUtils.parseCrossReference( field22 ) );
+            dbi.setInteractorTypeA( MitabLineParserUtils.parseCrossReference( field22 ) );
 
-            // expansion method
+            // InteractorType of B
             if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 23 + " must not be empty." );
             String field23 = st.nextToken();
-            dbi.setExpansionMethod( field23 );
+            dbi.setInteractorTypeB( MitabLineParserUtils.parseCrossReference( field23 ) );
+
+            // hostOrganism
+            if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 24 + " must not be empty." );
+            String field24 = st.nextToken();
+            dbi.setHostOrganism( MitabLineParserUtils.parseCrossReference( field24 ) );
+
+            // expansion method
+            if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 25 + " must not be empty." );
+            String field25 = st.nextToken();
+            dbi.setExpansionMethod( field25 );
 
             // dataset name
-            if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 24 + " must not be empty.");
-            String field24 = st.nextToken() ;
-            dbi.setDataset( parseStringList( field24 ));
+            if ( !st.hasMoreTokens() ) throw new MitabLineException( "Column " + 26 + " must not be empty." );
+            String field26 = st.nextToken();
+            dbi.setDataset( parseStringList( field26 ) );
 
         } catch ( MitabLineException e ) {
             e.printStackTrace();
@@ -559,7 +721,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
 
             // add new ExperimentalRoles
             if ( !pA.getExperimentalRoles().add( experimentalRole ) ) {
-                if (log.isDebugEnabled()) log.debug( "ExperimentalRole couldn't add to the participant" );
+                if ( logger.isDebugEnabled() ) logger.debug( "ExperimentalRole couldn't add to the participant" );
             }
         }
 
@@ -572,8 +734,24 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
 
             // add new ExperimentalRoles
             if ( !pB.getExperimentalRoles().add( experimentalRole ) ) {
-                if (log.isDebugEnabled()) log.debug( "ExperimentalRole couldn't add to the participant" );
+                if ( logger.isDebugEnabled() ) logger.debug( "ExperimentalRole couldn't add to the participant" );
             }
+        }
+
+        if ( dbi.hasBiologicalRolesInteractorA() ) {
+            // create new BiologicalRole
+            BiologicalRole biologicalRole = updateBiologicalRoles( dbi.getBiologicalRolesInteractorA(), index );
+
+            // set new BiologicalRoles
+            pA.setBiologicalRole( biologicalRole );
+        }
+
+        if ( dbi.hasBiologicalRolesInteractorB() ) {
+            // create new ExperimentalRoles
+            BiologicalRole biologicalRole = updateBiologicalRoles( dbi.getBiologicalRolesInteractorB(), index );
+
+            // set new ExperimentalRoles
+            pB.setBiologicalRole( biologicalRole );
         }
 
         try {
@@ -588,12 +766,12 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             }
 
             if ( dbi.hasPropertiesA() ) {
-                Collection<DbReference> secDbRef = getSecondaryRefs(dbi.getPropertiesA());
+                Collection<DbReference> secDbRef = getSecondaryRefs( dbi.getPropertiesA() );
                 iA.getXref().getSecondaryRef().addAll( secDbRef );
             }
 
             if ( dbi.hasPropertiesB() ) {
-                Collection<DbReference> secDbRef = getSecondaryRefs(dbi.getPropertiesB());
+                Collection<DbReference> secDbRef = getSecondaryRefs( dbi.getPropertiesB() );
                 iB.getXref().getSecondaryRef().addAll( secDbRef );
             }
 
@@ -633,6 +811,38 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         return new ExperimentalRole( names, experimentalXref );
     }
 
+    private BiologicalRole updateBiologicalRoles( List<CrossReference> biologicalRoles, int index ) {
+        // now create the new BiologicalRole
+        String roleA = biologicalRoles.get( index ).getText();
+        String dbA = biologicalRoles.get( index ).getDatabase().concat( ":".concat( biologicalRoles.get( 0 ).getIdentifier() ) );
+
+        Names names = new Names();
+        if ( roleA == null ) {
+            names.setShortLabel( "unspecified role" );
+            names.setFullName( "unspecified role" );
+        } else {
+            names.setShortLabel( roleA );
+            names.setFullName( roleA );
+        }
+
+        DbReference dbRef = new DbReference();
+        dbRef.setDb( "psi-mi" );
+        if ( dbA == null ) {
+            dbRef.setId( "MI:0499" );
+        } else {
+            dbRef.setId( dbA );
+        }
+
+        dbRef.setDbAc( "MI:0488" );
+        dbRef.setRefType( "identity" );
+        dbRef.setRefTypeAc( "MI:0356" );
+
+        Xref biologicalXref = new Xref( dbRef );
+
+        return new BiologicalRole();
+        //return new BiologicalRole( names, biologicalXref );
+    }
+
     private Collection<DbReference> getSecondaryRefs( List<CrossReference> properties ) {
         Collection<DbReference> refs = new ArrayList();
         for ( CrossReference property : properties ) {
@@ -656,7 +866,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             if ( property.hasText() ) {
                 secDbRef.setSecondary( property.getText() );
             }
-            refs.add(secDbRef);
+            refs.add( secDbRef );
         }
         return refs;
     }
@@ -687,48 +897,54 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
      * @param targets
      */
     public void mergeCollection( BinaryInteractionImpl interaction, BinaryInteractionImpl targets ) {
-        
-        IntActBinaryInteraction source =  (IntActBinaryInteraction) interaction;
-        IntActBinaryInteraction target =  (IntActBinaryInteraction) targets;
+
+        IntActBinaryInteraction source = ( IntActBinaryInteraction ) interaction;
+        IntActBinaryInteraction target = ( IntActBinaryInteraction ) targets;
 
         if ( source.hasExperimentalRolesInteractorA() )
-            mergeCrossReference( source.getExperimentalRolesInteractorA(), target.getExperimentalRolesInteractorA());
+            mergeCrossReference( source.getExperimentalRolesInteractorA(), target.getExperimentalRolesInteractorA() );
 
         if ( source.hasExperimentalRolesInteractorB() )
-            mergeCrossReference( source.getExperimentalRolesInteractorB(), target.getExperimentalRolesInteractorB());
+            mergeCrossReference( source.getExperimentalRolesInteractorB(), target.getExperimentalRolesInteractorB() );
+
+        if ( source.hasBiologicalRolesInteractorA() )
+            mergeCrossReference( source.getBiologicalRolesInteractorA(), target.getBiologicalRolesInteractorA() );
+
+        if ( source.hasBiologicalRolesInteractorB() )
+            mergeCrossReference( source.getBiologicalRolesInteractorB(), target.getBiologicalRolesInteractorB() );
 
         if ( source.hasHostOrganism() )
-            mergeCrossReference( source.getHostOrganism(), target.getHostOrganism());
+            mergeCrossReference( source.getHostOrganism(), target.getHostOrganism() );
 
-        if ( source.hasDatasetName() && target.hasDatasetName() ){
-            mergeString( source.getDataset(), target.getDataset());
+        if ( source.hasDatasetName() && target.hasDatasetName() ) {
+            mergeString( source.getDataset(), target.getDataset() );
         }
 
     }
 
-    private void mergeCrossReference(Collection<CrossReference> source, Collection<CrossReference> target ){
+    private void mergeCrossReference( Collection<CrossReference> source, Collection<CrossReference> target ) {
 
         if ( source == null ) throw new IllegalArgumentException( "Source collection must not be null." );
 
         if ( target == null ) throw new IllegalArgumentException( "Target collection must not be null." );
 
-        if ( source == target ) throw new IllegalStateException( );
+        if ( source == target ) throw new IllegalStateException();
 
-        for ( CrossReference s : source) {
+        for ( CrossReference s : source ) {
             // Repeat of objects are a necessity (eg. for detection method across multiple publications)
             target.add( s );
         }
     }
 
-    private void mergeString(Collection<String> source, Collection<String> target ){
+    private void mergeString( Collection<String> source, Collection<String> target ) {
 
         if ( source == null ) throw new IllegalArgumentException( "Source collection must not be null." );
 
         if ( target == null ) throw new IllegalArgumentException( "Target collection must not be null." );
 
-        if ( source == target ) throw new IllegalStateException( );
+        if ( source == target ) throw new IllegalStateException();
 
-        for ( String s : source) {
+        for ( String s : source ) {
             // Repeat of objects are a necessity (eg. for detection method across multiple publications)
             target.add( s );
         }
@@ -744,5 +960,17 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         if ( bi instanceof IntActBinaryInteraction ) {
             ( ( IntActBinaryInteraction ) bi ).setExpansionMethod( expansionStrategy.getName() );
         }
+    }
+
+
+    public static File getFileByResources( String fileName, Class clazz ) {
+        URL url = clazz.getResource( fileName );
+        String strFile = url.getFile();
+        try {
+            return new File( URLDecoder.decode( strFile, "utf-8" ) );
+        } catch ( UnsupportedEncodingException e ) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
