@@ -45,10 +45,10 @@ public class Playground {
 
     public static void main(String[] args) throws Exception{
 
-        IntactContext.initStandaloneContext(new File(Playground.class.getResource("/postgres-hibernate.cfg.xml").getFile()));
+        IntactContext.initStandaloneContext(new File(Playground.class.getResource("/d003-hibernate.cfg.xml").getFile()));
 
-        IntactOntology ontology = OboUtils.createOntologyFromOboLatestPsiMi();
-        new CvUpdater(ontology).createOrUpdateCVs();
+        //IntactOntology ontology = OboUtils.createOntologyFromOboLatestPsiMi();
+        //new CvUpdater(ontology).createOrUpdateCVs();
 
         CvXrefQualifier qual = getDataContext().getDaoFactory().getCvObjectDao(CvXrefQualifier.class).getByPsiMiRef(CvXrefQualifier.IDENTITY_MI_REF);
         CvDatabase psiMi = getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class).getByPsiMiRef(CvDatabase.PSI_MI_MI_REF);
@@ -71,7 +71,7 @@ public class Playground {
                 .getInstitutionDao().getShortLabelsLike("%"));
 
 
-        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-all-with-intact/");
+        File repoDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-mintdip/");
         Repository repo = ImexRepositoryContext.openRepository(repoDir.toString());
 
         ImexImporter importer = new ImexImporter(repo);
