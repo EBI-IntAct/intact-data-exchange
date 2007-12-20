@@ -36,13 +36,13 @@ import java.util.Iterator;
 public class Playground {
 
     public static void main(String[] args) throws Exception {
-        File fileToImport = new File("/tmp/export_test_20071109.xml");
+        File fileToImport = new File("/ebi/sp/pro6/intact/local/data/curation-material/whitworth-2007/whitworth2007.xml");
 
         Properties props = new Properties();
         props.put(IntactEnvironment.INSTITUTION_LABEL.getFqn(), "ebi");
         props.put(IntactEnvironment.AC_PREFIX_PARAM_NAME.getFqn(), "EBI");
 
-        File hibernateFile = new File(Playground.class.getResource("/playground-hibernate.cfg.xml").getFile());
+        File hibernateFile = new File(Playground.class.getResource("/d003-hibernate.cfg.xml").getFile());
 
         IntactContext.initStandaloneContext(hibernateFile);
         IntactContext.getCurrentInstance().getUserContext().setUserId("BARANDA");
@@ -56,13 +56,14 @@ public class Playground {
 
         InputStream is = new FileInputStream(fileToImport);
 
-        StringWriter writer = new StringWriter();
+        File tempFile = File.createTempFile("psiToImport-", ".xml");
+        Writer writer = new FileWriter(tempFile);
 
         PsiEnricher.enrichPsiXml(is, writer, enricherConfig);
 
         writer.flush();
 
-        InputStream enricherInput = new ByteArrayInputStream(writer.toString().getBytes());
+        InputStream enricherInput = new FileInputStream(tempFile);
 
         int interactionsBefore = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getInteractionDao().countAll();
