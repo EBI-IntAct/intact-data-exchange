@@ -16,12 +16,16 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.*;
+import psidev.psi.mi.xml.model.Alias;
+import psidev.psi.mi.xml.model.Interaction;
+import psidev.psi.mi.xml.model.Range;
+import psidev.psi.mi.xml.model.Confidence;
+import psidev.psi.mi.xml.model.Xref;
+import psidev.psi.mi.xml.model.Feature;
+import psidev.psi.mi.xml.model.Interactor;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
-import uk.ac.ebi.intact.model.CvAliasType;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.CvInteractorType;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.model.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,7 +152,8 @@ public class PsiMockFactory {
         participant.getExperimentalRoles().add(createCvType(ExperimentalRole.class));
 
         participant.getExperimentalPreparations().add(createCvType(ExperimentalPreparation.class));
-        participant.getParticipantIdentificationMethods().add(createCvType(ParticipantIdentificationMethod.class));
+
+        participant.getParticipantIdentificationMethods().add(createCvType(ParticipantIdentificationMethod.class, CvIdentification.PREDETERMINED_MI_REF, CvIdentification.PREDETERMINED));
 
         for (int i=0; i<childRandom(); i++) {
             participant.getFeatures().add(createFeature());

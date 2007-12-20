@@ -19,7 +19,18 @@ import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Interaction;
+
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * TODO comment this
@@ -28,6 +39,11 @@ import uk.ac.ebi.intact.model.*;
  * @version $Id$
  */
 public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experiment, ExperimentDescription> {
+
+    /**
+     * Sets up a logger for that class.
+     */
+    private static final Log log = LogFactory.getLog(ExperimentConverter.class);
 
     public ExperimentConverter(Institution institution) {
         super(institution, Experiment.class, ExperimentDescription.class);

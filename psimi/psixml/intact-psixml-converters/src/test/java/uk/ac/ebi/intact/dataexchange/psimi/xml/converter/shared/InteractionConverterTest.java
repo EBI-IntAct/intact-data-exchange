@@ -18,10 +18,16 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.Interaction;
+import psidev.psi.mi.xml.model.ExperimentDescription;
+import psidev.psi.mi.xml.model.Participant;
+import psidev.psi.mi.xml.model.ParticipantIdentificationMethod;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.CvIdentification;
+import uk.ac.ebi.intact.model.Experiment;
 
 /**
  * TODO comment this
@@ -55,6 +61,68 @@ public class InteractionConverterTest {
     public void psiToIntact_noInteractionType() throws Exception {
         Interaction psiInteraction = PsiMockFactory.createMockInteraction();
         psiInteraction.getInteractionTypes().clear();
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
+    }
+
+    @Test
+    public void psiToIntact_noPartDetMethodInExp() throws Exception {
+        Interaction psiInteraction = PsiMockFactory.createMockInteraction();
+
+        for (ExperimentDescription expDesc : psiInteraction.getExperiments()) {
+            expDesc.setParticipantIdentificationMethod(null);
+        }
+
+        for (Participant part : psiInteraction.getParticipants()) {
+            part.getParticipantIdentificationMethods().clear();
+            part.getParticipantIdentificationMethods().add(PsiMockFactory.createCvType(ParticipantIdentificationMethod.class, CvIdentification.PREDETERMINED_MI_REF, CvIdentification.PREDETERMINED));
+        }
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
+
+        Assert.assertNotNull(interaction.getCvInteractionType());
+
+        for (Experiment exp : interaction.getExperiments()) {
+            Assert.assertNotNull(exp.getCvIdentification());
+            Assert.assertEquals(CvIdentification.PREDETERMINED_MI_REF, exp.getCvIdentification().getMiIdentifier());
+        }
+    }
+    
+    @Test
+    public void psiToIntact_partDetMethodInExp() throws Exception {
+        Interaction psiInteraction = PsiMockFactory.createMockInteraction();
+
+        for (ExperimentDescription expDesc : psiInteraction.getExperiments()) {
+            expDesc.setParticipantIdentificationMethod(PsiMockFactory.createCvType(ParticipantIdentificationMethod.class, "MI:0000", "hello"));
+        }
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
+
+        Assert.assertNotNull(interaction.getCvInteractionType());
+
+        for (Experiment exp : interaction.getExperiments()) {
+            Assert.assertNotNull(exp.getCvIdentification());
+            Assert.assertEquals("MI:0000", exp.getCvIdentification().getMiIdentifier());
+        }
+    }
+
+    @Test (expected = UnsupportedConversionException.class)
+    public void psiToIntact_noPartDetMethodInExp_differentDetMethods() throws Exception {
+        Interaction psiInteraction = PsiMockFactory.createMockInteraction();
+
+        for (ExperimentDescription expDesc : psiInteraction.getExperiments()) {
+            expDesc.setParticipantIdentificationMethod(null);
+        }
+
+        int i=0;
+        for (Participant part : psiInteraction.getParticipants()) {
+            part.getParticipantIdentificationMethods().clear();
+            part.getParticipantIdentificationMethods().add(PsiMockFactory.createCvType(ParticipantIdentificationMethod.class, "MI:"+i, "lala"));
+            i++;
+        }
 
         InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
         uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);

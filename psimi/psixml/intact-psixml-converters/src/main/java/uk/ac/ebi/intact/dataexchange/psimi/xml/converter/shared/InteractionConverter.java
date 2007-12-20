@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -29,6 +30,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+
 /**
  * TODO comment this
  *
@@ -36,6 +40,11 @@ import java.util.List;
  * @version $Id$
  */
 public class InteractionConverter extends AbstractAnnotatedObjectConverter<Interaction, psidev.psi.mi.xml.model.Interaction> {
+
+    /**
+     * Sets up a logger for that class.
+     */
+    private static final Log log = LogFactory.getLog(InteractionConverter.class);
 
     public InteractionConverter(Institution institution) {
         super(institution, InteractionImpl.class, psidev.psi.mi.xml.model.Interaction.class);
@@ -82,6 +91,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
            Confidence confidence = confConverter.psiToIntact( psiConfidence );
             interaction.addConfidence( confidence);
         }
+
+        // update experiment participant detection method if necessary
+        updateExperimentParticipantDetectionMethod(interaction);
 
         failIfInconsistentConversion(interaction, psiObject);
 
@@ -146,6 +158,27 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         failIfInconsistentConversion(intactObject, interaction);
 
         return interaction;
+    }
+
+    private void updateExperimentParticipantDetectionMethod(Interaction interaction) {
+        for (Experiment experiment : interaction.getExperiments()) {
+            if (experiment.getCvIdentification() == null) {
+                for (Component component : interaction.getComponents() ) {
+                    for (CvIdentification partDetMethod : component.getParticipantDetectionMethods()) {
+                        if (experiment.getCvIdentification() != null && !experiment.getCvIdentification().getMiIdentifier().equals(partDetMethod.getMiIdentifier())) {
+                            throw new UnsupportedConversionException("Cannot convert an experiment that does not have participant " +
+                                  "detection method defined and its participants have different detection methods: Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"'");
+                        } else {
+                            experiment.setCvIdentification(partDetMethod);
+                        }
+                    }
+                }
+
+                if (experiment.getCvIdentification() == null) {
+                    log.error("Experiment without CvIdentification (participant detection method): Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"'");
+                }
+            }
+        }
     }
 
     protected Collection<Experiment> getExperiments(psidev.psi.mi.xml.model.Interaction psiInteraction) {

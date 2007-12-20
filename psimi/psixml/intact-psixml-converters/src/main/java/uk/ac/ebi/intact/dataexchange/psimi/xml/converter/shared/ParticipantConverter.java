@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -117,7 +118,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         CvBiologicalRole biologicalRole = new BiologicalRoleConverter(institution).psiToIntact(psiBioRole);
 
         if (participant.getExperimentalRoles().size() > 1) {
-            throw new PsiConversionException("Cannot convert participants with more than one experimental role: "+participant);
+            throw new UnsupportedConversionException("Cannot convert participants with more than one experimental role: "+participant);
         }
 
         // only the first experimental role
