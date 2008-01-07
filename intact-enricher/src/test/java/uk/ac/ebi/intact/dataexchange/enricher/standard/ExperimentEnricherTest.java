@@ -23,6 +23,7 @@ import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Publication;
 import uk.ac.ebi.intact.model.CvInteraction;
+import uk.ac.ebi.intact.model.CvIdentification;
 import uk.ac.ebi.intact.model.clone.IntactCloner;
 
 /**
@@ -70,6 +71,20 @@ public class ExperimentEnricherTest extends IntactBasicTestCase {
         enricher.enrich(experiment);
 
         Assert.assertEquals("ecoli", experiment.getBioSource().getShortLabel());
+    }
+
+    @Test
+    public void enrich_noDetectionMethod() {
+        Experiment experiment = getMockBuilder().createExperimentRandom(2);
+        experiment.getBioSource().setTaxId("83333");
+        experiment.setCvIdentification(null);
+
+        Assert.assertNull(experiment.getCvIdentification());
+
+        enricher.enrich(experiment);
+
+        Assert.assertNotNull(experiment.getCvIdentification());
+        Assert.assertEquals(CvIdentification.PREDETERMINED_MI_REF, experiment.getCvIdentification().getMiIdentifier());
     }
 
 }
