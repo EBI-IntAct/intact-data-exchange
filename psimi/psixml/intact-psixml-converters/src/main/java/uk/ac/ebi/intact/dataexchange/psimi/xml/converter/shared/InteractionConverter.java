@@ -15,7 +15,12 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
+import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
+import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
@@ -26,12 +31,7 @@ import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+import java.util.*;
 
 /**
  * TODO comment this
@@ -45,6 +45,21 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
      * Sets up a logger for that class.
      */
     private static final Log log = LogFactory.getLog(InteractionConverter.class);
+
+    private static ThreadLocal<IntactOntology> ontology = new ThreadLocal<IntactOntology>();
+
+    private static IntactOntology getCurrentOntology() {
+        if (ontology.get() == null) {
+            if (log.isDebugEnabled()) log.debug("Initializing Intact ontology lazily");
+            try {
+                ontology.set(OboUtils.createOntologyFromOboLatestPsiMi());
+            } catch (Exception e) {
+                throw new IllegalStateException("Could not load ontology");
+            }
+        }
+
+        return ontology.get();
+    }
 
     public InteractionConverter(Institution institution) {
         super(institution, InteractionImpl.class, psidev.psi.mi.xml.model.Interaction.class);
@@ -163,22 +178,56 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     private void updateExperimentParticipantDetectionMethod(Interaction interaction) {
         for (Experiment experiment : interaction.getExperiments()) {
             if (experiment.getCvIdentification() == null) {
-                for (Component component : interaction.getComponents() ) {
-                    for (CvIdentification partDetMethod : component.getParticipantDetectionMethods()) {
-                        if (experiment.getCvIdentification() != null && !experiment.getCvIdentification().getMiIdentifier().equals(partDetMethod.getMiIdentifier())) {
-                            throw new UnsupportedConversionException("Cannot convert an experiment that does not have participant " +
-                                  "detection method defined and its participants have different detection methods: Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"', Det. Methods: "+component.getParticipantDetectionMethods());
-                        } else {
-                            experiment.setCvIdentification(partDetMethod);
-                        }
-                    }
+
+                String partDetMethod = calculateParticipantDetMethod(interaction.getComponents());
+
+                if (partDetMethod != null) {
+                    if (log.isWarnEnabled())
+                        log.warn("Experiment without participant detection method. One was calculated from the components: " + partDetMethod);
+
+                    CvIdentification detMethod = CvObjectUtils.createCvObject(experiment.getOwner(), CvIdentification.class, partDetMethod, "undefined");
+                    experiment.setCvIdentification(detMethod);
                 }
+
+                /*
+               for (Component component : interaction.getComponents() ) {
+                   for (CvIdentification partDetMethod : component.getParticipantDetectionMethods()) {
+                       if (experiment.getCvIdentification() != null && !experiment.getCvIdentification().getMiIdentifier().equals(partDetMethod.getMiIdentifier())) {
+                           log.warn("Cannot convert an experiment that does not have participant " +
+                                 "detection method defined and its participants have different detection methods: Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"', Det. Methods: "+component.getParticipantDetectionMethods());
+                       } else {
+                           experiment.setCvIdentification(partDetMethod);
+                       }
+                   }
+               } */
 
                 if (experiment.getCvIdentification() == null) {
                     throw new UnsupportedConversionException("Experiment without CvIdentification (participant detection method) and its participants do not have one either: Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"'");
                 }
             }
         }
+    }
+
+     private String calculateParticipantDetMethod(Collection<Component> components) {
+        Set<String> detMethodMis = new HashSet<String>();
+
+         for (Component component : components) {
+             for (CvIdentification partDetMethod : component.getParticipantDetectionMethods()) {
+                 if (partDetMethod.getMiIdentifier() != null) {
+                     detMethodMis.add(partDetMethod.getMiIdentifier());
+                 }
+             }
+         }
+
+        if (detMethodMis.size() == 1) {
+            return detMethodMis.iterator().next();
+        } else if (detMethodMis.size() > 1) {
+            return CvUtils.findLowestCommonAncestor(getCurrentOntology(), detMethodMis.toArray(new String[detMethodMis.size()]));
+        }
+
+        log.error("No participant detection methods found for components in experiment");
+
+        return null;
     }
 
     protected Collection<Experiment> getExperiments(psidev.psi.mi.xml.model.Interaction psiInteraction) {

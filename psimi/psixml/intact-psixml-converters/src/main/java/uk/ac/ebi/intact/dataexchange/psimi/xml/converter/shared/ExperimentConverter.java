@@ -15,22 +15,14 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Interaction;
-
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * TODO comment this
@@ -81,7 +73,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         final DbReference primaryRef = psiObject.getBibref().getXref().getPrimaryRef();
         if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(primaryRef.getRefTypeAc()) ||
             !CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())) {
-            throw new UnsupportedConversionException("Bibref in ExperimentDescription [PSI Id="+psiObject.getId()+"] " +
+            log.error("Bibref in ExperimentDescription [PSI Id="+psiObject.getId()+"] " +
                                                      "should be a primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
                                                      "with points to Pubmed (dbAc="+ CvDatabase.PUBMED_MI_REF+"): "+primaryRef);
         }
