@@ -20,10 +20,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.model.Publication;
-import uk.ac.ebi.intact.model.CvInteraction;
-import uk.ac.ebi.intact.model.CvIdentification;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.clone.IntactCloner;
 
 /**
@@ -85,6 +82,22 @@ public class ExperimentEnricherTest extends IntactBasicTestCase {
 
         Assert.assertNotNull(experiment.getCvIdentification());
         Assert.assertEquals(CvIdentification.PREDETERMINED_MI_REF, experiment.getCvIdentification().getMiIdentifier());
+    }
+
+    @Test
+    public void enrich_wrongPubmedXrefQual() {
+        Experiment experiment = getMockBuilder().createExperimentEmpty();
+        experiment.getBioSource().setTaxId("83333");
+        experiment.setPublication(null);
+        experiment.getXrefs().clear();
+
+        CvDatabase pubmed = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.PUBMED_MI_REF, CvDatabase.PUBMED);
+        experiment.addXref(getMockBuilder().createIdentityXref(experiment, "15733859", pubmed));
+
+        enricher.enrich(experiment);
+
+        Assert.assertEquals("kang-2005", experiment.getShortLabel());
+        Assert.assertEquals(CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, experiment.getXrefs().iterator().next().getCvXrefQualifier().getMiIdentifier());
     }
 
 }

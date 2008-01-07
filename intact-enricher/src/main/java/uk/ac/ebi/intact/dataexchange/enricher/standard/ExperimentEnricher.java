@@ -15,13 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
-import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.CvIdentification;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.ExperimentUtils;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.CvObjectBuilder;
 import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
 import uk.ac.ebi.intact.util.cdb.InvalidPubmedException;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
@@ -73,6 +71,10 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
             cvObjectEnricher.enrich(objectToEnrich.getCvInteraction());
         }
 
+        // fix wrong xref qualifiers in pubmed xrefs if necessary
+        fixPubmedXrefIfNecessary(objectToEnrich);
+
+        // populate the experiment using the pubmed id
         String pubmedId = ExperimentUtils.getPubmedId(objectToEnrich);
         try {
             populateExperiment(objectToEnrich, pubmedId);
@@ -96,6 +98,8 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         if (objectToEnrich.getCvIdentification() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvIdentification());
         }
+
+
 
         super.enrich(objectToEnrich);
     }
@@ -133,5 +137,20 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         log.error("No participant detection methods found for components in experiment");
 
         return null;
+    }
+
+    protected void fixPubmedXrefIfNecessary(Experiment experiment) {
+        for (ExperimentXref xref : experiment.getXrefs()) {
+            if (CvDatabase.PUBMED_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
+                if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getMiIdentifier())) {
+                    log.warn("Fixing wrong xref qualifier for xref to pubmed: "+xref.getCvXrefQualifier().getShortLabel());
+
+                    CvXrefQualifier primaryRef = CvObjectUtils.createCvObject(experiment.getOwner(), CvXrefQualifier.class, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE);
+                    CvObjectEnricher.getInstance().enrich(primaryRef);
+
+                    xref.setCvXrefQualifier(primaryRef);
+                }
+            }
+        }
     }
 }
