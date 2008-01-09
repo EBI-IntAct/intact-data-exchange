@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import uk.ac.ebi.intact.model.AnnotatedObject;
 import uk.ac.ebi.intact.model.Xref;
+import uk.ac.ebi.intact.model.Institution;
 
 /**
  * TODO comment this
@@ -34,6 +35,10 @@ public abstract class AnnotatedObjectEnricher<T extends AnnotatedObject<?,?>> im
                 cvObjectEnricher.enrich(xref.getCvXrefQualifier());
             }
             cvObjectEnricher.enrich(xref.getCvDatabase());
+        }
+
+        if (!(objectToEnrich instanceof Institution)) {
+            InstitutionEnricher.getInstance().enrich(objectToEnrich.getOwner());
         }
     }
 
