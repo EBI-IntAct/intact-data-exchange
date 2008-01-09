@@ -4,14 +4,13 @@
 package uk.ac.ebi.intact.psimitab.search;
 
 import org.apache.lucene.store.Directory;
+import psidev.psi.mi.search.column.DefaultColumnSet;
 import psidev.psi.mi.search.engine.impl.FastSearchEngine;
 import psidev.psi.mi.search.util.DocumentBuilder;
-import psidev.psi.mi.search.column.DefaultColumnSet;
+import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
 
 import java.io.File;
 import java.io.IOException;
-
-import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
 
 /**
  * A Search Engine based on lucene

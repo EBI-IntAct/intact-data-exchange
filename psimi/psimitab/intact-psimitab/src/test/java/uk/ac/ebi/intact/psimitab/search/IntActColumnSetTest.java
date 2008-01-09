@@ -24,22 +24,22 @@ public class IntActColumnSetTest {
 		assertNotNull(columnSet.getPsimiTabColumns());
 		assertEquals(26, columnSet.getPsimiTabColumns().size());
 		
-		assertEquals("experimentalRole interactor A", columnSet.getByOrder(15).getColumnName());
-		assertEquals("experimentalRole interactor B", columnSet.getByOrder(16).getColumnName());
+		assertEquals("Experimental role(s) interactor A", columnSet.getByOrder(15).getColumnName());
+		assertEquals("Experimental role(s) interactor B", columnSet.getByOrder(16).getColumnName());
 
-		assertEquals("biologicalRole interactor A", columnSet.getByOrder(17).getColumnName());
-		assertEquals("biologicalRole interactor B", columnSet.getByOrder(18).getColumnName());
+		assertEquals("Biological role(s) interactor A", columnSet.getByOrder(17).getColumnName());
+		assertEquals("Biological role(s) interactor B", columnSet.getByOrder(18).getColumnName());
 
-        assertEquals("properties interactor A", columnSet.getByOrder(19).getColumnName());
-		assertEquals("properties interactor B", columnSet.getByOrder(20).getColumnName());
+        assertEquals("Properties interactor A", columnSet.getByOrder(19).getColumnName());
+		assertEquals("Properties interactor B", columnSet.getByOrder(20).getColumnName());
 
-		assertEquals("interactorType of A", columnSet.getByOrder(21).getColumnName());
-		assertEquals("interactorType of B", columnSet.getByOrder(22).getColumnName());
+		assertEquals("Type(s) interactor A", columnSet.getByOrder(21).getColumnName());
+		assertEquals("Type(s) interactor B", columnSet.getByOrder(22).getColumnName());
 
-		assertEquals("hostOrganism", columnSet.getByOrder(23).getColumnName());
+		assertEquals("HostOrganism(s)", columnSet.getByOrder(23).getColumnName());
 
-		assertEquals("expansion method", columnSet.getByOrder(24).getColumnName());
+		assertEquals("Expansion method(s)", columnSet.getByOrder(24).getColumnName());
 
-        assertEquals("dataset", columnSet.getByOrder(25).getColumnName());
+        assertEquals("Dataset name(s)", columnSet.getByOrder(25).getColumnName());
     }
 }

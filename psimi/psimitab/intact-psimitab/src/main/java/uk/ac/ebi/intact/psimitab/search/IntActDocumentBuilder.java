@@ -14,7 +14,6 @@ import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
 
 /**
- * TODO comment this!
  *
  * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
  * @version $Id$
@@ -22,9 +21,7 @@ import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
  */
 public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 
-	private Document doc;
-	
-	public Document createDocumentFromPsimiTabLine(String psiMiTabLine) throws MitabLineException
+    public Document createDocumentFromPsimiTabLine(String psiMiTabLine) throws MitabLineException
 	{
 		String[] tokens = psiMiTabLine.split(DEFAULT_COL_SEPARATOR);
 			
@@ -41,42 +38,55 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 		String expansion = tokens[IntActColumnSet.EXPANSION_METHOD.getOrder()];
         String dataset = tokens[IntActColumnSet.DATASET.getOrder()];
 
-        doc = super.createDocumentFromPsimiTabLine(psiMiTabLine);
+        Document doc = super.createDocumentFromPsimiTabLine( psiMiTabLine );
 		
 		doc.add(new Field("roles", isolateBracket( experimentRoleA ) + " " + isolateBracket( experimentRoleB )
                 + " " + isolateBracket( biologicalRoleA ) + " " + isolateBracket( biologicalRoleB),
 				Field.Store.NO,
 				Field.Index.TOKENIZED));
 		
-		addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_A, experimentRoleA);
-		addTokenizedAndSortableField(doc, IntActColumnSet.EXPERIMENTAL_ROLE_B, experimentRoleB);
-		addTokenizedAndSortableField(doc, IntActColumnSet.BIOLOGICAL_ROLE_A, biologicalRoleA);
-		addTokenizedAndSortableField(doc, IntActColumnSet.BIOLOGICAL_ROLE_B, biologicalRoleB);
+		addTokenizedAndSortableField( doc, IntActColumnSet.EXPERIMENTAL_ROLE_A, experimentRoleA);
+		addTokenizedAndSortableField( doc, IntActColumnSet.EXPERIMENTAL_ROLE_B, experimentRoleB);
+		addTokenizedAndSortableField( doc, IntActColumnSet.BIOLOGICAL_ROLE_A, biologicalRoleA);
+		addTokenizedAndSortableField( doc, IntActColumnSet.BIOLOGICAL_ROLE_B, biologicalRoleB);
 
         String value = isolateValues(propertiesA) + isolateValues(propertiesB);
 		doc.add(new Field("properties", value,
 				Field.Store.NO,
 				Field.Index.TOKENIZED));
 
-		addTokenizedAndSortableField(doc, IntActColumnSet.PROPERTIES_A, propertiesA);
-		addTokenizedAndSortableField(doc, IntActColumnSet.PROPERTIES_B, propertiesB);
+		addTokenizedAndSortableField( doc, IntActColumnSet.PROPERTIES_A, propertiesA);
+		addTokenizedAndSortableField( doc, IntActColumnSet.PROPERTIES_B, propertiesB);
 		
 		doc.add(new Field("interactor_types", isolateBracket(typeA) + " " + isolateBracket(typeB),
 				Field.Store.NO,
 				Field.Index.TOKENIZED));
 		
-		addTokenizedAndSortableField(doc, IntActColumnSet.INTERACTOR_TYPE_A, typeA);
-		addTokenizedAndSortableField(doc, IntActColumnSet.INTERACTOR_TYPE_B, typeB);
+		addTokenizedAndSortableField( doc, IntActColumnSet.INTERACTOR_TYPE_A, typeA);
+		addTokenizedAndSortableField( doc, IntActColumnSet.INTERACTOR_TYPE_B, typeB);
 		
-		addTokenizedAndSortableField(doc, IntActColumnSet.HOSTORGANISM, hostOrganism);
+		addTokenizedAndSortableField( doc, IntActColumnSet.HOSTORGANISM, hostOrganism);
 		
-		addTokenizedAndSortableField(doc, IntActColumnSet.EXPANSION_METHOD, expansion);
-        addTokenizedAndSortableField(doc, IntActColumnSet.DATASET, dataset);
+		addTokenizedAndSortableField( doc, IntActColumnSet.EXPANSION_METHOD, expansion);
+        addTokenizedAndSortableField( doc, IntActColumnSet.DATASET, dataset);
 
         return doc;
 	}
-	
-	public String createPsimiTabLine(Document doc)
+
+    public void addTokenizedAndSortableField(Document doc, PsimiTabColumn column, String columnValue)
+    {
+         doc.add(new Field(column.getShortName(),
+                columnValue,
+                Field.Store.YES,
+                Field.Index.TOKENIZED));
+
+        doc.add(new Field(column.getSortableColumnName(),
+        		isolateValues(columnValue),
+                Field.Store.NO,
+                Field.Index.UN_TOKENIZED));
+    }
+
+    public String createPsimiTabLine(Document doc)
 	{
     	if (doc == null)
     	{
@@ -171,19 +181,5 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         sb.trimToSize();
 
         return sb.toString();
-    }
-    
-    
-    public void addTokenizedAndSortableField(Document doc, PsimiTabColumn column, String columnValue)
-    {
-         doc.add(new Field(column.getShortName(),
-                columnValue,
-                Field.Store.YES,
-                Field.Index.TOKENIZED));
-        
-        doc.add(new Field(column.getSortableColumnName(),
-        		isolateValues(columnValue),
-                Field.Store.NO,
-                Field.Index.UN_TOKENIZED));
     }
 }

@@ -53,12 +53,18 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
 
     private static final String IDENTITY_MI_REF = "MI:0356";
 
-    private Boolean goTerm_Name_AutoCompletion = Boolean.TRUE;
+    private Boolean goTerm_Name_AutoCompletion = Boolean.FALSE;
 
-    private Boolean interpro_Name_AutoCompletion = Boolean.TRUE;
+    private Boolean interpro_Name_AutoCompletion = Boolean.FALSE;
 
+    /**
+     * Query is used for GOTerm Name AutoCompletion
+     */
     private Query query;
 
+    /**
+     * Query is used for Interpro Name AutoCompletion
+     */
     private InterproNameHandler handler;
 
     /**
@@ -97,9 +103,12 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         this.interpro_Name_AutoCompletion = autocompletion;
     }
 
-    /////////////////
-    //
-
+    /**
+     * Process additional Column information from PSI-MI XML 2.5 to IntactBinaryInteraction.
+     *
+     * @param bi
+     * @param interaction
+     */
     public void process( BinaryInteractionImpl bi, Interaction interaction ) {
 
         IntActBinaryInteraction dbi = ( IntActBinaryInteraction ) bi;
@@ -273,6 +282,12 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         }
     }
 
+    /**
+     * Checks if the ExperimentLabel is how expected.
+     *
+     * @param label
+     * @return
+     */
     private boolean isWellFormattedExperimentShortlabel( String label ) {
         if ( label == null ) {
             return false;
@@ -366,6 +381,12 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         return properties;
     }
 
+    /**
+     * Fetch the GoTerm of a specific GO identifier from Intact OLS-Webservice.
+     *
+     * @param id    GO identifier
+     * @return GOTerm
+     */
     private String fetchGoNameFromWebservice( String id ) {
         try {
             if ( query == null ) {
@@ -378,6 +399,12 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         }
     }
 
+    /**
+     * Fetch the Interpro name of a specific Interpro Id from a interpro-entryFile
+     *
+     * @param id    Interpro identifier
+     * @return Interpro name
+     */
     private String fetchInterproNameFromInterproNameHandler( String id ) {
         try {
             if ( handler == null ) {
@@ -395,23 +422,23 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
      */
     public void updateHeader( PsimitabHeader header ) {
 
-        header.appendColumnName( "experimentalRole interactor A" );
-        header.appendColumnName( "experimentalRole interactor B" );
+        header.appendColumnName( "Experimental role(s) interactor A" );
+        header.appendColumnName( "Experimental role(s) interactor B" );
 
-        header.appendColumnName( "biologicalRole interactor A" );
-        header.appendColumnName( "biologicalRole interactor B" );
+        header.appendColumnName( "Biological role(s) interactor A" );
+        header.appendColumnName( "Biological role(s) interactor B" );
 
-        header.appendColumnName( "properties interactor A" );
-        header.appendColumnName( "properties interactor B" );
+        header.appendColumnName( "Properties interactor A" );
+        header.appendColumnName( "Properties interactor B" );
 
-        header.appendColumnName( "interactorType of A" );
-        header.appendColumnName( "interactorType of B" );
+        header.appendColumnName( "Type(s) interactor A" );
+        header.appendColumnName( "Type(s) interactor B" );
 
-        header.appendColumnName( "hostOrganism" );
+        header.appendColumnName( "HostOrganism(s)" );
 
-        header.appendColumnName( "expansion method" );
+        header.appendColumnName( "Expansion method(s)" );
 
-        header.appendColumnName( "dataset" );
+        header.appendColumnName( "Dataset name(s)" );
     }
 
     /**
@@ -738,22 +765,6 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             }
         }
 
-        if ( dbi.hasBiologicalRolesInteractorA() ) {
-            // create new BiologicalRole
-            BiologicalRole biologicalRole = updateBiologicalRoles( dbi.getBiologicalRolesInteractorA(), index );
-
-            // set new BiologicalRoles
-            pA.setBiologicalRole( biologicalRole );
-        }
-
-        if ( dbi.hasBiologicalRolesInteractorB() ) {
-            // create new ExperimentalRoles
-            BiologicalRole biologicalRole = updateBiologicalRoles( dbi.getBiologicalRolesInteractorB(), index );
-
-            // set new ExperimentalRoles
-            pB.setBiologicalRole( biologicalRole );
-        }
-
         try {
             if ( dbi.hasInteractorTypeA() ) {
                 InteractorType typeA = ( InteractorType ) xConverter.fromMitab( dbi.getInteractorTypeA().get( 0 ), InteractorType.class );
@@ -809,38 +820,6 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         Xref experimentalXref = new Xref( dbRef );
 
         return new ExperimentalRole( names, experimentalXref );
-    }
-
-    private BiologicalRole updateBiologicalRoles( List<CrossReference> biologicalRoles, int index ) {
-        // now create the new BiologicalRole
-        String roleA = biologicalRoles.get( index ).getText();
-        String dbA = biologicalRoles.get( index ).getDatabase().concat( ":".concat( biologicalRoles.get( 0 ).getIdentifier() ) );
-
-        Names names = new Names();
-        if ( roleA == null ) {
-            names.setShortLabel( "unspecified role" );
-            names.setFullName( "unspecified role" );
-        } else {
-            names.setShortLabel( roleA );
-            names.setFullName( roleA );
-        }
-
-        DbReference dbRef = new DbReference();
-        dbRef.setDb( "psi-mi" );
-        if ( dbA == null ) {
-            dbRef.setId( "MI:0499" );
-        } else {
-            dbRef.setId( dbA );
-        }
-
-        dbRef.setDbAc( "MI:0488" );
-        dbRef.setRefType( "identity" );
-        dbRef.setRefTypeAc( "MI:0356" );
-
-        Xref biologicalXref = new Xref( dbRef );
-
-        return new BiologicalRole();
-        //return new BiologicalRole( names, biologicalXref );
     }
 
     private Collection<DbReference> getSecondaryRefs( List<CrossReference> properties ) {
@@ -962,7 +941,13 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
         }
     }
 
-
+    /**
+     * Decodes URL before getting File (usefull if path contains whitespaces). 
+     *
+     * @param fileName
+     * @param clazz
+     * @return
+     */
     public static File getFileByResources( String fileName, Class clazz ) {
         URL url = clazz.getResource( fileName );
         String strFile = url.getFile();

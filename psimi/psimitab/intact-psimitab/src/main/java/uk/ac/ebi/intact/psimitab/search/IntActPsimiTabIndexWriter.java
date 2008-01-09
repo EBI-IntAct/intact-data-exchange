@@ -3,15 +3,13 @@
  */
 package uk.ac.ebi.intact.psimitab.search;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import psidev.psi.mi.search.index.impl.PsimiTabIndexWriter;
 import psidev.psi.mi.search.util.DocumentBuilder;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 
 /**
- * TODO comment this!
+ * Creates an index from a psi mi tab file
  *
  * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
  * @version $Id$
@@ -20,8 +18,6 @@ import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 public class IntActPsimiTabIndexWriter extends PsimiTabIndexWriter
 {
 
-	private static final Log log = LogFactory.getLog(IntActPsimiTabIndexWriter.class);
-	
     public IntActPsimiTabIndexWriter()
     {
     }
