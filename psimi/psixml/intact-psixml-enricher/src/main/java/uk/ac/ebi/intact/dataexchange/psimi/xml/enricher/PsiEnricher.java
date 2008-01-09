@@ -23,6 +23,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.standard.IntactEntryEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
 import uk.ac.ebi.intact.model.IntactEntry;
 
 import java.io.*;
@@ -76,7 +77,6 @@ public class PsiEnricher {
         enricher.enrich(intactEntry);
 
         Entry enrichedEntry = converter.intactToPsi(intactEntry);
-        enrichedEntry.setSource(entry.getSource());
 
         return enrichedEntry;
 
