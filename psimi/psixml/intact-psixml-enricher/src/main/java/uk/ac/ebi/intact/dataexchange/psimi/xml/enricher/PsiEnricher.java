@@ -77,6 +77,7 @@ public class PsiEnricher {
         enricher.enrich(intactEntry);
 
         Entry enrichedEntry = converter.intactToPsi(intactEntry);
+        enrichedEntry.getSource().setReleaseDate(entry.getSource().getReleaseDate());
 
         return enrichedEntry;
 

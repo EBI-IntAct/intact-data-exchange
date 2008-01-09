@@ -48,7 +48,7 @@ public class PsiEnricherTest {
 
         PsiEnricher.enrichPsiXml(is, writer, config);
 
-        //System.out.println(writer.toString());
+        System.out.println(writer.toString());
         // not asserting anything
     }
 
