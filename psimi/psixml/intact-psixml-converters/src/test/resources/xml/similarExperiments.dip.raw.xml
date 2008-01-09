@@ -8,7 +8,7 @@
             </names>
             <bibref>
                 <xref>
-                    <primaryRef refTypeAc="MI:0356" refType="identity" id="17161365" dbAc="MI:0446" db="pubmed"/>
+                    <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="17161365" dbAc="MI:0446" db="pubmed"/>
                 </xref>
             </bibref>
             <attributeList>
@@ -21,7 +21,7 @@
             <experimentDescription id="5">
                 <bibref>
                     <xref>
-                        <primaryRef refTypeAc="MI:0356" refType="identity" id="17161365" dbAc="MI:0446" db="pubmed"/>
+                        <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="17161365" dbAc="MI:0446" db="pubmed"/>
                     </xref>
                 </bibref>
                 <xref>
@@ -46,7 +46,7 @@
             <experimentDescription id="9">
                 <bibref>
                     <xref>
-                        <primaryRef refTypeAc="MI:0356" refType="identity" id="17161365" dbAc="MI:0446" db="pubmed"/>
+                        <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="17161365" dbAc="MI:0446" db="pubmed"/>
                     </xref>
                 </bibref>
                 <xref>
@@ -71,7 +71,7 @@
             <experimentDescription id="13">
                 <bibref>
                     <xref>
-                        <primaryRef refTypeAc="MI:0356" refType="identity" id="17161365" dbAc="MI:0446" db="pubmed"/>
+                        <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="17161365" dbAc="MI:0446" db="pubmed"/>
                     </xref>
                 </bibref>
                 <xref>

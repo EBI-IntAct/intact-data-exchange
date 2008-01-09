@@ -17,17 +17,13 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.xml.model.Interaction;
 import psidev.psi.mi.xml.model.ExperimentDescription;
+import psidev.psi.mi.xml.model.Interaction;
 import psidev.psi.mi.xml.model.Participant;
 import psidev.psi.mi.xml.model.ParticipantIdentificationMethod;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
-import uk.ac.ebi.intact.model.Confidence;
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.CvIdentification;
-import uk.ac.ebi.intact.model.Experiment;
+import uk.ac.ebi.intact.model.*;
 
 /**
  * TODO comment this
@@ -55,6 +51,53 @@ public class InteractionConverterTest {
         Assert.assertEquals("intact conf score", conf.getCvConfidenceType().getShortLabel());
         Assert.assertEquals( "0.8", conf.getValue());
         Assert.assertEquals( interaction, conf.getInteraction());
+    }
+
+    @Test
+    public void psiToIntact_imexXref() throws Exception {
+        Interaction psiInteraction = PsiMockFactory.createMockInteraction();
+        psiInteraction.setImexId("IM-0000");
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
+
+        Xref imexXref = null;
+
+        for (Xref xref : interaction.getXrefs()) {
+            if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
+                if (imexXref != null) {
+                    Assert.fail("More than one IMEx xrefs found");
+                }
+                imexXref = xref;
+            }
+        }
+
+        Assert.assertNotNull(imexXref);
+        Assert.assertEquals("IM-0000", imexXref.getPrimaryId());
+    }
+
+    @Test
+    public void psiToIntact_imexXref_redundant() throws Exception {
+        Interaction psiInteraction = PsiMockFactory.createMockInteraction();
+        psiInteraction.getXref().getSecondaryRef().add(PsiMockFactory.createDbReferenceDatabaseOnly("IM-0000", CvDatabase.IMEX_MI_REF, CvDatabase.IMEX));
+        psiInteraction.setImexId("IM-0000");
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
+
+        Xref imexXref = null;
+
+        for (Xref xref : interaction.getXrefs()) {
+            if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
+                if (imexXref != null) {
+                    Assert.fail("More than one IMEx xrefs found");
+                }
+                imexXref = xref;
+            }
+        }
+
+        Assert.assertNotNull(imexXref);
+        Assert.assertEquals("IM-0000", imexXref.getPrimaryId());
     }
 
     @Test (expected = PsiConversionException.class)
@@ -109,7 +152,7 @@ public class InteractionConverterTest {
         }
     }
 
-    @Test (expected = UnsupportedConversionException.class)
+    @Test
     public void psiToIntact_noPartDetMethodInExp_differentDetMethods() throws Exception {
         Interaction psiInteraction = PsiMockFactory.createMockInteraction();
 
@@ -120,12 +163,16 @@ public class InteractionConverterTest {
         int i=0;
         for (Participant part : psiInteraction.getParticipants()) {
             part.getParticipantIdentificationMethods().clear();
-            part.getParticipantIdentificationMethods().add(PsiMockFactory.createCvType(ParticipantIdentificationMethod.class, "MI:"+i, "lala"));
+
+            if (i == 0) part.getParticipantIdentificationMethods().add(PsiMockFactory.createCvType(ParticipantIdentificationMethod.class, "MI:0427", "mass spectrometry"));
+            if (i == 1) part.getParticipantIdentificationMethods().add(PsiMockFactory.createCvType(ParticipantIdentificationMethod.class, "MI:0421", "identification by antibody"));
             i++;
         }
 
         InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
         uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
+
+        Assert.assertEquals("MI:0661", interaction.getExperiments().iterator().next().getCvIdentification().getMiIdentifier());
     }
 
 

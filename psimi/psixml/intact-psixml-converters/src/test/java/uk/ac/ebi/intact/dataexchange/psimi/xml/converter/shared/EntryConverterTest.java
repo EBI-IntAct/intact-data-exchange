@@ -18,16 +18,15 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import static junit.framework.Assert.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.collections.map.IdentityMap;
 import static org.easymock.classextension.EasyMock.createNiceMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.xml.sax.InputSource;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
-import psidev.psi.mi.xml.model.*;
+import psidev.psi.mi.xml.model.Entry;
+import psidev.psi.mi.xml.model.EntrySet;
+import psidev.psi.mi.xml.model.Interaction;
+import psidev.psi.mi.xml.model.Names;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
@@ -41,9 +40,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
 
 /**
  * TODO comment this
@@ -101,6 +97,7 @@ public class EntryConverterTest extends AbstractConverterTest {
     static boolean output = false;
 
     @Test
+    @Ignore
     public void roundtrip_dip() throws Exception {
 
         File file = getDipFile();

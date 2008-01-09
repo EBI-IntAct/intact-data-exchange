@@ -15,14 +15,14 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Alias;
-import psidev.psi.mi.xml.model.Interaction;
-import psidev.psi.mi.xml.model.Range;
+import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Confidence;
-import psidev.psi.mi.xml.model.Xref;
 import psidev.psi.mi.xml.model.Feature;
+import psidev.psi.mi.xml.model.Interaction;
 import psidev.psi.mi.xml.model.Interactor;
+import psidev.psi.mi.xml.model.Range;
+import psidev.psi.mi.xml.model.Xref;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
 import uk.ac.ebi.intact.model.*;
@@ -135,6 +135,24 @@ public class PsiMockFactory {
         for (int i = 0; i < childRandom(1, 2); i++) {
             interaction.getExperiments().add(createMockExperiment());
         }
+
+        for (int i=0; i< childRandom( 1, 2); i++){
+            interaction.getConfidences().add(createMockConfidence());
+        }
+
+        return interaction;
+    }
+
+    public static Interaction createMockInteraction(int participantNum) {
+        Interaction interaction = new Interaction();
+        populate(interaction);
+        interaction.getInteractionTypes().add(createCvType(InteractionType.class));
+
+        for (int i = 0; i < participantNum; i++) {
+            interaction.getParticipants().add(createMockParticipant(interaction));
+        }
+
+        interaction.getExperiments().add(createMockExperiment());
 
         for (int i=0; i< childRandom( 1, 2); i++){
             interaction.getConfidences().add(createMockConfidence());
@@ -324,6 +342,12 @@ public class PsiMockFactory {
         dbRef.setSecondary(nextString("secondary"));
         dbRef.setVersion(nextString("version"));
 
+        return dbRef;
+    }
+
+    public static DbReference createDbReferenceDatabaseOnly(String id, String dbAc, String db) {
+        DbReference dbRef = new DbReference(id, db);
+        dbRef.setDbAc(dbAc);
         return dbRef;
     }
 

@@ -28,6 +28,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
@@ -79,12 +80,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         Collection<Experiment> experiments = getExperiments(psiObject);
 
-        // imexId
-        String imexId = psiObject.getImexId();
-        if (imexId != null) {
-            interaction.addXref(createImexXref(interaction, imexId));
-        }
-
         // only gets the first interaction type
         CvInteractionType interactionType = getInteractionType(psiObject);
 
@@ -95,6 +90,13 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         IntactConverterUtils.populateNames(psiObject.getNames(), interaction);
         IntactConverterUtils.populateXref(psiObject.getXref(), interaction, new XrefConverter<InteractorXref>(getInstitution(), InteractorXref.class));
         IntactConverterUtils.populateAnnotations(psiObject, interaction, getInstitution());
+
+        // imexId
+        String imexId = psiObject.getImexId();
+        if (imexId != null && !alreadyContainsImexXref(interaction)) {
+            final InteractorXref imexXref = createImexXref(interaction, imexId);
+            interaction.addXref(imexXref);
+        }
 
         // components, created after the interaction, as we need the interaction to create them
         Collection<Component> components = getComponents(interaction, psiObject);
@@ -120,6 +122,16 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         cvImex.setFullName(CvDatabase.IMEX);
 
         return XrefUtils.createIdentityXref(interaction, imexId, null, cvImex);
+    }
+
+    private boolean alreadyContainsImexXref(Interaction interaction) {
+        for (Xref xref : interaction.getXrefs()) {
+            if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public psidev.psi.mi.xml.model.Interaction intactToPsi(Interaction intactObject) {
