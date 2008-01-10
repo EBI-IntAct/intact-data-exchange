@@ -74,6 +74,7 @@ public class InteractionConverterTest {
 
         Assert.assertNotNull(imexXref);
         Assert.assertEquals("IM-0000", imexXref.getPrimaryId());
+        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, imexXref.getCvXrefQualifier().getMiIdentifier());
     }
 
     @Test

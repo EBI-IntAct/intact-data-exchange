@@ -120,8 +120,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     private InteractorXref createImexXref(Interaction interaction, String imexId) {
         CvDatabase cvImex = CvObjectUtils.createCvObject(interaction.getOwner(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
         cvImex.setFullName(CvDatabase.IMEX);
+        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(interaction.getOwner(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
 
-        return XrefUtils.createIdentityXref(interaction, imexId, null, cvImex);
+        return XrefUtils.createIdentityXref(interaction, imexId, imexPrimary, cvImex);
     }
 
     private boolean alreadyContainsImexXref(Interaction interaction) {
