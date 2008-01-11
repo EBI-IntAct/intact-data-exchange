@@ -98,11 +98,13 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             interaction.addXref(imexXref);
         }
 
+        //TODO: verify xrefs to avoid wrong things like a DIP xref having type identity (must be source-reference)
+        // log a warning if this is the case
+
         // components, created after the interaction, as we need the interaction to create them
         Collection<Component> components = getComponents(interaction, psiObject);
         interaction.setComponents(components);
 
-        //TODO:test      
         ConfidenceConverter confConverter= new ConfidenceConverter( getInstitution());
         for (psidev.psi.mi.xml.model.Confidence psiConfidence :  psiObject.getConfidences()){
            Confidence confidence = confConverter.psiToIntact( psiConfidence );
@@ -125,11 +127,19 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         return XrefUtils.createIdentityXref(interaction, imexId, imexPrimary, cvImex);
     }
 
-    private boolean alreadyContainsImexXref(Interaction interaction) {
-        for (Xref xref : interaction.getXrefs()) {
+    private InteractorXref getImexXref(Interaction interaction) {
+        for (InteractorXref xref : interaction.getXrefs()) {
             if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
-                return true;
+                return xref;
             }
+        }
+
+        return null;
+    }
+
+    private boolean alreadyContainsImexXref(Interaction interaction) {
+        if (getImexXref(interaction) != null) {
+            return true;
         }
 
         return false;
@@ -143,15 +153,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
 
         // imexId
-        InteractorXref imexXref = null;
-
-        for (InteractorXref xref : intactObject.getXrefs()) {
-            String primaryId = CvObjectUtils.getPsiMiIdentityXref(xref.getCvDatabase()).getPrimaryId();
-            if (primaryId.equals(CvDatabase.IMEX_MI_REF)) {
-                imexXref = xref;
-                break;
-            }
-        }
+        InteractorXref imexXref = getImexXref(intactObject);
 
         if (imexXref != null) {
             interaction.setImexId(imexXref.getPrimaryId());
@@ -176,7 +178,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                 PsiConverterUtils.toCvType(intactObject.getCvInteractionType(), new InteractionTypeConverter(getInstitution()));
         interaction.getInteractionTypes().add(interactionType);
 
-        //TODO: test
+
         ConfidenceConverter confidenceConverter = new ConfidenceConverter( getInstitution());
         for (Confidence conf : intactObject.getConfidences()){
             psidev.psi.mi.xml.model.Confidence confidence = confidenceConverter.intactToPsi( conf);
