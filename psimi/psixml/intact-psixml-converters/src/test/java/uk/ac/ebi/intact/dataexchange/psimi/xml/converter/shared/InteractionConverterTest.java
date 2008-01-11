@@ -17,13 +17,14 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.xml.model.ExperimentDescription;
+import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Interaction;
-import psidev.psi.mi.xml.model.Participant;
-import psidev.psi.mi.xml.model.ParticipantIdentificationMethod;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Confidence;
+import uk.ac.ebi.intact.model.Xref;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 /**
  * TODO comment this
@@ -174,6 +175,23 @@ public class InteractionConverterTest {
         uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
 
         Assert.assertEquals("MI:0661", interaction.getExperiments().iterator().next().getCvIdentification().getMiIdentifier());
+    }
+
+    @Test
+    public void psiToIntact_fixSourceReferenceXrefs() throws Exception {
+        Interaction psiInteraction = PsiMockFactory.createMockInteraction();
+        final DbReference dbRef = PsiMockFactory.createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.DIP, CvDatabase.DIP_MI_REF);
+        dbRef.setId("DIP:12345");
+        psiInteraction.getXref().setPrimaryRef(dbRef);
+
+        final Institution dip = new Institution(Institution.DIP);
+        dip.addXref(XrefUtils.createIdentityXrefPsiMi(dip, Institution.DIP_REF));
+
+        InteractionConverter converter = new InteractionConverter(dip);
+        uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
+
+        Assert.assertEquals(1, interaction.getXrefs().size());
+        Assert.assertEquals(CvXrefQualifier.SOURCE_REFERENCE_MI_REF, interaction.getXrefs().iterator().next().getCvXrefQualifier().getMiIdentifier());
     }
 
 

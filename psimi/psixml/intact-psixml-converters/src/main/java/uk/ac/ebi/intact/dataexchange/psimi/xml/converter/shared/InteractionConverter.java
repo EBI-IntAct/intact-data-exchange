@@ -23,6 +23,7 @@ import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -98,8 +99,11 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             interaction.addXref(imexXref);
         }
 
-        //TODO: verify xrefs to avoid wrong things like a DIP xref having type identity (must be source-reference)
-        // log a warning if this is the case
+        // note: with the first IMEx conversions, the source-database xref was wrongly
+        // marked as an "identity" xref instead of source-database. This is meant to fix that on the fly
+        if (ConverterContext.getInstance().getInteractionConfig().isAutoFixSourceReferences()) {
+            fixSourceReferenceXrefsIfNecessary(interaction);
+        }
 
         // components, created after the interaction, as we need the interaction to create them
         Collection<Component> components = getComponents(interaction, psiObject);
@@ -119,7 +123,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         return interaction;
     }
 
-    private InteractorXref createImexXref(Interaction interaction, String imexId) {
+    protected InteractorXref createImexXref(Interaction interaction, String imexId) {
         CvDatabase cvImex = CvObjectUtils.createCvObject(interaction.getOwner(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
         cvImex.setFullName(CvDatabase.IMEX);
         CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(interaction.getOwner(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
@@ -127,7 +131,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         return XrefUtils.createIdentityXref(interaction, imexId, imexPrimary, cvImex);
     }
 
-    private InteractorXref getImexXref(Interaction interaction) {
+    protected InteractorXref getImexXref(Interaction interaction) {
         for (InteractorXref xref : interaction.getXrefs()) {
             if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
                 return xref;
@@ -138,11 +142,31 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     }
 
     private boolean alreadyContainsImexXref(Interaction interaction) {
-        if (getImexXref(interaction) != null) {
-            return true;
+        return getImexXref(interaction) != null;
+
+    }
+
+    protected void fixSourceReferenceXrefsIfNecessary(Interaction interaction) {
+        InteractorXref xrefToFix = null;
+
+        // if the qualifier is identity, we will check if the owner identity MI is the same as the database MI
+        for (InteractorXref xref : interaction.getXrefs()) {
+            if (CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getMiIdentifier())) {
+                Xref ownerIdentityXref = XrefUtils.getIdentityXref(interaction.getOwner(), CvDatabase.PSI_MI_MI_REF);
+
+                if (ownerIdentityXref != null && ownerIdentityXref.getPrimaryId().equals(xref.getCvDatabase().getMiIdentifier())) {
+                    xrefToFix = xref;
+                    break;
+                }
+            }
         }
 
-        return false;
+        if (xrefToFix != null) {
+            log.warn("Interaction identity xref found pointing to the source database. It should be of type 'source-reference'. Will be fixed automatically: "+xrefToFix);
+            CvXrefQualifier sourceReference = CvObjectUtils.createCvObject(interaction.getOwner(), CvXrefQualifier.class, CvXrefQualifier.SOURCE_REFERENCE_MI_REF, CvXrefQualifier.SOURCE_REFERENCE);
+            xrefToFix.setCvXrefQualifier(sourceReference);
+        }
+        
     }
 
     public psidev.psi.mi.xml.model.Interaction intactToPsi(Interaction intactObject) {

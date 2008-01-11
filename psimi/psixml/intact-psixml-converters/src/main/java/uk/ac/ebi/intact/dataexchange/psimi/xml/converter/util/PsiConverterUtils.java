@@ -17,8 +17,8 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Xref;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AnnotationConverterConfig;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.InteractorConverterConfig;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.AnnotationConverterConfig;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractorConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
@@ -157,7 +157,7 @@ public class PsiConverterUtils {
     private static void populateAttributes( AnnotatedObject<?, ?> annotatedObject, AttributeContainer attributeContainer ) {
         AnnotationConverter annotationConverter = new AnnotationConverter( annotatedObject.getOwner() );
 
-        AnnotationConverterConfig configAnnotation = ConverterContext.getInstance().getAnnotationConfig(); 
+        AnnotationConverterConfig configAnnotation = ConverterContext.getInstance().getAnnotationConfig();
         
         for ( Annotation annotation : annotatedObject.getAnnotations() ) {
         	if (false == configAnnotation.isExcluded(annotation.getCvTopic())) {

@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
+package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config;
 
 import java.util.HashSet;
 import java.util.Set;

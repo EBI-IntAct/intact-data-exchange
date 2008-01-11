@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
+package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config;
 
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
@@ -44,6 +44,8 @@ public class InteractorConverterConfig {
      * Do not export Interactor Xref that have a CvXrefQualifier that is in the list.
      */
     private Set<CvXrefQualifier> excludeInteractorXrefCvXrefQualifier = new HashSet<CvXrefQualifier>( );
+
+    private boolean autoFixSourceReferences = true;
 
     ///////////////////
     // Constructor
@@ -180,5 +182,13 @@ public class InteractorConverterConfig {
 
     public boolean hasExcludesCvXrefQualifier() {
         return !excludeInteractorXrefCvXrefQualifier.isEmpty();
+    }
+
+    public boolean isAutoFixSourceReferences() {
+        return autoFixSourceReferences;
+    }
+
+    public void setAutoFixSourceReferences(boolean autoFixSourceReferences) {
+        this.autoFixSourceReferences = autoFixSourceReferences;
     }
 }
