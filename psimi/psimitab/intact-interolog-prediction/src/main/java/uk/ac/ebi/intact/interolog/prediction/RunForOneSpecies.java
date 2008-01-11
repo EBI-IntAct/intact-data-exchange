@@ -62,6 +62,7 @@ public class RunForOneSpecies {
 		Collection<Long> taxids = new HashSet<Long>(1);
 		taxids.add(taxid);
 		up.setUserTaxidsToDownCast(taxids);
+		up.setDownCastOnChildren(true);
 		up.run();
 
 	}
