@@ -190,7 +190,7 @@ public class InteractionConverterTest {
         InteractionConverter converter = new InteractionConverter(dip);
         uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
 
-        Assert.assertEquals(1, interaction.getXrefs().size());
+        Assert.assertEquals(2, interaction.getXrefs().size());
         Assert.assertEquals(CvXrefQualifier.SOURCE_REFERENCE_MI_REF, interaction.getXrefs().iterator().next().getCvXrefQualifier().getMiIdentifier());
     }
 

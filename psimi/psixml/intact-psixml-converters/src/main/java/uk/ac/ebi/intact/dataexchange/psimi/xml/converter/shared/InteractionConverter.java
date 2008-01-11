@@ -151,7 +151,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         // if the qualifier is identity, we will check if the owner identity MI is the same as the database MI
         for (InteractorXref xref : interaction.getXrefs()) {
-            if (CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getMiIdentifier())) {
+            if (xref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getMiIdentifier())) {
                 Xref ownerIdentityXref = XrefUtils.getIdentityXref(interaction.getOwner(), CvDatabase.PSI_MI_MI_REF);
 
                 if (ownerIdentityXref != null && ownerIdentityXref.getPrimaryId().equals(xref.getCvDatabase().getMiIdentifier())) {
