@@ -1,7 +1,7 @@
 
 ####################################
 #                                  #
-# INTEROPORC PREDICTION PROGRAMME  #
+# INTEROPORC PREDICTION MODULE     #
 #                                  #
 ####################################
 
@@ -19,17 +19,19 @@ and a document on this prediction programme: http://www.ebi.ac.uk/~mmichaut/docu
 but it may not be updated... ;-)
 
 
-HOW TO USE THE PROGRAMME?
-=========================
 
->>> With an independant JAR (including all dependancies)
-Here is described a simple way to use this programme to predict interactions for one species. You can also import the jar lib and use more options.
-http://www.ebi.ac.uk/~maven/m2repo_snapshots/uk/ac/ebi/intact/dataexchange/psimi/intact-interolog-prediction/2.0.0-SNAPSHOT/
+HOW TO USE THE MODULE?
+======================
 
-If you have a jar with all dependencies -->interologPrediction.jar:
+You can either use the JAR file available on (... coming soon...) independently (see I) or import the latest jar library and include it into your code to use more options (see II).
+
+>>> I) With an independant JAR file (including all dependancies)
+Here is described a simple way to use this program to predict interactions for one species.
+
+If you have a jar with all dependencies --> interologPrediction.jar:
 1) create a directory for the predictions --> DIR
 2) put the jar in it
-3) put a mitab file in it with all interactions you want to use as source interactions from other species --> sourceInteractions.mitab
+3) put a mitab file in it with all interactions you want to use as source interactions from other species --> sourceInteractions.mitab (if you're asking what the mitab format could be, see the FAQ at the end)
 4) download the orthologous clusters from ftp://ftp.ebi.ac.uk/pub/databases/integr8/porc/proc_gene.dat and put it in the directory --> porc_gene.dat
 5) choose the NCBI taxid of the species you are interested in (for example Synecocystis is 1148, yeast is 4932, E. coli is 562 ... see http://www.ebi.ac.uk/newt/display )
 6) OPTION: you can put a log4j-property-file in the dir (you can copy-paste the example given below and put it in interologPrediction.log4j.properties file in the directory) --> interologPrediction.log4j.properties
@@ -39,8 +41,10 @@ Then, execute this command in the directory DIR with your taxid (instead of 1148
 java -ms500m -mx1000m -cp interologPrediction.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies . sourceInteractions.mitab porc_gene.dat 1148 interologPrediction.log4j.properties
 
 
->>> With the JAR available on EBI maven repos (http://www.ebi.ac.uk/~maven/m2repo/uk/ac/ebi/intact/dataexchange/psimi/intact-interolog-prediction/)
-You have to create an instance of InterologPrediction with the required working directory.
+>>> II) With the JAR available on EBI maven repos
+http://www.ebi.ac.uk/~maven/m2repo/uk/ac/ebi/intact/dataexchange/psimi/intact-interolog-prediction/
+http://www.ebi.ac.uk/~maven/m2repo_snapshots/uk/ac/ebi/intact/dataexchange/psimi/intact-interolog-prediction/2.0.0-SNAPSHOT/
+You have to create an instance of InterologPrediction with the required working directory (where files will be created).
 Then you can change some parameters if needed and finally just run it. An example is given below:
 
   InterologPrediction p = new InterologPrediction(workingDir);
@@ -61,6 +65,8 @@ Then you can change some parameters if needed and finally just run it. An exampl
 
 Be aware that this program needs some space. I am used to running it with extended arguments to the VM (-ms500m -mx900m). On the other hand, it does not take too much time.
 Running it on the global mitab file (merge of all Intact, MINT and DIP) and predicting interactions for all species present in it will take less than 5 minutes.
+
+
 
 RESULTS
 ========
@@ -110,4 +116,14 @@ log4j.appender.R.layout=org.apache.log4j.PatternLayout
 log4j.appender.R.layout.ConversionPattern=%d %-5p (%C{1},%L) - %m%n
 #log4j.appender.R.layout.ConversionPattern=%p %t %c - %m%n
 
+
+
+FAQ
+====
+
+* What is the mitab format?
+MITAB25 describes binary interactions, one pair of interactors per row. Columns are separated by tabulators.
+Fore more information, see:
+- a simple readme file ftp://ftp.ebi.ac.uk/pub/databases/intact/current/psimitab/README
+- the Proteomics Standards Initiative (PSI) website http://www.psidev.info/
 
