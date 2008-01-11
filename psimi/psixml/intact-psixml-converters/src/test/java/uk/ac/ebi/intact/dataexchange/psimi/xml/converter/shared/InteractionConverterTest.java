@@ -182,6 +182,7 @@ public class InteractionConverterTest {
         Interaction psiInteraction = PsiMockFactory.createMockInteraction();
         final DbReference dbRef = PsiMockFactory.createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.DIP, CvDatabase.DIP_MI_REF);
         dbRef.setId("DIP:12345");
+        psiInteraction.getXref().getSecondaryRef().clear();
         psiInteraction.getXref().setPrimaryRef(dbRef);
 
         final Institution dip = new Institution(Institution.DIP);
@@ -190,7 +191,7 @@ public class InteractionConverterTest {
         InteractionConverter converter = new InteractionConverter(dip);
         uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
 
-        Assert.assertEquals(2, interaction.getXrefs().size());
+        Assert.assertEquals(1, interaction.getXrefs().size());
         Assert.assertEquals(CvXrefQualifier.SOURCE_REFERENCE_MI_REF, interaction.getXrefs().iterator().next().getCvXrefQualifier().getMiIdentifier());
     }
 
