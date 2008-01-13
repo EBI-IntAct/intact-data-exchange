@@ -88,6 +88,10 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         interaction.setExperiments(experiments);
         interaction.setCvInteractionType(interactionType);
 
+        // interactor type is always "interaction" for interactions
+        CvInteractorType interactorType = CvObjectUtils.createCvObject(getInstitution(), CvInteractorType.class, CvInteractorType.INTERACTION_MI_REF, CvInteractorType.INTERACTION);
+        interaction.setCvInteractorType(interactorType);
+
         IntactConverterUtils.populateNames(psiObject.getNames(), interaction);
         IntactConverterUtils.populateXref(psiObject.getXref(), interaction, new XrefConverter<InteractorXref>(getInstitution(), InteractorXref.class));
         IntactConverterUtils.populateAnnotations(psiObject, interaction, getInstitution());
