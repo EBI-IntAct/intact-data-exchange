@@ -42,7 +42,7 @@ public class InteractionConverterTest {
         uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
 
         Assert.assertNotNull(interaction.getCvInteractionType());
-        Assert.assertNull(interaction.getCvInteractorType());
+        Assert.assertNotNull(interaction.getCvInteractorType());
         Assert.assertNotNull(interaction.getComponents().iterator().next().getInteractor().getOwner());
         Assert.assertEquals("testInstitution", interaction.getComponents().iterator().next().getInteractor().getOwner().getShortLabel());
         Assert.assertEquals( 1, interaction.getConfidences().size());
