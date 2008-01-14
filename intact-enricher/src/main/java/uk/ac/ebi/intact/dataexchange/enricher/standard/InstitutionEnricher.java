@@ -35,7 +35,7 @@ public class InstitutionEnricher extends AnnotatedObjectEnricher<Institution>{
         INTACT = new Institution("IntAct");
 
         CvDatabase pubmed = CvObjectUtils.createCvObject(INTACT, CvDatabase.class, CvDatabase.PUBMED_MI_REF, CvDatabase.PUBMED);
-        CvTopic postalAddress = CvObjectUtils.createCvObject(INTACT, CvTopic.class, null, "postal address");
+        CvTopic postalAddress = CvObjectUtils.createCvObject(INTACT, CvTopic.class, null, "postaladdress");
         CvTopic email = CvObjectUtils.createCvObject(INTACT, CvTopic.class, CvTopic.CONTACT_EMAIL_MI_REF, CvTopic.CONTACT_EMAIL);
         CvTopic url = CvObjectUtils.createCvObject(INTACT, CvTopic.class, CvTopic.URL_MI_REF, CvTopic.URL);
 
