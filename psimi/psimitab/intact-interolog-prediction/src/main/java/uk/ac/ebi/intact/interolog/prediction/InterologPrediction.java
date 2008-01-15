@@ -575,7 +575,7 @@ public class InterologPrediction {
 			throw new InterologPredictionException("Error while reading mitab file "+getMitab(),e);
 		}
 		
-		log.warn("you can use Picr tool to collect UniprotKB identifiers from RefSeq ids");		
+		log.info("you can use Picr tool to collect UniprotKB identifiers from RefSeq ids");		
 	}
 	
 	/**
@@ -1052,6 +1052,10 @@ public class InterologPrediction {
 		chooseSpeciesToPredict();
 		if (false) {
 			testTaxids();
+		}
+		if (proteomeIdsToDownCast.isEmpty()) {
+			log.warn("The list of species is empty, it is not useful to work... no interaction is predicted.");
+			System.exit(0);
 		}
 		
 	}
