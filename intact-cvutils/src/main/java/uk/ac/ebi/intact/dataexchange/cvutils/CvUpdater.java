@@ -26,27 +26,22 @@ public class CvUpdater {
 
     private static Log log = LogFactory.getLog(CvUpdater.class);
 
-    private IntactOntology ontology;
-
     private Map<String,CvObject> processed;
     private CvUpdaterStatistics stats;
 
     private boolean excludeObsolete;
     private CvDatabase nonMiCvDatabase;
 
-    public CvUpdater(IntactOntology ontology) {
-        this.ontology = ontology;
-
+    public CvUpdater() {
         this.nonMiCvDatabase = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(),
                 CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT);
     }
-
 
     /**
      * Starts the creation and update of CVs by using the ontology provided
      * @return An object containing some statistics about the update
      */
-    public CvUpdaterStatistics createOrUpdateCVs() {
+    public CvUpdaterStatistics createOrUpdateCVs(IntactOntology ontology) {
         this.processed = new HashMap<String,CvObject>();
 
         stats = new CvUpdaterStatistics();
@@ -93,20 +88,34 @@ public class CvUpdater {
             }
         }
 
-        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate(rootsAndOrphans.toArray(new CvObject[rootsAndOrphans.size()]));
+        List<CvDagObject> allCvs = new ArrayList<CvDagObject>();
+        for (CvObject rootOrOrphan : rootsAndOrphans) {
+            allCvs.addAll(itselfAndChildrenAsList((CvDagObject) rootOrOrphan));
+        }
+
+        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate(allCvs.toArray(new CvObject[rootsAndOrphans.size()]));
         addCvObjectsToUpdaterStats(persisterStats, stats);
 
         if (log.isDebugEnabled()) {
             log.debug("Persisted: " + persisterStats);
-        }
 
-        if (log.isDebugEnabled()) {
             log.debug("Processed: "+processed.size());
             log.debug("Terms in ontology: "+ontology.getCvTerms().size());
             log.debug(stats);
         }
 
         return stats;
+    }
+
+    private List<CvDagObject> itselfAndChildrenAsList(CvDagObject cv) {
+        List<CvDagObject> itselfAndChildren = new ArrayList<CvDagObject>();
+        itselfAndChildren.add(cv);
+
+        for (CvDagObject child : cv.getChildren()) {
+            itselfAndChildren.addAll(itselfAndChildrenAsList(child));
+        }
+
+        return itselfAndChildren;
     }
 
     private void addCvObjectsToUpdaterStats(PersisterStatistics persisterStats, CvUpdaterStatistics stats) {
