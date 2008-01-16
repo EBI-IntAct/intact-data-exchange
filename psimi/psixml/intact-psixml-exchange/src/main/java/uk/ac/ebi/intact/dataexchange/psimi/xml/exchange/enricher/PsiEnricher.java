@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.ebi.intact.dataexchange.psimi.xml.enricher;
+package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher;
 
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
@@ -23,7 +23,6 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.standard.IntactEntryEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
 import uk.ac.ebi.intact.model.IntactEntry;
 
 import java.io.*;
