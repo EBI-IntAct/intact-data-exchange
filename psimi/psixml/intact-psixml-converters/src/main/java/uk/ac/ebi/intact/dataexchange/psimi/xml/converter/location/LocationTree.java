@@ -32,8 +32,9 @@ public class LocationTree {
     }
 
     public void newChild(LocationItem locationItem) {
-        if (parent != null) {
-            parent.getChildren().add(locationItem);
+        if (currentLocation != null) {
+            currentLocation.getChildren().add(locationItem);
+            locationItem.setParent(currentLocation);
         } else {
             root = locationItem;
             parent = locationItem;
