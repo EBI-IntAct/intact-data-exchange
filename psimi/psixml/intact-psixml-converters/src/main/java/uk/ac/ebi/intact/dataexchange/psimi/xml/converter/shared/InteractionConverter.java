@@ -235,7 +235,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                 String partDetMethod = calculateParticipantDetMethod(interaction.getComponents());
 
                 if (partDetMethod != null) {
-                    final String message = "Experiment '"+experiment.getShortLabel()+"' without participant detection method. One was calculated from the components: " + partDetMethod;
+                    final String message = "Experiment without participant detection method. One was calculated from the components: " + partDetMethod;
                     addMessageToContext(MessageLevel.INFO, message, true);
 
                     if (log.isWarnEnabled()) {

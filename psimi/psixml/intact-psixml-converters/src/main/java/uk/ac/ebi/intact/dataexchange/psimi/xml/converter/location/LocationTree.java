@@ -45,7 +45,7 @@ public class LocationTree {
 
     public void resetPosition() {
         currentLocation = parent;
-        if (currentLocation.getParent() != root) {
+        if (currentLocation != null && currentLocation.getParent() != null) {
             parent = currentLocation.getParent();
         } else {
             parent = currentLocation;
