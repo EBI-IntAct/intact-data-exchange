@@ -20,7 +20,8 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
 * @version $Id$
 */
 public enum MessageLevel {
-    FATAL,
+
+    ERROR,
     WARN,
     INFO
 }
