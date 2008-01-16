@@ -23,6 +23,7 @@ import org.junit.Test;
 import psidev.psi.mi.xml.model.EntrySet;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
+import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.DebugUtil;
@@ -54,13 +55,13 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
     @Test
     public void importXml_mint() throws Exception {
-        PsiExchange.importIntoIntact(getMintEntrySet());
+        PersisterStatistics stats = PsiExchange.importIntoIntact(getMintEntrySet());
 
         int count = getDaoFactory().getInteractionDao().countAll();
-        final List<String> labels = DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll());
-        System.out.println(labels);
 
-        Assert.assertEquals(18, count);
+        Assert.assertEquals(17, stats.getPersistedCount(InteractionImpl.class, false));
+        Assert.assertEquals(1, stats.getDuplicatesCount(InteractionImpl.class, false));
+        Assert.assertEquals(17, count);
     }
 
     @Test
@@ -94,8 +95,6 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         PsiExchange.importIntoIntact(getDipEntrySet());
 
         int count = getDaoFactory().getInteractionDao().countAll();
-        System.out.println(DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll()));
-
         Assert.assertEquals(74, count);
     }
 
@@ -107,12 +106,11 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
         PsiExchange.importIntoIntact(getMintEntrySet());
 
-        // the mint file contains 2 duplicated interactions
-        Assert.assertEquals(24, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(23, getDaoFactory().getInteractionDao().countAll());
 
         PsiExchange.importIntoIntact(getDipEntrySet());
 
-        Assert.assertEquals(98, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(97, getDaoFactory().getInteractionDao().countAll());
 
     }
 

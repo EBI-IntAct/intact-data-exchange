@@ -85,7 +85,7 @@ public class PsiExchange {
      *
      * @throws PersisterException thrown if there are problems parsing the stream or persisting the data in the intact-model database
      */
-    public static void importIntoIntact(InputStream psiXmlStream) throws PersisterException {
+    public static PersisterStatistics importIntoIntact(InputStream psiXmlStream) throws PersisterException {
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = null;
         try {
@@ -94,7 +94,7 @@ public class PsiExchange {
             throw new PersisterException("Exception reading the PSI XML from an InputStream", e);
         }
 
-        importIntoIntact(entrySet);
+        return importIntoIntact(entrySet);
     }
 
     /**
@@ -105,7 +105,7 @@ public class PsiExchange {
      *
      * @throws PersisterException thrown if there are problems persisting the data in the intact-model database
      */
-    public static void importIntoIntact(EntrySet entrySet) throws PersisterException {
+    public static PersisterStatistics importIntoIntact(EntrySet entrySet) throws PersisterException {
         IntactContext context = IntactContext.getCurrentInstance();
 
         // check if the transaction is active
@@ -114,14 +114,13 @@ public class PsiExchange {
             IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().begin();
         }
 
+        PersisterStatistics importStats = new PersisterStatistics();
+
         // some time for stats
         long startTime = System.currentTimeMillis();
 
         // this will count the interactions and will be used to flush in batches
         int interactionCount = 0;
-
-        int interactionsPersisted = 0;
-        int interactionsDuplicated = 0;
 
         for (Entry entry : entrySet.getEntries()) {
             InstitutionConverter institutionConverter = new InstitutionConverter();
@@ -156,9 +155,7 @@ public class PsiExchange {
                 if (interactionLabelsToCommit.contains(interaction.getShortLabel())) {
                     // commit the persistence
                     PersisterStatistics stats = persistAndClear(interactionsToCommit, interactionLabelsToCommit);
-
-                    interactionsPersisted += stats.getPersistedCount(InteractionImpl.class, false);
-                    interactionsDuplicated += stats.getDuplicatesCount(InteractionImpl.class, false);
+                    importStats = merge(importStats, stats);
 
                     if (log.isDebugEnabled()) {
                         log.debug("Forced commit due to a label already existing in this commit page: "+interaction.getShortLabel());
@@ -176,9 +173,7 @@ public class PsiExchange {
                 // commit the interactions in batches into the database
                 if (interactionCount > 0 && interactionCount % importBatchSize == 0) {
                     PersisterStatistics stats = persistAndClear(interactionsToCommit, interactionLabelsToCommit);
-
-                    interactionsPersisted += stats.getPersistedCount(InteractionImpl.class, false);
-                    interactionsDuplicated += stats.getDuplicatesCount(InteractionImpl.class, false);
+                    importStats = merge(importStats, stats);
 
                     // restart a transaction
                     beginTransaction();
@@ -189,17 +184,18 @@ public class PsiExchange {
 
             // final persistence for the last batch
             PersisterStatistics stats = persistAndClear(interactionsToCommit, interactionLabelsToCommit);
+            importStats = merge(importStats, stats);
 
-            interactionsPersisted += stats.getPersistedCount(InteractionImpl.class, false);
-            interactionsDuplicated += stats.getDuplicatesCount(InteractionImpl.class, false);
         }
 
         ConversionCache.clear();
 
         if (log.isDebugEnabled()) {
-            log.debug("Processed " + interactionCount+" interactions ("+interactionsPersisted + " persisted, "+interactionsDuplicated+" duplicated (ignored)) in "+
+            log.debug("Processed " + interactionCount+" interactions ("+importStats.getPersistedCount(InteractionImpl.class, false) + " persisted, "+importStats.getDuplicatesCount(InteractionImpl.class, false)+" duplicated (ignored)) in "+
                     (System.currentTimeMillis() - startTime) + "ms");
         }
+
+        return importStats;
     }
 
     private static PersisterStatistics persistAndClear(List<Interaction> interactionsToCommit, List<String> interactionLabelsToCommit) {
@@ -226,6 +222,20 @@ public class PsiExchange {
         commitTransaction();
 
         return stats;
+    }
+
+    private static PersisterStatistics merge(PersisterStatistics stats1, PersisterStatistics stats2) {
+        PersisterStatistics mergedStats = new PersisterStatistics();
+        mergedStats.getDuplicatesMap().putAll(stats1.getDuplicatesMap());
+        mergedStats.getDuplicatesMap().putAll(stats2.getDuplicatesMap());
+        mergedStats.getPersistedMap().putAll(stats1.getPersistedMap());
+        mergedStats.getPersistedMap().putAll(stats2.getPersistedMap());
+        mergedStats.getMergedMap().putAll(stats1.getMergedMap());
+        mergedStats.getMergedMap().putAll(stats2.getMergedMap());
+        mergedStats.getTransientMap().putAll(stats1.getTransientMap());
+        mergedStats.getTransientMap().putAll(stats2.getTransientMap());
+
+        return mergedStats;
     }
 
     private static void beginTransaction() {
