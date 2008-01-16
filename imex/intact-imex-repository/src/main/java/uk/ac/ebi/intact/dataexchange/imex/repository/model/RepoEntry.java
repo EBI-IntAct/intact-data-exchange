@@ -49,11 +49,13 @@ public class RepoEntry extends RepoEntity {
 
     private boolean importable = true;
 
+    private boolean autoFixed;
+
     @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
     private DateTime releaseDate;
 
     @OneToMany (mappedBy = "repoEntry", cascade = CascadeType.ALL)
-    private List<UnexpectedError> errors;
+    private List<Message> messages;
 
     public RepoEntry() {
     }
@@ -104,23 +106,26 @@ public class RepoEntry extends RepoEntity {
         if (!valid) importable = false;
     }
 
-    public List<UnexpectedError> getErrors() {
-        if (errors == null) {
-           errors = new ArrayList<UnexpectedError>();
+    public List<Message> getMessages() {
+        if (messages == null) {
+           messages = new ArrayList<Message>();
         }
-        return errors;
+        return messages;
     }
 
-    public void setErrors(List<UnexpectedError> errors) {
-        this.errors = errors;
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
     }
 
-    public void addError(UnexpectedError error) {
-        getErrors().add(error);
-        error.setRepoEntry(this);
+    public void addMessage(Message message) {
+        getMessages().add(message);
+        message.setRepoEntry(this);
         
         valid = false;
-        importable = false;
+
+        if (message.getLevel() == MessageLevel.ERROR) {
+            importable = false;
+        }
     }
 
     public boolean isImportable() {
@@ -137,5 +142,13 @@ public class RepoEntry extends RepoEntity {
 
     public void setReleaseDate(DateTime releaseDate) {
         this.releaseDate = releaseDate;
+    }
+
+    public boolean isAutoFixed() {
+        return autoFixed;
+    }
+
+    public void setAutoFixed(boolean autoFixed) {
+        this.autoFixed = autoFixed;
     }
 }

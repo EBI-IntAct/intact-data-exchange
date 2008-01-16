@@ -1,15 +1,11 @@
 package uk.ac.ebi.intact.dataexchange.imex.repository;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 
 import uk.ac.ebi.intact.dataexchange.imex.repository.dao.RepoEntryService;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.UnexpectedError;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.Message;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
 
 /**
@@ -41,8 +37,8 @@ public class PlaygroundStats {
             if (repoEntry.isImportable()) importableCount.add(provider);
 
             if (!repoEntry.isValid()) {
-                if (!repoEntry.getErrors().isEmpty()) {
-                    UnexpectedError error = repoEntry.getErrors().iterator().next();
+                if (!repoEntry.getMessages().isEmpty()) {
+                    Message error = repoEntry.getMessages().iterator().next();
 
 
                     if (error.getStackTrace() != null) {
@@ -62,10 +58,10 @@ public class PlaygroundStats {
                             System.out.println(errorLine);
                         }
                     } else {
-                        if (error.getMessage().contains("Error:(")) {
+                        if (error.getText().contains("Error:(")) {
                             xmlErrors.add(provider);
                         } else {
-                            System.out.println("\tError: " + error.getMessage());
+                            System.out.println("\tError: " + error.getText());
                         }
                     }
                 }

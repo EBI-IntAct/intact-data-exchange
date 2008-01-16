@@ -19,7 +19,8 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
 import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryHelper;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.UnexpectedError;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.Message;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.MessageLevel;
 
 import java.io.*;
 
@@ -41,14 +42,14 @@ public class RepoEntryUtils {
     /**
      * Fail an entry. Change its status to failed and write and error message file
      * @param repoEntry the entry failing
-     * @param message error message
+     * @param text error message
      * @param throwable cause
      */
-    public static void failEntry(RepoEntry repoEntry, String message, Throwable throwable) {
-        UnexpectedError unexpectedError = new UnexpectedError(message, throwable);
-        repoEntry.addError(unexpectedError);
+    public static void failEntry(RepoEntry repoEntry, String text, Throwable throwable) {
+        Message message = new Message(text, MessageLevel.ERROR, throwable);
+        repoEntry.addMessage(message);
 
-        failEntry(repoEntry, unexpectedError);
+        failEntry(repoEntry, message);
     }
 
     /**
@@ -56,7 +57,7 @@ public class RepoEntryUtils {
      * @param repoEntry The entry to fail
      * @param errors Causing errors 
      */
-    public static void failEntry(RepoEntry repoEntry, UnexpectedError ... errors) {
+    public static void failEntry(RepoEntry repoEntry, Message... errors) {
         invalidateRepoEntry(repoEntry);
 
         Repository repository = ImexRepositoryContext.getInstance().getRepository();
@@ -66,8 +67,8 @@ public class RepoEntryUtils {
         try {
             Writer writer = new FileWriter(errorFile);
 
-            for (UnexpectedError error : errors) {
-                writer.append(errorFormattedMessage(error.getMessage(), error.getStackTrace()));
+            for (Message error : errors) {
+                writer.append(errorFormattedMessage(error.getText(), error.getStackTrace()));
             }
 
             writer.close();

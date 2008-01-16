@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007 The European Bioinformatics Institute.
+ * Copyright 2001-2008 The European Bioinformatics Institute.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.model;
 
-import javax.persistence.Entity;
-
 /**
- * TODO comment this
- *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Entity
-public class ValidationError extends UnexpectedError {
+public enum MessageLevel {
+
+    ERROR,
+
+    WARN,
+
+    INFO
 
 }

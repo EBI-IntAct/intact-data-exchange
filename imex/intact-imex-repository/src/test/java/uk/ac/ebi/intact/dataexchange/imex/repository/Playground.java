@@ -21,9 +21,10 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.ftp.ImexFTPClient;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ftp.ImexFTPClientFactory;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ftp.ImexFTPFile;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.UnexpectedError;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.Message;
 
 import java.io.File;
+import java.util.Collections;
 
 /**
  * TODO comment this
@@ -38,7 +39,7 @@ public class Playground {
         FileUtils.deleteDirectory(tempDir);
 
         Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
-           
+
         final ImexFTPClient mintClient = ImexFTPClientFactory.createMintClient();
         mintClient.connect();
         for (ImexFTPFile ftpFile : mintClient.listFiles()) {
@@ -64,18 +65,22 @@ public class Playground {
 //        }
 //        intactClient.disconnect();
 
+
         RepoEntryService repoEntryService = ImexRepositoryContext.getInstance().getImexServiceProvider().getRepoEntryService();
         for (RepoEntry repoEntry : repoEntryService.findAllRepoEntries()) {
             System.out.println(repoEntry.getPmid()+" - "+repoEntry.getRepoEntrySet().getProvider().getName()+" - "+(repoEntry.isValid()? "OK" : "ERROR")+
             (repoEntry.isImportable()? " - IMPORTABLE" : ""));
 
             if (!repoEntry.isValid()) {
-                for (UnexpectedError error : repoEntry.getErrors()) {
-                    System.out.println("\tError: "+error.getMessage());
+                for (Message error : repoEntry.getMessages()) {
+                    System.out.println("\tError: "+error.getText());
                     System.out.println(error.getStackTrace());
                 }
             }
         }
+
+        System.out.println("\nStats:");
+        System.out.println("\tImportable: "+repoEntryService.findImportableExcluding(Collections.EMPTY_LIST).size());
 
     }
 

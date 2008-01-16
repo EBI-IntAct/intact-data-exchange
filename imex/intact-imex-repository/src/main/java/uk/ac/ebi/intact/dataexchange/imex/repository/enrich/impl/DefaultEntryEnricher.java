@@ -2,14 +2,19 @@ package uk.ac.ebi.intact.dataexchange.imex.repository.enrich.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.ImexRepositoryContext;
 import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
 import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryHelper;
 import uk.ac.ebi.intact.dataexchange.imex.repository.enrich.EntryEnricher;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.Message;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.ConversionMessage;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.MessageLevel;
 import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterReport;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterMessage;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.enricher.PsiEnricher;
 
 import java.io.File;
@@ -53,7 +58,19 @@ public class DefaultEntryEnricher implements EntryEnricher
                                                         repoEntry.getRepoEntrySet().getProvider().getName(), true);
 
         try {
+            ConverterContext.getInstance().clear();
+
             PsiEnricher.enrichPsiXml(entryBeforeEnrichFile, entryAfterEnrichFile, new DefaultEnricherConfig());
+
+            ConverterReport report = ConverterContext.getInstance().getReport();
+
+            for (ConverterMessage message : report.getMessages()) {
+                if (message.isAutoFixed()) {
+                    repoEntry.setAutoFixed(message.isAutoFixed());
+                }
+
+                repoEntry.addMessage(new ConversionMessage(message));
+            }
 
             repoEntry.setEnriched(true);
 
@@ -69,5 +86,7 @@ public class DefaultEntryEnricher implements EntryEnricher
             if (log.isErrorEnabled()) log.error(errorMessage, e);
             RepoEntryUtils.failEntry(repoEntry, errorMessage, e);
         }
+
+        ConverterContext.getInstance().clear();
     }
 }

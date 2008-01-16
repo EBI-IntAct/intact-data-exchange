@@ -11,7 +11,7 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryException;
 import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryHelper;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.ValidationError;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.ValidationMessage;
 import uk.ac.ebi.intact.dataexchange.imex.repository.split.EntrySetSplitter;
 import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.PsiExchange;
@@ -79,9 +79,9 @@ public class DefaultEntrySetSplitter implements EntrySetSplitter
 
                 if (!report.isValid()) {
                     for (PsiValidatorMessage psiValidatorMessage : report.getMessages()) {
-                        ValidationError validationError = new ValidationError();
-                        validationError.setMessage(psiValidatorMessage.toString());
-                        repoEntry.addError(validationError);
+                        ValidationMessage validationMessage = new ValidationMessage();
+                        validationMessage.setText(psiValidatorMessage.toString());
+                        repoEntry.addMessage(validationMessage);
                     }
 
                     RepoEntryUtils.failEntry(repoEntry, "Failed PSI Validation", report.toString());

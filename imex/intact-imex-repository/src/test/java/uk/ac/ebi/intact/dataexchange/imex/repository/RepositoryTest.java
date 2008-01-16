@@ -17,8 +17,14 @@ package uk.ac.ebi.intact.dataexchange.imex.repository;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 
 import java.io.File;
+
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.Message;
 
 /**
  * TODO comment this
@@ -38,6 +44,13 @@ public class RepositoryTest extends AbstractRepositoryTestCase {
         File expectedFile = helper.getEntrySetFile("2006-11-01", "dip");
 
         Assert.assertTrue(expectedFile.exists());
+
+        System.out.println("-------------");
+        for (RepoEntry re : getRepository().findRepoEntriesModifiedAfter(new DateTime(1))) {
+                for (Message msg : re.getMessages()) {
+                    System.out.println("["+msg.getLevel()+"] "+msg.getText()+" ["+msg.getContext()+"]");
+                }
+            }
     }
 
     @Test
@@ -57,7 +70,7 @@ public class RepositoryTest extends AbstractRepositoryTestCase {
         getRepository().storeEntrySet(empty, "intact");
 
         RepositoryHelper helper = new RepositoryHelper(getRepository());
-        File expectedFile = helper.getEntrySetFile("2006-07-19", "intact");
+        File expectedFile = helper.getEntrySetFile("2006-05-19", "intact");
 
         Assert.assertTrue(expectedFile.exists());
     }

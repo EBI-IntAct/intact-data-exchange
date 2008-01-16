@@ -15,10 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.imex.repository.mock;
 
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.Provider;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntrySet;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.UnexpectedError;
+import uk.ac.ebi.intact.dataexchange.imex.repository.model.*;
 import org.joda.time.DateTime;
 
 /**
@@ -59,7 +56,7 @@ public class RepoMockBuilder {
             repoEntry.setImportable(true);
         } else {
             repoEntry.setValid(true);
-            repoEntry.getErrors().add(createError("This is an error."));
+            repoEntry.getMessages().add(createError("This is an error."));
         }
 
         return repoEntry;
@@ -70,8 +67,8 @@ public class RepoMockBuilder {
         return provider;
     }
 
-    public UnexpectedError createError(String message) {
-        UnexpectedError error = new UnexpectedError(message, new RuntimeException("anException"));
+    public Message createError(String message) {
+        Message error = new Message(message, MessageLevel.ERROR, new RuntimeException("anException"));
         return error;
     }
 }
