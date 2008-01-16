@@ -18,7 +18,6 @@
 
     <modules>
         <module>intact-psixml-converters</module>
-        <module>intact-psixml-enricher</module>
         <module>intact-psixml-exchange</module>
     </modules>
 
