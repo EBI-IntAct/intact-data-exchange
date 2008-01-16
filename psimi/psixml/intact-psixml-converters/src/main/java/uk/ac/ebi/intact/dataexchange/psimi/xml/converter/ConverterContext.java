@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractionConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractorConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.AnnotationConverterConfig;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationTree;
 
 /**
  * Makes the configuration available to the current thread (through ThreadLocal).
@@ -23,6 +24,10 @@ public class ConverterContext {
 
     private InteractionConverterConfig configInteraction;
 
+    private ConverterReport report;
+
+    private LocationTree location;
+
     private static ThreadLocal<ConverterContext> instance = new ThreadLocal<ConverterContext>() {
         @Override
         protected ConverterContext initialValue() {
@@ -38,6 +43,8 @@ public class ConverterContext {
         this.configInteractor = new InteractorConverterConfig();
         this.configAnnotation = new AnnotationConverterConfig();
         this.configInteraction = new InteractionConverterConfig();
+        this.report = new ConverterReport();
+        this.location = new LocationTree();
     }
 
     public InteractorConverterConfig getInteractorConfig() {
@@ -64,5 +71,22 @@ public class ConverterContext {
     @Deprecated
     public void setConfig( InteractorConverterConfig configInteractor ) {
         this.configInteractor = configInteractor;
+    }
+
+    public void clear() {
+        report = new ConverterReport();
+        resetLocation();
+    }
+
+    public void resetLocation() {
+        this.location = new LocationTree();
+    }
+
+    public ConverterReport getReport() {
+        return report;
+    }
+
+    public LocationTree getLocation() {
+        return location;
     }
 }

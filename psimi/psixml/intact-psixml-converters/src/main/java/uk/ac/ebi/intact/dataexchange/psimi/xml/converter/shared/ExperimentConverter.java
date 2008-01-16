@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.MessageLevel;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
@@ -73,9 +74,12 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         final DbReference primaryRef = psiObject.getBibref().getXref().getPrimaryRef();
         if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(primaryRef.getRefTypeAc()) ||
             !CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())) {
-            log.error("Bibref in ExperimentDescription [PSI Id="+psiObject.getId()+"] " +
-                                                     "should be a primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
-                                                     "with points to Pubmed (dbAc="+ CvDatabase.PUBMED_MI_REF+"): "+primaryRef);
+            final String message = "Bibref in ExperimentDescription [PSI Id=" + psiObject.getId() + "] " +
+                                   "should be a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
+                                   "with points to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + "): " + primaryRef;
+            log.error(message);
+
+            addMessageToContext(MessageLevel.WARN, message+". Fixed.");
         }
 
         IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));

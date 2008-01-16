@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import psidev.psi.mi.xml.model.InteractorType;
 import psidev.psi.mi.xml.model.Organism;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -42,6 +43,8 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             return interactor;
         }
 
+        psiStartConversion(psiObject);
+
         Organism organism = psiObject.getOrganism();
 
         if (organism != null) {
@@ -62,6 +65,8 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             polymer.setCrc64( Crc64.getCrc64( sequence ) );
         }
 
+        psiEndConversion(psiObject);
+
         return interactor;
     }
 
@@ -79,6 +84,8 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             return interactor;
         }
 
+        intactStartConversation(intactObject);
+
         if ( !ConverterContext.getInstance().getInteractorConfig().isExcludePolymerSequence() ) {
             if ( intactObject instanceof Polymer ) {
                 String sequence = ( ( Polymer ) intactObject ).getSequence();
@@ -95,6 +102,8 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getBioSource());
             interactor.setOrganism(organism);
         }
+
+        intactEndConversion(intactObject);
 
         return interactor;
     }
@@ -123,7 +132,7 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         if ( interactorTypeLabel.equals( CvInteractorType.NUCLEIC_ACID ) || interactorTypeLabel.equals( CvInteractorType.DNA ) ) {
             interactor = new NucleicAcidImpl( getInstitution(), organism, shortLabel, interactorType );
         } else {
-            throw new RuntimeException( "Interaction of unexpected type: " + interactorTypeLabel );
+            throw new PsiConversionException( "Interaction of unexpected type: " + interactorTypeLabel );
         }
 
         return interactor;

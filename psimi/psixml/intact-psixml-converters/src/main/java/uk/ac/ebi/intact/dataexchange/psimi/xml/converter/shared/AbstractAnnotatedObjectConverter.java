@@ -16,6 +16,8 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationItem;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.AnnotatedObject;
@@ -41,6 +43,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         this.psiClass = psiClass;
     }
 
+
     public A psiToIntact(T psiObject) {
         A intactObject = (A) ConversionCache.getElement(psiElementKey(psiObject));
         
@@ -61,6 +64,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
 
         return intactObject;
     }
+
 
     public T intactToPsi(A intactObject) {
         T psiObject = (T) ConversionCache.getElement(intactElementKey(intactObject));

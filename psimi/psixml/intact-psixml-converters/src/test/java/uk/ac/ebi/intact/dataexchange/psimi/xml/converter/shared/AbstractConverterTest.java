@@ -16,11 +16,13 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Before;
+import org.junit.After;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 
 import java.io.File;
 import java.io.InputStream;
@@ -36,6 +38,11 @@ public class AbstractConverterTest extends IntactBasicTestCase {
     private static final String INTACT_FILE = "/xml/intact_2006-07-19.xml";
     private static final String MINT_FILE = "/xml/mint_2006-07-18.xml";
     private static final String DIP_FILE = "/xml/dip_2006-11-01.xml";
+
+    @Before @After
+    public void clearConverter() {
+        ConverterContext.getInstance().clear();
+    }
 
     protected File getIntactFile() {
         return new File(AbstractConverterTest.class.getResource(INTACT_FILE).getFile());

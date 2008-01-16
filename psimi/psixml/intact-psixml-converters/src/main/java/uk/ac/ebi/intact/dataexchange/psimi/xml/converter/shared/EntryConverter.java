@@ -17,6 +17,8 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationItem;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
@@ -45,6 +47,8 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
     }
 
     public IntactEntry psiToIntact(Entry psiObject) {
+        psiStartConversion(psiObject);
+
         InstitutionConverter institutionConverter = new InstitutionConverter();
         Institution institution = institutionConverter.psiToIntact(psiObject.getSource());
 
@@ -70,12 +74,17 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
 
         ConversionCache.clear();
 
+        psiEndConversion(psiObject);
+        ConverterContext.getInstance().getLocation().resetPosition();
+
         failIfInconsistentConversion(ientry, psiObject);
 
         return ientry;
     }
 
     public Entry intactToPsi(IntactEntry intactObject) {
+        intactStartConversation(intactObject);
+
         Entry entry = new Entry();
 
         Interaction firstInteraction = intactObject.getInteractions().iterator().next();
@@ -107,6 +116,8 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         }
 
         ConversionCache.clear();
+        
+        intactEndConversion(intactObject);
 
         failIfInconsistentConversion(intactObject, entry);
 

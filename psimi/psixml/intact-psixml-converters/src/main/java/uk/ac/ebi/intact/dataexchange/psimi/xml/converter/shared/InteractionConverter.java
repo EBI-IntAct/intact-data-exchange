@@ -17,13 +17,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.beanutils.ConversionException;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -74,6 +73,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             return interaction;
         }
 
+        psiStartConversion(psiObject);
+
         // This has to be before anything else (e.g. when creating xrefs)
         interaction.setOwner(getInstitution());
 
@@ -121,6 +122,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         // update experiment participant detection method if necessary
         updateExperimentParticipantDetectionMethod(interaction);
+
+        psiEndConversion(psiObject);
 
         failIfInconsistentConversion(interaction, psiObject);
 
@@ -170,6 +173,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             log.warn("Interaction identity xref found pointing to the source database. It should be of type 'source-reference'. Will be fixed automatically: "+xrefToFix);
             CvXrefQualifier sourceReference = CvObjectUtils.createCvObject(interaction.getOwner(), CvXrefQualifier.class, CvXrefQualifier.SOURCE_REFERENCE_MI_REF, CvXrefQualifier.SOURCE_REFERENCE);
             xrefToFix.setCvXrefQualifier(sourceReference);
+
+            addMessageToContext(MessageLevel.WARN, "Interaction identity xref found pointing to the source database. It should be of type 'source-reference'. Fixed.");
         }
         
     }
@@ -180,6 +185,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         if (!isNewPsiObjectCreated()) {
             return interaction;
         }
+
+        intactStartConversation(intactObject);
 
         // imexId
         InteractorXref imexXref = getImexXref(intactObject);
@@ -214,6 +221,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             interaction.getConfidences().add( confidence);
         }
 
+        intactEndConversion(intactObject);
+
         failIfInconsistentConversion(intactObject, interaction);
 
         return interaction;
@@ -226,24 +235,16 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                 String partDetMethod = calculateParticipantDetMethod(interaction.getComponents());
 
                 if (partDetMethod != null) {
-                    if (log.isWarnEnabled())
-                        log.warn("Experiment without participant detection method. One was calculated from the components: " + partDetMethod);
+                    final String message = "Experiment without participant detection method. One was calculated from the components: " + partDetMethod;
+                    addMessageToContext(MessageLevel.INFO, message);
+
+                    if (log.isWarnEnabled()) {
+                        log.warn(message);
+                    }
 
                     CvIdentification detMethod = CvObjectUtils.createCvObject(experiment.getOwner(), CvIdentification.class, partDetMethod, "undefined");
                     experiment.setCvIdentification(detMethod);
                 }
-
-                /*
-               for (Component component : interaction.getComponents() ) {
-                   for (CvIdentification partDetMethod : component.getParticipantDetectionMethods()) {
-                       if (experiment.getCvIdentification() != null && !experiment.getCvIdentification().getMiIdentifier().equals(partDetMethod.getMiIdentifier())) {
-                           log.warn("Cannot convert an experiment that does not have participant " +
-                                 "detection method defined and its participants have different detection methods: Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"', Det. Methods: "+component.getParticipantDetectionMethods());
-                       } else {
-                           experiment.setCvIdentification(partDetMethod);
-                       }
-                   }
-               } */
 
                 if (experiment.getCvIdentification() == null) {
                     throw new UnsupportedConversionException("Experiment without CvIdentification (participant detection method) and its participants do not have one either: Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"'");
@@ -252,7 +253,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
     }
 
-     private String calculateParticipantDetMethod(Collection<Component> components) {
+    private String calculateParticipantDetMethod(Collection<Component> components) {
         Set<String> detMethodMis = new HashSet<String>();
 
          for (Component component : components) {

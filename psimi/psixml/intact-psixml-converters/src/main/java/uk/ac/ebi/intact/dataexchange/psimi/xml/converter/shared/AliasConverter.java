@@ -39,6 +39,8 @@ public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<
     }
 
     public A psiToIntact(psidev.psi.mi.xml.model.Alias psiObject) {
+        psiStartConversion(psiObject);
+
         String name = psiObject.getValue();
         String aliasType = psiObject.getType();
         String aliasTypeAc = psiObject.getTypeAc();
@@ -59,10 +61,14 @@ public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<
         A alias = newAliasInstance(aliasClass, cvAliasType, name);
         alias.setOwner(getInstitution());
 
+        psiEndConversion(psiObject);
+
         return alias;
     }
 
     public psidev.psi.mi.xml.model.Alias intactToPsi(Alias intactObject) {
+        intactStartConversation(intactObject);
+
         String name = intactObject.getName();
 
         psidev.psi.mi.xml.model.Alias psiAlias = new psidev.psi.mi.xml.model.Alias(name);
@@ -76,6 +82,8 @@ public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<
             psiAlias.setType(aliasType);
             psiAlias.setTypeAc(aliasTypeAc);
         }
+
+        intactEndConversion(intactObject);
 
         return psiAlias;
     }

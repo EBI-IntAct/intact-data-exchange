@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007 The European Bioinformatics Institute.
+ * Copyright 2001-2008 The European Bioinformatics Institute.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,11 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
 
 /**
- * Exception thrown if the case is possible by IMEx standards, but not supported by the intact curation spec.
- *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id$
- */
-public class UnsupportedConversionException extends PsiConversionException {
-
-    public UnsupportedConversionException() {
-    }
-
-    public UnsupportedConversionException(Throwable cause) {
-        super(cause);
-    }
-
-    public UnsupportedConversionException(String message) {
-        super(message);
-    }
-
-    public UnsupportedConversionException(String message, Throwable cause) {
-        super(message, cause);
-    }
+* @version $Id$
+*/
+public enum MessageLevel {
+    FATAL,
+    WARN,
+    INFO
 }

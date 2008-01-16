@@ -42,15 +42,21 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
     }
 
     public C psiToIntact(T psiObject) {
+        psiStartConversion(psiObject);
+
         C cv = newCvInstance(intactCvClass);
         cv.setOwner(getInstitution());
         IntactConverterUtils.populateNames(psiObject.getNames(), cv);
         IntactConverterUtils.populateXref(psiObject.getXref(), cv, new XrefConverter<CvObjectXref>(getInstitution(), CvObjectXref.class));
-        
+
+        psiEndConversion(psiObject);
+
         return cv;
     }
 
     public T intactToPsi(C intactObject) {
+        intactStartConversation(intactObject);
+
         T cvType = (T) ConversionCache.getElement(elementKey(intactObject));
 
         if (cvType != null) {
@@ -61,6 +67,8 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
         PsiConverterUtils.populate(intactObject, cvType);
 
         ConversionCache.putElement(elementKey(intactObject), cvType);
+
+        intactEndConversion(intactObject);
 
         return cvType;
     }

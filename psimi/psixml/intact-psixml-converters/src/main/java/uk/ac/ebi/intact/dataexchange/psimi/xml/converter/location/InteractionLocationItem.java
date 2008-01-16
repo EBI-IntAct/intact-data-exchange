@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007 The European Bioinformatics Institute.
+ * Copyright 2001-2008 The European Bioinformatics Institute.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
+package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location;
 
 /**
- * Exception thrown if the case is possible by IMEx standards, but not supported by the intact curation spec.
- *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class UnsupportedConversionException extends PsiConversionException {
+public class InteractionLocationItem extends LocationItem{
 
-    public UnsupportedConversionException() {
+    private String imexId;
+
+    public InteractionLocationItem(String id, Class<?> type, String imexId) {
+        super(id, type);
+        this.imexId = imexId;
     }
 
-    public UnsupportedConversionException(Throwable cause) {
-        super(cause);
+    public String getImexId() {
+        return imexId;
     }
 
-    public UnsupportedConversionException(String message) {
-        super(message);
+    public void setImexId(String imexId) {
+        this.imexId = imexId;
     }
 
-    public UnsupportedConversionException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    public String toString() {
+        return getType().getSimpleName()+"[imexId="+imexId+", id="+getId()+"]";
     }
 }

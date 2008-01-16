@@ -15,13 +15,9 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import psidev.psi.mi.xml.model.DbReference;
 import psidev.psi.mi.xml.model.Attribute;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiMiPopulator;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
  * TODO comment this
@@ -36,14 +32,22 @@ public class AnnotationConverter extends AbstractIntactPsiConverter<Annotation, 
     }
 
     public Annotation psiToIntact(Attribute psiObject) {
+        psiEndConversion(psiObject);
+
         CvTopic cvTopic = new CvTopic(getInstitution(), psiObject.getName());
         Annotation annotation = new Annotation(getInstitution(), cvTopic, psiObject.getValue());
+
+        psiEndConversion(psiObject);
 
         return annotation;
     }
 
     public Attribute intactToPsi(Annotation intactObject) {
+        intactStartConversation(intactObject);
+
         Attribute attribute = new Attribute(intactObject.getCvTopic().getShortLabel(), intactObject.getAnnotationText());
+
+        psiEndConversion(intactObject);
 
         return attribute;
     }

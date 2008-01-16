@@ -32,7 +32,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionEx
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class ExperimentConverterTest extends IntactBasicTestCase {
+public class ExperimentConverterTest extends AbstractConverterTest {
 
     @Test
     public void psiToIntact_default() {

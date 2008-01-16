@@ -15,6 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
 
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationTree;
+
 /**
  * TODO comment this
  *
@@ -23,18 +25,33 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
  */
 public class PsiConversionException extends RuntimeException {
 
+    private LocationTree location;
+
     public PsiConversionException() {
+        resetState();
     }
 
     public PsiConversionException(Throwable cause) {
         super(cause);
+        resetState();
     }
 
     public PsiConversionException(String message) {
         super(message);
+        resetState();
     }
 
     public PsiConversionException(String message, Throwable cause) {
         super(message, cause);
+        resetState();
+    }
+
+    public LocationTree getLocation() {
+        return location;
+    }
+
+    public void resetState() {
+        this.location = ConverterContext.getInstance().getLocation();
+        ConverterContext.getInstance().resetLocation();
     }
 }

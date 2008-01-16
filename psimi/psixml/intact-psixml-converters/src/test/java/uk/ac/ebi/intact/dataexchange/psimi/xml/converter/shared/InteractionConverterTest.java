@@ -19,8 +19,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Interaction;
+import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterMessage;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.model.Xref;
@@ -32,7 +35,7 @@ import uk.ac.ebi.intact.model.util.XrefUtils;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InteractionConverterTest {
+public class InteractionConverterTest extends AbstractConverterTest {
 
     @Test
     public void psiToIntact_default() throws Exception {
@@ -180,6 +183,7 @@ public class InteractionConverterTest {
     @Test
     public void psiToIntact_fixSourceReferenceXrefs() throws Exception {
         Interaction psiInteraction = PsiMockFactory.createMockInteraction();
+
         final DbReference dbRef = PsiMockFactory.createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.DIP, CvDatabase.DIP_MI_REF);
         dbRef.setId("DIP:12345");
         psiInteraction.getXref().getSecondaryRef().clear();
@@ -193,6 +197,8 @@ public class InteractionConverterTest {
 
         Assert.assertEquals(1, interaction.getXrefs().size());
         Assert.assertEquals(CvXrefQualifier.SOURCE_REFERENCE_MI_REF, interaction.getXrefs().iterator().next().getCvXrefQualifier().getMiIdentifier());
+
+        Assert.assertEquals(2, ConverterContext.getInstance().getReport().getMessages().size());
     }
 
 

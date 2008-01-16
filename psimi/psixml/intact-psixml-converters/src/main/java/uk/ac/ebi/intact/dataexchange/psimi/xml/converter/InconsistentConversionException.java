@@ -21,7 +21,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InconsistentConversionException extends RuntimeException {
+public class InconsistentConversionException extends PsiConversionException {
 
     public InconsistentConversionException(String type, int intactNumber, int psiNumber) {
         super("The number of non-redundant "+type.toLowerCase()+"s (with different ids) during conversion has changed. Intact:"+intactNumber+" != Psi:"+psiNumber);

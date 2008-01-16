@@ -97,7 +97,6 @@ public class EntryConverterTest extends AbstractConverterTest {
     static boolean output = false;
 
     @Test
-    @Ignore
     public void roundtrip_dip() throws Exception {
 
         File file = getDipFile();
