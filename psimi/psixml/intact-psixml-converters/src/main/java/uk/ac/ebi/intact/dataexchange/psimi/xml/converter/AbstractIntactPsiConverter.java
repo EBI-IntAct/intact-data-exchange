@@ -45,7 +45,7 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
     }
 
     protected void psiStartConversion(Object psiObject) {
-        String id = "";
+        String id = null;
         if (psiObject instanceof HasId) {
             id = String.valueOf(((HasId)psiObject).getId());
         }
@@ -67,7 +67,7 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
     }
 
     protected void intactStartConversation(Object intactObject) {
-         String id = "";
+         String id = null;
         if (intactObject instanceof IntactObject) {
             final String ac = ((IntactObject) intactObject).getAc();
             if (ac != null) {

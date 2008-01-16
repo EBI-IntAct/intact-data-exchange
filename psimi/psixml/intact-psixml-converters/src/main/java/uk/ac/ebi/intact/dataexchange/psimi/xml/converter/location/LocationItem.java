@@ -99,7 +99,7 @@ public class LocationItem {
 
     @Override
     public String toString() {
-        return type.getSimpleName()+"[id="+id+"]";
+        return type.getSimpleName()+((id == null)? "" : "[id="+id+"]");
     }
 
 

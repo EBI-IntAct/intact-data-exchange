@@ -49,6 +49,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             return experiment;
         }
 
+        psiStartConversion(psiObject);
+
         String shortLabel;
 
         if (psiObject.getNames() != null) {
@@ -96,6 +98,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         Publication publication = createPublication(psiObject);
         experiment.setPublication(publication);
 
+        psiEndConversion(psiObject);
+
         return experiment;
     }
 
@@ -105,6 +109,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         if (!isNewPsiObjectCreated()) {
             return expDesc;
         }
+
+        intactStartConversation(intactObject);
 
         Bibref bibref = new Bibref();
 
@@ -130,6 +136,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getBioSource());
         expDesc.getHostOrganisms().add(organism);
+
+        intactEndConversion(intactObject);
 
         return expDesc;
     }

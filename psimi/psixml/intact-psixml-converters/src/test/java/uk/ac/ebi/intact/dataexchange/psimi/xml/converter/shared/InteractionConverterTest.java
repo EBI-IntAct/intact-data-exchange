@@ -201,6 +201,35 @@ public class InteractionConverterTest extends AbstractConverterTest {
         Assert.assertEquals(2, ConverterContext.getInstance().getReport().getMessages().size());
     }
 
+    @Test
+    public void psiToIntact_fixSourceReferenceXrefs2() throws Exception {
+        Interaction psiInteraction = PsiMockFactory.createMockInteraction();
+
+        Entry entry = PsiMockFactory.createMockEntry();
+        entry.getInteractions().clear();
+        entry.getExperiments().clear();
+        entry.getInteractors().clear();
+
+        entry.getInteractions().add(psiInteraction);
+
+        final DbReference dbRef = PsiMockFactory.createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.DIP, CvDatabase.DIP_MI_REF);
+        dbRef.setId("DIP:12345");
+        psiInteraction.getXref().getSecondaryRef().clear();
+        psiInteraction.getXref().setPrimaryRef(dbRef);
+
+        final Institution dip = new Institution(Institution.DIP);
+        dip.addXref(XrefUtils.createIdentityXrefPsiMi(dip, Institution.DIP_REF));
+
+        EntryConverter converter = new EntryConverter();
+        IntactEntry ientry = converter.psiToIntact(entry);
+
+        for (ConverterMessage msg : ConverterContext.getInstance().getReport().getMessages()) {
+            System.out.println(msg);
+        }
+
+        Assert.assertEquals(2, ConverterContext.getInstance().getReport().getMessages().size());
+    }
+
 
     @Test
     public void intactTopsi_default() throws Exception {
