@@ -174,7 +174,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             CvXrefQualifier sourceReference = CvObjectUtils.createCvObject(interaction.getOwner(), CvXrefQualifier.class, CvXrefQualifier.SOURCE_REFERENCE_MI_REF, CvXrefQualifier.SOURCE_REFERENCE);
             xrefToFix.setCvXrefQualifier(sourceReference);
 
-            addMessageToContext(MessageLevel.WARN, "Interaction identity xref found pointing to the source database. It should be of type 'source-reference'. Fixed.");
+            addMessageToContext(MessageLevel.WARN, "Interaction identity xref found pointing to the source database. It should be of type 'source-reference'. Fixed.", true);
         }
         
     }
@@ -236,7 +236,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
                 if (partDetMethod != null) {
                     final String message = "Experiment without participant detection method. One was calculated from the components: " + partDetMethod;
-                    addMessageToContext(MessageLevel.INFO, message);
+                    addMessageToContext(MessageLevel.INFO, message, true);
 
                     if (log.isWarnEnabled()) {
                         log.warn(message);

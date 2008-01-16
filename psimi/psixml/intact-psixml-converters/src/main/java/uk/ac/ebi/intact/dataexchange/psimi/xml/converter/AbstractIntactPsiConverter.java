@@ -82,7 +82,9 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
         ConverterContext.getInstance().getLocation().resetPosition();
     }
 
-    protected void addMessageToContext(MessageLevel level, String message) {
-        ConverterContext.getInstance().getReport().getMessages().add(new ConverterMessage(level, message, ConverterContext.getInstance().getLocation().getCurrentLocation()));
+    protected void addMessageToContext(MessageLevel level, String message, boolean autoFixed) {
+        final ConverterMessage converterMessage = new ConverterMessage(level, message, ConverterContext.getInstance().getLocation().getCurrentLocation());
+        converterMessage.setAutoFixed(autoFixed);
+        ConverterContext.getInstance().getReport().getMessages().add(converterMessage);
     }
 }

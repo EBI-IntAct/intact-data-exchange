@@ -79,7 +79,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
                                    "with points to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + "): " + primaryRef;
             log.error(message);
 
-            addMessageToContext(MessageLevel.WARN, message+". Fixed.");
+            addMessageToContext(MessageLevel.WARN, message+". Fixed.", true);
         }
 
         IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));

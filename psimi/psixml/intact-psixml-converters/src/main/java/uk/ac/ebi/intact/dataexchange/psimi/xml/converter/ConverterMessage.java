@@ -31,6 +31,8 @@ public class ConverterMessage implements Serializable {
 
     private LocationItem location;
 
+    boolean autoFixed;
+
     public ConverterMessage() {
     }
 
@@ -58,6 +60,14 @@ public class ConverterMessage implements Serializable {
 
     public LocationItem getLocation() {
         return location;
+    }
+
+    public boolean isAutoFixed() {
+        return autoFixed;
+    }
+
+    public void setAutoFixed(boolean autoFixed) {
+        this.autoFixed = autoFixed;
     }
 
     @Override
