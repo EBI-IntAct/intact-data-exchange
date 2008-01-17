@@ -112,18 +112,29 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         experiment.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(autoFill.getShortlabel(false)));
         experiment.setFullName(autoFill.getFullname());
 
-        CvTopic publicationYearTopic = CvObjectUtils.createCvObject(experiment.getOwner(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
-        experiment.addAnnotation(new Annotation(experiment.getOwner(), publicationYearTopic, String.valueOf(autoFill.getYear())));
+        if (!experimentAnnotationsContainTopic(experiment, CvTopic.AUTHOR_LIST_MI_REF)) {
+            CvTopic publicationYearTopic = CvObjectUtils.createCvObject(experiment.getOwner(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
+            experiment.addAnnotation(new Annotation(experiment.getOwner(), publicationYearTopic, String.valueOf(autoFill.getYear())));
+        }
 
-        if (autoFill.getAuthorList() != null) {
+        if (autoFill.getAuthorList() != null && !experimentAnnotationsContainTopic(experiment, CvTopic.AUTHOR_LIST_MI_REF)) {
             CvTopic authorListTopic = CvObjectUtils.createCvObject(experiment.getOwner(), CvTopic.class, CvTopic.AUTHOR_LIST_MI_REF, CvTopic.AUTHOR_LIST);
             experiment.addAnnotation(new Annotation(experiment.getOwner(), authorListTopic, autoFill.getAuthorList()));
         }
 
-        if (autoFill.getAuthorEmail() != null) {
+        if (autoFill.getAuthorEmail() != null && !experimentAnnotationsContainTopic(experiment, CvTopic.CONTACT_EMAIL_MI_REF)) {
             CvTopic authorEmail = CvObjectUtils.createCvObject(experiment.getOwner(), CvTopic.class, CvTopic.CONTACT_EMAIL_MI_REF, CvTopic.CONTACT_EMAIL);
             experiment.addAnnotation(new Annotation(experiment.getOwner(), authorEmail, autoFill.getAuthorEmail()));
         }
+    }
+
+    private boolean experimentAnnotationsContainTopic(Experiment experiment, String miIdentifier) {
+        for (Annotation annot : experiment.getAnnotations()) {
+            if (miIdentifier.equals(annot.getCvTopic().getMiIdentifier())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String calculateParticipantDetMethod(Experiment experiment) {
