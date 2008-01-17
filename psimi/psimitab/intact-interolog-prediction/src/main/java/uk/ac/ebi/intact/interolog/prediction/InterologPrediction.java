@@ -52,6 +52,7 @@ import uk.ac.ebi.intact.interolog.util.NewtUtils;
 /**
  * This is the main part of the prediction process.
  * 
+ * 08/01/15: little improvment, the program stop when the list of taxids is empty (the list of species for which we will predict interactions).
  * 07/11/26: the clog data are now public and called the porc data (for Putative ORthologous Clusters, see http://www.ebi.ac.uk/integr8/EBI-Integr8-HomePage.do)
  * the URL is known and added in this class. Nevertheless, it is recommended to download the file manually and then run the program pointing to the downloaded file (160257 KB  	15/11/07).
  * 
