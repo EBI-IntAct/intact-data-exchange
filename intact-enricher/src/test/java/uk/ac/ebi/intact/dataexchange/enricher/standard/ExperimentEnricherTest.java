@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.clone.IntactCloner;
 
 /**
@@ -63,6 +64,22 @@ public class ExperimentEnricherTest extends IntactBasicTestCase {
         Assert.assertEquals(2, experiment.getAnnotations().size());
 
         Assert.assertEquals("DIP", experiment.getOwner().getShortLabel());
+    }
+
+    @Test
+    public void enrich_pub_repeatedAnnots() {
+        final String pubmedId = "15733859";
+
+        Publication publication = getMockBuilder().createPublication(pubmedId);
+        Experiment experiment = getMockBuilder().createExperimentEmpty();
+        experiment.setPublication(publication);
+
+        CvTopic publicationYearTopic = CvObjectUtils.createCvObject(experiment.getOwner(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
+        experiment.addAnnotation(new Annotation(experiment.getOwner(), publicationYearTopic,"2005"));
+
+        enricher.enrich(experiment);
+
+        Assert.assertEquals(2, experiment.getAnnotations().size());
     }
 
     @Test
