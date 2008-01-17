@@ -162,8 +162,10 @@ public class PsiConverterUtils {
         for ( Annotation annotation : annotatedObject.getAnnotations() ) {
         	if (false == configAnnotation.isExcluded(annotation.getCvTopic())) {
         		Attribute attribute = annotationConverter.intactToPsi( annotation );
-        		attributeContainer.getAttributes().add( attribute );
-        	}
+                if (!attributeContainer.getAttributes().contains( attribute )) {
+                    attributeContainer.getAttributes().add( attribute );
+                }
+            }
         }
     }
 

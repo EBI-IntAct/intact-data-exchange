@@ -120,7 +120,10 @@ public class IntactConverterUtils {
             for (Attribute attribute : attributeContainer.getAttributes()) {
                 Annotation annotation = annotationConverter.psiToIntact(attribute);
                 annotation.setOwner(institution);
-                annotated.getAnnotations().add(annotation);
+
+                if (!annotated.getAnnotations().contains(annotation)) {
+                    annotated.getAnnotations().add(annotation);
+                }
             }
         }
     }
