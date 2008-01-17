@@ -24,6 +24,7 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.Message;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 
 /**
@@ -35,7 +36,7 @@ import java.util.Collections;
 public class Playground {
 
     public static void main(String[] args) throws Exception {
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-mintdip/");
+        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-mintdip2/");
         FileUtils.deleteDirectory(tempDir);
 
         Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
@@ -54,7 +55,11 @@ public class Playground {
         final ImexFTPClient dipClient = ImexFTPClientFactory.createDipClient();
         dipClient.connect();
         for (ImexFTPFile ftpFile : dipClient.listFiles()) {
-            repo.storeEntrySet(ftpFile, "dip");
+            try {
+                repo.storeEntrySet(ftpFile, "dip");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         dipClient.disconnect();
 

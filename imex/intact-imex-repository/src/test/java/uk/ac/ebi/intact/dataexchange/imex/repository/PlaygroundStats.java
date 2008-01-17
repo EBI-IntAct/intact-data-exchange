@@ -17,7 +17,7 @@ import com.google.common.collect.HashMultiset;
 public class PlaygroundStats {
 
     public static void main(String[] args) throws Exception {
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-mintdip/");
+        File tempDir = new File(System.getProperty("java.io.tmpdir"), "myRepo-mintdip2/");
 
         Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
 

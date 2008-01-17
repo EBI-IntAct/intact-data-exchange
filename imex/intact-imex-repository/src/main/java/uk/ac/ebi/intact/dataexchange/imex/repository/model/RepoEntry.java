@@ -120,8 +120,10 @@ public class RepoEntry extends RepoEntity {
     public void addMessage(Message message) {
         getMessages().add(message);
         message.setRepoEntry(this);
-        
-        valid = false;
+
+        if (message instanceof ValidationMessage && message.getLevel() == MessageLevel.ERROR) {
+            valid = false;
+        }
 
         if (message.getLevel() == MessageLevel.ERROR) {
             importable = false;

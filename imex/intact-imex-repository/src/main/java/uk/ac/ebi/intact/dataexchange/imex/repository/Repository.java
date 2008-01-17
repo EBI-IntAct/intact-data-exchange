@@ -78,6 +78,7 @@ public class Repository {
 
         RepoEntrySet repoEntrySet = new RepoEntrySet(provider, name);
 
+
         RepositoryHelper repoHelper = new RepositoryHelper(this);
         File newFile = repoHelper.getEntrySetFile(repoEntrySet);
 
