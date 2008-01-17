@@ -111,6 +111,19 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         ExperimentAutoFill autoFill = new ExperimentAutoFill(pubmedId);
         experiment.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(autoFill.getShortlabel(false)));
         experiment.setFullName(autoFill.getFullname());
+
+        CvTopic publicationYearTopic = CvObjectUtils.createCvObject(experiment.getOwner(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
+        experiment.addAnnotation(new Annotation(experiment.getOwner(), publicationYearTopic, String.valueOf(autoFill.getYear())));
+
+        if (autoFill.getAuthorList() != null) {
+            CvTopic authorListTopic = CvObjectUtils.createCvObject(experiment.getOwner(), CvTopic.class, CvTopic.AUTHOR_LIST_MI_REF, CvTopic.AUTHOR_LIST);
+            experiment.addAnnotation(new Annotation(experiment.getOwner(), authorListTopic, autoFill.getAuthorList()));
+        }
+
+        if (autoFill.getAuthorEmail() != null) {
+            CvTopic authorEmail = CvObjectUtils.createCvObject(experiment.getOwner(), CvTopic.class, CvTopic.CONTACT_EMAIL_MI_REF, CvTopic.CONTACT_EMAIL);
+            experiment.addAnnotation(new Annotation(experiment.getOwner(), authorEmail, autoFill.getAuthorEmail()));
+        }
     }
 
     private String calculateParticipantDetMethod(Experiment experiment) {
