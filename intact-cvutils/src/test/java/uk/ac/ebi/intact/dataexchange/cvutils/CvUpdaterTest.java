@@ -3,8 +3,11 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
+import uk.ac.ebi.intact.model.CvInteractionType;
+import uk.ac.ebi.intact.model.CvTopic;
 
 import java.net.URL;
 
@@ -41,6 +44,29 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals(0, stats2.getUpdatedCvs().size());
         Assert.assertEquals(50, stats2.getObsoleteCvs().size());
         Assert.assertEquals(9, stats2.getInvalidTerms().size());
+    }
+
+    @Test
+    public void createOrUpdateCVs_existingTermToMarkAsObsolete() throws Exception {
+        CvInteractionType aggregation = getMockBuilder().createCvObject(CvInteractionType.class, "MI:0191", "aggregation");
+        CvTopic obsolete = getMockBuilder().createCvObject(CvTopic.class, CvTopic.OBSOLETE_MI_REF, CvTopic.OBSOLETE);
+        PersisterHelper.saveOrUpdate(aggregation, obsolete);
+
+        IntactOntology ontology = OboUtils.createOntologyFromOboDefault(10841);
+
+        CvUpdater updater = new CvUpdater();
+        CvUpdaterStatistics stats = updater.createOrUpdateCVs(ontology);
+        System.out.println(stats);
+
+        int total = getDaoFactory().getCvObjectDao().countAll();
+        Assert.assertEquals(849, total);
+
+        // TODO fix assertions
+        Assert.assertEquals(845, stats.getCreatedCvs().size());
+        Assert.assertEquals(0, stats.getUpdatedCvs().size());
+        Assert.assertEquals(50, stats.getObsoleteCvs().size());
+        Assert.assertEquals(9, stats.getInvalidTerms().size());
+
     }
 
     @Test

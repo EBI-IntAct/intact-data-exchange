@@ -13,6 +13,7 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
+import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 
 import java.util.*;
 
@@ -31,6 +32,8 @@ public class CvUpdater {
 
     private boolean excludeObsolete;
     private CvDatabase nonMiCvDatabase;
+
+    private CvTopic obsoleteTopic;
 
     public CvUpdater() {
         this.nonMiCvDatabase = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(),
@@ -68,7 +71,20 @@ public class CvUpdater {
 
         List<CvTopic> orphanCvs = new ArrayList<CvTopic>(ontology.getOrphanTerms().size());
 
+        CvTopic obsoleteTopic = createCvTopicObsolete();
+
         for (CvTerm orphan : ontology.getOrphanTerms()) {
+
+            // skip if it is the "obsolete" term
+            if (CvTopic.OBSOLETE_MI_REF.equals(orphan.getId())) {
+                continue;
+            }
+
+            // all obsolete terms are orphan, we should check if what is now an orphan term
+            // was not obsolete before and already exists in the database. If so, it should be
+            // added the obsolete term
+            boolean markedAsObsolete = checkAndMarkAsObsoleteIfExisted(orphan, stats);
+
             // check if we deal with obsolete terms
             if (excludeObsolete && orphan.isObsolete()) {
                 continue;
@@ -77,8 +93,13 @@ public class CvUpdater {
             addCvObjectToStatsIfObsolete(orphan);
 
             // check if it is valid and persist
-            if (isValidTerm(orphan)) {
+            if (isValidTerm(orphan) && !markedAsObsolete) {
                 CvTopic cvOrphan = toCvObject(CvTopic.class, orphan);
+
+                if (orphan.isObsolete()) {
+                    addObsoleteAnnotation(cvOrphan);
+                }
+
                 orphanCvs.add(cvOrphan);
                 stats.addOrphanCv(cvOrphan);
 
@@ -87,6 +108,16 @@ public class CvUpdater {
                 stats.getInvalidTerms().put(orphan.getId(), orphan.getShortName());
             }
         }
+
+        // workaround, as we create the "obsolete" term in the class, ignoring the one
+        // that comes from the OBO file
+        if (obsoleteTopic.getAc() == null) {
+            rootsAndOrphans.add(obsoleteTopic);
+        }
+        stats.addObsoleteCv(obsoleteTopic);
+        stats.addOrphanCv(obsoleteTopic);
+
+        // Persist all CVs
 
         List<CvDagObject> allCvs = new ArrayList<CvDagObject>();
         for (CvObject rootOrOrphan : rootsAndOrphans) {
@@ -105,6 +136,62 @@ public class CvUpdater {
         }
 
         return stats;
+    }
+
+    private boolean checkAndMarkAsObsoleteIfExisted(CvTerm orphan, CvUpdaterStatistics stats) {
+        String id = orphan.getId();
+
+        boolean markedAsObsolete = false;
+
+        final CvObjectDao<CvObject> cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                .getCvObjectDao();
+        CvObject existingCv = cvObjectDao.getByPsiMiRef(id);
+
+        if (existingCv == null) {
+            existingCv = cvObjectDao.getByShortLabel(CvObject.class, orphan.getShortName());
+        }
+
+        if (existingCv != null) {
+             CvTopic obsoleteTopic = createCvTopicObsolete();
+
+            boolean alreadyContainsObsolete = false;
+
+            for (Annotation annot : existingCv.getAnnotations()) {
+                if (CvTopic.OBSOLETE_MI_REF.equals(annot.getCvTopic().getMiIdentifier())) {
+                    alreadyContainsObsolete = true;
+                }
+            }
+
+            if (!alreadyContainsObsolete) {
+                existingCv.addAnnotation(new Annotation(existingCv.getOwner(), obsoleteTopic, CvTopic.OBSOLETE));
+                stats.addUpdatedCv(existingCv);
+                markedAsObsolete = true;
+            }
+        }
+
+        return markedAsObsolete;
+    }
+
+    private void addObsoleteAnnotation(CvObject existingCv) {
+        obsoleteTopic.addAnnotation(new Annotation(existingCv.getOwner(), obsoleteTopic, CvTopic.OBSOLETE));
+    }
+
+    private CvTopic createCvTopicObsolete() {
+        if (obsoleteTopic != null) {
+            return obsoleteTopic;
+        }
+
+        obsoleteTopic = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                .getCvObjectDao(CvTopic.class).getByPsiMiRef(CvTopic.OBSOLETE_MI_REF);
+
+        if (obsoleteTopic == null) {
+                // create the obsolete term (which is obsolete too!)
+                obsoleteTopic = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.OBSOLETE_MI_REF, CvTopic.OBSOLETE);
+                obsoleteTopic.setFullName("obsolete term");
+                addObsoleteAnnotation(obsoleteTopic);
+        }
+
+        return obsoleteTopic;
     }
 
     private List<CvDagObject> itselfAndChildrenAsList(CvDagObject cv) {
