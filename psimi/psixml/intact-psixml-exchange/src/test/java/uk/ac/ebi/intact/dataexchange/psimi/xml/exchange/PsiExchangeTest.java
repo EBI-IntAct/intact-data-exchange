@@ -45,23 +45,22 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     public void importXml_intact() throws Exception {
         EntrySet set = getIntactEntrySet();
 
-        PsiExchange.importIntoIntact(set);
+        PersisterStatistics stats = PsiExchange.importIntoIntact(set);
 
-        int count = getDaoFactory().getInteractionDao().countAll();
-        System.out.println(DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll()));
+        Assert.assertEquals(6, stats.getPersistedCount(InteractionImpl.class, false));
+        Assert.assertEquals(0, stats.getDuplicatesCount(InteractionImpl.class, false));
+        Assert.assertEquals(6, getDaoFactory().getInteractionDao().countAll());
 
-        Assert.assertEquals(6, count);
+        Assert.assertEquals(6, getDaoFactory().getInteractionDao().countAll());
     }
 
     @Test
     public void importXml_mint() throws Exception {
         PersisterStatistics stats = PsiExchange.importIntoIntact(getMintEntrySet());
 
-        int count = getDaoFactory().getInteractionDao().countAll();
-
-        Assert.assertEquals(17, stats.getPersistedCount(InteractionImpl.class, false));
-        Assert.assertEquals(1, stats.getDuplicatesCount(InteractionImpl.class, false));
-        Assert.assertEquals(17, count);
+        Assert.assertEquals(16, stats.getPersistedCount(InteractionImpl.class, false));
+        Assert.assertEquals(2, stats.getDuplicatesCount(InteractionImpl.class, false));
+        Assert.assertEquals(16, getDaoFactory().getInteractionDao().countAll());
     }
 
     @Test
@@ -79,15 +78,13 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
     @Test
     public void importXml_dupes() throws Exception {
-        PsimiXmlReader reader = new PsimiXmlReader();
-        EntrySet entrySet = reader.read(PsiExchangeTest.class.getResourceAsStream("/xml/dupes.xml"));
-        PsiExchange.importIntoIntact(entrySet);
-
-        int count = getDaoFactory().getInteractionDao().countAll();
-        final List<String> labels = DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll());
+        PersisterStatistics stats = PsiExchange.importIntoIntact(PsiExchangeTest.class.getResourceAsStream("/xml/dupes.xml"));
 
         // there are 8 interactions in the file, but 1 is a duplicate
-        Assert.assertEquals(7, count);
+        Assert.assertEquals(7, getDaoFactory().getInteractionDao().countAll());
+
+        Assert.assertEquals(7, stats.getPersistedCount(InteractionImpl.class, false));
+        Assert.assertEquals(1, stats.getDuplicatesCount(InteractionImpl.class, false));
     }
 
     @Test
@@ -100,17 +97,21 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
     @Test
     public void importXml_all() throws Exception {
-        PsiExchange.importIntoIntact(getIntactEntrySet());
+        PersisterStatistics intactStatistics = PsiExchange.importIntoIntact(getIntactStream());
 
+        Assert.assertEquals(6, intactStatistics.getPersistedCount(InteractionImpl.class, false));
         Assert.assertEquals(6, getDaoFactory().getInteractionDao().countAll());
 
-        PsiExchange.importIntoIntact(getMintEntrySet());
+        PersisterStatistics mintStats = PsiExchange.importIntoIntact(getMintStream());
 
-        Assert.assertEquals(23, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(16, mintStats.getPersistedCount(InteractionImpl.class, false));
+        Assert.assertEquals(2, mintStats.getDuplicatesCount(InteractionImpl.class, false));
+        Assert.assertEquals(22, getDaoFactory().getInteractionDao().countAll());
 
-        PsiExchange.importIntoIntact(getDipEntrySet());
+        PersisterStatistics dipStats = PsiExchange.importIntoIntact(getDipStream());
 
-        Assert.assertEquals(97, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(74, dipStats.getPersistedCount(InteractionImpl.class, false));
+        Assert.assertEquals(96, getDaoFactory().getInteractionDao().countAll());
 
     }
 

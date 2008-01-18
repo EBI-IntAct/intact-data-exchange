@@ -27,6 +27,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
+import psidev.psi.mi.xml.PsimiXmlLightweightReader;
+import psidev.psi.mi.xml.PsimiXmlReaderException;
+import psidev.psi.mi.xml.xmlindex.IndexedEntry;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 import psidev.psi.mi.xml.model.Source;
@@ -41,6 +44,8 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConve
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher.PsiEnricherException;
+import uk.ac.ebi.intact.dataexchange.enricher.standard.InteractionEnricher;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
@@ -51,6 +56,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * Imports/exports data between an IntAct-model database and PSI XML
@@ -86,15 +92,86 @@ public class PsiExchange {
      * @throws PersisterException thrown if there are problems parsing the stream or persisting the data in the intact-model database
      */
     public static PersisterStatistics importIntoIntact(InputStream psiXmlStream) throws PersisterException {
-        PsimiXmlReader reader = new PsimiXmlReader();
-        EntrySet entrySet = null;
+        final List<IndexedEntry> indexedEntries;
         try {
-            entrySet = reader.read(psiXmlStream);
-        } catch (Exception e) {
-            throw new PersisterException("Exception reading the PSI XML from an InputStream", e);
+            PsimiXmlLightweightReader reader = new PsimiXmlLightweightReader( psiXmlStream );
+            indexedEntries = reader.getIndexedEntries();
+        } catch (PsimiXmlReaderException e) {
+            throw new PsiEnricherException("Problem reading source PSI", e);
         }
 
-        return importIntoIntact(entrySet);
+        PersisterStatistics stats = new PersisterStatistics();
+
+        for (IndexedEntry indexedEntry : indexedEntries) {
+            PersisterStatistics entryStats = importIntoIntact(indexedEntry);
+            stats = merge(stats, entryStats);
+        }
+
+        return stats;
+    }
+
+    public static PersisterStatistics importIntoIntact(IndexedEntry entry) throws ImportException {
+        // check if the transaction is active
+        if (!IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().isActive()) {
+            log.warn("Started a new transaction as there was not transaction active");
+            IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().begin();
+        }
+
+        long startTime = System.currentTimeMillis();
+
+        ConversionCache.clear();
+
+        PersisterStatistics importStats = new PersisterStatistics();
+
+        final Institution institution;
+        try {
+            final Source source = entry.unmarshallSource();
+            InstitutionConverter institutionConverter = new InstitutionConverter();
+            institution = institutionConverter.psiToIntact(source);
+        } catch (PsimiXmlReaderException e) {
+            throw new ImportException("Problem unmarshalling IndexedEntry source", e);
+        }
+
+        InteractionConverter interactionConverter = new InteractionConverter(institution);
+
+        final Iterator<psidev.psi.mi.xml.model.Interaction> iterator;
+        try {
+            iterator = entry.unmarshallInteractionIterator();
+        } catch (PsimiXmlReaderException e) {
+            throw new ImportException("Problem unmarshalling psi interactions from IndexedEntry", e);
+        }
+
+        int interactionCount = 0;
+
+        while (iterator.hasNext()) {
+            psidev.psi.mi.xml.model.Interaction psiInteraction = iterator.next();
+
+            Interaction interaction = interactionConverter.psiToIntact(psiInteraction);
+            ConversionCache.clear();
+
+            beginTransaction();
+
+            // mark the interaction to save or update
+            if (log.isDebugEnabled()) log.debug("Persisting: "+interaction.getShortLabel());
+
+            PersisterStatistics stats = PersisterHelper.saveOrUpdate(interaction);
+
+            try {
+                commitTransaction();
+            } catch (PersisterException e) {
+                throw new ImportException("Problem importing interaction: " + interaction.getShortLabel(), e);
+            }
+
+            importStats = merge(importStats, stats);
+            interactionCount++;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("On the fly import done. Processed " + interactionCount+" interactions ("+importStats.getPersistedCount(InteractionImpl.class, false) + " persisted, "+importStats.getDuplicatesCount(InteractionImpl.class, false)+" duplicated (ignored)) in "+
+                    (System.currentTimeMillis() - startTime) + "ms");
+        }
+
+        return importStats;
     }
 
     /**
@@ -105,7 +182,7 @@ public class PsiExchange {
      *
      * @throws PersisterException thrown if there are problems persisting the data in the intact-model database
      */
-    public static PersisterStatistics importIntoIntact(EntrySet entrySet) throws PersisterException {
+    public static PersisterStatistics importIntoIntact(EntrySet entrySet) throws ImportException {
         IntactContext context = IntactContext.getCurrentInstance();
 
         // check if the transaction is active
@@ -132,97 +209,50 @@ public class PsiExchange {
                 institution = context.getInstitution();
             }
 
+            ConversionCache.clear();
+
             // instead of converting/processing the whole Entry, we process the interactions to avoid memory exceptions
             InteractionConverter interactionConverter = new InteractionConverter(institution);
 
-            // We use the following list to store the labels of the interactions between commits (when
-            // the data is actually saved in the database).
-            // If when processing a label, the label is already found in the list, a commit will be forced
-            // so the interaction can be properly synced and get the corresponding prefix XXX-2
-            List<Interaction> interactionsToCommit = new ArrayList<Interaction>();
-            List<String> interactionLabelsToCommit = new ArrayList<String>();
-
             for (psidev.psi.mi.xml.model.Interaction psiInteraction : entry.getInteractions()) {
-                ConversionCache.clear();
-                
+
+
                 Interaction interaction = null;
                 try {
                     interaction = interactionConverter.psiToIntact(psiInteraction);
                 } catch (PsiConversionException e) {
-                    throw new PersisterException("Problem converting PSI interaction: "+psiInteraction, e);
-                } 
-
-                if (interactionLabelsToCommit.contains(interaction.getShortLabel())) {
-                    // commit the persistence
-                    PersisterStatistics stats = persistAndClear(interactionsToCommit, interactionLabelsToCommit);
-                    importStats = merge(importStats, stats);
-
-                    if (log.isDebugEnabled()) {
-                        log.debug("Forced commit due to a label already existing in this commit page: "+interaction.getShortLabel());
-                    }
-
-                    beginTransaction();
+                    throw new PersisterException("Problem converting PSI interaction: " + psiInteraction, e);
                 }
+
+                beginTransaction();
 
                 // mark the interaction to save or update
-                if (log.isDebugEnabled()) log.debug("Marking to save or update: "+interaction.getShortLabel());
+                if (log.isDebugEnabled()) log.debug("Persisting: " + interaction.getShortLabel());
 
-                interactionsToCommit.add(interaction);
-                interactionLabelsToCommit.add(interaction.getShortLabel());
+                // commit the persistence
+                PersisterStatistics stats = PersisterHelper.saveOrUpdate(interaction);
+                importStats = merge(importStats, stats);
 
-                // commit the interactions in batches into the database
-                if (interactionCount > 0 && interactionCount % importBatchSize == 0) {
-                    PersisterStatistics stats = persistAndClear(interactionsToCommit, interactionLabelsToCommit);
-                    importStats = merge(importStats, stats);
-
-                    // restart a transaction
-                    beginTransaction();
+                try {
+                    commitTransaction();
+                } catch (PersisterException e) {
+                    throw new ImportException("Problem importing interaction: " + interaction.getShortLabel(), e);
                 }
+
+                ConversionCache.clear();
 
                 interactionCount++;
             }
-
-            // final persistence for the last batch
-            PersisterStatistics stats = persistAndClear(interactionsToCommit, interactionLabelsToCommit);
-            importStats = merge(importStats, stats);
-
         }
 
-        ConversionCache.clear();
-
         if (log.isDebugEnabled()) {
-            log.debug("Processed " + interactionCount+" interactions ("+importStats.getPersistedCount(InteractionImpl.class, false) + " persisted, "+importStats.getDuplicatesCount(InteractionImpl.class, false)+" duplicated (ignored)) in "+
-                    (System.currentTimeMillis() - startTime) + "ms");
+            log.debug("Processed " + interactionCount + " interactions (" + importStats.getPersistedCount(InteractionImpl.class, false) + " persisted, " + importStats.getDuplicatesCount(InteractionImpl.class, false) + " duplicated (ignored)) in " +
+                      (System.currentTimeMillis() - startTime) + "ms");
         }
 
         return importStats;
     }
 
-    private static PersisterStatistics persistAndClear(List<Interaction> interactionsToCommit, List<String> interactionLabelsToCommit) {
-        PersisterStatistics stats = null;
-
-        // commit the persistence
-        try {
-            stats = PersisterHelper.saveOrUpdate(interactionsToCommit.toArray(new Interaction[interactionsToCommit.size()]));
-        } catch (PersisterException e) {
-            List<String> infoLabels = new ArrayList<String>(interactionsToCommit.size());
-
-            for (Interaction interactionToCommit : interactionsToCommit) {
-                final String imexId = InteractionUtils.getImexIdentifier(interactionToCommit);
-                infoLabels.add(interactionToCommit.getShortLabel()+ (imexId != null? " ("+ imexId +")" : ""));
-            }
-
-            throw new ImportException("Problem persisting this set of interactions: "+infoLabels, e);
-        } finally {
-            interactionsToCommit.clear();
-            interactionLabelsToCommit.clear();
-        }
-
-        ConversionCache.clear();
-        commitTransaction();
-
-        return stats;
-    }
 
     private static PersisterStatistics merge(PersisterStatistics stats1, PersisterStatistics stats2) {
         PersisterStatistics mergedStats = new PersisterStatistics();

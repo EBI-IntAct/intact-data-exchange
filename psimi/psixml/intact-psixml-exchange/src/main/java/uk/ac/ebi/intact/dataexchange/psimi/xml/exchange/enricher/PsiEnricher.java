@@ -72,6 +72,8 @@ public class PsiEnricher {
         }
 
         EnricherContext.getInstance().setConfig(config);
+
+        ConversionCache.clear();
         
         try {
 
