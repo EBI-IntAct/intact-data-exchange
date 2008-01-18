@@ -146,7 +146,7 @@ public class DRLineExport extends LineExport {
                     for (Iterator iterator3 = annotations.iterator(); iterator3.hasNext() && !annotationFound;) {
                         final Annotation annotation = (Annotation) iterator3.next();
 
-                        CvTopic authorConfidenceTopic = getCvContext().getByMiRef(CvTopic.class, CvTopic.AUTHOR_CONFIDENCE_MI_REF);
+                        CvTopic authorConfidenceTopic = getAuthorConfidence();
 
                         if (authorConfidenceTopic.equals(annotation.getCvTopic())) {
                             String text = annotation.getAnnotationText();
@@ -433,11 +433,10 @@ public class DRLineExport extends LineExport {
                     for (Iterator iterator3 = annotations.iterator(); iterator3.hasNext() && !found;) {
                         final Annotation annotation = (Annotation) iterator3.next();
 
-                        CvTopic authorConfidenceTopic = getCvContext().getByMiRef(CvTopic.class, CvTopic.AUTHOR_CONFIDENCE_MI_REF);
+                        CvTopic authorConfidenceTopic = getAuthorConfidence();
 
                         if (authorConfidenceTopic.equals(annotation.getCvTopic())) {
                             String text = annotation.getAnnotationText();
-
 
                             getOut().println("\t\t\t\t Interaction has " + authorConfidenceTopic.getShortLabel() +
                                              ": '" + text + "'");
@@ -582,6 +581,8 @@ public class DRLineExport extends LineExport {
         List<ProteinImpl> proteins = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getProteinDao().getUniprotProteinsInvolvedInInteractions(firstResult, maxResults);
 
+        getOut().println( proteins.size() + " UniProt protein(s) found in the database" );
+
         return getEligibleProteins(proteins);
     }
 
@@ -614,9 +615,9 @@ public class DRLineExport extends LineExport {
 
             proteinCount++;
 
-            if (isProteinEligible(protein)) {
-
-            }
+//            if (isProteinEligible(protein)) {
+//
+//            }
 
             if ((proteinCount % 100) == 0) {
                 System.out.print("..." + proteinCount);

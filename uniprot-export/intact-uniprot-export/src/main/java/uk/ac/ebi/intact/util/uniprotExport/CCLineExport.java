@@ -142,9 +142,7 @@ public class CCLineExport extends LineExport {
      */
     private Collection<ProteinImpl> getProteinFromIntact(String uniprotID) throws IntactException {
 
-        Collection<ProteinImpl> proteins = getProteinByXref(uniprotID,
-                                                            (CvDatabase) getCvContext().getByMiRef(CvDatabase.class, CvDatabase.UNIPROT_MI_REF),
-                                                            (CvXrefQualifier) getCvContext().getByMiRef(CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF));
+        Collection<ProteinImpl> proteins = getProteinByXref(uniprotID, getUniprot(), getIdentity() );
         //Collection<ProteinImpl> proteins = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getProteinDao().getByUniprotId(uniprotID);
 
         if (proteins.size() == 0) {
@@ -157,9 +155,7 @@ public class CCLineExport extends LineExport {
         // now from that try to get splice variants (if any)
         for (Protein protein : proteins) {
             String ac = protein.getAc();
-            Collection<ProteinImpl> sv = getProteinByXref(ac,
-                                                          (CvDatabase) getCvContext().getByMiRef(CvDatabase.class, CvDatabase.INTACT_MI_REF),
-                                                          (CvXrefQualifier) getCvContext().getByMiRef(CvXrefQualifier.class, CvXrefQualifier.ISOFORM_PARENT_MI_REF));
+            Collection<ProteinImpl> sv = getProteinByXref(ac, getIntact(), getIsoformParent() );
 //      Collection<ProteinImpl> sv =              IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getProteinDao()
 //                    .getByXrefLike((CvDatabase)getCvContext().getByMiRef(CvDatabase.class, CvDatabase.INTACT_MI_REF),
 //                            (CvXrefQualifier)getCvContext().getByMiRef(CvXrefQualifier.class, CvXrefQualifier.ISOFORM_PARENT_MI_REF), ac);
@@ -171,6 +167,8 @@ public class CCLineExport extends LineExport {
 
         return proteins;
     }
+
+
 
     private Collection<ProteinImpl> getProteinByXref(String primaryId, CvDatabase database, CvXrefQualifier qualifier) {
         XrefDao<InteractorXref> xrefDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao(InteractorXref.class);
@@ -379,8 +377,8 @@ public class CCLineExport extends LineExport {
             for (Iterator iterator1 = experiment.getXrefs().iterator(); iterator1.hasNext() && !found;) {
                 Xref xref = (Xref) iterator1.next();
 
-                if (getCvContext().getByMiRef(CvDatabase.class, CvDatabase.PUBMED_MI_REF).equals(xref.getCvDatabase()) &&
-                    getCvContext().getByMiRef(CvXrefQualifier.class, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF).equals(xref.getCvXrefQualifier())) {
+                if (getPubmed().equals(xref.getCvDatabase()) &&
+                    getPrimaryReference().equals(xref.getCvXrefQualifier())) {
                     found = true;
                     pubmeds.add(xref.getPrimaryId());
                 }
@@ -601,7 +599,7 @@ public class CCLineExport extends LineExport {
                     Collection annotations = interaction.getAnnotations();
                     boolean annotationFound = false;
 
-                    CvTopic authorConfidenceTopic = (CvTopic) getCvContext().getByMiRef(CvTopic.class, CvTopic.AUTHOR_CONFIDENCE_MI_REF);
+                    CvTopic authorConfidenceTopic = getAuthorConfidence();
 
                     // We assume here that an interaction has only one Annotation( uniprot-dr-export ).
                     for (Iterator iterator3 = annotations.iterator(); iterator3.hasNext() && !annotationFound;) {
