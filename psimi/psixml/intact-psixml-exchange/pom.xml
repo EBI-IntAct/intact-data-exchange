@@ -31,9 +31,16 @@
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psixml-converters</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-            <artifactId>intact-psixml-enricher</artifactId>
+            <groupId>uk.ac.ebi.intact.dataexchange</groupId>
+            <artifactId>intact-enricher</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>psidev.psi.mi</groupId>
+            <artifactId>psimi-xslt</artifactId>
+            <version>1.5.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

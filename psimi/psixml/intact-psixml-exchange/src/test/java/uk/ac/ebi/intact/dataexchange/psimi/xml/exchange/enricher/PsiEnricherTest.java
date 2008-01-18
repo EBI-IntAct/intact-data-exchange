@@ -18,14 +18,15 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher;
 import org.junit.Test;
 import org.junit.Assert;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
+import uk.ac.ebi.intact.model.Experiment;
 
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.model.EntrySet;
 import psidev.psi.mi.xml.model.Entry;
+import psidev.psi.mi.xml.model.ExperimentDescription;
+import psidev.psi.mi.stylesheets.XslTransformerUtils;
 
 /**
  * TODO comment this
@@ -48,8 +49,9 @@ public class PsiEnricherTest {
 
         PsiEnricher.enrichPsiXml(is, writer, config);
 
-        System.out.println(writer.toString());
-        // not asserting anything
+        //System.out.println(writer.toString());
+
+        // TODO not asserting anything !
     }
 
     @Test
@@ -66,22 +68,29 @@ public class PsiEnricherTest {
         Assert.assertEquals(3, originalEntry.getExperiments().size());
         Assert.assertEquals(3, originalEntry.getInteractors().size());
 
-        Writer writer = new StringWriter();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Writer writer = new OutputStreamWriter(baos);
 
         EnricherConfig config = new EnricherConfig();
         config.setUpdateInteractionShortLabels(true);
 
+        // the actual method
         PsiEnricher.enrichPsiXml(PsiEnricherTest.class.getResourceAsStream(pathToXml), writer, config);
 
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        ByteArrayOutputStream expandedBaos = new ByteArrayOutputStream();
+
+        XslTransformerUtils.compactPsiMi25(bais, expandedBaos);
+
+        ByteArrayInputStream expandedBais = new ByteArrayInputStream(expandedBaos.toByteArray());
+
         reader = new PsimiXmlReader();
-        EntrySet enrichedSet = reader.read(writer.toString());
+        EntrySet enrichedSet = reader.read(expandedBais);
 
         Entry entry = enrichedSet.getEntries().iterator().next();
         
         Assert.assertEquals(3, entry.getInteractions().size());
         Assert.assertEquals(3, entry.getExperiments().size());
         Assert.assertEquals(3, entry.getInteractors().size());
-
-
     }
 }

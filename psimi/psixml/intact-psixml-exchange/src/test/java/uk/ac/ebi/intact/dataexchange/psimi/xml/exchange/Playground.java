@@ -19,7 +19,7 @@ import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.context.IntactEnvironment;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.enricher.PsiEnricher;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher.PsiEnricher;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Component;
 

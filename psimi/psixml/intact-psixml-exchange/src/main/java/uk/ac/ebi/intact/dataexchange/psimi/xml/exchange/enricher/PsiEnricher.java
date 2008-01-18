@@ -15,17 +15,27 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher;
 
-import psidev.psi.mi.xml.PsimiXmlReader;
-import psidev.psi.mi.xml.PsimiXmlWriter;
+import psidev.psi.mi.xml.*;
+import psidev.psi.mi.xml.xmlindex.IndexedEntry;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
+import psidev.psi.mi.xml.model.Interaction;
+import psidev.psi.mi.xml.model.Source;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.dataexchange.enricher.standard.IntactEntryEnricher;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
+import uk.ac.ebi.intact.dataexchange.enricher.standard.InstitutionEnricher;
+import uk.ac.ebi.intact.dataexchange.enricher.standard.InteractionEnricher;
 import uk.ac.ebi.intact.model.IntactEntry;
+import uk.ac.ebi.intact.model.Institution;
 
 import java.io.*;
+import java.util.List;
+import java.util.Iterator;
 
 /**
  * Main utility to enrich a Psi file with additional information from the intact database and external sources
@@ -44,11 +54,72 @@ public class PsiEnricher {
         writer.close();
     }
 
-    public static void enrichPsiXml(InputStream sourcePsi, Writer enrichedPsiWriter, EnricherConfig config) throws IOException {
-        EntrySet entrySet = readEntrySet(sourcePsi);
-        entrySet = enrichEntrySet(entrySet, config);
-        writeEntrySet(entrySet, enrichedPsiWriter);
+    /**
+     * Enriches a PSI XML Stream in memory
+     * @param sourcePsi The PSI XML data to enrich
+     * @param enrichedPsiWriter The writer where
+     * @param config configuration to use
+     * @throws IOException
+     */
+    public static void enrichPsiXml(InputStream sourcePsi, Writer enrichedPsiWriter, EnricherConfig config) throws PsiEnricherException {
+        final List<IndexedEntry> indexedEntries;
+        try {
+            PsimiXmlLightweightReader reader = new PsimiXmlLightweightReader( sourcePsi );
+            indexedEntries = reader.getIndexedEntries();
+        } catch (PsimiXmlReaderException e) {
+            throw new PsiEnricherException("Problem reading source PSI", e);
+        }
+
+        EnricherContext.getInstance().setConfig(config);
+        
+        try {
+
+            PsimiXmlLightweightWriter writer = new PsimiXmlLightweightWriter(enrichedPsiWriter);
+
+            writer.writeStartDocument();
+
+            for (Iterator<IndexedEntry> indexedEntryIterator = indexedEntries.iterator(); indexedEntryIterator.hasNext();) {
+                IndexedEntry entry =  indexedEntryIterator.next();
+
+                // TODO put the source conversion in a method
+                final Source source = entry.unmarshallSource();
+                InstitutionConverter institutionConverter = new InstitutionConverter();
+                final Institution institution = institutionConverter.psiToIntact(source);
+                InstitutionEnricher.getInstance().enrich(institution);
+                Source enrichedSource = institutionConverter.intactToPsi(institution);
+                if (source.getReleaseDate() != null) {
+                    enrichedSource.setReleaseDate(source.getReleaseDate());
+                }
+
+                writer.writeStartEntry(enrichedSource, entry.unmarshallAvailabilityList());
+
+                InteractionConverter interactionConverter = new InteractionConverter(institution);
+
+                final Iterator<Interaction> iterator = entry.unmarshallInteractionIterator();
+                while (iterator.hasNext()) {
+
+                    Interaction interaction = iterator.next();
+
+                    //TODO put this in a different method?
+                    uk.ac.ebi.intact.model.Interaction intactInteraction = interactionConverter.psiToIntact(interaction);
+                    InteractionEnricher.getInstance().enrich(intactInteraction);
+                    Interaction enrichedInteraction = interactionConverter.intactToPsi(intactInteraction);
+
+                    writer.writeInteraction(enrichedInteraction);
+                }
+
+                writer.writeEndEntry(entry.unmarshallAttributeList());
+
+            }
+            writer.writeEndDocument();
+
+        } catch (EnricherException ee) {
+            throw new PsiEnricherException("Problem enriching data", ee);
+        } catch (Exception e) {
+            throw new PsiEnricherException("Problem writing output PSI", e);
+        }
     }
+
 
     public static EntrySet enrichEntrySet(EntrySet entrySet, EnricherConfig config) {
         EntrySet enrichedSet = new EntrySet();
@@ -65,8 +136,6 @@ public class PsiEnricher {
     }
 
     public static Entry enrichEntry(Entry entry, EnricherConfig config) {
-        // this counts will help to check the integrity of the entriy after enriching it,
-        // the numbers should be the same
         EntryConverter converter = new EntryConverter();
         IntactEntry intactEntry = converter.psiToIntact(entry);
 
