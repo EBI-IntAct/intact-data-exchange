@@ -1,11 +1,15 @@
 package uk.ac.ebi.intact.psimitab;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-
-import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  * InterproNameHandler Tester.
@@ -17,9 +21,31 @@ import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
 public class InterproNameHandlerTest  extends AbstractPsimitabTestCase {
 
     @Test
-    public void getNameByIdTest() throws UnsupportedEncodingException, NameNotFoundException {
+    public void usingLocalEntryFile() throws UnsupportedEncodingException, NameNotFoundException {
         File file = getFileByResources( "/interpro-entry-local.txt", InterproNameHandler.class );
-        InterproNameHandler handler = new InterproNameHandler(file);
+        InterproNameHandler handler = new InterproNameHandler( file );
+        String interproName = handler.getNameById( "IPR008255" );
+
+        assertNotNull( interproName );
+        assertEquals( "Pyridine nucleotide-disulphide oxidoreductase, class-II, active site", interproName );
+        assertEquals( null, handler.getNameById( "Active_site" ));
+    }
+
+    @Test
+    public void usingURL() throws UnsupportedEncodingException, NameNotFoundException, MalformedURLException {
+        URL url = new URL( "ftp://ftp.ebi.ac.uk/pub/databases/interpro/entry.list" );
+        InterproNameHandler handler = new InterproNameHandler( url );
+        String interproName = handler.getNameById( "IPR008255" );
+
+        assertNotNull( interproName );
+        assertEquals( "Pyridine nucleotide-disulphide oxidoreductase, class-II, active site", interproName );
+        assertEquals( null, handler.getNameById( "Active_site" ));
+    }
+
+    @Test
+    public void usingStream() throws IOException, NameNotFoundException {
+        URL url = new URL( "ftp://ftp.ebi.ac.uk/pub/databases/interpro/entry.list" );
+        InterproNameHandler handler = new InterproNameHandler( url.openStream() );
         String interproName = handler.getNameById( "IPR008255" );
 
         assertNotNull( interproName );

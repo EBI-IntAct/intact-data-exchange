@@ -19,8 +19,8 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URL;
+import java.net.URLDecoder;
 
 /**
  * PSIMITAB Test Case.

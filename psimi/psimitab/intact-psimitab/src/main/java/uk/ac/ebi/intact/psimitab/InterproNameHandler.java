@@ -20,10 +20,11 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.net.URL;
 
 /**
  * The InterproNameHandler gets the Information from a entyFile using a Map.
@@ -38,49 +39,103 @@ public class InterproNameHandler {
 
     private static final Pattern INTERPRO_ENTRY_PATTERN = Pattern.compile( "IPR\\d{6}[ ].+" );
 
-    private File entryFile;
-
     private Map<String, String> interproMap;
 
-    public InterproNameHandler( File entryFile ) {
-        this.entryFile = entryFile;
+    public InterproNameHandler( File entryFile ) throws NameNotFoundException {
         if ( interproMap == null || interproMap.isEmpty() ) {
-            init();
+            try {
+                BufferedReader reader = new BufferedReader( new FileReader( entryFile ) );
+                init( reader );
+            } catch ( FileNotFoundException e ) {
+                throw new NameNotFoundException( "File not found" );
+            } catch ( IOException e ) {
+                throw new NameNotFoundException( "Can not read " + entryFile.getAbsolutePath() );
+            }
         }
     }
 
-    private void init() {
-        try {
-            interproMap = new HashMap<String, String>();
-
-            BufferedReader reader = new BufferedReader( new FileReader( entryFile ) );
-            String line = reader.readLine();
-            while ( line != null ) {
-
-                if ( line != null ) {
-                    if ( INTERPRO_ENTRY_PATTERN.matcher( line ).matches() ) {
-                        int index = line.indexOf( " " );
-                        String interproTerm = line.substring( 0, index );
-                        String interproName = line.substring( index + 1, line.length() );
-                        interproMap.put( interproTerm, interproName );
-                    }
-                }
-                line = reader.readLine();
+    public InterproNameHandler( InputStream stream ) throws NameNotFoundException {
+        if ( interproMap == null || interproMap.isEmpty() ) {
+            BufferedReader reader = new BufferedReader( new InputStreamReader( stream ) );
+            try {
+                init( reader );
+            } catch ( IOException e ) {
+                throw new NameNotFoundException( "Can not read " + stream.toString() );
             }
-            reader.close();
-        } catch ( FileNotFoundException e ) {
-            logger.error( "Could not find file " + entryFile.getAbsolutePath() );
-        } catch ( IOException e ) {
-            logger.warn( "Could not read file " + entryFile.getAbsolutePath() );
         }
+    }
+
+    public InterproNameHandler( URL url ) throws NameNotFoundException {
+        try {
+            InputStream stream = url.openStream();
+            if ( interproMap == null || interproMap.isEmpty() ) {
+                BufferedReader reader = new BufferedReader( new InputStreamReader( stream ) );
+                try {
+                    init( reader );
+                } catch ( IOException e ) {
+                    throw new NameNotFoundException( "Can not read " + stream.toString() );
+                }
+            }
+        } catch ( IOException e ) {
+            throw new NameNotFoundException( "Can not open stream for  " + url.getPath() );
+        }
+    }
+
+    private void init( BufferedReader reader ) throws IOException {
+        long start = System.currentTimeMillis();
+        logger.debug( "Starting to init InterproNameMap." );
+        interproMap = new HashMap<String, String>();
+
+        String line = reader.readLine();
+        while ( line != null ) {
+            if ( line != null ) {
+                if ( INTERPRO_ENTRY_PATTERN.matcher( line ).matches() ) {
+                    int index = line.indexOf( " " );
+                    String interproTerm = line.substring( 0, index );
+                    String interproName = line.substring( index + 1, line.length() );
+
+                    interproMap.put( interproTerm, interproName );
+                }
+            }
+            line = reader.readLine();
+        }
+        reader.close();
+        if ( logger.isDebugEnabled() ) logger.debug( "Number of Interpro entries " + interproMap.keySet().size() );
+        if ( logger.isInfoEnabled() )
+            logger.info( "Time to init InterproNameMap " + ( System.currentTimeMillis() - start ) );
     }
 
     public String getNameById( String interproTerm ) throws NameNotFoundException {
+        long start = System.currentTimeMillis();
         if ( interproMap != null && !interproMap.isEmpty() ) {
-            return interproMap.get( interproTerm );
+            String result = interproMap.get( interproTerm );
+            if ( result == null ) {
+                logger.warn( "Could not find " + interproTerm );
+            } else {
+                logger.info( "Time to get InterproName " + interproTerm + " from map " + ( System.currentTimeMillis() - start ) );
+            }
+            return result;
         } else {
             logger.error( "Map is not initialized or is Empty." );
         }
-        throw new NameNotFoundException();
+        throw new NameNotFoundException( "Could not find " + interproTerm );
+    }
+
+    /**
+     * Decodes URL before getting File (usefull if path contains whitespaces).
+     *
+     * @param fileName
+     * @param clazz
+     * @return
+     */
+    public static File getFileByResources( String fileName, Class clazz ) {
+        URL url = clazz.getResource( fileName );
+        String strFile = url.getFile();
+        try {
+            return new File( URLDecoder.decode( strFile, "utf-8" ) );
+        } catch ( UnsupportedEncodingException e ) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

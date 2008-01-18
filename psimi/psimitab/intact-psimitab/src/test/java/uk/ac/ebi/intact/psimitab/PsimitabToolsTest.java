@@ -16,14 +16,10 @@
 package uk.ac.ebi.intact.psimitab;
 
 import org.junit.Test;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
-import uk.ac.ebi.intact.psimitab.search.TestHelper;
+import psidev.psi.mi.search.index.AbstractIndexWriter;
 import uk.ac.ebi.intact.psimitab.search.IntActPsimiTabIndexWriter;
 
 import java.io.File;
-
-import psidev.psi.mi.search.index.AbstractIndexWriter;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)

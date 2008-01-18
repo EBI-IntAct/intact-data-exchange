@@ -1,7 +1,5 @@
 package uk.ac.ebi.intact.psimitab;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -9,10 +7,7 @@ import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.BinaryInteractionImpl;
-import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.CrossReferenceFactory;
+import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 
 import java.io.File;
@@ -20,12 +15,10 @@ import java.util.Collection;
 
 public class IntActTabTest extends AbstractPsimitabTestCase {
 
-    private static final Log log = LogFactory.getLog( IntActTabTest.class );
-
     @Test
     public void testBinaryInteractionHandler() throws Exception {
 
-        File xmlFile = getFileByResources("/psi25-testset/9971739.xml", IntActTabTest.class);
+        File xmlFile = getFileByResources( "/psi25-testset/9971739.xml", IntActTabTest.class );
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
@@ -56,7 +49,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
     @Test
     public void testPsimiTabReader() throws Exception {
 
-        File tabFile = getFileByResources("/mitab-testset/9971739_expanded.txt", IntActTabTest.class );
+        File tabFile = getFileByResources( "/mitab-testset/9971739_expanded.txt", IntActTabTest.class );
         assertTrue( tabFile.canRead() );
 
         boolean hasHeaderLine = true;
@@ -67,7 +60,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
 
         Collection<BinaryInteraction> bis = reader.read( tabFile );
 
-        File xmlFile = getFileByResources("/psi25-testset/9971739.xml", IntActTabTest.class);
+        File xmlFile = getFileByResources( "/psi25-testset/9971739.xml", IntActTabTest.class );
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
@@ -96,7 +89,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
     @Test
     public void testExpansion() throws Exception {
 
-        File xmlFile = getFileByResources( "/psi25-testset/simple.xml", IntActTabTest.class);
+        File xmlFile = getFileByResources( "/psi25-testset/simple.xml", IntActTabTest.class );
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
@@ -141,5 +134,30 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
 
         assertTrue( ibi.hasPropertiesA() );
         assertTrue( ibi.hasPropertiesB() );
+    }
+
+    @Test
+    public void testIfAuthorIsCurrator() throws Exception {
+        // reading a file were all interactions inferred by currators
+        File xmlFile = getFileByResources( "/psi25-testset/14681455.xml", IntActTabTest.class );
+        assertTrue( xmlFile.canRead() );
+
+        // convert into Tab object model
+        Xml2Tab x2t = new Xml2Tab();
+        x2t.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        x2t.setColumnHandler( new IntActColumnHandler() );
+        x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
+        x2t.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
+        x2t.setPostProcessor( new ClusterInteractorPairProcessor() );
+
+        Collection<BinaryInteraction> interactions = x2t.convert( xmlFile, false );
+
+        for ( BinaryInteraction interaction : interactions ) {
+            for ( Author author : interaction.getAuthors() ) {
+                // if we know that all interactions inferred by currators,
+                // alls authors should start with 'Curated complexes'
+                assertTrue( author.getName().startsWith( "Curated complexes" ) );
+            }
+        }
     }
 }

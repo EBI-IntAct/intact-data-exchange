@@ -1,16 +1,12 @@
 package uk.ac.ebi.intact.psimitab;
 
 import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Test;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
 import psidev.psi.mi.tab.converter.xml2tab.IsExpansionStrategyAware;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.SpokeExpansion;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
-import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReferenceFactory;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
@@ -203,7 +199,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
         ConvertXml2Tab converter = new ConvertXml2Tab();
         converter.setBinaryInteractionClass( IntActBinaryInteraction.class );
-        converter.setColumnHandler( new IntActColumnHandler() );
+        converter.setColumnHandler( new IntActColumnHandler(true, true) );
         converter.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         converter.setInteractorPairClustering( true );
         converter.setOverwriteOutputFile( true );
@@ -264,7 +260,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
         ConvertXml2Tab converter = new ConvertXml2Tab();
         converter.setBinaryInteractionClass( IntActBinaryInteraction.class );
-        converter.setColumnHandler( new IntActColumnHandler() );
+        converter.setColumnHandler( new IntActColumnHandler(true, true) );
         converter.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         converter.setInteractorPairClustering( true );
         converter.setOverwriteOutputFile( true );

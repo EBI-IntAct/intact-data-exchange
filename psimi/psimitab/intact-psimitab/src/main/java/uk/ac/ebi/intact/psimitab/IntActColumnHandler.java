@@ -21,6 +21,7 @@ import psidev.psi.mi.tab.formatter.TabulatedLineFormatter;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.column.Column;
 import psidev.psi.mi.xml.model.*;
+import psidev.psi.mi.xml.model.InteractionDetectionMethod;
 import psidev.psi.mi.xml.model.Interactor;
 import psidev.psi.mi.xml.model.Organism;
 import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
@@ -28,6 +29,8 @@ import uk.ac.ebi.intact.util.ols.OlsClient;
 import uk.ac.ebi.ook.web.services.Query;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -278,6 +281,20 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
 
                 authors.add( new AuthorImpl( sb.toString() ) );
                 dbi.setAuthors( authors );
+            } else {
+                // if Interaction is inferred by currator 
+                InteractionDetectionMethod method = experiment.getInteractionDetectionMethod();
+                if ( method != null && method.getNames() != null ) {
+                    String shortLabel = method.getNames().getShortLabel();
+                    if ( shortLabel != null && shortLabel.equals( "inferred by curator" ) ) {
+                        String experimentFullName = null;
+                        if ( experiment.getNames() != null && ( experimentFullName = experiment.getNames().getFullName() ) != null ) {
+//                            experimentFullName = experimentFullName.replaceAll("\\s-\\s", "-");
+                            authors.add( new AuthorImpl( experimentFullName ) );
+                            dbi.setAuthors( authors );
+                        }
+                    }
+                }
             }
         }
     }
@@ -384,15 +401,21 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
     /**
      * Fetch the GoTerm of a specific GO identifier from Intact OLS-Webservice.
      *
-     * @param id    GO identifier
+     * @param id GO identifier
      * @return GOTerm
      */
     private String fetchGoNameFromWebservice( String id ) {
         try {
             if ( query == null ) {
+                long start = System.currentTimeMillis();
                 query = new OlsClient().getOntologyQuery();
+                if ( logger.isInfoEnabled() )
+                    logger.info( "Time to create OntologyQuery " + ( System.currentTimeMillis() - start ) );
             }
-            return query.getTermById( id, "GO" );
+            long start = System.currentTimeMillis();
+            String goTerm = query.getTermById( id, "GO" );
+            logger.info( "Time to get GOTerm " + id + " from Webservice " + ( System.currentTimeMillis() - start ) );
+            return goTerm;
         } catch ( RemoteException e ) {
             logger.info( "No Description for " + id + " found." );
             return null;
@@ -402,13 +425,20 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
     /**
      * Fetch the Interpro name of a specific Interpro Id from a interpro-entryFile
      *
-     * @param id    Interpro identifier
+     * @param id Interpro identifier
      * @return Interpro name
      */
     private String fetchInterproNameFromInterproNameHandler( String id ) {
         try {
             if ( handler == null ) {
-                handler = new InterproNameHandler( getFileByResources( "/interpro-entry-local.txt", InterproNameHandler.class ) );
+                InputStream stream = null;
+                try {
+                    URL url = new URL( "ftp://ftp.ebi.ac.uk/pub/databases/interpro/entry.list" );
+                    stream = url.openStream();
+                    handler = new InterproNameHandler( stream );
+                } catch ( IOException e ) {
+                    handler = new InterproNameHandler( getFileByResources( "/interpro-entry-local.txt", InterproNameHandler.class ) );
+                }
             }
             return handler.getNameById( id );
         } catch ( NameNotFoundException e ) {
@@ -942,7 +972,7 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
     }
 
     /**
-     * Decodes URL before getting File (usefull if path contains whitespaces). 
+     * Decodes URL before getting File (usefull if path contains whitespaces).
      *
      * @param fileName
      * @param clazz
