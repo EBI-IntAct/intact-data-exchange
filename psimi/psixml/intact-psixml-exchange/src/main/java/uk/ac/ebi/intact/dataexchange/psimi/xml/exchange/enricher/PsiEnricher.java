@@ -24,6 +24,7 @@ import psidev.psi.mi.xml.model.Source;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
@@ -104,6 +105,8 @@ public class PsiEnricher {
                     uk.ac.ebi.intact.model.Interaction intactInteraction = interactionConverter.psiToIntact(interaction);
                     InteractionEnricher.getInstance().enrich(intactInteraction);
                     Interaction enrichedInteraction = interactionConverter.intactToPsi(intactInteraction);
+
+                    ConversionCache.clear();
 
                     writer.writeInteraction(enrichedInteraction);
                 }
