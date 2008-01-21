@@ -85,6 +85,8 @@ public class CvUpdater {
             // added the obsolete term
             boolean markedAsObsolete = checkAndMarkAsObsoleteIfExisted(orphan, stats);
 
+            if (markedAsObsolete) System.out.println("MARKED AS OBSOLETE: "+orphan);
+
             // check if we deal with obsolete terms
             if (excludeObsolete && orphan.isObsolete()) {
                 continue;
@@ -145,30 +147,32 @@ public class CvUpdater {
 
         final CvObjectDao<CvObject> cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getCvObjectDao();
-        CvObject existingCv = cvObjectDao.getByPsiMiRef(id);
+        Collection<CvObject> existingCvs = cvObjectDao.getByPsiMiRefCollection(Collections.singleton(id));
 
-        if (existingCv == null) {
-            existingCv = cvObjectDao.getByShortLabel(CvObject.class, orphan.getShortName());
+        if (existingCvs.isEmpty()) {
+            existingCvs = cvObjectDao.getByShortLabelLike(orphan.getShortName());
         }
 
-        if (existingCv != null) {
-             CvTopic obsoleteTopic = createCvTopicObsolete();
 
-            boolean alreadyContainsObsolete = false;
+        if (!existingCvs.isEmpty()) {
+            CvTopic obsoleteTopic = createCvTopicObsolete();
 
-            for (Annotation annot : existingCv.getAnnotations()) {
-                if (CvTopic.OBSOLETE_MI_REF.equals(annot.getCvTopic().getMiIdentifier())) {
-                    alreadyContainsObsolete = true;
+            for (CvObject existingCv : existingCvs) {
+                boolean alreadyContainsObsolete = false;
+
+                for (Annotation annot : existingCv.getAnnotations()) {
+                    if (CvTopic.OBSOLETE_MI_REF.equals(annot.getCvTopic().getMiIdentifier())) {
+                        alreadyContainsObsolete = true;
+                    }
+                }
+
+                if (!alreadyContainsObsolete) {
+                    existingCv.addAnnotation(new Annotation(existingCv.getOwner(), obsoleteTopic, CvTopic.OBSOLETE));
+                    stats.addUpdatedCv(existingCv);
+                    markedAsObsolete = true;
                 }
             }
-
-            if (!alreadyContainsObsolete) {
-                existingCv.addAnnotation(new Annotation(existingCv.getOwner(), obsoleteTopic, CvTopic.OBSOLETE));
-                stats.addUpdatedCv(existingCv);
-                markedAsObsolete = true;
-            }
         }
-
         return markedAsObsolete;
     }
 

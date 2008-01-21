@@ -1,10 +1,12 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.model.CvInteractionType;
 import uk.ac.ebi.intact.model.CvTopic;
@@ -18,6 +20,11 @@ import java.net.URL;
  * @version $Id$
  */
 public class CvUpdaterTest extends IntactBasicTestCase {
+
+    @Before
+    public void clear() throws Exception {
+        SchemaUtils.createSchema();
+    }
 
     @Test
     public void createOrUpdateCVs() throws Exception {
@@ -59,13 +66,13 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         System.out.println(stats);
 
         int total = getDaoFactory().getCvObjectDao().countAll();
+
         Assert.assertEquals(849, total);
 
-        // TODO fix assertions
         Assert.assertEquals(845, stats.getCreatedCvs().size());
-        Assert.assertEquals(0, stats.getUpdatedCvs().size());
+        Assert.assertEquals(1, stats.getUpdatedCvs().size());
         Assert.assertEquals(50, stats.getObsoleteCvs().size());
-        Assert.assertEquals(9, stats.getInvalidTerms().size());
+        Assert.assertEquals(10, stats.getInvalidTerms().size());
 
     }
 
