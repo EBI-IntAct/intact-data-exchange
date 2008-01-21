@@ -85,8 +85,6 @@ public class CvUpdater {
             // added the obsolete term
             boolean markedAsObsolete = checkAndMarkAsObsoleteIfExisted(orphan, stats);
 
-            if (markedAsObsolete) System.out.println("MARKED AS OBSOLETE: "+orphan);
-
             // check if we deal with obsolete terms
             if (excludeObsolete && orphan.isObsolete()) {
                 continue;
@@ -95,19 +93,21 @@ public class CvUpdater {
             addCvObjectToStatsIfObsolete(orphan);
 
             // check if it is valid and persist
-            if (isValidTerm(orphan) && !markedAsObsolete) {
-                CvTopic cvOrphan = toCvObject(CvTopic.class, orphan);
+            if (!markedAsObsolete) {
+                if (isValidTerm(orphan)) {
+                    CvTopic cvOrphan = toCvObject(CvTopic.class, orphan);
 
-                if (orphan.isObsolete()) {
-                    addObsoleteAnnotation(cvOrphan);
+                    if (orphan.isObsolete()) {
+                        addObsoleteAnnotation(cvOrphan);
+                    }
+
+                    orphanCvs.add(cvOrphan);
+                    stats.addOrphanCv(cvOrphan);
+
+                    rootsAndOrphans.add(cvOrphan);
+                } else {
+                    stats.getInvalidTerms().put(orphan.getId(), orphan.getShortName());
                 }
-
-                orphanCvs.add(cvOrphan);
-                stats.addOrphanCv(cvOrphan);
-
-                rootsAndOrphans.add(cvOrphan);
-            } else {
-                stats.getInvalidTerms().put(orphan.getId(), orphan.getShortName());
             }
         }
 

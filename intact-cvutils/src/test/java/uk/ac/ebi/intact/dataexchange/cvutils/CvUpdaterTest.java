@@ -70,7 +70,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals(845, stats.getCreatedCvs().size());
         Assert.assertEquals(1, stats.getUpdatedCvs().size());
         Assert.assertEquals(50, stats.getObsoleteCvs().size());
-        Assert.assertEquals(10, stats.getInvalidTerms().size());
+        Assert.assertEquals(9, stats.getInvalidTerms().size());
 
     }
 
