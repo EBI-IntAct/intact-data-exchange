@@ -1,15 +1,13 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.model.CvInteractionType;
 import uk.ac.ebi.intact.model.CvTopic;
+import uk.ac.ebi.intact.context.IntactContext;
 
 import java.net.URL;
 

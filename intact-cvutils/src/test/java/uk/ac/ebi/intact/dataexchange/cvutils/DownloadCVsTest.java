@@ -91,7 +91,7 @@ public class DownloadCVsTest extends IntactBasicTestCase {
         PSILoader loader = new PSILoader();
         IntactOntology ontology = loader.parseOboFile(new ByteArrayInputStream(oboOutput.getBytes()));
 
-        Assert.assertEquals(24, ontology.getCvTerms().size());
+        Assert.assertEquals(33, ontology.getCvTerms().size());
     }
 
     @Test
@@ -124,7 +124,7 @@ public class DownloadCVsTest extends IntactBasicTestCase {
         PSILoader loader = new PSILoader();
         IntactOntology ontology = loader.parseOboFile(new ByteArrayInputStream(oboOutput.getBytes()));
 
-        Assert.assertEquals(25, ontology.getCvTerms().size());
+        Assert.assertEquals(34, ontology.getCvTerms().size());
     }
 
     @Test (expected = IntactException.class)
