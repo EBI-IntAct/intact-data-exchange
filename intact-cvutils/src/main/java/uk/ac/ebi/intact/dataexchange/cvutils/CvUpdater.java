@@ -83,7 +83,7 @@ public class CvUpdater {
             // all obsolete terms are orphan, we should check if what is now an orphan term
             // was not obsolete before and already exists in the database. If so, it should be
             // added the obsolete term
-            boolean markedAsObsolete = checkAndMarkAsObsoleteIfExisted(orphan, stats);
+            int cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted(orphan, stats);
 
             // check if we deal with obsolete terms
             if (excludeObsolete && orphan.isObsolete()) {
@@ -93,7 +93,7 @@ public class CvUpdater {
             addCvObjectToStatsIfObsolete(orphan);
 
             // check if it is valid and persist
-            if (!markedAsObsolete) {
+            if (cvObjectsWithSameId == 0) {
                 if (isValidTerm(orphan)) {
                     CvTopic cvOrphan = toCvObject(CvTopic.class, orphan);
 
@@ -140,10 +140,8 @@ public class CvUpdater {
         return stats;
     }
 
-    private boolean checkAndMarkAsObsoleteIfExisted(CvTerm orphan, CvUpdaterStatistics stats) {
+    private int checkAndMarkAsObsoleteIfExisted(CvTerm orphan, CvUpdaterStatistics stats) {
         String id = orphan.getId();
-
-        boolean markedAsObsolete = false;
 
         final CvObjectDao<CvObject> cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getCvObjectDao();
@@ -169,11 +167,10 @@ public class CvUpdater {
                 if (!alreadyContainsObsolete) {
                     existingCv.addAnnotation(new Annotation(existingCv.getOwner(), obsoleteTopic, CvTopic.OBSOLETE));
                     stats.addUpdatedCv(existingCv);
-                    markedAsObsolete = true;
                 }
             }
         }
-        return markedAsObsolete;
+        return existingCvs.size();
     }
 
     private void addObsoleteAnnotation(CvObject existingCv) {
