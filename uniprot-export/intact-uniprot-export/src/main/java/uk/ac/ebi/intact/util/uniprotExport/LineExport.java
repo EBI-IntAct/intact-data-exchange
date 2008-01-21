@@ -366,39 +366,102 @@ public class LineExport {
         return cv;
     }
 
+    private CvXrefQualifier identity;
+    private CvXrefQualifier isoformParent;
+    private CvXrefQualifier primaryReference;
+    private CvDatabase uniprot;
+    private CvDatabase intact;
+    private CvDatabase pubmed;
+
+    private CvTopic authorConfidence;
+    private CvTopic negative;
+    private CvTopic uniprotCcExport;
+    private CvTopic uniprotDrExport;
+    private CvTopic noUniprotUpdate;
+
+
     protected CvXrefQualifier getIdentity() {
-        return (CvXrefQualifier) getCvObject( CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, CvXrefQualifier.IDENTITY );
+        if( identity == null ) {
+            identity = ( CvXrefQualifier ) getCvObject( CvXrefQualifier.class,
+                                                        CvXrefQualifier.IDENTITY_MI_REF,
+                                                        CvXrefQualifier.IDENTITY );
+        }
+        return identity;
     }
 
     protected CvXrefQualifier getIsoformParent() {
-        return (CvXrefQualifier) getCvObject( CvXrefQualifier.class, CvXrefQualifier.ISOFORM_PARENT_MI_REF, CvXrefQualifier.ISOFORM_PARENT );
+        if( isoformParent == null ) {
+            isoformParent = (CvXrefQualifier) getCvObject( CvXrefQualifier.class,
+                                                           CvXrefQualifier.ISOFORM_PARENT_MI_REF,
+                                                           CvXrefQualifier.ISOFORM_PARENT );
+        }
+        return isoformParent;
     }
 
     protected CvXrefQualifier getPrimaryReference() {
-        return (CvXrefQualifier) getCvObject( CvXrefQualifier.class, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE );
+        if( primaryReference == null ) {
+            primaryReference = (CvXrefQualifier) getCvObject( CvXrefQualifier.class,
+                                                              CvXrefQualifier.PRIMARY_REFERENCE_MI_REF,
+                                                              CvXrefQualifier.PRIMARY_REFERENCE );
+        }
+        return primaryReference;
     }
 
     protected CvDatabase getUniprot() {
-        return (CvDatabase) getCvObject( CvDatabase.class, CvDatabase.UNIPROT_MI_REF, CvDatabase.UNIPROT );
+        if( uniprot == null ) {
+            uniprot = (CvDatabase) getCvObject( CvDatabase.class, CvDatabase.UNIPROT_MI_REF, CvDatabase.UNIPROT );
+        }
+        return uniprot;
     }
 
     protected CvDatabase getIntact() {
-        return (CvDatabase) getCvObject( CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT );
+        if ( intact == null ) {
+            intact = (CvDatabase) getCvObject( CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT );
+        }
+        return intact;
     }
 
     protected CvDatabase getPubmed() {
-        return (CvDatabase) getCvObject( CvDatabase.class, CvDatabase.PUBMED_MI_REF, CvDatabase.PUBMED );
+        if ( pubmed == null ) {
+            pubmed = (CvDatabase) getCvObject( CvDatabase.class, CvDatabase.PUBMED_MI_REF, CvDatabase.PUBMED );
+        }
+        return pubmed;
     }
 
     protected CvTopic getAuthorConfidence() {
-        return (CvTopic) getCvObject( CvTopic.class, CvTopic.AUTHOR_CONFIDENCE_MI_REF, CvTopic.AUTHOR_CONFIDENCE );
+        if ( authorConfidence == null ) {
+            authorConfidence = (CvTopic) getCvObject( CvTopic.class, CvTopic.AUTHOR_CONFIDENCE_MI_REF, CvTopic.AUTHOR_CONFIDENCE );
+        }
+        return authorConfidence;
     }
 
-    protected CvTopic getNegative() {return ( CvTopic ) getCvObject( CvTopic.class, null, CvTopic.NEGATIVE );}
+    protected CvTopic getNegative() {
+        if ( negative == null ) {
+            negative = ( CvTopic ) getCvObject( CvTopic.class, null, CvTopic.NEGATIVE );
+        }
+        return negative;
+    }
 
-    protected CvTopic getUniprotCcExport() {return ( CvTopic ) getCvObject( CvTopic.class, null, CvTopic.UNIPROT_CC_EXPORT );}
+    private CvTopic getUniprotDrExport() {
+        if ( uniprotDrExport == null ) {
+            uniprotDrExport = ( CvTopic ) getCvObject( CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT );
+        }
+        return uniprotDrExport;
+    }
 
-    protected CvTopic getNoUniprotUpdate() {return ( CvTopic ) getCvObject( CvTopic.class, null, CvTopic.NON_UNIPROT );}
+    protected CvTopic getUniprotCcExport() {
+        if ( uniprotCcExport == null ) {
+            uniprotCcExport = ( CvTopic ) getCvObject( CvTopic.class, null, CvTopic.UNIPROT_CC_EXPORT );
+        }
+        return uniprotCcExport;
+    }
+
+    protected CvTopic getNoUniprotUpdate() {
+        if ( noUniprotUpdate == null ) {
+            noUniprotUpdate = ( CvTopic ) getCvObject( CvTopic.class, null, CvTopic.NON_UNIPROT );
+        }
+        return noUniprotUpdate;
+    }
 
     /**
      * @param flag
@@ -957,8 +1020,6 @@ public class LineExport {
         out.println(logPrefix + "Experiment status: " + status);
         return status;
     }
-
-    private CvTopic getUniprotDrExport() {return ( CvTopic ) getCvObject( CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT );}
 
     /**
      * Answers the question: is that AnnotatedObject (Interaction, Experiment) annotated as negative ?
