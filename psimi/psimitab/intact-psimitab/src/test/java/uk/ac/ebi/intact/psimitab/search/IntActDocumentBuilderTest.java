@@ -9,6 +9,7 @@ import org.apache.lucene.document.Document;
 import org.junit.Test;
 import psidev.psi.mi.search.util.DocumentBuilder;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
 
 /**
  * IntActDocumentBuilder Tester.
@@ -34,7 +35,7 @@ public class IntActDocumentBuilderTest {
         DocumentBuilder builder = new IntActDocumentBuilder();
         Document doc = builder.createDocumentFromPsimiTabLine(psiMiTabLine);
 
-        BinaryInteraction interaction = (BinaryInteraction) builder.createBinaryInteraction(doc);
-		Assert.assertNotNull(interaction);
+        IntActBinaryInteraction interaction = (IntActBinaryInteraction) builder.createBinaryInteraction(doc);
+        Assert.assertNotNull(interaction);
 	}
 }
