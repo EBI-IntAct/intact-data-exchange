@@ -25,8 +25,6 @@ import psidev.psi.mi.xml.model.InteractionDetectionMethod;
 import psidev.psi.mi.xml.model.Interactor;
 import psidev.psi.mi.xml.model.Organism;
 import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
-import uk.ac.ebi.intact.util.ols.OlsClient;
-import uk.ac.ebi.ook.web.services.Query;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +32,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.rmi.RemoteException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -63,12 +60,12 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
     /**
      * Query is used for GOTerm Name AutoCompletion
      */
-    private Query query;
+    private GoTermHandler goHandler;
 
     /**
      * Query is used for Interpro Name AutoCompletion
      */
-    private InterproNameHandler handler;
+    private InterproNameHandler interproHandler;
 
     /**
      * CrossReference Converter
@@ -373,18 +370,10 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
             db = dbref.getDb();
 
             if ( goTerm_Name_AutoCompletion && dbref.getDb().equalsIgnoreCase( "GO" ) ) {
-                if ( dbref.hasSecondary() ) {
-                    text = dbref.getSecondary();
-                } else {
-                    text = fetchGoNameFromWebservice( id );
-                }
+                text = fetchGoNameFromWebservice( id );
             }
             if ( interpro_Name_AutoCompletion && dbref.getDb().equalsIgnoreCase( "Interpro" ) ) {
-                if ( dbref.hasSecondary() ) {
-                    text = dbref.getSecondary();
-                } else {
-                    text = fetchInterproNameFromInterproNameHandler( id );
-                }
+                text = fetchInterproNameFromInterproNameHandler( id );
             }
 
             if ( dbref.getRefTypeAc() == null ) {
@@ -405,19 +394,13 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
      * @return GOTerm
      */
     private String fetchGoNameFromWebservice( String id ) {
-        try {
-            if ( query == null ) {
-                long start = System.currentTimeMillis();
-                query = new OlsClient().getOntologyQuery();
-                if ( logger.isInfoEnabled() )
-                    logger.info( "Time to create OntologyQuery " + ( System.currentTimeMillis() - start ) );
+        try{
+            if ( goHandler == null ) {
+                goHandler = new GoTermHandler();
             }
-            long start = System.currentTimeMillis();
-            String goTerm = query.getTermById( id, "GO" );
-            logger.info( "Time to get GOTerm " + id + " from Webservice " + ( System.currentTimeMillis() - start ) );
-            return goTerm;
-        } catch ( RemoteException e ) {
-            logger.info( "No Description for " + id + " found." );
+            return goHandler.getNameById( id );
+        } catch ( NameNotFoundException e ){
+            logger.info( "No Description for " + id + " found.");
             return null;
         }
     }
@@ -430,19 +413,19 @@ public class IntActColumnHandler implements ColumnHandler, IsExpansionStrategyAw
      */
     private String fetchInterproNameFromInterproNameHandler( String id ) {
         try {
-            if ( handler == null ) {
+            if ( interproHandler == null ) {
                 InputStream stream = null;
                 try {
                     URL url = new URL( "ftp://ftp.ebi.ac.uk/pub/databases/interpro/entry.list" );
                     stream = url.openStream();
-                    handler = new InterproNameHandler( stream );
+                    interproHandler = new InterproNameHandler( stream );
                 } catch ( IOException e ) {
-                    handler = new InterproNameHandler( getFileByResources( "/interpro-entry-local.txt", InterproNameHandler.class ) );
+                    interproHandler = new InterproNameHandler( getFileByResources( "/interpro-entry-local.txt", InterproNameHandler.class ) );
                 }
             }
-            return handler.getNameById( id );
+            return interproHandler.getNameById( id );
         } catch ( NameNotFoundException e ) {
-            logger.info( "No Description for " + id + "found." );
+            logger.info( "No Description for " + id + " found." );
             return null;
         }
     }

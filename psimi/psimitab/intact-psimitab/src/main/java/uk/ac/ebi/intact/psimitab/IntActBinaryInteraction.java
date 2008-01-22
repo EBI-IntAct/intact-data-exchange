@@ -11,8 +11,6 @@ import psidev.psi.mi.tab.model.Interactor;
 
 import java.util.List;
 
-import org.apache.commons.lang.time.DateUtils;
-
 /**
  * IntAct extension of a BinaryInteractionImpl.
  *
