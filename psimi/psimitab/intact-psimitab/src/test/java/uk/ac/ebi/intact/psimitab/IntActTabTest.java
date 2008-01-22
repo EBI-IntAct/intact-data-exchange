@@ -65,10 +65,8 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
-        Xml2Tab xml2tab = new Xml2Tab();
+        Xml2Tab xml2tab = new IntactXml2Tab();
 
-        xml2tab.setBinaryInteractionClass( IntActBinaryInteraction.class );
-        xml2tab.setColumnHandler( new IntActColumnHandler() );
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
         xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
