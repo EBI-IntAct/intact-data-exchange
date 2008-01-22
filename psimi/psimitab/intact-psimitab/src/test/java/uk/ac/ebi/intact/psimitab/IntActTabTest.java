@@ -11,6 +11,7 @@ import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 
 import java.io.File;
+import java.io.StringWriter;
 import java.util.Collection;
 
 public class IntActTabTest extends AbstractPsimitabTestCase {
@@ -104,13 +105,17 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
         PsimiTabWriter writer = new PsimiTabWriter();
-        writer.setColumnHandler( new IntActColumnHandler() );
+
+        IntActColumnHandler intActColumnHandler = new IntActColumnHandler();
+        intActColumnHandler.setGoTermNameAutoCompletion(true);
+        intActColumnHandler.setInterproNameAutoCompletion(true);
+
+        writer.setColumnHandler(intActColumnHandler);
         writer.setBinaryInteractionClass( IntActBinaryInteraction.class );
 
-        File tabFile = new File( getTargetDirectory(), "simple.txt" );
-        assertTrue( tabFile.getParentFile().canWrite() );
+        StringWriter sw = new StringWriter();
 
-        writer.write( interactions, tabFile );
+        writer.write( interactions, sw );
         assertEquals( 2, interactions.size() );
 
         BinaryInteraction interaction = ( BinaryInteraction ) interactions.toArray()[1];
@@ -134,6 +139,8 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
 
         assertTrue( ibi.hasPropertiesA() );
         assertTrue( ibi.hasPropertiesB() );
+
+        System.out.println(sw);
     }
 
     @Test
