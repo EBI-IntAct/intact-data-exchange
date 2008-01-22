@@ -102,14 +102,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
-        PsimiTabWriter writer = new PsimiTabWriter();
-
-        IntActColumnHandler intActColumnHandler = new IntActColumnHandler();
-        intActColumnHandler.setGoTermNameAutoCompletion(true);
-        intActColumnHandler.setInterproNameAutoCompletion(true);
-
-        writer.setColumnHandler(intActColumnHandler);
-        writer.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        PsimiTabWriter writer = new IntactPsimiTabWriter();
 
         StringWriter sw = new StringWriter();
 
@@ -148,9 +141,8 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
-        Xml2Tab x2t = new Xml2Tab();
-        x2t.setBinaryInteractionClass( IntActBinaryInteraction.class );
-        x2t.setColumnHandler( new IntActColumnHandler() );
+        Xml2Tab x2t = new IntactXml2Tab();
+        
         x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         x2t.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
         x2t.setPostProcessor( new ClusterInteractorPairProcessor() );
