@@ -38,7 +38,7 @@ import org.joda.time.Interval;
 public class Playground {
 
     public static void main(String[] args) throws Exception {
-        File fileToImport = new File("/ebi/sp/pro6/intact/local/data/curation-material/titz-2008/titz-2008-1.xml");
+        File fileToImport = new File("/ebi/sp/pro6/intact/local/data/curation-material/Sato-2007/sato.xml");
         //File fileToImport = new File("/tmp/titz_trepa_interactions_psi_mi.xml");
 
         Properties props = new Properties();
@@ -48,7 +48,7 @@ public class Playground {
         File hibernateFile = new File(Playground.class.getResource("/d003-hibernate.cfg.xml").getFile());
 
         IntactContext.initStandaloneContext(hibernateFile);
-        IntactContext.getCurrentInstance().getUserContext().setUserId("BARANDA");
+        IntactContext.getCurrentInstance().getUserContext().setUserId("DAVET");
 
         long startTime = System.currentTimeMillis();
 
