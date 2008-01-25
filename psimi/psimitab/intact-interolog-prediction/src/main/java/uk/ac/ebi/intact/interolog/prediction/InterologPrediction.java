@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
 
-
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.Author;
 import psidev.psi.mi.tab.model.AuthorImpl;
@@ -52,6 +51,7 @@ import uk.ac.ebi.intact.interolog.util.NewtUtils;
 /**
  * This is the main part of the prediction process.
  * 
+ * 08/01/25: added a file with konwn interactions in mitab format
  * 08/01/15: little improvment, the program stop when the list of taxids is empty (the list of species for which we will predict interactions).
  * 07/11/26: the clog data are now public and called the porc data (for Putative ORthologous Clusters, see http://www.ebi.ac.uk/integr8/EBI-Integr8-HomePage.do)
  * the URL is known and added in this class. Nevertheless, it is recommended to download the file manually and then run the program pointing to the downloaded file (160257 KB  	15/11/07).
@@ -149,9 +149,14 @@ public class InterologPrediction {
 	private String predictedinteractionsFileName;
 	
 	/**
-	 * Extension used for the mitab file generated with predicted interactions.
+	 * Name of the result file with known interactions in mitab format.
 	 */
-	private String predictedinteractionsFileExtension = ".mitab";
+	private String knowninteractionsFileName;
+	
+	/**
+	 * Extension used for the mitab files generated (predicted and known interactions).
+	 */
+	private String mitabFileExtension = ".mitab";
 	
 	
 	/**
@@ -170,9 +175,14 @@ public class InterologPrediction {
 	private Map<Long, Collection<Long>> taxid2ChildrenTaxids = getChildrenMapManually();
 	
 	/**
-	 * List of species for which we want predict interactions (proteomeIds).
+	 * List of species for which we want to predict interactions (proteomeIds).
 	 */
 	private Collection<Long> proteomeIdsToDownCast;
+	
+	/**
+	 * List of species for which we want to predict interactions (NCBI taxids).
+	 */
+	private Collection<Long> taxidsIdsToDownCast;
 	
 	/**
 	 * If we want to put all taxids present in the mitab source file into the list of species
@@ -306,6 +316,7 @@ public class InterologPrediction {
 		proteomeId2Taxid = new HashMap<Long, Long>();
 		taxid2proteomeId = new HashMap<Long, Long>();
 		proteomeIdsToDownCast = new HashSet<Long>();
+		taxidsIdsToDownCast   = new HashSet<Long>();
 	}
 	
 	public InterologPrediction(File workingDir, File mitab, File porc) {
@@ -357,15 +368,15 @@ public class InterologPrediction {
 		return UNIPROTKB;
 	}
 
-	public String getPredictedinteractionsFileExtension() {
-		return predictedinteractionsFileExtension;
+	public String getMitabFileExtension() {
+		return mitabFileExtension;
 	}
 
-	public void setPredictedinteractionsFileExtension(String mitabFileExtension) {
+	public void setMitabFileExtension(String mitabFileExtension) {
 		if (!mitabFileExtension.startsWith(".")) {
 			mitabFileExtension = "."+mitabFileExtension;
 		}
-		this.predictedinteractionsFileExtension = mitabFileExtension;
+		this.mitabFileExtension = mitabFileExtension;
 	}
 
 	public File getMitab() {
@@ -373,7 +384,7 @@ public class InterologPrediction {
 	}
 	
 	public void setMitab(File mitab) {
-		log.info("set mitab file: "+mitab.getName());
+		log.info("Set mitab file: "+mitab.getName());
 		this.mitab = mitab;
 	}
 	
@@ -390,7 +401,7 @@ public class InterologPrediction {
 	}
 	
 	public void setPorc(File clog) {
-		log.info("set clog file: "+clog.getName());
+		log.info("Set PORC file: "+clog.getName());
 		this.porc = clog;
 	}
 	
@@ -411,6 +422,14 @@ public class InterologPrediction {
 		this.predictedinteractionsFileName = predictedinteractionsFileName;
 	}
 	
+	public String getKnowninteractionsFileName() {
+		return this.knowninteractionsFileName;
+	}
+
+	public void setKnowninteractionsFileName(String knowninteractionsFileName) {
+		this.knowninteractionsFileName = knowninteractionsFileName;
+	}
+	
 	public boolean isDownCastOnAllPresentSpecies() {
 		return this.downCastOnAllPresentSpecies;
 	}
@@ -423,9 +442,8 @@ public class InterologPrediction {
 		return this.userTaxidsToDownCast;
 	}
 
-	public void setUserTaxidsToDownCast(
-			Collection<Long> userProteomeIdsToDownCast) {
-		this.userTaxidsToDownCast = userProteomeIdsToDownCast;
+	public void setUserTaxidsToDownCast(Collection<Long> userTaxidsToDownCast) {
+		this.userTaxidsToDownCast = userTaxidsToDownCast;
 	}
 	
 	public boolean isDownCastOnChildren() {
@@ -514,8 +532,7 @@ public class InterologPrediction {
 		this.workingDir = workingDir;
 		
 		if (!workingDir.exists()) {
-			System.out.println("create directory "+workingDir);
-			log.info("create directory "+workingDir);
+			log.warn("Create directory "+workingDir);
 			File dir = new File(workingDir.getAbsolutePath());
 			dir.mkdirs();
 		} else if (!workingDir.isDirectory()) {
@@ -529,6 +546,7 @@ public class InterologPrediction {
 		FILE_RESULT_PORC_INTERACTIONS = new File(workingDir.getAbsolutePath()+"/clog.interactions.txt");
 		
 		predictedinteractionsFileName = "InteroPorc.predictedInteractions";
+		knowninteractionsFileName     = "KnownInteractions";
 		
 	}
 	
@@ -550,7 +568,7 @@ public class InterologPrediction {
 	 */
 	private void checkFiles () throws InterologPredictionException {
 		if (!FILE_DATA_PROTEOME.exists()) {
-			log.info("proteome report file "+getFILE_DATA_PROTEOME().getAbsolutePath()+" is not found. It will be automatically downloaded.");
+			log.info("Proteome report file "+getFILE_DATA_PROTEOME().getAbsolutePath()+" is not found. It will be automatically downloaded.");
 			try {
 				downloadProteome();
 			} catch (IOException e) {
@@ -559,7 +577,7 @@ public class InterologPrediction {
 		}
 		
 		if (!getPorc().exists()) {
-			log.info("porc file "+getPorc().getAbsolutePath()+" is not found. It will be automatically downloaded.");
+			log.info("PORC file "+getPorc().getAbsolutePath()+" is not found. It will be automatically downloaded.");
 			// check here that we have uniprotKB id in the clog data?
 			// no it is not worth doing a whole parsing of the clog file now
 			try {
@@ -576,7 +594,7 @@ public class InterologPrediction {
 			throw new InterologPredictionException("Error while reading mitab file "+getMitab(),e);
 		}
 		
-		log.info("you can use Picr tool to collect UniprotKB identifiers from RefSeq ids");		
+		log.debug("You can use Picr tool to collect UniprotKB identifiers from RefSeq ids");		
 	}
 	
 	/**
@@ -652,7 +670,7 @@ public class InterologPrediction {
     		mitabTaxids.add(taxidB);
         }
 		
-		log.warn(mitabTaxids.size()+" taxids in the mitab file");
+		log.info(mitabTaxids.size()+" different taxids in the source interactions (mitab file)");
 		log.debug(mitabTaxids);
 		
 		log.warn("We use UniprotKB ids for proteins. " +
@@ -662,9 +680,9 @@ public class InterologPrediction {
 		log.info(proteinWithoutUniprot+" proteins do not have Uniprot id");
 		log.info(interactionWithoutUniprot+" interactions do not have both Uniprot ids");
 		log.info(notPhysical+" interactions are not physical type");
-		log.info(self+" interactions are not self interactions");
+		log.info(self+" interactions are self interactions");
 		log.info(interSpecies+" interactions are between 2 different species");
-		log.warn("--> "+interactionOK+" interactions can be used among the "+count+" of the mitab file "+getMitab()+" (Uniprot id and physical type)");
+		log.warn(interactionOK+" interactions can be used among the "+count+" of the mitab file "+getMitab());
 	}
 	
 	
@@ -678,7 +696,7 @@ public class InterologPrediction {
 	}
 	
 	/**
-	 * Download cporc data file from Integr8 ftp;
+	 * Download porc data file from Integr8 ftp;
 	 * .
 	 * @throws IOException
 	 */
@@ -694,12 +712,11 @@ public class InterologPrediction {
 	 * @throws InterologPredictionException
 	 */
 	private void parseProteomes() throws InterologPredictionException {
-		log.info("compute mapping between proteome ids and taxids..");
 		
 		// Integr8 uses specific proteome identifiers
 		// we need to map proteome ids to NCBI taxid to know if species in the clog are in our list
 		// this is done by parsing the proteome_report file from Integr8 ftp
-		log.info("mapping proteomeId to NCBI taxid from file "+FILE_DATA_PROTEOME);
+		log.info("Compute the mapping from proteomeIds to NCBI taxids from file "+FILE_DATA_PROTEOME);
 		Collection<ProteomeReport> entries = ProteomeReportParser.parse(FILE_DATA_PROTEOME);
 		for (ProteomeReport report : entries) {
 			taxid2proteomeId.put(new Long(report.getProteomeTaxid()), new Long(report.getProteomeId()));
@@ -711,32 +728,29 @@ public class InterologPrediction {
 	
 	@SuppressWarnings("unchecked")
 	private void testTaxids() {
-		log.warn(mitabTaxids.size()+" taxids in the mitab file");
-		log.warn(porcTaxids.size()+" ids in the clog file");
+		log.info(mitabTaxids.size()+" taxids in the mitab file");
+		log.info(porcTaxids.size()+" ids in the porc file");
 		
 		Collection<Long> intersection = PsiCollectionUtils.intersection(mitabTaxids, porcTaxids);
 		Collection<Long> clogOnly = MitabStats.getAWithoutB(porcTaxids, intersection);
 		Collection<Long> mitabOnly = MitabStats.getAWithoutB(mitabTaxids, intersection);
 		
-		log.warn(intersection.size()+" ids in both the mitab file and the clog data");
+		log.info(intersection.size()+" ids in both the mitab file and the clog data");
 		
-		System.out.println("clog only:");
-		System.out.println(clogOnly);
-		System.out.println("mitab only:");
-		System.out.println(mitabOnly);
-		System.out.println("intersection:");
-		System.out.println(intersection);
+		log.info("clog only:"+clogOnly);
+		log.info("mitab only:"+mitabOnly);
+		log.info("intersection:"+intersection);
 		
 		Map<Long, Collection<Long>> mitab2Children = new HashMap<Long, Collection <Long>>(mitabOnly.size());
 		
 		for (Long childTaxid : mitabOnly) {
 			try {
 				Collection<Long> children = NewtUtils.getReallyAllChildrenTaxids(childTaxid);
-				System.out.println(childTaxid+" -> "+children);
+				log.info(childTaxid+" -> "+children);
 				Collection<Long> newIntersection = PsiCollectionUtils.intersection(children, porcTaxids);
 				if (!newIntersection.isEmpty()) {
 					mitab2Children.put(childTaxid, newIntersection);
-					System.out.println(childTaxid+" -> "+newIntersection);
+					log.info(childTaxid+" -> "+newIntersection);
 				}
 			} catch (NewtException e) {
 				log.debug("Newt error while retrieving children taxid for: "+childTaxid);
@@ -744,7 +758,7 @@ public class InterologPrediction {
 			}
 		}
 		
-		System.out.println(mitab2Children.size()+" mitab id have children in the clog list");
+		log.info(mitab2Children.size()+" mitab id have children in the clog list");
 		
 	}
 	
@@ -797,8 +811,8 @@ public class InterologPrediction {
 			}
 		}
 		
-		log.info(mitab2clogTaxids.size()+" taxids are found in clog data ("+direct+" directly and "+splitChildren+" have children in clog data)");
-		log.info(mitabTaxidsToTreat.size()+" are still to treat");
+		log.debug(mitab2clogTaxids.size()+" taxids are found in PORC data ("+direct+" directly and "+splitChildren+" have children in clog data)");
+		log.debug(mitabTaxidsToTreat.size()+" are still to treat");
 		log.debug(mitabTaxidsToTreat);
 		
 		mitabTaxid2PorcTaxid = mitab2clogTaxids;
@@ -811,12 +825,12 @@ public class InterologPrediction {
 	 */
 	@SuppressWarnings("unchecked")
 	private void chooseSpeciesToPredict() throws InterologPredictionException {
-		log.info("choose species for which we will transfer interactions");
+		log.debug("Choose species for which we will transfer interactions");
 		Map<Long, Long> taxid2proteomeIdsToDownCast = new HashMap<Long, Long>();
 		
 		Collection<Long> taxidsNotMappedToProteomeId = new HashSet<Long>();
 		
-		// strategy used: only taxids present in both mitab and clog data
+		// strategy used: only taxids present in both mitab and porc data
 		// and some strains as well
 		// taxids from mitab source file
 		if (downCastOnAllPresentSpecies) {
@@ -842,12 +856,18 @@ public class InterologPrediction {
 					taxid2proteomeIdsToDownCast.put(userTaxid, userProteomeId);
 				} else {
 					taxidsNotMappedToProteomeId.add(userTaxid);
-					log.debug("user species "+userTaxid+" can not be mapped to proteome id");
+					log.warn("The taxid "+userTaxid+" can not be mapped to Integr8 identifier. It is either incorrect or not in Integr8 species list. " +
+							"Check http://www.ebi.ac.uk/integr8/OrganismSearch.do?action=browseOrgs&currentclicked=BROWSE_SPECIES");
 				}
 			}
 			
-			log.warn(taxid2proteomeIdsToDownCast.size()+" species given by the user are added to the list for the predictions");
-			log.info("We now have "+taxid2proteomeIdsToDownCast.size()+" proteome ids in the list");
+			if (taxid2proteomeIdsToDownCast.size()==1) {
+				log.info("The predictions will be made for taxid "+taxid2proteomeIdsToDownCast.keySet().iterator());
+			} else {
+				log.info(taxid2proteomeIdsToDownCast.size()+" species given by the user are added to the list for the predictions");
+			}
+			
+			log.debug("We now have "+taxid2proteomeIdsToDownCast.size()+" proteome ids in the list");
 		}
 		
 		
@@ -884,15 +904,45 @@ public class InterologPrediction {
 			for (Object long1 : InterologUtils.getAllValues( mitabTaxid2PorcTaxid )) {
 				proteomeIdsToDownCast.add(taxid2proteomeId.get(Long.parseLong( long1.toString() )));
 			}
-			log.warn(proteomeIdsToDownCast.size()+" species");
+			log.info(proteomeIdsToDownCast.size()+" species to downcast");
 		}
 		
 		proteomeIdsToDownCast.addAll(taxid2proteomeIdsToDownCast.values());
+		taxidsIdsToDownCast.addAll(taxid2proteomeIdsToDownCast.keySet());
 		
-		log.warn("list of "+proteomeIdsToDownCast.size()+" proteomes for which we will predict interactions");
+		if (taxidsIdsToDownCast.size()==1) {
+			String tmp = "";
+			if (proteomeIdsToDownCast.size()==1) {
+				tmp = " (corresponding to "+proteomeIdsToDownCast.iterator()+" proteome id)";
+			} else {
+				tmp = " (corresponding to "+proteomeIdsToDownCast.size()+" proteome ids)";
+			}
+			log.warn("Interactions will be predicted for NCBI taxid "+taxidsIdsToDownCast.iterator()+
+					tmp);
+		} else {
+			log.warn("We have a list of "+taxidsIdsToDownCast.size()+" NCBI taxids (corresponding to "
+					+proteomeIdsToDownCast.size()+" proteome ids) for which we will predict interactions");
+		}
+		
 		log.debug(proteomeIdsToDownCast);
+		log.debug(taxidsIdsToDownCast);
 		
 		printMemoryInfo();
+	}
+	
+	/**
+	 * Collect all interactions in the source mitab file with at least one taxid in the list to downcast.
+	 * @throws InterologPredictionException
+	 */
+	private void generateKnownInteractionFile() throws InterologPredictionException {
+		Collection<BinaryInteraction> interactions = null;
+		try {
+			interactions = MitabUtils.extractSpeciesInteractionsOneTaxid(mitab, taxidsIdsToDownCast);
+		} catch (MitabException e) {
+			log.warn("Error while collecting all known interactions for taxid(s) "+taxidsIdsToDownCast);
+		}
+		log.info(interactions.size()+" interactions are present in the source file and will be written in "+knowninteractionsFileName+mitabFileExtension+ " file");
+		writeFile(new File(workingDir.getAbsoluteFile()+"/"+knowninteractionsFileName+mitabFileExtension), interactions);
 	}
 	
 	/**
@@ -907,15 +957,15 @@ public class InterologPrediction {
 		parser.setClogRepeatFile(getPorc());
 		Map<Long, Clog> id2porc = null;
 		if (classicPorcFormat) {
-			log.info("parse porcs (format=one gene by line)...");
+			log.info("Parse PORC data (format = one gene by line)...");
 			id2porc = parser.parseClogProteinFormat();
 		} else {
-			log.warn("olf file format -> parse clogs (format=one porc by line)...");
+			log.warn("old file format -> parse clogs (format=one porc by line)...");
 			id2porc = parser.parseClog();
 		}
 		
 		porcId2Porc = id2porc;
-		log.info(id2porc.size()+" porcs described in the map");
+		log.warn(id2porc.size()+" clusters are described in the PORC data");
 		printMemoryInfo();
 	}
 	
@@ -924,10 +974,10 @@ public class InterologPrediction {
 	 * The key is based on proteinAc_taxid.
 	 */
 	private void mapProtein2ItsPorc() {
-		log.info("Compute mapping from protein (ac and species) to the clog id...");
+		log.debug("Compute mapping from protein (ac and species) to the clog id...");
 		
 		if (porcId2Porc==null || porcId2Porc.isEmpty()) {
-			throw new IllegalArgumentException("mapping impossible because clogs are not loaded");
+			throw new IllegalArgumentException("mapping impossible because PORCs are not loaded");
 		}
 		
 		for (Clog porc : porcId2Porc.values()) {
@@ -950,7 +1000,7 @@ public class InterologPrediction {
 				if (protein2porc.containsKey(key)) {
 					
 					if (porc.getId()!=porcId2Porc.get(protein2porc.get(key)).getId()) {
-						log.warn(key+" already in the map with different clog id -> "+protein2porc.get(key));
+						log.warn(key+" already in the map with a different PORC id -> "+protein2porc.get(key));
 					}
 				}
 				
@@ -960,7 +1010,7 @@ public class InterologPrediction {
 			
 		}
 		
-		log.info(protein2porc.size()+ " proteins in the map");
+		log.warn(protein2porc.size()+ " proteins are found in the PORC data");
 	}
 	
 	/**
@@ -1005,25 +1055,24 @@ public class InterologPrediction {
 		buf.append(MitabUtils.getUniprotAcB(interaction)).append(SEP);
 		String spId = MitabUtils.getSpeciesTaxidA(interaction);
 		if (!spId.equals(MitabUtils.getSpeciesTaxidB(interaction))) {
-			System.out.println("A inter-species interaction has been used here as a source interaction"+ interaction);
+			log.warn("A inter-species interaction has been used here as a source interaction"+ interaction);
 		}
 		buf.append(spId).append(SEP);
 		buf.appendWithSeparators(MitabUtils.getDetectionMethodsIds(interaction), ";").append(SEP);
 		buf.appendWithSeparators(MitabUtils.getDetectionMethodsNames(interaction), ";");
 		return buf;
 	}
-
+	
 	/**
 	 * @param mitab
-	 * @throws InterologPredictionException 
+	 * @param interactions
+	 * @throws InterologPredictionException
 	 */
-	private void writeFile(File mitab) throws InterologPredictionException {
-		log.warn("Write mitab file...");
-		log.info("file name: "+mitab.getName());
-		log.info("nb interactions: "+getInteractions().size());
+	private void writeFile(File mitab, Collection<BinaryInteraction> interactions) throws InterologPredictionException {
+		log.warn("Write "+interactions.size()+" interactions in the mitab file "+mitab.getName());
 		PsimiTabWriter writer = new PsimiTabWriter();
 		try {
-			writer.write(getInteractions(), mitab);
+			writer.write(interactions, mitab);
 		} catch (ConverterException e) {
 			throw new InterologPredictionException("Error while writting mitab file "+mitab, e);
 		} catch (IOException e) {
@@ -1058,6 +1107,9 @@ public class InterologPrediction {
 			log.warn("The list of species is empty, it is not useful to work... no interaction is predicted.");
 			System.exit(0);
 		}
+		
+		// generate file with known interactions
+		generateKnownInteractionFile();
 		
 	}
 	
@@ -1183,7 +1235,7 @@ public class InterologPrediction {
 		        	
 				}
 			} else {
-				log.warn("skip self porc interaction porc "+porcIdA+" from proteins "+proteinAcA+" - "+proteinAcB);
+				log.info("skip self porc interaction porc "+porcIdA+" from proteins "+proteinAcA+" - "+proteinAcB);
 			}
 				
         }
@@ -1197,7 +1249,7 @@ public class InterologPrediction {
 				ps.append(interaction.toString()).append("\n");
 				if(current%10000==0) {
 					current=0;
-					log.warn("10000 new interactions written - remain "+(totalSize-done));
+					log.info("10000 new interactions written - remain "+(totalSize-done));
 				}
 			}
 			ps.close();
@@ -1207,12 +1259,12 @@ public class InterologPrediction {
 		log.info(count+" source interactions");
 		log.info(protNotInClog+" interactions miss at least one protein in the porcs");
 		log.info(abstracted+" have been abstracted");
-		log.warn(porcInteraction2porcInteraction.size()+" distinct porc interactions");
+		log.warn(porcInteraction2porcInteraction.size()+" distinct porc interactions are constructed");
 		
 		porcInteractions = porcInteraction2porcInteraction.values();
 		
 		// remove the clog data to have a little more space
-		log.info("remove porc data");
+		log.debug("remove porc data");
 		porcId2Porc = null;
 		printMemoryInfo();
 	}
@@ -1355,7 +1407,7 @@ public class InterologPrediction {
 				downCastHistory.append("porcA\tporcB\tprot1\tprot2\tsources\tinferences\n");
 				log.warn("Create file "+getFILE_HISTORY_DOWN_CAST());
 			} catch (FileNotFoundException e) {
-				log.warn("down cast history is redirecting on System.out");
+				log.warn("down cast history is redirected on System.out");
 				downCastHistory = System.out;
 			}
 		}
@@ -1367,7 +1419,7 @@ public class InterologPrediction {
 				srcInteractions.append(getMitabHeaders().toString()).append("\n");
 				log.warn("Create file "+getFILE_SOURCE_INTERACTIONS());
 			} catch (FileNotFoundException e) {
-				log.warn("down source interactions printstream is redirecting on System.out");
+				log.warn("down source interactions printstream is redirected on System.out");
 				srcInteractions = System.out;
 			}
 		}
@@ -1380,7 +1432,7 @@ public class InterologPrediction {
 		
 		log.warn(interactions.size()+" binary interactions predicted");
 		log.info(sourceInteraction+" binary interactions have not been predicted because they are source interactions");
-		log.info(IPIid+" binary interactions have not been predicted because IPI id");
+		log.debug(IPIid+" binary interactions have not been predicted because IPI id");
 		log.info(noMatchUniprotId+" binary interactions have not been predicted because uniprot id missed");
 		
 		if (isWriteDownCastHistory()) {
@@ -1402,7 +1454,7 @@ public class InterologPrediction {
 	 */
 	private void postProcess() throws InterologPredictionException {
 		log.warn("========== Post-process ==========");
-		writeFile(new File(workingDir.getAbsoluteFile()+"/"+predictedinteractionsFileName+predictedinteractionsFileExtension));
+		writeFile(new File(workingDir.getAbsoluteFile()+"/"+predictedinteractionsFileName+mitabFileExtension), getInteractions());
 		
 		float elapsedTimeMin = (System.currentTimeMillis()-start)/(60*1000F);
 		log.info("time elapsed: "+elapsedTimeMin+" min");

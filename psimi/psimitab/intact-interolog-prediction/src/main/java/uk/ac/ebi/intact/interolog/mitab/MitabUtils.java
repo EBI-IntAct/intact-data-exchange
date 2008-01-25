@@ -26,6 +26,7 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.InteractionDetectionMethod;
 import psidev.psi.mi.tab.model.InteractionType;
+import psidev.psi.mi.tab.model.Interactor;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 import psidev.psi.mi.tab.utils.PsimiTabFileMerger;
 import psidev.psi.mi.xml.converter.ConverterException;
@@ -129,6 +130,23 @@ public class MitabUtils implements MitabFiles {
 	 */
 	public static String getSpeciesTaxidB(BinaryInteraction interaction) {
 		return interaction.getInteractorB().getOrganism().getTaxid();
+	}
+	
+	/**
+	 * Get species taxid of an interactor (in a psimi interaction).
+	 * null if it does not exist.
+	 * 
+	 * @param interaction
+	 * @return
+	 */
+	public static String getSpeciesTaxid(Interactor interactor) {
+		if (interactor==null) {
+			return null;
+		}
+		if (interactor.getOrganism()==null) {
+			return null;
+		}
+		return interactor.getOrganism().getTaxid();
 	}
 	
 	
@@ -352,6 +370,53 @@ public class MitabUtils implements MitabFiles {
         Iterator<BinaryInteraction> iterator = getIterator(mitab);
 		while ( iterator.hasNext() ) {
         	interactions.add(iterator.next());
+        }
+        return interactions;
+	}
+	
+	/**
+	 * Collect all interactions with at least one taxid in the list.
+	 * @param mitab
+	 * @param taxids
+	 * @return
+	 * @throws MitabException
+	 */
+	public static Collection<BinaryInteraction> extractSpeciesInteractionsOneTaxid (File mitab, Collection<Long> taxids) throws MitabException {
+		log.info("Extract interactions with at least one taxid in "+taxids);
+		Collection<BinaryInteraction> interactions = new ArrayList<BinaryInteraction>();
+        Iterator<BinaryInteraction> iterator = getIterator(mitab);
+		while ( iterator.hasNext() ) {
+			BinaryInteraction interaction = iterator.next();
+			String taxidA = getSpeciesTaxid(interaction.getInteractorA());
+			String taxidB = getSpeciesTaxid(interaction.getInteractorB());
+			if (taxidA!=null && taxids.contains(Long.parseLong(taxidA)) || 
+					taxidB!=null && taxids.contains(Long.parseLong(taxidB)) ) {
+				interactions.add(interaction);
+			}
+        	
+        }
+        return interactions;
+	}
+	
+	/**
+	 * Collect all interactions with both taxids in the list.
+	 * @param mitab
+	 * @param taxids
+	 * @return
+	 * @throws MitabException
+	 */
+	public static Collection<BinaryInteraction> extractSpeciesInteractionsBothTaxid (File mitab, Collection<Long> taxids) throws MitabException {
+		Collection<BinaryInteraction> interactions = new ArrayList<BinaryInteraction>();
+        Iterator<BinaryInteraction> iterator = getIterator(mitab);
+		while ( iterator.hasNext() ) {
+			BinaryInteraction interaction = iterator.next();
+			String taxidA = getSpeciesTaxid(interaction.getInteractorA());
+			String taxidB = getSpeciesTaxid(interaction.getInteractorB());
+			if (taxidA!=null && taxids.contains(taxidA) && 
+					taxidB!=null && taxids.contains(taxidB)) {
+				interactions.add(interaction);
+			}
+        	
         }
         return interactions;
 	}

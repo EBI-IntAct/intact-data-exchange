@@ -108,7 +108,7 @@ public class InterologPredictionTest {
 		ids.add(1148l);
 		prediction.setUserTaxidsToDownCast(ids);
 		String extension = ".mitab";
-		prediction.setPredictedinteractionsFileExtension(extension);
+		prediction.setMitabFileExtension(extension);
 		String name = "clog.predictedInteractions";
 		prediction.setPredictedinteractionsFileName(name);
 		prediction.setClassicPorcFormat(false);
@@ -171,7 +171,7 @@ public class InterologPredictionTest {
 		ids.add(1148l);
 		prediction.setUserTaxidsToDownCast(ids);
 		String extension = ".mitab";
-		prediction.setPredictedinteractionsFileExtension(extension);
+		prediction.setMitabFileExtension(extension);
 		String name = "clog.predictedInteractions";
 		prediction.setPredictedinteractionsFileName(name);
 		prediction.setClassicPorcFormat(true);

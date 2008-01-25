@@ -1,12 +1,15 @@
 
-####################################
-#                                  #
-# INTEROPORC PREDICTION MODULE     #
-#                                  #
-####################################
+###############################
+                                  
+  INTEROPORC PREDICTION MODULE 
+                                  
+###############################
+
+http://biodev.extra.cea.fr/interoporc/
 
 Magali Michaut
 magali.michaut@cea.fr
+magali.michaut.2005@ingenieurs-supelec.org
 mmichaut@ebi.ac.uk
 --
 07/06/20 created
@@ -19,9 +22,19 @@ and a document on this prediction programme: http://www.ebi.ac.uk/~mmichaut/docu
 but it may not be updated... ;-)
 
 
+******************************
+CONTENT
+******************************
+1. How to use the module?
+2. What are the result files?
+3. Log4j property file example
+4. FAQ
+5. License
+******************************
 
-HOW TO USE THE MODULE?
-======================
+
+1) HOW TO USE THE MODULE?
+=========================
 
 You can either use the JAR file available on (... coming soon...) independently (see I) or import the latest jar library and include it into your code to use more options (see II).
 
@@ -68,19 +81,32 @@ Running it on the global mitab file (merge of all Intact, MINT and DIP) and pred
 
 
 
-RESULTS
-========
-1) predicted interactions are described in InteroPorc.predictedInteractions.mitab in mitab format
-2) some information about the constructed porc interactions are in the tabulated text file downCast.history.txt
+2) WHAT ARE THE RESULT FILES?
+=============================
+1. InteroPorc.predictedInteractions.mitab
+Predicted interactions are described in InteroPorc.predictedInteractions.mitab in mitab format.
+
+2. KnownInteractions.mitab
+All interactions from the species you are interested in are in KnownInteractions.mitab in mitab format.
+
+3. srcInteractionsUsed.txt
+All source interactions used during the process are described in the srcInteractionsUsed.txt file.
+
+4. interologPrediction.log
+Comments are written in the interologPrediction.log file during the process if you have configured the log4j property file.
+
+5. downCast.history.txt
+Some information about the constructed porc interactions are in the tabulated text file downCast.history.txt
 porcA=id from the porc data
 porcB=id from the porc data
 prot1=number of proteins in cluster porcA
 prot2=number of proteins in cluster porcB
 sources=number of source interactions used to construct this porc interaction
 inferences=number of interaction predicted thanks to this porc interaction
-3) all source interactions used dureing the process are describe in the srcInteractionsUsed.txt file
-4) comments are written in the interologPrediction.log file during the process if you have configured the log4j property file
-5) the proteome_report.txt file is downloaded and used during the process. You can remove it or keep it in the directory so that it is not downloaded again next time.
+
+0. proteome_report.txt
+The proteome_report.txt file is downloaded and used during the process. It is not a result file but rather an input file.
+You can remove it or keep it in the directory so that it is not downloaded again next time.
 
 
 If it is not clear, don't hesitate to contact me.
@@ -89,8 +115,8 @@ Have fun! :-)
 
 
 
-LOG4J PROPERTY FILE EXAMPLE
-===========================
+3) LOG4J PROPERTY FILE EXAMPLE
+===============================
 
 log4j.rootCategory=DEBUG, R, A
 
@@ -107,6 +133,7 @@ log4j.appender.A.Threshold=WARN
 # ***** R file appender
 log4j.appender.R=org.apache.log4j.RollingFileAppender
 log4j.appender.R.File=interologPrediction.log
+log4j.appender.R.Threshold=INFO
 
 log4j.appender.R.MaxFileSize=100KB
 # Keep one backup file
@@ -118,8 +145,8 @@ log4j.appender.R.layout.ConversionPattern=%d %-5p (%C{1},%L) - %m%n
 
 
 
-FAQ
-====
+4) FAQ
+========
 
 * What is the mitab format?
 MITAB25 describes binary interactions, one pair of interactors per row. Columns are separated by tabulators.
@@ -127,3 +154,47 @@ Fore more information, see:
 - a simple readme file ftp://ftp.ebi.ac.uk/pub/databases/intact/current/psimitab/README
 - the Proteomics Standards Initiative (PSI) website http://www.psidev.info/
 
+
+
+5) LICENSE
+===========
+Copyright (c) 2002 The European Bioinformatics Institute, and others.  
+All rights reserved.
+  
+ Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer. 
+
+2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in
+the documentation and/or other materials provided with the
+distribution.
+ 
+3. The name IntAct must not be used to endorse or promote products 
+ derived from this software without prior written permission. For 
+written permission, please contact intact-dev@ebi.ac.uk
+
+4. Products derived from this software may not be called "IntAct"
+nor may "IntAct" appear in their names without prior written
+permission of the IntAct developers.
+
+5. Redistributions of any form whatsoever must retain the following
+acknowledgment:
+ "This product includes software developed by IntAct 
+ (http://www.ebi.ac.uk/intact)"
+ 
+THIS SOFTWARE IS PROVIDED BY THE INTACT GROUP ``AS IS'' AND ANY
+EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE INTACT GROUP OR
+ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGE.
