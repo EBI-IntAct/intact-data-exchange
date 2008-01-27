@@ -1098,7 +1098,7 @@ public class InterologPrediction {
 	 * @throws InterologPredictionException
 	 */
 	private void preProcess() throws InterologPredictionException {
-		log.warn("========== Pre-process ==========");
+		log.warn("==================== Pre-process  ====================");
 		printMemoryInfo();
 		start = System.currentTimeMillis();
 		
@@ -1128,7 +1128,7 @@ public class InterologPrediction {
 	 * @throws InterologPredictionException
 	 */
 	private void upCast() throws InterologPredictionException {
-		log.warn("========== Up-cast ==========");
+		log.warn("==================== Up-cast      ====================");
 		log.warn("Combine protein-protein interactions and clusters of orthologous proteins.");
 		
 		PrintStream ps = null;
@@ -1409,7 +1409,7 @@ public class InterologPrediction {
 	 * @return
 	 */
 	private void downCast() {
-		log.warn("========== Down-cast ==========");
+		log.warn("==================== Down-cast    ====================");
 				
 		if (isWriteDownCastHistory()) {
 			try {
@@ -1463,16 +1463,16 @@ public class InterologPrediction {
 	 * @throws InterologPredictionException
 	 */
 	private void postProcess() throws InterologPredictionException {
-		log.warn("========== Post-process ==========");
+		log.warn("==================== Post-process ====================");
 		log.warn("Create file "+predictedinteractionsFileName+mitabFileExtension);
 		writeFile(new File(workingDir.getAbsoluteFile()+"/"+predictedinteractionsFileName+mitabFileExtension), getInteractions());
 		
 		float elapsedTimeMin = (System.currentTimeMillis()-start)/(60*1000F);
 		log.info("time elapsed: "+elapsedTimeMin+" min");
-		log.warn("==================================");
+		log.warn("======================================================");
 		
 		log.warn("");
-		log.warn("Thanks to use the interoPORC tool. All informations are available on http://biodev.extra.cea.fr/interoporc/");
+		log.warn("Thanks for using the interoPORC tool. All informations are available on http://biodev.extra.cea.fr/interoporc/");
 		log.warn("");
 	}
 	
