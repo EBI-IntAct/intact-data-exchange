@@ -101,8 +101,8 @@ public class InterproNameHandler {
         }
         reader.close();
         if ( logger.isDebugEnabled() ) logger.debug( "Number of Interpro entries " + interproMap.keySet().size() );
-        if ( logger.isInfoEnabled() )
-            logger.info( "Time to init InterproNameMap " + ( System.currentTimeMillis() - start ) );
+        if ( logger.isTraceEnabled() )
+            logger.trace( "Time to init InterproNameMap " + ( System.currentTimeMillis() - start ) );
     }
 
     public String getNameById( String interproTerm ) throws NameNotFoundException {
@@ -111,8 +111,8 @@ public class InterproNameHandler {
             String result = interproMap.get( interproTerm );
             if ( result == null ) {
                 logger.warn( "Could not find " + interproTerm );
-            } else {
-                logger.info( "Time to get InterproName " + interproTerm + " from map " + ( System.currentTimeMillis() - start ) );
+            } else if (logger.isTraceEnabled()) {
+                logger.trace( "Time to get InterproName " + interproTerm + " from map " + ( System.currentTimeMillis() - start ) );
             }
             return result;
         } else {
