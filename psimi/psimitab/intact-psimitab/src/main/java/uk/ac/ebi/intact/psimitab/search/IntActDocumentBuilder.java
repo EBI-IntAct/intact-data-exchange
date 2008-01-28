@@ -25,7 +25,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 	{
 		String[] tokens = psiMiTabLine.split(DEFAULT_COL_SEPARATOR);
 
-        int maxColumns = 26;
+        int maxColumns = new IntActColumnSet().getPsimiTabColumns().size();
 
         if (tokens.length != maxColumns) {
             throw new MitabLineException("This line contains an invalid number of columns: "+tokens.length+". IntAct PSI-MITAB expects "+maxColumns+" columns");
