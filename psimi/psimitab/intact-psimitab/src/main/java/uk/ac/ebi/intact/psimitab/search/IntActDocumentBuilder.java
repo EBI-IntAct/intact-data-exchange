@@ -24,8 +24,14 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
     public Document createDocumentFromPsimiTabLine(String psiMiTabLine) throws MitabLineException
 	{
 		String[] tokens = psiMiTabLine.split(DEFAULT_COL_SEPARATOR);
-			
-		// raw fields
+
+        int maxColumns = 26;
+
+        if (tokens.length != maxColumns) {
+            throw new MitabLineException("This line contains an invalid number of columns: "+tokens.length+". IntAct PSI-MITAB expects "+maxColumns+" columns");
+        }
+
+        // raw fields
 		String experimentRoleA = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_A.getOrder()];
 		String experimentRoleB = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_B.getOrder()];
         String biologicalRoleA = tokens[IntActColumnSet.BIOLOGICAL_ROLE_A.getOrder()];
