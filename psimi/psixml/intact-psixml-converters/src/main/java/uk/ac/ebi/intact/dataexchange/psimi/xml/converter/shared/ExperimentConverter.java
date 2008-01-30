@@ -59,15 +59,22 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
            shortLabel = IntactConverterUtils.createExperimentTempShortLabel(); 
         }
 
-        Organism hostOrganism = psiObject.getHostOrganisms().iterator().next();
-        BioSource bioSource = new OrganismConverter(experiment.getOwner()).psiToIntact(hostOrganism);
+        BioSource bioSource = null;
+
+        if (psiObject.getHostOrganisms() != null && !psiObject.getHostOrganisms().isEmpty()) {
+            Organism hostOrganism = psiObject.getHostOrganisms().iterator().next();
+            bioSource = new OrganismConverter(experiment.getOwner()).psiToIntact(hostOrganism);
+        }
 
         InteractionDetectionMethod idm = psiObject.getInteractionDetectionMethod();
         CvInteraction cvInteractionDetectionMethod = new InteractionDetectionMethodConverter(getInstitution()).psiToIntact(idm);
 
         experiment.setOwner(getInstitution());
         experiment.setShortLabel(shortLabel);
-        experiment.setBioSource(bioSource);
+
+        if (bioSource != null) {
+            experiment.setBioSource(bioSource);
+        }
 
         IntactConverterUtils.populateNames(psiObject.getNames(), experiment);
         IntactConverterUtils.populateXref(psiObject.getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
@@ -134,8 +141,10 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             expDesc.setParticipantIdentificationMethod(identMethod);
         }
 
-        Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getBioSource());
-        expDesc.getHostOrganisms().add(organism);
+        if (intactObject.getBioSource() != null) {
+            Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getBioSource());
+            expDesc.getHostOrganisms().add(organism);
+        }
 
         intactEndConversion(intactObject);
 
