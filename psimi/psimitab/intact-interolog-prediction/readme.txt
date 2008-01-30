@@ -15,6 +15,7 @@ mmichaut@ebi.ac.uk
 07/06/20 created
 07/11/26 added a simple run for one species predictions
 07/11/30 added a result file with all source interactions used in the process
+08/01/25 structured this file (content) and added the new project page
 --
 
 You can find information on EBI website: http://www.ebi.ac.uk/~mmichaut/
@@ -36,9 +37,14 @@ CONTENT
 1) HOW TO USE THE MODULE?
 =========================
 
-You can either use the JAR file available on (... coming soon...) independently (see I) or import the latest jar library and include it into your code to use more options (see II).
+You can either use the module online (see I) or use the independant JAR file available on the project page (http://biodev.extra.cea.fr/interoporc/) (see II) or import the latest jar library and include it into your code to use more options (see III).
 
->>> I) With an independant JAR file (including all dependancies)
+>>> I) Online
+Go http://biodev.extra.cea.fr/interoporc/ and run analysis for the NCBI taxid you are interested in.
+See all species of Integr8 on http://www.ebi.ac.uk/integr8/OrganismSearch.do?action=setOrganismSearchType&searchType=2&pageContext=207
+
+>>> II) With an independant JAR file (including all dependancies)
+This JAR file is downloadable from the project page http://biodev.extra.cea.fr/interoporc/data/interopor.tar.gz
 Here is described a simple way to use this program to predict interactions for one species.
 
 If you have a jar with all dependencies --> interologPrediction.jar:
@@ -46,7 +52,7 @@ If you have a jar with all dependencies --> interologPrediction.jar:
 2) put the jar in it
 3) put a mitab file in it with all interactions you want to use as source interactions from other species --> sourceInteractions.mitab (if you're asking what the mitab format could be, see the FAQ at the end)
 4) download the orthologous clusters from ftp://ftp.ebi.ac.uk/pub/databases/integr8/porc/proc_gene.dat and put it in the directory --> porc_gene.dat
-5) choose the NCBI taxid of the species you are interested in (for example Synecocystis is 1148, yeast is 4932, E. coli is 562 ... see http://www.ebi.ac.uk/newt/display )
+5) choose the NCBI taxid of the species you are interested in (for example Synecocystis is 1148, yeast is 4932, E. coli is 562 ... see all species of Integr8 on http://www.ebi.ac.uk/integr8/OrganismSearch.do?action=setOrganismSearchType&searchType=2&pageContext=207)
 6) OPTION: you can put a log4j-property-file in the dir (you can copy-paste the example given below and put it in interologPrediction.log4j.properties file in the directory) --> interologPrediction.log4j.properties
 
 Then, execute this command in the directory DIR with your taxid (instead of 1148):
@@ -54,7 +60,7 @@ Then, execute this command in the directory DIR with your taxid (instead of 1148
 java -ms500m -mx1000m -cp interologPrediction.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies . sourceInteractions.mitab porc_gene.dat 1148 interologPrediction.log4j.properties
 
 
->>> II) With the JAR available on EBI maven repos
+>>> III) With the JAR available on EBI maven repos
 http://www.ebi.ac.uk/~maven/m2repo/uk/ac/ebi/intact/dataexchange/psimi/intact-interolog-prediction/
 http://www.ebi.ac.uk/~maven/m2repo_snapshots/uk/ac/ebi/intact/dataexchange/psimi/intact-interolog-prediction/2.0.0-SNAPSHOT/
 You have to create an instance of InterologPrediction with the required working directory (where files will be created).
