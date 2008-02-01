@@ -25,6 +25,7 @@ public class EnricherConfig {
 
     private boolean updateOrganisms = true;
     private boolean updateProteins = true;
+    private boolean updateExperiments = true;
     private boolean updateInteractionShortLabels = false;
     private String oboUrl = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/psi-mi25-4intact.obo";
 
@@ -62,5 +63,13 @@ public class EnricherConfig {
 
     public void setUpdateInteractionShortLabels(boolean updateInteractionShortLabels) {
         this.updateInteractionShortLabels = updateInteractionShortLabels;
+    }
+
+    public boolean isUpdateExperiments() {
+        return updateExperiments;
+    }
+
+    public void setUpdateExperiments(boolean updateExperiments) {
+        this.updateExperiments = updateExperiments;
     }
 }

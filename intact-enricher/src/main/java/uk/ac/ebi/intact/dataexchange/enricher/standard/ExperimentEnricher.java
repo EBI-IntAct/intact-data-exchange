@@ -62,6 +62,10 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
     }
 
     public void enrich(Experiment objectToEnrich) {
+        if (!EnricherContext.getInstance().getConfig().isUpdateExperiments()) {
+            return;
+        }
+        
         BioSourceEnricher bioSourceEnricher = BioSourceEnricher.getInstance();
         bioSourceEnricher.enrich(objectToEnrich.getBioSource());
 
