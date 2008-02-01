@@ -71,7 +71,14 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
 
             UniprotProtein uniprotProt = null;
 
-            int taxId = Integer.valueOf(proteinToEnrich.getBioSource().getTaxId());
+            int taxId;
+
+            if (proteinToEnrich.getBioSource() != null) {
+               taxId = Integer.valueOf(proteinToEnrich.getBioSource().getTaxId());
+            } else {
+                taxId = -3; // unknown
+            }
+            
             InteractorXref uniprotXref = ProteinUtils.getUniprotXref(proteinToEnrich);
 
             if (uniprotXref != null) {

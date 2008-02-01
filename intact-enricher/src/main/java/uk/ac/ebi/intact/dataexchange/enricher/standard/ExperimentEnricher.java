@@ -75,6 +75,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         // fix wrong xref qualifiers in pubmed xrefs if necessary
         fixPubmedXrefIfNecessary(objectToEnrich);
 
+        
         // populate the experiment using the pubmed id
         if (EnricherContext.getInstance().getConfig().isUpdateExperiments()) {
             String pubmedId = ExperimentUtils.getPubmedId(objectToEnrich);
