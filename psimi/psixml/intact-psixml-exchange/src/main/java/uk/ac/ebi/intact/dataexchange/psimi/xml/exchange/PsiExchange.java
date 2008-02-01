@@ -201,6 +201,18 @@ public class PsiExchange {
      * @throws PersisterException thrown if there are problems persisting the data in the intact-model database
      */
     public static PersisterStatistics importIntoIntact(EntrySet entrySet) throws ImportException {
+         return importIntoIntact(entrySet, new CorePersister());
+    }
+
+    /**
+     * Imports an EntrySet into intact
+     *
+     * @param entrySet the psi set of entries to import
+     * @return report of the import
+     *
+     * @throws PersisterException thrown if there are problems persisting the data in the intact-model database
+     */
+    public static PersisterStatistics importIntoIntact(EntrySet entrySet,CorePersister persister) throws ImportException {
         IntactContext context = IntactContext.getCurrentInstance();
 
         // check if the transaction is active
@@ -248,7 +260,7 @@ public class PsiExchange {
                 if (log.isDebugEnabled()) log.debug("Persisting: " + interaction.getShortLabel());
 
                 // commit the persistence
-                PersisterStatistics stats = PersisterHelper.saveOrUpdate(interaction);
+                PersisterStatistics stats = PersisterHelper.saveOrUpdate(persister, interaction);
                 importStats = merge(importStats, stats);
 
                 try {
