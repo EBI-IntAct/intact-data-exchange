@@ -38,6 +38,8 @@ import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterException;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import uk.ac.ebi.intact.core.persister.CorePersister;
+import uk.ac.ebi.intact.core.persister.Persister;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
@@ -92,6 +94,18 @@ public class PsiExchange {
      * @throws PersisterException thrown if there are problems parsing the stream or persisting the data in the intact-model database
      */
     public static PersisterStatistics importIntoIntact(InputStream psiXmlStream) throws PersisterException {
+        return importIntoIntact(psiXmlStream, new CorePersister());
+    }
+
+    /**
+     * Imports a stream containing PSI XML
+     *
+     * @param psiXmlStream the stream to read and import
+     * @return report of the import
+     *
+     * @throws PersisterException thrown if there are problems parsing the stream or persisting the data in the intact-model database
+     */
+    public static PersisterStatistics importIntoIntact(InputStream psiXmlStream,CorePersister persister) throws PersisterException {
         final List<IndexedEntry> indexedEntries;
         try {
             PsimiXmlLightweightReader reader = new PsimiXmlLightweightReader( psiXmlStream );
@@ -103,7 +117,7 @@ public class PsiExchange {
         PersisterStatistics stats = new PersisterStatistics();
 
         for (IndexedEntry indexedEntry : indexedEntries) {
-            PersisterStatistics entryStats = importIntoIntact(indexedEntry);
+            PersisterStatistics entryStats = importIntoIntact(indexedEntry, persister);
             stats = merge(stats, entryStats);
         }
 
@@ -111,6 +125,10 @@ public class PsiExchange {
     }
 
     public static PersisterStatistics importIntoIntact(IndexedEntry entry) throws ImportException {
+        return importIntoIntact(entry, new CorePersister());
+    }
+
+    public static PersisterStatistics importIntoIntact(IndexedEntry entry, CorePersister persister) throws ImportException {
         // check if the transaction is active
         if (!IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().isActive()) {
             log.warn("Started a new transaction as there was not transaction active");
@@ -154,7 +172,7 @@ public class PsiExchange {
             // mark the interaction to save or update
             if (log.isDebugEnabled()) log.debug("Persisting: "+interaction.getShortLabel());
 
-            PersisterStatistics stats = PersisterHelper.saveOrUpdate(interaction);
+            PersisterStatistics stats = PersisterHelper.saveOrUpdate(persister, interaction);
 
             try {
                 commitTransaction();
