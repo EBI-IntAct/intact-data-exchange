@@ -76,11 +76,19 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         CvObjectConverter<CvFuzzyType,RangeStatus> fuzzyTypeConverter =
                 new CvObjectConverter<CvFuzzyType,RangeStatus>(getInstitution(), CvFuzzyType.class, RangeStatus.class);
 
-        CvFuzzyType fromFuzzyType = fuzzyTypeConverter.psiToIntact(psiObject.getStartStatus());
-        range.setFromCvFuzzyType(fromFuzzyType);
+        final RangeStatus startStatus = psiObject.getStartStatus();
 
-        CvFuzzyType toFuzzyType = fuzzyTypeConverter.psiToIntact(psiObject.getEndStatus());
-        range.setToCvFuzzyType(toFuzzyType);
+        if (startStatus != null) {
+            CvFuzzyType fromFuzzyType = fuzzyTypeConverter.psiToIntact(startStatus);
+            range.setFromCvFuzzyType(fromFuzzyType);
+        }
+
+        final RangeStatus endStatus = psiObject.getEndStatus();
+
+        if (endStatus != null) {
+            CvFuzzyType toFuzzyType = fuzzyTypeConverter.psiToIntact(endStatus);
+            range.setToCvFuzzyType(toFuzzyType);
+        }
 
         return range;
     }
@@ -109,11 +117,19 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         CvObjectConverter<CvFuzzyType,RangeStatus> fuzzyTypeConverter =
                         new CvObjectConverter<CvFuzzyType,RangeStatus>(getInstitution(), CvFuzzyType.class, RangeStatus.class);
 
-        RangeStatus startStatus = fuzzyTypeConverter.intactToPsi(intactObject.getFromCvFuzzyType());
-        psiRange.setStartStatus(startStatus);
+        final CvFuzzyType fromFuzzyType = intactObject.getFromCvFuzzyType();
 
-        RangeStatus endStatus = fuzzyTypeConverter.intactToPsi(intactObject.getToCvFuzzyType());
-        psiRange.setEndStatus(endStatus);
+        if (fromFuzzyType != null) {
+            RangeStatus startStatus = fuzzyTypeConverter.intactToPsi(fromFuzzyType);
+            psiRange.setStartStatus(startStatus);
+        }
+
+        final CvFuzzyType toFuzzyType = intactObject.getToCvFuzzyType();
+
+        if (toFuzzyType != null) {
+            RangeStatus endStatus = fuzzyTypeConverter.intactToPsi(toFuzzyType);
+            psiRange.setEndStatus(endStatus);
+        }
 
 
         return psiRange;
