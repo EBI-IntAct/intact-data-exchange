@@ -62,9 +62,6 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
     }
 
     public void enrich(Experiment objectToEnrich) {
-        if (!EnricherContext.getInstance().getConfig().isUpdateExperiments()) {
-            return;
-        }
         
         BioSourceEnricher bioSourceEnricher = BioSourceEnricher.getInstance();
         bioSourceEnricher.enrich(objectToEnrich.getBioSource());
@@ -79,17 +76,19 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         fixPubmedXrefIfNecessary(objectToEnrich);
 
         // populate the experiment using the pubmed id
-        String pubmedId = ExperimentUtils.getPubmedId(objectToEnrich);
-        try {
-            Long.parseLong(pubmedId);
+        if (EnricherContext.getInstance().getConfig().isUpdateExperiments()) {
+            String pubmedId = ExperimentUtils.getPubmedId(objectToEnrich);
+            try {
+                Long.parseLong(pubmedId);
 
-            populateExperiment(objectToEnrich, pubmedId);
-        } catch (InvalidPubmedException pe) {
-           log.error("Experiment with invalid pubmed cannot be enriched from citeXplore: "+pubmedId);
-        } catch (NumberFormatException nfe) {
-            log.error("Experiment with invalid pubmed (it is not a number) cannot be enriched from citeXplore: "+pubmedId);
-        } catch (Exception e) {
-            e.printStackTrace();
+                populateExperiment(objectToEnrich, pubmedId);
+            } catch (InvalidPubmedException pe) {
+               log.error("Experiment with invalid pubmed cannot be enriched from citeXplore: "+pubmedId);
+            } catch (NumberFormatException nfe) {
+                log.error("Experiment with invalid pubmed (it is not a number) cannot be enriched from citeXplore: "+pubmedId);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         // add the participant detection method to the experiment if missing
