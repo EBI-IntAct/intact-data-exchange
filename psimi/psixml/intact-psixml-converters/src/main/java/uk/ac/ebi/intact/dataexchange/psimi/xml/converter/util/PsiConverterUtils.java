@@ -111,7 +111,8 @@ public class PsiConverterUtils {
                 xref.setPrimaryRef( primaryRef );
             } else {
                 throw new UnsupportedConversionException("No primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
-                                                         "to Pubmed (dbAc="+ CvDatabase.PUBMED_MI_REF+") could be found in "+xrefContainer.getClass().getSimpleName());
+                                                         "to Pubmed (dbAc="+ CvDatabase.PUBMED_MI_REF+") could be found in "+xrefContainer.getClass().getSimpleName()+
+                        ": "+xrefContainer+", located at: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString());
             }
         } else {
             // remove the primary ref from the collection if it is a experiment
@@ -261,12 +262,12 @@ public class PsiConverterUtils {
             if ( annotatedObject instanceof Interactor && !( annotatedObject instanceof Interaction ) ) {
                 // We have an interactor that is not an interaction.
                 if ( includeInteractorXref( intactXref ) ) {
-                    XrefConverter xrefConverter = new XrefConverter( null, intactXref.getClass() );
+                    XrefConverter xrefConverter = new XrefConverter( annotatedObject.getOwner(), intactXref.getClass() );
                     DbReference dbRef = xrefConverter.intactToPsi( intactXref );
                     dbRefs.add( dbRef );
                 }
             } else {
-                XrefConverter xrefConverter = new XrefConverter( null, intactXref.getClass() );
+                XrefConverter xrefConverter = new XrefConverter( annotatedObject.getOwner(), intactXref.getClass() );
                 DbReference dbRef = xrefConverter.intactToPsi( intactXref );
                 dbRefs.add( dbRef );
             }

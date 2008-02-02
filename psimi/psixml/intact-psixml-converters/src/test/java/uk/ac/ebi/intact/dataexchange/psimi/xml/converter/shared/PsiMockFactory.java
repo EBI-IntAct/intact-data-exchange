@@ -85,7 +85,9 @@ public class PsiMockFactory {
 
         names.getAliases().add(createAlias("ebi", CvAliasType.GO_SYNONYM, CvAliasType.GO_SYNONYM_MI_REF));
 
-        source.setXref(createSourceXref(CvDatabase.INTACT_MI_REF));
+        Xref miRef = createPsiMiXref();
+        miRef.getPrimaryRef().setId(CvDatabase.INTACT_MI_REF);
+        source.setXref(miRef);
 
         source.setBibref(createSourceBibref());
 

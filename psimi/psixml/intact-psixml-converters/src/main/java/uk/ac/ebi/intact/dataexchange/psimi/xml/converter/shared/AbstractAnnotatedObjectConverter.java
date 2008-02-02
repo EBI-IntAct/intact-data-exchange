@@ -20,9 +20,13 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationItem;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
-import uk.ac.ebi.intact.model.AnnotatedObject;
-import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 import psidev.psi.mi.xml.model.HasId;
+import psidev.psi.mi.xml.model.DbReference;
+
+import java.util.Collection;
 
 /**
  * TODO comment this
@@ -30,7 +34,7 @@ import psidev.psi.mi.xml.model.HasId;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject, T> extends AbstractIntactPsiConverter<A, T> {
+public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject<?,?>, T> extends AbstractIntactPsiConverter<A, T> {
 
     private Class<? extends A> intactClass;
     private Class<T> psiClass;
@@ -74,8 +78,32 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
             return psiObject;
         }
 
+        // ac - create a xref to the institution db
+        if (intactObject.getAc() != null && getInstitutionPrimaryId() != null)  {
+            boolean containsAcXref = false;
+            for (Xref xref : (Collection<Xref>) intactObject.getXrefs()) {
+                if (intactObject.getAc().equals(xref.getPrimaryId())) {
+                    containsAcXref = true;
+                    break;
+                }
+            }
+
+            if (!containsAcXref) {
+                CvXrefQualifier sourceRef = CvObjectUtils.createCvObject(getInstitution(), CvXrefQualifier.class,
+                        CvXrefQualifier.SOURCE_REFERENCE_MI_REF, CvXrefQualifier.SOURCE_REFERENCE);
+                CvDatabase db = CvObjectUtils.createCvObject(getInstitution(), CvDatabase.class,
+                        getInstitutionPrimaryId(), getInstitution().getShortLabel());
+
+                Xref xref = XrefUtils.newXrefInstanceFor(intactClass);
+                xref.setCvXrefQualifier(sourceRef);
+                xref.setCvDatabase(db);
+                xref.setPrimaryId(intactObject.getAc());
+            }
+        }
+
         psiObject = newInstance(psiClass);
         PsiConverterUtils.populate(intactObject, psiObject);
+
 
         ConversionCache.putElement(intactElementKey(intactObject), psiObject);
 

@@ -205,7 +205,11 @@ public class InteractionConverterTest extends AbstractConverterTest {
     public void psiToIntact_fixSourceReferenceXrefs2() throws Exception {
         Interaction psiInteraction = PsiMockFactory.createMockInteraction();
 
+        psidev.psi.mi.xml.model.Xref sourceMiRef = PsiMockFactory.createPsiMiXref();
+        sourceMiRef.getPrimaryRef().setId(CvDatabase.DIP_MI_REF);
+
         Entry entry = PsiMockFactory.createMockEntry();
+        entry.getSource().setXref(sourceMiRef);
         entry.getInteractions().clear();
         entry.getExperiments().clear();
         entry.getInteractors().clear();

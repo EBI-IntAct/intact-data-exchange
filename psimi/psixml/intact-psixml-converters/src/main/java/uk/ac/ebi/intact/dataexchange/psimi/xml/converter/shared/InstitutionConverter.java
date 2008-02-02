@@ -33,8 +33,6 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
 
         IntactConverterUtils.populateNames(psiObject.getNames(), institution);
 
-        setInstitution(institution);
-
         if (psiObject.getXref() != null) {
             IntactConverterUtils.populateXref(psiObject.getXref(), institution, new XrefConverter<InstitutionXref>(getInstitution(), InstitutionXref.class));
         }
@@ -53,6 +51,8 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
                 institution.setUrl(attribute.getValue());
             }
         }
+
+        setInstitution(institution);
 
         return institution;
     }

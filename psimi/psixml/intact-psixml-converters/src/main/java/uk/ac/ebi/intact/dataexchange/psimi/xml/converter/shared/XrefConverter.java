@@ -16,8 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.DbReference;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiMiPopulator;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
@@ -46,6 +45,8 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
             throw new PsiConversionException("Id in DbReference is empty: "+psiObject);
         }
 
+        fixPubmedReferenceAsIdentityToPrimaryRef(psiObject);
+
         PsiMiPopulator psiMiPopulator = new PsiMiPopulator(getInstitution());
 
         String db = psiObject.getDb();
@@ -72,7 +73,6 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
             }
         }
 
-
         X xref = newXrefInstance(xrefClass, cvDb, primaryId, secondaryId, dbRelease, xrefQual);
         xref.setOwner(getInstitution());
 
@@ -80,6 +80,8 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
     }
 
     public DbReference intactToPsi(Xref intactObject) {
+        fixPubmedReferenceAsIdentityToPrimaryRef(intactObject);
+
         DbReference dbRef = new DbReference();
         dbRef.setDb(intactObject.getCvDatabase().getShortLabel());
         dbRef.setId(intactObject.getPrimaryId());
@@ -88,18 +90,12 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
 
         if (intactObject.getCvXrefQualifier() != null) {
             dbRef.setRefType(intactObject.getCvXrefQualifier().getShortLabel());
+            dbRef.setRefTypeAc(intactObject.getCvXrefQualifier().getMiIdentifier());
         }
 
-        CvObjectXref cvDatabasePsiMiXref = CvObjectUtils.getPsiMiIdentityXref(intactObject.getCvDatabase());
-        if (cvDatabasePsiMiXref != null) {
-            dbRef.setDbAc(CvObjectUtils.getPsiMiIdentityXref(intactObject.getCvDatabase()).getPrimaryId());
-        }
-
-        if (intactObject.getCvXrefQualifier() != null) {
-            CvObjectXref cvRefTypePsiMiXref = CvObjectUtils.getPsiMiIdentityXref(intactObject.getCvXrefQualifier());
-            if (cvRefTypePsiMiXref != null) {
-                dbRef.setRefTypeAc(cvRefTypePsiMiXref.getPrimaryId());
-            }
+        if (intactObject.getCvDatabase() != null) {
+            dbRef.setDbAc(intactObject.getCvDatabase().getMiIdentifier());
+            dbRef.setDb(intactObject.getCvDatabase().getShortLabel());
         }
 
         return dbRef;
@@ -121,5 +117,31 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
         return xref;
     }
 
+     protected void fixPubmedReferenceAsIdentityToPrimaryRef(Xref xref) {
+         if (CvDatabase.PUBMED_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())
+                 && CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getMiIdentifier())) {
+             CvXrefQualifier primaryRef = CvObjectUtils.createCvObject(xref.getOwner(), CvXrefQualifier.class,
+                     CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE);
+             xref.setCvXrefQualifier(primaryRef);
+
+            final ConverterMessage converterMessage = new ConverterMessage(MessageLevel.WARN, "Incorrect cross refernece to Pubmed that had qualifier 'identity'. Changed to 'primary-reference",
+                    ConverterContext.getInstance().getLocation().getCurrentLocation());
+            converterMessage.setAutoFixed(true);
+            ConverterContext.getInstance().getReport().getMessages().add(converterMessage);
+         }
+     }
+
+    protected void fixPubmedReferenceAsIdentityToPrimaryRef(DbReference dbRef) {
+         if (CvDatabase.PUBMED_MI_REF.equals(dbRef.getDbAc())
+                 && CvXrefQualifier.IDENTITY_MI_REF.equals(dbRef.getRefTypeAc())) {
+             dbRef.setRefTypeAc(CvXrefQualifier.PRIMARY_REFERENCE_MI_REF);
+             dbRef.setRefType(CvXrefQualifier.PRIMARY_REFERENCE);
+
+            final ConverterMessage converterMessage = new ConverterMessage(MessageLevel.WARN, "Incorrect cross refernece to Pubmed that had qualifier 'identity'. Changed to 'primary-reference",
+                    ConverterContext.getInstance().getLocation().getCurrentLocation());
+            converterMessage.setAutoFixed(true);
+            ConverterContext.getInstance().getReport().getMessages().add(converterMessage);
+         }
+     }
 
 }

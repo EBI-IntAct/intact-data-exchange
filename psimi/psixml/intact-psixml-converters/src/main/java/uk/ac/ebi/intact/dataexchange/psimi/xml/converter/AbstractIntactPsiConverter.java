@@ -3,6 +3,9 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.IntactObject;
+import uk.ac.ebi.intact.model.InstitutionXref;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationItem;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.InteractionLocationItem;
 import psidev.psi.mi.xml.model.Entry;
@@ -20,9 +23,20 @@ import java.util.Collection;
 public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConverter<I, P> {
 
     private Institution institution;
+    private String institutionPrimaryId;
 
     public AbstractIntactPsiConverter(Institution institution) {
-        this.institution = institution;
+        setInstitution(institution);
+    }
+
+    private void calculateInstitutionPrimaryId(Institution institution) {
+        if (institution != null) {
+            InstitutionXref xref = XrefUtils.getPsiMiIdentityXref(institution);
+
+            if (xref != null) {
+                institutionPrimaryId = xref.getPrimaryId();
+            }
+        }
     }
 
     protected Institution getInstitution() {
@@ -32,6 +46,7 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
     protected void setInstitution(Institution institution)
     {
         this.institution = institution;
+        calculateInstitutionPrimaryId(institution);
     }
 
     protected void failIfInconsistentConversion(I intactEntry, Entry P) {
@@ -86,5 +101,9 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
         final ConverterMessage converterMessage = new ConverterMessage(level, message, ConverterContext.getInstance().getLocation().getCurrentLocation());
         converterMessage.setAutoFixed(autoFixed);
         ConverterContext.getInstance().getReport().getMessages().add(converterMessage);
+    }
+
+    protected String getInstitutionPrimaryId() {
+        return institutionPrimaryId;
     }
 }
