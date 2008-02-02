@@ -249,13 +249,26 @@ public class InteractionConverterTest extends AbstractConverterTest {
     }
 
     @Test
-    public void intactToPsi_ac_sourceRef() throws Exception {
+    public void intactToPsi_ac_intactOrMint() throws Exception {
         uk.ac.ebi.intact.model.Interaction intactInteraction = new IntactMockBuilder().createDeterministicInteraction();
-        intactInteraction.setAc("AC-12345");
+        intactInteraction.setAc("EBI-12345");
 
         InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
         Interaction psiInteraction = converter.intactToPsi( intactInteraction);
 
         Assert.assertNotNull(psiInteraction.getXref());
+        Assert.assertEquals(Institution.INTACT_REF, psiInteraction.getXref().getPrimaryRef().getDbAc());
+    }
+
+    @Test
+    public void intactToPsi_ac_other() throws Exception {
+        uk.ac.ebi.intact.model.Interaction intactInteraction = new IntactMockBuilder().createDeterministicInteraction();
+        intactInteraction.setAc("OTHER-12345");
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        Interaction psiInteraction = converter.intactToPsi( intactInteraction);
+
+        Assert.assertNotNull(psiInteraction.getXref());
+        Assert.assertEquals("testInstitution", psiInteraction.getXref().getPrimaryRef().getDb());
     }
 }

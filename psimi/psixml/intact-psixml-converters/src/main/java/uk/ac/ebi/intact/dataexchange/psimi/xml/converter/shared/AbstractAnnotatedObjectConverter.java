@@ -16,15 +16,11 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationItem;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
-import psidev.psi.mi.xml.model.HasId;
-import psidev.psi.mi.xml.model.DbReference;
 
 import java.util.Collection;
 
@@ -79,7 +75,8 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         }
 
         // ac - create a xref to the institution db
-        if (intactObject.getAc() != null)  {
+        String ac = intactObject.getAc();
+        if (ac != null)  {
             boolean containsAcXref = false;
             for (Xref xref : (Collection<Xref>) intactObject.getXrefs()) {
                 if (intactObject.getAc().equals(xref.getPrimaryId())) {
@@ -89,14 +86,28 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
             }
 
             if (!containsAcXref) {
+                String dbMi = null;
+                String db = null;
+
+                if (ac.startsWith("EBI")) {
+                    dbMi = Institution.INTACT_REF;
+                    db = Institution.INTACT;
+                } else if (ac.startsWith("MINT")) {
+                    dbMi = Institution.MINT_REF;
+                    db = Institution.MINT;
+                } else {
+                    dbMi = getInstitutionPrimaryId();
+                    db = getInstitution().getShortLabel();
+                }
+
                 CvXrefQualifier sourceRef = CvObjectUtils.createCvObject(getInstitution(), CvXrefQualifier.class,
                         CvXrefQualifier.SOURCE_REFERENCE_MI_REF, CvXrefQualifier.SOURCE_REFERENCE);
-                CvDatabase db = CvObjectUtils.createCvObject(getInstitution(), CvDatabase.class,
-                        getInstitutionPrimaryId(), getInstitution().getShortLabel());
+                CvDatabase cvDb = CvObjectUtils.createCvObject(getInstitution(), CvDatabase.class,
+                        dbMi, db);
 
                 Xref xref = XrefUtils.newXrefInstanceFor(intactClass);
                 xref.setCvXrefQualifier(sourceRef);
-                xref.setCvDatabase(db);
+                xref.setCvDatabase(cvDb);
                 xref.setPrimaryId(intactObject.getAc());
                 xref.setSecondaryId(intactObject.getShortLabel());
                 intactObject.addXref(xref);
