@@ -95,17 +95,17 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
                 // finally to the Institution in the source section of the PSI-XML
                 if (ac.startsWith("EBI")) {
                     dbMi = Institution.INTACT_REF;
-                    db = Institution.INTACT;
+                    db = Institution.INTACT.toLowerCase();
                 } else if (ac.startsWith("MINT")) {
                     dbMi = Institution.MINT_REF;
-                    db = Institution.MINT;
+                    db = Institution.MINT.toLowerCase();
                 } else if (ConverterContext.getInstance().getDefaultInstitutionForAcs() != null){
                     Institution defaultInstitution = ConverterContext.getInstance().getDefaultInstitutionForAcs();
                     dbMi = calculateInstitutionPrimaryId(defaultInstitution);
-                    db = defaultInstitution.getShortLabel();
+                    db = defaultInstitution.getShortLabel().toLowerCase();
                 } else {
                     dbMi = getInstitutionPrimaryId();
-                    db = getInstitution().getShortLabel();
+                    db = getInstitution().getShortLabel().toLowerCase();
                 }
 
                 CvXrefQualifier sourceRef = CvObjectUtils.createCvObject(getInstitution(), CvXrefQualifier.class,
