@@ -34,7 +34,7 @@ import java.util.Collection;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject<?,?>, T> extends AbstractIntactPsiConverter<A, T> {
+public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject, T> extends AbstractIntactPsiConverter<A, T> {
 
     private Class<? extends A> intactClass;
     private Class<T> psiClass;
@@ -79,7 +79,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         }
 
         // ac - create a xref to the institution db
-        if (intactObject.getAc() != null && getInstitutionPrimaryId() != null)  {
+        if (intactObject.getAc() != null)  {
             boolean containsAcXref = false;
             for (Xref xref : (Collection<Xref>) intactObject.getXrefs()) {
                 if (intactObject.getAc().equals(xref.getPrimaryId())) {
@@ -98,6 +98,8 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
                 xref.setCvXrefQualifier(sourceRef);
                 xref.setCvDatabase(db);
                 xref.setPrimaryId(intactObject.getAc());
+                xref.setSecondaryId(intactObject.getShortLabel());
+                intactObject.addXref(xref);
             }
         }
 

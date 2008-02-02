@@ -247,4 +247,15 @@ public class InteractionConverterTest extends AbstractConverterTest {
         Assert.assertEquals( intactInteraction.getConfidences().iterator().next().getValue(),  psiInteraction.getConfidences().iterator().next().getValue());
         Assert.assertEquals( intactInteraction.getConfidences().iterator().next().getCvConfidenceType().getShortLabel(), psiInteraction.getConfidences().iterator().next().getUnit().getNames().getShortLabel());
     }
+
+    @Test
+    public void intactToPsi_ac_sourceRef() throws Exception {
+        uk.ac.ebi.intact.model.Interaction intactInteraction = new IntactMockBuilder().createDeterministicInteraction();
+        intactInteraction.setAc("AC-12345");
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        Interaction psiInteraction = converter.intactToPsi( intactInteraction);
+
+        Assert.assertNotNull(psiInteraction.getXref());
+    }
 }
