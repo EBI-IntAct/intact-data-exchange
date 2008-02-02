@@ -6,6 +6,8 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractionConve
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractorConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.AnnotationConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationTree;
+import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.context.IntactContext;
 
 /**
  * Makes the configuration available to the current thread (through ThreadLocal).
@@ -27,6 +29,8 @@ public class ConverterContext {
     private ConverterReport report;
 
     private LocationTree location;
+
+    private Institution defaultInstitutionForAcs;
 
     private static ThreadLocal<ConverterContext> instance = new ThreadLocal<ConverterContext>() {
         @Override
@@ -88,5 +92,16 @@ public class ConverterContext {
 
     public LocationTree getLocation() {
         return location;
+    }
+
+    public Institution getDefaultInstitutionForAcs() {
+        if (defaultInstitutionForAcs == null && IntactContext.currentInstanceExists()) {
+            defaultInstitutionForAcs = IntactContext.getCurrentInstance().getInstitution();
+        }
+        return defaultInstitutionForAcs;
+    }
+
+    public void setDefaultInstitutionForAcs(Institution defaultInstitutionForAcs) {
+        this.defaultInstitutionForAcs = defaultInstitutionForAcs;
     }
 }

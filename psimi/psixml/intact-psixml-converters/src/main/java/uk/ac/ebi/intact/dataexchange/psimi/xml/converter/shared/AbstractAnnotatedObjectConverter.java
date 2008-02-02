@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -89,12 +90,19 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
                 String dbMi = null;
                 String db = null;
 
+                // calculate the owner of the interaction, based on the AC prefix first,
+                // then in the defaultInstitutionForACs if passed to the ConverterContext or,
+                // finally to the Institution in the source section of the PSI-XML
                 if (ac.startsWith("EBI")) {
                     dbMi = Institution.INTACT_REF;
                     db = Institution.INTACT;
                 } else if (ac.startsWith("MINT")) {
                     dbMi = Institution.MINT_REF;
                     db = Institution.MINT;
+                } else if (ConverterContext.getInstance().getDefaultInstitutionForAcs() != null){
+                    Institution defaultInstitution = ConverterContext.getInstance().getDefaultInstitutionForAcs();
+                    dbMi = calculateInstitutionPrimaryId(defaultInstitution);
+                    db = defaultInstitution.getShortLabel();
                 } else {
                     dbMi = getInstitutionPrimaryId();
                     db = getInstitution().getShortLabel();

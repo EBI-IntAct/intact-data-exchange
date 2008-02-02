@@ -29,7 +29,8 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
         setInstitution(institution);
     }
 
-    private void calculateInstitutionPrimaryId(Institution institution) {
+    protected String calculateInstitutionPrimaryId(Institution institution) {
+        String institutionPrimaryId = null;
         if (institution != null) {
             InstitutionXref xref = XrefUtils.getPsiMiIdentityXref(institution);
 
@@ -37,6 +38,7 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
                 institutionPrimaryId = xref.getPrimaryId();
             }
         }
+        return institutionPrimaryId;
     }
 
     protected Institution getInstitution() {
@@ -46,7 +48,7 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
     protected void setInstitution(Institution institution)
     {
         this.institution = institution;
-        calculateInstitutionPrimaryId(institution);
+        this.institutionPrimaryId = calculateInstitutionPrimaryId(institution);
     }
 
     protected void failIfInconsistentConversion(I intactEntry, Entry P) {
