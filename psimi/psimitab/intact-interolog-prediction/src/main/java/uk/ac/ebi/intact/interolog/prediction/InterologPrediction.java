@@ -51,7 +51,8 @@ import uk.ac.ebi.intact.interolog.util.NewtUtils;
 /**
  * This is the main part of the prediction process.
  * 
- * 08/01/25: added a file with konwn interactions in mitab format
+ * 08/02/12: added the associated publication in the generated file
+ * 08/01/25: added a file with known interactions in mitab format
  * 08/01/15: little improvment, the program stop when the list of taxids is empty (the list of species for which we will predict interactions).
  * 07/11/26: the clog data are now public and called the porc data (for Putative ORthologous Clusters, see http://www.ebi.ac.uk/integr8/EBI-Integr8-HomePage.do)
  * the URL is known and added in this class. Nevertheless, it is recommended to download the file manually and then run the program pointing to the downloaded file (160257 KB  	15/11/07).
@@ -73,6 +74,14 @@ public class InterologPrediction {
 	public static Log log = LogFactory.getLog(InterologPrediction.class);
 	
 	private final static String SEP = "\t";
+	
+	/**
+	 * All information for generated interactions.
+	 */
+	private final static String AUTHORS = "Michaut et al. (2008)";
+	private final static String METHOD_DATABASE = "MI";
+	private final static String METHOD_ID = "0064";
+	private final static String METHOD_NAME = "interologs mapping";
 	
 	/**
 	 * To indent all numeric results during the process.
@@ -1357,16 +1366,16 @@ public class InterologPrediction {
 					// authors
 					List<Author> authors = new ArrayList<Author>(1);
 					Author me = new AuthorImpl();
-					me.setName("Magali Michaut");
+					me.setName(AUTHORS);
 					authors.add(me);
 					interaction.setAuthors(authors);
 					
 					// detection method = interologs mapping
 					List <InteractionDetectionMethod> methods = new ArrayList<InteractionDetectionMethod>(1);
 					InteractionDetectionMethod interologsMapping = new InteractionDetectionMethodImpl();
-					interologsMapping.setDatabase("MI");
-					interologsMapping.setIdentifier("0064");
-					interologsMapping.setText("interologs mapping");
+					interologsMapping.setDatabase(METHOD_DATABASE);
+					interologsMapping.setIdentifier(METHOD_ID);
+					interologsMapping.setText(METHOD_NAME);
 					methods.add(interologsMapping);
 					interaction.setDetectionMethods(methods);
 					
@@ -1472,7 +1481,7 @@ public class InterologPrediction {
 		log.warn("======================================================");
 		
 		log.warn("");
-		log.warn("Thanks for using the interoPORC tool. All informations are available on http://biodev.extra.cea.fr/interoporc/");
+		log.warn("Thanks for using the interoPORC tool. All information is available on http://biodev.extra.cea.fr/interoporc/");
 		log.warn("");
 	}
 	
