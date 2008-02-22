@@ -33,7 +33,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         int total = getDaoFactory().getCvObjectDao().countAll();
 
-        Assert.assertEquals(849, stats.getCreatedCvs().size());
+        Assert.assertEquals(850, stats.getCreatedCvs().size());
         Assert.assertEquals(0, stats.getUpdatedCvs().size());
         Assert.assertEquals(50, stats.getObsoleteCvs().size());
         Assert.assertEquals(9, stats.getInvalidTerms().size());
@@ -65,9 +65,9 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         int total = getDaoFactory().getCvObjectDao().countAll();
 
-        Assert.assertEquals(849, total);
+        Assert.assertEquals(850, total);
 
-        Assert.assertEquals(845, stats.getCreatedCvs().size());
+        Assert.assertEquals(846, stats.getCreatedCvs().size());
         Assert.assertEquals(1, stats.getUpdatedCvs().size());
         Assert.assertEquals(50, stats.getObsoleteCvs().size());
         Assert.assertEquals(9, stats.getInvalidTerms().size());

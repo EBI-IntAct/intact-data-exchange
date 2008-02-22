@@ -237,7 +237,9 @@ public class CvUpdater {
             return (T) processed.get(processedKey);
         }
 
-        T cvObject = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(),
+        final Institution institution = IntactContext.getCurrentInstance().getInstitution();
+
+        T cvObject = CvObjectUtils.createCvObject(institution,
                     cvClass, null, calculateShortLabel(cvTerm));
         cvObject.addXref(createIdentityXref(cvObject, cvTerm));
 
@@ -255,6 +257,12 @@ public class CvUpdater {
             if (annot != null) {
                 cvObject.addAnnotation(annot);
             }
+        }
+
+        // definition
+        if (cvTerm.getDefinition() != null) {
+            CvTopic definitionTopic = CvObjectUtils.createCvObject(institution, CvTopic.class, null, CvTopic.DEFINITION);
+            cvObject.addAnnotation(new Annotation(institution, definitionTopic, cvTerm.getDefinition()));
         }
 
         processed.put(processedKey, cvObject);
