@@ -111,7 +111,7 @@ public class CvUpdater {
                     CvTopic cvOrphan = toCvObject(CvTopic.class, orphan);
 
                     if (orphan.isObsolete()) {
-                        addObsoleteAnnotation(cvOrphan);
+                        addObsoleteAnnotation(cvOrphan, orphan.getObsoleteMessage());
                     }
 
                     orphanCvs.add(cvOrphan);
@@ -218,7 +218,7 @@ public class CvUpdater {
                 }
 
                 if (!alreadyContainsObsolete) {
-                    existingCv.addAnnotation(new Annotation(existingCv.getOwner(), obsoleteTopic, CvTopic.OBSOLETE));
+                    existingCv.addAnnotation(new Annotation(existingCv.getOwner(), obsoleteTopic, orphan.getObsoleteMessage()));
                     stats.addUpdatedCv(existingCv);
                 }
             }
@@ -226,8 +226,8 @@ public class CvUpdater {
         return existingCvs.size();
     }
 
-    private void addObsoleteAnnotation(CvObject existingCv) {
-        obsoleteTopic.addAnnotation(new Annotation(existingCv.getOwner(), obsoleteTopic, CvTopic.OBSOLETE));
+    private void addObsoleteAnnotation(CvObject existingCv, String obsoleteMessage) {
+        obsoleteTopic.addAnnotation(new Annotation(existingCv.getOwner(), obsoleteTopic, obsoleteMessage));
     }
 
     private CvTopic createCvTopicObsolete() {
@@ -239,10 +239,10 @@ public class CvUpdater {
                 .getCvObjectDao(CvTopic.class).getByPsiMiRef(CvTopic.OBSOLETE_MI_REF);
 
         if (obsoleteTopic == null) {
-                // create the obsolete term (which is obsolete too!)
-                obsoleteTopic = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.OBSOLETE_MI_REF, CvTopic.OBSOLETE);
-                obsoleteTopic.setFullName("obsolete term");
-                addObsoleteAnnotation(obsoleteTopic);
+            // create the obsolete term (which is obsolete too!)
+            obsoleteTopic = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.OBSOLETE_MI_REF, CvTopic.OBSOLETE);
+            obsoleteTopic.setFullName("obsolete term");
+            addObsoleteAnnotation(obsoleteTopic, "Deprecated CV term that should not be used to annotate entries");
         }
 
         return obsoleteTopic;
