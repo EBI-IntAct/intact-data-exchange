@@ -5,6 +5,7 @@ import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.model.CvInteractionType;
 import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.context.IntactContext;
@@ -27,13 +28,14 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     @Test
     public void createOrUpdateCVs() throws Exception {
         IntactOntology ontology = OboUtils.createOntologyFromOboDefault(10841);
+        AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault(10841);
 
         CvUpdater updater = new CvUpdater();
-        CvUpdaterStatistics stats = updater.createOrUpdateCVs(ontology);
+        CvUpdaterStatistics stats = updater.createOrUpdateCVs(ontology, annotationDataset);
 
         int total = getDaoFactory().getCvObjectDao().countAll();
 
-        Assert.assertEquals(850, stats.getCreatedCvs().size());
+        Assert.assertEquals(851, stats.getCreatedCvs().size());
         Assert.assertEquals(0, stats.getUpdatedCvs().size());
         Assert.assertEquals(50, stats.getObsoleteCvs().size());
         Assert.assertEquals(9, stats.getInvalidTerms().size());
@@ -58,16 +60,17 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         PersisterHelper.saveOrUpdate(aggregation, obsolete);
 
         IntactOntology ontology = OboUtils.createOntologyFromOboDefault(10841);
+        AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault(10841);
 
         CvUpdater updater = new CvUpdater();
-        CvUpdaterStatistics stats = updater.createOrUpdateCVs(ontology);
+        CvUpdaterStatistics stats = updater.createOrUpdateCVs(ontology, annotationDataset);
         System.out.println(stats);
 
         int total = getDaoFactory().getCvObjectDao().countAll();
 
-        Assert.assertEquals(850, total);
+        Assert.assertEquals(851, total);
 
-        Assert.assertEquals(846, stats.getCreatedCvs().size());
+        Assert.assertEquals(847, stats.getCreatedCvs().size());
         Assert.assertEquals(1, stats.getUpdatedCvs().size());
         Assert.assertEquals(50, stats.getObsoleteCvs().size());
         Assert.assertEquals(9, stats.getInvalidTerms().size());

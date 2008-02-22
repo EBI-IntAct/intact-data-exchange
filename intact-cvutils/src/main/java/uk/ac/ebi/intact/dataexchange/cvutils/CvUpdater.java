@@ -6,14 +6,12 @@ import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.core.persister.stats.StatsUnit;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTermAnnotation;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTermXref;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.*;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 
 import java.util.*;
 
@@ -45,6 +43,21 @@ public class CvUpdater {
      * @return An object containing some statistics about the update
      */
     public CvUpdaterStatistics createOrUpdateCVs(IntactOntology ontology) {
+        return createOrUpdateCVs(ontology, new AnnotationInfoDataset());
+    }
+
+    /**
+     * Starts the creation and update of CVs by using the ontology provided
+     * @return An object containing some statistics about the update
+     */
+    public CvUpdaterStatistics createOrUpdateCVs(IntactOntology ontology, AnnotationInfoDataset annotationInfoDataset) {
+        if (ontology == null) {
+            throw new NullPointerException("ontology");
+        }
+        if (annotationInfoDataset == null) {
+            throw new NullPointerException("annotationDataset");
+        }
+
         this.processed = new HashMap<String,CvObject>();
 
         stats = new CvUpdaterStatistics();
@@ -119,12 +132,13 @@ public class CvUpdater {
         stats.addObsoleteCv(obsoleteTopic);
         stats.addOrphanCv(obsoleteTopic);
 
-        // Persist all CVs
-
         List<CvDagObject> allCvs = new ArrayList<CvDagObject>();
         for (CvObject rootOrOrphan : rootsAndOrphans) {
             allCvs.addAll(itselfAndChildrenAsList((CvDagObject) rootOrOrphan));
         }
+
+        // process any term from the cv annotations dataset resource
+        updateCVsUsingAnnotationDataset(allCvs, annotationInfoDataset);
 
         PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate(allCvs.toArray(new CvObject[rootsAndOrphans.size()]));
         addCvObjectsToUpdaterStats(persisterStats, stats);
@@ -138,6 +152,45 @@ public class CvUpdater {
         }
 
         return stats;
+    }
+
+    private void updateCVsUsingAnnotationDataset(List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset) {
+        CvTopic hidden = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(),
+                                                      CvTopic.class, null, CvTopic.HIDDEN);
+
+         for (CvDagObject cvObject : allCvs) {
+            if (cvObject.getMiIdentifier() != null && annotationInfoDataset.containsCvAnnotation(cvObject.getMiIdentifier())) {
+                AnnotationInfo annotInfo = annotationInfoDataset.getCvAnnotation(cvObject.getMiIdentifier());
+
+                if (CvTopic.HIDDEN.equals(annotInfo.getTopicShortLabel())) {
+                    Annotation annotation = new Annotation(IntactContext.getCurrentInstance().getInstitution(), hidden, annotInfo.getReason());
+                    addAnnotation(annotation, cvObject, annotInfo.isApplyToChildren());
+                } else {
+                    log.warn("Case not implemented: topic short label in annotation info different from 'hidden': "+annotInfo.getTopicShortLabel());
+                }
+            }
+        }
+    }
+
+    private void addAnnotation(Annotation annotation, CvDagObject cvObject, boolean includeChildren) {
+        boolean containsAnnotation = false;
+
+        for (Annotation annot : cvObject.getAnnotations()) {
+            if (annot.getAnnotationText().equals(annotation.getAnnotationText())) {
+                containsAnnotation = true;
+                break;
+            }
+        }
+
+        if (!containsAnnotation) {
+            cvObject.getAnnotations().add(annotation);
+        }
+
+        if (includeChildren) {
+            for (CvDagObject child : cvObject.getChildren()) {
+                addAnnotation(annotation, child, includeChildren);
+            }
+        }
     }
 
     private int checkAndMarkAsObsoleteIfExisted(CvTerm orphan, CvUpdaterStatistics stats) {
@@ -377,6 +430,10 @@ public class CvUpdater {
 
         return IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getCvObjectDao(cvObjectClass).getByShortLabel(cvObjectClass, label);
+    }
+
+    private DaoFactory getDaoFactory() {
+        return IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
     }
 
     public boolean isExcludeObsolete() {
