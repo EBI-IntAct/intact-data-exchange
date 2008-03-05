@@ -64,7 +64,7 @@ public class ImexImporter {
         institutions = new HashMap<String, Institution>();
     }
 
-    protected ImexImport importNew() {
+    public ImexImport importNew() {
         ImexImportDao imexObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getImexImportDao();
 
         DateTime lastUpdateTime = imexObjectDao.getLatestUpdate(ImexImportActivationType.DATE_BASED);
