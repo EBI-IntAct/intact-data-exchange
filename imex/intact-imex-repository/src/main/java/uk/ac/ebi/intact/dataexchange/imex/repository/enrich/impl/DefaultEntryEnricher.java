@@ -7,15 +7,13 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.Repository;
 import uk.ac.ebi.intact.dataexchange.imex.repository.RepositoryHelper;
 import uk.ac.ebi.intact.dataexchange.imex.repository.enrich.EntryEnricher;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.RepoEntry;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.Message;
 import uk.ac.ebi.intact.dataexchange.imex.repository.model.ConversionMessage;
-import uk.ac.ebi.intact.dataexchange.imex.repository.model.MessageLevel;
 import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterReport;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterMessage;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.enricher.PsiEnricher;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher.PsiEnricher;
 
 import java.io.File;
 import java.io.IOException;
