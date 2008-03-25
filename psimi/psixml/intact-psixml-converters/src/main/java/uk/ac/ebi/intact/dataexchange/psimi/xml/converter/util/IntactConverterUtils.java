@@ -26,6 +26,7 @@ import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
@@ -104,11 +105,15 @@ public class IntactConverterUtils {
         }
 
         for (psidev.psi.mi.xml.model.Alias psiAlias : psiAliases) {
-            A alias = aliasConverter.psiToIntact(psiAlias);
-            annotatedObject.addAlias(alias);
+            if (psiAlias.hasValue()) {
+                A alias = aliasConverter.psiToIntact(psiAlias);
+                annotatedObject.addAlias(alias);
 
-            if (annotatedObject instanceof Institution) {
-                alias.setOwner((Institution) annotatedObject);
+                if (annotatedObject instanceof Institution) {
+                    alias.setOwner((Institution) annotatedObject);
+                }
+            } else {
+                if (log.isWarnEnabled()) log.warn("Alias without value in location: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString());
             }
         }
     }
@@ -161,7 +166,8 @@ public class IntactConverterUtils {
 
         if (shortLabel.length() > SHORT_LABEL_LENGTH) {
             shortLabel = shortLabel.substring(0, SHORT_LABEL_LENGTH);
-            if (log.isWarnEnabled()) log.warn("\tFull name to short label truncated: " + shortLabel);
+            if (log.isWarnEnabled()) log.warn("\tFull name to short label truncated to: '" + shortLabel+"' in location: "+
+                                              ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString());
         }
 
         return shortLabel;
