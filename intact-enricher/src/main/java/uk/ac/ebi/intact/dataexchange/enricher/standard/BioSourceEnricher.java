@@ -94,8 +94,7 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
         boolean hasNewt = false;
 
         for (BioSourceXref xref : organism.getXrefs()) {
-            if (CvObjectUtils.getPsiMiIdentityXref(xref.getCvDatabase()).getPrimaryId()
-                    .equals(CvDatabase.NEWT_MI_REF)) {
+            if (CvDatabase.NEWT_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
                 hasNewt = true;
                 break;
             }
