@@ -269,6 +269,6 @@ public class InteractionConverterTest extends AbstractConverterTest {
         Interaction psiInteraction = converter.intactToPsi( intactInteraction);
 
         Assert.assertNotNull(psiInteraction.getXref());
-        Assert.assertEquals("testInstitution", psiInteraction.getXref().getPrimaryRef().getDb());
+        Assert.assertEquals("testinstitution", psiInteraction.getXref().getPrimaryRef().getDb());
     }
 }

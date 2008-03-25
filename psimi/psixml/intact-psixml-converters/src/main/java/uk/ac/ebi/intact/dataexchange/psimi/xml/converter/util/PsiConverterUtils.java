@@ -128,7 +128,7 @@ public class PsiConverterUtils {
             DbReference primaryRef = getIdentity( dbRefs );
             xref.setPrimaryRef( primaryRef );
 
-            // remove the primary ref 
+            // remove the primary ref
             // from the collection and add the rest as secondary refs
             dbRefs.remove( primaryRef );
 
