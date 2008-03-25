@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<entrySet version="5" minorVersion="3" level="2" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="net:sf:psidev:mi">
+    <entry>
+        <source releaseDate="2006-07-19">
+            <names>
+                <shortLabel>MINT</shortLabel>
+                <fullName>MINT, Dpt of Biology, University of Rome Tor Vergata</fullName>
+            </names>
+            <bibref>
+                <xref>
+                    <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="14681455" dbAc="MI:0446" db="pubmed"/>
+                </xref>
+            </bibref>
+            <xref>
+                <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="MI:0471" dbAc="MI:0488" db="psi-mi"/>
+            </xref>
+            <attributeList>
+                <attribute name="url">http://mint.bio.uniroma2.it/mint</attribute>
+            </attributeList>
+        </source>
+        <experimentList>
+            <experimentDescription id="46">
+                <names>
+                    <shortLabel>he-2005</shortLabel>
+                    <fullName>Fibrillogenesis of apomyoglobin facilitated by aggregation sequence of yeast Sup35 in various regions.</fullName>
+                </names>
+                <bibref>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="15733864" dbAc="MI:0446" db="pubmed"/>
+                    </xref>
+                </bibref>
+                <hostOrganismList>
+                    <hostOrganism ncbiTaxId="-1">
+                        <names>
+                            <shortLabel>in vitro</shortLabel>
+                            <fullName>interaction occurs in vitro</fullName>
+                        </names>
+                    </hostOrganism>
+                </hostOrganismList>
+                <interactionDetectionMethod>
+                    <names>
+                        <shortLabel>electron microscopy</shortLabel>
+                        <fullName>electron microscopy</fullName>
+                        <alias>Electron cryomicroscopy</alias>
+                        <alias>Electron crystallography</alias>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0040" dbAc="MI:0488" db="psi-mi"/>
+                        <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="11785754" dbAc="MI:0446" db="pubmed"/>
+                    </xref>
+                </interactionDetectionMethod>
+            </experimentDescription>
+        </experimentList>
+        <interactorList>
+            <interactor id="48">
+                <names>
+                    <shortLabel>myg_delle</shortLabel>
+                    <fullName>Myoglobin</fullName>
+                    <alias typeAc="MI:0301" type="gene name">MB</alias>
+                </names>
+                <xref>
+                    <primaryRef version="SP_18" secondary="myg_delle" refTypeAc="MI:0356" refType="identity" id="P83682" dbAc="MI:0486" db="uniprotkb"/>
+                    <secondaryRef secondary="Globin_like" id="IPR009050" dbAc="MI:0449" db="interpro"/>
+                    <secondaryRef secondary="Globin" id="IPR000971" dbAc="MI:0449" db="interpro"/>
+                    <secondaryRef secondary="Globin_related" id="IPR012292" dbAc="MI:0449" db="interpro"/>
+                    <secondaryRef secondary="Myoglobin" id="IPR002335" dbAc="MI:0449" db="interpro"/>
+                </xref>
+                <interactorType>
+                    <names>
+                        <shortLabel>protein</shortLabel>
+                        <fullName>protein</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0326" dbAc="MI:0488" db="psi-mi"/>
+                        <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                        <secondaryRef refTypeAc="MI:0356" refType="identity" id="SO:0000358" dbAc="MI:0601" db="so"/>
+                    </xref>
+                </interactorType>
+                <organism ncbiTaxId="9749">
+                    <names>
+                        <shortLabel>delle</shortLabel>
+                        <fullName>Delphinapterus leucas</fullName>
+                    </names>
+                </organism>
+                <sequence>GLSEGEWQLVLXXXXKVEADLAGHGQDVLIRLFKGHPETLEKFDKFKHLKTXXXMKASEDLKKHGNTVLTALGGILKKKGHHEAELKPLAQSHATKHKIPIKYLXXXXEAIIHVLHSRHPAEFGADAQGAMNKALELFRKDIAAKYKELGFHG</sequence>
+            </interactor>
+        </interactorList>
+        <interactionList>
+            <interaction imexId="IM-1381" id="45">
+                <names>
+                    <shortLabel>myg-myg</shortLabel>
+                </names>
+                <xref>
+                    <primaryRef secondary="myg-myg" id="MINT-56644" dbAc="MI:0471" db="mint"/>
+                    <secondaryRef id="IM-1381" dbAc="MI:0670" db="imex"/>
+                    <secondaryRef refTypeAc="MI:0662" refType="imex-primary" id="MINT-56644" dbAc="MI:0471" db="mint"/>
+                </xref>
+                <experimentList>
+                    <experimentDescription id="46">
+                        <names>
+                            <shortLabel>he-2005</shortLabel>
+                            <fullName>Fibrillogenesis of apomyoglobin facilitated by aggregation sequence of yeast Sup35 in various regions.</fullName>
+                        </names>
+                        <bibref>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="15733864" dbAc="MI:0446" db="pubmed"/>
+                            </xref>
+                        </bibref>
+                        <hostOrganismList>
+                            <hostOrganism ncbiTaxId="-1">
+                                <names>
+                                    <shortLabel>in vitro</shortLabel>
+                                    <fullName>interaction occurs in vitro</fullName>
+                                </names>
+                            </hostOrganism>
+                        </hostOrganismList>
+                        <interactionDetectionMethod>
+                            <names>
+                                <shortLabel>electron microscopy</shortLabel>
+                                <fullName>electron microscopy</fullName>
+                                <alias>Electron cryomicroscopy</alias>
+                                <alias>Electron crystallography</alias>
+                            </names>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0040" dbAc="MI:0488" db="psi-mi"/>
+                                <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="11785754" dbAc="MI:0446" db="pubmed"/>
+                            </xref>
+                        </interactionDetectionMethod>
+                    </experimentDescription>
+                </experimentList>
+                <participantList>
+                    <participant id="47">
+                        <names>
+                            <shortLabel>MYG</shortLabel>
+                        </names>
+                        <interactor id="48">
+                            <names>
+                                <shortLabel>myg_delle</shortLabel>
+                                <fullName>Myoglobin</fullName>
+                                <alias typeAc="MI:0301" type="gene name">MB</alias>
+                            </names>
+                            <xref>
+                                <primaryRef version="SP_18" secondary="myg_delle" refTypeAc="MI:0356" refType="identity" id="P83682" dbAc="MI:0486" db="uniprotkb"/>
+                                <secondaryRef secondary="Globin_like" id="IPR009050" dbAc="MI:0449" db="interpro"/>
+                                <secondaryRef secondary="Globin" id="IPR000971" dbAc="MI:0449" db="interpro"/>
+                                <secondaryRef secondary="Globin_related" id="IPR012292" dbAc="MI:0449" db="interpro"/>
+                                <secondaryRef secondary="Myoglobin" id="IPR002335" dbAc="MI:0449" db="interpro"/>
+                            </xref>
+                            <interactorType>
+                                <names>
+                                    <shortLabel>protein</shortLabel>
+                                    <fullName>protein</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0326" dbAc="MI:0488" db="psi-mi"/>
+                                    <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                                    <secondaryRef refTypeAc="MI:0356" refType="identity" id="SO:0000358" dbAc="MI:0601" db="so"/>
+                                </xref>
+                            </interactorType>
+                            <organism ncbiTaxId="9749">
+                                <names>
+                                    <shortLabel>delle</shortLabel>
+                                    <fullName>Delphinapterus leucas</fullName>
+                                </names>
+                            </organism>
+                            <sequence>GLSEGEWQLVLXXXXKVEADLAGHGQDVLIRLFKGHPETLEKFDKFKHLKTXXXMKASEDLKKHGNTVLTALGGILKKKGHHEAELKPLAQSHATKHKIPIKYLXXXXEAIIHVLHSRHPAEFGADAQGAMNKALELFRKDIAAKYKELGFHG</sequence>
+                        </interactor>
+                        <participantIdentificationMethodList>
+                            <participantIdentificationMethod>
+                                <names>
+                                    <shortLabel>nucleotide sequence</shortLabel>
+                                    <fullName>nucleotide sequence identification</fullName>
+                                    <alias>sequence cloning</alias>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0078" dbAc="MI:0488" db="psi-mi"/>
+                                    <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                                </xref>
+                            </participantIdentificationMethod>
+                        </participantIdentificationMethodList>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>neutral component</shortLabel>
+                                    <fullName>neutral component</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0497" dbAc="MI:0488" db="psi-mi"/>
+                                    <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <experimentalPreparationList>
+                            <experimentalPreparation>
+                                <names>
+                                    <shortLabel>purified</shortLabel>
+                                    <fullName>purified</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0350" dbAc="MI:0488" db="psi-mi"/>
+                                    <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                                </xref>
+                            </experimentalPreparation>
+                        </experimentalPreparationList>
+                        <featureList>
+                            <feature id="49">
+                                <names>
+                                    <shortLabel>unspecified</shortLabel>
+                                    <fullName>unspecified</fullName>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <shortLabel>unspecified</shortLabel>
+                                        <fullName>unspecified</fullName>
+                                    </names>
+                                    <xref>
+                                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488" db="psi-mi"/>
+                                        <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <shortLabel>certain</shortLabel>
+                                            </names>
+                                            <xref>
+                                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="0"/>
+                                        <endStatus>
+                                            <names>
+                                                <shortLabel>certain</shortLabel>
+                                            </names>
+                                            <xref>
+                                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="0"/>
+                                        <isLink>false</isLink>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                        </featureList>
+                    </participant>
+                    <participant id="50">
+                        <names>
+                            <shortLabel>MYG</shortLabel>
+                        </names>
+                        <interactor id="48">
+                            <names>
+                                <shortLabel>myg_delle</shortLabel>
+                                <fullName>Myoglobin</fullName>
+                                <alias typeAc="MI:0301" type="gene name">MB</alias>
+                            </names>
+                            <xref>
+                                <primaryRef version="SP_18" secondary="myg_delle" refTypeAc="MI:0356" refType="identity" id="P83682" dbAc="MI:0486" db="uniprotkb"/>
+                                <secondaryRef secondary="Globin_like" id="IPR009050" dbAc="MI:0449" db="interpro"/>
+                                <secondaryRef secondary="Globin" id="IPR000971" dbAc="MI:0449" db="interpro"/>
+                                <secondaryRef secondary="Globin_related" id="IPR012292" dbAc="MI:0449" db="interpro"/>
+                                <secondaryRef secondary="Myoglobin" id="IPR002335" dbAc="MI:0449" db="interpro"/>
+                            </xref>
+                            <interactorType>
+                                <names>
+                                    <shortLabel>protein</shortLabel>
+                                    <fullName>protein</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0326" dbAc="MI:0488" db="psi-mi"/>
+                                    <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                                    <secondaryRef refTypeAc="MI:0356" refType="identity" id="SO:0000358" dbAc="MI:0601" db="so"/>
+                                </xref>
+                            </interactorType>
+                            <organism ncbiTaxId="9749">
+                                <names>
+                                    <shortLabel>delle</shortLabel>
+                                    <fullName>Delphinapterus leucas</fullName>
+                                </names>
+                            </organism>
+                            <sequence>GLSEGEWQLVLXXXXKVEADLAGHGQDVLIRLFKGHPETLEKFDKFKHLKTXXXMKASEDLKKHGNTVLTALGGILKKKGHHEAELKPLAQSHATKHKIPIKYLXXXXEAIIHVLHSRHPAEFGADAQGAMNKALELFRKDIAAKYKELGFHG</sequence>
+                        </interactor>
+                        <participantIdentificationMethodList>
+                            <participantIdentificationMethod>
+                                <names>
+                                    <shortLabel>nucleotide sequence</shortLabel>
+                                    <fullName>nucleotide sequence identification</fullName>
+                                    <alias>sequence cloning</alias>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0078" dbAc="MI:0488" db="psi-mi"/>
+                                    <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                                </xref>
+                            </participantIdentificationMethod>
+                        </participantIdentificationMethodList>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>neutral component</shortLabel>
+                                    <fullName>neutral component</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0497" dbAc="MI:0488" db="psi-mi"/>
+                                    <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <experimentalPreparationList>
+                            <experimentalPreparation>
+                                <names>
+                                    <shortLabel>purified</shortLabel>
+                                    <fullName>purified</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0350" dbAc="MI:0488" db="psi-mi"/>
+                                    <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                                </xref>
+                            </experimentalPreparation>
+                        </experimentalPreparationList>
+                        <featureList>
+                            <feature id="51">
+                                <names>
+                                    <shortLabel>unspecified</shortLabel>
+                                    <fullName>unspecified</fullName>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <shortLabel>unspecified</shortLabel>
+                                        <fullName>unspecified</fullName>
+                                    </names>
+                                    <xref>
+                                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488" db="psi-mi"/>
+                                        <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <shortLabel>certain</shortLabel>
+                                            </names>
+                                            <xref>
+                                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="0"/>
+                                        <endStatus>
+                                            <names>
+                                                <shortLabel>certain</shortLabel>
+                                            </names>
+                                            <xref>
+                                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="0"/>
+                                        <isLink>false</isLink>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                        </featureList>
+                    </participant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>physical interaction</shortLabel>
+                        <fullName>physical interaction</fullName>
+                        <alias>aggregation</alias>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0218" dbAc="MI:0488" db="psi-mi"/>
+                        <secondaryRef refTypeAc="MI:0358" refType="primary-reference" id="14755292" dbAc="MI:0446" db="pubmed"/>
+                    </xref>
+                </interactionType>
+                <modelled>false</modelled>
+                <intraMolecular>false</intraMolecular>
+                <negative>false</negative>
+                <attributeList>
+                    <attribute name="comment">The interaction represents a polymerization reaction</attribute>
+                    <attribute name="figure-legend">F3</attribute>
+                </attributeList>
+            </interaction>
+        </interactionList>
+    </entry>
+</entrySet>

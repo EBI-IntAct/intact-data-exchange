@@ -19,8 +19,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.collections.map.IdentityMap;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+
+import psidev.psi.mi.xml.model.HasId;
 
 /**
  * Stores a cache of elements with id
@@ -32,10 +34,12 @@ public class ConversionCache {
 
     private static final Log log = LogFactory.getLog(ConversionCache.class);
 
-    private Map idMap;
+    private Map objectIdentityMap;
+    private Map<String,Object> psiIdMap;
 
     public ConversionCache() {
-        this.idMap = new IdentityMap();
+        this.objectIdentityMap = new IdentityMap();
+        this.psiIdMap = new HashMap<String,Object>();
     }
 
     public static ThreadLocal<ConversionCache> instance = new ThreadLocal<ConversionCache>() {
@@ -48,18 +52,38 @@ public class ConversionCache {
     public static Object getElement(Object id) {
         if (id == null) return null;
 
-        return instance.get().idMap.get(id);
+        Object cachedObject = instance.get().objectIdentityMap.get(id);
+
+        if (cachedObject == null) {
+            if (id instanceof HasId) {
+                String psiIdKey = createPsiIdKey(id);
+                cachedObject = instance.get().psiIdMap.get(psiIdKey);
+            }
+        }
+
+        return cachedObject;
     }
 
     public static void putElement(Object key, Object element) {
         if (key != null) {
-            instance.get().idMap.put(key, element);
+            instance.get().objectIdentityMap.put(key, element);
+
+            if (key instanceof HasId) {
+                String psiIdKey = createPsiIdKey(key);
+                instance.get().psiIdMap.put(psiIdKey, element);
+            }
         }
+    }
+
+    private static String createPsiIdKey(Object key) {
+        int psiIdKey = ((HasId)key).getId();
+        return key.getClass().getName()+":"+psiIdKey;
     }
 
     public static void clear() {
         if (log.isDebugEnabled()) log.debug("Clearing Conversion cache");
         
-        instance.get().idMap.clear();
+        instance.get().objectIdentityMap.clear();
+        instance.get().psiIdMap.clear();
     }
 }

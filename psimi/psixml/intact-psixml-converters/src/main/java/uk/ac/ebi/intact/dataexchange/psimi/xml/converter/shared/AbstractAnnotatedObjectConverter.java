@@ -46,7 +46,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
 
 
     public A psiToIntact(T psiObject) {
-        A intactObject = (A) ConversionCache.getElement(psiElementKey(psiObject));
+        A intactObject = (A) ConversionCache.getElement(psiObject);
         
         if (intactObject != null) {
             newIntactObjectCreated = false;
@@ -59,7 +59,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
             intactObject.setOwner(getInstitution());
         }
 
-        ConversionCache.putElement(psiElementKey(psiObject), intactObject);
+        ConversionCache.putElement(psiObject, intactObject);
 
         newIntactObjectCreated = true;
 
@@ -68,7 +68,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
 
 
     public T intactToPsi(A intactObject) {
-        T psiObject = (T) ConversionCache.getElement(intactElementKey(intactObject));
+        T psiObject = (T) ConversionCache.getElement(intactObject);
 
         if (psiObject != null) {
             newPsiObjectCreated = false;
@@ -126,7 +126,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         PsiConverterUtils.populate(intactObject, psiObject);
 
 
-        ConversionCache.putElement(intactElementKey(intactObject), psiObject);
+        ConversionCache.putElement(intactObject, psiObject);
 
         newPsiObjectCreated = true;
 
@@ -146,26 +146,6 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         }
 
         return instance;
-    }
-
-    protected Object intactElementKey(A intactObject) {
-        return intactObject;
-        /*
-        if (intactObject.getAc() != null) {
-            return intactObject.getAc();
-        }
-        // no caching by default
-        return null;  */
-    }
-
-    protected Object psiElementKey(T psiObject) {
-        return psiObject;
-       /* if (psiObject instanceof HasId) {
-            return psiObject.getClass().getSimpleName()+":"+((HasId) psiObject).getId();
-        }
-        
-        // no caching by default
-        return null;     */
     }
 
     protected boolean isNewIntactObjectCreated() {

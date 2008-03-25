@@ -140,6 +140,17 @@ public class EntryConverterTest extends AbstractConverterTest {
     }
 
     @Test
+    public void roundtrip_mint_selfInteraction_2comp_1interactor() throws Exception {
+        final String resource = "/xml/15733864.mint.raw.xml";
+        InputStream is = EntryConverterTest.class.getResourceAsStream(resource);
+
+        File file = new File(EntryConverterTest.class.getResource(resource).getFile());
+        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
+
+        roundtripWithStream(is, "MINT");
+    }
+
+    @Test
     public void roundtrip_intact_redundantExperiments() throws Exception {
         final String resource = "/xml/16267818.intact.raw.xml";
         InputStream is = EntryConverterTest.class.getResourceAsStream(resource);
