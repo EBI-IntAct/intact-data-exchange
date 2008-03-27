@@ -54,10 +54,11 @@ public class IntactOntology {
         class2mi.put( CvParameterType.class, new String[]{ "MI:0640" } );
         class2mi.put( CvParameterUnit.class, new String[]{ "MI:0647" } );
 
-        // we map here all CVs that are not supported in PSI-MI
-        // we use the range IA:0001 to IA:0050 for these
+        // We map here all CVs that are not supported in PSI-MI
+        // We use the range IA:0001 to IA:0050 for these
         class2mi.put( CvCellType.class, new String[]{ "IA:0001" } );
         class2mi.put( CvTissue.class, new String[]{ "IA:0002" } );
+        class2mi.put( CvConfidenceType.class, new String[]{ "IA:0003" } );
 
         // mapping of the non DAG term to their shortlabel
         mi2name.put( "MI:0300", "alias type" );
@@ -71,6 +72,7 @@ public class IntactOntology {
 
         mi2name.put( "IA:0001", "cell type" );
         mi2name.put( "IA:0002", "tissue" );
+        mi2name.put( "IA:0003", "confidence type" );
     }
 
     ///////////////////////////////
