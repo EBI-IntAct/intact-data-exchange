@@ -16,9 +16,8 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.XrefUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.annotation.util.AnnotationUtil;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -129,9 +128,5 @@ public class InstitutionEnricher extends AnnotatedObjectEnricher<Institution>{
         institutionToEnrich.setXrefs(reference.getXrefs());
         institutionToEnrich.setAliases(reference.getAliases());
         institutionToEnrich.setAnnotations(reference.getAnnotations());
-    }
-
-    public void close() {
-        // nothing
     }
 }

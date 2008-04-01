@@ -156,9 +156,6 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         }
     }
 
-    public void close() {
-    }
-
     protected String replaceLabelInvalidChars(String label) {
         label = label.replaceAll("-", "");
         return label;

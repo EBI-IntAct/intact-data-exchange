@@ -15,10 +15,12 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 
 /**
@@ -34,6 +36,11 @@ public class CvObjectFetcherTest {
     @Before
     public void before() throws Exception {
         fetcher = CvObjectFetcher.getInstance();
+    }
+
+    @After
+    public void after() throws Exception {
+        EnricherContext.getInstance().close();
     }
 
     @Test

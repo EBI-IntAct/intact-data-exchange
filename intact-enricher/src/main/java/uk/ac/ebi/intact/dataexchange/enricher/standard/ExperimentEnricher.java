@@ -15,25 +15,23 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.ExperimentUtils;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.CvObjectBuilder;
-import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
-import uk.ac.ebi.intact.util.cdb.InvalidPubmedException;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.ExperimentFetcher;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.ExperimentUtils;
+import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
+import uk.ac.ebi.intact.util.cdb.InvalidPubmedException;
 
-import java.util.Collection;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * TODO comment this
@@ -111,9 +109,6 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
 
 
         super.enrich(objectToEnrich);
-    }
-
-    public void close() {
     }
 
     protected void populateExperiment(Experiment experiment, String pubmedId) throws Exception {

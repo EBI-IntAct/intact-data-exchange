@@ -15,11 +15,13 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
+import net.sf.ehcache.CacheManager;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
-import net.sf.ehcache.CacheManager;
 
 /**
  * TODO comment this
@@ -36,9 +38,14 @@ public class InteractorFetcherTest {
         fetcher = InteractorFetcher.getInstance();
     }
 
+    @After
+    public void after() throws Exception {
+        EnricherContext.getInstance().close();
+    }
+
     @Test
     public void fetchFromUniprot() throws Exception {
-        CacheManager.getInstance().getCache("Interactor").getStatistics().clearStatistics();
+        EnricherContext.getInstance().getCache("Interactor").getStatistics().clearStatistics();
         
         UniprotProtein uniprotProtein = fetcher.fetchInteractorFromUniprot("MK01_HUMAN", 9606);
         Assert.assertNotNull(uniprotProtein);

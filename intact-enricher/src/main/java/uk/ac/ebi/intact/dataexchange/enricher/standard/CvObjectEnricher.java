@@ -19,10 +19,9 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
 import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.model.CvObjectXref;
-import uk.ac.ebi.intact.model.util.CvObjectBuilder;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
 /**
  * TODO comment this
@@ -69,9 +68,6 @@ public class CvObjectEnricher extends AnnotatedObjectEnricher<CvObject> {
             objectToEnrich.setFullName(term.getFullName());
         }
 
-    }
-
-    public void close() {
     }
 
 }

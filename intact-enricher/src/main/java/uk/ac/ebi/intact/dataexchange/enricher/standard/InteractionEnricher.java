@@ -15,15 +15,15 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+import uk.ac.ebi.intact.model.util.InteractionUtils;
 
 /**
  * TODO comment this
@@ -86,9 +86,5 @@ public class InteractionEnricher extends AnnotatedObjectEnricher<Interaction> {
         }
 
         super.enrich(objectToEnrich);
-    }
-
-
-    public void close() {
     }
 }

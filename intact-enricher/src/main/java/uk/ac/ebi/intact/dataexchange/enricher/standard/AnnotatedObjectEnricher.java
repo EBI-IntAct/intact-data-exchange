@@ -15,9 +15,12 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.model.AnnotatedObject;
-import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.Xref;
 
 /**
  * TODO comment this
@@ -26,6 +29,8 @@ import uk.ac.ebi.intact.model.Institution;
  * @version $Id$
  */
 public abstract class AnnotatedObjectEnricher<T extends AnnotatedObject<?,?>> implements Enricher<T> {
+
+    private static final Log log = LogFactory.getLog( AnnotatedObjectEnricher.class );
 
     public void enrich(T objectToEnrich) {
         CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
@@ -40,6 +45,12 @@ public abstract class AnnotatedObjectEnricher<T extends AnnotatedObject<?,?>> im
         if (!(objectToEnrich instanceof Institution)) {
             InstitutionEnricher.getInstance().enrich(objectToEnrich.getOwner());
         }
+    }
+
+    public void close() {
+        if (log.isDebugEnabled()) log.debug("Closing "+getClass().getSimpleName());
+        
+        EnricherContext.getInstance().close();
     }
 
 }

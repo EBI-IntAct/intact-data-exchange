@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.enricher;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Status;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.dataexchange.cvutils.PSILoader;
@@ -57,10 +58,6 @@ public class EnricherContext {
 
     private EnricherContext() {
         this.config = new EnricherConfig();
-
-
-        InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/META-INF/ehcache-enricher.xml");
-        this.cacheManager = CacheManager.create(ehcacheConfig);
     }
 
     public EnricherConfig getConfig() {
@@ -72,6 +69,11 @@ public class EnricherContext {
     }
 
     public Cache getCache(String name) {
+        if (cacheManager == null || !Status.STATUS_ALIVE.equals(cacheManager)) {
+            InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/META-INF/ehcache-enricher.xml");
+            this.cacheManager = CacheManager.create(ehcacheConfig);
+        }
+
         Cache cache = cacheManager.getCache(name);
 
         if (cache == null) {
@@ -106,6 +108,11 @@ public class EnricherContext {
         IntactOntology ontology = loader.parseOboFile(url);
 
         return ontology;
+    }
+
+    public void close() {
+        if (log.isDebugEnabled()) log.debug("CacheManager shutdown");
+        this.cacheManager.shutdown();
     }
 
 }

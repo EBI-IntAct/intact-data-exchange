@@ -23,9 +23,9 @@ import uk.ac.ebi.intact.model.BioSourceXref;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.CvObjectBuilder;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
-import uk.ac.ebi.intact.model.util.CvObjectBuilder;
 
 /**
  * TODO comment this
@@ -110,6 +110,4 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
         }
     }
 
-    public void close() {
-    }
 }

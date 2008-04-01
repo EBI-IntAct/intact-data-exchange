@@ -25,7 +25,7 @@ import uk.ac.ebi.intact.model.CvIdentification;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class ComponentEnricher implements Enricher<Component>{
+public class ComponentEnricher extends AnnotatedObjectEnricher<Component>{
 
      private static ThreadLocal<ComponentEnricher> instance = new ThreadLocal<ComponentEnricher>() {
         @Override
@@ -63,8 +63,7 @@ public class ComponentEnricher implements Enricher<Component>{
         for (CvIdentification participantDetectionMethods : objectToEnrich.getParticipantDetectionMethods()) {
             cvObjectEnricher.enrich(participantDetectionMethods);
         }
-    }
 
-    public void close() {
+        super.enrich(objectToEnrich);
     }
 }
