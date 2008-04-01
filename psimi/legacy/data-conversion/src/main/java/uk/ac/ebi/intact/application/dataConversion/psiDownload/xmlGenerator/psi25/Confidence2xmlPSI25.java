@@ -85,43 +85,42 @@ public class Confidence2xmlPSI25 extends AnnotatedObject2xmlPSI25 implements Con
                             AnnotatedObject annotatedObject,
                             final String cvTopicFilter ) {
 
-        Collection confidences = new ArrayList( 2 ); // 2 will be enough in most cases.
+        Collection<Confidence> confidences = new ArrayList<Confidence>();
 
-        for ( Iterator iterator = annotatedObject.getAnnotations().iterator(); iterator.hasNext(); ) {
-            Annotation annotation = (Annotation) iterator.next();
+        if (annotatedObject instanceof Interaction) {
+            confidences = ((Interaction)annotatedObject).getConfidences();
+        }
+
+        // confidences as annotations
+        Collection<Annotation> confidencesAsAnnotations = new ArrayList<Annotation>( 2 ); // 2 will be enough in most cases.
+
+        for ( Iterator<Annotation> iterator = annotatedObject.getAnnotations().iterator(); iterator.hasNext(); ) {
+            Annotation annotation = iterator.next();
 
             if ( cvTopicFilter.equals( annotation.getCvTopic().getShortLabel() ) ) {
                 // export it
-                confidences.add( annotation );
+                confidencesAsAnnotations.add( annotation );
             }
         }
 
         Element confidenceListElement = null;
-        if ( false == confidences.isEmpty() ) {
+        if ( !confidences.isEmpty() && !confidencesAsAnnotations.isEmpty() ) {
             // create the list element and export the annotations...
             confidenceListElement = session.createElement( CONFIDENCE_LIST_TAG_NAME );
 
-            for ( Iterator iterator = confidences.iterator(); iterator.hasNext(); ) {
-                Annotation annotation = (Annotation) iterator.next();
+            // iterate through the confidence objects
+            for (Confidence confidence : confidences) {
+                Element confidenceElement = createConfidenceElement(session, confidence.getCvConfidenceType(), confidence.getValue());
+                confidenceListElement.appendChild(confidenceElement);
+            }
 
+            // iterate through the confidences as annotations
+            for (Annotation annotation : confidencesAsAnnotations) {
                 // 1. Create a confidence element
-                Element confidenceElement = session.createElement( CONFIDENCE_TAG_NAME );
-
-                // 2. Generating Unit...
-                Element unitElement = session.createElement( CONFIDENCE_UNIT_TAG_NAME );
-                createNames( session, unitElement, annotation.getCvTopic() );
-                confidenceElement.appendChild( unitElement );
-
-                // TODO check if it has MI reference, if so export them as xref of the confidence.unit.
-
-                // 3. Generating value...
-                Element valueElement = session.createElement( CONFIDENCE_VALUE_TAG_NAME );
-                Text valueTextElement = session.createTextNode( annotation.getAnnotationText() );
-                valueElement.appendChild( valueTextElement );
-                confidenceElement.appendChild( valueElement );
+                Element confidenceElement = createConfidenceElement(session, annotation.getCvTopic(), annotation.getAnnotationText());
 
                 // 4. Appending the confidence to the list...
-                confidenceListElement.appendChild( confidenceElement );
+                confidenceListElement.appendChild(confidenceElement);
             }
 
             // Appending the confidenceList to the parent Element...
@@ -129,5 +128,23 @@ public class Confidence2xmlPSI25 extends AnnotatedObject2xmlPSI25 implements Con
         }
 
         return confidenceListElement;
+    }
+
+    private Element createConfidenceElement(UserSessionDownload session, CvObject unit, Object value) {
+        Element confidenceElement = session.createElement(CONFIDENCE_TAG_NAME);
+
+        // 2. Generating Unit...
+        Element unitElement = session.createElement(CONFIDENCE_UNIT_TAG_NAME);
+        createNames(session, unitElement, unit);
+        confidenceElement.appendChild(unitElement);
+
+        // TODO check if it has MI reference, if so export them as xref of the confidence.unit.
+
+        // 3. Generating value...
+        Element valueElement = session.createElement(CONFIDENCE_VALUE_TAG_NAME);
+        Text valueTextElement = session.createTextNode((String)value);
+        valueElement.appendChild(valueTextElement);
+        confidenceElement.appendChild(valueElement);
+        return confidenceElement;
     }
 }

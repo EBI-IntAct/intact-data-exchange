@@ -100,6 +100,8 @@ public class PsiDownloadTest extends TestCase {
     protected static CvInteractorType interactionType = new CvInteractorType( owner, "interaction" );
     protected static CvInteractorType nucleicAcidType = new CvInteractorType( owner, "nucleic acid" );
 
+    protected static CvConfidenceType intactConfScore = new CvConfidenceType( owner, CvConfidenceType.INTACT_CONFIDENCE_SCORE );
+
     static {
         addPsiReference( bait, "MI:0496" );
         addPsiReference( prey, "MI:0498" );
@@ -132,7 +134,7 @@ public class PsiDownloadTest extends TestCase {
 
         addPsiReference( proteinType, CvInteractorType.getProteinMI() );
         addPsiReference( interactionType, CvInteractorType.getInteractionMI() );
-        addPsiReference( interactionType, (String) CvInteractorType.getNucleicAcidMIs().get( 0 ) );
+        addPsiReference( interactionType, CvInteractorType.DNA_MI_REF);
     }
 
 
