@@ -20,12 +20,13 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
 {
     public InstitutionConverter()
     {
-        super(new Institution(), Institution.class, Source.class);
+        super(new Institution("Unknown"), Institution.class, Source.class);
     }
 
     public Institution psiToIntact(Source psiObject)
     {
         Institution institution = super.psiToIntact( psiObject );
+        setInstitution(institution);
 
         if ( !isNewIntactObjectCreated() ) {
             return institution;
@@ -34,7 +35,7 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
         IntactConverterUtils.populateNames(psiObject.getNames(), institution);
 
         if (psiObject.getXref() != null) {
-            IntactConverterUtils.populateXref(psiObject.getXref(), institution, new XrefConverter<InstitutionXref>(getInstitution(), InstitutionXref.class));
+            IntactConverterUtils.populateXref(psiObject.getXref(), institution, new XrefConverter<InstitutionXref>(institution, InstitutionXref.class));
         }
 
         if (psiObject.getBibref() != null) {
