@@ -1,4 +1,5 @@
-<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ehcache.xsdxsd">
+<!--<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ehcache.xsdxsd">-->
+<ehcache>
 
     <!-- Sets the path to the directory where cache .data files are created.
 
