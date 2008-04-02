@@ -111,8 +111,8 @@ public class EnricherContext {
     }
 
     public void close() {
-        //if (log.isDebugEnabled()) log.debug("CacheManager shutdown");
-        //this.cacheManager.shutdown();
+        if (log.isDebugEnabled()) log.debug("CacheManager shutdown");
+        this.cacheManager.shutdown();
     }
 
 }
