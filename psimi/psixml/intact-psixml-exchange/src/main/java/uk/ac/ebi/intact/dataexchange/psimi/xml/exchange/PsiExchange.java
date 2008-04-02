@@ -221,7 +221,7 @@ public class PsiExchange {
             IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getEntityManager().getTransaction().begin();
         }
 
-        PersisterStatistics importStats = new PersisterStatistics();
+        PersisterStatistics importStats = null;
 
         // some time for stats
         long startTime = System.currentTimeMillis();
@@ -260,8 +260,7 @@ public class PsiExchange {
                 if (log.isDebugEnabled()) log.debug("Persisting: " + interaction.getShortLabel());
 
                 // commit the persistence
-                PersisterStatistics stats = PersisterHelper.saveOrUpdate(persister, interaction);
-                importStats = merge(importStats, stats);
+                importStats = PersisterHelper.saveOrUpdate(persister, interaction);
 
                 try {
                     commitTransaction();
