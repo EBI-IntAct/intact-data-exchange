@@ -138,7 +138,7 @@ public class PsiExchange {
 
         ConversionCache.clear();
 
-        PersisterStatistics importStats = new PersisterStatistics();
+        PersisterStatistics importStats = null;
 
         final Institution institution;
         try {
@@ -171,7 +171,7 @@ public class PsiExchange {
             // mark the interaction to save or update
             if (log.isDebugEnabled()) log.debug("Persisting: "+interaction.getShortLabel());
 
-            PersisterStatistics stats = PersisterHelper.saveOrUpdate(persister, interaction);
+            importStats = PersisterHelper.saveOrUpdate(persister, interaction);
 
             try {
                 commitTransaction();
@@ -179,7 +179,6 @@ public class PsiExchange {
                 throw new ImportException("Problem importing interaction: " + interaction.getShortLabel(), e);
             }
 
-            importStats = merge(importStats, stats);
             interactionCount++;
         }
 
