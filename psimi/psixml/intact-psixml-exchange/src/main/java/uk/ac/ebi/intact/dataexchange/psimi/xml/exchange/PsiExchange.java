@@ -114,11 +114,10 @@ public class PsiExchange {
             throw new PsiEnricherException("Problem reading source PSI", e);
         }
 
-        PersisterStatistics stats = new PersisterStatistics();
+        PersisterStatistics stats = null;
 
         for (IndexedEntry indexedEntry : indexedEntries) {
-            PersisterStatistics entryStats = importIntoIntact(indexedEntry, persister);
-            stats = merge(stats, entryStats);
+            stats = importIntoIntact(indexedEntry, persister);
         }
 
         return stats;
