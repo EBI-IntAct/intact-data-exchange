@@ -166,8 +166,14 @@ public class IntactConverterUtils {
 
         if (shortLabel.length() > SHORT_LABEL_LENGTH) {
             shortLabel = shortLabel.substring(0, SHORT_LABEL_LENGTH);
-            if (log.isWarnEnabled()) log.warn("\tFull name to short label truncated to: '" + shortLabel+"' in location: "+
-                                              ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString());
+
+            if (log.isWarnEnabled()) {
+                String msg = "\tFull name to short label truncated to: '" + shortLabel+"'";
+                if (ConverterContext.getInstance().getLocation() != null && ConverterContext.getInstance().getLocation().getCurrentLocation() != null) {
+                    msg = msg + " in location: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString();
+                }
+                log.warn(msg);
+            }
         }
 
         return shortLabel;
