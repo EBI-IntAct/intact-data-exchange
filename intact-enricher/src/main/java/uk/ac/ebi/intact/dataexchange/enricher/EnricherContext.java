@@ -69,7 +69,7 @@ public class EnricherContext {
     }
 
     public Cache getCache(String name) {
-        if (cacheManager == null || !Status.STATUS_ALIVE.equals(cacheManager)) {
+        if (cacheManager == null) {
             InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/META-INF/ehcache-enricher.xml");
             this.cacheManager = CacheManager.create(ehcacheConfig);
         }
@@ -111,8 +111,8 @@ public class EnricherContext {
     }
 
     public void close() {
-        if (log.isDebugEnabled()) log.debug("CacheManager shutdown");
-        this.cacheManager.shutdown();
+        //if (log.isDebugEnabled()) log.debug("CacheManager shutdown");
+        //this.cacheManager.shutdown();
     }
 
 }
