@@ -98,8 +98,9 @@ public class InterologPredictionTest {
         URL urlMitab = InterologPredictionTest.class.getResource( mitab );
         assertNotNull( "Could not initialize test, file " + mitab + " could not be found.", urlMitab );
         File inputMitab = new File(urlMitab.getFile());
-        
-        InterologPrediction prediction = new InterologPrediction(new File("./src/test/resources/"));
+
+        File testFolder = new File("./target");
+        InterologPrediction prediction = new InterologPrediction(testFolder);
         assertNotNull(prediction);
         prediction.setPorc(inputClog);
         prediction.setMitab(inputMitab);
@@ -125,11 +126,9 @@ public class InterologPredictionTest {
 		}
 		
 		// check results
-		final String res = "/"+name+extension;
-        URL url = InterologPredictionTest.class.getResource( res );
-        assertNotNull( "Could not initialize test, file " + res + " could not be found.", url );
-        File resFile = new File(url.getFile());
-        
+        File resFile = new File(testFolder, name+extension);
+        assertTrue( "Could not initialize test, file " + resFile + " could not be found.", resFile.exists() );
+
         Collection<BinaryInteraction> interactions = MitabUtils.readMiTab(resFile);
         assertNotNull(interactions);
 		assertEquals(interactions.size(), 2);
