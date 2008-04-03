@@ -23,7 +23,6 @@ import uk.ac.ebi.intact.dataexchange.cvutils.PSILoader;
 import uk.ac.ebi.intact.dataexchange.cvutils.PsiLoaderException;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -57,8 +56,8 @@ public class EnricherContext {
     private EnricherContext() {
         this.config = new EnricherConfig();
 
-        InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/META-INF/ehcache-enricher.xml");
-        CacheManager.create(ehcacheConfig);
+        //InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/META-INF/ehcache-enricher.xml");
+        //CacheManager.create(ehcacheConfig);
     }
 
     public EnricherConfig getConfig() {
