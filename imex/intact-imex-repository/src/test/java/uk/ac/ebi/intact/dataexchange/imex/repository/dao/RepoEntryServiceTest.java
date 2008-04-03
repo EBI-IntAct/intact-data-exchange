@@ -29,7 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * TODO comment this
+ * RepoEntryService Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -37,7 +37,6 @@ import java.util.List;
 public class RepoEntryServiceTest extends AbstractRepositoryTestCase {
     
     @Test
-    @Ignore
     public void findImportablesExcluding() throws Exception {
         persistRepoEntrySet();
         

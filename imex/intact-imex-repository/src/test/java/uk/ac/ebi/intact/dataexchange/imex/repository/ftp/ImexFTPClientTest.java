@@ -23,7 +23,7 @@ import org.junit.Test;
 import java.util.List;
 
 /**
- * TODO comment this
+ * ImexFTPClient Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -52,6 +52,23 @@ public class ImexFTPClientTest {
     @Test
     public void listFiles_mint() throws Exception {
         final ImexFTPClient imexFTPClient = ImexFTPClientFactory.createMintClient();
+        imexFTPClient.connect();
+
+        final List<ImexFTPFile> ftpFiles = imexFTPClient.listFiles();
+
+        System.out.println("Files: "+ftpFiles.size());
+
+        for (ImexFTPFile file : ftpFiles) {
+            System.out.println(file);
+        }
+        Assert.assertFalse(ftpFiles.isEmpty());
+
+        imexFTPClient.disconnect();
+    }
+
+    @Test
+    public void listFiles_intact() throws Exception {
+        final ImexFTPClient imexFTPClient = ImexFTPClientFactory.createIntactClient();
         imexFTPClient.connect();
 
         final List<ImexFTPFile> ftpFiles = imexFTPClient.listFiles();
