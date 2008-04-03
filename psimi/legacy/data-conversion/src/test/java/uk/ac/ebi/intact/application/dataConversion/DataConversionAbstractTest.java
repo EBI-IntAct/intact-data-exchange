@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.application.dataConversion;
 
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import uk.ac.ebi.intact.config.impl.SmallCvPrimer;
 import uk.ac.ebi.intact.context.DataContext;
 import uk.ac.ebi.intact.context.IntactContext;
@@ -47,6 +48,8 @@ public abstract class DataConversionAbstractTest extends IntactBasicTestCase {
 
     @BeforeClass
     public static void prepare() throws Exception {
+        IntactContext.initStandaloneContext();
+        
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
         dataContext.beginTransaction();
         DataConversionCvPrimer primer = new DataConversionCvPrimer(dataContext.getDaoFactory());
