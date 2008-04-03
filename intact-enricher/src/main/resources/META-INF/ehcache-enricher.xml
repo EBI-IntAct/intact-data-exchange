@@ -153,7 +153,6 @@
             overflowToDisk="true"
             diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
-            memoryStoreEvictionPolicy="LRU"
             />
 
     <!--Predefined caches.  Add your cache configuration settings here.
@@ -185,10 +184,6 @@
                                          The default value is false.
         diskExpiryThreadIntervalSeconds- The number of seconds between runs of the disk expiry thread. The default value
                                          is 120 seconds.
-        memoryStoreEvictionPolicy      - Policy would be enforced upon reaching the maxElementsInMemory limit. Default
-                                         policy is Least Recently Used (specified as LRU). Other policies available -
-                                         First In First Out (specified as FIFO) and Less Frequently Used
-                                         (specified as LFU)
 
         Cache elements can also contain zero or more cacheEventListenerFactory elements.
 
@@ -210,7 +205,6 @@
            overflowToDisk="false"
            timeToIdleSeconds="300"
            timeToLiveSeconds="600"
-           memoryStoreEvictionPolicy="LFU"
             />
 
     <cache name="CvObject"
@@ -219,7 +213,6 @@
            overflowToDisk="false"
            timeToIdleSeconds="300"
            timeToLiveSeconds="600"
-           memoryStoreEvictionPolicy="LFU"
             />
 
     <cache name="Interactor"
@@ -228,7 +221,6 @@
            overflowToDisk="false"
            timeToIdleSeconds="300"
            timeToLiveSeconds="600"
-           memoryStoreEvictionPolicy="LFU"
             />
 
     <cache name="Experiment"
@@ -237,7 +229,6 @@
            overflowToDisk="false"
            timeToIdleSeconds="300"
            timeToLiveSeconds="600"
-           memoryStoreEvictionPolicy="LFU"
             />
 
 
