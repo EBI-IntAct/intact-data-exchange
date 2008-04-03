@@ -36,30 +36,7 @@
             <groupId>uk.ac.ebi.intact.dataexchange</groupId>
             <artifactId>intact-enricher</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>psidev.psi.mi</groupId>
-            <artifactId>psimi-xslt</artifactId>
-            <version>1.5.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.xml</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.1</version>
-        </dependency>
-
-        <dependency>
-    <groupId>com.sun.xml.fastinfoset</groupId>
-    <artifactId>FastInfoset</artifactId>
-    <version>1.1.1</version>
-</dependency>
-
+        
     </dependencies>
 
 </project>
