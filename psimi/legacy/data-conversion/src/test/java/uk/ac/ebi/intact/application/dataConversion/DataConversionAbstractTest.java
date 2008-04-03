@@ -53,6 +53,7 @@ public abstract class DataConversionAbstractTest extends IntactBasicTestCase {
         primer.createCVs();
         dataContext.commitTransaction();
 
+        dataContext.beginTransaction();
         IntactMockBuilder mockBuilder = new IntactMockBuilder();
 
         Experiment exp1 = mockBuilder.createDeterministicExperiment();
@@ -60,6 +61,9 @@ public abstract class DataConversionAbstractTest extends IntactBasicTestCase {
         exp1.addInteraction(mockBuilder.createInteractionRandomBinary());
 
         PersisterHelper.saveOrUpdate(exp1);
+
+        dataContext.commitTransaction();
+        dataContext.beginTransaction();
 
         Experiment exp2 = mockBuilder.createExperimentEmpty("ni-1998-2", "1234");
         exp2.addInteraction(mockBuilder.createInteractionRandomBinary());
@@ -71,6 +75,8 @@ public abstract class DataConversionAbstractTest extends IntactBasicTestCase {
         c2.setExpressedIn(mockBuilder.createBioSource(-1, "in vitro"));
 
         PersisterHelper.saveOrUpdate(exp2);
+
+        dataContext.commitTransaction();
 
         // update target species
         new UpdateTargetSpecies().updateAllExperiments();
