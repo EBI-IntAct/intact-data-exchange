@@ -48,8 +48,6 @@ public abstract class DataConversionAbstractTest extends IntactBasicTestCase {
 
     @BeforeClass
     public static void prepare() throws Exception {
-        IntactContext.initStandaloneContext();
-        
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
         dataContext.beginTransaction();
         DataConversionCvPrimer primer = new DataConversionCvPrimer(dataContext.getDaoFactory());
@@ -86,6 +84,11 @@ public abstract class DataConversionAbstractTest extends IntactBasicTestCase {
 
         File file = new File("reverseMapping.txt.ser");
         if (file.exists()) file.delete();
+    }
+
+    @AfterClass
+    public void theAftermath() {
+        IntactContext.closeCurrentInstance();
     }
 
     private static class DataConversionCvPrimer extends SmallCvPrimer {
