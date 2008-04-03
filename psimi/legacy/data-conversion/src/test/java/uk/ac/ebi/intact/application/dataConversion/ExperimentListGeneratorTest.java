@@ -34,7 +34,9 @@ public class ExperimentListGeneratorTest extends DataConversionAbstractTest
     @Test
     public void testGenerate_ni1998() throws Exception
     {
-        ExperimentListGenerator gen = new ExperimentListGenerator("ni-1998-2");
+        Assert.assertNotNull(getDaoFactory().getExperimentDao().getByShortLabel("ni-1998-1"));
+
+        ExperimentListGenerator gen = new ExperimentListGenerator("ni-1998-1");
         gen.setOnlyWithPmid(true);
 
         List<ExperimentListItem> eliSpecies = gen.generateClassificationBySpecies();

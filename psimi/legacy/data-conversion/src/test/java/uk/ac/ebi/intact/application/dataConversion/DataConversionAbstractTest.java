@@ -65,7 +65,7 @@ public abstract class DataConversionAbstractTest extends IntactBasicTestCase {
         dataContext.commitTransaction();
         dataContext.beginTransaction();
 
-        Experiment exp2 = mockBuilder.createExperimentEmpty("ni-1998-2", "1234");
+        Experiment exp2 = mockBuilder.createExperimentEmpty("ni-1998-1", "1234");
         exp2.addInteraction(mockBuilder.createInteractionRandomBinary());
         Iterator<Component> compIter = exp2.getInteractions().iterator().next().getComponents().iterator();
         Component c1 = compIter.next();
