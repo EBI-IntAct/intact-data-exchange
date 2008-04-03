@@ -17,7 +17,6 @@ package uk.ac.ebi.intact.dataexchange.enricher;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Status;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.dataexchange.cvutils.PSILoader;
@@ -42,7 +41,6 @@ public class EnricherContext {
     public static final Log log = LogFactory.getLog(EnricherContext.class);
 
     private EnricherConfig config;
-    private CacheManager cacheManager;
     private IntactOntology ontology;
 
     private static ThreadLocal<EnricherContext> instance = new ThreadLocal<EnricherContext>() {
@@ -58,6 +56,9 @@ public class EnricherContext {
 
     private EnricherContext() {
         this.config = new EnricherConfig();
+
+        InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/META-INF/ehcache-enricher.xml");
+        CacheManager.create(ehcacheConfig);
     }
 
     public EnricherConfig getConfig() {
@@ -69,12 +70,7 @@ public class EnricherContext {
     }
 
     public Cache getCache(String name) {
-        if (cacheManager == null || Status.STATUS_ALIVE != cacheManager.getStatus()) {
-            InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/META-INF/ehcache-enricher.xml");
-            this.cacheManager = CacheManager.create(ehcacheConfig);
-        }
-
-        Cache cache = cacheManager.getCache(name);
+        Cache cache = CacheManager.getInstance().getCache(name);
 
         if (cache == null) {
             throw new EnricherException("Cache not found: "+name);
@@ -111,10 +107,8 @@ public class EnricherContext {
     }
 
     public void close() {
-        if (Status.STATUS_ALIVE == cacheManager.getStatus()) {
-            if (log.isDebugEnabled()) log.debug("CacheManager shutdown");
-            this.cacheManager.shutdown();
-        }
+        if (log.isDebugEnabled()) log.debug("Clearing all caches from CacheManager");
+        CacheManager.getInstance().clearAll();
     }
 
 }
