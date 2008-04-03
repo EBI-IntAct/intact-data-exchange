@@ -31,7 +31,7 @@
 
     If no class is specified, no listener is created. There is no default.
     -->
-    <cacheManagerEventListenerFactory class="" properties=""/>
+    <!--<cacheManagerEventListenerFactory class="" properties=""/>-->
 
 
     <!--
