@@ -35,7 +35,12 @@ public class AbstractRepositoryTestCase {
 
     @Before
     public final void before() throws Exception {
-        FileUtils.deleteDirectory(TEMP_REPO_DIR);
+        try {
+            FileUtils.deleteDirectory(TEMP_REPO_DIR);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
         Assert.assertFalse(TEMP_REPO_DIR.exists());
 
         repository = ImexRepositoryContext.openRepository(TEMP_REPO_DIR.getAbsolutePath());
@@ -44,13 +49,14 @@ public class AbstractRepositoryTestCase {
     @After
     public final void after() throws Exception {
         ImexRepositoryContext.closeRepository();
+        repository = null;
+        System.gc();
         try {
             FileUtils.deleteDirectory(TEMP_REPO_DIR);
         }
         catch (IOException e) {
             e.printStackTrace();
         }
-        repository = null;
     }
 
     public Repository getRepository() {

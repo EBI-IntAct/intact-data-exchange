@@ -35,7 +35,7 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.model.Message;
 public class RepositoryTest extends AbstractRepositoryTestCase {
 
     @Test
-    public void storeFile_dip() throws Exception{
+    public void storeFile_dip() throws Exception {
 
         File empty = new File(RepositoryTest.class.getResource("/xml/dip_2006-11-01.xml").getFile());
         getRepository().storeEntrySet(empty, "dip");
@@ -54,7 +54,7 @@ public class RepositoryTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void storeFile_mint() throws Exception{
+    public void storeFile_mint() throws Exception {
         File empty = new File(RepositoryTest.class.getResource("/xml/mint_2006-07-18.xml").getFile());
         getRepository().storeEntrySet(empty, "mint");
 
@@ -65,7 +65,7 @@ public class RepositoryTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void storeFile_intact() throws Exception{
+    public void storeFile_intact() throws Exception {
         File empty = new File(RepositoryTest.class.getResource("/xml/intact_2006-05-19.xml").getFile());
         getRepository().storeEntrySet(empty, "intact");
 

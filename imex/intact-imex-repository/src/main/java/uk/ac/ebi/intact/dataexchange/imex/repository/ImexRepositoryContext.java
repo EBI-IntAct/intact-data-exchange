@@ -50,6 +50,7 @@ public class ImexRepositoryContext {
         Repository repository = RepositoryFactory.createFileSystemRepository(repositoryDir, true);
 
         instance.set(new ImexRepositoryContext(repository));
+        assert( getInstance() != null );
 
         // check if the main providers exist (intact, mint and dip)
         // and create them otherwise
@@ -61,8 +62,10 @@ public class ImexRepositoryContext {
     public static void closeRepository() {
         if (log.isDebugEnabled()) log.debug("Closing ImexRepositoryContext");
 
-        getInstance().getImexPersistence().getEntityManagerFactory().close();
-        ((ConfigurableListableBeanFactory)getInstance().getBeanFactory()).destroySingletons();
+        if( getInstance() != null ) {
+            getInstance().getImexPersistence().getEntityManagerFactory().close();
+            ((ConfigurableListableBeanFactory)getInstance().getBeanFactory()).destroySingletons();
+        }
 
         instance.set(null);
     }
