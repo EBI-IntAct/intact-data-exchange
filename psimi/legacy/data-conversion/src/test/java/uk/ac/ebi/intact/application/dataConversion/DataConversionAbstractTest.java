@@ -87,7 +87,7 @@ public abstract class DataConversionAbstractTest extends IntactBasicTestCase {
     }
 
     @AfterClass
-    public void theAftermath() {
+    public static void theAftermath() {
         IntactContext.closeCurrentInstance();
     }
 
