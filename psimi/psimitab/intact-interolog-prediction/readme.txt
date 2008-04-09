@@ -16,11 +16,14 @@ mmichaut@ebi.ac.uk
 07/11/26 added a simple run for one species predictions
 07/11/30 added a result file with all source interactions used in the process
 08/01/25 structured this file (content) and added the new project page
+08/03/27 added PSI25-XML result files info
+08/04/04 added info on new options to run the tool
 --
 
 You can find information on EBI website: http://www.ebi.ac.uk/~mmichaut/
 and a document on this prediction programme: http://www.ebi.ac.uk/~mmichaut/documents/bio.pdf
-but it may not be updated... ;-)
+but it is not updated any longer... ;-)
+otherwise try http://people.rez-gif.supelec.fr/mmichaut/
 
 
 ******************************
@@ -37,11 +40,14 @@ CONTENT
 1) HOW TO USE THE MODULE?
 =========================
 
-You can either use the module online (see I) or use the independant JAR file available on the project page (http://biodev.extra.cea.fr/interoporc/) (see II) or import the latest jar library and include it into your code to use more options (see III).
+You can either use the module online (see I) 
+or use the independant JAR file available on the project page (http://biodev.extra.cea.fr/interoporc/) (see II)
+or import the latest jar library and include it into your code to use more options (see III).
 
 >>> I) Online
-Go http://biodev.extra.cea.fr/interoporc/ and run analysis for the NCBI taxid you are interested in.
-See all species of Integr8 on http://www.ebi.ac.uk/integr8/OrganismSearch.do?action=setOrganismSearchType&searchType=2&pageContext=207
+Go to http://biodev.extra.cea.fr/interoporc/ and run analysis for the NCBI taxid you are interested in.
+See all species of Integr8 on 
+http://www.ebi.ac.uk/integr8/OrganismSearch.do?action=setOrganismSearchType&searchType=2&pageContext=207
 
 >>> II) With an independant JAR file (including all dependancies)
 This JAR file is downloadable from the project page http://biodev.extra.cea.fr/interoporc/data/interopor.tar.gz
@@ -50,14 +56,37 @@ Here is described a simple way to use this program to predict interactions for o
 If you have a jar with all dependencies --> interologPrediction.jar:
 1) create a directory for the predictions --> DIR
 2) put the jar in it
-3) put a mitab file in it with all interactions you want to use as source interactions from other species --> sourceInteractions.mitab (if you're asking what the mitab format could be, see the FAQ at the end)
+3) put a MITAB25 file in it with all interactions you want to use as source interactions from other species --> sourceInteractions.mitab 
+(if you're asking what the MITAB25 format could be, see the FAQ at the end)
 4) download the orthologous clusters from ftp://ftp.ebi.ac.uk/pub/databases/integr8/porc/proc_gene.dat and put it in the directory --> porc_gene.dat
-5) choose the NCBI taxid of the species you are interested in (for example Synecocystis is 1148, yeast is 4932, E. coli is 562 ... see all species of Integr8 on http://www.ebi.ac.uk/integr8/OrganismSearch.do?action=setOrganismSearchType&searchType=2&pageContext=207)
-6) OPTION: you can put a log4j-property-file in the dir (you can copy-paste the example given below and put it in interologPrediction.log4j.properties file in the directory) --> interologPrediction.log4j.properties
+5) choose the NCBI taxid of the species you are interested in 
+(for example Synechocystis is 1148, yeast is 4932, E. coli is 562 ... see all species of Integr8 on 
+http://www.ebi.ac.uk/integr8/OrganismSearch.do?action=setOrganismSearchType&searchType=2&pageContext=207)
+6) OPTION: you can put a log4j-property-file in the dir  --> interologPrediction.log4j.properties
+(you can copy-paste the example given below and put it in interologPrediction.log4j.properties file in the directory)
 
 Then, execute this command in the directory DIR with your taxid (instead of 1148):
+Then you can use the tool with the following options:
+usage: Interoporc [OPTIONS]
+Options:
+ -o,--output-directory <file>   Directory where all files will be created
+ -i,--mitab-file <file>         MITAB File (Release 2.5) with source
+                                interactions
+ -p,--porc-file <file>          PORC file with orthologous clusters
+ -x,--xml-files                 If output XML files are required
+ -m,--max-nb-inter-xml <int>    Maximum nb of interactions to generate a
+                                XML file
+ -h,--help                      print this message
+ -l <file>                      use given file for log
+ -t,--taxid <int>               NCBI taxonomy identifier of the species
+ 
+ Here are some examples:
+	* To print options
+java -cp interologPrediction.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies
+java -cp interologPrediction.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies -h
 
-java -ms500m -mx1000m -cp interologPrediction.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies . sourceInteractions.mitab porc_gene.dat 1148 interologPrediction.log4j.properties
+	* To predict interactions for Synechocystis (taxid=1148)
+java -ms500m -mx1000m -cp interologPrediction.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies -o . -i sourceInteractions.mitab -p porc_gene.dat -t 1148 -l interologPrediction.log4j.properties
 
 
 >>> III) With the JAR available on EBI maven repos
@@ -82,26 +111,35 @@ Then you can change some parameters if needed and finally just run it. An exampl
   
   p.run();
 
-Be aware that this program needs some space. I am used to running it with extended arguments to the VM (-ms500m -mx900m). On the other hand, it does not take too much time.
-Running it on the global mitab file (merge of all Intact, MINT and DIP) and predicting interactions for all species present in it will take less than 5 minutes.
+Be aware that this program needs some space. I am used to running it with extended arguments to the VM (-ms500m -mx1000m).
+On the other hand, it does not take too much time.
+Running it on the global MITAB25 file (merge of all Intact, MINT and DIP) 
+and predicting interactions for all species present in it will take less than 5 minutes.
 
 
 
 2) WHAT ARE THE RESULT FILES?
 =============================
-1. InteroPorc.predictedInteractions.mitab
-Predicted interactions are described in InteroPorc.predictedInteractions.mitab in mitab format.
+1. InteroPorc.predictedInteractions.mitab / InteroPorc.predictedInteractions.xml
+Predicted interactions are described in both PSIMI25-XML and MITAB25 formats
+(PSI25-XML is obtained with option -x and if not too many interactions are predicted)
 
-2. KnownInteractions.mitab
-All interactions from the species you are interested in are in KnownInteractions.mitab in mitab format.
+2. KnownInteractions.mitab / KnownInteractions.xml
+Interactions extracted from the source interaction fils for the species you are interested in
+are described in both PSIMI25-XML and MITAB25 formats.
+(PSI25-XML is obtained with option -x and if not too many interactions are predicted)
 
-3. srcInteractionsUsed.txt
+3. AllInteractions.mitab / AllInteractions.xml
+All interactions (known and predicted) are described in both PSIMI25-XML and MITAB25 formats.
+(PSI25-XML is obtained with option -x and if not too many interactions are predicted)
+
+4. srcInteractionsUsed.txt
 All source interactions used during the process are described in the srcInteractionsUsed.txt file.
 
-4. interologPrediction.log
+5. interologPrediction.log
 Comments are written in the interologPrediction.log file during the process if you have configured the log4j property file.
 
-5. downCast.history.txt
+6. downCast.history.txt
 Some information about the constructed porc interactions are in the tabulated text file downCast.history.txt
 porcA=id from the porc data
 porcB=id from the porc data
@@ -124,42 +162,39 @@ Have fun! :-)
 3) LOG4J PROPERTY FILE EXAMPLE
 ===============================
 
-log4j.rootCategory=DEBUG, R, A
+log4j.rootCategory=INFO, R, A
 
 # package/class specific config
-#log4j.category.edu.ucla.mbi.imex.imexcentral=WARN
+log4j.category.psidev=ERROR
 
 # ***** A is set to be a ConsoleAppender.
 log4j.appender.A=org.apache.log4j.ConsoleAppender
-# ***** A uses PatternLayout.
 log4j.appender.A.layout=org.apache.log4j.PatternLayout
-log4j.appender.A.layout.ConversionPattern=%d [%t] %-5p (%C{1},%L) - %m%n
+log4j.appender.A.layout.ConversionPattern=%m%n
 log4j.appender.A.Threshold=WARN
 
 # ***** R file appender
 log4j.appender.R=org.apache.log4j.RollingFileAppender
-log4j.appender.R.File=interologPrediction.log
-log4j.appender.R.Threshold=INFO
-
-log4j.appender.R.MaxFileSize=100KB
-# Keep one backup file
-log4j.appender.R.MaxBackupIndex=1
-
+log4j.appender.R.File=interoporc.log
+log4j.appender.R.MaxFileSize=1000KB
+log4j.appender.R.MaxBackupIndex=0
 log4j.appender.R.layout=org.apache.log4j.PatternLayout
-log4j.appender.R.layout.ConversionPattern=%d %-5p (%C{1},%L) - %m%n
-#log4j.appender.R.layout.ConversionPattern=%p %t %c - %m%n
+log4j.appender.R.layout.ConversionPattern=%d - %m%n
 
 
 
 4) FAQ
 ========
 
-* What is the mitab format?
+* What is the PSI25-XML format?
+PSI25-XML is the standard molecular interaction data exchange format defined by the Proteomics Standards Initiative (PSI).
+All information are on the PSI website: http://www.psidev.info/
+
+* What is the MITAB25 format?
 MITAB25 describes binary interactions, one pair of interactors per row. Columns are separated by tabulators.
 Fore more information, see:
 - a simple readme file ftp://ftp.ebi.ac.uk/pub/databases/intact/current/psimitab/README
 - the Proteomics Standards Initiative (PSI) website http://www.psidev.info/
-
 
 
 5) LICENSE

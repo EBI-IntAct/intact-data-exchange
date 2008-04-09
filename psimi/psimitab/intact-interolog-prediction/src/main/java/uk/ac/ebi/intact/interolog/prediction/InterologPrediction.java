@@ -21,7 +21,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
 
+import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.PsimiTabWriter;
+import psidev.psi.mi.tab.converter.tab2xml.Tab2Xml;
+import psidev.psi.mi.tab.converter.tab2xml.XmlConvertionException;
 import psidev.psi.mi.tab.model.Author;
 import psidev.psi.mi.tab.model.AuthorImpl;
 import psidev.psi.mi.tab.model.BinaryInteraction;
@@ -32,9 +35,13 @@ import psidev.psi.mi.tab.model.InteractionDetectionMethod;
 import psidev.psi.mi.tab.model.InteractionDetectionMethodImpl;
 import psidev.psi.mi.tab.model.Interactor;
 import psidev.psi.mi.tab.model.Organism;
+import psidev.psi.mi.tab.model.OrganismFactory;
 import psidev.psi.mi.tab.model.OrganismImpl;
 import psidev.psi.mi.tab.utils.PsiCollectionUtils;
+import psidev.psi.mi.xml.PsimiXmlWriter;
+import psidev.psi.mi.xml.PsimiXmlWriterException;
 import psidev.psi.mi.xml.converter.ConverterException;
+import psidev.psi.mi.xml.model.EntrySet;
 import uk.ac.ebi.intact.interolog.download.Sucker;
 import uk.ac.ebi.intact.interolog.mitab.MitabException;
 import uk.ac.ebi.intact.interolog.mitab.MitabStats;
@@ -51,6 +58,12 @@ import uk.ac.ebi.intact.interolog.util.NewtUtils;
 /**
  * This is the main part of the prediction process.
  * 
+ * 08/03/29: by default, the tool does not generate XML files (keep an option to do it). We use a separate tool to convert
+ *           generated MITAB25 into PSI25-XML
+ * 08/03/28: added a threshold to compute files in XML format or not (too heavy...)
+ * 08/03/27: generate result files in PSI25-XML format in addition to MITAB format
+ *           added global files with known and predicted interactions together
+ *           added the pubmed database and id (00000000 so far because not known)
  * 08/02/12: added the associated publication in the generated file
  * 08/01/25: added a file with known interactions in mitab format
  * 08/01/15: little improvment, the program stop when the list of taxids is empty (the list of species for which we will predict interactions).
@@ -79,6 +92,8 @@ public class InterologPrediction {
 	 * All information for generated interactions.
 	 */
 	private final static String AUTHORS = "Michaut et al. (2008)";
+	private final static String PUBMED_DB = "pubmed";
+	private final static String MICHAUT_ET_AL_ID = "00000000";
 	private final static String METHOD_DATABASE = "MI";
 	private final static String METHOD_ID = "0064";
 	private final static String METHOD_NAME = "interologs mapping";
@@ -128,7 +143,6 @@ public class InterologPrediction {
 	 */
 	private static final String UNIPROTKB = "uniprotkb";
 	
-	
 
 	
 	/*----------------------INSTANCES-----------------------*/
@@ -158,20 +172,40 @@ public class InterologPrediction {
 	private boolean classicPorcFormat = true;
 	
 	/**
-	 * Name of the result file with predicted interactions in mitab format.
+	 * Name of the result file with predicted interactions.
 	 */
-	private String predictedinteractionsFileName;
+	private String predictedInteractionsFileName = "InteroPorc.predictedInteractions";
 	
 	/**
-	 * Name of the result file with known interactions in mitab format.
+	 * Name of the result file with known interactions.
 	 */
-	private String knowninteractionsFileName;
+	private String knownInteractionsFileName = "KnownInteractions";
 	
 	/**
-	 * Extension used for the mitab files generated (predicted and known interactions).
+	 * Name of the result file with all interactions (known and predicted).
+	 */
+	private String allInteractionsFileName = "AllInteractions";
+	
+	/**
+	 * Extension used for the mitab files generated.
 	 */
 	private String mitabFileExtension = ".mitab";
 	
+	/**
+	 * Extension used for the XML files generated.
+	 */
+	private String xmlFileExtension = ".xml";
+	
+	/**
+	 * By default, no XML files are generated (can be too heavy when lots of predictions).
+	 * We use a separate tool. Nevertheless, the option is kept to generate XML files.
+	 */
+	private boolean generateXml = false;
+	
+	/**
+	 * Maximum nb of interactions to generate a XML file.
+	 */
+	private int nbInterMaxForXml = 15000;
 	
 	/**
 	 * All NCBI taxids present in the mitab file.
@@ -311,6 +345,7 @@ public class InterologPrediction {
 	private int IPIid = 0;
 	
 	
+	
 	///////////////////////////////
 	////////// CONSTRUCTORS
 	/////////
@@ -427,21 +462,29 @@ public class InterologPrediction {
 		this.classicPorcFormat = clogFormatByProtein;
 	}
 	
-	public String getPredictedinteractionsFileName() {
-		return this.predictedinteractionsFileName;
+	public String getPredictedInteractionsFileName() {
+		return this.predictedInteractionsFileName;
 	}
 
-	public void setPredictedinteractionsFileName(
+	public void setPredictedInteractionsFileName(
 			String predictedinteractionsFileName) {
-		this.predictedinteractionsFileName = predictedinteractionsFileName;
+		this.predictedInteractionsFileName = predictedinteractionsFileName;
 	}
 	
-	public String getKnowninteractionsFileName() {
-		return this.knowninteractionsFileName;
+	public String getKnownInteractionsFileName() {
+		return this.knownInteractionsFileName;
 	}
 
-	public void setKnowninteractionsFileName(String knowninteractionsFileName) {
-		this.knowninteractionsFileName = knowninteractionsFileName;
+	public void setKnownInteractionsFileName(String knowninteractionsFileName) {
+		this.knownInteractionsFileName = knowninteractionsFileName;
+	}
+	
+	public String getAllInteractionsFileName() {
+		return this.allInteractionsFileName;
+	}
+
+	public void setAllInteractionsFileName(String allInteractionsFileName) {
+		this.allInteractionsFileName = allInteractionsFileName;
 	}
 	
 	public boolean isDownCastOnAllPresentSpecies() {
@@ -559,15 +602,78 @@ public class InterologPrediction {
 		FILE_SOURCE_INTERACTIONS      = new File(workingDir.getAbsolutePath()+"/srcInteractionsUsed.txt");
 		FILE_RESULT_PORC_INTERACTIONS = new File(workingDir.getAbsolutePath()+"/clog.interactions.txt");
 		
-		predictedinteractionsFileName = "InteroPorc.predictedInteractions";
-		knowninteractionsFileName     = "KnownInteractions";
-		
 	}
 	
 	
 	///////////////////////////////
 	////////// METHODS
 	/////////
+	
+	
+	/////
+	/////       some getters to have dynamically the name of the files (after the dir has been set)
+	/////
+	
+	public File getPredictedMitabFile() {
+		return new File(workingDir.getAbsoluteFile()+"/"+predictedInteractionsFileName+mitabFileExtension);
+	}
+	
+	public File getPredictedXmlFile() {
+		return new File(workingDir.getAbsoluteFile()+"/"+predictedInteractionsFileName+xmlFileExtension);
+	}
+	
+	public File getKnownMitabFile() {
+		return new File(workingDir.getAbsoluteFile()+"/"+knownInteractionsFileName+mitabFileExtension);
+	}
+	
+	public File getKnownXmlFile() {
+		return new File(workingDir.getAbsoluteFile()+"/"+knownInteractionsFileName+xmlFileExtension);
+	}
+	
+	public File getGlobalMitabFile() {
+		return new File(workingDir.getAbsoluteFile()+"/"+allInteractionsFileName+mitabFileExtension);
+	}
+	
+	public File getGlobalXmlFile() {
+		return new File(workingDir.getAbsoluteFile()+"/"+allInteractionsFileName+xmlFileExtension);
+	}
+	
+	public int getNbInterMaxForXml() {
+		return this.nbInterMaxForXml;
+	}
+
+	public void setNbInterMaxForXml(int nbInterMaxForXml) {
+		this.nbInterMaxForXml = nbInterMaxForXml;
+	}
+	
+	public boolean isGenerateXml() {
+		return this.generateXml;
+	}
+
+	public void setGenerateXml(boolean generateXml) {
+		this.generateXml = generateXml;
+	}
+	
+	
+	/**
+	 * @param mitab
+	 * @return
+	 * @throws InterologPredictionException
+	 */
+	private Collection<BinaryInteraction> readMitabInteractions(File mitab) throws InterologPredictionException {
+		PsimiTabReader reader = new PsimiTabReader(true);
+		Collection<BinaryInteraction> binaryInteractions = null;
+		try {
+			binaryInteractions = reader.read(mitab);
+			log.info(binaryInteractions.size()+" interactions read from mitab file");
+		} catch (IOException e) {
+			throw new InterologPredictionException("Error while reading interactions from file " +mitab.getAbsolutePath(),e);
+		} catch (ConverterException e) {
+			throw new InterologPredictionException("Error while reading interactions from file " +mitab.getAbsolutePath(),e);
+		}
+		
+		return binaryInteractions;
+	}
 	
 	
 	/**
@@ -959,8 +1065,11 @@ public class InterologPrediction {
 		} catch (MitabException e) {
 			log.warn("Error while collecting all known interactions for taxid(s) "+taxidsIdsToDownCast);
 		}
-		log.warn(INDENT_STRING+interactions.size()+" interactions are present in the source file and will be written in "+knowninteractionsFileName+mitabFileExtension+ " file");
-		writeFile(new File(workingDir.getAbsoluteFile()+"/"+knowninteractionsFileName+mitabFileExtension), interactions);
+		
+		log.warn(INDENT_STRING+interactions.size()+" interactions are present in the source file and will be written.");
+		writeFile(getKnownMitabFile(), interactions);
+		convertMitabFileToXML(getKnownMitabFile(), getKnownXmlFile(), interactions.size());
+		
 	}
 	
 	/**
@@ -1082,12 +1191,70 @@ public class InterologPrediction {
 	}
 	
 	/**
+	 * @param mitab source file MITAB25
+	 * @param xml output file PSI25-XML
+	 * @param nbINteractions number of interactions in the source file.
+	 * @throws InterologPredictionException
+	 */
+	private void convertMitabFileToXML(File mitab, File xml, int nbInteractions) throws InterologPredictionException {
+		
+		if (isGenerateXml()) {
+			
+			if (nbInteractions <= nbInterMaxForXml) {
+				Collection<BinaryInteraction> binaryInteractions = readMitabInteractions(mitab);
+				writeXMLFile(xml, binaryInteractions);
+				
+			} else {
+				log.warn("The file "+xml.getAbsolutePath()+
+						" is not generated because there are more than "+nbInterMaxForXml+" interactions ("+nbInteractions+")");
+				if (xml.exists()) {
+					log.warn("The previsous "+xml.getAbsolutePath()+" file is deleted");
+					xml.delete();
+				}
+			}
+			
+		}
+		
+	}
+	
+	/**
+	 * @param xml
+	 * @param interactions
+	 * @throws InterologPredictionException
+	 */
+	private void writeXMLFile(File xml, Collection<BinaryInteraction> interactions) throws InterologPredictionException {
+		log.warn("Write "+interactions.size()+" interactions in the xml file "+xml.getName());
+		
+		Tab2Xml converter = new Tab2Xml();
+		
+		EntrySet entry = null;
+		try {
+			entry = converter.convert(interactions);
+		} catch (IllegalAccessException e) {
+			throw new InterologPredictionException("Error while converting MITAB to XML",e);
+		} catch (XmlConvertionException e) {
+			throw new InterologPredictionException("Error while converting MITAB to XML",e);
+		}
+		
+		PsimiXmlWriter writer = new PsimiXmlWriter();
+		try {
+			writer.write(entry,xml);
+		} catch (PsimiXmlWriterException e) {
+			throw new InterologPredictionException("Error while writting XML file "+xml.getAbsolutePath(),e);
+		}
+		
+		printMemoryInfo();
+		
+	}
+	
+	
+	/**
 	 * @param mitab
 	 * @param interactions
 	 * @throws InterologPredictionException
 	 */
 	private void writeFile(File mitab, Collection<BinaryInteraction> interactions) throws InterologPredictionException {
-		log.info("Write "+interactions.size()+" interactions in the mitab file "+mitab.getName());
+		log.warn("Write "+interactions.size()+" interactions in the mitab file "+mitab.getName());
 		PsimiTabWriter writer = new PsimiTabWriter();
 		try {
 			writer.write(interactions, mitab);
@@ -1097,6 +1264,18 @@ public class InterologPrediction {
 			throw new InterologPredictionException("Error while writting mitab file "+mitab,e);
 		}
 		printMemoryInfo();
+	}
+	
+	/**
+	 * @throws InterologPredictionException
+	 */
+	private void createGlobalFiles() throws InterologPredictionException {
+		Collection<BinaryInteraction> all = readMitabInteractions(getPredictedMitabFile());
+		Collection<BinaryInteraction> known = readMitabInteractions(getKnownMitabFile());
+		all.addAll(known);
+		writeFile(getGlobalMitabFile(), all);
+		convertMitabFileToXML(getGlobalMitabFile(), getGlobalXmlFile(), all.size());
+		
 	}
 	
 	/**
@@ -1363,12 +1542,15 @@ public class InterologPrediction {
 					BinaryInteraction interaction = new BinaryInteractionImpl(iA, iB);
 					inference++;
 					
-					// authors
+					// authors - publi
 					List<Author> authors = new ArrayList<Author>(1);
 					Author me = new AuthorImpl();
 					me.setName(AUTHORS);
 					authors.add(me);
 					interaction.setAuthors(authors);
+					List<CrossReference> publis = new ArrayList<CrossReference>(1);
+					publis.add( new CrossReferenceImpl( PUBMED_DB, MICHAUT_ET_AL_ID ) );
+					interaction.setPublications(publis);
 					
 					// detection method = interologs mapping
 					List <InteractionDetectionMethod> methods = new ArrayList<InteractionDetectionMethod>(1);
@@ -1381,7 +1563,6 @@ public class InterologPrediction {
 					
 					interaction.setInteractionAcs(null);
 					interaction.setInteractionTypes(null);// physical interaction?
-					interaction.setPublications(null);
 					interaction.setSourceDatabases(null);
 					interaction.setConfidenceValues(null);
 					
@@ -1467,14 +1648,22 @@ public class InterologPrediction {
 	
 	
 	/**
-	 * Write predicted interactions in a mitab file
-	 * Printed global execution time
+	 * Write predicted interactions in mitab and psi25-XML files.
+	 * Write all interactions (known and predicted together) in mitab and psi25-XML files.
+	 * Print global execution time.
 	 * @throws InterologPredictionException
 	 */
 	private void postProcess() throws InterologPredictionException {
 		log.warn("==================== Post-process ====================");
-		log.warn("Create file "+predictedinteractionsFileName+mitabFileExtension);
-		writeFile(new File(workingDir.getAbsoluteFile()+"/"+predictedinteractionsFileName+mitabFileExtension), getInteractions());
+		
+		// known interactions only have alread been written in files during pre-process.
+		
+		// predicted interactions
+		writeFile(getPredictedMitabFile(), getInteractions());
+		convertMitabFileToXML(getPredictedMitabFile(), getPredictedXmlFile(), getInteractions().size());
+		
+		// global files (predicted and known)
+		createGlobalFiles();
 		
 		float elapsedTimeMin = (System.currentTimeMillis()-start)/(60*1000F);
 		log.info("time elapsed: "+elapsedTimeMin+" min");
@@ -1534,6 +1723,38 @@ public class InterologPrediction {
 	}
 	
 	/**
+	 * A test function to return a non-null and non-empty interaction collection.
+	 * @return
+	 */
+	public static Collection<BinaryInteraction> createTestInteractionCollection() {
+		Collection<BinaryInteraction> interactions = new ArrayList<BinaryInteraction>();
+		
+		//Organism o = new OrganismImpl(1148);
+		OrganismFactory f = OrganismFactory.getInstance();
+		Organism o = f.build(1148);
+		//o.setIdentifiers(identifiers);
+		
+		Collection<CrossReference> identifiersA = new ArrayList<CrossReference>(1);
+        identifiersA.add( new CrossReferenceImpl( getUNIPROTKB(), "P74638" ) );
+        Interactor iA = new Interactor( identifiersA );
+        iA.setOrganism(o);
+        
+        Collection<CrossReference> identifiersB = new ArrayList<CrossReference>(1);
+        identifiersB.add( new CrossReferenceImpl( getUNIPROTKB(), "Q57417" ) );
+        Interactor iB = new Interactor( identifiersB );
+        iB.setOrganism(o);
+		BinaryInteraction interaction = new BinaryInteractionImpl(iA, iB);
+		List<CrossReference> interactionAcs = new ArrayList<CrossReference>();
+		interactionAcs.add(new CrossReferenceImpl( getUNIPROTKB(), "interactionsAcs" ));
+		interaction.setInteractionAcs(interactionAcs);
+		
+		interactions.add(interaction);
+		
+		
+		return interactions;
+	}
+	
+	/**
 	 * Put memory information in the log.
 	 */
 	public static void printMemoryInfo() {
@@ -1558,29 +1779,34 @@ public class InterologPrediction {
 	 */
 	public static void main(String[] args) throws InterologPredictionException, NewtException{
 		
+		
 		File dir = new File("/Users/mmichaut/Documents/These/Results/Inference/interoPorc/test/");
 		
 		//File mitab = new File("/Users/mmichaut/Documents/EBI/data/IntAct/intact.mitab");
-		File mitab = new File("/Users/mmichaut/Documents/EBI/data/PsimiTab/global_only7speciesWithStrains.mitab");
+		File mitab = new File("/Users/mmichaut/Documents/Data/interaction/psimi/tab/07.05.24_global_only7speciesWithStrains.mitab");
 		//File mitab = new File("/Users/mmichaut/Documents/EBI/data/PsimiTab/global.mitab");
 		
-		File porcFileOldFormat = new File("/Users/mmichaut/Documents/EBI/data/Integr8/clog/20070630/clog.revised2.dat");
-		//File porcFile = new File("/Users/mmichaut/Documents/Data/integr8/PORC/porc_gene.dat");
+		//File porcFileOldFormat = new File("/Users/mmichaut/Documents/EBI/data/Integr8/clog/20070630/clog.revised2.dat");
+		File porcFile = new File("/Users/mmichaut/Documents/Data/integr8/PORC/porc_gene.dat");
 		
 		InterologPrediction up = new InterologPrediction(dir);
 		up.setMitab(mitab);
-		up.setPorc(porcFileOldFormat);
+		up.setPorc(porcFile);
 		Collection<Long> taxids = new HashSet<Long>(1);
 		taxids.add(1148l);
 		up.setUserTaxidsToDownCast(taxids);
 		
 		up.setDownCastOnAllPresentSpecies(false);
-		up.setClassicPorcFormat(true);
+		//up.setClassicPorcFormat(true);
 		up.setWriteDownCastHistory(true);
 		up.setWriteSrcInteractions(true);
 		ClogInteraction.setNB_LINES_MAX(100000);
 		up.setWritePorcInteractions(false);
 		up.setDownCastOnChildren(true);
+		
+		
+		//up.writeXMLFile(new File("/Users/mmichaut/Desktop/testXMLwriter.txt"), createTestInteractionCollection());
+		
 		
 		up.run();
 	}

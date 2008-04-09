@@ -8,6 +8,15 @@ import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
+
 /**
  * Class created to have an esay access in command line to predict interactions for one species.
  * You just have to give the mitab file with the source interactions 
@@ -17,7 +26,81 @@ import java.util.HashSet;
  * @version $Id$
  * @since 27 nov. 07
  */
+@SuppressWarnings("static-access")
 public class RunForOneSpecies {
+	
+	
+	// ----------------------------------
+	//
+	//      Options for command line
+	//
+	// ----------------------------------
+	
+	
+	public static Option help = OptionBuilder
+	.withLongOpt("help")
+	.withDescription("print this message")
+	.create('h');
+	
+	public static Option logfile   = OptionBuilder
+	.withArgName( "file" )
+	.hasArg()
+	.withDescription(  "use given file for log" )
+	.create( 'l' );
+	
+	public static Option mitabFile = OptionBuilder
+	.withLongOpt("mitab-file")
+	.withDescription("MITAB File (Release 2.5) with source interactions")
+	//.isRequired() // <-- it is indeed required but it does not print help with -h if we put required here
+	.hasArg()
+	.withArgName("file")
+	.create('i');
+	
+	public static Option outputDir = OptionBuilder
+	.withLongOpt("output-directory")
+	.withDescription("Directory where all files will be created")
+	//.isRequired()
+	.hasArg()
+	.withArgName("file")
+	.create('o');
+	
+	public static Option porcFile = OptionBuilder
+	.withLongOpt("porc-file")
+	.withDescription("PORC file with orthologous clusters")
+	//.isRequired()
+	.hasArg()
+	.withArgName("file")
+	.create('p');
+	
+	public static Option taxid = OptionBuilder
+	.withLongOpt("taxid")
+	.withDescription("NCBI taxonomy identifier of the species")
+	//.isRequired()
+	.hasArg()
+	.withArgName("int")
+	.create('t');
+	
+	public static Option nbInterMaxForXml = OptionBuilder
+	.withLongOpt("max-nb-inter-xml")
+	.withDescription("Maximum nb of interactions to generate a XML file")
+	//.isRequired()
+	.hasArg()
+	.withArgName("int")
+	.create('m');
+	
+	public static Option xml = OptionBuilder
+	.withLongOpt("xml-files")
+	.withDescription("If output XML files are required")
+	.create('x');
+	
+	public static void printHelp(Options options) {
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp("Interoporc [OPTIONS]", "Options:", options, 
+				"\n(C) EBI-CEA 2008, More information on http://biodev.extra.cea.fr/interoporc/\n", false);
+	}
+	
+	
+	
 
 	/**
 	 * @param args
@@ -25,35 +108,106 @@ public class RunForOneSpecies {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws InterologPredictionException, FileNotFoundException {
-		
-		if (args.length<4) {
-			throw new IllegalArgumentException("Usage: directory mitabFile PorcFile speciesTaxid [log4j-prop-file]");
+		Options options = new Options();
+		CommandLine line = null;
+
+		// init.
+		options.addOption(help);
+		options.addOption(logfile);
+		options.addOption(mitabFile);
+		options.addOption(outputDir);
+		options.addOption(porcFile);
+		options.addOption(taxid);
+		options.addOption(nbInterMaxForXml);
+		options.addOption(xml);
+
+		// check 0
+		if(args.length == 0) {
+			printHelp(options);
+			return;
+		}
+
+		// parse commande line
+		CommandLineParser parser = new PosixParser();
+		try {
+			line = parser.parse(options, args);
+		}
+		catch(ParseException ex) {
+			System.err.println("Command line parsing failed, reason :" + ex.getMessage());
+			return;
+		}
+
+		// handle options
+		if (line.hasOption("h")) {
+			printHelp(options);
+			return;
 		}
 		
-		File dir = new File(args[0]);
-		if (!dir.isDirectory()) {
-			throw new IllegalArgumentException(args[0]+" is not a directory");
+		File dir = new File(line.getOptionValue("o"));
+		File mitabFile = new File(line.getOptionValue("i"));
+		File porcFile = new File(line.getOptionValue("p"));
+		long taxid = Long.parseLong(line.getOptionValue("t"));
+		
+		boolean generateXml = false;
+		if (line.hasOption("x")) {
+			generateXml = true;
 		}
 		
-		File mitabFile = new File(args[1]);
-		if (!mitabFile.exists()) {
-			throw new FileNotFoundException("File "+args[1]+" not found");
+		int nbInterMaxForXml = 15000;
+		if (line.hasOption("m")) {
+			nbInterMaxForXml = Integer.parseInt(line.getOptionValue("m"));
 		}
 		
-		File porcFile = new File(args[2]);
-		if (!porcFile.exists()) {
-			throw new FileNotFoundException("File "+args[2]+" not found");
-		}
-		
-		long taxid = Long.parseLong(args[3]);
-		
-		if (args.length>4) {
-			File propertiesFile = new File(args[4]);
+		if (line.hasOption("l")) {
+			File propertiesFile = new File(line.getOptionValue("l"));
 			if (!propertiesFile.exists()) {
-				throw new FileNotFoundException("File "+args[4]+" not found");
+				throw new FileNotFoundException("File "+line.getOptionValue("l")+" not found");
 			} else {
 				InterologPrediction.log = InterologPrediction.initLog(propertiesFile.getAbsolutePath());
 			}
+		}
+		
+		
+		if (false) {
+			int nbArgRequired = 5;
+			
+			if (args.length<nbArgRequired) {
+				throw new IllegalArgumentException("Usage: directory mitabFile PorcFile speciesTaxid maxInterNbForXML [log4j-prop-file]");
+			}
+			
+			int cpt = 0;
+			dir = new File(args[cpt]);
+			if (!dir.isDirectory()) {
+				throw new IllegalArgumentException(args[cpt]+" is not a directory");
+			}
+			
+			cpt++;
+			mitabFile = new File(args[cpt]);
+			if (!mitabFile.exists()) {
+				throw new FileNotFoundException("File "+args[cpt]+" not found");
+			}
+			
+			cpt++;
+			porcFile = new File(args[cpt]);
+			if (!porcFile.exists()) {
+				throw new FileNotFoundException("File "+args[cpt]+" not found");
+			}
+			
+			cpt++;
+			taxid = Long.parseLong(args[cpt]);
+			
+			cpt++;
+			nbInterMaxForXml = Integer.parseInt(args[cpt]);
+			
+			if (args.length>nbArgRequired) {
+				File propertiesFile = new File(args[nbArgRequired]);
+				if (!propertiesFile.exists()) {
+					throw new FileNotFoundException("File "+args[nbArgRequired]+" not found");
+				} else {
+					InterologPrediction.log = InterologPrediction.initLog(propertiesFile.getAbsolutePath());
+				}
+			}
+			
 		}
 		
 		InterologPrediction up = new InterologPrediction(dir);
@@ -63,6 +217,8 @@ public class RunForOneSpecies {
 		taxids.add(taxid);
 		up.setUserTaxidsToDownCast(taxids);
 		up.setDownCastOnChildren(true);
+		up.setNbInterMaxForXml(nbInterMaxForXml);
+		up.setGenerateXml(generateXml);
 		up.run();
 
 	}

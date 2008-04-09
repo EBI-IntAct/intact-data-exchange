@@ -17,9 +17,22 @@
     <name>IntAct Data Exchange :: PSI MI :: TAB :: Interolog prediction</name>
 
     <dependencies>
+        <!-- <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.1</version>
+        </dependency> -->
+        
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>20040117.000000</version>
+        </dependency>
+    
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psimitab</artifactId>
+            <!-- <version>1.5.0-SNAPSHOT</version> -->
         </dependency>
 
         <dependency>
@@ -72,7 +85,8 @@
         </repository>
     </repositories>
 
-  <build>       <plugins>
+  <build>
+       <plugins>
          
          <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
@@ -82,7 +96,9 @@
                </descriptorRefs>
             </configuration> 
          </plugin>
-		      </plugins>   </build>
+		
+      </plugins>
+   </build>
 
 
 </project>
