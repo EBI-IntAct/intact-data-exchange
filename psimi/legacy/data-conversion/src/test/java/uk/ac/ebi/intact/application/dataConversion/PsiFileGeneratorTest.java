@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.w3c.dom.Document;
 import uk.ac.ebi.intact.application.dataConversion.psiDownload.CvMapping;
 import uk.ac.ebi.intact.application.dataConversion.util.DisplayXML;
@@ -23,6 +24,7 @@ import java.util.List;
  * @version $Id$
  * @since <pre>09-Aug-2006</pre>
  */
+@Ignore
 public class PsiFileGeneratorTest extends DataConversionAbstractTest {
 
     private static final Log log = LogFactory.getLog( PsiFileGeneratorTest.class );
