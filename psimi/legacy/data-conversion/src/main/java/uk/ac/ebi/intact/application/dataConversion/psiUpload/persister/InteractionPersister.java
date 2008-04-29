@@ -5,7 +5,7 @@
  */
 package uk.ac.ebi.intact.application.dataConversion.psiUpload.persister;
 
-import uk.ac.ebi.intact.application.commons.go.GoXrefHelper;
+import uk.ac.ebi.intact.application.dataConversion.util.GoXrefHelper;
 import uk.ac.ebi.intact.application.dataConversion.psiUpload.checker.*;
 import uk.ac.ebi.intact.application.dataConversion.psiUpload.model.*;
 import uk.ac.ebi.intact.application.dataConversion.psiUpload.util.CommandLineOptions;
