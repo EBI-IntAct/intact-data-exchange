@@ -8,7 +8,7 @@ package uk.ac.ebi.intact.application.dataConversion;
 import org.apache.commons.cli.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.application.commons.util.ZipBuilder;
+import uk.ac.ebi.intact.util.Utilities;
 
 import java.io.File;
 import java.io.IOException;
@@ -114,7 +114,7 @@ public class ZipFileGenerator {
         if ( isCurrentDirectoryWriteable ) {
             for ( Iterator iterator = pmid2files.keySet().iterator(); iterator.hasNext(); ) {
                 String pmid = (String) iterator.next();
-                Collection xmlFiles = (Collection) pmid2files.get( pmid );
+                Collection<File> xmlFiles = (Collection) pmid2files.get( pmid );
 
                 // build plateform specific filename
                 String zipFullpath = directory.getAbsolutePath() + File.separator + pmid + FileHelper.ZIP_FILE_EXTENSION;
@@ -126,7 +126,7 @@ public class ZipFileGenerator {
                     }
                 } else {
                     try {
-                        ZipBuilder.createZipFile( zipFile, xmlFiles, VERBOSE );
+                        Utilities.zip(xmlFiles.toArray(new File[xmlFiles.size()]), zipFile, false);
                     } catch ( IOException e ) {
                         e.printStackTrace();
                     }
