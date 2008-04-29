@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.Assert;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.BinaryInteractionImpl;
@@ -122,7 +123,7 @@ public class InterologPredictionTest {
 		try {
 			prediction.run();
 		} catch (InterologPredictionException e) {
-			System.out.println(e);
+			Assert.fail(e.getMessage());
 		}
 		
 		// check results
@@ -131,7 +132,7 @@ public class InterologPredictionTest {
 
         Collection<BinaryInteraction> interactions = MitabUtils.readMiTab(resFile);
         assertNotNull(interactions);
-		assertEquals(interactions.size(), 2);
+		assertEquals(2, interactions.size());
 		
 		/*BinaryInteraction interaction1 = buildInteraction("P73479", "P73723", 1148l); // pbm with interaction equals...I just check the protein ids
 		assertNotNull(interaction1);
@@ -197,7 +198,7 @@ public class InterologPredictionTest {
 		try {
 			prediction.run();
 		} catch (InterologPredictionException e) {
-			System.out.println(e);
+			Assert.fail(e.getMessage());
 		}
 		
 		// check results
@@ -206,7 +207,7 @@ public class InterologPredictionTest {
 
         Collection<BinaryInteraction> interactions = MitabUtils.readMiTab(resFile);
         assertNotNull(interactions);
-		assertEquals(interactions.size(), 2);
+		assertEquals(2, interactions.size());
 		
 		/*BinaryInteraction interaction1 = buildInteraction("P73479", "P73723", 1148l);
 		assertNotNull(interaction1);
