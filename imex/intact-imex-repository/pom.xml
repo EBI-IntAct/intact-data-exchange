@@ -23,6 +23,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psixml-exchange</artifactId>
+            <version>${pom.version}</version>
         </dependency>
 
         <!--<dependency>-->

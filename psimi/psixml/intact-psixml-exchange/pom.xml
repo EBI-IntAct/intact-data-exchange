@@ -30,6 +30,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psixml-converters</artifactId>
+            <version>${pom.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>ehcache</groupId>
@@ -41,6 +42,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange</groupId>
             <artifactId>intact-enricher</artifactId>
+            <version>${pom.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>ehcache</groupId>

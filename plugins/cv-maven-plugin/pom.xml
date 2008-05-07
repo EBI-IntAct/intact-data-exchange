@@ -31,6 +31,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange</groupId>
             <artifactId>intact-cvutils</artifactId>
+            <version>${pom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
