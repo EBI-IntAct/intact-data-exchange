@@ -3,8 +3,6 @@ package uk.ac.ebi.intact.externalservices.searchengine;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.persister.standard.ExperimentPersister;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Experiment;
 
 import java.io.StringWriter;
