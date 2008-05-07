@@ -30,7 +30,6 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>
-            <version>1.8.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
