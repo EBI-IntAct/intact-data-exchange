@@ -31,7 +31,7 @@ public class PsimitabToolsTest extends AbstractPsimitabTestCase{
     public void buildIndex() throws Exception {
        File psimitabFile = getFileByResources("/mitab_samples/intact.sample-extra.txt", PsimitabToolsTest.class );
 //       File psimitabFile = new File(PsimitabToolsTest.class.getResource("/mitab_samples/intact.sample-extra.txt").getFile());
-       File indexDirectory = new File(System.getProperty("java.io.tmpdir"), "PsimitabToolsTest");
+       File indexDirectory = new File("target", "PsimitabToolsTest"+System.currentTimeMillis);
 
        AbstractIndexWriter indexWriter = new IntActPsimiTabIndexWriter();
 
