@@ -29,7 +29,7 @@ import java.io.IOException;
  */
 public class AbstractRepositoryTestCase {
 
-    private static final File TEMP_REPO_DIR = new File(System.getProperty("java.io.tmpdir"), "imex-repo-test/");
+    private static final File TEMP_REPO_DIR = new File(System.getProperty("target"), "imex-repo-test/");
 
     private Repository repository;
 
