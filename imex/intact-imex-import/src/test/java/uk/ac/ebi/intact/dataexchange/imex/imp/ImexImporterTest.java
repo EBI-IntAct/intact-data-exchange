@@ -147,7 +147,7 @@ public class ImexImporterTest extends IntactBasicTestCase {
      * 15757671 - mint - OK - IMPORTABLE
      */
     private static Repository createRepositoryWithMint() throws Exception{
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "imex-test-repo-"+System.currentTimeMillis());
+        File tempDir = new File(System.getProperty("target"), "imex-test-repo-"+System.currentTimeMillis());
         FileUtils.deleteDirectory(tempDir);
 
         Repository repo = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
