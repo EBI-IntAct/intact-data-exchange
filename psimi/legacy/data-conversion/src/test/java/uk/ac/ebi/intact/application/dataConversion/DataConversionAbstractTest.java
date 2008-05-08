@@ -28,7 +28,6 @@ import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.plugins.dbupdate.targetspecies.UpdateTargetSpecies;
 
 import java.io.File;
 import java.util.Iterator;
