@@ -15,20 +15,19 @@
  */
 package uk.ac.ebi.intact.dataexchange.cvutils.model;
 
-import org.obo.datamodel.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obo.datamodel.*;
+import uk.ac.ebi.intact.business.IntactException;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.AliasUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
-import uk.ac.ebi.intact.model.util.AliasUtils;
-import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.business.IntactException;
-
 
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**

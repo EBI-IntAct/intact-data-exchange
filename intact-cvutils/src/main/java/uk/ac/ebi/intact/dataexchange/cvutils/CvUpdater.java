@@ -18,22 +18,23 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obo.dataadapter.OBOParseException;
 import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOObject;
-import org.obo.dataadapter.OBOParseException;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.core.persister.stats.StatsUnit;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.*;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfo;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 
-
-import java.util.*;
-import java.net.URL;
 import java.io.IOException;
+import java.net.URL;
+import java.util.*;
 
 /**
  * Contains method to Update Cv tables using the PersisterHelper.
@@ -108,6 +109,10 @@ public class CvUpdater {
               
                CvTopic obsoleteTopic = createCvTopicObsolete();
 
+        if (obsoleteTopic.getAc() != null) {
+            rootsAndOrphans.add(obsoleteTopic);
+        }
+
                for (IdentifiedObject orphanObo : ontologyBuilder.getOrphanOBOObjects()) {
                    if (orphanObo instanceof OBOObject) {
                        OBOObject orphanObj=(OBOObject)orphanObo;
@@ -133,11 +138,6 @@ public class CvUpdater {
                        }
                    }
 
-                   // workaround, as we create the "obsolete" term in the class, ignoring the one
-                   // that comes from the OBO file
-                   if (obsoleteTopic.getAc() == null) {
-                       rootsAndOrphans.add(obsoleteTopic);
-                   }
                   // stats.addObsoleteCv(obsoleteTopic);
                   // stats.addOrphanCv(obsoleteTopic);
                }//end for
