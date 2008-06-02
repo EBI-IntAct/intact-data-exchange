@@ -12,6 +12,7 @@ package uk.ac.ebi.intact.dataexchange.cvutils.model;
  * @version $Id$
  * @since <pre>29-Sep-2005</pre>
  */
+@Deprecated
 public class CvTermSynonym {
 
     ///////////////////////

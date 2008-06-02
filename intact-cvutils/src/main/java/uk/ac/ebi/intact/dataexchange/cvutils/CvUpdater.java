@@ -1,7 +1,26 @@
+/**
+ * Copyright 2008 The European Bioinformatics Institute, and others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obo.datamodel.IdentifiedObject;
+import org.obo.datamodel.OBOObject;
+import org.obo.dataadapter.OBOParseException;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
@@ -9,17 +28,21 @@ import uk.ac.ebi.intact.core.persister.stats.StatsUnit;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.*;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.XrefUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
-import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+
 
 import java.util.*;
+import java.net.URL;
+import java.io.IOException;
 
 /**
- * TODO comment this
+ * Contains method to Update Cv tables using the PersisterHelper.
+ * Basically passes a list of CvDagObjects with all the children
+ * and parents set to the saveorUpdate method in the PersisterHelper
  *
- * @author Bruno Aranda (baranda@ebi.ac.uk)
+ * @author Prem Anand (prem@ebi.ac.uk)
  * @version $Id$
+ * @since 2.0.1
  */
 public class CvUpdater {
 
@@ -27,139 +50,172 @@ public class CvUpdater {
 
     private Map<String,CvObject> processed;
     private CvUpdaterStatistics stats;
+    private List<CvDagObject> allCvs;
 
-    private boolean excludeObsolete;
+   
     private CvDatabase nonMiCvDatabase;
 
     private CvTopic obsoleteTopic;
 
-    public CvUpdater() {
+
+    public CvUpdater() throws IOException, OBOParseException {
         this.nonMiCvDatabase = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(),
                 CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT);
-    }
+
+        URL url = CvUpdater.class.getResource( "/psi-mi25.obo" );
+        log.info("url "+ url );
+
+
+
+        this.processed = new HashMap<String,CvObject>();
+        this.stats = new CvUpdaterStatistics();
+
+
+    }//end constructor
 
     /**
      * Starts the creation and update of CVs by using the ontology provided
+     * @param allCvs List of all Cvs
      * @return An object containing some statistics about the update
      */
-    public CvUpdaterStatistics createOrUpdateCVs(IntactOntology ontology) {
-        return createOrUpdateCVs(ontology, new AnnotationInfoDataset());
+    public CvUpdaterStatistics createOrUpdateCVs(List<CvDagObject> allCvs) {
+        return createOrUpdateCVs(allCvs, new AnnotationInfoDataset());
     }
 
+
+    public List<CvDagObject> getAllCvsAsList(CvObjectOntologyBuilder ontologyBuilder){
+
+               if (ontologyBuilder == null) {
+                   throw new NullPointerException("ontologyBuilder");
+               }
+
+
+
+               //until here
+               List<CvObject> rootsAndOrphans = new ArrayList<CvObject>();
+               Collection<IdentifiedObject> rootOboObjects=ontologyBuilder.getRootOBOObjects();
+
+        for ( IdentifiedObject rootOboObject : rootOboObjects ) {
+            OBOObject rootObject = ( OBOObject ) rootOboObject;
+            CvObject cvObjectRoot = ontologyBuilder.toCvObject( rootObject );
+            rootsAndOrphans.add( cvObjectRoot );
+
+        }//end for
+
+               log.debug("rootsAndOrphans size :"+rootsAndOrphans.size());
+
+
+              
+               CvTopic obsoleteTopic = createCvTopicObsolete();
+
+               for (IdentifiedObject orphanObo : ontologyBuilder.getOrphanOBOObjects()) {
+                   if (orphanObo instanceof OBOObject) {
+                       OBOObject orphanObj=(OBOObject)orphanObo;
+                       CvObject cvOrphan=ontologyBuilder.toCvObject(orphanObj);
+
+
+                       int cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted(cvOrphan, stats);
+
+
+                       String defText=orphanObj.getDefinition();
+                       if(orphanObj.isObsolete() || defText.contains("\nOBSOLETE")){
+                           addCvObjectToStatsIfObsolete(cvOrphan);
+                          // continue;
+                       }
+                       // check if it is valid and persist
+                       if (cvObjectsWithSameId == 0) {
+                           if (isValidTerm(cvOrphan)) {
+                               //CvTopic cvOrphan = toCvObject(CvTopic.class, orphan);
+                               stats.addOrphanCv(cvOrphan);
+
+                               rootsAndOrphans.add(cvOrphan);
+                           }
+                       }
+                   }
+
+                   // workaround, as we create the "obsolete" term in the class, ignoring the one
+                   // that comes from the OBO file
+                   if (obsoleteTopic.getAc() == null) {
+                       rootsAndOrphans.add(obsoleteTopic);
+                   }
+                  // stats.addObsoleteCv(obsoleteTopic);
+                  // stats.addOrphanCv(obsoleteTopic);
+               }//end for
+                   //until here
+
+
+             //deal with Invalid Terms seperately
+
+               for (IdentifiedObject invalidObo : ontologyBuilder.getInvalidOBOObjects()) {
+                  if (invalidObo instanceof OBOObject) {
+                           OBOObject invalidObj=(OBOObject)invalidObo;
+                   stats.getInvalidTerms().put(invalidObj.getID(), invalidObj.getName());
+                  }
+               } //
+
+
+
+              log.info("rootsAndOrphans size() "+rootsAndOrphans.size());
+               allCvs = new ArrayList<CvDagObject>();
+               for (CvObject rootOrOrphan : rootsAndOrphans) {
+                   allCvs.addAll(itselfAndChildrenAsList((CvDagObject) rootOrOrphan));
+               }
+
+               log.info("all Cvs size() "+allCvs.size());
+               setAllCvs(allCvs);
+               //until here
+
+
+      return allCvs;
+
+
+    } //end of method
+
+
     /**
-     * Starts the creation and update of CVs by using the ontology provided
+     * Starts the creation and update of CVs by using the CVobject List provided
+     * @param allCvs   List of all Cvs
+     * @param annotationInfoDataset    A seperate dataset specific for intact
      * @return An object containing some statistics about the update
      */
-    public CvUpdaterStatistics createOrUpdateCVs(IntactOntology ontology, AnnotationInfoDataset annotationInfoDataset) {
-        if (ontology == null) {
-            throw new NullPointerException("ontology");
+
+
+    public CvUpdaterStatistics createOrUpdateCVs(List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset) {
+
+        if (allCvs == null) {
+            throw new NullPointerException("Cvs Null");
         }
         if (annotationInfoDataset == null) {
             throw new NullPointerException("annotationDataset");
         }
 
-        this.processed = new HashMap<String,CvObject>();
-
-        stats = new CvUpdaterStatistics();
-
-        List<CvObject> rootsAndOrphans = new ArrayList<CvObject>();
-
-        final Collection<Class> ontologyTypes = ontology.getTypes();
-        if (log.isDebugEnabled()) log.debug("Ontology types ("+ ontologyTypes.size()+"): "+ ontologyTypes);
-
-        for (Class<? extends CvObject> type : ontologyTypes) {
-            final Collection<CvTerm> rootsForType = ontology.getRoots(type);
-            if (log.isDebugEnabled()) log.debug("Roots for type "+type.getSimpleName()+" ("+rootsForType.size()+")");
-
-            for (CvTerm root : rootsForType) {
-                if (log.isDebugEnabled()) log.debug("\tProcessing root: "+root.getShortName()+" ("+root.getId()+")");
-
-                CvObject cvObjectRoot = toCvObject(type, root);
-                rootsAndOrphans.add(cvObjectRoot);
-            }
-        }
-
-        // handle orphans - create a CvTopic for each
-        if (log.isDebugEnabled()) log.debug("Processing orphan terms...");
-
-        List<CvTopic> orphanCvs = new ArrayList<CvTopic>(ontology.getOrphanTerms().size());
-
-        CvTopic obsoleteTopic = createCvTopicObsolete();
-
-        for (CvTerm orphan : ontology.getOrphanTerms()) {
-
-            // skip if it is the "obsolete" term
-            if (CvTopic.OBSOLETE_MI_REF.equals(orphan.getId())) {
-                continue;
-            }
-
-            // all obsolete terms are orphan, we should check if what is now an orphan term
-            // was not obsolete before and already exists in the database. If so, it should be
-            // added the obsolete term
-            int cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted(orphan, stats);
-
-            // check if we deal with obsolete terms
-            if (excludeObsolete && orphan.isObsolete()) {
-                continue;
-            }
-
-            addCvObjectToStatsIfObsolete(orphan);
-
-            // check if it is valid and persist
-            if (cvObjectsWithSameId == 0) {
-                if (isValidTerm(orphan)) {
-                    CvTopic cvOrphan = toCvObject(CvTopic.class, orphan);
-
-                    if (orphan.isObsolete()) {
-                        addObsoleteAnnotation(cvOrphan, orphan.getObsoleteMessage());
-                    }
-
-                    orphanCvs.add(cvOrphan);
-                    stats.addOrphanCv(cvOrphan);
-
-                    rootsAndOrphans.add(cvOrphan);
-                } else {
-                    stats.getInvalidTerms().put(orphan.getId(), orphan.getShortName());
-                }
-            }
-        }
-
-        // workaround, as we create the "obsolete" term in the class, ignoring the one
-        // that comes from the OBO file
-        if (obsoleteTopic.getAc() == null) {
-            rootsAndOrphans.add(obsoleteTopic);
-        }
-        stats.addObsoleteCv(obsoleteTopic);
-        stats.addOrphanCv(obsoleteTopic);
-
-        List<CvDagObject> allCvs = new ArrayList<CvDagObject>();
-        for (CvObject rootOrOrphan : rootsAndOrphans) {
-            allCvs.addAll(itselfAndChildrenAsList((CvDagObject) rootOrOrphan));
-        }
-
-        // process any term from the cv annotations dataset resource
+       // process any term from the cv annotations dataset resource
         updateCVsUsingAnnotationDataset(allCvs, annotationInfoDataset);
 
-        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate(allCvs.toArray(new CvObject[rootsAndOrphans.size()]));
+
+
+        //PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate(allCvs.toArray(new CvObject[rootsAndOrphans.size()]));
+        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate(allCvs.toArray(new CvObject[allCvs.size()]));
         addCvObjectsToUpdaterStats(persisterStats, stats);
 
         if (log.isDebugEnabled()) {
             log.debug("Persisted: " + persisterStats);
-
-            log.debug("Processed: "+processed.size());
-            log.debug("Terms in ontology: "+ontology.getCvTerms().size());
+            log.debug("Processed: "+  processed.size());
             log.debug(stats);
         }
 
+
+
+
         return stats;
-    }
+    } //end method
 
     private void updateCVsUsingAnnotationDataset(List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset) {
         CvTopic hidden = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(),
-                                                      CvTopic.class, null, CvTopic.HIDDEN);
+                CvTopic.class, null, CvTopic.HIDDEN);
 
-         for (CvDagObject cvObject : allCvs) {
-            if (cvObject.getMiIdentifier() != null && annotationInfoDataset.containsCvAnnotation(cvObject.getMiIdentifier())) {
+        for (CvDagObject cvObject : allCvs) {
+            if (CvObjectUtils.getIdentity(cvObject) != null && annotationInfoDataset.containsCvAnnotation(cvObject.getMiIdentifier())) {
                 AnnotationInfo annotInfo = annotationInfoDataset.getCvAnnotation(cvObject.getMiIdentifier());
 
                 if (CvTopic.HIDDEN.equals(annotInfo.getTopicShortLabel())) {
@@ -171,6 +227,7 @@ public class CvUpdater {
             }
         }
     }
+
 
     private void addAnnotation(Annotation annotation, CvDagObject cvObject, boolean includeChildren) {
         boolean containsAnnotation = false;
@@ -193,15 +250,15 @@ public class CvUpdater {
         }
     }
 
-    private int checkAndMarkAsObsoleteIfExisted(CvTerm orphan, CvUpdaterStatistics stats) {
-        String id = orphan.getId();
+    private int checkAndMarkAsObsoleteIfExisted(CvObject orphan, CvUpdaterStatistics stats) {
+        String id = CvObjectUtils.getIdentity( orphan );
 
         final CvObjectDao<CvObject> cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getCvObjectDao();
         Collection<CvObject> existingCvs = cvObjectDao.getByPsiMiRefCollection(Collections.singleton(id));
 
         if (existingCvs.isEmpty()) {
-            existingCvs = cvObjectDao.getByShortLabelLike(orphan.getShortName());
+            existingCvs = cvObjectDao.getByShortLabelLike(orphan.getShortLabel());
         }
 
 
@@ -212,13 +269,22 @@ public class CvUpdater {
                 boolean alreadyContainsObsolete = false;
 
                 for (Annotation annot : existingCv.getAnnotations()) {
-                    if (CvTopic.OBSOLETE_MI_REF.equals(annot.getCvTopic().getMiIdentifier())) {
+                    if (CvTopic.OBSOLETE_MI_REF.equals(CvObjectUtils.getIdentity(annot.getCvTopic()))) {
                         alreadyContainsObsolete = true;
                     }
                 }
 
                 if (!alreadyContainsObsolete) {
-                    existingCv.addAnnotation(new Annotation(existingCv.getOwner(), obsoleteTopic, orphan.getObsoleteMessage()));
+                    //get Annotations and find Def for Obsolote
+                    String annotatedText=null;
+                    for (Annotation annot:  orphan.getAnnotations()){
+                        if (CvTopic.OBSOLETE_MI_REF.equals(CvObjectUtils.getIdentity(annot.getCvTopic()))) {
+                            annotatedText=annot.getAnnotationText();
+                        }
+                    }
+
+
+                    existingCv.addAnnotation(new Annotation(existingCv.getOwner(), obsoleteTopic, annotatedText));
                     stats.addUpdatedCv(existingCv);
                 }
             }
@@ -269,180 +335,17 @@ public class CvUpdater {
         }
     }
 
-    private void addCvObjectToStatsIfObsolete(CvTerm cvTerm) {
-        if (cvTerm.isObsolete()) {
-            stats.getObsoleteCvs().put(cvTerm.getId(), cvTerm.getShortName());
-        }
+    private void addCvObjectToStatsIfObsolete(CvObject cvObj) {
+
+        stats.getObsoleteCvs().put(CvObjectUtils.getIdentity( cvObj ), cvObj.getShortLabel());
+
     }
 
-    protected boolean isValidTerm(CvTerm term) {
-        return term.getId().contains(":");
+    protected boolean isValidTerm(CvObject term) {
+        return CvObjectUtils.getIdentity( term ).contains(":");
     }
 
-    protected <T extends CvObject> T toCvObject(Class<T> cvClass, CvTerm cvTerm) {
-        String primaryId = cvTerm.getId();
-
-        if (log.isTraceEnabled()) log.trace("\t\t"+cvClass.getSimpleName()+": "+cvTerm.getId()+" ("+cvTerm.getShortName()+")");
-
-        final String processedKey = cvKey(cvClass, primaryId);
-        
-        if (processed.containsKey(processedKey)) {
-            return (T) processed.get(processedKey);
-        }
-
-        final Institution institution = IntactContext.getCurrentInstance().getInstitution();
-
-        T cvObject = CvObjectUtils.createCvObject(institution,
-                    cvClass, null, calculateShortLabel(cvTerm));
-        cvObject.addXref(createIdentityXref(cvObject, cvTerm));
-
-        cvObject.setFullName(cvTerm.getFullName());
-
-        for (CvTermXref cvTermXref : cvTerm.getXrefs()) {
-            final CvObjectXref xref = toXref(cvObject, cvTermXref);
-            if (xref != null) {
-                cvObject.addXref(xref);
-            }
-        }
-
-        for (CvTermAnnotation cvTermAnnot : cvTerm.getAnnotations()) {
-            Annotation annot = toAnnotation(cvTermAnnot);
-            if (annot != null) {
-                cvObject.addAnnotation(annot);
-            }
-        }
-
-        // definition
-        if (cvTerm.getDefinition() != null) {
-            CvTopic definitionTopic = CvObjectUtils.createCvObject(institution, CvTopic.class, null, CvTopic.DEFINITION);
-            cvObject.addAnnotation(new Annotation(institution, definitionTopic, cvTerm.getDefinition()));
-        }
-
-        processed.put(processedKey, cvObject);
-
-        if (cvObject instanceof CvDagObject) {
-            for (CvTerm cvTermChild : cvTerm.getChildren()) {
-                // exclude obsoletes
-                if (excludeObsolete && cvTermChild.isObsolete()) {
-                    continue;
-                }
-
-                addCvObjectToStatsIfObsolete(cvTerm);
-                
-                CvDagObject dagObject = (CvDagObject)cvObject;
-                dagObject.getChildren().add((CvDagObject)toCvObject(cvClass, cvTermChild));
-            }
-        }
-
-        return cvObject;
-    }
-
-    private <T extends CvObject> String cvKey(Class<T> cvClass, String primaryId) {
-        return cvClass.getSimpleName() + ":" + primaryId;
-    }
-
-    protected String calculateShortLabel(CvTerm cvTerm) {
-        String shortLabel = cvTerm.getShortName();
-
-        if (shortLabel.length() > 20) {
-            shortLabel = shortLabel.substring(0, 20);
-        }
-        
-        return shortLabel;
-    }
-
-
-    protected CvObjectXref createIdentityXref(CvObject parent, CvTerm cvTerm) {
-        CvObjectXref idXref;
-
-        String primaryId = cvTerm.getId();
-
-        if (primaryId.startsWith("MI")) {
-            idXref = XrefUtils.createIdentityXrefPsiMi(parent, cvTerm.getId());
-            idXref.prepareParentMi();
-        } else {
-            idXref = XrefUtils.createIdentityXref(parent, cvTerm.getId(), nonMiCvDatabase);
-        }
-
-        return idXref;
-    }
-
-    protected CvObjectXref toXref(CvObject parent, CvTermXref termXref) {
-        Institution owner = IntactContext.getCurrentInstance().getInstitution();
-
-        CvXrefQualifier qualifier = getCvObjectByLabel(CvXrefQualifier.class, termXref.getQualifier());
-        CvDatabase database = getCvObjectByLabel(CvDatabase.class, termXref.getDatabase());
-
-        if (qualifier == null || database == null) {
-            if (CvDatabase.PUBMED.equals(termXref.getDatabase())) {
-                qualifier = CvObjectUtils.createCvObject(owner, CvXrefQualifier.class, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE);
-                database = CvObjectUtils.createCvObject(owner, CvDatabase.class, CvDatabase.PUBMED_MI_REF, CvDatabase.PUBMED);
-            } else if (CvDatabase.GO.equals(termXref.getDatabase())) {
-                qualifier = CvObjectUtils.createCvObject(owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, CvXrefQualifier.IDENTITY);
-                database = CvObjectUtils.createCvObject(owner, CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO);
-            } else if (CvDatabase.RESID.equals(termXref.getDatabase())) {
-                qualifier = CvObjectUtils.createCvObject(owner, CvXrefQualifier.class, CvXrefQualifier.SEE_ALSO_MI_REF, CvXrefQualifier.SEE_ALSO);
-                database = CvObjectUtils.createCvObject(owner, CvDatabase.class, CvDatabase.RESID_MI_REF, CvDatabase.RESID);
-            } else if (CvDatabase.SO.equals(termXref.getDatabase())) {
-                qualifier = CvObjectUtils.createCvObject(owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, CvXrefQualifier.IDENTITY);
-                database = CvObjectUtils.createCvObject(owner, CvDatabase.class, CvDatabase.SO_MI_REF, CvDatabase.SO);
-            } else {
-                log.error("Unexpected combination qualifier-database found on xref: " + termXref.getQualifier() + " - " + termXref.getDatabase());
-                return null;
-            }
-        }
-
-        return XrefUtils.createIdentityXref(parent, termXref.getId(), qualifier, database);
-    }
-
-    protected Annotation toAnnotation(CvTermAnnotation termAnnot) {
-        Institution owner = IntactContext.getCurrentInstance().getInstitution();
-
-        CvTopic topic = getCvObjectByLabel(CvTopic.class, termAnnot.getTopic());
-
-        if (topic == null) {
-            if (CvTopic.URL.equals(termAnnot.getTopic())) {
-                topic = CvObjectUtils.createCvObject(owner, CvTopic.class, CvTopic.URL_MI_REF, CvTopic.URL);
-            } else if (CvTopic.SEARCH_URL.equals(termAnnot.getTopic())) {
-                topic = CvObjectUtils.createCvObject(owner, CvTopic.class, CvTopic.SEARCH_URL_MI_REF, CvTopic.SEARCH_URL);
-            } else if (CvTopic.XREF_VALIDATION_REGEXP.equals(termAnnot.getTopic())) {
-                topic = CvObjectUtils.createCvObject(owner, CvTopic.class, CvTopic.XREF_VALIDATION_REGEXP_MI_REF, CvTopic.XREF_VALIDATION_REGEXP);
-            } else if (CvTopic.COMMENT.equals(termAnnot.getTopic())) {
-                topic = CvObjectUtils.createCvObject(owner, CvTopic.class, CvTopic.COMMENT_MI_REF, CvTopic.COMMENT);
-            } else if (CvTopic.OBSOLETE.equals(termAnnot.getTopic()) || CvTopic.OBSOLETE_OLD.equals(termAnnot.getTopic())) {
-                topic = CvObjectUtils.createCvObject(owner, CvTopic.class, CvTopic.OBSOLETE_MI_REF, CvTopic.OBSOLETE);
-                topic.setFullName(CvTopic.OBSOLETE);
-            } else {
-                log.error("Unexpected topic found on annotation: "+termAnnot.getTopic());
-                return null;
-            }
-        } 
-
-        return new Annotation(owner, topic, termAnnot.getAnnotation());
-    }
-
-    protected <T extends CvObject> T getCvObjectByLabel(Class<T> cvObjectClass, String label) {
-        for (CvObject cvObject : processed.values()) {
-            if (cvObjectClass.isAssignableFrom(cvObject.getClass()) && label.equals(cvObject.getShortLabel())) {
-                return (T) cvObject;
-            }
-        }
-
-        return IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getCvObjectDao(cvObjectClass).getByShortLabel(cvObjectClass, label);
-    }
-
-    private DaoFactory getDaoFactory() {
-        return IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
-    }
-
-    public boolean isExcludeObsolete() {
-        return excludeObsolete;
-    }
-
-    public void setExcludeObsolete(boolean excludeObsolete) {
-        this.excludeObsolete = excludeObsolete;
-    }
+   
 
     public CvDatabase getNonMiCvDatabase() {
         return nonMiCvDatabase;
@@ -451,4 +354,14 @@ public class CvUpdater {
     public void setNonMiCvDatabase(CvDatabase nonMiCvDatabase) {
         this.nonMiCvDatabase = nonMiCvDatabase;
     }
-}
+
+    public List<CvDagObject> getAllCvs() {
+        return allCvs;
+    }
+
+    public void setAllCvs(List<CvDagObject> allCvs) {
+        this.allCvs = allCvs;
+    }
+
+
+}   //end class

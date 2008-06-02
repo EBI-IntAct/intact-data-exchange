@@ -35,6 +35,7 @@ import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.io.FileWriter;
 
 /**
  * DownloadCVs tester.
@@ -116,6 +117,12 @@ public class DownloadCVsTest extends IntactBasicTestCase {
         String oboOutput = writer.toString();
 
         commitTransaction();
+
+
+        //testing by prem
+        //BufferedWriter outputStream = new BufferedWriter(new FileWriter("characteroutput.txt"));
+        //outputStream.write(oboOutput);
+       // outputStream.close();
 
 
         Assert.assertEquals(25, getDaoFactory().getCvObjectDao().countAll());

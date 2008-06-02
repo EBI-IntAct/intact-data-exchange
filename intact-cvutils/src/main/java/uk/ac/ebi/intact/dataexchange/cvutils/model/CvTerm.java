@@ -15,6 +15,7 @@ import java.util.*;
  * @version $Id$
  * @since <pre>28-Sep-2005</pre>
  */
+@Deprecated
 public class CvTerm implements Serializable {
 
     ///////////////////////

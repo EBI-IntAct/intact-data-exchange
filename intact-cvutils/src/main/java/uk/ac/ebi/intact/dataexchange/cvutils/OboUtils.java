@@ -1,13 +1,19 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
-import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
+import org.obo.dataadapter.DefaultOBOParser;
+import org.obo.dataadapter.OBOParseEngine;
+import org.obo.dataadapter.OBOParseException;
+import org.obo.datamodel.OBOSession;
+
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDatasetFactory;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 
 /**
  * Set of methods to deal with OBO files 
@@ -21,6 +27,28 @@ public class OboUtils {
     private static final String PSI_MI_LOCAL_ANNOTATIONS = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/CvObject-annotation-update.txt";
 
     private OboUtils() {}
+
+    public static OBOSession createOBOSession(URL ... paths) throws IOException, OBOParseException {
+        String[] strPaths = new String[paths.length];
+
+        for (int i=0; i<strPaths.length; i++) {
+            strPaths[i] = paths[i].toString();
+        }
+
+        return createOBOSession(strPaths);
+    }
+
+    public static OBOSession createOBOSession(String ... paths) throws IOException, OBOParseException {
+        DefaultOBOParser parser = new DefaultOBOParser();
+        OBOParseEngine engine = new OBOParseEngine(parser);
+        //OBOParseEngine can parse several files at once
+	    //and create one munged-together ontology,
+	    //so we need to provide a Collection to the setPaths() method
+        engine.setPaths(Arrays.asList(paths));
+        engine.parse();
+        OBOSession session = parser.getSession();
+        return session;
+    }
 
     public static IntactOntology createOntologyFromOboLatestPsiMi() throws IOException, PsiLoaderException {
         URL url = new URL(PSI_MI_OBO_LOCATION);

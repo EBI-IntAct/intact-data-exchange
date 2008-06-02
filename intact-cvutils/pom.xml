@@ -18,7 +18,14 @@
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.geneontology</groupId>
+            <artifactId>obo</artifactId>
+            <version>2.000-beta38</version>
+          </dependency>
+
+        <!-- TO BE REMOVED -->
         <dependency>
             <groupId>org.geneontology</groupId>
             <artifactId>oboedit</artifactId>
@@ -30,6 +37,7 @@
             <artifactId>ols</artifactId>
             <version>1.14</version>
         </dependency>
+
     </dependencies>
 
     <!-- EBI repositories -->

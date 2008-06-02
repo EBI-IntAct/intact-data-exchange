@@ -12,6 +12,7 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
  * @version $Id$
  * @since <pre>16-Feb-2006</pre>
  */
+
 public class PsiLoaderException extends Exception {
     public PsiLoaderException( String message ) {
         super( message );

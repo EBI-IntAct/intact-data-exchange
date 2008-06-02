@@ -14,20 +14,17 @@ import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.ook.loader.impl.AbstractLoader;
 import uk.ac.ebi.ook.loader.parser.OBOFormatParser;
+import uk.ac.ebi.ook.model.interfaces.DbXref;
+import uk.ac.ebi.ook.model.interfaces.TermRelationship;
 import uk.ac.ebi.ook.model.ojb.AnnotationBean;
 import uk.ac.ebi.ook.model.ojb.DbXrefBean;
 import uk.ac.ebi.ook.model.ojb.TermBean;
 import uk.ac.ebi.ook.model.ojb.TermSynonymBean;
-import uk.ac.ebi.ook.model.interfaces.DbXref;
-import uk.ac.ebi.ook.model.interfaces.TermRelationship;
-import uk.ac.ebi.ook.model.interfaces.Ontology;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Wrapper class that hides the way OLS handles OBO files.
@@ -36,6 +33,7 @@ import java.util.regex.Pattern;
  * @version $Id$
  * @since <pre>30-Sep-2005</pre>
  */
+@Deprecated
 public class PSILoader extends AbstractLoader {
 
     private static final Log log = LogFactory.getLog(PSILoader.class);

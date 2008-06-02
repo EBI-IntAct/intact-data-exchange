@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
  * @version $Id$
  * @since <pre>29-Sep-2005</pre>
  */
+@Deprecated
 public class CvTermAnnotation {
 
     ////////////////////////
