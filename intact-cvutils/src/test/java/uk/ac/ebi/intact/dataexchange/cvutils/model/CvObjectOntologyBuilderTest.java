@@ -28,7 +28,6 @@ import java.net.URL;
 import java.util.Collection;
 
 
-
 /**
  * Test class for CvObjectOntologyBuilder
  *
@@ -53,7 +52,13 @@ public class CvObjectOntologyBuilderTest {
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
 
+
         Assert.assertEquals( 16, ontologyBuilder.getRootOBOObjects().size() );
+        Assert.assertEquals( 894, ontologyBuilder.getAllValidCvsAsList().size() );
+        Assert.assertEquals( 53, ontologyBuilder.getOrphanCvObjects().size() );
+        Assert.assertEquals( 947,ontologyBuilder.getAllValidCvsAsList().size() + ontologyBuilder.getOrphanCvObjects().size() );
+
+
 
         Assert.assertEquals( uk.ac.ebi.intact.model.CvInteraction.class, ontologyBuilder.findCvClassforMI( "MI:0439" ) );
         Assert.assertEquals( uk.ac.ebi.intact.model.CvDatabase.class, ontologyBuilder.findCvClassforMI( "MI:0244" ) );//non-root object
@@ -77,7 +82,7 @@ public class CvObjectOntologyBuilderTest {
         CvObject cvObject = ontologyBuilder.toCvObject( testObj );
         Assert.assertEquals( "random spore analysis", cvObject.getFullName() );
         Assert.assertEquals( "MI:0439", CvObjectUtils.getIdentity( cvObject ) );
-        Assert.assertEquals( "MI:0439", cvObject.getMiIdentifier());
+        Assert.assertEquals( "MI:0439", cvObject.getMiIdentifier() );
         Assert.assertEquals( "rsa", cvObject.getShortLabel() );
         Assert.assertEquals( 3, cvObject.getAliases().size() );
         Assert.assertEquals( 2, cvObject.getXrefs().size() );
@@ -88,17 +93,12 @@ public class CvObjectOntologyBuilderTest {
         Assert.assertEquals( true, testObsoleteObj.isObsolete() );
 
         //947+1=948 root object MI:0000
-        Assert.assertEquals( 947,ontologyBuilder.getAllMIOBOObjects().size() );
+        Assert.assertEquals( 947, ontologyBuilder.getAllMIOBOObjects().size() );
         Assert.assertEquals( 53, ontologyBuilder.getObsoleteOBOObjects().size() );
         Assert.assertEquals( 53, ontologyBuilder.getOrphanOBOObjects().size() );
         Assert.assertEquals( 11, ontologyBuilder.getInvalidOBOObjects().size() );
         //947+11+1=959
         Assert.assertEquals( 959, ontologyBuilder.getAllOBOObjects().size() );
-
-
-
-
-
 
         //OBOObject testObj = (OBOObject)oboSession.getObject("MI:0001");//root Cv interaction detection method
         //OBOObject testObj = (OBOObject)oboSession.getObject("MI:0012");

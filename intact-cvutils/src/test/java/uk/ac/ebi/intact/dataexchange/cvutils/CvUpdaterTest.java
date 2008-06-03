@@ -16,6 +16,7 @@
 
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
@@ -25,6 +26,7 @@ import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.CvDagObject;
+import uk.ac.ebi.intact.model.CvObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,11 +47,11 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     private static final Log log = LogFactory.getLog( CvUpdaterTest.class );
 
-   @Test
-    public void reportDirectlyFromOBOFile( ) {
+    @Test
+    public void reportDirectlyFromOBOFile() {
 
         URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
-       if(log.isDebugEnabled()) log.debug( "url " + url );
+        if ( log.isDebugEnabled() ) log.debug( "url " + url );
         try {
             BufferedReader in = new BufferedReader( new InputStreamReader( url.openStream() ) );
             String inputLine;
@@ -62,18 +64,18 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             int typedefCounter = 0;
 
             while ( ( inputLine = in.readLine() ) != null ) {
-              
+
 
                 if ( inputLine.startsWith( "[Term]" ) ) {
                     termCounter++;
-                 }
+                }
 
                 if ( inputLine.startsWith( "id:" ) ) {
                     idCounter++;
-                 }
+                }
                 if ( inputLine.matches( "id:\\s+MI:.*" ) ) {
                     miCounter++;
-                 }
+                }
 
                 if ( inputLine.contains( "is_obsolete: true" ) ) {
                     obsoleteCounter++;
@@ -81,30 +83,27 @@ public class CvUpdaterTest extends IntactBasicTestCase {
                 if ( inputLine.matches( "def:.*?OBSOLETE.*" ) ) {
                     obsoleteCounterDef++;
                 }
-                if ( inputLine.startsWith("[Typedef]") ) {
+                if ( inputLine.startsWith( "[Typedef]" ) ) {
                     typedefCounter++;
                 }
 
             }
 
-            
-
             //948+1 with Typedef
-            Assert.assertEquals(949, idCounter);
-            Assert.assertEquals(948, termCounter);
-            Assert.assertEquals(948, miCounter);
-            Assert.assertEquals(53, obsoleteCounter);
-            Assert.assertEquals(53, obsoleteCounterDef);
-            Assert.assertEquals(1, typedefCounter);
+            Assert.assertEquals( 949, idCounter );
+            Assert.assertEquals( 948, termCounter );
+            Assert.assertEquals( 948, miCounter );
+            Assert.assertEquals( 53, obsoleteCounter );
+            Assert.assertEquals( 53, obsoleteCounterDef );
+            Assert.assertEquals( 1, typedefCounter );
 
             in.close();
         } catch ( IOException ioex ) {
             ioex.printStackTrace();
         }
     }//end method
-    
 
-  
+
     @Test
     public void createOrUpdateCVs() throws Exception {
 
@@ -112,45 +111,38 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         log.debug( "url " + url );
 
 
-
         OBOSession oboSession = OboUtils.createOBOSession( url );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
+
+        List<CvDagObject> allValidCvs = ontologyBuilder.getAllValidCvsAsList();
+        Assert.assertEquals( 894, allValidCvs.size() );
+
+        List<CvObject> orphanCvs = ontologyBuilder.getOrphanCvObjects();
+        Assert.assertEquals( 53, orphanCvs.size() );
+        Assert.assertEquals( 947, ontologyBuilder.getAllValidCvsAsList().size() + ontologyBuilder.getOrphanCvObjects().size() );
+
         AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault( 10841 );
 
         CvUpdater updater = new CvUpdater();
-        List<CvDagObject> allCvs = updater.getAllCvsAsList( ontologyBuilder );
-        CvUpdaterStatistics stats = updater.createOrUpdateCVs( allCvs, annotationDataset );
+        CvUpdaterStatistics stats = updater.createOrUpdateCVs( allValidCvs, orphanCvs, annotationDataset );
 
-
-        log.debug( "CreatedCvs->" + stats.getCreatedCvs().size() );
-        log.debug( "UpdatedCvs->" + stats.getUpdatedCvs().size() );
-        log.debug( "ObsoleteCvs->" + stats.getObsoleteCvs().size() );
-        log.debug( "InvalidTerms->" + stats.getInvalidTerms().size() );
 
         int total = getDaoFactory().getCvObjectDao().countAll();
         log.debug( "Total->" + total );
 
         //it should be 947 as we don't create the root Cv MI:0000
-        //Have to check the additional two cvs, probably cause of more than one parent
-        
+        //The additional two cvs are hidden and definition from annotation dataset
+
         Assert.assertEquals( 949, stats.getCreatedCvs().size() );
         Assert.assertEquals( 0, stats.getUpdatedCvs().size() );
         //52+1 obsolete term
         Assert.assertEquals( 53, stats.getObsoleteCvs().size() );
-        Assert.assertEquals( 11, stats.getInvalidTerms().size() );
+        //invalid terms are already filtered out
+
+        Assert.assertEquals( 0, stats.getInvalidTerms().size() );
         Assert.assertEquals( total, stats.getCreatedCvs().size() );
 
 
-
-        // update
-        /*    CvUpdaterStatistics stats2 = updater.createOrUpdateCVs(ontologyBuilder,annotationDataset);
-
-      Assert.assertEquals(total, getDaoFactory().getCvObjectDao().countAll());
-
-      Assert.assertEquals(0, stats2.getCreatedCvs().size());
-      Assert.assertEquals(0, stats2.getUpdatedCvs().size());
-      Assert.assertEquals(50, stats2.getObsoleteCvs().size());
-      Assert.assertEquals(9, stats2.getInvalidTerms().size()); */
     } //end method
 
     /*

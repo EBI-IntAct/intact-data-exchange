@@ -28,7 +28,6 @@ import org.obo.datamodel.impl.*;
 import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.CvExporter;
 import uk.ac.ebi.intact.model.CvDagObject;
 import uk.ac.ebi.intact.model.CvInteraction;
 import uk.ac.ebi.intact.model.CvObject;
@@ -65,9 +64,11 @@ public class CvExporterTest extends IntactBasicTestCase {
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
 
-        CvUpdater updater = new CvUpdater();
+       
         List<CvDagObject> allCvs_;
-        allCvs_ = updater.getAllCvsAsList( ontologyBuilder );
+        allCvs_ = ontologyBuilder.getAllValidCvsAsList();
+
+        
 
         //Uncomment this block if you want to test it after persiting
         /*
