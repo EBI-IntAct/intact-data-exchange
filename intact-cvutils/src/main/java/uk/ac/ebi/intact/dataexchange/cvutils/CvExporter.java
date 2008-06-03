@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.ac.ebi.intact.dataexchange.cvutils.model;
+package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import org.apache.log4j.Logger;
 import org.bbop.dataadapter.DataAdapterException;
@@ -23,6 +23,7 @@ import org.obo.datamodel.*;
 import org.obo.datamodel.impl.*;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 
 import java.io.File;
 import java.io.IOException;
