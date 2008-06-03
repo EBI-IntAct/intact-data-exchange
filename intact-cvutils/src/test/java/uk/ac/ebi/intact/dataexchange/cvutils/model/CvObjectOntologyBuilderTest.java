@@ -52,12 +52,10 @@ public class CvObjectOntologyBuilderTest {
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
 
-
         Assert.assertEquals( 16, ontologyBuilder.getRootOBOObjects().size() );
         Assert.assertEquals( 894, ontologyBuilder.getAllValidCvsAsList().size() );
         Assert.assertEquals( 53, ontologyBuilder.getOrphanCvObjects().size() );
-        Assert.assertEquals( 947,ontologyBuilder.getAllValidCvsAsList().size() + ontologyBuilder.getOrphanCvObjects().size() );
-
+        Assert.assertEquals( 947, ontologyBuilder.getAllValidCvsAsList().size() + ontologyBuilder.getOrphanCvObjects().size() );
 
 
         Assert.assertEquals( uk.ac.ebi.intact.model.CvInteraction.class, ontologyBuilder.findCvClassforMI( "MI:0439" ) );

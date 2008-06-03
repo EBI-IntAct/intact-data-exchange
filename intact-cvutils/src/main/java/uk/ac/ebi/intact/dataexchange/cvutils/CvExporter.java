@@ -21,9 +21,9 @@ import org.bbop.dataadapter.DataAdapterException;
 import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.*;
 import org.obo.datamodel.impl.*;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 
 import java.io.File;
 import java.io.IOException;

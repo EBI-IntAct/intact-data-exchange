@@ -30,7 +30,6 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 
 import java.io.IOException;
-
 import java.util.*;
 
 /**
@@ -48,7 +47,6 @@ public class CvUpdater {
 
     private Map<String, CvObject> processed;
     private CvUpdaterStatistics stats;
- 
 
 
     private CvDatabase nonMiCvDatabase;
@@ -58,9 +56,8 @@ public class CvUpdater {
 
     public CvUpdater() throws IOException, OBOParseException {
         this.nonMiCvDatabase = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
-                                                          CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT );
+                                                             CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT );
 
-       
 
         this.processed = new HashMap<String, CvObject>();
         this.stats = new CvUpdaterStatistics();
@@ -99,18 +96,19 @@ public class CvUpdater {
             throw new NullPointerException( "annotationDataset" );
         }
 
-        List<CvDagObject> allValidAndOrphanCvs = dealWithOrphans( allValidCvs, orphanCvs );
+        List<CvDagObject> orphanCvList = dealWithOrphans( orphanCvs );
+         if ( log.isDebugEnabled() )log.debug( "orphanCvList " + orphanCvList.size() );
 
-       log.debug( "allValidAndOrphanCvs " +allValidAndOrphanCvs.size());
+        List<CvDagObject> allValidAndOrphanCvs = new ArrayList<CvDagObject>();
+        allValidAndOrphanCvs.addAll( allValidCvs );
+        allValidAndOrphanCvs.addAll( orphanCvList );
 
         // process any term from the cv annotations dataset resource
         updateCVsUsingAnnotationDataset( allValidAndOrphanCvs, annotationInfoDataset );
 
-       
+
         PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate( allValidAndOrphanCvs.toArray( new CvObject[allValidAndOrphanCvs.size()] ) );
         addCvObjectsToUpdaterStats( persisterStats, stats );
-
-
 
 
         if ( log.isDebugEnabled() ) {
@@ -123,7 +121,9 @@ public class CvUpdater {
         return stats;
     } //end method
 
-    private List<CvDagObject> dealWithOrphans( List<CvDagObject> allValidAndOrphanCvs, List<CvObject> orphanCvs ) {
+    private List<CvDagObject> dealWithOrphans( List<CvObject> orphanCvs ) {
+
+        List<CvDagObject> orphanCvList = new ArrayList<CvDagObject>();
 
         for ( CvObject cvOrphan : orphanCvs ) {
 
@@ -137,7 +137,7 @@ public class CvUpdater {
             if ( cvObjectsWithSameId == 0 ) {
                 if ( isValidTerm( cvOrphan ) ) {
                     stats.addOrphanCv( cvOrphan );
-                    allValidAndOrphanCvs.add( ( CvDagObject ) cvOrphan );
+                    orphanCvList.add( ( CvDagObject ) cvOrphan );
                 }
             }
 
@@ -145,7 +145,7 @@ public class CvUpdater {
         //until here
 
 
-        return allValidAndOrphanCvs;
+        return orphanCvList;
     }//end method
 
 
@@ -189,7 +189,7 @@ public class CvUpdater {
         }
     } //end of method
 
- 
+
     private int checkAndMarkAsObsoleteIfExisted( CvObject orphan, CvUpdaterStatistics stats ) {
         String id = CvObjectUtils.getIdentity( orphan );
 
@@ -257,7 +257,6 @@ public class CvUpdater {
     }
 
 
-
     private void addCvObjectsToUpdaterStats( PersisterStatistics persisterStats, CvUpdaterStatistics stats ) {
         for ( StatsUnit statsUnit : persisterStats.getPersisted( CvObject.class, true ) ) {
             stats.getCreatedCvs().put( statsUnit.getType(), statsUnit );
@@ -274,7 +273,6 @@ public class CvUpdater {
 
     }
 
- 
 
     public CvDatabase getNonMiCvDatabase() {
         return nonMiCvDatabase;
@@ -284,7 +282,6 @@ public class CvUpdater {
         this.nonMiCvDatabase = nonMiCvDatabase;
     }
 
-   
 
     private boolean isValidTerm( CvObject term ) {
         return CvObjectUtils.getIdentity( term ).contains( ":" );

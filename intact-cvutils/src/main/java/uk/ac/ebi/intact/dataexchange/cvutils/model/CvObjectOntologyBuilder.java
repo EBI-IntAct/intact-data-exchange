@@ -108,7 +108,6 @@ public class CvObjectOntologyBuilder {
         try {
             if ( log.isDebugEnabled() ) log.debug( "ID    ->" + oboObj.getID() );
             if ( log.isDebugEnabled() ) log.debug( "Name  ->" + oboObj.getName() );
-          
 
             //find the CvClass for any given MI identifier
             Class<T> cvClass = findCvClassforMI( oboObj.getID() );
@@ -276,9 +275,6 @@ public class CvObjectOntologyBuilder {
                     cvObject.addAlias( alias_ );
                 } //end if
             } //end for
-
-
-
 
 
             processed.put( processedKey, cvObject );
@@ -779,24 +775,23 @@ public class CvObjectOntologyBuilder {
 
         }//end for
 
-        if(log.isDebugEnabled())log.debug( "validCvs size :" + validCvs.size() );
+        if ( log.isDebugEnabled() ) log.debug( "validCvs size :" + validCvs.size() );
 
+        /*
+            CvTopic obsoleteTopic = createCvTopicObsolete();
 
-        CvTopic obsoleteTopic = createCvTopicObsolete();
+            if ( obsoleteTopic.getAc() != null ) {
+                validCvs.add( obsoleteTopic );
+            }
 
-        if ( obsoleteTopic.getAc() != null ) {
-            validCvs.add( obsoleteTopic );
-        }
-
-
+        */
         allValidCvs = new ArrayList<CvDagObject>();
         for ( CvObject validCv : validCvs ) {
-         allValidCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) validCv ) );
+            allValidCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) validCv ) );
         }
 
         allValidCvs = new ArrayList( new HashSet( allValidCvs ) );
         log.info( "all allValidCvs size() " + allValidCvs.size() );
-
 
 
         return allValidCvs;
@@ -805,7 +800,7 @@ public class CvObjectOntologyBuilder {
     } //end of method
 
 
-      public List<CvDagObject> getAllCvsAsList() {
+    public List<CvDagObject> getAllCvsAsList() {
 
         //until here
         List<CvObject> rootsAndOrphans = new ArrayList<CvObject>();
@@ -828,7 +823,6 @@ public class CvObjectOntologyBuilder {
         }
 
 
-
         for ( IdentifiedObject orphanObo : getOrphanOBOObjects() ) {
             if ( orphanObo instanceof OBOObject ) {
                 OBOObject orphanObj = ( OBOObject ) orphanObo;
@@ -840,20 +834,17 @@ public class CvObjectOntologyBuilder {
 
         }//end for
 
-
         //until here
 
 
         log.info( "rootsAndOrphans size() " + rootsAndOrphans.size() );
         List<CvDagObject> allCvs = new ArrayList<CvDagObject>();
         for ( CvObject validCv : rootsAndOrphans ) {
-         allCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) validCv ) );
+            allCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) validCv ) );
         }
 
         allCvs = new ArrayList( new HashSet( rootsAndOrphans ) );
         log.info( "allValidCvs size() " + allCvs.size() );
-
-
 
         //until here
         return allCvs;
@@ -893,8 +884,6 @@ public class CvObjectOntologyBuilder {
     }
 
 
-   
-
     private List<CvDagObject> itselfAndChildrenAsList( CvDagObject cv ) {
         List<CvDagObject> itselfAndChildren = new ArrayList<CvDagObject>();
         itselfAndChildren.add( cv );
@@ -931,7 +920,7 @@ public class CvObjectOntologyBuilder {
             }
         }//end for
         //until here
-   return orphanList;
+        return orphanList;
 
     } //end method
 

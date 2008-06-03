@@ -36,6 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Test the DownloadCvsExtended class that contains methods to recreate the OBOSession object from a list of CVObjects
@@ -64,11 +66,11 @@ public class CvExporterTest extends IntactBasicTestCase {
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
 
-       
         List<CvDagObject> allCvs_;
-        allCvs_ = ontologyBuilder.getAllValidCvsAsList();
+        allCvs_ = ontologyBuilder.getAllCvsAsList();
 
         
+
 
         //Uncomment this block if you want to test it after persiting
         /*
