@@ -35,7 +35,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
 import java.util.Comparator;
-import java.util.Collections;
 import static java.util.Collections.*;
 
 
@@ -117,6 +116,33 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         log.debug( "url " + url );
 
 
+        int cvsBeforeUpdate = getDaoFactory().getCvObjectDao().countAll();
+             log.debug( "cvsBeforeUpdate->" + cvsBeforeUpdate );
+
+             List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
+
+             sort( allCvsCommittedBefore, new Comparator() {
+                 public int compare( Object o1, Object o2 ) {
+                     CvObject cv1 = ( CvObject ) o1;
+                     CvObject cv2 = ( CvObject ) o2;
+
+                     String id1 = cv1.getShortLabel();
+                     String id2 = cv2.getShortLabel();
+
+                     return id1.compareTo( id2 );
+                 }
+             } );
+
+             int cvCounter = 1;
+             log.debug( "Printing results of getCvObjectDao().getAll() before update " );
+             for ( CvObject cvObject : allCvsCommittedBefore ) {
+                 log.debug( cvCounter + "\t" + CvObjectUtils.getIdentity( cvObject)+"\t"+ cvObject.getMiIdentifier() + "\t" + cvObject.getShortLabel() );
+                 cvCounter++;
+             }
+        
+
+
+
         OBOSession oboSession = OboUtils.createOBOSession( url );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
@@ -127,33 +153,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( 53, orphanCvs.size() );
         Assert.assertEquals( 947, ontologyBuilder.getAllValidCvsAsList().size() + ontologyBuilder.getOrphanCvObjects().size() );
 
+
         AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault( 10841 );
-
-        int cvsBeforeUpdate = getDaoFactory().getCvObjectDao().countAll();
-        log.debug( "cvsBeforeUpdate->" + cvsBeforeUpdate );
-
-        List<CvObject> allCvsCommitted = getDaoFactory().getCvObjectDao().getAll();
-
-        sort( allCvsCommitted, new Comparator() {
-            public int compare( Object o1, Object o2 ) {
-                CvObject cv1 = ( CvObject ) o1;
-                CvObject cv2 = ( CvObject ) o2;
-
-                String id1 = cv1.getShortLabel();
-                String id2 = cv2.getShortLabel();
-
-                return id1.compareTo( id2 );
-            }
-        } );
-
-        int cvCounter = 1;
-        log.debug( "Printing results of getCvObjectDao().getAll() before update " );
-        for ( CvObject cvObject : allCvsCommitted ) {
-            log.debug( cvCounter + "\t" + CvObjectUtils.getIdentity( cvObject)+"\t"+ cvObject.getMiIdentifier() + "\t" + cvObject.getShortLabel() );
-            cvCounter++;
-        }
-
-
         CvUpdater updater = new CvUpdater();
         CvUpdaterStatistics stats = updater.createOrUpdateCVs( allValidCvs, orphanCvs, annotationDataset );
 
