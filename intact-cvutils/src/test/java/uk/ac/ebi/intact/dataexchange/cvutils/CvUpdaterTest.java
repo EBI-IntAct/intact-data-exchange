@@ -27,12 +27,16 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.CvDagObject;
 import uk.ac.ebi.intact.model.CvObject;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
+import java.util.Comparator;
+import java.util.Collections;
+import static java.util.Collections.*;
 
 
 /**
@@ -128,6 +132,28 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         int cvsBeforeUpdate = getDaoFactory().getCvObjectDao().countAll();
         log.debug( "cvsBeforeUpdate->" + cvsBeforeUpdate );
 
+        List<CvObject> allCvsCommitted = getDaoFactory().getCvObjectDao().getAll();
+
+        sort( allCvsCommitted, new Comparator() {
+            public int compare( Object o1, Object o2 ) {
+                CvObject cv1 = ( CvObject ) o1;
+                CvObject cv2 = ( CvObject ) o2;
+
+                String id1 = cv1.getShortLabel();
+                String id2 = cv2.getShortLabel();
+
+                return id1.compareTo( id2 );
+            }
+        } );
+
+        int cvCounter = 1;
+        log.debug( "Printing results of getCvObjectDao().getAll() before update " );
+        for ( CvObject cvObject : allCvsCommitted ) {
+            log.debug( cvCounter + "\t" + CvObjectUtils.getIdentity( cvObject)+"\t"+ cvObject.getMiIdentifier() + "\t" + cvObject.getShortLabel() );
+            cvCounter++;
+        }
+
+
         CvUpdater updater = new CvUpdater();
         CvUpdaterStatistics stats = updater.createOrUpdateCVs( allValidCvs, orphanCvs, annotationDataset );
 
@@ -139,19 +165,16 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         log.debug( "stats.getCreatedCvs().size()->" + stats.getCreatedCvs().size() );
         log.debug( "stats.getUpdatedCvs().size() ->" + stats.getUpdatedCvs().size() );
 
-
-
-
         //Assert.assertEquals(totalCvsAfterUpdate,stats.getCreatedCvs().size() + cvsBeforeUpdate);
 
-       // Assert.assertEquals( 949, stats.getCreatedCvs().size() );
-       // Assert.assertEquals( 0, stats.getUpdatedCvs().size() );
+        // Assert.assertEquals( 949, stats.getCreatedCvs().size() );
+        // Assert.assertEquals( 0, stats.getUpdatedCvs().size() );
         //52+1 obsolete term
-       // Assert.assertEquals( 53, stats.getObsoleteCvs().size() );
+        // Assert.assertEquals( 53, stats.getObsoleteCvs().size() );
 
         //invalid terms are already filtered out
-       // Assert.assertEquals( 0, stats.getInvalidTerms().size() );
-       // Assert.assertEquals( totalCvsAfterUpdate, stats.getCreatedCvs().size() );
+        // Assert.assertEquals( 0, stats.getInvalidTerms().size() );
+        // Assert.assertEquals( totalCvsAfterUpdate, stats.getCreatedCvs().size() );
 
         /**
          * Uncomment this block when you want to output the CvObjects to the

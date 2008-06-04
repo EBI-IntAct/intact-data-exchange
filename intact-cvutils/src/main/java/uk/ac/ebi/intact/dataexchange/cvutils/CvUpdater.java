@@ -154,8 +154,8 @@ public class CvUpdater {
                                                        CvTopic.class, null, CvTopic.HIDDEN );
 
         for ( CvDagObject cvObject : allCvs ) {
-            if ( CvObjectUtils.getIdentity( cvObject ) != null && annotationInfoDataset.containsCvAnnotation( cvObject.getMiIdentifier() ) ) {
-                AnnotationInfo annotInfo = annotationInfoDataset.getCvAnnotation( cvObject.getMiIdentifier() );
+            if ( CvObjectUtils.getIdentity( cvObject ) != null && annotationInfoDataset.containsCvAnnotation( CvObjectUtils.getIdentity( cvObject )) ) {
+                AnnotationInfo annotInfo = annotationInfoDataset.getCvAnnotation( CvObjectUtils.getIdentity( cvObject ) );
 
                 if ( CvTopic.HIDDEN.equals( annotInfo.getTopicShortLabel() ) ) {
                     Annotation annotation = new Annotation( IntactContext.getCurrentInstance().getInstitution(), hidden, annotInfo.getReason() );
