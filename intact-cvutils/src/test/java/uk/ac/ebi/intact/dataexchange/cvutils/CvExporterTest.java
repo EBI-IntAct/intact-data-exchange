@@ -86,7 +86,7 @@ public class CvExporterTest extends IntactBasicTestCase {
 
 
         this.allCvs = allCvs_;
-        log.info( "allCvs size " + allCvs.size() );
+        log.debug( "allCvs size " + allCvs.size() );
 
 
     }//end method
@@ -130,7 +130,7 @@ public class CvExporterTest extends IntactBasicTestCase {
     public void testAllCvs() throws DataAdapterException, IOException {
         CvExporter downloadCv = new CvExporter();
 
-        log.info( "From Test all : " + allCvs.size() );
+        log.debug( "From Test all : " + allCvs.size() );
         OBOSession oboSession = downloadCv.convertCvList2OBOSession( allCvs );
         // Create temp directory
         File tempDir = new File( "temp" );

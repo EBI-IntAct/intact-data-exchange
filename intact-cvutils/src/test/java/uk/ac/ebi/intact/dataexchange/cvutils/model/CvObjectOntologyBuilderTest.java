@@ -86,6 +86,9 @@ public class CvObjectOntologyBuilderTest {
         Assert.assertEquals( 2, cvObject.getXrefs().size() );
         Assert.assertTrue( CvObjectUtils.hasIdentity( cvObject, "MI:0439" ) );
 
+
+
+        
         //Obsolote Term test MI:0443
         OBOObject testObsoleteObj = ( OBOObject ) oboSession.getObject( "MI:0443" );
         Assert.assertEquals( true, testObsoleteObj.isObsolete() );
@@ -98,7 +101,13 @@ public class CvObjectOntologyBuilderTest {
         //947+11+1=959
         Assert.assertEquals( 959, ontologyBuilder.getAllOBOObjects().size() );
 
-        //OBOObject testObj = (OBOObject)oboSession.getObject("MI:0001");//root Cv interaction detection method
+        OBOObject endogenousObj = (OBOObject)oboSession.getObject("MI:0222");
+        CvObject endogenousCvObject = ontologyBuilder.toCvObject( endogenousObj );
+        testCvObject( endogenousCvObject);
+
+
+
+       //OBOObject testObj = (OBOObject)oboSession.getObject("MI:0001");//root Cv interaction detection method
         //OBOObject testObj = (OBOObject)oboSession.getObject("MI:0012");
         //OBOObject testObj = (OBOObject)oboSession.getObject("MI:0192");//with GO
         //OBOObject testObj = (OBOObject)oboSession.getObject("MI:0122");//with unique resid

@@ -17,13 +17,11 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
 
-import com.google.common.collect.Multimap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
-import uk.ac.ebi.intact.core.persister.stats.StatsUnit;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
@@ -34,8 +32,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.*;
-import static java.util.Collections.sort;
+import java.util.List;
 
 
 /**
@@ -101,6 +98,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             Assert.assertEquals( 1, typedefCounter );
 
             in.close();
+
+
         } catch ( IOException ioex ) {
             ioex.printStackTrace();
         }
@@ -126,125 +125,144 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault( 10841 );
 
+        int cvsBeforeUpdate = getDaoFactory().getCvObjectDao().countAll();
+        log.debug( "cvsBeforeUpdate->" + cvsBeforeUpdate );
+
         CvUpdater updater = new CvUpdater();
         CvUpdaterStatistics stats = updater.createOrUpdateCVs( allValidCvs, orphanCvs, annotationDataset );
 
 
-        int total = getDaoFactory().getCvObjectDao().countAll();
-        log.debug( "Total->" + total );
-
-        List<CvObject> allCvsCommitted = getDaoFactory().getCvObjectDao().getAll();
-
-        sort( allCvsCommitted, new Comparator() {
-            public int compare( Object o1, Object o2 ) {
-                CvObject cv1 = ( CvObject ) o1;
-                CvObject cv2 = ( CvObject ) o2;
-
-                String id1 = cv1.getShortLabel();
-                String id2 = cv2.getShortLabel();
-
-                return id1.compareTo( id2 );
-            }
-        } );
-
-        int cvCounter = 1;
-        log.debug( "Printing results of getCvObjectDao().getAll() " );
-        for ( CvObject cvObject : allCvsCommitted ) {
-            log.debug( cvCounter + "\t" + cvObject.getMiIdentifier() + "\t" + cvObject.getShortLabel() );
-            cvCounter++;
-        }
+        int totalCvsAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
 
 
-        int cvCounterCreated = 1;
-        Multimap<Class, StatsUnit> mmc = stats.getCreatedCvs();
-        List<StatsUnit> allStatsUnitsCreated = new ArrayList<StatsUnit>();
+        log.debug( "totalCvsAfterUpdate->" + totalCvsAfterUpdate );
+        log.debug( "stats.getCreatedCvs().size()->" + stats.getCreatedCvs().size() );
+        log.debug( "stats.getUpdatedCvs().size() ->" + stats.getUpdatedCvs().size() );
 
 
-        log.debug( "\n\n\nPrinting results of stats.getCreatedCvs() " );
-        for ( Class aClass : mmc.keySet() ) {
-            Collection<StatsUnit> statsCol = mmc.get( aClass );
-            allStatsUnitsCreated.addAll( statsCol );
-        }//end outer for
-
-        sort( allStatsUnitsCreated, new Comparator() {
-            public int compare( Object o1, Object o2 ) {
-                StatsUnit cv1 = ( StatsUnit ) o1;
-                StatsUnit cv2 = ( StatsUnit ) o2;
-
-                String id1 = cv1.getShortLabel();
-                String id2 = cv2.getShortLabel();
-
-                return id1.compareTo( id2 );
-            }
-        } );
-
-        for ( StatsUnit statsUnit : allStatsUnitsCreated ) {
-            log.debug( cvCounterCreated + "\t" + statsUnit.getAc() + "\t" + statsUnit.getShortLabel() );
-            cvCounterCreated++;
-        }//end for
-
-        //----------------------------------------------------------------
-
-        int cvCounterUpdated = 1;
-        Multimap<Class, StatsUnit> mmu = stats.getUpdatedCvs();
-        List<StatsUnit> allStatsUnitsUpdated = new ArrayList<StatsUnit>();
-        log.debug( "\n\n\nPrinting results of stats.getUpdatedCvs() " );
-
-        for ( Class aClass : mmu.keySet() ) {
-            Collection<StatsUnit> statsCol = mmu.get( aClass );
-            allStatsUnitsUpdated.addAll( statsCol );
 
 
-        }//end outer for
+        //Assert.assertEquals(totalCvsAfterUpdate,stats.getCreatedCvs().size() + cvsBeforeUpdate);
+
+       // Assert.assertEquals( 949, stats.getCreatedCvs().size() );
+       // Assert.assertEquals( 0, stats.getUpdatedCvs().size() );
+        //52+1 obsolete term
+       // Assert.assertEquals( 53, stats.getObsoleteCvs().size() );
+
+        //invalid terms are already filtered out
+       // Assert.assertEquals( 0, stats.getInvalidTerms().size() );
+       // Assert.assertEquals( totalCvsAfterUpdate, stats.getCreatedCvs().size() );
+
+        /**
+         * Uncomment this block when you want to output the CvObjects to the
+         * log file in Teamcity
+         */
+
+        /*
+                List<CvObject> allCvsCommitted = getDaoFactory().getCvObjectDao().getAll();
+
+                sort( allCvsCommitted, new Comparator() {
+                    public int compare( Object o1, Object o2 ) {
+                        CvObject cv1 = ( CvObject ) o1;
+                        CvObject cv2 = ( CvObject ) o2;
+
+                        String id1 = cv1.getShortLabel();
+                        String id2 = cv2.getShortLabel();
+
+                        return id1.compareTo( id2 );
+                    }
+                } );
+
+                int cvCounter = 1;
+                log.debug( "Printing results of getCvObjectDao().getAll() " );
+                for ( CvObject cvObject : allCvsCommitted ) {
+                    log.debug( cvCounter + "\t" + cvObject.getMiIdentifier() + "\t" + cvObject.getShortLabel() );
+                    cvCounter++;
+                }
 
 
-        sort( allStatsUnitsUpdated, new Comparator() {
-            public int compare( Object o1, Object o2 ) {
-                StatsUnit cv1 = ( StatsUnit ) o1;
-                StatsUnit cv2 = ( StatsUnit ) o2;
-
-                String id1 = cv1.getShortLabel();
-                String id2 = cv2.getShortLabel();
-
-                return id1.compareTo( id2 );
-            }
-        } );
-
-        for ( StatsUnit statsUnit : allStatsUnitsUpdated ) {
-            log.debug( cvCounterUpdated + "\t" + statsUnit.getAc() + "\t" + statsUnit.getShortLabel() );
-            cvCounterUpdated++;
-        }//end for
-
-        //-------------------------------------------------------
+                int cvCounterCreated = 1;
+                Multimap<Class, StatsUnit> mmc = stats.getCreatedCvs();
+                List<StatsUnit> allStatsUnitsCreated = new ArrayList<StatsUnit>();
 
 
-        int cvCounterObsolete = 1;
-        Map<String, String> mmo = stats.getObsoleteCvs();
-        List<String> keys = new ArrayList( mmo.keySet() );
-        Collections.sort( keys);
-        // List<StatsUnit> allObsoleteCvs =
+                log.debug( "\n\n\nPrinting results of stats.getCreatedCvs() " );
+                for ( Class aClass : mmc.keySet() ) {
+                    Collection<StatsUnit> statsCol = mmc.get( aClass );
+                    allStatsUnitsCreated.addAll( statsCol );
+                }//end outer for
 
-        log.debug( "\n\n\nPrinting results of stats.getObsoleteCvs() " );
+                sort( allStatsUnitsCreated, new Comparator() {
+                    public int compare( Object o1, Object o2 ) {
+                        StatsUnit cv1 = ( StatsUnit ) o1;
+                        StatsUnit cv2 = ( StatsUnit ) o2;
 
-        for ( String id : keys) {
-            log.debug( cvCounterObsolete + "\t" + id + "\t" + mmo.get( id ) );
-            cvCounterObsolete++;
+                        String id1 = cv1.getShortLabel();
+                        String id2 = cv2.getShortLabel();
 
-        }//end outer for
+                        return id1.compareTo( id2 );
+                    }
+                } );
 
-        //-------------------------------------------------------
+                for ( StatsUnit statsUnit : allStatsUnitsCreated ) {
+                    log.debug( cvCounterCreated + "\t" + statsUnit.getAc() + "\t" + statsUnit.getShortLabel() );
+                    cvCounterCreated++;
+                }//end for
 
+                //----------------------------------------------------------------
+
+                int cvCounterUpdated = 1;
+                Multimap<Class, StatsUnit> mmu = stats.getUpdatedCvs();
+                List<StatsUnit> allStatsUnitsUpdated = new ArrayList<StatsUnit>();
+                log.debug( "\n\n\nPrinting results of stats.getUpdatedCvs() " );
+
+                for ( Class aClass : mmu.keySet() ) {
+                    Collection<StatsUnit> statsCol = mmu.get( aClass );
+                    allStatsUnitsUpdated.addAll( statsCol );
+
+
+                }//end outer for
+
+
+                sort( allStatsUnitsUpdated, new Comparator() {
+                    public int compare( Object o1, Object o2 ) {
+                        StatsUnit cv1 = ( StatsUnit ) o1;
+                        StatsUnit cv2 = ( StatsUnit ) o2;
+
+                        String id1 = cv1.getShortLabel();
+                        String id2 = cv2.getShortLabel();
+
+                        return id1.compareTo( id2 );
+                    }
+                } );
+
+                for ( StatsUnit statsUnit : allStatsUnitsUpdated ) {
+                    log.debug( cvCounterUpdated + "\t" + statsUnit.getAc() + "\t" + statsUnit.getShortLabel() );
+                    cvCounterUpdated++;
+                }//end for
+
+                //-------------------------------------------------------
+
+
+                int cvCounterObsolete = 1;
+                Map<String, String> mmo = stats.getObsoleteCvs();
+                List<String> keys = new ArrayList( mmo.keySet() );
+                Collections.sort( keys);
+                // List<StatsUnit> allObsoleteCvs =
+
+                log.debug( "\n\n\nPrinting results of stats.getObsoleteCvs() " );
+
+                for ( String id : keys) {
+                    log.debug( cvCounterObsolete + "\t" + id + "\t" + mmo.get( id ) );
+                    cvCounterObsolete++;
+
+                }//end outer for
+
+                //-------------------------------------------------------
+
+        */
         //it should be 947 as we don't create the root Cv MI:0000
         //The additional two cvs are hidden and definition from annotation dataset
-
-        //Assert.assertEquals( 949, stats.getCreatedCvs().size() );
-        //Assert.assertEquals( 0, stats.getUpdatedCvs().size() );
-        //52+1 obsolete term
-        //Assert.assertEquals( 53, stats.getObsoleteCvs().size() );
-        //invalid terms are already filtered out
-
-        // Assert.assertEquals( 0, stats.getInvalidTerms().size() );
-        // Assert.assertEquals( total, stats.getCreatedCvs().size() );
 
 
     } //end method

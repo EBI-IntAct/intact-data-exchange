@@ -111,7 +111,7 @@ public class CvUpdater {
         addCvObjectsToUpdaterStats( persisterStats, stats );
 
 
-        if ( log.isDebugEnabled() ) {
+        if (log.isDebugEnabled() ) {
             log.debug( "Persisted: " + persisterStats );
             log.debug( "Processed: " + processed.size() );
             log.debug( stats );
