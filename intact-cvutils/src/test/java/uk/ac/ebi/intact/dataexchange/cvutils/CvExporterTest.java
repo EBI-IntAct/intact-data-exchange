@@ -59,44 +59,29 @@ public class CvExporterTest extends IntactBasicTestCase {
     public void prepareCvs() throws OBOParseException, IOException, PsiLoaderException, IntactTransactionException {
 
 
-        URL url = CvExporterTest.class.getResource( "/psi-mi25.obo" );
-        log.info( "url " + url );
+        //URL url = CvExporterTest.class.getResource( "/psi-mi25.obo" );
+        //log.info( "url " + url );
+        //OBOSession oboSession = OboUtils.createOBOSession( url );
 
-        OBOSession oboSession = OboUtils.createOBOSession( url );
+        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
 
         List<CvDagObject> allCvs_;
         allCvs_ = ontologyBuilder.getAllCvsAsList();
 
-        
-
-
-        //Uncomment this block if you want to test it after persiting
-        /*
-        AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault( 10841 );
-        CvUpdaterStatistics stats = updater.createOrUpdateCVs(allCvs, annotationDataset);
-        log.info("CreatedCvs->" + stats.getCreatedCvs().size());
-        log.info("UpdatedCvs->" + stats.getUpdatedCvs().size());
-        log.info("ObsoleteCvs->" + stats.getObsoleteCvs().size());
-        log.info("InvalidTerms->" + stats.getInvalidTerms().size());
-        int total = getDaoFactory().getCvObjectDao().countAll();
-        log.debug("Total->" + total);
-        */
-
-
         this.allCvs = allCvs_;
         log.debug( "allCvs size " + allCvs.size() );
 
+
+       
 
     }//end method
 
 
     @Test
     public void testCv2OBORoundTrip() throws OBOParseException, IOException {
-        URL url = CvExporterTest.class.getResource( "/psi-mi25.obo" );
-        log.info( "url " + url );
-
+        
         /**
          * id: MI:0244
          name: reactome complex
@@ -108,7 +93,9 @@ public class CvExporterTest extends IntactBasicTestCase {
 
          */
 
-        OBOSession oboSession = OboUtils.createOBOSession( url );
+
+
+        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
         OBOObject readOBOObj = ( OBOObject ) oboSession.getObject( "MI:0244" );
         CvObject cvObject = ontologyBuilder.toCvObject( readOBOObj );

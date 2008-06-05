@@ -51,10 +51,12 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     private static final Log log = LogFactory.getLog( CvUpdaterTest.class );
 
     @Test
-    public void reportDirectlyFromOBOFile() {
+    public void reportDirectlyFromOBOFile() throws Exception {
 
-        URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
-        if ( log.isDebugEnabled() ) log.debug( "url " + url );
+        //URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
+
+        URL url = new URL(OboUtils.PSI_MI_OBO12_LOCATION);
+        log.debug( "url " + url );
         try {
             BufferedReader in = new BufferedReader( new InputStreamReader( url.openStream() ) );
             String inputLine;
@@ -111,10 +113,11 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     //@Test
     public void isConstraintViolatedTest() throws Exception {
 
-        URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
-        log.debug( "url " + url );
+        //URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
+        //log.debug( "url " + url );
+        //OBOSession oboSession = OboUtils.createOBOSession( url );
 
-        OBOSession oboSession = OboUtils.createOBOSession( url );
+        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvDagObject> allValidCvs = ontologyBuilder.getAllCvsAsList();
@@ -160,10 +163,11 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         }
 
 
-        URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
-        log.debug( "url " + url );
+        //URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
+        //log.debug( "url " + url );
+        //OBOSession oboSession = OboUtils.createOBOSession( url );
 
-        OBOSession oboSession = OboUtils.createOBOSession( url );
+        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
        

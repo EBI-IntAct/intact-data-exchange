@@ -26,6 +26,9 @@ public class OboUtils {
     private static final String PSI_MI_OBO_LOCATION = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/psi-mi25-4intact.obo";
     private static final String PSI_MI_LOCAL_ANNOTATIONS = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/CvObject-annotation-update.txt";
 
+    //file location for OBO1.2 file pointing directly to psi cvs
+    public static final String PSI_MI_OBO12_LOCATION = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo?revision=HEAD";
+
     private OboUtils() {}
 
     public static OBOSession createOBOSession(URL ... paths) throws IOException, OBOParseException {
@@ -50,6 +53,11 @@ public class OboUtils {
         return session;
     }
 
+    public static OBOSession createOBOSessionFromLatestMi() throws IOException, OBOParseException {
+     URL url = new URL(PSI_MI_OBO12_LOCATION);
+      return createOBOSession(url);
+
+    }
     public static IntactOntology createOntologyFromOboLatestPsiMi() throws IOException, PsiLoaderException {
         URL url = new URL(PSI_MI_OBO_LOCATION);
         return createOntologyFromObo(url);

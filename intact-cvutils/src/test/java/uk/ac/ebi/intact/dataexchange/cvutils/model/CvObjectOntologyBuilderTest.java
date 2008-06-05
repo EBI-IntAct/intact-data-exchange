@@ -44,11 +44,11 @@ public class CvObjectOntologyBuilderTest {
     @Test
     public void build_default() throws Exception {
 
-        URL url = CvObjectOntologyBuilderTest.class.getResource( "/psi-mi25.obo" );
+        //URL url = CvObjectOntologyBuilderTest.class.getResource( "/psi-mi25.obo" );
+        //log.info( "url " + url );
+        //OBOSession oboSession = OboUtils.createOBOSession( url );
 
-        log.info( "url " + url );
-
-        OBOSession oboSession = OboUtils.createOBOSession( url );
+        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
 
