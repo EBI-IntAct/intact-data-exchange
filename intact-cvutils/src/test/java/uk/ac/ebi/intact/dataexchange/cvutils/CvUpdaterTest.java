@@ -33,9 +33,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.List;
+import static java.util.Collections.sort;
 import java.util.Comparator;
-import static java.util.Collections.*;
+import java.util.List;
 
 
 /**
@@ -108,40 +108,11 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         }
     }//end method
 
-
-    @Test
-    public void createOrUpdateCVs() throws Exception {
+    //@Test
+    public void isConstraintViolatedTest() throws Exception {
 
         URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
         log.debug( "url " + url );
-
-
-        int cvsBeforeUpdate = getDaoFactory().getCvObjectDao().countAll();
-             log.debug( "cvsBeforeUpdate->" + cvsBeforeUpdate );
-
-             List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
-
-             sort( allCvsCommittedBefore, new Comparator() {
-                 public int compare( Object o1, Object o2 ) {
-                     CvObject cv1 = ( CvObject ) o1;
-                     CvObject cv2 = ( CvObject ) o2;
-
-                     String id1 = cv1.getShortLabel();
-                     String id2 = cv2.getShortLabel();
-
-                     return id1.compareTo( id2 );
-                 }
-             } );
-
-             int cvCounter = 1;
-             log.debug( "Printing results of getCvObjectDao().getAll() before update " );
-             for ( CvObject cvObject : allCvsCommittedBefore ) {
-                 log.debug( cvCounter + "\t" + CvObjectUtils.getIdentity( cvObject)+"\t"+ cvObject.getMiIdentifier() + "\t" + cvObject.getShortLabel() );
-                 cvCounter++;
-             }
-        
-
-
 
         OBOSession oboSession = OboUtils.createOBOSession( url );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
@@ -151,32 +122,93 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         List<CvObject> orphanCvs = ontologyBuilder.getOrphanCvObjects();
         Assert.assertEquals( 53, orphanCvs.size() );
-        Assert.assertEquals( 947, ontologyBuilder.getAllValidCvsAsList().size() + ontologyBuilder.getOrphanCvObjects().size() );
+
+
+        CvUpdater updater = new CvUpdater();
+        log.debug( "isConstraintViolated :" + updater.isConstraintViolated( allValidCvs, orphanCvs ) );
+
+
+    }
+
+    @Test
+    public void createOrUpdateCVs() throws Exception {
+
+
+
+        List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
+        int cvsBeforeUpdate = allCvsCommittedBefore.size();
+        log.debug( "cvsBeforeUpdate->" + cvsBeforeUpdate );
+        
+
+
+        sort( allCvsCommittedBefore, new Comparator() {
+            public int compare( Object o1, Object o2 ) {
+                CvObject cv1 = ( CvObject ) o1;
+                CvObject cv2 = ( CvObject ) o2;
+
+                String id1 = cv1.getShortLabel();
+                String id2 = cv2.getShortLabel();
+
+                return id1.compareTo( id2 );
+            }
+        } );
+
+        int cvCounter = 1;
+        log.debug( "Printing results of getCvObjectDao().getAll() before update " );
+        for ( CvObject cvObject : allCvsCommittedBefore ) {
+            log.debug( cvCounter + "\t" + CvObjectUtils.getIdentity( cvObject ) + "\t" + cvObject.getMiIdentifier() + "\t" + cvObject.getShortLabel() );
+            cvCounter++;
+        }
+
+
+        URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
+        log.debug( "url " + url );
+
+        OBOSession oboSession = OboUtils.createOBOSession( url );
+        CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
+
+        List<CvDagObject> allValidCvs = ontologyBuilder.getAllValidCvsAsList();
+        Assert.assertEquals( 894, allValidCvs.size() );
+
+        List<CvObject> orphanCvs = ontologyBuilder.getOrphanCvObjects();
+
+        Assert.assertEquals( 53, orphanCvs.size() );
+        Assert.assertEquals( 947, allValidCvs.size() + orphanCvs.size() );
 
 
         AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault( 10841 );
         CvUpdater updater = new CvUpdater();
-        CvUpdaterStatistics stats = updater.createOrUpdateCVs( allValidCvs, orphanCvs, annotationDataset );
 
+
+        if(!updater.isConstraintViolated(allValidCvs, orphanCvs) && cvsBeforeUpdate==0) {
+
+        log.debug( "Constraint not violated and proceeding with Update " );
+        CvUpdaterStatistics stats = updater.createOrUpdateCVs( allValidCvs, orphanCvs, annotationDataset );
 
         int totalCvsAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
 
+        Assert.assertEquals( totalCvsAfterUpdate, stats.getCreatedCvs().size() + cvsBeforeUpdate );
+
+        Assert.assertEquals( 949, stats.getCreatedCvs().size() );
+        Assert.assertEquals( 0, stats.getUpdatedCvs().size() );
+
+        //52+1 obsolete term
+        Assert.assertEquals( 53, stats.getObsoleteCvs().size() );
+
+        //invalid terms are already filtered out
+        Assert.assertEquals( 0, stats.getInvalidTerms().size() );
+        Assert.assertEquals( totalCvsAfterUpdate, stats.getCreatedCvs().size() );
 
         log.debug( "totalCvsAfterUpdate->" + totalCvsAfterUpdate );
         log.debug( "stats.getCreatedCvs().size()->" + stats.getCreatedCvs().size() );
         log.debug( "stats.getUpdatedCvs().size() ->" + stats.getUpdatedCvs().size() );
 
-        //Assert.assertEquals(totalCvsAfterUpdate,stats.getCreatedCvs().size() + cvsBeforeUpdate);
+        }//end if
+        else{
 
-        // Assert.assertEquals( 949, stats.getCreatedCvs().size() );
-        // Assert.assertEquals( 0, stats.getUpdatedCvs().size() );
-        //52+1 obsolete term
-        // Assert.assertEquals( 53, stats.getObsoleteCvs().size() );
-
-        //invalid terms are already filtered out
-        // Assert.assertEquals( 0, stats.getInvalidTerms().size() );
-        // Assert.assertEquals( totalCvsAfterUpdate, stats.getCreatedCvs().size() );
-
+            throw new Exception("isConstraintViolated == true "+"PK Constraint Violated");
+        }
+        
         /**
          * Uncomment this block when you want to output the CvObjects to the
          * log file in Teamcity
