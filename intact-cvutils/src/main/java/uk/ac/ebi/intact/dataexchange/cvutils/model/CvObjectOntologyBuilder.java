@@ -84,7 +84,7 @@ public class CvObjectOntologyBuilder {
     }
 
 
-    //Initialises nonMiCvDatabase
+   
     public CvObjectOntologyBuilder() {
 
     }//end constructor

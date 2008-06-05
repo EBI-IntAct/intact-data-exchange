@@ -27,6 +27,7 @@ import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.core.persister.stats.StatsUnit;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfo;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
@@ -70,12 +71,11 @@ public class CvUpdater {
     /**
      * Starts the creation and update of CVs by using the ontology provided
      *
-     * @param allCvs    List of all Cvs
-     * @param orphanCvs List of all orphan  Cvs
+     * @param allCvs List of all Cvs
      * @return An object containing some statistics about the update
      */
-    public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allCvs, List<CvObject> orphanCvs ) {
-        return createOrUpdateCVs( allCvs, orphanCvs, new AnnotationInfoDataset() );
+    public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allCvs ) {
+        return createOrUpdateCVs( allCvs, new AnnotationInfoDataset() );
     }
 
 
@@ -83,13 +83,12 @@ public class CvUpdater {
      * Starts the creation and update of CVs by using the CVobject List provided
      *
      * @param allValidCvs           List of all valid  Cvs
-     * @param orphanCvs             List of all orphan  Cvs
      * @param annotationInfoDataset A seperate dataset specific for intact
      * @return An object containing some statistics about the update
      */
 
 
-    public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allValidCvs, List<CvObject> orphanCvs, AnnotationInfoDataset annotationInfoDataset ) {
+    public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allValidCvs, AnnotationInfoDataset annotationInfoDataset ) {
 
         if ( allValidCvs == null ) {
             throw new NullPointerException( "Cvs Null" );
@@ -98,18 +97,16 @@ public class CvUpdater {
             throw new NullPointerException( "annotationDataset" );
         }
 
-        List<CvDagObject> orphanCvList = dealWithOrphans( orphanCvs );
+        List<CvDagObject> orphanCvList = dealWithOrphans( allValidCvs );
+
         if ( log.isDebugEnabled() ) log.debug( "orphanCvList " + orphanCvList.size() );
 
-        List<CvDagObject> allValidAndOrphanCvs = new ArrayList<CvDagObject>();
-        allValidAndOrphanCvs.addAll( allValidCvs );
-        allValidAndOrphanCvs.addAll( orphanCvList );
 
         // process any term from the cv annotations dataset resource
-        updateCVsUsingAnnotationDataset( allValidAndOrphanCvs, annotationInfoDataset );
+        updateCVsUsingAnnotationDataset( allValidCvs, annotationInfoDataset );
 
 
-        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate( allValidAndOrphanCvs.toArray( new CvObject[allValidAndOrphanCvs.size()] ) );
+        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate( allValidCvs.toArray( new CvObject[allValidCvs.size()] ) );
         addCvObjectsToUpdaterStats( persisterStats, stats );
 
 
@@ -123,26 +120,29 @@ public class CvUpdater {
         return stats;
     } //end method
 
-    private List<CvDagObject> dealWithOrphans( List<CvObject> orphanCvs ) {
+    private List<CvDagObject> dealWithOrphans( List<CvDagObject> allCvs ) {
 
         List<CvDagObject> orphanCvList = new ArrayList<CvDagObject>();
 
-        for ( CvObject cvOrphan : orphanCvs ) {
+        for ( CvDagObject cvDag : allCvs ) {
+            if ( !isRootObject( CvObjectUtils.getIdentity( cvDag ) ) ) {
+
+                if ( cvDag.getParents() == null || cvDag.getParents().size() == 0 ) {
+
+                    int cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted( cvDag, stats );
 
 
-            int cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted( cvOrphan, stats );
+                    addCvObjectToStatsIfObsolete( cvDag );
 
-
-            addCvObjectToStatsIfObsolete( cvOrphan );
-
-            // check if it is valid and persist
-            if ( cvObjectsWithSameId == 0 ) {
-                if ( isValidTerm( cvOrphan ) ) {
-                    stats.addOrphanCv( cvOrphan );
-                    orphanCvList.add( ( CvDagObject ) cvOrphan );
-                }
-            }
-
+                    // check if it is valid and persist
+                    if ( cvObjectsWithSameId == 0 ) {
+                        if ( isValidTerm( cvDag ) ) {
+                            stats.addOrphanCv( cvDag );
+                            orphanCvList.add( cvDag );
+                        }
+                    }
+                }//end of if
+            }//end if
         }//end for
         //until here
 
@@ -150,6 +150,13 @@ public class CvUpdater {
         return orphanCvList;
     }//end method
 
+
+    private boolean isRootObject( String identity ) {
+
+        return CvObjectOntologyBuilder.mi2Class.keySet().contains( identity );
+
+
+    } //end of method
 
     private void updateCVsUsingAnnotationDataset( List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset ) {
         CvTopic hidden = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
@@ -196,25 +203,18 @@ public class CvUpdater {
      * CONSTRAINT_INDEX_0 ON PUBLIC.IA_CONTROLLEDVOCAB(OBJCLASS, SHORTLABEL)
      *
      * @param allValidCvs List of all Uniq Cvs
-     * @param orphanCvs List of all orphan  Cvs
      * @return true if violated or false if not
      */
 
-    public boolean isConstraintViolated( List<CvDagObject> allValidCvs, List<CvObject> orphanCvs ) {
+    public boolean isConstraintViolated( List<CvDagObject> allValidCvs ) {
         if ( allValidCvs == null ) {
             throw new NullPointerException( "Cvs Null" );
         }
 
 
-        List<CvDagObject> orphanCvList = dealWithOrphans( orphanCvs );
-        if ( log.isDebugEnabled() ) log.debug( "orphanCvList " + orphanCvList.size() );
-
-        List<CvDagObject> allValidAndOrphanCvs = new ArrayList<CvDagObject>();
-        allValidAndOrphanCvs.addAll( allValidCvs );
-        allValidAndOrphanCvs.addAll( orphanCvList );
-
+      
         Bag hashBag = new HashBag();
-        for ( CvDagObject cvDag : allValidAndOrphanCvs ) {
+        for ( CvDagObject cvDag : allValidCvs ) {
             String primaryKey = cvDag.getClass().toString() + ":" + cvDag.getShortLabel();
             hashBag.add( primaryKey );
         }

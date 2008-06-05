@@ -117,15 +117,14 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         OBOSession oboSession = OboUtils.createOBOSession( url );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
-        List<CvDagObject> allValidCvs = ontologyBuilder.getAllValidCvsAsList();
-        Assert.assertEquals( 894, allValidCvs.size() );
+        List<CvDagObject> allValidCvs = ontologyBuilder.getAllCvsAsList();
+        Assert.assertEquals( 947, allValidCvs.size() );
 
-        List<CvObject> orphanCvs = ontologyBuilder.getOrphanCvObjects();
-        Assert.assertEquals( 53, orphanCvs.size() );
+       
 
 
         CvUpdater updater = new CvUpdater();
-        log.debug( "isConstraintViolated :" + updater.isConstraintViolated( allValidCvs, orphanCvs ) );
+        log.debug( "isConstraintViolated :" + updater.isConstraintViolated( allValidCvs ) );
 
 
     }
@@ -167,23 +166,25 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         OBOSession oboSession = OboUtils.createOBOSession( url );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
-        List<CvDagObject> allValidCvs = ontologyBuilder.getAllValidCvsAsList();
-        Assert.assertEquals( 894, allValidCvs.size() );
+       
 
         List<CvObject> orphanCvs = ontologyBuilder.getOrphanCvObjects();
-
         Assert.assertEquals( 53, orphanCvs.size() );
-        Assert.assertEquals( 947, allValidCvs.size() + orphanCvs.size() );
 
+
+
+
+        List<CvDagObject> allCvs = ontologyBuilder.getAllCvsAsList();
+        Assert.assertEquals( 947, allCvs.size());
 
         AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault( 10841 );
         CvUpdater updater = new CvUpdater();
 
 
-        if(!updater.isConstraintViolated(allValidCvs, orphanCvs) && cvsBeforeUpdate==0) {
+        if(!updater.isConstraintViolated(allCvs) && cvsBeforeUpdate==0) {
 
         log.debug( "Constraint not violated and proceeding with Update " );
-        CvUpdaterStatistics stats = updater.createOrUpdateCVs( allValidCvs, orphanCvs, annotationDataset );
+        CvUpdaterStatistics stats = updater.createOrUpdateCVs(allCvs, annotationDataset );
 
         int totalCvsAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
 
