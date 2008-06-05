@@ -76,7 +76,8 @@ public class CvExporter {
 
     public OBOSession convertCvList2OBOSession( List<CvDagObject> allCvs ) {
 
-        List<CvDagObject> allUniqCvs = removeCvsDuplicated( allCvs );
+        // List<CvDagObject> allUniqCvs = removeCvsDuplicated( allCvs );
+        List<CvDagObject> allUniqCvs = allCvs;
 
         sort( allUniqCvs, new Comparator() {
             public int compare( Object o1, Object o2 ) {

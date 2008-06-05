@@ -97,7 +97,7 @@ public class CvUpdater {
         }
 
         List<CvDagObject> orphanCvList = dealWithOrphans( orphanCvs );
-         if ( log.isDebugEnabled() )log.debug( "orphanCvList " + orphanCvList.size() );
+        if ( log.isDebugEnabled() ) log.debug( "orphanCvList " + orphanCvList.size() );
 
         List<CvDagObject> allValidAndOrphanCvs = new ArrayList<CvDagObject>();
         allValidAndOrphanCvs.addAll( allValidCvs );
@@ -111,7 +111,7 @@ public class CvUpdater {
         addCvObjectsToUpdaterStats( persisterStats, stats );
 
 
-        if (log.isDebugEnabled() ) {
+        if ( log.isDebugEnabled() ) {
             log.debug( "Persisted: " + persisterStats );
             log.debug( "Processed: " + processed.size() );
             log.debug( stats );
@@ -154,7 +154,7 @@ public class CvUpdater {
                                                        CvTopic.class, null, CvTopic.HIDDEN );
 
         for ( CvDagObject cvObject : allCvs ) {
-            if ( CvObjectUtils.getIdentity( cvObject ) != null && annotationInfoDataset.containsCvAnnotation( CvObjectUtils.getIdentity( cvObject )) ) {
+            if ( CvObjectUtils.getIdentity( cvObject ) != null && annotationInfoDataset.containsCvAnnotation( CvObjectUtils.getIdentity( cvObject ) ) ) {
                 AnnotationInfo annotInfo = annotationInfoDataset.getCvAnnotation( CvObjectUtils.getIdentity( cvObject ) );
 
                 if ( CvTopic.HIDDEN.equals( annotInfo.getTopicShortLabel() ) ) {
@@ -165,7 +165,7 @@ public class CvUpdater {
                 }
             }
         }
-    }
+    }//end method
 
 
     private void addAnnotation( Annotation annotation, CvDagObject cvObject, boolean includeChildren ) {

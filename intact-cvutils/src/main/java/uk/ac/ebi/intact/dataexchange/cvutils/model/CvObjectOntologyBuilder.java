@@ -785,6 +785,7 @@ public class CvObjectOntologyBuilder {
             }
 
         */
+
         allValidCvs = new ArrayList<CvDagObject>();
         for ( CvObject validCv : validCvs ) {
             allValidCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) validCv ) );
@@ -802,48 +803,48 @@ public class CvObjectOntologyBuilder {
 
     public List<CvDagObject> getAllCvsAsList() {
 
+        List<CvDagObject> allCvs = new ArrayList<CvDagObject>();
         //until here
-        List<CvObject> rootsAndOrphans = new ArrayList<CvObject>();
+        List<CvObject> rootsAndChildren = new ArrayList<CvObject>();
         Collection<IdentifiedObject> rootOboObjects = getRootOBOObjects();
 
         for ( IdentifiedObject rootOboObject : rootOboObjects ) {
             OBOObject rootObject = ( OBOObject ) rootOboObject;
             CvObject cvObjectRoot = toCvObject( rootObject );
-            rootsAndOrphans.add( cvObjectRoot );
+            rootsAndChildren.add( cvObjectRoot );
 
         }//end for
 
-        log.debug( "rootsAndOrphans size :" + rootsAndOrphans.size() );
+        log.debug( "rootsAndChildren size :" + rootsAndChildren.size() );
+
+        /*
+           CvTopic obsoleteTopic = createCvTopicObsolete();
+           if ( obsoleteTopic.getAc() != null ) {
+               rootsAndOrphans.add( obsoleteTopic );
+           }
+        */
 
 
-        CvTopic obsoleteTopic = createCvTopicObsolete();
+        log.info( "rootsAndChildren size() " + rootsAndChildren.size() );
 
-        if ( obsoleteTopic.getAc() != null ) {
-            rootsAndOrphans.add( obsoleteTopic );
+
+        for ( CvObject validCv : rootsAndChildren ) {
+            allCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) validCv ) );
         }
-
 
         for ( IdentifiedObject orphanObo : getOrphanOBOObjects() ) {
             if ( orphanObo instanceof OBOObject ) {
                 OBOObject orphanObj = ( OBOObject ) orphanObo;
                 CvObject cvOrphan = toCvObject( orphanObj );
-                rootsAndOrphans.add( cvOrphan );
+                allCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) cvOrphan ) );
 
             }
 
 
         }//end for
 
-        //until here
 
-
-        log.info( "rootsAndOrphans size() " + rootsAndOrphans.size() );
-        List<CvDagObject> allCvs = new ArrayList<CvDagObject>();
-        for ( CvObject validCv : rootsAndOrphans ) {
-            allCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) validCv ) );
-        }
-
-        allCvs = new ArrayList( new HashSet( rootsAndOrphans ) );
+        allCvs = new ArrayList( new HashSet( allCvs ) );
         log.info( "allValidCvs size() " + allCvs.size() );
 
         //until here
@@ -923,5 +924,6 @@ public class CvObjectOntologyBuilder {
         return orphanList;
 
     } //end method
+
 
 }//end class
