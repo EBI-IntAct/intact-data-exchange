@@ -96,7 +96,7 @@ public class CvExporter {
             if ( CvObjectUtils.getIdentity( cvDagObj ) == null ) {
                 throw new NullPointerException( "No Identifier for the cvObject " + cvDagObj );
             }
-            log.info( counter + "  " + CvObjectUtils.getIdentity( cvDagObj ) );
+            if(log.isDebugEnabled())log.debug( counter + "  " + CvObjectUtils.getIdentity( cvDagObj ) );
 
             oboSession.addObject( getRootObject() );
             OBOClass oboObj = convertCv2OBO( cvDagObj );

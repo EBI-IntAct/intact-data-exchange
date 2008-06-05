@@ -16,6 +16,8 @@
 
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
+import org.apache.commons.collections.Bag;
+import org.apache.commons.collections.bag.HashBag;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obo.dataadapter.OBOParseException;
@@ -189,6 +191,43 @@ public class CvUpdater {
         }
     } //end of method
 
+    /**
+     * This method should check if the below constraint is violated
+     * CONSTRAINT_INDEX_0 ON PUBLIC.IA_CONTROLLEDVOCAB(OBJCLASS, SHORTLABEL)
+     *
+     * @param allValidCvs List of all Uniq Cvs
+     * @param orphanCvs List of all orphan  Cvs
+     * @return true if violated or false if not
+     */
+
+    public boolean isConstraintViolated( List<CvDagObject> allValidCvs, List<CvObject> orphanCvs ) {
+        if ( allValidCvs == null ) {
+            throw new NullPointerException( "Cvs Null" );
+        }
+
+
+        List<CvDagObject> orphanCvList = dealWithOrphans( orphanCvs );
+        if ( log.isDebugEnabled() ) log.debug( "orphanCvList " + orphanCvList.size() );
+
+        List<CvDagObject> allValidAndOrphanCvs = new ArrayList<CvDagObject>();
+        allValidAndOrphanCvs.addAll( allValidCvs );
+        allValidAndOrphanCvs.addAll( orphanCvList );
+
+        Bag hashBag = new HashBag();
+        for ( CvDagObject cvDag : allValidAndOrphanCvs ) {
+            String primaryKey = cvDag.getClass().toString() + ":" + cvDag.getShortLabel();
+            hashBag.add( primaryKey );
+        }
+
+        log.debug( "HashBag size " + hashBag.size() );
+        for ( Object aHashBag : hashBag ) {
+            String s = ( String ) aHashBag;
+            if ( hashBag.getCount( s ) > 1 )
+                return true;
+        }
+        log.debug( "Constraint not violated" );
+        return false;
+    } //end method
 
     private int checkAndMarkAsObsoleteIfExisted( CvObject orphan, CvUpdaterStatistics stats ) {
         String id = CvObjectUtils.getIdentity( orphan );
