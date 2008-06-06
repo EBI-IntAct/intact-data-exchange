@@ -26,7 +26,7 @@ import org.obo.dataadapter.OBOParseException;
 import org.obo.datamodel.*;
 import org.obo.datamodel.impl.*;
 import uk.ac.ebi.intact.business.IntactTransactionException;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.CvDagObject;
 import uk.ac.ebi.intact.model.CvInteraction;
@@ -45,7 +45,7 @@ import java.util.List;
  * @version $Id$
  * @since 2.0.1
  */
-public class CvExporterTest extends IntactBasicTestCase {
+public class CvExporterTest {
 
     //initialize logger
     protected final static Logger log = Logger.getLogger( CvExporterTest.class );
@@ -137,7 +137,7 @@ public class CvExporterTest extends IntactBasicTestCase {
         syn.setScope( 1 );
         obj1.addSynonym( syn );
 
-        CvObject cvObject = getMockBuilder().createCvObject( CvInteraction.class, "MI:0001", "interaction detect" );
+        CvObject cvObject = new IntactMockBuilder().createCvObject( CvInteraction.class, "MI:0001", "interaction detect" );
         cvObject.setFullName( "interaction detection method" );
 
         OBOClass obj2 = downloadCv.convertCv2OBO( cvObject );

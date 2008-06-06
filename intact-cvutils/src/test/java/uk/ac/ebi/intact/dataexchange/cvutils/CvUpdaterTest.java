@@ -117,44 +117,26 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         }
     }//end method
 
-    //@Test
+    @Test
     public void isConstraintViolatedTest() throws Exception {
-
-        //URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
-        //log.debug( "url " + url );
-        //OBOSession oboSession = OboUtils.createOBOSession( url );
-
         OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvDagObject> allValidCvs = ontologyBuilder.getAllCvsAsList();
         Assert.assertEquals( 947, allValidCvs.size() );
 
-       
-
-
         CvUpdater updater = new CvUpdater();
-        log.debug( "isConstraintViolated :" + updater.isConstraintViolated( allValidCvs ) );
-
-
+        Assert.assertFalse( updater.isConstraintViolated( allValidCvs ) );
     }
 
     @Test
     public void createOrUpdateCVs() throws Exception {
-
-
-
         List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
         int cvsBeforeUpdate = allCvsCommittedBefore.size();
         log.debug( "cvsBeforeUpdate->" + cvsBeforeUpdate );
-        
 
-
-        sort( allCvsCommittedBefore, new Comparator() {
-            public int compare( Object o1, Object o2 ) {
-                CvObject cv1 = ( CvObject ) o1;
-                CvObject cv2 = ( CvObject ) o2;
-
+        sort( allCvsCommittedBefore, new Comparator<CvObject>() {
+            public int compare( CvObject cv1, CvObject cv2 ) {
                 String id1 = cv1.getShortLabel();
                 String id2 = cv2.getShortLabel();
 

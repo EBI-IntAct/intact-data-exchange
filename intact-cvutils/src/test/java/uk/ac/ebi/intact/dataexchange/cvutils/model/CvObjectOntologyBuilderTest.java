@@ -24,7 +24,6 @@ import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
-import java.net.URL;
 import java.util.Collection;
 
 
@@ -48,7 +47,7 @@ public class CvObjectOntologyBuilderTest {
         //log.info( "url " + url );
         //OBOSession oboSession = OboUtils.createOBOSession( url );
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.45");
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
 
