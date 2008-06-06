@@ -27,11 +27,13 @@ import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.DebugUtil;
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.context.DataContext;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.Writer;
+import java.util.*;
 
 /**
  * TODO comment this
@@ -40,6 +42,35 @@ import java.util.List;
  * @version $Id$
  */
 public class PsiExchangeTest extends AbstractPsiExchangeTest  {
+
+    @Test
+    public void importXml_intact2() throws Exception {
+        EntrySet set = getIntactEntrySet();
+
+        PersisterStatistics stats = PsiExchange.importIntoIntact(set);
+
+        Assert.assertEquals(6, stats.getPersistedCount(InteractionImpl.class, false));
+        Assert.assertEquals(0, stats.getDuplicatesCount(InteractionImpl.class, false));
+        Assert.assertEquals(6, getDaoFactory().getInteractionDao().countAll());
+
+        Assert.assertEquals(6, getDaoFactory().getInteractionDao().countAll());
+
+        IntactContext intactContext = IntactContext.getCurrentInstance();
+        DataContext dataContext = intactContext.getDataContext();
+        dataContext.beginTransaction();
+
+        DaoFactory daoFactory = dataContext.getDaoFactory();
+        final Collection<InteractionImpl> interactions = daoFactory.getInteractionDao().getAll();
+        IntactEntry intactEntry = new IntactEntry(new ArrayList<Interaction>( interactions ) );
+
+        Writer writer = new StringWriter();
+        PsiExchange.exportToPsiXml(writer, intactEntry);
+
+
+
+
+        dataContext.commitTransaction();
+    }
 
     @Test
     public void importXml_intact() throws Exception {
@@ -71,7 +102,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
         int count = getDaoFactory().getInteractionDao().countAll();
         final List<String> labels = DebugUtil.labelList(getDaoFactory().getInteractionDao().getAll());
-        System.out.println(labels);
+
 
         Assert.assertEquals(2, count);
     }
@@ -157,7 +188,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         StringWriter writer = new StringWriter();
         PsiExchange.exportToPsiXml(writer, entry);
 
-        System.out.println(writer);
+        
     }
 
     @Test
