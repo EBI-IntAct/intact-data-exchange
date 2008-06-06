@@ -210,7 +210,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
 
         InteractionType interactionType = (InteractionType)
-                PsiConverterUtils.toCvType(intactObject.getCvInteractionType(), new InteractionTypeConverter(getInstitution()));
+                PsiConverterUtils.toCvType(intactObject.getCvInteractionType(),
+                                           new InteractionTypeConverter(getInstitution()),
+                                           this );
         interaction.getInteractionTypes().add(interactionType);
 
 

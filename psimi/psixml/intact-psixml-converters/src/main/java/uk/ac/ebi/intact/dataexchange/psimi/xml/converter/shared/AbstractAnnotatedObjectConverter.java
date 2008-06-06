@@ -75,56 +75,8 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
             return psiObject;
         }
 
-        // ac - create a xref to the institution db
-        String ac = intactObject.getAc();
-        if (ac != null)  {
-            boolean containsAcXref = false;
-            for (Xref xref : (Collection<Xref>) intactObject.getXrefs()) {
-                if (intactObject.getAc().equals(xref.getPrimaryId())) {
-                    containsAcXref = true;
-                    break;
-                }
-            }
-
-            if (!containsAcXref) {
-                String dbMi = null;
-                String db = null;
-
-                // calculate the owner of the interaction, based on the AC prefix first,
-                // then in the defaultInstitutionForACs if passed to the ConverterContext or,
-                // finally to the Institution in the source section of the PSI-XML
-                if (ac.startsWith("EBI")) {
-                    dbMi = Institution.INTACT_REF;
-                    db = Institution.INTACT.toLowerCase();
-                } else if (ac.startsWith("MINT")) {
-                    dbMi = Institution.MINT_REF;
-                    db = Institution.MINT.toLowerCase();
-                } else if (ConverterContext.getInstance().getDefaultInstitutionForAcs() != null){
-                    Institution defaultInstitution = ConverterContext.getInstance().getDefaultInstitutionForAcs();
-                    dbMi = calculateInstitutionPrimaryId(defaultInstitution);
-                    db = defaultInstitution.getShortLabel().toLowerCase();
-                } else {
-                    dbMi = getInstitutionPrimaryId();
-                    db = getInstitution().getShortLabel().toLowerCase();
-                }
-
-                CvXrefQualifier sourceRef = CvObjectUtils.createCvObject(getInstitution(), CvXrefQualifier.class,
-                        CvXrefQualifier.SOURCE_REFERENCE_MI_REF, CvXrefQualifier.SOURCE_REFERENCE);
-                CvDatabase cvDb = CvObjectUtils.createCvObject(getInstitution(), CvDatabase.class,
-                        dbMi, db);
-
-                Xref xref = XrefUtils.newXrefInstanceFor(intactClass);
-                xref.setCvXrefQualifier(sourceRef);
-                xref.setCvDatabase(cvDb);
-                xref.setPrimaryId(intactObject.getAc());
-                xref.setSecondaryId(intactObject.getShortLabel());
-                intactObject.addXref(xref);
-            }
-        }
-
         psiObject = newInstance(psiClass);
-        PsiConverterUtils.populate(intactObject, psiObject);
-
+        PsiConverterUtils.populate(intactObject, psiObject, this);
 
         ConversionCache.putElement(intactObject, psiObject);
 

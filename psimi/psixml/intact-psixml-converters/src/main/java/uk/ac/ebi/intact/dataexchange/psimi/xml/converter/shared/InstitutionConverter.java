@@ -67,7 +67,7 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
         }
 
         source = new Source();
-        PsiConverterUtils.populate(intactObject, source);
+        PsiConverterUtils.populate(intactObject, source, this);
 
         source.setReleaseDate(new Date());
 

@@ -123,22 +123,24 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         Bibref bibref = new Bibref();
 
         try {
-            PsiConverterUtils.populate(intactObject, bibref);
+            PsiConverterUtils.populate(intactObject, bibref, this);
         } catch (UnsupportedConversionException e) {
             throw new UnsupportedConversionException("No Bibref could be found for Experiment with Xrefs: "+intactObject.getXrefs(), e);
         }
 
         InteractionDetectionMethodConverter detMethodConverter = new InteractionDetectionMethodConverter(getInstitution());
-        InteractionDetectionMethod detMethod = (InteractionDetectionMethod) PsiConverterUtils.toCvType(intactObject.getCvInteraction(), detMethodConverter);
+        InteractionDetectionMethod detMethod = (InteractionDetectionMethod) PsiConverterUtils.toCvType(intactObject.getCvInteraction(), detMethodConverter, this);
 
         expDesc.setBibref(bibref);
         expDesc.setInteractionDetectionMethod(detMethod);
 
-        PsiConverterUtils.populate(intactObject, expDesc);
+        PsiConverterUtils.populate(intactObject, expDesc, this);
 
         if (intactObject.getCvIdentification() != null) {
             ParticipantIdentificationMethod identMethod = (ParticipantIdentificationMethod)
-                    PsiConverterUtils.toCvType(intactObject.getCvIdentification(), new ParticipantIdentificationMethodConverter(getInstitution()));
+                    PsiConverterUtils.toCvType(intactObject.getCvIdentification(),
+                                               new ParticipantIdentificationMethodConverter(getInstitution()),
+                                               this );
             expDesc.setParticipantIdentificationMethod(identMethod);
         }
 

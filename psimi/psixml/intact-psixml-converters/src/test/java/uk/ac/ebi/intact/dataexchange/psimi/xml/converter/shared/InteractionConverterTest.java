@@ -251,6 +251,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
     @Test
     public void intactToPsi_ac_intactOrMint() throws Exception {
         uk.ac.ebi.intact.model.Interaction intactInteraction = new IntactMockBuilder().createDeterministicInteraction();
+        Assert.assertEquals( 0, intactInteraction.getXrefs().size() );
         intactInteraction.setAc("EBI-12345");
 
         InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));

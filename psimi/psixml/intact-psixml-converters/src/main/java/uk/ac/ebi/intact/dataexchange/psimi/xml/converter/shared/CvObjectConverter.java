@@ -64,7 +64,7 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
         }
 
         cvType = newCvInstance(psiCvClass);
-        PsiConverterUtils.populate(intactObject, cvType);
+        PsiConverterUtils.populate(intactObject, cvType, this);
 
         ConversionCache.putElement(elementKey(intactObject), cvType);
 

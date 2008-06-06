@@ -35,7 +35,7 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
 
     public Organism intactToPsi(BioSource intactObject) {
         Organism organism = new Organism();
-        PsiConverterUtils.populate(intactObject, organism);
+        PsiConverterUtils.populate(intactObject, organism, this);
 
         organism.setNcbiTaxId(Integer.valueOf(intactObject.getTaxId()));
 

@@ -95,7 +95,8 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
 
         InteractorType interactorType = ( InteractorType )
                 PsiConverterUtils.toCvType( intactObject.getCvInteractorType(),
-                                            new InteractorTypeConverter( getInstitution() ) );
+                                            new InteractorTypeConverter( getInstitution() ),
+                                            this );
         interactor.setInteractorType( interactorType );
 
         if (intactObject.getBioSource() != null) {

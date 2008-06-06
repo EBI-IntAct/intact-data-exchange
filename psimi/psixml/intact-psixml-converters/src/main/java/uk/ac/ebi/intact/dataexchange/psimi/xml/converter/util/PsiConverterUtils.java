@@ -21,6 +21,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.AnnotationConver
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractorConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.CvObjectConverter;
@@ -30,6 +31,8 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -47,7 +50,7 @@ public class PsiConverterUtils {
     private PsiConverterUtils() {
     }
 
-    public static void populate( AnnotatedObject<?, ?> annotatedObject, Object objectToPopulate ) {
+    public static void populate( AnnotatedObject<?, ?> annotatedObject, Object objectToPopulate, AbstractIntactPsiConverter converter ) {
         if ( objectToPopulate instanceof HasId ) {
             populateId( ( HasId ) objectToPopulate );
         }
@@ -57,7 +60,7 @@ public class PsiConverterUtils {
         }
 
         if ( objectToPopulate instanceof XrefContainer ) {
-            populateXref( annotatedObject, ( XrefContainer ) objectToPopulate );
+            populateXref( annotatedObject, ( XrefContainer ) objectToPopulate, converter );
         }
 
         if ( objectToPopulate instanceof AttributeContainer ) {
@@ -89,8 +92,50 @@ public class PsiConverterUtils {
         namesContainer.setNames( names );
     }
 
-    private static void populateXref( AnnotatedObject<?, ?> annotatedObject, XrefContainer xrefContainer ) {
-        if ( annotatedObject.getXrefs().isEmpty() ) {
+    private static void populateXref( AnnotatedObject<?, ?> annotatedObject, XrefContainer xrefContainer, AbstractIntactPsiConverter converter ) {
+
+        // ac - create a xref to the institution db
+        String ac = annotatedObject.getAc();
+        boolean containsAcXref = false;
+        DbReference acRef = null;
+
+        if (ac != null)  {
+            for ( uk.ac.ebi.intact.model.Xref xref : (Collection<uk.ac.ebi.intact.model.Xref>) annotatedObject.getXrefs()) {
+                if (annotatedObject.getAc().equals(xref.getPrimaryId())) {
+                    containsAcXref = true;
+                    break;
+                }
+            }
+
+            if (!containsAcXref) {
+                String dbMi = null;
+                String db = null;
+
+                // calculate the owner of the interaction, based on the AC prefix first,
+                // then in the defaultInstitutionForACs if passed to the ConverterContext or,
+                // finally to the Institution in the source section of the PSI-XML
+                if (ac.startsWith("EBI")) {
+                    dbMi = Institution.INTACT_REF;
+                    db = Institution.INTACT.toLowerCase();
+                } else if (ac.startsWith("MINT")) {
+                    dbMi = Institution.MINT_REF;
+                    db = Institution.MINT.toLowerCase();
+                } else if (ConverterContext.getInstance().getDefaultInstitutionForAcs() != null){
+                    Institution defaultInstitution = ConverterContext.getInstance().getDefaultInstitutionForAcs();
+                    dbMi = converter.calculateInstitutionPrimaryId(defaultInstitution);
+                    db = defaultInstitution.getShortLabel().toLowerCase();
+                } else {
+                    dbMi = converter.getInstitutionPrimaryId();
+                    db = converter.getInstitution().getShortLabel().toLowerCase();
+                }
+
+                acRef = new DbReference( db, dbMi, ac,
+                                         CvXrefQualifier.SOURCE_REFERENCE,
+                                         CvXrefQualifier.SOURCE_REFERENCE_MI_REF );
+            }
+        }
+
+        if ( acRef == null && annotatedObject.getXrefs().isEmpty() ) {
             return;
         }
 
@@ -101,6 +146,10 @@ public class PsiConverterUtils {
         }
 
         Collection<DbReference> dbRefs = toDbReferences( annotatedObject, annotatedObject.getXrefs() );
+
+        if(acRef != null) {
+            dbRefs.add( acRef );
+        }
 
         // normally the primary reference is the identity reference, but for bibliographic references
         // it is the primary-reference and it does not contain secondary refs
@@ -170,13 +219,13 @@ public class PsiConverterUtils {
         }
     }
 
-    public static CvType toCvType( CvObject cvObject, CvObjectConverter converter ) {
+    public static CvType toCvType( CvObject cvObject, CvObjectConverter cvConverter, AbstractIntactPsiConverter converter ) {
         if ( cvObject == null ) {
             throw new NullPointerException( "cvObject" );
         }
 
-        CvType cvType = converter.intactToPsi( cvObject );
-        populate( cvObject, cvType );
+        CvType cvType = cvConverter.intactToPsi( cvObject );
+        populate( cvObject, cvType, converter );
 
         return cvType;
     }
