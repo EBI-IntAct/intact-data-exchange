@@ -20,9 +20,11 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.CvDagObject;
@@ -50,6 +52,11 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     private static final Log log = LogFactory.getLog( CvUpdaterTest.class );
 
+    @Before
+    public void before() throws Exception {
+        SchemaUtils.createSchema();
+    }
+    
     @Test
     public void reportDirectlyFromOBOFile() throws Exception {
 

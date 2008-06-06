@@ -4,7 +4,6 @@ import org.obo.dataadapter.DefaultOBOParser;
 import org.obo.dataadapter.OBOParseEngine;
 import org.obo.dataadapter.OBOParseException;
 import org.obo.datamodel.OBOSession;
-
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDatasetFactory;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
@@ -27,7 +26,7 @@ public class OboUtils {
     private static final String PSI_MI_LOCAL_ANNOTATIONS = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/CvObject-annotation-update.txt";
 
     //file location for OBO1.2 file pointing directly to psi cvs
-    public static final String PSI_MI_OBO12_LOCATION = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo?revision=HEAD";
+    public static final String PSI_MI_OBO12_LOCATION = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
 
     private OboUtils() {}
 
@@ -58,19 +57,15 @@ public class OboUtils {
       return createOBOSession(url);
 
     }
-    public static IntactOntology createOntologyFromOboLatestPsiMi() throws IOException, PsiLoaderException {
-        URL url = new URL(PSI_MI_OBO_LOCATION);
-        return createOntologyFromObo(url);
-    }
 
     public static AnnotationInfoDataset createAnnotationInfoDatasetFromLatestResource() throws IOException {
         URL url = new URL(PSI_MI_LOCAL_ANNOTATIONS);
         return createAnnotationInfoDatasetFromResource(url.openStream());
     }
 
-    public static IntactOntology createOntologyFromOboDefault(int revision) throws IOException, PsiLoaderException {
+    public static OBOSession createOBOSessionFromDefault(String revision) throws IOException,  OBOParseException {
         URL url = new URL(PSI_MI_OBO_LOCATION+"?revision="+revision);
-        return createOntologyFromObo(url);
+        return createOBOSession(url);
     }
 
     public static AnnotationInfoDataset createAnnotationInfoDatasetFromDefault(int revision) throws IOException, PsiLoaderException {
@@ -78,6 +73,24 @@ public class OboUtils {
         return createAnnotationInfoDatasetFromResource(url.openStream());
     }
 
+
+    public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource(InputStream is) throws IOException{
+        return AnnotationInfoDatasetFactory.buildFromTabResource(is);
+    }
+
+    @Deprecated
+    public static IntactOntology createOntologyFromOboLatestPsiMi() throws IOException, PsiLoaderException {
+        URL url = new URL(PSI_MI_OBO_LOCATION);
+        return createOntologyFromObo(url);
+    }
+
+    @Deprecated
+    public static IntactOntology createOntologyFromOboDefault(int revision) throws IOException, PsiLoaderException {
+        URL url = new URL(PSI_MI_OBO_LOCATION+"?revision="+revision);
+        return createOntologyFromObo(url);
+    }
+
+    @Deprecated
     public static IntactOntology createOntologyFromObo(URL url) throws IOException, PsiLoaderException {
         PSILoader psi = new PSILoader();
         IntactOntology ontology = psi.parseOboFile(url);
@@ -85,15 +98,12 @@ public class OboUtils {
         return ontology;
     }
 
+    @Deprecated
      public static IntactOntology createOntologyFromObo(File oboFile) throws IOException, PsiLoaderException {
         PSILoader psi = new PSILoader();
         IntactOntology ontology = psi.parseOboFile(oboFile);
 
         return ontology;
-    }
-
-    public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource(InputStream is) throws IOException{
-        return AnnotationInfoDatasetFactory.buildFromTabResource(is);
     }
 
 }

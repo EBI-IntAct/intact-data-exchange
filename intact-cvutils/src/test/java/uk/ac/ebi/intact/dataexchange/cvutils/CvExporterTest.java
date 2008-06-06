@@ -34,10 +34,7 @@ import uk.ac.ebi.intact.model.CvObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * Test the DownloadCvsExtended class that contains methods to recreate the OBOSession object from a list of CVObjects
@@ -63,18 +60,14 @@ public class CvExporterTest extends IntactBasicTestCase {
         //log.info( "url " + url );
         //OBOSession oboSession = OboUtils.createOBOSession( url );
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.45");
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
-
 
         List<CvDagObject> allCvs_;
         allCvs_ = ontologyBuilder.getAllCvsAsList();
 
         this.allCvs = allCvs_;
         log.debug( "allCvs size " + allCvs.size() );
-
-
-       
 
     }//end method
 
