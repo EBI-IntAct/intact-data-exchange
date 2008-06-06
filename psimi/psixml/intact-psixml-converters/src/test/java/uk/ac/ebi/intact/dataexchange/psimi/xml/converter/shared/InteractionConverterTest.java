@@ -228,7 +228,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
         IntactEntry ientry = converter.psiToIntact(entry);
 
         for (ConverterMessage msg : ConverterContext.getInstance().getReport().getMessages()) {
-            System.out.println(msg);
+//            System.out.println(msg);
         }
 
         Assert.assertEquals(2, ConverterContext.getInstance().getReport().getMessages().size());

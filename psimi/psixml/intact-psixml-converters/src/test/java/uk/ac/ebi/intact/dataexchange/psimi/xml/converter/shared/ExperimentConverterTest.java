@@ -95,7 +95,7 @@ public class ExperimentConverterTest extends AbstractConverterTest {
         ExperimentConverter converter = new ExperimentConverter(new Institution("testInst"));
         ExperimentDescription expDesc = converter.intactToPsi(exp);
 
-        System.out.println(exp.getShortLabel());
+//        System.out.println(exp.getShortLabel());
 
         Assert.assertNotNull(expDesc.getBibref());
         Assert.assertNull(expDesc.getXref());
