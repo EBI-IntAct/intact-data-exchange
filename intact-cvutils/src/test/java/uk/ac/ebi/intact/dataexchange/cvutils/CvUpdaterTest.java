@@ -62,7 +62,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         //URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
 
-        URL url = new URL(OboUtils.PSI_MI_OBO12_LOCATION);
+        URL url = new URL(OboUtils.PSI_MI_OBO_LOCATION);
         log.debug( "url " + url );
         try {
             BufferedReader in = new BufferedReader( new InputStreamReader( url.openStream() ) );

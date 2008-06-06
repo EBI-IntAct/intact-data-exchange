@@ -22,11 +22,11 @@ import java.util.Arrays;
  */
 public class OboUtils {
 
-    private static final String PSI_MI_OBO_LOCATION = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/psi-mi25-4intact.obo";
+    private static final String PSI_MI_OBO_LOCATION_OLD = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/psi-mi25-4intact.obo";
     private static final String PSI_MI_LOCAL_ANNOTATIONS = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/CvObject-annotation-update.txt";
 
-    //file location for OBO1.2 file pointing directly to psi cvs
-    public static final String PSI_MI_OBO12_LOCATION = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
+    //file location for OBO file pointing directly to psi cvs
+    public static final String PSI_MI_OBO_LOCATION = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
 
     private OboUtils() {}
 
@@ -53,8 +53,7 @@ public class OboUtils {
     }
 
     public static OBOSession createOBOSessionFromLatestMi() throws IOException, OBOParseException {
-     URL url = new URL(PSI_MI_OBO12_LOCATION);
-      return createOBOSession(url);
+      return createOBOSessionFromDefault("HEAD");
 
     }
 
@@ -64,7 +63,7 @@ public class OboUtils {
     }
 
     public static OBOSession createOBOSessionFromDefault(String revision) throws IOException,  OBOParseException {
-        URL url = new URL(PSI_MI_OBO_LOCATION+"?revision="+revision);
+        URL url = new URL(PSI_MI_OBO_LOCATION +"?revision="+revision);
         return createOBOSession(url);
     }
 
@@ -80,13 +79,13 @@ public class OboUtils {
 
     @Deprecated
     public static IntactOntology createOntologyFromOboLatestPsiMi() throws IOException, PsiLoaderException {
-        URL url = new URL(PSI_MI_OBO_LOCATION);
+        URL url = new URL(PSI_MI_OBO_LOCATION_OLD);
         return createOntologyFromObo(url);
     }
 
     @Deprecated
     public static IntactOntology createOntologyFromOboDefault(int revision) throws IOException, PsiLoaderException {
-        URL url = new URL(PSI_MI_OBO_LOCATION+"?revision="+revision);
+        URL url = new URL(PSI_MI_OBO_LOCATION_OLD +"?revision="+revision);
         return createOntologyFromObo(url);
     }
 
