@@ -52,12 +52,7 @@ public class AbstractRepositoryTestCase {
         ImexRepositoryContext.closeRepository();
         repository = null;
         System.gc();
-        try {
-            FileUtils.deleteDirectory(tempDir);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+
         tempDir = null;
     }
 
