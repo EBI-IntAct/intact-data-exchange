@@ -29,21 +29,22 @@ import java.io.IOException;
  */
 public class AbstractRepositoryTestCase {
 
-    private static final File TEMP_REPO_DIR = new File(System.getProperty("target"), "imex-repo-test/");
+    private File tempDir;
 
     private Repository repository;
 
     @Before
     public final void before() throws Exception {
+        tempDir = new File("target", "imex-repo-"+System.currentTimeMillis());
         try {
-            FileUtils.deleteDirectory(TEMP_REPO_DIR);
+            FileUtils.deleteDirectory(tempDir);
         }
         catch (IOException e) {
             e.printStackTrace();
         }
-        Assert.assertFalse(TEMP_REPO_DIR.exists());
+        Assert.assertFalse(tempDir.exists());
 
-        repository = ImexRepositoryContext.openRepository(TEMP_REPO_DIR.getAbsolutePath());
+        repository = ImexRepositoryContext.openRepository(tempDir.getAbsolutePath());
     }
 
     @After
@@ -52,11 +53,12 @@ public class AbstractRepositoryTestCase {
         repository = null;
         System.gc();
         try {
-            FileUtils.deleteDirectory(TEMP_REPO_DIR);
+            FileUtils.deleteDirectory(tempDir);
         }
         catch (IOException e) {
             e.printStackTrace();
         }
+        tempDir = null;
     }
 
     public Repository getRepository() {
