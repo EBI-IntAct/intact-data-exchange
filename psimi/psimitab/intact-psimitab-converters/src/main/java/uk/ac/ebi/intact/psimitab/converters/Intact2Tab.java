@@ -109,7 +109,7 @@ public class Intact2Tab {
 
                 for ( Interaction expandedInteraction : expandedInteractions ) {
 
-                    bi = interactionConverter.toMitab( expandedInteraction, expansionStrategy, isExpanded );
+                    bi = interactionConverter.toBinaryInteraction( expandedInteraction, expansionStrategy, isExpanded );
 
                     if ( bi != null ) {
                         result.add( bi );
@@ -117,7 +117,7 @@ public class Intact2Tab {
                 }
 
             } else {
-                bi = interactionConverter.toMitab( interaction );
+                bi = interactionConverter.toBinaryInteraction( interaction );
 
                 if ( bi != null ) {
                     result.add( bi );

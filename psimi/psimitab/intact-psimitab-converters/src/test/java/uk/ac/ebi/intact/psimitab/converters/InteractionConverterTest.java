@@ -29,7 +29,7 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         i.next().getInteractor().setAc( "EBI-xxxxxxx" );
         i.next().getInteractor().setAc( "EBI-yyyyyyy" );
 
-        BinaryInteraction bi = interactionConverter.toMitab( interaction );
+        BinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
 
         assertNotNull( bi );
     }
@@ -45,7 +45,7 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         i.next().getInteractor().setAc( "EBI-xxxxxxx" );
         i.next().getInteractor().setAc( "EBI-yyyyyyy" );
 
-        BinaryInteraction bi = interactionConverter.toMitab( interaction );
+        BinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
 
         assertNotNull( bi );
 

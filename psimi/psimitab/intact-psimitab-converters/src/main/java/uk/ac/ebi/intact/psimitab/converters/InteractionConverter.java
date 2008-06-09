@@ -69,11 +69,11 @@ public class InteractionConverter {
         this.biHandler = handler;
     }
 
-    public BinaryInteraction toMitab( Interaction interaction ) throws Intact2TabException {
-        return toMitab( interaction, null, false );
+    public BinaryInteraction toBinaryInteraction( Interaction interaction ) throws Intact2TabException {
+        return toBinaryInteraction( interaction, null, false );
     }
 
-    public BinaryInteraction toMitab( Interaction interaction,
+    public BinaryInteraction toBinaryInteraction( Interaction interaction,
                                       ExpansionStrategy expansionStrategy,
                                       boolean isExpanded ) throws Intact2TabException {
 
