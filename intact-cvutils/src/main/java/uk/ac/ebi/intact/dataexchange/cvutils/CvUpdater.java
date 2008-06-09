@@ -219,7 +219,7 @@ public class CvUpdater {
             hashBag.add( primaryKey );
         }
 
-        log.debug( "HashBag size " + hashBag.size() );
+        if (log.isDebugEnabled()) log.debug( "HashBag size " + hashBag.size() );
         for ( Object aHashBag : hashBag ) {
             String s = ( String ) aHashBag;
             if ( hashBag.getCount( s ) > 1 )

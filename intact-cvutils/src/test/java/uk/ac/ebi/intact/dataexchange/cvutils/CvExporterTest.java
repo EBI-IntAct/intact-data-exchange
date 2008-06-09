@@ -64,7 +64,7 @@ public class CvExporterTest {
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvDagObject> allCvs_;
-        allCvs_ = ontologyBuilder.getAllCvsAsList();
+        allCvs_ = ontologyBuilder.getAllCvs();
 
         this.allCvs = allCvs_;
         log.debug( "allCvs size " + allCvs.size() );

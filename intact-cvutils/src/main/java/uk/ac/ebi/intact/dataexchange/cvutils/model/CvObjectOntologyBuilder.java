@@ -57,8 +57,6 @@ public class CvObjectOntologyBuilder {
 
     private List<CvDagObject> allValidCvs;
 
-    private CvTopic obsoleteTopic;
-
     private CvDatabase nonMiCvDatabase;
 
 
@@ -747,7 +745,8 @@ public class CvObjectOntologyBuilder {
             throw new NullPointerException( "label is null" );
         }
 
-        log.debug( "Processed values size " + processed.size() );
+        if (log.isDebugEnabled()) log.debug( "Processed values size: " + processed.size() );
+
         for ( CvObject cvObject : processed.values() ) {
 
 
@@ -762,7 +761,7 @@ public class CvObjectOntologyBuilder {
     }  //end method
 
 
-    public List<CvDagObject> getAllValidCvsAsList() {
+    public Collection<CvDagObject> getAllValidCvs() {
 
 
         List<CvObject> validCvs = new ArrayList<CvObject>();
@@ -777,31 +776,18 @@ public class CvObjectOntologyBuilder {
 
         if ( log.isDebugEnabled() ) log.debug( "validCvs size :" + validCvs.size() );
 
-        /*
-            CvTopic obsoleteTopic = createCvTopicObsolete();
-
-            if ( obsoleteTopic.getAc() != null ) {
-                validCvs.add( obsoleteTopic );
-            }
-
-        */
-
         allValidCvs = new ArrayList<CvDagObject>();
         for ( CvObject validCv : validCvs ) {
             allValidCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) validCv ) );
         }
 
-        allValidCvs = new ArrayList( new HashSet( allValidCvs ) );
-        log.info( "all allValidCvs size() " + allValidCvs.size() );
-
-
-        return allValidCvs;
+        return new HashSet<CvDagObject>( allValidCvs );
 
 
     } //end of method
 
 
-    public List<CvDagObject> getAllCvsAsList() {
+    public List<CvDagObject> getAllCvs() {
 
         List<CvDagObject> allCvs = new ArrayList<CvDagObject>();
         //until here
@@ -815,18 +801,7 @@ public class CvObjectOntologyBuilder {
 
         }//end for
 
-        log.debug( "rootsAndChildren size :" + rootsAndChildren.size() );
-
-        /*
-           CvTopic obsoleteTopic = createCvTopicObsolete();
-           if ( obsoleteTopic.getAc() != null ) {
-               rootsAndOrphans.add( obsoleteTopic );
-           }
-        */
-
-
-        log.info( "rootsAndChildren size() " + rootsAndChildren.size() );
-
+        if (log.isDebugEnabled()) log.debug( "Roots and children size :" + rootsAndChildren.size() );
 
         for ( CvObject validCv : rootsAndChildren ) {
             allCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) validCv ) );
@@ -844,46 +819,27 @@ public class CvObjectOntologyBuilder {
         }//end for
 
 
-        allCvs = new ArrayList( new HashSet( allCvs ) );
-        log.info( "allValidCvs size() " + allCvs.size() );
+        allCvs = new ArrayList<CvDagObject>( new HashSet<CvDagObject>( allCvs ) );
+
+        if (log.isDebugEnabled()) log.debug( "Size of the collection with all CVs: " + allCvs.size() );
+
+
+        // put identity in the first position, to avoid recursivity problems
+        // put identity on top
+        LinkedList<CvDagObject> orderedList = new LinkedList<CvDagObject>();
+        for (CvDagObject cv : allCvs) {
+            if (CvXrefQualifier.IDENTITY_MI_REF.equals(cv.getMiIdentifier())) {
+                orderedList.addFirst(cv);
+            } else {
+                orderedList.add(cv);
+            }
+        }
 
         //until here
-        return allCvs;
+        return orderedList;
 
 
     } //end of method
-
-    private CvTopic createCvTopicObsolete() {
-        if ( obsoleteTopic != null ) {
-            return obsoleteTopic;
-        }
-
-        obsoleteTopic = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getCvObjectDao( CvTopic.class ).getByPsiMiRef( CvTopic.OBSOLETE_MI_REF );
-
-        if ( obsoleteTopic == null ) {
-            // create the obsolete term (which is obsolete too!)
-            obsoleteTopic = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.OBSOLETE_MI_REF, CvTopic.OBSOLETE );
-            obsoleteTopic.setFullName( "obsolete term" );
-            addObsoleteAnnotation( obsoleteTopic, "Deprecated CV term that should not be used to annotate entries" );
-        }
-
-        return obsoleteTopic;
-    }//end of method
-
-    private void addObsoleteAnnotation( CvObject existingCv, String obsoleteMessage ) {
-        obsoleteTopic.addAnnotation( new Annotation( existingCv.getOwner(), obsoleteTopic, obsoleteMessage ) );
-    }
-
-
-    public List<CvDagObject> getAllCvs() {
-        return allValidCvs;
-    }
-
-    public void setAllCvs( List<CvDagObject> allCvs ) {
-        this.allValidCvs = allCvs;
-    }
-
 
     private List<CvDagObject> itselfAndChildrenAsList( CvDagObject cv ) {
         List<CvDagObject> itselfAndChildren = new ArrayList<CvDagObject>();

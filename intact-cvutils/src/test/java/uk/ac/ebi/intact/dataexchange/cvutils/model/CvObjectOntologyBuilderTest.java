@@ -52,12 +52,12 @@ public class CvObjectOntologyBuilderTest {
 
 
         Assert.assertEquals( 16, ontologyBuilder.getRootOBOObjects().size() );
-        Assert.assertEquals( 894, ontologyBuilder.getAllValidCvsAsList().size() );
+        Assert.assertEquals( 894, ontologyBuilder.getAllValidCvs().size() );
         Assert.assertEquals( 53, ontologyBuilder.getOrphanCvObjects().size() );
-        Assert.assertEquals( 947, ontologyBuilder.getAllValidCvsAsList().size() + ontologyBuilder.getOrphanCvObjects().size() );
-        Assert.assertEquals( 947, ontologyBuilder.getAllCvsAsList().size());
+        Assert.assertEquals( 947, ontologyBuilder.getAllValidCvs().size() + ontologyBuilder.getOrphanCvObjects().size() );
+        Assert.assertEquals( 947, ontologyBuilder.getAllCvs().size());
 
-        log.debug("ontologyBuilder.getAllCvsAsList().size() "+ ontologyBuilder.getAllCvsAsList().size());
+        log.debug("ontologyBuilder.getAllCvsAsList().size() "+ ontologyBuilder.getAllCvs().size());
         Assert.assertEquals( uk.ac.ebi.intact.model.CvInteraction.class, ontologyBuilder.findCvClassforMI( "MI:0439" ) );
         Assert.assertEquals( uk.ac.ebi.intact.model.CvDatabase.class, ontologyBuilder.findCvClassforMI( "MI:0244" ) );//non-root object
         Assert.assertEquals( uk.ac.ebi.intact.model.CvFeatureIdentification.class, ontologyBuilder.findCvClassforMI( "MI:0003" ) );//root object
