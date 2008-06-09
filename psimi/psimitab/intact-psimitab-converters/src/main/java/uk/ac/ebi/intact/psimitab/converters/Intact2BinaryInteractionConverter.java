@@ -22,11 +22,13 @@ import psidev.psi.mi.tab.processor.PostProcessorStrategy;
 import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
+import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
 
 //import uk.ac.ebi.intact.psimitab.converters.processor.PostProcessorStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Arrays;
 
 
 /**
@@ -36,9 +38,9 @@ import java.util.Collection;
  * @version $Id$
  * @since 2.0.0
  */
-public class Intact2Tab {
+public class Intact2BinaryInteractionConverter {
 
-    public static final Log logger = LogFactory.getLog( Intact2Tab.class );
+    public static final Log logger = LogFactory.getLog( Intact2BinaryInteractionConverter.class );
 
     private ExpansionStrategy expansionStrategy;
 
@@ -49,6 +51,11 @@ public class Intact2Tab {
     private BinaryInteractionHandler biHandler;
 
     private PostProcessorStrategy postProcessor;
+
+    public Intact2BinaryInteractionConverter() {
+        binaryInteractionClass = IntActBinaryInteraction.class;
+        biHandler = new IntactBinaryInteractionHandler();
+    }
 
     /////////////////////
     // Getters & Setters
@@ -85,10 +92,11 @@ public class Intact2Tab {
         this.postProcessor = postProssesorStrategy;
     }
 
-    //////////////////////
-    // Construtor
+    public Collection<BinaryInteraction> convert( Interaction ... interactions ) {
+        return convert(Arrays.asList(interactions));
+    }
 
-    public Collection<BinaryInteraction> convert( Collection<Interaction> interactions ) throws Intact2TabException {
+    public Collection<BinaryInteraction> convert( Collection<Interaction> interactions ) {
         if ( interactions == null ) {
             throw new IllegalArgumentException( "Interaction(s) must not be null" );
         }
@@ -144,7 +152,7 @@ public class Intact2Tab {
             throw new IllegalArgumentException( "Interaction cannot be null." );
         }
 
-        Collection<BinaryInteraction> processedInteraction = null;
+        Collection<BinaryInteraction> processedInteractions = null;
 
         // Run post processing (if requested)
         if ( postProcessor != null ) {
@@ -152,13 +160,13 @@ public class Intact2Tab {
                 logger.debug( "Running " + postProcessor.getClass().getSimpleName() + "..." );
             }
             postProcessor.setColumnHandler((ColumnHandler) biHandler );
-            processedInteraction = postProcessor.process( interactions );
+            processedInteractions = postProcessor.process( interactions );
             logger.debug( "Post processing completed." );
         } else {
             logger.debug( "No post processing requested." );
-            processedInteraction = interactions;
+            processedInteractions = interactions;
         }
 
-        return processedInteraction;
+        return processedInteractions;
     }
 }

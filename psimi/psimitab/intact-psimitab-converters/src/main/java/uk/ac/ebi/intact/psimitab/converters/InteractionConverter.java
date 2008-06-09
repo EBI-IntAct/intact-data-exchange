@@ -104,9 +104,8 @@ public class InteractionConverter {
         if ( interaction.getExperiments() != null ) {
             for ( Experiment experiment : interaction.getExperiments() ) {
                 for ( Annotation a : experiment.getAnnotations() ) {
-                    CvObjectXref idXref = CvObjectUtils.getPsiMiIdentityXref( a.getCvTopic() );
-                    if (idXref != null && idXref.getPrimaryId() != null) {
-                        if ( CvTopic.AUTHOR_LIST_MI_REF.equals( idXref.getPrimaryId() ) ) {
+                    if (a.getCvTopic().getMiIdentifier() != null) {
+                        if ( CvTopic.AUTHOR_LIST_MI_REF.equals( a.getCvTopic().getMiIdentifier() ) ) {
                             authors.add( new AuthorImpl( a.getAnnotationText().split(" ")[0] + " et al." ) );
                         }
                     }
@@ -121,7 +120,7 @@ public class InteractionConverter {
             for ( Experiment experiment : interaction.getExperiments() ) {
                 if ( experiment.getCvInteraction() != null ) {
                     detectionMethods.add( ( InteractionDetectionMethod ) cvObjectConverter.
-                            toMitab( InteractionDetectionMethodImpl.class, experiment.getCvInteraction() ) );
+                            toCrossReference( InteractionDetectionMethodImpl.class, experiment.getCvInteraction() ) );
                 }
             }
         }
@@ -137,7 +136,7 @@ public class InteractionConverter {
         // set interaction type list
         if ( interaction.getCvInteractionType() != null ) {
             List<InteractionType> interactionTypes = new ArrayList<InteractionType>();
-            interactionTypes.add( ( InteractionType ) cvObjectConverter.toMitab( InteractionTypeImpl.class,
+            interactionTypes.add( ( InteractionType ) cvObjectConverter.toCrossReference( InteractionTypeImpl.class,
                                                                                  interaction.getCvInteractionType() ) );
             bi.setInteractionTypes( interactionTypes );
         }
@@ -164,7 +163,7 @@ public class InteractionConverter {
 
         // set source database list
         if ( interaction.getOwner() != null && interaction.getOwner().getXrefs() != null ) {
-            List<CrossReference> sourceDatabases = xConverter.toMitab( interaction.getOwner().getXrefs(), true, false );
+            List<CrossReference> sourceDatabases = xConverter.toCrossReferences( interaction.getOwner().getXrefs(), true, false );
             if ( !sourceDatabases.isEmpty() ){
                 bi.setSourceDatabases( sourceDatabases );
             } else {

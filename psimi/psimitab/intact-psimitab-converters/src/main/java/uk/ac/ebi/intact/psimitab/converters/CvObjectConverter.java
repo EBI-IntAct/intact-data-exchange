@@ -35,7 +35,7 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
 
     public static final Log logger = LogFactory.getLog( CvObjectConverter.class );
 
-    public T toMitab( Class<T> clazz, O cvObject ) throws Intact2TabException {
+    public T toCrossReference( Class<T> clazz, O cvObject ) throws Intact2TabException {
         if ( cvObject == null ) {
             throw new IllegalArgumentException( "CvObject must not be null. " );
         }
@@ -59,11 +59,11 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
 
     }
 
-    public T toMitab( O cvObject ) throws Intact2TabException {
-        return toMitab( ( Class<T> ) CrossReferenceImpl.class, cvObject );
+    public T toCrossReference( O cvObject ) throws Intact2TabException {
+        return toCrossReference( ( Class<T> ) CrossReferenceImpl.class, cvObject );
     }
 
-    public O fromMitab( Class<O> clazz, T reference ) {
+    public O fromCrossReference( Class<O> clazz, T reference ) {
         throw new UnsupportedOperationException();
     }
 }

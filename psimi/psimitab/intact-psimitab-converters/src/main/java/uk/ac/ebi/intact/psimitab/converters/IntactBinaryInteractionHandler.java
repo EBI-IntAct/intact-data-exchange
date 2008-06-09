@@ -52,21 +52,21 @@ public class IntactBinaryInteractionHandler extends IntActColumnHandler implemen
         uk.ac.ebi.intact.model.Interactor intactInteractorB = iterator.next().getInteractor();
 
         // set properties of interactor A
-        List<CrossReference> propertiesA = xConverter.toMitab( intactInteractorA.getXrefs(), false, true );
+        List<CrossReference> propertiesA = xConverter.toCrossReferences( intactInteractorA.getXrefs(), false, true );
         ibi.setPropertiesA( propertiesA );
 
         // set properties of interactor B
-        List<CrossReference> propertiesB = xConverter.toMitab( intactInteractorB.getXrefs(), false, true );
+        List<CrossReference> propertiesB = xConverter.toCrossReferences( intactInteractorB.getXrefs(), false, true );
         ibi.setPropertiesB( propertiesB );
 
         // set type of interactor A
         List<CrossReference> interactorTypesA = new ArrayList<CrossReference>();
-        interactorTypesA.add( cvObjectConverter.toMitab( intactInteractorA.getCvInteractorType() ) );
+        interactorTypesA.add( cvObjectConverter.toCrossReference( intactInteractorA.getCvInteractorType() ) );
         ibi.setInteractorTypeA( interactorTypesA );
 
         // set type of interactor B
         List<CrossReference> interactorTypesB = new ArrayList<CrossReference>();
-        interactorTypesB.add( cvObjectConverter.toMitab( intactInteractorB.getCvInteractorType() ) );
+        interactorTypesB.add( cvObjectConverter.toCrossReference( intactInteractorB.getCvInteractorType() ) );
         ibi.setInteractorTypeB( interactorTypesB );
 
         // set host organism
@@ -87,12 +87,12 @@ public class IntactBinaryInteractionHandler extends IntActColumnHandler implemen
         List<CrossReference> biologicalRolesB = new ArrayList<CrossReference>();
         for ( Component component : interaction.getComponents() ) {
             if ( component.getInteractor().equals( intactInteractorA ) ) {
-                biologicalRolesA.add( cvObjectConverter.toMitab( component.getCvBiologicalRole() ) );
-                experimentRolesA.add( cvObjectConverter.toMitab( component.getCvExperimentalRole() ) );
+                biologicalRolesA.add( cvObjectConverter.toCrossReference( component.getCvBiologicalRole() ) );
+                experimentRolesA.add( cvObjectConverter.toCrossReference( component.getCvExperimentalRole() ) );
             }
             if ( component.getInteractor().equals( intactInteractorB ) ) {
-                biologicalRolesB.add( cvObjectConverter.toMitab( component.getCvBiologicalRole() ) );
-                experimentRolesB.add( cvObjectConverter.toMitab( component.getCvExperimentalRole() ) );
+                biologicalRolesB.add( cvObjectConverter.toCrossReference( component.getCvBiologicalRole() ) );
+                experimentRolesB.add( cvObjectConverter.toCrossReference( component.getCvExperimentalRole() ) );
             }
         }
         ibi.setExperimentalRolesInteractorA( experimentRolesA );

@@ -124,7 +124,7 @@ public class Intact2TabTest extends IntactBasicTestCase {
         @Test
         public void convertIntact2TabTest_1() throws Exception {
 
-            Intact2Tab i2t = new Intact2Tab();
+            Intact2BinaryInteractionConverter i2t = new Intact2BinaryInteractionConverter();
             i2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
             i2t.setBinaryInteractionClass( IntActBinaryInteraction.class );
             i2t.setBinaryInteractionHandler( new IntactBinaryInteractionHandler() );
@@ -156,7 +156,7 @@ public class Intact2TabTest extends IntactBasicTestCase {
         @Test
         public void convertIntact2TabTest_2() throws Exception {
 
-            Intact2Tab i2t = new Intact2Tab();
+            Intact2BinaryInteractionConverter i2t = new Intact2BinaryInteractionConverter();
             i2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
             i2t.setBinaryInteractionClass( IntActBinaryInteraction.class );
             i2t.setBinaryInteractionHandler( new IntactBinaryInteractionHandler() );
@@ -186,7 +186,7 @@ public class Intact2TabTest extends IntactBasicTestCase {
         @Test
         public void convertIntact2TabTest_3() throws Exception {
 
-            Intact2Tab i2t = new Intact2Tab();
+            Intact2BinaryInteractionConverter i2t = new Intact2BinaryInteractionConverter();
             i2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
             i2t.setBinaryInteractionClass( IntActBinaryInteraction.class );
             i2t.setBinaryInteractionHandler( new IntactBinaryInteractionHandler() );

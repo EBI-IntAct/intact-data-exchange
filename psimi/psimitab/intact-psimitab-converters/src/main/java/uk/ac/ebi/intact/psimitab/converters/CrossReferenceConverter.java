@@ -45,7 +45,7 @@ public class CrossReferenceConverter<T extends Xref> {
      *                     if is false all CrossReferences without CvXrefQualifier equals identiy will be returned
      * @return List of CrossReferences sorted by CvXrefQualifier
      */
-    public List<CrossReference> toMitab( Collection<T> xrefs, boolean onlyIdentity, boolean withText ) {
+    public List<CrossReference> toCrossReferences( Collection<T> xrefs, boolean onlyIdentity, boolean withText ) {
         if ( xrefs == null ) {
             throw new IllegalArgumentException( "Xref must not be null. " );
         }

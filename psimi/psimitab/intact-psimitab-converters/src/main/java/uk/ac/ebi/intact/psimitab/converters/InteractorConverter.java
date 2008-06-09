@@ -54,7 +54,7 @@ public class InteractorConverter {
         Interactor tabInteractor = new Interactor();
 
         // set identifiers of interactor
-        Collection<CrossReference> identifiers = xRefConverter.toMitab( intactInteractor.getXrefs(), true, false );
+        Collection<CrossReference> identifiers = xRefConverter.toCrossReferences( intactInteractor.getXrefs(), true, false );
         identifiers.add( CrossReferenceFactory.getInstance().build( CvDatabase.INTACT, intactInteractor.getAc() ) );
         tabInteractor.setIdentifiers( identifiers );
 
