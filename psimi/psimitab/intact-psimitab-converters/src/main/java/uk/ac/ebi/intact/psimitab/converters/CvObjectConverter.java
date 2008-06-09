@@ -19,7 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.intact.model.CvObject;
-import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.lang.reflect.Constructor;
@@ -35,7 +34,7 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
 
     public static final Log logger = LogFactory.getLog( CvObjectConverter.class );
 
-    public T toCrossReference( Class<T> clazz, O cvObject ) throws Intact2TabException {
+    public T toCrossReference( Class<T> clazz, O cvObject )  {
         if ( cvObject == null ) {
             throw new IllegalArgumentException( "CvObject must not be null. " );
         }
@@ -45,21 +44,21 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
         }
 
         String text = cvObject.getShortLabel();
-        CvObjectXref idxref = CvObjectUtils.getPsiMiIdentityXref( cvObject );
-        String db = idxref.getPrimaryId().split( ":" )[0];
-        String id = idxref.getPrimaryId().split( ":" )[1];
+        String identity = CvObjectUtils.getIdentity(cvObject);
+        String db = identity.split( ":" )[0];
+        String id = identity.split( ":" )[1];
 
         try {
             Constructor<T> constructor = clazz.getConstructor( String.class, String.class, String.class );
 
             return constructor.newInstance( db, id, text );
         } catch ( Exception e ) {
-            throw new Intact2TabException( "An error occured while converting " + clazz.getSimpleName() + ": " + text, e );
+            throw new IllegalStateException( "An exception occured while converting " + clazz.getSimpleName() + ": " + text, e );
         }
 
     }
 
-    public T toCrossReference( O cvObject ) throws Intact2TabException {
+    public T toCrossReference( O cvObject ) {
         return toCrossReference( ( Class<T> ) CrossReferenceImpl.class, cvObject );
     }
 

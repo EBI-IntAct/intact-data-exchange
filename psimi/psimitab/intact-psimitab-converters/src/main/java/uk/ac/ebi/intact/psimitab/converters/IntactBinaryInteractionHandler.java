@@ -44,7 +44,7 @@ public class IntactBinaryInteractionHandler extends IntActColumnHandler implemen
     private static final String TAXID = "taxid";
 
 
-    public void process( BinaryInteractionImpl bi, Interaction interaction ) throws Intact2TabException {
+    public void process( BinaryInteractionImpl bi, Interaction interaction ) {
         IntActBinaryInteraction ibi = ( IntActBinaryInteraction ) bi;
 
         Iterator<Component> iterator = interaction.getComponents().iterator();
@@ -120,7 +120,7 @@ public class IntactBinaryInteractionHandler extends IntActColumnHandler implemen
     // IsExpansionStrategyAware
 
     public void process( BinaryInteractionImpl bi, Interaction interaction, ExpansionStrategy expansionStrategy )
-            throws Intact2TabException {
+             {
         // first, do the usual processing
         process( bi, interaction );
 

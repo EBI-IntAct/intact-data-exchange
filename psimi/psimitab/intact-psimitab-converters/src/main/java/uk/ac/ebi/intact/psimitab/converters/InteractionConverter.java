@@ -21,6 +21,7 @@ import psidev.psi.mi.tab.converter.xml2tab.BinaryInteractionUtils;
 import psidev.psi.mi.tab.converter.xml2tab.TabConvertionException;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Interactor;
+import uk.ac.ebi.intact.business.IntactException;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
@@ -69,13 +70,13 @@ public class InteractionConverter {
         this.biHandler = handler;
     }
 
-    public BinaryInteraction toBinaryInteraction( Interaction interaction ) throws Intact2TabException {
+    public BinaryInteraction toBinaryInteraction( Interaction interaction ) {
         return toBinaryInteraction( interaction, null, false );
     }
 
     public BinaryInteraction toBinaryInteraction( Interaction interaction,
                                       ExpansionStrategy expansionStrategy,
-                                      boolean isExpanded ) throws Intact2TabException {
+                                      boolean isExpanded ) {
 
         if ( interaction == null ) {
             throw new IllegalArgumentException( "Interaction must not be null" );
@@ -96,7 +97,7 @@ public class InteractionConverter {
         try {
             bi = BinaryInteractionUtils.buildInteraction( interactorA, interactorB, binaryInteractionClass );
         } catch ( TabConvertionException e ) {
-            throw new Intact2TabException( "Error while building a BinaryInteraction", e );
+            throw new IntactException( "Error while building a BinaryInteraction", e );
         }
 
         // set authors

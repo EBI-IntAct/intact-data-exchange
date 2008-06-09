@@ -35,7 +35,7 @@ public interface BinaryInteractionHandler<T extends BinaryInteractionImpl> {
      * @param bi          Binary interaction to be processed.
      * @param interaction Source interaction.
      */
-    public void process( T bi, Interaction interaction ) throws Intact2TabException;
+    public void process( T bi, Interaction interaction );
 
 	/**
 	 * This method merge could called in ClusterInteractorPairProssesor to write the correct format of lists.
