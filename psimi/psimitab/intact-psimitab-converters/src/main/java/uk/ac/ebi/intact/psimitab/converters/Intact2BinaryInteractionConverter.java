@@ -17,18 +17,17 @@ package uk.ac.ebi.intact.psimitab.converters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.processor.PostProcessorStrategy;
-import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
-
-//import uk.ac.ebi.intact.psimitab.converters.processor.PostProcessorStrategy;
+import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
+import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Arrays;
+import java.util.Collection;
 
 
 /**
@@ -55,6 +54,7 @@ public class Intact2BinaryInteractionConverter {
     public Intact2BinaryInteractionConverter() {
         binaryInteractionClass = IntActBinaryInteraction.class;
         biHandler = new IntactBinaryInteractionHandler();
+        expansionStrategy = new SpokeWithoutBaitExpansion();
     }
 
     /////////////////////
