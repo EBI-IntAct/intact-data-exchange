@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 import psidev.psi.mi.tab.processor.PostProcessorStrategy;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
@@ -55,6 +56,14 @@ public class Intact2BinaryInteractionConverter {
         binaryInteractionClass = IntActBinaryInteraction.class;
         biHandler = new IntactBinaryInteractionHandler();
         expansionStrategy = new SpokeWithoutBaitExpansion();
+        postProcessor = new ClusterInteractorPairProcessor();
+    }
+
+    public Intact2BinaryInteractionConverter(ExpansionStrategy expansionStrategy, PostProcessorStrategy postProcessor) {
+        binaryInteractionClass = IntActBinaryInteraction.class;
+        biHandler = new IntactBinaryInteractionHandler();
+        this.expansionStrategy = expansionStrategy;
+        this.postProcessor = postProcessor;
     }
 
     /////////////////////
