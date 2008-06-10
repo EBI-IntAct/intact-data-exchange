@@ -105,6 +105,13 @@ public class CvObjectOntologyBuilderTest {
         CvObject endogenousCvObject = ontologyBuilder.toCvObject( endogenousObj );
         testCvObject( endogenousCvObject);
 
+         OBOObject rnaCleavage = (OBOObject)oboSession.getObject("MI:0902");
+        CvObject rnaCleavageCv = ontologyBuilder.toCvObject( rnaCleavage );
+        testCvObject( rnaCleavageCv);
+
+        
+
+
 
 
        //OBOObject testObj = (OBOObject)oboSession.getObject("MI:0001");//root Cv interaction detection method

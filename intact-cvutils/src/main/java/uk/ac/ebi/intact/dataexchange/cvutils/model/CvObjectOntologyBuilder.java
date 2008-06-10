@@ -676,6 +676,7 @@ public class CvObjectOntologyBuilder {
             } else if ( CvDatabase.GO.equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
                 databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO );
+                identifier = "GO:"+identifier;
             } else if ( CvDatabase.RESID.equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.SEE_ALSO_MI_REF, qualifier );
                 databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.RESID_MI_REF, CvDatabase.RESID );
