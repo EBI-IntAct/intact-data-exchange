@@ -437,7 +437,7 @@ public class CvObjectOntologyBuilder {
             database = CvDatabase.PUBMED;
             qualifier = CvXrefQualifier.SEE_ALSO;
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( CvDatabase.GO ) ) {
-            identifier = defDbxref.getDatabaseID();
+            identifier = defDbxref.getDatabase()+":"+defDbxref.getDatabaseID();
             database = CvDatabase.GO;
             qualifier = CvXrefQualifier.IDENTITY;
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( CvDatabase.RESID ) ) {
@@ -450,11 +450,11 @@ public class CvObjectOntologyBuilder {
                 qualifier = CvXrefQualifier.SEE_ALSO;
             }
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( CvDatabase.SO ) ) {
-            identifier = defDbxref.getDatabaseID();
+            identifier = defDbxref.getDatabase()+":"+defDbxref.getDatabaseID();
             database = CvDatabase.SO;
             qualifier = CvXrefQualifier.IDENTITY;
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( "MOD" ) ) {
-            identifier = defDbxref.getDatabaseID();
+            identifier = defDbxref.getDatabase()+":"+defDbxref.getDatabaseID();
             database = "MOD";
             qualifier = CvXrefQualifier.IDENTITY;
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( "UNIMOD" ) ) {
@@ -676,7 +676,7 @@ public class CvObjectOntologyBuilder {
             } else if ( CvDatabase.GO.equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
                 databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO );
-                identifier = "GO:"+identifier;
+//                identifier = "GO:"+identifier;
             } else if ( CvDatabase.RESID.equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.SEE_ALSO_MI_REF, qualifier );
                 databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.RESID_MI_REF, CvDatabase.RESID );
