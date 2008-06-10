@@ -77,15 +77,14 @@ public class CvExporter {
     public OBOSession convertCvList2OBOSession( List<CvDagObject> allCvs ) {
 
         // List<CvDagObject> allUniqCvs = removeCvsDuplicated( allCvs );
-        List<CvDagObject> allUniqCvs = allCvs;
+        List<CvDagObject> allUniqCvs;
+        allUniqCvs = allCvs;
 
-        sort( allUniqCvs, new Comparator() {
-            public int compare( Object o1, Object o2 ) {
-                CvObject cv1 = ( CvObject ) o1;
-                CvObject cv2 = ( CvObject ) o2;
+        sort( allUniqCvs, new Comparator<CvDagObject>() {
+            public int compare( CvDagObject o1, CvDagObject o2 ) {
 
-                String id1 = CvObjectUtils.getIdentity( cv1 );
-                String id2 = CvObjectUtils.getIdentity( cv2 );
+                String id1 = CvObjectUtils.getIdentity( o1 );
+                String id2 = CvObjectUtils.getIdentity( o2 );
 
                 return id1.compareTo( id2 );
             }
@@ -259,11 +258,11 @@ public class CvExporter {
                         definitionSuffix = "\n" + annotation.getAnnotationText();
                     } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.SEARCH_URL ) ) {
                         String annotationText = annotation.getAnnotationText();
-                        log.info( "annotationText before " + annotationText );
+                       if (log.isDebugEnabled())  log.debug( "annotationText before " + annotationText );
                         annotationText = annotationText.replaceAll( "\\\\", "" );
 
                         annotationText = " \"" + annotationText + "\"";
-                        log.info( "annotationText after " + annotationText );
+                       if (log.isDebugEnabled())  log.debug( "annotationText after " + annotationText );
                         Dbxref dbxref = new DbxrefImpl( CvTopic.SEARCH_URL, annotationText );
 
                         oboObj.addDbxref( dbxref );
@@ -276,7 +275,7 @@ public class CvExporter {
                         oboObj.setObsolete( true );
                         definitionSuffix = "\n" + annotation.getAnnotationText();
                     } else {
-                        log.info( "Annotation don't fit anywhere-----" );
+                       if (log.isDebugEnabled())  log.debug( "Annotation don't fit anywhere-----" );
                     }
                 } //end if
             }//end for
@@ -293,7 +292,7 @@ public class CvExporter {
             //check if root
 
             if ( checkIfRootMI( CvObjectUtils.getIdentity( dagObj ) ) ) {
-                //log.info("Root Classes "+ dagObj.getMiIdentifier());
+               
                 OBOClass rootObject = getRootObject();
                 Link linkToRoot = new OBORestrictionImpl( oboObj );
                 OBOProperty oboProp = new OBOPropertyImpl( "part_of" );
@@ -303,13 +302,11 @@ public class CvExporter {
 
             List<CvDagObject> cvParents = ( List ) dagObj.getParents();
 
-            sort( cvParents, new Comparator() {
-                public int compare( Object o1, Object o2 ) {
-                    CvObject cv1 = ( CvObject ) o1;
-                    CvObject cv2 = ( CvObject ) o2;
+            sort( cvParents, new Comparator<CvDagObject>() {
+                public int compare( CvDagObject o1, CvDagObject o2 ) {
 
-                    String id1 = CvObjectUtils.getIdentity( cv1 );
-                    String id2 = CvObjectUtils.getIdentity( cv2 );
+                    String id1 = CvObjectUtils.getIdentity( o1 );
+                    String id2 = CvObjectUtils.getIdentity( o2 );
 
                     return id1.compareTo( id2 );
                 }

@@ -67,7 +67,7 @@ public class CvExporterTest {
         allCvs_ = ontologyBuilder.getAllCvs();
 
         this.allCvs = allCvs_;
-        log.debug( "allCvs size " + allCvs.size() );
+        if (log.isDebugEnabled()) log.debug( "allCvs size " + allCvs.size() );
 
     }//end method
 
@@ -110,7 +110,7 @@ public class CvExporterTest {
     public void testAllCvs() throws DataAdapterException, IOException {
         CvExporter downloadCv = new CvExporter();
 
-        log.debug( "From Test all : " + allCvs.size() );
+       if (log.isDebugEnabled())  log.debug( "From Test all : " + allCvs.size() );
         OBOSession oboSession = downloadCv.convertCvList2OBOSession( allCvs );
         // Create temp directory
         File tempDir = new File( "temp" );
