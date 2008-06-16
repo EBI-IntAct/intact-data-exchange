@@ -15,7 +15,6 @@
  */
 package uk.ac.ebi.intact.psimitab;
 
-import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.converter.tab2xml.Tab2Xml;
 
 /**
@@ -27,6 +26,6 @@ public class IntactTab2Xml extends Tab2Xml {
     public IntactTab2Xml() {
         final IntActColumnHandler columnHandler = new IntActColumnHandler();
         setColumnHandler(columnHandler);
-        setBinaryInteractionClass( IntActBinaryInteraction.class );
+        setBinaryInteractionClass( IntactBinaryInteraction.class );
     }
 }

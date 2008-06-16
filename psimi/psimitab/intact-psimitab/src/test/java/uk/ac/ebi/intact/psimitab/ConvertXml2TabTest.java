@@ -198,8 +198,8 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         File intputDir = getFileByResources("/xml-samples", ConvertXml2TabTest.class);
 
         ConvertXml2Tab converter = new ConvertXml2Tab();
-        converter.setBinaryInteractionClass( IntActBinaryInteraction.class );
-        converter.setColumnHandler( new IntActColumnHandler(true, true) );
+        converter.setBinaryInteractionClass( IntactBinaryInteraction.class );
+        converter.setColumnHandler( new IntactColumnHandler(true, true) );
         converter.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         converter.setInteractorPairClustering( true );
         converter.setOverwriteOutputFile( true );
@@ -259,8 +259,8 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         Assert.assertNotNull( file );
 
         ConvertXml2Tab converter = new ConvertXml2Tab();
-        converter.setBinaryInteractionClass( IntActBinaryInteraction.class );
-        converter.setColumnHandler( new IntActColumnHandler(true, true) );
+        converter.setBinaryInteractionClass( IntactBinaryInteraction.class );
+        converter.setColumnHandler( new IntactColumnHandler(true, true) );
         converter.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         converter.setInteractorPairClustering( true );
         converter.setOverwriteOutputFile( true );
@@ -295,7 +295,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         // convert into Tab object model
         Xml2Tab xml2tab = new Xml2Tab();
 
-        xml2tab.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        xml2tab.setBinaryInteractionClass( IntactBinaryInteraction.class );
 
         // this column handler IS aware of the the expansion strategy
         final IntActColumnHandler columnHandler = new IntActColumnHandler();
@@ -308,7 +308,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
-        IntActBinaryInteraction interaction = ( IntActBinaryInteraction ) interactions.iterator().next();
+        IntactBinaryInteraction interaction = (IntactBinaryInteraction) interactions.iterator().next();
         Assert.assertNotNull( interaction.getExpansionMethod() );
         assertEquals( SpokeExpansion.EXPANSION_NAME, interaction.getExpansionMethod() );
     }
@@ -322,7 +322,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         // convert into Tab object model
         Xml2Tab xml2tab = new Xml2Tab();
 
-        xml2tab.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        xml2tab.setBinaryInteractionClass( IntactBinaryInteraction.class );
         xml2tab.setColumnHandler( new IntActColumnHandler() );
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
@@ -330,7 +330,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
-        IntActBinaryInteraction interaction = ( IntActBinaryInteraction ) interactions.iterator().next();
+        IntactBinaryInteraction interaction = (IntactBinaryInteraction) interactions.iterator().next();
         assertEquals( null, interaction.getExpansionMethod() );
     }
 
@@ -343,7 +343,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         // convert into Tab object model
         Xml2Tab xml2tab = new Xml2Tab();
 
-        xml2tab.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        xml2tab.setBinaryInteractionClass( IntactBinaryInteraction.class );
 
         // this column handler IS aware of the the expansion strategy
         final IntActColumnHandler columnHandler = new IntActColumnHandler();
@@ -356,7 +356,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
-        IntActBinaryInteraction interaction = ( IntActBinaryInteraction ) interactions.iterator().next();
+        IntactBinaryInteraction interaction = (IntactBinaryInteraction) interactions.iterator().next();
         Assert.assertNotNull( interaction.getDataset() );
         assertTrue( interaction.getDataset().get( 0 ).startsWith( "Cancer" ));
     }

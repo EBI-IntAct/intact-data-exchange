@@ -29,6 +29,6 @@ public class IntactXml2Tab extends Xml2Tab {
         columnHandler.setInterproNameAutoCompletion(true);
 
         setColumnHandler(columnHandler);
-        setBinaryInteractionClass( IntActBinaryInteraction.class );
+        setBinaryInteractionClass( IntactBinaryInteraction.class );
     }
 }

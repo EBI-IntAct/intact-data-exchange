@@ -29,6 +29,6 @@ public class IntactPsimiTabWriter extends PsimiTabWriter {
         columnHandler.setInterproNameAutoCompletion(true);
 
         setColumnHandler(columnHandler);
-        setBinaryInteractionClass( IntActBinaryInteraction.class );
+        setBinaryInteractionClass( IntactBinaryInteraction.class );
     }
 }

@@ -15,7 +15,6 @@
  */
 package uk.ac.ebi.intact.psimitab;
 
-import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.PsimiTabReader;
 
 /**
@@ -32,6 +31,6 @@ public class IntactPsimiTabReader extends PsimiTabReader {
         columnHandler.setInterproNameAutoCompletion(true);
 
         setColumnHandler(columnHandler);
-        setBinaryInteractionClass( IntActBinaryInteraction.class );
+        setBinaryInteractionClass( IntactBinaryInteraction.class );
     }
 }

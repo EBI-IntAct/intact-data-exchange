@@ -8,8 +8,7 @@ import junit.framework.Assert;
 import org.apache.lucene.document.Document;
 import org.junit.Test;
 import psidev.psi.mi.search.util.DocumentBuilder;
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
 /**
  * IntActDocumentBuilder Tester.
@@ -35,7 +34,7 @@ public class IntActDocumentBuilderTest {
         DocumentBuilder builder = new IntActDocumentBuilder();
         Document doc = builder.createDocumentFromPsimiTabLine(psiMiTabLine);
 
-        IntActBinaryInteraction interaction = (IntActBinaryInteraction) builder.createBinaryInteraction(doc);
+        IntactBinaryInteraction interaction = (IntactBinaryInteraction) builder.createBinaryInteraction(doc);
         Assert.assertNotNull(interaction);
 	}
 }

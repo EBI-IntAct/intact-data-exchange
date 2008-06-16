@@ -10,7 +10,7 @@ import psidev.psi.mi.search.util.DefaultDocumentBuilder;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineParser;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
 
 /**
@@ -128,7 +128,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
         String line = createPsimiTabLine(doc);
 
         MitabLineParser parser = new MitabLineParser();
-        parser.setBinaryInteractionClass(IntActBinaryInteraction.class);
+        parser.setBinaryInteractionClass(IntactBinaryInteraction.class);
         parser.setColumnHandler(new IntActColumnHandler());
 
         return parser.parse(line);

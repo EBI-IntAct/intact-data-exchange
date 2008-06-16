@@ -7,7 +7,7 @@ import org.apache.lucene.store.Directory;
 import psidev.psi.mi.search.column.DefaultColumnSet;
 import psidev.psi.mi.search.engine.impl.FastSearchEngine;
 import psidev.psi.mi.search.util.DocumentBuilder;
-import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.io.IOException;
  * @version $Id$
  * @since 2.0.0
  */
-public class IntActSearchEngine extends FastSearchEngine<IntActBinaryInteraction> {
+public class IntActSearchEngine extends FastSearchEngine<IntactBinaryInteraction> {
 
     private static final String[] DEFAULT_FIELDS = {"identifiers",
                                                     DefaultColumnSet.PUB_ID.getShortName(),

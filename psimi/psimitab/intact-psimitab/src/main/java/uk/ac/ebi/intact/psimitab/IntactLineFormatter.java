@@ -15,7 +15,6 @@
  */
 package uk.ac.ebi.intact.psimitab;
 
-import psidev.psi.mi.tab.formatter.LineFormatter;
 import psidev.psi.mi.tab.formatter.TabulatedLineFormatter;
 
 /**
@@ -34,6 +33,6 @@ public class IntactLineFormatter extends TabulatedLineFormatter {
         columnHandler.setInterproNameAutoCompletion(true);
 
         setColumnHandler(columnHandler);
-        setBinaryInteractionClass( IntActBinaryInteraction.class );
+        setBinaryInteractionClass( IntactBinaryInteraction.class );
     }
 }

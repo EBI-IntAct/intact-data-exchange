@@ -25,7 +25,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         // convert into Tab object model
         Xml2Tab xml2tab = new Xml2Tab();
 
-        xml2tab.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        xml2tab.setBinaryInteractionClass( IntactBinaryInteraction.class );
         xml2tab.setColumnHandler( new IntActColumnHandler() );
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
@@ -35,7 +35,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
 
         PsimiTabWriter writer = new PsimiTabWriter();
         writer.setColumnHandler( new IntActColumnHandler() );
-        writer.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        writer.setBinaryInteractionClass( IntactBinaryInteraction.class );
 
         File tabFile = new File( getTargetDirectory(), "9971739_expanded.txt" );
         assertTrue( tabFile.getParentFile().canWrite() );
@@ -43,7 +43,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         //assertEquals( 3, interactions.size() );
 
         for ( BinaryInteraction interaction : interactions ) {
-            assertTrue( interaction instanceof IntActBinaryInteraction );
+            assertTrue( interaction instanceof IntactBinaryInteraction);
         }
     }
 
@@ -56,7 +56,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         boolean hasHeaderLine = true;
 
         PsimiTabReader reader = new PsimiTabReader( hasHeaderLine );
-        reader.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        reader.setBinaryInteractionClass( IntactBinaryInteraction.class );
         reader.setColumnHandler( new IntActColumnHandler() );
 
         Collection<BinaryInteraction> bis = reader.read( tabFile );
@@ -75,7 +75,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         assertEquals( interactions.size(), bis.size() );
 
         for ( BinaryInteraction bi : bis ) {
-            IntActBinaryInteraction dbi = ( IntActBinaryInteraction ) bi;
+            IntactBinaryInteraction dbi = (IntactBinaryInteraction) bi;
             assertTrue( dbi.getAuthors().get( 0 ).getName().contains( "Leung" ) );
             assertTrue( dbi.hasExperimentalRolesInteractorA() );
             assertTrue( dbi.hasExperimentalRolesInteractorB() );
@@ -94,7 +94,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         // convert into Tab object model
         Xml2Tab xml2tab = new Xml2Tab();
 
-        xml2tab.setBinaryInteractionClass( IntActBinaryInteraction.class );
+        xml2tab.setBinaryInteractionClass( IntactBinaryInteraction.class );
         xml2tab.setColumnHandler( new IntActColumnHandler() );
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
@@ -110,9 +110,9 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
         assertEquals( 2, interactions.size() );
 
         BinaryInteraction interaction = ( BinaryInteraction ) interactions.toArray()[1];
-        assertTrue( interaction instanceof IntActBinaryInteraction );
+        assertTrue( interaction instanceof IntactBinaryInteraction);
 
-        IntActBinaryInteraction ibi = ( IntActBinaryInteraction ) interaction;
+        IntactBinaryInteraction ibi = (IntactBinaryInteraction) interaction;
         assertTrue( ibi.getAuthors().get( 0 ).getName().contains( "Liu et al." ) );
 
         assertTrue( ibi.getHostOrganism().size() == 2 );
