@@ -15,16 +15,14 @@
  */
 package uk.ac.ebi.intact.psimitab.converters;
 
-import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceFactory;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntactColumnHandler;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
-import uk.ac.ebi.intact.psimitab.converters.expansion.IsExpansionStrategyAware;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -37,16 +35,14 @@ import java.util.List;
  * @version $Id$
  * @since 2.0.0
  */
-public class IntactBinaryInteractionHandler extends IntActColumnHandler implements BinaryInteractionHandler, IsExpansionStrategyAware {
+public class IntactBinaryInteractionHandler extends IntactColumnHandler implements BinaryInteractionHandler<IntactBinaryInteraction> {
 
     private CrossReferenceConverter<InteractorXref> xConverter = new CrossReferenceConverter<InteractorXref>();
     private CvObjectConverter<CrossReferenceImpl, CvObject> cvObjectConverter = new CvObjectConverter<CrossReferenceImpl, CvObject>();
     private static final String TAXID = "taxid";
 
 
-    public void process( BinaryInteractionImpl bi, Interaction interaction ) {
-        IntActBinaryInteraction ibi = ( IntActBinaryInteraction ) bi;
-
+    public void process( IntactBinaryInteraction ibi, Interaction interaction ) {
         Iterator<Component> iterator = interaction.getComponents().iterator();
         uk.ac.ebi.intact.model.Interactor intactInteractorA = iterator.next().getInteractor();
         uk.ac.ebi.intact.model.Interactor intactInteractorB = iterator.next().getInteractor();
@@ -119,14 +115,14 @@ public class IntactBinaryInteractionHandler extends IntActColumnHandler implemen
     ///////////////////////////////
     // IsExpansionStrategyAware
 
-    public void process( BinaryInteractionImpl bi, Interaction interaction, ExpansionStrategy expansionStrategy )
+    public void process( IntactBinaryInteraction bi, Interaction interaction, ExpansionStrategy expansionStrategy )
              {
         // first, do the usual processing
         process( bi, interaction );
 
         // deal with expansion strategy now
-        if ( bi instanceof IntActBinaryInteraction ) {
-            ( ( IntActBinaryInteraction ) bi ).setExpansionMethod( expansionStrategy.getName() );
+        if ( bi instanceof IntactBinaryInteraction ) {
+            ( ( IntactBinaryInteraction ) bi ).setExpansionMethod( expansionStrategy.getName() );
         }
     }
 
