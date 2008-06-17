@@ -253,8 +253,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( 896, stats.getCreatedCvs().size() );
         Assert.assertEquals( 1, stats.getUpdatedCvs().size() );
 
-        //53-1 as aggregation was already created and later updated
-        Assert.assertEquals( 52, stats.getOrphanCvs().size() );
+        //53-2 as aggregation was already created and later updated + obsolete term
+        Assert.assertEquals( 51, stats.getOrphanCvs().size() );
 
         //52+1 obsolete term
         Assert.assertEquals( 53, stats.getObsoleteCvs().size() );

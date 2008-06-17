@@ -163,8 +163,10 @@ public class CvUpdater {
                     if ( cvObjectsWithSameId ) {
                         alreadyExistingObsoleteCvList.add( cvDag );
                     } else {
+                        if(!CvObjectUtils.getIdentity(cvDag).equalsIgnoreCase(CvTopic.OBSOLETE_MI_REF)){
                         stats.addOrphanCv( cvDag );
                         orphanCvList.add( cvDag );
+                        }
                     }
 
                  
