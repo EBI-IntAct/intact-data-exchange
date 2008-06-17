@@ -17,6 +17,7 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import org.apache.commons.collections.Bag;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.bag.HashBag;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +32,7 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -57,16 +59,31 @@ public class CvUpdater {
     private CvTopic obsoleteTopic;
 
 
+
+
     public CvUpdater() throws IOException, OBOParseException {
         this.nonMiCvDatabase = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
                                                              CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT );
-
-
         this.processed = new HashMap<String, CvObject>();
         this.stats = new CvUpdaterStatistics();
+        
 
 
     }//end constructor
+
+
+    protected Map<String, Class> getMapOfExistingCvs() {
+
+        Map<String, Class> existingMi2Class = new HashMap<String, Class>();
+        List<CvObject> allExistingCvs = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().getAll();
+
+        for ( CvObject cvObject : allExistingCvs ) {
+            existingMi2Class.put( CvObjectUtils.getIdentity( cvObject ), cvObject.getClass() );
+        }
+
+        return existingMi2Class;
+    }
+
 
     /**
      * Starts the creation and update of CVs by using the ontology provided
@@ -74,7 +91,7 @@ public class CvUpdater {
      * @param allCvs List of all Cvs
      * @return An object containing some statistics about the update
      */
-    public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allCvs ) {
+    protected CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allCvs ) {
         return createOrUpdateCVs( allCvs, new AnnotationInfoDataset() );
     }
 
@@ -88,7 +105,7 @@ public class CvUpdater {
      */
 
 
-    public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allValidCvs, AnnotationInfoDataset annotationInfoDataset ) {
+    protected CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allValidCvs, AnnotationInfoDataset annotationInfoDataset ) {
 
         if ( allValidCvs == null ) {
             throw new NullPointerException( "Cvs Null" );
@@ -99,14 +116,23 @@ public class CvUpdater {
 
         List<CvDagObject> orphanCvList = dealWithOrphans( allValidCvs );
 
-        if ( log.isDebugEnabled() ) log.debug( "orphanCvList " + orphanCvList.size() );
+
+
+        if ( log.isDebugEnabled() )
+            log.debug( "orphanCvList " + orphanCvList.size() );
+
+
+        List<CvDagObject> cleanedList = (List<CvDagObject>)CollectionUtils.subtract(allValidCvs,orphanCvList );
+        log.debug("cleanedList size "+cleanedList.size());                             
 
 
         // process any term from the cv annotations dataset resource
-        updateCVsUsingAnnotationDataset( allValidCvs, annotationInfoDataset );
+       // updateCVsUsingAnnotationDataset( allValidCvs, annotationInfoDataset );
+         updateCVsUsingAnnotationDataset( cleanedList, annotationInfoDataset );
 
 
-        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate( allValidCvs.toArray( new CvObject[allValidCvs.size()] ) );
+        //PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate( allValidCvs.toArray( new CvObject[allValidCvs.size()] ) );
+        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate( cleanedList.toArray( new CvObject[cleanedList.size()] ) );
         addCvObjectsToUpdaterStats( persisterStats, stats );
 
 
@@ -124,29 +150,32 @@ public class CvUpdater {
 
         List<CvDagObject> orphanCvList = new ArrayList<CvDagObject>();
 
+        List<CvDagObject> alreadyExistingObsoleteCvList = new ArrayList<CvDagObject>();
+
         for ( CvDagObject cvDag : allCvs ) {
             if ( !isRootObject( CvObjectUtils.getIdentity( cvDag ) ) ) {
 
                 if ( cvDag.getParents() == null || cvDag.getParents().size() == 0 ) {
-
-                    int cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted( cvDag, stats );
-
-
                     addCvObjectToStatsIfObsolete( cvDag );
 
-                    // check if it is valid and persist
-                    if ( cvObjectsWithSameId == 0 ) {
-                        if ( isValidTerm( cvDag ) ) {
-                            stats.addOrphanCv( cvDag );
-                            orphanCvList.add( cvDag );
-                        }
+                    boolean cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted( cvDag, stats);
+
+                    if ( cvObjectsWithSameId ) {
+                        alreadyExistingObsoleteCvList.add( cvDag );
+                    } else {
+                        stats.addOrphanCv( cvDag );
+                        orphanCvList.add( cvDag );
                     }
+
+                 
                 }//end of if
             }//end if
         }//end for
         //until here
 
-
+        if ( log.isDebugEnabled() ) log.debug( "orphanCvList size " + orphanCvList.size() );
+        if ( log.isDebugEnabled() ) log.debug( "alreadyExistingObsoleteCvList size " + alreadyExistingObsoleteCvList.size() );
+        //return orphanCvList;
         return orphanCvList;
     }//end method
 
@@ -212,14 +241,13 @@ public class CvUpdater {
         }
 
 
-      
         Bag hashBag = new HashBag();
         for ( CvDagObject cvDag : allValidCvs ) {
             String primaryKey = cvDag.getClass().toString() + ":" + cvDag.getShortLabel();
             hashBag.add( primaryKey );
         }
 
-        if (log.isDebugEnabled()) log.debug( "HashBag size " + hashBag.size() );
+        if ( log.isDebugEnabled() ) log.debug( "HashBag size " + hashBag.size() );
         for ( Object aHashBag : hashBag ) {
             String s = ( String ) aHashBag;
             if ( hashBag.getCount( s ) > 1 )
@@ -229,11 +257,18 @@ public class CvUpdater {
         return false;
     } //end method
 
-    private int checkAndMarkAsObsoleteIfExisted( CvObject orphan, CvUpdaterStatistics stats ) {
-        String id = CvObjectUtils.getIdentity( orphan );
 
-        final CvObjectDao<CvObject> cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getCvObjectDao();
+    protected boolean checkAndMarkAsObsoleteIfExisted( CvObject orphan, CvUpdaterStatistics stats) {
+        boolean alreadyExistingCv = false;
+        String id = CvObjectUtils.getIdentity( orphan );
+        Set<String> existingKeys = getMapOfExistingCvs().keySet();
+
+        if ( existingKeys != null && existingKeys.contains( id ) ) {
+            alreadyExistingCv = true;
+        }
+
+
+        final CvObjectDao<CvObject> cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao();
         Collection<CvObject> existingCvs = cvObjectDao.getByPsiMiRefCollection( Collections.singleton( id ) );
 
         if ( existingCvs.isEmpty() ) {
@@ -241,8 +276,9 @@ public class CvUpdater {
         }
 
 
-        if ( !existingCvs.isEmpty() ) {
+        if ( alreadyExistingCv ) {
             CvTopic obsoleteTopic = createCvTopicObsolete();
+
 
             for ( CvObject existingCv : existingCvs ) {
                 boolean alreadyContainsObsolete = false;
@@ -250,8 +286,8 @@ public class CvUpdater {
                 for ( Annotation annot : existingCv.getAnnotations() ) {
                     if ( CvTopic.OBSOLETE_MI_REF.equals( CvObjectUtils.getIdentity( annot.getCvTopic() ) ) ) {
                         alreadyContainsObsolete = true;
-                    }
-                }
+                    }  //end if
+                } //end for
 
                 if ( !alreadyContainsObsolete ) {
                     //get Annotations and find Def for Obsolote
@@ -260,15 +296,26 @@ public class CvUpdater {
                         if ( CvTopic.OBSOLETE_MI_REF.equals( CvObjectUtils.getIdentity( annot.getCvTopic() ) ) ) {
                             annotatedText = annot.getAnnotationText();
                         }
-                    }
+                    }//end for
 
-
-                    existingCv.addAnnotation( new Annotation( existingCv.getOwner(), obsoleteTopic, annotatedText ) );
+                    if (log.isDebugEnabled()) log.debug( "Updating CV: " +existingCv );
+                    final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+                    final Annotation annotation = new Annotation( existingCv.getOwner(), obsoleteTopic, annotatedText );
+                    existingCv.addAnnotation( annotation );
                     stats.addUpdatedCv( existingCv );
-                }
-            }
-        }
-        return existingCvs.size();
+
+
+
+                    PersisterHelper.saveOrUpdate( obsoleteTopic );
+                   daoFactory.getAnnotationDao().persist( annotation );
+                    daoFactory.getCvObjectDao().update( existingCv );
+                    
+                    
+                    stats.addCreatedCv(obsoleteTopic);
+                } //end if
+            }//end for
+        }//end if
+        return alreadyExistingCv;
     }
 
 
@@ -321,10 +368,10 @@ public class CvUpdater {
         this.nonMiCvDatabase = nonMiCvDatabase;
     }
 
-
+   /*
     private boolean isValidTerm( CvObject term ) {
         return CvObjectUtils.getIdentity( term ).contains( ":" );
     }
-
+   */
 
 }   //end class

@@ -25,6 +25,9 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.LinkedList;
 
 
 /**
@@ -52,12 +55,29 @@ public class CvObjectOntologyBuilderTest {
 
 
         Assert.assertEquals( 16, ontologyBuilder.getRootOBOObjects().size() );
-        Assert.assertEquals( 894, ontologyBuilder.getAllValidCvs().size() );
-        Assert.assertEquals( 53, ontologyBuilder.getOrphanCvObjects().size() );
-        Assert.assertEquals( 947, ontologyBuilder.getAllValidCvs().size() + ontologyBuilder.getOrphanCvObjects().size() );
-        Assert.assertEquals( 947, ontologyBuilder.getAllCvs().size());
 
-        log.debug("ontologyBuilder.getAllCvsAsList().size() "+ ontologyBuilder.getAllCvs().size());
+        int allValidCvs = ontologyBuilder.getAllValidCvs().size();
+        Assert.assertEquals( 894,allValidCvs);
+
+        int allOrphanCvs =  ontologyBuilder.getOrphanCvObjects().size();
+        Assert.assertEquals( 53,allOrphanCvs);
+        Assert.assertEquals( 947, allValidCvs + allOrphanCvs );
+
+
+        List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
+        int allCvsSize =  allCvs.size();
+        Assert.assertEquals( 947,allCvsSize);
+
+
+        List<CvDagObject> orderedList = ontologyBuilder.getAllOrderedCvs( allCvs );
+        Assert.assertEquals( 947,orderedList.size());
+
+        //for ( CvDagObject cvDag : orderedList ) {
+            //if(log.isDebugEnabled())log.debug( "# " + cvDag.getMiIdentifier() + "  " + cvDag.getClass() + "   " + cvDag.getShortLabel() );
+        //}
+
+
+        if(log.isDebugEnabled())log.debug("ontologyBuilder.getAllCvsAsList().size() "+ ontologyBuilder.getAllCvs().size());
         Assert.assertEquals( uk.ac.ebi.intact.model.CvInteraction.class, ontologyBuilder.findCvClassforMI( "MI:0439" ) );
         Assert.assertEquals( uk.ac.ebi.intact.model.CvDatabase.class, ontologyBuilder.findCvClassforMI( "MI:0244" ) );//non-root object
         Assert.assertEquals( uk.ac.ebi.intact.model.CvFeatureIdentification.class, ontologyBuilder.findCvClassforMI( "MI:0003" ) );//root object
@@ -105,11 +125,15 @@ public class CvObjectOntologyBuilderTest {
         CvObject endogenousCvObject = ontologyBuilder.toCvObject( endogenousObj );
         testCvObject( endogenousCvObject);
 
-         OBOObject rnaCleavage = (OBOObject)oboSession.getObject("MI:0902");
+        OBOObject rnaCleavage = (OBOObject)oboSession.getObject("MI:0902");
         CvObject rnaCleavageCv = ontologyBuilder.toCvObject( rnaCleavage );
         testCvObject( rnaCleavageCv);
 
-        
+
+        OBOObject obsoleteTerm = (OBOObject)oboSession.getObject("MI:0021");
+        CvObject obsoleteCv = ontologyBuilder.toCvObject( obsoleteTerm );
+        testCvObject( obsoleteCv);
+
 
 
 

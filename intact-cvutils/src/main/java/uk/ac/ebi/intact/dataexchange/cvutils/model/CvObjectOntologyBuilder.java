@@ -82,7 +82,6 @@ public class CvObjectOntologyBuilder {
     }
 
 
-   
     public CvObjectOntologyBuilder() {
 
     }//end constructor
@@ -104,8 +103,7 @@ public class CvObjectOntologyBuilder {
     public <T extends CvObject> T toCvObject( OBOObject oboObj ) {
         T cvObject;
         try {
-            if ( log.isDebugEnabled() ) log.debug( "ID    ->" + oboObj.getID() );
-            if ( log.isDebugEnabled() ) log.debug( "Name  ->" + oboObj.getName() );
+            if ( log.isTraceEnabled() ) log.trace( "ID    ->" + oboObj.getID() + "   Name ->" + oboObj.getName() );
 
             //find the CvClass for any given MI identifier
             Class<T> cvClass = findCvClassforMI( oboObj.getID() );
@@ -115,7 +113,7 @@ public class CvObjectOntologyBuilder {
                 cvClass = ( Class<T> ) CvTopic.class;
 
             }
-            if ( log.isDebugEnabled() ) log.debug( "cvClass ->" + cvClass.getName() );
+            if ( log.isTraceEnabled() ) log.trace( "cvClass ->" + cvClass.getName() );
 
             //Checks if the given object is already processed. If so, returns the CvObject
             String processedKey = cvKey( cvClass, oboObj.getID() );
@@ -130,7 +128,7 @@ public class CvObjectOntologyBuilder {
             //Short label look for EXACT PSI-MI-short  in synonym tag OBO 1.2
             String shortLabel = calculateShortLabel( oboObj );
             cvObject = CvObjectUtils.createCvObject( institution, cvClass, null, shortLabel );
-            if ( log.isDebugEnabled() ) log.debug( "shortLabel     ->" + shortLabel );
+            if ( log.isTraceEnabled() ) log.trace( "shortLabel     ->" + shortLabel );
 
             cvObject.addXref( createIdentityXref( cvObject, oboObj.getID() ) );
             cvObject.setFullName( oboObj.getName() );
@@ -276,7 +274,7 @@ public class CvObjectOntologyBuilder {
 
 
             processed.put( processedKey, cvObject );
-            log.debug( "--Processed size " + processed.size() );
+            if ( log.isTraceEnabled() ) log.trace( "--Processed size " + processed.size() );
 
 
             if ( cvObject instanceof CvDagObject ) {
@@ -420,8 +418,9 @@ public class CvObjectOntologyBuilder {
             throw new NullPointerException( "defDbxref is null" );
         }
 
-        if ( log.isDebugEnabled() )
-            log.debug( "defDbxref: " + defDbxref.getDatabase() + "defDbxref ID: " + defDbxref.getDatabaseID() );
+
+        if ( log.isTraceEnabled() )
+            log.trace( "defDbxref: " + defDbxref.getDatabase() + "defDbxref ID: " + defDbxref.getDatabaseID() );
 
         if ( defDbxref.getDatabase().equalsIgnoreCase( "PMID" ) ) {
             identifier = defDbxref.getDatabaseID();
@@ -437,7 +436,7 @@ public class CvObjectOntologyBuilder {
             database = CvDatabase.PUBMED;
             qualifier = CvXrefQualifier.SEE_ALSO;
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( CvDatabase.GO ) ) {
-            identifier = defDbxref.getDatabase()+":"+defDbxref.getDatabaseID();
+            identifier = defDbxref.getDatabase() + ":" + defDbxref.getDatabaseID();
             database = CvDatabase.GO;
             qualifier = CvXrefQualifier.IDENTITY;
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( CvDatabase.RESID ) ) {
@@ -450,11 +449,11 @@ public class CvObjectOntologyBuilder {
                 qualifier = CvXrefQualifier.SEE_ALSO;
             }
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( CvDatabase.SO ) ) {
-            identifier = defDbxref.getDatabase()+":"+defDbxref.getDatabaseID();
+            identifier = defDbxref.getDatabase() + ":" + defDbxref.getDatabaseID();
             database = CvDatabase.SO;
             qualifier = CvXrefQualifier.IDENTITY;
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( "MOD" ) ) {
-            identifier = defDbxref.getDatabase()+":"+defDbxref.getDatabaseID();
+            identifier = defDbxref.getDatabase() + ":" + defDbxref.getDatabaseID();
             database = "MOD";
             qualifier = CvXrefQualifier.IDENTITY;
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( "UNIMOD" ) ) {
@@ -466,8 +465,8 @@ public class CvObjectOntologyBuilder {
         }
 
 
-        if ( log.isDebugEnabled() )
-            log.debug( "Returning identifier:  " + identifier + "  " + "  database: " + database + "  qualifier:  " + qualifier );
+        if ( log.isTraceEnabled() )
+            log.trace( "Returning identifier:  " + identifier + "  " + "  database: " + database + "  qualifier:  " + qualifier );
         return new CvTermXref( identifier, database, qualifier );
 
     }   //end method
@@ -588,8 +587,8 @@ public class CvObjectOntologyBuilder {
             if ( identifiedObject instanceof OBOObject ) {
                 if ( !identifiedObject.getID().startsWith( "MI:" ) ) {
                     invalidOboObjects.add( identifiedObject );
-                    if ( log.isDebugEnabled() )
-                        log.debug( "invalidCv## " + identifiedObject.getID() + "  " + identifiedObject.getName() );
+                    if ( log.isTraceEnabled() )
+                        log.trace( "invalidCv## " + identifiedObject.getID() + "  " + identifiedObject.getName() );
                 }
 
             } //end if
@@ -648,7 +647,7 @@ public class CvObjectOntologyBuilder {
 
 
     private CvObjectXref toXref( CvObject cvObj, String identifier, String qualifier, String database ) {
-        log.debug( "from toXref " + identifier + "   " + qualifier + "   " + database );
+        if ( log.isTraceEnabled() ) log.trace( "from toXref " + identifier + "   " + qualifier + "   " + database );
 
         Institution owner = IntactContext.getCurrentInstance().getInstitution();
 
@@ -666,7 +665,7 @@ public class CvObjectOntologyBuilder {
 
         CvDatabase databaseCv = getCvObjectByLabel( CvDatabase.class, database );
 
-        if ( log.isDebugEnabled() ) log.debug( "qualifierCv  " + qualifierCv + "   databaseCv  " + databaseCv );
+        if ( log.isTraceEnabled() ) log.trace( "qualifierCv  " + qualifierCv + "   databaseCv  " + databaseCv );
 
 
         if ( qualifierCv == null || databaseCv == null ) {
@@ -676,7 +675,6 @@ public class CvObjectOntologyBuilder {
             } else if ( CvDatabase.GO.equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
                 databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO );
-//                identifier = "GO:"+identifier;
             } else if ( CvDatabase.RESID.equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.SEE_ALSO_MI_REF, qualifier );
                 databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.RESID_MI_REF, CvDatabase.RESID );
@@ -691,10 +689,20 @@ public class CvObjectOntologyBuilder {
                 return null;
             }
 
+            if ( qualifierCv != null ) {
+                String processedKey = cvKey( CvXrefQualifier.class, qualifierCv.getMiIdentifier() );
+                processed.put( processedKey, qualifierCv );
+            }
+
+            if ( databaseCv != null ) {
+                String processedKey = cvKey( CvDatabase.class, databaseCv.getMiIdentifier() );
+                processed.put( processedKey, databaseCv );
+            }
+
         }//end if
 
-        if ( log.isDebugEnabled() )
-            log.debug( "Returning from toXref: identifier_: " + identifier + "  qualifierCv: " + qualifierCv + " databaseCv  " + databaseCv );
+        if ( log.isTraceEnabled() )
+            log.trace( "Returning from toXref: identifier_: " + identifier + "  qualifierCv: " + qualifierCv + " databaseCv  " + databaseCv );
         return XrefUtils.createIdentityXref( cvObj, identifier, qualifierCv, databaseCv );
     } //end method
 
@@ -704,8 +712,11 @@ public class CvObjectOntologyBuilder {
 
         CvAliasType alias = getCvObjectByLabel( CvAliasType.class, CvAliasType.GO_SYNONYM );
         if ( alias == null ) {
-            if ( log.isDebugEnabled() ) log.debug( "alias ==null creating new" );
+            if ( log.isTraceEnabled() ) log.trace( "alias ==null creating new" );
             alias = CvObjectUtils.createCvObject( owner, CvAliasType.class, CvAliasType.GO_SYNONYM_MI_REF, CvAliasType.GO_SYNONYM );
+
+            String processedKey = cvKey( CvAliasType.class, alias.getMiIdentifier() );
+            processed.put( processedKey, alias );
         }
 
         return AliasUtils.createAlias( cvobj, aliasName, alias );
@@ -735,7 +746,8 @@ public class CvObjectOntologyBuilder {
             }
         }
 
-        log.debug( "Returning from toAnnotation: owner: " + owner + "  topic: " + topic + " annotation  " + annotation );
+        if ( log.isTraceEnabled() )
+            log.debug( "Returning from toAnnotation: owner: " + owner + "  topic: " + topic + " annotation  " + annotation );
         return new Annotation( owner, topic, annotation );
     }//end method
 
@@ -746,7 +758,7 @@ public class CvObjectOntologyBuilder {
             throw new NullPointerException( "label is null" );
         }
 
-        if (log.isDebugEnabled()) log.debug( "Processed values size: " + processed.size() );
+        if ( log.isTraceEnabled() ) log.trace( "Processed values size: " + processed.size() );
 
         for ( CvObject cvObject : processed.values() ) {
 
@@ -802,7 +814,7 @@ public class CvObjectOntologyBuilder {
 
         }//end for
 
-        if (log.isDebugEnabled()) log.debug( "Roots and children size :" + rootsAndChildren.size() );
+        if ( log.isDebugEnabled() ) log.debug( "Roots and children size :" + rootsAndChildren.size() );
 
         for ( CvObject validCv : rootsAndChildren ) {
             allCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) validCv ) );
@@ -822,25 +834,52 @@ public class CvObjectOntologyBuilder {
 
         allCvs = new ArrayList<CvDagObject>( new HashSet<CvDagObject>( allCvs ) );
 
-        if (log.isDebugEnabled()) log.debug( "Size of the collection with all CVs: " + allCvs.size() );
-
+        if ( log.isDebugEnabled() ) log.debug( "Size of the collection with all CVs: " + allCvs.size() );
 
         // put identity in the first position, to avoid recursivity problems
         // put identity on top
         LinkedList<CvDagObject> orderedList = new LinkedList<CvDagObject>();
-        for (CvDagObject cv : allCvs) {
-            if (CvXrefQualifier.IDENTITY_MI_REF.equals(cv.getMiIdentifier())) {
-                orderedList.addFirst(cv);
+        for ( CvDagObject cv : allCvs ) {
+            if ( CvXrefQualifier.IDENTITY_MI_REF.equals( cv.getMiIdentifier() ) ) {
+                orderedList.addFirst( cv );
             } else {
-                orderedList.add(cv);
+                orderedList.add( cv );
             }
         }
 
-        //until here
-        return orderedList;
+        //Order by Putting CvXrefs first and CvDatabases next followed by all other topics
+        return getAllOrderedCvs(orderedList);
 
 
     } //end of method
+
+
+    public LinkedList<CvDagObject> getAllOrderedCvs( List<CvDagObject> allCvs ) {
+        LinkedList<CvDagObject> orderedList = new LinkedList<CvDagObject>();
+        LinkedList<CvDagObject> xrefList = new LinkedList<CvDagObject>();
+        LinkedList<CvDagObject> databaseList = new LinkedList<CvDagObject>();
+        LinkedList<CvDagObject> otherList = new LinkedList<CvDagObject>();
+
+        for ( CvDagObject cvDag : allCvs ) {
+
+            if ( cvDag.getClass().toString().equals( uk.ac.ebi.intact.model.CvXrefQualifier.class.toString() ) ) {
+                xrefList.add( cvDag );
+            } else if ( cvDag.getClass().toString().equals( CvDatabase.class.toString() ) ) {
+                databaseList.add( cvDag );
+            } else {
+                otherList.add( cvDag );
+            }
+
+        }//end for
+        //add in an order
+        orderedList.addAll( xrefList );
+        orderedList.addAll( databaseList );
+        orderedList.addAll( otherList );
+
+       
+
+        return orderedList;
+    }//end of method
 
     private List<CvDagObject> itselfAndChildrenAsList( CvDagObject cv ) {
         List<CvDagObject> itselfAndChildren = new ArrayList<CvDagObject>();

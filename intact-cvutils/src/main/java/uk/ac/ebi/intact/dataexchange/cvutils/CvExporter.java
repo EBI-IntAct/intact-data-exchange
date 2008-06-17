@@ -95,7 +95,7 @@ public class CvExporter {
             if ( CvObjectUtils.getIdentity( cvDagObj ) == null ) {
                 throw new NullPointerException( "No Identifier for the cvObject " + cvDagObj );
             }
-            if(log.isDebugEnabled())log.debug( counter + "  " + CvObjectUtils.getIdentity( cvDagObj ) );
+            if(log.isTraceEnabled())log.trace( counter + "  " + CvObjectUtils.getIdentity( cvDagObj ) );
 
             oboSession.addObject( getRootObject() );
             OBOClass oboObj = convertCv2OBO( cvDagObj );
@@ -258,11 +258,11 @@ public class CvExporter {
                         definitionSuffix = "\n" + annotation.getAnnotationText();
                     } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.SEARCH_URL ) ) {
                         String annotationText = annotation.getAnnotationText();
-                       if (log.isDebugEnabled())  log.debug( "annotationText before " + annotationText );
+                       if (log.isTraceEnabled())  log.trace( "annotationText before " + annotationText );
                         annotationText = annotationText.replaceAll( "\\\\", "" );
 
                         annotationText = " \"" + annotationText + "\"";
-                       if (log.isDebugEnabled())  log.debug( "annotationText after " + annotationText );
+                       if (log.isTraceEnabled())  log.trace( "annotationText after " + annotationText );
                         Dbxref dbxref = new DbxrefImpl( CvTopic.SEARCH_URL, annotationText );
 
                         oboObj.addDbxref( dbxref );
