@@ -33,6 +33,6 @@ public abstract class TestHelper {
 
     public static Directory createIndexFromResource(String resourcePath) throws IOException, ConverterException, MitabLineException {
         InputStream is = TestHelper.class.getResourceAsStream(resourcePath);
-        return Searcher.buildIndexInMemory(is, true, true, new IntActPsimiTabIndexWriter());
+        return Searcher.buildIndexInMemory(is, true, true, new IntactPsimiTabIndexWriter());
     }    
 }

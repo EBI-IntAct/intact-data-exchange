@@ -16,7 +16,7 @@ import java.util.List;
  * @version $Id$
  * @since 2.0.0
  */
-public class IntActColumnSet extends DefaultColumnSet implements ColumnSet {
+public class IntactColumnSet extends DefaultColumnSet implements ColumnSet {
 	
 	public static final PsimiTabColumn EXPERIMENTAL_ROLE_A = new PsimiTabColumn(15, "Experimental role(s) interactor A", "experimentalRoleA");
 	public static final PsimiTabColumn EXPERIMENTAL_ROLE_B = new PsimiTabColumn(16, "Experimental role(s) interactor B", "experimentalRoleB");
@@ -31,7 +31,7 @@ public class IntActColumnSet extends DefaultColumnSet implements ColumnSet {
     public static final PsimiTabColumn DATASET = new PsimiTabColumn( 25, "Dataset name(s)", "dataset");
 	
 	
-	public IntActColumnSet(){
+	public IntactColumnSet(){
 		super();
 		List<PsimiTabColumn> psimiTabColumns = super.getPsimiTabColumns();
 		

@@ -32,8 +32,8 @@ import java.net.URLDecoder;
 public abstract class AbstractPsimitabTestCase {
 
     protected File getTargetDirectory() throws UnsupportedEncodingException {
-        String outputDirPath = getFileByResources( "/", IntActTabTest.class).getAbsolutePath();
-        //String outputDirPath = IntActTabTest.class.getResource( "/" ).getFile();
+        String outputDirPath = getFileByResources( "/", IntactTabTest.class).getAbsolutePath();
+        //String outputDirPath = IntactTabTest.class.getResource( "/" ).getFile();
         assertNotNull( outputDirPath );
         File outputDir = new File( outputDirPath );
         // we are in test-classes, move one up

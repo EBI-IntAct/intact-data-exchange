@@ -11,7 +11,8 @@ import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineParser;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
+import uk.ac.ebi.intact.psimitab.IntactColumnHandler;
+import uk.ac.ebi.intact.psimitab.IntactColumnHandler;
 
 /**
  *
@@ -19,30 +20,30 @@ import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
  * @version $Id$
  * @since 2.0.0
  */
-public class IntActDocumentBuilder extends DefaultDocumentBuilder {
+public class IntactDocumentBuilder extends DefaultDocumentBuilder {
 
     public Document createDocumentFromPsimiTabLine(String psiMiTabLine) throws MitabLineException
 	{
 		String[] tokens = psiMiTabLine.split(DEFAULT_COL_SEPARATOR);
 
-        int maxColumns = new IntActColumnSet().getPsimiTabColumns().size();
+        int maxColumns = new IntactColumnSet().getPsimiTabColumns().size();
 
         if (tokens.length != maxColumns) {
             throw new MitabLineException("This line contains an invalid number of columns: "+tokens.length+". IntAct PSI-MITAB expects "+maxColumns+" columns");
         }
 
         // raw fields
-		String experimentRoleA = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_A.getOrder()];
-		String experimentRoleB = tokens[IntActColumnSet.EXPERIMENTAL_ROLE_B.getOrder()];
-        String biologicalRoleA = tokens[IntActColumnSet.BIOLOGICAL_ROLE_A.getOrder()];
-        String biologicalRoleB = tokens[IntActColumnSet.BIOLOGICAL_ROLE_B.getOrder()];
-        String propertiesA = tokens[IntActColumnSet.PROPERTIES_A.getOrder()];
-		String propertiesB = tokens[IntActColumnSet.PROPERTIES_B.getOrder()];
-		String typeA = tokens[IntActColumnSet.INTERACTOR_TYPE_A.getOrder()];
-		String typeB = tokens[IntActColumnSet.INTERACTOR_TYPE_B.getOrder()];
-		String hostOrganism = tokens[IntActColumnSet.HOSTORGANISM.getOrder()];
-		String expansion = tokens[IntActColumnSet.EXPANSION_METHOD.getOrder()];
-        String dataset = tokens[IntActColumnSet.DATASET.getOrder()];
+		String experimentRoleA = tokens[IntactColumnSet.EXPERIMENTAL_ROLE_A.getOrder()];
+		String experimentRoleB = tokens[IntactColumnSet.EXPERIMENTAL_ROLE_B.getOrder()];
+        String biologicalRoleA = tokens[IntactColumnSet.BIOLOGICAL_ROLE_A.getOrder()];
+        String biologicalRoleB = tokens[IntactColumnSet.BIOLOGICAL_ROLE_B.getOrder()];
+        String propertiesA = tokens[IntactColumnSet.PROPERTIES_A.getOrder()];
+		String propertiesB = tokens[IntactColumnSet.PROPERTIES_B.getOrder()];
+		String typeA = tokens[IntactColumnSet.INTERACTOR_TYPE_A.getOrder()];
+		String typeB = tokens[IntactColumnSet.INTERACTOR_TYPE_B.getOrder()];
+		String hostOrganism = tokens[IntactColumnSet.HOSTORGANISM.getOrder()];
+		String expansion = tokens[IntactColumnSet.EXPANSION_METHOD.getOrder()];
+        String dataset = tokens[IntactColumnSet.DATASET.getOrder()];
 
         Document doc = super.createDocumentFromPsimiTabLine( psiMiTabLine );
 		
@@ -51,30 +52,30 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 				Field.Store.NO,
 				Field.Index.TOKENIZED));
 		
-		addTokenizedAndSortableField( doc, IntActColumnSet.EXPERIMENTAL_ROLE_A, experimentRoleA);
-		addTokenizedAndSortableField( doc, IntActColumnSet.EXPERIMENTAL_ROLE_B, experimentRoleB);
-		addTokenizedAndSortableField( doc, IntActColumnSet.BIOLOGICAL_ROLE_A, biologicalRoleA);
-		addTokenizedAndSortableField( doc, IntActColumnSet.BIOLOGICAL_ROLE_B, biologicalRoleB);
+		addTokenizedAndSortableField( doc, IntactColumnSet.EXPERIMENTAL_ROLE_A, experimentRoleA);
+		addTokenizedAndSortableField( doc, IntactColumnSet.EXPERIMENTAL_ROLE_B, experimentRoleB);
+		addTokenizedAndSortableField( doc, IntactColumnSet.BIOLOGICAL_ROLE_A, biologicalRoleA);
+		addTokenizedAndSortableField( doc, IntactColumnSet.BIOLOGICAL_ROLE_B, biologicalRoleB);
 
         String value = isolateValues(propertiesA) + isolateValues(propertiesB);
 		doc.add(new Field("properties", value,
 				Field.Store.NO,
 				Field.Index.TOKENIZED));
 
-		addTokenizedAndSortableField( doc, IntActColumnSet.PROPERTIES_A, propertiesA);
-		addTokenizedAndSortableField( doc, IntActColumnSet.PROPERTIES_B, propertiesB);
+		addTokenizedAndSortableField( doc, IntactColumnSet.PROPERTIES_A, propertiesA);
+		addTokenizedAndSortableField( doc, IntactColumnSet.PROPERTIES_B, propertiesB);
 		
 		doc.add(new Field("interactor_types", isolateBracket(typeA) + " " + isolateBracket(typeB),
 				Field.Store.NO,
 				Field.Index.TOKENIZED));
 		
-		addTokenizedAndSortableField( doc, IntActColumnSet.INTERACTOR_TYPE_A, typeA);
-		addTokenizedAndSortableField( doc, IntActColumnSet.INTERACTOR_TYPE_B, typeB);
+		addTokenizedAndSortableField( doc, IntactColumnSet.INTERACTOR_TYPE_A, typeA);
+		addTokenizedAndSortableField( doc, IntactColumnSet.INTERACTOR_TYPE_B, typeB);
 		
-		addTokenizedAndSortableField( doc, IntActColumnSet.HOSTORGANISM, hostOrganism);
+		addTokenizedAndSortableField( doc, IntactColumnSet.HOSTORGANISM, hostOrganism);
 		
-		addTokenizedAndSortableField( doc, IntActColumnSet.EXPANSION_METHOD, expansion);
-        addTokenizedAndSortableField( doc, IntActColumnSet.DATASET, dataset);
+		addTokenizedAndSortableField( doc, IntactColumnSet.EXPANSION_METHOD, expansion);
+        addTokenizedAndSortableField( doc, IntactColumnSet.DATASET, dataset);
 
         return doc;
 	}
@@ -102,17 +103,17 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 		StringBuffer sb = new StringBuffer(256);
         DefaultDocumentBuilder builder = new DefaultDocumentBuilder();
         sb.append(builder.createPsimiTabLine(doc));
-		sb.append(doc.get(IntActColumnSet.EXPERIMENTAL_ROLE_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
-		sb.append(doc.get(IntActColumnSet.EXPERIMENTAL_ROLE_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
-		sb.append(doc.get(IntActColumnSet.BIOLOGICAL_ROLE_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
-		sb.append(doc.get(IntActColumnSet.BIOLOGICAL_ROLE_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
-        sb.append(doc.get(IntActColumnSet.PROPERTIES_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
-		sb.append(doc.get(IntActColumnSet.PROPERTIES_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
-		sb.append(doc.get(IntActColumnSet.INTERACTOR_TYPE_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
-		sb.append(doc.get(IntActColumnSet.INTERACTOR_TYPE_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
-		sb.append(doc.get(IntActColumnSet.HOSTORGANISM.getShortName())).append(DEFAULT_COL_SEPARATOR);
-		sb.append(doc.get(IntActColumnSet.EXPANSION_METHOD.getShortName())).append(DEFAULT_COL_SEPARATOR);
-        sb.append(doc.get(IntActColumnSet.DATASET.getShortName())).append(DEFAULT_COL_SEPARATOR);
+		sb.append(doc.get(IntactColumnSet.EXPERIMENTAL_ROLE_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
+		sb.append(doc.get(IntactColumnSet.EXPERIMENTAL_ROLE_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
+		sb.append(doc.get(IntactColumnSet.BIOLOGICAL_ROLE_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
+		sb.append(doc.get(IntactColumnSet.BIOLOGICAL_ROLE_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
+        sb.append(doc.get(IntactColumnSet.PROPERTIES_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
+		sb.append(doc.get(IntactColumnSet.PROPERTIES_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
+		sb.append(doc.get(IntactColumnSet.INTERACTOR_TYPE_A.getShortName())).append(DEFAULT_COL_SEPARATOR);
+		sb.append(doc.get(IntactColumnSet.INTERACTOR_TYPE_B.getShortName())).append(DEFAULT_COL_SEPARATOR);
+		sb.append(doc.get(IntactColumnSet.HOSTORGANISM.getShortName())).append(DEFAULT_COL_SEPARATOR);
+		sb.append(doc.get(IntactColumnSet.EXPANSION_METHOD.getShortName())).append(DEFAULT_COL_SEPARATOR);
+        sb.append(doc.get(IntactColumnSet.DATASET.getShortName())).append(DEFAULT_COL_SEPARATOR);
 
         return  sb.toString();
 	}
@@ -129,7 +130,7 @@ public class IntActDocumentBuilder extends DefaultDocumentBuilder {
 
         MitabLineParser parser = new MitabLineParser();
         parser.setBinaryInteractionClass(IntactBinaryInteraction.class);
-        parser.setColumnHandler(new IntActColumnHandler());
+        parser.setColumnHandler(new IntactColumnHandler());
 
         return parser.parse(line);
     }

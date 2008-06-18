@@ -19,7 +19,7 @@ public class IntActColumnSetTest {
 
 	@Test
 	public void testIntActColumnSet() {
-		IntActColumnSet columnSet = new IntActColumnSet();
+		IntactColumnSet columnSet = new IntactColumnSet();
 		
 		assertNotNull(columnSet.getPsimiTabColumns());
 		assertEquals(26, columnSet.getPsimiTabColumns().size());

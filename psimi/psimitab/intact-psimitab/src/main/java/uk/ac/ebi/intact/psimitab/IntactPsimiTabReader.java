@@ -26,7 +26,7 @@ public class IntactPsimiTabReader extends PsimiTabReader {
     public IntactPsimiTabReader(boolean hasHeaderLine) {
         super(hasHeaderLine);
         
-        final IntActColumnHandler columnHandler = new IntActColumnHandler();
+        final IntactColumnHandler columnHandler = new IntactColumnHandler();
         columnHandler.setGoTermNameAutoCompletion(true);
         columnHandler.setInterproNameAutoCompletion(true);
 

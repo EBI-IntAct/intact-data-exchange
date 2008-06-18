@@ -83,12 +83,14 @@ public class InterproNameHandler {
 
     private void init( BufferedReader reader ) throws IOException {
         long start = System.currentTimeMillis();
-        logger.debug( "Starting to init InterproNameMap." );
+
+        if (logger.isDebugEnabled())
+            logger.debug( "Starting to init InterproNameMap." );
+
         interproMap = new HashMap<String, String>();
 
         String line = reader.readLine();
         while ( line != null ) {
-            if ( line != null ) {
                 if ( INTERPRO_ENTRY_PATTERN.matcher( line ).matches() ) {
                     int index = line.indexOf( " " );
                     String interproTerm = line.substring( 0, index );
@@ -96,7 +98,6 @@ public class InterproNameHandler {
 
                     interproMap.put( interproTerm, interproName );
                 }
-            }
             line = reader.readLine();
         }
         reader.close();

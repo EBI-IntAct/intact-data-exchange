@@ -28,7 +28,7 @@ public class IntactLineFormatter extends TabulatedLineFormatter {
     public IntactLineFormatter() {
         super();
 
-        final IntActColumnHandler columnHandler = new IntActColumnHandler();
+        final IntactColumnHandler columnHandler = new IntactColumnHandler();
         columnHandler.setGoTermNameAutoCompletion(true);
         columnHandler.setInterproNameAutoCompletion(true);
 

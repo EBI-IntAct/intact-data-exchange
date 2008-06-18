@@ -24,7 +24,7 @@ import psidev.psi.mi.tab.converter.tab2xml.Tab2Xml;
 public class IntactTab2Xml extends Tab2Xml {
 
     public IntactTab2Xml() {
-        final IntActColumnHandler columnHandler = new IntActColumnHandler();
+        final IntactColumnHandler columnHandler = new IntactColumnHandler();
         setColumnHandler(columnHandler);
         setBinaryInteractionClass( IntactBinaryInteraction.class );
     }

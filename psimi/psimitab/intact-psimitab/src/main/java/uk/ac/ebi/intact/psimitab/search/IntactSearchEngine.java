@@ -19,7 +19,7 @@ import java.io.IOException;
  * @version $Id$
  * @since 2.0.0
  */
-public class IntActSearchEngine extends FastSearchEngine<IntactBinaryInteraction> {
+public class IntactSearchEngine extends FastSearchEngine<IntactBinaryInteraction> {
 
     private static final String[] DEFAULT_FIELDS = {"identifiers",
                                                     DefaultColumnSet.PUB_ID.getShortName(),
@@ -29,25 +29,25 @@ public class IntActSearchEngine extends FastSearchEngine<IntactBinaryInteraction
                                                     DefaultColumnSet.INTER_DETECTION_METHODS.getShortName(),
                                                     DefaultColumnSet.INTERACTION_ID.getShortName(),
                                                     "properties",
-                                                    IntActColumnSet.HOSTORGANISM.getShortName(),
-                                                    IntActColumnSet.EXPANSION_METHOD.getShortName(),
-                                                    IntActColumnSet.DATASET.getShortName()};
+                                                    IntactColumnSet.HOSTORGANISM.getShortName(),
+                                                    IntactColumnSet.EXPANSION_METHOD.getShortName(),
+                                                    IntactColumnSet.DATASET.getShortName()};
 
-    public IntActSearchEngine(Directory indexDirectory) throws IOException {
+    public IntactSearchEngine(Directory indexDirectory) throws IOException {
         super(indexDirectory);
     }
 
-    public IntActSearchEngine(File indexDirectory) throws IOException {
+    public IntactSearchEngine(File indexDirectory) throws IOException {
         super(indexDirectory);
     }
 
-    public IntActSearchEngine(String indexDirectory) throws IOException {
+    public IntactSearchEngine(String indexDirectory) throws IOException {
         super(indexDirectory);
     }
 
     @Override
     protected DocumentBuilder createDocumentBuilder() {
-        return new IntActDocumentBuilder();
+        return new IntactDocumentBuilder();
     }
 
     protected String[] getSearchFields() {

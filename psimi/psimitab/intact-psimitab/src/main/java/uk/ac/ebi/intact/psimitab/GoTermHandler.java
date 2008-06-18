@@ -46,8 +46,8 @@ public class GoTermHandler {
         query = new OlsClient().getOntologyQuery();
         goMap = new HashMap<String, String>();
 
-        if ( logger.isInfoEnabled() )
-            logger.info( "Time to init GoTermHandler " + ( System.currentTimeMillis() - start ) );        
+        if ( logger.isTraceEnabled() )
+            logger.trace( "Time to init GoTermHandler " + ( System.currentTimeMillis() - start ) );
     }
 
     public String getNameById( String goTerm ) throws NameNotFoundException {
@@ -63,7 +63,9 @@ public class GoTermHandler {
                 throw new NameNotFoundException( "Could not find " + goTerm );
             }
         }
-        logger.info( "Time to get goTerm " + goTerm + " from map " + ( System.currentTimeMillis() - start ) );
+
+        if (logger.isTraceEnabled())
+            logger.trace( "Time to get goTerm " + goTerm + " from map " + ( System.currentTimeMillis() - start ) );
 
         if ( result != null ) {
             goMap.put( goTerm, result );

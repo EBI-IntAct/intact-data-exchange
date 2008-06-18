@@ -15,16 +15,16 @@ import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
  * @version $Id$
  * @since 2.0.0 
  */
-public class IntActPsimiTabIndexWriter extends PsimiTabIndexWriter
+public class IntactPsimiTabIndexWriter extends PsimiTabIndexWriter
 {
 
-    public IntActPsimiTabIndexWriter()
+    public IntactPsimiTabIndexWriter()
     {
     }
 
     @Override
 	public Document createDocument(String interaction) throws MitabLineException {
-        DocumentBuilder builder = new IntActDocumentBuilder();
+        DocumentBuilder builder = new IntactDocumentBuilder();
         return builder.createDocumentFromPsimiTabLine(interaction);
 	}
 

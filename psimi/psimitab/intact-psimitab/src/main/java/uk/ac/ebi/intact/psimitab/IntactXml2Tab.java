@@ -24,7 +24,7 @@ import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 public class IntactXml2Tab extends Xml2Tab {
 
     public IntactXml2Tab() {
-        final IntActColumnHandler columnHandler = new IntActColumnHandler();
+        final IntactColumnHandler columnHandler = new IntactColumnHandler();
         columnHandler.setGoTermNameAutoCompletion(true);
         columnHandler.setInterproNameAutoCompletion(true);
 

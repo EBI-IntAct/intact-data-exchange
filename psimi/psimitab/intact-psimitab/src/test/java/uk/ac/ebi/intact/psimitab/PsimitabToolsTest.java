@@ -17,7 +17,7 @@ package uk.ac.ebi.intact.psimitab;
 
 import org.junit.Test;
 import psidev.psi.mi.search.index.AbstractIndexWriter;
-import uk.ac.ebi.intact.psimitab.search.IntActPsimiTabIndexWriter;
+import uk.ac.ebi.intact.psimitab.search.IntactPsimiTabIndexWriter;
 
 import java.io.File;
 
@@ -33,7 +33,7 @@ public class PsimitabToolsTest extends AbstractPsimitabTestCase{
 //       File psimitabFile = new File(PsimitabToolsTest.class.getResource("/mitab_samples/intact.sample-extra.txt").getFile());
        File indexDirectory = new File("target", "PsimitabToolsTest"+System.currentTimeMillis());
 
-       AbstractIndexWriter indexWriter = new IntActPsimiTabIndexWriter();
+       AbstractIndexWriter indexWriter = new IntactPsimiTabIndexWriter();
 
        PsimitabTools.buildIndex(indexDirectory, psimitabFile, true, true, indexWriter);
     }

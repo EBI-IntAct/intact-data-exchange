@@ -24,7 +24,7 @@ import psidev.psi.mi.tab.PsimiTabWriter;
 public class IntactPsimiTabWriter extends PsimiTabWriter {
 
     public IntactPsimiTabWriter() {
-        final IntActColumnHandler columnHandler = new IntActColumnHandler();
+        final IntactColumnHandler columnHandler = new IntactColumnHandler();
         columnHandler.setGoTermNameAutoCompletion(true);
         columnHandler.setInterproNameAutoCompletion(true);
 

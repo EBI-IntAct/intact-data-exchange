@@ -14,28 +14,26 @@ import java.io.File;
 import java.io.StringWriter;
 import java.util.Collection;
 
-public class IntActTabTest extends AbstractPsimitabTestCase {
+public class IntactTabTest extends AbstractPsimitabTestCase {
 
     @Test
     public void testBinaryInteractionHandler() throws Exception {
 
-        File xmlFile = getFileByResources( "/psi25-testset/9971739.xml", IntActTabTest.class );
+        File xmlFile = getFileByResources( "/psi25-testset/9971739.xml", IntactTabTest.class );
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
         Xml2Tab xml2tab = new Xml2Tab();
 
         xml2tab.setBinaryInteractionClass( IntactBinaryInteraction.class );
-        xml2tab.setColumnHandler( new IntActColumnHandler() );
+        xml2tab.setColumnHandler( new IntactColumnHandler() );
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
         xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
-        PsimiTabWriter writer = new PsimiTabWriter();
-        writer.setColumnHandler( new IntActColumnHandler() );
-        writer.setBinaryInteractionClass( IntactBinaryInteraction.class );
+        PsimiTabWriter writer = new IntactPsimiTabWriter();
 
         File tabFile = new File( getTargetDirectory(), "9971739_expanded.txt" );
         assertTrue( tabFile.getParentFile().canWrite() );
@@ -50,18 +48,16 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
     @Test
     public void testPsimiTabReader() throws Exception {
 
-        File tabFile = getFileByResources( "/mitab-testset/9971739_expanded.txt", IntActTabTest.class );
+        File tabFile = getFileByResources( "/mitab-testset/9971739_expanded.txt", IntactTabTest.class );
         assertTrue( tabFile.canRead() );
 
         boolean hasHeaderLine = true;
 
-        PsimiTabReader reader = new PsimiTabReader( hasHeaderLine );
-        reader.setBinaryInteractionClass( IntactBinaryInteraction.class );
-        reader.setColumnHandler( new IntActColumnHandler() );
+        PsimiTabReader reader = new IntactPsimiTabReader( hasHeaderLine );
 
         Collection<BinaryInteraction> bis = reader.read( tabFile );
 
-        File xmlFile = getFileByResources( "/psi25-testset/9971739.xml", IntActTabTest.class );
+        File xmlFile = getFileByResources( "/psi25-testset/9971739.xml", IntactTabTest.class );
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
@@ -88,14 +84,14 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
     @Test
     public void testExpansion() throws Exception {
 
-        File xmlFile = getFileByResources( "/psi25-testset/simple.xml", IntActTabTest.class );
+        File xmlFile = getFileByResources( "/psi25-testset/simple.xml", IntactTabTest.class );
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
         Xml2Tab xml2tab = new Xml2Tab();
 
         xml2tab.setBinaryInteractionClass( IntactBinaryInteraction.class );
-        xml2tab.setColumnHandler( new IntActColumnHandler() );
+        xml2tab.setColumnHandler( new IntactColumnHandler() );
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
         xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
@@ -137,7 +133,7 @@ public class IntActTabTest extends AbstractPsimitabTestCase {
     @Test
     public void testIfAuthorIsCurrator() throws Exception {
         // reading a file were all interactions inferred by currators
-        File xmlFile = getFileByResources( "/psi25-testset/14681455.xml", IntActTabTest.class );
+        File xmlFile = getFileByResources( "/psi25-testset/14681455.xml", IntactTabTest.class );
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
