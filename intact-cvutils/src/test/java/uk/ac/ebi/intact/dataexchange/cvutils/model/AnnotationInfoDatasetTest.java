@@ -18,11 +18,6 @@ import java.util.Iterator;
 public class AnnotationInfoDatasetTest {
 
     @Test
-    public void getCvAnnotation() throws Exception {
-        fail( "Not yet implemented." );
-    }
-
-    @Test
     public void getAllAnnotationInfoSorted() throws Exception {
 
         AnnotationInfoDataset dataset = new AnnotationInfoDataset();
@@ -56,7 +51,6 @@ public class AnnotationInfoDatasetTest {
 
         info = i.next();
         Assert.assertEquals( "1", info.getMi() );
-
     }
 
     @Test
