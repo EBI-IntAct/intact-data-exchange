@@ -9,8 +9,8 @@ import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntActColumnHandler;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntactColumnHandler;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -74,8 +74,8 @@ public class Intact2TabTest extends IntactBasicTestCase {
 
         File file = new File( TestHelper.getTargetDirectory(), "test_2.txt" );
         PsimiTabWriter writer = new PsimiTabWriter();
-        writer.setBinaryInteractionClass( IntActBinaryInteraction.class );
-        writer.setColumnHandler( new IntActColumnHandler() );
+        writer.setBinaryInteractionClass( IntactBinaryInteraction.class );
+        writer.setColumnHandler( new IntactColumnHandler() );
         writer.write( bis, file );
     }
 
@@ -106,8 +106,8 @@ public class Intact2TabTest extends IntactBasicTestCase {
 
         File file = new File( TestHelper.getTargetDirectory(), "test_3.txt" );
         PsimiTabWriter writer = new PsimiTabWriter();
-        writer.setBinaryInteractionClass( IntActBinaryInteraction.class );
-        writer.setColumnHandler( new IntActColumnHandler() );
+        writer.setBinaryInteractionClass( IntactBinaryInteraction.class );
+        writer.setColumnHandler( new IntactColumnHandler() );
         writer.write( bis, file );
     }
 
