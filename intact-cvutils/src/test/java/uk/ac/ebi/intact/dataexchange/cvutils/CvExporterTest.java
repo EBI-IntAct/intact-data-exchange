@@ -55,12 +55,8 @@ public class CvExporterTest {
     @Before
     public void prepareCvs() throws OBOParseException, IOException, PsiLoaderException, IntactTransactionException {
 
-
-        //URL url = CvExporterTest.class.getResource( "/psi-mi25.obo" );
-        //log.info( "url " + url );
-        //OBOSession oboSession = OboUtils.createOBOSession( url );
-
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.45");
+        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
+        log.debug( oboSession.getObjects().size() );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvDagObject> allCvs_;

@@ -62,8 +62,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     public void reportDirectlyFromOBOFile() throws Exception {
 
         //URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
-
-        URL url = new URL( OboUtils.PSI_MI_OBO_LOCATION );
+        String revision ="HEAD";
+        URL url =  new URL( OboUtils.PSI_MI_OBO_LOCATION +"?revision="+revision);
         log.debug( "url " + url );
 
         BufferedReader in = new BufferedReader( new InputStreamReader( url.openStream() ) );
@@ -75,6 +75,9 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         int obsoleteCounter = 0;
         int obsoleteCounterDef = 0;
         int typedefCounter = 0;
+
+        int drugTerm = 0;
+        int psiTerm = 0;
 
         while ( ( inputLine = in.readLine() ) != null ) {
 
@@ -100,7 +103,16 @@ public class CvUpdaterTest extends IntactBasicTestCase {
                 typedefCounter++;
             }
 
+            if ( inputLine.matches("subset:\\s+PSI-MI\\s+slim" ) ) {
+                psiTerm++;
+                 }
+            if ( inputLine.matches("subset:\\s+Drugable" ) ) {
+                drugTerm++;
+                //log.info(drugTerm+"  "+ temp );
+            }
         }
+
+      
 
         //948+1 with Typedef
         Assert.assertEquals( 949, idCounter );
@@ -109,6 +121,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( 53, obsoleteCounter );
         Assert.assertEquals( 53, obsoleteCounterDef );
         Assert.assertEquals( 1, typedefCounter );
+        Assert.assertEquals( 844, psiTerm );
+        Assert.assertEquals( 124, drugTerm );
 
         in.close();
 

@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 
+
 /**
  * Set of methods to deal with OBO files 
  *
@@ -51,6 +52,9 @@ public class OboUtils {
         OBOSession session = parser.getSession();
         return session;
     }
+
+
+  
 
     public static OBOSession createOBOSessionFromLatestMi() throws IOException, OBOParseException {
       return createOBOSessionFromDefault("HEAD");

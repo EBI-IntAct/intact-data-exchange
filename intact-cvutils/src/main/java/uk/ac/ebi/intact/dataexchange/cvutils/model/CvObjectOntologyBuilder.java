@@ -93,6 +93,7 @@ public class CvObjectOntologyBuilder {
                                                              CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT );
         this.processed = new HashMap<String, CvObject>();
 
+
     }
 
     /*
@@ -100,9 +101,11 @@ public class CvObjectOntologyBuilder {
     *   toCVObject.
     *
     * */
-    public <T extends CvObject> T toCvObject( OBOObject oboObj ) {
+    public <T extends CvObject> T toCvObject( OBOObject oboObj, OboCategory... categories ) {
         T cvObject;
         try {
+
+
             if ( log.isTraceEnabled() ) log.trace( "ID    ->" + oboObj.getID() + "   Name ->" + oboObj.getName() );
 
             //find the CvClass for any given MI identifier
@@ -122,6 +125,9 @@ public class CvObjectOntologyBuilder {
             if ( processed.containsKey( processedKey ) ) {
                 return ( T ) processed.get( processedKey );
             }
+
+            //test
+
 
             final Institution institution = IntactContext.getCurrentInstance().getInstitution();
 
@@ -207,7 +213,7 @@ public class CvObjectOntologyBuilder {
                             if ( log.isDebugEnabled() ) log.debug( " New format " + suffixString );
                         }
                     } else {
-                        if ( log.isDebugEnabled() ) log.debug( "-----something wrong here check------" );
+                        if ( log.isDebugEnabled() ) log.debug( "-----Check Def line--"+oboObj.getID()+" DefArray length: "+defArray.length+"  Def: "+definition );
                     }
 
                 }//end outer if
@@ -290,7 +296,30 @@ public class CvObjectOntologyBuilder {
                         if ( m.group( 2 ).equalsIgnoreCase( oboObj.getID() ) ) {
                             CvDagObject dagObject = ( CvDagObject ) cvObject;
                             OBOObject childObj = ( OBOObject ) oboSession.getObject( m.group( 1 ) );
-                            dagObject.addChild( ( CvDagObject ) toCvObject( childObj ) );
+
+                           //check for subset
+                            if(categories==null || categories.length==0){
+                              dagObject.addChild( ( CvDagObject ) toCvObject( childObj, categories ) );
+                            }else{
+                            for ( OboCategory category : categories ) {
+                                for ( TermCategory oboCat : childObj.getCategories() ) {
+                                    if ( category.getName().equalsIgnoreCase( oboCat.getName() ) ) {
+                                        if ( log.isTraceEnabled() ) {
+                                           log.trace( "Adding child after subset check: "+childObj.getID() +"   "+childObj.getName() ); 
+                                        }
+
+                                        dagObject.addChild( ( CvDagObject ) toCvObject( childObj, categories ) );
+                                    } //end if
+
+                                } //end for
+
+                            }//end for
+                           } //end else 
+                            //check end
+
+       //                         dagObject.addChild( ( CvDagObject ) toCvObject( childObj, categories ) );
+
+
                         }//end if
                     }//end matches
                 } //end for
@@ -621,7 +650,7 @@ public class CvObjectOntologyBuilder {
         return orphanOboObjects;
     }//end of method
 
-    public Collection<IdentifiedObject> getRootOBOObjects() {
+    public Collection<IdentifiedObject> getRootOBOObjects( OboCategory... categories ) {
         ArrayList<IdentifiedObject> rootOboObjects = new ArrayList<IdentifiedObject>();
 
         OBOObject rootObj = ( OBOObject ) oboSession.getObject( MI_ROOT_IDENTIFIER );
@@ -635,7 +664,15 @@ public class CvObjectOntologyBuilder {
             if ( m.matches() ) {
 
                 if ( m.group( 2 ).equalsIgnoreCase( MI_ROOT_IDENTIFIER ) ) {
-                    rootOboObjects.add( oboSession.getObject( m.group( 1 ) ) );
+
+                    OBOObject immediateChildOfRoot = ( OBOObject ) oboSession.getObject( m.group( 1 ) );
+
+                    if ( log.isDebugEnabled() ) log.debug( "immediateChildOfRoot " + immediateChildOfRoot.getID() );
+                    
+                    if ( checkIfCategorySubset( immediateChildOfRoot, categories ) ) {
+                        rootOboObjects.add( immediateChildOfRoot );
+                    }
+
                 }
 
             }//end matches
@@ -800,17 +837,41 @@ public class CvObjectOntologyBuilder {
     } //end of method
 
 
-    public List<CvDagObject> getAllCvs() {
+    public boolean checkIfCategorySubset( OBOObject oboObject, OboCategory... categories ) {
+
+        if ( categories == null || categories.length == 0 )
+            return true;
+
+
+        for ( OboCategory category : categories ) {
+               for ( TermCategory oboCat : oboObject.getCategories() ) {
+                if ( category.getName().equalsIgnoreCase( oboCat.getName() ) ) {
+                    return true;
+                } //end if
+
+            } //end for
+
+        }//end for
+        return false;
+    }
+
+    public List<CvDagObject> getAllCvs( OboCategory... categories ) {
+
 
         List<CvDagObject> allCvs = new ArrayList<CvDagObject>();
         //until here
         List<CvObject> rootsAndChildren = new ArrayList<CvObject>();
-        Collection<IdentifiedObject> rootOboObjects = getRootOBOObjects();
+        Collection<IdentifiedObject> rootOboObjects = getRootOBOObjects( categories );
 
         for ( IdentifiedObject rootOboObject : rootOboObjects ) {
             OBOObject rootObject = ( OBOObject ) rootOboObject;
-            CvObject cvObjectRoot = toCvObject( rootObject );
+
+           if(log.isTraceEnabled())log.trace("Adding Parent Object "+rootObject.getID());
+
+            CvObject cvObjectRoot = toCvObject( rootObject, categories );
+
             rootsAndChildren.add( cvObjectRoot );
+
 
         }//end for
 
@@ -823,9 +884,11 @@ public class CvObjectOntologyBuilder {
         for ( IdentifiedObject orphanObo : getOrphanOBOObjects() ) {
             if ( orphanObo instanceof OBOObject ) {
                 OBOObject orphanObj = ( OBOObject ) orphanObo;
-                CvObject cvOrphan = toCvObject( orphanObj );
-                allCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) cvOrphan ) );
 
+                if ( checkIfCategorySubset( orphanObj, categories ) ) {
+                    CvObject cvOrphan = toCvObject( orphanObj,categories );
+                    allCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) cvOrphan ) );
+                }
             }
 
 
@@ -848,7 +911,7 @@ public class CvObjectOntologyBuilder {
         }
 
         //Order by Putting CvXrefs first and CvDatabases next followed by all other topics
-        return getAllOrderedCvs(orderedList);
+        return getAllOrderedCvs( orderedList );
 
 
     } //end of method
@@ -876,7 +939,6 @@ public class CvObjectOntologyBuilder {
         orderedList.addAll( databaseList );
         orderedList.addAll( otherList );
 
-       
 
         return orderedList;
     }//end of method
