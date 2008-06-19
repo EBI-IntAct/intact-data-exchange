@@ -22,7 +22,7 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 import psidev.psi.mi.tab.processor.PostProcessorStrategy;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.IntActBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
 
@@ -51,16 +51,16 @@ public class Intact2BinaryInteractionConverter {
     private BinaryInteractionHandler biHandler;
 
     private PostProcessorStrategy postProcessor;
-
+                                    
     public Intact2BinaryInteractionConverter() {
-        binaryInteractionClass = IntActBinaryInteraction.class;
+        binaryInteractionClass = IntactBinaryInteraction.class;
         biHandler = new IntactBinaryInteractionHandler();
         expansionStrategy = new SpokeWithoutBaitExpansion();
         postProcessor = new ClusterInteractorPairProcessor();
     }
 
     public Intact2BinaryInteractionConverter(ExpansionStrategy expansionStrategy, PostProcessorStrategy postProcessor) {
-        binaryInteractionClass = IntActBinaryInteraction.class;
+        binaryInteractionClass = IntactBinaryInteraction.class;
         biHandler = new IntactBinaryInteractionHandler();
         this.expansionStrategy = expansionStrategy;
         this.postProcessor = postProcessor;
