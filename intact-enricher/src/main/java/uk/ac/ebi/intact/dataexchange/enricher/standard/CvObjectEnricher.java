@@ -19,9 +19,11 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
 import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.model.CvObjectXref;
+import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
+import uk.ac.ebi.intact.core.persister.DefaultEntityStateCopier;
 
 /**
  * TODO comment this
@@ -48,24 +50,21 @@ public class CvObjectEnricher extends AnnotatedObjectEnricher<CvObject> {
     public void enrich(CvObject objectToEnrich) {
         CvObjectXref identityXref = CvObjectUtils.getPsiMiIdentityXref(objectToEnrich);
 
-        CvTerm term;
+        CvObject referenceTerm;
 
         if (identityXref != null) {
             String mi = identityXref.getPrimaryId();
-            term = CvObjectFetcher.getInstance().fetchByTermId(mi);
+            referenceTerm = CvObjectFetcher.getInstance().fetchByTermId(objectToEnrich.getClass(), mi);
         } else {
-            term = CvObjectFetcher.getInstance().fetchByShortLabel(objectToEnrich.getClass(), objectToEnrich.getShortLabel());
-
-            // create PSI MI Xref
-            if (term != null) {
-                CvObjectXref xref = XrefUtils.createIdentityXrefPsiMi(objectToEnrich, term.getId());
-                objectToEnrich.addXref(xref);
-            }
+            referenceTerm = CvObjectFetcher.getInstance().fetchByShortLabel(objectToEnrich.getClass(), objectToEnrich.getShortLabel());
         }
 
-        if (term != null) {
-            objectToEnrich.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(term.getShortName()));
-            objectToEnrich.setFullName(term.getFullName());
+        if (referenceTerm != null) {
+            //objectToEnrich.setShortLabel(referenceTerm.getShortLabel());
+            //objectToEnrich.setFullName(referenceTerm.getFullName());
+
+            DefaultEntityStateCopier copier = new DefaultEntityStateCopier();
+            copier.copy(referenceTerm, objectToEnrich);
         }
 
     }

@@ -22,6 +22,9 @@ import org.junit.Test;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
+import uk.ac.ebi.intact.model.CvObject;
+import uk.ac.ebi.intact.model.CvInteractorType;
+import uk.ac.ebi.intact.model.CvInteraction;
 
 /**
  * TODO comment this
@@ -45,22 +48,24 @@ public class CvObjectFetcherTest {
 
     @Test
     public void fetchByTermId_short() {
-        CvTerm term = fetcher.fetchByTermId("MI:0326");
-        Assert.assertEquals("protein", term.getShortName());
+        CvObject term = fetcher.fetchByTermId(CvInteractorType.class, "MI:0326");
+        Assert.assertEquals("protein", term.getShortLabel());
     }
 
     @Test
     public void fetchByTermId_long() {
-        CvTerm term = fetcher.fetchByTermId("MI:0001");
-        Assert.assertEquals("interaction detect", term.getShortName());
+        CvObject term = fetcher.fetchByTermId(CvInteraction.class, "MI:0001");
+        Assert.assertNotNull(term);
+        Assert.assertEquals("interaction detect", term.getShortLabel());
         Assert.assertEquals("interaction detection method", term.getFullName());
     }
 
     @Test
     public void fetchByTermShortLabel() {
-        CvTerm term = fetcher.fetchByShortLabel(CvExperimentalRole.class, CvExperimentalRole.UNSPECIFIED);
-        Assert.assertEquals(CvExperimentalRole.UNSPECIFIED, term.getShortName());
+        CvObject term = fetcher.fetchByShortLabel(CvExperimentalRole.class, CvExperimentalRole.UNSPECIFIED);
+        Assert.assertNotNull(term);
+        Assert.assertEquals(CvExperimentalRole.UNSPECIFIED, term.getShortLabel());
         Assert.assertEquals("unspecified role", term.getFullName());
-        Assert.assertEquals(CvExperimentalRole.UNSPECIFIED_PSI_REF, term.getId());
+        Assert.assertEquals(CvExperimentalRole.UNSPECIFIED_PSI_REF, term.getMiIdentifier());
     }
 }

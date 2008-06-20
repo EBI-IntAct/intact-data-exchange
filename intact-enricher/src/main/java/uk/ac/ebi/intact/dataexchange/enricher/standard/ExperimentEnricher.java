@@ -32,6 +32,7 @@ import uk.ac.ebi.intact.util.cdb.InvalidPubmedException;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 
 /**
  * TODO comment this
@@ -96,8 +97,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
             String detMethodMi = calculateParticipantDetMethod(objectToEnrich);
 
             if (detMethodMi != null) {
-                CvTerm detMethodTerm = CvObjectFetcher.getInstance().fetchByTermId(detMethodMi);
-                CvIdentification detMethod = CvObjectUtils.createCvObject(objectToEnrich.getOwner(), CvIdentification.class, detMethodMi, detMethodTerm.getShortName());
+                CvIdentification detMethod = CvObjectFetcher.getInstance().fetchByTermId(CvIdentification.class, detMethodMi);
                 objectToEnrich.setCvIdentification(detMethod);
             }
         }
@@ -162,7 +162,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         if (detMethodMis.size() == 1) {
             return detMethodMis.iterator().next();
         } else if (detMethodMis.size() > 1) {
-            IntactOntology ontology = EnricherContext.getInstance().getIntactOntology();
+            List<CvDagObject> ontology = EnricherContext.getInstance().getIntactOntology();
 
             return CvUtils.findLowestCommonAncestor(ontology, detMethodMis.toArray(new String[detMethodMis.size()]));
         }

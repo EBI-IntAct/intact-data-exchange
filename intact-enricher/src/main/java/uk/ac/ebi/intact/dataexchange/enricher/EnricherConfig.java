@@ -27,7 +27,7 @@ public class EnricherConfig {
     private boolean updateProteins = true;
     private boolean updateExperiments = true;
     private boolean updateInteractionShortLabels = false;
-    private String oboUrl = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/psi-mi25-4intact.obo";
+    private String oboUrl = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
 
     public EnricherConfig() {
 

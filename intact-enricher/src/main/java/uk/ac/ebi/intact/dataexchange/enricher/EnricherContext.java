@@ -19,13 +19,21 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obo.datamodel.OBOSession;
+import org.obo.dataadapter.OBOParseException;
 import uk.ac.ebi.intact.dataexchange.cvutils.PSILoader;
 import uk.ac.ebi.intact.dataexchange.cvutils.PsiLoaderException;
+import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
+import uk.ac.ebi.intact.model.CvObject;
+import uk.ac.ebi.intact.model.CvDagObject;
 
 import java.io.InputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * TODO comment this
@@ -41,7 +49,7 @@ public class EnricherContext {
     public static final Log log = LogFactory.getLog(EnricherContext.class);
 
     private EnricherConfig config;
-    private IntactOntology ontology;
+    private List<CvDagObject> ontology;
 
     private static ThreadLocal<EnricherContext> instance = new ThreadLocal<EnricherContext>() {
         @Override
@@ -80,7 +88,7 @@ public class EnricherContext {
     }
 
 
-    public IntactOntology getIntactOntology() {
+    public List<CvDagObject> getIntactOntology() {
         if (ontology == null) {
             try {
                 ontology = loadOntology();
@@ -92,18 +100,27 @@ public class EnricherContext {
         return ontology;
     }
 
-    private IntactOntology loadOntology() throws PsiLoaderException {
-        URL url = null;
+    private List<CvDagObject> loadOntology() throws PsiLoaderException {
+        final URL url;
         try {
             url = new URL(getConfig().getOboUrl());
         } catch (MalformedURLException e) {
             throw new EnricherException(e);
         }
 
-        PSILoader loader = new PSILoader();
-        IntactOntology ontology = loader.parseOboFile(url);
+        OBOSession oboSession = null;
+        try {
+            oboSession = OboUtils.createOBOSession(url);
+        } catch (IOException e) {
+            throw new EnricherException("Problem reading OBO file from URL: "+url, e);
+        } catch (OBOParseException e) {
+            throw new EnricherException("Problem parsing OBO file: "+url);
+        }
 
-        return ontology;
+        CvObjectOntologyBuilder builder = new CvObjectOntologyBuilder(oboSession);
+
+
+        return builder.getAllCvs();
     }
 
     public void close() {

@@ -23,6 +23,9 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.model.CvObject;
+import uk.ac.ebi.intact.model.CvDagObject;
+
+import java.util.List;
 
 /**
  * TODO comment this
@@ -51,16 +54,18 @@ public class CvObjectFetcher {
     public CvObjectFetcher() {
     }
 
-    public CvTerm fetchByTermId(String termId) {
+    public <T extends CvObject> T fetchByTermId(Class<T> objClass, String termId) {
         Cache cache = EnricherContext.getInstance().getCache("CvObject");
 
-        CvTerm term = null;
+        T term = null;
+
+        String key = objClass.getSimpleName()+"_"+termId;
 
         if (cache.isKeyInCache(termId)) {
             final Element element = cache.get(termId);
 
             if (element != null) {
-                term = (CvTerm) element.getObjectValue();
+                term = (T) element.getObjectValue();
             } else {
                 if (log.isDebugEnabled())
                     log.debug("Term was found in the cache but the element returned was null: "+termId);
@@ -69,46 +74,63 @@ public class CvObjectFetcher {
         }
 
         if (term == null) {
-            IntactOntology ontology = EnricherContext.getInstance().getIntactOntology();
-            term = ontology.search(termId);
+            List<CvDagObject> ontology = EnricherContext.getInstance().getIntactOntology();
+            term = searchById(ontology, objClass, termId);
 
             if (term != null) {
-                cache.put(new Element(termId, term));
+                cache.put(new Element(key, term));
             }
         }
 
         return term;
     }
 
-    public CvTerm fetchByShortLabel(Class<? extends CvObject> cvClass, String label) {
+    public <T extends CvObject> T fetchByShortLabel(Class<T> cvClass, String label) {
         if (cvClass == null || label == null) {
             return null;
         }
         
         Cache cache = EnricherContext.getInstance().getCache("CvObject");
 
-        String key = cvClass+"_"+label;
+        String key = cvClass.getSimpleName()+"_"+label;
 
-        CvTerm term = null;
+        T term;
 
         if (cache.isKeyInCache(key)) {
-            term = (CvTerm) cache.get(key).getObjectValue();
+            term = (T) cache.get(key).getObjectValue();
         } else {
-            IntactOntology ontology = EnricherContext.getInstance().getIntactOntology();
+            List<CvDagObject> ontology = EnricherContext.getInstance().getIntactOntology();
 
-            for (CvTerm candidateTerm : ontology.getCvTerms(cvClass)) {
-                if (candidateTerm.getShortName().equals(label)) {
-                    term = candidateTerm;
-                }
-            }
+            term = searchByLabel(ontology, cvClass, label);
 
             if (term != null) {
                 cache.put(new Element(key, term));
-                cache.put(new Element(term.getId(), term));
+                cache.put(new Element(cvClass.getSimpleName()+"_"+term.getMiIdentifier(), term));
             }
         }
 
         return term;
+    }
+
+    private <T extends CvObject> T searchById(List<CvDagObject> ontology, Class<T> objClass, String termId) {
+        for (CvObject cv : ontology) {
+            if (objClass.getName().equals(cv.getObjClass()) && termId.equals(cv.getMiIdentifier())) {
+                return (T) cv;
+            }
+        }
+
+        return null;
+    }
+
+    private <T extends CvObject> T searchByLabel(List<CvDagObject> ontology, Class<T> objClass, String shortLabel) {
+        for (CvObject cv : ontology) {
+            System.out.println(cv.getObjClass()+"\t"+cv.getShortLabel());
+            if (objClass.getName().equals(cv.getObjClass()) && shortLabel.equals(cv.getShortLabel())) {
+                return (T) cv;
+            }
+        }
+
+        return null;
     }
 
 }
