@@ -28,6 +28,7 @@ import java.util.Iterator;
  * @version $Id$
  * @since <pre>03-Mar-2006</pre>
  */
+@Deprecated
 public class SequenceManager {
 
     private static final Log log = LogFactory.getLog(SequenceManager.class);

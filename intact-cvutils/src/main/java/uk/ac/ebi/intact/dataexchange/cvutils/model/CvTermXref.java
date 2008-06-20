@@ -13,7 +13,7 @@ package uk.ac.ebi.intact.dataexchange.cvutils.model;
  * 
  * @since <pre>28-Sep-2005</pre>
  */
-
+@Deprecated
 public class CvTermXref {
 
     //////////////////////////

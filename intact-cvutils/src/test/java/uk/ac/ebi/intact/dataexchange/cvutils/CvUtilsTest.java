@@ -15,8 +15,13 @@
  */
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
-import org.junit.*;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
+import uk.ac.ebi.intact.model.CvDagObject;
+
+import java.util.List;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -24,20 +29,20 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
  */
 public class CvUtilsTest {
 
-    private static IntactOntology ontology;
+    private static List<CvDagObject> ontology;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-       ontology = OboUtils.createOntologyFromOboLatestPsiMi();
+       ontology = new CvObjectOntologyBuilder(OboUtils.createOBOSessionFromDefault("1.48")).getAllCvs();
     }
 
     @Test
     public void findLowerCommonAncestor() throws Exception {
         Assert.assertEquals("MI:0116", CvUtils.findLowestCommonAncestor(ontology, "MI:0252", "MI:0505"));
         Assert.assertEquals("MI:0505", CvUtils.findLowestCommonAncestor(ontology, "MI:0253", "MI:0505"));
-        Assert.assertEquals("MI:0000", CvUtils.findLowestCommonAncestor(ontology, "MI:0500", "MI:0116"));
+        Assert.assertNull("MI:0000", CvUtils.findLowestCommonAncestor(ontology, "MI:0500", "MI:0116"));
         Assert.assertEquals("MI:0495", CvUtils.findLowestCommonAncestor(ontology, "MI:0496", "MI:0498", "MI:0503"));
-        Assert.assertEquals("MI:0000", CvUtils.findLowestCommonAncestor(ontology, "MI:0496", "MI:0498", "MI:0503", "MI:0501"));
+        Assert.assertNull("MI:0000", CvUtils.findLowestCommonAncestor(ontology, "MI:0496", "MI:0498", "MI:0503", "MI:0501"));
     }
 
 }

@@ -21,7 +21,7 @@ import java.util.*;
  * @since <pre>30-Sep-2005</pre>
  */
 
-
+@Deprecated
 public class IntactOntology {
 
     ///////////////////////////////
