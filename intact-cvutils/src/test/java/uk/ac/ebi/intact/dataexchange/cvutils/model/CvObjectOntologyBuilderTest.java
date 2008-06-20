@@ -15,22 +15,25 @@
  */
 package uk.ac.ebi.intact.dataexchange.cvutils.model;
 
-import org.apache.commons.logging.Log;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.logging.Log;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.TermCategory;
-import org.obo.datamodel.IdentifiedObject;
 import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
-import java.util.*;
-import java.net.URL;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -431,6 +434,35 @@ public class CvObjectOntologyBuilderTest {
 
         return miCol;
     }//end method
+
+     @Test
+     @Ignore
+    public void build_cvsWithSameMi() throws Exception {
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
+        log.debug( oboSession.getObjects().size() );
+
+        CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
+
+        List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
+
+         boolean foundExpRole = false;
+         boolean foundBioRole = false;
+         
+         for (CvDagObject cv : allCvs) {
+             if (cv.getShortLabel().contains("unspecified role")) {
+                 if (CvBiologicalRole.class.getName().equals(cv.getObjClass())) {
+                    foundBioRole = true;
+                }
+                 if (CvExperimentalRole.class.getName().equals(cv.getObjClass())) {
+                    foundExpRole = true;
+                }
+             }
+         }
+
+         Assert.assertTrue("There should be an unspecified role of type CvBiologicalRole", foundBioRole);
+         Assert.assertTrue("There should be an unspecified role of type CvExperimentalRole", foundExpRole);
+
+     }
 
 }//end class
 
