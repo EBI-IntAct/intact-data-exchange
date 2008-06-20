@@ -40,9 +40,9 @@ public class CvUtilsTest {
     public void findLowerCommonAncestor() throws Exception {
         Assert.assertEquals("MI:0116", CvUtils.findLowestCommonAncestor(ontology, "MI:0252", "MI:0505"));
         Assert.assertEquals("MI:0505", CvUtils.findLowestCommonAncestor(ontology, "MI:0253", "MI:0505"));
-        Assert.assertNull("MI:0000", CvUtils.findLowestCommonAncestor(ontology, "MI:0500", "MI:0116"));
+        Assert.assertNull(CvUtils.findLowestCommonAncestor(ontology, "MI:0500", "MI:0116"));
         Assert.assertEquals("MI:0495", CvUtils.findLowestCommonAncestor(ontology, "MI:0496", "MI:0498", "MI:0503"));
-        Assert.assertNull("MI:0000", CvUtils.findLowestCommonAncestor(ontology, "MI:0496", "MI:0498", "MI:0503", "MI:0501"));
+        Assert.assertNull(CvUtils.findLowestCommonAncestor(ontology, "MI:0496", "MI:0498", "MI:0503", "MI:0501"));
     }
 
 }
