@@ -31,13 +31,11 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.context.DataContext;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import static java.util.Collections.sort;
 import java.util.*;
 
 
@@ -62,7 +60,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     public void reportDirectlyFromOBOFile() throws Exception {
 
         //URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
-        String revision ="HEAD";
+        String revision ="1.48";
         URL url =  new URL( OboUtils.PSI_MI_OBO_LOCATION +"?revision="+revision);
         log.debug( "url " + url );
 
@@ -130,7 +128,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     @Test
     public void isConstraintViolatedTest() throws Exception {
-        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
+
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvDagObject> allValidCvs = ontologyBuilder.getAllCvs();
@@ -149,7 +148,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( 0, cvsBeforeUpdate );
 
 
-        IntactContext intactContext = IntactContext.getCurrentInstance();
+        
         Institution owner = IntactContext.getCurrentInstance().getInstitution();
 
 
@@ -215,7 +214,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         }//end for
 
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvObject> orphanCvs = ontologyBuilder.getOrphanCvObjects();

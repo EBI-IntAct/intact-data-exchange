@@ -24,7 +24,6 @@ import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.TermCategory;
 import org.obo.datamodel.IdentifiedObject;
 import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
-import uk.ac.ebi.intact.dataexchange.cvutils.CvUpdater;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
@@ -46,12 +45,12 @@ public class CvObjectOntologyBuilderTest {
     private static int counter = 1;
 
     private static final Log log = org.apache.commons.logging.LogFactory.getLog( CvObjectOntologyBuilderTest.class );
-    
+
     @Test
     public void build_default() throws Exception {
 
-       
-        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
+
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
         log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
@@ -85,8 +84,6 @@ public class CvObjectOntologyBuilderTest {
         Assert.assertEquals( uk.ac.ebi.intact.model.CvInteraction.class, ontologyBuilder.findCvClassforMI( "MI:0439" ) );
         Assert.assertEquals( uk.ac.ebi.intact.model.CvDatabase.class, ontologyBuilder.findCvClassforMI( "MI:0244" ) );//non-root object
         Assert.assertEquals( uk.ac.ebi.intact.model.CvFeatureIdentification.class, ontologyBuilder.findCvClassforMI( "MI:0003" ) );//root object
-
-
 
         //an example term with  3 Aliases and 2 xrefs, a database xref and identity xref
         /**
@@ -157,7 +154,7 @@ public class CvObjectOntologyBuilderTest {
     public void categoryTest() throws Exception
 
     {
-        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
         log.debug( oboSession.getObjects().size() );
 
         OBOObject interactionDetection = ( OBOObject ) oboSession.getObject( "MI:0001" );
@@ -187,7 +184,7 @@ public class CvObjectOntologyBuilderTest {
     @Test
     public void build_subset_drugable() throws Exception {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
         log.debug( oboSession.getObjects().size() );
 
 
@@ -225,7 +222,10 @@ public class CvObjectOntologyBuilderTest {
         */
 
         List<CvDagObject> allDrugableCvs = ontologyBuilder.getAllCvs( oboCatDrug );
-        log.info( "Drug subset size " + allDrugableCvs.size() );
+        if ( log.isDebugEnabled() ) {
+            log.debug("Drug subset size " + allDrugableCvs.size()   );
+        }
+
         Collection<String> drugablemis = new ArrayList<String>();
         for ( CvDagObject cvDag : allDrugableCvs ) {
             if ( log.isDebugEnabled() ) log.debug( cvDag.getMiIdentifier() + " -> " + cvDag.getShortLabel() );
@@ -235,14 +235,20 @@ public class CvObjectOntologyBuilderTest {
 
         }
 
+        if ( log.isDebugEnabled() ) {
+            log.debug("drugablemis size " + drugablemis.size()  );
+        }
 
-        log.info( "drugablemis size " + drugablemis.size() );
 
-        Collection<String> crossCheck = crossCheckFromOBOFile(OboCategory.DRUGABLE);
 
-        log.info( "crossCheckFromOBOFile().size() " + crossCheck.size() );
+
+        Collection<String> crossCheck = crossCheckFromOBOFile( OboCategory.DRUGABLE );
+
+        if ( log.isDebugEnabled() )log.debug( "crossCheckFromOBOFile().size() " + crossCheck.size() );
+
         Collection<String> difference = CollectionUtils.subtract( crossCheck, drugablemis );
-        log.info( "difference size " + difference.size() );
+
+        if ( log.isDebugEnabled() )log.debug( "difference size " + difference.size() );
         for ( String diff : difference ) {
             if ( log.isDebugEnabled() ) log.debug( "diff MI: " + diff );
         }
@@ -253,8 +259,9 @@ public class CvObjectOntologyBuilderTest {
 
     @Test
     public void build_subset_psi() throws Exception {
-        OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
-        log.debug( oboSession.getObjects().size() );
+
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
+        if ( log.isDebugEnabled() )log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
         OBOObject psiObj = ( OBOObject ) oboSession.getObject( "MI:0005" );//psi-mi
@@ -270,19 +277,20 @@ public class CvObjectOntologyBuilderTest {
 
 //            log.info( cvDag.getMiIdentifier() + " -> " + cvDag.getShortLabel() );
             OBOObject psimi = ( OBOObject ) oboSession.getObject( cvDag.getMiIdentifier() );
-            Assert.assertTrue(ontologyBuilder.checkIfCategorySubset( psimi, oboCatPsi ));
+            Assert.assertTrue( ontologyBuilder.checkIfCategorySubset( psimi, oboCatPsi ) );
 //            log.info( "isTrue PSI Term:  " + ontologyBuilder.checkIfCategorySubset( psimi, oboCatPsi ) );
             psiMis.add( psimi.getID() );
         }
 
-        log.info( "PSI-MI slim subset size " + allPsimiCvs.size() );
-        log.info( "PSI-MIs  size " + psiMis.size() );
+        if ( log.isDebugEnabled() )log.debug( "PSI-MI slim subset size " + allPsimiCvs.size() );
+        if ( log.isDebugEnabled() )log.debug( "PSI-MIs  size " + psiMis.size() );
 
-        Collection<String> crossCheck = crossCheckFromOBOFile(OboCategory.PSI_MI_SLIM);
+        Collection<String> crossCheck = crossCheckFromOBOFile( OboCategory.PSI_MI_SLIM );
 
-        log.info( "crossCheckFromOBOFile().size() " + crossCheck.size() );
+        if ( log.isDebugEnabled() )log.debug( "crossCheckFromOBOFile().size() " + crossCheck.size() );
         Collection<String> difference = CollectionUtils.subtract( crossCheck, psiMis );
         log.info( "difference size " + difference.size() );
+
         for ( String diff : difference ) {
             if ( log.isDebugEnabled() ) log.debug( "diff MI: " + diff );
         }
@@ -334,12 +342,11 @@ public class CvObjectOntologyBuilderTest {
         Collection<CvObjectXref> xrefs = cvObject.getXrefs();
         int xrefCount = 1;
         for ( CvObjectXref cvObjectXref : xrefs ) {
-            if ( log.isDebugEnabled() )
+            if ( log.isDebugEnabled() ) {
                 log.debug( xrefCount + " cvObjectXref CvDatabase-> " + cvObjectXref.getCvDatabase() );
-            if ( log.isDebugEnabled() )
                 log.debug( xrefCount + " cvObjectXref CvXref Qualifier-> " + cvObjectXref.getCvXrefQualifier() );
-            if ( log.isDebugEnabled() )
                 log.debug( xrefCount + " cvObjectXref CvXref PrimaryId-> " + cvObjectXref.getPrimaryId() );
+            }
 
 
             xrefCount++;
@@ -359,11 +366,11 @@ public class CvObjectOntologyBuilderTest {
     } //end method
 
 
-    private static Collection<String> crossCheckFromOBOFile(String category) throws Exception {
+    private static Collection<String> crossCheckFromOBOFile( String category ) throws Exception {
 
         Collection<String> miCol = new ArrayList<String>();
         //URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
-        String revision = "HEAD";
+        String revision = "1.48";
         URL url = new URL( OboUtils.PSI_MI_OBO_LOCATION + "?revision=" + revision );
         log.debug( "url " + url );
 
@@ -380,7 +387,8 @@ public class CvObjectOntologyBuilderTest {
         int psiTerm = 0;
         String mi = null;
         while ( ( inputLine = in.readLine() ) != null ) {
-            String temp = inputLine;
+            String temp;
+            temp = inputLine;
 
 
             if ( inputLine.startsWith( "[Term]" ) ) {
@@ -397,13 +405,13 @@ public class CvObjectOntologyBuilderTest {
                 typedefCounter++;
             } else if ( inputLine.matches( "subset:\\s+PSI-MI\\s+slim" ) ) {
                 psiTerm++;
-                if(category.equalsIgnoreCase( OboCategory.PSI_MI_SLIM ))
-                 miCol.add( mi);
+                if ( category.equalsIgnoreCase( OboCategory.PSI_MI_SLIM ) )
+                    miCol.add( mi );
 
             } else if ( inputLine.matches( "subset:\\s+Drugable" ) ) {
                 drugTerm++;
-                if(category.equalsIgnoreCase( OboCategory.DRUGABLE ))
-                miCol.add( mi );
+                if ( category.equalsIgnoreCase( OboCategory.DRUGABLE ) )
+                    miCol.add( mi );
 
                 //log.info(drugTerm+"  "+ temp );
             }

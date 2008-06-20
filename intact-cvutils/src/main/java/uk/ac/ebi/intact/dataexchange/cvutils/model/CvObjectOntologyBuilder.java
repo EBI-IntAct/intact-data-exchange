@@ -811,6 +811,10 @@ public class CvObjectOntologyBuilder {
     }  //end method
 
 
+    /**
+     * Used only for test purposes
+     * @return  Collection of CvDagObjects
+     */
     public Collection<CvDagObject> getAllValidCvs() {
 
 
@@ -836,8 +840,14 @@ public class CvObjectOntologyBuilder {
 
     } //end of method
 
+    /**
+     *
+     * @param oboObject The current OBOObject instance
+     * @param categories   OboCategory could be PSI-MI slim, Drugable, etc.,
+     * @return
+     */
 
-    public boolean checkIfCategorySubset( OBOObject oboObject, OboCategory... categories ) {
+    protected boolean checkIfCategorySubset( OBOObject oboObject, OboCategory... categories ) {
 
         if ( categories == null || categories.length == 0 )
             return true;
@@ -855,6 +865,11 @@ public class CvObjectOntologyBuilder {
         return false;
     }
 
+    /**
+     *
+     * @param categories OboCategory could be PSI-MI slim, Drugable, etc.,
+     * @return A subset of CvDagObjects if a category is passed, if not returns all 
+     */
     public List<CvDagObject> getAllCvs( OboCategory... categories ) {
 
 
