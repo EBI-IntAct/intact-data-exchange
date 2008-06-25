@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.dataexchange.cvutils.model;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOObject;
@@ -31,9 +30,7 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -53,7 +50,7 @@ public class CvObjectOntologyBuilderTest {
     public void build_default() throws Exception {
 
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
         log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
@@ -61,32 +58,32 @@ public class CvObjectOntologyBuilderTest {
 
         Assert.assertEquals( 16, ontologyBuilder.getRootOBOObjects().size() );
 
-        int allValidCvs = ontologyBuilder.getAllValidCvs().size();
-        Assert.assertEquals( 894, allValidCvs );
 
         int allOrphanCvs = ontologyBuilder.getOrphanCvObjects().size();
         Assert.assertEquals( 53, allOrphanCvs );
-        Assert.assertEquals( 947, allValidCvs + allOrphanCvs );
 
 
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
         int allCvsSize = allCvs.size();
-        Assert.assertEquals( 947, allCvsSize );
+        Assert.assertEquals( 978, allCvsSize );
+
+      
 
 
         List<CvDagObject> orderedList = ontologyBuilder.getAllOrderedCvs( allCvs );
-        Assert.assertEquals( 947, orderedList.size() );
+        Assert.assertEquals( 978, orderedList.size() );
 
-        //for ( CvDagObject cvDag : orderedList ) {
-        //if(log.isDebugEnabled())log.debug( "# " + cvDag.getMiIdentifier() + "  " + cvDag.getClass() + "   " + cvDag.getShortLabel() );
-        //}
+
+        for ( CvDagObject cvdag : orderedList ) {
+            log.debug( "CvDag: \t" + cvdag.getMiIdentifier() + "\t" + cvdag.getObjClass() + "\t" + cvdag.getShortLabel() );
+        }
 
 
         if ( log.isDebugEnabled() )
             log.debug( "ontologyBuilder.getAllCvsAsList().size() " + ontologyBuilder.getAllCvs().size() );
-        Assert.assertEquals( uk.ac.ebi.intact.model.CvInteraction.class, ontologyBuilder.findCvClassforMI( "MI:0439" ) );
-        Assert.assertEquals( uk.ac.ebi.intact.model.CvDatabase.class, ontologyBuilder.findCvClassforMI( "MI:0244" ) );//non-root object
-        Assert.assertEquals( uk.ac.ebi.intact.model.CvFeatureIdentification.class, ontologyBuilder.findCvClassforMI( "MI:0003" ) );//root object
+        Assert.assertEquals("CvInteraction", ontologyBuilder.findCvClassforMI( "MI:0439" ).getSimpleName());
+        Assert.assertEquals("CvDatabase", ontologyBuilder.findCvClassforMI( "MI:0244" ).getSimpleName() );//non-root object
+        Assert.assertEquals("CvFeatureIdentification", ontologyBuilder.findCvClassforMI( "MI:0003" ).getSimpleName() );//root object
 
         //an example term with  3 Aliases and 2 xrefs, a database xref and identity xref
         /**
@@ -157,7 +154,7 @@ public class CvObjectOntologyBuilderTest {
     public void categoryTest() throws Exception
 
     {
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
         log.debug( oboSession.getObjects().size() );
 
         OBOObject interactionDetection = ( OBOObject ) oboSession.getObject( "MI:0001" );
@@ -187,7 +184,7 @@ public class CvObjectOntologyBuilderTest {
     @Test
     public void build_subset_drugable() throws Exception {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
         log.debug( oboSession.getObjects().size() );
 
 
@@ -226,7 +223,7 @@ public class CvObjectOntologyBuilderTest {
 
         List<CvDagObject> allDrugableCvs = ontologyBuilder.getAllCvs( oboCatDrug );
         if ( log.isDebugEnabled() ) {
-            log.debug("Drug subset size " + allDrugableCvs.size()   );
+            log.debug( "Drug subset size " + allDrugableCvs.size() );
         }
 
         Collection<String> drugablemis = new ArrayList<String>();
@@ -239,23 +236,23 @@ public class CvObjectOntologyBuilderTest {
         }
 
         if ( log.isDebugEnabled() ) {
-            log.debug("drugablemis size " + drugablemis.size()  );
+            log.debug( "drugablemis size " + drugablemis.size() );
         }
-
-
 
 
         Collection<String> crossCheck = crossCheckFromOBOFile( OboCategory.DRUGABLE );
 
-        if ( log.isDebugEnabled() )log.debug( "crossCheckFromOBOFile().size() " + crossCheck.size() );
+        if ( log.isDebugEnabled() ) log.debug( "crossCheckFromOBOFile().size() " + crossCheck.size() );
 
         Collection<String> difference = CollectionUtils.subtract( crossCheck, drugablemis );
 
-        if ( log.isDebugEnabled() )log.debug( "difference size " + difference.size() );
+        if ( log.isDebugEnabled() ) log.debug( "difference size " + difference.size() );
         for ( String diff : difference ) {
             if ( log.isDebugEnabled() ) log.debug( "diff MI: " + diff );
         }
 
+        //Only the root term MI:0000 should be in the difference
+        Assert.assertEquals( 1, difference.size() );
 
     } //end method
 
@@ -263,8 +260,8 @@ public class CvObjectOntologyBuilderTest {
     @Test
     public void build_subset_psi() throws Exception {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
-        if ( log.isDebugEnabled() )log.debug( oboSession.getObjects().size() );
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
+        if ( log.isDebugEnabled() ) log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
         OBOObject psiObj = ( OBOObject ) oboSession.getObject( "MI:0005" );//psi-mi
@@ -285,18 +282,21 @@ public class CvObjectOntologyBuilderTest {
             psiMis.add( psimi.getID() );
         }
 
-        if ( log.isDebugEnabled() )log.debug( "PSI-MI slim subset size " + allPsimiCvs.size() );
-        if ( log.isDebugEnabled() )log.debug( "PSI-MIs  size " + psiMis.size() );
+        if ( log.isDebugEnabled() ) log.debug( "PSI-MI slim subset size " + allPsimiCvs.size() );
+        if ( log.isDebugEnabled() ) log.debug( "PSI-MIs  size " + psiMis.size() );
 
         Collection<String> crossCheck = crossCheckFromOBOFile( OboCategory.PSI_MI_SLIM );
 
-        if ( log.isDebugEnabled() )log.debug( "crossCheckFromOBOFile().size() " + crossCheck.size() );
+        if ( log.isDebugEnabled() ) log.debug( "crossCheckFromOBOFile().size() " + crossCheck.size() );
         Collection<String> difference = CollectionUtils.subtract( crossCheck, psiMis );
         log.info( "difference size " + difference.size() );
 
         for ( String diff : difference ) {
             if ( log.isDebugEnabled() ) log.debug( "diff MI: " + diff );
         }
+
+        //Only the root term MI:0000 should be in the difference
+        Assert.assertEquals( 1, difference.size() );
 
 
     } //end method
@@ -435,34 +435,46 @@ public class CvObjectOntologyBuilderTest {
         return miCol;
     }//end method
 
-     @Test
-     @Ignore
-    public void build_cvsWithSameMi() throws Exception {
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
+    @Test
+      public void build_cvsWithSameMi() throws Exception {
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
         log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
 
-         boolean foundExpRole = false;
-         boolean foundBioRole = false;
-         
-         for (CvDagObject cv : allCvs) {
-             if (cv.getShortLabel().contains("unspecified role")) {
-                 if (CvBiologicalRole.class.getName().equals(cv.getObjClass())) {
+        if ( log.isDebugEnabled() ) {
+            log.debug( "allCvs size from Test : " + allCvs.size() );
+        }
+
+
+        boolean foundExpRole = false;
+        boolean foundBioRole = false;
+
+        for ( CvDagObject cv : allCvs ) {
+
+            if (cv.getShortLabel().contains("unspecified role")) {
+           
+
+                log.debug( "---CvObject--" + cv.getMiIdentifier() + "--" + cv.getShortLabel() );
+                
+
+                if ( CvBiologicalRole.class.getName().equals( cv.getObjClass() ) ) {
                     foundBioRole = true;
                 }
-                 if (CvExperimentalRole.class.getName().equals(cv.getObjClass())) {
+                if ( CvExperimentalRole.class.getName().equals( cv.getObjClass() ) ) {
                     foundExpRole = true;
                 }
-             }
-         }
+            }
+        }//end for
 
-         Assert.assertTrue("There should be an unspecified role of type CvBiologicalRole", foundBioRole);
-         Assert.assertTrue("There should be an unspecified role of type CvExperimentalRole", foundExpRole);
+        Assert.assertTrue( "There should be an unspecified role of type CvBiologicalRole", foundBioRole );
+        Assert.assertTrue( "There should be an unspecified role of type CvExperimentalRole", foundExpRole );
+    }
 
-     }
+
+
 
 }//end class
 

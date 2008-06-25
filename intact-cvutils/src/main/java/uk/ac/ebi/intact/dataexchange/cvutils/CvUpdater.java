@@ -245,7 +245,7 @@ public class CvUpdater {
 
         Bag hashBag = new HashBag();
         for ( CvDagObject cvDag : allValidCvs ) {
-            String primaryKey = cvDag.getClass().toString() + ":" + cvDag.getShortLabel();
+            String primaryKey = cvDag.getObjClass().toString() + ":" + cvDag.getShortLabel();
             hashBag.add( primaryKey );
         }
 

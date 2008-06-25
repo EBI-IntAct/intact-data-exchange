@@ -25,17 +25,18 @@
             <version>2.000-beta38</version>
           </dependency>
 
-        <!-- TO BE REMOVED -->
+       <!--To be removed when Dataexchange 2.0.1 is released -->
         <dependency>
             <groupId>org.geneontology</groupId>
             <artifactId>oboedit</artifactId>
-            <version>beta8</version>
+            <version>1.101</version>
             <scope>runtime</scope>
         </dependency>
+        
         <dependency>
             <groupId>uk.ac.ebi</groupId>
             <artifactId>ols</artifactId>
-            <version>1.14</version>
+            <version>1.14.1</version>
         </dependency>
 
     </dependencies>

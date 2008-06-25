@@ -45,6 +45,7 @@ public class CvObjectOntologyBuilder {
     private static final Log log = LogFactory.getLog( CvObjectOntologyBuilder.class );
 
     public static Map<String, Class> mi2Class;
+    public static Map<String, String> class2mi;
     private Map<String, CvObject> processed;
 
 
@@ -52,12 +53,12 @@ public class CvObjectOntologyBuilder {
     private static final String ALIAS_IDENTIFIER = "PSI-MI-alternate";
     private static final String SHORTLABEL_IDENTIFIER = "PSI-MI-short";
 
-    private static OBOSession oboSession = null;
+    private static OBOSession oboSession;
 
-
-    private List<CvDagObject> allValidCvs;
 
     private CvDatabase nonMiCvDatabase;
+
+    private HashMap<String, LinkedHashSet<String>> map4misWithMoreParent;
 
 
     static {
@@ -79,6 +80,28 @@ public class CvObjectOntologyBuilder {
         mi2Class.put( "MI:0590", CvTopic.class );
         mi2Class.put( "MI:0640", CvParameterType.class );
         mi2Class.put( "MI:0647", CvParameterUnit.class );
+
+        //
+        class2mi = new HashMap<String, String>();
+        // DAG objects:  A Hashmap of MI and the CV(Type).class
+        class2mi.put( "CvInteraction", "MI:0001" );
+        class2mi.put( "CvInteractionType", "MI:0190" );
+        class2mi.put( "CvIdentification", "MI:0002" );
+        class2mi.put( "CvFeatureIdentification", "MI:0003" );
+        class2mi.put( "CvFeatureType", "MI:0116" );
+        class2mi.put( "CvInteractorType", "MI:0313" );
+        class2mi.put( "CvExperimentalPreparation", "MI:0346" );
+        class2mi.put( "CvFuzzyType", "MI:0333" );
+        class2mi.put( "CvXrefQualifier", "MI:0353" );
+        class2mi.put( "CvDatabase", "MI:0444" );
+        class2mi.put( "CvExperimentalRole", "MI:0495" );
+        class2mi.put( "CvBiologicalRole", "MI:0500" );
+        class2mi.put( "CvAliasType", "MI:0300" );
+        class2mi.put( "CvTopic", "MI:0590" );
+        class2mi.put( "CvParameterType", "MI:0640" );
+        class2mi.put( "CvParameterUnit", "MI:0647" );
+
+
     }
 
 
@@ -92,24 +115,156 @@ public class CvObjectOntologyBuilder {
         this.nonMiCvDatabase = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
                                                              CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT );
         this.processed = new HashMap<String, CvObject>();
+        this.map4misWithMoreParent = new HashMap<String, LinkedHashSet<String>>();
+        map4misWithMoreParent = initializeMisWithMoreParents();
+
+        if ( log.isDebugEnabled() ) {
+            log.debug( "map4misWithMoreParent size " + map4misWithMoreParent.size() );
+        }
 
 
     }
 
+
+    /**
+     * Sometimes Cvterms with more than one parent will
+     * have children but as it would be difficult to assign
+     * to the right root parent class, we also create
+     * children for each of the parent root class
+     *
+     * @param oboObj
+     * @return String[] with MIs of all childresn
+     */
+    private String[] getChildren4MisWithMoreParent( OBOObject oboObj ) {
+
+
+        Collection<Link> childLinks = oboObj.getChildren();
+        String[] mis = new String[childLinks.size()];
+
+
+        int i = -1;
+        for ( Link childLink1 : childLinks ) {
+
+
+            Pattern p = Pattern.compile( "(MI:\\d+)-OBO_REL:is_a->(MI:\\d+)" );
+            Matcher m = p.matcher( childLink1.getID() );
+
+
+            if ( m.matches() ) {
+
+                if ( m.group( 2 ).equalsIgnoreCase( oboObj.getID() ) ) {
+
+                    OBOObject childObj = ( OBOObject ) oboSession.getObject( m.group( 1 ) );
+                    mis[++i] = childObj.getID();
+                }
+            }
+
+
+        } //end for
+
+
+        return mis;
+    }   //end method
+
+
+    protected boolean isHavingMoreThanOneParent( String id ) {
+        if ( id == null ) {
+            throw new NullPointerException( "You must give a non null id" );
+        }
+
+        return map4misWithMoreParent.get( id ) != null;
+
+    }//end method
+
+
+    private <T extends CvObject> Class<T> getRootClass( String className ) {
+        Class<T> cvclass = null;
+        if ( class2mi.get( className ) != null && mi2Class.get( class2mi.get( className ) ) != null ) {
+            cvclass = mi2Class.get( class2mi.get( className ) );
+        }
+        return cvclass;
+    }
+
     /*
-    *   The main method which converts the OBOOBject
-    *   toCVObject.
-    *
-    * */
+   *   The main method which converts the OBOOBject
+   *   toCVObject.
+   *
+   * */
     public <T extends CvObject> T toCvObject( OBOObject oboObj, OboCategory... categories ) {
         T cvObject;
+        Class<T> cvClass = null;
         try {
 
 
             if ( log.isTraceEnabled() ) log.trace( "ID    ->" + oboObj.getID() + "   Name ->" + oboObj.getName() );
 
-            //find the CvClass for any given MI identifier
-            Class<T> cvClass = findCvClassforMI( oboObj.getID() );
+            /*first check if it has more than one parents
+            * it true, get all the children
+            * and add to the map4misWithMoreParent but with a new
+            * LinkedHashset same as that of the parent
+            *
+            *
+            * */
+
+            if ( this.isHavingMoreThanOneParent( oboObj.getID() ) ) {
+
+                String[] children = getChildren4MisWithMoreParent( oboObj );
+
+                for ( String child : children ) {
+
+
+                    LinkedHashSet<String> linkedSet4child = map4misWithMoreParent.get( oboObj.getID() );
+
+                    LinkedHashSet<String> newLinkedSet4child = new LinkedHashSet<String>();
+                    newLinkedSet4child.addAll( linkedSet4child );
+
+                    map4misWithMoreParent.put( child, newLinkedSet4child );
+                }
+
+                /*
+               * map4misWithMoreParent stores the mi id and a
+               * LinkedHashSet that contains all the root parent class
+               * as we have to create cvterms for each root, for each
+               * iteration take one parent root assign to cv class
+               * and remove it from the set...otherwise we don't know
+               * which parent class was assigned when
+               *
+               * */
+                String rootclass = null;
+                LinkedHashSet<String> linkedSet = map4misWithMoreParent.get( oboObj.getID() );
+                if ( linkedSet != null && linkedSet.size() > 0 ) {
+                    rootclass = ( String ) linkedSet.toArray()[0];
+                    cvClass = getRootClass( rootclass );
+
+                }
+
+                if ( rootclass != null ) {
+                    linkedSet.remove( rootclass );
+                }
+
+
+                if ( log.isTraceEnabled() ) {
+                    log.trace( "More than One Parent True " + oboObj.getID() );
+                }
+                /*
+             *   if more than one parent is true and cvClass is still null means
+                 it has parents that are from same root class eg: 3 parents 2 root class
+                 so when it iterates third time and as the set contains one two classes, it returns null
+               * */
+                if ( cvClass == null ) {
+                    cvClass = findCvClassforMI( oboObj.getID() );
+                    String processedKey_ = cvKey( cvClass, oboObj.getID() );
+
+
+                    if ( processed.containsKey( processedKey_ ) ) {
+                        return ( T ) processed.get( processedKey_ );
+                    }
+                }
+
+            } else {
+                //find the CvClass for any given MI identifier
+                cvClass = findCvClassforMI( oboObj.getID() );
+            }
 
             //if CvClass is null then CvTopic.class is taken as default
             if ( cvClass == null ) {
@@ -136,6 +291,7 @@ public class CvObjectOntologyBuilder {
             cvObject = CvObjectUtils.createCvObject( institution, cvClass, null, shortLabel );
             if ( log.isTraceEnabled() ) log.trace( "shortLabel     ->" + shortLabel );
 
+            //Identity xref is added to all the cvs
             cvObject.addXref( createIdentityXref( cvObject, oboObj.getID() ) );
             cvObject.setFullName( oboObj.getName() );
 
@@ -213,7 +369,8 @@ public class CvObjectOntologyBuilder {
                             if ( log.isDebugEnabled() ) log.debug( " New format " + suffixString );
                         }
                     } else {
-                        if ( log.isDebugEnabled() ) log.debug( "-----Check Def line--"+oboObj.getID()+" DefArray length: "+defArray.length+"  Def: "+definition );
+                        if ( log.isDebugEnabled() )
+                            log.debug( "-----Check Def line--" + oboObj.getID() + " DefArray length: " + defArray.length + "  Def: " + definition );
                     }
 
                 }//end outer if
@@ -278,46 +435,57 @@ public class CvObjectOntologyBuilder {
                 } //end if
             } //end for
 
-
+            // if ( !isHavingMoreThanOneParent( oboObj.getID() ) ) {
             processed.put( processedKey, cvObject );
+            // }
+
             if ( log.isTraceEnabled() ) log.trace( "--Processed size " + processed.size() );
 
 
             if ( cvObject instanceof CvDagObject ) {
                 Collection<Link> childLinks = oboObj.getChildren();
 
+
                 for ( Link childLink1 : childLinks ) {
 
 
                     Pattern p = Pattern.compile( "(MI:\\d+)-OBO_REL:is_a->(MI:\\d+)" );
                     Matcher m = p.matcher( childLink1.getID() );
+
+
                     if ( m.matches() ) {
 
                         if ( m.group( 2 ).equalsIgnoreCase( oboObj.getID() ) ) {
                             CvDagObject dagObject = ( CvDagObject ) cvObject;
                             OBOObject childObj = ( OBOObject ) oboSession.getObject( m.group( 1 ) );
 
-                           //check for subset
-                            if(categories==null || categories.length==0){
-                              dagObject.addChild( ( CvDagObject ) toCvObject( childObj, categories ) );
-                            }else{
-                            for ( OboCategory category : categories ) {
-                                for ( TermCategory oboCat : childObj.getCategories() ) {
-                                    if ( category.getName().equalsIgnoreCase( oboCat.getName() ) ) {
-                                        if ( log.isTraceEnabled() ) {
-                                           log.trace( "Adding child after subset check: "+childObj.getID() +"   "+childObj.getName() ); 
-                                        }
+                            //check for subset
+                            if ( categories == null || categories.length == 0 ) {
 
-                                        dagObject.addChild( ( CvDagObject ) toCvObject( childObj, categories ) );
-                                    } //end if
+                                //if ( !isHavingMoreThanOneParent( childObj.getID() ) ) {
+                                dagObject.addChild( ( CvDagObject ) toCvObject( childObj, categories ) );
+                                //}
 
-                                } //end for
+                            } else {
+                                for ( OboCategory category : categories ) {
+                                    for ( TermCategory oboCat : childObj.getCategories() ) {
+                                        if ( category.getName().equalsIgnoreCase( oboCat.getName() ) ) {
+                                            if ( log.isTraceEnabled() ) {
+                                                log.trace( "Adding child after subset check: " + childObj.getID() + "   " + childObj.getName() );
+                                            }
 
-                            }//end for
-                           } //end else 
+                                            // if ( !isHavingMoreThanOneParent( childObj.getID() ) ) {
+                                            dagObject.addChild( ( CvDagObject ) toCvObject( childObj, categories ) );
+                                            // }
+                                        } //end if
+
+                                    } //end for
+
+                                }//end for
+                            } //end else
                             //check end
 
-       //                         dagObject.addChild( ( CvDagObject ) toCvObject( childObj, categories ) );
+                            //                         dagObject.addChild( ( CvDagObject ) toCvObject( childObj, categories ) );
 
 
                         }//end if
@@ -380,6 +548,8 @@ public class CvObjectOntologyBuilder {
         } else {
             OBOObject oboObj = ( OBOObject ) oboSession.getObject( id );
             Collection<Link> parentLinks = oboObj.getParents();
+
+
             for ( Link parentLink : parentLinks ) {
 
 
@@ -392,10 +562,12 @@ public class CvObjectOntologyBuilder {
                     cvClass = mi2Class.get( miIdentifierRight );
                     if ( cvClass != null ) {
                         //then it is one of rootCv
+
                         return cvClass;
                     }//end if
                     else {
                         return findCvClassforMI( miIdentifierRight );
+
                     }
                 }//end if
 
@@ -404,6 +576,74 @@ public class CvObjectOntologyBuilder {
         }
         return cvClass;
     } //end method
+
+
+    protected <T extends CvObject> HashMap<String, LinkedHashSet<String>> initializeMisWithMoreParents() {
+
+        for ( IdentifiedObject identifiedObject : oboSession.getObjects() ) {
+
+            if ( identifiedObject instanceof OBOObject ) {
+                OBOObject oboObj = ( OBOObject ) identifiedObject;
+
+
+                Class<T> cvClass;
+                //cvClass = mi2Class.get( id );
+
+                // OBOObject oboObj = ( OBOObject ) oboSession.getObject( obo.getID() );
+                Collection<Link> parentLinks = oboObj.getParents();
+
+                if ( parentLinks != null && parentLinks.size() > 1 ) {
+
+                    LinkedHashSet<String> hashSet = new LinkedHashSet<String>();
+
+                    for ( Link parentLink : parentLinks ) {
+
+
+                        String miIdentifierRight = parseToGetRightMI( parentLink.getID() );//eg: MI:0436-OBO_REL:is_a->MI:0659
+                        String miIdentifierLeft = parseToGetLeftMI( parentLink.getID() );//eg: MI:0436-OBO_REL:is_a->MI:0659
+
+
+                        if ( miIdentifierLeft != null && miIdentifierRight != null && miIdentifierLeft.equalsIgnoreCase( oboObj.getID() ) ) {
+
+                            cvClass = mi2Class.get( miIdentifierRight );
+                            if ( cvClass == null ) {
+
+                                cvClass = findCvClassforMI( miIdentifierRight );
+
+                            }
+                            hashSet.add( cvClass.getSimpleName() );
+                            //parentMap.put(miIdentifierRight+":"+cvClass.getSimpleName(),id);
+                            map4misWithMoreParent.put( oboObj.getID(), hashSet );
+                        }//end if
+
+
+                    }  //end for
+
+                }//end of if
+
+            }//end of if
+        }//end for
+        int counter = 0;
+        List<String> falseList = new ArrayList<String>();
+        for ( String key : map4misWithMoreParent.keySet() ) {
+
+            if ( map4misWithMoreParent.get( key ).size() > 1 ) {
+                counter++;
+
+            } else {
+                falseList.add( key );
+            }
+        } //end for
+
+        for ( String falseKey : falseList ) {
+            map4misWithMoreParent.remove( falseKey );
+        }
+        log.debug( "More than two parents count " + counter );
+
+
+        return map4misWithMoreParent;
+    } //end method
+
 
     /*
     *  Parses the given String and returns the MI identifier in
@@ -667,8 +907,7 @@ public class CvObjectOntologyBuilder {
 
                     OBOObject immediateChildOfRoot = ( OBOObject ) oboSession.getObject( m.group( 1 ) );
 
-                    if ( log.isDebugEnabled() ) log.debug( "immediateChildOfRoot " + immediateChildOfRoot.getID() );
-                    
+
                     if ( checkIfCategorySubset( immediateChildOfRoot, categories ) ) {
                         rootOboObjects.add( immediateChildOfRoot );
                     }
@@ -813,7 +1052,8 @@ public class CvObjectOntologyBuilder {
 
     /**
      * Used only for test purposes
-     * @return  Collection of CvDagObjects
+     *
+     * @return Collection of CvDagObjects
      */
     public Collection<CvDagObject> getAllValidCvs() {
 
@@ -830,7 +1070,7 @@ public class CvObjectOntologyBuilder {
 
         if ( log.isDebugEnabled() ) log.debug( "validCvs size :" + validCvs.size() );
 
-        allValidCvs = new ArrayList<CvDagObject>();
+        List<CvDagObject> allValidCvs = new ArrayList<CvDagObject>();
         for ( CvObject validCv : validCvs ) {
             allValidCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) validCv ) );
         }
@@ -841,10 +1081,9 @@ public class CvObjectOntologyBuilder {
     } //end of method
 
     /**
-     *
-     * @param oboObject The current OBOObject instance
-     * @param categories   OboCategory could be PSI-MI slim, Drugable, etc.,
-     * @return
+     * @param oboObject  The current OBOObject instance
+     * @param categories OboCategory could be PSI-MI slim, Drugable, etc.,
+     * @return true if belongs to the subset
      */
 
     protected boolean checkIfCategorySubset( OBOObject oboObject, OboCategory... categories ) {
@@ -854,7 +1093,7 @@ public class CvObjectOntologyBuilder {
 
 
         for ( OboCategory category : categories ) {
-               for ( TermCategory oboCat : oboObject.getCategories() ) {
+            for ( TermCategory oboCat : oboObject.getCategories() ) {
                 if ( category.getName().equalsIgnoreCase( oboCat.getName() ) ) {
                     return true;
                 } //end if
@@ -866,9 +1105,8 @@ public class CvObjectOntologyBuilder {
     }
 
     /**
-     *
      * @param categories OboCategory could be PSI-MI slim, Drugable, etc.,
-     * @return A subset of CvDagObjects if a category is passed, if not returns all 
+     * @return A subset of CvDagObjects if a category is passed, if not returns all
      */
     public List<CvDagObject> getAllCvs( OboCategory... categories ) {
 
@@ -881,7 +1119,7 @@ public class CvObjectOntologyBuilder {
         for ( IdentifiedObject rootOboObject : rootOboObjects ) {
             OBOObject rootObject = ( OBOObject ) rootOboObject;
 
-           if(log.isTraceEnabled())log.trace("Adding Parent Object "+rootObject.getID());
+            if ( log.isTraceEnabled() ) log.trace( "Adding Parent Object " + rootObject.getID() );
 
             CvObject cvObjectRoot = toCvObject( rootObject, categories );
 
@@ -889,6 +1127,9 @@ public class CvObjectOntologyBuilder {
 
 
         }//end for
+
+        //handle the cvobjects with more than one parent here
+
 
         if ( log.isDebugEnabled() ) log.debug( "Roots and children size :" + rootsAndChildren.size() );
 
@@ -901,7 +1142,7 @@ public class CvObjectOntologyBuilder {
                 OBOObject orphanObj = ( OBOObject ) orphanObo;
 
                 if ( checkIfCategorySubset( orphanObj, categories ) ) {
-                    CvObject cvOrphan = toCvObject( orphanObj,categories );
+                    CvObject cvOrphan = toCvObject( orphanObj, categories );
                     allCvs.addAll( itselfAndChildrenAsList( ( CvDagObject ) cvOrphan ) );
                 }
             }

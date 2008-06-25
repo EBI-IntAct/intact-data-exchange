@@ -89,6 +89,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             }
             if ( inputLine.matches( "id:\\s+MI:.*" ) ) {
                 miCounter++;
+                
             }
 
             if ( inputLine.contains( "is_obsolete: true" ) ) {
@@ -126,17 +127,20 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     }//end method
 
+
+    
+
     @Test
     public void isConstraintViolatedTest() throws Exception {
 
         OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
-        List<CvDagObject> allValidCvs = ontologyBuilder.getAllCvs();
-        Assert.assertEquals( 947, allValidCvs.size() );
+        List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
+        Assert.assertEquals( 978, allCvs.size() );
 
         CvUpdater updater = new CvUpdater();
-        Assert.assertFalse( updater.isConstraintViolated( allValidCvs ) );
+        Assert.assertFalse( updater.isConstraintViolated( allCvs ) );
     }
 
     @Test
@@ -221,7 +225,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( 53, orphanCvs.size() );
 
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
-        Assert.assertEquals( 947, allCvs.size() );
+        Assert.assertEquals( 978, allCvs.size() );
 
 
         AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault( 10841 );
@@ -260,10 +264,10 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         if ( log.isDebugEnabled() ) log.debug( "stats.getUpdatedCvs().size() ->" + stats.getUpdatedCvs().size() );
 
 
-        Assert.assertEquals( 899, totalCvsAfterUpdate );
+        Assert.assertEquals( 930, totalCvsAfterUpdate );
 
-        //947-(53-1(aggregation))= 895  , one addition because of exp.role has two parents
-        Assert.assertEquals( 896, stats.getCreatedCvs().size() );
+
+        Assert.assertEquals( 927, stats.getCreatedCvs().size() );
         Assert.assertEquals( 1, stats.getUpdatedCvs().size() );
 
         //53-2 as aggregation was already created and later updated + obsolete term

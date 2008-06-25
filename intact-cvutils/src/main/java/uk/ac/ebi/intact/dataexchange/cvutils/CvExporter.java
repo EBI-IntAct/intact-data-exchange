@@ -76,7 +76,7 @@ public class CvExporter {
 
     public OBOSession convertCvList2OBOSession( List<CvDagObject> allCvs ) {
 
-        // List<CvDagObject> allUniqCvs = removeCvsDuplicated( allCvs );
+
         List<CvDagObject> allUniqCvs;
         allUniqCvs = allCvs;
 
@@ -89,20 +89,29 @@ public class CvExporter {
                 return id1.compareTo( id2 );
             }
         } );
+
+        //group by mis
+
+        Map<String, HashSet<CvDagObject>> cvMapWithParents = groupByMis( allUniqCvs );
+
         int counter = 1;
         for ( CvDagObject cvDagObj : allUniqCvs ) {
 
             if ( CvObjectUtils.getIdentity( cvDagObj ) == null ) {
                 throw new NullPointerException( "No Identifier for the cvObject " + cvDagObj );
             }
-            if(log.isTraceEnabled())log.trace( counter + "  " + CvObjectUtils.getIdentity( cvDagObj ) );
+            if ( log.isTraceEnabled() ) log.trace( counter + "  " + CvObjectUtils.getIdentity( cvDagObj ) );
 
             oboSession.addObject( getRootObject() );
-            OBOClass oboObj = convertCv2OBO( cvDagObj );
+            OBOClass oboObj = convertCv2OBO( cvDagObj, cvMapWithParents );
             oboSession.addObject( oboObj );
 
             counter++;
         }  //end of for
+
+        if ( log.isDebugEnabled() ) {
+            log.debug( "Total CvTerms written " + counter );
+        }
 
         addHeaderInfo();
         addFooterInfo();
@@ -111,6 +120,25 @@ public class CvExporter {
         return oboSession;
     }//end method
 
+
+    protected Map<String, HashSet<CvDagObject>> groupByMis( List<CvDagObject> allCvs ) {
+
+        Map<String, HashSet<CvDagObject>> cvMapWithParents = new HashMap<String, HashSet<CvDagObject>>();
+        for ( CvDagObject cvdag : allCvs ) {
+
+            if ( cvMapWithParents.get( CvObjectUtils.getIdentity( cvdag ) ) == null ) {
+                cvMapWithParents.put( CvObjectUtils.getIdentity( cvdag ), new HashSet<CvDagObject>( cvdag.getParents() ) );
+            } else {
+
+                HashSet<CvDagObject> alreadyExisting = cvMapWithParents.get( CvObjectUtils.getIdentity( cvdag ) );
+                alreadyExisting.addAll( cvdag.getParents() );
+                cvMapWithParents.put( CvObjectUtils.getIdentity( cvdag ), alreadyExisting );
+            }
+
+
+        }
+        return cvMapWithParents;
+    }
 
     public void addObject( OBOClass oboObj ) {
         oboSession.addObject( oboObj );
@@ -174,154 +202,147 @@ public class CvExporter {
         return allUniqCvs;
     }//end of method
 
+
     /**
      * Converts cvobject to OBOobject
      *
-     * @param cvObj CvObject that needs to be converted to OBOOBject
+     * @param dagObj           CvObject that needs to be converted to OBOOBject
+     * @param cvMapWithParents a HashMap with CvDag object and all its parents as HashSet
      * @return a OBOClass instance
      */
 
-    public OBOClass convertCv2OBO( CvObject cvObj ) {
+    public OBOClass convertCv2OBO( CvDagObject dagObj, Map<String, HashSet<CvDagObject>> cvMapWithParents ) {
 
-        OBOClass oboObj = null;
-
-        if ( cvObj instanceof CvDagObject ) {
-            CvDagObject dagObj = ( CvDagObject ) cvObj;
-            if ( CvObjectUtils.getIdentity( dagObj ) == null ) {
-                throw new NullPointerException( "Identifier is null" );
-            }
-
-            oboObj = new OBOClassImpl( dagObj.getFullName(), CvObjectUtils.getIdentity( dagObj ) );
-            //assign short label
-
-            if ( dagObj.getShortLabel() != null ) {
-                Synonym syn = createSynonym( dagObj.getShortLabel() );
-                oboObj.addSynonym( syn );
-            }
-
-            //assign Xrefs
-            Collection<CvObjectXref> xrefs = dagObj.getXrefs();
+        OBOClass oboObj;
 
 
-            for ( CvObjectXref xref : xrefs ) {
-                boolean isIdentity = false;
-                CvXrefQualifier qualifier = xref.getCvXrefQualifier();
-                CvDatabase database = xref.getCvDatabase();
-                String qualMi;
-                String dbMi;
+        if ( CvObjectUtils.getIdentity( dagObj ) == null ) {
+            throw new NullPointerException( "Identifier is null" );
+        }
 
-                if ( qualifier != null && database != null &&
-                     ( qualMi = CvObjectUtils.getIdentity( qualifier ) ) != null &&
-                     ( dbMi = CvObjectUtils.getIdentity( database ) ) != null &&
-                     qualMi.equals( CvXrefQualifier.IDENTITY_MI_REF ) &&
-                     dbMi.equals( CvDatabase.PSI_MI_MI_REF ) ) {
-                    isIdentity = true;
-                }//end if
+        oboObj = new OBOClassImpl( dagObj.getFullName(), CvObjectUtils.getIdentity( dagObj ) );
+        //assign short label
 
-                if ( !isIdentity ) {
+        if ( dagObj.getShortLabel() != null ) {
+            Synonym syn = createSynonym( dagObj.getShortLabel() );
+            oboObj.addSynonym( syn );
+        }
 
-                    String dbx = "";
+        //assign Xrefs
+        Collection<CvObjectXref> xrefs = dagObj.getXrefs();
 
-                    //check for pubmed
 
-                    if ( database != null && database.getShortLabel() != null ) {
-                        if ( database.getShortLabel().equals( CvDatabase.PUBMED ) ) {
+        for ( CvObjectXref xref : xrefs ) {
+            boolean isIdentity = false;
+            CvXrefQualifier qualifier = xref.getCvXrefQualifier();
+            CvDatabase database = xref.getCvDatabase();
+            String qualMi;
+            String dbMi;
 
-                            dbx = "PMID";
-                        } else {
+            if ( qualifier != null && database != null &&
+                 ( qualMi = CvObjectUtils.getIdentity( qualifier ) ) != null &&
+                 ( dbMi = CvObjectUtils.getIdentity( database ) ) != null &&
+                 qualMi.equals( CvXrefQualifier.IDENTITY_MI_REF ) &&
+                 dbMi.equals( CvDatabase.PSI_MI_MI_REF ) ) {
+                isIdentity = true;
+            }//end if
 
-                            dbx = database.getShortLabel().toUpperCase();
-                        }
-                    }
+            if ( !isIdentity ) {
 
-                    Dbxref dbxref = new DbxrefImpl( dbx, xref.getPrimaryId() );
-                    dbxref.setType( Dbxref.DEFINITION );
+                String dbx = "";
 
-                    oboObj.addDefDbxref( dbxref );
-                }//end if
+                //check for pubmed
 
-            } //end for
+                if ( database != null && database.getShortLabel() != null ) {
+                    if ( database.getShortLabel().equals( CvDatabase.PUBMED ) ) {
 
-            //assign def   from Annotations
-            Collection<Annotation> annotations = dagObj.getAnnotations();
-
-            String definitionPrefix = "";
-            String definitionSuffix = "";
-            for ( Annotation annotation : annotations ) {
-
-                if ( annotation.getCvTopic() != null && annotation.getCvTopic().getShortLabel() != null ) {
-                    CvTopic cvTopic = annotation.getCvTopic();
-
-                    if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.DEFINITION ) ) {
-                        definitionPrefix = annotation.getAnnotationText();
-                    } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.URL ) ) {
-                        definitionSuffix = "\n" + annotation.getAnnotationText();
-                    } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.SEARCH_URL ) ) {
-                        String annotationText = annotation.getAnnotationText();
-                       if (log.isTraceEnabled())  log.trace( "annotationText before " + annotationText );
-                        annotationText = annotationText.replaceAll( "\\\\", "" );
-
-                        annotationText = " \"" + annotationText + "\"";
-                       if (log.isTraceEnabled())  log.trace( "annotationText after " + annotationText );
-                        Dbxref dbxref = new DbxrefImpl( CvTopic.SEARCH_URL, annotationText );
-
-                        oboObj.addDbxref( dbxref );
-                    } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.XREF_VALIDATION_REGEXP ) ) {
-                        Dbxref dbxref = new DbxrefImpl( CvTopic.XREF_VALIDATION_REGEXP, annotation.getAnnotationText() );
-                        oboObj.addDbxref( dbxref );
-                    } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.COMMENT ) ) {
-                        oboObj.setComment( annotation.getAnnotationText() );
-                    } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.OBSOLETE ) ) {
-                        oboObj.setObsolete( true );
-                        definitionSuffix = "\n" + annotation.getAnnotationText();
+                        dbx = "PMID";
                     } else {
-                       if (log.isDebugEnabled())  log.debug( "Annotation don't fit anywhere-----" );
+
+                        dbx = database.getShortLabel().toUpperCase();
                     }
-                } //end if
-            }//end for
-            oboObj.setDefinition( definitionPrefix + definitionSuffix );
-            //assign alias
-
-            for ( CvObjectAlias cvAlias : dagObj.getAliases() ) {
-                Synonym altSyn = createAlias( cvAlias );
-                oboObj.addSynonym( altSyn );
-
-            }
-
-            //add children and parents
-            //check if root
-
-            if ( checkIfRootMI( CvObjectUtils.getIdentity( dagObj ) ) ) {
-               
-                OBOClass rootObject = getRootObject();
-                Link linkToRoot = new OBORestrictionImpl( oboObj );
-                OBOProperty oboProp = new OBOPropertyImpl( "part_of" );
-                linkToRoot.setType( oboProp );
-                rootObject.addChild( linkToRoot );
-            }
-
-            List<CvDagObject> cvParents = ( List ) dagObj.getParents();
-
-            sort( cvParents, new Comparator<CvDagObject>() {
-                public int compare( CvDagObject o1, CvDagObject o2 ) {
-
-                    String id1 = CvObjectUtils.getIdentity( o1 );
-                    String id2 = CvObjectUtils.getIdentity( o2 );
-
-                    return id1.compareTo( id2 );
                 }
-            } );
 
+                Dbxref dbxref = new DbxrefImpl( dbx, xref.getPrimaryId() );
+                dbxref.setType( Dbxref.DEFINITION );
+
+                oboObj.addDefDbxref( dbxref );
+            }//end if
+
+        } //end for
+
+        //assign def   from Annotations
+        Collection<Annotation> annotations = dagObj.getAnnotations();
+
+        String definitionPrefix = "";
+        String definitionSuffix = "";
+        for ( Annotation annotation : annotations ) {
+
+            if ( annotation.getCvTopic() != null && annotation.getCvTopic().getShortLabel() != null ) {
+                CvTopic cvTopic = annotation.getCvTopic();
+
+                if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.DEFINITION ) ) {
+                    definitionPrefix = annotation.getAnnotationText();
+                } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.URL ) ) {
+                    definitionSuffix = "\n" + annotation.getAnnotationText();
+                } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.SEARCH_URL ) ) {
+                    String annotationText = annotation.getAnnotationText();
+                    if ( log.isTraceEnabled() ) log.trace( "annotationText before " + annotationText );
+                    annotationText = annotationText.replaceAll( "\\\\", "" );
+
+                    annotationText = " \"" + annotationText + "\"";
+                    if ( log.isTraceEnabled() ) log.trace( "annotationText after " + annotationText );
+                    Dbxref dbxref = new DbxrefImpl( CvTopic.SEARCH_URL, annotationText );
+
+                    oboObj.addDbxref( dbxref );
+                } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.XREF_VALIDATION_REGEXP ) ) {
+                    Dbxref dbxref = new DbxrefImpl( CvTopic.XREF_VALIDATION_REGEXP, annotation.getAnnotationText() );
+                    oboObj.addDbxref( dbxref );
+                } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.COMMENT ) ) {
+                    oboObj.setComment( annotation.getAnnotationText() );
+                } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.OBSOLETE ) ) {
+                    oboObj.setObsolete( true );
+                    definitionSuffix = "\n" + annotation.getAnnotationText();
+                } else {
+                    if ( log.isDebugEnabled() ) log.debug( "Annotation don't fit anywhere-----" );
+                }
+            } //end if
+        }//end for
+        oboObj.setDefinition( definitionPrefix + definitionSuffix );
+        //assign alias
+
+        for ( CvObjectAlias cvAlias : dagObj.getAliases() ) {
+            Synonym altSyn = createAlias( cvAlias );
+            oboObj.addSynonym( altSyn );
+
+        }
+
+        //add children and parents
+        //check if root
+
+        if ( checkIfRootMI( CvObjectUtils.getIdentity( dagObj ) ) ) {
+
+            OBOClass rootObject = getRootObject();
+            Link linkToRoot = new OBORestrictionImpl( oboObj );
+            OBOProperty oboProp = new OBOPropertyImpl( "part_of" );
+            linkToRoot.setType( oboProp );
+            rootObject.addChild( linkToRoot );
+        }
+
+
+        HashSet<CvDagObject> cvParents = cvMapWithParents.get( CvObjectUtils.getIdentity( dagObj ) );
+
+
+        if ( cvParents != null ) {
             for ( CvDagObject cvParentObj : cvParents ) {
 
-                OBOClass isA = convertCv2OBO( cvParentObj );
+                OBOClass isA = convertCv2OBO( cvParentObj, cvMapWithParents );
                 Link linkToIsA = new OBORestrictionImpl( oboObj );
                 linkToIsA.setType( OBOProperty.IS_A );
                 isA.addChild( linkToIsA );
             }//end for
+        }
 
-
-        }//outermost if
 
         return oboObj;
     }//end method

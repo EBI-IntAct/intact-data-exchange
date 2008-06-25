@@ -35,6 +35,8 @@ import uk.ac.ebi.intact.model.CvObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Test the DownloadCvsExtended class that contains methods to recreate the OBOSession object from a list of CVObjects
@@ -55,7 +57,7 @@ public class CvExporterTest {
     @Before
     public void prepareCvs() throws OBOParseException, IOException, PsiLoaderException, IntactTransactionException {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
         log.debug( oboSession.getObjects().size() );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
@@ -63,14 +65,14 @@ public class CvExporterTest {
         allCvs_ = ontologyBuilder.getAllCvs();
 
         this.allCvs = allCvs_;
-        if (log.isDebugEnabled()) log.debug( "allCvs size " + allCvs.size() );
+        if ( log.isDebugEnabled() ) log.debug( "allCvs size " + allCvs.size() );
 
     }//end method
 
 
     @Test
     public void testCv2OBORoundTrip() throws OBOParseException, IOException {
-        
+
         /**
          * id: MI:0244
          name: reactome complex
@@ -83,14 +85,18 @@ public class CvExporterTest {
          */
 
 
-
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
+
+
         OBOObject readOBOObj = ( OBOObject ) oboSession.getObject( "MI:0244" );
         CvObject cvObject = ontologyBuilder.toCvObject( readOBOObj );
 
         CvExporter downloadCv = new CvExporter();
-        OBOObject createdOBOObj = downloadCv.convertCv2OBO( cvObject );
+
+        Map<String, HashSet<CvDagObject>> cvMapWithParents = downloadCv.groupByMis( allCvs );
+
+        OBOObject createdOBOObj = downloadCv.convertCv2OBO( ( CvDagObject ) cvObject, cvMapWithParents );
 
         Assert.assertEquals( readOBOObj.getID(), createdOBOObj.getID() );
         Assert.assertEquals( readOBOObj.getDefinition(), createdOBOObj.getDefinition() );
@@ -106,7 +112,9 @@ public class CvExporterTest {
     public void testAllCvs() throws DataAdapterException, IOException {
         CvExporter downloadCv = new CvExporter();
 
-       if (log.isDebugEnabled())  log.debug( "From Test all : " + allCvs.size() );
+        if ( log.isDebugEnabled() ) log.debug( "From Test all : " + allCvs.size() );
+
+
         OBOSession oboSession = downloadCv.convertCvList2OBOSession( allCvs );
         // Create temp directory
         File tempDir = new File( "temp" );
@@ -136,7 +144,8 @@ public class CvExporterTest {
         CvObject cvObject = new IntactMockBuilder().createCvObject( CvInteraction.class, "MI:0001", "interaction detect" );
         cvObject.setFullName( "interaction detection method" );
 
-        OBOClass obj2 = downloadCv.convertCv2OBO( cvObject );
+        Map<String, HashSet<CvDagObject>> cvMapWithParents = downloadCv.groupByMis( allCvs );
+        OBOClass obj2 = downloadCv.convertCv2OBO( ( CvDagObject ) cvObject, cvMapWithParents );
 
         Link linkToObj2 = new OBORestrictionImpl( obj2 );
         OBOProperty oboProp = new OBOPropertyImpl( "part_of" );
