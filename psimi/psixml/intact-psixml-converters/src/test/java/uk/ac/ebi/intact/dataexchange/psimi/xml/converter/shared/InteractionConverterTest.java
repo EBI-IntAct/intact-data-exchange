@@ -181,6 +181,25 @@ public class InteractionConverterTest extends AbstractConverterTest {
     }
 
     @Test
+    public void psiToIntact_noPartDetMethodInExp_norInParticipants() throws Exception {
+        Interaction psiInteraction = PsiMockFactory.createMockInteraction();
+
+        for (ExperimentDescription expDesc : psiInteraction.getExperiments()) {
+            expDesc.setParticipantIdentificationMethod(null);
+        }
+
+        int i=0;
+        for (Participant part : psiInteraction.getParticipants()) {
+            part.getParticipantIdentificationMethods().clear();
+        }
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
+
+        Assert.assertEquals("MI:0661", interaction.getExperiments().iterator().next().getCvIdentification().getMiIdentifier());
+    }
+
+    @Test
     public void psiToIntact_fixSourceReferenceXrefs() throws Exception {
         Interaction psiInteraction = PsiMockFactory.createMockInteraction();
 

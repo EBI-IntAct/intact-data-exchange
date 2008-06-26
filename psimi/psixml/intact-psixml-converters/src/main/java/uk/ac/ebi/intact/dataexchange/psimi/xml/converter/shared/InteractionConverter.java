@@ -249,10 +249,15 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
                     CvIdentification detMethod = CvObjectUtils.createCvObject(experiment.getOwner(), CvIdentification.class, partDetMethod, "undefined");
                     experiment.setCvIdentification(detMethod);
-                }
+                } else {
 
-                if (experiment.getCvIdentification() == null) {
-                    throw new UnsupportedConversionException("Experiment without CvIdentification (participant detection method) and its participants do not have one either: Experiment '"+experiment.getShortLabel()+"', Interaction '"+interaction.getShortLabel()+"'");
+                    final String message = "Neither the Experiment nor its participants have CvIdentification (participant detection method). Using the term \"experimental particp\" (MI:0661).";
+                    if (log.isWarnEnabled()) log.warn(": Experiment '"+experiment.getShortLabel()+
+                            "', Interaction '"+interaction.getShortLabel()+"' - Location: "+ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString());
+                    addMessageToContext(MessageLevel.WARN, message, true);
+
+                    CvIdentification detMethod = CvObjectUtils.createCvObject(experiment.getOwner(), CvIdentification.class, "MI:0661", "experimental particp");
+                    experiment.setCvIdentification(detMethod);  
                 }
             }
         }
