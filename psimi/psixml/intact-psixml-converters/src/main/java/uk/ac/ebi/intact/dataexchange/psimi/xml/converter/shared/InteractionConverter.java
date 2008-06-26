@@ -18,10 +18,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.beanutils.ConversionException;
+import org.obo.datamodel.OBOSession;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
@@ -47,13 +49,15 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
      */
     private static final Log log = LogFactory.getLog(InteractionConverter.class);
 
-    private static ThreadLocal<IntactOntology> ontology = new ThreadLocal<IntactOntology>();
+    private static ThreadLocal<List<CvDagObject>> ontology = new ThreadLocal<List<CvDagObject>>();
 
-    private static IntactOntology getCurrentOntology() {
+    private static List<CvDagObject> getCurrentOntology() {
         if (ontology.get() == null) {
             if (log.isDebugEnabled()) log.debug("Initializing Intact ontology lazily");
             try {
-                ontology.set(OboUtils.createOntologyFromOboLatestPsiMi());
+                final OBOSession oboSession = OboUtils.createOBOSessionFromLatestMi();
+                CvObjectOntologyBuilder builder = new CvObjectOntologyBuilder(oboSession);
+                ontology.set(new ArrayList<CvDagObject>(builder.getAllValidCvs()));
             } catch (Exception e) {
                 throw new IllegalStateException("Could not load ontology");
             }
