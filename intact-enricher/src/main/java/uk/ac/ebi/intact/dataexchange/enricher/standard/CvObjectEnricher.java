@@ -15,15 +15,10 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
-import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
+import uk.ac.ebi.intact.core.persister.DefaultEntityStateCopier;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
 import uk.ac.ebi.intact.model.CvObject;
-import uk.ac.ebi.intact.model.CvObjectXref;
-import uk.ac.ebi.intact.model.Annotation;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.XrefUtils;
-import uk.ac.ebi.intact.core.persister.DefaultEntityStateCopier;
 
 /**
  * TODO comment this
@@ -48,20 +43,19 @@ public class CvObjectEnricher extends AnnotatedObjectEnricher<CvObject> {
     }
 
     public void enrich(CvObject objectToEnrich) {
-        CvObjectXref identityXref = CvObjectUtils.getPsiMiIdentityXref(objectToEnrich);
+        String id = CvObjectUtils.getIdentity(objectToEnrich);
 
         CvObject referenceTerm;
 
-        if (identityXref != null) {
-            String mi = identityXref.getPrimaryId();
-            referenceTerm = CvObjectFetcher.getInstance().fetchByTermId(objectToEnrich.getClass(), mi);
+        if (id != null) {
+            referenceTerm = CvObjectFetcher.getInstance().fetchByTermId(objectToEnrich.getClass(), id);
         } else {
             referenceTerm = CvObjectFetcher.getInstance().fetchByShortLabel(objectToEnrich.getClass(), objectToEnrich.getShortLabel());
         }
 
         if (referenceTerm != null) {
-            //objectToEnrich.setShortLabel(referenceTerm.getShortLabel());
-            //objectToEnrich.setFullName(referenceTerm.getFullName());
+            objectToEnrich.setShortLabel(referenceTerm.getShortLabel());
+            objectToEnrich.setFullName(referenceTerm.getFullName());
 
             DefaultEntityStateCopier copier = new DefaultEntityStateCopier();
             copier.copy(referenceTerm, objectToEnrich);
