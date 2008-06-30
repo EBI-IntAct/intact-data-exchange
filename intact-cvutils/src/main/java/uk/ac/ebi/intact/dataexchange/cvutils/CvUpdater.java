@@ -246,14 +246,23 @@ public class CvUpdater {
         Bag hashBag = new HashBag();
         for ( CvDagObject cvDag : allValidCvs ) {
             String primaryKey = cvDag.getObjClass().toString() + ":" + cvDag.getShortLabel();
+            if ( log.isDebugEnabled() ) {
+                log.debug( "PrimaryKey :"+primaryKey );
+            }
+
             hashBag.add( primaryKey );
         }
 
         if ( log.isDebugEnabled() ) log.debug( "HashBag size " + hashBag.size() );
         for ( Object aHashBag : hashBag ) {
             String s = ( String ) aHashBag;
-            if ( hashBag.getCount( s ) > 1 )
-                return true;
+            if ( hashBag.getCount( s ) > 1 )  {
+                if ( log.isDebugEnabled() ) {
+                    log.debug( "Constraint violated by "+s );
+                }
+
+            return true;
+            }     
         }
         log.debug( "Constraint not violated" );
         return false;

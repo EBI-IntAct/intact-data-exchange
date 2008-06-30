@@ -455,10 +455,12 @@ public class CvObjectOntologyBuilderTest {
         for ( CvDagObject cv : allCvs ) {
 
             if (cv.getShortLabel().contains("unspecified role")) {
-           
 
+                if ( log.isDebugEnabled() ) {
                 log.debug( "---CvObject--" + cv.getMiIdentifier() + "--" + cv.getShortLabel() );
-                
+                }
+
+
 
                 if ( CvBiologicalRole.class.getName().equals( cv.getObjClass() ) ) {
                     foundBioRole = true;

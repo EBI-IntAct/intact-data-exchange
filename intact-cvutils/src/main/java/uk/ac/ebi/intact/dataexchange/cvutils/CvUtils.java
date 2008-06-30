@@ -21,6 +21,11 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.model.CvDagObject;
+import uk.ac.ebi.intact.model.CvObject;
+import uk.ac.ebi.intact.context.DataContext;
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+
 
 import java.util.*;
 
@@ -45,7 +50,6 @@ public class CvUtils {
     public static String findLowestCommonAncestor( List<CvDagObject> ontology, String... ids ) {
 
 
-
         if ( ids.length < 2 ) {
             throw new IllegalArgumentException( "At least two IDs have to be provided to find a common parent" );
         }
@@ -53,9 +57,8 @@ public class CvUtils {
         Collection<CvDagObject> children = new ArrayList<CvDagObject>( ids.length );
 
         for ( String id : ids ) {
-            //CvDagObject term = searchById(ontology,id);
-            List<CvDagObject> terms = searchById( ontology, id );
 
+            List<CvDagObject> terms = searchById( ontology, id );
 
             if ( terms == null ) {
                 throw new IllegalArgumentException( "Term with id '" + id + "' was not found in the ontology provided" );
@@ -63,7 +66,6 @@ public class CvUtils {
 
             children.addAll( terms );
         }
-
 
 
         CvDagObject parent = findLowestCommonAncestor( children.toArray( new CvDagObject[children.size()] ) );
@@ -172,4 +174,82 @@ public class CvUtils {
         return terms;
 
     }
+
+    /**
+     * @return List of Cvs with No MiIdentifiers
+     */
+    public static List<CvObject> getCvsInIntactNotInPsi() {
+
+        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+        DaoFactory daof = dataContext.getDaoFactory();
+        List<CvObject> allCvs = daof.getCvObjectDao().getAll();
+
+        List<CvObject> cvsNotInPsi = new ArrayList<CvObject>();
+
+        for ( CvObject cv : allCvs ) {
+            if ( cv.getMiIdentifier() == null ) {
+
+                if ( !( cv.getObjClass().equals( "uk.ac.ebi.intact.model.CvCellType" ) || cv.getObjClass().equals( "uk.ac.ebi.intact.model.CvTissue" ) ) )
+                    cvsNotInPsi.add( cv );
+            }
+        }
+
+        return cvsNotInPsi;
+    }
+
+    /**
+     *
+     * @param date
+     * @return List of cvs added after the given date excluding the date
+     */
+    public static List<CvObject> getCvsAddedAfter( Date date ) {
+
+        if ( date == null ) {
+            throw new NullPointerException( "You must give a non null date" );
+        }
+
+        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+        DaoFactory daof = dataContext.getDaoFactory();
+        List<CvObject> allCvs = daof.getCvObjectDao().getAll();
+
+        List<CvObject> cvsAddedAfter = new ArrayList<CvObject>();
+
+        for ( CvObject cv : allCvs ) {
+
+            if ( cv.getCreated() != null && cv.getCreated().after( date ) ) {
+                cvsAddedAfter.add( cv );
+            }
+        }
+
+        return cvsAddedAfter;
+    }
+
+   /**
+     *
+     * @param date
+     * @return List of cvs added before the given date excluding the date
+     */
+    public static List<CvObject> getCVsAddedBefore( Date date ) {
+
+        if ( date == null ) {
+            throw new NullPointerException( "You must give a non null date" );
+        }
+
+        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+        DaoFactory daof = dataContext.getDaoFactory();
+        List<CvObject> allCvs = daof.getCvObjectDao().getAll();
+
+        List<CvObject> cvsAddedBefore = new ArrayList<CvObject>();
+
+        for ( CvObject cv : allCvs ) {
+
+            if ( cv.getCreated() != null && cv.getCreated().before( date ) ) {
+                cvsAddedBefore.add( cv );
+            }
+        }
+
+        return cvsAddedBefore;
+    }
+
+
 }
