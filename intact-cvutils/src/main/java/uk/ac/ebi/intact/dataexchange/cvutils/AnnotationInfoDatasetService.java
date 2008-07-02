@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
+import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.context.DataContext;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfo;
@@ -23,12 +24,12 @@ import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.core.persister.PersisterException;
-import uk.ac.ebi.intact.business.IntactTransactionException;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Service allowing to retreive annotation info dataset from the intact databse.
@@ -47,41 +48,51 @@ public class AnnotationInfoDatasetService {
      *
      * @param topics topic filter.
      * @return a non null dataset.
-     *
      * @throws AnnotationInfoDatasetServiceException
+     *
      */
     public AnnotationInfoDataset retrieveAnnotationInfoDataset( Collection<CvTopic> topics ) throws AnnotationInfoDatasetServiceException {
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
-        boolean inTransaction = dataContext.isTransactionActive();
+        final boolean inTransaction = dataContext.isTransactionActive();
 
         if ( !inTransaction ) dataContext.beginTransaction();
 
         AnnotationInfoDataset dataset = new AnnotationInfoDataset();
 
         DaoFactory daof = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
-        final Iterator<CvObject> cvIterator = daof.getCvObjectDao().getAllIterator();
-        while ( cvIterator.hasNext() ) {
-            CvObject cvObject = cvIterator.next();
+        final CvObjectDao<CvObject> cvDao = daof.getCvObjectDao();
 
-            final Collection<Annotation> annotations = AnnotatedObjectUtils.findAnnotationsByCvTopic( cvObject, topics );
-            for ( Annotation annotation : annotations ) {
+        final int termCount = cvDao.countAll();
+        final int batchSize = 50;
+        int currentIdx = 0;
 
-                AnnotationInfo ai = new AnnotationInfo( cvObject.getShortLabel(),
-                                                        cvObject.getFullName(),
-                                                        cvObject.getClass().getName(),
-                                                        cvObject.getMiIdentifier(),
-                                                        annotation.getCvTopic().getShortLabel(),
-                                                        annotation.getAnnotationText(),
-                                                        false );
-                dataset.addCvAnnotation( ai );
-            } // annotations
-        } // cvObjects
+        do {
+            final List<CvObject> terms = cvDao.getAll( currentIdx, batchSize );
+
+            for ( CvObject cvObject : terms ) {
+                final Collection<Annotation> annotations = AnnotatedObjectUtils.findAnnotationsByCvTopic( cvObject, topics );
+                for ( Annotation annotation : annotations ) {
+
+                    AnnotationInfo ai = new AnnotationInfo( cvObject.getShortLabel(),
+                                                            cvObject.getFullName(),
+                                                            cvObject.getClass().getName(),
+                                                            cvObject.getMiIdentifier(),
+                                                            annotation.getCvTopic().getShortLabel(),
+                                                            annotation.getAnnotationText(),
+                                                            false );
+                    dataset.addCvAnnotation( ai );
+                } // annotations
+            }
+
+            currentIdx += terms.size();
+
+        } while ( currentIdx < termCount - 1 );
 
         try {
             if ( !inTransaction ) dataContext.commitTransaction();
         } catch ( IntactTransactionException e ) {
-            throw new AnnotationInfoDatasetServiceException(e);
+            throw new AnnotationInfoDatasetServiceException( e );
         }
 
         return dataset;
