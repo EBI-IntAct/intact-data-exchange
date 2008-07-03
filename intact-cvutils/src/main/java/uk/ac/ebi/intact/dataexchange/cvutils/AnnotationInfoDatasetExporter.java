@@ -57,6 +57,7 @@ public class AnnotationInfoDatasetExporter {
             sb.append( "\"" ).append( "# Cv shortlabel" ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( "Cv fullname" ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( "Cv Class" ).append( "\"" ).append( ',' );
+            sb.append( "\"" ).append( "Cv identifier" ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( "CvTopic shortlabel" ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( "Annotation's text " ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( "apply to children " ).append( "\"" );
@@ -70,8 +71,8 @@ public class AnnotationInfoDatasetExporter {
 
             sb.append( "\"" ).append( info.getShortLabel() ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( info.getFullName() ).append( "\"" ).append( ',' );
-            sb.append( "\"" ).append( info.getMi() ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( info.getType() ).append( "\"" ).append( ',' );
+            sb.append( "\"" ).append( info.getMi() ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( info.getTopicShortLabel() ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( info.getReason() ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( info.isApplyToChildren() ).append( "\"" ).append( ',' );
