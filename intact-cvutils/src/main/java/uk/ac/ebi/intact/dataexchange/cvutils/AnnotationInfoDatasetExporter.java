@@ -74,7 +74,7 @@ public class AnnotationInfoDatasetExporter {
             sb.append( "\"" ).append( info.getType() ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( ( info.getMi() == null ? "" : info.getMi() ) ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( info.getTopicShortLabel() ).append( "\"" ).append( ',' );
-            sb.append( "\"" ).append( info.getReason() ).append( "\"" ).append( ',' );
+            sb.append( "\"" ).append( ( info.getReason() == null ? "" : info.getReason() ) ).append( "\"" ).append( ',' );
             sb.append( "\"" ).append( info.isApplyToChildren() ).append( "\"" ).append( ',' );
 
             sb.append( '\n' );
