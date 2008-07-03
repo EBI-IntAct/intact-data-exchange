@@ -29,17 +29,19 @@ import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.persistence.util.CgLibUtil;
 
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
 
 /**
- * Service allowing to retreive annotation info dataset from the intact databse.
+ * Service allowing to retreive annotation info dataset from the intact database.
  *
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id$
  * @since 2.0.1
  */
 public class AnnotationInfoDatasetService {
+
+    private static final int MAX_CV_BATCH_SIZE = 50;
 
     public AnnotationInfoDatasetService() {
     }
@@ -53,6 +55,21 @@ public class AnnotationInfoDatasetService {
      *
      */
     public AnnotationInfoDataset retrieveAnnotationInfoDataset( Collection<CvTopic> topics ) throws AnnotationInfoDatasetServiceException {
+        return retrieveAnnotationInfoDataset( topics, null );
+    }
+
+    /**
+     * Extract from the IntAct database all CvObjects having at least one annotation having one of the given CvTopic.
+     * If a non null date is given, we filter annotation so that we return only those that have been created or updated
+     * after than date.
+     *
+     * @param topics topic filter.
+     * @param after  only export terms that have been created or updated after this date
+     * @return a non null dataset.
+     * @throws AnnotationInfoDatasetServiceException
+     *
+     */
+    public AnnotationInfoDataset retrieveAnnotationInfoDataset( Collection<CvTopic> topics, Date after ) throws AnnotationInfoDatasetServiceException {
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
         final boolean inTransaction = dataContext.isTransactionActive();
@@ -65,24 +82,28 @@ public class AnnotationInfoDatasetService {
         final CvObjectDao<CvObject> cvDao = daof.getCvObjectDao();
 
         final int termCount = cvDao.countAll();
-        final int batchSize = 50;
         int currentIdx = 0;
 
         do {
-            final List<CvObject> terms = cvDao.getAll( currentIdx, batchSize );
+            final List<CvObject> terms = cvDao.getAll( currentIdx, MAX_CV_BATCH_SIZE );
 
             for ( CvObject cvObject : terms ) {
                 final Collection<Annotation> annotations = AnnotatedObjectUtils.findAnnotationsByCvTopic( cvObject, topics );
                 for ( Annotation annotation : annotations ) {
 
-                    AnnotationInfo ai = new AnnotationInfo( cvObject.getShortLabel(),
-                                                            cvObject.getFullName(),
-                                                            CgLibUtil.getRealClassName( cvObject ).getName(),
-                                                            cvObject.getMiIdentifier(),
-                                                            annotation.getCvTopic().getShortLabel(),
-                                                            annotation.getAnnotationText(),
-                                                            false );
-                    dataset.addCvAnnotation( ai );
+                    if ( after == null
+                         || after.before( annotation.getUpdated() )
+                         || after.before( annotation.getCreated() ) ) {
+
+                        AnnotationInfo ai = new AnnotationInfo( cvObject.getShortLabel(),
+                                                                cvObject.getFullName(),
+                                                                CgLibUtil.getRealClassName( cvObject ).getName(),
+                                                                cvObject.getMiIdentifier(),
+                                                                annotation.getCvTopic().getShortLabel(),
+                                                                annotation.getAnnotationText(),
+                                                                false );
+                        dataset.addCvAnnotation( ai );
+                    }
                 } // annotations
             }
 
