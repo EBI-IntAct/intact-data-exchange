@@ -198,11 +198,10 @@ public class CvUtils {
     }
 
     /**
-     *
      * @param date
      * @return List of cvs added after the given date excluding the date
      */
-    public static List<CvObject> getCvsAddedAfter( Date date ) {
+    public static List<CvObject> getCvsAddedAfter( Date date, Collection<String> exclusionList ) {
 
         if ( date == null ) {
             throw new NullPointerException( "You must give a non null date" );
@@ -217,19 +216,23 @@ public class CvUtils {
         for ( CvObject cv : allCvs ) {
 
             if ( cv.getCreated() != null && cv.getCreated().after( date ) ) {
-                cvsAddedAfter.add( cv );
+                if ( exclusionList == null || exclusionList.size() == 0 ) {
+                    cvsAddedAfter.add( cv );
+                } else {
+                    if ( !exclusionList.contains( cv.getObjClass() ) )
+                        cvsAddedAfter.add( cv );
+                }
             }
         }
 
         return cvsAddedAfter;
     }
 
-   /**
-     *
+    /**
      * @param date
      * @return List of cvs added before the given date excluding the date
      */
-    public static List<CvObject> getCVsAddedBefore( Date date ) {
+    public static List<CvObject> getCVsAddedBefore( Date date, Collection<String> exclusionList ) {
 
         if ( date == null ) {
             throw new NullPointerException( "You must give a non null date" );
@@ -244,7 +247,12 @@ public class CvUtils {
         for ( CvObject cv : allCvs ) {
 
             if ( cv.getCreated() != null && cv.getCreated().before( date ) ) {
-                cvsAddedBefore.add( cv );
+               if ( exclusionList == null || exclusionList.size() == 0 ) {
+                    cvsAddedBefore.add( cv );
+                } else {
+                    if ( !exclusionList.contains( cv.getObjClass() ) )
+                        cvsAddedBefore.add( cv );
+                }
             }
         }
 

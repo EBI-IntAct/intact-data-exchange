@@ -28,6 +28,8 @@ import uk.ac.ebi.intact.core.unit.IntactUnit;
 
 import java.util.List;
 import java.util.Date;
+import java.util.Collection;
+import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 
 /**
@@ -35,6 +37,9 @@ import java.text.SimpleDateFormat;
  * @version $Id$
  */
 public class CvUtilsTest extends IntactBasicTestCase {
+
+
+
 
     private static List<CvDagObject> ontology;
 
@@ -109,12 +114,21 @@ public class CvUtilsTest extends IntactBasicTestCase {
 
         Date cutoffDate = sdf.parse( "2008-06-19" );
 
-        List<CvObject> cvsbefore = CvUtils.getCVsAddedBefore( cutoffDate );
+        List<CvObject> cvsbefore = CvUtils.getCVsAddedBefore( cutoffDate,null );
         Assert.assertEquals( 2, cvsbefore.size() );
 
         // it should be 3+2 terms(identity+psi-mi)
-        List<CvObject> cvsafter = CvUtils.getCvsAddedAfter( cutoffDate );
+        List<CvObject> cvsafter = CvUtils.getCvsAddedAfter( cutoffDate,null );
         Assert.assertEquals( 5, cvsafter.size() );
+
+
+        Collection<String> exclusionList = new ArrayList<String>();
+        exclusionList.add( "uk.ac.ebi.intact.model.CvCellType" );
+        exclusionList.add( "uk.ac.ebi.intact.model.CvTissue" );
+
+        List<CvObject> cvsafterWithExclusion = CvUtils.getCvsAddedAfter( cutoffDate,exclusionList );
+        Assert.assertEquals( 3, cvsafterWithExclusion.size() );
+        
 
         //one term which is added on the date provided (2008-06-19) is left out
       commitTransaction();
