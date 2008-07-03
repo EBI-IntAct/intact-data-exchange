@@ -77,7 +77,7 @@ public class AnnotationInfoDatasetService {
 
                     AnnotationInfo ai = new AnnotationInfo( cvObject.getShortLabel(),
                                                             cvObject.getFullName(),
-                                                            CgLibUtil.getDisplayableClassName( cvObject.getClass() ),
+                                                            CgLibUtil.getRealClassName( cvObject ).getName(),
                                                             cvObject.getMiIdentifier(),
                                                             annotation.getCvTopic().getShortLabel(),
                                                             annotation.getAnnotationText(),
