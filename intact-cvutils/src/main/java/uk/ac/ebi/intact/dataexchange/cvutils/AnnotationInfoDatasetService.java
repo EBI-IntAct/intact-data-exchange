@@ -26,6 +26,7 @@ import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.persistence.util.CgLibUtil;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -76,7 +77,7 @@ public class AnnotationInfoDatasetService {
 
                     AnnotationInfo ai = new AnnotationInfo( cvObject.getShortLabel(),
                                                             cvObject.getFullName(),
-                                                            cvObject.getClass().getName(),
+                                                            CgLibUtil.getDisplayableClassName( cvObject.getClass() ),
                                                             cvObject.getMiIdentifier(),
                                                             annotation.getCvTopic().getShortLabel(),
                                                             annotation.getAnnotationText(),
