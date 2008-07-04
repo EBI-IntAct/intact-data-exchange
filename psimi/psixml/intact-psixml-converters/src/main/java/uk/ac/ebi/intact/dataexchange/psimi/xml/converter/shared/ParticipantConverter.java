@@ -56,11 +56,13 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         PsiConverterUtils.populate(intactObject, participant, this );
         participant.getNames().setShortLabel(intactObject.getInteractor().getShortLabel());
 
-        ExperimentalRole expRole = (ExperimentalRole)
-                PsiConverterUtils.toCvType(intactObject.getCvExperimentalRole(),
-                                           new ExperimentalRoleConverter(getInstitution()),
-                                           this);
-        participant.getExperimentalRoles().add(expRole);
+        for ( CvExperimentalRole experimentalRole : intactObject.getExperimentalRoles() ) {
+            ExperimentalRole expRole = ( ExperimentalRole )
+                    PsiConverterUtils.toCvType( experimentalRole,
+                                                new ExperimentalRoleConverter( getInstitution() ),
+                                                this );
+            participant.getExperimentalRoles().add( expRole );
+        }
 
         BiologicalRole bioRole = (BiologicalRole)
                 PsiConverterUtils.toCvType(intactObject.getCvBiologicalRole(), 
