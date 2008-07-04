@@ -66,14 +66,9 @@ public class CvUtilsTest extends IntactBasicTestCase {
         String DATE_FORMAT = "yyyy-MM-dd";
         SimpleDateFormat sdf = new SimpleDateFormat( DATE_FORMAT );
 
-
         Institution owner = IntactContext.getCurrentInstance().getInstitution();
 
-
         beginTransaction();
-
-      
-
 
         CvObject twoHybrid = CvObjectUtils.createCvObject( owner, CvInteraction.class, "MI:0018", "two hybrid" );
         twoHybrid.setCreated( sdf.parse( "2008-06-17" ) );
@@ -99,9 +94,6 @@ public class CvUtilsTest extends IntactBasicTestCase {
         pc12.setCreated( sdf.parse( "2008-06-22" ) );
         PersisterHelper.saveOrUpdate( pc12 );
 
-
-
-
         List<CvObject> notInPsiCvs = CvUtils.getCvsInIntactNotInPsi();
         for( CvObject cvs: notInPsiCvs){
             System.out.println( "cv   "+cvs.toString() );
@@ -110,7 +102,6 @@ public class CvUtilsTest extends IntactBasicTestCase {
 
         //6 terms are added out of 4 have null MI_Identifier and after excluding CvTissue and CvCellType it should be 2
         Assert.assertEquals( 2, notInPsiCvs.size() );
-
 
         Date cutoffDate = sdf.parse( "2008-06-19" );
 
@@ -121,17 +112,15 @@ public class CvUtilsTest extends IntactBasicTestCase {
         List<CvObject> cvsafter = CvUtils.getCvsAddedAfter( cutoffDate,null );
         Assert.assertEquals( 5, cvsafter.size() );
 
-
         Collection<String> exclusionList = new ArrayList<String>();
         exclusionList.add( "uk.ac.ebi.intact.model.CvCellType" );
         exclusionList.add( "uk.ac.ebi.intact.model.CvTissue" );
 
         List<CvObject> cvsafterWithExclusion = CvUtils.getCvsAddedAfter( cutoffDate,exclusionList );
         Assert.assertEquals( 3, cvsafterWithExclusion.size() );
-        
 
         //one term which is added on the date provided (2008-06-19) is left out
-      commitTransaction();
+       commitTransaction();
     
     }
 
