@@ -91,7 +91,7 @@ public class CvUpdater {
      * @param allCvs List of all Cvs
      * @return An object containing some statistics about the update
      */
-    protected CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allCvs ) {
+    public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allCvs ) {
         return createOrUpdateCVs( allCvs, new AnnotationInfoDataset() );
     }
 
