@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
@@ -146,15 +147,14 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     @Test
     public void obsoleteTest() throws Exception {
 
+        new IntactUnit().createSchema( true );
 
         List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
         int cvsBeforeUpdate = allCvsCommittedBefore.size();
-        Assert.assertEquals( 0, cvsBeforeUpdate );
+        //PersisterHelper is adding the intact, psi-mi and identity terms...so we have 3
+        Assert.assertEquals( 3, cvsBeforeUpdate );
 
-
-        
         Institution owner = IntactContext.getCurrentInstance().getInstitution();
-
 
         beginTransaction();
         CvDagObject aggregation = CvObjectUtils.createCvObject( owner, CvInteractionType.class, "MI:0191", "aggregation" );
@@ -164,8 +164,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         List<CvObject> allCvsCommittedAfter = getDaoFactory().getCvObjectDao().getAll();
         int cvsAfterPersist = allCvsCommittedAfter.size();
-        //PersisterHelper is adding the psi-mi and identity terms...so we have 3
-        Assert.assertEquals( 3, cvsAfterPersist );
+        //PersisterHelper is adding the intact, psi-mi and identity terms+aggregation...so we have 4
+        Assert.assertEquals( 4, cvsAfterPersist );
 
 
 
@@ -174,12 +174,13 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     @Test
     public void createOrUpdateCVsWithObsolete() throws Exception {
-
+         new IntactUnit().createSchema( true );
 
         List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
         int cvsBeforeUpdate = allCvsCommittedBefore.size();
 
-        Assert.assertEquals( 0, cvsBeforeUpdate );
+        //PersisterHelper is adding the intact, psi-mi and identity terms...so we have 3
+        Assert.assertEquals( 3, cvsBeforeUpdate );
 
         //Insert aggregation an obsolete term MI:0191
         CvObjectDao<CvObject> cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao();
@@ -194,11 +195,11 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         List<CvObject> allCvsCommittedAfter = getDaoFactory().getCvObjectDao().getAll();
         for ( CvObject cv : allCvsCommittedAfter ) {
             if ( log.isDebugEnabled() )
-                log.debug( "Cv->" + cv.getMiIdentifier() + "shortLabel: " + cv.getShortLabel() );
+                log.debug( "Cv-> " + cv.getIdentifier() + "  shortLabel: " + cv.getShortLabel() );
         }
 
 
-        Assert.assertEquals( 3, cvObjectDao.countAll() );
+        Assert.assertEquals( 4, cvObjectDao.countAll() );
 
         //check if aggregation has obsolote annotation  before createOrUpdateCvs call
         String id_ = CvObjectUtils.getIdentity( aggregation );
@@ -209,7 +210,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         for ( CvObject existingCv : existingCvsBefore ) {
             if ( log.isDebugEnabled() )
-                log.debug( "existingCv MI -> shortLabel ->Ac" + existingCv.getMiIdentifier() + " -> " + existingCv.getShortLabel() + " ->" + existingCv.getAc() );
+                log.debug( "existingCv MI -> shortLabel ->Ac  " + existingCv.getIdentifier() + " -> " + existingCv.getShortLabel() + " ->" + existingCv.getAc() );
             for ( Annotation annot : existingCv.getAnnotations() ) {
                 if ( log.isDebugEnabled() ) log.debug( "Annot CvTopic " + annot.getCvTopic() );
                 if ( log.isDebugEnabled() ) log.debug( "Annot Text " + annot.getAnnotationText() );
@@ -248,7 +249,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         }
 
         for ( CvObject existingCv : existingCvs ) {
-            log.debug( "existingCv MI -> shortLabel" + existingCv.getMiIdentifier() + " -> " + existingCv.getShortLabel() );
+            log.debug( "existingCv MI -> shortLabel  " + existingCv.getIdentifier() + " -> " + existingCv.getShortLabel() );
             for ( Annotation annot : existingCv.getAnnotations() ) {
                 if ( log.isDebugEnabled() ) log.debug( "Annot CvTopic " + annot.getCvTopic() );
                 if ( log.isDebugEnabled() ) log.debug( "Annot Text " + annot.getAnnotationText() );
@@ -263,11 +264,9 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         if ( log.isDebugEnabled() ) log.debug( "stats.getCreatedCvs().size()->" + stats.getCreatedCvs().size() );
         if ( log.isDebugEnabled() ) log.debug( "stats.getUpdatedCvs().size() ->" + stats.getUpdatedCvs().size() );
 
-
         Assert.assertEquals( 930, totalCvsAfterUpdate );
 
-
-        Assert.assertEquals( 927, stats.getCreatedCvs().size() );
+        Assert.assertEquals( 926, stats.getCreatedCvs().size() );
         Assert.assertEquals( 1, stats.getUpdatedCvs().size() );
 
         //53-2 as aggregation was already created and later updated + obsolete term

@@ -94,12 +94,13 @@ public class CvUtilsTest extends IntactBasicTestCase {
         pc12.setCreated( sdf.parse( "2008-06-22" ) );
         PersisterHelper.saveOrUpdate( pc12 );
 
-        List<CvObject> notInPsiCvs = CvUtils.getCvsInIntactNotInPsi();
-        for( CvObject cvs: notInPsiCvs){
-            System.out.println( "cv   "+cvs.toString() );
-           
-        }
+        Collection<String> exclusionList = new ArrayList<String>();
+        exclusionList.add( "uk.ac.ebi.intact.model.CvCellType" );
+        exclusionList.add( "uk.ac.ebi.intact.model.CvTissue" );
 
+
+        List<CvObject> notInPsiCvs = CvUtils.getCvsInIntactNotInPsi(exclusionList);
+       
         //6 terms are added out of 4 have null MI_Identifier and after excluding CvTissue and CvCellType it should be 2
         Assert.assertEquals( 2, notInPsiCvs.size() );
 
@@ -108,19 +109,16 @@ public class CvUtilsTest extends IntactBasicTestCase {
         List<CvObject> cvsbefore = CvUtils.getCVsAddedBefore( cutoffDate,null );
         Assert.assertEquals( 2, cvsbefore.size() );
 
-        // it should be 3+2 terms(identity+psi-mi)
+        // it should be 3+3 terms(intact+identity+psi-mi)
         List<CvObject> cvsafter = CvUtils.getCvsAddedAfter( cutoffDate,null );
-        Assert.assertEquals( 5, cvsafter.size() );
+        Assert.assertEquals( 6, cvsafter.size() );
 
-        Collection<String> exclusionList = new ArrayList<String>();
-        exclusionList.add( "uk.ac.ebi.intact.model.CvCellType" );
-        exclusionList.add( "uk.ac.ebi.intact.model.CvTissue" );
-
+        //with exclusion list
         List<CvObject> cvsafterWithExclusion = CvUtils.getCvsAddedAfter( cutoffDate,exclusionList );
-        Assert.assertEquals( 3, cvsafterWithExclusion.size() );
+        Assert.assertEquals( 4, cvsafterWithExclusion.size() );
 
         //one term which is added on the date provided (2008-06-19) is left out
-       commitTransaction();
+        commitTransaction();
     
     }
 

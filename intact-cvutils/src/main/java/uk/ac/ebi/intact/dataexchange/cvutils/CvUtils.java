@@ -71,7 +71,7 @@ public class CvUtils {
         CvDagObject parent = findLowestCommonAncestor( children.toArray( new CvDagObject[children.size()] ) );
 
         if ( parent != null ) {
-            return parent.getMiIdentifier();
+            return parent.getIdentifier();
         }
 
         return null;
@@ -93,8 +93,8 @@ public class CvUtils {
         // get all the parents for each child
         for ( CvDagObject child : children ) {
 
-            cvMap.put( child.getMiIdentifier(), child.getMiIdentifier() );
-            cvMap.putAll( child.getMiIdentifier(), findAllParentsForTerm( child ) );
+            cvMap.put( child.getIdentifier(), child.getIdentifier() );
+            cvMap.putAll( child.getIdentifier(), findAllParentsForTerm( child ) );
         }
 
         // calculate the common parents by interesecting all the collections of parents for each child
@@ -127,10 +127,10 @@ public class CvUtils {
         for ( CvDagObject parent : child.getParents() ) {
 
 
-            if ( parents.contains( parent.getMiIdentifier() ) ) {
-                parents.remove( parent.getMiIdentifier() );
+            if ( parents.contains( parent.getIdentifier() ) ) {
+                parents.remove( parent.getIdentifier() );
             }
-            parents.add( parent.getMiIdentifier() );
+            parents.add( parent.getIdentifier() );
 
             for ( String parentId : findAllParentsForTerm( parent ) ) {
                 if ( parents.contains( parentId ) ) {
@@ -144,12 +144,12 @@ public class CvUtils {
     }
 
     private static CvDagObject findParentById( CvDagObject child, String parentId ) {
-        if ( parentId.equals( child.getMiIdentifier() ) ) {
+        if ( parentId.equals( child.getIdentifier() ) ) {
             return child;
         }
 
         for ( CvDagObject parent : child.getParents() ) {
-            if ( parentId.equals( parent.getMiIdentifier() ) ) {
+            if ( parentId.equals( parent.getIdentifier() ) ) {
                 return parent;
             }
 
@@ -167,7 +167,7 @@ public class CvUtils {
         List<CvDagObject> terms = new ArrayList<CvDagObject>();
 
         for ( CvDagObject cv : ontology ) {
-            if ( termId.equals( cv.getMiIdentifier() ) ) {
+            if ( termId.equals( cv.getIdentifier() ) ) {
                 terms.add( cv );
             }
         }
@@ -176,9 +176,17 @@ public class CvUtils {
     }
 
     /**
+     * @param exclusionList list of cv classes that are to be excluded   eg: uk.ac.ebi.intact.model.CvCellType
      * @return List of Cvs with No MiIdentifiers
      */
-    public static List<CvObject> getCvsInIntactNotInPsi() {
+    public static List<CvObject> getCvsInIntactNotInPsi(Collection<String> exclusionList) {
+
+        if(exclusionList==null || exclusionList.size()==0) {
+            //create a default exclusionList
+        exclusionList = new ArrayList<String>();
+        exclusionList.add( "uk.ac.ebi.intact.model.CvCellType" );
+        exclusionList.add( "uk.ac.ebi.intact.model.CvTissue" );
+        }
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
         DaoFactory daof = dataContext.getDaoFactory();
@@ -187,18 +195,20 @@ public class CvUtils {
         List<CvObject> cvsNotInPsi = new ArrayList<CvObject>();
 
         for ( CvObject cv : allCvs ) {
-            if ( cv.getMiIdentifier() == null ) {
+            if ( cv.getIdentifier() != null && cv.getIdentifier().startsWith( "IA:" )) {
 
-                if ( !( cv.getObjClass().equals( "uk.ac.ebi.intact.model.CvCellType" ) || cv.getObjClass().equals( "uk.ac.ebi.intact.model.CvTissue" ) ) )
-                    cvsNotInPsi.add( cv );
-            }
+                if(!exclusionList.contains( cv.getObjClass() )){
+                  cvsNotInPsi.add( cv );
+                }
+            }    
         }
 
         return cvsNotInPsi;
     }
 
     /**
-     * @param date
+     * @param date cutoff date
+     * @param exclusionList list of cv classes that are to be excluded   eg: uk.ac.ebi.intact.model.CvCellType
      * @return List of cvs added after the given date excluding the date
      */
     public static List<CvObject> getCvsAddedAfter( Date date, Collection<String> exclusionList ) {
@@ -229,7 +239,8 @@ public class CvUtils {
     }
 
     /**
-     * @param date
+     * @param date  cutoff date
+     * @param exclusionList list of cv classes that are to be excluded   eg: uk.ac.ebi.intact.model.CvCellType
      * @return List of cvs added before the given date excluding the date
      */
     public static List<CvObject> getCVsAddedBefore( Date date, Collection<String> exclusionList ) {
