@@ -116,8 +116,6 @@ public class CvUpdater {
 
         List<CvDagObject> orphanCvList = dealWithOrphans( allValidCvs );
 
-
-
         if ( log.isDebugEnabled() )
             log.debug( "orphanCvList " + orphanCvList.size() );
 
@@ -125,16 +123,11 @@ public class CvUpdater {
         List<CvDagObject> cleanedList = (List<CvDagObject>)CollectionUtils.subtract(allValidCvs,orphanCvList );
         log.debug("cleanedList size "+cleanedList.size());                             
 
+        // update the cvs using the annotation info dataset
+        updateCVsUsingAnnotationDataset( cleanedList, annotationInfoDataset );
 
-        // process any term from the cv annotations dataset resource
-       // updateCVsUsingAnnotationDataset( allValidCvs, annotationInfoDataset );
-         updateCVsUsingAnnotationDataset( cleanedList, annotationInfoDataset );
-
-
-        //PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate( allValidCvs.toArray( new CvObject[allValidCvs.size()] ) );
         PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate( cleanedList.toArray( new CvObject[cleanedList.size()] ) );
         addCvObjectsToUpdaterStats( persisterStats, stats );
-
 
         if ( log.isDebugEnabled() ) {
             log.debug( "Persisted: " + persisterStats );

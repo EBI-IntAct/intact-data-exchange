@@ -78,7 +78,11 @@ public class OboUtils {
 
 
     public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource(InputStream is) throws IOException{
-        return AnnotationInfoDatasetFactory.buildFromTabResource(is);
+        return AnnotationInfoDatasetFactory.buildFromTabResource(is,"\t");
+    }
+
+    public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource(InputStream is,String delimiter) throws IOException{
+        return AnnotationInfoDatasetFactory.buildFromTabResource(is,delimiter);
     }
 
     @Deprecated

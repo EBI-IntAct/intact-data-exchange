@@ -34,6 +34,11 @@ public final class AnnotationInfoDatasetFactory {
     }
 
     public static AnnotationInfoDataset buildFromTabResource(InputStream is) throws IOException {
+
+        return buildFromTabResource(is,"\t");
+    }
+
+    public static AnnotationInfoDataset buildFromTabResource(InputStream is,String delimiter) throws IOException {
         AnnotationInfoDataset annotInfoDataset = new AnnotationInfoDataset();
 
         BufferedReader in = null;
@@ -57,7 +62,7 @@ public final class AnnotationInfoDatasetFactory {
             }
 
             // process line
-            StringTokenizer stringTokenizer = new StringTokenizer(line, "\t");
+            StringTokenizer stringTokenizer = new StringTokenizer(line, delimiter);
 
             final String shorltabel = stringTokenizer.nextToken();           // 1. shortlabel
             final String fullname = stringTokenizer.nextToken();             // 2. fullname
