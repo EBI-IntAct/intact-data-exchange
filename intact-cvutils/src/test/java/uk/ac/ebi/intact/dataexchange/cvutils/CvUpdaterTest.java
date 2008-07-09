@@ -34,8 +34,7 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 
@@ -208,17 +207,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             existingCvsBefore = cvObjectDao.getByShortLabelLike( aggregation.getShortLabel() );
         }
 
-        for ( CvObject existingCv : existingCvsBefore ) {
-            if ( log.isDebugEnabled() )
-                log.debug( "existingCv MI -> shortLabel ->Ac  " + existingCv.getIdentifier() + " -> " + existingCv.getShortLabel() + " ->" + existingCv.getAc() );
-            for ( Annotation annot : existingCv.getAnnotations() ) {
-                if ( log.isDebugEnabled() ) log.debug( "Annot CvTopic " + annot.getCvTopic() );
-                if ( log.isDebugEnabled() ) log.debug( "Annot Text " + annot.getAnnotationText() );
-
-            }
-        }//end for
-
-
         OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
@@ -228,8 +216,20 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
         Assert.assertEquals( 978, allCvs.size() );
 
+        InputStream is = AnnotationInfoDatasetExporterTest.class.getResourceAsStream( "/annotations-Luisa.csv" );
 
-        AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault( 10841 );
+        if ( is == null ) {
+            if ( log.isDebugEnabled() ) {
+                log.debug( "Please check the resource" );
+            }
+        throw new NullPointerException( "InputStream is null" );
+        }
+
+        AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromResource( is);
+        if ( log.isDebugEnabled() ) {
+            log.debug( "AnnotationInfoDataset size :   " + annotationDataset.getAll().size()  );
+        }
+        //AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault( 10841 );
 
         beginTransaction();
 
@@ -264,9 +264,9 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         if ( log.isDebugEnabled() ) log.debug( "stats.getCreatedCvs().size()->" + stats.getCreatedCvs().size() );
         if ( log.isDebugEnabled() ) log.debug( "stats.getUpdatedCvs().size() ->" + stats.getUpdatedCvs().size() );
 
-        Assert.assertEquals( 930, totalCvsAfterUpdate );
+        Assert.assertEquals( 932, totalCvsAfterUpdate );
 
-        Assert.assertEquals( 926, stats.getCreatedCvs().size() );
+        Assert.assertEquals( 928, stats.getCreatedCvs().size() );
         Assert.assertEquals( 1, stats.getUpdatedCvs().size() );
 
         //53-2 as aggregation was already created and later updated + obsolete term

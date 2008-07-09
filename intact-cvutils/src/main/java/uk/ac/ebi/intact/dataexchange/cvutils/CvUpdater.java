@@ -183,15 +183,22 @@ public class CvUpdater {
     } //end of method
 
     private void updateCVsUsingAnnotationDataset( List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset ) {
-        CvTopic hidden = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
-                                                       CvTopic.class, null, CvTopic.HIDDEN );
-
+        CvTopic hidden = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),CvTopic.class, null, CvTopic.HIDDEN );
+        CvTopic uniprot_dr_export = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT );
+        CvTopic used_in_class = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, null, CvTopic.USED_IN_CLASS );
+        
         for ( CvDagObject cvObject : allCvs ) {
             if ( CvObjectUtils.getIdentity( cvObject ) != null && annotationInfoDataset.containsCvAnnotation( CvObjectUtils.getIdentity( cvObject ) ) ) {
                 AnnotationInfo annotInfo = annotationInfoDataset.getCvAnnotation( CvObjectUtils.getIdentity( cvObject ) );
 
                 if ( CvTopic.HIDDEN.equals( annotInfo.getTopicShortLabel() ) ) {
                     Annotation annotation = new Annotation( IntactContext.getCurrentInstance().getInstitution(), hidden, annotInfo.getReason() );
+                    addAnnotation( annotation, cvObject, annotInfo.isApplyToChildren() );
+                } else if ( CvTopic.UNIPROT_DR_EXPORT.equals( annotInfo.getTopicShortLabel() ) ) {
+                    Annotation annotation = new Annotation( IntactContext.getCurrentInstance().getInstitution(), uniprot_dr_export, annotInfo.getReason() );
+                    addAnnotation( annotation, cvObject, annotInfo.isApplyToChildren() );
+                } else if ( CvTopic.USED_IN_CLASS.equals( annotInfo.getTopicShortLabel() ) ) {
+                    Annotation annotation = new Annotation( IntactContext.getCurrentInstance().getInstitution(), used_in_class, annotInfo.getReason() );
                     addAnnotation( annotation, cvObject, annotInfo.isApplyToChildren() );
                 } else {
                     log.warn( "Case not implemented: topic short label in annotation info different from 'hidden': " + annotInfo.getTopicShortLabel() );

@@ -38,6 +38,15 @@
             <version>1.14.1</version>
         </dependency>
 
+        <!--for opencsv -->
+
+       <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>1.8</version>
+       </dependency>
+        
+
     </dependencies>
 
     <!-- EBI repositories -->

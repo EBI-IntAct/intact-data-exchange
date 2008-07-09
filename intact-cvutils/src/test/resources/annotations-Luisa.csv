@@ -1,0 +1,318 @@
+# Cv shortlabel,Cv fullname,Cv Class,Cv identifier,CvTopic shortlabel,Annotation's text ,apply to children 
+alias type,alias type,uk.ac.ebi.intact.model.CvAliasType,MI:0300,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+biological role,biological role,uk.ac.ebi.intact.model.CvBiologicalRole,MI:0500,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+3d repertoire,3d repertoire,uk.ac.ebi.intact.model.CvDatabase,MI:0731,hidden,Term currently not used in IntAct.,FALSE
+bind,bind,uk.ac.ebi.intact.model.CvDatabase,MI:0462,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+cdd,cdd,uk.ac.ebi.intact.model.CvDatabase,MI:0450,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+database citation,database citation,uk.ac.ebi.intact.model.CvDatabase,MI:0444,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+dip,dip,uk.ac.ebi.intact.model.CvDatabase,MI:0465,hidden,Term currently not used in IntAct.,FALSE
+ecocyc,ecocyc,uk.ac.ebi.intact.model.CvDatabase,MI:0466,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+entrezgene/locuslink,entrez gene/locuslink,uk.ac.ebi.intact.model.CvDatabase,MI:0477,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+experiment xref,literature database,uk.ac.ebi.intact.model.CvDatabase,MI:0445,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+feature xref,feature database,uk.ac.ebi.intact.model.CvDatabase,MI:0447,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+gene3d,gene3d,uk.ac.ebi.intact.model.CvDatabase,MI:0703,hidden,Term currently not used in IntAct.,FALSE
+gpm,gpm,uk.ac.ebi.intact.model.CvDatabase,MI:0742,hidden,Term currently not used in IntAct.,FALSE
+grid,grid,uk.ac.ebi.intact.model.CvDatabase,MI:0463,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+hprd,hprd,uk.ac.ebi.intact.model.CvDatabase,MI:0468,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+interaction xref,interaction database,uk.ac.ebi.intact.model.CvDatabase,MI:0461,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+ipfam,ipfam,uk.ac.ebi.intact.model.CvDatabase,MI:0592,hidden,Term currently not used in IntAct.,FALSE
+kegg,kegg,uk.ac.ebi.intact.model.CvDatabase,MI:0470,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+mgd/mgi,mgd/mgi,uk.ac.ebi.intact.model.CvDatabase,MI:0479,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+mint,mint,uk.ac.ebi.intact.model.CvDatabase,MI:0471,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+mmdb,mmdb,uk.ac.ebi.intact.model.CvDatabase,MI:0459,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+msd pdb,msd pdb,uk.ac.ebi.intact.model.CvDatabase,MI:0472,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+panther,panther,uk.ac.ebi.intact.model.CvDatabase,MI:0702,hidden,Term currently not used in IntAct.,FALSE
+participant xref,participant database,uk.ac.ebi.intact.model.CvDatabase,MI:0473,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+pep seq db,peptide sequence database,uk.ac.ebi.intact.model.CvDatabase,MI:0737,hidden,Term currently not used in IntAct.,FALSE
+peptide atlas,peptide atlas,uk.ac.ebi.intact.model.CvDatabase,MI:0741,hidden,Term currently not used in IntAct.,FALSE
+pfam,pfam,uk.ac.ebi.intact.model.CvDatabase,MI:0451,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+pirsf,pirsf,uk.ac.ebi.intact.model.CvDatabase,MI:0452,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+prints,prints,uk.ac.ebi.intact.model.CvDatabase,MI:0453,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+prodom,prodom,uk.ac.ebi.intact.model.CvDatabase,MI:0454,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+pubchem,pubchem,uk.ac.ebi.intact.model.CvDatabase,MI:0730,hidden,Term currently not used in IntAct.,FALSE
+reactome,reactome,uk.ac.ebi.intact.model.CvDatabase,MI:0467,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+rfam,rfam,uk.ac.ebi.intact.model.CvDatabase,MI:0482,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+scop superfamily,scop superfamily,uk.ac.ebi.intact.model.CvDatabase,MI:0456,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+sequence database,sequence database,uk.ac.ebi.intact.model.CvDatabase,MI:0683,hidden,Term currently not used in IntAct.,FALSE
+smart,smart,uk.ac.ebi.intact.model.CvDatabase,MI:0457,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+source database,source database,uk.ac.ebi.intact.model.CvDatabase,MI:0489,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+tigrfams,tigrfams,uk.ac.ebi.intact.model.CvDatabase,MI:0458,hidden,Term currently not used in IntAct as this database is not cross referenced.,FALSE
+experimental prep,experimental preparation,uk.ac.ebi.intact.model.CvExperimentalPreparation,MI:0346,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+experimental role,experimental role,uk.ac.ebi.intact.model.CvExperimentalRole,MI:0495,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+suppressed gene,suppressed gene,uk.ac.ebi.intact.model.CvExperimentalRole,MI:0582,hidden,Term currently not used in IntAct.,FALSE
+suppressor gene,suppressor gene,uk.ac.ebi.intact.model.CvExperimentalRole,MI:0581,hidden,Term currently not used in IntAct.,FALSE
+feature detection,feature detection method,uk.ac.ebi.intact.model.CvFeatureIdentification,MI:0003,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+interface predictor,neural network on interface properties,uk.ac.ebi.intact.model.CvFeatureIdentification,MI:0076,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+surface patches,surface patches,uk.ac.ebi.intact.model.CvFeatureIdentification,MI:0106,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+activation domain,activation domain tag,uk.ac.ebi.intact.model.CvFeatureType,MI:0689,hidden,Term currently not used in IntAct.,FALSE
+b42 ad,b42 activation domain,uk.ac.ebi.intact.model.CvFeatureType,MI:0692,hidden,Term currently not used in IntAct.,FALSE
+dna binding domain,dna binding domain tag,uk.ac.ebi.intact.model.CvFeatureType,MI:0688,hidden,Term currently not used in IntAct.,FALSE
+feature type,feature type,uk.ac.ebi.intact.model.CvFeatureType,MI:0116,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+gal4 ad,gal4 activation domain,uk.ac.ebi.intact.model.CvFeatureType,MI:0690,hidden,Term currently not used in IntAct.,FALSE
+gal4 dna bd,gal4 dna binding domain,uk.ac.ebi.intact.model.CvFeatureType,MI:0693,hidden,"Tags used routinely in Yeast 2-hybrid methodology, presence can be inferred fom Interaction Detection Method.",FALSE
+lexa dna bd,lexa dna binding domain,uk.ac.ebi.intact.model.CvFeatureType,MI:0694,hidden,"Tags used routinely in Yeast 2-hybrid methodology, presence can be inferred fom Interaction Detection Method.",FALSE
+vp16 ad,vp16 activation domain,uk.ac.ebi.intact.model.CvFeatureType,MI:0691,hidden,Term currently not used in IntAct.,FALSE
+feature range status,feature range status,uk.ac.ebi.intact.model.CvFuzzyType,MI:0333,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+participant ident,participant identification method,uk.ac.ebi.intact.model.CvIdentification,MI:0002,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+2 hybrid,two hybrid,uk.ac.ebi.intact.model.CvInteraction,MI:0018,uniprot-dr-export,2,FALSE
+2h fragment pooling,two hybrid fragment pooling approach,uk.ac.ebi.intact.model.CvInteraction,MI:0399,uniprot-dr-export,2,FALSE
+3 hybrid method,3 hybrid method,uk.ac.ebi.intact.model.CvInteraction,MI:0588,uniprot-dr-export,no,FALSE
+adenylate cyclase,adenylate cyclase complementation,uk.ac.ebi.intact.model.CvInteraction,MI:0014,uniprot-dr-export,2,FALSE
+affinity chrom,affinity chromatography technology,uk.ac.ebi.intact.model.CvInteraction,MI:0004,uniprot-dr-export,no,FALSE
+affinity techniques,affinity technology,uk.ac.ebi.intact.model.CvInteraction,MI:0400,uniprot-dr-export,no,FALSE
+anti bait coip,anti bait coimmunoprecipitation,uk.ac.ebi.intact.model.CvInteraction,MI:0006,uniprot-dr-export,yes,FALSE
+anti tag coip,anti tag coimmunoprecipitation,uk.ac.ebi.intact.model.CvInteraction,MI:0007,uniprot-dr-export,yes,FALSE
+antibody array,antibody array,uk.ac.ebi.intact.model.CvInteraction,MI:0678,uniprot-dr-export,yes,FALSE
+antisense rna,antisense rna,uk.ac.ebi.intact.model.CvInteraction,MI:0257,hidden,Term currently not used in IntAct.,FALSE
+array technology,array technology,uk.ac.ebi.intact.model.CvInteraction,MI:0008,uniprot-dr-export,no,FALSE
+atomic force microsc,atomic force microscopy,uk.ac.ebi.intact.model.CvInteraction,MI:0872,uniprot-dr-export,no,FALSE
+atpase assay,atpase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0880,uniprot-dr-export,yes,FALSE
+bacterial display,bacterial display,uk.ac.ebi.intact.model.CvInteraction,MI:0009,uniprot-dr-export,yes,FALSE
+beta galactosidase,beta galactosidase complementation,uk.ac.ebi.intact.model.CvInteraction,MI:0010,uniprot-dr-export,2,FALSE
+beta lactamase,beta lactamase complementation,uk.ac.ebi.intact.model.CvInteraction,MI:0011,uniprot-dr-export,2,FALSE
+bifc,bimolecular fluorescence complementation,uk.ac.ebi.intact.model.CvInteraction,MI:0809,uniprot-dr-export,yes,FALSE
+biochemical,biochemical,uk.ac.ebi.intact.model.CvInteraction,MI:0401,uniprot-dr-export,no,FALSE
+biophysical,biophysical,uk.ac.ebi.intact.model.CvInteraction,MI:0013,uniprot-dr-export,no,FALSE
+bn-page,blue native page,uk.ac.ebi.intact.model.CvInteraction,MI:0276,uniprot-dr-export,no,FALSE
+bret,bioluminescence resonance energy transfer,uk.ac.ebi.intact.model.CvInteraction,MI:0012,uniprot-dr-export,yes,FALSE
+cd,circular dichroism,uk.ac.ebi.intact.model.CvInteraction,MI:0016,uniprot-dr-export,no,FALSE
+ch-ip,chromatin immunoprecipitation assays,uk.ac.ebi.intact.model.CvInteraction,MI:0402,uniprot-dr-export,no,FALSE
+chemical footprint,chemical footprinting,uk.ac.ebi.intact.model.CvInteraction,MI:0602,uniprot-dr-export,yes,FALSE
+chip-chip,chromatin immunoprecipitation array,uk.ac.ebi.intact.model.CvInteraction,MI:0225,uniprot-dr-export,no,FALSE
+chromatography,chromatography technology,uk.ac.ebi.intact.model.CvInteraction,MI:0091,uniprot-dr-export,no,FALSE
+coip,coimmunoprecipitation,uk.ac.ebi.intact.model.CvInteraction,MI:0019,uniprot-dr-export,yes,FALSE
+collagen film assay,collagen film assay,uk.ac.ebi.intact.model.CvInteraction,MI:0513,uniprot-dr-export,yes,FALSE
+coloc fluoresc probe,colocalization by fluorescent probes cloning,uk.ac.ebi.intact.model.CvInteraction,MI:0021,uniprot-dr-export,no,FALSE
+comig non denat gel,comigration in non denaturing gel electrophoresis,uk.ac.ebi.intact.model.CvInteraction,MI:0404,uniprot-dr-export,no,FALSE
+comigration in gel,comigration in gel electrophoresis,uk.ac.ebi.intact.model.CvInteraction,MI:0807,uniprot-dr-export,no,FALSE
+comigration in sds,comigration in sds page,uk.ac.ebi.intact.model.CvInteraction,MI:0808,uniprot-dr-export,no,FALSE
+competition binding,competition binding,uk.ac.ebi.intact.model.CvInteraction,MI:0405,uniprot-dr-export,yes,FALSE
+complementation,protein complementation assay,uk.ac.ebi.intact.model.CvInteraction,MI:0090,uniprot-dr-export,2,FALSE
+confocal microscopy,confocal microscopy,uk.ac.ebi.intact.model.CvInteraction,MI:0663,uniprot-dr-export,no,FALSE
+conformational tm,confirmational text mining,uk.ac.ebi.intact.model.CvInteraction,MI:0024,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+correlated mutations,correlated mutations,uk.ac.ebi.intact.model.CvInteraction,MI:0026,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+cosedimentation,cosedimentation,uk.ac.ebi.intact.model.CvInteraction,MI:0027,uniprot-dr-export,yes,FALSE
+crosslink,cross-linking study,uk.ac.ebi.intact.model.CvInteraction,MI:0030,uniprot-dr-export,yes,FALSE
+cytoplasmic compl,cytoplasmic complementation assay,uk.ac.ebi.intact.model.CvInteraction,MI:0228,uniprot-dr-export,2,FALSE
+deacetylase assay,deacetylase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0406,uniprot-dr-export,yes,FALSE
+demethylase assay,demethylase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0870,uniprot-dr-export,yes,FALSE
+density sedimentatio,cosedimentation through density gradient,uk.ac.ebi.intact.model.CvInteraction,MI:0029,uniprot-dr-export,yes,FALSE
+dhfr reconstruction,dihydrofolate reductase reconstruction,uk.ac.ebi.intact.model.CvInteraction,MI:0111,uniprot-dr-export,2,FALSE
+display technology,display technology,uk.ac.ebi.intact.model.CvInteraction,MI:0034,uniprot-dr-export,no,FALSE
+dls,dynamic light scattering,uk.ac.ebi.intact.model.CvInteraction,MI:0038,uniprot-dr-export,no,FALSE
+dms footprinting,dimethylsulphate footprinting,uk.ac.ebi.intact.model.CvInteraction,MI:0603,uniprot-dr-export,yes,FALSE
+dna dna pol assay,dna directed dna polymerase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0697,uniprot-dr-export,no,FALSE
+dna footprinting,dna footprinting,uk.ac.ebi.intact.model.CvInteraction,MI:0409,uniprot-dr-export,no,FALSE
+dna rna pol assay,dna directed rna polymerase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0698,uniprot-dr-export,no,FALSE
+dnase 1 footprinting,DNase I footprinting,uk.ac.ebi.intact.model.CvInteraction,MI:0606,uniprot-dr-export,yes,FALSE
+docking,docking,uk.ac.ebi.intact.model.CvInteraction,MI:0035,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+domain fusion,domain fusion,uk.ac.ebi.intact.model.CvInteraction,MI:0036,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+domain profile pairs,domain profile pairs,uk.ac.ebi.intact.model.CvInteraction,MI:0037,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+electron microscopy,electron microscopy,uk.ac.ebi.intact.model.CvInteraction,MI:0040,uniprot-dr-export,yes,FALSE
+electron resonance,electron resonance,uk.ac.ebi.intact.model.CvInteraction,MI:0043,uniprot-dr-export,yes,FALSE
+elisa,enzyme linked immunosorbent assay,uk.ac.ebi.intact.model.CvInteraction,MI:0411,uniprot-dr-export,yes,FALSE
+emsa,electrophoretic mobility shift assay,uk.ac.ebi.intact.model.CvInteraction,MI:0413,uniprot-dr-export,2,FALSE
+emsa supershift,electrophoretic mobility supershift assay,uk.ac.ebi.intact.model.CvInteraction,MI:0412,uniprot-dr-export,2,FALSE
+endor,electron nuclear double resonance,uk.ac.ebi.intact.model.CvInteraction,MI:0041,uniprot-dr-export,yes,FALSE
+enzymatic footprint,enzymatic footprinting,uk.ac.ebi.intact.model.CvInteraction,MI:0605,uniprot-dr-export,yes,FALSE
+enzymatic study,enzymatic study,uk.ac.ebi.intact.model.CvInteraction,MI:0415,uniprot-dr-export,yes,FALSE
+epr,electron paramagnetic resonance,uk.ac.ebi.intact.model.CvInteraction,MI:0042,uniprot-dr-export,yes,FALSE
+experimental info,experimental knowledge based,uk.ac.ebi.intact.model.CvInteraction,MI:0046,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+experimental interac,experimental interaction detection,uk.ac.ebi.intact.model.CvInteraction,MI:0045,uniprot-dr-export,no,FALSE
+expression interfer,post transcriptional interference,uk.ac.ebi.intact.model.CvInteraction,MI:0255,hidden,Term currently not used in IntAct.,FALSE
+facs,fluorescence-activated cell sorting,uk.ac.ebi.intact.model.CvInteraction,MI:0054,uniprot-dr-export,no,FALSE
+far western blotting,far western blotting,uk.ac.ebi.intact.model.CvInteraction,MI:0047,uniprot-dr-export,yes,FALSE
+fcs,fluorescence correlation spectroscopy,uk.ac.ebi.intact.model.CvInteraction,MI:0052,uniprot-dr-export,yes,FALSE
+filamentous phage,filamentous phage display,uk.ac.ebi.intact.model.CvInteraction,MI:0048,uniprot-dr-export,yes,FALSE
+filter binding,filter binding,uk.ac.ebi.intact.model.CvInteraction,MI:0049,uniprot-dr-export,yes,FALSE
+fluorescence,fluorescence technology,uk.ac.ebi.intact.model.CvInteraction,MI:0051,uniprot-dr-export,no,FALSE
+fluorescence imaging,fluorescence microscopy,uk.ac.ebi.intact.model.CvInteraction,MI:0416,uniprot-dr-export,no,FALSE
+fluorescence spectr,classical fluorescence spectroscopy,uk.ac.ebi.intact.model.CvInteraction,MI:0017,uniprot-dr-export,yes,FALSE
+footprinting,footprinting,uk.ac.ebi.intact.model.CvInteraction,MI:0417,uniprot-dr-export,yes,FALSE
+fps,fluorescence polarization spectroscopy,uk.ac.ebi.intact.model.CvInteraction,MI:0053,uniprot-dr-export,yes,FALSE
+fret,fluorescent resonance energy transfer,uk.ac.ebi.intact.model.CvInteraction,MI:0055,uniprot-dr-export,yes,FALSE
+gal4 vp16 complement,gal4 vp16 complementation,uk.ac.ebi.intact.model.CvInteraction,MI:0728,uniprot-dr-export,2,FALSE
+gallex,lex-a dimerization assay,uk.ac.ebi.intact.model.CvInteraction,MI:0369,uniprot-dr-export,2,FALSE
+gene neighbourhood,gene neighbourhood,uk.ac.ebi.intact.model.CvInteraction,MI:0057,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+genetic interference,genetic interference,uk.ac.ebi.intact.model.CvInteraction,MI:0254,hidden,Term currently not used in IntAct.,FALSE
+genome prediction,genome based prediction,uk.ac.ebi.intact.model.CvInteraction,MI:0058,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+gfp complementation,green fluorescence protein complementation assay,uk.ac.ebi.intact.model.CvInteraction,MI:0229,uniprot-dr-export,2,FALSE
+gtpase assay,gtpase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0419,uniprot-dr-export,yes,FALSE
+htrf,homogeneous time resolved fluorescence,uk.ac.ebi.intact.model.CvInteraction,MI:0510,uniprot-dr-export,yes,FALSE
+imaging techniques,imaging techniques,uk.ac.ebi.intact.model.CvInteraction,MI:0428,uniprot-dr-export,no,FALSE
+immunodepletion,immunodepleted coimmunoprecipitation,uk.ac.ebi.intact.model.CvInteraction,MI:0858,uniprot-dr-export,no,FALSE
+in gel kinase assay,in-gel kinase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0423,uniprot-dr-export,yes,FALSE
+in gel phosphatase,in gel phosphatase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0514,uniprot-dr-export,yes,FALSE
+inference,inference,uk.ac.ebi.intact.model.CvInteraction,MI:0362,uniprot-dr-export,no,FALSE
+inferred by author,inferred by author,uk.ac.ebi.intact.model.CvInteraction,MI:0363,uniprot-dr-export,no,FALSE
+inferred by curator,inferred by curator,uk.ac.ebi.intact.model.CvInteraction,MI:0364,uniprot-dr-export,no,FALSE
+interaction detect,interaction detection method,uk.ac.ebi.intact.model.CvInteraction,MI:0001,uniprot-dr-export,no,FALSE
+intermolecular force,intermolecular force,uk.ac.ebi.intact.model.CvInteraction,MI:0859,uniprot-dr-export,yes,FALSE
+interologs mapping,interologs mapping,uk.ac.ebi.intact.model.CvInteraction,MI:0064,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+ion exchange chrom,ion exchange chromatography,uk.ac.ebi.intact.model.CvInteraction,MI:0226,uniprot-dr-export,no,FALSE
+itc,isothermal titration calorimetry,uk.ac.ebi.intact.model.CvInteraction,MI:0065,uniprot-dr-export,yes,FALSE
+k-mn-04 footprinting,potassium permanganate footprinting,uk.ac.ebi.intact.model.CvInteraction,MI:0604,uniprot-dr-export,yes,FALSE
+kinase htrf,kinase homogeneous time resolved fluorescence,uk.ac.ebi.intact.model.CvInteraction,MI:0420,uniprot-dr-export,yes,FALSE
+kinase spa,kinase scintillation proximity assay,uk.ac.ebi.intact.model.CvInteraction,MI:0425,uniprot-dr-export,yes,FALSE
+lambda phage,lambda phage display,uk.ac.ebi.intact.model.CvInteraction,MI:0066,uniprot-dr-export,yes,FALSE
+lambda two hybrid,lambda repressor two hybrid,uk.ac.ebi.intact.model.CvInteraction,MI:0655,uniprot-dr-export,yes,FALSE
+lexa b52 complement,lexa b52 complementation,uk.ac.ebi.intact.model.CvInteraction,MI:0727,uniprot-dr-export,2,FALSE
+light microscopy,light microscopy,uk.ac.ebi.intact.model.CvInteraction,MI:0426,uniprot-dr-export,no,FALSE
+light scattering,light scattering,uk.ac.ebi.intact.model.CvInteraction,MI:0067,uniprot-dr-export,no,FALSE
+lumier,luminescence based mammalian interactome mapping,uk.ac.ebi.intact.model.CvInteraction,MI:0729,uniprot-dr-export,yes,FALSE
+mappit,mammalian protein protein interaction trap,uk.ac.ebi.intact.model.CvInteraction,MI:0231,uniprot-dr-export,2,FALSE
+membrane compl,membrane bound complementation assay,uk.ac.ebi.intact.model.CvInteraction,MI:0230,uniprot-dr-export,2,FALSE
+methyltransferase as,methyltransferase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0515,uniprot-dr-export,yes,FALSE
+molecular sieving,molecular sieving,uk.ac.ebi.intact.model.CvInteraction,MI:0071,uniprot-dr-export,no,FALSE
+mrna display,mrna display,uk.ac.ebi.intact.model.CvInteraction,MI:0073,hidden,,FALSE
+ms of complexes,mass spectrometry studies of complexes,uk.ac.ebi.intact.model.CvInteraction,MI:0069,uniprot-dr-export,yes,FALSE
+nmr,nuclear magnetic resonance,uk.ac.ebi.intact.model.CvInteraction,MI:0077,uniprot-dr-export,yes,FALSE
+nucl ac uv crosslink,nucleic acid uv cross-linking assay,uk.ac.ebi.intact.model.CvInteraction,MI:0430,uniprot-dr-export,no,FALSE
+one hybrid,one hybrid,uk.ac.ebi.intact.model.CvInteraction,MI:0432,uniprot-dr-export,no,FALSE
+p elisa,proximity enzyme linked immunosorbent assay,uk.ac.ebi.intact.model.CvInteraction,MI:0813,uniprot-dr-export,no,FALSE
+peptide array,peptide array,uk.ac.ebi.intact.model.CvInteraction,MI:0081,uniprot-dr-export,yes,FALSE
+phage display,phage display,uk.ac.ebi.intact.model.CvInteraction,MI:0084,uniprot-dr-export,yes,FALSE
+phosphatase assay,phosphatase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0434,uniprot-dr-export,yes,FALSE
+phosphatase htrf,phosphatase homogeneous time resolved fluorescence,uk.ac.ebi.intact.model.CvInteraction,MI:0509,uniprot-dr-export,yes,FALSE
+phosphotransfer assa,phosphotransfer assay,uk.ac.ebi.intact.model.CvInteraction,MI:0841,uniprot-dr-export,yes,FALSE
+phylogenetic profile,phylogenetic profile,uk.ac.ebi.intact.model.CvInteraction,MI:0085,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+pisa,protein in situ array,uk.ac.ebi.intact.model.CvInteraction,MI:0092,uniprot-dr-export,yes,FALSE
+polymerase assay,polymerase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0696,uniprot-dr-export,no,FALSE
+predict from sequenc,sequence based prediction,uk.ac.ebi.intact.model.CvInteraction,MI:0101,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+predict from struct,structure based prediction,uk.ac.ebi.intact.model.CvInteraction,MI:0105,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+predicted interac,interaction prediction,uk.ac.ebi.intact.model.CvInteraction,MI:0063,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+predictive tm,predictive text mining,uk.ac.ebi.intact.model.CvInteraction,MI:0087,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+protease access,protease accessibility laddering,uk.ac.ebi.intact.model.CvInteraction,MI:0814,uniprot-dr-export,yes,FALSE
+protease assay,protease assay,uk.ac.ebi.intact.model.CvInteraction,MI:0435,uniprot-dr-export,yes,FALSE
+protease htrf,protease homogeneous time resolved fluorescence,uk.ac.ebi.intact.model.CvInteraction,MI:0511,uniprot-dr-export,yes,FALSE
+protein array,protein array,uk.ac.ebi.intact.model.CvInteraction,MI:0089,uniprot-dr-export,yes,FALSE
+protein crosslink,protein cross-linking with a bifunctional reagent,uk.ac.ebi.intact.model.CvInteraction,MI:0031,uniprot-dr-export,yes,FALSE
+protein kinase assay,protein kinase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0424,uniprot-dr-export,yes,FALSE
+protein tri hybrid,protein tri hybrid,uk.ac.ebi.intact.model.CvInteraction,MI:0437,uniprot-dr-export,2,FALSE
+pull down,pull down,uk.ac.ebi.intact.model.CvInteraction,MI:0096,uniprot-dr-export,yes,FALSE
+radiolabeled acetate,deacetylase radiometric assay,uk.ac.ebi.intact.model.CvInteraction,MI:0508,uniprot-dr-export,yes,FALSE
+radiolabeled methyl,methyltransferase radiometric assay,uk.ac.ebi.intact.model.CvInteraction,MI:0516,uniprot-dr-export,yes,FALSE
+reverse phase chrom,reverse phase chromatography,uk.ac.ebi.intact.model.CvInteraction,MI:0227,uniprot-dr-export,no,FALSE
+reverse rrs,reverse ras recruitment system,uk.ac.ebi.intact.model.CvInteraction,MI:0097,uniprot-dr-export,2,FALSE
+reverse two hybrid,reverse two hybrid,uk.ac.ebi.intact.model.CvInteraction,MI:0726,uniprot-dr-export,2,FALSE
+ribosome display,ribosome display,uk.ac.ebi.intact.model.CvInteraction,MI:0098,uniprot-dr-export,yes,FALSE
+rna dna pol assay,rna directed dna polymerase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0699,uniprot-dr-export,no,FALSE
+rna rna pol assay,rna directed rna polymerase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0700,uniprot-dr-export,no,FALSE
+rna tri hybrid,rna tri hybrid,uk.ac.ebi.intact.model.CvInteraction,MI:0438,uniprot-dr-export,no,FALSE
+rnai,rna interference,uk.ac.ebi.intact.model.CvInteraction,MI:0256,hidden,Term currently not used in IntAct.,FALSE
+rsa,random spore analysis,uk.ac.ebi.intact.model.CvInteraction,MI:0439,hidden,Term currently not used in IntAct.,FALSE
+sandwich immunoassay,sandwich immunoassay,uk.ac.ebi.intact.model.CvInteraction,MI:0695,uniprot-dr-export,yes,FALSE
+saturation binding,saturation binding,uk.ac.ebi.intact.model.CvInteraction,MI:0440,uniprot-dr-export,yes,FALSE
+saxs,x ray scattering,uk.ac.ebi.intact.model.CvInteraction,MI:0826,uniprot-dr-export,yes,FALSE
+seldi chip,proteinchip(r) on a surface-enhanced laser desorption/ionization,uk.ac.ebi.intact.model.CvInteraction,MI:0095,uniprot-dr-export,no,FALSE
+selex,systematic evolution of ligands by exponential enrichment,uk.ac.ebi.intact.model.CvInteraction,MI:0657,uniprot-dr-export,2,FALSE
+sem,electron tomography,uk.ac.ebi.intact.model.CvInteraction,MI:0410,uniprot-dr-export,no,FALSE
+sequence phylogeny,sequence based phylogenetic profile,uk.ac.ebi.intact.model.CvInteraction,MI:0100,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+sga,synthetic genetic analysis,uk.ac.ebi.intact.model.CvInteraction,MI:0441,hidden,Term currently not used in IntAct.,FALSE
+sls,static light scattering,uk.ac.ebi.intact.model.CvInteraction,MI:0104,uniprot-dr-export,no,FALSE
+solution sedimentati,cosedimentation in solution,uk.ac.ebi.intact.model.CvInteraction,MI:0028,uniprot-dr-export,yes,FALSE
+spa,scintillation proximity assay,uk.ac.ebi.intact.model.CvInteraction,MI:0099,uniprot-dr-export,yes,FALSE
+spr,surface plasmon resonance,uk.ac.ebi.intact.model.CvInteraction,MI:0107,uniprot-dr-export,yes,FALSE
+t7 phage,t7 phage display,uk.ac.ebi.intact.model.CvInteraction,MI:0108,uniprot-dr-export,yes,FALSE
+tap,tandem affinity purification,uk.ac.ebi.intact.model.CvInteraction,MI:0676,uniprot-dr-export,yes,FALSE
+tem,transmission electron microscopy,uk.ac.ebi.intact.model.CvInteraction,MI:0020,uniprot-dr-export,yes,FALSE
+text mining,text mining,uk.ac.ebi.intact.model.CvInteraction,MI:0110,hidden,Term currently not used in IntAct as interaction predictions are not curated.,FALSE
+toxcat,tox-r dimerization assay,uk.ac.ebi.intact.model.CvInteraction,MI:0370,uniprot-dr-export,2,FALSE
+transcription compl,transcriptional complementation assay,uk.ac.ebi.intact.model.CvInteraction,MI:0232,uniprot-dr-export,2,FALSE
+triphosphatase ass,nucleoside triphosphatase assay,uk.ac.ebi.intact.model.CvInteraction,MI:0879,uniprot-dr-export,yes,FALSE
+two hybrid array,two hybrid array,uk.ac.ebi.intact.model.CvInteraction,MI:0397,uniprot-dr-export,2,FALSE
+two hybrid pooling,two hybrid pooling approach,uk.ac.ebi.intact.model.CvInteraction,MI:0398,uniprot-dr-export,2,FALSE
+ub reconstruction,ubiquitin reconstruction,uk.ac.ebi.intact.model.CvInteraction,MI:0112,uniprot-dr-export,2,FALSE
+unspecified method,unspecified method,uk.ac.ebi.intact.model.CvInteraction,MI:0686,uniprot-dr-export,no,FALSE
+x-ray diffraction,x-ray crystallography,uk.ac.ebi.intact.model.CvInteraction,MI:0114,uniprot-dr-export,yes,FALSE
+x-ray fiber diffrac,x-ray fiber diffraction,uk.ac.ebi.intact.model.CvInteraction,MI:0825,uniprot-dr-export,yes,FALSE
+x-ray powder diffrac,x-ray powder diffraction,uk.ac.ebi.intact.model.CvInteraction,MI:0824,uniprot-dr-export,yes,FALSE
+x-ray tomography,x-ray tomography,uk.ac.ebi.intact.model.CvInteraction,MI:0827,uniprot-dr-export,yes,FALSE
+yeast display,yeast display,uk.ac.ebi.intact.model.CvInteraction,MI:0115,uniprot-dr-export,yes,FALSE
+zymography,zymography,uk.ac.ebi.intact.model.CvInteraction,MI:0512,uniprot-dr-export,yes,FALSE
+cond syntetic lethal,conditional synthetic lethal,uk.ac.ebi.intact.model.CvInteractionType,MI:0270,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+degeranylation,degeranylation reaction,uk.ac.ebi.intact.model.CvInteractionType,MI:0200,hidden,Term currently not used in IntAct.,FALSE
+demyristoylation,demyristoylation reaction,uk.ac.ebi.intact.model.CvInteractionType,MI:0201,hidden,Term currently not used in IntAct.,FALSE
+genetic interaction,genetic interaction,uk.ac.ebi.intact.model.CvInteractionType,MI:0208,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+nutrition synt letal,conditional synthetic lethal nutrition-sensitivity,uk.ac.ebi.intact.model.CvInteractionType,MI:0600,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+suppress expression,suppression expression alteration,uk.ac.ebi.intact.model.CvInteractionType,MI:0265,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+suppress knockout,suppression knockout,uk.ac.ebi.intact.model.CvInteractionType,MI:0263,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+suppress overexpress,suppression overexpression,uk.ac.ebi.intact.model.CvInteractionType,MI:0266,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+suppress underexpres,suppression underexpression,uk.ac.ebi.intact.model.CvInteractionType,MI:0268,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+suppression,suppression,uk.ac.ebi.intact.model.CvInteractionType,MI:0261,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+suppression mutation,suppression mutation,uk.ac.ebi.intact.model.CvInteractionType,MI:0262,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+suppression partial,suppression partial alteration,uk.ac.ebi.intact.model.CvInteractionType,MI:0264,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+suppression scalable,suppression scalable,uk.ac.ebi.intact.model.CvInteractionType,MI:0267,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+synt growth defect,synthetic growth defect,uk.ac.ebi.intact.model.CvInteractionType,MI:0274,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+synt growth effect,synthetic growth effect,uk.ac.ebi.intact.model.CvInteractionType,MI:0273,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+synt growth increase,synthetic growth increase,uk.ac.ebi.intact.model.CvInteractionType,MI:0275,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+synthetic lethal,synthetic lethal,uk.ac.ebi.intact.model.CvInteractionType,MI:0219,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+synthetic phenotype,synthetic phenotype,uk.ac.ebi.intact.model.CvInteractionType,MI:0269,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+temprtr synt lethal,conditional synthetic lethal temperature-sensitivity,uk.ac.ebi.intact.model.CvInteractionType,MI:0271,hidden,Term currently not used  in IntAct as genetic interactions are not curated.,FALSE
+biopolymer,biopolymer,uk.ac.ebi.intact.model.CvInteractorType,MI:0383,hidden,Term currently not used during manual curation as they are automatically assigned.,FALSE
+complex,complex,uk.ac.ebi.intact.model.CvInteractorType,MI:0314,hidden,Term currently not used during manual curation as they are automatically assigned.,FALSE
+gene,gene,uk.ac.ebi.intact.model.CvInteractorType,MI:0250,hidden,Term currently not used during manual curation as they are automatically assigned.,FALSE
+interactor type,interactor type,uk.ac.ebi.intact.model.CvInteractorType,MI:0313,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+protein complex,protein complex,uk.ac.ebi.intact.model.CvInteractorType,MI:0315,hidden,Term currently not used during manual curation as they are automatically assigned.,FALSE
+protein dna complex,protein dna complex,uk.ac.ebi.intact.model.CvInteractorType,MI:0233,hidden,Term currently not used during manual curation as they are automatically assigned.,FALSE
+ribonucleoprot compl,ribonucleoprotein complex,uk.ac.ebi.intact.model.CvInteractorType,MI:0316,hidden,Term currently not used during manual curation as they are automatically assigned.,FALSE
+unknown participant,unknown participant,uk.ac.ebi.intact.model.CvInteractorType,MI:0329,hidden,Term currently not used during manual curation as they are automatically assigned.,FALSE
+3d-r-factors,3d-r-factors,uk.ac.ebi.intact.model.CvTopic,MI:0631,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+3d-resolution,3d-resolution,uk.ac.ebi.intact.model.CvTopic,MI:0632,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+3d-structure,3d-structure,uk.ac.ebi.intact.model.CvTopic,MI:0630,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+agonist,agonist,uk.ac.ebi.intact.model.CvTopic,MI:0625,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+antagonist,antagonist,uk.ac.ebi.intact.model.CvTopic,MI:0626,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+antibodies,antibodies,uk.ac.ebi.intact.model.CvTopic,MI:0671,used-in-class,"uk.ac.ebi.intact.model.Experiment,   	uk.ac.ebi.intact.model.Interaction",FALSE
+attribute name,attribute name,uk.ac.ebi.intact.model.CvTopic,MI:0590,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+author-confidence,author-confidence,uk.ac.ebi.intact.model.CvTopic,MI:0621,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+author-list,author-list,uk.ac.ebi.intact.model.CvTopic,MI:0636,used-in-class,uk.ac.ebi.intact.model.Experiment,FALSE
+caution,caution,uk.ac.ebi.intact.model.CvTopic,MI:0618,used-in-class,"uk.ac.ebi.intact.model.Interaction, uk.ac.ebi.intact.model.Experiment, uk.ac.ebi.intact.model.CvObject, uk.ac.ebi.intact.model.Protein, uk.ac.ebi.intact.model.NucleicAcid, uk.ac.ebi.intact.model.SmallMolecule",FALSE
+comment,comment,uk.ac.ebi.intact.model.CvTopic,MI:0612,used-in-class,"uk.ac.ebi.intact.model.Interaction, uk.ac.ebi.intact.model.Experiment, uk.ac.ebi.intact.model.CvObject, uk.ac.ebi.intact.model.Protein, uk.ac.ebi.intact.model.BioSource, uk.ac.ebi.intact.model.NucleicAcid, uk.ac.ebi.intact.model.SmallMolecule",FALSE
+complex-properties,complex-properties,uk.ac.ebi.intact.model.CvTopic,MI:0629,used-in-class,"uk.ac.ebi.intact.model.Interaction,uk.ac.ebi.intact.model.Experiment",FALSE
+confidence-mapping,confidence-mapping,uk.ac.ebi.intact.model.CvTopic,MI:0622,used-in-class,uk.ac.ebi.intact.model.Experiment,FALSE
+contact-comment,contact-comment,uk.ac.ebi.intact.model.CvTopic,MI:0635,used-in-class,uk.ac.ebi.intact.model.Experiment,FALSE
+contact-email,contact-email,uk.ac.ebi.intact.model.CvTopic,MI:0634,used-in-class,uk.ac.ebi.intact.model.Experiment,FALSE
+cv att name,controlled vocabulary attribute name,uk.ac.ebi.intact.model.CvTopic,MI:0667,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+data-processing,data-processing,uk.ac.ebi.intact.model.CvTopic,MI:0633,used-in-class,uk.ac.ebi.intact.model.Experiment,FALSE
+dataset,dataset,uk.ac.ebi.intact.model.CvTopic,MI:0875,used-in-class,uk.ac.ebi.intact.model.Experiment,FALSE
+delivery-method,delivery method,uk.ac.ebi.intact.model.CvTopic,MI:0307,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+disease,disease,uk.ac.ebi.intact.model.CvTopic,MI:0617,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+example,example,uk.ac.ebi.intact.model.CvTopic,MI:0616,used-in-class,"uk.ac.ebi.intact.model.CvObject,uk.ac.ebi.intact.model.BioSource",FALSE
+exp-modification,experiment modification,uk.ac.ebi.intact.model.CvTopic,MI:0627,used-in-class,uk.ac.ebi.intact.model.Experiment,FALSE
+experiment att name,experiment attibute name,uk.ac.ebi.intact.model.CvTopic,MI:0665,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+experiment descripti,experiment description,uk.ac.ebi.intact.model.CvTopic,MI:0591,hidden,Term currently not used in IntAct.,FALSE
+experimental form de,experimental form description,uk.ac.ebi.intact.model.CvTopic,MI:0596,hidden,Term currently not used in IntAct.,FALSE
+expression-level,expression level,uk.ac.ebi.intact.model.CvTopic,MI:0221,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+feature att name,feature attribute name,uk.ac.ebi.intact.model.CvTopic,MI:0668,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+feature constrain,feature constrain,uk.ac.ebi.intact.model.CvTopic,MI:0598,hidden,Term currently not used in IntAct.,FALSE
+feature description,feature description,uk.ac.ebi.intact.model.CvTopic,MI:0597,hidden,Term currently not used in IntAct.,FALSE
+figure legend,figure legend,uk.ac.ebi.intact.model.CvTopic,MI:0599,used-in-class,"uk.ac.ebi.intact.model.Interaction, uk.ac.ebi.intact.model.Experiment",FALSE
+function,function,uk.ac.ebi.intact.model.CvTopic,MI:0613,used-in-class,"uk.ac.ebi.intact.model.Protein, uk.ac.ebi.intact.model.Interaction",FALSE
+id-validation-regexp,validation regular expression,uk.ac.ebi.intact.model.CvTopic,MI:0628,used-in-class,uk.ac.ebi.intact.model.CvObject,FALSE
+inhibition,inhibition,uk.ac.ebi.intact.model.CvTopic,MI:0623,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+interaction att name,interaction attribute name,uk.ac.ebi.intact.model.CvTopic,MI:0664,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+isoform-comment,isoform-comment,uk.ac.ebi.intact.model.CvTopic,MI:0637,used-in-class,"uk.ac.ebi.intact.model.Interaction, uk.ac.ebi.intact.model.Protein",FALSE
+journal,journal,uk.ac.ebi.intact.model.CvTopic,MI:0885,used-in-class,"uk.ac.ebi.intact.model.Experiment,uk.ac.ebi.intact.model.Interaction",FALSE
+library-used,library-used,uk.ac.ebi.intact.model.CvTopic,MI:0672,used-in-class,uk.ac.ebi.intact.model.Experiment,FALSE
+obsolete term,obsolete,uk.ac.ebi.intact.model.CvTopic,MI:0431,used-in-class,uk.ac.ebi.intact.model.CvObject,FALSE
+organism att name,organism attribute name,uk.ac.ebi.intact.model.CvTopic,MI:0669,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+participant att name,participant attribute name,uk.ac.ebi.intact.model.CvTopic,MI:0666,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+pathway,pathway,uk.ac.ebi.intact.model.CvTopic,MI:0619,hidden,Term currently not used in IntAct.,FALSE
+prerequisite-ptm,prerequisite-ptm,uk.ac.ebi.intact.model.CvTopic,MI:0638,hidden,Term currently not used in IntAct.,FALSE
+publication year,publication year,uk.ac.ebi.intact.model.CvTopic,MI:0886,used-in-class,"uk.ac.ebi.intact.model.Experiment,uk.ac.ebi.intact.model.Interaction",FALSE
+resulting-ptm,resulting-ptm,uk.ac.ebi.intact.model.CvTopic,MI:0639,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+sample-process,sample process,uk.ac.ebi.intact.model.CvTopic,MI:0342,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+search-url,search-url,uk.ac.ebi.intact.model.CvTopic,MI:0615,used-in-class,uk.ac.ebi.intact.model.CvObject,FALSE
+search-url-ascii,search-url-ascii,uk.ac.ebi.intact.model.CvTopic,MI:0620,used-in-class,uk.ac.ebi.intact.model.CvObject,FALSE
+stimulation,stimulation,uk.ac.ebi.intact.model.CvTopic,MI:0624,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+to-delete,to-delete,uk.ac.ebi.intact.model.CvTopic,,hidden,Should not be added by the curators but only by the protein udpate tool.,FALSE
+url,url,uk.ac.ebi.intact.model.CvTopic,MI:0614,used-in-class,"uk.ac.ebi.intact.model.Experiment, uk.ac.ebi.intact.model.Interaction, uk.ac.ebi.intact.model.CvObject, uk.ac.ebi.intact.model.BioSource, uk.ac.ebi.intact.model.NucleicAcid, uk.ac.ebi.intact.model.SmallMolecule",FALSE
+xref type,cross-reference type,uk.ac.ebi.intact.model.CvXrefQualifier,MI:0353,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+mpidb,mpidb,uk.ac.ebi.intact.model.CvDatabase,MI:0903,hidden,Term currently not used in IntAct.,FALSE
+polysaccharide,polysaccharide,uk.ac.ebi.intact.model.CvInteractorType,MI:0904,hidden,Term currently not used in IntAct.,FALSE
+alfa-screen,amplified luminescent proximity homogeneous assay,uk.ac.ebi.intact.model.CvInteraction,MI:0905,uniprot-dr-export,yes,FALSE
+lexa vp16 complementation,lexa vp16 complementation,uk.ac.ebi.intact.model.CvInteraction,MI:0916,uniprot-dr-export,2,FALSE
+matrixdb,matrixdb,uk.ac.ebi.intact.model.CvDatabase,MI:0917,hidden,Term currently not used in IntAct.,FALSE
+ribonuclease assay,ribonuclease assay,uk.ac.ebi.intact.model.CvInteraction,MI:0920,uniprot-dr-export,yes,FALSE
+spr array,surface plasmon resonance array,uk.ac.ebi.intact.model.CvInteraction,MI:0921,uniprot-dr-export,yes,FALSE
+irefindex,irefindex,uk.ac.ebi.intact.model.CvDatabase,MI:0923,hidden,Term currently not used in IntAct.,FALSE

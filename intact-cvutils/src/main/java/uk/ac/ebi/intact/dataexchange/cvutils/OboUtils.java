@@ -78,12 +78,17 @@ public class OboUtils {
 
 
     public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource(InputStream is) throws IOException{
-        return AnnotationInfoDatasetFactory.buildFromTabResource(is,"\t");
+        //return AnnotationInfoDatasetFactory.buildFromTabResource(is,"\t");
+        return AnnotationInfoDatasetFactory.buildFromOpenCsv( is,',' );
     }
 
-    public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource(InputStream is,String delimiter) throws IOException{
-        return AnnotationInfoDatasetFactory.buildFromTabResource(is,delimiter);
+    public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource(InputStream is,char seperator) throws IOException{
+        //return AnnotationInfoDatasetFactory.buildFromTabResource(is,seperator);
+        return AnnotationInfoDatasetFactory.buildFromOpenCsv( is,seperator );
     }
+
+
+
 
     @Deprecated
     public static IntactOntology createOntologyFromOboLatestPsiMi() throws IOException, PsiLoaderException {

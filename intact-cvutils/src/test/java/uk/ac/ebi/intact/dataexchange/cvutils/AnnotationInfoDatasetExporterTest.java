@@ -1,12 +1,16 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import org.apache.geronimo.mail.util.StringBufferOutputStream;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfo;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 
 import java.io.OutputStream;
+import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * AnnotationInfoDatasetExporter Tester.
@@ -16,6 +20,9 @@ import java.io.OutputStream;
  * @since 2.0.1
  */
 public class AnnotationInfoDatasetExporterTest {
+
+    private static final Log log = LogFactory.getLog( AnnotationInfoDatasetExporterTest.class );
+
 
     private AnnotationInfoDataset buildDataset() {
         AnnotationInfoDataset dataset = new AnnotationInfoDataset();
@@ -49,5 +56,29 @@ public class AnnotationInfoDatasetExporterTest {
         OutputStream os = new StringBufferOutputStream( sb );
         exporter.exportCSV( dataset, os, false );
         Assert.assertEquals( dataset.getAll().size(), sb.toString().split( "\n" ).length );
+    }
+
+
+    @Test
+    public void buildFromOpenCsvTest() throws IOException {
+
+        InputStream is = AnnotationInfoDatasetExporterTest.class.getResourceAsStream( "/annotations-Luisa.csv" );
+
+        if ( is == null ) {
+            if ( log.isDebugEnabled() ) {
+                log.debug( "input stream is null" );
+            }
+
+        }
+
+
+        AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromResource( is );
+        if ( log.isDebugEnabled() ) {
+            log.debug( "AnnotationInfoDataset size " + annotationDataset.getAll().size() );
+        }
+
+        Assert.assertEquals( 317, annotationDataset.getAll().size() );
+
+
     }
 }

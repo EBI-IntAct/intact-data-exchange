@@ -15,11 +15,13 @@
  */
 package uk.ac.ebi.intact.dataexchange.cvutils.model;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import au.com.bytecode.opencsv.CSVReader;
+
+import java.io.*;
 import java.util.StringTokenizer;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -30,8 +32,85 @@ import java.util.StringTokenizer;
  */
 public final class AnnotationInfoDatasetFactory {
 
+    private static final Log log = LogFactory.getLog( AnnotationInfoDatasetFactory.class );
+
     private AnnotationInfoDatasetFactory() {
     }
+
+    public static AnnotationInfoDataset buildFromOpenCsv( InputStream is) throws IOException {
+
+        return buildFromOpenCsv(is,',');
+    }
+
+    public static AnnotationInfoDataset buildFromOpenCsv( InputStream is, char seperator ) throws IOException {
+
+        if ( is == null ) {
+            throw new NullPointerException( "You must give a non null inputstream" );
+        }
+
+        if(seperator==0){
+            seperator = ',';
+        }
+
+
+        AnnotationInfoDataset annotInfoDataset = new AnnotationInfoDataset();
+
+        InputStreamReader ioreader = new InputStreamReader(is);
+
+
+        CSVReader csvreader = new CSVReader( ioreader, seperator );
+        String[] nextLine;
+         int lineCount = 0;
+         int lineCountProper = 0;
+        while ( ( nextLine = csvreader.readNext() ) != null ) {
+          lineCount++;
+            // nextLine[] is an array of values from the line
+            // skip comments
+            if (nextLine[0].startsWith("#")) {
+                continue;
+            }
+
+            // skip empty lines
+            if (nextLine.length == 0) {
+                continue;
+            }
+
+           // process line
+
+            if(nextLine.length==7){
+              lineCountProper++;
+
+
+
+            final String shorltabel = nextLine[0];               // 1. shortlabel
+            final String fullname = nextLine[1];                 // 2. fullname
+            final String type = nextLine[2];                     // 3. type
+            final String mi = nextLine[3];                       // 4. mi
+            final String topic = nextLine[4];                    // 5. topic
+            final String reason = nextLine[5];                   // 6. exclusion reason
+            final String applyToChildrenValue = nextLine[6];     // 7. apply to children
+
+
+            boolean applyToChildren = false;
+            if (Boolean.parseBoolean(applyToChildrenValue.trim())) {
+                applyToChildren = true;
+            }
+
+            AnnotationInfo annotInfo = new AnnotationInfo(shorltabel, fullname, type, mi, topic, reason, applyToChildren);
+            annotInfoDataset.addCvAnnotation(annotInfo);     
+            }
+
+        }//end while
+
+        if ( log.isDebugEnabled() ) {
+            log.debug( "line Count  " +lineCount);
+            log.debug( "line Count Proper " +lineCountProper);
+
+        }
+
+        return annotInfoDataset;
+    }//end method
+
 
     public static AnnotationInfoDataset buildFromTabResource(InputStream is) throws IOException {
 
@@ -72,6 +151,7 @@ public final class AnnotationInfoDatasetFactory {
             final String reason = stringTokenizer.nextToken();               // 6. exclusion reason
             final String applyToChildrenValue = stringTokenizer.nextToken(); // 7. apply to children
 
+            
             boolean applyToChildren = false;
             if (Boolean.parseBoolean(applyToChildrenValue.trim())) {
                 applyToChildren = true;
