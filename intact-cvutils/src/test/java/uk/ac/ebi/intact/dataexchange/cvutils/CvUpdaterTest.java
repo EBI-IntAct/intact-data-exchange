@@ -341,7 +341,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         Assert.assertEquals( 932, totalCvsAfterUpdate );
 
-        Assert.assertEquals( 928, stats.getCreatedCvs().size() );
+        Assert.assertEquals( 925, stats.getCreatedCvs().size() );
         Assert.assertEquals( 1, stats.getUpdatedCvs().size() );
 
         //53-2 as aggregation was already created and later updated + obsolete term
@@ -353,7 +353,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         //invalid terms are already filtered out
         Assert.assertEquals( 0, stats.getInvalidTerms().size() );
 
-
         //check for annotations
        CvObject cvAlias = cvObjectDao.getByShortLabel( "alias type");
 
@@ -361,12 +360,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             log.debug( "cvAlias : "+cvAlias.toString() );
             log.debug( "cvAlias Annotations : "+cvAlias.getAnnotations().toString() );
         }
-
-
-
-
-
-
 
     } //end method
 
