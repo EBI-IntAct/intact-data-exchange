@@ -51,8 +51,8 @@ public class CvUpdater {
     private static Log log = LogFactory.getLog( CvUpdater.class );
 
     private Map<String, CvObject> processed;
-    private CvUpdaterStatistics stats;
 
+    private CvUpdaterStatistics stats;
 
     private CvDatabase nonMiCvDatabase;
 
@@ -64,10 +64,7 @@ public class CvUpdater {
                                                              CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT );
         this.processed = new HashMap<String, CvObject>();
         this.stats = new CvUpdaterStatistics();
-
-
-    }//end constructor
-
+    }
 
     protected Map<String, Class> getMapOfExistingCvs() {
 
@@ -81,7 +78,6 @@ public class CvUpdater {
         return existingMi2Class;
     }
 
-
     /**
      * Starts the creation and update of CVs by using the ontology provided
      *
@@ -91,7 +87,6 @@ public class CvUpdater {
     public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allCvs ) {
         return createOrUpdateCVs( allCvs, new AnnotationInfoDataset() );
     }
-
 
     /**
      * Starts the creation and update of CVs by using the CVobject List provided
@@ -103,17 +98,15 @@ public class CvUpdater {
     public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allValidCvs, AnnotationInfoDataset annotationInfoDataset ) {
 
         if ( allValidCvs == null ) {
-            throw new NullPointerException( "Cvs Null" );
+            throw new IllegalArgumentException( "You must give a non null collection of CvDagObject" );
         }
         if ( annotationInfoDataset == null ) {
-            throw new NullPointerException( "annotationDataset" );
+            throw new IllegalArgumentException( "You must give a non null AnnotationInfoDataset" );
         }
 
         List<CvDagObject> orphanCvList = dealWithOrphans( allValidCvs );
 
-        if ( log.isDebugEnabled() )
-            log.debug( "orphanCvList " + orphanCvList.size() );
-
+        if ( log.isDebugEnabled() ) log.debug( "orphanCvList " + orphanCvList.size() );
 
         List<CvDagObject> cleanedList = ( List<CvDagObject> ) CollectionUtils.subtract( allValidCvs, orphanCvList );
         log.debug( "cleanedList size " + cleanedList.size() );
@@ -130,7 +123,6 @@ public class CvUpdater {
             log.debug( stats );
         }
 
-
         return stats;
     } //end method
 
@@ -143,7 +135,7 @@ public class CvUpdater {
         for ( CvDagObject cvDag : allCvs ) {
             if ( !isRootObject( CvObjectUtils.getIdentity( cvDag ) ) ) {
 
-                if ( cvDag.getParents() == null || cvDag.getParents().size() == 0 ) {
+                if ( cvDag.getParents() == null || cvDag.getParents().isEmpty() ) {
                     addCvObjectToStatsIfObsolete( cvDag );
 
                     boolean cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted( cvDag, stats );
@@ -156,27 +148,22 @@ public class CvUpdater {
                             orphanCvList.add( cvDag );
                         }
                     }
-
-
                 }//end of if
             }//end if
         }//end for
-        //until here
 
-        if ( log.isDebugEnabled() ) log.debug( "orphanCvList size " + orphanCvList.size() );
-        if ( log.isDebugEnabled() )
+        if ( log.isDebugEnabled() ) {
+            log.debug( "orphanCvList size " + orphanCvList.size() );
             log.debug( "alreadyExistingObsoleteCvList size " + alreadyExistingObsoleteCvList.size() );
-        //return orphanCvList;
+        }
+
         return orphanCvList;
-    }//end method
+    }
 
 
     private boolean isRootObject( String identity ) {
-
         return CvObjectOntologyBuilder.mi2Class.keySet().contains( identity );
-
-
-    } //end of method
+    }
 
     private void updateCVsUsingAnnotationDataset( List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset ) {
 
@@ -196,7 +183,7 @@ public class CvUpdater {
 
             }
         }
-    }//end method
+    }
 
 
     private void addAnnotation( Annotation annotation, CvDagObject cvObject, boolean includeChildren ) {
@@ -226,7 +213,7 @@ public class CvUpdater {
                 addAnnotation( annotation, child, includeChildren );
             }
         }
-    } //end of method
+    }
 
     /**
      * This method should check if the below constraint is violated
@@ -240,7 +227,6 @@ public class CvUpdater {
         if ( allValidCvs == null ) {
             throw new NullPointerException( "Cvs Null" );
         }
-
 
         Bag hashBag = new HashBag();
         for ( CvDagObject cvDag : allValidCvs ) {
@@ -263,9 +249,10 @@ public class CvUpdater {
                 return true;
             }
         }
+        
         log.debug( "Constraint not violated" );
         return false;
-    } //end method
+    }
 
 
     protected boolean checkAndMarkAsObsoleteIfExisted( CvObject orphan, CvUpdaterStatistics stats ) {
@@ -277,7 +264,6 @@ public class CvUpdater {
             alreadyExistingCv = true;
         }
 
-
         final CvObjectDao<CvObject> cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao();
         Collection<CvObject> existingCvs = cvObjectDao.getByPsiMiRefCollection( Collections.singleton( id ) );
 
@@ -285,10 +271,8 @@ public class CvUpdater {
             existingCvs = cvObjectDao.getByShortLabelLike( orphan.getShortLabel() );
         }
 
-
         if ( alreadyExistingCv ) {
             CvTopic obsoleteTopic = createCvTopicObsolete();
-
 
             for ( CvObject existingCv : existingCvs ) {
                 boolean alreadyContainsObsolete = false;
@@ -325,11 +309,9 @@ public class CvUpdater {
         return alreadyExistingCv;
     }
 
-
     private void addObsoleteAnnotation( CvObject existingCv, String obsoleteMessage ) {
         obsoleteTopic.addAnnotation( new Annotation( existingCv.getOwner(), obsoleteTopic, obsoleteMessage ) );
     }
-
 
     private CvTopic createCvTopicObsolete() {
         if ( obsoleteTopic != null ) {
@@ -349,7 +331,6 @@ public class CvUpdater {
         return obsoleteTopic;
     }
 
-
     private void addCvObjectsToUpdaterStats( PersisterStatistics persisterStats, CvUpdaterStatistics stats ) {
         for ( StatsUnit statsUnit : persisterStats.getPersisted( CvObject.class, true ) ) {
             stats.getCreatedCvs().put( statsUnit.getType(), statsUnit );
@@ -361,11 +342,8 @@ public class CvUpdater {
     }
 
     private void addCvObjectToStatsIfObsolete( CvObject cvObj ) {
-
         stats.getObsoleteCvs().put( CvObjectUtils.getIdentity( cvObj ), cvObj.getShortLabel() );
-
     }
-
 
     public CvDatabase getNonMiCvDatabase() {
         return nonMiCvDatabase;
@@ -374,11 +352,4 @@ public class CvUpdater {
     public void setNonMiCvDatabase( CvDatabase nonMiCvDatabase ) {
         this.nonMiCvDatabase = nonMiCvDatabase;
     }
-
-    /*
-     private boolean isValidTerm( CvObject term ) {
-         return CvObjectUtils.getIdentity( term ).contains( ":" );
-     }
-    */
-
-}   //end class
+}
