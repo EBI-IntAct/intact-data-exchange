@@ -59,14 +59,11 @@ public class CvUpdater {
     private CvTopic obsoleteTopic;
 
 
-
-
     public CvUpdater() throws IOException, OBOParseException {
         this.nonMiCvDatabase = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
                                                              CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT );
         this.processed = new HashMap<String, CvObject>();
         this.stats = new CvUpdaterStatistics();
-        
 
 
     }//end constructor
@@ -103,8 +100,6 @@ public class CvUpdater {
      * @param annotationInfoDataset A seperate dataset specific for intact
      * @return An object containing some statistics about the update
      */
-
-
     public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allValidCvs, AnnotationInfoDataset annotationInfoDataset ) {
 
         if ( allValidCvs == null ) {
@@ -120,8 +115,8 @@ public class CvUpdater {
             log.debug( "orphanCvList " + orphanCvList.size() );
 
 
-        List<CvDagObject> cleanedList = (List<CvDagObject>)CollectionUtils.subtract(allValidCvs,orphanCvList );
-        log.debug("cleanedList size "+cleanedList.size());                             
+        List<CvDagObject> cleanedList = ( List<CvDagObject> ) CollectionUtils.subtract( allValidCvs, orphanCvList );
+        log.debug( "cleanedList size " + cleanedList.size() );
 
         // update the cvs using the annotation info dataset
         updateCVsUsingAnnotationDataset( cleanedList, annotationInfoDataset );
@@ -151,25 +146,26 @@ public class CvUpdater {
                 if ( cvDag.getParents() == null || cvDag.getParents().size() == 0 ) {
                     addCvObjectToStatsIfObsolete( cvDag );
 
-                    boolean cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted( cvDag, stats);
+                    boolean cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted( cvDag, stats );
 
                     if ( cvObjectsWithSameId ) {
                         alreadyExistingObsoleteCvList.add( cvDag );
                     } else {
-                        if(!CvObjectUtils.getIdentity(cvDag).equalsIgnoreCase(CvTopic.OBSOLETE_MI_REF)){
-                        stats.addOrphanCv( cvDag );
-                        orphanCvList.add( cvDag );
+                        if ( !CvObjectUtils.getIdentity( cvDag ).equalsIgnoreCase( CvTopic.OBSOLETE_MI_REF ) ) {
+                            stats.addOrphanCv( cvDag );
+                            orphanCvList.add( cvDag );
                         }
                     }
 
-                 
+
                 }//end of if
             }//end if
         }//end for
         //until here
 
         if ( log.isDebugEnabled() ) log.debug( "orphanCvList size " + orphanCvList.size() );
-        if ( log.isDebugEnabled() ) log.debug( "alreadyExistingObsoleteCvList size " + alreadyExistingObsoleteCvList.size() );
+        if ( log.isDebugEnabled() )
+            log.debug( "alreadyExistingObsoleteCvList size " + alreadyExistingObsoleteCvList.size() );
         //return orphanCvList;
         return orphanCvList;
     }//end method
@@ -183,26 +179,21 @@ public class CvUpdater {
     } //end of method
 
     private void updateCVsUsingAnnotationDataset( List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset ) {
-        CvTopic hidden = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),CvTopic.class, null, CvTopic.HIDDEN );
-        CvTopic uniprot_dr_export = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT );
-        CvTopic used_in_class = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, null, CvTopic.USED_IN_CLASS );
-        
-        for ( CvDagObject cvObject : allCvs ) {
-            if ( CvObjectUtils.getIdentity( cvObject ) != null && annotationInfoDataset.containsCvAnnotation( CvObjectUtils.getIdentity( cvObject ) ) ) {
-                AnnotationInfo annotInfo = annotationInfoDataset.getCvAnnotation( CvObjectUtils.getIdentity( cvObject ) );
 
-                if ( CvTopic.HIDDEN.equals( annotInfo.getTopicShortLabel() ) ) {
-                    Annotation annotation = new Annotation( IntactContext.getCurrentInstance().getInstitution(), hidden, annotInfo.getReason() );
-                    addAnnotation( annotation, cvObject, annotInfo.isApplyToChildren() );
-                } else if ( CvTopic.UNIPROT_DR_EXPORT.equals( annotInfo.getTopicShortLabel() ) ) {
-                    Annotation annotation = new Annotation( IntactContext.getCurrentInstance().getInstitution(), uniprot_dr_export, annotInfo.getReason() );
-                    addAnnotation( annotation, cvObject, annotInfo.isApplyToChildren() );
-                } else if ( CvTopic.USED_IN_CLASS.equals( annotInfo.getTopicShortLabel() ) ) {
-                    Annotation annotation = new Annotation( IntactContext.getCurrentInstance().getInstitution(), used_in_class, annotInfo.getReason() );
-                    addAnnotation( annotation, cvObject, annotInfo.isApplyToChildren() );
-                } else {
-                    log.warn( "Case not implemented: topic short label in annotation info different from 'hidden': " + annotInfo.getTopicShortLabel() );
-                }
+        for ( CvDagObject cvObject : allCvs ) {
+            final String identity = CvObjectUtils.getIdentity( cvObject );
+            if ( identity != null && annotationInfoDataset.containsCvAnnotation( identity ) ) {
+                AnnotationInfo annotInfo = annotationInfoDataset.getCvAnnotation( identity );
+
+                CvTopic topic = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
+                                                              CvTopic.class,
+                                                              null,
+                                                              annotInfo.getTopicShortLabel() );
+                PersisterHelper.saveOrUpdate( topic );
+
+                Annotation annotation = new Annotation( IntactContext.getCurrentInstance().getInstitution(), topic, annotInfo.getReason() );
+                addAnnotation( annotation, cvObject, annotInfo.isApplyToChildren() );
+
             }
         }
     }//end method
@@ -212,7 +203,8 @@ public class CvUpdater {
         boolean containsAnnotation = false;
 
         for ( Annotation annot : cvObject.getAnnotations() ) {
-            if ( annot.getAnnotationText().equals( annotation.getAnnotationText() ) ) {
+            if ( annot.getAnnotationText() != null
+                 && annot.getAnnotationText().equals( annotation.getAnnotationText() ) ) {
                 containsAnnotation = true;
                 break;
             }
@@ -220,6 +212,13 @@ public class CvUpdater {
 
         if ( !containsAnnotation ) {
             cvObject.getAnnotations().add( annotation );
+
+            if ( log.isDebugEnabled() ) {
+                final CvTopic topic = annotation.getCvTopic();
+                log.debug( "Added Annotation(" + topic.getShortLabel() + ", '" + annotation.getAnnotationText() +
+                           "') onto " + cvObject.getClass().getSimpleName() + "(" + cvObject.getShortLabel() +
+                           ")" );
+            }
         }
 
         if ( includeChildren ) {
@@ -247,7 +246,7 @@ public class CvUpdater {
         for ( CvDagObject cvDag : allValidCvs ) {
             String primaryKey = cvDag.getObjClass().toString() + ":" + cvDag.getShortLabel();
             if ( log.isDebugEnabled() ) {
-                log.debug( "PrimaryKey :"+primaryKey );
+                log.debug( "PrimaryKey :" + primaryKey );
             }
 
             hashBag.add( primaryKey );
@@ -256,20 +255,20 @@ public class CvUpdater {
         if ( log.isDebugEnabled() ) log.debug( "HashBag size " + hashBag.size() );
         for ( Object aHashBag : hashBag ) {
             String s = ( String ) aHashBag;
-            if ( hashBag.getCount( s ) > 1 )  {
+            if ( hashBag.getCount( s ) > 1 ) {
                 if ( log.isDebugEnabled() ) {
-                    log.debug( "Constraint violated by "+s );
+                    log.debug( "Constraint violated by " + s );
                 }
 
-            return true;
-            }     
+                return true;
+            }
         }
         log.debug( "Constraint not violated" );
         return false;
     } //end method
 
 
-    protected boolean checkAndMarkAsObsoleteIfExisted( CvObject orphan, CvUpdaterStatistics stats) {
+    protected boolean checkAndMarkAsObsoleteIfExisted( CvObject orphan, CvUpdaterStatistics stats ) {
         boolean alreadyExistingCv = false;
         String id = CvObjectUtils.getIdentity( orphan );
         Set<String> existingKeys = getMapOfExistingCvs().keySet();
@@ -309,20 +308,17 @@ public class CvUpdater {
                         }
                     }//end for
 
-                    if (log.isDebugEnabled()) log.debug( "Updating CV: " +existingCv );
+                    if ( log.isDebugEnabled() ) log.debug( "Updating CV: " + existingCv );
                     final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
                     final Annotation annotation = new Annotation( existingCv.getOwner(), obsoleteTopic, annotatedText );
                     existingCv.addAnnotation( annotation );
                     stats.addUpdatedCv( existingCv );
 
-
-
                     PersisterHelper.saveOrUpdate( obsoleteTopic );
-                   daoFactory.getAnnotationDao().persist( annotation );
+                    daoFactory.getAnnotationDao().persist( annotation );
                     daoFactory.getCvObjectDao().update( existingCv );
-                    
-                    
-                    stats.addCreatedCv(obsoleteTopic);
+
+                    stats.addCreatedCv( obsoleteTopic );
                 } //end if
             }//end for
         }//end if
@@ -379,10 +375,10 @@ public class CvUpdater {
         this.nonMiCvDatabase = nonMiCvDatabase;
     }
 
-   /*
-    private boolean isValidTerm( CvObject term ) {
-        return CvObjectUtils.getIdentity( term ).contains( ":" );
-    }
-   */
+    /*
+     private boolean isValidTerm( CvObject term ) {
+         return CvObjectUtils.getIdentity( term ).contains( ":" );
+     }
+    */
 
 }   //end class
