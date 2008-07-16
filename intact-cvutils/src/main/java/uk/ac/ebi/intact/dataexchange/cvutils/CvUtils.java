@@ -172,6 +172,13 @@ public class CvUtils {
     }
 
     /**
+     * @return List of Cvs that come from IntAct (do not have an MI identifier)
+     */
+    public static List<CvObject> getCvsInIntactNotInPsi() {
+        return getCvsInIntactNotInPsi(Collections.EMPTY_LIST);
+    }
+
+    /**
      * @param exclusionList list of cv classes that are to be excluded   eg: uk.ac.ebi.intact.model.CvCellType
      * @return List of Cvs with No MiIdentifiers
      */
