@@ -49,7 +49,6 @@ public class CvUtils {
      */
     public static String findLowestCommonAncestor( List<CvDagObject> ontology, String... ids ) {
 
-
         if ( ids.length < 2 ) {
             throw new IllegalArgumentException( "At least two IDs have to be provided to find a common parent" );
         }
@@ -66,7 +65,6 @@ public class CvUtils {
 
             children.addAll( terms );
         }
-
 
         CvDagObject parent = findLowestCommonAncestor( children.toArray( new CvDagObject[children.size()] ) );
 
@@ -92,7 +90,6 @@ public class CvUtils {
 
         // get all the parents for each child
         for ( CvDagObject child : children ) {
-
             cvMap.put( child.getIdentifier(), child.getIdentifier() );
             cvMap.putAll( child.getIdentifier(), findAllParentsForTerm( child ) );
         }
@@ -125,7 +122,6 @@ public class CvUtils {
         // creates a set of IDs from the parents. If the parent id is found,
         // the id is removed from the set and added to the end
         for ( CvDagObject parent : child.getParents() ) {
-
 
             if ( parents.contains( parent.getIdentifier() ) ) {
                 parents.remove( parent.getIdentifier() );
@@ -183,9 +179,9 @@ public class CvUtils {
 
         if(exclusionList==null || exclusionList.size()==0) {
             //create a default exclusionList
-        exclusionList = new ArrayList<String>();
-        exclusionList.add( "uk.ac.ebi.intact.model.CvCellType" );
-        exclusionList.add( "uk.ac.ebi.intact.model.CvTissue" );
+            exclusionList = new ArrayList<String>();
+            exclusionList.add( "uk.ac.ebi.intact.model.CvCellType" );
+            exclusionList.add( "uk.ac.ebi.intact.model.CvTissue" );
         }
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
@@ -207,6 +203,16 @@ public class CvUtils {
     }
 
     /**
+     * Gets the CVs from the database created after a given date.
+     * @param date cutoff date
+     * @return List of cvs added after the given date excluding the date
+     */
+    public static List<CvObject> getCvsAddedAfter( Date date ) {
+         return getCvsAddedAfter( date, Collections.EMPTY_LIST );
+    }
+
+    /**
+     * Gets the CVs from the database created after a given date.
      * @param date cutoff date
      * @param exclusionList list of cv classes that are to be excluded   eg: uk.ac.ebi.intact.model.CvCellType
      * @return List of cvs added after the given date excluding the date
@@ -239,6 +245,16 @@ public class CvUtils {
     }
 
     /**
+     * Gets the CVs from the database created before a given date.
+     * @param date cutoff date
+     * @return List of cvs added after the given date excluding the date
+     */
+    public static List<CvObject> getCVsAddedBefore( Date date ) {
+         return getCVsAddedBefore( date, Collections.EMPTY_LIST );
+    }
+
+    /**
+     * Gets the CVs from the database created before a given date.
      * @param date  cutoff date
      * @param exclusionList list of cv classes that are to be excluded   eg: uk.ac.ebi.intact.model.CvCellType
      * @return List of cvs added before the given date excluding the date
