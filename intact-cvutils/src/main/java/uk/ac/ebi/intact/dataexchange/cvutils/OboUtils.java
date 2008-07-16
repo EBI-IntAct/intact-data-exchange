@@ -78,16 +78,16 @@ public class OboUtils {
 
 
     public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource(InputStream is) throws IOException{
-        //return AnnotationInfoDatasetFactory.buildFromTabResource(is,"\t");
-        return AnnotationInfoDatasetFactory.buildFromOpenCsv( is,',' );
+        return AnnotationInfoDatasetFactory.buildFromCsv( is );
     }
 
-    public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource(InputStream is,char seperator) throws IOException{
-        //return AnnotationInfoDatasetFactory.buildFromTabResource(is,seperator);
-        return AnnotationInfoDatasetFactory.buildFromOpenCsv( is,seperator );
+     public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource(InputStream is, char separator) throws IOException{
+        return AnnotationInfoDatasetFactory.buildFromCsv( is, separator, '\b' );
     }
 
-
+    public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource(InputStream is, char separator, char delimiter) throws IOException{
+        return AnnotationInfoDatasetFactory.buildFromCsv( is, separator, delimiter );
+    }
 
 
     @Deprecated

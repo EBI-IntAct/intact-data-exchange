@@ -37,31 +37,31 @@ public final class AnnotationInfoDatasetFactory {
     private AnnotationInfoDatasetFactory() {
     }
 
-    public static AnnotationInfoDataset buildFromOpenCsv( InputStream is) throws IOException {
-
-        return buildFromOpenCsv(is,',');
+    public static AnnotationInfoDataset buildFromCsv( InputStream is) throws IOException {
+        return buildFromCsv(is, CSVReader.DEFAULT_SEPARATOR, CSVReader.DEFAULT_QUOTE_CHARACTER);
     }
 
-    public static AnnotationInfoDataset buildFromOpenCsv( InputStream is, char seperator ) throws IOException {
+    public static AnnotationInfoDataset buildFromTabResource(InputStream is) throws IOException {
+        return buildFromCsv(is,'\t', '\b');
+    }
+
+    public static AnnotationInfoDataset buildFromCsv( InputStream is, char separator, char delimiter ) throws IOException {
 
         if ( is == null ) {
             throw new NullPointerException( "You must give a non null inputstream" );
         }
-
-        if(seperator==0){
-            seperator = ',';
-        }
-
 
         AnnotationInfoDataset annotInfoDataset = new AnnotationInfoDataset();
 
         InputStreamReader ioreader = new InputStreamReader(is);
 
 
-        CSVReader csvreader = new CSVReader( ioreader, seperator );
+        CSVReader csvreader = new CSVReader( ioreader, separator );
         String[] nextLine;
-         int lineCount = 0;
-         int lineCountProper = 0;
+
+        int lineCount = 0;
+        int lineCountExcludingHeader = 0;
+
         while ( ( nextLine = csvreader.readNext() ) != null ) {
           lineCount++;
             // nextLine[] is an array of values from the line
@@ -77,90 +77,38 @@ public final class AnnotationInfoDatasetFactory {
 
            // process line
 
-            if(nextLine.length==7){
-              lineCountProper++;
+            if(nextLine.length == 7){
+                lineCountExcludingHeader++;
 
+                final String shorltabel = nextLine[0];               // 1. shortlabel
+                final String fullname = nextLine[1];                 // 2. fullname
+                final String type = nextLine[2];                     // 3. type
+                final String mi = nextLine[3];                       // 4. mi
+                final String topic = nextLine[4];                    // 5. topic
+                final String reason = nextLine[5];                   // 6. exclusion reason
+                final String applyToChildrenValue = nextLine[6];     // 7. apply to children
 
+                boolean applyToChildren = false;
+                if (Boolean.parseBoolean(applyToChildrenValue.trim())) {
+                    applyToChildren = true;
+                }
 
-            final String shorltabel = nextLine[0];               // 1. shortlabel
-            final String fullname = nextLine[1];                 // 2. fullname
-            final String type = nextLine[2];                     // 3. type
-            final String mi = nextLine[3];                       // 4. mi
-            final String topic = nextLine[4];                    // 5. topic
-            final String reason = nextLine[5];                   // 6. exclusion reason
-            final String applyToChildrenValue = nextLine[6];     // 7. apply to children
-
-
-            boolean applyToChildren = false;
-            if (Boolean.parseBoolean(applyToChildrenValue.trim())) {
-                applyToChildren = true;
-            }
-
-            AnnotationInfo annotInfo = new AnnotationInfo(shorltabel, fullname, type, mi, topic, reason, applyToChildren);
-            annotInfoDataset.addCvAnnotation(annotInfo);     
+                AnnotationInfo annotInfo = new AnnotationInfo(shorltabel, fullname, type, mi, topic, reason, applyToChildren);
+                annotInfoDataset.addCvAnnotation(annotInfo);
             }
 
         }//end while
 
         if ( log.isDebugEnabled() ) {
-            log.debug( "line Count  " +lineCount);
-            log.debug( "line Count Proper " +lineCountProper);
-
+            log.debug( "Total lines processed: " +lineCount);
+            log.debug( "Lines excluding header: " +lineCountExcludingHeader);
         }
 
         return annotInfoDataset;
     }//end method
 
 
-    public static AnnotationInfoDataset buildFromTabResource(InputStream is) throws IOException {
 
-        return buildFromTabResource(is,"\t");
-    }
 
-    public static AnnotationInfoDataset buildFromTabResource(InputStream is,String delimiter) throws IOException {
-        AnnotationInfoDataset annotInfoDataset = new AnnotationInfoDataset();
 
-        BufferedReader in = null;
-
-        in = new BufferedReader(new InputStreamReader(is));
-        String line;
-        int lineCount = 0;
-        while ((line = in.readLine()) != null) {
-
-            lineCount++;
-            line = line.trim();
-
-            // skip comments
-            if (line.startsWith("#")) {
-                continue;
-            }
-
-            // skip empty lines
-            if (line.length() == 0) {
-                continue;
-            }
-
-            // process line
-            StringTokenizer stringTokenizer = new StringTokenizer(line, delimiter);
-
-            final String shorltabel = stringTokenizer.nextToken();           // 1. shortlabel
-            final String fullname = stringTokenizer.nextToken();             // 2. fullname
-            final String type = stringTokenizer.nextToken();                 // 3. type
-            final String mi = stringTokenizer.nextToken();                   // 4. mi
-            final String topic = stringTokenizer.nextToken();                // 5. topic
-            final String reason = stringTokenizer.nextToken();               // 6. exclusion reason
-            final String applyToChildrenValue = stringTokenizer.nextToken(); // 7. apply to children
-
-            
-            boolean applyToChildren = false;
-            if (Boolean.parseBoolean(applyToChildrenValue.trim())) {
-                applyToChildren = true;
-            }
-
-            AnnotationInfo annotInfo = new AnnotationInfo(shorltabel, fullname, type, mi, topic, reason, applyToChildren);
-            annotInfoDataset.addCvAnnotation(annotInfo);
-        }
-
-        return annotInfoDataset;
-    }
 }

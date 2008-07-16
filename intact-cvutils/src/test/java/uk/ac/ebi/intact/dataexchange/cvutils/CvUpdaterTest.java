@@ -33,7 +33,6 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
-import uk.ac.ebi.intact.util.DebugUtil;
 
 import java.io.*;
 import java.net.URL;
@@ -372,7 +371,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
         Assert.assertEquals( 978, allCvs.size() );
 
-        InputStream is = CvUpdaterTest.class.getResourceAsStream( "/annotations-Luisa.csv" );
+        InputStream is = CvUpdaterTest.class.getResourceAsStream("/additional-annotations.csv");
 
         if ( is == null ) {
             if ( log.isDebugEnabled() ) {

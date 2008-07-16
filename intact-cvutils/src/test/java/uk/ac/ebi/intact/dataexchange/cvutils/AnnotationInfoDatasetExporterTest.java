@@ -58,27 +58,4 @@ public class AnnotationInfoDatasetExporterTest {
         Assert.assertEquals( dataset.getAll().size(), sb.toString().split( "\n" ).length );
     }
 
-
-    @Test
-    public void buildFromOpenCsvTest() throws IOException {
-
-        InputStream is = AnnotationInfoDatasetExporterTest.class.getResourceAsStream( "/annotations-Luisa.csv" );
-
-        if ( is == null ) {
-            if ( log.isDebugEnabled() ) {
-                log.debug( "input stream is null" );
-            }
-
-        }
-
-
-        AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromResource( is );
-        if ( log.isDebugEnabled() ) {
-            log.debug( "AnnotationInfoDataset size " + annotationDataset.getAll().size() );
-        }
-
-        Assert.assertEquals( 317, annotationDataset.getAll().size() );
-
-
-    }
 }
