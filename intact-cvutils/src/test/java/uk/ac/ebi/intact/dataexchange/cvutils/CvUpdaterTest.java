@@ -90,7 +90,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             }
             if ( inputLine.matches( "id:\\s+MI:.*" ) ) {
                 miCounter++;
-                
+
             }
 
             if ( inputLine.contains( "is_obsolete: true" ) ) {
@@ -112,7 +112,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             }
         }
 
-      
+
 
         //948+1 with Typedef
         Assert.assertEquals( 949, idCounter );
@@ -129,7 +129,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }//end method
 
 
-    
+
 
     @Test
     public void isConstraintViolatedTest() throws Exception {
@@ -160,7 +160,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         CvDagObject aggregation = CvObjectUtils.createCvObject( owner, CvInteractionType.class, "MI:0191", "aggregation" );
         PersisterHelper.saveOrUpdate( aggregation );
         commitTransaction();
-     
+
 
         List<CvObject> allCvsCommittedAfter = getDaoFactory().getCvObjectDao().getAll();
         int cvsAfterPersist = allCvsCommittedAfter.size();
@@ -172,8 +172,10 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }//end method
 
 
+
+
     @Test
-    public void annotationTest() throws Exception{
+    public void updatingWithNewAnnotations() throws Exception{
 
         CvObjectDao<CvObject> cvObjectDao;
         cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao();
@@ -234,6 +236,88 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     }
 
+     @Test
+    public void updatingExistingAnnotations() throws Exception{
+
+        CvObjectDao<CvObject> cvObjectDao;
+        cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao();
+        final int existingCvsCount = cvObjectDao.countAll();
+
+        final CvAliasType alias = getMockBuilder().createCvObject( CvAliasType.class, "MI:0300", "alias type" );
+
+        final CvTopic topicsParent = getMockBuilder().createCvObject( CvTopic.class, "MI:0590", "attribute name" );
+        final CvTopic cvTopic1 = getMockBuilder().createCvObject( CvTopic.class, "MI:0631", "3d-r-factors" );
+        cvTopic1.addParent( topicsParent );
+
+
+        Annotation annot = getMockBuilder().createAnnotation( "no type", null, CvTopic.USED_IN_CLASS);
+        cvTopic1.addAnnotation( annot );
+
+        final Annotation annotBeforeUpdate = cvTopic1.getAnnotations().iterator().next();
+        Assert.assertEquals( "used-in-class", annotBeforeUpdate.getCvTopic().getShortLabel() );
+        Assert.assertEquals( "no type", annotBeforeUpdate.getAnnotationText());
+
+        PersisterHelper.saveOrUpdate( alias, topicsParent, cvTopic1);
+        commitTransaction();
+
+        beginTransaction();
+        CvUpdater cvupdater = new CvUpdater();
+
+        cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao();
+
+        final List<CvDagObject> list = new ArrayList<CvDagObject>( );
+        final List<CvObject> cvObjectList = cvObjectDao.getAll();
+        for ( CvObject cvObject : cvObjectList ) {
+            list.add( (CvDagObject ) cvObject );
+        }
+
+        int cvsBeforeUpdate = list.size();
+        Assert.assertEquals( existingCvsCount + 4, cvsBeforeUpdate);
+
+        final InputStream is = CvUpdaterTest.class.getResourceAsStream( "/annotations_test.csv" );
+        AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromResource(is);
+
+        cvupdater.createOrUpdateCVs(list,annotationDataset);
+        commitTransaction();
+
+        cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao();
+        CvObject topic;
+
+        topic = cvObjectDao.getByShortLabel( CvTopic.class, "3d-r-factors" );
+        Assert.assertNotNull( topic );
+        Assert.assertEquals( 1, topic.getAnnotations().size() );
+        final Annotation annotation = topic.getAnnotations().iterator().next();
+        Assert.assertEquals( "used-in-class", annotation.getCvTopic().getShortLabel() );
+        //updated no type annotation to Interaction 
+        Assert.assertEquals( "uk.ac.ebi.intact.model.Interaction", annotation.getAnnotationText());
+
+         //crated new annotation
+        topic = cvObjectDao.getByShortLabel( CvAliasType.class, "alias type" );
+        Assert.assertNotNull( topic );
+        Assert.assertEquals( 1, topic.getAnnotations().size() );
+        Assert.assertEquals( "hidden", topic.getAnnotations().iterator().next().getCvTopic().getShortLabel() );
+
+        final int cvCountAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
+
+        for(CvObject cv: getDaoFactory().getCvObjectDao().getAll()){
+            if ( log.isDebugEnabled() ) {
+                log.debug("Cvs created " +cv.toString() );
+            }
+
+        }
+        Assert.assertEquals( "2 CvObjects expected to be created during update: hidden and obsolete & 1 Cvobject updated used-in-class ",
+                             cvsBeforeUpdate + 2, cvCountAfterUpdate );
+
+        //again call cvupdate and this time it should ignore the annotations 
+        beginTransaction();
+        cvupdater.createOrUpdateCVs(list,annotationDataset);
+        commitTransaction();
+        Assert.assertEquals( "2 CvObjects expected to be created during update: hidden and obsolete & 1 Cvobject updated used-in-class ",
+                                     cvsBeforeUpdate + 2, cvCountAfterUpdate );
+
+
+    }
+
 
 
     @Test
@@ -272,15 +356,12 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             existingCvsBefore = cvObjectDao.getByShortLabelLike( aggregation.getShortLabel() );
         }
 
-
 /*
         //use for testing the latest files--change the file path as in ur system
         OBOSession oboSession = OboUtils.createOBOSession("C:\\intactall\\intact-current\\data-exchange\\intact-cvutils\\src\\test\\resources\\psi-mi25-next.obo");
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
 */
-
-
 
         OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
@@ -363,6 +444,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     } //end method
 
-  
+
 
 }  //end class
