@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.obo.dataadapter.OBOParseException;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.core.persister.stats.StatsUnit;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfo;
@@ -114,7 +115,10 @@ public class CvUpdater {
          // update the cvs using the annotation info dataset
         updateCVsUsingAnnotationDataset( cleanedList, annotationInfoDataset );
 
-        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate( cleanedList.toArray( new CvObject[cleanedList.size()] ) );
+        CorePersister corePersister = new CorePersister();
+        corePersister.setUpdateWithoutAcEnabled(true);
+
+        PersisterStatistics persisterStats = PersisterHelper.saveOrUpdate( corePersister, cleanedList.toArray( new CvObject[cleanedList.size()] ) );
         addCvObjectsToUpdaterStats( persisterStats, stats );
 
         if ( log.isDebugEnabled() ) {
@@ -248,7 +252,6 @@ public class CvUpdater {
             hashBag.add( primaryKey );
         }
 
-        if ( log.isDebugEnabled() ) log.debug( "HashBag size " + hashBag.size() );
         for ( Object aHashBag : hashBag ) {
             String s = ( String ) aHashBag;
             if ( hashBag.getCount( s ) > 1 ) {
@@ -260,7 +263,6 @@ public class CvUpdater {
             }
         }
         
-        log.debug( "Constraint not violated" );
         return false;
     }
 
@@ -303,7 +305,7 @@ public class CvUpdater {
                     }//end for
 
                     if ( log.isDebugEnabled() ) log.debug( "Updating CV: " + existingCv );
-                    final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+
                     final Annotation annotation = new Annotation( existingCv.getOwner(), obsoleteTopic, annotatedText );
                     existingCv.addAnnotation( annotation );
                     stats.addUpdatedCv( existingCv );
