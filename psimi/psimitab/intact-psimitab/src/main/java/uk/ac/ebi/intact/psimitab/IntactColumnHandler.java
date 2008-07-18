@@ -8,7 +8,6 @@ package uk.ac.ebi.intact.psimitab;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.collections.CollectionUtils;
 import psidev.psi.mi.tab.PsimitabHeader;
 import psidev.psi.mi.tab.converter.tab2xml.XmlConvertionException;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
@@ -45,18 +44,15 @@ import java.util.regex.Pattern;
  */
 public class IntactColumnHandler implements ColumnHandler<IntactBinaryInteraction,PsimitabHeader>, IsExpansionStrategyAware<IntactBinaryInteraction> {
 
-    /**
-     * Sets up a logger for that class.
-     */
     public static final Log logger = LogFactory.getLog( IntactColumnHandler.class );
 
     private static final Pattern EXPERIMENT_LABEL_PATTERN = Pattern.compile( "[a-z-_]+-\\d{4}[a-z]?-\\d+" );
 
     private static final String IDENTITY_MI_REF = "MI:0356";
 
-    private Boolean goTerm_Name_AutoCompletion = Boolean.FALSE;
+    private Boolean goTermNameAutoCompletion = Boolean.FALSE;
 
-    private Boolean interpro_Name_AutoCompletion = Boolean.FALSE;
+    private Boolean interproNameAutoCompletion = Boolean.FALSE;
 
     /**
      * Query is used for GOTerm Name AutoCompletion
@@ -80,8 +76,8 @@ public class IntactColumnHandler implements ColumnHandler<IntactBinaryInteractio
     }
 
     public IntactColumnHandler( boolean goTerm_Name_AutoCompletion, boolean interpro_Name_AutoCompletion ) {
-        this.goTerm_Name_AutoCompletion = goTerm_Name_AutoCompletion;
-        this.interpro_Name_AutoCompletion = interpro_Name_AutoCompletion;
+        this.goTermNameAutoCompletion = goTerm_Name_AutoCompletion;
+        this.interproNameAutoCompletion = interpro_Name_AutoCompletion;
     }
 
     /////////////////
@@ -91,12 +87,12 @@ public class IntactColumnHandler implements ColumnHandler<IntactBinaryInteractio
         throw new UnsupportedOperationException("Expansion method is not supported");
     }
 
-    public void setGoTermNameAutoCompletion( Boolean autocompletion ) {
-        this.goTerm_Name_AutoCompletion = autocompletion;
+    public void setGoTermNameAutoCompletion( boolean autocompletion ) {
+        this.goTermNameAutoCompletion = autocompletion;
     }
 
-    public void setInterproNameAutoCompletion( Boolean autocompletion ) {
-        this.interpro_Name_AutoCompletion = autocompletion;
+    public void setInterproNameAutoCompletion( boolean autocompletion ) {
+        this.interproNameAutoCompletion = autocompletion;
     }
 
     /**
@@ -363,10 +359,10 @@ public class IntactColumnHandler implements ColumnHandler<IntactBinaryInteractio
             id = dbref.getId();
             db = dbref.getDb();
 
-            if ( goTerm_Name_AutoCompletion && dbref.getDb().equalsIgnoreCase( "GO" ) ) {
+            if ( goTermNameAutoCompletion && dbref.getDb().equalsIgnoreCase( "GO" ) ) {
                 text = fetchGoNameFromWebservice( id );
             }
-            if ( interpro_Name_AutoCompletion && dbref.getDb().equalsIgnoreCase( "Interpro" ) ) {
+            if ( interproNameAutoCompletion && dbref.getDb().equalsIgnoreCase( "Interpro" ) ) {
                 text = fetchInterproNameFromInterproNameHandler( id );
             }
 
@@ -419,7 +415,10 @@ public class IntactColumnHandler implements ColumnHandler<IntactBinaryInteractio
             }
             return interproHandler.getNameById( id );
         } catch ( NameNotFoundException e ) {
-            logger.info( "No Description for " + id + " found." );
+            if ( logger.isDebugEnabled() ) {
+                logger.info( "No Description for " + id + " found." );
+            }
+
             return null;
         }
     }
@@ -458,40 +457,32 @@ public class IntactColumnHandler implements ColumnHandler<IntactBinaryInteractio
             sb.append( TabulatedLineFormatter.formatCv( bi.getExperimentalRolesInteractorA() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if ( logger.isDebugEnabled() )
-                logger.debug( "No experimentalRole for Interactor A found for " + bi.getInteractionAcs() );
         }
-        sb.append( '\t' );
+        sb.append( TabulatedLineFormatter.TAB );
 
         // field 17 - experimentalRole of interactorB
         if ( bi.hasExperimentalRolesInteractorB() ) {
             sb.append( TabulatedLineFormatter.formatCv( bi.getExperimentalRolesInteractorB() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if ( logger.isDebugEnabled() )
-                logger.debug( "No experimentalRole for Interactor B found for " + bi.getInteractionAcs() );
         }
-        sb.append( '\t' );
+        sb.append( TabulatedLineFormatter.TAB );
 
         // field 18 - biologicalRole of interactorA
         if ( bi.hasBiologicalRolesInteractorA() ) {
             sb.append( TabulatedLineFormatter.formatCv( bi.getBiologicalRolesInteractorA() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if ( logger.isDebugEnabled() )
-                logger.debug( "No biologicalRole for Interactor A found for " + bi.getInteractionAcs() );
         }
-        sb.append( '\t' );
+        sb.append( TabulatedLineFormatter.TAB );
 
         // field 19 - biologicalRole of interactorB
         if ( bi.hasBiologicalRolesInteractorB() ) {
             sb.append( TabulatedLineFormatter.formatCv( bi.getBiologicalRolesInteractorB() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if ( logger.isDebugEnabled() )
-                logger.debug( "No biologicalRole for Interactor B found for " + bi.getInteractionAcs() );
         }
-        sb.append( '\t' );
+        sb.append( TabulatedLineFormatter.TAB );
 
         // field 19 - properties of interactorA
         if ( bi.hasPropertiesA() ) {
@@ -499,67 +490,62 @@ public class IntactColumnHandler implements ColumnHandler<IntactBinaryInteractio
             sb.append( formatedText );
         } else {
             sb.append( LineFormatter.NONE );
-            if ( logger.isDebugEnabled() )
-                logger.debug( "No properties for Interactor A found for " + bi.getInteractionAcs() );
         }
-        sb.append( '\t' );
+        sb.append( TabulatedLineFormatter.TAB );
 
         // field 20 - properties of interactorB
         if ( bi.hasPropertiesB() ) {
             sb.append( TabulatedLineFormatter.formatCv( bi.getPropertiesB() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if ( logger.isDebugEnabled() )
-                logger.debug( "No properties for Interactor B found for " + bi.getInteractionAcs() );
         }
-        sb.append( '\t' );
+        sb.append( TabulatedLineFormatter.TAB );
 
         // field 21 - interactorType of A
         if ( bi.hasInteractorTypeA() ) {
             sb.append( TabulatedLineFormatter.formatCv( bi.getInteractorTypeA() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if ( logger.isDebugEnabled() )
-                logger.debug( "No interactorType for A found for " + bi.getInteractionAcs() );
         }
-        sb.append( '\t' );
+        sb.append( TabulatedLineFormatter.TAB );
 
         // field 22 - interactorType of B
         if ( bi.hasInteractorTypeB() ) {
             sb.append( TabulatedLineFormatter.formatCv( bi.getInteractorTypeB() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if ( logger.isDebugEnabled() )
-                logger.debug( "No interactorType for B found for " + bi.getInteractionAcs() );
         }
-        sb.append( '\t' );
+        sb.append( TabulatedLineFormatter.TAB );
 
         // field 23 - interactorType of B
         if ( bi.hasHostOrganism() ) {
             sb.append( TabulatedLineFormatter.formatCv( bi.getHostOrganism() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if ( logger.isDebugEnabled() ) logger.debug( "No hostOrganism found for " + bi.getInteractionAcs() );
         }
-        sb.append( '\t' );
+        sb.append( TabulatedLineFormatter.TAB );
 
-        // field 24 - expansion method
-        if ( bi.hasExpansionMethod() ) {
-            sb.append( bi.getExpansionMethod() );
+        // field 24 - expansion methods
+        if ( bi.hasExpansionMethods() ) {
+            for ( Iterator<String> iterator = bi.getExpansionMethods().iterator(); iterator.hasNext(); ) {
+                final String method = iterator.next();
+                sb.append( method );
+                if( iterator.hasNext() ) {
+                    sb.append( TabulatedLineFormatter.PIPE );
+                }
+            }
         } else {
             sb.append( LineFormatter.NONE );
-            if ( logger.isDebugEnabled() ) logger.debug( "No expansionMethod found for " + bi.getInteractionAcs() );
         }
-        sb.append( '\t' );
+        sb.append( TabulatedLineFormatter.TAB );
 
         //field 25 - dataset name
         if ( bi.hasDatasetName() ) {
             sb.append( formatStringList( bi.getDataset() ) );
         } else {
             sb.append( LineFormatter.NONE );
-            if ( logger.isDebugEnabled() ) logger.debug( "No dataset name found for " + bi.getInteractionAcs() );
         }
-        sb.append( '\t' );
+        sb.append( TabulatedLineFormatter.TAB );
     }
 
     private String formatStringList( List<String> field ) {
