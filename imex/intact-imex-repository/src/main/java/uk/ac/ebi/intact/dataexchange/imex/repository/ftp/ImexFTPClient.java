@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO comment this
+ * IMEx FTP Client.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
