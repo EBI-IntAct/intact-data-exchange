@@ -23,12 +23,17 @@ import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
  */
 public class IntactXml2Tab extends Xml2Tab {
 
-    public IntactXml2Tab() {
+    public IntactXml2Tab( boolean GoTermNameAutoCompletionEnabled,
+                          boolean InterproNameAutoCompletionEnabled ) {
         final IntactColumnHandler columnHandler = new IntactColumnHandler();
-        columnHandler.setGoTermNameAutoCompletion(true);
-        columnHandler.setInterproNameAutoCompletion(true);
+        columnHandler.setGoTermNameAutoCompletion( GoTermNameAutoCompletionEnabled );
+        columnHandler.setInterproNameAutoCompletion( InterproNameAutoCompletionEnabled );
 
-        setColumnHandler(columnHandler);
+        setColumnHandler( columnHandler );
         setBinaryInteractionClass( IntactBinaryInteraction.class );
+    }
+
+    public IntactXml2Tab() {
+        this( true, true );
     }
 }

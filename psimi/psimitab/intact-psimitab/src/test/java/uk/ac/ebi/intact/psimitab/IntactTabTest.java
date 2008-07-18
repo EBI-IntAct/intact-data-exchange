@@ -17,7 +17,7 @@ import java.util.Collection;
 public class IntactTabTest extends AbstractPsimitabTestCase {
 
     @Test
-    public void testBinaryInteractionHandler() throws Exception {
+    public void binaryInteractionHandler() throws Exception {
 
         File xmlFile = getFileByResources( "/psi25-testset/9971739.xml", IntactTabTest.class );
         assertTrue( xmlFile.canRead() );
@@ -33,7 +33,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
-        PsimiTabWriter writer = new IntactPsimiTabWriter();
+        PsimiTabWriter writer = new IntactPsimiTabWriter( false, false );
 
         File tabFile = new File( getTargetDirectory(), "9971739_expanded.txt" );
         assertTrue( tabFile.getParentFile().canWrite() );
@@ -41,12 +41,12 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         //assertEquals( 3, interactions.size() );
 
         for ( BinaryInteraction interaction : interactions ) {
-            assertTrue( interaction instanceof IntactBinaryInteraction);
+            assertTrue( interaction instanceof IntactBinaryInteraction );
         }
     }
 
     @Test
-    public void testPsimiTabReader() throws Exception {
+    public void psimiTabReader() throws Exception {
 
         File tabFile = getFileByResources( "/mitab-testset/9971739_expanded.txt", IntactTabTest.class );
         assertTrue( tabFile.canRead() );
@@ -61,7 +61,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
-        Xml2Tab xml2tab = new IntactXml2Tab();
+        Xml2Tab xml2tab = new IntactXml2Tab( false, false );
 
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
@@ -71,7 +71,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         assertEquals( interactions.size(), bis.size() );
 
         for ( BinaryInteraction bi : bis ) {
-            IntactBinaryInteraction dbi = (IntactBinaryInteraction) bi;
+            IntactBinaryInteraction dbi = ( IntactBinaryInteraction ) bi;
             assertTrue( dbi.getAuthors().get( 0 ).getName().contains( "Leung" ) );
             assertTrue( dbi.hasExperimentalRolesInteractorA() );
             assertTrue( dbi.hasExperimentalRolesInteractorB() );
@@ -82,7 +82,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
     }
 
     @Test
-    public void testExpansion() throws Exception {
+    public void expansion() throws Exception {
 
         File xmlFile = getFileByResources( "/psi25-testset/simple.xml", IntactTabTest.class );
         assertTrue( xmlFile.canRead() );
@@ -98,7 +98,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
-        PsimiTabWriter writer = new IntactPsimiTabWriter();
+        PsimiTabWriter writer = new IntactPsimiTabWriter( false, false );
 
         StringWriter sw = new StringWriter();
 
@@ -106,9 +106,9 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         assertEquals( 2, interactions.size() );
 
         BinaryInteraction interaction = ( BinaryInteraction ) interactions.toArray()[1];
-        assertTrue( interaction instanceof IntactBinaryInteraction);
+        assertTrue( interaction instanceof IntactBinaryInteraction );
 
-        IntactBinaryInteraction ibi = (IntactBinaryInteraction) interaction;
+        IntactBinaryInteraction ibi = ( IntactBinaryInteraction ) interaction;
         assertTrue( ibi.getAuthors().get( 0 ).getName().contains( "Liu et al." ) );
 
         assertTrue( ibi.getHostOrganism().size() == 2 );
@@ -126,19 +126,17 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
 
         assertTrue( ibi.hasPropertiesA() );
         assertTrue( ibi.hasPropertiesB() );
-
-        System.out.println(sw);
     }
 
     @Test
-    public void testIfAuthorIsCurrator() throws Exception {
+    public void ifAuthorIsCurator() throws Exception {
         // reading a file were all interactions inferred by currators
         File xmlFile = getFileByResources( "/psi25-testset/14681455.xml", IntactTabTest.class );
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
-        Xml2Tab x2t = new IntactXml2Tab();
-        
+        Xml2Tab x2t = new IntactXml2Tab( false, false );
+
         x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         x2t.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
         x2t.setPostProcessor( new ClusterInteractorPairProcessor() );
