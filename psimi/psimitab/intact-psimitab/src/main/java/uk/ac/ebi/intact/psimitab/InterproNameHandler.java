@@ -21,7 +21,6 @@ import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
 
 import java.io.*;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -31,7 +30,7 @@ import java.util.regex.Pattern;
  *
  * @author Nadin Neuhauser
  * @version $Id$
- * @since 2.0.0-Snapshot
+ * @since 2.0.0
  */
 public class InterproNameHandler {
 
@@ -84,26 +83,26 @@ public class InterproNameHandler {
     private void init( BufferedReader reader ) throws IOException {
         long start = System.currentTimeMillis();
 
-        if (logger.isDebugEnabled())
-            logger.debug( "Starting to init InterproNameMap." );
+        if ( logger.isDebugEnabled() ) logger.debug( "Starting to init InterproNameMap." );
 
         interproMap = new HashMap<String, String>();
 
-        String line = reader.readLine();
-        while ( line != null ) {
-                if ( INTERPRO_ENTRY_PATTERN.matcher( line ).matches() ) {
-                    int index = line.indexOf( " " );
-                    String interproTerm = line.substring( 0, index );
-                    String interproName = line.substring( index + 1, line.length() );
+        String line = null;
+        while ( ( line = reader.readLine() ) != null ) {
+            if ( INTERPRO_ENTRY_PATTERN.matcher( line ).matches() ) {
+                int index = line.indexOf( " " );
+                String interproTerm = line.substring( 0, index );
+                String interproName = line.substring( index + 1, line.length() );
 
-                    interproMap.put( interproTerm, interproName );
-                }
-            line = reader.readLine();
+                interproMap.put( interproTerm, interproName );
+            }
         }
         reader.close();
-        if ( logger.isDebugEnabled() ) logger.debug( "Number of Interpro entries " + interproMap.keySet().size() );
-        if ( logger.isTraceEnabled() )
+
+        if ( logger.isDebugEnabled() ) {
+            logger.debug( "Number of Interpro entries " + interproMap.keySet().size() );
             logger.trace( "Time to init InterproNameMap " + ( System.currentTimeMillis() - start ) );
+        }
     }
 
     public String getNameById( String interproTerm ) throws NameNotFoundException {
@@ -112,7 +111,7 @@ public class InterproNameHandler {
             String result = interproMap.get( interproTerm );
             if ( result == null ) {
                 logger.warn( "Could not find " + interproTerm );
-            } else if (logger.isTraceEnabled()) {
+            } else if ( logger.isTraceEnabled() ) {
                 logger.trace( "Time to get InterproName " + interproTerm + " from map " + ( System.currentTimeMillis() - start ) );
             }
             return result;
@@ -120,23 +119,5 @@ public class InterproNameHandler {
             logger.error( "Map is not initialized or is Empty." );
         }
         throw new NameNotFoundException( "Could not find " + interproTerm );
-    }
-
-    /**
-     * Decodes URL before getting File (usefull if path contains whitespaces).
-     *
-     * @param fileName
-     * @param clazz
-     * @return
-     */
-    public static File getFileByResources( String fileName, Class clazz ) {
-        URL url = clazz.getResource( fileName );
-        String strFile = url.getFile();
-        try {
-            return new File( URLDecoder.decode( strFile, "utf-8" ) );
-        } catch ( UnsupportedEncodingException e ) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }
