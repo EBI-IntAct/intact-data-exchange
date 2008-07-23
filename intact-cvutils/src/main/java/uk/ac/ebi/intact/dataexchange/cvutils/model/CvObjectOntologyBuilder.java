@@ -281,9 +281,6 @@ public class CvObjectOntologyBuilder {
                 return ( T ) processed.get( processedKey );
             }
 
-            //test
-
-
             final Institution institution = IntactContext.getCurrentInstance().getInstitution();
 
             //Short label look for EXACT PSI-MI-short  in synonym tag OBO 1.2

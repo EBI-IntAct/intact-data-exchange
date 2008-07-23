@@ -23,20 +23,25 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.core.util.SchemaUtils;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -377,14 +382,13 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             if ( log.isDebugEnabled() ) {
                 log.debug( "Please check the resource" );
             }
-        throw new NullPointerException( "InputStream is null" );
+            throw new NullPointerException( "InputStream is null" );
         }
 
         AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromResource( is);
         if ( log.isDebugEnabled() ) {
             log.debug( "AnnotationInfoDataset size :   " + annotationDataset.getAll().size()  );
         }
-        //AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromDefault( 10841 );
 
         beginTransaction();
 
@@ -422,7 +426,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( 932, totalCvsAfterUpdate );
 
         Assert.assertEquals( 925, stats.getCreatedCvs().size() );
-        Assert.assertEquals( 1, stats.getUpdatedCvs().size() );
+        System.out.println(stats.getUpdatedCvs());
+        Assert.assertEquals( 3, stats.getUpdatedCvs().size() );
 
         //53-2 as aggregation was already created and later updated + obsolete term
         Assert.assertEquals( 51, stats.getOrphanCvs().size() );

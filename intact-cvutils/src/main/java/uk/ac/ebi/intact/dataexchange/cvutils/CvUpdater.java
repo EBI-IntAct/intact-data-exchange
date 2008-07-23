@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obo.dataadapter.OBOParseException;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.persister.CorePersister;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.core.persister.stats.StatsUnit;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfo;
@@ -33,7 +33,6 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
-import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -107,10 +106,11 @@ public class CvUpdater {
 
         List<CvDagObject> orphanCvList = dealWithOrphans( allValidCvs );
 
-        if ( log.isDebugEnabled() ) log.debug( "orphanCvList " + orphanCvList.size() );
+        if ( log.isDebugEnabled() ) log.debug( "Orphan count: " + orphanCvList.size() );
 
         List<CvDagObject> cleanedList = ( List<CvDagObject> ) CollectionUtils.subtract( allValidCvs, orphanCvList );
-        log.debug( "cleanedList size " + cleanedList.size() );
+
+        if (log.isDebugEnabled()) log.debug( "Cleaned list size: " + cleanedList.size() );
 
          // update the cvs using the annotation info dataset
         updateCVsUsingAnnotationDataset( cleanedList, annotationInfoDataset );
@@ -155,11 +155,6 @@ public class CvUpdater {
                 }//end of if
             }//end if
         }//end for
-
-        if ( log.isDebugEnabled() ) {
-            log.debug( "orphanCvList size " + orphanCvList.size() );
-            log.debug( "alreadyExistingObsoleteCvList size " + alreadyExistingObsoleteCvList.size() );
-        }
 
         return orphanCvList;
     }
@@ -245,8 +240,8 @@ public class CvUpdater {
         Bag hashBag = new HashBag();
         for ( CvDagObject cvDag : allValidCvs ) {
             String primaryKey = cvDag.getObjClass().toString() + ":" + cvDag.getShortLabel();
-            if ( log.isDebugEnabled() ) {
-                log.debug( "PrimaryKey :" + primaryKey );
+            if ( log.isTraceEnabled() ) {
+                log.trace( "PrimaryKey: " + primaryKey );
             }
 
             hashBag.add( primaryKey );
@@ -304,7 +299,7 @@ public class CvUpdater {
                         }
                     }//end for
 
-                    if ( log.isDebugEnabled() ) log.debug( "Updating CV: " + existingCv );
+                    if ( log.isDebugEnabled() ) log.debug( "Updating CV - adding obsolete annotation to: " + existingCv );
 
                     final Annotation annotation = new Annotation( existingCv.getOwner(), obsoleteTopic, annotatedText );
                     existingCv.addAnnotation( annotation );
