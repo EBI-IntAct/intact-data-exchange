@@ -57,7 +57,7 @@ public class CvExporterTest {
     @Before
     public void prepareCvs() throws OBOParseException, IOException, PsiLoaderException, IntactTransactionException {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
         log.debug( oboSession.getObjects().size() );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
@@ -85,7 +85,7 @@ public class CvExporterTest {
          */
 
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
 

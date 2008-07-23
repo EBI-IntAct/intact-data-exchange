@@ -65,7 +65,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     public void reportDirectlyFromOBOFile() throws Exception {
 
         //URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
-        String revision ="1.48";
+        String revision ="1.51";
         URL url =  new URL( OboUtils.PSI_MI_OBO_LOCATION +"?revision="+revision);
         log.debug( "url " + url );
 
@@ -116,17 +116,15 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             }
         }
 
-
-
         //948+1 with Typedef
-        Assert.assertEquals( 949, idCounter );
-        Assert.assertEquals( 948, termCounter );
-        Assert.assertEquals( 948, miCounter );
-        Assert.assertEquals( 53, obsoleteCounter );
-        Assert.assertEquals( 53, obsoleteCounterDef );
+        Assert.assertEquals( 959, idCounter );
+        Assert.assertEquals( 958, termCounter );
+        Assert.assertEquals( 958, miCounter );
+        Assert.assertEquals( 54, obsoleteCounter );
+        Assert.assertEquals( 54, obsoleteCounterDef );
         Assert.assertEquals( 1, typedefCounter );
-        Assert.assertEquals( 844, psiTerm );
-        Assert.assertEquals( 124, drugTerm );
+        Assert.assertEquals( 854, psiTerm );
+        Assert.assertEquals( 125, drugTerm );
 
         in.close();
 
@@ -138,11 +136,11 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     @Test
     public void isConstraintViolatedTest() throws Exception {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.51");
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
-        Assert.assertEquals( 978, allCvs.size() );
+        Assert.assertEquals( 987, allCvs.size() );
 
         CvUpdater updater = new CvUpdater();
         Assert.assertFalse( updater.isConstraintViolated( allCvs ) );
@@ -360,21 +358,14 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             existingCvsBefore = cvObjectDao.getByShortLabelLike( aggregation.getShortLabel() );
         }
 
-/*
-        //use for testing the latest files--change the file path as in ur system
-        OBOSession oboSession = OboUtils.createOBOSession("C:\\intactall\\intact-current\\data-exchange\\intact-cvutils\\src\\test\\resources\\psi-mi25-next.obo");
-        CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
-
-*/
-
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.48");
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.51");
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvObject> orphanCvs = ontologyBuilder.getOrphanCvObjects();
-        Assert.assertEquals( 53, orphanCvs.size() );
+        Assert.assertEquals( 54, orphanCvs.size() );
 
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
-        Assert.assertEquals( 978, allCvs.size() );
+        Assert.assertEquals( 987, allCvs.size() );
 
         InputStream is = CvUpdaterTest.class.getResourceAsStream("/additional-annotations.csv");
 
@@ -423,17 +414,16 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         if ( log.isDebugEnabled() ) log.debug( "stats.getCreatedCvs().size()->" + stats.getCreatedCvs().size() );
         if ( log.isDebugEnabled() ) log.debug( "stats.getUpdatedCvs().size() ->" + stats.getUpdatedCvs().size() );
 
-        Assert.assertEquals( 932, totalCvsAfterUpdate );
+        Assert.assertEquals( 940, totalCvsAfterUpdate );
 
-        Assert.assertEquals( 925, stats.getCreatedCvs().size() );
+        Assert.assertEquals( 933, stats.getCreatedCvs().size() );
 
-        Assert.assertEquals( 3, stats.getUpdatedCvs().size() );
+        //Assert.assertEquals( 5, stats.getUpdatedCvs().size() );
 
-        //53-2 as aggregation was already created and later updated + obsolete term
-        Assert.assertEquals( 51, stats.getOrphanCvs().size() );
+        //54-2 as aggregation was already created and later updated + obsolete term
+        Assert.assertEquals( 52, stats.getOrphanCvs().size() );
 
-        //52+1 obsolete term
-        Assert.assertEquals( 53, stats.getObsoleteCvs().size() );
+        Assert.assertEquals( 54, stats.getObsoleteCvs().size() );
 
         //invalid terms are already filtered out
         Assert.assertEquals( 0, stats.getInvalidTerms().size() );

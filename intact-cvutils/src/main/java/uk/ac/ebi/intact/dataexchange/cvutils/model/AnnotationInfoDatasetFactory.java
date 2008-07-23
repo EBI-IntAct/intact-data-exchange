@@ -18,8 +18,6 @@ package uk.ac.ebi.intact.dataexchange.cvutils.model;
 import au.com.bytecode.opencsv.CSVReader;
 
 import java.io.*;
-import java.util.StringTokenizer;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -50,7 +50,7 @@ public class CvObjectOntologyBuilderTest {
     public void build_default() throws Exception {
 
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
         log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
@@ -60,18 +60,18 @@ public class CvObjectOntologyBuilderTest {
 
 
         int allOrphanCvs = ontologyBuilder.getOrphanCvObjects().size();
-        Assert.assertEquals( 53, allOrphanCvs );
+        Assert.assertEquals( 54, allOrphanCvs );
 
 
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
         int allCvsSize = allCvs.size();
-        Assert.assertEquals( 978, allCvsSize );
+        Assert.assertEquals( 987, allCvsSize );
 
       
 
 
         List<CvDagObject> orderedList = ontologyBuilder.getAllOrderedCvs( allCvs );
-        Assert.assertEquals( 978, orderedList.size() );
+        Assert.assertEquals( 987, orderedList.size() );
 
 
         for ( CvDagObject cvdag : orderedList ) {
@@ -114,12 +114,12 @@ public class CvObjectOntologyBuilderTest {
         Assert.assertEquals( true, testObsoleteObj.isObsolete() );
 
         //947+1=948 root object MI:0000
-        Assert.assertEquals( 947, ontologyBuilder.getAllMIOBOObjects().size() );
-        Assert.assertEquals( 53, ontologyBuilder.getObsoleteOBOObjects().size() );
-        Assert.assertEquals( 53, ontologyBuilder.getOrphanOBOObjects().size() );
+        Assert.assertEquals( 957, ontologyBuilder.getAllMIOBOObjects().size() );
+        Assert.assertEquals( 54, ontologyBuilder.getObsoleteOBOObjects().size() );
+        Assert.assertEquals( 54, ontologyBuilder.getOrphanOBOObjects().size() );
         Assert.assertEquals( 11, ontologyBuilder.getInvalidOBOObjects().size() );
-        //947+11+1=959
-        Assert.assertEquals( 959, ontologyBuilder.getAllOBOObjects().size() );
+        //957+11+1=959
+        Assert.assertEquals( 969, ontologyBuilder.getAllOBOObjects().size() );
 
         OBOObject endogenousObj = ( OBOObject ) oboSession.getObject( "MI:0222" );
         CvObject endogenousCvObject = ontologyBuilder.toCvObject( endogenousObj );
@@ -154,7 +154,7 @@ public class CvObjectOntologyBuilderTest {
     public void categoryTest() throws Exception
 
     {
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
         log.debug( oboSession.getObjects().size() );
 
         OBOObject interactionDetection = ( OBOObject ) oboSession.getObject( "MI:0001" );
@@ -184,7 +184,7 @@ public class CvObjectOntologyBuilderTest {
     @Test
     public void build_subset_drugable() throws Exception {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
         log.debug( oboSession.getObjects().size() );
 
 
@@ -260,7 +260,7 @@ public class CvObjectOntologyBuilderTest {
     @Test
     public void build_subset_psi() throws Exception {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
         if ( log.isDebugEnabled() ) log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
@@ -437,7 +437,7 @@ public class CvObjectOntologyBuilderTest {
 
     @Test
       public void build_cvsWithSameMi() throws Exception {
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.48" );
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
         log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );

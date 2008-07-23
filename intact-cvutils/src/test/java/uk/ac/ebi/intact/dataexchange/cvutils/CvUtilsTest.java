@@ -46,7 +46,7 @@ public class CvUtilsTest extends IntactBasicTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        ontology = new CvObjectOntologyBuilder( OboUtils.createOBOSessionFromDefault( "1.48" ) ).getAllCvs();
+        ontology = new CvObjectOntologyBuilder( OboUtils.createOBOSessionFromDefault( "1.51" ) ).getAllCvs();
     }
 
     @Test

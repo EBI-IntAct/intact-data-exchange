@@ -184,13 +184,24 @@ public class CvUpdater {
         }
     }
 
+    private boolean areEqual(CvObject cv1, CvObject cv2) {
+        if ( cv1 == null || cv2 == null ) {
+            return false;
+        }
+
+        if (cv1.getIdentifier() != null && cv2.getIdentifier() != null) {
+            return cv1.getIdentifier().equals(cv2.getIdentifier());
+        }
+
+        return cv1.getShortLabel().equals(cv2.getShortLabel());
+    }
 
     private void addAnnotation( Annotation annotation, CvDagObject cvObject, boolean includeChildren ) {
         boolean containsAnnotation = false;
 
         for ( Annotation annot : cvObject.getAnnotations() ) {
 
-            if ( annot.getCvTopic().getShortLabel().equals( annotation.getCvTopic().getShortLabel() ) ) {
+            if (this.areEqual(annot.getCvTopic(),annotation.getCvTopic())) {
                 if ( annot.getAnnotationText() != null
                      && annot.getAnnotationText().equals( annotation.getAnnotationText() ) ) {
                     containsAnnotation = true;
