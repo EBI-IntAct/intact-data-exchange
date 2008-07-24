@@ -189,8 +189,8 @@ public class CvUpdater {
             return false;
         }
 
-        if (cv1.getIdentifier() != null && cv2.getIdentifier() != null) {
-            return cv1.getIdentifier().equals(cv2.getIdentifier());
+        if (cv1.getMiIdentifier() != null && cv2.getMiIdentifier() != null) {
+            return cv1.getMiIdentifier().equals(cv2.getMiIdentifier());
         }
 
         return cv1.getShortLabel().equals(cv2.getShortLabel());
