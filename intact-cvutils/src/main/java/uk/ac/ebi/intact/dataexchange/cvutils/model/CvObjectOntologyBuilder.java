@@ -387,7 +387,11 @@ public class CvObjectOntologyBuilder {
                 String xref = dbxref.toString();
                 if ( xref.contains( CvTopic.XREF_VALIDATION_REGEXP ) ) {
 
-                    Annotation annot = toAnnotation( CvTopic.XREF_VALIDATION_REGEXP, xref.split( ":" )[1] );
+                    int firstIndex = xref.indexOf( '"' );
+                    int lastIndex = xref.lastIndexOf( '"' );
+
+                    String annotaionText = xref.substring( firstIndex + 1, lastIndex );
+                    Annotation annot = toAnnotation( CvTopic.XREF_VALIDATION_REGEXP, annotaionText );
                     if ( annot != null ) {
                         cvObject.addAnnotation( annot );
                     }

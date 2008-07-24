@@ -19,10 +19,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.junit.Assert;
 import org.junit.Test;
-import org.obo.datamodel.IdentifiedObject;
-import org.obo.datamodel.OBOObject;
-import org.obo.datamodel.OBOSession;
-import org.obo.datamodel.TermCategory;
+import org.obo.datamodel.*;
 import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
@@ -300,6 +297,29 @@ public class CvObjectOntologyBuilderTest {
 
 
     } //end method
+
+
+    @Test
+    public void regex_test() throws Exception {
+
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        log.debug( oboSession.getObjects().size() );
+
+        CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
+
+        OBOObject testObj = ( OBOObject ) oboSession.getObject( "MI:0448" );
+
+        CvObject cvObject = ontologyBuilder.toCvObject( testObj );
+        testCvObject( cvObject );
+        Collection<Annotation> annotations = cvObject.getAnnotations();
+
+        for ( Annotation annot : annotations ) {
+            if ( annot.getCvTopic().getShortLabel().equals( "id-validation-regexp" ) ) {
+                Assert.assertEquals( "GO:[0-9]{7}", annot.getAnnotationText() );
+            }
+        }
+
+    }
 
 
     public static void testCvObject( CvObject cvObject ) {
