@@ -153,13 +153,16 @@ public class CvExporterTest {
 
         obj1.addChild( linkToObj2 );
 
-        CvExporter.getOboSession().addObject( obj1 );
-        CvExporter.getOboSession().addObject( obj2 );
+        CvExporter cvExporter = new CvExporter();
+        
+        cvExporter.getOboSession().addObject( obj1 );
+        cvExporter.getOboSession().addObject( obj2 );
 
         File tempDir = new File( "temp" );
         tempDir.mkdir();
         File outFile = File.createTempFile( "test", ".obo" );
-        downloadCv.writeOBOFile( CvExporter.getOboSession(), outFile );
+        outFile.deleteOnExit();
+        downloadCv.writeOBOFile( cvExporter.getOboSession(), outFile );
 
 
     }//end method
