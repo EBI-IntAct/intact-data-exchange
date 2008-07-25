@@ -34,8 +34,8 @@ import uk.ac.ebi.intact.model.CvObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -115,7 +115,7 @@ public class CvExporterTest {
         if ( log.isDebugEnabled() ) log.debug( "From Test all : " + allCvs.size() );
 
 
-        OBOSession oboSession = downloadCv.convertCvList2OBOSession( allCvs );
+        OBOSession oboSession = downloadCv.convertToOBOSession( allCvs );
         // Create temp directory
         File tempDir = new File( "temp" );
         tempDir.mkdir();

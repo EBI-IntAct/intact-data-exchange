@@ -55,17 +55,13 @@ public class CvExporter {
     public CvTopic obsolete = null;
 
 
-    private static OBOSession oboSession;
+    private OBOSession oboSession;
 
     public CvExporter() {
-
-    } //end constructor
-
-    static {
         ObjectFactory objFactory;
         objFactory = new DefaultObjectFactory();
         oboSession = new OBOSessionImpl( objFactory );
-    }
+    } //end constructor
 
     /**
      * Converts a list of Cvs to list of OBOObjects and add it to the OBOSession
@@ -74,8 +70,7 @@ public class CvExporter {
      * @return OBOSession objects with all Cvs converted to OBOObject and added to the OBOsession
      */
 
-    public OBOSession convertCvList2OBOSession( List<CvDagObject> allCvs ) {
-
+    public OBOSession convertToOBOSession( List<CvDagObject> allCvs ) {
 
         List<CvDagObject> allUniqCvs;
         allUniqCvs = allCvs;
@@ -120,6 +115,10 @@ public class CvExporter {
         return oboSession;
     }//end method
 
+    public void exportToFile(List<? extends CvObject> cvObjects, File oboFileToExport) throws IOException, DataAdapterException {
+        OBOSession oboSession = convertToOBOSession((List<CvDagObject>) cvObjects);
+        writeOBOFile(oboSession, oboFileToExport);
+    }
 
     protected Map<String, HashSet<CvDagObject>> groupByMis( List<CvDagObject> allCvs ) {
 
@@ -140,7 +139,7 @@ public class CvExporter {
         return cvMapWithParents;
     }
 
-    public void addObject( OBOClass oboObj ) {
+    protected void addObject( OBOClass oboObj ) {
         oboSession.addObject( oboObj );
     } //end method
 
@@ -185,7 +184,7 @@ public class CvExporter {
      * @return Lists of Uniq Cvs
      */
 
-    public List<CvDagObject> removeCvsDuplicated( List<CvDagObject> allCvs ) {
+    protected List<CvDagObject> removeCvsDuplicated( List<CvDagObject> allCvs ) {
 
         HashMap<String, CvDagObject> cvHash = new HashMap<String, CvDagObject>();
         List<CvDagObject> allUniqCvs = new ArrayList<CvDagObject>();
@@ -211,7 +210,7 @@ public class CvExporter {
      * @return a OBOClass instance
      */
 
-    public OBOClass convertCv2OBO( CvDagObject dagObj, Map<String, HashSet<CvDagObject>> cvMapWithParents ) {
+    protected OBOClass convertCv2OBO( CvDagObject dagObj, Map<String, HashSet<CvDagObject>> cvMapWithParents ) {
 
         OBOClass oboObj;
 
@@ -405,7 +404,7 @@ public class CvExporter {
         return syn;
     } //end method
 
-    public static OBOSession getOboSession() {
+    protected OBOSession getOboSession() {
         return oboSession;
     } //end method
 
