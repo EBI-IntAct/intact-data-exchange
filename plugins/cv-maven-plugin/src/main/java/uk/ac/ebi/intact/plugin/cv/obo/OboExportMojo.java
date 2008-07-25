@@ -19,8 +19,11 @@ import org.apache.log4j.Priority;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.bbop.dataadapter.DataAdapterException;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.util.LogUtils;
-import uk.ac.ebi.intact.dataexchange.cvutils.DownloadCVs;
+import uk.ac.ebi.intact.dataexchange.cvutils.CvExporter;
+import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.plugin.IntactHibernateMojo;
 import uk.ac.ebi.intact.plugin.MojoUtils;
 
@@ -28,6 +31,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Export an OBO file from the provided database in the hibernateConfig file
@@ -75,12 +79,13 @@ public class OboExportMojo
 
         BufferedWriter out = new BufferedWriter(new FileWriter(exportedOboFile));
 
-        DownloadCVs downloadCVs = new DownloadCVs();
-        downloadCVs.download(out, isDryRun());
-
-
-        out.flush();
-        out.close();
+        CvExporter exporter = new CvExporter();
+        final List<CvObject> allCvs = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao().getAll();
+        try {
+            exporter.exportToFile(allCvs, exportedOboFile);
+        } catch (DataAdapterException e) {
+            throw new MojoExecutionException("Problem exporting file: "+exportedOboFile, e);
+        }
 
         getLog().info("Closed " + exportedOboFile);
     }
