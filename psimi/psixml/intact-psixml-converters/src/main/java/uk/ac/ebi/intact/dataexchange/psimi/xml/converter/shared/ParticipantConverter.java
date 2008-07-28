@@ -65,7 +65,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         }
 
         if (intactObject.getCvBiologicalRole() == null) {
-            throw new IllegalStateException("Found component without biological role: "+intactObject.getAc();
+            throw new IllegalStateException("Found component without biological role: "+intactObject.getAc());
         }
 
         BiologicalRole bioRole = (BiologicalRole)
