@@ -339,36 +339,48 @@ public class CvObjectOntologyBuilder {
 
                 if ( definition.contains( "\n" ) ) {
                     String[] defArray = definition.split( "\n" );
+                    String prefixString = "";
+                    String suffixString = "";
 
                     if ( defArray.length == 2 ) {
-                        String prefixString = defArray[0];
-                        String suffixString = defArray[1];
+                        prefixString = defArray[0];
+                        suffixString = defArray[1];
+                    } else if ( defArray.length > 2 ) {
+                        prefixString = defArray[0];
 
-                        if ( suffixString.startsWith( "OBSOLETE" ) || oboObj.isObsolete() ) {
-
-
-                            Annotation annot = toAnnotation( CvTopic.OBSOLETE, suffixString );
-                            if ( annot != null ) {
-                                cvObject.addAnnotation( annot );
+                        for ( int i = 1; i < defArray.length; i++ ) {
+                            if ( i == 1 ) {
+                                suffixString = defArray[i];
+                            } else {
+                                suffixString = suffixString + "\n" + defArray[i];
                             }
-                            CvTopic definitionTopicDef = CvObjectUtils.createCvObject( institution, CvTopic.class, null, CvTopic.DEFINITION );
-                            cvObject.addAnnotation( new Annotation( institution, definitionTopicDef, prefixString ) );
-                        } else if ( suffixString.startsWith( "http" ) ) {
-
-                            Annotation annot = toAnnotation( CvTopic.URL, suffixString );
-                            if ( annot != null ) {
-                                cvObject.addAnnotation( annot );
-                            }
-                            CvTopic definitionTopicDef = CvObjectUtils.createCvObject( institution, CvTopic.class, null, CvTopic.DEFINITION );
-                            cvObject.addAnnotation( new Annotation( institution, definitionTopicDef, prefixString ) );
-
-                        } else {
-                            if ( log.isDebugEnabled() ) log.debug( " New format " + suffixString );
                         }
-                    } else {
-                        if ( log.isDebugEnabled() )
-                            log.debug( "-----Check Def line--" + oboObj.getID() + " DefArray length: " + defArray.length + "  Def: " + definition );
+
                     }
+                    if ( suffixString.startsWith( "OBSOLETE" ) || oboObj.isObsolete() ) {
+
+
+                        Annotation annot = toAnnotation( CvTopic.OBSOLETE, suffixString );
+                        if ( annot != null ) {
+                            cvObject.addAnnotation( annot );
+                        }
+                        CvTopic definitionTopicDef = CvObjectUtils.createCvObject( institution, CvTopic.class, null, CvTopic.DEFINITION );
+                        cvObject.addAnnotation( new Annotation( institution, definitionTopicDef, prefixString ) );
+                    } else if ( suffixString.startsWith( "http" ) ) {
+
+                        Annotation annot = toAnnotation( CvTopic.URL, suffixString );
+                        if ( annot != null ) {
+                            cvObject.addAnnotation( annot );
+                        }
+                        CvTopic definitionTopicDef = CvObjectUtils.createCvObject( institution, CvTopic.class, null, CvTopic.DEFINITION );
+                        cvObject.addAnnotation( new Annotation( institution, definitionTopicDef, prefixString ) );
+
+                    } else {
+                       if ( log.isDebugEnabled() ) log.debug( " Line Break in Definition--special case  MI: " +oboObj.getID()+"  Defintion:  " +oboObj.getDefinition() );
+                       CvTopic definitionTopic = CvObjectUtils.createCvObject( institution, CvTopic.class, null, CvTopic.DEFINITION );
+                       cvObject.addAnnotation( new Annotation( institution, definitionTopic, oboObj.getDefinition() ) );
+                    }
+
 
                 }//end outer if
                 else {

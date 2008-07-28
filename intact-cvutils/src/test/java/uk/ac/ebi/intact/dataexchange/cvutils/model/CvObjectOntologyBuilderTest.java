@@ -131,6 +131,10 @@ public class CvObjectOntologyBuilderTest {
         CvObject obsoleteCv = ontologyBuilder.toCvObject( obsoleteTerm );
         testCvObject( obsoleteCv );
 
+        OBOObject defTerm = ( OBOObject ) oboSession.getObject( "MI:0409" );
+        CvObject longDefCv = ontologyBuilder.toCvObject( defTerm );
+        testCvObject( longDefCv );
+
         //OBOObject testObj = (OBOObject)oboSession.getObject("MI:0001");//root Cv interaction detection method
         //OBOObject testObj = (OBOObject)oboSession.getObject("MI:0012");
         //OBOObject testObj = (OBOObject)oboSession.getObject("MI:0192");//with GO
@@ -321,6 +325,31 @@ public class CvObjectOntologyBuilderTest {
 
     }
 
+    @Test
+    public void definition_test() throws Exception {
+
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        log.debug( oboSession.getObjects().size() );
+
+        CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
+
+        OBOObject testObj = ( OBOObject ) oboSession.getObject( "MI:0409" );
+        CvObject cvObject = ontologyBuilder.toCvObject( testObj );
+
+        Collection<Annotation> annotations = cvObject.getAnnotations();
+        for ( Annotation annot : annotations ) {
+            if ( annot.getCvTopic().getShortLabel().equals( "obsolete" ) ) {
+                Assert.assertEquals( "OBSOLETE because redundant with MI:0417 'footprinting' combined with interactor type MI:0319 'DNA' \nreplace by:MI:0417", annot.getAnnotationText() );
+            }
+            if ( annot.getCvTopic().getShortLabel().equals( "definition" ) ) {
+                Assert.assertEquals( "Experimental method used to identify the region of a nucleic acid involved in an interaction with a protein. One sample of a radiolabeled nucleic acid of known sequence is submitted to partial digestion. A second sample is incubated with its interacting partner and then is submitted to the same partial digestion. The two samples are then analyzed in parallel by electrophoresis on a denaturing acrylamide gel. After autoradiography the identification of the bands that correspond to fragments missing from the lane loaded with the second sample reveals the region of the nucleic acid that is protected from nuclease digestion upon binding.", annot.getAnnotationText() );
+            }
+
+
+        }
+
+    }
+
 
     public static void testCvObject( CvObject cvObject ) {
 
@@ -344,7 +373,7 @@ public class CvObjectOntologyBuilderTest {
         if ( log.isDebugEnabled() ) log.debug( "shortLabel->" + shortLabel );
 
         if ( cvObject.getShortLabel() == null || cvObject.getShortLabel().length() < 1 ) {
-            System.exit( 5 );
+            log.error( "ShortLabel null for cvObject "+cvObject.getMiIdentifier() );
         }
 
 
