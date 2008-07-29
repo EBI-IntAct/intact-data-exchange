@@ -321,10 +321,10 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
 
-
     @Test
-    public void createOrUpdateCVsWithObsolete() throws Exception {
-         new IntactUnit().createSchema( true );
+    public void obsoleteAggregationTest() throws Exception {
+
+        new IntactUnit().createSchema( true );
 
         List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
         int cvsBeforeUpdate = allCvsCommittedBefore.size();
@@ -341,14 +341,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         PersisterHelper.saveOrUpdate( aggregation );
         commitTransaction();
 
-
-        List<CvObject> allCvsCommittedAfter = getDaoFactory().getCvObjectDao().getAll();
-        for ( CvObject cv : allCvsCommittedAfter ) {
-            if ( log.isDebugEnabled() )
-                log.debug( "Cv-> " + cv.getIdentifier() + "  shortLabel: " + cv.getShortLabel() );
-        }
-
-
         Assert.assertEquals( 4, cvObjectDao.countAll() );
 
         //check if aggregation has obsolote annotation  before createOrUpdateCvs call
@@ -357,6 +349,85 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         if ( existingCvsBefore.isEmpty() ) {
             existingCvsBefore = cvObjectDao.getByShortLabelLike( aggregation.getShortLabel() );
         }
+
+        Assert.assertNotNull( existingCvsBefore );
+        Assert.assertEquals( existingCvsBefore.size(), 1 );
+        for ( CvObject existingCv : existingCvsBefore ) {
+            log.debug( "existingCv Before: AC ->  MI -> ShortLabel -> ObjClass " + existingCv.getAc() + "  -> " + existingCv.getIdentifier() + " -> " + existingCv.getShortLabel() + " ->" + existingCv.getObjClass() + "\n" );
+            Assert.assertEquals( existingCv.getAnnotations().size(),0 );
+
+        }//end for
+
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
+        List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
+
+        InputStream is = CvUpdaterTest.class.getResourceAsStream( "/additional-annotations.csv" );
+
+        if ( is == null ) {
+            if ( log.isDebugEnabled() ) {
+                log.debug( "Please check the resource" );
+            }
+            throw new NullPointerException( "InputStream is null" );
+        }
+
+        AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromResource( is );
+        if ( log.isDebugEnabled() ) {
+            log.debug( "AnnotationInfoDataset size :   " + annotationDataset.getAll().size() );
+        }
+
+        beginTransaction();
+
+        CvUpdater updater = new CvUpdater();
+
+        Assert.assertFalse( updater.isConstraintViolated( allCvs ) );
+
+        if ( log.isDebugEnabled() ) log.debug( "Constraint not violated and proceeding with Update " );
+        updater.createOrUpdateCVs( allCvs, annotationDataset );
+
+        commitTransaction();
+        //check if aggregation has obsolote annotation  after createOrUpdateCvs call
+        String id = CvObjectUtils.getIdentity( aggregation );
+        Collection<CvObject> existingCvs = cvObjectDao.getByPsiMiRefCollection( Collections.singleton( id ) );
+        if ( existingCvs.isEmpty() ) {
+            existingCvs = cvObjectDao.getByShortLabelLike( aggregation.getShortLabel() );
+        }
+
+        int count = 1;
+        boolean absoleteTopic = false;
+        for ( CvObject existingCv : existingCvs ) {
+            log.debug( "existingCv After: AC ->  MI -> ShortLabel -> ObjClass " + count + "\t" + existingCv.getAc() + "  -> " + existingCv.getIdentifier() + " -> " + existingCv.getShortLabel() + " ->" + existingCv.getObjClass() + "\n" );
+            count++;
+            for ( Annotation annot : existingCv.getAnnotations() ) {
+                if ( log.isDebugEnabled() ) {
+                    log.debug( "Annot CvTopic: " + annot.getCvTopic() );
+                    log.debug( "Annot Text: " + annot.getAnnotationText() + "\n" );
+                }
+
+                if ( annot.getCvTopic().getShortLabel().equals( CvTopic.OBSOLETE ) ) {
+                    absoleteTopic = true;
+                }
+
+
+            }
+        }//end for
+        Assert.assertNotNull( existingCvs );
+        Assert.assertEquals( existingCvs.size(), 1 );
+        Assert.assertEquals( absoleteTopic, true );
+
+
+    }
+
+    @Test
+    public void createOrUpdateCVsTest() throws Exception {
+         new IntactUnit().createSchema( true );
+
+        List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
+        int cvsBeforeUpdate = allCvsCommittedBefore.size();
+
+        //PersisterHelper is adding the intact, psi-mi and identity terms...so we have 3
+        Assert.assertEquals( 3, cvsBeforeUpdate );
+
 
         OBOSession oboSession = OboUtils.createOBOSessionFromDefault("1.51");
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
@@ -391,21 +462,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         CvUpdaterStatistics stats = updater.createOrUpdateCVs( allCvs, annotationDataset );
 
         commitTransaction();
-        //check if aggregation has obsolote annotation  after createOrUpdateCvs call
-        String id = CvObjectUtils.getIdentity( aggregation );
-        Collection<CvObject> existingCvs = cvObjectDao.getByPsiMiRefCollection( Collections.singleton( id ) );
-        if ( existingCvs.isEmpty() ) {
-            existingCvs = cvObjectDao.getByShortLabelLike( aggregation.getShortLabel() );
-        }
-
-        for ( CvObject existingCv : existingCvs ) {
-            log.debug( "existingCv MI -> shortLabel  " + existingCv.getIdentifier() + " -> " + existingCv.getShortLabel() );
-            for ( Annotation annot : existingCv.getAnnotations() ) {
-                if ( log.isDebugEnabled() ) log.debug( "Annot CvTopic " + annot.getCvTopic() );
-                if ( log.isDebugEnabled() ) log.debug( "Annot Text " + annot.getAnnotationText() );
-
-            }
-        }//end for
 
 
         int totalCvsAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
@@ -414,28 +470,21 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         if ( log.isDebugEnabled() ) log.debug( "stats.getCreatedCvs().size()->" + stats.getCreatedCvs().size() );
         if ( log.isDebugEnabled() ) log.debug( "stats.getUpdatedCvs().size() ->" + stats.getUpdatedCvs().size() );
 
-        Assert.assertEquals( 940, totalCvsAfterUpdate );
+        Assert.assertEquals( 938, totalCvsAfterUpdate );
 
-        Assert.assertEquals( 933, stats.getCreatedCvs().size() );
+        Assert.assertEquals( 932, stats.getCreatedCvs().size() );
 
-        //Assert.assertEquals( 5, stats.getUpdatedCvs().size() );
+        //Assert.assertEquals( 3, stats.getUpdatedCvs().size() );
 
-        //54-2 as aggregation was already created and later updated + obsolete term
-        Assert.assertEquals( 52, stats.getOrphanCvs().size() );
+        //54-1 obsolete term
+        Assert.assertEquals( 53, stats.getOrphanCvs().size() );
 
         Assert.assertEquals( 54, stats.getObsoleteCvs().size() );
 
         //invalid terms are already filtered out
         Assert.assertEquals( 0, stats.getInvalidTerms().size() );
 
-        //check for annotations
-       CvObject cvAlias = cvObjectDao.getByShortLabel( "alias type");
-
-        if ( log.isDebugEnabled() ) {
-            log.debug( "cvAlias : "+cvAlias.toString() );
-            log.debug( "cvAlias Annotations : "+cvAlias.getAnnotations().toString() );
-        }
-
+    
     } //end method
 
 

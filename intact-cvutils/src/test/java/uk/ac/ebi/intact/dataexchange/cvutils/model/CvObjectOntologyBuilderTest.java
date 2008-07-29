@@ -335,6 +335,7 @@ public class CvObjectOntologyBuilderTest {
 
         OBOObject testObj = ( OBOObject ) oboSession.getObject( "MI:0409" );
         CvObject cvObject = ontologyBuilder.toCvObject( testObj );
+        testCvObject(cvObject);
 
         Collection<Annotation> annotations = cvObject.getAnnotations();
         for ( Annotation annot : annotations ) {

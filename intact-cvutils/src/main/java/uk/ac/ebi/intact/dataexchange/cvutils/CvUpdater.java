@@ -104,13 +104,21 @@ public class CvUpdater {
             throw new IllegalArgumentException( "You must give a non null AnnotationInfoDataset" );
         }
 
-        List<CvDagObject> orphanCvList = dealWithOrphans( allValidCvs );
+        List<CvDagObject> alreadyExistingObsoleteCvList = new ArrayList<CvDagObject>();
+        List<CvDagObject> orphanCvList = dealWithOrphans( allValidCvs,alreadyExistingObsoleteCvList );
 
-        if ( log.isDebugEnabled() ) log.debug( "Orphan count: " + orphanCvList.size() );
+        if ( log.isDebugEnabled() ){
+            log.debug( "Orphan count: " + orphanCvList.size() );
+            log.debug( "AlreadyExisting cvs annotated with Obsolete: "+alreadyExistingObsoleteCvList.size() );
+        }
 
+        //first step remove the orphan cvs that are not existing in database
         List<CvDagObject> cleanedList = ( List<CvDagObject> ) CollectionUtils.subtract( allValidCvs, orphanCvList );
+        if (log.isDebugEnabled()) log.debug( "Cleaned list after first filtering : " + cleanedList.size() );
+        //second step remove the orphan cvs that are are already existing in the database
+        cleanedList = ( List<CvDagObject> ) CollectionUtils.subtract( cleanedList, alreadyExistingObsoleteCvList );
 
-        if (log.isDebugEnabled()) log.debug( "Cleaned list size: " + cleanedList.size() );
+        if (log.isDebugEnabled()) log.debug( "Cleaned list after second filtering : " + cleanedList.size() );
 
          // update the cvs using the annotation info dataset
         updateCVsUsingAnnotationDataset( cleanedList, annotationInfoDataset );
@@ -130,11 +138,10 @@ public class CvUpdater {
         return stats;
     } //end method
 
-    private List<CvDagObject> dealWithOrphans( List<CvDagObject> allCvs ) {
+    private List<CvDagObject> dealWithOrphans( List<CvDagObject> allCvs,List<CvDagObject> alreadyExistingObsoleteCvList) {
 
         List<CvDagObject> orphanCvList = new ArrayList<CvDagObject>();
 
-        List<CvDagObject> alreadyExistingObsoleteCvList = new ArrayList<CvDagObject>();
 
         for ( CvDagObject cvDag : allCvs ) {
             if ( !isRootObject( CvObjectUtils.getIdentity( cvDag ) ) ) {
