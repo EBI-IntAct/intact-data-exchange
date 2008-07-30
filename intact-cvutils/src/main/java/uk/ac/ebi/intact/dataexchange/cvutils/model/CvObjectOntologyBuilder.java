@@ -736,7 +736,7 @@ public class CvObjectOntologyBuilder {
             qualifier = CvXrefQualifier.IDENTITY;
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( "MOD" ) ) {
             identifier = defDbxref.getDatabase() + ":" + defDbxref.getDatabaseID();
-            database = "MOD";
+            database = "psi-mod";
             qualifier = CvXrefQualifier.IDENTITY;
         } else if ( defDbxref.getDatabase().equalsIgnoreCase( "UNIMOD" ) ) {
             identifier = defDbxref.getDatabaseID();
