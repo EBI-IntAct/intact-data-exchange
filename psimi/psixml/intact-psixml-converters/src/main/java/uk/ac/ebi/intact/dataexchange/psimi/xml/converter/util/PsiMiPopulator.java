@@ -45,7 +45,7 @@ public class PsiMiPopulator {
         xref.setParent(annotatedObject);
 
         if (xref instanceof CvObjectXref) {
-            if (((CvObject)annotatedObject).getMiIdentifier() == null) {
+            if (((CvObject)annotatedObject).getIdentifier() == null) {
                 ((CvObjectXref)xref).prepareParentMi();
             }
         }

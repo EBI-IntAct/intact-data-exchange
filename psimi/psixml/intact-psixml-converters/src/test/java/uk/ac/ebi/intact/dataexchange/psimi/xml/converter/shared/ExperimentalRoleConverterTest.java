@@ -41,7 +41,7 @@ public class ExperimentalRoleConverterTest extends IntactBasicTestCase {
         CvExperimentalRole expRole = converter.psiToIntact(cvType);
 
         Assert.assertNotNull(expRole);
-        Assert.assertEquals(CvExperimentalRole.BAIT_PSI_REF, expRole.getMiIdentifier());
+        Assert.assertEquals(CvExperimentalRole.BAIT_PSI_REF, expRole.getIdentifier());
         Assert.assertEquals(CvExperimentalRole.BAIT, expRole.getShortLabel());
 
         CvObjectXref identity = CvObjectUtils.getPsiMiIdentityXref(expRole);

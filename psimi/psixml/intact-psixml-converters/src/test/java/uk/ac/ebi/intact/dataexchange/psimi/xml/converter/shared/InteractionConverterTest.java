@@ -68,7 +68,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
         Xref imexXref = null;
 
         for (Xref xref : interaction.getXrefs()) {
-            if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
+            if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getIdentifier())) {
                 if (imexXref != null) {
                     Assert.fail("More than one IMEx xrefs found");
                 }
@@ -78,7 +78,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
 
         Assert.assertNotNull(imexXref);
         Assert.assertEquals("IM-0000", imexXref.getPrimaryId());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, imexXref.getCvXrefQualifier().getMiIdentifier());
+        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, imexXref.getCvXrefQualifier().getIdentifier());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
         Xref imexXref = null;
 
         for (Xref xref : interaction.getXrefs()) {
-            if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
+            if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getIdentifier())) {
                 if (imexXref != null) {
                     Assert.fail("More than one IMEx xrefs found");
                 }
@@ -134,7 +134,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
 
         for (Experiment exp : interaction.getExperiments()) {
             Assert.assertNotNull(exp.getCvIdentification());
-            Assert.assertEquals(CvIdentification.PREDETERMINED_MI_REF, exp.getCvIdentification().getMiIdentifier());
+            Assert.assertEquals(CvIdentification.PREDETERMINED_MI_REF, exp.getCvIdentification().getIdentifier());
         }
     }
     
@@ -153,7 +153,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
 
         for (Experiment exp : interaction.getExperiments()) {
             Assert.assertNotNull(exp.getCvIdentification());
-            Assert.assertEquals("MI:0000", exp.getCvIdentification().getMiIdentifier());
+            Assert.assertEquals("MI:0000", exp.getCvIdentification().getIdentifier());
         }
     }
 
@@ -177,7 +177,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
         InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
         uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
 
-        Assert.assertEquals("MI:0661", interaction.getExperiments().iterator().next().getCvIdentification().getMiIdentifier());
+        Assert.assertEquals("MI:0661", interaction.getExperiments().iterator().next().getCvIdentification().getIdentifier());
     }
 
     @Test
@@ -196,7 +196,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
         InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
         uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
 
-        Assert.assertEquals("MI:0661", interaction.getExperiments().iterator().next().getCvIdentification().getMiIdentifier());
+        Assert.assertEquals("MI:0661", interaction.getExperiments().iterator().next().getCvIdentification().getIdentifier());
     }
 
     @Test
@@ -215,7 +215,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
         uk.ac.ebi.intact.model.Interaction interaction = converter.psiToIntact(psiInteraction);
 
         Assert.assertEquals(1, interaction.getXrefs().size());
-        Assert.assertEquals(CvXrefQualifier.SOURCE_REFERENCE_MI_REF, interaction.getXrefs().iterator().next().getCvXrefQualifier().getMiIdentifier());
+        Assert.assertEquals(CvXrefQualifier.SOURCE_REFERENCE_MI_REF, interaction.getXrefs().iterator().next().getCvXrefQualifier().getIdentifier());
 
         Assert.assertEquals(2, ConverterContext.getInstance().getReport().getMessages().size());
     }

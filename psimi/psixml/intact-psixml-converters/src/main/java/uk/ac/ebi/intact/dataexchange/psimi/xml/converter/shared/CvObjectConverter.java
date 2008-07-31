@@ -86,6 +86,6 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
     }
 
     private String elementKey(C intactObject) {
-        return intactObject.getMiIdentifier() + "_" + intactObject.getClass();
+        return intactObject.getIdentifier() + "_" + intactObject.getClass();
     }
 }

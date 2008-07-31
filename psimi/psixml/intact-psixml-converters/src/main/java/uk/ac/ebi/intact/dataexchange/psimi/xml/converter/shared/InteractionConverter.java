@@ -144,7 +144,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
     protected InteractorXref getImexXref(Interaction interaction) {
         for (InteractorXref xref : interaction.getXrefs()) {
-            if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
+            if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getIdentifier())) {
                 return xref;
             }
         }
@@ -164,8 +164,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         for (InteractorXref xref : interaction.getXrefs()) {
             if (xref.getCvXrefQualifier() != null &&
                     getInstitutionPrimaryId() != null &&
-                    getInstitutionPrimaryId().equals(xref.getCvDatabase().getMiIdentifier()) &&
-                    !CvXrefQualifier.SOURCE_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getMiIdentifier())) {
+                    getInstitutionPrimaryId().equals(xref.getCvDatabase().getIdentifier()) &&
+                    !CvXrefQualifier.SOURCE_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
 
                 xrefToFix = xref;
                 break;
@@ -268,8 +268,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
          for (Component component : components) {
              for (CvIdentification partDetMethod : component.getParticipantDetectionMethods()) {
-                 if (partDetMethod.getMiIdentifier() != null) {
-                     detMethodMis.add(partDetMethod.getMiIdentifier());
+                 if (partDetMethod.getIdentifier() != null) {
+                     detMethodMis.add(partDetMethod.getIdentifier());
                  }
              }
          }

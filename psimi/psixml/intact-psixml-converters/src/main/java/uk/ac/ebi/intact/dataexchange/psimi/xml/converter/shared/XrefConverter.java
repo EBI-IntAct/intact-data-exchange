@@ -90,11 +90,11 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
 
         if (intactObject.getCvXrefQualifier() != null) {
             dbRef.setRefType(intactObject.getCvXrefQualifier().getShortLabel());
-            dbRef.setRefTypeAc(intactObject.getCvXrefQualifier().getMiIdentifier());
+            dbRef.setRefTypeAc(intactObject.getCvXrefQualifier().getIdentifier());
         }
 
         if (intactObject.getCvDatabase() != null) {
-            dbRef.setDbAc(intactObject.getCvDatabase().getMiIdentifier());
+            dbRef.setDbAc(intactObject.getCvDatabase().getIdentifier());
             dbRef.setDb(intactObject.getCvDatabase().getShortLabel());
         }
 
@@ -118,8 +118,8 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
     }
 
      protected void fixPubmedReferenceAsIdentityToPrimaryRef(Xref xref) {
-         if (CvDatabase.PUBMED_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())
-                 && CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getMiIdentifier())) {
+         if (CvDatabase.PUBMED_MI_REF.equals(xref.getCvDatabase().getIdentifier())
+                 && CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
              CvXrefQualifier primaryRef = CvObjectUtils.createCvObject(xref.getOwner(), CvXrefQualifier.class,
                      CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE);
              xref.setCvXrefQualifier(primaryRef);
