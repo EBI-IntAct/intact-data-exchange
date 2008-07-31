@@ -970,9 +970,9 @@ public class CvObjectOntologyBuilder {
             } else if ( CvDatabase.SO.equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
                 databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.SO_MI_REF, CvDatabase.SO );
-            } else if ( "MOD".equalsIgnoreCase( database ) ) {
+            } else if ( "psi-mod".equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
-                databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, "MI:0897", "MOD" );
+                databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, "MI:0897", "psi-mod" );
             } else {
                 log.error( "Unexpected combination qualifier-database found on xref: " + qualifier + " - " + database );
                 return null;
