@@ -83,37 +83,14 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         int psiTerm = 0;
 
         while ( ( inputLine = in.readLine() ) != null ) {
-
-
-            if ( inputLine.startsWith( "[Term]" ) ) {
-                termCounter++;
-            }
-
-            if ( inputLine.startsWith( "id:" ) ) {
-                idCounter++;
-            }
-            if ( inputLine.matches( "id:\\s+MI:.*" ) ) {
-                miCounter++;
-
-            }
-
-            if ( inputLine.contains( "is_obsolete: true" ) ) {
-                obsoleteCounter++;
-            }
-            if ( inputLine.matches( "def:.*?OBSOLETE.*" ) ) {
-                obsoleteCounterDef++;
-            }
-            if ( inputLine.startsWith( "[Typedef]" ) ) {
-                typedefCounter++;
-            }
-
-            if ( inputLine.matches("subset:\\s+PSI-MI\\s+slim" ) ) {
-                psiTerm++;
-                 }
-            if ( inputLine.matches("subset:\\s+Drugable" ) ) {
-                drugTerm++;
-                //log.info(drugTerm+"  "+ temp );
-            }
+            if ( inputLine.startsWith( "[Term]" ) ) termCounter++;
+            if ( inputLine.startsWith( "id:" ) ) idCounter++;
+            if ( inputLine.matches( "id:\\s+MI:.*" ) ) miCounter++;
+            if ( inputLine.contains( "is_obsolete: true" ) ) obsoleteCounter++;
+            if ( inputLine.matches( "def:.*?OBSOLETE.*" ) ) obsoleteCounterDef++;
+            if ( inputLine.startsWith( "[Typedef]" ) ) typedefCounter++;
+            if ( inputLine.matches("subset:\\s+PSI-MI\\s+slim" ) ) psiTerm++;
+            if ( inputLine.matches("subset:\\s+Drugable" ) ) drugTerm++;
         }
 
         //948+1 with Typedef
@@ -127,11 +104,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( 125, drugTerm );
 
         in.close();
-
-    }//end method
-
-
-
+    }
 
     @Test
     public void isConstraintViolatedTest() throws Exception {
@@ -168,13 +141,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         int cvsAfterPersist = allCvsCommittedAfter.size();
         //PersisterHelper is adding the intact, psi-mi and identity terms+aggregation...so we have 4
         Assert.assertEquals( 4, cvsAfterPersist );
-
-
-
-    }//end method
-
-
-
+    }
 
     @Test
     public void updatingWithNewAnnotations() throws Exception{
@@ -235,7 +202,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         final int cvCountAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
         Assert.assertEquals( "3 CvObjects expected to be created during update: hidden, used-in-class and obsolete",
                              cvsBeforeUpdate + 3, cvCountAfterUpdate );
-
     }
 
      @Test
@@ -316,10 +282,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         commitTransaction();
         Assert.assertEquals( "2 CvObjects expected to be created during update: hidden and obsolete & 1 Cvobject updated used-in-class ",
                                      cvsBeforeUpdate + 2, cvCountAfterUpdate );
-
-
     }
-
 
     @Test
     public void obsoleteAggregationTest() throws Exception {
@@ -407,15 +370,11 @@ public class CvUpdaterTest extends IntactBasicTestCase {
                 if ( annot.getCvTopic().getShortLabel().equals( CvTopic.OBSOLETE ) ) {
                     absoleteTopic = true;
                 }
-
-
             }
         }//end for
         Assert.assertNotNull( existingCvs );
         Assert.assertEquals( existingCvs.size(), 1 );
         Assert.assertEquals( absoleteTopic, true );
-
-
     }
 
     @Test
@@ -463,7 +422,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         commitTransaction();
 
-
         int totalCvsAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
 
         if ( log.isDebugEnabled() ) log.debug( "totalCvsAfterUpdate->" + totalCvsAfterUpdate );
@@ -474,8 +432,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         Assert.assertEquals( 932, stats.getCreatedCvs().size() );
 
-        //Assert.assertEquals( 3, stats.getUpdatedCvs().size() );
-
         //54-1 obsolete term
         Assert.assertEquals( 53, stats.getOrphanCvs().size() );
 
@@ -483,10 +439,5 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         //invalid terms are already filtered out
         Assert.assertEquals( 0, stats.getInvalidTerms().size() );
-
-    
-    } //end method
-
-
-
-}  //end class
+    }
+}
