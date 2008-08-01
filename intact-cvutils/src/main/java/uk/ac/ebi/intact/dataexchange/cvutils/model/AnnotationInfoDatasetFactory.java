@@ -98,7 +98,7 @@ public final class AnnotationInfoDatasetFactory {
         }//end while
 
         if ( log.isDebugEnabled() ) {
-            log.debug( "Total lines processed: " +lineCount);
+            log.debug( "Total lines mi2cv: " +lineCount);
             log.debug( "Lines excluding header: " +lineCountExcludingHeader);
         }
 
