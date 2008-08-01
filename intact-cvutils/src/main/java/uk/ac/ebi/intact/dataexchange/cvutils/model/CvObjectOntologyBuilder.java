@@ -1188,7 +1188,12 @@ public class CvObjectOntologyBuilder {
         orderedList.addAll( otherList );
 
         // resolve CVs on Annotations, Xrefs and Aliases
-        IntactObjectTraverser traverser = new DefaultTraverser();
+        IntactObjectTraverser traverser = new DefaultTraverser() {
+            @Override
+            protected void traverseInstitution( Institution institution, IntactVisitor... visitors ) {
+                return;
+            }
+        };
         IntactVisitor visitor = new CvResolverVisitor( processed );
         for ( CvObject cvObject : processed.values() ) {
             traverser.traverse( cvObject, visitor);

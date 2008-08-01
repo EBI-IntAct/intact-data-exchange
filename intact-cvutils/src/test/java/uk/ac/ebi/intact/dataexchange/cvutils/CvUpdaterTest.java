@@ -24,6 +24,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
 import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.context.IntactConfigurator;
+import uk.ac.ebi.intact.context.IntactEnvironment;
+import uk.ac.ebi.intact.context.IntactSession;
+import uk.ac.ebi.intact.context.impl.StandaloneSession;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.unit.IntactUnit;
@@ -36,15 +40,13 @@ import uk.ac.ebi.intact.model.clone.IntactCloner;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.config.impl.TemporaryH2DataConfig;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -409,6 +411,17 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.52" );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
+
+        if( IntactContext.currentInstanceExists() ) {
+            IntactContext.closeCurrentInstance();
+        }
+        Properties props = new Properties( );
+        props.setProperty( IntactEnvironment.INSTITUTION_LABEL.getFqn(), "intact" );
+        IntactSession session = new StandaloneSession( props );
+        IntactContext.initContext( new TemporaryH2DataConfig( session ), session );
+        IntactContext.getCurrentInstance().getConfig().getDefaultDataConfig().setAutoFlush( false );
+
+
         List<CvDagObject> cvs = ontologyBuilder.getAllCvs();
 
         List<CvDagObject> copyOfCvs = new ArrayList<CvDagObject>( cvs.size() );
@@ -420,13 +433,11 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         }
 
         beginTransaction();
-
         CvUpdater updater = new CvUpdater();
         updater.createOrUpdateCVs( cvs );
         commitTransaction();
 
         beginTransaction();
-
         DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
         final Collection<CvObject> notPersistedCvs = new ArrayList<CvObject>();
         final Collection<CvObject> badCvs = new ArrayList<CvObject>();
@@ -445,6 +456,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         commitTransaction();
 
         Assert.assertEquals( 0, badCvs.size() );
+
+        IntactContext.closeCurrentInstance();
     }
 
     private boolean isSizeOfCollectionTheSame( CvObject cv1, CvObject cv2 ) {

@@ -104,6 +104,13 @@ public class CvUpdater {
             throw new IllegalArgumentException( "You must give a non null AnnotationInfoDataset" );
         }
 
+        // in order to prevent Transient object problems we disable the autoflush. We will set it to what it was after the update.
+        final boolean wasAutoFlushEnabled = IntactContext.getCurrentInstance().getConfig().getDefaultDataConfig().isAutoFlush();
+        if( wasAutoFlushEnabled ) {
+            if ( log.isInfoEnabled() ) log.info( "Turning hibernate auto-flush OFF" );
+            IntactContext.getCurrentInstance().getConfig().getDefaultDataConfig().setAutoFlush( false );
+        }
+
         List<CvDagObject> alreadyExistingObsoleteCvList = new ArrayList<CvDagObject>();
         List<CvDagObject> orphanCvList = dealWithOrphans( allValidCvs,alreadyExistingObsoleteCvList );
 
@@ -114,11 +121,11 @@ public class CvUpdater {
 
         //first step remove the orphan cvs that are not existing in database
         List<CvDagObject> cleanedList = ( List<CvDagObject> ) CollectionUtils.subtract( allValidCvs, orphanCvList );
-        if (log.isDebugEnabled()) log.debug( "Cleaned list after first filtering : " + cleanedList.size() );
+        if (log.isDebugEnabled()) log.debug( "Size of CV list after removin' orphans: " + cleanedList.size() );
         //second step remove the orphan cvs that are are already existing in the database
         cleanedList = ( List<CvDagObject> ) CollectionUtils.subtract( cleanedList, alreadyExistingObsoleteCvList );
 
-        if (log.isDebugEnabled()) log.debug( "Cleaned list after second filtering : " + cleanedList.size() );
+        if (log.isDebugEnabled()) log.debug( "Size of CV list after removin' obsolete terms: " + cleanedList.size() );
 
          // update the cvs using the annotation info dataset
         updateCVsUsingAnnotationDataset( cleanedList, annotationInfoDataset );
@@ -135,13 +142,18 @@ public class CvUpdater {
             log.debug( stats );
         }
 
+        // set autoupdate to what it was before the CV update.
+        if( wasAutoFlushEnabled ) {
+            if ( log.isInfoEnabled() ) log.info( "Turning hibernate auto-flush ON" );
+            IntactContext.getCurrentInstance().getConfig().getDefaultDataConfig().setAutoFlush( wasAutoFlushEnabled );
+        }
+
         return stats;
     } //end method
 
     private List<CvDagObject> dealWithOrphans( List<CvDagObject> allCvs,List<CvDagObject> alreadyExistingObsoleteCvList) {
 
         List<CvDagObject> orphanCvList = new ArrayList<CvDagObject>();
-
 
         for ( CvDagObject cvDag : allCvs ) {
             if ( !isRootObject( CvObjectUtils.getIdentity( cvDag ) ) ) {
@@ -186,7 +198,6 @@ public class CvUpdater {
 
                 Annotation annotation = new Annotation( IntactContext.getCurrentInstance().getInstitution(), topic, annotInfo.getReason() );
                 addAnnotation( annotation, cvObject, annotInfo.isApplyToChildren() );
-
             }
         }
     }
@@ -196,8 +207,8 @@ public class CvUpdater {
             return false;
         }
 
-        if (cv1.getMiIdentifier() != null && cv2.getMiIdentifier() != null) {
-            return cv1.getMiIdentifier().equals(cv2.getMiIdentifier());
+        if (cv1.getIdentifier() != null && cv2.getIdentifier() != null) {
+            return cv1.getIdentifier().equals(cv2.getIdentifier());
         }
 
         return cv1.getShortLabel().equals(cv2.getShortLabel());
