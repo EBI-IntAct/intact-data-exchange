@@ -406,7 +406,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     @Test
     public void checkAnnotationUpdated() throws Exception {
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.52" );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvDagObject> cvs = ontologyBuilder.getAllCvs();
@@ -447,25 +447,18 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( 0, badCvs.size() );
     }
 
-    private int xrefs = 0;
-    private int annotations = 0;
-    private int aliases = 0;
-
     private boolean isSizeOfCollectionTheSame( CvObject cv1, CvObject cv2 ) {
         boolean similar = true;
 
         if( cv1.getXrefs().size() != cv2.getXrefs().size() ) {
-            xrefs++;
             similar = false;
         }
 
         if ( cv1.getAnnotations().size() != cv2.getAnnotations().size() ) {
-            annotations++;
             similar = false;
         }
 
         if ( cv1.getAliases().size() != cv2.getAliases().size() ) {
-            aliases++;
             similar = false;
         }
 

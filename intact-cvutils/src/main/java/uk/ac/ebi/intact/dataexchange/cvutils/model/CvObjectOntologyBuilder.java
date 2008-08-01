@@ -1247,14 +1247,16 @@ public class CvObjectOntologyBuilder {
         public void visitAlias( Alias alias ) {
 
             final CvAliasType type = alias.getCvAliasType();
-            final String mi = type.getIdentifier();
-            if ( mi != null ) {
-                final String key = createCvKey( type.getClass(), mi );
-                final CvAliasType oboTerm = ( CvAliasType ) mi2cv.get( key );
-                if ( oboTerm == null ) {
-                    log.warn( "Could not find " + type.getClass().getSimpleName() + "( " + type.getShortLabel() + " ) by MI: " + mi );
-                } else {
-                    alias.setCvAliasType( oboTerm );
+            if( type != null ) {
+                final String mi = type.getIdentifier();
+                if ( mi != null ) {
+                    final String key = createCvKey( type.getClass(), mi );
+                    final CvAliasType oboTerm = ( CvAliasType ) mi2cv.get( key );
+                    if ( oboTerm == null ) {
+                        log.warn( "Could not find " + type.getClass().getSimpleName() + "( " + type.getShortLabel() + " ) by MI: " + mi );
+                    } else {
+                        alias.setCvAliasType( oboTerm );
+                    }
                 }
             }
         }
@@ -1275,15 +1277,17 @@ public class CvObjectOntologyBuilder {
             }
 
             final CvXrefQualifier qualifier = xref.getCvXrefQualifier();
-            mi = qualifier.getIdentifier();
+            if( qualifier != null ) {
+                mi = qualifier.getIdentifier();
 
-            if ( mi != null ) {
-                final String key = createCvKey( qualifier.getClass(), mi );
-                final CvXrefQualifier oboQualifier = ( CvXrefQualifier ) mi2cv.get( key );
-                if ( oboQualifier == null ) {
-                    log.warn( "Could not find " + qualifier.getClass().getSimpleName() + "( " + qualifier.getShortLabel() + " ) by MI: " + mi );
-                } else {
-                    xref.setCvXrefQualifier( oboQualifier );
+                if ( mi != null ) {
+                    final String key = createCvKey( qualifier.getClass(), mi );
+                    final CvXrefQualifier oboQualifier = ( CvXrefQualifier ) mi2cv.get( key );
+                    if ( oboQualifier == null ) {
+                        log.warn( "Could not find " + qualifier.getClass().getSimpleName() + "( " + qualifier.getShortLabel() + " ) by MI: " + mi );
+                    } else {
+                        xref.setCvXrefQualifier( oboQualifier );
+                    }
                 }
             }
         }
