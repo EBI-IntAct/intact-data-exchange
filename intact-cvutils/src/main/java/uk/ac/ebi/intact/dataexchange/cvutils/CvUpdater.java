@@ -58,6 +58,11 @@ public class CvUpdater {
 
     private CvTopic obsoleteTopic;
 
+    /**
+     * This map is used internally to keep track of the created topics during the update.
+     */
+    private Map<String,CvTopic> createdNonMiTopics = new HashMap<String,CvTopic>();
+
 
     public CvUpdater() throws IOException, OBOParseException {
         this.nonMiCvDatabase = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
@@ -190,12 +195,30 @@ public class CvUpdater {
             if ( identity != null && annotationInfoDataset.containsCvAnnotation( identity ) ) {
                 AnnotationInfo annotInfo = annotationInfoDataset.getCvAnnotation( identity );
 
-                CvTopic topic = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
-                                                              CvTopic.class,
-                                                              null,
-                                                              annotInfo.getTopicShortLabel() );
-                PersisterHelper.saveOrUpdate( topic );
+                // check if the topic has already been processed
+                CvTopic topic = createdNonMiTopics.get(annotInfo.getTopicShortLabel());
 
+                // if not, try to get it from the database
+                if (topic == null) {
+                    topic = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                                .getCvObjectDao(CvTopic.class).getByShortLabel(CvTopic.class, annotInfo.getTopicShortLabel());
+
+                    // if it is not in the database, create it and persist it.
+                    if (topic == null) {
+                        topic = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
+                                                                  CvTopic.class,
+                                                                  null,
+                                                                  annotInfo.getTopicShortLabel() );
+
+                        IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                                .getCvObjectDao(CvTopic.class).persist(topic);
+
+                    }
+                    // now it has been created
+                    createdNonMiTopics.put(annotInfo.getTopicShortLabel(), topic);
+                }
+
+                // create the corresponding annotation
                 Annotation annotation = new Annotation( IntactContext.getCurrentInstance().getInstitution(), topic, annotInfo.getReason() );
                 addAnnotation( annotation, cvObject, annotInfo.isApplyToChildren() );
             }
