@@ -19,7 +19,10 @@ import static junit.framework.Assert.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import static org.easymock.classextension.EasyMock.createNiceMock;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.xml.sax.InputSource;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
@@ -91,7 +94,7 @@ public class EntryConverterTest extends AbstractConverterTest {
         File file = getIntactFile();
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
-        roundtripWithStream(new FileInputStream(file), "European Bioinformat");
+        roundtripWithStream(new FileInputStream(file), "European Bioinformatics Institute");
     }
 
     static boolean output = false;
@@ -158,7 +161,7 @@ public class EntryConverterTest extends AbstractConverterTest {
         File file = new File(EntryConverterTest.class.getResource(resource).getFile());
         assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
-        roundtripWithStream(is, "European Bioinformat");
+        roundtripWithStream(is, "European Bioinformatics Institute");
     }
 
     @Test

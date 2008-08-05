@@ -2,12 +2,13 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.AnnotationConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractionConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractorConverterConfig;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.AnnotationConverterConfig;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.DisabledLocationTree;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationTree;
 import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.context.IntactContext;
 
 /**
  * Makes the configuration available to the current thread (through ThreadLocal).
@@ -32,6 +33,8 @@ public class ConverterContext {
 
     private Institution defaultInstitutionForAcs;
 
+    private boolean locationInfoDisabled;
+
     private static ThreadLocal<ConverterContext> instance = new ThreadLocal<ConverterContext>() {
         @Override
         protected ConverterContext initialValue() {
@@ -48,7 +51,8 @@ public class ConverterContext {
         this.configAnnotation = new AnnotationConverterConfig();
         this.configInteraction = new InteractionConverterConfig();
         this.report = new ConverterReport();
-        this.location = new LocationTree();
+
+        resetLocation();
     }
 
     public InteractorConverterConfig getInteractorConfig() {
@@ -83,7 +87,11 @@ public class ConverterContext {
     }
 
     public void resetLocation() {
-        this.location = new LocationTree();
+        if (locationInfoDisabled) {
+            this.location = new DisabledLocationTree();
+        } else {
+            this.location = new LocationTree();
+        }
     }
 
     public ConverterReport getReport() {
@@ -103,5 +111,14 @@ public class ConverterContext {
 
     public void setDefaultInstitutionForAcs(Institution defaultInstitutionForAcs) {
         this.defaultInstitutionForAcs = defaultInstitutionForAcs;
+    }
+
+    public boolean isLocationInfoDisabled() {
+        return locationInfoDisabled;
+    }
+
+    public void setLocationInfoDisabled(boolean locationInfoDisabled) {
+        this.locationInfoDisabled = locationInfoDisabled;
+        resetLocation();
     }
 }
