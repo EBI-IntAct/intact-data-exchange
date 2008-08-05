@@ -21,12 +21,11 @@ import psidev.psi.mi.xml.model.Attribute;
 import psidev.psi.mi.xml.model.AttributeContainer;
 import psidev.psi.mi.xml.model.DbReference;
 import psidev.psi.mi.xml.model.Names;
-import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
@@ -43,8 +42,6 @@ import java.util.Random;
 public class IntactConverterUtils {
 
     private static final Log log = LogFactory.getLog(IntactConverterUtils.class);
-
-    private static final int SHORT_LABEL_LENGTH = 20;
 
     private IntactConverterUtils() {
     }
@@ -164,8 +161,8 @@ public class IntactConverterUtils {
             }
         }
 
-        if (shortLabel.length() > SHORT_LABEL_LENGTH) {
-            shortLabel = shortLabel.substring(0, SHORT_LABEL_LENGTH);
+        if (shortLabel.length() > AnnotatedObject.MAX_SHORT_LABEL_LEN) {
+            shortLabel = shortLabel.substring(0, AnnotatedObject.MAX_SHORT_LABEL_LEN);
 
             if (log.isWarnEnabled()) {
                 String msg = "\tFull name to short label truncated to: '" + shortLabel+"'";
