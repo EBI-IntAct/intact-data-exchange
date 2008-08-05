@@ -22,8 +22,7 @@ import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 import psidev.psi.mi.xml.model.ExperimentDescription;
 import uk.ac.ebi.intact.model.Annotation;
-
-import java.util.Collection;
+import uk.ac.ebi.intact.model.CvTopic;
 
 /**
  * TODO comment this
@@ -58,7 +57,29 @@ public class AnnotationConverterTest extends AbstractConverterTest {
             Assert.assertEquals(attribute.getValue().trim(), annotation.getAnnotationText());
             Assert.assertEquals(attribute.getName(), annotation.getCvTopic().getShortLabel());
         }
+    }
 
+    @Test
+    public void psiToIntact_nameAc() throws Exception {
+        Attribute attribute = PsiMockFactory.createAttribute();
+        attribute.setNameAc("MI:5555");
 
+        AnnotationConverter annotationConverter = new AnnotationConverter(getMockInstitution());
+        
+        Annotation annotation = annotationConverter.psiToIntact(attribute);
+        Assert.assertEquals("MI:5555", annotation.getCvTopic().getIdentifier());
+    }
+
+    @Test
+    public void intactToPsi_default() throws Exception {
+        Annotation annotation = getMockBuilder().createAnnotation("annotText",CvTopic.URL_MI_REF, CvTopic.URL);
+
+        AnnotationConverter annotationConverter = new AnnotationConverter(getMockInstitution());
+        
+        Attribute attribute = annotationConverter.intactToPsi(annotation);
+
+        Assert.assertEquals(CvTopic.URL, attribute.getName());
+        Assert.assertEquals(CvTopic.URL_MI_REF, attribute.getNameAc());
+        Assert.assertEquals("annotText", attribute.getValue());
     }
 }
