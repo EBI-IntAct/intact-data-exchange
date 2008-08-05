@@ -17,16 +17,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.xml.model.Entry;
-import psidev.psi.mi.xml.model.EntrySet;
-import psidev.psi.mi.xml.model.Interaction;
+import psidev.psi.mi.xml.model.Parameter;
 import psidev.psi.mi.xml.model.Participant;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.CvExperimentalRole;
-import uk.ac.ebi.intact.model.CvObjectXref;
-import uk.ac.ebi.intact.model.Feature;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.model.Component;
+import uk.ac.ebi.intact.model.ComponentParameter;
+import uk.ac.ebi.intact.model.CvExperimentalRole;
 
 /**
  * TODO comment this
@@ -48,12 +44,21 @@ public class ComponentConverterTest extends IntactBasicTestCase {
         Component component = participantConverter.psiToIntact(participant);
 
         Assert.assertNotNull(component);
-        Assert.assertNotNull(component.getCvExperimentalRole());
+        Assert.assertEquals(1, component.getExperimentalRoles().size());
         Assert.assertNull(component.getExpressedIn());
 
-        CvObjectXref identity = CvObjectUtils.getPsiMiIdentityXref(component.getCvExperimentalRole());
-        Assert.assertEquals(CvExperimentalRole.BAIT_PSI_REF, identity.getPrimaryId());
+        CvExperimentalRole expRole = component.getExperimentalRoles().iterator().next();
+
+        Assert.assertEquals(CvExperimentalRole.BAIT_PSI_REF, expRole.getIdentifier());
         Assert.assertEquals(1, component.getBindingDomains().size());
+        
+        Assert.assertEquals(1, component.getParameters().size());
+        final ComponentParameter param = component.getParameters().iterator().next();
+        Assert.assertEquals("temperature of inter", param.getCvParameterType().getShortLabel());
+        Assert.assertEquals("MI:0836", param.getCvParameterType().getIdentifier());
+        Assert.assertEquals("kelvin", param.getCvParameterUnit().getShortLabel());
+        Assert.assertEquals("MI:0838", param.getCvParameterUnit().getIdentifier());
+        Assert.assertEquals(275d, param.getFactor());
     }
 
     @Test
@@ -67,5 +72,13 @@ public class ComponentConverterTest extends IntactBasicTestCase {
         Assert.assertNotNull(participant);
         Assert.assertEquals(1, participant.getExperimentalRoles().size());
         Assert.assertEquals(1, participant.getHostOrganisms().size());
+
+        Assert.assertEquals(1, participant.getParameters().size());
+        Parameter param = participant.getParameters().iterator().next();
+        Assert.assertEquals(302d, param.getFactor());
+        Assert.assertEquals("temperature", param.getTerm());
+        Assert.assertEquals("MI:0836", param.getTermAc());
+        Assert.assertEquals("kelvin", param.getUnit());
+        Assert.assertEquals("MI:0838", param.getUnitAc());
     }
 }

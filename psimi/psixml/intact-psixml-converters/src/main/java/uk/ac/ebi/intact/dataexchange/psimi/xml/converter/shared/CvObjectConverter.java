@@ -16,13 +16,13 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.CvType;
-import uk.ac.ebi.intact.model.CvObject;
-import uk.ac.ebi.intact.model.CvObjectXref;
-import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
+import uk.ac.ebi.intact.model.CvObject;
+import uk.ac.ebi.intact.model.CvObjectXref;
+import uk.ac.ebi.intact.model.Institution;
 
 /**
  * TODO comment this

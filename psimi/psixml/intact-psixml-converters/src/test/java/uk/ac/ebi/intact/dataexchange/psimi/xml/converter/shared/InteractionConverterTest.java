@@ -19,13 +19,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Interaction;
-import psidev.psi.mi.xml.converter.ConverterException;
+import psidev.psi.mi.xml.model.Parameter;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterMessage;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterMessage;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.model.Confidence;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
@@ -55,6 +55,14 @@ public class InteractionConverterTest extends AbstractConverterTest {
         Assert.assertEquals("intact conf score", conf.getCvConfidenceType().getShortLabel());
         Assert.assertEquals( "0.8", conf.getValue());
         Assert.assertEquals( interaction, conf.getInteraction());
+
+        Assert.assertEquals(1, interaction.getParameters().size());
+        final InteractionParameter param = interaction.getParameters().iterator().next();
+        Assert.assertEquals("temperature of inter", param.getCvParameterType().getShortLabel());
+        Assert.assertEquals("MI:0836", param.getCvParameterType().getIdentifier());
+        Assert.assertEquals("kelvin", param.getCvParameterUnit().getShortLabel());
+        Assert.assertEquals("MI:0838", param.getCvParameterUnit().getIdentifier());
+        Assert.assertEquals(275d, param.getFactor());
     }
 
     @Test
@@ -265,6 +273,14 @@ public class InteractionConverterTest extends AbstractConverterTest {
         Assert.assertNotNull( psiInteraction.getConfidences().iterator().next().getUnit());
         Assert.assertEquals( intactInteraction.getConfidences().iterator().next().getValue(),  psiInteraction.getConfidences().iterator().next().getValue());
         Assert.assertEquals( intactInteraction.getConfidences().iterator().next().getCvConfidenceType().getShortLabel(), psiInteraction.getConfidences().iterator().next().getUnit().getNames().getShortLabel());
+
+        Assert.assertEquals(1, psiInteraction.getParameters().size());
+        Parameter param = psiInteraction.getParameters().iterator().next();
+        Assert.assertEquals(302d, param.getFactor());
+        Assert.assertEquals("temperature", param.getTerm());
+        Assert.assertEquals("MI:0836", param.getTermAc());
+        Assert.assertEquals("kelvin", param.getUnit());
+        Assert.assertEquals("MI:0838", param.getUnitAc());
     }
 
     @Test

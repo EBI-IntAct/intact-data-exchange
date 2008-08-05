@@ -21,6 +21,7 @@ import psidev.psi.mi.xml.model.Confidence;
 import psidev.psi.mi.xml.model.Feature;
 import psidev.psi.mi.xml.model.Interaction;
 import psidev.psi.mi.xml.model.Interactor;
+import psidev.psi.mi.xml.model.Parameter;
 import psidev.psi.mi.xml.model.Range;
 import psidev.psi.mi.xml.model.Xref;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
@@ -142,6 +143,8 @@ public class PsiMockFactory {
             interaction.getConfidences().add(createMockConfidence());
         }
 
+        interaction.getParameters().add(createParameter());
+
         return interaction;
     }
 
@@ -178,6 +181,8 @@ public class PsiMockFactory {
         for (int i=0; i<childRandom(); i++) {
             participant.getFeatures().add(createFeature());
         }
+
+        participant.getParameters().add(createParameter());
 
         return participant;
     }
@@ -398,6 +403,16 @@ public class PsiMockFactory {
         feature.getRanges().add(createRange());
 
         return feature;
+    }
+
+    public static Parameter createParameter() {
+        Parameter param = new Parameter();
+        param.setTerm("temperature of interaction");
+        param.setTermAc("MI:0836");
+        param.setUnit("kelvin");
+        param.setUnitAc("MI:0838");
+        param.setFactor(275);
+        return param;
     }
 
     public static Range createRange() {

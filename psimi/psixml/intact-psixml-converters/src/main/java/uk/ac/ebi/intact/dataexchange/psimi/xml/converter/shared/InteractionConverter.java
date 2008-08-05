@@ -17,20 +17,19 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.beanutils.ConversionException;
 import org.obo.datamodel.OBOSession;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.*;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.MessageLevel;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
@@ -122,6 +121,13 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         for (psidev.psi.mi.xml.model.Confidence psiConfidence :  psiObject.getConfidences()){
            Confidence confidence = confConverter.psiToIntact( psiConfidence );
             interaction.addConfidence( confidence);
+        }
+
+        // parameter conversion
+        InteractionParameterConverter paramConverter= new InteractionParameterConverter( getInstitution());
+        for (psidev.psi.mi.xml.model.Parameter psiParameter :  psiObject.getParameters()){
+            InteractionParameter parameter = paramConverter.psiToIntact( psiParameter );
+            interaction.addParameter(parameter);
         }
 
         // update experiment participant detection method if necessary
@@ -224,6 +230,12 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         for (Confidence conf : intactObject.getConfidences()){
             psidev.psi.mi.xml.model.Confidence confidence = confidenceConverter.intactToPsi( conf);
             interaction.getConfidences().add( confidence);
+        }
+
+        InteractionParameterConverter interactionParameterConverter = new InteractionParameterConverter( getInstitution());
+        for (uk.ac.ebi.intact.model.InteractionParameter param : intactObject.getParameters()){
+            psidev.psi.mi.xml.model.Parameter parameter = interactionParameterConverter.intactToPsi(param);
+            interaction.getParameters().add(parameter);
         }
 
         intactEndConversion(intactObject);

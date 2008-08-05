@@ -18,7 +18,10 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import psidev.psi.mi.xml.model.DbReference;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiMiPopulator;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**

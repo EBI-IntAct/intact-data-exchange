@@ -19,7 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
@@ -115,6 +114,12 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             }
         }
 
+        ParticipantParameterConverter participantParameterConverter = new ParticipantParameterConverter( getInstitution());
+        for (uk.ac.ebi.intact.model.ComponentParameter param : intactObject.getParameters()){
+            psidev.psi.mi.xml.model.Parameter parameter = participantParameterConverter.intactToPsi(param);
+            participant.getParameters().add(parameter);
+        }
+
         return participant;
     }
 
@@ -181,6 +186,12 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
 
             BioSource bioSource = new OrganismConverter(institution).psiToIntact(organism);
             component.setExpressedIn(bioSource);
+        }
+
+        ParticipantParameterConverter paramConverter= new ParticipantParameterConverter(institution);
+        for (psidev.psi.mi.xml.model.Parameter psiParameter : participant.getParameters()){
+            ComponentParameter parameter = paramConverter.psiToIntact( psiParameter );
+            component.addParameter(parameter);
         }
 
         return component;

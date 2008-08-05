@@ -17,13 +17,13 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.xml.model.*;
+import psidev.psi.mi.xml.model.ExperimentalRole;
+import psidev.psi.mi.xml.model.Participant;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.CvObjectXref;
-import uk.ac.ebi.intact.model.Feature;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 
 /**
  * TODO comment this
