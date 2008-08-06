@@ -21,13 +21,14 @@ import org.obo.datamodel.*;
 import uk.ac.ebi.intact.business.IntactException;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.visitor.DefaultTraverser;
-import uk.ac.ebi.intact.model.visitor.IntactObjectTraverser;
-import uk.ac.ebi.intact.model.visitor.IntactVisitor;
-import uk.ac.ebi.intact.model.visitor.BaseIntactVisitor;
+import uk.ac.ebi.intact.model.AnnotatedObject;
 import uk.ac.ebi.intact.model.util.AliasUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
+import uk.ac.ebi.intact.model.visitor.BaseIntactVisitor;
+import uk.ac.ebi.intact.model.visitor.DefaultTraverser;
+import uk.ac.ebi.intact.model.visitor.IntactObjectTraverser;
+import uk.ac.ebi.intact.model.visitor.IntactVisitor;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -743,8 +744,8 @@ public class CvObjectOntologyBuilder {
 
   /**
    * This method returns the shortLabel for the term
-   * If the name length is less than 20 characters, name is returned
-   * If it is more than 20 characters, then the synonyms with EXACT PSI-MI-short is taken
+   * If the name length is less than <code>AnnotatedObject.MAX_SHORT_LABEL_LEN</code> characters, name is returned
+   * If it is more than <code>AnnotatedObject.MAX_SHORT_LABEL_LEN</code> characters, then the synonyms with EXACT PSI-MI-short is taken
    */
     private String calculateShortLabel( OBOObject oboObj ) {
         String shortLabel = null;
@@ -754,21 +755,21 @@ public class CvObjectOntologyBuilder {
 
             if ( synCat.getID() != null && synCat.getID().equalsIgnoreCase( CvObjectOntologyBuilder.SHORTLABEL_IDENTIFIER ) ) {
                 shortLabel = synonym.getText();
-                //another check just to reduce the length to 20 characters--rarely happens
-                if ( shortLabel != null && shortLabel.length() > 20 ) {
+                //another check just to reduce the length to 256 characters--rarely happens
+                if ( shortLabel != null && shortLabel.length() > AnnotatedObject.MAX_SHORT_LABEL_LEN) {
 
-                    shortLabel = shortLabel.substring( 0, 20 );
+                    shortLabel = shortLabel.substring( 0, AnnotatedObject.MAX_SHORT_LABEL_LEN );
                 }//end if
             }//end for
         } //end for
 
 
         if ( shortLabel == null ) {
-            if ( oboObj.getName() != null && oboObj.getName().length() <= 20 ) {
+            if ( oboObj.getName() != null && oboObj.getName().length() <= AnnotatedObject.MAX_SHORT_LABEL_LEN ) {
                 return oboObj.getName();
-            } else if ( oboObj.getName() != null && oboObj.getName().length() > 20 ) {
+            } else if ( oboObj.getName() != null && oboObj.getName().length() > AnnotatedObject.MAX_SHORT_LABEL_LEN ) {
                 if ( log.isDebugEnabled() ) log.debug( "No shortLabel for " + oboObj.getName() );
-                return oboObj.getName().substring( 0, 20 );
+                return oboObj.getName().substring( 0, AnnotatedObject.MAX_SHORT_LABEL_LEN );
             }
         }
         return shortLabel;
