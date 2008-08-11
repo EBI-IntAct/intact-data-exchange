@@ -10,6 +10,7 @@ import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.tab.model.builder.Column;
 import psidev.psi.mi.tab.model.builder.Row;
 import psidev.psi.mi.tab.model.builder.RowBuilder;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
 import java.util.Iterator;
@@ -20,7 +21,7 @@ import java.util.Iterator;
  * @version $Id$
  * @since 2.0.0
  */
-public class IntactDocumentBuilder extends DefaultDocumentBuilder {
+public class IntactDocumentBuilder extends DefaultDocumentBuilder<IntactBinaryInteraction> {
 
     public IntactDocumentBuilder() {
         super(new IntactDocumentDefinition());

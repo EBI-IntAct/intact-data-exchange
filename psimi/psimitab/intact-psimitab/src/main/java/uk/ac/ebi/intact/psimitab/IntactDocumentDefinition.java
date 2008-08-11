@@ -54,6 +54,6 @@ public class IntactDocumentDefinition extends MitabDocumentDefinition {
     }
 
     public InteractionRowConverter<BinaryInteraction> createInteractionRowConverter() {
-        return new MitabInteractionRowConverter();
+        return new IntactInteractionRowConverter();
     }
 }
