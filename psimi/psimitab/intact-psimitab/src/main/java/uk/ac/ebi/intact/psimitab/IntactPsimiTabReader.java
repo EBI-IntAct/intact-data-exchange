@@ -24,13 +24,6 @@ import psidev.psi.mi.tab.PsimiTabReader;
 public class IntactPsimiTabReader extends PsimiTabReader {
 
     public IntactPsimiTabReader(boolean hasHeaderLine) {
-        super(hasHeaderLine);
-        
-        final IntactColumnHandler columnHandler = new IntactColumnHandler();
-        columnHandler.setGoTermNameAutoCompletion(true);
-        columnHandler.setInterproNameAutoCompletion(true);
-
-        setColumnHandler(columnHandler);
-        setBinaryInteractionClass( IntactBinaryInteraction.class );
+        super(new IntactDocumentDefinition(), hasHeaderLine);
     }
 }

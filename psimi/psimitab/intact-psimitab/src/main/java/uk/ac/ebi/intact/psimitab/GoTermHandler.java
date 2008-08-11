@@ -15,8 +15,6 @@
  */
 package uk.ac.ebi.intact.psimitab;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
 import uk.ac.ebi.intact.util.ols.OlsClient;
 import uk.ac.ebi.ook.web.services.Query;
@@ -30,48 +28,32 @@ import java.util.Map;
  *
  * @author Nadin Neuhauser
  * @version $Id$
- * @since 2.0.0-Snapshot
+ * @since 2.0.0
  */
 public class GoTermHandler {
-
-    private static final Log logger = LogFactory.getLog( InterproNameHandler.class );
 
     private Map<String, String> goMap;
 
     private Query query;
 
     public GoTermHandler() {
-
-        long start = System.currentTimeMillis();
         query = new OlsClient().getOntologyQuery();
         goMap = new HashMap<String, String>();
-
-        if ( logger.isTraceEnabled() )
-            logger.trace( "Time to init GoTermHandler " + ( System.currentTimeMillis() - start ) );
     }
 
-    public String getNameById( String goTerm ) throws NameNotFoundException {
+    public String getNameById( String goTerm ) throws RemoteException {
+        String result;
 
-        long start = System.currentTimeMillis();
-        String result = null;
-        if ( goMap != null && !goMap.isEmpty() && goMap.containsKey( goTerm ) ) {
-            result = goMap.get( goTerm );
+        if (goMap.containsKey(goTerm)) {
+            result = goMap.get(goTerm);
         } else {
-            try {
-                result = query.getTermById( goTerm, "GO" );
-            } catch ( RemoteException e ) {
-                throw new NameNotFoundException( "Could not find " + goTerm );
+            result = query.getTermById( goTerm, "GO" );
+
+            if (result != null) {
+                goMap.put(goTerm, result);
             }
         }
 
-        if (logger.isTraceEnabled())
-            logger.trace( "Time to get goTerm " + goTerm + " from map " + ( System.currentTimeMillis() - start ) );
-
-        if ( result != null ) {
-            goMap.put( goTerm, result );
-            return result;
-        } else {
-            throw new NameNotFoundException( "Could not find " + goTerm );
-        }
+        return result;
     }
 }

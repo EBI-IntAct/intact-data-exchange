@@ -24,12 +24,13 @@ import psidev.psi.mi.tab.PsimiTabWriter;
 public class IntactPsimiTabWriter extends PsimiTabWriter {
 
     public IntactPsimiTabWriter( boolean goTermNameAutoCompletionEnabled, boolean interproNameAutoCompletionEnabled ) {
-        final IntactColumnHandler columnHandler = new IntactColumnHandler();
-        columnHandler.setGoTermNameAutoCompletion( goTermNameAutoCompletionEnabled );
-        columnHandler.setInterproNameAutoCompletion( interproNameAutoCompletionEnabled );
+        super(new IntactDocumentDefinition(), true);
 
-        setColumnHandler( columnHandler );
-        setBinaryInteractionClass( IntactBinaryInteraction.class );
+//        final IntactColumnHandler columnHandler = new IntactColumnHandler();
+//        columnHandler.setGoTermNameAutoCompletion( goTermNameAutoCompletionEnabled );
+//        columnHandler.setInterproNameAutoCompletion( interproNameAutoCompletionEnabled );
+
+
     }
 
     public IntactPsimiTabWriter() {

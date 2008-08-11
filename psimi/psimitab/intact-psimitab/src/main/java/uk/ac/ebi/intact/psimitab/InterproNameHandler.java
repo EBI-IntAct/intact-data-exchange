@@ -17,9 +17,11 @@ package uk.ac.ebi.intact.psimitab;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,51 +42,27 @@ public class InterproNameHandler {
 
     private Map<String, String> interproMap;
 
-    public InterproNameHandler( File entryFile ) throws NameNotFoundException {
-        if ( interproMap == null || interproMap.isEmpty() ) {
-            try {
-                BufferedReader reader = new BufferedReader( new FileReader( entryFile ) );
-                init( reader );
-            } catch ( FileNotFoundException e ) {
-                throw new NameNotFoundException( "File not found" );
-            } catch ( IOException e ) {
-                throw new NameNotFoundException( "Can not read " + entryFile.getAbsolutePath() );
-            }
-        }
-    }
 
-    public InterproNameHandler( InputStream stream ) throws NameNotFoundException {
-        if ( interproMap == null || interproMap.isEmpty() ) {
-            BufferedReader reader = new BufferedReader( new InputStreamReader( stream ) );
-            try {
-                init( reader );
-            } catch ( IOException e ) {
-                throw new NameNotFoundException( "Can not read " + stream.toString() );
-            }
-        }
-    }
+    public InterproNameHandler( InputStream stream )  {
+       BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
-    public InterproNameHandler( URL url ) throws NameNotFoundException {
         try {
-            InputStream stream = url.openStream();
-            if ( interproMap == null || interproMap.isEmpty() ) {
-                BufferedReader reader = new BufferedReader( new InputStreamReader( stream ) );
-                try {
-                    init( reader );
-                } catch ( IOException e ) {
-                    throw new NameNotFoundException( "Can not read " + stream.toString() );
-                }
-            }
-        } catch ( IOException e ) {
-            throw new NameNotFoundException( "Can not open stream for  " + url.getPath() );
+            init(reader);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Problem initializing using a stream", e);
+        }
+    }
+
+    public InterproNameHandler( URL url ) {
+        try {
+            BufferedReader reader = new BufferedReader( new InputStreamReader((url.openStream())));
+            init(reader);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Problem opening stream from URL", e);
         }
     }
 
     private void init( BufferedReader reader ) throws IOException {
-        long start = System.currentTimeMillis();
-
-        if ( logger.isDebugEnabled() ) logger.debug( "Starting to init InterproNameMap." );
-
         interproMap = new HashMap<String, String>();
 
         String line = null;
@@ -101,23 +79,14 @@ public class InterproNameHandler {
 
         if ( logger.isDebugEnabled() ) {
             logger.debug( "Number of Interpro entries " + interproMap.keySet().size() );
-            logger.trace( "Time to init InterproNameMap " + ( System.currentTimeMillis() - start ) );
         }
     }
 
-    public String getNameById( String interproTerm ) throws NameNotFoundException {
-        long start = System.currentTimeMillis();
-        if ( interproMap != null && !interproMap.isEmpty() ) {
-            String result = interproMap.get( interproTerm );
-            if ( result == null ) {
-                logger.warn( "Could not find " + interproTerm );
-            } else if ( logger.isTraceEnabled() ) {
-                logger.trace( "Time to get InterproName " + interproTerm + " from map " + ( System.currentTimeMillis() - start ) );
-            }
-            return result;
-        } else {
-            logger.error( "Map is not initialized or is Empty." );
+    public String getNameById( String interproTerm ) {
+        if (interproMap.isEmpty()) {
+            throw new IllegalStateException("InterPro map is empty");
         }
-        throw new NameNotFoundException( "Could not find " + interproTerm );
+
+        return interproMap.get(interproTerm);
     }
 }
