@@ -24,7 +24,7 @@ import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class IntactClusterInteractionPairProcessor extends ClusterInteractorPairProcessor<IntactBinaryInteraction>{
+public class IntactClusterInteractorPairProcessor extends ClusterInteractorPairProcessor<IntactBinaryInteraction>{
 
     @Override
     protected void mergeCollections(IntactBinaryInteraction source, IntactBinaryInteraction target) {

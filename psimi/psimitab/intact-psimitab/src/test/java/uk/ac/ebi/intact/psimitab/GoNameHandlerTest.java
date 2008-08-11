@@ -15,15 +15,12 @@
  */
 package uk.ac.ebi.intact.psimitab;
 
-import org.junit.Test;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
 
-import java.io.UnsupportedEncodingException;
-import java.util.List;
 import java.util.ArrayList;
-
-import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
+import java.util.List;
 
 /**
  * GoTermHandler Tester.
@@ -35,7 +32,7 @@ import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
 public class GoNameHandlerTest {
 
     @Test
-    public void usingBaseTest() throws UnsupportedEncodingException, NameNotFoundException {
+    public void usingBaseTest() throws Exception {
         GoTermHandler handler = new GoTermHandler( );
         String goTerm = handler.getNameById( "GO:0005515" );
         assertNotNull( goTerm );
@@ -43,7 +40,7 @@ public class GoNameHandlerTest {
     }
 
     @Test
-    public void usingPerformanceTest() throws UnsupportedEncodingException, NameNotFoundException {
+    public void usingPerformanceTest() throws Exception {
         GoTermHandler handler = new GoTermHandler( );
         List<String> listOfGoTerms = new ArrayList<String>();
         // add 10 different GO-Terms

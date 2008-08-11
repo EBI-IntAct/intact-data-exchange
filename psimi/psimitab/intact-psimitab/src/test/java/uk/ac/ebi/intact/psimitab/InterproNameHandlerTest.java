@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URL;
 
 /**
@@ -19,7 +20,7 @@ public class InterproNameHandlerTest extends AbstractPsimitabTestCase {
     @Test
     public void usingLocalEntryFile() throws Exception {
         File file = getFileByResources( "/interpro-entry-local.txt", InterproNameHandler.class );
-        InterproNameHandler handler = new InterproNameHandler( file );
+        InterproNameHandler handler = new InterproNameHandler( new FileInputStream(file) );
         String interproName = handler.getNameById( "IPR008255" );
 
         assertNotNull( interproName );

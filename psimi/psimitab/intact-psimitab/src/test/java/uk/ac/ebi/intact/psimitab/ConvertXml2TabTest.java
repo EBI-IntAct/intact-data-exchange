@@ -3,13 +3,12 @@ package uk.ac.ebi.intact.psimitab;
 import org.junit.Assert;
 import static org.junit.Assert.*;
 import org.junit.Test;
-import psidev.psi.mi.tab.converter.xml2tab.IsExpansionStrategyAware;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.SpokeExpansion;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReferenceFactory;
-import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
+import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -198,8 +197,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         File intputDir = getFileByResources("/xml-samples", ConvertXml2TabTest.class);
 
         ConvertXml2Tab converter = new ConvertXml2Tab();
-        converter.setBinaryInteractionClass( IntactBinaryInteraction.class );
-        converter.setColumnHandler( new IntactColumnHandler(true, true) );
+
         converter.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         converter.setInteractorPairClustering( true );
         converter.setOverwriteOutputFile( true );
@@ -259,8 +257,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         Assert.assertNotNull( file );
 
         ConvertXml2Tab converter = new ConvertXml2Tab();
-        converter.setBinaryInteractionClass( IntactBinaryInteraction.class );
-        converter.setColumnHandler( new IntactColumnHandler(true, true) );
+
         converter.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         converter.setInteractorPairClustering( true );
         converter.setOverwriteOutputFile( true );
@@ -293,18 +290,11 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
-        Xml2Tab xml2tab = new Xml2Tab();
-
-        xml2tab.setBinaryInteractionClass( IntactBinaryInteraction.class );
-
-        // this column handler IS aware of the the expansion strategy
-        final IntactColumnHandler columnHandler = new IntactColumnHandler();
-        assertTrue( columnHandler instanceof IsExpansionStrategyAware );
-        xml2tab.setColumnHandler( columnHandler );
+        Xml2Tab xml2tab = new IntactXml2Tab();
 
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
-        xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
+        xml2tab.setPostProcessor( new IntactClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
@@ -320,13 +310,11 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
-        Xml2Tab xml2tab = new Xml2Tab();
+        Xml2Tab xml2tab = new IntactXml2Tab();
 
-        xml2tab.setBinaryInteractionClass( IntactBinaryInteraction.class );
-        xml2tab.setColumnHandler( new IntactColumnHandler() );
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
-        xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
+        xml2tab.setPostProcessor( new IntactClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
@@ -341,18 +329,11 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
-        Xml2Tab xml2tab = new Xml2Tab();
-
-        xml2tab.setBinaryInteractionClass( IntactBinaryInteraction.class );
-
-        // this column handler IS aware of the the expansion strategy
-        final IntactColumnHandler columnHandler = new IntactColumnHandler();
-        assertTrue( columnHandler instanceof IsExpansionStrategyAware );
-        xml2tab.setColumnHandler( columnHandler );
+        Xml2Tab xml2tab = new IntactXml2Tab();
 
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
-        xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
+        xml2tab.setPostProcessor( new IntactClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
