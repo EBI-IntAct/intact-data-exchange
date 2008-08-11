@@ -15,7 +15,6 @@
  */
 package uk.ac.ebi.intact.psimitab;
 
-import uk.ac.ebi.intact.psimitab.exception.NameNotFoundException;
 import uk.ac.ebi.intact.util.ols.OlsClient;
 import uk.ac.ebi.ook.web.services.Query;
 

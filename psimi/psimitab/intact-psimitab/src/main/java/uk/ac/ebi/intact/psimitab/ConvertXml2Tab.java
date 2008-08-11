@@ -18,15 +18,13 @@ package uk.ac.ebi.intact.psimitab;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.PsimiTabWriter;
-import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
-import psidev.psi.mi.tab.converter.xml2tab.TabConvertionException;
+import psidev.psi.mi.tab.converter.xml2tab.TabConversionException;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.BinaryExpansionStrategy;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
-import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 import psidev.psi.mi.xml.converter.ConverterException;
+import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +53,7 @@ public class ConvertXml2Tab {
     /**
      * Controls the clustering of interactor pair in the final PSIMITAB file.
      */
-    private boolean interactorPairCluctering = true;
+    private boolean interactorPairClustering = true;
 
     /**
      * Strategy defining the behaviour of the binary expansion.
@@ -85,22 +83,6 @@ public class ConvertXml2Tab {
      * Where warning messages are going to be writtet to.
      */
     private Writer logWriter;
-    
-    /**
-     * Class that is going to hold the data. An extension of BinaryInteractionImpl could be used to hold extra columns that
-     * the ColumnsHandler fill up.
-     *
-     * @see ColumnHandler
-     */
-    private Class binaryInteractionClass = BinaryInteractionImpl.class;
-
-    /**
-     * Allows to tweak the production of the columns and also to add extra columns.
-     * The ColumnHandler has to be specific to a BinaryInteractionImpl.
-     *
-     * @See BinaryInteractionImpl
-     */
-    private ColumnHandler columnHandler;
 
     ////////////////////////
     // Constructor
@@ -112,11 +94,11 @@ public class ConvertXml2Tab {
     // Getters and Setters
 
     public void setInteractorPairClustering(boolean enabled) {
-        this.interactorPairCluctering = enabled;
+        this.interactorPairClustering = enabled;
     }
 
     public boolean isInteractorPairClustering() {
-        return interactorPairCluctering;
+        return interactorPairClustering;
     }
 
     public void setExpansionStrategy(BinaryExpansionStrategy expansionStragegy) {
@@ -159,35 +141,10 @@ public class ConvertXml2Tab {
         this.logWriter = logWriter;
     }
 
-    /**
-     * Setter for property 'binaryInteractionClass'.
-     *
-     * @param binaryInteractionClass Value to set for property 'binaryInteractionClass'.
-     */
-    public void setBinaryInteractionClass( Class binaryInteractionClass ) {
-        if ( binaryInteractionClass == null ) {
-            throw new IllegalArgumentException( "You must give a non null Class." );
-        }
-
-        if ( !BinaryInteractionImpl.class.isAssignableFrom( binaryInteractionClass ) ) {
-            throw new IllegalArgumentException( "You must give a Class extending BinaryInteractionImpl." );
-        }
-
-        this.binaryInteractionClass = binaryInteractionClass;
-    }
-    
-    /**
-     * Setter for property 'columnHandler'.
-     *
-     * @param columnHandler Value to set for property 'columnHandler'.
-     */
-    public void setColumnHandler( ColumnHandler columnHandler ) {
-        this.columnHandler = columnHandler;
-    }
     ///////////////////////////
-    // Convertion
+    // Conversion
 
-    public void convert() throws ConverterException, IOException, TabConvertionException {
+    public void convert() throws ConverterException, IOException, TabConversionException {
 
         // a few checks before to start computationally intensive operations
 
@@ -212,17 +169,15 @@ public class ConvertXml2Tab {
         }
 
         // now start conversion
-        Xml2Tab x2t = new Xml2Tab();
-        x2t.setBinaryInteractionClass(binaryInteractionClass);
-        x2t.setColumnHandler(columnHandler);
+        Xml2Tab x2t = new IntactXml2Tab();
 
         // Makes sure the database source is well set.
         x2t.addOverrideSourceDatabase(new CrossReferenceImpl("MI", "0469", "intact"));
 
         x2t.setExpansionStrategy(expansionStragegy);
 
-        if (interactorPairCluctering) {
-            x2t.setPostProcessor(new ClusterInteractorPairProcessor());
+        if (interactorPairClustering) {
+            x2t.setPostProcessor(new IntactClusterInteractorPairProcessor());
         } else {
             x2t.setPostProcessor(null);
         }
@@ -242,10 +197,7 @@ public class ConvertXml2Tab {
             }
         } else {
             // Writing file on disk
-            PsimiTabWriter writer = new PsimiTabWriter();
-            
-            writer.setBinaryInteractionClass( binaryInteractionClass );
-            writer.setColumnHandler(columnHandler);
+            PsimiTabWriter writer = new IntactPsimiTabWriter();
             writer.write(interactions, outputFile);
         }
     }

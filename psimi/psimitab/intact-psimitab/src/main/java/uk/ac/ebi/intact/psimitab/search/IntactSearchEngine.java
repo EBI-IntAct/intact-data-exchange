@@ -4,10 +4,11 @@
 package uk.ac.ebi.intact.psimitab.search;
 
 import org.apache.lucene.store.Directory;
-import psidev.psi.mi.search.column.DefaultColumnSet;
 import psidev.psi.mi.search.engine.impl.FastSearchEngine;
 import psidev.psi.mi.search.util.DocumentBuilder;
+import psidev.psi.mi.tab.model.builder.DocumentDefinition;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,18 +21,6 @@ import java.io.IOException;
  * @since 2.0.0
  */
 public class IntactSearchEngine extends FastSearchEngine<IntactBinaryInteraction> {
-
-    private static final String[] DEFAULT_FIELDS = {"identifiers",
-                                                    DefaultColumnSet.PUB_ID.getShortName(),
-                                                    DefaultColumnSet.PUB_1ST_AUTHORS.getShortName(),
-                                                    "species",
-                                                    DefaultColumnSet.INTERACTION_TYPES.getShortName(),
-                                                    DefaultColumnSet.INTER_DETECTION_METHODS.getShortName(),
-                                                    DefaultColumnSet.INTERACTION_ID.getShortName(),
-                                                    "properties",
-                                                    IntactColumnSet.HOSTORGANISM.getShortName(),
-                                                    IntactColumnSet.EXPANSION_METHOD.getShortName(),
-                                                    IntactColumnSet.DATASET.getShortName()};
 
     public IntactSearchEngine(Directory indexDirectory) throws IOException {
         super(indexDirectory);
@@ -51,7 +40,19 @@ public class IntactSearchEngine extends FastSearchEngine<IntactBinaryInteraction
     }
 
     protected String[] getSearchFields() {
-        return DEFAULT_FIELDS;
+        DocumentDefinition docDef = new IntactDocumentDefinition();
+
+        return new String[]{"identifiers",
+                            docDef.getColumnDefinition(IntactDocumentDefinition.PUB_ID).getShortName(),
+                            docDef.getColumnDefinition(IntactDocumentDefinition.PUB_AUTH).getShortName(),
+                            "species",
+                            docDef.getColumnDefinition(IntactDocumentDefinition.INT_TYPE).getShortName(),
+                            docDef.getColumnDefinition(IntactDocumentDefinition.INT_DET_METHOD).getShortName(),
+                            docDef.getColumnDefinition(IntactDocumentDefinition.INTERACTION_ID).getShortName(),
+                            "properties",
+                            docDef.getColumnDefinition(IntactDocumentDefinition.HOST_ORGANISM).getShortName(),
+                            docDef.getColumnDefinition(IntactDocumentDefinition.EXPANSION_METHOD).getShortName(),
+                            docDef.getColumnDefinition(IntactDocumentDefinition.DATASET).getShortName()};
     }
 
 }
