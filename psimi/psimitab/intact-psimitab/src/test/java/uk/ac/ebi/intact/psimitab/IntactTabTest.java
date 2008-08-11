@@ -9,6 +9,7 @@ import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
+import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
 
 import java.io.File;
 import java.io.StringWriter;
@@ -63,11 +64,14 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
 
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
-        xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
+        xml2tab.setPostProcessor( new IntactClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
         assertEquals( interactions.size(), bis.size() );
 
+        // TODO (Bruno 11/08/08) THIS IS NOT WORKING, follow the calls and check if the IntactInteractionConverter
+        // is invoked correctly. Thanks for your patience :)
+        
         for ( BinaryInteraction bi : bis ) {
             IntactBinaryInteraction dbi = ( IntactBinaryInteraction ) bi;
             assertTrue( dbi.getAuthors().get( 0 ).getName().contains( "Leung" ) );
@@ -90,7 +94,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
 
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
-        xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
+        xml2tab.setPostProcessor( new IntactClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
@@ -135,7 +139,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
 
         x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         x2t.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
-        x2t.setPostProcessor( new ClusterInteractorPairProcessor() );
+        x2t.setPostProcessor( new IntactClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = x2t.convert( xmlFile, false );
 
