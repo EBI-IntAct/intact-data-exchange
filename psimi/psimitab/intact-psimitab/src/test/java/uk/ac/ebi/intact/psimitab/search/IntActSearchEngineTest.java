@@ -55,11 +55,11 @@ public class IntActSearchEngineTest {
 
         String searchQuery = ("experimentalRoleA:bait");
         SearchResult<?> result = searchEngine.search(searchQuery, null, null);
-        assertEquals(182, result.getInteractions().size());
+        assertEquals(183, result.getInteractions().size());
 
         searchQuery = ("roles:\"unspecified role\"");
         result = searchEngine.search(searchQuery, null, null);
-        assertEquals(199, result.getInteractions().size());
+        assertEquals(200, result.getInteractions().size());
 
         Sort sort = new Sort(docDef.getColumnDefinition(IntactDocumentDefinition.EXPERIMENTAL_ROLE_B).getSortableColumnName());
         result = searchEngine.search(("experimentalRoleB:prey"), 20, 10, sort);
@@ -79,7 +79,7 @@ public class IntActSearchEngineTest {
 
         searchQuery = ("roles:\"unspecified role\"");
         result = searchEngine.search(searchQuery, null, null);
-        assertEquals(199, result.getInteractions().size());
+        assertEquals(200, result.getInteractions().size());
 
         Sort sort = new Sort(docDef.getColumnDefinition(IntactDocumentDefinition.BIOLOGICAL_ROLE_B).getSortableColumnName());
         result = searchEngine.search(("biologicalRoleB:\"unspecified role\""), 20, 10, sort);
@@ -128,7 +128,7 @@ public class IntActSearchEngineTest {
 
         String searchQuery = ("typeA:\"small molecule\"");
         SearchResult<?> result = searchEngine.search(searchQuery, null, null);
-        assertEquals(179, result.getInteractions().size());
+        assertEquals(180, result.getInteractions().size());
 
         searchQuery = ("typeB:protein");
         result = searchEngine.search(searchQuery, null, 10);
@@ -163,7 +163,7 @@ public class IntActSearchEngineTest {
 
         String searchQuery = ("expansion:spoke");
         SearchResult<?> result = searchEngine.search(searchQuery, null, null);
-        assertEquals(160, result.getInteractions().size());
+        assertEquals(161, result.getInteractions().size());
 
         Sort sort = new Sort(docDef.getColumnDefinition(IntactDocumentDefinition.EXPANSION_METHOD).getSortableColumnName());
         result = searchEngine.search(("spoke"), 50, 20, sort);
