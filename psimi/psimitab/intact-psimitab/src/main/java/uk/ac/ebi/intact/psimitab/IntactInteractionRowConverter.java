@@ -23,6 +23,7 @@ import psidev.psi.mi.tab.model.builder.Row;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * TODO comment that class header
@@ -64,6 +65,45 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
         return row;
     }
 
+    @Override
+    protected void populateBinaryInteraction( BinaryInteraction binaryInteraction, Row row ) {
+        super.populateBinaryInteraction( binaryInteraction, row );
+
+        IntactBinaryInteraction ibi = (IntactBinaryInteraction ) binaryInteraction;
+
+        Column expRoleA = row.getColumnByIndex(15);
+        Column expRoleB = row.getColumnByIndex(16);
+        Column bioRoleA = row.getColumnByIndex(17);
+        Column bioRoleB = row.getColumnByIndex(18);
+        Column propA = row.getColumnByIndex(19);
+        Column propB = row.getColumnByIndex(20);
+        Column typeA = row.getColumnByIndex(21);
+        Column typeB = row.getColumnByIndex(22);
+        Column hostOrganism = row.getColumnByIndex(23);
+        Column expansion = row.getColumnByIndex(24);
+        Column dataset = row.getColumnByIndex(25);
+
+        ibi.setExperimentalRolesInteractorA(createCrossReferences(expRoleA) );
+        ibi.setExperimentalRolesInteractorB(createCrossReferences(expRoleB) );
+        ibi.setBiologicalRolesInteractorA(createCrossReferences(bioRoleA) );
+        ibi.setBiologicalRolesInteractorB(createCrossReferences(bioRoleB) );
+        ibi.setPropertiesA(createCrossReferences(propA) );
+        ibi.setPropertiesB(createCrossReferences(propB) );
+        ibi.setInteractorTypeA( createCrossReferences( typeA ) );
+        ibi.setInteractorTypeB( createCrossReferences( typeB ) );
+        ibi.setHostOrganism( createCrossReferences( hostOrganism ) );
+        ibi.setExpansionMethods( createStringsFromColumn( expansion ) );
+        ibi.setDataset( createStringsFromColumn( dataset ) );
+    }
+
+    protected List<String> createStringsFromColumn( Column column ) {
+        List<String> strings = new ArrayList<String>( );
+        for ( Field field : column.getFields() ) {
+            strings.add( field.getValue() );
+        }
+        return strings;
+    }
+
     protected Column createColumnFromStrings( List<String> strings ) {
         final LinkedList<Field> fields = new LinkedList<Field>();
         for ( String str : strings ) {
@@ -71,5 +111,4 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
         }
         return new Column( fields );
     }
-
 }

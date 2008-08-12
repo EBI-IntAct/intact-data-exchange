@@ -47,10 +47,10 @@ public class IntactDocumentDefinition extends MitabDocumentDefinition {
         addColumnDefinition(new ColumnDefinition("Properties interactor A", "propertiesA", new CrossReferenceFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("Properties interactor B", "propertiesB", new CrossReferenceFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("Type(s) interactor A", "typeA", new CrossReferenceFieldBuilder()));
-        addColumnDefinition(new ColumnDefinition("Type(s) interactor B", "typeB", new PlainTextFieldBuilder()));
+        addColumnDefinition(new ColumnDefinition("Type(s) interactor B", "typeB", new CrossReferenceFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("HostOrganism(s)", "hostOrganism", new CrossReferenceFieldBuilder()));
-        addColumnDefinition(new ColumnDefinition("Expansion method(s)", "expansion", new CrossReferenceFieldBuilder()));
-        addColumnDefinition(new ColumnDefinition("Dataset name(s)", "dataset", new CrossReferenceFieldBuilder()));
+        addColumnDefinition(new ColumnDefinition("Expansion method(s)", "expansion", new PlainTextFieldBuilder()));
+        addColumnDefinition(new ColumnDefinition("Dataset name(s)", "dataset", new PlainTextFieldBuilder()));
     }
 
     public InteractionRowConverter<BinaryInteraction> createInteractionRowConverter() {

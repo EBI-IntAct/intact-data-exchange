@@ -257,10 +257,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
         Participant pA = pi.next();
         Participant pB = pi.next();
 
-        if ( pA.getExperimentalRoles() != null && pA.getExperimentalRoles().size() != 1 ) {
-            if ( log.isDebugEnabled() )
-                log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
-        } else {
+        if ( pA.hasExperimentalRoles() ) {
             CrossReference experimentalRoleA = extractExperimentalRole( pA );
 
             if ( bi.hasExperimentalRolesInteractorA() ) {
@@ -272,10 +269,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             }
         }
 
-        if ( pB.getExperimentalRoles() != null && pB.getExperimentalRoles().size() != 1 ) {
-            if ( log.isDebugEnabled() )
-                log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 experimentalRole." );
-        } else {
+        if ( pB.hasExperimentalRoles() ) {
             CrossReference experimentalRoleB = extractExperimentalRole( pB );
 
             if ( bi.hasExperimentalRolesInteractorB() ) {
@@ -287,10 +281,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             }
         }
 
-        if ( pA.getBiologicalRole() == null ) {
-            if ( log.isDebugEnabled() )
-                log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have a biologicalRole." );
-        } else {
+        if ( pA.hasBiologicalRole() ) {
             CrossReference biologicalRoleA = extractBiologicalRole( pA );
 
             if ( bi.hasBiologicalRolesInteractorA() ) {
@@ -302,10 +293,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             }
         }
 
-        if ( pB.getBiologicalRole() == null ) {
-            if ( log.isDebugEnabled() )
-                log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have a biologicalRole." );
-        } else {
+        if ( pB.hasBiologicalRole() ) {
             CrossReference biologicalRoleB = extractBiologicalRole( pB );
 
             if ( bi.hasBiologicalRolesInteractorB() ) {
@@ -317,10 +305,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             }
         }
 
-        if ( pA.getInteractor().getInteractorType() == null ) {
-            if ( log.isDebugEnabled() )
-                log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
-        } else {
+        if ( pA.getInteractor().getInteractorType() != null ) {
             CrossReference typeA = extractInteractorType( pA );
 
             if ( bi.hasInteractorTypeA() ) {
@@ -332,10 +317,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             }
         }
 
-        if ( pB.getInteractor().getInteractorType() == null ) {
-            if ( log.isDebugEnabled() )
-                log.debug( "interaction (id:" + interaction.getId() + ") could not be converted to MITAB25 as it does not have exactly 1 interactorType." );
-        } else {
+        if ( pB.getInteractor().getInteractorType() != null ) {
             CrossReference typeB = extractInteractorType( pB );
 
             if ( bi.hasInteractorTypeB() ) {
@@ -347,21 +329,21 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             }
         }
 
-        if ( pA.getInteractor().getXref().getSecondaryRef() != null && !pA.getInteractor().getXref().getSecondaryRef().isEmpty() ) {
+
+
+        if ( ! pA.getInteractor().getXref().getAllDbReferences().isEmpty() ) {
             List<CrossReference> propertiesA = extractProperties( pA );
             if ( !bi.hasPropertiesA() ) bi.setPropertiesA( new ArrayList<CrossReference>() );
             bi.getPropertiesA().addAll( propertiesA );
         }
 
-
-        if ( pB.getInteractor().getXref().getSecondaryRef() != null && !pB.getInteractor().getXref().getSecondaryRef().isEmpty() ) {
+        if ( ! pB.getInteractor().getXref().getAllDbReferences().isEmpty() ) {
             List<CrossReference> propertiesB = extractProperties( pB );
             if ( !bi.hasPropertiesB() ) bi.setPropertiesB( new ArrayList<CrossReference>() );
             bi.getPropertiesB().addAll( propertiesB );
-
         }
 
-        if ( interaction.getExperiments() != null && !interaction.getExperiments().isEmpty() ) {
+        if ( interaction.hasExperiments() ) {
             for ( ExperimentDescription description : interaction.getExperiments() ) {
                 if ( description.hasHostOrganisms() ) {
                     Organism hostOrganism = description.getHostOrganisms().iterator().next();

@@ -28,7 +28,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
-        xml2tab.setPostProcessor( new ClusterInteractorPairProcessor() );
+        xml2tab.setPostProcessor( new IntactClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
@@ -48,30 +48,12 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
     public void psimiTabReader() throws Exception {
 
         File tabFile = getFileByResources( "/mitab-testset/9971739_expanded.txt", IntactTabTest.class );
-        assertTrue( tabFile.canRead() );
 
         boolean hasHeaderLine = true;
-
         PsimiTabReader reader = new IntactPsimiTabReader( hasHeaderLine );
 
         Collection<BinaryInteraction> bis = reader.read( tabFile );
 
-        File xmlFile = getFileByResources( "/psi25-testset/9971739.xml", IntactTabTest.class );
-        assertTrue( xmlFile.canRead() );
-
-        // convert into Tab object model
-        Xml2Tab xml2tab = new IntactXml2Tab( false, false );
-
-        xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
-        xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
-        xml2tab.setPostProcessor( new IntactClusterInteractorPairProcessor() );
-
-        Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
-        assertEquals( interactions.size(), bis.size() );
-
-        // TODO (Bruno 11/08/08) THIS IS NOT WORKING, follow the calls and check if the IntactInteractionConverter
-        // is invoked correctly. Thanks for your patience :)
-        
         for ( BinaryInteraction bi : bis ) {
             IntactBinaryInteraction dbi = ( IntactBinaryInteraction ) bi;
             assertTrue( dbi.getAuthors().get( 0 ).getName().contains( "Leung" ) );
