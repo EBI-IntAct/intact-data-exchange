@@ -60,7 +60,6 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
         row.appendColumn( createColumnFromCrossReferences( interaction.getHostOrganism() ) );
         row.appendColumn( createColumnFromStrings( interaction.getExpansionMethods() ) );
         row.appendColumn( createColumnFromStrings( interaction.getDataset() ) );
-        row.appendColumn( createColumnFromConfidences( interaction.getConfidenceValues() ) );
 
         return row;
     }
