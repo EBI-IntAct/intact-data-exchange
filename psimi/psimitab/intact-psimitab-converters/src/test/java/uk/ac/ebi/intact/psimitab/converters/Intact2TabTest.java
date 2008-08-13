@@ -10,7 +10,7 @@ import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntactColumnHandler;
+import uk.ac.ebi.intact.psimitab.IntactPsimiTabWriter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -73,9 +73,7 @@ public class Intact2TabTest extends IntactBasicTestCase {
         assertNotNull( bis );
 
         File file = new File( TestHelper.getTargetDirectory(), "test_2.txt" );
-        PsimiTabWriter writer = new PsimiTabWriter();
-        writer.setBinaryInteractionClass( IntactBinaryInteraction.class );
-        writer.setColumnHandler( new IntactColumnHandler() );
+        PsimiTabWriter writer = new IntactPsimiTabWriter();
         writer.write( bis, file );
     }
 
@@ -105,10 +103,7 @@ public class Intact2TabTest extends IntactBasicTestCase {
         assertNotNull( bis );
 
         File file = new File( TestHelper.getTargetDirectory(), "test_3.txt" );
-        PsimiTabWriter writer = new PsimiTabWriter();
-        writer.setBinaryInteractionClass( IntactBinaryInteraction.class );
-        writer.setColumnHandler( new IntactColumnHandler() );
+        PsimiTabWriter writer = new IntactPsimiTabWriter();
         writer.write( bis, file );
     }
-
 }

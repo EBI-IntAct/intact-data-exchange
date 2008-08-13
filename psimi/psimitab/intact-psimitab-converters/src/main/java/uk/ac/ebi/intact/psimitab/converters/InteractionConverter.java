@@ -17,15 +17,13 @@ package uk.ac.ebi.intact.psimitab.converters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.mi.tab.converter.xml2tab.BinaryInteractionUtils;
-import psidev.psi.mi.tab.converter.xml2tab.TabConvertionException;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.intact.business.IntactException;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.IsExpansionStrategyAware;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,8 +73,8 @@ public class InteractionConverter {
     }
 
     public BinaryInteraction toBinaryInteraction( Interaction interaction,
-                                      ExpansionStrategy expansionStrategy,
-                                      boolean isExpanded ) {
+                                                  ExpansionStrategy expansionStrategy,
+                                                  boolean isExpanded ) {
 
         if ( interaction == null ) {
             throw new IllegalArgumentException( "Interaction must not be null" );
@@ -93,20 +91,16 @@ public class InteractionConverter {
         Interactor interactorA = interactorConverter.toMitab( intactInteractorA );
         Interactor interactorB = interactorConverter.toMitab( intactInteractorB );
 
-        BinaryInteraction bi;
-        try {
-            bi = BinaryInteractionUtils.buildInteraction( interactorA, interactorB, binaryInteractionClass );
-        } catch ( TabConvertionException e ) {
-            throw new IntactException( "Error while building a BinaryInteraction", e );
-        }
+        BinaryInteraction bi = new IntactBinaryInteraction( interactorA, interactorB );
 
         // set authors
         List<Author> authors = new ArrayList<Author>();
         if ( interaction.getExperiments() != null ) {
             for ( Experiment experiment : interaction.getExperiments() ) {
                 for ( Annotation a : experiment.getAnnotations() ) {
-                    if (a.getCvTopic().getMiIdentifier() != null) {
-                        if ( CvTopic.AUTHOR_LIST_MI_REF.equals( a.getCvTopic().getMiIdentifier() ) ) {
+                    final String mi = a.getCvTopic().getIdentifier();
+                    if ( mi != null) {
+                        if ( CvTopic.AUTHOR_LIST_MI_REF.equals( mi ) ) {
                             authors.add( new AuthorImpl( a.getAnnotationText().split(" ")[0] + " et al." ) );
                         }
                     }
@@ -181,7 +175,7 @@ public class InteractionConverter {
             if ( biHandler instanceof IsExpansionStrategyAware ) {
                 if ( isExpanded ) {
                     if ( logger.isDebugEnabled() ) {
-                        logger.debug( "Using an expansion stategy aware column handler" );
+                        logger.debug( "Using an expansion stategy aware column handler: " + biHandler.getClass().getName() );
                     }
 
                     ( ( IsExpansionStrategyAware ) biHandler ).process( ( BinaryInteractionImpl ) bi,

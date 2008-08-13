@@ -17,7 +17,6 @@ package uk.ac.ebi.intact.psimitab.converters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.mi.tab.converter.xml2tab.ColumnHandler;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 import psidev.psi.mi.tab.processor.PostProcessorStrategy;
@@ -168,7 +167,6 @@ public class Intact2BinaryInteractionConverter {
             if ( logger.isDebugEnabled() ) {
                 logger.debug( "Running " + postProcessor.getClass().getSimpleName() + "..." );
             }
-            postProcessor.setColumnHandler((ColumnHandler) biHandler );
             processedInteractions = postProcessor.process( interactions );
             logger.debug( "Post processing completed." );
         } else {

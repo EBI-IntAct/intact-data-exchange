@@ -45,17 +45,24 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
 
         String text = cvObject.getShortLabel();
         String identity = CvObjectUtils.getIdentity(cvObject);
-        String db = identity.split( ":" )[0];
-        String id = identity.split( ":" )[1];
+        if(identity == null ) {
+            throw new NullPointerException( cvObject.getClass().getSimpleName() + "("+ text +") didn't have an identity" );
+        }
+
+        final String[] strings = identity.split( ":" );
+        if(strings.length != 2) {
+            throw new IllegalStateException( cvObject.getClass().getSimpleName() + "("+ text +") didn't have a valid identity: " + identity );
+        }
+
+        String db = strings[0];
+        String id = strings[1];
 
         try {
             Constructor<T> constructor = clazz.getConstructor( String.class, String.class, String.class );
-
             return constructor.newInstance( db, id, text );
         } catch ( Exception e ) {
-            throw new IllegalStateException( "An exception occured while converting " + clazz.getSimpleName() + ": " + text, e );
+            throw new RuntimeException( "An exception occured while building a " + clazz.getSimpleName() + ": " + text, e );
         }
-
     }
 
     public T toCrossReference( O cvObject ) {

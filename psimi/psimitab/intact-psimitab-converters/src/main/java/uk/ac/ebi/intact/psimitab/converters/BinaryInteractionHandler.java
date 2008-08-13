@@ -37,12 +37,11 @@ public interface BinaryInteractionHandler<T extends BinaryInteractionImpl> {
      */
     public void process( T bi, Interaction interaction );
 
-	/**
-	 * This method merge could called in ClusterInteractorPairProssesor to write the correct format of lists.
-	 *
-	 * @param interaction
-	 * @param target
-	 */
-	public void mergeCollection(T interaction, T target);    
-
+    /**
+     * This method merge could called in ClusterInteractorPairProssesor to write the correct format of lists.
+     *
+     * @param interaction
+     * @param target
+     */
+    public void mergeCollection( T interaction, T target );
 }
