@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
@@ -187,20 +188,64 @@ public class InteractionConverter {
         List<CrossReference> experimentRolesB = new ArrayList<CrossReference>();
         List<CrossReference> biologicalRolesA = new ArrayList<CrossReference>();
         List<CrossReference> biologicalRolesB = new ArrayList<CrossReference>();
+
+        //set parameters
+        List<uk.ac.ebi.intact.psimitab.model.Parameter> parametersA = new ArrayList<uk.ac.ebi.intact.psimitab.model.Parameter>();
+        List<uk.ac.ebi.intact.psimitab.model.Parameter> parametersB = new ArrayList<uk.ac.ebi.intact.psimitab.model.Parameter>();
+        List<uk.ac.ebi.intact.psimitab.model.Parameter> parametersInteraction = new ArrayList<uk.ac.ebi.intact.psimitab.model.Parameter>();
+
+
         for ( Component component : interaction.getComponents() ) {
             if ( component.getInteractor().equals( intactInteractorA ) ) {
                 biologicalRolesA.add( cvObjectConverter.toCrossReference( component.getCvBiologicalRole() ) );
                 experimentRolesA.add( cvObjectConverter.toCrossReference( component.getCvExperimentalRole() ) );
+
+                //parameters  for InteractorA
+                for ( ComponentParameter componentParameterA : component.getParameters() ) {
+                    uk.ac.ebi.intact.psimitab.model.Parameter parameterA = getParameter( componentParameterA );
+                    if ( parameterA != null ) {
+                        parametersA.add( parameterA );
+                    }
+                }
+
             }
             if ( component.getInteractor().equals( intactInteractorB ) ) {
                 biologicalRolesB.add( cvObjectConverter.toCrossReference( component.getCvBiologicalRole() ) );
                 experimentRolesB.add( cvObjectConverter.toCrossReference( component.getCvExperimentalRole() ) );
+
+                //paramters for InteractorB
+                for ( ComponentParameter componentParameterB : component.getParameters() ) {
+                    uk.ac.ebi.intact.psimitab.model.Parameter parameterB = getParameter( componentParameterB );
+                    if ( parameterB != null ) {
+                        parametersB.add( parameterB );
+                    }
+                }
+
             }
         }
+
+        //parameters for interaction
+
+        if ( interaction.getParameters() != null ) {
+            for ( InteractionParameter interactionParameter : interaction.getParameters() ) {
+                uk.ac.ebi.intact.psimitab.model.Parameter parameterInteraction = getParameter( interactionParameter );
+                if ( parameterInteraction != null ) {
+                    parametersInteraction.add( parameterInteraction );
+                }
+            }
+
+        }
+
+
         bi.setExperimentalRolesInteractorA( experimentRolesA );
         bi.setExperimentalRolesInteractorB( experimentRolesB );
         bi.setBiologicalRolesInteractorA( biologicalRolesA );
         bi.setBiologicalRolesInteractorB( biologicalRolesB );
+
+        //set parameters
+        bi.setParametersA( parametersA );
+        bi.setParametersB( parametersB );
+        bi.setParametersInteraction( parametersInteraction );
 
         // set dataset
         if ( interaction.getExperiments() != null ) {
@@ -235,4 +280,37 @@ public class InteractionConverter {
 
         return bi;
     }
+
+    private uk.ac.ebi.intact.psimitab.model.Parameter getParameter( uk.ac.ebi.intact.model.Parameter parameter ) {
+
+        final String BASE_E_NOTATION = "E";
+        if ( parameter == null ) {
+            throw new NullPointerException( "You must give a non null parameter" );
+        }
+
+        final CvParameterType parameterType = parameter.getCvParameterType();
+        final CvParameterUnit parameterUnit = parameter.getCvParameterUnit();
+        final Double factor = parameter.getFactor();
+        final Integer exponent = parameter.getExponent();   //non-null value default 0
+        final Integer base = parameter.getBase();           //non-null value default 10
+
+        //factor is the "main" value of the parameter.
+        //value is a combined expression of factor, base and exponent
+
+
+        if ( factor == null || parameterType == null || parameterUnit == null ) {
+            return null;
+        } else {
+            String value;
+            if ( base == 10 ) {
+                value = factor.toString() + BASE_E_NOTATION + exponent.toString();
+            } else {
+                value = factor.toString() + base.toString() + exponent.toString();
+            }
+            uk.ac.ebi.intact.psimitab.model.Parameter psiParameter = new uk.ac.ebi.intact.psimitab.model.Parameter( parameterType.getShortLabel(), value, parameterUnit.getShortLabel() );
+            return psiParameter;
+        }
+
+    }
+
 }
