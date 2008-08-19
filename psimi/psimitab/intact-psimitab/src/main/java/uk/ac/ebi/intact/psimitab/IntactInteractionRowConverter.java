@@ -20,10 +20,12 @@ import psidev.psi.mi.tab.model.builder.Column;
 import psidev.psi.mi.tab.model.builder.Field;
 import psidev.psi.mi.tab.model.builder.MitabInteractionRowConverter;
 import psidev.psi.mi.tab.model.builder.Row;
+import uk.ac.ebi.intact.psimitab.model.Annotation;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * TODO comment that class header
@@ -60,6 +62,8 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
         row.appendColumn( createColumnFromCrossReferences( interaction.getHostOrganism() ) );
         row.appendColumn( createColumnFromStrings( interaction.getExpansionMethods() ) );
         row.appendColumn( createColumnFromStrings( interaction.getDataset() ) );
+        row.appendColumn( createColumnFromAnnotations( interaction.getAnnotationsA() ) );
+        row.appendColumn( createColumnFromAnnotations( interaction.getAnnotationsB() ) );
 
         return row;
     }
@@ -70,17 +74,22 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
 
         IntactBinaryInteraction ibi = (IntactBinaryInteraction ) binaryInteraction;
 
-        Column expRoleA = row.getColumnByIndex(15);
-        Column expRoleB = row.getColumnByIndex(16);
-        Column bioRoleA = row.getColumnByIndex(17);
-        Column bioRoleB = row.getColumnByIndex(18);
-        Column propA = row.getColumnByIndex(19);
-        Column propB = row.getColumnByIndex(20);
-        Column typeA = row.getColumnByIndex(21);
-        Column typeB = row.getColumnByIndex(22);
-        Column hostOrganism = row.getColumnByIndex(23);
-        Column expansion = row.getColumnByIndex(24);
-        Column dataset = row.getColumnByIndex(25);
+        if (row.getColumnCount() <= IntactDocumentDefinition.EXPERIMENTAL_ROLE_A) {
+            return;
+        }
+
+        Column expRoleA = row.getColumnByIndex(IntactDocumentDefinition.EXPERIMENTAL_ROLE_A);
+        Column expRoleB = row.getColumnByIndex(IntactDocumentDefinition.EXPERIMENTAL_ROLE_B);
+        Column bioRoleA = row.getColumnByIndex(IntactDocumentDefinition.BIOLOGICAL_ROLE_A);
+        Column bioRoleB = row.getColumnByIndex(IntactDocumentDefinition.BIOLOGICAL_ROLE_B);
+        Column propA = row.getColumnByIndex(IntactDocumentDefinition.PROPERTIES_A);
+        Column propB = row.getColumnByIndex(IntactDocumentDefinition.PROPERTIES_B);
+        Column typeA = row.getColumnByIndex(IntactDocumentDefinition.INTERACTOR_TYPE_A);
+        Column typeB = row.getColumnByIndex(IntactDocumentDefinition.INTERACTOR_TYPE_B);
+        Column hostOrganism = row.getColumnByIndex(IntactDocumentDefinition.HOST_ORGANISM);
+        Column expansion = row.getColumnByIndex(IntactDocumentDefinition.EXPANSION_METHOD);
+        Column dataset = row.getColumnByIndex(IntactDocumentDefinition.DATASET);
+
 
         ibi.setExperimentalRolesInteractorA(createCrossReferences(expRoleA) );
         ibi.setExperimentalRolesInteractorB(createCrossReferences(expRoleB) );
@@ -93,6 +102,19 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
         ibi.setHostOrganism( createCrossReferences( hostOrganism ) );
         ibi.setExpansionMethods( createStringsFromColumn( expansion ) );
         ibi.setDataset( createStringsFromColumn( dataset ) );
+
+
+        // second extension
+
+        if (row.getColumnCount() > IntactDocumentDefinition.ANNOTATIONS_A) {
+            Column annotationsA = row.getColumnByIndex(IntactDocumentDefinition.ANNOTATIONS_A);
+            ibi.setAnnotationsA(createAnnotations(annotationsA));
+        }
+
+        if (row.getColumnCount() > IntactDocumentDefinition.ANNOTATIONS_B) {
+            Column annotationsB = row.getColumnByIndex(IntactDocumentDefinition.ANNOTATIONS_B);
+            ibi.setAnnotationsB(createAnnotations(annotationsB));
+        }
     }
 
     protected List<String> createStringsFromColumn( Column column ) {
@@ -109,5 +131,31 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
             fields.add( new Field(str) );
         }
         return new Column( fields );
+    }
+
+    protected Column createColumnFromAnnotations( Collection<Annotation> annotations ) {
+        final LinkedList<Field> fields = new LinkedList<Field>();
+        for ( Annotation annotation : annotations ) {
+            fields.add( createFieldFromAnnotation( annotation ));
+        }
+        return new Column( fields );
+    }
+
+    protected Field createFieldFromAnnotation( Annotation annotation ) {
+        return new Field( annotation.getType(), annotation.getText() );
+    }
+
+    protected List<Annotation> createAnnotations(Column column) {
+        List<Annotation> annotations = new ArrayList<Annotation>();
+
+        for (Field field : column.getFields()) {
+            annotations.add(createAnnotation(field));
+        }
+
+        return annotations;
+    }
+
+    protected Annotation createAnnotation(Field field) {
+        return new Annotation(field.getType(), field.getValue());
     }
 }

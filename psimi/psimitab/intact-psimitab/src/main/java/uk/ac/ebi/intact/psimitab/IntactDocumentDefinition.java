@@ -37,6 +37,8 @@ public class IntactDocumentDefinition extends MitabDocumentDefinition {
     public static final int HOST_ORGANISM = 23;
     public static final int EXPANSION_METHOD = 24;
     public static final int DATASET = 25;
+    public static final int ANNOTATIONS_A = 26;
+    public static final int ANNOTATIONS_B = 27;
 
     public IntactDocumentDefinition() {
         super();
@@ -51,6 +53,8 @@ public class IntactDocumentDefinition extends MitabDocumentDefinition {
         addColumnDefinition(new ColumnDefinition("HostOrganism(s)", "hostOrganism", new CrossReferenceFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("Expansion method(s)", "expansion", new PlainTextFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("Dataset name(s)", "dataset", new PlainTextFieldBuilder()));
+        addColumnDefinition(new ColumnDefinition("Annotation(s) interactor A", "annotationA", new CrossReferenceFieldBuilder()));
+        addColumnDefinition(new ColumnDefinition("Annotation(s) interactor B", "annotationB", new CrossReferenceFieldBuilder()));
     }
 
     public InteractionRowConverter<BinaryInteraction> createInteractionRowConverter() {

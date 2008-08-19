@@ -27,6 +27,7 @@ import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.InteractionDetectionMethod;
 import psidev.psi.mi.xml.model.Organism;
+import uk.ac.ebi.intact.psimitab.model.Annotation;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -410,6 +411,19 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
                     }
                 }
             }
+        }
+
+
+        // annotations
+
+        for (Attribute attribute : pA.getAttributes()) {
+            Annotation annotation = new Annotation(attribute.getName(), attribute.getValue());
+            bi.getAnnotationsA().add(annotation);
+        }
+
+        for (Attribute attribute : pB.getAttributes()) {
+            Annotation annotation = new Annotation(attribute.getName(), attribute.getValue());
+            bi.getAnnotationsB().add(annotation);
         }
     }
 

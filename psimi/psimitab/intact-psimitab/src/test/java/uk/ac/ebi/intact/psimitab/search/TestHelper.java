@@ -20,6 +20,7 @@ import psidev.psi.mi.search.Searcher;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.xml.converter.ConverterException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -34,5 +35,9 @@ public abstract class TestHelper {
     public static Directory createIndexFromResource(String resourcePath) throws IOException, ConverterException, MitabLineException {
         InputStream is = TestHelper.class.getResourceAsStream(resourcePath);
         return Searcher.buildIndexInMemory(is, true, true, new IntactPsimiTabIndexWriter());
-    }    
+    }
+
+    public static Directory createIndexFromLine(String line) throws IOException, ConverterException, MitabLineException {
+        return Searcher.buildIndexInMemory(new ByteArrayInputStream(line.getBytes()), true, false, new IntactPsimiTabIndexWriter());
+    }
 }

@@ -8,6 +8,7 @@ package uk.ac.ebi.intact.psimitab;
 import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
+import uk.ac.ebi.intact.psimitab.model.Annotation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +43,10 @@ public class IntactBinaryInteraction extends BinaryInteractionImpl {
     private List<String> expansionMethods;
 
     private List<String> dataset;
+
+    private List<Annotation> annotationsA;
+    private List<Annotation> annotationsB;
+
     private Interactor interactorA;
 
     private Interactor interactorB;
@@ -198,6 +203,28 @@ public class IntactBinaryInteraction extends BinaryInteractionImpl {
 
     public void setDataset( List<String> dataset ) {
         this.dataset = dataset;
+    }
+
+    public List<Annotation> getAnnotationsA() {
+        if (annotationsA == null) {
+            annotationsA = new ArrayList<Annotation>();
+        }
+        return annotationsA;
+    }
+
+    public void setAnnotationsA(List<Annotation> annotationsA) {
+        this.annotationsA = annotationsA;
+    }
+
+    public List<Annotation> getAnnotationsB() {
+        if (annotationsB == null) {
+            annotationsB = new ArrayList<Annotation>();
+        }
+        return annotationsB;
+    }
+
+    public void setAnnotationsB(List<Annotation> annotationsB) {
+        this.annotationsB = annotationsB;
     }
 
     public boolean hasExperimentalRolesInteractorA() {

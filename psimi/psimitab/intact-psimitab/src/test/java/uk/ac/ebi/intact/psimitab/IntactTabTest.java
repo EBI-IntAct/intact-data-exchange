@@ -1,12 +1,11 @@
 package uk.ac.ebi.intact.psimitab;
 
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import org.junit.Assert;
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.PsimiTabWriter;
-import psidev.psi.mi.tab.mock.PsimiTabMockBuilder;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
 import psidev.psi.mi.tab.model.*;
@@ -15,8 +14,6 @@ import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
 import java.io.File;
 import java.io.StringWriter;
 import java.util.Collection;
-import java.util.Arrays;
-import java.util.List;
 
 public class IntactTabTest extends AbstractPsimitabTestCase {
 
@@ -71,7 +68,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
     @Test
     public void roundtrip() throws Exception {
 
-        String mitab = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)\tintact:EBI-446356\tintact:high\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)\tMI:0499(unspecified role)\tuniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716\tgo:\"GO:0005737\"(\"C:cytoplasm\")|interpro:IPR001589(Actbind_actnin)\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\tSpoke\tCancer|Apoptosis";
+        String mitab = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)\tintact:EBI-446356\tintact:high\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)\tMI:0499(unspecified role)\tuniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716\tgo:\"GO:0005737\"(\"C:cytoplasm\")|interpro:IPR001589(Actbind_actnin)\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\tSpoke\tCancer|Apoptosis\tcomment:commentA\tcomment:commentB";
 
         PsimiTabReader reader = new IntactPsimiTabReader( false );
         Collection<BinaryInteraction> bis = reader.read( mitab );
@@ -162,6 +159,11 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         Assert.assertEquals( 2, bi.getDataset().size() );
         Assert.assertTrue( bi.getDataset().contains( "Cancer" ) );
         Assert.assertTrue( bi.getDataset().contains( "Apoptosis" ) );
+
+        Assert.assertEquals(1, bi.getAnnotationsA().size());
+        Assert.assertEquals("commentA", bi.getAnnotationsA().iterator().next().getText());
+        Assert.assertEquals(1, bi.getAnnotationsB().size());
+        Assert.assertEquals("commentB", bi.getAnnotationsB().iterator().next().getText());
 
 
         // now write it back into a String

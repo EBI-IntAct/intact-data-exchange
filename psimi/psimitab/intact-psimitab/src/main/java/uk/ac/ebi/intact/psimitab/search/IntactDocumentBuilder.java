@@ -34,6 +34,10 @@ public class IntactDocumentBuilder extends DefaultDocumentBuilder<IntactBinaryIn
         final RowBuilder rowBuilder = getDocumentDefinition().createRowBuilder();
         final Row row = rowBuilder.createRow(psiMiTabLine);
 
+        if (row.getColumnCount() <= IntactDocumentDefinition.EXPERIMENTAL_ROLE_A) {
+            return doc;
+        }
+
         // raw fields
 		Column experimentRoleA = row.getColumnByIndex(IntactDocumentDefinition.EXPERIMENTAL_ROLE_A);
 		Column experimentRoleB = row.getColumnByIndex(IntactDocumentDefinition.EXPERIMENTAL_ROLE_B);
@@ -46,6 +50,9 @@ public class IntactDocumentBuilder extends DefaultDocumentBuilder<IntactBinaryIn
 		Column hostOrganism = row.getColumnByIndex(IntactDocumentDefinition.HOST_ORGANISM);
 		Column expansion = row.getColumnByIndex(IntactDocumentDefinition.EXPANSION_METHOD);
         Column dataset = row.getColumnByIndex(IntactDocumentDefinition.DATASET);
+
+        // other columns, such as the annotations (corresponding to a second extension of the format)
+        // after next section
 
 		doc.add(new Field("roles", isolateDescriptions( experimentRoleA ) + " " + isolateDescriptions( experimentRoleB )
                 + " " + isolateDescriptions( biologicalRoleA ) + " " + isolateDescriptions( biologicalRoleB),
@@ -76,6 +83,21 @@ public class IntactDocumentBuilder extends DefaultDocumentBuilder<IntactBinaryIn
 		
 		addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition(IntactDocumentDefinition.EXPANSION_METHOD), expansion);
         addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition(IntactDocumentDefinition.DATASET), dataset);
+
+
+        // second extension
+
+        if (row.getColumnCount() > IntactDocumentDefinition.ANNOTATIONS_B) {
+            Column annotationsA = row.getColumnByIndex(IntactDocumentDefinition.ANNOTATIONS_A);
+            Column annotationsB = row.getColumnByIndex(IntactDocumentDefinition.ANNOTATIONS_B);
+
+            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition(IntactDocumentDefinition.ANNOTATIONS_A), annotationsA);
+            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition(IntactDocumentDefinition.ANNOTATIONS_B), annotationsB);
+
+            doc.add(new Field("annotation", isolateValue(annotationsA)+" "+isolateValue(annotationsB),
+                    Field.Store.NO,
+                    Field.Index.TOKENIZED));
+        }
 
         return doc;
 	}
