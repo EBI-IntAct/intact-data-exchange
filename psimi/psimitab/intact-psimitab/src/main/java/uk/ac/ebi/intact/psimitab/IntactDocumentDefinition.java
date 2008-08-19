@@ -39,6 +39,9 @@ public class IntactDocumentDefinition extends MitabDocumentDefinition {
     public static final int DATASET = 25;
     public static final int ANNOTATIONS_A = 26;
     public static final int ANNOTATIONS_B = 27;
+    public static final int PARAMETERS_A = 28;
+    public static final int PARAMETERS_B = 29;
+    public static final int PARAMETERS_INTERACTION = 30;
 
     public IntactDocumentDefinition() {
         super();
@@ -55,6 +58,9 @@ public class IntactDocumentDefinition extends MitabDocumentDefinition {
         addColumnDefinition(new ColumnDefinition("Dataset name(s)", "dataset", new PlainTextFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("Annotation(s) interactor A", "annotationA", new CrossReferenceFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("Annotation(s) interactor B", "annotationB", new CrossReferenceFieldBuilder()));
+        addColumnDefinition(new ColumnDefinition("Parameter(s) interactor A", "parameterA", new CrossReferenceFieldBuilder()));
+        addColumnDefinition(new ColumnDefinition("Parameter(s) interactor B", "parameterB", new CrossReferenceFieldBuilder()));
+        addColumnDefinition(new ColumnDefinition("Parameter(s) interaction", "parameterInteraction", new CrossReferenceFieldBuilder()));
     }
 
     public InteractionRowConverter<BinaryInteraction> createInteractionRowConverter() {

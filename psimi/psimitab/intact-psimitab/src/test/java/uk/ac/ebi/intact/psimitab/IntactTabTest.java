@@ -68,7 +68,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
     @Test
     public void roundtrip() throws Exception {
 
-        String mitab = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)\tintact:EBI-446356\tintact:high\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)\tMI:0499(unspecified role)\tuniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716\tgo:\"GO:0005737\"(\"C:cytoplasm\")|interpro:IPR001589(Actbind_actnin)\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\tSpoke\tCancer|Apoptosis\tcomment:commentA\tcomment:commentB";
+        String mitab = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)\tintact:EBI-446356\tintact:high\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)\tMI:0499(unspecified role)\tuniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716\tgo:\"GO:0005737\"(\"C:cytoplasm\")|interpro:IPR001589(Actbind_actnin)\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\tSpoke\tCancer|Apoptosis\tcomment:commentA\tcomment:commentB\tic50A:100(molar)\tic50B:200(molar)\tic50C:300(molar)";
 
         PsimiTabReader reader = new IntactPsimiTabReader( false );
         Collection<BinaryInteraction> bis = reader.read( mitab );
@@ -164,6 +164,20 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         Assert.assertEquals("commentA", bi.getAnnotationsA().iterator().next().getText());
         Assert.assertEquals(1, bi.getAnnotationsB().size());
         Assert.assertEquals("commentB", bi.getAnnotationsB().iterator().next().getText());
+
+        Assert.assertEquals(1, bi.getParametersA().size());
+        Assert.assertEquals("ic50A", bi.getParametersA().iterator().next().getType());
+        Assert.assertEquals("100", bi.getParametersA().iterator().next().getValue());
+        Assert.assertEquals("molar", bi.getParametersA().iterator().next().getUnit());
+
+        Assert.assertEquals(1, bi.getParametersB().size());
+        Assert.assertEquals("ic50B", bi.getParametersB().iterator().next().getType());
+        Assert.assertEquals("200", bi.getParametersB().iterator().next().getValue());
+
+        Assert.assertEquals(1, bi.getParametersInteraction().size());
+        Assert.assertEquals("ic50C", bi.getParametersInteraction().iterator().next().getType());
+        Assert.assertEquals("300", bi.getParametersInteraction().iterator().next().getValue());
+
 
 
         // now write it back into a String

@@ -99,6 +99,22 @@ public class IntactDocumentBuilder extends DefaultDocumentBuilder<IntactBinaryIn
                     Field.Index.TOKENIZED));
         }
 
+        if (row.getColumnCount() > IntactDocumentDefinition.PARAMETERS_INTERACTION) {
+            Column parametersA = row.getColumnByIndex(IntactDocumentDefinition.PARAMETERS_A);
+            Column parametersB = row.getColumnByIndex(IntactDocumentDefinition.PARAMETERS_B);
+            Column parametersInteraction = row.getColumnByIndex(IntactDocumentDefinition.PARAMETERS_INTERACTION);
+
+
+            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition(IntactDocumentDefinition.PARAMETERS_A), parametersA);
+            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition(IntactDocumentDefinition.PARAMETERS_B), parametersB);
+            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition(IntactDocumentDefinition.PARAMETERS_INTERACTION), parametersInteraction);
+
+            doc.add(new Field("parameter", isolateValue(parametersA)+" "+isolateValue(parametersB)+" "+isolateValue(parametersInteraction),
+                    Field.Store.NO,
+                    Field.Index.TOKENIZED));
+        }
+
+
         return doc;
 	}
 

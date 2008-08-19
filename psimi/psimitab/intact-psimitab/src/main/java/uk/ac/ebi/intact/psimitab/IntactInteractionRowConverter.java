@@ -21,6 +21,7 @@ import psidev.psi.mi.tab.model.builder.Field;
 import psidev.psi.mi.tab.model.builder.MitabInteractionRowConverter;
 import psidev.psi.mi.tab.model.builder.Row;
 import uk.ac.ebi.intact.psimitab.model.Annotation;
+import uk.ac.ebi.intact.psimitab.model.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,6 +65,10 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
         row.appendColumn( createColumnFromStrings( interaction.getDataset() ) );
         row.appendColumn( createColumnFromAnnotations( interaction.getAnnotationsA() ) );
         row.appendColumn( createColumnFromAnnotations( interaction.getAnnotationsB() ) );
+        row.appendColumn( createColumnFromParameters( interaction.getParametersA() ) );
+        row.appendColumn( createColumnFromParameters( interaction.getParametersB() ) );
+        row.appendColumn( createColumnFromParameters( interaction.getParametersInteraction() ) );
+
 
         return row;
     }
@@ -115,6 +120,21 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
             Column annotationsB = row.getColumnByIndex(IntactDocumentDefinition.ANNOTATIONS_B);
             ibi.setAnnotationsB(createAnnotations(annotationsB));
         }
+
+        if(row.getColumnCount() > IntactDocumentDefinition.PARAMETERS_A ){
+            Column parametersA = row.getColumnByIndex( IntactDocumentDefinition.PARAMETERS_A );
+            ibi.setParametersA(createParameters(parametersA) );
+        }
+
+        if(row.getColumnCount() > IntactDocumentDefinition.PARAMETERS_B ){
+            Column parametersB = row.getColumnByIndex( IntactDocumentDefinition.PARAMETERS_B );
+            ibi.setParametersB(createParameters(parametersB) );
+        }
+
+        if(row.getColumnCount() > IntactDocumentDefinition.PARAMETERS_INTERACTION ){
+            Column parametersInteraction = row.getColumnByIndex( IntactDocumentDefinition.PARAMETERS_INTERACTION );
+            ibi.setParametersInteraction(createParameters(parametersInteraction) );
+        }
     }
 
     protected List<String> createStringsFromColumn( Column column ) {
@@ -141,8 +161,20 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
         return new Column( fields );
     }
 
+     protected Column createColumnFromParameters( Collection<Parameter> parameters ) {
+        final LinkedList<Field> fields = new LinkedList<Field>();
+        for ( Parameter parameter : parameters ) {
+            fields.add( createFieldFromParameter( parameter ));
+        }
+        return new Column( fields );
+    }
+
     protected Field createFieldFromAnnotation( Annotation annotation ) {
         return new Field( annotation.getType(), annotation.getText() );
+    }
+
+    protected Field createFieldFromParameter( Parameter parameter ) {
+        return new Field( parameter.getType(), parameter.getValue(), parameter.getUnit() );
     }
 
     protected List<Annotation> createAnnotations(Column column) {
@@ -157,5 +189,19 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
 
     protected Annotation createAnnotation(Field field) {
         return new Annotation(field.getType(), field.getValue());
+    }
+
+    protected List<Parameter> createParameters(Column column) {
+        List<Parameter> parameters = new ArrayList<Parameter>();
+
+        for (Field field : column.getFields()) {
+            parameters.add(createParameter(field));
+        }
+
+        return parameters;
+    }
+
+    protected Parameter createParameter(Field field) {
+        return new Parameter(field.getType(), field.getValue(),field.getDescription());
     }
 }

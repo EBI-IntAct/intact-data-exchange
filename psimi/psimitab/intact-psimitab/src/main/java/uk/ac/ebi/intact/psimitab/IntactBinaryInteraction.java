@@ -9,6 +9,7 @@ import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.psimitab.model.Annotation;
+import uk.ac.ebi.intact.psimitab.model.Parameter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +47,11 @@ public class IntactBinaryInteraction extends BinaryInteractionImpl {
 
     private List<Annotation> annotationsA;
     private List<Annotation> annotationsB;
+
+    private List<Parameter> parametersA;
+    private List<Parameter> parametersB;
+    private List<Parameter> parametersInteraction;
+
 
     private Interactor interactorA;
 
@@ -221,6 +227,39 @@ public class IntactBinaryInteraction extends BinaryInteractionImpl {
             annotationsB = new ArrayList<Annotation>();
         }
         return annotationsB;
+    }
+
+    public List<Parameter> getParametersA() {
+        if ( parametersA == null ) {
+            parametersA = new ArrayList<Parameter>();
+        }
+        return parametersA;
+    }
+
+    public void setParametersA( List<Parameter> parametersA ) {
+        this.parametersA = parametersA;
+    }
+
+    public List<Parameter> getParametersB() {
+        if ( parametersB == null ) {
+            parametersB = new ArrayList<Parameter>();
+        }
+        return parametersB;
+    }
+
+    public void setParametersB( List<Parameter> parametersB ) {
+        this.parametersB = parametersB;
+    }
+
+    public List<Parameter> getParametersInteraction() {
+        if ( parametersInteraction == null ) {
+            parametersInteraction = new ArrayList<Parameter>();
+        }
+        return parametersInteraction;
+    }
+
+    public void setParametersInteraction( List<Parameter> parametersInteraction ) {
+        this.parametersInteraction = parametersInteraction;
     }
 
     public void setAnnotationsB(List<Annotation> annotationsB) {
