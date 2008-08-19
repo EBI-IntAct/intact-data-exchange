@@ -4,13 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import psidev.psi.mi.tab.PsimiTabWriter;
-import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntactPsimiTabWriter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,7 +41,7 @@ public class Intact2TabTest extends IntactBasicTestCase {
         }
         assertEquals( 3, interactions.size() );
 
-        Collection<BinaryInteraction> bis = i2t.convert( interactions );
+        Collection bis = i2t.convert( interactions );
         assertNotNull( bis );
 
         File file = new File( TestHelper.getTargetDirectory(), "test_1.txt" );
@@ -69,11 +66,11 @@ public class Intact2TabTest extends IntactBasicTestCase {
         }
         assertEquals( 3, interactions.size() );
 
-        Collection<BinaryInteraction> bis = i2t.convert( interactions );
+        Collection bis = i2t.convert( interactions );
         assertNotNull( bis );
 
         File file = new File( TestHelper.getTargetDirectory(), "test_2.txt" );
-        PsimiTabWriter writer = new IntactPsimiTabWriter();
+        PsimiTabWriter writer = new PsimiTabWriter();
         writer.write( bis, file );
     }
 
@@ -99,11 +96,12 @@ public class Intact2TabTest extends IntactBasicTestCase {
 
         assertEquals( 2, interactions.size() );
 
-        Collection<BinaryInteraction> bis = i2t.convert( interactions );
+        Collection bis = i2t.convert( interactions );
         assertNotNull( bis );
 
         File file = new File( TestHelper.getTargetDirectory(), "test_3.txt" );
-        PsimiTabWriter writer = new IntactPsimiTabWriter();
+        PsimiTabWriter writer = new PsimiTabWriter();
         writer.write( bis, file );
     }
+
 }

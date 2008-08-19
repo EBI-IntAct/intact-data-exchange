@@ -6,7 +6,6 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
 import java.util.Iterator;
 
@@ -37,8 +36,6 @@ public class InteractionConverterTest extends IntactBasicTestCase {
     @Test
     public void convertToIntactMitab() throws Exception {
         InteractionConverter interactionConverter = new InteractionConverter();
-        interactionConverter.setBinaryInteractionClass( IntactBinaryInteraction.class );
-        interactionConverter.setBinaryInteractionHandler( new IntactBinaryInteractionHandler() );
 
         final Interaction interaction = getMockBuilder().createInteractionRandomBinary();
         Iterator<Component> i = interaction.getComponents().iterator();
