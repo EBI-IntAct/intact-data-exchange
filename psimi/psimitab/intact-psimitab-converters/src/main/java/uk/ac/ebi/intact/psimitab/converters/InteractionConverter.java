@@ -281,7 +281,7 @@ public class InteractionConverter {
         return bi;
     }
 
-    private uk.ac.ebi.intact.psimitab.model.Parameter getParameter( uk.ac.ebi.intact.model.Parameter parameter ) {
+    protected uk.ac.ebi.intact.psimitab.model.Parameter getParameter( uk.ac.ebi.intact.model.Parameter parameter ) {
 
         final String BASE_E_NOTATION = "E";
         if ( parameter == null ) {
