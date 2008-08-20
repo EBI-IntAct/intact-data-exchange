@@ -6,11 +6,10 @@ import org.junit.Assert;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.ComponentParameter;
-import uk.ac.ebi.intact.model.InteractionParameter;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.psimitab.model.Parameter;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
 import java.util.Iterator;
 import java.util.List;
@@ -62,73 +61,57 @@ public class InteractionConverterTest extends IntactBasicTestCase {
 
         final Interaction interaction = getMockBuilder().createInteractionRandomBinary();
         Iterator<Component> i = interaction.getComponents().iterator();
-        i.next().getInteractor().setAc( "EBI-xxxxxxx" );
-        i.next().getInteractor().setAc( "EBI-yyyyyyy" );
+        final uk.ac.ebi.intact.model.Interactor interactorA = i.next().getInteractor();
+        final uk.ac.ebi.intact.model.Interactor interactorB = i.next().getInteractor();
+        interactorA.setAc( "EBI-xxxxxxx" );
+        interactorB.setAc( "EBI-yyyyyyy" );
 
-        BinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
+        final ComponentParameter paramB = interactorB.getActiveInstances().iterator().next().getParameters().iterator().next();
+        paramB.setFactor(30.2);
+        paramB.setExponent(1);
+
+        final InteractionParameter interactionParameter =
+                getMockBuilder().createInteractionParameter(
+                        getMockBuilder().createCvObject(CvParameterType.class, "MI:9898", "kD"),
+                        getMockBuilder().createCvObject(CvParameterUnit.class, "MI:9999", "kilodalton"),
+                        4d);
+        interaction.getParameters().add(interactionParameter);
+
+        IntactBinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
 
         assertNotNull( bi );
         final Collection<Component> components = interaction.getComponents();
         if ( components.size() != 2 ) {
             throw new IllegalArgumentException( "We only convert binary interaction (2 components or a single with stoichiometry 2)" );
         }
-        Iterator<Component> iterator = components.iterator();
-        uk.ac.ebi.intact.model.Interactor intactInteractorA = iterator.next().getInteractor();
-        uk.ac.ebi.intact.model.Interactor intactInteractorB = iterator.next().getInteractor();
-
-        //set parameters
-        List<Parameter> parametersA = new ArrayList<Parameter>();
-        List<uk.ac.ebi.intact.psimitab.model.Parameter> parametersB = new ArrayList<uk.ac.ebi.intact.psimitab.model.Parameter>();
-        List<uk.ac.ebi.intact.psimitab.model.Parameter> parametersInteraction = new ArrayList<uk.ac.ebi.intact.psimitab.model.Parameter>();
-
-        for ( Component component : interaction.getComponents() ) {
-            if ( component.getInteractor().equals( intactInteractorA ) ) {
-
-                //parameters  for InteractorA
-                for ( ComponentParameter componentParameterA : component.getParameters() ) {
-                    uk.ac.ebi.intact.psimitab.model.Parameter parameterA = interactionConverter.getParameter( componentParameterA );
-                    if ( parameterA != null ) {
-                        parametersA.add( parameterA );
-                    }
-                }
-
-            }
-            if ( component.getInteractor().equals( intactInteractorB ) ) {
-
-                //paramters for InteractorB
-                for ( ComponentParameter componentParameterB : component.getParameters() ) {
-                    uk.ac.ebi.intact.psimitab.model.Parameter parameterB = interactionConverter.getParameter( componentParameterB );
-                    if ( parameterB != null ) {
-                        parametersB.add( parameterB );
-                    }
-                }
-
-            }
-        }//end for
-
-        //for ParametersInterection -- but it is empty
-        if ( interaction.getParameters() != null ) {
-            for ( InteractionParameter interactionParameter : interaction.getParameters() ) {
-                uk.ac.ebi.intact.psimitab.model.Parameter parameterInteraction = interactionConverter.getParameter( interactionParameter );
-                if ( parameterInteraction != null ) {
-                    parametersInteraction.add( parameterInteraction );
-                }
-            }
-
-        }
 
         //check Parameter A
-        Assert.assertEquals( "temperature", parametersA.iterator().next().getType() );
-        Assert.assertEquals( "302.0E0", parametersA.iterator().next().getValue() );
-        Assert.assertEquals( "kelvin", parametersA.iterator().next().getUnit() );
+        List<Parameter> parametersA = bi.getInteractorA().getParameters();
+
+        final Parameter parameterA = parametersA.iterator().next();
+        Assert.assertEquals( "temperature", parameterA.getType() );
+        Assert.assertEquals( "302.0", parameterA.getValue() );
+        Assert.assertEquals( "kelvin", parameterA.getUnit() );
 
         //check Parameter B
-        Assert.assertEquals( "temperature", parametersB.iterator().next().getType() );
-        Assert.assertEquals( "302.0E0", parametersB.iterator().next().getValue() );
-        Assert.assertEquals( "kelvin", parametersB.iterator().next().getUnit() );
+        List<Parameter> parametersB = bi.getInteractorB().getParameters();
+
+        final Parameter parameterB = parametersB.iterator().next();
+        Assert.assertEquals( "temperature", parameterB.getType() );
+        Assert.assertEquals( "30.2E1", parameterB.getValue() );
+        Assert.assertEquals( "kelvin", parameterB.getUnit() );
 
         //check ParametersInteraction
-        Assert.assertEquals(0,parametersInteraction.size());
+        List<Parameter> parametersInteraction = bi.getParameters();
+        Assert.assertEquals(1, parametersInteraction.size());
+
+        final Parameter ip = bi.getParameters().iterator().next();
+
+        Assert.assertEquals("kD", ip.getType());
+        Assert.assertEquals(4d, ip.getFactor());
+        Assert.assertEquals("kilodalton", ip.getUnit());
+
+
 
 
 

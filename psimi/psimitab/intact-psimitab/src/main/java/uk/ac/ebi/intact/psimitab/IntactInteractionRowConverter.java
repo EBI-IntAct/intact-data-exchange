@@ -16,12 +16,11 @@
 package uk.ac.ebi.intact.psimitab;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.builder.Column;
-import psidev.psi.mi.tab.model.builder.Field;
-import psidev.psi.mi.tab.model.builder.MitabInteractionRowConverter;
-import psidev.psi.mi.tab.model.builder.Row;
+import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.builder.*;
 import uk.ac.ebi.intact.psimitab.model.Annotation;
 import uk.ac.ebi.intact.psimitab.model.Parameter;
+import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,41 +33,47 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class IntactInteractionRowConverter extends MitabInteractionRowConverter {
+public class IntactInteractionRowConverter extends AbstractInteractionRowConverter<IntactBinaryInteraction> {
 
-    public BinaryInteraction createBinaryInteraction(Row row) {
+    protected IntactBinaryInteraction newBinaryInteraction(Interactor interactorA, Interactor interactorB) {
+        return new IntactBinaryInteraction((ExtendedInteractor)interactorA, (ExtendedInteractor)interactorB);
+    }
+
+    protected Interactor newInteractor() {
+        return new ExtendedInteractor();
+    }
+
+    public IntactBinaryInteraction createBinaryInteraction(Row row) {
         if (row.getColumnCount() < 25) {
             throw new IllegalArgumentException("At least 25 columns were expected in row: "+row);
         }
 
-        BinaryInteraction binaryInteraction = new IntactBinaryInteraction(createInteractorA(row), createInteractorB(row));
+        IntactBinaryInteraction binaryInteraction = super.createBinaryInteraction(row);
         populateBinaryInteraction(binaryInteraction, row);
 
         return binaryInteraction;
     }
 
-    public Row createRow( BinaryInteraction binaryInteraction ) {
-        IntactBinaryInteraction interaction = (IntactBinaryInteraction) binaryInteraction;
+    public Row createRow( IntactBinaryInteraction interaction ) {
 
-        Row row = super.createRow(binaryInteraction);
+        Row row = super.createRow(interaction);
 
-        row.appendColumn( createColumnFromCrossReferences( interaction.getExperimentalRolesInteractorA() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getExperimentalRolesInteractorB() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getBiologicalRolesInteractorA() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getBiologicalRolesInteractorB() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getPropertiesA() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getPropertiesB() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorTypeA() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorTypeB() ) );
+        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorA().getExperimentalRoles() ) );
+        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorB().getExperimentalRoles() ) );
+        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorA().getBiologicalRoles() ) );
+        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorB().getBiologicalRoles() ) );
+        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorA().getProperties() ) );
+        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorB().getProperties() ) );
+        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorA().getInteractorType() ) );
+        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorB().getInteractorType() ) );
         row.appendColumn( createColumnFromCrossReferences( interaction.getHostOrganism() ) );
         row.appendColumn( createColumnFromStrings( interaction.getExpansionMethods() ) );
         row.appendColumn( createColumnFromStrings( interaction.getDataset() ) );
-        row.appendColumn( createColumnFromAnnotations( interaction.getAnnotationsA() ) );
-        row.appendColumn( createColumnFromAnnotations( interaction.getAnnotationsB() ) );
-        row.appendColumn( createColumnFromParameters( interaction.getParametersA() ) );
-        row.appendColumn( createColumnFromParameters( interaction.getParametersB() ) );
-        row.appendColumn( createColumnFromParameters( interaction.getParametersInteraction() ) );
-
+        row.appendColumn( createColumnFromAnnotations( interaction.getInteractorA().getAnnotations() ) );
+        row.appendColumn( createColumnFromAnnotations( interaction.getInteractorB().getAnnotations() ) );
+        row.appendColumn( createColumnFromParameters( interaction.getInteractorA().getParameters() ) );
+        row.appendColumn( createColumnFromParameters( interaction.getInteractorB().getParameters() ) );
+        row.appendColumn( createColumnFromParameters( interaction.getParameters() ) );
 
         return row;
     }
@@ -96,44 +101,40 @@ public class IntactInteractionRowConverter extends MitabInteractionRowConverter 
         Column dataset = row.getColumnByIndex(IntactDocumentDefinition.DATASET);
 
 
-        ibi.setExperimentalRolesInteractorA(createCrossReferences(expRoleA) );
-        ibi.setExperimentalRolesInteractorB(createCrossReferences(expRoleB) );
-        ibi.setBiologicalRolesInteractorA(createCrossReferences(bioRoleA) );
-        ibi.setBiologicalRolesInteractorB(createCrossReferences(bioRoleB) );
-        ibi.setPropertiesA(createCrossReferences(propA) );
-        ibi.setPropertiesB(createCrossReferences(propB) );
-        ibi.setInteractorTypeA( createCrossReferences( typeA ) );
-        ibi.setInteractorTypeB( createCrossReferences( typeB ) );
+        ibi.getInteractorA().setExperimentalRoles(createCrossReferences(expRoleA) );
+        ibi.getInteractorB().setExperimentalRoles(createCrossReferences(expRoleB) );
+        ibi.getInteractorA().setBiologicalRoles(createCrossReferences(bioRoleA) );
+        ibi.getInteractorB().setBiologicalRoles(createCrossReferences(bioRoleB) );
+        ibi.getInteractorA().setProperties(createCrossReferences(propA) );
+        ibi.getInteractorB().setProperties(createCrossReferences(propB) );
+        ibi.getInteractorA().setInteractorType( createCrossReferences( typeA ).iterator().next() );
+        ibi.getInteractorB().setInteractorType( createCrossReferences( typeB ).iterator().next() );
         ibi.setHostOrganism( createCrossReferences( hostOrganism ) );
         ibi.setExpansionMethods( createStringsFromColumn( expansion ) );
         ibi.setDataset( createStringsFromColumn( dataset ) );
 
 
-        // second extension
-
-        if (row.getColumnCount() > IntactDocumentDefinition.ANNOTATIONS_A) {
-            Column annotationsA = row.getColumnByIndex(IntactDocumentDefinition.ANNOTATIONS_A);
-            ibi.setAnnotationsA(createAnnotations(annotationsA));
-        }
+        // second extension (annotations
 
         if (row.getColumnCount() > IntactDocumentDefinition.ANNOTATIONS_B) {
+            Column annotationsA = row.getColumnByIndex(IntactDocumentDefinition.ANNOTATIONS_A);
+            ibi.getInteractorA().setAnnotations(createAnnotations(annotationsA));
+
             Column annotationsB = row.getColumnByIndex(IntactDocumentDefinition.ANNOTATIONS_B);
-            ibi.setAnnotationsB(createAnnotations(annotationsB));
+            ibi.getInteractorB().setAnnotations(createAnnotations(annotationsB));
         }
 
-        if(row.getColumnCount() > IntactDocumentDefinition.PARAMETERS_A ){
-            Column parametersA = row.getColumnByIndex( IntactDocumentDefinition.PARAMETERS_A );
-            ibi.setParametersA(createParameters(parametersA) );
-        }
-
-        if(row.getColumnCount() > IntactDocumentDefinition.PARAMETERS_B ){
-            Column parametersB = row.getColumnByIndex( IntactDocumentDefinition.PARAMETERS_B );
-            ibi.setParametersB(createParameters(parametersB) );
-        }
+        // third extension (parameters)
 
         if(row.getColumnCount() > IntactDocumentDefinition.PARAMETERS_INTERACTION ){
+            Column parametersA = row.getColumnByIndex( IntactDocumentDefinition.PARAMETERS_A );
+            ibi.getInteractorA().setParameters(createParameters(parametersA) );
+
+            Column parametersB = row.getColumnByIndex( IntactDocumentDefinition.PARAMETERS_B );
+            ibi.getInteractorB().setParameters(createParameters(parametersB) );
+
             Column parametersInteraction = row.getColumnByIndex( IntactDocumentDefinition.PARAMETERS_INTERACTION );
-            ibi.setParametersInteraction(createParameters(parametersInteraction) );
+            ibi.setParameters(createParameters(parametersInteraction) );
         }
     }
 

@@ -59,7 +59,6 @@ public class IntactXml2TabTest extends AbstractPsimitabTestCase {
             assertTrue( dbi.hasExperimentalRolesInteractorB() );
             assertTrue( dbi.hasPropertiesA() );
             assertTrue( dbi.hasPropertiesB() );
-            assertTrue( BinaryInteractionImpl.class.isAssignableFrom( dbi.getClass() ) );
         }
     }
 }

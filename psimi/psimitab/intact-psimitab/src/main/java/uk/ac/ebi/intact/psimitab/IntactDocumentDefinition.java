@@ -24,7 +24,7 @@ import psidev.psi.mi.tab.model.builder.*;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class IntactDocumentDefinition extends MitabDocumentDefinition {
+public class IntactDocumentDefinition extends AbstractDocumentDefinition<IntactBinaryInteraction> {
 
     public static final int EXPERIMENTAL_ROLE_A = 15;
     public static final int EXPERIMENTAL_ROLE_B = 16;
@@ -63,7 +63,7 @@ public class IntactDocumentDefinition extends MitabDocumentDefinition {
         addColumnDefinition(new ColumnDefinition("Parameter(s) interaction", "parameterInteraction", new CrossReferenceFieldBuilder()));
     }
 
-    public InteractionRowConverter<BinaryInteraction> createInteractionRowConverter() {
+    public InteractionRowConverter<IntactBinaryInteraction> createInteractionRowConverter() {
         return new IntactInteractionRowConverter();
     }
 }

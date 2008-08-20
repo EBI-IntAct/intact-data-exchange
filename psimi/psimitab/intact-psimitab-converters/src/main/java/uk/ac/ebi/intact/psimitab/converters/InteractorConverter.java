@@ -21,10 +21,12 @@ import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.model.*;
 import static uk.ac.ebi.intact.model.CvAliasType.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Interactor Converter.
@@ -46,12 +48,12 @@ public class InteractorConverter {
     }
 
 
-    public Interactor toMitab( uk.ac.ebi.intact.model.Interactor intactInteractor ) {
+    public ExtendedInteractor toMitab( uk.ac.ebi.intact.model.Interactor intactInteractor, Interaction interaction ) {
         if ( intactInteractor == null ) {
             throw new IllegalArgumentException( "Interactor must not be null" );
         }
 
-        Interactor tabInteractor = new Interactor();
+        ExtendedInteractor tabInteractor = new ExtendedInteractor();
 
         // set identifiers of interactor
         Collection<CrossReference> identifiers = xRefConverter.toCrossReferences( intactInteractor.getXrefs(), true, false );
@@ -108,6 +110,58 @@ public class InteractorConverter {
             Organism oragnism = new OrganismImpl( taxid, name );
             tabInteractor.setOrganism( oragnism );
         }
+
+
+         // process extended
+        CvObjectConverter cvObjectConverter = new CvObjectConverter();
+        CrossReferenceConverter xConverter = new CrossReferenceConverter();
+
+        // set properties of interactor
+        List<CrossReference> properties = xConverter.toCrossReferences( intactInteractor.getXrefs(), false, true );
+        tabInteractor.setProperties( properties );
+
+        // set type of interactor A
+        CrossReference interactorTypeA = cvObjectConverter.toCrossReference( intactInteractor.getCvInteractorType() );
+        tabInteractor.setInteractorType( interactorTypeA );
+
+        // set expermimental role of interactor
+        List<CrossReference> experimentRoles = new ArrayList<CrossReference>();
+        List<CrossReference> biologicalRoles = new ArrayList<CrossReference>();
+
+        //set parameters
+        List<uk.ac.ebi.intact.psimitab.model.Parameter> parameters = new ArrayList<uk.ac.ebi.intact.psimitab.model.Parameter>();
+
+        for ( Component component : interaction.getComponents() ) {
+            if ( component.getInteractor().equals( intactInteractor ) ) {
+                biologicalRoles.add( cvObjectConverter.toCrossReference( component.getCvBiologicalRole() ) );
+                experimentRoles.add( cvObjectConverter.toCrossReference( component.getCvExperimentalRole() ) );
+
+                //parameters  for InteractorA
+                for ( ComponentParameter componentParameter : component.getParameters() ) {
+                    uk.ac.ebi.intact.psimitab.model.Parameter parameter =
+                            new uk.ac.ebi.intact.psimitab.model.Parameter(componentParameter.getCvParameterType().getShortLabel(),
+                                                                          componentParameter.getFactor(),
+                                                                          componentParameter.getBase(),
+                                                                          componentParameter.getExponent(),
+                                                                          (componentParameter.getCvParameterUnit() != null? componentParameter.getCvParameterUnit().getShortLabel() : null));
+                    parameters.add( parameter );
+                }
+
+            }
+        }
+
+        tabInteractor.setExperimentalRoles( experimentRoles );
+        tabInteractor.setBiologicalRoles( biologicalRoles );
+
+        // annotations
+        for (Annotation intactAnnotation : intactInteractor.getAnnotations()) {
+            uk.ac.ebi.intact.psimitab.model.Annotation annot =
+                    new uk.ac.ebi.intact.psimitab.model.Annotation(intactAnnotation.getCvTopic().getShortLabel(), intactAnnotation.getAnnotationText());
+            tabInteractor.getAnnotations().add(annot);
+        }
+
+        //set parameters
+        tabInteractor.setParameters( parameters );
 
         return tabInteractor;
     }

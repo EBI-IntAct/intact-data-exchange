@@ -9,6 +9,8 @@ import org.apache.lucene.document.Document;
 import org.junit.Test;
 import psidev.psi.mi.search.util.DocumentBuilder;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.model.Parameter;
+import uk.ac.ebi.intact.psimitab.model.Annotation;
 
 /**
  * IntActDocumentBuilder Tester.
@@ -47,8 +49,9 @@ public class IntActDocumentBuilderTest {
         IntactBinaryInteraction interaction = (IntactBinaryInteraction) builder.createBinaryInteraction(doc);
         Assert.assertNotNull(interaction);
 
-        Assert.assertEquals("comment", interaction.getAnnotationsA().iterator().next().getType());
-        Assert.assertEquals("commentA", interaction.getAnnotationsA().iterator().next().getText());
+        final Annotation annotationA = interaction.getInteractorA().getAnnotations().iterator().next();
+        Assert.assertEquals("comment", annotationA.getType());
+        Assert.assertEquals("commentA", annotationA.getText());
 	}
 
 
@@ -61,12 +64,14 @@ public class IntActDocumentBuilderTest {
         IntactBinaryInteraction interaction = (IntactBinaryInteraction) builder.createBinaryInteraction(doc);
         Assert.assertNotNull(interaction);
 
-        Assert.assertEquals("comment", interaction.getAnnotationsA().iterator().next().getType());
-        Assert.assertEquals("commentA", interaction.getAnnotationsA().iterator().next().getText());
+        final Annotation annotationA = interaction.getInteractorA().getAnnotations().iterator().next();
+        Assert.assertEquals("comment", annotationA.getType());
+        Assert.assertEquals("commentA", annotationA.getText());
 
-        Assert.assertEquals("ic50A", interaction.getParametersA().iterator().next().getType());
-        Assert.assertEquals("100", interaction.getParametersA().iterator().next().getValue());
-        Assert.assertEquals("molar", interaction.getParametersA().iterator().next().getUnit());
+        final Parameter parameterA = interaction.getInteractorA().getParameters().iterator().next();
+        Assert.assertEquals("ic50A", parameterA.getType());
+        Assert.assertEquals("100", parameterA.getValue());
+        Assert.assertEquals("molar", parameterA.getUnit());
 
 
     }

@@ -10,6 +10,7 @@ import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
 import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
+import uk.ac.ebi.intact.psimitab.model.Parameter;
 
 import java.io.File;
 import java.io.StringWriter;
@@ -61,7 +62,6 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
             assertTrue( dbi.hasExperimentalRolesInteractorB() );
             assertTrue( dbi.hasPropertiesA() );
             assertTrue( dbi.hasPropertiesB() );
-            assertTrue( BinaryInteractionImpl.class.isAssignableFrom( dbi.getClass() ) );
         }
     }
 
@@ -160,23 +160,26 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         Assert.assertTrue( bi.getDataset().contains( "Cancer" ) );
         Assert.assertTrue( bi.getDataset().contains( "Apoptosis" ) );
 
-        Assert.assertEquals(1, bi.getAnnotationsA().size());
-        Assert.assertEquals("commentA", bi.getAnnotationsA().iterator().next().getText());
-        Assert.assertEquals(1, bi.getAnnotationsB().size());
-        Assert.assertEquals("commentB", bi.getAnnotationsB().iterator().next().getText());
+        Assert.assertEquals(1, bi.getInteractorA().getAnnotations().size());
+        Assert.assertEquals("commentA", bi.getInteractorA().getAnnotations().iterator().next().getText());
+        Assert.assertEquals(1, bi.getInteractorB().getAnnotations().size());
+        Assert.assertEquals("commentB", bi.getInteractorB().getAnnotations().iterator().next().getText());
 
-        Assert.assertEquals(1, bi.getParametersA().size());
-        Assert.assertEquals("ic50A", bi.getParametersA().iterator().next().getType());
-        Assert.assertEquals("100", bi.getParametersA().iterator().next().getValue());
-        Assert.assertEquals("molar", bi.getParametersA().iterator().next().getUnit());
+        Assert.assertEquals(1, bi.getInteractorA().getParameters().size());
+        final Parameter parameterA = bi.getInteractorA().getParameters().iterator().next();
+        Assert.assertEquals("ic50A", parameterA.getType());
+        Assert.assertEquals("100", parameterA.getValue());
+        Assert.assertEquals("molar", parameterA.getUnit());
 
-        Assert.assertEquals(1, bi.getParametersB().size());
-        Assert.assertEquals("ic50B", bi.getParametersB().iterator().next().getType());
-        Assert.assertEquals("200", bi.getParametersB().iterator().next().getValue());
+        Assert.assertEquals(1, bi.getInteractorB().getParameters().size());
+        final Parameter parameterB = bi.getInteractorB().getParameters().iterator().next();
+        Assert.assertEquals("ic50B", parameterB.getType());
+        Assert.assertEquals("200", parameterB.getValue());
 
-        Assert.assertEquals(1, bi.getParametersInteraction().size());
-        Assert.assertEquals("ic50C", bi.getParametersInteraction().iterator().next().getType());
-        Assert.assertEquals("300", bi.getParametersInteraction().iterator().next().getValue());
+        Assert.assertEquals(1, bi.getParameters().size());
+        final Parameter interactionParameter = bi.getParameters().iterator().next();
+        Assert.assertEquals("ic50C", interactionParameter.getType());
+        Assert.assertEquals("300", interactionParameter.getValue());
 
 
 
@@ -255,7 +258,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
 
         Collection<BinaryInteraction> interactions = x2t.convert( xmlFile, false );
 
-        for ( BinaryInteraction interaction : interactions ) {
+        for ( BinaryInteraction<?> interaction : interactions ) {
             for ( Author author : interaction.getAuthors() ) {
                 // if we know that all interactions inferred by currators,
                 // alls authors should start with 'Curated complexes'

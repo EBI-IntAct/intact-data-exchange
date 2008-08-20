@@ -23,6 +23,8 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntactInteractorConverter;
+import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 
 import java.util.ArrayList;
@@ -42,8 +44,6 @@ public class InteractionConverter {
     public static final Log logger = LogFactory.getLog( InteractionConverter.class );
 
     private static final String TAXID = "taxid";
-
-    private InteractorConverter interactorConverter = new InteractorConverter();
 
     private CvObjectConverter cvObjectConverter = new CvObjectConverter();
 
@@ -71,12 +71,15 @@ public class InteractionConverter {
         if ( components.size() != 2 ) {
             throw new IllegalArgumentException( "We only convert binary interaction (2 components or a single with stoichiometry 2)" );
         }
+
         Iterator<Component> iterator = components.iterator();
         uk.ac.ebi.intact.model.Interactor intactInteractorA = iterator.next().getInteractor();
         uk.ac.ebi.intact.model.Interactor intactInteractorB = iterator.next().getInteractor();
 
-        Interactor interactorA = interactorConverter.toMitab( intactInteractorA );
-        Interactor interactorB = interactorConverter.toMitab( intactInteractorB );
+        InteractorConverter interactorConverter = new InteractorConverter();
+
+        ExtendedInteractor interactorA = interactorConverter.toMitab( intactInteractorA, interaction );
+        ExtendedInteractor interactorB = interactorConverter.toMitab( intactInteractorB, interaction );
 
         IntactBinaryInteraction bi = new IntactBinaryInteraction( interactorA, interactorB );
 
@@ -85,8 +88,8 @@ public class InteractionConverter {
         if ( interaction.getExperiments() != null ) {
             for ( Experiment experiment : interaction.getExperiments() ) {
                 for ( Annotation a : experiment.getAnnotations() ) {
-                    if (a.getCvTopic().getMiIdentifier() != null) {
-                        if ( CvTopic.AUTHOR_LIST_MI_REF.equals( a.getCvTopic().getMiIdentifier() ) ) {
+                    if (a.getCvTopic().getIdentifier() != null) {
+                        if ( CvTopic.AUTHOR_LIST_MI_REF.equals( a.getCvTopic().getIdentifier() ) ) {
                             authors.add( new AuthorImpl( a.getAnnotationText().split(" ")[0] + " et al." ) );
                         }
                     }
@@ -154,24 +157,6 @@ public class InteractionConverter {
 
         // process extended
 
-        // set properties of interactor A
-        List<CrossReference> propertiesA = xConverter.toCrossReferences( intactInteractorA.getXrefs(), false, true );
-        bi.setPropertiesA( propertiesA );
-
-        // set properties of interactor B
-        List<CrossReference> propertiesB = xConverter.toCrossReferences( intactInteractorB.getXrefs(), false, true );
-        bi.setPropertiesB( propertiesB );
-
-        // set type of interactor A
-        List<CrossReference> interactorTypesA = new ArrayList<CrossReference>();
-        interactorTypesA.add( cvObjectConverter.toCrossReference( intactInteractorA.getCvInteractorType() ) );
-        bi.setInteractorTypeA( interactorTypesA );
-
-        // set type of interactor B
-        List<CrossReference> interactorTypesB = new ArrayList<CrossReference>();
-        interactorTypesB.add( cvObjectConverter.toCrossReference( intactInteractorB.getCvInteractorType() ) );
-        bi.setInteractorTypeB( interactorTypesB );
-
         // set host organism
         List<CrossReference> hostOrganisms = new ArrayList<CrossReference>();
         for ( Experiment experiment : interaction.getExperiments() ) {
@@ -182,70 +167,6 @@ public class InteractionConverter {
             }
         }
         bi.setHostOrganism( hostOrganisms );
-
-        // set expermimental role of interactor A and B
-        List<CrossReference> experimentRolesA = new ArrayList<CrossReference>();
-        List<CrossReference> experimentRolesB = new ArrayList<CrossReference>();
-        List<CrossReference> biologicalRolesA = new ArrayList<CrossReference>();
-        List<CrossReference> biologicalRolesB = new ArrayList<CrossReference>();
-
-        //set parameters
-        List<uk.ac.ebi.intact.psimitab.model.Parameter> parametersA = new ArrayList<uk.ac.ebi.intact.psimitab.model.Parameter>();
-        List<uk.ac.ebi.intact.psimitab.model.Parameter> parametersB = new ArrayList<uk.ac.ebi.intact.psimitab.model.Parameter>();
-        List<uk.ac.ebi.intact.psimitab.model.Parameter> parametersInteraction = new ArrayList<uk.ac.ebi.intact.psimitab.model.Parameter>();
-
-
-        for ( Component component : interaction.getComponents() ) {
-            if ( component.getInteractor().equals( intactInteractorA ) ) {
-                biologicalRolesA.add( cvObjectConverter.toCrossReference( component.getCvBiologicalRole() ) );
-                experimentRolesA.add( cvObjectConverter.toCrossReference( component.getCvExperimentalRole() ) );
-
-                //parameters  for InteractorA
-                for ( ComponentParameter componentParameterA : component.getParameters() ) {
-                    uk.ac.ebi.intact.psimitab.model.Parameter parameterA = getParameter( componentParameterA );
-                    if ( parameterA != null ) {
-                        parametersA.add( parameterA );
-                    }
-                }
-
-            }
-            if ( component.getInteractor().equals( intactInteractorB ) ) {
-                biologicalRolesB.add( cvObjectConverter.toCrossReference( component.getCvBiologicalRole() ) );
-                experimentRolesB.add( cvObjectConverter.toCrossReference( component.getCvExperimentalRole() ) );
-
-                //paramters for InteractorB
-                for ( ComponentParameter componentParameterB : component.getParameters() ) {
-                    uk.ac.ebi.intact.psimitab.model.Parameter parameterB = getParameter( componentParameterB );
-                    if ( parameterB != null ) {
-                        parametersB.add( parameterB );
-                    }
-                }
-
-            }
-        }
-
-        //parameters for interaction
-
-        if ( interaction.getParameters() != null ) {
-            for ( InteractionParameter interactionParameter : interaction.getParameters() ) {
-                uk.ac.ebi.intact.psimitab.model.Parameter parameterInteraction = getParameter( interactionParameter );
-                if ( parameterInteraction != null ) {
-                    parametersInteraction.add( parameterInteraction );
-                }
-            }
-
-        }
-
-
-        bi.setExperimentalRolesInteractorA( experimentRolesA );
-        bi.setExperimentalRolesInteractorB( experimentRolesB );
-        bi.setBiologicalRolesInteractorA( biologicalRolesA );
-        bi.setBiologicalRolesInteractorB( biologicalRolesB );
-
-        //set parameters
-        bi.setParametersA( parametersA );
-        bi.setParametersB( parametersB );
-        bi.setParametersInteraction( parametersInteraction );
 
         // set dataset
         if ( interaction.getExperiments() != null ) {
@@ -261,56 +182,22 @@ public class InteractionConverter {
             bi.setDataset( datasets );
         }
 
+        // expansion
         if (expansionStrategy != null && isExpanded) {
             bi.getExpansionMethods().add( expansionStrategy.getName() );
         }
 
-        // annotations
-        for (Annotation intactAnnotation : intactInteractorA.getAnnotations()) {
-            uk.ac.ebi.intact.psimitab.model.Annotation annot =
-                    new uk.ac.ebi.intact.psimitab.model.Annotation(intactAnnotation.getCvTopic().getShortLabel(), intactAnnotation.getAnnotationText());
-            bi.getAnnotationsA().add(annot);
-        }
-
-        for (Annotation intactAnnotation : intactInteractorB.getAnnotations()) {
-            uk.ac.ebi.intact.psimitab.model.Annotation annot =
-                    new uk.ac.ebi.intact.psimitab.model.Annotation(intactAnnotation.getCvTopic().getShortLabel(), intactAnnotation.getAnnotationText());
-            bi.getAnnotationsB().add(annot);
+        //parameters for interaction
+        for ( InteractionParameter interactionParameter : interaction.getParameters() ) {
+            uk.ac.ebi.intact.psimitab.model.Parameter parameterInteraction =
+                    new uk.ac.ebi.intact.psimitab.model.Parameter(interactionParameter.getCvParameterType().getShortLabel(),
+                                                                  interactionParameter.getFactor(),
+                                                                  interactionParameter.getBase(),
+                                                                  interactionParameter.getExponent(),
+                                                                  (interactionParameter.getCvParameterUnit() != null? interactionParameter.getCvParameterUnit().getShortLabel() : null));
+            bi.getParameters().add( parameterInteraction );
         }
 
         return bi;
     }
-
-    protected uk.ac.ebi.intact.psimitab.model.Parameter getParameter( uk.ac.ebi.intact.model.Parameter parameter ) {
-
-        final String BASE_E_NOTATION = "E";
-        if ( parameter == null ) {
-            throw new NullPointerException( "You must give a non null parameter" );
-        }
-
-        final CvParameterType parameterType = parameter.getCvParameterType();
-        final CvParameterUnit parameterUnit = parameter.getCvParameterUnit();
-        final Double factor = parameter.getFactor();
-        final Integer exponent = parameter.getExponent();   //non-null value default 0
-        final Integer base = parameter.getBase();           //non-null value default 10
-
-        //factor is the "main" value of the parameter.
-        //value is a combined expression of factor, base and exponent
-
-
-        if ( factor == null || parameterType == null || parameterUnit == null ) {
-            return null;
-        } else {
-            String value;
-            if ( base == 10 ) {
-                value = factor.toString() + BASE_E_NOTATION + exponent.toString();
-            } else {
-                value = factor.toString() + base.toString() + exponent.toString();
-            }
-            uk.ac.ebi.intact.psimitab.model.Parameter psiParameter = new uk.ac.ebi.intact.psimitab.model.Parameter( parameterType.getShortLabel(), value, parameterUnit.getShortLabel() );
-            return psiParameter;
-        }
-
-    }
-
 }

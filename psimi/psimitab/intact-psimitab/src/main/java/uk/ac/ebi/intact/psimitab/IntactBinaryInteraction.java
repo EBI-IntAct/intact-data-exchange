@@ -8,12 +8,15 @@ package uk.ac.ebi.intact.psimitab;
 import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.AbstractBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.model.Annotation;
+import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.psimitab.model.Parameter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * IntAct extension of a BinaryInteractionImpl.
@@ -22,22 +25,9 @@ import java.util.List;
  * @version $Id$
  * @since 2.0.0
  */
-public class IntactBinaryInteraction extends BinaryInteractionImpl {
+public class IntactBinaryInteraction extends AbstractBinaryInteraction<ExtendedInteractor> {
 
     private static final long serialVersionUID = -8872335762187393793L;
-
-    private List<CrossReference> experimentalRoleA;
-
-    private List<CrossReference> experimentalRoleB;
-    private List<CrossReference> biologicalRoleA;
-
-    private List<CrossReference> biologicalRoleB;
-    private List<CrossReference> propertiesA;
-
-    private List<CrossReference> propertiesB;
-    private List<CrossReference> interactorTypeA;
-
-    private List<CrossReference> interactorTypeB;
 
     private List<CrossReference> hostOrganism;
 
@@ -45,23 +35,17 @@ public class IntactBinaryInteraction extends BinaryInteractionImpl {
 
     private List<String> dataset;
 
-    private List<Annotation> annotationsA;
-    private List<Annotation> annotationsB;
+    private ExtendedInteractor interactorA;
+    private ExtendedInteractor interactorB;
 
-    private List<Parameter> parametersA;
-    private List<Parameter> parametersB;
-    private List<Parameter> parametersInteraction;
+    private List<Parameter> parameters;
 
-
-    private Interactor interactorA;
-
-    private Interactor interactorB;
     private static int expectedColumnCount = 24;
 
     //////////////////
     // Constructors
 
-    public IntactBinaryInteraction( Interactor interactorA, Interactor interactorB ) {
+    public IntactBinaryInteraction( ExtendedInteractor interactorA, ExtendedInteractor interactorB ) {
         super( interactorA, interactorB );
         this.interactorA = interactorA;
         this.interactorB = interactorB;
@@ -69,93 +53,84 @@ public class IntactBinaryInteraction extends BinaryInteractionImpl {
 
     ///////////////////////////
     // Getters and Setters
-
+    @Deprecated
     public List<CrossReference> getExperimentalRolesInteractorA() {
-        if ( experimentalRoleA == null ) {
-            experimentalRoleA = new ArrayList<CrossReference>( 2 );
-        }
-        return experimentalRoleA;
+        return interactorA.getExperimentalRoles();
     }
 
+    @Deprecated
     public void setExperimentalRolesInteractorA( List<CrossReference> experimentalRoles ) {
-        this.experimentalRoleA = experimentalRoles;
+        interactorA.setExperimentalRoles(experimentalRoles);
     }
 
+    @Deprecated
     public List<CrossReference> getExperimentalRolesInteractorB() {
-        if ( experimentalRoleB == null ) {
-            experimentalRoleB = new ArrayList<CrossReference>( 2 );
-        }
-        return experimentalRoleB;
+        return interactorB.getExperimentalRoles();
     }
 
+    @Deprecated
     public void setExperimentalRolesInteractorB( List<CrossReference> experimentalRoles ) {
-        this.experimentalRoleB = experimentalRoles;
+        interactorB.setExperimentalRoles(experimentalRoles);
     }
 
+    @Deprecated
     public List<CrossReference> getBiologicalRolesInteractorA() {
-        if ( biologicalRoleA == null ) {
-            biologicalRoleA = new ArrayList<CrossReference>( 2 );
-        }
-        return biologicalRoleA;
+        return interactorA.getBiologicalRoles();
     }
 
+    @Deprecated
     public void setBiologicalRolesInteractorA( List<CrossReference> biologicalRoles ) {
-        this.biologicalRoleA = biologicalRoles;
+        interactorA.setBiologicalRoles(biologicalRoles);
     }
 
+    @Deprecated
     public List<CrossReference> getBiologicalRolesInteractorB() {
-        if ( biologicalRoleB == null ) {
-            biologicalRoleB = new ArrayList<CrossReference>( 2 );
-        }
-        return biologicalRoleB;
+        return interactorB.getBiologicalRoles();
     }
 
+    @Deprecated
     public void setBiologicalRolesInteractorB( List<CrossReference> biologicalRoles ) {
-        this.biologicalRoleB = biologicalRoles;
+        interactorB.setBiologicalRoles(biologicalRoles);
     }
 
+    @Deprecated
     public List<CrossReference> getPropertiesA() {
-        if ( propertiesA == null ) {
-            propertiesA = new ArrayList<CrossReference>( 2 );
-        }
-        return propertiesA;
+        return interactorA.getProperties();
     }
 
+    @Deprecated
     public void setPropertiesA( List<CrossReference> propertiesA ) {
-        this.propertiesA = propertiesA;
+        interactorA.setProperties(propertiesA);
     }
 
+    @Deprecated
     public List<CrossReference> getPropertiesB() {
-        if ( propertiesB == null ) {
-            propertiesB = new ArrayList<CrossReference>( 2 );
-        }
-        return propertiesB;
+        return interactorB.getProperties();
     }
 
+    @Deprecated
     public void setPropertiesB( List<CrossReference> propertiesB ) {
-        this.propertiesB = propertiesB;
+        interactorB.setProperties(propertiesB);
     }
 
+    @Deprecated
     public List<CrossReference> getInteractorTypeA() {
-        if ( interactorTypeA == null ) {
-            interactorTypeA = new ArrayList<CrossReference>( 2 );
-        }
-        return interactorTypeA;
+        return Collections.singletonList(interactorA.getInteractorType());
     }
 
+    @Deprecated
     public void setInteractorTypeA( List<CrossReference> interactorType ) {
-        this.interactorTypeA = interactorType;
+        interactorA.setInteractorType(interactorType.iterator().next());
     }
 
+    @Deprecated
     public List<CrossReference> getInteractorTypeB() {
-        if ( interactorTypeB == null ) {
-            interactorTypeB = new ArrayList<CrossReference>( 2 );
-        }
-        return interactorTypeB;
+        return Collections.singletonList(interactorB.getInteractorType());
     }
 
+    @Deprecated
     public void setInteractorTypeB( List<CrossReference> interactorType ) {
-        this.interactorTypeB = interactorType;
+        interactorB.setInteractorType(interactorType.iterator().next());
     }
 
     public List<CrossReference> getHostOrganism() {
@@ -211,83 +186,45 @@ public class IntactBinaryInteraction extends BinaryInteractionImpl {
         this.dataset = dataset;
     }
 
-    public List<Annotation> getAnnotationsA() {
-        if (annotationsA == null) {
-            annotationsA = new ArrayList<Annotation>();
+    public List<Parameter> getParameters() {
+        if (parameters == null) {
+            parameters = new ArrayList<Parameter>();
         }
-        return annotationsA;
+        return parameters;
     }
 
-    public void setAnnotationsA(List<Annotation> annotationsA) {
-        this.annotationsA = annotationsA;
+    public void setParameters(List<Parameter> parameters) {
+        this.parameters = parameters;
     }
 
-    public List<Annotation> getAnnotationsB() {
-        if (annotationsB == null) {
-            annotationsB = new ArrayList<Annotation>();
-        }
-        return annotationsB;
-    }
-
-    public List<Parameter> getParametersA() {
-        if ( parametersA == null ) {
-            parametersA = new ArrayList<Parameter>();
-        }
-        return parametersA;
-    }
-
-    public void setParametersA( List<Parameter> parametersA ) {
-        this.parametersA = parametersA;
-    }
-
-    public List<Parameter> getParametersB() {
-        if ( parametersB == null ) {
-            parametersB = new ArrayList<Parameter>();
-        }
-        return parametersB;
-    }
-
-    public void setParametersB( List<Parameter> parametersB ) {
-        this.parametersB = parametersB;
-    }
-
-    public List<Parameter> getParametersInteraction() {
-        if ( parametersInteraction == null ) {
-            parametersInteraction = new ArrayList<Parameter>();
-        }
-        return parametersInteraction;
-    }
-
-    public void setParametersInteraction( List<Parameter> parametersInteraction ) {
-        this.parametersInteraction = parametersInteraction;
-    }
-
-    public void setAnnotationsB(List<Annotation> annotationsB) {
-        this.annotationsB = annotationsB;
-    }
-
+    @Deprecated
     public boolean hasExperimentalRolesInteractorA() {
-        return !( experimentalRoleA == null || experimentalRoleA.isEmpty() );
+        return interactorA.hasExperimentalRoles();
     }
 
+    @Deprecated
     public boolean hasExperimentalRolesInteractorB() {
-        return !( experimentalRoleB == null || experimentalRoleB.isEmpty() );
+        return interactorB.hasExperimentalRoles();
     }
 
+    @Deprecated
     public boolean hasPropertiesA() {
-        return !( propertiesA == null || propertiesA.isEmpty() );
+        return interactorA.hasProperties();
     }
 
+    @Deprecated
     public boolean hasPropertiesB() {
-        return !( propertiesB == null || propertiesB.isEmpty() );
+        return interactorB.hasProperties();
     }
 
+    @Deprecated
     public boolean hasInteractorTypeA() {
-        return !( interactorTypeA == null || interactorTypeA.isEmpty() );
+        return interactorA.hasInteractorType();
     }
 
+    @Deprecated
     public boolean hasInteractorTypeB() {
-        return !( interactorTypeB == null || interactorTypeB.isEmpty() );
+        return interactorB.hasInteractorType();
     }
 
     public boolean hasHostOrganism() {
@@ -310,12 +247,13 @@ public class IntactBinaryInteraction extends BinaryInteractionImpl {
         return !( dataset == null || dataset.isEmpty() );
     }
 
+    @Deprecated
     public boolean hasBiologicalRolesInteractorA() {
-        return !( biologicalRoleA == null || biologicalRoleA.isEmpty() );
+        return interactorA.hasBiologicalRoles();
     }
 
     public boolean hasBiologicalRolesInteractorB() {
-        return !( biologicalRoleB == null || biologicalRoleB.isEmpty() );
+        return interactorB.hasBiologicalRoles();
     }
 
     /**
@@ -347,14 +285,6 @@ public class IntactBinaryInteraction extends BinaryInteractionImpl {
         sb.append( "BinaryInteractionImpl" );
         sb.append( "{interactorA=" ).append( interactorA );
         sb.append( ", interactorB=" ).append( interactorB );
-        sb.append( ", ExperimentalRoleInteractorA=" ).append( experimentalRoleA );
-        sb.append( ", ExperimentalRoleInteractorB=" ).append( experimentalRoleB );
-        sb.append( ", BiologicalRoleInteractorA=" ).append( biologicalRoleA );
-        sb.append( ", BiologicalRoleInteractorB=" ).append( biologicalRoleB );
-        sb.append( ", PropertiesA=" ).append( propertiesA );
-        sb.append( ", PropertiesB=" ).append( propertiesB );
-        sb.append( ", InteractorType of A=" ).append( interactorTypeA );
-        sb.append( ", InteractorType of B=" ).append( interactorTypeB );
         sb.append( ", HostOrganismn" ).append( hostOrganism );
         sb.append( ", ExpansionMethod" ).append( expansionMethods );
         sb.append( ", dataset" ).append( dataset );

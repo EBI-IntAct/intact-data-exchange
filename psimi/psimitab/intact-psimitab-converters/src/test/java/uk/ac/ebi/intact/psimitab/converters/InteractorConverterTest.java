@@ -5,6 +5,7 @@ import org.junit.Test;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
+import uk.ac.ebi.intact.model.Interaction;
 
 /**
  * InteractorConverter Tester.
@@ -20,10 +21,11 @@ public class InteractorConverterTest extends IntactBasicTestCase {
     public void toMitabTest() {
         InteractorConverter converter = new InteractorConverter();
 
-        final Component c = getMockBuilder().createComponentRandom();
+        final Interaction interaction = getMockBuilder().createInteractionRandomBinary();
+        final Component c = interaction.getComponents().iterator().next();
         c.getInteractor().setAc( "EBI-xxxxxx" );
 
-        Interactor interactor = converter.toMitab( c.getInteractor() );
+        Interactor interactor = converter.toMitab( c.getInteractor(), interaction );
         assertNotNull( interactor );
 
     }

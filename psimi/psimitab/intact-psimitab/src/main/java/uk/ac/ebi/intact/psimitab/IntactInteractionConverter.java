@@ -22,20 +22,20 @@ import psidev.psi.mi.tab.converter.tab2xml.XmlConversionException;
 import psidev.psi.mi.tab.converter.xml2tab.CrossReferenceConverter;
 import psidev.psi.mi.tab.converter.xml2tab.InteractionConverter;
 import psidev.psi.mi.tab.converter.xml2tab.TabConversionException;
+import psidev.psi.mi.tab.converter.xml2tab.InteractorConverter;
 import psidev.psi.mi.tab.expansion.ExpansionStrategy;
 import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.tab.model.Interactor;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.InteractionDetectionMethod;
 import psidev.psi.mi.xml.model.Organism;
-import uk.ac.ebi.intact.psimitab.model.Annotation;
+import uk.ac.ebi.intact.psimitab.model.Parameter;
+import uk.ac.ebi.intact.psimitab.model.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -76,10 +76,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
      */
     private InterproNameHandler interproHandler;
 
-    /**
-     * CrossReference Converter
-     */
-    private final CrossReferenceConverter xrefConverter;
+    private IntactInteractorConverter interactorConverter;
 
     public IntactInteractionConverter() {
         this(true, true);
@@ -90,16 +87,20 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
     }
 
     public IntactInteractionConverter(GoTermHandler goHandler, InterproNameHandler interproHandler, boolean goTermNameAutoCompletion, boolean interproNameAutoCompletion) {
-        this.xrefConverter = new CrossReferenceConverter();
-
         this.goHandler = goHandler;
         this.interproHandler = interproHandler;
         this.goTermNameAutoCompletion = goTermNameAutoCompletion;
         this.interproNameAutoCompletion = interproNameAutoCompletion;
+
+        this.interactorConverter = new IntactInteractorConverter();
     }
 
-    protected BinaryInteraction newBinaryInteraction(psidev.psi.mi.tab.model.Interactor interactorA, psidev.psi.mi.tab.model.Interactor interactorB) {
-        return new IntactBinaryInteraction(interactorA, interactorB);
+    protected BinaryInteraction newBinaryInteraction(Interactor interactorA, Interactor interactorB) {
+        return new IntactBinaryInteraction((ExtendedInteractor)interactorA, (ExtendedInteractor)interactorB);
+    }
+
+    public InteractorConverter<?> getInteractorConverter() {
+        return interactorConverter;
     }
 
     public BinaryInteraction toMitab( Interaction interaction,
@@ -128,117 +129,6 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             if ( o.hasText() ) organismNames.setFullName( o.getText() );
             hostOrganism.setNames( organismNames );
         }
-    }
-
-    public void updateParticipants(BinaryInteraction binaryInteraction, Participant participantA, Participant participantB, int index) throws XmlConversionException{
-        psidev.psi.mi.xml.model.Interactor iA = participantA.getInteractor();
-        psidev.psi.mi.xml.model.Interactor iB = participantB.getInteractor();
-
-        IntactBinaryInteraction dbi = (IntactBinaryInteraction) binaryInteraction;
-
-
-        if ( dbi.hasExperimentalRolesInteractorA() ) {
-            // delete default ExperimentalRoles
-            participantA.getExperimentalRoles().clear();
-
-            // create new ExperimentalRoles
-            ExperimentalRole experimentalRole = updateExperimentalRoles( dbi.getExperimentalRolesInteractorA(), index );
-
-            // add new ExperimentalRoles
-            if ( !participantA.getExperimentalRoles().add( experimentalRole ) ) {
-                if ( log.isDebugEnabled() ) log.debug( "ExperimentalRole couldn't add to the participant" );
-            }
-        }
-
-        if ( dbi.hasExperimentalRolesInteractorB() ) {
-            // delete default ExperimentalRoles
-            participantB.getExperimentalRoles().clear();
-
-            // create new ExperimentalRoles
-            ExperimentalRole experimentalRole = updateExperimentalRoles( dbi.getExperimentalRolesInteractorB(), index );
-
-            // add new ExperimentalRoles
-            participantB.getExperimentalRoles().add( experimentalRole );
-        }
-
-            if ( dbi.hasInteractorTypeA() ) {
-                InteractorType typeA = ( InteractorType ) xrefConverter.fromMitab( dbi.getInteractorTypeA().get( 0 ), InteractorType.class );
-                iA.setInteractorType( typeA );
-            }
-
-            if ( dbi.hasInteractorTypeB() ) {
-                InteractorType typeB = ( InteractorType ) xrefConverter.fromMitab( dbi.getInteractorTypeB().get( 0 ), InteractorType.class );
-                iB.setInteractorType( typeB );
-            }
-
-            if ( dbi.hasPropertiesA() ) {
-                Collection<DbReference> secDbRef = getSecondaryRefs( dbi.getPropertiesA() );
-                iA.getXref().getSecondaryRef().addAll( secDbRef );
-            }
-
-            if ( dbi.hasPropertiesB() ) {
-                Collection<DbReference> secDbRef = getSecondaryRefs( dbi.getPropertiesB() );
-                iB.getXref().getSecondaryRef().addAll( secDbRef );
-            }
-    }
-
-    private Collection<DbReference> getSecondaryRefs( List<CrossReference> properties ) {
-        Collection<DbReference> refs = new ArrayList<DbReference>();
-        for ( CrossReference property : properties ) {
-            DbReference secDbRef = new DbReference();
-            secDbRef.setDb( property.getDatabase() );
-            if ( property.getDatabase().equalsIgnoreCase( "GO" ) ) {
-                secDbRef.setId( property.getDatabase().concat( ":".concat( property.getIdentifier() ) ) );
-                secDbRef.setDbAc( "MI:0448" );
-            } else {
-                secDbRef.setId( property.getIdentifier() );
-                if ( property.getDatabase().equals( "interpro" ) ) {
-                    secDbRef.setDbAc( "MI:0449" );
-                }
-                if ( property.getDatabase().equals( "intact" ) ) {
-                    secDbRef.setDbAc( "MI:0469" );
-                }
-                if ( property.getDatabase().equals( "uniprotkb" ) ) {
-                    secDbRef.setDbAc( "MI:0486" );
-                }
-            }
-            if ( property.hasText() ) {
-                secDbRef.setSecondary( property.getText() );
-            }
-            refs.add( secDbRef );
-        }
-        return refs;
-    }
-
-    private ExperimentalRole updateExperimentalRoles( List<CrossReference> experimentalRoles, int index ) {
-        // now create the new ExperimentalRoles
-        String roleA = experimentalRoles.get( index ).getText();
-        String dbA = experimentalRoles.get( index ).getDatabase().concat( ":".concat( experimentalRoles.get( 0 ).getIdentifier() ) );
-
-        Names names = new Names();
-        if ( roleA == null ) {
-            names.setShortLabel( "unspecified role" );
-            names.setFullName( "unspecified role" );
-        } else {
-            names.setShortLabel( roleA );
-            names.setFullName( roleA );
-        }
-
-        DbReference dbRef = new DbReference();
-        dbRef.setDb( "psi-mi" );
-        if ( dbA == null ) {
-            dbRef.setId( "MI:0499" );
-        } else {
-            dbRef.setId( dbA );
-        }
-
-        dbRef.setDbAc( "MI:0488" );
-        dbRef.setRefType( "identity" );
-        dbRef.setRefTypeAc( "MI:0356" );
-
-        Xref experimentalXref = new Xref( dbRef );
-
-        return new ExperimentalRole( names, experimentalXref );
     }
 
     /**
@@ -418,12 +308,71 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
 
         for (Attribute attribute : pA.getAttributes()) {
             Annotation annotation = new Annotation(attribute.getName(), attribute.getValue());
-            bi.getAnnotationsA().add(annotation);
+            bi.getInteractorA().getAnnotations().add(annotation);
         }
 
         for (Attribute attribute : pB.getAttributes()) {
             Annotation annotation = new Annotation(attribute.getName(), attribute.getValue());
-            bi.getAnnotationsB().add(annotation);
+            bi.getInteractorB().getAnnotations().add(annotation);
+        }
+
+        // parameters
+
+        for (psidev.psi.mi.xml.model.Parameter xmlParam : pA.getParameters()) {
+            Parameter param = new Parameter(xmlParam.getTerm(), xmlParam.getFactor(), xmlParam.getBase(), xmlParam.getExponent(), xmlParam.getUnit());
+            bi.getInteractorA().getParameters().add(param);
+        }
+
+        for (psidev.psi.mi.xml.model.Parameter xmlParam : pB.getParameters()) {
+            Parameter param = new Parameter(xmlParam.getTerm(), xmlParam.getFactor(), xmlParam.getBase(), xmlParam.getExponent(), xmlParam.getUnit());
+            bi.getInteractorB().getParameters().add(param);
+        }
+
+        for (psidev.psi.mi.xml.model.Parameter xmlParam : interaction.getParameters()) {
+            Parameter param = new Parameter(xmlParam.getTerm(), xmlParam.getFactor(), xmlParam.getBase(), xmlParam.getExponent(), xmlParam.getUnit());
+            bi.getParameters().add(param);
+        }
+    }
+
+    @Override
+    protected void populateInteractionFromMitab(Interaction interaction, BinaryInteraction<?> binaryInteraction, int index) {
+        // mitab -> xml
+
+        IntactBinaryInteraction ibi = (IntactBinaryInteraction)binaryInteraction;
+
+        // host organism
+        ExperimentDescription experiment = interaction.getExperiments().iterator().next();
+        experiment.getHostOrganisms().clear();
+
+        for (CrossReference orgXref : ibi.getHostOrganism()) {
+            Organism hostOrganism = new Organism();
+            hostOrganism.setNcbiTaxId( Integer.parseInt(orgXref.getIdentifier()) );
+            Names organismNames = new Names();
+            organismNames.setShortLabel( orgXref.getText() );
+            hostOrganism.setNames( organismNames );
+
+            experiment.getHostOrganisms().add(hostOrganism);
+        }
+
+        // expansion method
+        for (String expMethod : ibi.getExpansionMethods()) {
+            Attribute attr = new Attribute("expansion", expMethod);
+            interaction.getAttributes().add(attr);
+        }
+
+        // dataset
+        for (String dataset : ibi.getDataset()) {
+            Attribute attr = new Attribute("dataset", dataset);
+            interaction.getAttributes().add(attr);
+        }
+
+        // parameters
+        for (uk.ac.ebi.intact.psimitab.model.Parameter parameter : ibi.getParameters()) {
+            psidev.psi.mi.xml.model.Parameter param = new psidev.psi.mi.xml.model.Parameter(parameter.getType(), parameter.getFactor());
+            param.setUnit(parameter.getUnit());
+            param.setBase(parameter.getBase());
+            param.setExponent(parameter.getExponent());
+            interaction.getParameters().add(param);
         }
     }
 
