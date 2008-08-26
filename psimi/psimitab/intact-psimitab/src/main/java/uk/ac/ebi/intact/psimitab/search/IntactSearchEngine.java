@@ -5,6 +5,7 @@ package uk.ac.ebi.intact.psimitab.search;
 
 import org.apache.lucene.store.Directory;
 import psidev.psi.mi.search.engine.impl.FastSearchEngine;
+import psidev.psi.mi.search.engine.impl.AbstractSearchEngine;
 import psidev.psi.mi.search.util.DocumentBuilder;
 import psidev.psi.mi.tab.model.builder.DocumentDefinition;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
@@ -20,7 +21,7 @@ import java.io.IOException;
  * @version $Id$
  * @since 2.0.0
  */
-public class IntactSearchEngine extends FastSearchEngine<IntactBinaryInteraction> {
+public class IntactSearchEngine extends AbstractSearchEngine<IntactBinaryInteraction> {
 
     public IntactSearchEngine(Directory indexDirectory) throws IOException {
         super(indexDirectory);

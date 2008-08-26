@@ -6,6 +6,7 @@ package uk.ac.ebi.intact.psimitab.search;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import psidev.psi.mi.search.util.DefaultDocumentBuilder;
+import psidev.psi.mi.search.util.AbstractInteractionDocumentBuilder;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.tab.model.builder.Column;
 import psidev.psi.mi.tab.model.builder.Row;
@@ -21,7 +22,7 @@ import java.util.Iterator;
  * @version $Id$
  * @since 2.0.0
  */
-public class IntactDocumentBuilder extends DefaultDocumentBuilder<IntactBinaryInteraction> {
+public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<IntactBinaryInteraction> {
 
     public IntactDocumentBuilder() {
         super(new IntactDocumentDefinition());

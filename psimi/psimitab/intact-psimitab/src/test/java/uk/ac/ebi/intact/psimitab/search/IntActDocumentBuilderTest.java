@@ -36,7 +36,7 @@ public class IntActDocumentBuilderTest {
         DocumentBuilder builder = new IntactDocumentBuilder();
         Document doc = builder.createDocumentFromPsimiTabLine(psiMiTabLine);
 
-        IntactBinaryInteraction interaction = (IntactBinaryInteraction) builder.createBinaryInteraction(doc);
+        IntactBinaryInteraction interaction = (IntactBinaryInteraction) builder.createData(doc);
         Assert.assertNotNull(interaction);
 	}
 
@@ -46,7 +46,7 @@ public class IntActDocumentBuilderTest {
         DocumentBuilder builder = new IntactDocumentBuilder();
         Document doc = builder.createDocumentFromPsimiTabLine(psiMiTabLine);
 
-        IntactBinaryInteraction interaction = (IntactBinaryInteraction) builder.createBinaryInteraction(doc);
+        IntactBinaryInteraction interaction = (IntactBinaryInteraction) builder.createData(doc);
         Assert.assertNotNull(interaction);
 
         final Annotation annotationA = interaction.getInteractorA().getAnnotations().iterator().next();
@@ -61,7 +61,7 @@ public class IntActDocumentBuilderTest {
         DocumentBuilder builder = new IntactDocumentBuilder();
         Document doc = builder.createDocumentFromPsimiTabLine(psiMiTabLine);
 
-        IntactBinaryInteraction interaction = (IntactBinaryInteraction) builder.createBinaryInteraction(doc);
+        IntactBinaryInteraction interaction = (IntactBinaryInteraction) builder.createData(doc);
         Assert.assertNotNull(interaction);
 
         final Annotation annotationA = interaction.getInteractorA().getAnnotations().iterator().next();
