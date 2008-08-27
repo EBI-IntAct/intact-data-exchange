@@ -16,10 +16,14 @@
 package uk.ac.ebi.intact.psimitab.search;
 
 import psidev.psi.mi.search.index.impl.InteractorIndexWriter;
+import psidev.psi.mi.search.engine.SearchEngine;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
+import org.apache.lucene.store.Directory;
+
+import java.io.IOException;
 
 /**
  * TODO comment that class header
@@ -31,6 +35,11 @@ public class IntactInteractorIndexWriter extends InteractorIndexWriter {
 
     public IntactInteractorIndexWriter() {
         super(new IntactDocumentBuilder());
+    }
+
+    @Override
+    protected SearchEngine createSearchEngine(Directory directory) throws IOException {
+        return new IntactSearchEngine(directory);
     }
 
     @Override
