@@ -16,6 +16,10 @@
 package uk.ac.ebi.intact.psimitab.search;
 
 import psidev.psi.mi.search.index.impl.InteractorIndexWriter;
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Interactor;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
 /**
  * TODO comment that class header
@@ -27,5 +31,31 @@ public class IntactInteractorIndexWriter extends InteractorIndexWriter {
 
     public IntactInteractorIndexWriter() {
         super(new IntactDocumentBuilder());
+    }
+
+    @Override
+    protected void mergeBinaryInteractions(BinaryInteraction source, BinaryInteraction target) {
+        super.mergeBinaryInteractions(source, target);
+
+        IntactBinaryInteraction ibiSource = (IntactBinaryInteraction) source;
+        IntactBinaryInteraction ibiTarget = (IntactBinaryInteraction) target;
+
+        ibiTarget.getHostOrganism().addAll(ibiSource.getHostOrganism());
+        ibiTarget.getDataset().addAll(ibiSource.getDataset());
+        ibiTarget.getExpansionMethods().addAll(ibiSource.getExpansionMethods());
+        ibiTarget.getParameters().addAll(ibiSource.getParameters());
+    }
+
+    @Override
+    protected void mergeInteractors(Interactor source, Interactor target) {
+        super.mergeInteractors(source, target);
+
+        ExtendedInteractor extSource = (ExtendedInteractor)source;
+        ExtendedInteractor extTarget = (ExtendedInteractor)target;
+
+        extTarget.getExperimentalRoles().addAll(extSource.getExperimentalRoles());
+        extTarget.getBiologicalRoles().addAll(extSource.getBiologicalRoles());
+        extTarget.getProperties().addAll(extSource.getProperties());
+        extTarget.getParameters().addAll(extSource.getParameters());
     }
 }
