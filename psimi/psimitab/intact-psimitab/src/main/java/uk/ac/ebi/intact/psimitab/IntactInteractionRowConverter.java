@@ -58,15 +58,15 @@ public class IntactInteractionRowConverter extends AbstractInteractionRowConvert
 
         Row row = super.createRow(interaction);
 
-        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorA().getExperimentalRoles() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorB().getExperimentalRoles() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorA().getBiologicalRoles() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorB().getBiologicalRoles() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorA().getProperties() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorB().getProperties() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorA().getInteractorType() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getInteractorB().getInteractorType() ) );
-        row.appendColumn( createColumnFromCrossReferences( interaction.getHostOrganism() ) );
+        row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getInteractorA().getExperimentalRoles() ) );
+        row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getInteractorB().getExperimentalRoles() ) );
+        row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getInteractorA().getBiologicalRoles() ) );
+        row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getInteractorB().getBiologicalRoles() ) );
+        row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getInteractorA().getProperties() ) );
+        row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getInteractorB().getProperties() ) );
+        row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getInteractorA().getInteractorType() ) );
+        row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getInteractorB().getInteractorType() ) );
+        row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getHostOrganism() ) );
         row.appendColumn( createColumnFromStrings( interaction.getExpansionMethods() ) );
         row.appendColumn( createColumnFromStrings( interaction.getDataset() ) );
         row.appendColumn( createColumnFromAnnotations( interaction.getInteractorA().getAnnotations() ) );
@@ -101,15 +101,15 @@ public class IntactInteractionRowConverter extends AbstractInteractionRowConvert
         Column dataset = row.getColumnByIndex(IntactDocumentDefinition.DATASET);
 
 
-        ibi.getInteractorA().setExperimentalRoles(createCrossReferences(expRoleA) );
-        ibi.getInteractorB().setExperimentalRoles(createCrossReferences(expRoleB) );
-        ibi.getInteractorA().setBiologicalRoles(createCrossReferences(bioRoleA) );
-        ibi.getInteractorB().setBiologicalRoles(createCrossReferences(bioRoleB) );
-        ibi.getInteractorA().setProperties(createCrossReferences(propA) );
-        ibi.getInteractorB().setProperties(createCrossReferences(propB) );
-        ibi.getInteractorA().setInteractorType( createCrossReferences( typeA ).iterator().next() );
-        ibi.getInteractorB().setInteractorType( createCrossReferences( typeB ).iterator().next() );
-        ibi.setHostOrganism( createCrossReferences( hostOrganism ) );
+        ibi.getInteractorA().setExperimentalRoles(ParseUtils.createCrossReferences(expRoleA) );
+        ibi.getInteractorB().setExperimentalRoles(ParseUtils.createCrossReferences(expRoleB) );
+        ibi.getInteractorA().setBiologicalRoles(ParseUtils.createCrossReferences(bioRoleA) );
+        ibi.getInteractorB().setBiologicalRoles(ParseUtils.createCrossReferences(bioRoleB) );
+        ibi.getInteractorA().setProperties(ParseUtils.createCrossReferences(propA) );
+        ibi.getInteractorB().setProperties(ParseUtils.createCrossReferences(propB) );
+        ibi.getInteractorA().setInteractorType( ParseUtils.createCrossReferences( typeA ).iterator().next() );
+        ibi.getInteractorB().setInteractorType( ParseUtils.createCrossReferences( typeB ).iterator().next() );
+        ibi.setHostOrganism( ParseUtils.createCrossReferences( hostOrganism ) );
         ibi.setExpansionMethods( createStringsFromColumn( expansion ) );
         ibi.setDataset( createStringsFromColumn( dataset ) );
 
@@ -157,7 +157,7 @@ public class IntactInteractionRowConverter extends AbstractInteractionRowConvert
     protected Column createColumnFromAnnotations( Collection<Annotation> annotations ) {
         final LinkedList<Field> fields = new LinkedList<Field>();
         for ( Annotation annotation : annotations ) {
-            fields.add( createFieldFromAnnotation( annotation ));
+            ParseUtils.addFieldToList( fields, createFieldFromAnnotation( annotation ));
         }
         return new Column( fields );
     }
@@ -165,7 +165,7 @@ public class IntactInteractionRowConverter extends AbstractInteractionRowConvert
      protected Column createColumnFromParameters( Collection<Parameter> parameters ) {
         final LinkedList<Field> fields = new LinkedList<Field>();
         for ( Parameter parameter : parameters ) {
-            fields.add( createFieldFromParameter( parameter ));
+            ParseUtils.addFieldToList(fields, createFieldFromParameter(parameter));
         }
         return new Column( fields );
     }
