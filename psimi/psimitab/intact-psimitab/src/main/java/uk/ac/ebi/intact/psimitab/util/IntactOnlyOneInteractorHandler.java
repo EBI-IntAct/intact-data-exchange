@@ -13,18 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.ebi.intact.psimitab.search;
+package uk.ac.ebi.intact.psimitab.util;
 
-import psidev.psi.mi.search.index.impl.InteractorIndexWriter;
-import psidev.psi.mi.search.engine.SearchEngine;
-import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.util.IntactOnlyOneInteractorHandler;
-import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import org.apache.lucene.store.Directory;
-
-import java.io.IOException;
 
 /**
  * TODO comment that class header
@@ -32,15 +23,10 @@ import java.io.IOException;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class IntactInteractorIndexWriter extends InteractorIndexWriter {
-
-    public IntactInteractorIndexWriter() {
-        super(new IntactDocumentBuilder(), new IntactOnlyOneInteractorHandler());
-    }
+public class IntactOnlyOneInteractorHandler extends IntactBinaryInteractionHandler {
 
     @Override
-    protected SearchEngine createSearchEngine(Directory directory) throws IOException {
-        return new IntactSearchEngine(directory);
+    protected Interactor mergeInteractorA(Interactor i1, Interactor i2) {
+        return cloneInteractor(i1);
     }
-
 }

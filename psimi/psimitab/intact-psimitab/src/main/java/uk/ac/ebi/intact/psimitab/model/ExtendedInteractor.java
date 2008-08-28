@@ -61,8 +61,8 @@ public class ExtendedInteractor extends Interactor {
     }
 
     public List<CrossReference> getBiologicalRoles() {
-        if (experimentalRoles == null) {
-            experimentalRoles = new ArrayList<CrossReference>(2);
+        if (biologicalRoles == null) {
+            biologicalRoles = new ArrayList<CrossReference>(2);
         }
 
         return biologicalRoles;
@@ -73,8 +73,8 @@ public class ExtendedInteractor extends Interactor {
     }
 
     public List<CrossReference> getProperties() {
-        if (experimentalRoles == null) {
-            experimentalRoles = new ArrayList<CrossReference>();
+        if (properties == null) {
+            properties = new ArrayList<CrossReference>();
         }
 
         return properties;
