@@ -19,8 +19,12 @@ import psidev.psi.mi.search.index.impl.InteractorIndexWriter;
 import psidev.psi.mi.search.engine.SearchEngine;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
+import psidev.psi.mi.tab.utils.BinaryInteractionHandler;
+import psidev.psi.mi.tab.utils.OnlyOneInteractorHandler;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.util.IntactOnlyOneInteractorHandler;
+import uk.ac.ebi.intact.psimitab.util.IntactBinaryInteractionHandler;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import org.apache.lucene.store.Directory;
 
@@ -36,6 +40,12 @@ public class IntactInteractorIndexWriter extends InteractorIndexWriter {
 
     public IntactInteractorIndexWriter() {
         super(new IntactDocumentBuilder(), new IntactOnlyOneInteractorHandler());
+    }
+
+    @Override
+    protected BinaryInteraction mergeBinaryInteractions( BinaryInteraction source, BinaryInteraction target ) {
+        IntactBinaryInteractionHandler handler = new IntactOnlyOneInteractorHandler();
+        return handler.merge((IntactBinaryInteraction) source, (IntactBinaryInteraction) target);
     }
 
     @Override
