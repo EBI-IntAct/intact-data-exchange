@@ -19,6 +19,7 @@ import psidev.psi.mi.tab.converter.tab2xml.XmlConversionException;
 import psidev.psi.mi.tab.converter.xml2tab.InteractorConverter;
 import psidev.psi.mi.tab.converter.xml2tab.TabConversionException;
 import psidev.psi.mi.tab.converter.xml2tab.CrossReferenceConverter;
+import psidev.psi.mi.tab.converter.IdentifierGenerator;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.xml.model.*;
@@ -82,7 +83,8 @@ public class IntactInteractorConverter extends InteractorConverter<ExtendedInter
 
     private Participant buildParticipant(psidev.psi.mi.xml.model.Interactor interactor, ExtendedInteractor extInteractor, int index) throws XmlConversionException {
         Participant participant = new Participant();
-        participant.setInteractor(interactor);
+        participant.setId( IdentifierGenerator.getInstance().nextId() );
+        participant.setInteractor( interactor );
 
         CrossReference expRoleXref = extInteractor.getExperimentalRoles().get(index);
         participant.getExperimentalRoles().add(xrefConverter.fromMitab(expRoleXref, ExperimentalRole.class));
@@ -100,7 +102,9 @@ public class IntactInteractorConverter extends InteractorConverter<ExtendedInter
         // annotations
         for (Annotation annotation : extInteractor.getAnnotations()) {
             Attribute attr = new Attribute(annotation.getType(), annotation.getText());
-            participant.getInteractor().getAttributes().add(attr);
+            if( ! participant.getInteractor().getAttributes().contains( attr )) {
+                participant.getInteractor().getAttributes().add(attr);
+            }
         }
 
         // parameters

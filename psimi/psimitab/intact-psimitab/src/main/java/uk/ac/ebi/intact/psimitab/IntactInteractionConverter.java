@@ -338,35 +338,49 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
     protected void populateInteractionFromMitab(Interaction interaction, BinaryInteraction<?> binaryInteraction, int index) {
         // mitab -> xml
 
-        IntactBinaryInteraction ibi = (IntactBinaryInteraction)binaryInteraction;
+        IntactBinaryInteraction ibi = (IntactBinaryInteraction) binaryInteraction;
 
         // host organism
-        ExperimentDescription experiment = interaction.getExperiments().iterator().next();
-        experiment.getHostOrganisms().clear();
-
-        for (CrossReference orgXref : ibi.getHostOrganism()) {
+        final int hostCount = ibi.getHostOrganism().size();
+        if( index <= hostCount ) {
+            CrossReference orgXref = ibi.getHostOrganism().get( index );
             Organism hostOrganism = new Organism();
             hostOrganism.setNcbiTaxId( Integer.parseInt(orgXref.getIdentifier()) );
             Names organismNames = new Names();
             organismNames.setShortLabel( orgXref.getText() );
             hostOrganism.setNames( organismNames );
 
+            final ExperimentDescription experiment;
+            if( interaction.hasExperiments() ) {
+                experiment = interaction.getExperiments().iterator().next();
+            } else {
+                experiment = new ExperimentDescription( );
+                interaction.getExperiments().add( experiment );
+            }
             experiment.getHostOrganisms().add(hostOrganism);
+        } else {
+            log.warn( "Could not fetch a host organism at index " + index + " only " + hostCount + " found." );
         }
 
         // expansion method
-        for (String expMethod : ibi.getExpansionMethods()) {
-            Attribute attr = new Attribute("expansion", expMethod);
-            interaction.getAttributes().add(attr);
+        final int expansionCount = ibi.getExpansionMethods().size();
+        if( index <= expansionCount ) {
+            String expMethod = ibi.getExpansionMethods().get( index );
+            if( ! "-".equals( expMethod ) ) {
+                Attribute attr = new Attribute("expansion", expMethod);
+                interaction.getAttributes().add(attr);
+            }
+        } else {
+            log.warn( "Could not fetch an expansion method at index " + index + " only " + expansionCount + " found." );
         }
 
-        // dataset
+        // dataset -- there could be many: add them all
         for (String dataset : ibi.getDataset()) {
             Attribute attr = new Attribute("dataset", dataset);
             interaction.getAttributes().add(attr);
         }
 
-        // parameters
+        // parameters --  there could be many: add them all
         for (uk.ac.ebi.intact.psimitab.model.Parameter parameter : ibi.getParameters()) {
             psidev.psi.mi.xml.model.Parameter param = new psidev.psi.mi.xml.model.Parameter(parameter.getType(), parameter.getFactor());
             param.setUnit(parameter.getUnit());
