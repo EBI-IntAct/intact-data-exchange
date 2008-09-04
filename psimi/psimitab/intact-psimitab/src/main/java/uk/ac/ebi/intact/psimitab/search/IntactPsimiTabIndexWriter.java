@@ -25,4 +25,9 @@ public class IntactPsimiTabIndexWriter extends PsimiIndexWriter
     public Document createDocument(String line) throws MitabLineException {
         return getDocumentBuilder().createDocumentFromPsimiTabLine( line );
     }
+
+    public IntactPsimiTabIndexWriter(boolean includeParents) {
+                super(new IntactDocumentBuilder(includeParents));
+            }
+
 }

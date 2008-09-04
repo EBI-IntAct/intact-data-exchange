@@ -40,4 +40,13 @@ public abstract class TestHelper {
     public static Directory createIndexFromLine(String line) throws IOException, ConverterException, MitabLineException {
         return Searcher.buildIndexInMemory(new ByteArrayInputStream(line.getBytes()), true, false, new IntactPsimiTabIndexWriter());
     }
+
+    public static Directory createIndexFromResource(String resourcePath,boolean includeParents) throws IOException, ConverterException, MitabLineException {
+        InputStream is = TestHelper.class.getResourceAsStream(resourcePath);
+        return Searcher.buildIndexInMemory(is, true, true, new IntactPsimiTabIndexWriter(includeParents));
+    }
+
+    public static Directory createIndexFromLine(String line, boolean includeParents) throws IOException, ConverterException, MitabLineException {
+        return Searcher.buildIndexInMemory(new ByteArrayInputStream(line.getBytes()), true, false, new IntactPsimiTabIndexWriter(includeParents));
+    }
 }
