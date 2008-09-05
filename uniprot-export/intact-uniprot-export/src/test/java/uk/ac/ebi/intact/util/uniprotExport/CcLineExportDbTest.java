@@ -117,4 +117,62 @@ public class CcLineExportDbTest extends IntactBasicTestCase {
 
         System.out.println(ccWriter.toString());
     }
+
+    @Test
+    public void testGenerateCCLines_splicevariant() throws Exception {
+        Collection<String> uniprotIds =
+                CCLineExport.getEligibleProteinsFromFile(CcLineExportDbTest.class.getResource("uniprotlinks.dat").getFile());
+
+        uniprotIds.add( "P14712-1" );
+
+        // build data
+        final BioSource human = getMockBuilder().createBioSource( 9606, "human" );
+        final BioSource mouse = getMockBuilder().createBioSource( 10032, "mouse" );
+        mouse.setFullName( "Mus musculus" );
+
+        final Protein q9swi1 = getMockBuilder().createProtein( "Q9SWI1", "Q9SWI1_HUMAN", human );
+        q9swi1.getAliases().clear();
+        q9swi1.addAlias( new InteractorAlias( getMockBuilder().getInstitution(), q9swi1,
+                                              getMockBuilder().createCvObject( CvAliasType.class,
+                                                                               CvAliasType.GENE_NAME_MI_REF,
+                                                                               CvAliasType.GENE_NAME ),
+                                              "foo"));
+
+        final Protein p14712 = getMockBuilder().createProtein( "P14712", "P14712_HUMAN", mouse );
+
+        final Protein p14713 = getMockBuilder().createProtein( "P14713", "P14713_HUMAN", human );
+        PersisterHelper.saveOrUpdate( p14713 );
+
+        final Protein p14713_1 = getMockBuilder().createProtein( "P14712-1", "SV1", mouse );
+        p14713_1.addXref( new InteractorXref( getMockBuilder().getInstitution(),
+                                              getDaoFactory().getCvObjectDao(CvDatabase.class).getByPsiMiRef(CvDatabase.INTACT_MI_REF),
+                                              p14713.getAc(),
+                                              getDaoFactory().getCvObjectDao(CvXrefQualifier.class).getByPsiMiRef( CvXrefQualifier.ISOFORM_PARENT_MI_REF )) );
+
+        final Protein p12345 = getMockBuilder().createProtein( "P12345", "P12345_HUMAN", human );
+
+        final Interaction interaction1 = getMockBuilder().createInteraction( q9swi1, p14713_1 );
+        final Experiment exp = getMockBuilder().createDeterministicExperiment();
+        final CvTopic uniprotDrExport = getMockBuilder().createCvObject( CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT );
+        final Annotation annotation = new Annotation( getMockBuilder().getInstitution(), uniprotDrExport, "yes" );
+        exp.addAnnotation( annotation );
+        interaction1.addExperiment( exp );
+
+        PersisterHelper.saveOrUpdate( p14712, q9swi1, p14713_1, p12345 );
+
+        StringWriter ccWriter = new StringWriter();
+        Writer goaWriter = new StringWriter();
+
+        LineExportConfig config = new LineExportConfig();
+        config.setIgnoreUniprotDrExportAnnotation(true);
+
+        CCLineExport ccLineExport = new CCLineExport(ccWriter, goaWriter, config, System.out);
+
+        ccLineExport.generateCCLines(uniprotIds);
+
+        Assert.assertEquals(2, ccLineExport.getCcLineCount());
+        Assert.assertEquals(2, ccLineExport.getGoaLineCount());
+
+        System.out.println(ccWriter.toString());
+    }
 }
