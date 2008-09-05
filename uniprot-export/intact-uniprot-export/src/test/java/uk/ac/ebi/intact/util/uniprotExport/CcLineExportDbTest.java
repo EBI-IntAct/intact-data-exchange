@@ -9,6 +9,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.*;
 import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.config.CvPrimer;
+import uk.ac.ebi.intact.config.impl.EssentialCvPrimer;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import uk.ac.ebi.intact.model.*;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -21,20 +28,39 @@ import java.util.Collection;
  * @version $Id$
  * @since <pre>24-Aug-2006</pre>
  */
-@Ignore
-public class CcLineExportDbTest {
+public class CcLineExportDbTest extends IntactBasicTestCase {
 
     private static final Log log = LogFactory.getLog(CcLineExportDbTest.class);
 
-
     @After
-    protected void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         IntactContext.getCurrentInstance().getDataContext().commitAllActiveTransactions();
     }
 
     @Before
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+
+        DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+        EssentialCvPrimer cvPrimer = new EssentialCvPrimer( daoFactory ){
+            @Override
+            public void createCVs() {
+                super.createCVs();
+
+                IntactMockBuilder builder = new IntactMockBuilder( );
+                final CvDatabase uniprotkb = builder.createCvObject( CvDatabase.class, CvDatabase.UNIPROT_MI_REF, CvDatabase.UNIPROT );
+                final CvXrefQualifier isoformParent = builder.createCvObject( CvXrefQualifier.class, CvXrefQualifier.ISOFORM_PARENT_MI_REF, CvXrefQualifier.ISOFORM_PARENT );
+                final CvTopic noUniprotUpdate = builder.createCvObject( CvTopic.class, null, CvTopic.NON_UNIPROT );
+                final CvTopic negative = builder.createCvObject( CvTopic.class, null, CvTopic.NEGATIVE );
+                final CvTopic ccNote = builder.createCvObject( CvTopic.class, null, "uniprot-cc-note" );
+                final CvAliasType locusName = builder.createCvObject( CvAliasType.class, CvAliasType.LOCUS_NAME_MI_REF, "locus name" );
+                final CvAliasType orfName = builder.createCvObject( CvAliasType.class, CvAliasType.ORF_NAME_MI_REF, "orf name" );
+
+
+                PersisterHelper.saveOrUpdate( uniprotkb, isoformParent, noUniprotUpdate, negative, ccNote, locusName, orfName );
+            }
+        };
+        cvPrimer.createCVs();
     }
 
     @Test
@@ -42,7 +68,39 @@ public class CcLineExportDbTest {
         Collection<String> uniprotIds =
                 CCLineExport.getEligibleProteinsFromFile(CcLineExportDbTest.class.getResource("uniprotlinks.dat").getFile());
 
-        Writer ccWriter = new StringWriter();
+        // build data
+        final BioSource human = getMockBuilder().createBioSource( 9606, "human" );
+        final BioSource mouse = getMockBuilder().createBioSource( 10032, "mouse" );
+        mouse.setFullName( "Mus musculus" );
+        final Protein q9swi1 = getMockBuilder().createProtein( "Q9SWI1", "Q9SWI1_HUMAN", human );
+        q9swi1.getAliases().clear();
+        q9swi1.addAlias( new InteractorAlias( getMockBuilder().getInstitution(), q9swi1,
+                                              getMockBuilder().createCvObject( CvAliasType.class,
+                                                                               CvAliasType.GENE_NAME_MI_REF,
+                                                                               CvAliasType.GENE_NAME ),
+                                              "foo"));
+        final Protein p14712 = getMockBuilder().createProtein( "P14712", "P14712_HUMAN", mouse );
+        final Protein p14713 = getMockBuilder().createProtein( "P14713", "P14712_HUMAN", human );
+        p14713.getAliases().clear();
+        p14713.addAlias( new InteractorAlias( getMockBuilder().getInstitution(), p14713,
+                                              getMockBuilder().createCvObject( CvAliasType.class,
+                                                                               CvAliasType.ORF_NAME_MI_REF,
+                                                                               CvAliasType.ORF_NAME ),
+                                              "bar"));
+        final Protein p12345 = getMockBuilder().createProtein( "P12345", "P12345_HUMAN", human );
+
+        final Interaction interaction1 = getMockBuilder().createInteraction( q9swi1, p14713 );
+        final Interaction interaction2 = getMockBuilder().createInteraction( q9swi1, p14712 );
+        final Experiment exp = getMockBuilder().createDeterministicExperiment();
+        final CvTopic uniprotDrExport = getMockBuilder().createCvObject( CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT );
+        final Annotation annotation = new Annotation( getMockBuilder().getInstitution(), uniprotDrExport, "yes" );
+        exp.addAnnotation( annotation );
+        interaction1.addExperiment( exp );
+        interaction2.addExperiment( exp );
+
+        PersisterHelper.saveOrUpdate( q9swi1, p14712, p14713, p12345 );
+
+        StringWriter ccWriter = new StringWriter();
         Writer goaWriter = new StringWriter();
 
         LineExportConfig config = new LineExportConfig();
@@ -55,26 +113,8 @@ public class CcLineExportDbTest {
         ccLineExport.generateCCLines(uniprotIds);
 
         Assert.assertEquals(3, ccLineExport.getCcLineCount());
-        Assert.assertEquals(5, ccLineExport.getGoaLineCount());
+        Assert.assertEquals(4, ccLineExport.getGoaLineCount());
 
         System.out.println(ccWriter.toString());
     }
-    /*
-  public void testGenerateCCLines_self() throws Exception
-  {
-      Collection<String> uniprotIds =
-              CCLineExport.getEligibleProteinsFromFile(CcLineExportDbTest.class.getResource("uniprotlinks_self.dat").getFile());
-
-      Writer ccWriter = new StringWriter();
-      Writer goaWriter = new StringWriter();
-
-      CCLineExport ccLineExport = new CCLineExport(ccWriter, goaWriter);
-
-      ccLineExport.generateCCLines(uniprotIds);
-
-      assertEquals(1, ccLineExport.getCcLineCount());
-
-      System.out.println(ccWriter.toString());
-  }
-    */
 }

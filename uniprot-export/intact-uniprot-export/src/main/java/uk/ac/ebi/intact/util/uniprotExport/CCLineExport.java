@@ -237,11 +237,11 @@ public class CCLineExport extends LineExport {
      * @param uniprotID1      the uniprot AC of the protein to which that CC lines will be attached.
      * @param uniprotID2      the uniprot AC of the protein which interacts with the protein to which that CC lines will
      *                        be attached.
-     * @param experimentCount count of distinct experimental support for that CC line.
+     * @param eligibleExperiments list of experimental support for that CC line.
      */
     private void createCCLine(String uniprotID1, Protein protein1,
                               String uniprotID2, Protein protein2,
-                              int experimentCount
+                              Set<Experiment> eligibleExperiments
     ) {
 
         // BUG:
@@ -281,7 +281,7 @@ public class CCLineExport extends LineExport {
         }
 
         // produce the CC lines for the 1st protein
-        CcLine cc1 = formatCCLines(uniprotID1, protein1, uniprotID2, protein2, experimentCount);
+        CcLine cc1 = formatCCLines(uniprotID1, protein1, uniprotID2, protein2, eligibleExperiments);
         List cc4protein1 = (List) ccLines.get(master1);
         if (null == cc4protein1) {
             cc4protein1 = new ArrayList();
@@ -291,7 +291,7 @@ public class CCLineExport extends LineExport {
 
         // produce the CC lines for the 2nd protein
         if (!uniprotID1.equals(uniprotID2)) {
-            CcLine cc2 = formatCCLines(uniprotID2, protein2, uniprotID1, protein1, experimentCount);
+            CcLine cc2 = formatCCLines(uniprotID2, protein2, uniprotID1, protein1, eligibleExperiments);
             List cc4protein2 = (List) ccLines.get(master2);
             if (null == cc4protein2) {
                 cc4protein2 = new ArrayList();
@@ -325,12 +325,12 @@ public class CCLineExport extends LineExport {
      *
      * @return a CCLine
      */
-    private CcLine formatCCLines(String uniprotID1, Protein protein1,
-                                 String uniprotID2, Protein protein2,
-                                 int experimentCount
+    private CcLine formatCCLinesOld(String uniprotID1, Protein protein1,
+                                    String uniprotID2, Protein protein2,
+                                    Set<Experiment> eligibleExperiments
     ) {
 
-        StringBuffer buffer = new StringBuffer(128); // average size is 160 char
+        StringBuffer buffer = new StringBuffer(256); // average size is 160 char
 
         buffer.append("CC       ");
 
@@ -344,10 +344,6 @@ public class CCLineExport extends LineExport {
 
             // A gene must be there ... it must have been checked before.
             geneName = getGeneName(protein2);
-            if (geneName == null) {
-                geneName = "-";
-            }
-
             buffer.append(uniprotID2).append(':').append(geneName);
         }
 
@@ -356,7 +352,7 @@ public class CCLineExport extends LineExport {
             buffer.append(' ').append("(xeno)");
         }
 
-        buffer.append(';').append(' ').append("NbExp=").append(experimentCount).append(';').append(' ');
+        buffer.append(';').append(' ').append("NbExp=").append(eligibleExperiments.size()).append(';').append(' ');
         buffer.append("IntAct=").append(protein1.getAc()).append(',').append(' ').append(protein2.getAc()).append(';');
 
         getOut().println("\t\t\t" + buffer.toString());
@@ -366,12 +362,76 @@ public class CCLineExport extends LineExport {
         return new CcLine(buffer.toString(), geneName, uniprotID2);
     }
 
-    public Set getPumedIds(Set experiments) {
+    /**
+     * Generate the CC line content based on the Interaction and its two interactor. <br> protein1 is the entry in which
+     * that CC content will appear.
+     * <p/>
+     * <pre>
+     *          <font color=gray>ID   rr44_HUMAN     STANDARD;      PRT;   123 AA.</font>
+     *          <font color=gray>AC   P01232</font>
+     *          <font color=gray>GN   rr44.</font>
+     *          CC   -!- INTERACTION:
+     *          CC       Interact=Yes (PubMed:12344567); Xref=IntAct:EBI-375446,EBI-389883;
+     *          CC         Protein1=rr44 [P01232];
+     *          CC         Protein2=tsr [P10981];
+     * </pre>
+     *
+     * @param uniprotID1      uniprot ID of the protein in which we will export that CC line
+     * @param protein1        IntAct associated protein
+     * @param uniprotID2      uniprot ID of the protein with which interacts protein 1
+     * @param protein2        IntAct associated protein
+     * @param eligibleExperiments distinct experiment supporting this interactions.
+     *
+     * @return a CCLine
+     */
+    private CcLine formatCCLines(String uniprotID1, Protein protein1,
+                                 String uniprotID2, Protein protein2,
+                                 Set<Experiment> eligibleExperiments
+    ) {
 
-        Set pubmeds = new HashSet();
+        StringBuffer buffer = new StringBuffer(256); // average size is 160 char
 
-        for (Iterator iterator = experiments.iterator(); iterator.hasNext();) {
-            Experiment experiment = (Experiment) iterator.next();
+        buffer.append("CC       Interact=Yes ");
+
+        // collect all pubmeds and format them
+        Set<String> pubmeds = getPumedIds( eligibleExperiments, false );
+        if(!pubmeds.isEmpty()) {
+            buffer.append("( ");
+            for ( String pubmed : pubmeds ) {
+                buffer.append("PubMed=").append( pubmed ).append( ';' );
+            }
+            buffer.append(")");
+        }
+        buffer.append(" Xref=").append( protein1.getAc() ).append(',').append(protein2.getAc()).append(';');
+        buffer.append(NEW_LINE);
+
+        buffer.append("CC         Protein1=");
+        String geneName1 = getGeneName(protein1);
+        buffer.append( geneName1 ).append(' ').append( '[' ).append( uniprotID1 ).append( ']' ).append( ';' );
+        buffer.append(NEW_LINE);
+
+        buffer.append("CC         Protein2=");
+        String geneName2 = getGeneName(protein2);
+        buffer.append( geneName2 ).append(' ').append( '[' ).append( uniprotID2 ).append( ']' ).append( ';' );
+        // handle protein originating from different organism
+        final BioSource biosource2 = protein2.getBioSource();
+        if (!protein1.getBioSource().equals( biosource2 )) {
+            buffer.append(' ').append("( Organism=");
+            buffer.append( biosource2.getFullName() ).append( " [NCBI TaxID=" ).append( biosource2.getTaxId() ).append( "]" );
+            buffer.append(";)");
+        }
+
+        getOut().println("\t\t\t" + buffer.toString());
+        buffer.append(NEW_LINE);
+
+        return new CcLine(buffer.toString(), geneName1, uniprotID2);
+    }
+
+    public Set<String> getPumedIds(Set<Experiment> experiments, final boolean stopOnceOneFound ) {
+
+        Set<String> pubmeds = new HashSet<String>();
+
+        for ( Experiment experiment : experiments ) {
             boolean found = false;
 
             for (Iterator iterator1 = experiment.getXrefs().iterator(); iterator1.hasNext() && !found;) {
@@ -379,7 +439,9 @@ public class CCLineExport extends LineExport {
 
                 if (getPubmed().equals(xref.getCvDatabase()) &&
                     getPrimaryReference().equals(xref.getCvXrefQualifier())) {
-                    found = true;
+                    if( stopOnceOneFound ) {
+                        found = true;
+                    }
                     pubmeds.add(xref.getPrimaryId());
                 }
             } // xref
@@ -432,7 +494,7 @@ public class CCLineExport extends LineExport {
             master2 = uniprotID_2;
         }
 
-        Set pubmeds = getPumedIds(eligibleExperiments);
+        Set pubmeds = getPumedIds(eligibleExperiments, true );
         if (pubmeds.isEmpty()) {
             getOut().println("ERROR: No PubMed ID found in that set of experiments. ");
             return;
@@ -552,14 +614,14 @@ public class CCLineExport extends LineExport {
      * @return Collection(ExportableInteraction) or can be null if no interaction have been found to be eligible for
      *         CC export
      */
-    private Set getEligibleExperimentCount(List interactions, Set eligibleInteractions) {
+    private Set<Experiment> getEligibleExperimentCount(List<Interaction> interactions, Set<Interaction> eligibleInteractions) {
 
-        Set eligibleExperiments = new HashSet();
+        Set<Experiment> eligibleExperiments = new HashSet<Experiment>();
 
         final int interactionCount = interactions.size();
         for (int i = 0; i < interactionCount; i++) {
 
-            Interaction interaction = (Interaction) interactions.get(i);
+            Interaction interaction = interactions.get(i);
 
             getOut().println("\t\t Interaction: Shortlabel:" + interaction.getShortLabel() + "  AC: " + interaction.getAc());
 
@@ -601,7 +663,7 @@ public class CCLineExport extends LineExport {
 
                     CvTopic authorConfidenceTopic = getAuthorConfidence();
 
-                    // We assume here that an interaction has only one Annotation( uniprot-dr-export ).
+                    // We assume here that an interaction has a single Annotation of type 'uniprot-dr-export'.
                     for (Iterator iterator3 = annotations.iterator(); iterator3.hasNext() && !annotationFound;) {
                         final Annotation annotation = (Annotation) iterator3.next();
 
@@ -1003,8 +1065,9 @@ public class CCLineExport extends LineExport {
                                 //     the collection of eligible interactions to get the feature information (GO specific)
                                 //     the collection of eligible experimentss to get the pubmed ids (GO specific)
                                 Set eligibleInteractions = new HashSet();
-                                Set eligibleExperiments = getEligibleExperimentCount(potentiallyEligibleInteraction,
-                                                                                     eligibleInteractions);
+                                Set<Experiment> eligibleExperiments =
+                                        getEligibleExperimentCount(potentiallyEligibleInteraction,
+                                                                   eligibleInteractions);
 
                                 if (!eligibleExperiments.isEmpty()) {
 
@@ -1013,7 +1076,7 @@ public class CCLineExport extends LineExport {
                                     // CC Lines
                                     createCCLine(uniprotID_1, protein1,
                                                  uniprotID_2, protein2,
-                                                 eligibleExperiments.size());
+                                                 eligibleExperiments);
 
                                     // if we select the interactions that are seen in the collection of experiment,
                                     // then we can inspect the features and extract c-terminal, n-terminal...
@@ -1120,8 +1183,7 @@ public class CCLineExport extends LineExport {
         return proteins;
     }
 
-    protected EventListenerList listenerList =
-            new EventListenerList();
+    protected EventListenerList listenerList = new EventListenerList();
 
     public void addCcLineExportListener(CcLineEventListener eventListener) {
         listenerList.add(CcLineEventListener.class, eventListener);

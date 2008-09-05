@@ -1151,6 +1151,10 @@ public class LineExport {
             geneName = (geneNames.get(0)).getName();
         }
 
+        if( geneName == null ) {
+            geneName = "-";
+        }
+
         return geneName;
     }
 
