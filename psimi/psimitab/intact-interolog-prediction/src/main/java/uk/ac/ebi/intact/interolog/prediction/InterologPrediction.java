@@ -58,6 +58,7 @@ import uk.ac.ebi.intact.interolog.util.NewtUtils;
 /**
  * This is the main part of the prediction process.
  * 
+ * 08/09/06: added the definitive pudmed id 18508856
  * 08/03/29: by default, the tool does not generate XML files (keep an option to do it). We use a separate tool to convert
  *           generated MITAB25 into PSI25-XML
  * 08/03/28: added a threshold to compute files in XML format or not (too heavy...)
@@ -93,7 +94,7 @@ public class InterologPrediction {
 	 */
 	private final static String AUTHORS = "Michaut et al. (2008)";
 	private final static String PUBMED_DB = "pubmed";
-	private final static String MICHAUT_ET_AL_ID = "00000000";
+	private final static String MICHAUT_ET_AL_ID = "18508856";
 	private final static String METHOD_DATABASE = "MI";
 	private final static String METHOD_ID = "0064";
 	private final static String METHOD_NAME = "interologs mapping";
@@ -1687,17 +1688,17 @@ public class InterologPrediction {
 	
 	/**
 	 * Give direct children taxids of some species
-	 * yeast pylori
+	 * E. coli, H. pylori
 	 * @return
 	 */
 	private static Map<Long, Collection<Long>> getChildrenMapManually() {
 		Map<Long, Collection<Long>> map = new HashMap<Long, Collection<Long>>();
 		
-		// yeast
+		// E. coli
 		Long[] coliTab = new Long[] {511145l,244314l, 244318l, 199310l, 364106l, 244323l, 362663l, 366838l, 244319l, 340185l, 244316l, 244322l, 155864l, 316401l, 244324l, 358709l, 316435l, 397449l, 168807l, 397447l, 217992l, 168927l, 366837l, 244326l, 340186l, 316397l, 397454l, 244325l, 397453l, 366839l, 244321l, 341037l, 373045l, 397448l, 331111l, 397452l, 83333l, 183192l, 366836l, 344610l, 37762l, 405955l, 397450l, 216592l, 244317l, 331112l, 344601l, 244315l, 340197l, 216593l, 83334l, 397451l, 340184l, 244320l};
 		map.put(562l, Arrays.asList( coliTab ));
 		
-		// pylori
+		// H. pylori
 		Long[] pyloriTab = new Long[] {85963l, 102617l, 85962l, 357544l, 102618l, 102619l};
 		map.put(210l, Arrays.asList( pyloriTab ));
 		
