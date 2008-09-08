@@ -14,7 +14,9 @@ import uk.ac.ebi.intact.config.impl.EssentialCvPrimer;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.model.*;
 
 import java.io.StringWriter;
@@ -39,6 +41,7 @@ public class CcLineExportDbTest extends IntactBasicTestCase {
 
     @Before
     public void setUp() throws Exception {
+        SchemaUtils.createSchema( true );
         IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
         DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
@@ -64,7 +67,7 @@ public class CcLineExportDbTest extends IntactBasicTestCase {
     }
 
     @Test
-    public void testGenerateCCLines() throws Exception {
+    public void generateCCLines() throws Exception {
         Collection<String> uniprotIds =
                 CCLineExport.getEligibleProteinsFromFile(CcLineExportDbTest.class.getResource("uniprotlinks.dat").getFile());
 
@@ -107,6 +110,8 @@ public class CcLineExportDbTest extends IntactBasicTestCase {
         config.setIgnoreUniprotDrExportAnnotation(true);
 
         CCLineExport ccLineExport = new CCLineExport(ccWriter, goaWriter, config, System.out);
+        Assert.assertEquals(0, ccLineExport.getCcLineCount());
+        Assert.assertEquals(0, ccLineExport.getGoaLineCount());
 
         //new CcLineExportProgressThread(ccLineExport, uniprotIds.size()).start();
 
@@ -119,7 +124,7 @@ public class CcLineExportDbTest extends IntactBasicTestCase {
     }
 
     @Test
-    public void testGenerateCCLines_splicevariant() throws Exception {
+    public void generateCCLines_splicevariant() throws Exception {
         Collection<String> uniprotIds =
                 CCLineExport.getEligibleProteinsFromFile(CcLineExportDbTest.class.getResource("uniprotlinks.dat").getFile());
 
@@ -167,12 +172,17 @@ public class CcLineExportDbTest extends IntactBasicTestCase {
         config.setIgnoreUniprotDrExportAnnotation(true);
 
         CCLineExport ccLineExport = new CCLineExport(ccWriter, goaWriter, config, System.out);
+        Assert.assertEquals(0, ccLineExport.getCcLineCount());
+        Assert.assertEquals(0, ccLineExport.getGoaLineCount());
 
         ccLineExport.generateCCLines(uniprotIds);
 
+        System.out.println( "CC Lines exported:" );
+        System.out.println( "-----------------" );
+        System.out.println(ccWriter.toString());
+        System.out.println( "-----------------" );
+
         Assert.assertEquals(2, ccLineExport.getCcLineCount());
         Assert.assertEquals(2, ccLineExport.getGoaLineCount());
-
-        System.out.println(ccWriter.toString());
     }
 }
