@@ -93,6 +93,11 @@ public class RunForOneSpecies {
 	.withDescription("If output XML files are required")
 	.create('x');
 	
+	public static Option checkTaxid = OptionBuilder
+	.withLongOpt("check-taxid")
+	.withDescription("If protein accession numbers and taxids are checked between interaction and porc data")
+	.create('c');
+	
 	public static void printHelp(Options options) {
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.printHelp("Interoporc [OPTIONS]", "Options:", options, 
@@ -120,6 +125,7 @@ public class RunForOneSpecies {
 		options.addOption(taxid);
 		options.addOption(nbInterMaxForXml);
 		options.addOption(xml);
+		options.addOption(checkTaxid);
 
 		// check 0
 		if(args.length == 0) {
@@ -158,6 +164,11 @@ public class RunForOneSpecies {
 			nbInterMaxForXml = Integer.parseInt(line.getOptionValue("m"));
 		}
 		
+		boolean checkTaxid = false;
+		if (line.hasOption("c")) {
+			generateXml = true;
+		}
+		
 		if (line.hasOption("l")) {
 			File propertiesFile = new File(line.getOptionValue("l"));
 			if (!propertiesFile.exists()) {
@@ -168,48 +179,6 @@ public class RunForOneSpecies {
 		}
 		
 		
-		if (false) {
-			int nbArgRequired = 5;
-			
-			if (args.length<nbArgRequired) {
-				throw new IllegalArgumentException("Usage: directory mitabFile PorcFile speciesTaxid maxInterNbForXML [log4j-prop-file]");
-			}
-			
-			int cpt = 0;
-			dir = new File(args[cpt]);
-			if (!dir.isDirectory()) {
-				throw new IllegalArgumentException(args[cpt]+" is not a directory");
-			}
-			
-			cpt++;
-			mitabFile = new File(args[cpt]);
-			if (!mitabFile.exists()) {
-				throw new FileNotFoundException("File "+args[cpt]+" not found");
-			}
-			
-			cpt++;
-			porcFile = new File(args[cpt]);
-			if (!porcFile.exists()) {
-				throw new FileNotFoundException("File "+args[cpt]+" not found");
-			}
-			
-			cpt++;
-			taxid = Long.parseLong(args[cpt]);
-			
-			cpt++;
-			nbInterMaxForXml = Integer.parseInt(args[cpt]);
-			
-			if (args.length>nbArgRequired) {
-				File propertiesFile = new File(args[nbArgRequired]);
-				if (!propertiesFile.exists()) {
-					throw new FileNotFoundException("File "+args[nbArgRequired]+" not found");
-				} else {
-					InterologPrediction.log = InterologPrediction.initLog(propertiesFile.getAbsolutePath());
-				}
-			}
-			
-		}
-		
 		InterologPrediction up = new InterologPrediction(dir);
 		up.setMitab(mitabFile);
 		up.setPorc(porcFile);
@@ -219,6 +188,7 @@ public class RunForOneSpecies {
 		up.setDownCastOnChildren(true);
 		up.setNbInterMaxForXml(nbInterMaxForXml);
 		up.setGenerateXml(generateXml);
+		up.setCheckTaxid(checkTaxid);
 		up.run();
 
 	}

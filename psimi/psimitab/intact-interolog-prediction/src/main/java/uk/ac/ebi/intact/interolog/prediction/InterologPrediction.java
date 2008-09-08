@@ -58,7 +58,10 @@ import uk.ac.ebi.intact.interolog.util.NewtUtils;
 /**
  * This is the main part of the prediction process.
  * 
+
  * 08/09/06: added the definitive pudmed id 18508856
+ * 			 removed the default check of the taxids and put it in option. It is not useful given that a Uniprot AC is unique
+ * 			 but leads to problems with taxids not from the same rank (e.g. species or strains) between interaction and proc data.
  * 08/03/29: by default, the tool does not generate XML files (keep an option to do it). We use a separate tool to convert
  *           generated MITAB25 into PSI25-XML
  * 08/03/28: added a threshold to compute files in XML format or not (too heavy...)
@@ -125,7 +128,7 @@ public class InterologPrediction {
 	private static File FILE_SOURCE_INTERACTIONS;
 	
 	/**
-	 * File used to print all clog interactions if asked.
+	 * File used to print all porc interactions if asked.
 	 */
 	private static File FILE_RESULT_PORC_INTERACTIONS;
 	
@@ -207,6 +210,12 @@ public class InterologPrediction {
 	 * Maximum nb of interactions to generate a XML file.
 	 */
 	private int nbInterMaxForXml = 15000;
+	
+	/**
+	 * If true, taxids are check between interactions and porc data in addition to the proteinAc.
+	 * In that case, a mapping to the species rank should be added to get a good merging between interaction and porc data.
+	 */
+	private boolean checkTaxid = false;
 	
 	/**
 	 * All NCBI taxids present in the mitab file.
@@ -655,6 +664,13 @@ public class InterologPrediction {
 		this.generateXml = generateXml;
 	}
 	
+	public boolean isCheckTaxid() {
+		return this.checkTaxid;
+	}
+
+	public void setCheckTaxid(boolean checkTaxid) {
+		this.checkTaxid = checkTaxid;
+	}
 	
 	/**
 	 * @param mitab
@@ -1117,6 +1133,10 @@ public class InterologPrediction {
 				porcTaxids.add(taxid);
 				String proteinAc = porc.getProteomeId2protein().get(proteomeId);
 				String key = proteinAc+"_"+taxid;
+				// in that case, we only check the proteinAc is the same between interaction and porc data.
+				if (!checkTaxid) {
+					key = proteinAc;
+				}
 				
 				// sometimes some different proteomeIds can point to the same NCBI taxid (related strains probably...)
 				// for example 
@@ -1384,6 +1404,12 @@ public class InterologPrediction {
 			// proteinAc and taxid
 			Long porcIdA = protein2porc.get(proteinAcA+"_"+taxid);
 			Long porcIdB = protein2porc.get(proteinAcB+"_"+taxid);
+			
+			if (!checkTaxid) {
+				porcIdA = protein2porc.get(proteinAcA);
+				porcIdB = protein2porc.get(proteinAcB);
+				taxid = null;
+			}
 			
 			if (porcIdA==null && porcIdB==null && taxid!=null) {
 				Collection<Long> childrenTaxids = taxid2ChildrenTaxids.get(taxid);
@@ -1811,5 +1837,7 @@ public class InterologPrediction {
 		
 		up.run();
 	}
+
+
 	
 }

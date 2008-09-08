@@ -74,6 +74,8 @@ Options:
                                 interactions
  -p,--porc-file <file>          PORC file with orthologous clusters
  -x,--xml-files                 If output XML files are required
+ -c,--check-taxid               If protein accession numbers and taxids
+                                are checked between interaction and porc data
  -m,--max-nb-inter-xml <int>    Maximum nb of interactions to generate a
                                 XML file
  -h,--help                      print this message
