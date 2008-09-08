@@ -257,14 +257,14 @@ public class LineExport {
     // Attributes
 
     /**
-     * Cache the CvInteraction property for the export. CvInteraction.ac -> Boolean.TRUE or Boolean.FALSE
+     * Cache the CvInteraction property for the export. CvInteraction.ac -> CvInteractionStatus.
      */
-    protected HashMap<String, CvInteractionStatus> cvInteractionExportStatusCache = new HashMap<String, CvInteractionStatus>();
+    protected Map<String, CvInteractionStatus> cvInteractionExportStatusCache = new HashMap<String, CvInteractionStatus>();
 
     /**
-     * Cache the Experiment property for the export. Experiment.ac -> Integer (EXPORT, DO_NOT_EXPORT, NOT_SPECIFIED)
+     * Cache the Experiment property for the export. Experiment.ac -> ExperimentStatus.
      */
-    protected HashMap<String, ExperimentStatus> experimentExportStatusCache = new HashMap<String, ExperimentStatus>();
+    protected Map<String, ExperimentStatus> experimentExportStatusCache = new HashMap<String, ExperimentStatus>();
 
     protected boolean debugEnabled = false; // protected to allow the testcase to modify it.
 
@@ -857,14 +857,13 @@ public class LineExport {
     }
 
     /**
-     * Checks if there is a uniprot-cc-exportt annotation defined at the experiment level. if set to yes, export. if set
+     * Checks if there is a uniprot-cc-export annotation defined at the experiment level. if set to yes, export. if set
      * to no, do not export. if no set or the keyword is not yes, no, relies on the standart method.
      *
      * @param experiment the experiment for which we check if we have to export it.
      * @param logPrefix  for all logging messages
      *
-     * @return an Integer that has 4 possible value based on constant value: EXPORT, DO_NOT_EXPORT, NOT_SPECIFIED,
-     *         LARGE_SCALE. and a list of keywords that is set in case of large scale experiment.
+     * @return a non null ExperimentStatus.
      */
     public final ExperimentStatus getCCLineExperimentExportStatus(final Experiment experiment, String logPrefix) {
 
@@ -919,18 +918,17 @@ public class LineExport {
         }
 
         if (status != null) {
-
             // cache it.
             experimentExportStatusCache.put(experiment.getAc(), status);
-
             return status;
         }
 
+        // Then relies on the methods used for the DR Lines.
         return getExperimentExportStatus(experiment, logPrefix);
     }
 
     /**
-     * Answers the question: does that experiment is to be exported to SwissProt ? <br> Do give that answer, we check
+     * Answers the question: does that experiment is to be exported to SwissProt ? <br> To give that answer, we check
      * that the Experiment has an annotation having <br> <b>CvTopic</b>: uniprot-dr-export <br> <b>text</b>: yes [OR] no
      * [OR] &lt;keyword list&gt;
      * <p/>
@@ -942,8 +940,7 @@ public class LineExport {
      * @param experiment the experiment for which we check if we have to export it.
      * @param logPrefix  for all logging messages
      *
-     * @return an Integer that has 4 possible value based on constant value: EXPORT, DO_NOT_EXPORT, NOT_SPECIFIED,
-     *         LARGE_SCALE. and a list of keywords that is set in case of large scale experiment.
+     * @return a non null ExperimentStatus.
      */
     public final ExperimentStatus getExperimentExportStatus(final Experiment experiment, String logPrefix) {
 

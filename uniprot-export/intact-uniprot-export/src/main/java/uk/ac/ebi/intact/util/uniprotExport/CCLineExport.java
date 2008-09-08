@@ -61,12 +61,12 @@ public class CCLineExport extends LineExport {
      * Storage of the CC lines per protein. <br> Structure: Map( ProteinAC, Collection( CCLine ) ) <br> <b>Note</b>:
      * proteinAC must be a protein AC, not a Splice Variant ID.
      */
-    private Map ccLines = new HashMap(4096);
+    private Map<String, List<CcLine>> ccLines = new HashMap<String, List<CcLine>>(4096);
 
     /**
      * Store Interaction's AC of those that have been already processed.
      */
-    private HashSet alreadyProcessedInteraction = new HashSet(4096);
+    private Set<String> alreadyProcessedInteraction = new HashSet<String>(4096);
 
     /**
      * Use to out the CC lines in a file.
@@ -143,32 +143,23 @@ public class CCLineExport extends LineExport {
     private Collection<ProteinImpl> getProteinFromIntact(String uniprotID) throws IntactException {
 
         Collection<ProteinImpl> proteins = getProteinByXref(uniprotID, getUniprot(), getIdentity() );
-        //Collection<ProteinImpl> proteins = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getProteinDao().getByUniprotId(uniprotID);
 
         if (proteins.size() == 0) {
             throw new IntactException("the ID " + uniprotID + " didn't return the expected number of protein: " +
                                       proteins.size() + ". Abort.");
         }
-
         spliceVariants.clear();
 
         // now from that try to get splice variants (if any)
         for (Protein protein : proteins) {
             String ac = protein.getAc();
             Collection<ProteinImpl> sv = getProteinByXref(ac, getIntact(), getIsoformParent() );
-//      Collection<ProteinImpl> sv =              IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getProteinDao()
-//                    .getByXrefLike((CvDatabase)getCvContext().getByMiRef(CvDatabase.class, CvDatabase.INTACT_MI_REF),
-//                            (CvXrefQualifier)getCvContext().getByMiRef(CvXrefQualifier.class, CvXrefQualifier.ISOFORM_PARENT_MI_REF), ac);
-
             spliceVariants.addAll(sv);
         }
-
         proteins.addAll(spliceVariants);
 
         return proteins;
     }
-
-
 
     private Collection<ProteinImpl> getProteinByXref(String primaryId, CvDatabase database, CvXrefQualifier qualifier) {
         XrefDao<InteractorXref> xrefDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getXrefDao(InteractorXref.class);
@@ -193,7 +184,7 @@ public class CCLineExport extends LineExport {
 
     private void flushCCLine(String id) throws IOException {
 
-        List cc4protein = (List) ccLines.remove(id);
+        List<CcLine> cc4protein = ccLines.remove(id);
 
         if (null != cc4protein && !cc4protein.isEmpty()) {
             ccLineCount++;
@@ -209,9 +200,7 @@ public class CCLineExport extends LineExport {
             sb.append("CC   -!- INTERACTION:");
             sb.append(NEW_LINE);
 
-            for (Iterator iterator = cc4protein.iterator(); iterator.hasNext();) {
-                CcLine ccLine = (CcLine) iterator.next();
-
+            for ( CcLine ccLine : cc4protein ) {
                 sb.append(ccLine.getCcLine());
             }
 
@@ -241,9 +230,7 @@ public class CCLineExport extends LineExport {
      */
     private void createCCLine(String uniprotID1, Protein protein1,
                               String uniprotID2, Protein protein2,
-                              Set<Experiment> eligibleExperiments
-    ) {
-
+                              Set<Experiment> eligibleExperiments ) {
         // BUG:
         //      if we give a UniProt ID which is a splice variant, then we add it with a key and that it never flushed
         //      to fix that bug we need to convert it to a master AC before to put it in ccLines.
@@ -282,9 +269,9 @@ public class CCLineExport extends LineExport {
 
         // produce the CC lines for the 1st protein
         CcLine cc1 = formatCCLines(uniprotID1, protein1, uniprotID2, protein2, eligibleExperiments);
-        List cc4protein1 = (List) ccLines.get(master1);
+        List<CcLine> cc4protein1 = ccLines.get(master1);
         if (null == cc4protein1) {
-            cc4protein1 = new ArrayList();
+            cc4protein1 = new ArrayList<CcLine>();
             ccLines.put(master1, cc4protein1);
         }
         cc4protein1.add(cc1);
@@ -292,9 +279,9 @@ public class CCLineExport extends LineExport {
         // produce the CC lines for the 2nd protein
         if (!uniprotID1.equals(uniprotID2)) {
             CcLine cc2 = formatCCLines(uniprotID2, protein2, uniprotID1, protein1, eligibleExperiments);
-            List cc4protein2 = (List) ccLines.get(master2);
+            List<CcLine> cc4protein2 = ccLines.get(master2);
             if (null == cc4protein2) {
-                cc4protein2 = new ArrayList();
+                cc4protein2 = new ArrayList<CcLine>();
                 ccLines.put(master2, cc4protein2);
             }
             cc4protein2.add(cc2);
@@ -321,7 +308,7 @@ public class CCLineExport extends LineExport {
      * @param protein1        IntAct associated protein
      * @param uniprotID2      uniprot ID of the protein with which interacts protein 1
      * @param protein2        IntAct associated protein
-     * @param experimentCount count of distinct experimental support
+     * @param eligibleExperiments experimental evidences
      *
      * @return a CCLine
      */
@@ -457,9 +444,8 @@ public class CCLineExport extends LineExport {
 
     private void createGoLine(String uniprotID_1, Protein protein1,
                               String uniprotID_2, Protein protein2,
-                              Set eligibleExperiments,
-                              Set eligibleInteractions
-    ) throws IOException {
+                              Set<Experiment> eligibleExperiments,
+                              Set<Interaction> eligibleInteractions ) throws IOException {
 
         // in case a protein is a splice variant, get its master ID
         // we consider an isoform interacting with its parent as self interaction.
@@ -614,7 +600,7 @@ public class CCLineExport extends LineExport {
      * @return Collection(ExportableInteraction) or can be null if no interaction have been found to be eligible for
      *         CC export
      */
-    private Set<Experiment> getEligibleExperimentCount(List<Interaction> interactions, Set<Interaction> eligibleInteractions) {
+    private Set<Experiment> getEligibleExperiments(List<Interaction> interactions, Set<Interaction> eligibleInteractions) {
 
         Set<Experiment> eligibleExperiments = new HashSet<Experiment>();
 
@@ -782,7 +768,7 @@ public class CCLineExport extends LineExport {
                             //                                                 if reached, stop, esle carry on.
                             //
 
-                            Interaction interaction2 = (Interaction) interactions.get(j);
+                            Interaction interaction2 = interactions.get(j);
 
                             getOut().println("\t\t Interaction: Shortlabel:" + interaction2.getShortLabel() + "  AC: " + interaction2.getAc());
 
@@ -866,7 +852,7 @@ public class CCLineExport extends LineExport {
         int percentProteinProcessed;
         List<Interaction> potentiallyEligibleInteraction = new ArrayList<Interaction>(16);
 
-        // iterate over the Uniprot ID of the protein that have been selected for DR export.
+        // iterate over the Uniprot ID of the proteins that have been selected for DR export.
         for (String uniprot_ID : uniprotIDs) {
             idProcessed++;
 
@@ -937,7 +923,7 @@ public class CCLineExport extends LineExport {
 
                             // here we know already that the interaction is binary
                             if (interaction.getComponents().size() == 1) {
-                                // the protein is interacting with itself (stochio = 2)
+                                // the protein is interacting with itself (stoichio = 2)
                                 Iterator iteratorC = interaction.getComponents().iterator();
                                 component2 = component1 = (Component) iteratorC.next();
                             } else {
@@ -961,8 +947,6 @@ public class CCLineExport extends LineExport {
 
                             // we assume that Component carry only Protein as Interactor.
                             getOut().println("\t\t Check what is the partner of " + uniprotID_1);
-
-                            // TODO what happen is uniprot_ID = P12345 and protein1 is its splice variant: P12345-2 ?
 
                             Protein p1 = (Protein) component1.getInteractor();
                             getOut().println("\t\t 1st Partner found: " + p1.getShortLabel());
@@ -1064,12 +1048,11 @@ public class CCLineExport extends LineExport {
                                 // we need to output
                                 //     the collection of eligible interactions to get the feature information (GO specific)
                                 //     the collection of eligible experimentss to get the pubmed ids (GO specific)
-                                Set eligibleInteractions = new HashSet();
+                                Set<Interaction> eligibleInteractions = new HashSet<Interaction>();
                                 Set<Experiment> eligibleExperiments =
-                                        getEligibleExperimentCount(potentiallyEligibleInteraction,
-                                                                   eligibleInteractions);
+                                        getEligibleExperiments(potentiallyEligibleInteraction, eligibleInteractions );
 
-                                if (!eligibleExperiments.isEmpty()) {
+                                if ( !eligibleExperiments.isEmpty()) {
 
                                     getOut().println("\t\t Creating CC Lines");
 
@@ -1368,7 +1351,7 @@ public class CCLineExport extends LineExport {
             ccFileWriter = new FileWriter(ccFile);
             goFileWriter = new FileWriter(goFile);
 
-            CCLineExport exporter = new CCLineExport((Writer) ccFileWriter, (Writer) goFileWriter);
+            CCLineExport exporter = new CCLineExport( ccFileWriter, goFileWriter);
             exporter.setDebugEnabled(debugEnabled);
             exporter.setDebugFileEnabled(debugFileEnabled);
 
