@@ -554,7 +554,7 @@ public class DRLineExport extends LineExport {
 
         // get the set of Uniprot ID to be exported to Swiss-Prot, using a paginated query
         // to avoid OutOfMemory errors
-        Set proteinEligible;
+        Set<String> proteinEligible;
         int firstResult = 0;
         int maxResults = 100000;
 
