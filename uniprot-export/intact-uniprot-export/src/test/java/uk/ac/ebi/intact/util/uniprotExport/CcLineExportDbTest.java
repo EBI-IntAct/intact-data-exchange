@@ -30,41 +30,9 @@ import java.util.Collection;
  * @version $Id$
  * @since <pre>24-Aug-2006</pre>
  */
-public class CcLineExportDbTest extends IntactBasicTestCase {
+public class CcLineExportDbTest extends UniprotExportTestCase {
 
     private static final Log log = LogFactory.getLog(CcLineExportDbTest.class);
-
-    @After
-    public void tearDown() throws Exception {
-        IntactContext.getCurrentInstance().getDataContext().commitAllActiveTransactions();
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        SchemaUtils.createSchema( true );
-        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-
-        DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
-        EssentialCvPrimer cvPrimer = new EssentialCvPrimer( daoFactory ){
-            @Override
-            public void createCVs() {
-                super.createCVs();
-
-                IntactMockBuilder builder = new IntactMockBuilder( );
-                final CvDatabase uniprotkb = builder.createCvObject( CvDatabase.class, CvDatabase.UNIPROT_MI_REF, CvDatabase.UNIPROT );
-                final CvXrefQualifier isoformParent = builder.createCvObject( CvXrefQualifier.class, CvXrefQualifier.ISOFORM_PARENT_MI_REF, CvXrefQualifier.ISOFORM_PARENT );
-                final CvTopic noUniprotUpdate = builder.createCvObject( CvTopic.class, null, CvTopic.NON_UNIPROT );
-                final CvTopic negative = builder.createCvObject( CvTopic.class, null, CvTopic.NEGATIVE );
-                final CvTopic ccNote = builder.createCvObject( CvTopic.class, null, "uniprot-cc-note" );
-                final CvAliasType locusName = builder.createCvObject( CvAliasType.class, CvAliasType.LOCUS_NAME_MI_REF, "locus name" );
-                final CvAliasType orfName = builder.createCvObject( CvAliasType.class, CvAliasType.ORF_NAME_MI_REF, "orf name" );
-
-
-                PersisterHelper.saveOrUpdate( uniprotkb, isoformParent, noUniprotUpdate, negative, ccNote, locusName, orfName );
-            }
-        };
-        cvPrimer.createCVs();
-    }
 
     @Test
     public void generateCCLines() throws Exception {
