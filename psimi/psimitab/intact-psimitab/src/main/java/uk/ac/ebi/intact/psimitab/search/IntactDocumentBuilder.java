@@ -135,13 +135,21 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
 
 
         if(this.includeParentsForCvTerms){
-        //Expand interaction detection method and interaction type columns by including parent cv terms only for search, no store
+            if ( log.isDebugEnabled() ) {
+                log.debug( "including parents as includeParentsForCvTerms value is "+this.includeParentsForCvTerms );
+            }
+
+            //Expand interaction detection method and interaction type columns by including parent cv terms only for search, no store
         Column detMethod_exact = row.getColumnByIndex( MitabDocumentDefinition.INT_DET_METHOD );
 
         Column detMethodWithParents = getColumnWithParents( detMethod_exact,OlsUtils.PSI_MI_ONTOLOGY );
         String detMethodValue = isolateIdentifier(detMethodWithParents) + " " + isolateDescriptions(detMethodWithParents);
-        doc.add( new Field( "detmethod", detMethodValue,
-                            Field.Store.NO,
+            if ( log.isTraceEnabled() ) {
+                log.trace( "detmethod -> "+detMethodValue );
+            }
+
+            doc.add( new Field( "detmethod", detMethodValue,
+                            Field.Store.YES,
                             Field.Index.TOKENIZED ) );
 
 
@@ -149,54 +157,67 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
 
         Column interactionTypesWithParents = getColumnWithParents( interactionTypes_exact,OlsUtils.PSI_MI_ONTOLOGY );
         String intTypeValue = isolateIdentifier(interactionTypesWithParents) + " " + isolateDescriptions(interactionTypesWithParents);
+
+        if ( log.isTraceEnabled() ) {
+                log.trace( "type -> "+intTypeValue );
+            }
         doc.add( new Field( "type", intTypeValue,
-                            Field.Store.NO,
+                            Field.Store.YES,
                             Field.Index.TOKENIZED ) );
 
 
         //Expand properties field columns to by including the parent terms
         Column propertiesA_exact = row.getColumnByIndex(IntactDocumentDefinition.PROPERTIES_A);
-        if ( log.isDebugEnabled() ) {
-            log.debug( "propertiesA_exact: "+propertiesA_exact.toString() );
+        if ( log.isTraceEnabled() ) {
+            log.trace( "propertiesA_exact: "+propertiesA_exact.toString() );
         }
 
 
         Column propertiesAWithParents = getColumnWithParents(propertiesA_exact,OlsUtils.GO_ONTOLOGY);
-        if ( log.isDebugEnabled() ) {
-            log.debug( "propertisAWithParents: "+propertiesAWithParents.toString() );
+        if ( log.isTraceEnabled() ) {
+            log.trace( "propertisAWithParents: "+propertiesAWithParents.toString() );
         }
 
 
         String propertiesAValue = isolateIdentifier( propertiesAWithParents )+" " + isolateDescriptions( propertiesAWithParents );
 
         Column propertiesB_exact = row.getColumnByIndex(IntactDocumentDefinition.PROPERTIES_B);
-        if ( log.isDebugEnabled() ) {
-            log.debug( "propertiesB_exact: "+propertiesB_exact.toString() );
+        if ( log.isTraceEnabled() ) {
+            log.trace( "propertiesB_exact: "+propertiesB_exact.toString() );
         }
 
         Column propertiesBWithParents = getColumnWithParents(propertiesB_exact,OlsUtils.GO_ONTOLOGY);
-        if ( log.isDebugEnabled() ) {
-            log.debug( "propertiesBWithParents: "+propertiesBWithParents );
+        if ( log.isTraceEnabled() ) {
+            log.trace( "propertiesBWithParents: "+propertiesBWithParents );
         }
 
 
         String propertiesBValue = isolateIdentifier( propertiesBWithParents )+" " + isolateDescriptions( propertiesBWithParents );
 
         String propertiesValue = propertiesAValue + " " + propertiesBValue;
-        if ( log.isDebugEnabled() ) {
-            log.debug("propertiesValue  "+ propertiesValue );
+        if ( log.isTraceEnabled() ) {
+            log.trace("propertiesValue  "+ propertiesValue );
         }
 
         doc.add( new Field( "properties", propertiesValue,
-                                    Field.Store.NO,
+                                    Field.Store.YES,
                                     Field.Index.TOKENIZED ) );
 
 
         }else{
 
+            if ( log.isDebugEnabled() ) {
+                log.debug( "excluding parents as  includeParentsForCvTerms value is  "+this.includeParentsForCvTerms );
+            }
+
             //Do not Expand interaction detection method and interaction type columns by including parent cv terms, use it as exact
             Column detMethod_exact = row.getColumnByIndex( MitabDocumentDefinition.INT_DET_METHOD );
             String detMethodValue = isolateIdentifier( detMethod_exact ) + " " + isolateDescriptions( detMethod_exact );
+
+             if ( log.isTraceEnabled() ) {
+                log.trace( "detmethod -> "+detMethodValue );
+            }
+
             doc.add( new Field( "detmethod", detMethodValue,
                                 Field.Store.NO,
                                 Field.Index.TOKENIZED ) );
@@ -204,6 +225,11 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
 
             Column interactionTypes_exact = row.getColumnByIndex( MitabDocumentDefinition.INT_TYPE );
             String intTypeValue = isolateIdentifier( interactionTypes_exact ) + " " + isolateDescriptions( interactionTypes_exact );
+
+            if ( log.isTraceEnabled() ) {
+                log.trace( "type -> "+intTypeValue );
+            }
+
             doc.add( new Field( "type", intTypeValue,
                                 Field.Store.NO,
                                 Field.Index.TOKENIZED ) );
@@ -256,6 +282,12 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
      }
 
     public Column getColumnWithParents( Column cvColumn, String ontology, boolean excludeRoot ) {
+
+        if ( log.isDebugEnabled() && cvColumn!=null) {
+            log.debug( "cvColumn field size "+cvColumn.getFields().size() );
+        }
+
+
         List<psidev.psi.mi.tab.model.builder.Field> allFieldsList = new ArrayList<psidev.psi.mi.tab.model.builder.Field>();
         for ( psidev.psi.mi.tab.model.builder.Field field : cvColumn.getFields() ) {
 

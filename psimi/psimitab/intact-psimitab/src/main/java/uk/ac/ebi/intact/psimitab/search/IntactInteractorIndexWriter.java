@@ -42,6 +42,11 @@ public class IntactInteractorIndexWriter extends InteractorIndexWriter {
         super(new IntactDocumentBuilder(), new IntactOnlyOneInteractorHandler());
     }
 
+    public IntactInteractorIndexWriter(boolean includeParentsForCvTerms) {
+        super(new IntactDocumentBuilder(includeParentsForCvTerms), new IntactOnlyOneInteractorHandler());
+    }
+
+
     @Override
     protected BinaryInteraction mergeBinaryInteractions( BinaryInteraction source, BinaryInteraction target ) {
         IntactBinaryInteractionHandler handler = new IntactOnlyOneInteractorHandler();

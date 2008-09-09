@@ -48,12 +48,13 @@ public class IntactSearchEngine extends AbstractSearchEngine<IntactBinaryInterac
                             docDef.getColumnDefinition(IntactDocumentDefinition.PUB_AUTH).getShortName(),
                             "species",
                             docDef.getColumnDefinition(IntactDocumentDefinition.INT_TYPE).getShortName(),
+                            "type",
                             docDef.getColumnDefinition(IntactDocumentDefinition.INT_DET_METHOD).getShortName(),
+                            "detmethod",
                             docDef.getColumnDefinition(IntactDocumentDefinition.INTERACTION_ID).getShortName(),
                             "properties",
                             docDef.getColumnDefinition(IntactDocumentDefinition.HOST_ORGANISM).getShortName(),
                             docDef.getColumnDefinition(IntactDocumentDefinition.EXPANSION_METHOD).getShortName(),
                             docDef.getColumnDefinition(IntactDocumentDefinition.DATASET).getShortName()};
     }
-
 }
