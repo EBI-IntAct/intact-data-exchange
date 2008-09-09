@@ -8,7 +8,7 @@
 http://biodev.extra.cea.fr/interoporc/
 
 Magali Michaut
-magali.michaut@cea.fr
+michaut.bioinfo@gmail.com
 magali.michaut.2005@ingenieurs-supelec.org
 mmichaut@ebi.ac.uk
 --
@@ -66,18 +66,13 @@ http://www.ebi.ac.uk/integr8/OrganismSearch.do?action=setOrganismSearchType&sear
 (you can copy-paste the example given below and put it in interologPrediction.log4j.properties file in the directory)
 
 Then, execute this command in the directory DIR with your taxid (instead of 1148):
-Then you can use the tool with the following options:
+Then you can use the tool with the main following options:
 usage: Interoporc [OPTIONS]
 Options:
  -o,--output-directory <file>   Directory where all files will be created
  -i,--mitab-file <file>         MITAB File (Release 2.5) with source
                                 interactions
  -p,--porc-file <file>          PORC file with orthologous clusters
- -x,--xml-files                 If output XML files are required
- -c,--check-taxid               If protein accession numbers and taxids
-                                are checked between interaction and porc data
- -m,--max-nb-inter-xml <int>    Maximum nb of interactions to generate a
-                                XML file
  -h,--help                      print this message
  -l <file>                      use given file for log
  -t,--taxid <int>               NCBI taxonomy identifier of the species

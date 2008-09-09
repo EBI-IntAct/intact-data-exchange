@@ -17,6 +17,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
+import uk.ac.ebi.intact.interolog.proteome.integr8.TreeSpecies;
+
 /**
  * Class created to have an esay access in command line to predict interactions for one species.
  * You just have to give the mitab file with the source interactions 
@@ -80,6 +82,19 @@ public class RunForOneSpecies {
 	.withArgName("int")
 	.create('t');
 	
+	public static Option nodeFile = OptionBuilder
+	.withLongOpt("node-file")
+	.withDescription("NCBI Taxonomy file with taxonomy nodes")
+	//.isRequired()
+	.hasArg()
+	.withArgName("file")
+	.create('n');
+	
+	public static Option checkTaxid = OptionBuilder
+	.withLongOpt("check-taxid")
+	.withDescription("If protein accession numbers and taxids are checked between interaction and porc data")
+	.create('c');
+	
 	public static Option nbInterMaxForXml = OptionBuilder
 	.withLongOpt("max-nb-inter-xml")
 	.withDescription("Maximum nb of interactions to generate a XML file")
@@ -92,11 +107,6 @@ public class RunForOneSpecies {
 	.withLongOpt("xml-files")
 	.withDescription("If output XML files are required")
 	.create('x');
-	
-	public static Option checkTaxid = OptionBuilder
-	.withLongOpt("check-taxid")
-	.withDescription("If protein accession numbers and taxids are checked between interaction and porc data")
-	.create('c');
 	
 	public static void printHelp(Options options) {
 		HelpFormatter formatter = new HelpFormatter();
@@ -123,9 +133,10 @@ public class RunForOneSpecies {
 		options.addOption(outputDir);
 		options.addOption(porcFile);
 		options.addOption(taxid);
+		options.addOption(nodeFile);
+		options.addOption(checkTaxid);
 		options.addOption(nbInterMaxForXml);
 		options.addOption(xml);
-		options.addOption(checkTaxid);
 
 		// check 0
 		if(args.length == 0) {
@@ -149,6 +160,15 @@ public class RunForOneSpecies {
 			return;
 		}
 		
+		if (line.hasOption("l")) {
+			File propertiesFile = new File(line.getOptionValue("l"));
+			if (!propertiesFile.exists()) {
+				throw new FileNotFoundException("File "+line.getOptionValue("l")+" not found");
+			} else {
+				InterologPrediction.log = InterologPrediction.initLog(propertiesFile.getAbsolutePath());
+			}
+		}
+		
 		File dir = new File(line.getOptionValue("o"));
 		File mitabFile = new File(line.getOptionValue("i"));
 		File porcFile = new File(line.getOptionValue("p"));
@@ -164,19 +184,6 @@ public class RunForOneSpecies {
 			nbInterMaxForXml = Integer.parseInt(line.getOptionValue("m"));
 		}
 		
-		boolean checkTaxid = false;
-		if (line.hasOption("c")) {
-			generateXml = true;
-		}
-		
-		if (line.hasOption("l")) {
-			File propertiesFile = new File(line.getOptionValue("l"));
-			if (!propertiesFile.exists()) {
-				throw new FileNotFoundException("File "+line.getOptionValue("l")+" not found");
-			} else {
-				InterologPrediction.log = InterologPrediction.initLog(propertiesFile.getAbsolutePath());
-			}
-		}
 		
 		
 		InterologPrediction up = new InterologPrediction(dir);
@@ -188,7 +195,24 @@ public class RunForOneSpecies {
 		up.setDownCastOnChildren(true);
 		up.setNbInterMaxForXml(nbInterMaxForXml);
 		up.setGenerateXml(generateXml);
-		up.setCheckTaxid(checkTaxid);
+		
+		
+		// taxids
+		if (line.hasOption("c")) {
+			up.setCheckTaxid(true);
+		}
+		
+		if (line.hasOption("n")) {
+			File nodesFile = new File(line.getOptionValue("n"));
+			TreeSpecies.parse(nodesFile);
+			if (!line.hasOption("c")) {
+				InterologPrediction.log.warn("Since you have given a taxonomy file, taxid will be checked (option -c)");
+				up.setCheckTaxid(true);
+			}
+		}
+		
+		
+		
 		up.run();
 
 	}

@@ -51,6 +51,7 @@ import uk.ac.ebi.intact.interolog.ortholog.clog.ClogInteraction;
 import uk.ac.ebi.intact.interolog.ortholog.clog.ClogParser;
 import uk.ac.ebi.intact.interolog.proteome.integr8.ProteomeReport;
 import uk.ac.ebi.intact.interolog.proteome.integr8.ProteomeReportParser;
+import uk.ac.ebi.intact.interolog.proteome.integr8.TreeSpecies;
 import uk.ac.ebi.intact.interolog.util.InterologUtils;
 import uk.ac.ebi.intact.interolog.util.NewtException;
 import uk.ac.ebi.intact.interolog.util.NewtUtils;
@@ -58,7 +59,9 @@ import uk.ac.ebi.intact.interolog.util.NewtUtils;
 /**
  * This is the main part of the prediction process.
  * 
-
+ * 
+ * 
+ * 08/09/09: added the option to check the taxids and use NCBI taxonomy to go to the species rank
  * 08/09/06: added the definitive pudmed id 18508856
  * 			 removed the default check of the taxids and put it in option. It is not useful given that a Uniprot AC is unique
  * 			 but leads to problems with taxids not from the same rank (e.g. species or strains) between interaction and proc data.
@@ -228,9 +231,9 @@ public class InterologPrediction {
 	private Collection<Long> porcTaxids;
 	
 	/**
-	 * Get the first level of children in the taxonomy;
+	 * Get the first level of children in the taxonomy (or all from NCBI taxonomy file);
 	 */
-	private Map<Long, Collection<Long>> taxid2ChildrenTaxids = getChildrenMapManually();
+	private Map<Long, Collection<Long>> taxid2ChildrenTaxids;
 	
 	/**
 	 * List of species for which we want to predict interactions (proteomeIds).
@@ -1115,7 +1118,7 @@ public class InterologPrediction {
 	
 	/**
 	 * Create a map to have access for each protein to the porc which contains it.
-	 * The key is based on proteinAc_taxid.
+	 * The key is based on proteinAc (and taxid if needed).
 	 */
 	private void mapProtein2ItsPorc() {
 		log.debug("Compute mapping from protein (ac and species) to the clog id...");
@@ -1132,10 +1135,18 @@ public class InterologPrediction {
 				Long taxid = proteomeId2Taxid.get(proteomeId);
 				porcTaxids.add(taxid);
 				String proteinAc = porc.getProteomeId2protein().get(proteomeId);
-				String key = proteinAc+"_"+taxid;
-				// in that case, we only check the proteinAc is the same between interaction and porc data.
-				if (!checkTaxid) {
-					key = proteinAc;
+				
+				// in general, we only check the proteinAc is the same between interaction and porc data.
+				String key = proteinAc;
+				//if needed, we check the taxid as well (and try to merge using the species rank based on NCBI file if available).
+				if (checkTaxid) {
+					Long speciesRankTaxid = taxid;
+					if (TreeSpecies.isINIT() && taxid!=null) {
+						if (TreeSpecies.getTaxid2speciesRank().containsKey(taxid)) {
+							speciesRankTaxid = TreeSpecies.getTaxid2speciesRank().get(taxid);
+						}
+					}
+					key = proteinAc+"_"+speciesRankTaxid;
 				}
 				
 				// sometimes some different proteomeIds can point to the same NCBI taxid (related strains probably...)
@@ -1311,6 +1322,8 @@ public class InterologPrediction {
 		printMemoryInfo();
 		start = System.currentTimeMillis();
 		
+		taxid2ChildrenTaxids = getChildrenMapManually();
+		
 		checkFiles();// -> collect mitab NCBI taxids list in the same time
 		parseProteomes();
 		parsePorcs();
@@ -1391,8 +1404,9 @@ public class InterologPrediction {
 			
 			// Uniprot protein ac and NCBI taxid
 			// we have to check the species taxid as well
-			// because some identifiers can refer to different proteins in different species
+			// because some identifiers can refer to different proteins in different species ??? are you sure ??
 			// thus we can do a false mapping with a clog if it is not the same species and we do not check
+			// it is probably not useful as soon as Uniprot ac are unique
 			Collection<CrossReference> refsA = psimiInteraction.getInteractorA().getIdentifiers();
 			String proteinAcA = getIdentifier(refsA, getUNIPROTKB());
 			
@@ -1401,14 +1415,20 @@ public class InterologPrediction {
 			
 			
 			// mapping with clog ids
-			// proteinAc and taxid
-			Long porcIdA = protein2porc.get(proteinAcA+"_"+taxid);
-			Long porcIdB = protein2porc.get(proteinAcB+"_"+taxid);
+			// proteinAc only in general
+			Long porcIdA = protein2porc.get(proteinAcA);
+			Long porcIdB = protein2porc.get(proteinAcB);
 			
-			if (!checkTaxid) {
-				porcIdA = protein2porc.get(proteinAcA);
-				porcIdB = protein2porc.get(proteinAcB);
-				taxid = null;
+			// and taxid in addition if needed
+			if (checkTaxid && taxid!=null) {
+				Long speciesRankTaxid = taxid;
+				if (TreeSpecies.isINIT()) {
+					if (TreeSpecies.getTaxid2speciesRank().containsKey(taxid)) {
+						speciesRankTaxid = TreeSpecies.getTaxid2speciesRank().get(taxid);
+					}
+				}
+				porcIdA = protein2porc.get(proteinAcA+"_"+speciesRankTaxid);
+				porcIdB = protein2porc.get(proteinAcB+"_"+speciesRankTaxid);
 			}
 			
 			if (porcIdA==null && porcIdB==null && taxid!=null) {
@@ -1713,22 +1733,25 @@ public class InterologPrediction {
 	
 	
 	/**
-	 * Give direct children taxids of some species
-	 * E. coli, H. pylori
+	 * Give all children taxids of rank species.
 	 * @return
 	 */
 	private static Map<Long, Collection<Long>> getChildrenMapManually() {
-		Map<Long, Collection<Long>> map = new HashMap<Long, Collection<Long>>();
-		
-		// E. coli
-		Long[] coliTab = new Long[] {511145l,244314l, 244318l, 199310l, 364106l, 244323l, 362663l, 366838l, 244319l, 340185l, 244316l, 244322l, 155864l, 316401l, 244324l, 358709l, 316435l, 397449l, 168807l, 397447l, 217992l, 168927l, 366837l, 244326l, 340186l, 316397l, 397454l, 244325l, 397453l, 366839l, 244321l, 341037l, 373045l, 397448l, 331111l, 397452l, 83333l, 183192l, 366836l, 344610l, 37762l, 405955l, 397450l, 216592l, 244317l, 331112l, 344601l, 244315l, 340197l, 216593l, 83334l, 397451l, 340184l, 244320l};
-		map.put(562l, Arrays.asList( coliTab ));
-		
-		// H. pylori
-		Long[] pyloriTab = new Long[] {85963l, 102617l, 85962l, 357544l, 102618l, 102619l};
-		map.put(210l, Arrays.asList( pyloriTab ));
-		
-		return map;
+		if (TreeSpecies.isINIT()) {
+			return TreeSpecies.getSpecies();
+		} else {
+			Map<Long, Collection<Long>> map = new HashMap<Long, Collection<Long>>();
+			
+			// E. coli
+			Long[] coliTab = new Long[] {511145l,244314l, 244318l, 199310l, 364106l, 244323l, 362663l, 366838l, 244319l, 340185l, 244316l, 244322l, 155864l, 316401l, 244324l, 358709l, 316435l, 397449l, 168807l, 397447l, 217992l, 168927l, 366837l, 244326l, 340186l, 316397l, 397454l, 244325l, 397453l, 366839l, 244321l, 341037l, 373045l, 397448l, 331111l, 397452l, 83333l, 183192l, 366836l, 344610l, 37762l, 405955l, 397450l, 216592l, 244317l, 331112l, 344601l, 244315l, 340197l, 216593l, 83334l, 397451l, 340184l, 244320l};
+			map.put(562l, Arrays.asList( coliTab ));
+			
+			// H. pylori
+			Long[] pyloriTab = new Long[] {85963l, 102617l, 85962l, 357544l, 102618l, 102619l};
+			map.put(210l, Arrays.asList( pyloriTab ));
+			
+			return map;
+		}
 	}
 	
 	/**
