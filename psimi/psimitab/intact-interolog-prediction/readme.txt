@@ -53,7 +53,7 @@ http://www.ebi.ac.uk/integr8/OrganismSearch.do?action=setOrganismSearchType&sear
 This JAR file is downloadable from the project page http://biodev.extra.cea.fr/interoporc/data/interopor.tar.gz
 Here is described a simple way to use this program to predict interactions for one species.
 
-If you have a jar with all dependencies --> interologPrediction.jar:
+If you have a jar with all dependencies --> interoporc.jar:
 1) create a directory for the predictions --> DIR
 2) put the jar in it
 3) put a MITAB25 file in it with all interactions you want to use as source interactions from other species --> sourceInteractions.mitab 
@@ -62,28 +62,39 @@ If you have a jar with all dependencies --> interologPrediction.jar:
 5) choose the NCBI taxid of the species you are interested in 
 (for example Synechocystis is 1148, yeast is 4932, E. coli is 562 ... see all species of Integr8 on 
 http://www.ebi.ac.uk/integr8/OrganismSearch.do?action=setOrganismSearchType&searchType=2&pageContext=207)
-6) OPTION: you can put a log4j-property-file in the dir  --> interologPrediction.log4j.properties
-(you can copy-paste the example given below and put it in interologPrediction.log4j.properties file in the directory)
+6) OPTION: you can put a log4j-property-file in the dir  --> user.interoporc.log4j.properties
+(you can copy-paste the example given below and put it in user.interoporc.log4j.properties file in the directory)
 
 Then, execute this command in the directory DIR with your taxid (instead of 1148):
 Then you can use the tool with the main following options:
 usage: Interoporc [OPTIONS]
 Options:
+usage: Interoporc [OPTIONS]
+Options:
  -o,--output-directory <file>   Directory where all files will be created
  -i,--mitab-file <file>         MITAB File (Release 2.5) with source
                                 interactions
+ -n,--node-file <file>          NCBI Taxonomy file with taxonomy nodes
  -p,--porc-file <file>          PORC file with orthologous clusters
+ -x,--xml-files                 If output XML files are required
+ -c,--check-taxid               If protein accession numbers and taxids
+                                are checked between interaction and porc data
+ -m,--max-nb-inter-xml <int>    Maximum nb of interactions to generate a
+                                XML file
  -h,--help                      print this message
  -l <file>                      use given file for log
  -t,--taxid <int>               NCBI taxonomy identifier of the species
  
+ The required options are -i (input source interaction file) and -t (taxid).
+ The option -l is highly recommended (log4j configuration file) otherwise you won't have any message.
  Here are some examples:
 	* To print options
-java -cp interologPrediction.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies
-java -cp interologPrediction.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies -h
+java -cp interoporc.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies
+java -cp interoporc.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies -h
 
 	* To predict interactions for Synechocystis (taxid=1148)
-java -ms500m -mx1000m -cp interologPrediction.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies -o . -i sourceInteractions.mitab -p porc_gene.dat -t 1148 -l interologPrediction.log4j.properties
+java -ms500m -mx1200m -cp interoporc.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies -i sourceInteractions.mitab -t 1148 -l user.interoporc.log4j.properties
+java -ms500m -mx1200m -cp interoporc.jar uk.ac.ebi.intact.interolog.prediction.RunForOneSpecies -o . -i sourceInteractions.mitab -p porc_gene.dat -t 1148 -l user.interoporc.log4j.properties
 
 
 >>> III) With the JAR available on EBI maven repos
@@ -108,7 +119,7 @@ Then you can change some parameters if needed and finally just run it. An exampl
   
   p.run();
 
-Be aware that this program needs some space. I am used to running it with extended arguments to the VM (-ms500m -mx1000m).
+Be aware that this program needs some space. I am used to running it with extended arguments to the VM (-ms500m -mx1200m).
 On the other hand, it does not take too much time.
 Running it on the global MITAB25 file (merge of all Intact, MINT and DIP) 
 and predicting interactions for all species present in it will take less than 5 minutes.

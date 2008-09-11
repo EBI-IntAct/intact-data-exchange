@@ -20,7 +20,7 @@ import org.apache.commons.cli.PosixParser;
 import uk.ac.ebi.intact.interolog.proteome.integr8.TreeSpecies;
 
 /**
- * Class created to have an esay access in command line to predict interactions for one species.
+ * Class created to have an easy access in command line to predict interactions for one species.
  * You just have to give the mitab file with the source interactions 
  * and the porc file with the orthologous clusters (ftp://ftp.ebi.ac.uk/pub/databases/integr8/porc/proc_gene.dat).
  * 
@@ -69,7 +69,6 @@ public class RunForOneSpecies {
 	public static Option porcFile = OptionBuilder
 	.withLongOpt("porc-file")
 	.withDescription("PORC file with orthologous clusters")
-	//.isRequired()
 	.hasArg()
 	.withArgName("file")
 	.create('p');
@@ -160,6 +159,7 @@ public class RunForOneSpecies {
 			return;
 		}
 		
+		// log file
 		if (line.hasOption("l")) {
 			File propertiesFile = new File(line.getOptionValue("l"));
 			if (!propertiesFile.exists()) {
@@ -169,35 +169,34 @@ public class RunForOneSpecies {
 			}
 		}
 		
-		File dir = new File(line.getOptionValue("o"));
-		File mitabFile = new File(line.getOptionValue("i"));
-		File porcFile = new File(line.getOptionValue("p"));
-		long taxid = Long.parseLong(line.getOptionValue("t"));
-		
-		boolean generateXml = false;
-		if (line.hasOption("x")) {
-			generateXml = true;
+		// output dir
+		File dir = new File("./");
+		if (line.hasOption("o")) {
+			dir = new File(line.getOptionValue("o"));
 		}
-		
-		int nbInterMaxForXml = 15000;
-		if (line.hasOption("m")) {
-			nbInterMaxForXml = Integer.parseInt(line.getOptionValue("m"));
-		}
-		
-		
-		
 		InterologPrediction up = new InterologPrediction(dir);
-		up.setMitab(mitabFile);
-		up.setPorc(porcFile);
+		
+		// mitab file = source interactions
+		if (!line.hasOption("i")) {
+			System.err.println("The option -i is required (the source interactions in MITAB25 format).");
+		}
+		up.setMitab(new File(line.getOptionValue("i")));
+		
+		// porc file
+		if (line.hasOption("p")) {
+			up.setPorc(new File(line.getOptionValue("p")));
+		}
+		
+		// target taxid (the species in which we want the predictions
+		if (!line.hasOption("t")) {
+			System.err.println("The option -t is required (the NCBI taxid of the organism in which we will predict interactions).");
+		}
+		long taxid = Long.parseLong(line.getOptionValue("t"));
 		Collection<Long> taxids = new HashSet<Long>(1);
 		taxids.add(taxid);
 		up.setUserTaxidsToDownCast(taxids);
 		up.setDownCastOnChildren(true);
-		up.setNbInterMaxForXml(nbInterMaxForXml);
-		up.setGenerateXml(generateXml);
 		
-		
-		// taxids
 		if (line.hasOption("c")) {
 			up.setCheckTaxid(true);
 		}
@@ -211,8 +210,20 @@ public class RunForOneSpecies {
 			}
 		}
 		
+		// output in xml
+		boolean generateXml = false;
+		if (line.hasOption("x")) {
+			generateXml = true;
+		}
 		
+		int nbInterMaxForXml = 15000;
+		if (line.hasOption("m")) {
+			nbInterMaxForXml = Integer.parseInt(line.getOptionValue("m"));
+		}
+		up.setNbInterMaxForXml(nbInterMaxForXml);
+		up.setGenerateXml(generateXml);
 		
+		// run the tool
 		up.run();
 
 	}

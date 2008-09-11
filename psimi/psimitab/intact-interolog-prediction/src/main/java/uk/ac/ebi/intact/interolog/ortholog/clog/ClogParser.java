@@ -192,7 +192,7 @@ public class ClogParser {
 				// clogid ... proteinAc ... proteomeId
 				String[] columns = line.split("\t");
 				if (columns.length!=8) {
-					throw new IllegalArgumentException("Each line should contains 8 columns separated by a tab not "+columns.length+" in line #"+count);
+					throw new IllegalArgumentException("Each line should contains 8 columns separated by a tab not "+columns.length+" in line #"+count+"("+line+")");
 				} else {
 					Long id = Long.parseLong(columns[0]);
 					String proteinAc = columns[4];

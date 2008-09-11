@@ -143,7 +143,7 @@ public class InterologPrediction {
 	/**
 	 * URL of Integr8 ftp where porc data are (previously called clog);
 	 */
-	private static String URL_PORC_FILE = "ftp://ftp.ebi.ac.uk/pub/databases/integr8/porc/proc_gene.dat";
+	private static String URL_PORC_FILE = "ftp://ftp.ebi.ac.uk/pub/databases/integr8/porc/porc_gene.dat";
 	
 	/**
 	 * Used to read and write cross-ref in mitab format.
@@ -611,6 +611,7 @@ public class InterologPrediction {
 		
 		
 		FILE_DATA_PROTEOME            = new File(workingDir.getAbsolutePath()+"/proteome_report.txt");
+		FILE_DATA_PORC                = new File(workingDir.getAbsolutePath()+"/porc_gene.dat");
 		FILE_HISTORY_DOWN_CAST        = new File(workingDir.getAbsolutePath()+"/downCast.history.txt");
 		FILE_SOURCE_INTERACTIONS      = new File(workingDir.getAbsolutePath()+"/srcInteractionsUsed.txt");
 		FILE_RESULT_PORC_INTERACTIONS = new File(workingDir.getAbsolutePath()+"/clog.interactions.txt");
@@ -721,7 +722,7 @@ public class InterologPrediction {
 			// check here that we have uniprotKB id in the clog data?
 			// no it is not worth doing a whole parsing of the clog file now
 			try {
-				downloadClogs();
+				downloadPorcs();
 			} catch (IOException e) {
 				throw new InterologPredictionException("Error while downloading porc file",e);
 			}
@@ -839,7 +840,7 @@ public class InterologPrediction {
 	 * .
 	 * @throws IOException
 	 */
-	private void downloadClogs() throws IOException {
+	private void downloadPorcs() throws IOException {
 		Sucker.main(new String[]{URL_PORC_FILE, FILE_DATA_PORC.getAbsolutePath()});
 	}
 	
