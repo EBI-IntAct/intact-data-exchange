@@ -749,20 +749,21 @@ public class CvObjectOntologyBuilder {
    */
     private String calculateShortLabel( OBOObject oboObj ) {
         String shortLabel = null;
-        Set<Synonym> syn = oboObj.getSynonyms();
-        for ( Synonym synonym : syn ) {
-            SynonymCategory synCat = synonym.getSynonymCategory();
 
-            if ( synCat.getID() != null && synCat.getID().equalsIgnoreCase( CvObjectOntologyBuilder.SHORTLABEL_IDENTIFIER ) ) {
-                shortLabel = synonym.getText();
-                //another check just to reduce the length to 256 characters--rarely happens
-                if ( shortLabel != null && shortLabel.length() > AnnotatedObject.MAX_SHORT_LABEL_LEN) {
+        for ( Synonym synonym : oboObj.getSynonyms() ) {
+            if( synonym != null ) {
+                SynonymCategory synCat = synonym.getSynonymCategory();
 
-                    shortLabel = shortLabel.substring( 0, AnnotatedObject.MAX_SHORT_LABEL_LEN );
-                }//end if
-            }//end for
-        } //end for
+                if ( synCat.getID() != null && synCat.getID().equalsIgnoreCase( CvObjectOntologyBuilder.SHORTLABEL_IDENTIFIER ) ) {
+                    shortLabel = synonym.getText();
+                    //another check just to reduce the length to 256 characters--rarely happens
+                    if ( shortLabel != null && shortLabel.length() > AnnotatedObject.MAX_SHORT_LABEL_LEN) {
 
+                        shortLabel = shortLabel.substring( 0, AnnotatedObject.MAX_SHORT_LABEL_LEN );
+                    }//end if
+                }
+            }
+        }
 
         if ( shortLabel == null ) {
             if ( oboObj.getName() != null && oboObj.getName().length() <= AnnotatedObject.MAX_SHORT_LABEL_LEN ) {
@@ -772,8 +773,9 @@ public class CvObjectOntologyBuilder {
                 return oboObj.getName().substring( 0, AnnotatedObject.MAX_SHORT_LABEL_LEN );
             }
         }
+      
         return shortLabel;
-    }  //end method
+    }
 
 
     protected CvObjectXref createIdentityXref( CvObject parent, String id ) {
