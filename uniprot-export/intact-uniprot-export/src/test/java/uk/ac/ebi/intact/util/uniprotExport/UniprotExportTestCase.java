@@ -35,7 +35,7 @@ import uk.ac.ebi.intact.model.CvAliasType;
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id$
  */
-public class UniprotExportTestCase extends IntactBasicTestCase {
+public abstract class UniprotExportTestCase extends IntactBasicTestCase {
 
     @After
     public void tearDown() throws Exception {
@@ -61,7 +61,6 @@ public class UniprotExportTestCase extends IntactBasicTestCase {
                 final CvTopic ccNote = builder.createCvObject( CvTopic.class, null, "uniprot-cc-note" );
                 final CvAliasType locusName = builder.createCvObject( CvAliasType.class, CvAliasType.LOCUS_NAME_MI_REF, "locus name" );
                 final CvAliasType orfName = builder.createCvObject( CvAliasType.class, CvAliasType.ORF_NAME_MI_REF, "orf name" );
-
 
                 PersisterHelper.saveOrUpdate( uniprotkb, isoformParent, noUniprotUpdate, negative, ccNote, locusName, orfName );
             }
