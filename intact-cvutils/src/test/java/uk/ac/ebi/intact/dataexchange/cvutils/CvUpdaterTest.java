@@ -23,8 +23,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
+import uk.ac.ebi.intact.config.impl.TemporaryH2DataConfig;
 import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.context.IntactConfigurator;
 import uk.ac.ebi.intact.context.IntactEnvironment;
 import uk.ac.ebi.intact.context.IntactSession;
 import uk.ac.ebi.intact.context.impl.StandaloneSession;
@@ -40,7 +40,6 @@ import uk.ac.ebi.intact.model.clone.IntactCloner;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.config.impl.TemporaryH2DataConfig;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -259,7 +258,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( 1, topic.getAnnotations().size() );
         final Annotation annotation = topic.getAnnotations().iterator().next();
         Assert.assertEquals( "used-in-class", annotation.getCvTopic().getShortLabel() );
-        //updated no type annotation to Interaction 
+        //updated no type annotation to Interaction
         Assert.assertEquals( "uk.ac.ebi.intact.model.Interaction", annotation.getAnnotationText() );
 
         //crated new annotation
@@ -273,7 +272,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( "2 CvObjects expected to be created during update: hidden and obsolete & 1 Cvobject updated used-in-class ",
                              cvsBeforeUpdate + 2, cvCountAfterUpdate );
 
-        //again call cvupdate and this time it should ignore the annotations 
+        //again call cvupdate and this time it should ignore the annotations
         beginTransaction();
         cvupdater.createOrUpdateCVs( list, annotationDataset );
         commitTransaction();
@@ -494,5 +493,30 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         CvDatabase psiMod = getDaoFactory().getCvObjectDao( CvDatabase.class ).getByPsiMiRef( "MI:0897" );
         System.out.println( psiMod.getAnnotations() );
         Assert.assertEquals( 2, psiMod.getAnnotations().size() );
+    }
+
+    @Test
+    public void institutionWithNonMiAnnotations() throws Exception {
+
+        beginTransaction();
+        Institution institution = IntactContext.getCurrentInstance().getInstitution();
+        final Annotation annotation = getMockBuilder().createAnnotation("nowhere", "IA:0999", "postaladdress");
+        institution.addAnnotation(annotation);
+        PersisterHelper.saveOrUpdate(annotation.getCvTopic());
+        PersisterHelper.saveOrUpdate(institution);
+        commitTransaction();
+
+        beginTransaction();
+
+        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
+
+        List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
+        Assert.assertEquals( 987, allCvs.size() );
+
+        CvUpdater updater = new CvUpdater();
+        updater.createOrUpdateCVs(allCvs);
+
+        commitTransaction();
     }
 }

@@ -1193,6 +1193,14 @@ public class CvObjectOntologyBuilder {
         // resolve CVs on Annotations, Xrefs and Aliases
         IntactObjectTraverser traverser = new DefaultTraverser() {
             @Override
+            public void traverse(IntactObject intactObject, IntactVisitor... visitors) {
+                if (intactObject instanceof Institution) {
+                    return;
+                }
+                super.traverse(intactObject, visitors);
+            }
+
+            @Override
             protected void traverseInstitution( Institution institution, IntactVisitor... visitors ) {
                 return;
             }
@@ -1251,6 +1259,8 @@ public class CvObjectOntologyBuilder {
             this.mi2cv = mi2cv;
         }
 
+
+
         @Override
         public void visitAlias( Alias alias ) {
 
@@ -1261,7 +1271,7 @@ public class CvObjectOntologyBuilder {
                     final String key = createCvKey( type.getClass(), mi );
                     final CvAliasType oboTerm = ( CvAliasType ) mi2cv.get( key );
                     if ( oboTerm == null ) {
-                        log.warn( "Could not find " + type.getClass().getSimpleName() + "( " + type.getShortLabel() + " ) by MI: " + mi );
+                        log.warn( "Could not find alias " + type.getClass().getSimpleName() + "( " + type.getShortLabel() + " ) by MI: " + mi );
                     } else {
                         alias.setCvAliasType( oboTerm );
                     }
@@ -1278,7 +1288,7 @@ public class CvObjectOntologyBuilder {
                 String key = createCvKey( db.getClass(), mi );
                 final CvDatabase oboTerm = ( CvDatabase ) mi2cv.get( key );
                 if ( oboTerm == null ) {
-                    log.warn( "Could not find " + db.getClass().getSimpleName() + "( " + db.getShortLabel() + " ) by MI: " + mi );
+                    log.warn( "Could not find xref " + db.getClass().getSimpleName() + "( " + db.getShortLabel() + " ) by MI: " + mi );
                 } else {
                     xref.setCvDatabase( oboTerm );
                 }
@@ -1292,7 +1302,7 @@ public class CvObjectOntologyBuilder {
                     final String key = createCvKey( qualifier.getClass(), mi );
                     final CvXrefQualifier oboQualifier = ( CvXrefQualifier ) mi2cv.get( key );
                     if ( oboQualifier == null ) {
-                        log.warn( "Could not find " + qualifier.getClass().getSimpleName() + "( " + qualifier.getShortLabel() + " ) by MI: " + mi );
+                        log.warn( "Could not find qualifier " + qualifier.getClass().getSimpleName() + "( " + qualifier.getShortLabel() + " ) by MI: " + mi );
                     } else {
                         xref.setCvXrefQualifier( oboQualifier );
                     }
@@ -1308,7 +1318,7 @@ public class CvObjectOntologyBuilder {
             if ( mi != null ) {
                 final CvTopic oboTerm = ( CvTopic ) mi2cv.get( createCvKey( topic.getClass(), mi ) );
                 if ( oboTerm == null ) {
-                    log.warn( "Could not find " + topic.getClass().getSimpleName() + "( " + topic.getShortLabel() + " ) by MI: " + mi );
+                    log.warn( "Could not find topic " + topic.getClass().getSimpleName() + "( " + topic.getShortLabel() + " ) by MI: " + mi );
                 } else {
                     annotation.setCvTopic( oboTerm );
                 }
