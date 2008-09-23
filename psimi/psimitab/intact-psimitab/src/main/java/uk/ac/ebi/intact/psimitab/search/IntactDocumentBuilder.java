@@ -32,12 +32,12 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
 
     private static final Log log = LogFactory.getLog(IntactDocumentBuilder.class);
 
-    private boolean includeParentsForCvTerms = false;
+    private boolean includeParentsForCvTerms;
 
     private Map<String,List<psidev.psi.mi.tab.model.builder.Field>> parentsMapCache;
 
     public IntactDocumentBuilder() {
-        this(false);
+        this(true);
     }
 
     public IntactDocumentBuilder(boolean includeParentsForCvTerms) {
