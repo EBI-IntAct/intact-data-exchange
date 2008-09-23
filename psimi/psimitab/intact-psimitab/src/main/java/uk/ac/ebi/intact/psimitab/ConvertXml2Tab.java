@@ -172,7 +172,8 @@ public class ConvertXml2Tab {
         Xml2Tab x2t = new IntactXml2Tab();
 
         // Makes sure the database source is well set.
-        x2t.addOverrideSourceDatabase(new CrossReferenceImpl("MI", "0469", "intact"));
+        x2t.addOverrideSourceDatabase(new CrossReferenceImpl("psi-mi", "MI:0469", "intact")
+);
 
         x2t.setExpansionStrategy(expansionStragegy);
 

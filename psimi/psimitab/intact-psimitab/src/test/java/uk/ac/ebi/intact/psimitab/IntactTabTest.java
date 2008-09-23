@@ -9,8 +9,8 @@ import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
 import psidev.psi.mi.tab.expansion.SpokeWithoutBaitExpansion;
 import psidev.psi.mi.tab.model.*;
-import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
 import uk.ac.ebi.intact.psimitab.model.Parameter;
+import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
 
 import java.io.File;
 import java.io.StringWriter;
@@ -28,7 +28,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         Xml2Tab xml2tab = new IntactXml2Tab();
         
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
-        xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
+        xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "psi-mi", "MI:0469", "intact" ) );
         xml2tab.setPostProcessor( new IntactClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
@@ -68,7 +68,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
     @Test
     public void roundtrip() throws Exception {
 
-        String mitab = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)\tintact:EBI-446356\tintact:high\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)\tMI:0499(unspecified role)\tuniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716\tgo:\"GO:0005737\"(\"C:cytoplasm\")|interpro:IPR001589(Actbind_actnin)\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\tSpoke\tCancer|Apoptosis\tcomment:commentA\tcomment:commentB\tic50A:100(molar)\tic50B:200(molar)\tic50C:300(molar)";
+        String mitab = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tpsi-mi:\"MI:0018\"(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tpsi-mi:\"MI:0218\"(physical interaction)\tpsi-mi:\"MI:0469\"(intact)\tintact:EBI-446356\tintact:high\tpsi-mi:\"MI:0498\"(prey)\tpsi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\tuniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716\tgo:\"GO:0005737\"(\"C:cytoplasm\")|interpro:IPR001589(Actbind_actnin)\tpsi-mi:\"MI:0326\"(protein)\tpsi-mi:\"MI:0326\"(protein)\tyeast:4932\tSpoke\tCancer|Apoptosis\tcomment:commentA\tcomment:commentB\tic50A:100(molar)\tic50B:200(molar)\tic50C:300(molar)";
 
         PsimiTabReader reader = new IntactPsimiTabReader( false );
         Collection<BinaryInteraction> bis = reader.read( mitab );
@@ -101,7 +101,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
 
 
         Assert.assertEquals( 1, bi.getDetectionMethods().size() );
-        Assert.assertTrue( bi.getDetectionMethods().contains( new InteractionDetectionMethodImpl( "MI", "0018", "2 hybrid") ) );
+        Assert.assertTrue( bi.getDetectionMethods().contains( new InteractionDetectionMethodImpl( "psi-mi", "MI:0018", "2 hybrid") ) );
 
         Assert.assertEquals( 1, bi.getAuthors().size() );
         Assert.assertTrue( bi.getAuthors().contains( new AuthorImpl( "Leung et al. (1999)") ) );
@@ -110,10 +110,10 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         Assert.assertTrue( bi.getPublications().contains( new CrossReferenceImpl( "pubmed", "9971739" ) ) );
 
         Assert.assertEquals( 1, bi.getInteractionTypes().size() );
-        Assert.assertTrue( bi.getInteractionTypes().contains( new InteractionTypeImpl( "MI", "0218", "physical interaction" ) ) );
+        Assert.assertTrue( bi.getInteractionTypes().contains( new InteractionTypeImpl( "psi-mi", "MI:0218", "physical interaction" ) ) );
 
         Assert.assertEquals( 1, bi.getSourceDatabases().size() );
-        Assert.assertTrue( bi.getSourceDatabases().contains( new CrossReferenceImpl( "MI", "0469", "intact" ) ) );
+        Assert.assertTrue( bi.getSourceDatabases().contains( new CrossReferenceImpl( "psi-mi", "MI:0469", "intact" ) ) );
 
         Assert.assertEquals( 1, bi.getInteractionAcs().size() );
         Assert.assertTrue( bi.getInteractionAcs().contains( new CrossReferenceImpl( "intact", "EBI-446356" ) ) );
@@ -124,16 +124,16 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         // now onto intact specific fields
 
         Assert.assertEquals( 1, bi.getExperimentalRolesInteractorA().size() );
-        Assert.assertTrue( bi.getExperimentalRolesInteractorA().contains( new CrossReferenceImpl( "MI", "0498", "prey" ) ) );
+        Assert.assertTrue( bi.getExperimentalRolesInteractorA().contains( new CrossReferenceImpl( "psi-mi", "MI:0498", "prey" ) ) );
 
         Assert.assertEquals( 1, bi.getExperimentalRolesInteractorB().size() );
-        Assert.assertTrue( bi.getExperimentalRolesInteractorB().contains( new CrossReferenceImpl( "MI", "0496", "bait" ) ) );
+        Assert.assertTrue( bi.getExperimentalRolesInteractorB().contains( new CrossReferenceImpl( "psi-mi", "MI:0496", "bait" ) ) );
 
         Assert.assertEquals( 1, bi.getBiologicalRolesInteractorA().size() );
-        Assert.assertTrue( bi.getBiologicalRolesInteractorA().contains( new CrossReferenceImpl( "MI", "0499", "unspecified role" ) ) );
+        Assert.assertTrue( bi.getBiologicalRolesInteractorA().contains( new CrossReferenceImpl( "psi-mi", "MI:0499", "unspecified role" ) ) );
 
         Assert.assertEquals( 1, bi.getBiologicalRolesInteractorB().size() );
-        Assert.assertTrue( bi.getBiologicalRolesInteractorB().contains( new CrossReferenceImpl( "MI", "0499", "unspecified role" ) ) );
+        Assert.assertTrue( bi.getBiologicalRolesInteractorB().contains( new CrossReferenceImpl( "psi-mi", "MI:0499", "unspecified role" ) ) );
 
         Assert.assertEquals( 3, bi.getPropertiesA().size() );
         Assert.assertTrue( bi.getPropertiesA().contains( new CrossReferenceImpl( "uniprotkb", "O35482" ) ) );
@@ -145,10 +145,10 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         Assert.assertTrue( bi.getPropertiesB().contains( new CrossReferenceImpl( "interpro", "IPR001589", "Actbind_actnin" ) ) );
 
         Assert.assertEquals( 1, bi.getInteractorTypeA().size() );
-        Assert.assertTrue( bi.getInteractorTypeA().contains( new CrossReferenceImpl( "MI", "0326", "protein" ) ) );
+        Assert.assertTrue( bi.getInteractorTypeA().contains( new CrossReferenceImpl( "psi-mi", "MI:0326", "protein" ) ) );
 
         Assert.assertEquals( 1, bi.getInteractorTypeB().size() );
-        Assert.assertTrue( bi.getInteractorTypeB().contains( new CrossReferenceImpl( "MI", "0326", "protein" ) ) );
+        Assert.assertTrue( bi.getInteractorTypeB().contains( new CrossReferenceImpl( "psi-mi", "MI:0326", "protein" ) ) );
 
         Assert.assertEquals( 1, bi.getHostOrganism().size() );
         Assert.assertTrue( bi.getHostOrganism().contains( new CrossReferenceImpl( "yeast", "4932" ) ) );
@@ -208,7 +208,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         Xml2Tab xml2tab = new IntactXml2Tab();
 
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
-        xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
+        xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "psi-mi", "MI:0469", "intact" ) );
         xml2tab.setPostProcessor( new IntactClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
@@ -253,7 +253,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         Xml2Tab x2t = new IntactXml2Tab( false, false );
 
         x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
-        x2t.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
+        x2t.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "psi-mi", "MI:0469", "intact" ) );
         x2t.setPostProcessor( new IntactClusterInteractorPairProcessor() );
 
         Collection<BinaryInteraction> interactions = x2t.convert( xmlFile, false );

@@ -8,15 +8,16 @@ import junit.framework.Assert;
 import org.apache.lucene.document.Document;
 import org.junit.Test;
 import psidev.psi.mi.search.util.DocumentBuilder;
-import psidev.psi.mi.tab.model.builder.Field;
 import psidev.psi.mi.tab.model.builder.Column;
+import psidev.psi.mi.tab.model.builder.CrossReferenceFieldBuilder;
+import psidev.psi.mi.tab.model.builder.Field;
+import psidev.psi.mi.tab.model.builder.FieldBuilder;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.model.Parameter;
 import uk.ac.ebi.intact.psimitab.model.Annotation;
-import uk.ac.ebi.intact.util.ols.OlsUtils;
+import uk.ac.ebi.intact.psimitab.model.Parameter;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * IntActDocumentBuilder Tester.
@@ -86,29 +87,33 @@ public class IntActDocumentBuilderTest{
     public void testGetColumnWithParents() throws Exception {
 
         //Type 1
-        Field intTypeFieldType1 = new Field( "MI", "0407", "direct interaction" );
+        Field intTypeFieldType1 = new Field( "psi-mi", "MI:0407", "direct interaction" );
+
         List<Field> fieldList = new ArrayList<Field>();
         fieldList.add( intTypeFieldType1 );
+
         Column intTypeCol = new Column( fieldList );
         //MI:0407(direct interaction)
         Assert.assertEquals( 1, intTypeCol.toString().split( "\\|" ).length );
 
         IntactDocumentBuilder builder = new IntactDocumentBuilder(true);
-        Column intTypeColWithParents = builder.getColumnWithParents( intTypeCol, OlsUtils.PSI_MI_ONTOLOGY );
+        Column intTypeColWithParents = builder.getColumnWithParents( intTypeCol );
         //MI:0407(direct interaction)|MI:0915(physical association)|MI:0190(interaction type)|MI:0914(association)
         Assert.assertEquals( 4, intTypeColWithParents.toString().split( "\\|" ).length );
 
 
         //Type2
         Field intTypeFieldType2 = new Field( "psi-mi", "MI:0407", "direct interaction" );
+
         List<Field> fieldList_ = new ArrayList<Field>();
         fieldList_.add( intTypeFieldType2 );
+
         Column intTypeCol_ = new Column( fieldList_ );
         //MI:0407(direct interaction)
         Assert.assertEquals( 1, intTypeCol_.toString().split( "\\|" ).length );
 
 
-        Column intTypeColWithParents_ = builder.getColumnWithParents( intTypeCol, OlsUtils.PSI_MI_ONTOLOGY );
+        Column intTypeColWithParents_ = builder.getColumnWithParents( intTypeCol );
         //MI:0407(direct interaction)|MI:0915(physical association)|MI:0190(interaction type)|MI:0914(association)
         Assert.assertEquals( 4, intTypeColWithParents_.toString().split( "\\|" ).length );
 
@@ -121,7 +126,8 @@ public class IntActDocumentBuilderTest{
         IntactDocumentBuilder builder = new IntactDocumentBuilder(true);
 
         //interaction type MI:0407(direct interaction)
-        List<Field> fieldsWithParentsIntType = builder.getListOfFieldsWithParents( "MI:0407", OlsUtils.PSI_MI_ONTOLOGY,true );
+        FieldBuilder fieldBuilder = new CrossReferenceFieldBuilder();
+        List<Field> fieldsWithParentsIntType = builder.getListOfFieldsWithParents( fieldBuilder.createField("MI:0407(direct interaction)") );
 
         Assert.assertNotNull( fieldsWithParentsIntType );
         Assert.assertEquals( 4, fieldsWithParentsIntType.size() );
@@ -131,25 +137,27 @@ public class IntActDocumentBuilderTest{
 
         String colsIntType[] = colWithParentsIntType.toString().split( "\\|" );
 
+        Assert.assertEquals( 4, colsIntType.length );
+
         int countIntType = 0;
         for ( String col : colsIntType ) {
-            if ( col.equals( "MI:0407(direct interaction)" ) ) {
+            if ( col.equals( "psi-mi:\"MI:0407\"(direct interaction)" ) ) {
                 countIntType++;
             }
-            if ( col.equals( "MI:0190(interaction type)" ) ) {
+            if ( col.equals( "psi-mi:\"MI:0190\"(interaction type)" ) ) {
                 countIntType++;
             }
-            if ( col.equals( "MI:0914(association)" ) ) {
+            if ( col.equals( "psi-mi:\"MI:0914\"(association)" ) ) {
                 countIntType++;
             }
-            if ( col.equals( "MI:0915(physical association)" ) ) {
+            if ( col.equals( "psi-mi:\"MI:0915\"(physical association)" ) ) {
                 countIntType++;
             }
         }
         Assert.assertEquals( 4, countIntType );
 
         //interaction detection method MI:0045 (experimental interaction detection)
-        List<Field> fieldsWithParentsDetMethod = builder.getListOfFieldsWithParents( "MI:0045", OlsUtils.PSI_MI_ONTOLOGY,true );
+        List<Field> fieldsWithParentsDetMethod = builder.getListOfFieldsWithParents( fieldBuilder.createField("MI:0045(experimental interaction detection)") );
 
         Assert.assertNotNull( fieldsWithParentsDetMethod );
         Assert.assertEquals( 2, fieldsWithParentsDetMethod.size() );
@@ -161,10 +169,10 @@ public class IntActDocumentBuilderTest{
 
         int countDetMethod = 0;
         for ( String col : colsDetMethod ) {
-            if ( col.equals( "MI:0045(experimental interaction detection)" ) ) {
+            if ( col.equals( "psi-mi:\"MI:0045\"(experimental interaction detection)" ) ) {
                 countDetMethod++;
             }
-            if ( col.equals( "MI:0001(interaction detection method)" ) ) {
+            if ( col.equals( "psi-mi:\"MI:0001\"(interaction detection method)" ) ) {
                 countDetMethod++;
             }
 
@@ -180,10 +188,9 @@ public class IntActDocumentBuilderTest{
 
         IntactDocumentBuilder builder = new IntactDocumentBuilder(true);
 
-        //String goIdentifier = "GO:0030056";
-        String goIdentifier = "GO:0005634"; //nucleus
-
-        List<Field> fieldsWithParentsProperties = builder.getListOfFieldsWithParents( goIdentifier, OlsUtils.GO_ONTOLOGY, true );
+        //String goIdentifier = "go:\"GO:0030056";
+        FieldBuilder fieldBuilder = new CrossReferenceFieldBuilder();
+        List<Field> fieldsWithParentsProperties = builder.getListOfFieldsWithParents( fieldBuilder.createField("go:\"GO:0005634\"(nucleus)") );
 
 
         Assert.assertNotNull( fieldsWithParentsProperties );
@@ -208,29 +215,28 @@ public class IntActDocumentBuilderTest{
         int countProperty = 0;
 
         for ( String string : strings ) {
-
-            if(string.equals( "GO:0005634(nucleus)" )){
+            if(string.equals( "go:\"GO:0005634\"(nucleus)" )){
               countProperty++;  
             }
-            if(string.equals( "GO:0044464(cell part)" )){
+            if(string.equals( "go:\"GO:0044464\"(cell part)" )){
               countProperty++;
             }
-            if(string.equals( "GO:0043226(organelle)" )){
+            if(string.equals( "go:\"GO:0043226\"(organelle)" )){
               countProperty++;
             }
-            if(string.equals( "GO:0044424(intracellular part)" )){
+            if(string.equals( "go:\"GO:0044424\"(intracellular part)" )){
               countProperty++;
             }
-            if(string.equals( "GO:0043227(membrane-bounded organelle)" )){
+            if(string.equals( "go:\"GO:0043227\"(membrane-bounded organelle)" )){
               countProperty++;
             }
-            if(string.equals( "GO:0005622(intracellular)" )){
+            if(string.equals( "go:\"GO:0005622\"(intracellular)" )){
               countProperty++;
             }
-            if(string.equals( "GO:0005623(cell)" )){
+            if(string.equals( "go:\"GO:0005623\"(cell)" )){
               countProperty++;
             }
-            if(string.equals( "GO:0043231(intracellular membrane-bounded organelle)" )){
+            if(string.equals( "go:\"GO:0043231\"(intracellular membrane-bounded organelle)" )){
               countProperty++;
             }
         }
