@@ -75,8 +75,8 @@ public class CvExporter {
         List<CvDagObject> allUniqCvs;
         allUniqCvs = allCvs;
 
-        sort( allUniqCvs, new Comparator<CvDagObject>() {
-            public int compare( CvDagObject o1, CvDagObject o2 ) {
+        sort( allUniqCvs, new Comparator<CvObject>() {
+            public int compare( CvObject o1, CvObject o2 ) {
 
                 String id1 = CvObjectUtils.getIdentity( o1 );
                 String id2 = CvObjectUtils.getIdentity( o2 );
