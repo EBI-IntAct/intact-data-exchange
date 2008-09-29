@@ -9,6 +9,7 @@ import org.apache.commons.cli.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.util.Utilities;
+import uk.ac.ebi.intact.commons.util.CompressionUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,7 +127,7 @@ public class ZipFileGenerator {
                     }
                 } else {
                     try {
-                        Utilities.zip(xmlFiles.toArray(new File[xmlFiles.size()]), zipFile, false);
+                        CompressionUtils.zip(xmlFiles.toArray(new File[xmlFiles.size()]), zipFile, false,false);
                     } catch ( IOException e ) {
                         e.printStackTrace();
                     }
