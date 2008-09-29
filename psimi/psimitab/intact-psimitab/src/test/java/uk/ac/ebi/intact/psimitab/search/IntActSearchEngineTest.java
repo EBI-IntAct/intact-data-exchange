@@ -96,7 +96,7 @@ public class IntActSearchEngineTest {
 
         String searchQuery = "\"GO:0006928\"";
         SearchResult<IntactBinaryInteraction> result = searchEngine.search(searchQuery, null, null);
-        assertEquals(5, result.getData().size());
+        assertEquals(8, result.getData().size());
 
         searchQuery = ("GO*");
         result = searchEngine.search(searchQuery, null, 10);
@@ -118,7 +118,7 @@ public class IntActSearchEngineTest {
         IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         SearchResult<IntactBinaryInteraction> result = Searcher.search("GO\\:0006928", searchEngine);
-        assertEquals(5, result.getData().size());
+        assertEquals(8, result.getData().size());
     }
 
     @Test
