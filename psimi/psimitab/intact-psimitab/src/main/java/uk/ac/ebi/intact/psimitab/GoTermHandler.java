@@ -58,8 +58,8 @@ public class GoTermHandler {
     public String getNameById( String goTerm ) throws RemoteException {
         String result;
 
-        if (cache.isKeyInCache(goTerm)) {
-            result = (String) cache.get(goTerm).getValue();
+        if (cache.isKeyInCache(goTerm) || cache.get(goTerm) != null) {
+            result = (String) cache.get(goTerm).getObjectValue();
         } else {
             result = query.getTermById( goTerm, "GO" );
 
