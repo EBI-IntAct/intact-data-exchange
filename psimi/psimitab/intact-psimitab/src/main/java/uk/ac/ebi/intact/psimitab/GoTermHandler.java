@@ -15,17 +15,14 @@
  */
 package uk.ac.ebi.intact.psimitab;
 
-import uk.ac.ebi.intact.util.ols.OlsClient;
-import uk.ac.ebi.ook.web.services.Query;
-
-import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Map;
-import java.io.InputStream;
-
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import uk.ac.ebi.intact.util.ols.OlsClient;
+import uk.ac.ebi.ook.web.services.Query;
+
+import java.io.InputStream;
+import java.rmi.RemoteException;
 
 /**
  * The InterproNameHandler gets the Information from a OLS-Service or a Map.
@@ -58,7 +55,7 @@ public class GoTermHandler {
     public String getNameById( String goTerm ) throws RemoteException {
         String result;
 
-        if (cache.isKeyInCache(goTerm) || cache.get(goTerm) != null) {
+        if (cache.isKeyInCache(goTerm) && cache.get(goTerm) != null) {
             result = (String) cache.get(goTerm).getObjectValue();
         } else {
             result = query.getTermById( goTerm, "GO" );
