@@ -19,7 +19,7 @@ public class InterproNameHandlerTest extends AbstractPsimitabTestCase {
 
     @Test
     public void usingLocalEntryFile() throws Exception {
-        File file = getFileByResources( "/interpro-entry-local.txt", InterproNameHandler.class );
+        File file = getFileByResources("/META-INF/interpro-entry-local.txt", InterproNameHandler.class );
         InterproNameHandler handler = new InterproNameHandler( new FileInputStream(file) );
         String interproName = handler.getNameById( "IPR008255" );
 

@@ -21,6 +21,11 @@ import uk.ac.ebi.ook.web.services.Query;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.InputStream;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 /**
  * The InterproNameHandler gets the Information from a OLS-Service or a Map.
@@ -31,25 +36,35 @@ import java.util.Map;
  */
 public class GoTermHandler {
 
-    private Map<String, String> goMap;
-
     private Query query;
+
+    private Cache cache;
 
     public GoTermHandler() {
         query = new OlsClient().getOntologyQuery();
-        goMap = new HashMap<String, String>();
+
+        InputStream ehcacheConfig = GoTermHandler.class.getResourceAsStream("/META-INF/ehcache-go.xml");
+        CacheManager cacheManager = CacheManager.create(ehcacheConfig);
+
+        final String cacheName = "go";
+        cache = cacheManager.getCache(cacheName);
+
+        if (cache == null) {
+            throw new IllegalStateException("Cache not found: "+ cacheName);
+        }
+
     }
 
     public String getNameById( String goTerm ) throws RemoteException {
         String result;
 
-        if (goMap.containsKey(goTerm)) {
-            result = goMap.get(goTerm);
+        if (cache.isKeyInCache(goTerm)) {
+            result = (String) cache.get(goTerm).getValue();
         } else {
             result = query.getTermById( goTerm, "GO" );
 
             if (result != null) {
-                goMap.put(goTerm, result);
+                cache.put(new Element(goTerm, result));
             }
         }
 

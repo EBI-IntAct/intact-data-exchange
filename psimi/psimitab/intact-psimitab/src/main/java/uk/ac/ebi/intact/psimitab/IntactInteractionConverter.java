@@ -37,6 +37,9 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.io.InputStream;
+
+import net.sf.ehcache.CacheManager;
 
 /**
  * TODO comment that class header
