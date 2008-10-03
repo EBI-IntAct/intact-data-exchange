@@ -22,6 +22,7 @@ import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactInteractorConverter;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
@@ -49,7 +50,7 @@ public class InteractionConverter {
 
     private CrossReferenceConverter xConverter = new CrossReferenceConverter();
 
-    private CrossReference defaultSourceDatabase = CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" );
+    private CrossReference defaultSourceDatabase = CrossReferenceFactory.getInstance().build( "psi-mi", "MI:0469", "intact" );
 
     ///////////////////////////
     // Getters &  Setters
@@ -86,14 +87,23 @@ public class InteractionConverter {
         // set authors
         List<Author> authors = new ArrayList<Author>();
         if ( interaction.getExperiments() != null ) {
-            for ( Experiment experiment : interaction.getExperiments() ) {
-                for ( Annotation a : experiment.getAnnotations() ) {
-                    if (a.getCvTopic().getIdentifier() != null) {
-                        if ( CvTopic.AUTHOR_LIST_MI_REF.equals( a.getCvTopic().getIdentifier() ) ) {
-                            authors.add( new AuthorImpl( a.getAnnotationText().split(" ")[0] + " et al." ) );
-                        }
-                    }
+            if (!interaction.getExperiments().isEmpty()) {
+                Experiment experiment = interaction.getExperiments().iterator().next();
+
+                Annotation authorAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.AUTHOR_LIST_MI_REF);
+                Annotation yearAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.PUBLICATION_YEAR_MI_REF);
+
+                String authorText = "-";
+
+                if (authorAnnot != null) {
+                    authorText = authorAnnot.getAnnotationText().split(" ")[0] + " et al.";
                 }
+
+                if (yearAnnot != null) {
+                    authorText = authorText+" ("+yearAnnot.getAnnotationText()+")";
+                }
+
+                authors.add(new AuthorImpl(authorText));
             }
         }
         bi.setAuthors( authors );
@@ -129,7 +139,6 @@ public class InteractionConverter {
         List<CrossReference> publications = new ArrayList<CrossReference>();
         if ( interaction.getExperiments() != null ) {
             for ( Experiment experiment : interaction.getExperiments() ) {
-                if ( experiment.getXrefs() != null ) {
                     for ( Xref xref : experiment.getXrefs() ) {
                         if ( xref.getCvXrefQualifier() != null && xref.getCvDatabase().getShortLabel() != null ) {
                             CvObjectXref idref = CvObjectUtils.getPsiMiIdentityXref( xref.getCvXrefQualifier() );
@@ -139,7 +148,6 @@ public class InteractionConverter {
                                 publications.add( publication );
                             }
                         }
-                    }
                 }
             }
         }
@@ -149,6 +157,9 @@ public class InteractionConverter {
         if ( interaction.getOwner() != null && interaction.getOwner().getXrefs() != null ) {
             List<CrossReference> sourceDatabases = xConverter.toCrossReferences( interaction.getOwner().getXrefs(), true, false );
             if ( !sourceDatabases.isEmpty() ){
+                for (CrossReference sourceXref : sourceDatabases) {
+                    sourceXref.setText(interaction.getOwner().getShortLabel());
+                }
                 bi.setSourceDatabases( sourceDatabases );
             } else {
                 bi.getSourceDatabases().add( defaultSourceDatabase );

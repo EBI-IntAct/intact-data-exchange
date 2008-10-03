@@ -27,8 +27,8 @@ public class CvObjectConverterTest extends IntactBasicTestCase {
         CvInteractionType t = getMockBuilder().createCvObject( CvInteractionType.class, "MI:0407", "direct interaction" );
         InteractionType interactionType = ( InteractionType ) converter.toCrossReference( InteractionTypeImpl.class, t );
         assertNotNull( interactionType );
-        assertEquals( "MI", interactionType.getDatabase() );
-        assertEquals( "0407", interactionType.getIdentifier() );
+        assertEquals( "psi-mi", interactionType.getDatabase() );
+        assertEquals( "MI:0407", interactionType.getIdentifier() );
         assertEquals( "direct interaction", interactionType.getText() );
     }
 
@@ -40,8 +40,8 @@ public class CvObjectConverterTest extends IntactBasicTestCase {
 
         InteractionDetectionMethod detectionMethod = ( InteractionDetectionMethod ) converter.toCrossReference( InteractionDetectionMethodImpl.class, t );
         assertNotNull( detectionMethod );
-        assertEquals( "MI", detectionMethod.getDatabase() );
-        assertEquals( "0027", detectionMethod.getIdentifier() );
+        assertEquals( "psi-mi", detectionMethod.getDatabase() );
+        assertEquals( "MI:0027", detectionMethod.getIdentifier() );
         assertEquals( "cosedimentation", detectionMethod.getText() );
     }
 

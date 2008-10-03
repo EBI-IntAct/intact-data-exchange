@@ -19,7 +19,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.intact.model.CvObject;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.lang.reflect.Constructor;
 
@@ -44,22 +47,17 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
         }
 
         String text = cvObject.getShortLabel();
-        String identity = CvObjectUtils.getIdentity(cvObject);
+        String identity = cvObject.getIdentifier();
         if(identity == null ) {
             throw new NullPointerException( cvObject.getClass().getSimpleName() + "("+ text +") didn't have an identity" );
         }
 
-        final String[] strings = identity.split( ":" );
-        if(strings.length != 2) {
-            throw new IllegalStateException( cvObject.getClass().getSimpleName() + "("+ text +") didn't have a valid identity: " + identity );
-        }
-
-        String db = strings[0];
-        String id = strings[1];
+        final CvObjectXref idXref = XrefUtils.getIdentityXref(cvObject, CvDatabase.PSI_MI_MI_REF);
+        String db = (idXref != null)? idXref.getCvDatabase().getShortLabel() : "notspecified";
 
         try {
             Constructor<T> constructor = clazz.getConstructor( String.class, String.class, String.class );
-            return constructor.newInstance( db, id, text );
+            return constructor.newInstance( db, identity, text );
         } catch ( Exception e ) {
             throw new RuntimeException( "An exception occured while building a " + clazz.getSimpleName() + ": " + text, e );
         }
