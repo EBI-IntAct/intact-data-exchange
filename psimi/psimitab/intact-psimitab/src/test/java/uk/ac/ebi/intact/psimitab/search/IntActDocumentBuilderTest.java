@@ -9,6 +9,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.store.Directory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.AfterClass;
 import psidev.psi.mi.search.util.DocumentBuilder;
 import psidev.psi.mi.tab.model.builder.Column;
 import psidev.psi.mi.tab.model.builder.CrossReferenceFieldBuilder;
@@ -17,6 +18,7 @@ import psidev.psi.mi.tab.model.builder.FieldBuilder;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.model.Annotation;
 import uk.ac.ebi.intact.psimitab.model.Parameter;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,11 +33,18 @@ import java.util.List;
  */
 public class IntActDocumentBuilderTest {
 
-    private static Directory ontologyDirectory;
+    private static OntologyIndexSearcher ontologyIndexSearcher;
 
     @BeforeClass
     public static void buildIndex() throws Exception {
-        ontologyDirectory = TestHelper.buildDefaultOntologiesIndex();
+        Directory ontologyDirectory = TestHelper.buildDefaultOntologiesIndex();
+        ontologyIndexSearcher = new OntologyIndexSearcher(ontologyDirectory);
+    }
+
+    @AfterClass
+    public static void thePartyIsOver() throws Exception {
+        ontologyIndexSearcher.close();
+        ontologyIndexSearcher = null;
     }
 
     @Test
@@ -97,7 +106,7 @@ public class IntActDocumentBuilderTest {
         Field intTypeFieldType1 = new Field( "psi-mi", "MI:0407", "direct interaction" );
         Column intTypeCol = new Column( Arrays.asList( intTypeFieldType1 ) );
 
-        IntactDocumentBuilder builder = new IntactDocumentBuilder( ontologyDirectory );
+        IntactDocumentBuilder builder = new IntactDocumentBuilder( ontologyIndexSearcher );
         builder.addExpandableOntology( "MI" );
         builder.addExpandableOntology( "psi-mi" );
 
@@ -109,7 +118,7 @@ public class IntActDocumentBuilderTest {
     @Test
     public void testFieldsWithParentsForMI_interactionType() throws Exception {
 
-        IntactDocumentBuilder builder = new IntactDocumentBuilder( ontologyDirectory );
+        IntactDocumentBuilder builder = new IntactDocumentBuilder( ontologyIndexSearcher );
         builder.addExpandableOntology( "MI" );
         builder.addExpandableOntology( "psi-mi" );
 
@@ -131,7 +140,7 @@ public class IntActDocumentBuilderTest {
     @Test
     public void testFieldsWithParentsForMI_detectionMethod() throws Exception {
 
-        IntactDocumentBuilder builder = new IntactDocumentBuilder( ontologyDirectory );
+        IntactDocumentBuilder builder = new IntactDocumentBuilder( ontologyIndexSearcher );
         builder.addExpandableOntology( "MI" );
         builder.addExpandableOntology( "psi-mi" );
 
@@ -151,7 +160,7 @@ public class IntActDocumentBuilderTest {
     @Test
     public void testFieldsWithParentsForGO() throws Exception {
 
-        IntactDocumentBuilder builder = new IntactDocumentBuilder( ontologyDirectory );
+        IntactDocumentBuilder builder = new IntactDocumentBuilder( ontologyIndexSearcher );
         builder.addExpandableOntology( "GO" );
 
         //String goIdentifier = "go:\"GO:0030056";

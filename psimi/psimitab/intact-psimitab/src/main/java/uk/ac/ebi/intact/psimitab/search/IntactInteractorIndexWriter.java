@@ -26,6 +26,7 @@ import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.util.IntactOnlyOneInteractorHandler;
 import uk.ac.ebi.intact.psimitab.util.IntactBinaryInteractionHandler;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import org.apache.lucene.store.Directory;
 
 import java.io.IOException;
@@ -42,8 +43,8 @@ public class IntactInteractorIndexWriter extends InteractorIndexWriter {
         super(new IntactDocumentBuilder(), new IntactOnlyOneInteractorHandler());
     }
 
-    public IntactInteractorIndexWriter(Directory ontologyIndex) throws IOException {
-        super(new IntactDocumentBuilder(ontologyIndex), new IntactOnlyOneInteractorHandler());
+    public IntactInteractorIndexWriter(OntologyIndexSearcher ontologyIndexSearcher) throws IOException {
+        super(new IntactDocumentBuilder(ontologyIndexSearcher), new IntactOnlyOneInteractorHandler());
     }
 
     @Override

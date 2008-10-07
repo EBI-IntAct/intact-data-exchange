@@ -53,9 +53,8 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
         expandableOntologies = new HashSet<String>();
     }
 
-    public IntactDocumentBuilder( Directory ontologyIndexPath ) throws IOException {
+    public IntactDocumentBuilder( OntologyIndexSearcher ontologySearcher ) throws IOException {
         this();
-        this.ontologySearcher = new OntologyIndexSearcher( ontologyIndexPath );
     }
 
     ///////////////////////////

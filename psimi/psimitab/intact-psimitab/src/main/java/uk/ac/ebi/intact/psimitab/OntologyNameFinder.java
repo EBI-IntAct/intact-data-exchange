@@ -39,18 +39,18 @@ public class OntologyNameFinder {
 
     private static final Log log = LogFactory.getLog( OntologyNameFinder.class );
 
-    private Directory indexPath;
+    private OntologyIndexSearcher searcher;
 
     private Set<String> ontologyNames;
 
-    public OntologyNameFinder( Directory indexPath ) {
+    public OntologyNameFinder( OntologyIndexSearcher searcher ) {
 
         ontologyNames = new HashSet<String>();
 
-        if ( indexPath == null ) {
-            log.warn( "The given Ontomogy index was null, name autocompletion will be disabled." );
+        if ( searcher == null ) {
+            log.warn( "The given OntologyIndexSeacher is null, name autocompletion will be disabled." );
         } else {
-            this.indexPath = indexPath;
+            this.searcher = searcher;
         }
     }
 
@@ -72,14 +72,12 @@ public class OntologyNameFinder {
     }
 
     public String getNameByIdentifier( String identifier ) throws IOException {
-        if ( indexPath != null ) {
-            OntologyIndexSearcher searcher = new OntologyIndexSearcher( indexPath );
+        if ( searcher != null ) {
             final OntologyHits ontologyHits = searcher.searchByChildId( identifier );
             if ( ontologyHits.length() > 0 ) {
                 final OntologyDocument doc = ontologyHits.doc( 0 );
                 return doc.getChildName();
             }
-            searcher.close();
         }
         return null;
     }

@@ -35,6 +35,7 @@ import uk.ac.ebi.intact.psimitab.OntologyNameFinder;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.search.IntactInteractorIndexWriter;
 import uk.ac.ebi.intact.psimitab.search.IntactPsimiTabIndexWriter;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 
 import javax.persistence.Query;
 import java.io.IOException;
@@ -52,12 +53,12 @@ public class DatabaseMitabExporter {
     private static final Log log = LogFactory.getLog( DatabaseMitabExporter.class );
     private static final String NEW_LINE = System.getProperty("line.separator");
 
-    private final Directory ontologiesDirectory;
+    private final OntologyIndexSearcher ontologiesIndexSearcher;
     private final OntologyNameFinder nameFinder;
 
-    public DatabaseMitabExporter(Directory ontologiesDirectory, String ... supportedOntologies) {
-        this.ontologiesDirectory = ontologiesDirectory;
-        this.nameFinder = new OntologyNameFinder(ontologiesDirectory);
+    public DatabaseMitabExporter(OntologyIndexSearcher ontologiesIndexSearcher, String ... supportedOntologies) {
+        this.ontologiesIndexSearcher = ontologiesIndexSearcher;
+        this.nameFinder = new OntologyNameFinder(ontologiesIndexSearcher);
 
         for (String supportedOntology : supportedOntologies) {
             nameFinder.addOntologyName(supportedOntology);
@@ -90,12 +91,12 @@ public class DatabaseMitabExporter {
 
         if (interactionDirectory != null) {
             interactionIndexWriter = new IndexWriter(interactionDirectory, new StandardAnalyzer(), true);
-            interactionIndexer = new IntactPsimiTabIndexWriter(ontologiesDirectory);
+            interactionIndexer = new IntactPsimiTabIndexWriter(ontologiesIndexSearcher);
         }
 
         if (interactorDirectory != null) {
             interactorIndexWriter = new IndexWriter(interactorDirectory, new StandardAnalyzer(), true);
-            interactorIndexer = new IntactInteractorIndexWriter(ontologiesDirectory);
+            interactorIndexer = new IntactInteractorIndexWriter(ontologiesIndexSearcher);
         }
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();

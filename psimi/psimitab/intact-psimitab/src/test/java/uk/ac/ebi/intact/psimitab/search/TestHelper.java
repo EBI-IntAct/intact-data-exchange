@@ -25,6 +25,7 @@ import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexWriter;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.OboOntologyIterator;
 
 import java.io.ByteArrayInputStream;
@@ -48,17 +49,17 @@ public abstract class TestHelper {
         return Searcher.buildIndexInMemory(is, true, true, new IntactPsimiTabIndexWriter());
     }
 
-    public static Directory createIndexFromResource(String resourcePath, Directory ontologyDirectory) throws IOException, ConverterException, MitabLineException {
+    public static Directory createIndexFromResource(String resourcePath, OntologyIndexSearcher ontologyIndexSearcher) throws IOException, ConverterException, MitabLineException {
         InputStream is = TestHelper.class.getResourceAsStream(resourcePath);
-        return Searcher.buildIndexInMemory(is, true, true, new IntactPsimiTabIndexWriter(ontologyDirectory));
+        return Searcher.buildIndexInMemory(is, true, true, new IntactPsimiTabIndexWriter(ontologyIndexSearcher));
     }
 
     public static Directory createIndexFromLine(String line) throws IOException, ConverterException, MitabLineException {
-        return Searcher.buildIndexInMemory(new ByteArrayInputStream(line.getBytes()), true, false, new IntactPsimiTabIndexWriter(new RAMDirectory()));
+        return Searcher.buildIndexInMemory(new ByteArrayInputStream(line.getBytes()), true, false, new IntactPsimiTabIndexWriter());
     }
 
-    public static Directory createIndexFromLine(String line, Directory ontologyDirectory) throws IOException, ConverterException, MitabLineException {
-        return Searcher.buildIndexInMemory(new ByteArrayInputStream(line.getBytes()), true, false, new IntactPsimiTabIndexWriter(ontologyDirectory));
+    public static Directory createIndexFromLine(String line, OntologyIndexSearcher ontologyIndexSearcher) throws IOException, ConverterException, MitabLineException {
+        return Searcher.buildIndexInMemory(new ByteArrayInputStream(line.getBytes()), true, false, new IntactPsimiTabIndexWriter(ontologyIndexSearcher));
     }
 
      public static Directory buildOntologiesIndex(Map<String,URL> urls) throws Exception {

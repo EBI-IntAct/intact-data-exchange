@@ -11,6 +11,8 @@ import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 
 import java.io.IOException;
 
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
+
 /**
  * Creates an extended index.
  *
@@ -28,7 +30,7 @@ public class IntactPsimiTabIndexWriter extends PsimiIndexWriter {
         return getDocumentBuilder().createDocumentFromPsimiTabLine( line );
     }
 
-    public IntactPsimiTabIndexWriter( Directory ontologyIndex ) throws IOException {
-        super( new IntactDocumentBuilder(ontologyIndex) );
+    public IntactPsimiTabIndexWriter( OntologyIndexSearcher ontologyIndexSearcher ) throws IOException {
+        super( new IntactDocumentBuilder(ontologyIndexSearcher) );
     }
 }

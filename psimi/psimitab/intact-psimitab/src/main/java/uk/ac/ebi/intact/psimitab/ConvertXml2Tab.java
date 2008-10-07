@@ -26,6 +26,7 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,9 +88,9 @@ public class ConvertXml2Tab {
     private Writer logWriter;
 
     /**
-     * Path to the index that we can use to query CV terms.
+     * Path to the ontology index searcher that we can use to query CV terms.
      */
-    private Directory OntologyIndexPath;
+    private OntologyIndexSearcher ontologyIndexSearcher;
 
     /**
      * Name of the ontologies we want to support when fetching the name by identifier.
@@ -154,12 +155,12 @@ public class ConvertXml2Tab {
         this.logWriter = logWriter;
     }
 
-    public Directory getOntologyIndexPath() {
-        return OntologyIndexPath;
+    public OntologyIndexSearcher getOntologyIndexSearcher() {
+        return ontologyIndexSearcher;
     }
 
-    public void setOntologyIndexPath( Directory ontologyIndexPath ) {
-        OntologyIndexPath = ontologyIndexPath;
+    public void setOntologyIndexSearcher(OntologyIndexSearcher ontologyIndexSearcher) {
+        this.ontologyIndexSearcher = ontologyIndexSearcher;
     }
 
     public void addOntologyNameToAutocomplete( String name ) {
@@ -194,7 +195,7 @@ public class ConvertXml2Tab {
         }
 
         // build Ontology Name Finder
-        OntologyNameFinder finder = new OntologyNameFinder( OntologyIndexPath );
+        OntologyNameFinder finder = new OntologyNameFinder(ontologyIndexSearcher);
         for ( String name : ontologyNameToAutocomplete ) {
             finder.addOntologyName( name );
         }

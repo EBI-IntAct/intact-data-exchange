@@ -17,16 +17,14 @@ package uk.ac.ebi.intact.psimitab.search;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.store.Directory;
-import org.junit.After;
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import psidev.psi.mi.search.SearchResult;
 import psidev.psi.mi.search.Searcher;
 import psidev.psi.mi.tab.model.builder.DocumentDefinition;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 
 /**
  * IntActSearchEngine Tester.
@@ -37,12 +35,20 @@ import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
  */
 public class IntActSearchEngineTest {
 
-    private static Directory ontologyDirectory;
     private DocumentDefinition docDef;
+
+    private static OntologyIndexSearcher ontologyIndexSearcher;
 
     @BeforeClass
     public static void buildIndex() throws Exception {
-        ontologyDirectory = TestHelper.buildDefaultOntologiesIndex();
+        Directory ontologyDirectory = TestHelper.buildDefaultOntologiesIndex();
+        ontologyIndexSearcher = new OntologyIndexSearcher(ontologyDirectory);
+    }
+
+    @AfterClass
+    public static void thePartyIsOver() throws Exception {
+        ontologyIndexSearcher.close();
+        ontologyIndexSearcher = null;
     }
 
     @Before
@@ -222,7 +228,7 @@ public class IntActSearchEngineTest {
     public void testInteractionDetMethod() throws Exception {
 
         String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tpsi-mi:\"MI:0018\"(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tpsi-mi:\"MI:0218\"(physical interaction)\tpsi-mi:\"MI:0469\"(intact)\tintact:EBI-446356\t-\tpsi-mi:\"MI:0498\"(prey)\tpsi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\tinterpro:IPR004829|interpro:IPR010790|interpro:IPR001664|uniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716|uniprotkb:Q540Z7|uniprotkb:Q63368\tgo:0005737|go:0030056|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tpsi-mi:\"MI:0326\"(protein)\tpsi-mi:\"MI:0326\"(protein)\tyeast:4932\t-\t-\tcomment:commentA\t-";
-        Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine, ontologyDirectory );
+        Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine, ontologyIndexSearcher );
 
         IntactSearchEngine searchEngine = new IntactSearchEngine( indexDirectory );
 
@@ -252,7 +258,7 @@ public class IntActSearchEngineTest {
     public void testInteractionType() throws Exception {
 
         String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tpsi-mi:\"MI:0018\"(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0469\"(intact)\tintact:EBI-446356\t-\tpsi-mi:\"MI:0498\"(prey)\tpsi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\tinterpro:IPR004829|interpro:IPR010790|interpro:IPR001664|uniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716|uniprotkb:Q540Z7|uniprotkb:Q63368\tgo:0005737|go:0030056|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tpsi-mi:\"MI:0326\"(protein)\tpsi-mi:\"MI:0326\"(protein)\tyeast:4932\t-\t-\tcomment:commentA\t-";
-        Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine,ontologyDirectory );
+        Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine,ontologyIndexSearcher );
 
         IntactSearchEngine searchEngine = new IntactSearchEngine( indexDirectory );
 
@@ -283,7 +289,7 @@ public class IntActSearchEngineTest {
     public void testPropertiesWithParents() throws Exception {
 
         String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tpsi-mi:\"MI:0018\"(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0469\"(intact)\tintact:EBI-446356\t-\tpsi-mi:\"MI:0498\"(prey)\tpsi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\tinterpro:IPR004829|interpro:IPR010790|interpro:IPR001664|uniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716|uniprotkb:Q540Z7|uniprotkb:Q63368\tgo:0005737|go:\"GO:0030056\"(hemidesmosome)|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tpsi-mi:\"MI:0326\"(protein)\tpsi-mi:\"MI:0326\"(protein)\tyeast:4932\t-\t-\tcomment:commentA\t-";
-        Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine,ontologyDirectory );
+        Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine,ontologyIndexSearcher );
 
         IntactSearchEngine searchEngine = new IntactSearchEngine( indexDirectory );
 
@@ -315,7 +321,7 @@ public class IntActSearchEngineTest {
         //go:"GO:0005887"(integral to plasma membrane)|go:"GO:0004714"(transmembrane receptor protein tyrosine kinase activity)|go:"GO:0007155"(cell adhesion)|go:"GO:0007165"(signal transduction)|interpro:IPR000421(Coagulation factor 5/8 type, C-terminal)|interpro:IPR000719(Protein kinase, core)|interpro:IPR002011(Receptor tyrosine kinase, class II, conserved site)|interpro:IPR001245(Tyrosine protein kinase)|interpro:IPR008266(Tyrosine protein kinase, active site)
         String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tpsi-mi:\"MI:0018\"(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0469\"(intact)\tintact:EBI-446356\t-\tpsi-mi:\"MI:0498\"(prey)\tpsi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\tgo:\"GO:0005887\"(integral to plasma membrane)|go:\"GO:0004714\"(transmembrane receptor protein tyrosine kinase activity)|go:\"GO:0007155\"(cell adhesion)|go:\"GO:0007165\"(signal transduction)|interpro:IPR000421(Coagulation factor 5/8 type, C-terminal)|interpro:IPR000719(Protein kinase, core)|interpro:IPR002011(Receptor tyrosine kinase, class II, conserved site)|interpro:IPR001245(Tyrosine protein kinase)|interpro:IPR008266(Tyrosine protein kinase, active site)\tgo:0005737|go:0030056(hemidesmosome)|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tpsi-mi:\"MI:0326\"(protein)\tpsi-mi:\"MI:0326\"(protein)\tyeast:4932\t-\t-\tcomment:commentA\t-";
 
-            Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine,ontologyDirectory );
+            Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine,ontologyIndexSearcher );
 
             IntactSearchEngine searchEngine = new IntactSearchEngine( indexDirectory );
 

@@ -20,6 +20,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.junit.*;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import uk.ac.ebi.intact.bridges.ontologies.util.OntologyUtils;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
@@ -40,12 +41,12 @@ import java.net.URL;
  */
 public class DatabaseMitabExporterTest extends IntactBasicTestCase {
 
-    private static Directory ontologiesDir;
+    private static OntologyIndexSearcher ontologyIndexSearcher;
     private DatabaseMitabExporter exporter;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        ontologiesDir = new RAMDirectory();
+        Directory ontologiesDir = new RAMDirectory();
 
         final URL goSlimLocalUrl = DatabaseMitabExporterTest.class.getResource("/META-INF/goslim_generic.obo");
 
@@ -53,16 +54,19 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
                                         new OntologyMapping[] {
                                                 new OntologyMapping("go", goSlimLocalUrl)
                                         }, true);
+
+        ontologyIndexSearcher = new OntologyIndexSearcher(ontologiesDir);
     }
 
     @AfterClass
     public static void afterClass() throws Exception {
-        ontologiesDir = null;
+        ontologyIndexSearcher.close();
+        ontologyIndexSearcher = null;
     }
 
     @Before
     public void before() throws Exception {
-        exporter = new DatabaseMitabExporter(ontologiesDir, "go");
+        exporter = new DatabaseMitabExporter(ontologyIndexSearcher, "go");
         SchemaUtils.createSchema();
     }
 

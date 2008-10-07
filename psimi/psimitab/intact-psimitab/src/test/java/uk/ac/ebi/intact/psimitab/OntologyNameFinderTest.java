@@ -8,11 +8,13 @@ package uk.ac.ebi.intact.psimitab;
 
 import org.junit.Test;
 import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.Directory;
 import junit.framework.Assert;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexWriter;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.OboOntologyIterator;
 
 import java.io.File;
@@ -39,7 +41,7 @@ public class OntologyNameFinderTest {
         return outputDir;
     }
 
-    private static Directory ontologyDirectory;
+    private static OntologyIndexSearcher ontologyIndexSearcher;
 
     @BeforeClass
     public static void buildIndex() throws Exception {
@@ -47,7 +49,7 @@ public class OntologyNameFinderTest {
         final URI uri = OntologyNameFinderTest.class.getResource( "/ontologies/go_slim.obo" ).toURI();
         Assert.assertNotNull( uri );
         File f = new File( getTargetDirectory(), "ontologyIndex" );
-        ontologyDirectory = FSDirectory.getDirectory( f );
+        Directory ontologyDirectory = FSDirectory.getDirectory( f );
         OntologyIndexWriter writer = new OntologyIndexWriter( ontologyDirectory, true );
 
         OboOntologyIterator iterator = new OboOntologyIterator( "obo_slim_plant", uri.toURL() );
@@ -59,11 +61,19 @@ public class OntologyNameFinderTest {
         writer.flush();
         writer.optimize();
         writer.close();
+
+        ontologyIndexSearcher = new OntologyIndexSearcher(ontologyDirectory);
+    }
+
+    @AfterClass
+    public static void thePartyIsOver() throws Exception {
+        ontologyIndexSearcher.close();
+        ontologyIndexSearcher = null;
     }
 
     @Test
     public void getNameByIdentifier() throws IOException {
-        OntologyNameFinder finder = new OntologyNameFinder( ontologyDirectory );
+        OntologyNameFinder finder = new OntologyNameFinder( ontologyIndexSearcher );
         final String name = finder.getNameByIdentifier( "GO:0045182" );
         Assert.assertNotNull( name );
         Assert.assertEquals( "translation regulator activity", name );
