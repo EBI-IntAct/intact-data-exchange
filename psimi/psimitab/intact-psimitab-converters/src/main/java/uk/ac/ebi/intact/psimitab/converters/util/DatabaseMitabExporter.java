@@ -17,42 +17,32 @@ package uk.ac.ebi.intact.psimitab.converters.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.obo.dataadapter.OBOParseException;
-import uk.ac.ebi.intact.psimitab.OntologyNameFinder;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.store.Directory;
+import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
+import psidev.psi.mi.tab.model.CrossReference;
+import uk.ac.ebi.intact.business.IntactTransactionException;
+import uk.ac.ebi.intact.context.DataContext;
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.model.Component;
+import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.InteractionImpl;
+import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
+import uk.ac.ebi.intact.psimitab.OntologyNameFinder;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
-import uk.ac.ebi.intact.psimitab.search.IntactPsimiTabIndexWriter;
 import uk.ac.ebi.intact.psimitab.search.IntactInteractorIndexWriter;
-import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.context.DataContext;
-import uk.ac.ebi.intact.model.Interactor;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.InteractionImpl;
-import uk.ac.ebi.intact.bridges.ontologies.iterator.OboOntologyIterator;
-import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexWriter;
-import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
-import uk.ac.ebi.intact.business.IntactTransactionException;
+import uk.ac.ebi.intact.psimitab.search.IntactPsimiTabIndexWriter;
 
-import java.io.File;
-import java.io.FileWriter;
+import javax.persistence.Query;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
-import java.net.URL;
-
-import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
-import psidev.psi.mi.tab.model.CrossReference;
-
-import javax.persistence.Query;
 
 /**
- * TODO comment that class header
+ * Creates a MITAB file, and the interaction and interactors indexes directly using database data.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -67,12 +57,7 @@ public class DatabaseMitabExporter {
 
     public DatabaseMitabExporter(Directory ontologiesDirectory, String ... supportedOntologies) {
         this.ontologiesDirectory = ontologiesDirectory;
-
-        try {
-            this.nameFinder = new OntologyNameFinder(ontologiesDirectory);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Problem creating ontology name finder", e);
-        }
+        this.nameFinder = new OntologyNameFinder(ontologiesDirectory);
 
         for (String supportedOntology : supportedOntologies) {
             nameFinder.addOntologyName(supportedOntology);
