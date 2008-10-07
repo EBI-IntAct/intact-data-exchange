@@ -95,13 +95,7 @@ public class IntActDocumentBuilderTest {
 
         //Type 1
         Field intTypeFieldType1 = new Field( "psi-mi", "MI:0407", "direct interaction" );
-
-        List<Field> fieldList = new ArrayList<Field>();
-        fieldList.add( intTypeFieldType1 );
-
-        Column intTypeCol = new Column( fieldList );
-        //MI:0407(direct interaction)
-        Assert.assertEquals( 1, intTypeCol.toString().split( "\\|" ).length );
+        Column intTypeCol = new Column( Arrays.asList( intTypeFieldType1 ) );
 
         IntactDocumentBuilder builder = new IntactDocumentBuilder( ontologyDirectory );
         builder.addExpandableOntology( "MI" );
@@ -109,21 +103,7 @@ public class IntActDocumentBuilderTest {
 
         Column intTypeColWithParents = builder.getColumnWithParents( intTypeCol );
         //MI:0407(direct interaction)|MI:0915(physical association)|MI:0190(interaction type)|MI:0914(association)
-        Assert.assertEquals( 4, intTypeColWithParents.toString().split( "\\|" ).length );
-
-        //Type2
-        Field intTypeFieldType2 = new Field( "psi-mi", "MI:0407", "direct interaction" );
-
-        List<Field> fieldList_ = new ArrayList<Field>();
-        fieldList_.add( intTypeFieldType2 );
-
-        Column intTypeCol_ = new Column( fieldList_ );
-        //MI:0407(direct interaction)
-        Assert.assertEquals( 1, intTypeCol_.toString().split( "\\|" ).length );
-
-        Column intTypeColWithParents_ = builder.getColumnWithParents( intTypeCol );
-        //MI:0407(direct interaction)|MI:0915(physical association)|MI:0190(interaction type)|MI:0914(association)
-        Assert.assertEquals( 4, intTypeColWithParents_.toString().split( "\\|" ).length );
+        Assert.assertEquals( 5, intTypeColWithParents.getFields().size() );
     }
 
     @Test
@@ -140,19 +120,12 @@ public class IntActDocumentBuilderTest {
         Assert.assertNotNull( fieldsWithParentsIntType );
         Assert.assertEquals( 5, fieldsWithParentsIntType.size() );
 
-        Column colWithParentsIntType = new Column( fieldsWithParentsIntType );
-        //"MI:0407(direct interaction)|MI:0190(interaction type)|MI:0914(association)|MI:0915(physical association)
-
-        String colsIntType[] = colWithParentsIntType.toString().split( "\\|" );
-
-        Assert.assertEquals( 5, colsIntType.length );
-
-        Collection<String> results = Arrays.asList( colsIntType );
-        Assert.assertTrue( results.contains( "psi-mi:\"MI:0000\"(molecular interaction)" ) );
-        Assert.assertTrue( results.contains( "psi-mi:\"MI:0190\"(interaction type)" ) );
-        Assert.assertTrue( results.contains( "psi-mi:\"MI:0915\"(physical association)" ) );
-        Assert.assertTrue( results.contains( "psi-mi:\"MI:0914\"(association)" ) );
-        Assert.assertTrue( results.contains( "psi-mi:\"MI:0407\"(direct interaction)" ) );
+        CrossReferenceFieldBuilder fb = new CrossReferenceFieldBuilder();
+        Assert.assertTrue( fieldsWithParentsIntType.contains( fb.createField( "psi-mi:\"MI:0000\"(molecular interaction)" ) ) );
+        Assert.assertTrue( fieldsWithParentsIntType.contains( fb.createField( "psi-mi:\"MI:0190\"(interaction type)" ) ) );
+        Assert.assertTrue( fieldsWithParentsIntType.contains( fb.createField( "psi-mi:\"MI:0915\"(physical association)" ) ) );
+        Assert.assertTrue( fieldsWithParentsIntType.contains( fb.createField( "psi-mi:\"MI:0914\"(association)" ) ) );
+        Assert.assertTrue( fieldsWithParentsIntType.contains( fb.createField( "psi-mi:\"MI:0407\"(direct interaction)" ) ) );
     }
 
     @Test
@@ -164,19 +137,15 @@ public class IntActDocumentBuilderTest {
 
         //interaction detection method MI:0045 (experimental interaction detection)
         FieldBuilder fieldBuilder = new CrossReferenceFieldBuilder();
-        List<Field> fieldsWithParentsDetMethod = builder.getListOfFieldsWithParents( fieldBuilder.createField( "MI:0045(experimental interaction detection)" ) );
+        List<Field> fieldsWithParentsDetMethod = builder.getListOfFieldsWithParents( fieldBuilder.createField( "psi-mi\"MI:0045\"(experimental interaction detection)" ) );
 
         Assert.assertNotNull( fieldsWithParentsDetMethod );
         Assert.assertEquals( 3, fieldsWithParentsDetMethod.size() );
 
-        Column colWithParentsDetMethod = new Column( fieldsWithParentsDetMethod );
-        //"MI:0045(experimental interaction detection)|MI:0001(interaction detection method)"
-        String[] colsDetMethod = colWithParentsDetMethod.toString().split( "\\|" );
-
-        Collection<String> results = Arrays.asList( colsDetMethod );
-        Assert.assertTrue( results.contains( "psi-mi:\"MI:0000\"(molecular interaction)" ) );
-        Assert.assertTrue( results.contains( "psi-mi:\"MI:0001\"(interaction detection method)" ) );
-        Assert.assertTrue( results.contains( "psi-mi:\"MI:0045\"(experimental interaction detection)" ) );
+        CrossReferenceFieldBuilder fb = new CrossReferenceFieldBuilder();
+        Assert.assertTrue( fieldsWithParentsDetMethod.contains( fb.createField( "psi-mi:\"MI:0000\"(molecular interaction)" ) ) );
+        Assert.assertTrue( fieldsWithParentsDetMethod.contains( fb.createField( "psi-mi:\"MI:0001\"(interaction detection method)" ) ) );
+        Assert.assertTrue( fieldsWithParentsDetMethod.contains( fb.createField( "psi-mi:\"MI:0045\"(experimental interaction detection)" ) ) );
     }
 
     @Test
@@ -190,21 +159,18 @@ public class IntActDocumentBuilderTest {
         List<Field> fieldsWithParentsProperties = builder.getListOfFieldsWithParents( fieldBuilder.createField( "go:\"GO:0005634\"(nucleus)" ) );
 
         Assert.assertNotNull( fieldsWithParentsProperties );
-        //term+8 parents excludes root == 9
-        Assert.assertEquals( 9, fieldsWithParentsProperties.size() );
+        //term+8 parents excludes root == 10
+        Assert.assertEquals( 10, fieldsWithParentsProperties.size() );
 
-        Column colWithParents = new Column( fieldsWithParentsProperties );
-        final String[] strings = colWithParents.toString().split( "\\|" );
-
-        Collection<String> results = Arrays.asList( strings );
-        Assert.assertTrue( results.contains( "go:\"GO:0005634\"(nucleus)"                                   ) );
-        Assert.assertTrue( results.contains( "go:\"GO:0005634\"(nucleus)"                                   ) );
-        Assert.assertTrue( results.contains( "go:\"GO:0044464\"(cell part)"                                 ) );
-        Assert.assertTrue( results.contains( "go:\"GO:0043226\"(organelle)"                                 ) );
-        Assert.assertTrue( results.contains( "go:\"GO:0044424\"(intracellular part)"                        ) );
-        Assert.assertTrue( results.contains( "go:\"GO:0043227\"(membrane-bounded organelle)"                ) );
-        Assert.assertTrue( results.contains( "go:\"GO:0005622\"(intracellular)"                             ) );
-        Assert.assertTrue( results.contains( "go:\"GO:0005623\"(cell)"                                      ) );
-        Assert.assertTrue( results.contains( "go:\"GO:0043231\"(intracellular membrane-bounded organelle)"  ) );
+        CrossReferenceFieldBuilder fb = new CrossReferenceFieldBuilder();
+        Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0005634\"(nucleus)" ) ) );
+        Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0044464\"(cell part)" ) ) );
+        Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0043226\"(organelle)" ) ) );
+        Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0044424\"(intracellular part)" ) ) );
+        Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0043227\"(membrane-bounded organelle)" ) ) );
+        Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0005622\"(intracellular)" ) ) );
+        Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0005623\"(cell)" ) ) );
+        Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0043231\"(intracellular membrane-bounded organelle)" ) ) );
+        Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0005575\"(cellular_component)") ) );
     }
 }
