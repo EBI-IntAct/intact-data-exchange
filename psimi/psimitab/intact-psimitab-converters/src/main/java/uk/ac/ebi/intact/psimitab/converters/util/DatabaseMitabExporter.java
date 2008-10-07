@@ -65,15 +65,12 @@ public class DatabaseMitabExporter {
     }
 
     public void exportAllInteractors(Writer mitabWriter, Directory interactionDirectory, Directory interactorDirectory) throws IOException, IntactTransactionException {
-        Query q = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getEntityManager().createQuery("from InteractorImpl where objclass <> :objClass");
-        q.setParameter("objClass", InteractionImpl.class.getName());
-
-        exportInteractors(q, mitabWriter, interactionDirectory, interactorDirectory);
+        final String allInteractorsHql = "from InteractorImpl where objclass <> '" + InteractionImpl.class.getName()+"'";
+        exportInteractors(allInteractorsHql, mitabWriter, interactionDirectory, interactorDirectory);
     }
 
-    public void exportInteractors(Query interactorQuery, Writer mitabWriter, Directory interactionDirectory, Directory interactorDirectory) throws IOException, IntactTransactionException {
-        if (interactorQuery == null) {
+    public void exportInteractors(String interactorQueryHql, Writer mitabWriter, Directory interactionDirectory, Directory interactorDirectory) throws IOException, IntactTransactionException {
+        if (interactorQueryHql == null) {
             throw new NullPointerException("Query for interactors is null: interactorQuery");
         }
         if (mitabWriter == null) {
@@ -115,15 +112,13 @@ public class DatabaseMitabExporter {
 
         do {
             dataContext.beginTransaction();
-            interactors = findInteractors(interactorQuery, firstResult, maxResults);
+            interactors = findInteractors(interactorQueryHql, firstResult, maxResults);
 
             firstResult = firstResult + maxResults;
 
             for (Interactor interactor : interactors) {
 
                 if (log.isTraceEnabled()) log.trace("Processing interactor: "+interactor.getShortLabel());
-
-                interactorCount++;
 
                 List<Interaction> interactions = new ArrayList<Interaction>();
                 for (Component comp : interactor.getActiveInstances()) {
@@ -218,7 +213,9 @@ public class DatabaseMitabExporter {
     }
 
 
-    private static List<? extends Interactor> findInteractors(Query q, int firstResult, int maxResults) {
+    private static List<? extends Interactor> findInteractors(String hql, int firstResult, int maxResults) {
+        Query q = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
+                .getEntityManager().createQuery(hql);
         q.setFirstResult(firstResult);
         q.setMaxResults(maxResults);
 

@@ -55,12 +55,12 @@ public class CrossReferenceConverter<T extends Xref> {
         for (Xref xref : xrefs) {
 
                 if (onlyIdentity) {
-                    if (CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                    if (xref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
                         CrossReference ref = createCrossReference(xref, withText);
                         if (ref != null) crossReferences.add(ref);
                     }
                 } else {
-                    if (!CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                    if (xref.getCvXrefQualifier() == null || !CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
                         CrossReference ref = createCrossReference(xref, withText);
                         if (ref != null) crossReferences.add(ref);
                     }
