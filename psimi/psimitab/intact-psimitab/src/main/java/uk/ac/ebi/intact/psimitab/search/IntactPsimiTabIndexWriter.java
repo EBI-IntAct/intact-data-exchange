@@ -4,9 +4,12 @@
 package uk.ac.ebi.intact.psimitab.search;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.store.Directory;
 import psidev.psi.mi.search.index.PsimiIndexWriter;
 import psidev.psi.mi.search.util.DocumentBuilder;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
+
+import java.io.IOException;
 
 /**
  * Creates an extended index.
@@ -15,8 +18,7 @@ import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
  * @version $Id$
  * @since 2.0.0 
  */
-public class IntactPsimiTabIndexWriter extends PsimiIndexWriter
-{
+public class IntactPsimiTabIndexWriter extends PsimiIndexWriter {
 
     public IntactPsimiTabIndexWriter() {
         super(new IntactDocumentBuilder());
@@ -26,8 +28,7 @@ public class IntactPsimiTabIndexWriter extends PsimiIndexWriter
         return getDocumentBuilder().createDocumentFromPsimiTabLine( line );
     }
 
-    public IntactPsimiTabIndexWriter(boolean includeParents) {
-                super(new IntactDocumentBuilder(includeParents));
-            }
-
+    public IntactPsimiTabIndexWriter( Directory ontologyIndex ) throws IOException {
+        super( new IntactDocumentBuilder(ontologyIndex) );
+    }
 }

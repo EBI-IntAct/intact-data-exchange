@@ -31,7 +31,7 @@ import org.apache.lucene.store.Directory;
 import java.io.IOException;
 
 /**
- * TODO comment that class header
+ * Intact interactor index writer.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -42,10 +42,9 @@ public class IntactInteractorIndexWriter extends InteractorIndexWriter {
         super(new IntactDocumentBuilder(), new IntactOnlyOneInteractorHandler());
     }
 
-    public IntactInteractorIndexWriter(boolean includeParentsForCvTerms) {
-        super(new IntactDocumentBuilder(includeParentsForCvTerms), new IntactOnlyOneInteractorHandler());
+    public IntactInteractorIndexWriter(Directory ontologyIndex) throws IOException {
+        super(new IntactDocumentBuilder(ontologyIndex), new IntactOnlyOneInteractorHandler());
     }
-
 
     @Override
     protected BinaryInteraction mergeBinaryInteractions( BinaryInteraction source, BinaryInteraction target ) {
