@@ -43,7 +43,7 @@ public class OntologyNameFinder {
 
     private Set<String> ontologyNames;
 
-    public OntologyNameFinder( Directory indexPath ) throws IOException {
+    public OntologyNameFinder( Directory indexPath ) {
 
         ontologyNames = new HashSet<String>();
 

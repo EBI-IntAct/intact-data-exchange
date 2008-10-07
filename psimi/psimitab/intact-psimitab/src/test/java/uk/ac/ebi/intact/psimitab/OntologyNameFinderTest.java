@@ -70,7 +70,7 @@ public class OntologyNameFinderTest {
     }
 
     @Test
-    public void isSupported() throws Exception {
+    public void isSupported() {
         OntologyNameFinder finder = new OntologyNameFinder( null );
         finder.addOntologyName( "GO" );
         Assert.assertTrue( finder.isOntologySupported( "go" ) );
