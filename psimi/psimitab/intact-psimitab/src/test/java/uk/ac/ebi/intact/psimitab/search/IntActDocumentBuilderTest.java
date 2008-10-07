@@ -7,8 +7,6 @@ package uk.ac.ebi.intact.psimitab.search;
 import junit.framework.Assert;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.obo.dataadapter.OBOParseException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import psidev.psi.mi.search.util.DocumentBuilder;
@@ -16,16 +14,10 @@ import psidev.psi.mi.tab.model.builder.Column;
 import psidev.psi.mi.tab.model.builder.CrossReferenceFieldBuilder;
 import psidev.psi.mi.tab.model.builder.Field;
 import psidev.psi.mi.tab.model.builder.FieldBuilder;
-import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
-import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexWriter;
-import uk.ac.ebi.intact.bridges.ontologies.iterator.OboOntologyIterator;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.model.Annotation;
 import uk.ac.ebi.intact.psimitab.model.Parameter;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,46 +31,11 @@ import java.util.List;
  */
 public class IntActDocumentBuilderTest {
 
-    private static File getTargetDirectory() {
-        String outputDirPath = IntActDocumentBuilderTest.class.getResource( "/" ).getFile();
-        Assert.assertNotNull( outputDirPath );
-        File outputDir = new File( outputDirPath );
-        // we are in test-classes, move one up
-        outputDir = outputDir.getParentFile();
-        Assert.assertNotNull( outputDir );
-        Assert.assertTrue( outputDir.isDirectory() );
-        Assert.assertEquals( "target", outputDir.getName() );
-        return outputDir;
-    }
-
     private static Directory ontologyDirectory;
 
     @BeforeClass
     public static void buildIndex() throws Exception {
-
-        final URL goUrl = new URL( "http://www.geneontology.org/ontology/gene_ontology_edit.obo" );
-//        final URL goUrl = new URL( "file:C:\\Documents and Settings\\Samuel\\Desktop\\gene_ontology_edit.obo" );
-        final URL psimiUrl = new URL( "http://psidev.sourceforge.net/mi/rel25/data/psi-mi25.obo" );
-        //IntActDocumentBuilderTest.class.getResource( "/ontologies/go_slim.obo" ).toURI();
-        File f = new File( getTargetDirectory(), "ontologyIndex" );
-        ontologyDirectory = FSDirectory.getDirectory( f );
-        OntologyIndexWriter writer = new OntologyIndexWriter( ontologyDirectory, true );
-
-        addOntologyToIndex( goUrl, "GO",writer );
-        addOntologyToIndex( psimiUrl, "MI", writer );
-
-        writer.flush();
-        writer.optimize();
-        writer.close();
-    }
-
-    private static void addOntologyToIndex( URL goUrl, String ontology, OntologyIndexWriter writer ) throws OBOParseException,
-                                                                                                            IOException {
-        OboOntologyIterator iterator = new OboOntologyIterator( ontology, goUrl );
-        while ( iterator.hasNext() ) {
-            final OntologyDocument ontologyDocument = iterator.next();
-            writer.addDocument( ontologyDocument );
-        }
+        ontologyDirectory = TestHelper.buildDefaultOntologiesIndex();
     }
 
     @Test
