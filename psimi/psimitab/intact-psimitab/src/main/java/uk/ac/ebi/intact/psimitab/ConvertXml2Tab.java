@@ -196,7 +196,7 @@ public class ConvertXml2Tab {
         // build Ontology Name Finder
         OntologyNameFinder finder = new OntologyNameFinder( OntologyIndexPath );
         for ( String name : ontologyNameToAutocomplete ) {
-            finder.addDatabaseName( name );
+            finder.addOntologyName( name );
         }
 
         // now start conversion

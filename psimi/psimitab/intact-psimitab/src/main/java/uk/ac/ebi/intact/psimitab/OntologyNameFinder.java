@@ -54,7 +54,7 @@ public class OntologyNameFinder {
         }
     }
 
-    public void addDatabaseName( String name ) {
+    public void addOntologyName( String name ) {
         if ( name == null ) {
             throw new IllegalArgumentException( "You must give a non null ontology name" );
         }
