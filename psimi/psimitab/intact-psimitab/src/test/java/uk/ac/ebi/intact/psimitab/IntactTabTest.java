@@ -123,32 +123,29 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
 
         // now onto intact specific fields
 
-        Assert.assertEquals( 1, bi.getExperimentalRolesInteractorA().size() );
-        Assert.assertTrue( bi.getExperimentalRolesInteractorA().contains( new CrossReferenceImpl( "psi-mi", "MI:0498", "prey" ) ) );
+        Assert.assertEquals( 1, bi.getInteractorA().getExperimentalRoles().size() );
+        Assert.assertTrue( bi.getInteractorA().getExperimentalRoles().contains( new CrossReferenceImpl( "psi-mi", "MI:0498", "prey" ) ) );
 
-        Assert.assertEquals( 1, bi.getExperimentalRolesInteractorB().size() );
-        Assert.assertTrue( bi.getExperimentalRolesInteractorB().contains( new CrossReferenceImpl( "psi-mi", "MI:0496", "bait" ) ) );
+        Assert.assertEquals( 1, bi.getInteractorB().getExperimentalRoles().size() );
+        Assert.assertTrue( bi.getInteractorB().getExperimentalRoles().contains( new CrossReferenceImpl( "psi-mi", "MI:0496", "bait" ) ) );
 
-        Assert.assertEquals( 1, bi.getBiologicalRolesInteractorA().size() );
-        Assert.assertTrue( bi.getBiologicalRolesInteractorA().contains( new CrossReferenceImpl( "psi-mi", "MI:0499", "unspecified role" ) ) );
+        Assert.assertEquals( 1, bi.getInteractorA().getBiologicalRoles().size() );
+        Assert.assertTrue( bi.getInteractorA().getBiologicalRoles().contains( new CrossReferenceImpl( "psi-mi", "MI:0499", "unspecified role" ) ) );
 
-        Assert.assertEquals( 1, bi.getBiologicalRolesInteractorB().size() );
-        Assert.assertTrue( bi.getBiologicalRolesInteractorB().contains( new CrossReferenceImpl( "psi-mi", "MI:0499", "unspecified role" ) ) );
+        Assert.assertEquals( 1, bi.getInteractorB().getBiologicalRoles().size() );
+        Assert.assertTrue( bi.getInteractorB().getBiologicalRoles().contains( new CrossReferenceImpl( "psi-mi", "MI:0499", "unspecified role" ) ) );
 
-        Assert.assertEquals( 3, bi.getPropertiesA().size() );
-        Assert.assertTrue( bi.getPropertiesA().contains( new CrossReferenceImpl( "uniprotkb", "O35482" ) ) );
-        Assert.assertTrue( bi.getPropertiesA().contains( new CrossReferenceImpl( "rgd", "3159" ) ) );
-        Assert.assertTrue( bi.getPropertiesA().contains( new CrossReferenceImpl( "ensembl", "ENSRNOG00000008716" ) ) );
+        Assert.assertEquals( 3, bi.getInteractorA().getProperties().size() );
+        Assert.assertTrue( bi.getInteractorA().getProperties().contains( new CrossReferenceImpl( "uniprotkb", "O35482" ) ) );
+        Assert.assertTrue( bi.getInteractorA().getProperties().contains( new CrossReferenceImpl( "rgd", "3159" ) ) );
+        Assert.assertTrue( bi.getInteractorA().getProperties().contains( new CrossReferenceImpl( "ensembl", "ENSRNOG00000008716" ) ) );
 
-        Assert.assertEquals( 2, bi.getPropertiesB().size() );
-        Assert.assertTrue( bi.getPropertiesB().contains( new CrossReferenceImpl( "go", "GO:0005737", "C:cytoplasm" ) ) );
-        Assert.assertTrue( bi.getPropertiesB().contains( new CrossReferenceImpl( "interpro", "IPR001589", "Actbind_actnin" ) ) );
+        Assert.assertEquals( 2, bi.getInteractorB().getProperties().size() );
+        Assert.assertTrue( bi.getInteractorB().getProperties().contains( new CrossReferenceImpl( "go", "GO:0005737", "C:cytoplasm" ) ) );
+        Assert.assertTrue( bi.getInteractorB().getProperties().contains( new CrossReferenceImpl( "interpro", "IPR001589", "Actbind_actnin" ) ) );
 
-        Assert.assertEquals( 1, bi.getInteractorTypeA().size() );
-        Assert.assertTrue( bi.getInteractorTypeA().contains( new CrossReferenceImpl( "psi-mi", "MI:0326", "protein" ) ) );
-
-        Assert.assertEquals( 1, bi.getInteractorTypeB().size() );
-        Assert.assertTrue( bi.getInteractorTypeB().contains( new CrossReferenceImpl( "psi-mi", "MI:0326", "protein" ) ) );
+        Assert.assertEquals( bi.getInteractorA().getInteractorType(), new CrossReferenceImpl( "psi-mi", "MI:0326", "protein" ) );
+        Assert.assertEquals( bi.getInteractorB().getInteractorType(), new CrossReferenceImpl( "psi-mi", "MI:0326", "protein" ) );
 
         Assert.assertEquals( 1, bi.getHostOrganism().size() );
         Assert.assertTrue( bi.getHostOrganism().contains( new CrossReferenceImpl( "yeast", "4932" ) ) );
@@ -181,10 +178,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         Assert.assertEquals("ic50C", interactionParameter.getType());
         Assert.assertEquals("300", interactionParameter.getValue());
 
-
-
         // now write it back into a String
-
         IntactPsimiTabWriter writer = new IntactPsimiTabWriter( false, false );
         writer.setHeaderEnabled( false );
         StringWriter sw = new StringWriter( );
@@ -250,7 +244,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
-        Xml2Tab x2t = new IntactXml2Tab( false, false );
+        Xml2Tab x2t = new IntactXml2Tab();
 
         x2t.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         x2t.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "psi-mi", "MI:0469", "intact" ) );

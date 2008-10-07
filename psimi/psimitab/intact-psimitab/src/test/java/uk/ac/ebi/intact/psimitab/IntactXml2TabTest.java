@@ -29,11 +29,11 @@ import java.io.File;
 import java.util.Collection;
 
 /**
- * TODO comment that class header
+ * IntactXml2Tab Tester.
  *
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id$
- * @since TODO specify the maven artifact version
+ * @since 2.0.2
  */
 public class IntactXml2TabTest extends AbstractPsimitabTestCase {
 
@@ -43,7 +43,7 @@ public class IntactXml2TabTest extends AbstractPsimitabTestCase {
         assertTrue( xmlFile.canRead() );
 
         // convert into Tab object model
-        Xml2Tab xml2tab = new IntactXml2Tab( false, false );
+        Xml2Tab xml2tab = new IntactXml2Tab();
 
         xml2tab.setExpansionStrategy( new SpokeWithoutBaitExpansion() );
         xml2tab.addOverrideSourceDatabase( CrossReferenceFactory.getInstance().build( "MI", "0469", "intact" ) );
@@ -55,10 +55,10 @@ public class IntactXml2TabTest extends AbstractPsimitabTestCase {
         for ( BinaryInteraction bi : interactions ) {
             IntactBinaryInteraction dbi = ( IntactBinaryInteraction ) bi;
             assertTrue( dbi.getAuthors().get( 0 ).getName().contains( "Leung" ) );
-            assertTrue( dbi.hasExperimentalRolesInteractorA() );
-            assertTrue( dbi.hasExperimentalRolesInteractorB() );
-            assertTrue( dbi.hasPropertiesA() );
-            assertTrue( dbi.hasPropertiesB() );
+            assertTrue( dbi.getInteractorA().hasExperimentalRoles() );
+            assertTrue( dbi.getInteractorB().hasExperimentalRoles() );
+            assertTrue( dbi.getInteractorA().hasProperties() );
+            assertTrue( dbi.getInteractorB().hasProperties() );
         }
     }
 }

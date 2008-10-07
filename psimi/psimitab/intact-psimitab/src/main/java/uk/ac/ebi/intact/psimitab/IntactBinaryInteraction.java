@@ -197,31 +197,49 @@ public class IntactBinaryInteraction extends AbstractBinaryInteraction<ExtendedI
         this.parameters = parameters;
     }
 
+    /**
+     * @deprecated Use respective method in the Interactor.
+     */
     @Deprecated
     public boolean hasExperimentalRolesInteractorA() {
         return interactorA.hasExperimentalRoles();
     }
 
+    /**
+     * @deprecated Use respective method in the Interactor.
+     */
     @Deprecated
     public boolean hasExperimentalRolesInteractorB() {
         return interactorB.hasExperimentalRoles();
     }
 
+    /**
+     * @deprecated Use respective method in the Interactor.
+     */
     @Deprecated
     public boolean hasPropertiesA() {
         return interactorA.hasProperties();
     }
 
+    /**
+     * @deprecated Use respective method in the Interactor.
+     */
     @Deprecated
     public boolean hasPropertiesB() {
         return interactorB.hasProperties();
     }
 
+    /**
+     * @deprecated Use respective method in the Interactor.
+     */
     @Deprecated
     public boolean hasInteractorTypeA() {
         return interactorA.hasInteractorType();
     }
 
+    /**
+     * @deprecated Use respective method in the Interactor.
+     */
     @Deprecated
     public boolean hasInteractorTypeB() {
         return interactorB.hasInteractorType();

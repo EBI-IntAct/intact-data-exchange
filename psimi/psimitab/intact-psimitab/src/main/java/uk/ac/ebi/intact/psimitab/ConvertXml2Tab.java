@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.psimitab;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.store.Directory;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.converter.xml2tab.TabConversionException;
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * Tool allowing to convert a set of XML file or directories succesptible to contain XML files into PSIMITAB.
@@ -84,10 +86,21 @@ public class ConvertXml2Tab {
      */
     private Writer logWriter;
 
+    /**
+     * Path to the index that we can use to query CV terms.
+     */
+    private Directory OntologyIndexPath;
+
+    /**
+     * Name of the ontologies we want to support when fetching the name by identifier.
+     */
+    private Collection<String> ontologyNameToAutocomplete;
+
     ////////////////////////
     // Constructor
 
     public ConvertXml2Tab() {
+        ontologyNameToAutocomplete = new ArrayList<String>( );
     }
 
     ////////////////////////
@@ -141,6 +154,18 @@ public class ConvertXml2Tab {
         this.logWriter = logWriter;
     }
 
+    public Directory getOntologyIndexPath() {
+        return OntologyIndexPath;
+    }
+
+    public void setOntologyIndexPath( Directory ontologyIndexPath ) {
+        OntologyIndexPath = ontologyIndexPath;
+    }
+
+    public void addOntologyNameToAutocomplete( String name ) {
+        ontologyNameToAutocomplete.add( name );
+    }
+
     ///////////////////////////
     // Conversion
 
@@ -168,12 +193,17 @@ public class ConvertXml2Tab {
             throw new IllegalArgumentException(outputFile.getName() + " is not writable. abort.");
         }
 
+        // build Ontology Name Finder
+        OntologyNameFinder finder = new OntologyNameFinder( OntologyIndexPath );
+        for ( String name : ontologyNameToAutocomplete ) {
+            finder.addDatabaseName( name );
+        }
+
         // now start conversion
-        Xml2Tab x2t = new IntactXml2Tab();
+        Xml2Tab x2t = new IntactXml2Tab( finder );
 
         // Makes sure the database source is well set.
-        x2t.addOverrideSourceDatabase(new CrossReferenceImpl("psi-mi", "MI:0469", "intact")
-);
+        x2t.addOverrideSourceDatabase(new CrossReferenceImpl("psi-mi", "MI:0469", "intact") );
 
         x2t.setExpansionStrategy(expansionStragegy);
 

@@ -23,12 +23,10 @@ import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
  */
 public class IntactXml2Tab extends Xml2Tab {
 
-    public IntactXml2Tab( boolean goTermAutocompletionEnabled,
-                          boolean interproTermAutocompletionEnabled ) {
-        super(new IntactInteractionConverter(goTermAutocompletionEnabled, interproTermAutocompletionEnabled));
+    public IntactXml2Tab( OntologyNameFinder finder ) {
+        super(new IntactInteractionConverter( finder ) );
     }
 
     public IntactXml2Tab() {
-        this( true, true );
     }
 }

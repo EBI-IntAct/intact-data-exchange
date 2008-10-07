@@ -37,12 +37,12 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.io.InputStream;
+import java.io.IOException;
 
 import net.sf.ehcache.CacheManager;
 
 /**
- * TODO comment that class header
+ * Interaction converter.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -55,47 +55,20 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
 
     private static final String IDENTITY_MI_REF = "MI:0356";
 
-    private static final URL INTERPRO_FTP_URL;
-
-    static {
-        try {
-            INTERPRO_FTP_URL = new URL("ftp://ftp.ebi.ac.uk/pub/databases/interpro/entry.list");
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private boolean goTermNameAutoCompletion;
-
-    private boolean interproNameAutoCompletion;
-
-    /**
-     * Query is used for GOTerm Name AutoCompletion
-     */
-    private GoTermHandler goHandler;
-
-    /**
-     * Query is used for Interpro Name AutoCompletion
-     */
-    private InterproNameHandler interproHandler;
+    private OntologyNameFinder finder;
 
     private IntactInteractorConverter interactorConverter;
 
+    //////////////////
+    // Constructors
+
     public IntactInteractionConverter() {
-        this(true, true);
-    }
-
-    public IntactInteractionConverter(boolean goTermNameAutoCompletion, boolean interproNameAutoCompletion) {
-        this(new GoTermHandler(), new InterproNameHandler(INTERPRO_FTP_URL), goTermNameAutoCompletion, interproNameAutoCompletion);
-    }
-
-    public IntactInteractionConverter(GoTermHandler goHandler, InterproNameHandler interproHandler, boolean goTermNameAutoCompletion, boolean interproNameAutoCompletion) {
-        this.goHandler = goHandler;
-        this.interproHandler = interproHandler;
-        this.goTermNameAutoCompletion = goTermNameAutoCompletion;
-        this.interproNameAutoCompletion = interproNameAutoCompletion;
-
         this.interactorConverter = new IntactInteractorConverter();
+    }
+
+    public IntactInteractionConverter( OntologyNameFinder finder ) {
+        this();
+        this.finder = finder;
     }
 
     protected BinaryInteraction newBinaryInteraction(Interactor interactorA, Interactor interactorB) {
@@ -109,9 +82,15 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
     public BinaryInteraction toMitab( Interaction interaction,
                                       final ExpansionStrategy expansionStrategy,
                                       final boolean isExpanded ) throws TabConversionException {
+
         IntactBinaryInteraction binaryInteraction = (IntactBinaryInteraction) super.toMitab(interaction, expansionStrategy, isExpanded);
 
-        process(binaryInteraction, interaction);
+        try {
+            process(binaryInteraction, interaction);
+        } catch ( IOException e ) {
+            throw new TabConversionException( "An error occured while processing binary interaction: " +
+                                              binaryInteraction, e );
+        }
 
         if (isExpanded) {
             binaryInteraction.getExpansionMethods().add(expansionStrategy.getName());
@@ -140,7 +119,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
      * @param bi
      * @param interaction
      */
-    public void process( IntactBinaryInteraction bi, Interaction interaction ) {
+    public void process( IntactBinaryInteraction bi, Interaction interaction ) throws IOException {
 
         if ( interaction.getParticipants().size() != 2 ) {
             if ( log.isDebugEnabled() )
@@ -458,7 +437,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
      * @param participant
      * @return list of properties
      */
-    private List<CrossReference> extractProperties( Participant participant ) {
+    private List<CrossReference> extractProperties( Participant participant ) throws IOException {
         List<CrossReference> properties = new ArrayList<CrossReference>();
         for ( DbReference dbref : participant.getInteractor().getXref().getSecondaryRef() ) {
             String id, db, text = null;
@@ -466,11 +445,8 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             id = dbref.getId();
             db = dbref.getDb();
 
-            if ( goTermNameAutoCompletion && dbref.getDb().equalsIgnoreCase( "GO" ) ) {
-                text = fetchGoNameFromWebservice( id );
-            }
-            if ( interproNameAutoCompletion && dbref.getDb().equalsIgnoreCase( "Interpro" ) ) {
-                text = fetchInterproNameFromInterproNameHandler( id );
+            if( finder.isOntologySupported( db ) ) {
+                text = finder.getNameByIdentifier( id );
             }
 
             if ( dbref.getRefTypeAc() == null ) {
@@ -482,29 +458,5 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             }
         }
         return properties;
-    }
-
-    /**
-     * Fetch the GoTerm of a specific GO identifier from Intact OLS-Webservice.
-     *
-     * @param id GO identifier
-     * @return GOTerm
-     */
-    private String fetchGoNameFromWebservice( String id ) {
-        try {
-            return goHandler.getNameById(id);
-        } catch (RemoteException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Fetch the Interpro name of a specific Interpro Id from a interpro-entryFile
-     *
-     * @param id Interpro identifier
-     * @return Interpro name
-     */
-    private String fetchInterproNameFromInterproNameHandler( String id ) {
-        return interproHandler.getNameById( id );
     }
 }
