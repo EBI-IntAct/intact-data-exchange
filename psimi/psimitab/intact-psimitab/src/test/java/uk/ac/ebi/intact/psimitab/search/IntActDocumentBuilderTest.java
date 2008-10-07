@@ -8,9 +8,9 @@ import junit.framework.Assert;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.obo.dataadapter.OBOParseException;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.obo.dataadapter.OBOParseException;
 import psidev.psi.mi.search.util.DocumentBuilder;
 import psidev.psi.mi.tab.model.builder.Column;
 import psidev.psi.mi.tab.model.builder.CrossReferenceFieldBuilder;
@@ -34,7 +34,6 @@ import java.util.List;
 /**
  * IntActDocumentBuilder Tester.
  *
- * @author Nadin Neuhauser (nneuhaus@ebi.ac.uk)
  * @version $Id$
  * @since 2.0.0
  */
@@ -57,7 +56,7 @@ public class IntActDocumentBuilderTest {
     @BeforeClass
     public static void buildIndex() throws Exception {
 
-//        final URL goUrl = new URL( "http://www.geneontology.org/ontology/gene_ontology_edit.obo" );
+        final URL goUrl = new URL( "http://www.geneontology.org/ontology/gene_ontology_edit.obo" );
 //        final URL goUrl = new URL( "file:C:\\Documents and Settings\\Samuel\\Desktop\\gene_ontology_edit.obo" );
         final URL psimiUrl = new URL( "http://psidev.sourceforge.net/mi/rel25/data/psi-mi25.obo" );
         //IntActDocumentBuilderTest.class.getResource( "/ontologies/go_slim.obo" ).toURI();
@@ -65,7 +64,7 @@ public class IntActDocumentBuilderTest {
         ontologyDirectory = FSDirectory.getDirectory( f );
         OntologyIndexWriter writer = new OntologyIndexWriter( ontologyDirectory, true );
 
-//        addOntologyToIndex( goUrl, "GO",writer );
+        addOntologyToIndex( goUrl, "GO",writer );
         addOntologyToIndex( psimiUrl, "MI", writer );
 
         writer.flush();
@@ -240,45 +239,15 @@ public class IntActDocumentBuilderTest {
         Column colWithParents = new Column( fieldsWithParentsProperties );
         final String[] strings = colWithParents.toString().split( "\\|" );
 
-        /*GO:0005634(nucleus)
-           GO:0043229(intracellular organelle)
-           GO:0044464(cell part)
-           GO:0043226(organelle)
-           GO:0044424(intracellular part)
-           GO:0043227(membrane-bounded organelle)
-           GO:0005622(intracellular)
-           GO:0005623(cell)
-           GO:0043231(intracellular membrane-bounded organelle)
-        */
-
-        int countProperty = 0;
-
-        for ( String string : strings ) {
-            if ( string.equals( "go:\"GO:0005634\"(nucleus)" ) ) {
-                countProperty++;
-            }
-            if ( string.equals( "go:\"GO:0044464\"(cell part)" ) ) {
-                countProperty++;
-            }
-            if ( string.equals( "go:\"GO:0043226\"(organelle)" ) ) {
-                countProperty++;
-            }
-            if ( string.equals( "go:\"GO:0044424\"(intracellular part)" ) ) {
-                countProperty++;
-            }
-            if ( string.equals( "go:\"GO:0043227\"(membrane-bounded organelle)" ) ) {
-                countProperty++;
-            }
-            if ( string.equals( "go:\"GO:0005622\"(intracellular)" ) ) {
-                countProperty++;
-            }
-            if ( string.equals( "go:\"GO:0005623\"(cell)" ) ) {
-                countProperty++;
-            }
-            if ( string.equals( "go:\"GO:0043231\"(intracellular membrane-bounded organelle)" ) ) {
-                countProperty++;
-            }
-        }
-        Assert.assertEquals( 8, countProperty );
+        Collection<String> results = Arrays.asList( strings );
+        Assert.assertTrue( results.contains( "go:\"GO:0005634\"(nucleus)"                                   ) );
+        Assert.assertTrue( results.contains( "go:\"GO:0005634\"(nucleus)"                                   ) );
+        Assert.assertTrue( results.contains( "go:\"GO:0044464\"(cell part)"                                 ) );
+        Assert.assertTrue( results.contains( "go:\"GO:0043226\"(organelle)"                                 ) );
+        Assert.assertTrue( results.contains( "go:\"GO:0044424\"(intracellular part)"                        ) );
+        Assert.assertTrue( results.contains( "go:\"GO:0043227\"(membrane-bounded organelle)"                ) );
+        Assert.assertTrue( results.contains( "go:\"GO:0005622\"(intracellular)"                             ) );
+        Assert.assertTrue( results.contains( "go:\"GO:0005623\"(cell)"                                      ) );
+        Assert.assertTrue( results.contains( "go:\"GO:0043231\"(intracellular membrane-bounded organelle)"  ) );
     }
 }
