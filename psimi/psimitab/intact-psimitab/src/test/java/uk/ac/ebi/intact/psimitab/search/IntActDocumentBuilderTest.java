@@ -197,8 +197,6 @@ public class IntActDocumentBuilderTest {
         Assert.assertTrue( results.contains( "psi-mi:\"MI:0915\"(physical association)" ) );
         Assert.assertTrue( results.contains( "psi-mi:\"MI:0914\"(association)" ) );
         Assert.assertTrue( results.contains( "psi-mi:\"MI:0407\"(direct interaction)" ) );
-
-
     }
 
     @Test
@@ -213,23 +211,16 @@ public class IntActDocumentBuilderTest {
         List<Field> fieldsWithParentsDetMethod = builder.getListOfFieldsWithParents( fieldBuilder.createField( "MI:0045(experimental interaction detection)" ) );
 
         Assert.assertNotNull( fieldsWithParentsDetMethod );
-        Assert.assertEquals( 2, fieldsWithParentsDetMethod.size() );
+        Assert.assertEquals( 3, fieldsWithParentsDetMethod.size() );
 
         Column colWithParentsDetMethod = new Column( fieldsWithParentsDetMethod );
         //"MI:0045(experimental interaction detection)|MI:0001(interaction detection method)"
         String[] colsDetMethod = colWithParentsDetMethod.toString().split( "\\|" );
 
-        int countDetMethod = 0;
-        for ( String col : colsDetMethod ) {
-            if ( col.equals( "psi-mi:\"MI:0045\"(experimental interaction detection)" ) ) {
-                countDetMethod++;
-            }
-            if ( col.equals( "psi-mi:\"MI:0001\"(interaction detection method)" ) ) {
-                countDetMethod++;
-            }
-        }
-
-        Assert.assertEquals( 2, countDetMethod );
+        Collection<String> results = Arrays.asList( colsDetMethod );
+        Assert.assertTrue( results.contains( "psi-mi:\"MI:0000\"(molecular interaction)" ) );
+        Assert.assertTrue( results.contains( "psi-mi:\"MI:0001\"(interaction detection method)" ) );
+        Assert.assertTrue( results.contains( "psi-mi:\"MI:0045\"(experimental interaction detection)" ) );
     }
 
     @Test
@@ -237,8 +228,6 @@ public class IntActDocumentBuilderTest {
 
         IntactDocumentBuilder builder = new IntactDocumentBuilder( ontologyDirectory );
         builder.addExpandableOntology( "GO" );
-        builder.addExpandableOntology( "MI" );
-        builder.addExpandableOntology( "psi-mi" );
 
         //String goIdentifier = "go:\"GO:0030056";
         FieldBuilder fieldBuilder = new CrossReferenceFieldBuilder();
