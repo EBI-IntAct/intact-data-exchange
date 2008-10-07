@@ -23,6 +23,7 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactInteractorConverter;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
@@ -78,7 +79,7 @@ public class InteractionConverter {
         uk.ac.ebi.intact.model.Interactor intactInteractorB = iterator.next().getInteractor();
 
         InteractorConverter interactorConverter = new InteractorConverter();
-
+        
         ExtendedInteractor interactorA = interactorConverter.toMitab( intactInteractorA, interaction );
         ExtendedInteractor interactorB = interactorConverter.toMitab( intactInteractorB, interaction );
 
@@ -141,8 +142,7 @@ public class InteractionConverter {
             for ( Experiment experiment : interaction.getExperiments() ) {
                     for ( Xref xref : experiment.getXrefs() ) {
                         if ( xref.getCvXrefQualifier() != null && xref.getCvDatabase().getShortLabel() != null ) {
-                            CvObjectXref idref = CvObjectUtils.getPsiMiIdentityXref( xref.getCvXrefQualifier() );
-                            if ( idref != null && idref.getPrimaryId() != null && idref.getPrimaryId().equals( CvXrefQualifier.PRIMARY_REFERENCE_MI_REF ) ) {
+                            if ( CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier()) ) {
                                 CrossReference publication = CrossReferenceFactory.getInstance()
                                         .build( xref.getCvDatabase().getShortLabel(), xref.getPrimaryId() );
                                 publications.add( publication );
@@ -184,8 +184,7 @@ public class InteractionConverter {
             List<String> datasets = new ArrayList<String>();
             for ( Experiment experiment : interaction.getExperiments() ) {
                 for ( Annotation annotation : experiment.getAnnotations() ) {
-                    CvObjectXref idXref = CvObjectUtils.getPsiMiIdentityXref( annotation.getCvTopic() );
-                    if ( idXref != null && idXref.getPrimaryId() != null && idXref.getPrimaryId().equals( CvTopic.DATASET_MI_REF ) ) {
+                    if ( CvTopic.DATASET_MI_REF.equals(annotation.getCvTopic().getIdentifier()) ) {
                         datasets.add( annotation.getAnnotationText() );
                     }
                 }
