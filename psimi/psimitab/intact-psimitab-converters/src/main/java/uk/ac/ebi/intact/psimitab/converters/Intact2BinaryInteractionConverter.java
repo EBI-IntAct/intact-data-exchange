@@ -123,7 +123,9 @@ public class Intact2BinaryInteractionConverter {
             }
         }
 
-        result = doPostProcessing( result );
+        if (!result.isEmpty()) {
+            result = doPostProcessing( result );
+        }
         
         return result;
     }

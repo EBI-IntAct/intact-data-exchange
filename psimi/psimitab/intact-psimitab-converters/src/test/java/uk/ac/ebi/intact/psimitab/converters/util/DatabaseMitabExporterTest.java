@@ -21,8 +21,10 @@ import org.apache.lucene.store.RAMDirectory;
 import org.junit.*;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.bridges.ontologies.util.OntologyUtils;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
@@ -61,11 +63,13 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
     @Before
     public void before() throws Exception {
         exporter = new DatabaseMitabExporter(ontologiesDir, "go");
+        SchemaUtils.createSchema();
     }
 
     @After
     public void after() throws Exception {
         exporter = null;
+        IntactContext.closeCurrentInstance();
     }
 
     @Test
@@ -77,6 +81,8 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         interactor.addXref(getMockBuilder().createXref(interactor, "GO:0007028", null, goDb));
 
         PersisterHelper.saveOrUpdate(interaction);
+
+        Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
 
         StringWriter mitabWriter = new StringWriter();
         Directory interactionsDir = new RAMDirectory("interactions");
@@ -110,6 +116,8 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         interactor.addXref(getMockBuilder().createXref(interactor, "GO:0007028", null, goDb));
 
         PersisterHelper.saveOrUpdate(interaction);
+
+        Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
 
         StringWriter mitabWriter = new StringWriter();
         Directory interactionsDir = new RAMDirectory("interactions");
