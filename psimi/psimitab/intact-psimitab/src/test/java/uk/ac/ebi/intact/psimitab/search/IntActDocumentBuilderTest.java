@@ -137,7 +137,7 @@ public class IntActDocumentBuilderTest {
 
         //interaction detection method MI:0045 (experimental interaction detection)
         FieldBuilder fieldBuilder = new CrossReferenceFieldBuilder();
-        List<Field> fieldsWithParentsDetMethod = builder.getListOfFieldsWithParents( fieldBuilder.createField( "psi-mi\"MI:0045\"(experimental interaction detection)" ) );
+        List<Field> fieldsWithParentsDetMethod = builder.getListOfFieldsWithParents( fieldBuilder.createField( "psi-mi:\"MI:0045\"(experimental interaction detection)" ) );
 
         Assert.assertNotNull( fieldsWithParentsDetMethod );
         Assert.assertEquals( 3, fieldsWithParentsDetMethod.size() );
