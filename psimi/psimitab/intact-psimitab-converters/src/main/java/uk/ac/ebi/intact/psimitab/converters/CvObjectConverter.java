@@ -48,6 +48,7 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
 
         String text = cvObject.getShortLabel();
         String identity = cvObject.getIdentifier();
+
         if(identity == null ) {
             throw new NullPointerException( cvObject.getClass().getSimpleName() + "("+ text +") didn't have an identity" );
         }

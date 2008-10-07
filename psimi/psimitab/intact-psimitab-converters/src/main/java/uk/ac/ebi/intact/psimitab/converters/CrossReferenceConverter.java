@@ -45,52 +45,39 @@ public class CrossReferenceConverter<T extends Xref> {
      *                     if is false all CrossReferences without CvXrefQualifier equals identiy will be returned
      * @return List of CrossReferences sorted by CvXrefQualifier
      */
-    public List<CrossReference> toCrossReferences( Collection<T> xrefs, boolean onlyIdentity, boolean withText ) {
-        if ( xrefs == null ) {
-            throw new IllegalArgumentException( "Xref must not be null. " );
+    public List<CrossReference> toCrossReferences(Collection<T> xrefs, boolean onlyIdentity, boolean withText) {
+        if (xrefs == null) {
+            throw new IllegalArgumentException("Xref must not be null. ");
         }
 
         List<CrossReference> crossReferences = new ArrayList<CrossReference>();
 
-        for ( Xref xref : xrefs ) {
+        for (Xref xref : xrefs) {
 
-            String db = xref.getCvDatabase().getShortLabel();
-            String id = xref.getPrimaryId();
-
-            if ( id != null && db != null ) {
-
-                try {
-                    String qualifier = xref.getCvXrefQualifier().getShortLabel();
-                    CrossReference ref;
-                    if ( withText && xref.getSecondaryId() != null ) {
-                        ref = CrossReferenceFactory.getInstance().build( db, id, xref.getSecondaryId() );
-                    } else {
-                        ref = CrossReferenceFactory.getInstance().build( db, id );
+                if (onlyIdentity) {
+                    if (CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                        CrossReference ref = createCrossReference(xref, withText);
+                        if (ref != null) crossReferences.add(ref);
                     }
-
-                    if ( onlyIdentity ) {
-                        if ( qualifier.equals( CvXrefQualifier.IDENTITY ) ) {
-                            crossReferences.add( ref );
-                        }
-                    } else {
-                        if ( !qualifier.equals( CvXrefQualifier.IDENTITY ) ) {
-                            crossReferences.add( ref );
-                        }
-                    }
-
-                } catch ( Exception e ) {
-                    if ( !onlyIdentity ) {
-                        CrossReference ref;
-                        if ( withText && xref.getSecondaryId() != null) {
-                            ref = CrossReferenceFactory.getInstance().build( db, id, xref.getSecondaryId() );
-                        } else {
-                            ref = CrossReferenceFactory.getInstance().build( db, id );
-                        }
-                        crossReferences.add( ref );
+                } else {
+                    if (!CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                        CrossReference ref = createCrossReference(xref, withText);
+                        if (ref != null) crossReferences.add(ref);
                     }
                 }
-            }
         }
         return crossReferences;
+    }
+
+    private CrossReference createCrossReference(Xref xref, boolean withText) {
+        CrossReference ref = null;
+        String db = xref.getCvDatabase().getShortLabel();
+        String id = xref.getPrimaryId();
+
+        if (id != null && db != null) {
+            String secondaryId = (withText && xref.getSecondaryId() != null) ? xref.getSecondaryId() : null;
+            ref = CrossReferenceFactory.getInstance().build(db, id, secondaryId);
+        }
+        return ref;
     }
 }

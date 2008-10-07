@@ -85,11 +85,13 @@ public class InteractionConverter {
 
         IntactBinaryInteraction bi = new IntactBinaryInteraction( interactorA, interactorB );
 
+        final Collection<Experiment> experiments = interaction.getExperiments();
+        
         // set authors
         List<Author> authors = new ArrayList<Author>();
-        if ( interaction.getExperiments() != null ) {
-            if (!interaction.getExperiments().isEmpty()) {
-                Experiment experiment = interaction.getExperiments().iterator().next();
+        if ( experiments != null ) {
+            if (!experiments.isEmpty()) {
+                Experiment experiment = experiments.iterator().next();
 
                 Annotation authorAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.AUTHOR_LIST_MI_REF);
                 Annotation yearAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.PUBLICATION_YEAR_MI_REF);
@@ -111,8 +113,8 @@ public class InteractionConverter {
 
         // set interaction detection method
         List<InteractionDetectionMethod> detectionMethods = new ArrayList<InteractionDetectionMethod>();
-        if ( interaction.getExperiments() != null ) {
-            for ( Experiment experiment : interaction.getExperiments() ) {
+        if ( experiments != null ) {
+            for ( Experiment experiment : experiments) {
                 if ( experiment.getCvInteraction() != null ) {
                     detectionMethods.add( ( InteractionDetectionMethod ) cvObjectConverter.
                             toCrossReference( InteractionDetectionMethodImpl.class, experiment.getCvInteraction() ) );
@@ -138,8 +140,8 @@ public class InteractionConverter {
 
         // set publication list
         List<CrossReference> publications = new ArrayList<CrossReference>();
-        if ( interaction.getExperiments() != null ) {
-            for ( Experiment experiment : interaction.getExperiments() ) {
+        if ( experiments != null ) {
+            for ( Experiment experiment : experiments) {
                     for ( Xref xref : experiment.getXrefs() ) {
                         if ( xref.getCvXrefQualifier() != null && xref.getCvDatabase().getShortLabel() != null ) {
                             if ( CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier()) ) {
@@ -170,7 +172,7 @@ public class InteractionConverter {
 
         // set host organism
         List<CrossReference> hostOrganisms = new ArrayList<CrossReference>();
-        for ( Experiment experiment : interaction.getExperiments() ) {
+        for ( Experiment experiment : experiments) {
             String id = experiment.getBioSource().getTaxId();
             if ( id != null ) {
                 String text = experiment.getBioSource().getShortLabel();
@@ -180,9 +182,9 @@ public class InteractionConverter {
         bi.setHostOrganism( hostOrganisms );
 
         // set dataset
-        if ( interaction.getExperiments() != null ) {
+        if ( experiments != null ) {
             List<String> datasets = new ArrayList<String>();
-            for ( Experiment experiment : interaction.getExperiments() ) {
+            for ( Experiment experiment : experiments) {
                 for ( Annotation annotation : experiment.getAnnotations() ) {
                     if ( CvTopic.DATASET_MI_REF.equals(annotation.getCvTopic().getIdentifier()) ) {
                         datasets.add( annotation.getAnnotationText() );
