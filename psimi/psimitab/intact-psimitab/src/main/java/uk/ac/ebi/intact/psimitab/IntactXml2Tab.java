@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.psimitab;
 
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
+import psidev.psi.mi.xml.PsimiXmlReader;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -28,5 +29,6 @@ public class IntactXml2Tab extends Xml2Tab {
     }
 
     public IntactXml2Tab() {
+        super(new IntactInteractionConverter() );
     }
 }

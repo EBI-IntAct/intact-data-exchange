@@ -191,7 +191,6 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
         Assert.assertEquals( mitab, line );
     }
 
-
     @Test
     public void expansion() throws Exception {
 

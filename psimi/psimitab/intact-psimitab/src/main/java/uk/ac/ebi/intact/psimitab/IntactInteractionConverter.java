@@ -445,7 +445,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             id = dbref.getId();
             db = dbref.getDb();
 
-            if( finder.isOntologySupported( db ) ) {
+            if( finder!= null && finder.isOntologySupported( db ) ) {
                 text = finder.getNameByIdentifier( id );
             }
 

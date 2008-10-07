@@ -29,10 +29,10 @@ public class IntactClusterInteractorPairProcessor extends ClusterInteractorPairP
     @Override
     protected void mergeCollections(IntactBinaryInteraction source, IntactBinaryInteraction target) {
         super.mergeCollections(source, target);
-        mergeCollection(source.getExperimentalRolesInteractorA(), target.getExperimentalRolesInteractorA());
-        mergeCollection(source.getExperimentalRolesInteractorB(), target.getExperimentalRolesInteractorB());
-        mergeCollection(source.getBiologicalRolesInteractorA(), target.getBiologicalRolesInteractorA());
-        mergeCollection(source.getBiologicalRolesInteractorB(), target.getBiologicalRolesInteractorB());
+        mergeCollection(source.getInteractorA().getExperimentalRoles(), target.getInteractorA().getExperimentalRoles());
+        mergeCollection(source.getInteractorB().getExperimentalRoles(), target.getInteractorB().getExperimentalRoles());
+        mergeCollection(source.getInteractorA().getBiologicalRoles(), target.getInteractorA().getBiologicalRoles());
+        mergeCollection(source.getInteractorB().getBiologicalRoles(), target.getInteractorB().getBiologicalRoles());
         mergeCollection(source.getHostOrganism(), target.getHostOrganism());
         mergeCollection(source.getDataset(), target.getDataset());
     }
