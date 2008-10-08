@@ -7,21 +7,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.store.Directory;
 import psidev.psi.mi.search.util.AbstractInteractionDocumentBuilder;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
-import psidev.psi.mi.tab.model.builder.*;
+import psidev.psi.mi.tab.model.builder.Column;
+import psidev.psi.mi.tab.model.builder.MitabDocumentDefinition;
+import psidev.psi.mi.tab.model.builder.Row;
+import psidev.psi.mi.tab.model.builder.RowBuilder;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
-import uk.ac.ebi.intact.bridges.ontologies.OntologyHits;
 import uk.ac.ebi.intact.bridges.ontologies.term.LazyLoadedOntologyTerm;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 import uk.ac.ebi.intact.util.ols.OlsUtils;
-import uk.ac.ebi.intact.util.ols.Term;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.*;
 
 /**
@@ -55,6 +54,7 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
 
     public IntactDocumentBuilder( OntologyIndexSearcher ontologySearcher ) throws IOException {
         this();
+        this.ontologySearcher = ontologySearcher;
     }
 
     ///////////////////////////
@@ -224,9 +224,14 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
      * @return list of cv terms with parents and itself
      */
     private List<psidev.psi.mi.tab.model.builder.Field> getAllParents( psidev.psi.mi.tab.model.builder.Field field ) {
+        if (ontologySearcher == null) {
+            return Collections.EMPTY_LIST;
+        }
+        
         List<psidev.psi.mi.tab.model.builder.Field> allParents = null;
 
         final String type = field.getType();
+
         if ( isExpandableOntology( type ) ) {
             String identifier = field.getValue();
 

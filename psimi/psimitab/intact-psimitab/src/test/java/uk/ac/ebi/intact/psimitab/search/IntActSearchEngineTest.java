@@ -17,8 +17,11 @@ package uk.ac.ebi.intact.psimitab.search;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.store.Directory;
-import org.junit.*;
+import org.junit.After;
 import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import psidev.psi.mi.search.SearchResult;
 import psidev.psi.mi.search.Searcher;
 import psidev.psi.mi.tab.model.builder.DocumentDefinition;
@@ -37,36 +40,32 @@ public class IntActSearchEngineTest {
 
     private DocumentDefinition docDef;
 
-    private static OntologyIndexSearcher ontologyIndexSearcher;
+    private static Directory ontologyDirectory;
+    private OntologyIndexSearcher ontologyIndexSearcher;
 
     @BeforeClass
     public static void buildIndex() throws Exception {
-        Directory ontologyDirectory = TestHelper.buildDefaultOntologiesIndex();
-        ontologyIndexSearcher = new OntologyIndexSearcher(ontologyDirectory);
-    }
-
-    @AfterClass
-    public static void thePartyIsOver() throws Exception {
-        if (ontologyIndexSearcher != null) {
-            ontologyIndexSearcher.close();
-            ontologyIndexSearcher = null;
-        }
+        ontologyDirectory = TestHelper.buildDefaultOntologiesIndex();
     }
 
     @Before
-    public void before() {
+    public void before() throws Exception {
         this.docDef = new IntactDocumentDefinition();
+        this.ontologyIndexSearcher = new OntologyIndexSearcher(ontologyDirectory);
     }
 
     @After
-    public void after() {
+    public void after() throws Exception {
         this.docDef = null;
+
+        this.ontologyIndexSearcher.close();
+        ontologyIndexSearcher = null;
     }
     
     @Test
     public void testExperimentalRole() throws Exception {
 
-        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
+        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt", ontologyIndexSearcher);
         IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         String searchQuery = ("experimentalRoleA:bait");
@@ -86,7 +85,7 @@ public class IntActSearchEngineTest {
     @Test
     public void testBiologicalRole() throws Exception {
 
-        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
+        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt", ontologyIndexSearcher);
         IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         String searchQuery = ("biologicalRoleA:bait");
@@ -106,7 +105,7 @@ public class IntActSearchEngineTest {
     @Test
     public void testProperties() throws Exception {
 
-        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
+        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt", ontologyIndexSearcher);
         IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         String searchQuery = "\"GO:0006928\"";
@@ -129,7 +128,7 @@ public class IntActSearchEngineTest {
 
     @Test
     public void testProperties_usingSearcher() throws Exception {
-        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
+        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt", ontologyIndexSearcher);
         IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         SearchResult<IntactBinaryInteraction> result = Searcher.search("GO\\:0006928", searchEngine);
@@ -139,7 +138,7 @@ public class IntActSearchEngineTest {
     @Test
     public void testInteractorType() throws Exception {
 
-        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
+        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt", ontologyIndexSearcher);
         IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         String searchQuery = ("typeA:\"small molecule\"");
@@ -159,7 +158,7 @@ public class IntActSearchEngineTest {
     @Test
     public void testHostorganism() throws Exception {
 
-        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
+        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt", ontologyIndexSearcher);
         IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         String searchQuery = ("hostOrganism:\"in vitro\"");
@@ -174,7 +173,7 @@ public class IntActSearchEngineTest {
     @Test
     public void testExpansionMethod() throws Exception {
 
-        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
+        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt", ontologyIndexSearcher);
         IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         String searchQuery = ("expansion:spoke");
@@ -189,14 +188,14 @@ public class IntActSearchEngineTest {
     @Test
     public void testDataSet() throws Exception {
 
-        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt");
+        Directory indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/intact.sample-extra.txt", ontologyIndexSearcher);
         IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         String searchQuery = ("dataset:Cancer");
         SearchResult result = searchEngine.search(searchQuery, null, null);
         assertEquals(0, result.getData().size());
 
-        indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/17292829.txt");
+        indexDirectory = TestHelper.createIndexFromResource("/mitab_samples/17292829.txt", ontologyIndexSearcher);
         searchEngine = new IntactSearchEngine(indexDirectory);
 
         //searchQuery = ("dataset:\"Cancer - Interactions investigated in the context of cancer\"");
