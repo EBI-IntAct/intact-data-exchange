@@ -17,14 +17,14 @@ package uk.ac.ebi.intact.psimitab.search;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.store.Directory;
-import static org.junit.Assert.assertEquals;
 import org.junit.*;
+import static org.junit.Assert.assertEquals;
 import psidev.psi.mi.search.SearchResult;
 import psidev.psi.mi.search.Searcher;
 import psidev.psi.mi.tab.model.builder.DocumentDefinition;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
-import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 
 /**
  * IntActSearchEngine Tester.
@@ -47,8 +47,10 @@ public class IntActSearchEngineTest {
 
     @AfterClass
     public static void thePartyIsOver() throws Exception {
-        ontologyIndexSearcher.close();
-        ontologyIndexSearcher = null;
+        if (ontologyIndexSearcher != null) {
+            ontologyIndexSearcher.close();
+            ontologyIndexSearcher = null;
+        }
     }
 
     @Before
