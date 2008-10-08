@@ -44,18 +44,14 @@ public class Intact2BinaryInteractionConverter {
 
     private InteractionConverter interactionConverter = new InteractionConverter();
 
-    private Class binaryInteractionClass;
-
     private PostProcessorStrategy<IntactBinaryInteraction> postProcessor;
                                     
     public Intact2BinaryInteractionConverter() {
-        binaryInteractionClass = IntactBinaryInteraction.class;
         expansionStrategy = new SpokeWithoutBaitExpansion();
         postProcessor = new ClusterInteractorPairProcessor<IntactBinaryInteraction>();
     }
 
     public Intact2BinaryInteractionConverter(ExpansionStrategy expansionStrategy, PostProcessorStrategy<IntactBinaryInteraction> postProcessor) {
-        binaryInteractionClass = IntactBinaryInteraction.class;
         this.expansionStrategy = expansionStrategy;
         this.postProcessor = postProcessor;
     }
@@ -69,14 +65,6 @@ public class Intact2BinaryInteractionConverter {
 
     public void setExpansionStrategy( ExpansionStrategy expansionStrategy ) {
         this.expansionStrategy = expansionStrategy;
-    }
-
-    public Class getBinaryInteractionClass() {
-        return binaryInteractionClass;
-    }
-
-    public void setBinaryInteractionClass( Class binaryInteractionClass ) {
-        this.binaryInteractionClass = binaryInteractionClass;
     }
 
     public PostProcessorStrategy getPostProssesorStrategy() {

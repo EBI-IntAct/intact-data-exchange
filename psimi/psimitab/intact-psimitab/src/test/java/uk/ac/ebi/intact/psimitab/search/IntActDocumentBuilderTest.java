@@ -7,10 +7,7 @@ package uk.ac.ebi.intact.psimitab.search;
 import junit.framework.Assert;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.store.Directory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import psidev.psi.mi.search.util.DocumentBuilder;
 import psidev.psi.mi.tab.model.builder.Column;
 import psidev.psi.mi.tab.model.builder.CrossReferenceFieldBuilder;
@@ -40,6 +37,11 @@ public class IntActDocumentBuilderTest {
         ontologyDirectory = TestHelper.buildDefaultOntologiesIndex();
     }
 
+    @AfterClass
+    public static void afterMath() throws Exception {
+        ontologyDirectory.close();
+    }
+
     @Before
     public void before() throws Exception {
         this.ontologyIndexSearcher = new OntologyIndexSearcher(ontologyDirectory);
@@ -47,8 +49,10 @@ public class IntActDocumentBuilderTest {
 
     @After
     public void after() throws Exception {
-        this.ontologyIndexSearcher.close();
-        ontologyIndexSearcher = null;
+        if (ontologyIndexSearcher != null) {
+            this.ontologyIndexSearcher.close();
+            ontologyIndexSearcher = null;
+        }
     }
 
     @Test

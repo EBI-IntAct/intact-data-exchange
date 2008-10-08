@@ -61,7 +61,7 @@ public class IntActSearchEngineTest {
         this.ontologyIndexSearcher.close();
         ontologyIndexSearcher = null;
     }
-        /*
+
     @Test
     public void testExperimentalRole() throws Exception {
 
@@ -101,7 +101,7 @@ public class IntActSearchEngineTest {
         assertEquals(10, result.getData().size());
         assertEquals("Q08345", result.getData().get(0).getInteractorB().getIdentifiers().iterator().next().getIdentifier());
     }
-        */
+
     @Test
     public void testProperties() throws Exception {
 
@@ -134,7 +134,7 @@ public class IntActSearchEngineTest {
         SearchResult<IntactBinaryInteraction> result = Searcher.search("GO\\:0006928", searchEngine);
         assertEquals(8, result.getData().size());
     }
-     /*
+
     @Test
     public void testInteractorType() throws Exception {
 
@@ -229,29 +229,29 @@ public class IntActSearchEngineTest {
     public void testInteractionDetMethod() throws Exception {
 
         String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tpsi-mi:\"MI:0018\"(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tpsi-mi:\"MI:0218\"(physical interaction)\tpsi-mi:\"MI:0469\"(intact)\tintact:EBI-446356\t-\tpsi-mi:\"MI:0498\"(prey)\tpsi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\tinterpro:IPR004829|interpro:IPR010790|interpro:IPR001664|uniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716|uniprotkb:Q540Z7|uniprotkb:Q63368\tgo:0005737|go:0030056|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tpsi-mi:\"MI:0326\"(protein)\tpsi-mi:\"MI:0326\"(protein)\tyeast:4932\t-\t-\tcomment:commentA\t-";
-        Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine, ontologyIndexSearcher );
+        Directory indexDirectory = TestHelper.createIndexFromLine(psiMiTabLine, ontologyIndexSearcher);
 
-        IntactSearchEngine searchEngine = new IntactSearchEngine( indexDirectory );
+        IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         //search with exact term
-        String searchQuery = ( "detmethod_exact:\"2 hybrid\"" );
-        SearchResult<IntactBinaryInteraction> result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 1, result.getData().size() );
+        String searchQuery = ("detmethod_exact:\"2 hybrid\"");
+        SearchResult<IntactBinaryInteraction> result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
         //search with parent term
-        searchQuery = ( "detmethod:\"experimental interaction detection\"" );
-        result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 1, result.getData().size() );
+        searchQuery = ("detmethod:\"experimental interaction detection\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
         //search with parent mi
-        searchQuery = ( "detmethod:\"MI:0045\"" );
-        result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 1, result.getData().size() );
+        searchQuery = ("detmethod:\"MI:0045\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
         //search parent in exact field-should be 0
-        searchQuery = ( "detmethod_exact:\"experimental interaction detection\"" );
-        result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 0, result.getData().size() );
+        searchQuery = ("detmethod_exact:\"experimental interaction detection\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(0, result.getData().size());
 
     }
 
@@ -259,29 +259,29 @@ public class IntActSearchEngineTest {
     public void testInteractionType() throws Exception {
 
         String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tpsi-mi:\"MI:0018\"(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0469\"(intact)\tintact:EBI-446356\t-\tpsi-mi:\"MI:0498\"(prey)\tpsi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\tinterpro:IPR004829|interpro:IPR010790|interpro:IPR001664|uniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716|uniprotkb:Q540Z7|uniprotkb:Q63368\tgo:0005737|go:0030056|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tpsi-mi:\"MI:0326\"(protein)\tpsi-mi:\"MI:0326\"(protein)\tyeast:4932\t-\t-\tcomment:commentA\t-";
-        Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine,ontologyIndexSearcher );
+        Directory indexDirectory = TestHelper.createIndexFromLine(psiMiTabLine, ontologyIndexSearcher);
 
-        IntactSearchEngine searchEngine = new IntactSearchEngine( indexDirectory );
+        IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         //search with exact term
-        String searchQuery = ( "type_exact:\"physical association\"" );
-        SearchResult<IntactBinaryInteraction> result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 1, result.getData().size() );
+        String searchQuery = ("type_exact:\"physical association\"");
+        SearchResult<IntactBinaryInteraction> result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
         //search with parent term
-        searchQuery = ( "type:\"interaction type\"" );
-        result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 1, result.getData().size() );
+        searchQuery = ("type:\"interaction type\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
         //search with parent term mi
-        searchQuery = ( "type:\"MI:0190\"" );
-        result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 1, result.getData().size() );
+        searchQuery = ("type:\"MI:0190\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
         //search with parent term in exact field-should be 0
-        searchQuery = ( "type_exact:\"interaction type\"" );
-        result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 0, result.getData().size() );
+        searchQuery = ("type_exact:\"interaction type\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(0, result.getData().size());
 
     }
 
@@ -290,65 +290,62 @@ public class IntActSearchEngineTest {
     public void testPropertiesWithParents() throws Exception {
 
         String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tpsi-mi:\"MI:0018\"(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0469\"(intact)\tintact:EBI-446356\t-\tpsi-mi:\"MI:0498\"(prey)\tpsi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\tinterpro:IPR004829|interpro:IPR010790|interpro:IPR001664|uniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716|uniprotkb:Q540Z7|uniprotkb:Q63368\tgo:0005737|go:\"GO:0030056\"(hemidesmosome)|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tpsi-mi:\"MI:0326\"(protein)\tpsi-mi:\"MI:0326\"(protein)\tyeast:4932\t-\t-\tcomment:commentA\t-";
-        Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine,ontologyIndexSearcher );
+        Directory indexDirectory = TestHelper.createIndexFromLine(psiMiTabLine, ontologyIndexSearcher);
 
-        IntactSearchEngine searchEngine = new IntactSearchEngine( indexDirectory );
+        IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
         //search with exact term GO:0030056(hemidesmosome)
-        String searchQuery = ( "properties:\"hemidesmosome\"" );
-        SearchResult<IntactBinaryInteraction> result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 1, result.getData().size() );
+        String searchQuery = ("properties:\"hemidesmosome\"");
+        SearchResult<IntactBinaryInteraction> result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
         //search with parent term
-        searchQuery = ( "properties:\"plasma membrane part\"" );
-        result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 1, result.getData().size() );
+        searchQuery = ("properties:\"plasma membrane part\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
         //search with parent term GO:0044459(plasma membrane part)
-        searchQuery = ( "properties:\"GO:0044459\"" );
-        result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 1, result.getData().size() );
+        searchQuery = ("properties:\"GO:0044459\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
         //search with parent term in exact field-should be 0
-        searchQuery = ( "properties_exact:\"plasma membrane part\"" );
-        result = searchEngine.search( searchQuery, null, null );
-        assertEquals( 0, result.getData().size() );
+        searchQuery = ("properties_exact:\"plasma membrane part\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(0, result.getData().size());
 
     }
 
     @Test
-        public void testPropertiesWithParentsRecentFormat() throws Exception {
+    public void testPropertiesWithParentsRecentFormat() throws Exception {
 
         //go:"GO:0005887"(integral to plasma membrane)|go:"GO:0004714"(transmembrane receptor protein tyrosine kinase activity)|go:"GO:0007155"(cell adhesion)|go:"GO:0007165"(signal transduction)|interpro:IPR000421(Coagulation factor 5/8 type, C-terminal)|interpro:IPR000719(Protein kinase, core)|interpro:IPR002011(Receptor tyrosine kinase, class II, conserved site)|interpro:IPR001245(Tyrosine protein kinase)|interpro:IPR008266(Tyrosine protein kinase, active site)
         String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tpsi-mi:\"MI:0018\"(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0469\"(intact)\tintact:EBI-446356\t-\tpsi-mi:\"MI:0498\"(prey)\tpsi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\tgo:\"GO:0005887\"(integral to plasma membrane)|go:\"GO:0004714\"(transmembrane receptor protein tyrosine kinase activity)|go:\"GO:0007155\"(cell adhesion)|go:\"GO:0007165\"(signal transduction)|interpro:IPR000421(Coagulation factor 5/8 type, C-terminal)|interpro:IPR000719(Protein kinase, core)|interpro:IPR002011(Receptor tyrosine kinase, class II, conserved site)|interpro:IPR001245(Tyrosine protein kinase)|interpro:IPR008266(Tyrosine protein kinase, active site)\tgo:0005737|go:0030056(hemidesmosome)|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tpsi-mi:\"MI:0326\"(protein)\tpsi-mi:\"MI:0326\"(protein)\tyeast:4932\t-\t-\tcomment:commentA\t-";
 
-            Directory indexDirectory = TestHelper.createIndexFromLine( psiMiTabLine,ontologyIndexSearcher );
+        Directory indexDirectory = TestHelper.createIndexFromLine(psiMiTabLine, ontologyIndexSearcher);
 
-            IntactSearchEngine searchEngine = new IntactSearchEngine( indexDirectory );
+        IntactSearchEngine searchEngine = new IntactSearchEngine(indexDirectory);
 
-            //search with exact term GO:0030056(hemidesmosome)
-            String searchQuery = ( "properties:\"hemidesmosome\"" );
-            SearchResult<IntactBinaryInteraction> result = searchEngine.search( searchQuery, null, null );
-            assertEquals( 1, result.getData().size() );
+        //search with exact term GO:0030056(hemidesmosome)
+        String searchQuery = ("properties:\"hemidesmosome\"");
+        SearchResult<IntactBinaryInteraction> result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
-            //search with parent term
-            searchQuery = ( "properties:\"plasma membrane part\"" );
-            result = searchEngine.search( searchQuery, null, null );
-            assertEquals( 1, result.getData().size() );
+        //search with parent term
+        searchQuery = ("properties:\"plasma membrane part\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
-            //search with parent term GO:0044459(plasma membrane part)
-            searchQuery = ( "properties:\"GO:0044459\"" );
-            result = searchEngine.search( searchQuery, null, null );
-            assertEquals( 1, result.getData().size() );
+        //search with parent term GO:0044459(plasma membrane part)
+        searchQuery = ("properties:\"GO:0044459\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(1, result.getData().size());
 
-            //search with parent term in exact field-should be 0
-            searchQuery = ( "properties_exact:\"plasma membrane part\"" );
-            result = searchEngine.search( searchQuery, null, null );
-            assertEquals( 0, result.getData().size() );
+        //search with parent term in exact field-should be 0
+        searchQuery = ("properties_exact:\"plasma membrane part\"");
+        result = searchEngine.search(searchQuery, null, null);
+        assertEquals(0, result.getData().size());
 
-        }
-
-      */
-
+    }
 
 }

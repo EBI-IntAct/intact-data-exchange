@@ -64,6 +64,7 @@ public abstract class TestHelper {
      public static Directory buildOntologiesIndex(Map<String,URL> urls) throws Exception {
 
         File f = new File( getTargetDirectory(), "ontologyIndex-"+System.currentTimeMillis() );
+         
         Directory ontologyDirectory = FSDirectory.getDirectory( f );
         OntologyIndexWriter writer = new OntologyIndexWriter( ontologyDirectory, true );
 

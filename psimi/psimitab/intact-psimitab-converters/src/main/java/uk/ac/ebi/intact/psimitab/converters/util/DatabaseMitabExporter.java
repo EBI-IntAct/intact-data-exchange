@@ -55,10 +55,12 @@ public class DatabaseMitabExporter {
 
     private final OntologyIndexSearcher ontologiesIndexSearcher;
     private final OntologyNameFinder nameFinder;
+    private final String[] ontologiesToExpand;
 
     public DatabaseMitabExporter(OntologyIndexSearcher ontologiesIndexSearcher, String ... supportedOntologies) {
         this.ontologiesIndexSearcher = ontologiesIndexSearcher;
         this.nameFinder = new OntologyNameFinder(ontologiesIndexSearcher);
+        this.ontologiesToExpand = supportedOntologies;
 
         for (String supportedOntology : supportedOntologies) {
             nameFinder.addOntologyName(supportedOntology);
@@ -91,12 +93,12 @@ public class DatabaseMitabExporter {
 
         if (interactionDirectory != null) {
             interactionIndexWriter = new IndexWriter(interactionDirectory, new StandardAnalyzer(), true);
-            interactionIndexer = new IntactPsimiTabIndexWriter(ontologiesIndexSearcher);
+            interactionIndexer = new IntactPsimiTabIndexWriter(ontologiesIndexSearcher, ontologiesToExpand);
         }
 
         if (interactorDirectory != null) {
             interactorIndexWriter = new IndexWriter(interactorDirectory, new StandardAnalyzer(), true);
-            interactorIndexer = new IntactInteractorIndexWriter(ontologiesIndexSearcher);
+            interactorIndexer = new IntactInteractorIndexWriter(ontologiesIndexSearcher, ontologiesToExpand);
         }
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();

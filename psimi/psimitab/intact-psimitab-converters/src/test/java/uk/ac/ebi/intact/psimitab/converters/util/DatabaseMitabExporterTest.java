@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.psimitab.converters.util;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.store.FSDirectory;
 import org.junit.*;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
@@ -29,9 +30,13 @@ import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
+import uk.ac.ebi.intact.psimitab.search.IntactSearchEngine;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
 import java.io.StringWriter;
 import java.net.URL;
+
+import psidev.psi.mi.search.SearchResult;
 
 /**
  * TODO comment that class header
@@ -124,7 +129,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
 
         StringWriter mitabWriter = new StringWriter();
-        Directory interactionsDir = new RAMDirectory("interactions");
+        Directory interactionsDir = FSDirectory.getDirectory("/tmp/interactions");
 
         exporter.exportAllInteractors(mitabWriter, interactionsDir, null);
 
@@ -137,6 +142,11 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         IndexSearcher interactionSearcher = new IndexSearcher(interactionsDir);
 
         Assert.assertEquals(2, interactionSearcher.getIndexReader().maxDoc());
+
+        // check searching by a parent
+        IntactSearchEngine searchEngine = new IntactSearchEngine(interactionsDir);
+        final SearchResult<IntactBinaryInteraction> result = searchEngine.search("\"GO:0016043\"", 0, 50);
+        Assert.assertEquals(2, result.getTotalCount());
 
         interactionsDir.close();
     }
