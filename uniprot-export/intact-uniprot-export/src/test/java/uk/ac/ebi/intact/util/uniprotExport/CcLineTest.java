@@ -11,12 +11,13 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.io.StringWriter;
 
-public class CcLineTest  {
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
+
+public class CcLineTest extends UniprotExportTestCase {
 
     private static final Log log = LogFactory.getLog(CcLineTest.class);
 
@@ -101,5 +102,53 @@ public class CcLineTest  {
         Assert.assertEquals( "abCDef", ( ccLines.get( 2 ) ).getGeneName() );
         Assert.assertEquals( "abcdef", ( ccLines.get( 3 ) ).getGeneName() );
         Assert.assertEquals( "fedcba", ( ccLines.get( 4 ) ).getGeneName() );
+    }
+
+    @Test
+    public void getEligibleProteins_only_uniprot() throws Exception {
+
+        // build data:
+        //             4 uniprot proteins
+        //             2 interactions: involving only 3 distinct uniprot proteins
+
+        final BioSource human = getMockBuilder().createBioSource( 9606, "human" );
+        final BioSource mouse = getMockBuilder().createBioSource( 10032, "mouse" );
+        mouse.setFullName( "Mus musculus" );
+        final Protein q9swi1 = getMockBuilder().createProtein( "Q9SWI1", "Q9SWI1_HUMAN", human );
+        q9swi1.getAliases().clear();
+        q9swi1.addAlias( new InteractorAlias( getMockBuilder().getInstitution(), q9swi1,
+                                              getMockBuilder().createCvObject( CvAliasType.class,
+                                                                               CvAliasType.GENE_NAME_MI_REF,
+                                                                               CvAliasType.GENE_NAME ),
+                                              "GN_q9swi1"));
+        final Protein p14712 = getMockBuilder().createProtein( "P14712", "P14712_HUMAN", mouse );
+        final Protein p14713 = getMockBuilder().createProtein( "P14713", "P14712_HUMAN", human );
+        p14713.getAliases().clear();
+        p14713.addAlias( new InteractorAlias( getMockBuilder().getInstitution(), p14713,
+                                              getMockBuilder().createCvObject( CvAliasType.class,
+                                                                               CvAliasType.ORF_NAME_MI_REF,
+                                                                               CvAliasType.ORF_NAME ),
+                                              "ORF_p14713"));
+        final Protein p12345 = getMockBuilder().createProtein( "P12345", "P12345_HUMAN", human );
+
+
+        final Interaction interaction1 = getMockBuilder().createInteraction( q9swi1, p14713 );
+        final Interaction interaction2 = getMockBuilder().createInteraction( q9swi1, p14712 );
+        final Experiment exp = getMockBuilder().createDeterministicExperiment();
+        final CvTopic uniprotDrExport = getMockBuilder().createCvObject( CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT );
+        final Annotation annotation = new Annotation( getMockBuilder().getInstitution(), uniprotDrExport, "yes" );
+        exp.addAnnotation( annotation );
+        interaction1.addExperiment( exp );
+        interaction2.addExperiment( exp );
+
+        PersisterHelper.saveOrUpdate( q9swi1, p14712, p14713, p12345 );
+        StringWriter ccWriter = new StringWriter();
+        StringWriter goaWriter = new StringWriter();
+        CCLineExport exporter = new CCLineExport( ccWriter, goaWriter );
+
+        Collection<String> identifiers = Arrays.asList( "P14713", "P14712", "Q9SWI1" );
+        exporter.generateCCLines( identifiers );
+
+        Assert.assertTrue( ccWriter.getBuffer().length() > 0 );
     }
 }

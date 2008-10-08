@@ -268,7 +268,7 @@ public class CCLineExport extends LineExport {
         }
 
         // produce the CC lines for the 1st protein
-        CcLine cc1 = formatCCLines(uniprotID1, protein1, uniprotID2, protein2, eligibleExperiments);
+        CcLine cc1 = formatCCLinesOld(uniprotID1, protein1, uniprotID2, protein2, eligibleExperiments);
         List<CcLine> cc4protein1 = ccLines.get(master1);
         if (null == cc4protein1) {
             cc4protein1 = new ArrayList<CcLine>();
@@ -278,7 +278,7 @@ public class CCLineExport extends LineExport {
 
         // produce the CC lines for the 2nd protein
         if (!uniprotID1.equals(uniprotID2)) {
-            CcLine cc2 = formatCCLines(uniprotID2, protein2, uniprotID1, protein1, eligibleExperiments);
+            CcLine cc2 = formatCCLinesOld(uniprotID2, protein2, uniprotID1, protein1, eligibleExperiments);
             List<CcLine> cc4protein2 = ccLines.get(master2);
             if (null == cc4protein2) {
                 cc4protein2 = new ArrayList<CcLine>();
@@ -383,13 +383,18 @@ public class CCLineExport extends LineExport {
         // collect all pubmeds and format them
         Set<String> pubmeds = getPumedIds( eligibleExperiments, false );
         if(!pubmeds.isEmpty()) {
-            buffer.append("( ");
-            for ( String pubmed : pubmeds ) {
-                buffer.append("PubMed=").append( pubmed ).append( ';' );
+            buffer.append("(");
+            buffer.append("PubMed=");
+            for ( Iterator<String> iterator = pubmeds.iterator(); iterator.hasNext(); ) {
+                String pubmed = iterator.next();
+                buffer.append( pubmed );
+                if(iterator.hasNext()) {
+                   buffer.append( ", " );
+                }
             }
             buffer.append(")");
         }
-        buffer.append(" Xref=").append( protein1.getAc() ).append(',').append(protein2.getAc()).append(';');
+        buffer.append(" Xref=IntAct:").append( protein1.getAc() ).append(',').append(protein2.getAc()).append(';');
         buffer.append(NEW_LINE);
 
         buffer.append("CC         Protein1=");
@@ -403,9 +408,9 @@ public class CCLineExport extends LineExport {
         // handle protein originating from different organism
         final BioSource biosource2 = protein2.getBioSource();
         if (!protein1.getBioSource().equals( biosource2 )) {
-            buffer.append(' ').append("( Organism=");
+            buffer.append(' ').append(" Organism=");
             buffer.append( biosource2.getFullName() ).append( " [NCBI TaxID=" ).append( biosource2.getTaxId() ).append( "]" );
-            buffer.append(";)");
+            buffer.append(";");
         }
 
         getOut().println("\t\t\t" + buffer.toString());
