@@ -17,9 +17,9 @@ package uk.ac.ebi.intact.psimitab.converters.expansion;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.InteractionUtils;
+import uk.ac.ebi.intact.model.Component;
+import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.Interactor;
 
 import java.util.*;
 
@@ -42,70 +42,26 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
     ///////////////////////////////////////////
     // Implements ExpansionStrategy contract
 
-    /**
-     * Interaction having more than 2 components get split following the spoke model expansion. That is, we build
-     * pairs of components following bait-prey and enzyme-target associations.
-     *
-     * @param interaction a non null interaction.
-     * @return a non null collection of interaction, in case the expansion is not possible, we may return an empty
-     *         collection.
-     */
-    public Collection<Interaction> expand( Interaction interaction ) {
-        Collection<Interaction> interactions = new ArrayList<Interaction>();
-        Collection<Component> components = interaction.getComponents();
+    @Override
+    protected Collection<Interaction> processExpansionWithoutBait(Interaction interaction) {
+        List<Interaction> interactions = new ArrayList<Interaction>();
+        // bait was null
+        if (logger.isDebugEnabled())
+            logger.debug("Could not find a bait component. Pick a component arbitrarily: 1st by alphabetical order.");
 
-        if ( InteractionUtils.isBinaryInteraction( interaction ) ) {
+        // Collect and sort participants by name
+        List<Component> sortedComponents = sortComponents(interaction.getComponents());
 
-            logger.debug( "Interaction was binary, no further processing involved." );
-            if ( interaction.getComponents().size() == 1 ) {
-                // single Interaction
-                Component singleComponent = components.iterator().next();
-                CvObjectXref idRef = CvObjectUtils.getPsiMiIdentityXref( singleComponent.getCvExperimentalRole() );
-                if ( idRef.getPrimaryId().equals( CvExperimentalRole.SELF_PSI_REF ) ) {
-                    Interaction newSelfInteraction = buildSingleInteraction( interaction, singleComponent );
-                    interactions.add( newSelfInteraction );
-                }
-            } else {
-                interactions.add( interaction );
-            }
+        // Pick the first one
+        Component fakeBait = sortedComponents.get(0);
 
-        } else {
-            logger.debug( components.size() + " component(s) found." );
+        // Build interactions
+        for (int i = 1; i < sortedComponents.size(); i++) {
+            Component fakePrey = sortedComponents.get(i);
 
-            Component baitComponent = interaction.getBait();
-
-            if ( baitComponent != null ) {
-
-                Collection<Component> preyComponents = new ArrayList<Component>();
-                preyComponents.addAll( components );
-                preyComponents.remove( baitComponent );
-
-                for ( Component preyComponent : preyComponents ) {
-                    Interaction newInteraction = buildInteraction( interaction, baitComponent, preyComponent );
-                    interactions.add( newInteraction );
-                }
-            } else {
-
-                // bait was null
-                logger.debug( "Could not find a bait component. Pick a component arbitrarily: 1st by alphabetical order." );
-
-                // Collect and sort participants by name
-                List<Component> sortedComponents = sortComponents( components );
-
-                // Pick the first one
-                Component fakeBait = sortedComponents.get( 0 );
-
-                // Build interactions
-                for ( int i = 1; i < sortedComponents.size(); i++ ) {
-                    Component fakePrey = sortedComponents.get( i );
-
-                    Interaction spokeInteraction = buildInteraction( interaction, fakeBait, fakePrey );
-                    interactions.add( spokeInteraction );
-                }
-            }
+            Interaction spokeInteraction = buildInteraction(interaction, fakeBait, fakePrey);
+            interactions.add(spokeInteraction);
         }
-        logger.debug( "After expansion: " + interactions.size() + " binary interaction(s) were generated." );
-
 
         return interactions;
     }
