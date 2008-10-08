@@ -7,10 +7,8 @@ import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.Interaction;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * SpokeWithoutBaitExpansion Tester.
@@ -79,16 +77,10 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
         // generate a interaction with only one Component
         Component selfComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
         selfComponent.getCvExperimentalRole().setShortLabel(CvExperimentalRole.SELF);
-        selfComponent.getCvExperimentalRole().getXrefs().iterator().next().setPrimaryId(CvExperimentalRole.SELF_PSI_REF);
+        selfComponent.getCvExperimentalRole().setIdentifier(CvExperimentalRole.SELF_PSI_REF);
         selfComponent.setStoichiometry( 2 );
 
-        Interaction interaction = getMockBuilder().createInteractionRandomBinary( );
-        for (Component component : interaction.getComponents() ){
-            interaction.removeComponent(component);
-        }
-        List<Component> selfComponents = new ArrayList<Component>();
-        selfComponents.add( selfComponent ); 
-        interaction.setComponents( selfComponents );
+        Interaction interaction = getMockBuilder().createInteraction( selfComponent );
 
         SpokeWithoutBaitExpansion spokeWithoutBaitExpansion = new SpokeWithoutBaitExpansion();
         Collection<Interaction> interactions = spokeWithoutBaitExpansion.expand( interaction );
