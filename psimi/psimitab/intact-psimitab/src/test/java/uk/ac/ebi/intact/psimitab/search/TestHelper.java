@@ -18,14 +18,13 @@ package uk.ac.ebi.intact.psimitab.search;
 import junit.framework.Assert;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.RAMDirectory;
 import org.obo.dataadapter.OBOParseException;
 import psidev.psi.mi.search.Searcher;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
-import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexWriter;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexWriter;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.OboOntologyIterator;
 
 import java.io.ByteArrayInputStream;
@@ -51,7 +50,7 @@ public abstract class TestHelper {
 
     public static Directory createIndexFromResource(String resourcePath, OntologyIndexSearcher ontologyIndexSearcher) throws IOException, ConverterException, MitabLineException {
         InputStream is = TestHelper.class.getResourceAsStream(resourcePath);
-        return Searcher.buildIndexInMemory(is, true, true, new IntactPsimiTabIndexWriter(ontologyIndexSearcher));
+        return Searcher.buildIndexInMemory(is, true, true, new IntactPsimiTabIndexWriter(ontologyIndexSearcher, new String[] {"go", "interpro", "psi-mi"}));
     }
 
     public static Directory createIndexFromLine(String line) throws IOException, ConverterException, MitabLineException {
@@ -59,7 +58,7 @@ public abstract class TestHelper {
     }
 
     public static Directory createIndexFromLine(String line, OntologyIndexSearcher ontologyIndexSearcher) throws IOException, ConverterException, MitabLineException {
-        return Searcher.buildIndexInMemory(new ByteArrayInputStream(line.getBytes()), true, false, new IntactPsimiTabIndexWriter(ontologyIndexSearcher));
+        return Searcher.buildIndexInMemory(new ByteArrayInputStream(line.getBytes()), true, false, new IntactPsimiTabIndexWriter(ontologyIndexSearcher, new String[] {"go", "interpro", "psi-mi"}));
     }
 
      public static Directory buildOntologiesIndex(Map<String,URL> urls) throws Exception {

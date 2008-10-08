@@ -15,19 +15,14 @@
  */
 package uk.ac.ebi.intact.psimitab.search;
 
-import psidev.psi.mi.search.index.impl.InteractorIndexWriter;
-import psidev.psi.mi.search.engine.SearchEngine;
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.Interactor;
-import psidev.psi.mi.tab.model.CrossReferenceImpl;
-import psidev.psi.mi.tab.utils.BinaryInteractionHandler;
-import psidev.psi.mi.tab.utils.OnlyOneInteractorHandler;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.util.IntactOnlyOneInteractorHandler;
-import uk.ac.ebi.intact.psimitab.util.IntactBinaryInteractionHandler;
-import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import org.apache.lucene.store.Directory;
+import psidev.psi.mi.search.engine.SearchEngine;
+import psidev.psi.mi.search.index.impl.InteractorIndexWriter;
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.util.IntactBinaryInteractionHandler;
+import uk.ac.ebi.intact.psimitab.util.IntactOnlyOneInteractorHandler;
 
 import java.io.IOException;
 
@@ -43,8 +38,8 @@ public class IntactInteractorIndexWriter extends InteractorIndexWriter {
         super(new IntactDocumentBuilder(), new IntactOnlyOneInteractorHandler());
     }
 
-    public IntactInteractorIndexWriter(OntologyIndexSearcher ontologyIndexSearcher) throws IOException {
-        super(new IntactDocumentBuilder(ontologyIndexSearcher), new IntactOnlyOneInteractorHandler());
+    public IntactInteractorIndexWriter(OntologyIndexSearcher ontologyIndexSearcher, String[] ontologiesToExpand) throws IOException {
+        super(new IntactDocumentBuilder(ontologyIndexSearcher, ontologiesToExpand), new IntactOnlyOneInteractorHandler());
     }
 
     @Override

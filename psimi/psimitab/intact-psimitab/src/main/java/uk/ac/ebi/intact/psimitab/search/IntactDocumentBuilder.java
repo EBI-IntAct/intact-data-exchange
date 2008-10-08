@@ -52,9 +52,13 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
         expandableOntologies = new HashSet<String>();
     }
 
-    public IntactDocumentBuilder( OntologyIndexSearcher ontologySearcher ) throws IOException {
+    public IntactDocumentBuilder( OntologyIndexSearcher ontologySearcher, String[] ontologiesToExpand ) throws IOException {
         this();
         this.ontologySearcher = ontologySearcher;
+
+        for (String ontologyToExpand : ontologiesToExpand) {
+            addExpandableOntology(ontologyToExpand);
+        }
     }
 
     ///////////////////////////
