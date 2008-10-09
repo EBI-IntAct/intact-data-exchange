@@ -32,6 +32,8 @@ import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 import uk.ac.ebi.intact.psimitab.OntologyNameFinder;
+import uk.ac.ebi.intact.psimitab.PsimitabTools;
+import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.search.IntactInteractorIndexWriter;
 import uk.ac.ebi.intact.psimitab.search.IntactPsimiTabIndexWriter;
@@ -52,6 +54,8 @@ public class DatabaseMitabExporter {
 
     private static final Log log = LogFactory.getLog( DatabaseMitabExporter.class );
     private static final String NEW_LINE = System.getProperty("line.separator");
+
+    private static final String SMALLMOLECULE_MI_REF = "MI:0328";
 
     private final OntologyIndexSearcher ontologiesIndexSearcher;
     private final OntologyNameFinder nameFinder;
@@ -141,6 +145,8 @@ public class DatabaseMitabExporter {
                 final IntactDocumentDefinition docDef = new IntactDocumentDefinition();
 
                 for (IntactBinaryInteraction bi : binaryInteractions) {
+                    flipInteractorsIfNecessary(bi);
+
                     final String line = docDef.interactionToString(bi);
                     mitabWriter.write(line+ NEW_LINE);
 
@@ -193,6 +199,27 @@ public class DatabaseMitabExporter {
             interactorIndexWriter.close();
             if (log.isInfoEnabled()) log.info("Indexed "+interactorCount+" interactors");
         }
+    }
+
+    /**
+     * Flips the interactors if necessary, so the small molecule is always interactor A
+     * @param bi
+     */
+    private void flipInteractorsIfNecessary(IntactBinaryInteraction bi) {
+        PsimitabTools.reorderInteractors(bi, new Comparator<ExtendedInteractor>() {
+
+            public int compare(ExtendedInteractor o1, ExtendedInteractor o2) {
+                final CrossReference type1 = o1.getInteractorType();
+                final CrossReference type2 = o2.getInteractorType();
+
+                if (type1 != null && SMALLMOLECULE_MI_REF.equals(type1.getIdentifier())) {
+                    return 1;
+                } else if (type2 != null && SMALLMOLECULE_MI_REF.equals(type2.getIdentifier())) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
     }
 
     private void enrich(Collection<IntactBinaryInteraction> binaryInteractions) {
