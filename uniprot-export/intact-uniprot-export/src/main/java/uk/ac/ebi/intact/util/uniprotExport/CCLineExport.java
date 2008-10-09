@@ -384,7 +384,7 @@ public class CCLineExport extends LineExport {
         Set<String> pubmeds = getPumedIds( eligibleExperiments, false );
         if(!pubmeds.isEmpty()) {
             buffer.append("(");
-            buffer.append("PubMed=");
+            buffer.append("PubMed:");
             for ( Iterator<String> iterator = pubmeds.iterator(); iterator.hasNext(); ) {
                 String pubmed = iterator.next();
                 buffer.append( pubmed );
@@ -409,7 +409,7 @@ public class CCLineExport extends LineExport {
         final BioSource biosource2 = protein2.getBioSource();
         if (!protein1.getBioSource().equals( biosource2 )) {
             buffer.append(' ').append(" Organism=");
-            buffer.append( biosource2.getFullName() ).append( " [NCBI TaxID=" ).append( biosource2.getTaxId() ).append( "]" );
+            buffer.append( biosource2.getFullName() ).append( " [NCBI_TaxID=" ).append( biosource2.getTaxId() ).append( "]" );
             buffer.append(";");
         }
 
