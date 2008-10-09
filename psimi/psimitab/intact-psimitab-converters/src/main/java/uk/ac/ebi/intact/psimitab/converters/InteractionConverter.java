@@ -18,16 +18,11 @@ package uk.ac.ebi.intact.psimitab.converters;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.*;
-import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Annotation;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.XrefUtils;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntactInteractorConverter;
-import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
+import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -164,8 +159,9 @@ public class InteractionConverter {
                 }
                 bi.setSourceDatabases( sourceDatabases );
             } else {
+                defaultSourceDatabase.setText(interaction.getOwner().getShortLabel());
                 bi.getSourceDatabases().add( defaultSourceDatabase );
-            }            
+            }
         }
 
         // process extended
