@@ -20,10 +20,12 @@ import psidev.psi.mi.search.Searcher;
 import psidev.psi.mi.search.index.PsimiIndexWriter;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.xml.converter.ConverterException;
+import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Comparator;
 
 /**
  * Tools to manage PSIMITAB files
@@ -86,5 +88,23 @@ public class PsimitabTools {
      */
     public static Directory buildIndexInMemory(InputStream psimiTabData, boolean createIndex, boolean hasHeader) throws IOException, ConverterException, MitabLineException {
         return Searcher.buildIndexInMemory(psimiTabData, createIndex, hasHeader);
+    }
+
+    /**
+     * Alters the order of interactorA and interactorB of a binary interaction, according to a comparator.
+     * @param binaryInteraction the binary interaction
+     * @param comparator the comparator to use
+     */
+    public static void reorderInteractors(IntactBinaryInteraction binaryInteraction, Comparator<ExtendedInteractor> comparator) {
+        if (binaryInteraction == null) throw new NullPointerException("binaryInteraction is null");
+        if (comparator == null) throw new NullPointerException("comparator is null");
+        
+        ExtendedInteractor interactorA = binaryInteraction.getInteractorA();
+        ExtendedInteractor interactorB = binaryInteraction.getInteractorB();
+
+        if (comparator.compare(interactorA, interactorB) < 0) {
+            binaryInteraction.setInteractorA(interactorB);
+            binaryInteraction.setInteractorB(interactorA);
+        }
     }
 }
