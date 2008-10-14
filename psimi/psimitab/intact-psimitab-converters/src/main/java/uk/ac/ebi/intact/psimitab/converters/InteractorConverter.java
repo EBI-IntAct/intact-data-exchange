@@ -17,10 +17,10 @@ package uk.ac.ebi.intact.psimitab.converters;
 
 import psidev.psi.mi.tab.model.Alias;
 import psidev.psi.mi.tab.model.*;
-import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.model.*;
 import static uk.ac.ebi.intact.model.CvAliasType.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.ProteinUtils;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
 import java.util.ArrayList;
@@ -101,6 +101,17 @@ public class InteractorConverter {
             }
             tabInteractor.setAlternativeIdentifiers( altIds );
             tabInteractor.setAliases( tabAliases );
+        }
+
+        // if it is a protein from uniprot, assume the short label is the uniprot ID and add it to the
+        // alternative identifiers
+        if (intactInteractor instanceof Protein) {
+            Protein prot = (Protein)intactInteractor;
+
+            if (ProteinUtils.isFromUniprot(prot)) {
+                CrossReference altId = CrossReferenceFactory.getInstance().build( CvDatabase.UNIPROT, prot.getShortLabel() );
+                tabInteractor.getAlternativeIdentifiers().add(altId);
+            }
         }
 
         // set taxid of interactor
