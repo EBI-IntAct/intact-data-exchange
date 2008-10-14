@@ -42,12 +42,14 @@ public class InteractorFetcher {
             return new InteractorFetcher();
         }
     };
+    private UniprotService uniprotRemoteService;
 
     public static InteractorFetcher getInstance() {
         return instance.get();
     }
 
     public InteractorFetcher() {
+        uniprotRemoteService = new UniprotRemoteService();
     }
 
     public UniprotProtein fetchInteractorFromUniprot(String uniprotId, int taxId) {
@@ -78,8 +80,7 @@ public class InteractorFetcher {
         if (uniprotProtein == null) {
             if (log.isDebugEnabled()) log.debug("\t\tRemotely retrieving protein: "+uniprotId+" (taxid:"+taxId+")");
 
-            UniprotService service = new UniprotRemoteService();
-            Collection<UniprotProtein> uniprotProteins = service.retrieve(uniprotId);
+            Collection<UniprotProtein> uniprotProteins = uniprotRemoteService.retrieve(uniprotId);
 
             // if only one result, return it. If more, return the one that matches the tax id
             if (uniprotProteins.size() == 1) {
@@ -97,6 +98,8 @@ public class InteractorFetcher {
                 interactorCache.put(new Element(cacheKey(uniprotId, taxId), uniprotProtein));
             }
         }
+
+        uniprotRemoteService.clearErrors();
 
         return uniprotProtein;
     }
