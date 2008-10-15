@@ -95,15 +95,12 @@ public class IntactInteractorConverter extends InteractorConverter<ExtendedInter
         CrossReference interactorType = extInteractor.getInteractorType();
         participant.getInteractor().setInteractorType(xrefConverter.fromMitab(interactorType, InteractorType.class));
 
-        // properties
-        Collection<DbReference> secondaryRefs = getSecondaryRefs(extInteractor.getProperties());
-        participant.getInteractor().getXref().getSecondaryRef().addAll(secondaryRefs);
-
         // annotations
         for (Annotation annotation : extInteractor.getAnnotations()) {
             Attribute attr = new Attribute(annotation.getType(), annotation.getText());
-            if( ! participant.getInteractor().getAttributes().contains( attr )) {
-                participant.getInteractor().getAttributes().add(attr);
+            final Collection<Attribute> attributes = participant.getInteractor().getAttributes();
+            if( ! attributes.contains( attr )) {
+                attributes.add(attr);
             }
         }
 
