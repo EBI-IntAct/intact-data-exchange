@@ -16,11 +16,12 @@
 package uk.ac.ebi.intact.psimitab;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
 import psidev.psi.mi.tab.model.builder.*;
 import uk.ac.ebi.intact.psimitab.model.Annotation;
-import uk.ac.ebi.intact.psimitab.model.Parameter;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
+import uk.ac.ebi.intact.psimitab.model.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -108,7 +109,13 @@ public class IntactInteractionRowConverter extends AbstractInteractionRowConvert
         ibi.getInteractorA().setProperties(ParseUtils.createCrossReferences(propA) );
         ibi.getInteractorB().setProperties(ParseUtils.createCrossReferences(propB) );
         ibi.getInteractorA().setInteractorType( ParseUtils.createCrossReferences( typeA ).iterator().next() );
-        ibi.getInteractorB().setInteractorType( ParseUtils.createCrossReferences( typeB ).iterator().next() );
+
+        List<CrossReference> interactorTypes = ParseUtils.createCrossReferences(typeB);
+
+        if (!interactorTypes.isEmpty()) {
+            ibi.getInteractorB().setInteractorType( interactorTypes.iterator().next() );
+        }
+
         ibi.setHostOrganism( ParseUtils.createCrossReferences( hostOrganism ) );
         ibi.setExpansionMethods( createStringsFromColumn( expansion ) );
         ibi.setDataset( createStringsFromColumn( dataset ) );
