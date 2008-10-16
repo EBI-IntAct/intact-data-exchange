@@ -16,6 +16,8 @@
 package uk.ac.ebi.intact.psimitab.util;
 
 import psidev.psi.mi.tab.model.Interactor;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
 /**
  * TODO comment that class header
@@ -26,7 +28,17 @@ import psidev.psi.mi.tab.model.Interactor;
 public class IntactOnlyOneInteractorHandler extends IntactBinaryInteractionHandler {
 
     @Override
+    protected IntactBinaryInteraction newBinaryInteraction(Interactor i1, Interactor i2) {
+        return super.newBinaryInteraction(i1, new ExtendedInteractor());
+    }
+
+    @Override
     protected Interactor mergeInteractorA(Interactor i1, Interactor i2) {
         return cloneInteractor(i1);
+    }
+
+    @Override
+    protected Interactor mergeInteractorB(Interactor i1, Interactor i2) {
+        return new ExtendedInteractor();
     }
 }
