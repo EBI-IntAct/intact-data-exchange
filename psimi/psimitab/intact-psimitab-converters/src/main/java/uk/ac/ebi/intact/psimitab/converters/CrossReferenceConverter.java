@@ -43,7 +43,7 @@ public class CrossReferenceConverter<T extends Xref> {
      * @param xrefs        is a Collection of intact.model.Xref
      * @param onlyIdentity if is true only CrossReferences with CvXrefQualifier equals identiy will be returned
      *                     if is false all CrossReferences without CvXrefQualifier equals identiy will be returned
-     * @return List of CrossReferences sorted by CvXrefQualifier
+     * @return Non null list of CrossReferences sorted by CvXrefQualifier
      */
     public List<CrossReference> toCrossReferences(Collection<T> xrefs, boolean onlyIdentity, boolean withText) {
         if (xrefs == null) {
@@ -65,6 +65,26 @@ public class CrossReferenceConverter<T extends Xref> {
                         if (ref != null) crossReferences.add(ref);
                     }
                 }
+        }
+        return crossReferences;
+    }
+
+    /**
+     * Converts a Collection of Xrefs into a suitable format for PSIMITAB
+     *
+     * @param xrefs        is a Collection of intact.model.Xref
+     * @return Non null list of CrossReferences sorted by CvXrefQualifier
+     */
+    public List<CrossReference> toCrossReferences(Collection<T> xrefs, boolean withText) {
+        if (xrefs == null) {
+            throw new IllegalArgumentException("Xref must not be null. ");
+        }
+
+        List<CrossReference> crossReferences = new ArrayList<CrossReference>();
+
+        for (Xref xref : xrefs) {
+            CrossReference ref = createCrossReference(xref, withText);
+            if (ref != null) crossReferences.add(ref);
         }
         return crossReferences;
     }

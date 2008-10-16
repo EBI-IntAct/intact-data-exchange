@@ -49,16 +49,15 @@ public class InteractionConverter {
     private CrossReference defaultSourceDatabase = CrossReferenceFactory.getInstance().build( "psi-mi", "MI:0469", "intact" );
 
     ///////////////////////////
-    // Getters &  Setters
-
+    // Getters & Setters
 
     public IntactBinaryInteraction toBinaryInteraction( Interaction interaction ) {
         return toBinaryInteraction( interaction, null, false );
     }
 
     public IntactBinaryInteraction toBinaryInteraction( Interaction interaction,
-                                      ExpansionStrategy expansionStrategy,
-                                      boolean isExpanded ) {
+                                                        ExpansionStrategy expansionStrategy,
+                                                        boolean isExpanded ) {
 
         if ( interaction == null ) {
             throw new IllegalArgumentException( "Interaction must not be null" );

@@ -20,6 +20,7 @@ import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.intact.model.*;
 import static uk.ac.ebi.intact.model.CvAliasType.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.ProteinUtils;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
@@ -129,6 +130,16 @@ public class InteractorConverter {
 
         // set properties of interactor
         List<CrossReference> properties = xConverter.toCrossReferences( intactInteractor.getXrefs(), false, true );
+        // if molecule type is small molecule, export all chebi ids to that list.
+        if( CvObjectUtils.isSmallMoleculeType( intactInteractor.getCvInteractorType() ) ) {
+            final Collection<InteractorXref> chebiXrefs =
+                    AnnotatedObjectUtils.searchXrefs( intactInteractor, CvDatabase.CHEBI_MI_REF, null );
+            for ( CrossReference chebiCrossReference : xRefConverter.toCrossReferences( chebiXrefs, true ) ) {
+                if( !properties.contains( chebiCrossReference  ) ) {
+                    properties.add( chebiCrossReference );
+                }
+            }
+        }
         tabInteractor.setProperties( properties );
 
         // set type of interactor A
