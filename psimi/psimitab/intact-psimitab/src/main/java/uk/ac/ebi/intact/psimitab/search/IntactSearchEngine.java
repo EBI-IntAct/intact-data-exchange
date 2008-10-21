@@ -4,7 +4,6 @@
 package uk.ac.ebi.intact.psimitab.search;
 
 import org.apache.lucene.store.Directory;
-import psidev.psi.mi.search.engine.impl.FastSearchEngine;
 import psidev.psi.mi.search.engine.impl.AbstractSearchEngine;
 import psidev.psi.mi.search.util.DocumentBuilder;
 import psidev.psi.mi.tab.model.builder.DocumentDefinition;
@@ -40,7 +39,7 @@ public class IntactSearchEngine extends AbstractSearchEngine<IntactBinaryInterac
         return new IntactDocumentBuilder();
     }
 
-    protected String[] getSearchFields() {
+    public String[] getSearchFields() {
         DocumentDefinition docDef = new IntactDocumentDefinition();
 
         return new String[]{"identifiers",
