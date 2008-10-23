@@ -120,7 +120,7 @@ public class IntActDocumentBuilderTest {
 
         Column intTypeColWithParents = builder.getColumnWithParents( intTypeCol );
         //MI:0407(direct interaction)|MI:0915(physical association)|MI:0190(interaction type)|MI:0914(association)
-        Assert.assertEquals( 5, intTypeColWithParents.getFields().size() );
+        Assert.assertEquals( 4, intTypeColWithParents.getFields().size() );
     }
 
     @Test
@@ -135,10 +135,9 @@ public class IntActDocumentBuilderTest {
         List<Field> fieldsWithParentsIntType = builder.getListOfFieldsWithParents( fieldBuilder.createField( "psi-mi:\"MI:0407\"(direct interaction)" ) );
 
         Assert.assertNotNull( fieldsWithParentsIntType );
-        Assert.assertEquals( 5, fieldsWithParentsIntType.size() );
+        Assert.assertEquals( 4, fieldsWithParentsIntType.size() );
 
         CrossReferenceFieldBuilder fb = new CrossReferenceFieldBuilder();
-        Assert.assertTrue( fieldsWithParentsIntType.contains( fb.createField( "psi-mi:\"MI:0000\"(molecular interaction)" ) ) );
         Assert.assertTrue( fieldsWithParentsIntType.contains( fb.createField( "psi-mi:\"MI:0190\"(interaction type)" ) ) );
         Assert.assertTrue( fieldsWithParentsIntType.contains( fb.createField( "psi-mi:\"MI:0915\"(physical association)" ) ) );
         Assert.assertTrue( fieldsWithParentsIntType.contains( fb.createField( "psi-mi:\"MI:0914\"(association)" ) ) );
@@ -157,10 +156,9 @@ public class IntActDocumentBuilderTest {
         List<Field> fieldsWithParentsDetMethod = builder.getListOfFieldsWithParents( fieldBuilder.createField( "psi-mi:\"MI:0045\"(experimental interaction detection)" ) );
 
         Assert.assertNotNull( fieldsWithParentsDetMethod );
-        Assert.assertEquals( 3, fieldsWithParentsDetMethod.size() );
+        Assert.assertEquals( 2, fieldsWithParentsDetMethod.size() );
 
         CrossReferenceFieldBuilder fb = new CrossReferenceFieldBuilder();
-        Assert.assertTrue( fieldsWithParentsDetMethod.contains( fb.createField( "psi-mi:\"MI:0000\"(molecular interaction)" ) ) );
         Assert.assertTrue( fieldsWithParentsDetMethod.contains( fb.createField( "psi-mi:\"MI:0001\"(interaction detection method)" ) ) );
         Assert.assertTrue( fieldsWithParentsDetMethod.contains( fb.createField( "psi-mi:\"MI:0045\"(experimental interaction detection)" ) ) );
     }
@@ -177,7 +175,7 @@ public class IntActDocumentBuilderTest {
 
         Assert.assertNotNull( fieldsWithParentsProperties );
         //term+8 parents excludes root == 10
-        Assert.assertEquals( 10, fieldsWithParentsProperties.size() );
+        Assert.assertEquals( 8, fieldsWithParentsProperties.size() );
 
         CrossReferenceFieldBuilder fb = new CrossReferenceFieldBuilder();
         Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0005634\"(nucleus)" ) ) );
@@ -185,8 +183,6 @@ public class IntActDocumentBuilderTest {
         Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0043226\"(organelle)" ) ) );
         Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0044424\"(intracellular part)" ) ) );
         Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0043227\"(membrane-bounded organelle)" ) ) );
-        Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0005622\"(intracellular)" ) ) );
-        Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0005623\"(cell)" ) ) );
         Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0043231\"(intracellular membrane-bounded organelle)" ) ) );
         Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0005575\"(cellular_component)") ) );
     }
