@@ -34,6 +34,12 @@ public class Parameter implements Serializable {
     private String value;
     private String unit;
 
+    /**
+     * Builds a parameter.
+     * @param type the type of the parameter.
+     * @param value double value.
+     * @param unit the unit of the parameter.
+     */
     public Parameter(String type, String value, String unit) {
         this.type = type;
         this.unit = unit;
@@ -44,9 +50,9 @@ public class Parameter implements Serializable {
 
         // value using scientific notation
         try {
-            this.factor = Float.parseFloat(value);
+            this.factor = Double.parseDouble(value);
         } catch (NumberFormatException e) {
-            this.factor = Float.NaN;
+            this.factor = Double.NaN;
         }
     }
 
@@ -59,7 +65,7 @@ public class Parameter implements Serializable {
 
         this.value = String.valueOf(factor);
         if (exponent > 0) {
-            value = " x " + base + "^" + exponent;
+            value = value + " x " + base + "^" + exponent;
         }
     }
 
