@@ -19,11 +19,11 @@ import java.io.Serializable;
 import java.util.Formatter;
 
 /**
- * TODO comment that class header
+ * MITAB parameter
  *
  * @author Prem Anand (prem@ebi.ac.uk)
  * @version $Id$
- * @since 2.0.1-SNAPSHOT
+ * @since 2.0.1
  */
 public class Parameter implements Serializable {
 
@@ -59,11 +59,7 @@ public class Parameter implements Serializable {
 
         this.value = String.valueOf(factor);
         if (exponent > 0) {
-            if (base == 10) {
-                value = value + "E" + exponent;
-            } else {
-                value = " x " + base + "^" + exponent;
-            }
+            value = " x " + base + "^" + exponent;
         }
     }
 
@@ -74,7 +70,6 @@ public class Parameter implements Serializable {
     public String getType() {
         return type;
     }
-
 
     public String getUnit() {
         return unit;
