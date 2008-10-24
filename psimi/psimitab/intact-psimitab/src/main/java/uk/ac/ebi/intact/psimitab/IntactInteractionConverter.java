@@ -130,39 +130,42 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
         Participant pA = pi.next();
         Participant pB = pi.next();
 
+        final ExtendedInteractor interactorA = bi.getInteractorA();
+        final ExtendedInteractor interactorB = bi.getInteractorB();
+
         if ( pA.hasExperimentalRoles() ) {
             CrossReference experimentalRoleA = extractExperimentalRole( pA );
 
-            if ( bi.hasExperimentalRolesInteractorA() ) {
-                bi.getExperimentalRolesInteractorA().add( experimentalRoleA );
+            if ( interactorA.hasExperimentalRoles() ) {
+                bi.getInteractorA().getExperimentalRoles().add( experimentalRoleA );
             } else {
                 List<CrossReference> xrefs = new ArrayList<CrossReference>();
                 xrefs.add( experimentalRoleA );
-                bi.setExperimentalRolesInteractorA( xrefs );
+                bi.getInteractorA().setExperimentalRoles( xrefs );
             }
         }
 
         if ( pB.hasExperimentalRoles() ) {
             CrossReference experimentalRoleB = extractExperimentalRole( pB );
 
-            if ( bi.hasExperimentalRolesInteractorB() ) {
-                bi.getExperimentalRolesInteractorB().add( experimentalRoleB );
+            if ( interactorB.hasExperimentalRoles() ) {
+                interactorB.getExperimentalRoles().add( experimentalRoleB );
             } else {
                 List<CrossReference> xrefs = new ArrayList<CrossReference>();
                 xrefs.add( experimentalRoleB );
-                bi.setExperimentalRolesInteractorB( xrefs );
+                interactorB.setExperimentalRoles( xrefs );
             }
         }
 
         if ( pA.hasBiologicalRole() ) {
             CrossReference biologicalRoleA = extractBiologicalRole( pA );
 
-            if ( bi.hasBiologicalRolesInteractorA() ) {
-                bi.getBiologicalRolesInteractorA().add( biologicalRoleA );
+            if ( interactorA.hasBiologicalRoles() ) {
+                interactorA.getBiologicalRoles().add( biologicalRoleA );
             } else {
                 List<CrossReference> xrefs = new ArrayList<CrossReference>();
                 xrefs.add( biologicalRoleA );
-                bi.setBiologicalRolesInteractorA( xrefs );
+                interactorA.setBiologicalRoles( xrefs );
             }
         }
 
@@ -170,50 +173,34 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             CrossReference biologicalRoleB = extractBiologicalRole( pB );
 
             if ( bi.hasBiologicalRolesInteractorB() ) {
-                bi.getBiologicalRolesInteractorB().add( biologicalRoleB );
+                interactorB.getBiologicalRoles().add( biologicalRoleB );
             } else {
                 List<CrossReference> xrefs = new ArrayList<CrossReference>();
                 xrefs.add( biologicalRoleB );
-                bi.setBiologicalRolesInteractorB( xrefs );
+                interactorB.setBiologicalRoles( xrefs );
             }
         }
 
         if ( pA.getInteractor().getInteractorType() != null ) {
             CrossReference typeA = extractInteractorType( pA );
-
-            if ( bi.hasInteractorTypeA() ) {
-                bi.getInteractorTypeA().add( typeA );
-            } else {
-                List<CrossReference> xrefs = new ArrayList<CrossReference>();
-                xrefs.add( typeA );
-                bi.setInteractorTypeA( xrefs );
-            }
+            interactorA.setInteractorType( typeA );
         }
 
         if ( pB.getInteractor().getInteractorType() != null ) {
             CrossReference typeB = extractInteractorType( pB );
-
-            if ( bi.hasInteractorTypeB() ) {
-                bi.getInteractorTypeB().add( typeB );
-            } else {
-                List<CrossReference> xrefs = new ArrayList<CrossReference>();
-                xrefs.add( typeB );
-                bi.setInteractorTypeB( xrefs );
-            }
+            interactorB.setInteractorType( typeB );
         }
-
-
 
         if ( ! pA.getInteractor().getXref().getAllDbReferences().isEmpty() ) {
             List<CrossReference> propertiesA = extractProperties( pA );
-            if ( !bi.hasPropertiesA() ) bi.setPropertiesA( new ArrayList<CrossReference>() );
-            bi.getPropertiesA().addAll( propertiesA );
+            if ( !interactorA.hasProperties() ) interactorA.setProperties( new ArrayList<CrossReference>() );
+            interactorA.getProperties().addAll( propertiesA );
         }
 
         if ( ! pB.getInteractor().getXref().getAllDbReferences().isEmpty() ) {
             List<CrossReference> propertiesB = extractProperties( pB );
-            if ( !bi.hasPropertiesB() ) bi.setPropertiesB( new ArrayList<CrossReference>() );
-            bi.getPropertiesB().addAll( propertiesB );
+            if ( !interactorB.hasProperties() ) interactorB.setProperties( new ArrayList<CrossReference>() );
+            interactorB.getProperties().addAll( propertiesB );
         }
 
         if ( interaction.hasExperiments() ) {
@@ -276,7 +263,6 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
                     if ( shortLabel != null && shortLabel.equals( "inferred by curator" ) ) {
                         String experimentFullName;
                         if ( experiment.getNames() != null && ( experimentFullName = experiment.getNames().getFullName() ) != null ) {
-//                            experimentFullName = experimentFullName.replaceAll("\\s-\\s", "-");
                             authors.add( new AuthorImpl( experimentFullName ) );
                             bi.setAuthors( authors );
                         }
@@ -285,9 +271,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             }
         }
 
-
         // annotations
-
         for (Attribute attribute : pA.getAttributes()) {
             Annotation annotation = new Annotation(attribute.getName(), attribute.getValue());
             bi.getInteractorA().getAnnotations().add(annotation);
@@ -299,7 +283,6 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
         }
 
         // parameters
-
         for (psidev.psi.mi.xml.model.Parameter xmlParam : pA.getParameters()) {
             Parameter param = new Parameter(xmlParam.getTerm(), xmlParam.getFactor(), xmlParam.getBase(), xmlParam.getExponent(), xmlParam.getUnit());
             bi.getInteractorA().getParameters().add(param);
@@ -394,8 +377,9 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
     private CrossReference extractExperimentalRole( Participant participant ) {
 
         ExperimentalRole role = participant.getExperimentalRoles().iterator().next();
-        String id = role.getXref().getPrimaryRef().getId().split( ":" )[1];
-        String db = role.getXref().getPrimaryRef().getId().split( ":" )[0];
+        final String[] values = role.getXref().getPrimaryRef().getId().split( ":" );
+        String id = values[1];
+        String db = values[0];
         String text = role.getNames().getShortLabel();
 
         return new CrossReferenceImpl( db, id, text );
@@ -410,8 +394,9 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
     private CrossReference extractBiologicalRole( Participant participant ) {
 
         BiologicalRole role = participant.getBiologicalRole();
-        String id = role.getXref().getPrimaryRef().getId().split( ":" )[1];
-        String db = role.getXref().getPrimaryRef().getId().split( ":" )[0];
+        final String[] values = role.getXref().getPrimaryRef().getId().split( ":" );
+        String id = values[1];
+        String db = values[0];
         String text = role.getNames().getShortLabel();
 
         return new CrossReferenceImpl( db, id, text );
@@ -424,8 +409,9 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
      * @return interactor type
      */
     private CrossReference extractInteractorType( Participant participant ) {
-        String id = participant.getInteractor().getInteractorType().getXref().getPrimaryRef().getId().split( ":" )[1];
-        String db = participant.getInteractor().getInteractorType().getXref().getPrimaryRef().getId().split( ":" )[0];
+        final String[] values = participant.getInteractor().getInteractorType().getXref().getPrimaryRef().getId().split( ":" );
+        String id = values[1];
+        String db = values[0];
         String text = participant.getInteractor().getInteractorType().getNames().getShortLabel();
 
         return new CrossReferenceImpl( db, id, text );
