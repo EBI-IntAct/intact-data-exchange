@@ -16,26 +16,50 @@
 package uk.ac.ebi.intact.dataexchange.cvutils.services;
 
 /**
- * TODO comment that class header
+ * Configuration for the Ontology merger.
  *
  * @author Prem Anand (prem@ebi.ac.uk)
  * @version $Id$
- * @since 2.0.1-SNAPSHOT
+ * @since 2.0.1
  */
 public class OntologyMergeConfig {
 
-
+    /**
+     * the root CV term identifier we are going to copy under the target term.
+     */
     private String sourceOntologyTerm;
+
+    /**
+     * the root CV term identifier where the source term are going to be copied.
+     */
     private String targetOntologyTerm;
+
+    /**
+     * if true, the merger should copy all children term of the source recursively.
+     */
     private boolean recursive;
+
+    /**
+     * if true, the merger should include the source term directly unter the target term, otherwise only the children
+     * terms of the source.
+     */
     private boolean includeSourceOntologyTerm;
 
+    public OntologyMergeConfig( String sourceOntologyTerm, String targetOntologyTerm, boolean recursive, boolean includeSourceOntologyTerm ) {
+        setSourceOntologyTerm( sourceOntologyTerm );
+        setTargetOntologyTerm(targetOntologyTerm );
+        this.recursive = recursive;
+        this.includeSourceOntologyTerm = includeSourceOntologyTerm;
+    }
 
     public String getSourceOntologyTerm() {
         return sourceOntologyTerm;
     }
 
     public void setSourceOntologyTerm( String sourceOntologyTerm ) {
+        if ( sourceOntologyTerm == null ) {
+            throw new IllegalArgumentException( "You must give a non null sourceOntologyTerm" );
+        }
         this.sourceOntologyTerm = sourceOntologyTerm;
     }
 
@@ -44,6 +68,9 @@ public class OntologyMergeConfig {
     }
 
     public void setTargetOntologyTerm( String targetOntologyTerm ) {
+        if ( targetOntologyTerm == null ) {
+            throw new IllegalArgumentException( "You must give a non null targetOntologyTerm" );
+        }
         this.targetOntologyTerm = targetOntologyTerm;
     }
 
@@ -61,5 +88,15 @@ public class OntologyMergeConfig {
 
     public void setIncludeSourceOntologyTerm( boolean includeSourceOntologyTerm ) {
         this.includeSourceOntologyTerm = includeSourceOntologyTerm;
+    }
+
+    @Override
+    public String toString() {
+        return "OntologyMergeConfig{" +
+               "sourceOntologyTerm='" + sourceOntologyTerm + '\'' +
+               ", targetOntologyTerm='" + targetOntologyTerm + '\'' +
+               ", recursive=" + recursive +
+               ", includeSourceOntologyTerm=" + includeSourceOntologyTerm +
+               '}';
     }
 }

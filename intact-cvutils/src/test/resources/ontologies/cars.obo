@@ -1,0 +1,67 @@
+format-version: 1.2
+date: 27:10:2008 13:54
+saved-by: Samuel
+auto-generated-by: OBO-Edit 2.000-beta50
+default-namespace: default_namespace
+
+[Term]
+id: car:09003
+name: car
+creation_date: 2008-10-27T01:41:32Z
+
+[Term]
+id: car:09004
+name: ford
+is_a: car:09003 ! car
+created_by: orchard
+creation_date: 2008-10-27T01:41:56Z
+
+[Term]
+id: car:09005
+name: vauxhall
+is_a: car:09003 ! car
+created_by: orchard
+creation_date: 2008-10-27T01:42:15Z
+
+[Term]
+id: car:09006
+name: rolls royce
+is_a: car:09003 ! car
+created_by: orchard
+creation_date: 2008-10-27T01:42:41Z
+
+[Term]
+id: car:09007
+name: citroen
+is_a: car:09003 ! car
+created_by: orchard
+creation_date: 2008-10-27T01:43:09Z
+
+[Term]
+id: car:09008
+name: C5
+is_a: car:09007 ! citroen
+created_by: orchard
+creation_date: 2008-10-27T01:43:24Z
+
+[Term]
+id: ID:0000000
+name: AX
+is_a: car:09007 ! citroen
+created_by: Samuel
+creation_date: 2008-10-27T01:52:37Z
+
+[Term]
+id: ID:0000001
+name: vectra
+is_a: car:09004 ! ford
+created_by: Samuel
+creation_date: 2008-10-27T01:53:00Z
+
+[Term]
+id: ID:0000002
+name: astra
+is_a: car:09004 ! ford
+created_by: Samuel
+creation_date: 2008-10-27T01:53:20Z
+
