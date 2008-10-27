@@ -437,13 +437,9 @@ public class CvObjectOntologyBuilder {
             Set<Synonym> syn = oboObj.getSynonyms();
             CvObjectAlias alias_;
             for ( Synonym aSyn : syn ) {
-                String aliasName;
-
                 SynonymCategory synCat = aSyn.getSynonymCategory();
-
-                if ( synCat.getID() != null && synCat.getID().equalsIgnoreCase( CvObjectOntologyBuilder.ALIAS_IDENTIFIER ) ) {
-                    aliasName = aSyn.getText();
-
+                if ( synCat != null && synCat.getID() != null && synCat.getID().equalsIgnoreCase( CvObjectOntologyBuilder.ALIAS_IDENTIFIER ) ) {
+                    String aliasName = aSyn.getText();
                     alias_ = ( CvObjectAlias ) toAlias( cvObject, aliasName );
                     cvObject.addAlias( alias_ );
                 }
@@ -689,11 +685,11 @@ public class CvObjectOntologyBuilder {
             throw new NullPointerException( "defDbxref is null" );
         }
 
-
         if ( log.isTraceEnabled() )
             log.trace( "defDbxref: " + defDbxref.getDatabase() + "defDbxref ID: " + defDbxref.getDatabaseID() );
 
-        if ( defDbxref.getDatabase().equalsIgnoreCase( "PMID" ) ) {
+        if ( defDbxref.getDatabase().equalsIgnoreCase( "PMID" ) ||
+             defDbxref.getDatabase().equalsIgnoreCase( "pubmed" ) ) {
             identifier = defDbxref.getDatabaseID();
             database = CvDatabase.PUBMED;
 
@@ -754,11 +750,12 @@ public class CvObjectOntologyBuilder {
             if( synonym != null ) {
                 SynonymCategory synCat = synonym.getSynonymCategory();
 
-                if ( synCat.getID() != null && synCat.getID().equalsIgnoreCase( CvObjectOntologyBuilder.SHORTLABEL_IDENTIFIER ) ) {
+                if ( synCat != null &&
+                     synCat.getID() != null &&
+                     synCat.getID().equalsIgnoreCase( CvObjectOntologyBuilder.SHORTLABEL_IDENTIFIER ) ) {
                     shortLabel = synonym.getText();
                     //another check just to reduce the length to 256 characters--rarely happens
                     if ( shortLabel != null && shortLabel.length() > AnnotatedObject.MAX_SHORT_LABEL_LEN) {
-
                         shortLabel = shortLabel.substring( 0, AnnotatedObject.MAX_SHORT_LABEL_LEN );
                     }//end if
                 }
