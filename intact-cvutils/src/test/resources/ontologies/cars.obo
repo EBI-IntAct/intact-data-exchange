@@ -45,21 +45,21 @@ created_by: orchard
 creation_date: 2008-10-27T01:43:24Z
 
 [Term]
-id: ID:0000000
+id: car:09009
 name: AX
 is_a: car:09007 ! citroen
 created_by: Samuel
 creation_date: 2008-10-27T01:52:37Z
 
 [Term]
-id: ID:0000001
+id: ID:090010
 name: vectra
 is_a: car:09004 ! ford
 created_by: Samuel
 creation_date: 2008-10-27T01:53:00Z
 
 [Term]
-id: ID:0000002
+id: ID:090011
 name: astra
 is_a: car:09004 ! ford
 created_by: Samuel
