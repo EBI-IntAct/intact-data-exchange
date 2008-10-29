@@ -40,14 +40,13 @@ public class InteractorConverter {
 
     private CrossReferenceConverter<InteractorXref> xRefConverter = new CrossReferenceConverter<InteractorXref>();
 
-    private static final ArrayList<String> uniprotKeys;
+    private static final List<String> uniprotKeys;
 
     static {
         uniprotKeys = new ArrayList<String>( Arrays.asList( GENE_NAME_MI_REF, GENE_NAME_SYNONYM_MI_REF,
                                                             ISOFORM_SYNONYM_MI_REF, LOCUS_NAME_MI_REF,
                                                             ORF_NAME_MI_REF ) );
     }
-
 
     public ExtendedInteractor toMitab( uk.ac.ebi.intact.model.Interactor intactInteractor, Interaction interaction ) {
         if ( intactInteractor == null ) {
@@ -123,7 +122,6 @@ public class InteractorConverter {
             tabInteractor.setOrganism( oragnism );
         }
 
-
          // process extended
         CvObjectConverter cvObjectConverter = new CvObjectConverter();
         CrossReferenceConverter xConverter = new CrossReferenceConverter();
@@ -151,14 +149,12 @@ public class InteractorConverter {
         List<CrossReference> biologicalRoles = new ArrayList<CrossReference>();
 
         //set parameters
-        List<uk.ac.ebi.intact.psimitab.model.Parameter> parameters = new ArrayList<uk.ac.ebi.intact.psimitab.model.Parameter>();
-
         for ( Component component : interaction.getComponents() ) {
             if ( component.getInteractor().equals( intactInteractor ) ) {
                 biologicalRoles.add( cvObjectConverter.toCrossReference( component.getCvBiologicalRole() ) );
                 experimentRoles.add( cvObjectConverter.toCrossReference( component.getCvExperimentalRole() ) );
 
-                //parameters  for InteractorA
+                //parameters
                 for ( ComponentParameter componentParameter : component.getParameters() ) {
                     uk.ac.ebi.intact.psimitab.model.Parameter parameter =
                             new uk.ac.ebi.intact.psimitab.model.Parameter(componentParameter.getCvParameterType().getShortLabel(),
@@ -166,9 +162,8 @@ public class InteractorConverter {
                                                                           componentParameter.getBase(),
                                                                           componentParameter.getExponent(),
                                                                           (componentParameter.getCvParameterUnit() != null? componentParameter.getCvParameterUnit().getShortLabel() : null));
-                    parameters.add( parameter );
+                    tabInteractor.getParameters().add( parameter );
                 }
-
             }
         }
 
@@ -182,12 +177,8 @@ public class InteractorConverter {
             tabInteractor.getAnnotations().add(annot);
         }
 
-        //set parameters
-        tabInteractor.setParameters( parameters );
-
         return tabInteractor;
     }
-
 
     public Component fromMitab() {
         throw new UnsupportedOperationException();
