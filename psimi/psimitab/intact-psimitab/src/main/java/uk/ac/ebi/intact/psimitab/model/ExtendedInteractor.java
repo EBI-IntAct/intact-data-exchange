@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.ArrayList;
 
 /**
- * TODO comment that class header
+ * Extended interactor that accomodates IntAct's new fields.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -106,7 +106,7 @@ public class ExtendedInteractor extends Interactor {
 
     public List<Parameter> getParameters() {
         if (parameters == null) {
-            return new ArrayList<Parameter>();
+            parameters = new ArrayList<Parameter>();
         }
         return parameters;
     }
