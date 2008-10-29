@@ -245,10 +245,8 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
             }
 
             // fetch parents and fill the field list
-            System.out.println("TERM: "+identifier);
             final OntologyTerm ontologyTerm = new LazyLoadedOntologyTerm( ontologySearcher, identifier );
             final Set<OntologyTerm> parents = ontologyTerm.getAllParentsToRoot();
-            System.out.println("PARENTS: "+parents);
 
             allParents = convertTermsToFields( type, parents );
         }
