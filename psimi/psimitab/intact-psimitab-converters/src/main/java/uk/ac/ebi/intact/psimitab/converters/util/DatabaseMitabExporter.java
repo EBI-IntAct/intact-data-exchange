@@ -163,6 +163,13 @@ public class DatabaseMitabExporter {
 
                     interactionCount++;
 
+                    if (interactorCount % 500 == 0) {
+                        if (log.isDebugEnabled()) log.debug("Auto optimization of the interactor index");
+                        if (interactorIndexWriter != null) {
+                            interactorIndexWriter.optimize();
+                        }
+                    }
+
                     if (interactionCount % 100 == 0) {
                         if (log.isDebugEnabled()) log.debug("Processed "+interactionCount+" interactions ("+interactorCount+" interactors)");
                         mitabWriter.flush();
@@ -242,7 +249,6 @@ public class DatabaseMitabExporter {
         }
     }
 
-
     private static List<? extends Interactor> findInteractors(String hql, int firstResult, int maxResults) {
         Query q = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                 .getEntityManager().createQuery(hql);
@@ -251,5 +257,4 @@ public class DatabaseMitabExporter {
 
         return q.getResultList();
     }
-
 }
