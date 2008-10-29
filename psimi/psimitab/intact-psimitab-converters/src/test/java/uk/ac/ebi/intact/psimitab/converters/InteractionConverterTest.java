@@ -98,7 +98,7 @@ public class InteractionConverterTest extends IntactBasicTestCase {
 
         final Parameter parameterB = parametersB.iterator().next();
         Assert.assertEquals( "temperature", parameterB.getType() );
-        Assert.assertEquals( "30.2E1", parameterB.getValue() );
+        Assert.assertEquals( "30.2 x 10^1", parameterB.getValue() );
         Assert.assertEquals( "kelvin", parameterB.getUnit() );
 
         //check ParametersInteraction
