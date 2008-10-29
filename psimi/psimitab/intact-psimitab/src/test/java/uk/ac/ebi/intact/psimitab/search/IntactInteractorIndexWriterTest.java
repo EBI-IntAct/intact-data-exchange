@@ -28,7 +28,7 @@ import org.junit.Assert;
 import java.io.InputStream;
 
 /**
- * TODO comment that class header
+ * IntactInteractorIndexWriter Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -56,7 +56,7 @@ public class IntactInteractorIndexWriterTest {
         InputStream is = IntactInteractorIndexWriterTest.class.getResourceAsStream("/mitab_samples/aspirin.tsv");
         indexWriter.index(directory, is, true, true);
 
-        SearchResult result = Searcher.search("aspirin", directory);
-        Assert.assertEquals(17, result.getTotalCount());
+        SearchResult result = Searcher.search("aspirine", directory);
+        Assert.assertEquals(1, result.getTotalCount());
     }
 }
