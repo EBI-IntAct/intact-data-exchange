@@ -32,14 +32,16 @@ import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
  */
 public class IntactBinaryInteractionHandler extends AbstractBinaryInteractionHandler<IntactBinaryInteraction> {
 
-    protected IntactBinaryInteraction newBinaryInteraction(Interactor i1, Interactor i2) {
+    @Override
+    public IntactBinaryInteraction newBinaryInteraction(Interactor i1, Interactor i2) {
         if (!(i1 instanceof ExtendedInteractor && i2 instanceof ExtendedInteractor)) {
             throw new IllegalArgumentException("To create an intact binary interaction, we need interactors of type ExtendedInteractor and not: "+i1.getClass().getName());
         }
         return new IntactBinaryInteraction((ExtendedInteractor)i1, (ExtendedInteractor)i2);
     }
 
-    protected Interactor newInteractor(Collection identifiers) {
+    @Override
+    public Interactor newInteractor(Collection identifiers) {
         return new ExtendedInteractor(identifiers);
     }
     

@@ -75,11 +75,8 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
         return name != null && expandableOntologies.contains( name.toLowerCase() );
     }
 
-    public Document createDocumentFromPsimiTabLine( String psiMiTabLine ) throws MitabLineException {
-        Document doc = super.createDocumentFromPsimiTabLine( psiMiTabLine );
-
-        final RowBuilder rowBuilder = getDocumentDefinition().createRowBuilder();
-        final Row row = rowBuilder.createRow( psiMiTabLine );
+    public Document createDocument( Row row ) {
+        Document doc = super.createDocument( row );
 
         if ( row.getColumnCount() <= IntactDocumentDefinition.EXPERIMENTAL_ROLE_A ) {
             return doc;
