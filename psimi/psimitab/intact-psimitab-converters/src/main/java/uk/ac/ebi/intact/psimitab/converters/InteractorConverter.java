@@ -55,12 +55,12 @@ public class InteractorConverter {
 
         ExtendedInteractor tabInteractor = new ExtendedInteractor();
 
-        // set identifiers of interactor
+        // identifiers
         Collection<CrossReference> identifiers = xRefConverter.toCrossReferences( intactInteractor.getXrefs(), true, false );
         identifiers.add( CrossReferenceFactory.getInstance().build( CvDatabase.INTACT, intactInteractor.getAc() ) );
         tabInteractor.setIdentifiers( identifiers );
 
-        // set alternative identifiers of interactor  & set aliases of interactor
+        // alternative identifiers & aliases
         if ( intactInteractor.getAliases() != null ) {
             Collection<CrossReference> altIds = new ArrayList<CrossReference>();
             Collection<Alias> tabAliases = new ArrayList<Alias>();
@@ -114,7 +114,7 @@ public class InteractorConverter {
             }
         }
 
-        // set taxid of interactor
+        // taxid
         if ( intactInteractor.getBioSource() != null ) {
             int taxid = Integer.parseInt( intactInteractor.getBioSource().getTaxId() );
             String name = intactInteractor.getBioSource().getShortLabel();
@@ -126,7 +126,7 @@ public class InteractorConverter {
         CvObjectConverter cvObjectConverter = new CvObjectConverter();
         CrossReferenceConverter xConverter = new CrossReferenceConverter();
 
-        // set properties of interactor
+        // properties
         List<CrossReference> properties = xConverter.toCrossReferences( intactInteractor.getXrefs(), false, true );
         // if molecule type is small molecule, export all chebi ids to that list.
         if( CvObjectUtils.isSmallMoleculeType( intactInteractor.getCvInteractorType() ) ) {
@@ -140,11 +140,11 @@ public class InteractorConverter {
         }
         tabInteractor.setProperties( properties );
 
-        // set type of interactor A
+        // interactor type
         CrossReference interactorTypeA = cvObjectConverter.toCrossReference( intactInteractor.getCvInteractorType() );
         tabInteractor.setInteractorType( interactorTypeA );
 
-        // set expermimental role of interactor
+        // expermimental role
         List<CrossReference> experimentRoles = new ArrayList<CrossReference>();
         List<CrossReference> biologicalRoles = new ArrayList<CrossReference>();
 
