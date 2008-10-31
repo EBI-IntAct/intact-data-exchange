@@ -43,7 +43,6 @@ public class IntactSearchEngine extends AbstractSearchEngine<IntactBinaryInterac
         DocumentDefinition docDef = new IntactDocumentDefinition();
 
         return new String[]{"identifier",
-                            "alias",
                             docDef.getColumnDefinition(IntactDocumentDefinition.PUB_ID).getShortName(),
                             docDef.getColumnDefinition(IntactDocumentDefinition.PUB_AUTH).getShortName(),
                             "species",
