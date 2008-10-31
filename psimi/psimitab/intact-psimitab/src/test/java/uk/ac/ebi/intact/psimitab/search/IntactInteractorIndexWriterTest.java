@@ -20,6 +20,7 @@ import psidev.psi.mi.search.SearchResult;
 import psidev.psi.mi.search.Searcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.store.FSDirectory;
 import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
@@ -42,6 +43,7 @@ public class IntactInteractorIndexWriterTest {
     public void before() throws Exception {
         indexWriter = new IntactInteractorIndexWriter();
         directory = new RAMDirectory();
+//        directory = FSDirectory.getDirectory( "C:\\testIndex" );
     }
 
     @After
@@ -52,11 +54,59 @@ public class IntactInteractorIndexWriterTest {
     }
 
     @Test
+    public void index3() throws Exception {
+        InputStream is = IntactInteractorIndexWriterTest.class.getResourceAsStream("/mitab_samples/imatinib_small.txt");
+        indexWriter.index(directory, is, true, true);
+
+        assertSearchResultCount(3, "*");
+    }
+
+    @Test
     public void index4() throws Exception {
         InputStream is = IntactInteractorIndexWriterTest.class.getResourceAsStream("/mitab_samples/aspirin.tsv");
         indexWriter.index(directory, is, true, true);
 
-        SearchResult result = Searcher.search("aspirine", directory);
-        Assert.assertEquals(1, result.getTotalCount());
+        assertSearchResultCount(17, "*");
+
+        assertSearchResultCount(1, "aspirine");
+
+        // check column by column
+
+        // protein identifier A
+        assertSearchResultCount(1, "idA:P23219");
+        assertSearchResultCount(2, "P23219");
+        // compound identifier A
+        assertSearchResultCount(1, "DB00371");
+
+        // protein identifier B
+        assertSearchResultCount(2, "P60045");
+        // compound identifier B
+        assertSearchResultCount(1, "DB00497");
+
+        // alternative identifier A
+        assertSearchResultCount(1, "Cirpon");
+
+        // alternative identifier B
+        assertSearchResultCount(1, "Acetophen");
+
+        // aliases A
+        assertSearchResultCount(1, "GABRA6");
+
+        // aliases B
+        assertSearchResultCount(1, "GABRA1");
+
+        // properties A
+        assertSearchResultCount(0, "1PXX_A");
+
+        // properties B
+        assertSearchResultCount(0, "APRD00387");
+
+        // properties of interactions
+        assertSearchResultCount(17, "18048412");
+        assertSearchResultCount(16, "9606");
+    }
+
+    private void assertSearchResultCount( final int expectedCount, String searchQuery ){
+        Assert.assertEquals( expectedCount, Searcher.search(searchQuery, directory).getTotalCount());
     }
 }
