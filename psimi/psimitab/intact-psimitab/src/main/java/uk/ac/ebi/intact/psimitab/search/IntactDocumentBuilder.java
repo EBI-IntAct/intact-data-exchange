@@ -107,13 +107,56 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
         addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.BIOLOGICAL_ROLE_A ), biologicalRoleA );
         addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.BIOLOGICAL_ROLE_B ), biologicalRoleB );
 
-        String value = isolateValue( propertiesA ) + " " + isolateValue( propertiesB );
+        final String propertiesAString = isolateValue( propertiesA );
+        final String propertiesBString = isolateValue( propertiesB );
+        String value = propertiesAString + " " + propertiesBString;
         doc.add( new Field( "properties_exact", value,
                             Field.Store.NO,
                             Field.Index.TOKENIZED ) );
 
-        addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_A ), propertiesA );
-        addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_B ), propertiesB );
+//        addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_A ), propertiesA );
+//        addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_B ), propertiesB );
+
+        // TODO I removed the sortable fields on properties!!
+        doc.add( new Field( "propertiesA_exact", propertiesAString,
+                            Field.Store.YES,
+                            Field.Index.TOKENIZED ) );
+
+        doc.add( new Field( "propertiesB_exact", propertiesBString,
+                            Field.Store.YES,
+                            Field.Index.TOKENIZED ) );
+
+        if ( ontologySearcher != null ) {
+            Column propertiesAExtended = getColumnWithParents( propertiesA );
+            Column propertiesBExtended = getColumnWithParents( propertiesB );
+
+            String extendedPropertiesA = isolateValue( propertiesAExtended ) ;
+            doc.add( new Field( "propertiesA", extendedPropertiesA,
+                                Field.Store.YES,
+                                Field.Index.TOKENIZED ) );
+
+            String extendedPropertiesB = isolateValue( propertiesBExtended ) ;
+            doc.add( new Field( "propertiesB", extendedPropertiesB,
+                                Field.Store.YES,
+                                Field.Index.TOKENIZED ) );
+
+            doc.add( new Field( "properties", extendedPropertiesA + " " + extendedPropertiesB,
+                                Field.Store.NO,
+                                Field.Index.TOKENIZED ) );
+        } else {
+
+            doc.add( new Field( "propertiesA", propertiesAString,
+                                Field.Store.YES,
+                                Field.Index.TOKENIZED ) );
+
+            doc.add( new Field( "propertiesB", propertiesBString,
+                                Field.Store.YES,
+                                Field.Index.TOKENIZED ) );
+
+            doc.add( new Field( "properties", propertiesAString + " " + propertiesBString,
+                                Field.Store.NO,
+                                Field.Index.TOKENIZED ) );
+        }
 
         doc.add( new Field( "interactor_types", isolateDescriptions( typeA ) + " " + isolateDescriptions( typeB ),
                             Field.Store.NO,
@@ -158,23 +201,16 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
         //Expand interaction detection method and interaction type columns by including parent cv terms only for search, no store
         Column detMethodsExtended = row.getColumnByIndex( MitabDocumentDefinition.INT_DET_METHOD );
         Column interactionTypesExtended = row.getColumnByIndex( MitabDocumentDefinition.INT_TYPE );
-        Column propertiesAExtended = propertiesA;
-        Column propertiesBExtended = propertiesB;
 
         if ( ontologySearcher != null ) {
             detMethodsExtended = getColumnWithParents( detMethodsExtended );
             interactionTypesExtended = getColumnWithParents( interactionTypesExtended );
-            propertiesAExtended = getColumnWithParents( propertiesAExtended );
-            propertiesBExtended = getColumnWithParents( propertiesBExtended );
         }
 
         doc.add( new Field( "detmethod", detMethodsExtended.toString(),
                             Field.Store.YES,
                             Field.Index.TOKENIZED ) );
         doc.add( new Field( "type", interactionTypesExtended.toString(),
-                            Field.Store.YES,
-                            Field.Index.TOKENIZED ) );
-        doc.add( new Field( "properties", propertiesAExtended.toString() + Column.FIELD_DELIMITER + propertiesBExtended,
                             Field.Store.YES,
                             Field.Index.TOKENIZED ) );
         return doc;
