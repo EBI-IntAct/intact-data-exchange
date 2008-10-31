@@ -44,13 +44,11 @@ public class IntactInteractorIndexWriter extends InteractorIndexWriter {
 
     @Override
     protected BinaryInteraction mergeBinaryInteractions( BinaryInteraction source, BinaryInteraction target ) {
-        IntactBinaryInteractionHandler handler = new IntactOnlyOneInteractorHandler();
-        return handler.merge((IntactBinaryInteraction) source, (IntactBinaryInteraction) target);
+        return getBinaryInteractionHandler().merge( source, target );
     }
 
     @Override
     protected SearchEngine createSearchEngine(Directory directory) throws IOException {
         return new IntactSearchEngine(directory);
     }
-
 }
