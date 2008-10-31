@@ -25,7 +25,7 @@ import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
 /**
- * TODO comment that class header
+ * Intact binary interaction handler.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -67,5 +67,6 @@ public class IntactBinaryInteractionHandler extends AbstractBinaryInteractionHan
         extTarget.getBiologicalRoles().addAll(extSource.getBiologicalRoles());
         extTarget.getProperties().addAll(extSource.getProperties());
         extTarget.getParameters().addAll(extSource.getParameters());
+        extTarget.getAnnotations().addAll( extSource.getAnnotations() );
     }
 }
