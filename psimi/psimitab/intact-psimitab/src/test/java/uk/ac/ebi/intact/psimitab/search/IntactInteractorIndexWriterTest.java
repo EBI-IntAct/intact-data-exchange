@@ -68,7 +68,7 @@ public class IntactInteractorIndexWriterTest {
 
         assertSearchResultCount(17, "*");
 
-        assertSearchResultCount(1, "aspirine");
+        assertSearchResultCount(5, "aspirine");
 
         // check column by column
 
@@ -76,24 +76,24 @@ public class IntactInteractorIndexWriterTest {
         assertSearchResultCount(1, "idA:P23219");
         assertSearchResultCount(2, "P23219");
         // compound identifier A
-        assertSearchResultCount(1, "DB00371");
+        assertSearchResultCount(7, "DB00371");
 
         // protein identifier B
         assertSearchResultCount(2, "P60045");
         // compound identifier B
-        assertSearchResultCount(1, "DB00497");
+        assertSearchResultCount(5, "DB00497");
 
         // alternative identifier A
-        assertSearchResultCount(1, "Cirpon");
+        assertSearchResultCount(7, "Cirpon");
 
         // alternative identifier B
-        assertSearchResultCount(1, "Acetophen");
+        assertSearchResultCount(5, "Acetophen");
 
         // aliases A
-        assertSearchResultCount(1, "GABRA6");
+        assertSearchResultCount(2, "GABRA6");
 
         // aliases B
-        assertSearchResultCount(1, "GABRA1");
+        assertSearchResultCount(2, "GABRA1");
 
         // properties A
         assertSearchResultCount(0, "1PXX_A");

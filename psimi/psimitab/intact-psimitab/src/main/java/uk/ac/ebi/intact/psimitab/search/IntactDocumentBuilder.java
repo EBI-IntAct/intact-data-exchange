@@ -107,6 +107,7 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
         addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.BIOLOGICAL_ROLE_A ), biologicalRoleA );
         addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.BIOLOGICAL_ROLE_B ), biologicalRoleB );
 
+        // properties
         final String propertiesAString = isolateValue( propertiesA );
         final String propertiesBString = isolateValue( propertiesB );
         String value = propertiesAString + " " + propertiesBString;
@@ -114,10 +115,6 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
                             Field.Store.NO,
                             Field.Index.TOKENIZED ) );
 
-//        addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_A ), propertiesA );
-//        addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_B ), propertiesB );
-
-        // TODO I removed the sortable fields on properties!!
         doc.add( new Field( "propertiesA_exact", propertiesAString,
                             Field.Store.YES,
                             Field.Index.TOKENIZED ) );
@@ -130,34 +127,23 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
             Column propertiesAExtended = getColumnWithParents( propertiesA );
             Column propertiesBExtended = getColumnWithParents( propertiesB );
 
-            String extendedPropertiesA = isolateValue( propertiesAExtended ) ;
-            doc.add( new Field( "propertiesA", extendedPropertiesA,
-                                Field.Store.YES,
-                                Field.Index.TOKENIZED ) );
+            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_A ), propertiesAExtended );
+            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_B ), propertiesBExtended );
 
-            String extendedPropertiesB = isolateValue( propertiesBExtended ) ;
-            doc.add( new Field( "propertiesB", extendedPropertiesB,
-                                Field.Store.YES,
-                                Field.Index.TOKENIZED ) );
-
-            doc.add( new Field( "properties", extendedPropertiesA + " " + extendedPropertiesB,
+            doc.add( new Field( "properties", isolateValue( propertiesAExtended ) + " " + isolateValue( propertiesBExtended ),
                                 Field.Store.NO,
                                 Field.Index.TOKENIZED ) );
         } else {
 
-            doc.add( new Field( "propertiesA", propertiesAString,
-                                Field.Store.YES,
-                                Field.Index.TOKENIZED ) );
-
-            doc.add( new Field( "propertiesB", propertiesBString,
-                                Field.Store.YES,
-                                Field.Index.TOKENIZED ) );
+            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_A ), propertiesA );
+            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_B ), propertiesB );
 
             doc.add( new Field( "properties", propertiesAString + " " + propertiesBString,
                                 Field.Store.NO,
                                 Field.Index.TOKENIZED ) );
         }
 
+        // type
         doc.add( new Field( "interactor_types", isolateDescriptions( typeA ) + " " + isolateDescriptions( typeB ),
                             Field.Store.NO,
                             Field.Index.TOKENIZED ) );
