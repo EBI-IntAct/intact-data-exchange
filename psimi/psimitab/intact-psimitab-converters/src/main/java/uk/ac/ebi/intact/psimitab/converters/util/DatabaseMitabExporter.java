@@ -22,6 +22,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.builder.Row;
 import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.context.DataContext;
 import uk.ac.ebi.intact.context.IntactContext;
@@ -38,6 +39,8 @@ import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.search.IntactInteractorIndexWriter;
 import uk.ac.ebi.intact.psimitab.search.IntactPsimiTabIndexWriter;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.commons.util.ETACalculator;
 
 import javax.persistence.Query;
 import java.io.IOException;
@@ -72,11 +75,21 @@ public class DatabaseMitabExporter {
     }
 
     public void exportAllInteractors(Writer mitabWriter, Directory interactionDirectory, Directory interactorDirectory) throws IOException, IntactTransactionException {
+        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+        DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+        final int interactionCount = daoFactory.getInteractorDao( InteractionImpl.class ).countAll();
+        final int allinteractorCount = daoFactory.getInteractorDao().countAll();
+        final int interactingMoleculeTotalCount = allinteractorCount - interactionCount;
+        IntactContext.getCurrentInstance().getDataContext().commitTransaction();
+
         final String allInteractorsHql = "from InteractorImpl where objclass <> '" + InteractionImpl.class.getName()+"'";
-        exportInteractors(allInteractorsHql, mitabWriter, interactionDirectory, interactorDirectory);
+        exportInteractors(allInteractorsHql, interactingMoleculeTotalCount, mitabWriter, interactionDirectory, interactorDirectory);
     }
 
-    public void exportInteractors(String interactorQueryHql, Writer mitabWriter, Directory interactionDirectory, Directory interactorDirectory) throws IOException, IntactTransactionException {
+    public void exportInteractors(String interactorQueryHql, int interactorTotalCount,
+                                  Writer mitabWriter,
+                                  Directory interactionDirectory,
+                                  Directory interactorDirectory) throws IOException, IntactTransactionException {
         if (interactorQueryHql == null) {
             throw new NullPointerException("Query for interactors is null: interactorQuery");
         }
@@ -85,6 +98,15 @@ public class DatabaseMitabExporter {
         }
         if (interactionDirectory == null && interactorDirectory == null) {
             throw new IllegalArgumentException("At least one of the directories has to be non-null in order to index something!");
+        }
+
+        if ( log.isDebugEnabled() ) {
+            log.debug( "Preparing to index " + interactorTotalCount + " interactor(s)." );
+        }
+
+        ETACalculator eta = null;
+        if( interactorTotalCount > 0 ) {
+            eta = new ETACalculator( interactorTotalCount );
         }
 
         // create the ontologies index
@@ -144,24 +166,37 @@ public class DatabaseMitabExporter {
 
                 final IntactDocumentDefinition docDef = new IntactDocumentDefinition();
 
+                if ( log.isTraceEnabled() ) log.trace( "Processing " + binaryInteractions.size() + " interactions..." );
+
                 for (IntactBinaryInteraction bi : binaryInteractions) {
                     flipInteractorsIfNecessary(bi);
 
-                    final String line = docDef.interactionToString(bi);
+                    final Row row = docDef.createInteractionRowConverter().createRow( bi );
+
+                    // here we could save some processing by converting first the line to a Row,
+                    // and then converting tow to string and giving this row to the indexers
+
+                    final String line = row.toString();
                     mitabWriter.write(line+ NEW_LINE);
 
-                    try {
-                        if (interactionIndexer != null) {
-                            interactionIndexer.addLineToIndex(interactionIndexWriter, line );
-                        }
-                        if (interactorIndexer != null) {
-                            interactorIndexer.addLineToIndex(interactorIndexWriter, line );
-                        }
-                    } catch (MitabLineException e) {
-                        log.error("Problem indexing binary interaction: "+bi, e);
+                    if (interactionIndexer != null) {
+                        interactionIndexer.addBinaryInteractionToIndex(interactionIndexWriter, row );
+                    }
+
+                    if (interactorIndexer != null) {
+                        interactorIndexer.addBinaryInteractionToIndex(interactorIndexWriter, row );
                     }
 
                     interactionCount++;
+
+                    if (interactorCount % 50 == 0) {
+                        if (eta != null) {
+                            if ( log.isDebugEnabled() ) {
+                                log.debug( "Processed "+interactorCount+"/"+interactorTotalCount+
+                                           " [ETA: " + eta.printETA( interactorCount ) +"]");
+                            }
+                        }
+                    }
 
                     if (interactorCount % 500 == 0) {
                         if (log.isDebugEnabled()) log.debug("Auto optimization of the interactor index");
