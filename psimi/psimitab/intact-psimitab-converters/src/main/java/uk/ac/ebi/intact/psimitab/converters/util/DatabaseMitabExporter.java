@@ -184,7 +184,7 @@ public class DatabaseMitabExporter {
                     }
 
                     if (interactorIndexer != null) {
-                        interactorIndexer.addBinaryInteractionToIndex(interactorIndexWriter, row );
+                        interactorIndexer.addBinaryInteractionToIndex(interactorIndexWriter, bi );
                     }
 
                     interactionCount++;
