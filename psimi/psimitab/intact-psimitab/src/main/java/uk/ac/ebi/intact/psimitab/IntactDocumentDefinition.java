@@ -49,8 +49,8 @@ public class IntactDocumentDefinition extends AbstractDocumentDefinition<IntactB
         addColumnDefinition(new ColumnDefinition("Experimental role(s) interactor B", "experimentalRoleB", new CrossReferenceFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("Biological role(s) interactor A", "biologicalRoleA", new CrossReferenceFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("Biological role(s) interactor B", "biologicalRoleB", new CrossReferenceFieldBuilder()));
-        addColumnDefinition(new ColumnDefinition("Properties interactor A", "propertiesA", new CrossReferenceFieldBuilder()));
-        addColumnDefinition(new ColumnDefinition("Properties interactor B", "propertiesB", new CrossReferenceFieldBuilder()));
+        addColumnDefinition(new ColumnDefinition("Properties interactor A", "propertiesA_exact", new CrossReferenceFieldBuilder()));
+        addColumnDefinition(new ColumnDefinition("Properties interactor B", "propertiesB_exact", new CrossReferenceFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("Type(s) interactor A", "typeA", new CrossReferenceFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("Type(s) interactor B", "typeB", new CrossReferenceFieldBuilder()));
         addColumnDefinition(new ColumnDefinition("HostOrganism(s)", "hostOrganism", new CrossReferenceFieldBuilder()));

@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.psimitab.search;
 
 
 import psidev.psi.mi.search.Searcher;
+import psidev.psi.mi.search.SearchResult;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.junit.Before;

@@ -110,20 +110,24 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
         addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.BIOLOGICAL_ROLE_B ), biologicalRoleB );
 
         // properties
-        final String propertiesAString = isolateValue( propertiesA );
-        final String propertiesBString = isolateValue( propertiesB );
-        String value = propertiesAString + " " + propertiesBString;
-        doc.add( new Field( "properties_exact", value,
-                            Field.Store.NO,
-                            Field.Index.TOKENIZED ) );
+//        final String propertiesAString = isolateValue( propertiesA );
+//        final String propertiesBString = isolateValue( propertiesB );
+//        String value = propertiesAString + " " + propertiesBString;
 
-        doc.add( new Field( "propertiesA_exact", propertiesAString,
-                            Field.Store.YES,
-                            Field.Index.TOKENIZED ) );
+//        doc.add( new Field( "properties_exact", value,
+//                            Field.Store.NO,
+//                            Field.Index.TOKENIZED ) );
 
-        doc.add( new Field( "propertiesB_exact", propertiesBString,
-                            Field.Store.YES,
-                            Field.Index.TOKENIZED ) );
+        addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_A ), propertiesA );
+        addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_B ), propertiesB );
+
+//        doc.add( new Field( "propertiesA_exact", propertiesAString,
+//                            Field.Store.YES,
+//                            Field.Index.TOKENIZED ) );
+//
+//        doc.add( new Field( "propertiesB_exact", propertiesBString,
+//                            Field.Store.YES,
+//                            Field.Index.TOKENIZED ) );
 
         if ( ontologySearcher != null ) {
             Column propertiesAExtended;
@@ -138,18 +142,24 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
                 propertiesBExtended = getColumnWithParents( propertiesB );
             }
 
-            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_A ), propertiesAExtended );
-            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_B ), propertiesBExtended );
-
-            doc.add( new Field( "properties", isolateValue( propertiesAExtended ) + " " + isolateValue( propertiesBExtended ),
+            doc.add( new Field( "propertiesA", propertiesAExtended.toString(),
+                                Field.Store.NO,
+                                Field.Index.TOKENIZED ) );
+            doc.add( new Field( "propertiesB", propertiesBExtended.toString(),
+                                Field.Store.NO,
+                                Field.Index.TOKENIZED ) );
+            doc.add( new Field( "properties", propertiesAExtended + "|" + propertiesBExtended,
                                 Field.Store.NO,
                                 Field.Index.TOKENIZED ) );
         } else {
 
-            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_A ), propertiesA );
-            addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_B ), propertiesB );
-
-            doc.add( new Field( "properties", propertiesAString + " " + propertiesBString,
+            doc.add( new Field( "propertiesA", propertiesA.toString(),
+                                Field.Store.NO,
+                                Field.Index.TOKENIZED ) );
+            doc.add( new Field( "propertiesB", propertiesB.toString(),
+                                Field.Store.NO,
+                                Field.Index.TOKENIZED ) );
+            doc.add( new Field( "properties", propertiesA + " " + propertiesB,
                                 Field.Store.NO,
                                 Field.Index.TOKENIZED ) );
         }
