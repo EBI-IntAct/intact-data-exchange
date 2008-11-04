@@ -147,10 +147,17 @@ public class DatabaseMitabExporter {
 
             for (Interactor interactor : interactors) {
 
+                final Collection<Component> components = interactor.getActiveInstances();
+                if( components.isEmpty() ) {
+                    // not need to index
+                    log.info( "Interactor " + interactor.getShortLabel() + " isn't involved in any interactions, skipping." );
+                    continue;
+                }
+
                 if (log.isTraceEnabled()) log.trace("Processing interactor: "+interactor.getShortLabel());
 
                 List<Interaction> interactions = new ArrayList<Interaction>();
-                for (Component comp : interactor.getActiveInstances()) {
+                for (Component comp : components) {
                     final Interaction interaction = comp.getInteraction();
 
                     if (!interactionAcProcessed.contains(interaction.getAc())) {
@@ -168,7 +175,13 @@ public class DatabaseMitabExporter {
 
                 if ( log.isTraceEnabled() ) log.trace( "Processing " + binaryInteractions.size() + " interactions..." );
 
+                int count = 0;
                 for (IntactBinaryInteraction bi : binaryInteractions) {
+                    count++;
+                    if ( log.isTraceEnabled() ) {
+                        log.trace( "Processing interaction #" + count );
+                    }
+
                     flipInteractorsIfNecessary(bi);
 
                     final Row row = docDef.createInteractionRowConverter().createRow( bi );
@@ -180,11 +193,19 @@ public class DatabaseMitabExporter {
                     mitabWriter.write(line+ NEW_LINE);
 
                     if (interactionIndexer != null) {
+                        if ( log.isTraceEnabled() ) log.trace( "Indexing interaction..." );
+                        long start  = System.currentTimeMillis();
                         interactionIndexer.addBinaryInteractionToIndex(interactionIndexWriter, row );
+                        long stop  = System.currentTimeMillis();
+                        if ( log.isTraceEnabled() ) log.trace( "Took " + (stop - start) + "ms" );
                     }
 
                     if (interactorIndexer != null) {
+                        if ( log.isTraceEnabled() ) log.trace( "Indexing interactor..." );
+                        long start  = System.currentTimeMillis();
                         interactorIndexer.addBinaryInteractionToIndex(interactorIndexWriter, bi );
+                        long stop  = System.currentTimeMillis();
+                        if ( log.isTraceEnabled() ) log.trace( "Took " + (stop - start) + "ms" );
                     }
 
                     interactionCount++;
