@@ -32,6 +32,8 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
 
     private static final Log log = LogFactory.getLog( IntactDocumentBuilder.class );
 
+    private boolean disableExpandInteractorsProperties;
+
     /**
      * Access to the Ontology index.
      */
@@ -124,8 +126,17 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
                             Field.Index.TOKENIZED ) );
 
         if ( ontologySearcher != null ) {
-            Column propertiesAExtended = getColumnWithParents( propertiesA );
-            Column propertiesBExtended = getColumnWithParents( propertiesB );
+            Column propertiesAExtended;
+            Column propertiesBExtended;
+            if( disableExpandInteractorsProperties ) {
+                propertiesAExtended = propertiesA;
+                propertiesBExtended = propertiesB;
+            } else {
+                log.trace( "Expanding properties of A" );
+                propertiesAExtended = getColumnWithParents( propertiesA );
+                log.trace( "Expanding properties of B" );
+                propertiesBExtended = getColumnWithParents( propertiesB );
+            }
 
             addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_A ), propertiesAExtended );
             addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_B ), propertiesBExtended );
@@ -202,6 +213,14 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
         return doc;
     }
 
+    public void setDisableExpandInteractorsProperties( boolean disable ) {
+        disableExpandInteractorsProperties = disable;
+    }
+
+    public boolean hasDisableExpandInteractorsProperties() {
+        return disableExpandInteractorsProperties;
+    }
+
     public String isolateIdentifier( Column column ) {
         StringBuilder sb = new StringBuilder( 256 );
 
@@ -220,14 +239,19 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
 
     public Column getColumnWithParents( Column cvColumn ) {
 
-        Column column = new Column();
-
+        Collection<psidev.psi.mi.tab.model.builder.Field> parentFieldsC = new ArrayList<psidev.psi.mi.tab.model.builder.Field>();
+        Set<psidev.psi.mi.tab.model.builder.Field> parentFields = new HashSet<psidev.psi.mi.tab.model.builder.Field>();
         for ( psidev.psi.mi.tab.model.builder.Field field : cvColumn.getFields() ) {
             List<psidev.psi.mi.tab.model.builder.Field> currentFieldListWithParents = getListOfFieldsWithParents( field );
-            column.getFields().addAll( currentFieldListWithParents );
+            parentFields.addAll( currentFieldListWithParents );
+            parentFieldsC.addAll( currentFieldListWithParents );
+        }
+        
+        if ( log.isTraceEnabled() ) {
+            log.trace( "From " + cvColumn.getFields().size() + " field, we expanded to " + parentFields.size() + " instead of " + parentFieldsC.size() );
         }
 
-        return column;
+        return new Column( parentFields );
     }
 
     private String prefixIdentifierIfNecessary( String identifier ) {
