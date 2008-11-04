@@ -239,16 +239,14 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
 
     public Column getColumnWithParents( Column cvColumn ) {
 
-        Collection<psidev.psi.mi.tab.model.builder.Field> parentFieldsC = new ArrayList<psidev.psi.mi.tab.model.builder.Field>();
         Set<psidev.psi.mi.tab.model.builder.Field> parentFields = new HashSet<psidev.psi.mi.tab.model.builder.Field>();
         for ( psidev.psi.mi.tab.model.builder.Field field : cvColumn.getFields() ) {
             List<psidev.psi.mi.tab.model.builder.Field> currentFieldListWithParents = getListOfFieldsWithParents( field );
             parentFields.addAll( currentFieldListWithParents );
-            parentFieldsC.addAll( currentFieldListWithParents );
         }
         
         if ( log.isTraceEnabled() ) {
-            log.trace( "From " + cvColumn.getFields().size() + " field, we expanded to " + parentFields.size() + " instead of " + parentFieldsC.size() );
+            log.trace( "From " + cvColumn.getFields().size() + " field, we expanded to " + parentFields.size() );
         }
 
         return new Column( parentFields );
