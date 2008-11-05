@@ -30,6 +30,8 @@ import java.util.*;
  */
 public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<IntactBinaryInteraction> {
 
+    public static final String XREF_FIELD_SEPARATOR = "|";
+
     private static final Log log = LogFactory.getLog( IntactDocumentBuilder.class );
 
     private boolean disableExpandInteractorsProperties;
@@ -110,57 +112,97 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
         addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.BIOLOGICAL_ROLE_B ), biologicalRoleB );
 
         // properties
-//        final String propertiesAString = isolateValue( propertiesA );
-//        final String propertiesBString = isolateValue( propertiesB );
-//        String value = propertiesAString + " " + propertiesBString;
-
-//        doc.add( new Field( "properties_exact", value,
-//                            Field.Store.NO,
-//                            Field.Index.TOKENIZED ) );
 
         addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_A ), propertiesA );
         addTokenizedAndSortableField( doc, getDocumentDefinition().getColumnDefinition( IntactDocumentDefinition.PROPERTIES_B ), propertiesB );
 
-//        doc.add( new Field( "propertiesA_exact", propertiesAString,
-//                            Field.Store.YES,
-//                            Field.Index.TOKENIZED ) );
-//
-//        doc.add( new Field( "propertiesB_exact", propertiesBString,
-//                            Field.Store.YES,
-//                            Field.Index.TOKENIZED ) );
-
         if ( ontologySearcher != null ) {
             Column propertiesAExtended;
             Column propertiesBExtended;
-            if( disableExpandInteractorsProperties ) {
-                propertiesAExtended = propertiesA;
-                propertiesBExtended = propertiesB;
-            } else {
-                log.trace( "Expanding properties of A" );
+//            if( disableExpandInteractorsProperties ) {
+//                propertiesAExtended = propertiesA;
+//                propertiesBExtended = propertiesB;
+//            } else {
                 propertiesAExtended = getColumnWithParents( propertiesA );
-                log.trace( "Expanding properties of B" );
+                if ( log.isTraceEnabled() ) {
+                    log.trace( "Expanding properties A" );
+                    log.trace( "From ("+ propertiesA.getFields().size() +"): " + propertiesA.toString() );
+                    log.trace( "To   ("+ propertiesAExtended.getFields().size() +"): " + propertiesAExtended.toString() );
+                }
+
                 propertiesBExtended = getColumnWithParents( propertiesB );
-            }
+//            }
+
+
+/*
+
+Document 386
+protein alias:PDGFB P01127
+
+propertiesB
+go:"GO:0009986"(cell surface)|
+go:"GO:0005576"(extracellular region)|
+go:"GO:0031089"(platelet dense granule lumen)|
+go:"GO:0043498"(cell surface binding)|
+go:"GO:0048407"(platelet-derived growth factor binding)|
+go:"GO:0005161"(platelet-derived growth factor receptor binding)|
+go:"GO:0046982"(protein heterodimerization activity)|
+go:"GO:0042803"(protein homodimerization activity)|
+go:"GO:0010512"(negative regulation of phosphatidylinositol biosynthetic process)|
+go:"GO:0010544"(negative regulation of platelet activation)|
+go:"GO:0048008"(platelet-derived growth factor receptor signaling pathway)|
+go:"GO:0043536"(positive regulation of blood vessel endothelial cell migration)|
+go:"GO:0050921"(positive regulation of chemotaxis)|
+go:"GO:0045740"(positive regulation of DNA replication)|
+go:"GO:0001938"(positive regulation of endothelial cell proliferation)|
+go:"GO:0048146"(positive regulation of fibroblast proliferation)|
+go:"GO:0043406"(positive regulation of MAP kinase activity)|
+go:"GO:0014911"(positive regulation of smooth muscle cell migration)
+
+
+propertiesB_exact
+
+go:"GO:0009986"(cell surface)|
+go:"GO:0005576"(extracellular region)|
+go:"GO:0031089"(platelet dense granule lumen)|
+go:"GO:0043498"(cell surface binding)|
+go:"GO:0048407"(platelet-derived growth factor binding)|
+go:"GO:0005161"(platelet-derived growth factor receptor binding)|
+go:"GO:0046982"(protein heterodimerization activity)|
+go:"GO:0042803"(protein homodimerization activity)|
+go:"GO:0010512"(negative regulation of phosphatidylinositol biosynthetic process)|
+go:"GO:0010544"(negative regulation of platelet activation)|
+go:"GO:0048008"(platelet-derived growth factor receptor signaling pathway)|
+go:"GO:0043536"(positive regulation of blood vessel endothelial cell migration)|
+go:"GO:0050921"(positive regulation of chemotaxis)|
+go:"GO:0045740"(positive regulation of DNA replication)|
+go:"GO:0001938"(positive regulation of endothelial cell proliferation)|
+go:"GO:0048146"(positive regulation of fibroblast proliferation)|
+go:"GO:0043406"(positive regulation of MAP kinase activity)|
+go:"GO:0014911"(positive regulation of smooth muscle cell migration)|
+
+*/
+
 
             doc.add( new Field( "propertiesA", propertiesAExtended.toString(),
-                                Field.Store.NO,
+                                Field.Store.YES, // was NO
                                 Field.Index.TOKENIZED ) );
             doc.add( new Field( "propertiesB", propertiesBExtended.toString(),
-                                Field.Store.NO,
+                                Field.Store.YES, // was NO
                                 Field.Index.TOKENIZED ) );
-            doc.add( new Field( "properties", propertiesAExtended + "|" + propertiesBExtended,
-                                Field.Store.NO,
+            doc.add( new Field( "properties", propertiesAExtended + XREF_FIELD_SEPARATOR + propertiesBExtended,
+                                Field.Store.YES, // was NO
                                 Field.Index.TOKENIZED ) );
         } else {
 
             doc.add( new Field( "propertiesA", propertiesA.toString(),
-                                Field.Store.NO,
+                                Field.Store.YES, // was NO
                                 Field.Index.TOKENIZED ) );
             doc.add( new Field( "propertiesB", propertiesB.toString(),
-                                Field.Store.NO,
+                                Field.Store.YES, // was NO
                                 Field.Index.TOKENIZED ) );
-            doc.add( new Field( "properties", propertiesA + " " + propertiesB,
-                                Field.Store.NO,
+            doc.add( new Field( "properties", propertiesA + XREF_FIELD_SEPARATOR + propertiesB,
+                                Field.Store.YES, // was NO,
                                 Field.Index.TOKENIZED ) );
         }
 
