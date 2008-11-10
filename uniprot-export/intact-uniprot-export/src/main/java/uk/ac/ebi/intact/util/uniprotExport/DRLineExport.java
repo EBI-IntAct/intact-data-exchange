@@ -441,12 +441,12 @@ public class DRLineExport extends LineExport {
     }
 
     public static String formatProtein(String uniprotID) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder( 64 );
 
-        sb.append(uniprotID).append('\t');
-        sb.append("IntAct").append('\t');
-        sb.append(uniprotID).append('\t');
-        sb.append('-');
+        sb.append("DR   ");
+        sb.append("IntAct; ");
+        sb.append(uniprotID).append("; ");
+        sb.append("-.");
 
         return sb.toString();
     }
