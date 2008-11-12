@@ -33,7 +33,11 @@ public class IntactClusterInteractorPairProcessor extends ClusterInteractorPairP
         mergeCollection(source.getInteractorB().getExperimentalRoles(), target.getInteractorB().getExperimentalRoles());
         mergeCollection(source.getInteractorA().getBiologicalRoles(), target.getInteractorA().getBiologicalRoles());
         mergeCollection(source.getInteractorB().getBiologicalRoles(), target.getInteractorB().getBiologicalRoles());
+        mergeCollection(source.getInteractorB().getParameters(), target.getInteractorB().getParameters());
+        mergeCollection(source.getInteractorB().getParameters(), target.getInteractorB().getParameters());
         mergeCollection(source.getHostOrganism(), target.getHostOrganism());
         mergeCollection(source.getDataset(), target.getDataset());
+        mergeCollection(source.getExpansionMethods(), target.getExpansionMethods());
+        mergeCollection(source.getParameters(), target.getParameters());
     }
 }
