@@ -20,20 +20,24 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.store.FSDirectory;
 import org.junit.*;
+import org.obo.dataadapter.OBOParseException;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexWriter;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
+import uk.ac.ebi.intact.bridges.ontologies.iterator.OntologyIterator;
+import uk.ac.ebi.intact.bridges.ontologies.iterator.OboOntologyIterator;
 import uk.ac.ebi.intact.bridges.ontologies.util.OntologyUtils;
 import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.util.SchemaUtils;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Interactor;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.psimitab.search.IntactSearchEngine;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
 import java.io.StringWriter;
+import java.io.IOException;
 import java.net.URL;
 
 import psidev.psi.mi.search.SearchResult;
@@ -81,6 +85,26 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         IntactContext.closeCurrentInstance();
     }
 
+    private static OntologyIndexSearcher createGoSlimIndexSearcher() throws OBOParseException, IOException {
+        final URL goSlimUrl = DatabaseMitabExporterTest.class.getResource("/META-INF/goslim_generic.obo");
+
+        OntologyIterator ontologyIterator = new OboOntologyIterator("go", goSlimUrl);
+
+        Directory directory = new RAMDirectory();
+        OntologyIndexWriter indexer = new OntologyIndexWriter(directory,true);
+
+        while (ontologyIterator.hasNext()) {
+            OntologyDocument document = ontologyIterator.next();
+            indexer.addDocument(document);
+        }
+
+        indexer.flush();
+        indexer.optimize();
+        indexer.close();
+
+        return new OntologyIndexSearcher(directory);
+    }
+
     @Test
     public void exportAll() throws Exception {
         Interaction interaction = getMockBuilder().createInteraction("a1", "a2", "a3");
@@ -113,9 +137,72 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
 
         interactionsDir.close();
         interactorsDir.close();
-
     }
-    
+
+    @Test
+    public void exportCvExpansion() throws Exception {
+        // then build a single binary interaction with 2 interactor having 1 distinct GO term (! overlapping parents)
+        final CvDatabase go = getMockBuilder().createCvObject( CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO );
+
+        final Protein p1 = getMockBuilder().createProtein( "P12345", "foo" );
+        // add a molecular function, parents are GO:0004871, GO:0003674
+        p1.addXref( new InteractorXref( getMockBuilder().getInstitution(), go, "GO:0004872", "receptor activity", null, null ) );
+
+        final Protein p9 = getMockBuilder().createProtein( "P98765", "foo" );
+        // add a biological process, parents: GO:0006091, GO:0008152, GO:0008150
+        p9.addXref( new InteractorXref( getMockBuilder().getInstitution(), go, "GO:0022904", "respiratory electron transport chain", null, null ) );
+
+        final Interaction interaction = getMockBuilder().createInteraction( "p1-p9",  p1, p9, getMockBuilder().createExperimentEmpty() );
+        PersisterHelper.saveOrUpdate( interaction );
+
+        Assert.assertEquals(2, getDaoFactory().getInteractorDao( ProteinImpl.class ).countAll());
+        Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
+
+        // Build indices with GO expansion enabled
+        StringWriter mitabWriter = new StringWriter();
+        Directory interactionsDir = new RAMDirectory();
+        Directory interactorsDir = new RAMDirectory();
+
+        exporter = new DatabaseMitabExporter( createGoSlimIndexSearcher(), "go" );
+        exporter.exportAllInteractors( mitabWriter, interactionsDir, interactorsDir );
+
+        // check on MITAB
+        String mitab = mitabWriter.getBuffer().toString();
+        Assert.assertEquals( 1, mitab.split( "\n" ).length );
+
+        // check on interaction index
+        Assert.assertEquals(1, new IndexSearcher(interactionsDir).getIndexReader().maxDoc());
+        // p1
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "properties:\"GO:0004872\"" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "properties:\"GO:0006091\"" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "properties:\"GO:0008152\"" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "properties:\"GO:0008150\"" ) );
+        // p2
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "properties:\"GO:0022904\"" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "properties:\"GO:0006091\"" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "properties:\"GO:0008152\"" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "properties:\"GO:0008150\"" ) );
+        interactionsDir.close();
+
+        // check on interactor index -- note: properties does aggragate expanded properties of A and B
+        Assert.assertEquals(2, new IndexSearcher(interactorsDir).getIndexReader().maxDoc());
+        Assert.assertEquals( 2, searchOnIndex( interactorsDir, "properties:\"GO:0004872\"" ) );
+        Assert.assertEquals( 2, searchOnIndex( interactorsDir, "properties:\"GO:0006091\"" ) );
+        Assert.assertEquals( 2, searchOnIndex( interactorsDir, "properties:\"GO:0008152\"" ) );
+        Assert.assertEquals( 2, searchOnIndex( interactorsDir, "properties:\"GO:0008150\"" ) );
+        // p2
+        Assert.assertEquals( 2, searchOnIndex( interactorsDir, "properties:\"GO:0022904\"" ) );
+        Assert.assertEquals( 2, searchOnIndex( interactorsDir, "properties:\"GO:0006091\"" ) );
+        Assert.assertEquals( 2, searchOnIndex( interactorsDir, "properties:\"GO:0008152\"" ) );
+        Assert.assertEquals( 2, searchOnIndex( interactorsDir, "properties:\"GO:0008150\"" ) );
+        interactorsDir.close();
+    }
+
+    private int searchOnIndex( Directory index, String query ) throws IOException {
+        IntactSearchEngine searchEngine = new IntactSearchEngine( index );
+        return searchEngine.search( query, 0, Integer.MAX_VALUE).getTotalCount();
+    }
+
     @Test
     public void exportAll_noInteractorIndex() throws Exception {
         Interaction interaction = getMockBuilder().createInteraction("a1", "a2", "a3");
@@ -129,7 +216,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
 
         StringWriter mitabWriter = new StringWriter();
-        Directory interactionsDir = FSDirectory.getDirectory("/tmp/interactions");
+        Directory interactionsDir = new RAMDirectory();
 
         exporter.exportAllInteractors(mitabWriter, interactionsDir, null);
 
@@ -144,9 +231,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         Assert.assertEquals(2, interactionSearcher.getIndexReader().maxDoc());
 
         // check searching by a parent
-        IntactSearchEngine searchEngine = new IntactSearchEngine(interactionsDir);
-        final SearchResult<IntactBinaryInteraction> result = searchEngine.search("\"GO:0016043\"", 0, 50);
-        Assert.assertEquals(2, result.getTotalCount());
+        Assert.assertEquals( 2, searchOnIndex( interactionsDir, "\"GO:0016043\"" ) );
 
         interactionsDir.close();
     }
