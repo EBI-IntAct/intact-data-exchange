@@ -28,6 +28,8 @@ import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
 
 import java.util.Iterator;
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * TODO comment this
@@ -137,20 +139,25 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         }
 
         // only the first experimental role
-        ExperimentalRole role;
+        Collection<ExperimentalRole> roles = new ArrayList<ExperimentalRole>(2);
 
-        Iterator<ExperimentalRole> expRoleIterator = participant.getExperimentalRoles().iterator();
-        if (expRoleIterator.hasNext()) {
-            role = expRoleIterator.next();
+        if (participant.getExperimentalRoles().isEmpty()) {
+            if (log.isWarnEnabled()) log.warn("Participant without experimental roles: " + participant);
+
+            roles.add(PsiConverterUtils.createUnspecifiedExperimentalRole());
         } else {
-            if (log.isWarnEnabled()) log.warn("Participant without experimental role: " + participant);
-
-            role = PsiConverterUtils.createUnspecifiedExperimentalRole();
+            roles = participant.getExperimentalRoles();
         }
 
-        CvExperimentalRole experimentalRole = new ExperimentalRoleConverter(institution).psiToIntact(role);
+        Collection<CvExperimentalRole> intactExpRoles = new ArrayList<CvExperimentalRole>(roles.size());
 
-        Component component = new Component(institution, interaction, interactor, experimentalRole, biologicalRole);
+        for (ExperimentalRole role : roles) {
+            CvExperimentalRole experimentalRole = new ExperimentalRoleConverter(institution).psiToIntact(role);
+            intactExpRoles.add(experimentalRole);
+        }
+
+        Component component = new Component(institution, interaction, interactor, intactExpRoles.iterator().next(), biologicalRole);
+        component.setExperimentalRoles(intactExpRoles);
 
         IntactConverterUtils.populateAnnotations(participant, component, institution);
 
