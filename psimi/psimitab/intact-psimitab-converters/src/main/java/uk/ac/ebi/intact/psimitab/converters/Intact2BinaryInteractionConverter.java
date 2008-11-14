@@ -21,6 +21,7 @@ import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 import psidev.psi.mi.tab.processor.PostProcessorStrategy;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
 
@@ -48,7 +49,7 @@ public class Intact2BinaryInteractionConverter {
                                     
     public Intact2BinaryInteractionConverter() {
         expansionStrategy = new SpokeWithoutBaitExpansion();
-        postProcessor = new ClusterInteractorPairProcessor<IntactBinaryInteraction>();
+        postProcessor = new IntactClusterInteractorPairProcessor();
     }
 
     public Intact2BinaryInteractionConverter(ExpansionStrategy expansionStrategy, PostProcessorStrategy<IntactBinaryInteraction> postProcessor) {
