@@ -17,9 +17,10 @@ package uk.ac.ebi.intact.psimitab.processor;
 
 import psidev.psi.mi.tab.processor.ClusterInteractorPairProcessor;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
 /**
- * TODO comment that class header
+ * Handles the extra fields of the IntactBinaryInteraction.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -29,15 +30,20 @@ public class IntactClusterInteractorPairProcessor extends ClusterInteractorPairP
     @Override
     protected void mergeCollections(IntactBinaryInteraction source, IntactBinaryInteraction target) {
         super.mergeCollections(source, target);
-        mergeCollection(source.getInteractorA().getExperimentalRoles(), target.getInteractorA().getExperimentalRoles());
-        mergeCollection(source.getInteractorB().getExperimentalRoles(), target.getInteractorB().getExperimentalRoles());
-        mergeCollection(source.getInteractorA().getBiologicalRoles(), target.getInteractorA().getBiologicalRoles());
-        mergeCollection(source.getInteractorB().getBiologicalRoles(), target.getInteractorB().getBiologicalRoles());
-        mergeCollection(source.getInteractorB().getParameters(), target.getInteractorB().getParameters());
-        mergeCollection(source.getInteractorB().getParameters(), target.getInteractorB().getParameters());
+
+        mergeInteractors( source.getInteractorA(), target.getInteractorA());
+        mergeInteractors( source.getInteractorB(), target.getInteractorB());
+        
         mergeCollection(source.getHostOrganism(), target.getHostOrganism());
         mergeCollection(source.getDataset(), target.getDataset());
         mergeCollection(source.getExpansionMethods(), target.getExpansionMethods());
         mergeCollection(source.getParameters(), target.getParameters());
+    }
+
+    private void mergeInteractors( ExtendedInteractor source, ExtendedInteractor target ) {
+        mergeCollection(source.getExperimentalRoles(), target.getExperimentalRoles());
+        mergeCollection(source.getBiologicalRoles(), target.getBiologicalRoles());
+        mergeCollection(source.getParameters(), target.getParameters());
+        mergeCollection(source.getAnnotations(), target.getAnnotations());
     }
 }
