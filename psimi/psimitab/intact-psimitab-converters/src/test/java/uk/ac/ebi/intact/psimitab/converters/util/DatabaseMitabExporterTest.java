@@ -39,6 +39,9 @@ import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import java.io.StringWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
 
 import psidev.psi.mi.search.SearchResult;
 
@@ -198,9 +201,191 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         interactorsDir.close();
     }
 
+    @Test
+    public void checkInteractionMerge() throws Exception {
+
+        final Protein p1 = getMockBuilder().createProtein( "P12345", "foo" );
+        final Protein p2 = getMockBuilder().createProtein( "Q11111", "lala" );
+        final Protein p9 = getMockBuilder().createProtein( "P98765", "bar" );
+
+        final CvInteraction cosedimentation = getMockBuilder().createCvObject( CvInteraction.class,
+                                                                               CvInteraction.COSEDIMENTATION_MI_REF,
+                                                                               CvInteraction.COSEDIMENTATION );
+        final CvInteraction inferred = getMockBuilder().createCvObject( CvInteraction.class,
+                                                                        CvInteraction.INFERRED_BY_CURATOR_MI_REF,
+                                                                        CvInteraction.INFERRED_BY_CURATOR );
+
+        final CvInteractionType direct = getMockBuilder().createCvObject( CvInteractionType.class,
+                                                                          CvInteractionType.DIRECT_INTERACTION_MI_REF,
+                                                                          CvInteractionType.DIRECT_INTERACTION );
+
+        final CvInteractionType physical = getMockBuilder().createCvObject( CvInteractionType.class,
+                                                                            CvInteractionType.PHYSICAL_INTERACTION_MI_REF,
+                                                                            CvInteractionType.PHYSICAL_INTERACTION );
+
+        final Experiment e1 = getMockBuilder().createExperimentEmpty();
+        e1.setCvInteraction( cosedimentation );
+        final Experiment e2 = getMockBuilder().createExperimentEmpty();
+        e2.setCvInteraction( inferred );
+
+        // Let's create interactions
+
+        final Interaction interaction1 = getMockBuilder().createInteraction( "p1-p9-1",  p1, p9, e1 );
+        interaction1.setCvInteractionType( direct );
+        addFeatureForInteractor( interaction1, p1 );
+        final Interaction interaction2 = getMockBuilder().createInteraction( "p1-p2-1",  p1, p2, e1 );
+        final Interaction interaction3 = getMockBuilder().createInteraction( "p9-p1-1",  p9, p1, e1 );
+
+        final Interaction interaction4 = getMockBuilder().createInteraction( "p9-p1-2",  p9, p1, e2 );
+        interaction1.setCvInteractionType( physical );
+        PersisterHelper.saveOrUpdate( interaction1, interaction2, interaction3, interaction4 );
+
+        Assert.assertEquals(3, getDaoFactory().getInteractorDao( ProteinImpl.class ).countAll());
+        Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(2, getDaoFactory().getExperimentDao().countAll());
+
+        // Build indices with GO expansion enabled
+        StringWriter mitabWriter = new StringWriter();
+        Directory interactionsDir = new RAMDirectory();
+        Directory interactorsDir = new RAMDirectory();
+
+        exporter.exportAllInteractors( mitabWriter, interactionsDir, interactorsDir );
+
+        // check on MITAB
+        String mitab = mitabWriter.getBuffer().toString();
+        Assert.assertEquals( 2, mitab.split( "\n" ).length );
+
+        // check on interaction index -- note: properties does aggragate expanded properties of A and B
+        Assert.assertEquals(2, new IndexSearcher(interactionsDir).getIndexReader().maxDoc());
+        Assert.assertEquals( 2, searchOnIndex( interactionsDir, "P12345" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "Q11111" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "P98765" ) );
+
+        // P98765 is only involved with P12345 in 2 distinct interactions, it should have been merged
+        Assert.assertEquals( 3, countEvidences( interactionsDir, "P98765" ) );
+        interactionsDir.close();
+
+        // check on interactor index
+        Assert.assertEquals(3, new IndexSearcher(interactorsDir).getIndexReader().maxDoc());
+        Assert.assertEquals( 1, searchOnIndex( interactorsDir, "idA:P12345" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactorsDir, "idA:P98765" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactorsDir, "idA:Q11111" ) );
+        interactorsDir.close();
+    }
+
+    @Test
+    public void checkNaryInteractionMerge() throws Exception {
+
+        final Protein p1 = getMockBuilder().createProtein( "P12345", "foo" );
+        final Protein p2 = getMockBuilder().createProtein( "Q11111", "lala" );
+        final Protein p9 = getMockBuilder().createProtein( "P98765", "bar" );
+
+        final CvInteraction cosedimentation = getMockBuilder().createCvObject( CvInteraction.class,
+                                                                               CvInteraction.COSEDIMENTATION_MI_REF,
+                                                                               CvInteraction.COSEDIMENTATION );
+        final CvInteraction inferred = getMockBuilder().createCvObject( CvInteraction.class,
+                                                                        CvInteraction.INFERRED_BY_CURATOR_MI_REF,
+                                                                        CvInteraction.INFERRED_BY_CURATOR );
+
+        final CvInteractionType direct = getMockBuilder().createCvObject( CvInteractionType.class,
+                                                                          CvInteractionType.DIRECT_INTERACTION_MI_REF,
+                                                                          CvInteractionType.DIRECT_INTERACTION );
+
+        final CvInteractionType physical = getMockBuilder().createCvObject( CvInteractionType.class,
+                                                                            CvInteractionType.PHYSICAL_INTERACTION_MI_REF,
+                                                                            CvInteractionType.PHYSICAL_INTERACTION );
+
+        final CvExperimentalRole bait = getMockBuilder().createCvObject( CvExperimentalRole.class,
+                                                                         CvExperimentalRole.BAIT_PSI_REF,
+                                                                         CvExperimentalRole.BAIT );
+
+        final CvExperimentalRole prey = getMockBuilder().createCvObject( CvExperimentalRole.class,
+                                                                         CvExperimentalRole.PREY_PSI_REF,
+                                                                         CvExperimentalRole.PREY );
+
+        final Experiment e1 = getMockBuilder().createExperimentEmpty();
+        e1.setCvInteraction( cosedimentation );
+        e1.setBioSource( getMockBuilder().createBioSource( 9606, "human" ) );
+        final Experiment e2 = getMockBuilder().createExperimentEmpty();
+        e2.setCvInteraction( inferred );
+        e2.setBioSource( getMockBuilder().createBioSource( 9999, "alian" ) );
+
+        // Let's create interactions
+
+        final Interaction interaction1 = getMockBuilder().createInteraction( p1, p2, p9 );
+        updateInteractorRole( interaction1, p1, bait );
+        updateInteractorRole( interaction1, p2, prey );
+        updateInteractorRole( interaction1, p9, prey );
+        interaction1.setCvInteractionType( direct );
+        addFeatureForInteractor( interaction1, p1 );
+
+        final Interaction interaction4 = getMockBuilder().createInteraction( "p9-p1-2",  p9, p1, e2 );
+        interaction1.setCvInteractionType( physical );
+        PersisterHelper.saveOrUpdate( interaction1, interaction4 );
+
+        Assert.assertEquals(3, getDaoFactory().getInteractorDao( ProteinImpl.class ).countAll());
+        Assert.assertEquals(2, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(2, getDaoFactory().getExperimentDao().countAll());
+
+        // Build indices with GO expansion enabled
+        StringWriter mitabWriter = new StringWriter();
+        Directory interactionsDir = new RAMDirectory();
+        Directory interactorsDir = new RAMDirectory();
+
+        exporter.exportAllInteractors( mitabWriter, interactionsDir, interactorsDir );
+
+        // check on MITAB
+        String mitab = mitabWriter.getBuffer().toString();
+        Assert.assertEquals( 2, mitab.split( "\n" ).length );
+
+        // check on interaction index -- note: properties does aggragate expanded properties of A and B
+        Assert.assertEquals(2, new IndexSearcher(interactionsDir).getIndexReader().maxDoc());
+        Assert.assertEquals( 2, searchOnIndex( interactionsDir, "P12345" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "Q11111" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactionsDir, "P98765" ) );
+
+        // P98765 is only involved with P12345 in 2 distinct interactions, it should have been merged
+        Assert.assertEquals( 2, countEvidences( interactionsDir, "P98765" ) );
+        interactionsDir.close();
+
+        // check on interactor index
+        Assert.assertEquals(3, new IndexSearcher(interactorsDir).getIndexReader().maxDoc());
+        Assert.assertEquals( 1, searchOnIndex( interactorsDir, "idA:P12345" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactorsDir, "idA:P98765" ) );
+        Assert.assertEquals( 1, searchOnIndex( interactorsDir, "idA:Q11111" ) );
+        interactorsDir.close();
+    }
+
+    private void updateInteractorRole( Interaction i, Protein p, CvExperimentalRole role ) {
+        for ( Component component : i.getComponents() ) {
+            if( component.getInteractor().equals(p) ) {
+                component.setExperimentalRoles( Arrays.asList( role ) );
+            }
+        }
+    }
+
+    private void addFeatureForInteractor( Interaction i, Protein p ) {
+        for ( Component c : i.getComponents() ) {
+            if( c.getInteractor().equals( p ) ) {
+                // add a feature
+                final Feature feature = getMockBuilder().createFeatureRandom();
+                feature.addRange( getMockBuilder().createRangeCTerminal() );
+                c.addBindingDomain( feature );
+            }
+        }
+    }
+
     private int searchOnIndex( Directory index, String query ) throws IOException {
         IntactSearchEngine searchEngine = new IntactSearchEngine( index );
         return searchEngine.search( query, 0, Integer.MAX_VALUE).getTotalCount();
+    }
+
+    private int countEvidences( Directory index, String query ) throws IOException {
+        IntactSearchEngine searchEngine = new IntactSearchEngine( index );
+        final List<IntactBinaryInteraction> interactions = searchEngine.search( query, 0, Integer.MAX_VALUE ).getData();
+        Assert.assertEquals(1, interactions.size());
+        final IntactBinaryInteraction i = interactions.iterator().next();
+        return i.getInteractionAcs().size();
     }
 
     @Test
