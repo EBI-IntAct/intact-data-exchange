@@ -62,6 +62,10 @@ public class IntactInteractorConverter extends InteractorConverter<ExtendedInter
 
         Interactor interactor = super.fromMitab(extInteractor);
 
+        Collection<DbReference> secondaryRefs = getSecondaryRefs(interactor,extInteractor.getProperties());
+        //setting the secondary refs with properties
+        Xref interactorXref = new Xref(interactor.getXref().getPrimaryRef(),secondaryRefs);
+        interactor.setXref(interactorXref);
         return interactor;
     }
 
@@ -116,9 +120,13 @@ public class IntactInteractorConverter extends InteractorConverter<ExtendedInter
         return participant;
     }
 
-    private Collection<DbReference> getSecondaryRefs( List<CrossReference> properties ) {
+    private Collection<DbReference> getSecondaryRefs( Interactor interactor,List<CrossReference> properties ) {
         Collection<DbReference> refs = new ArrayList<DbReference>();
         for ( CrossReference property : properties ) {
+
+           // if(!"identity".equals(property.getText())){
+            if(!interactor.getXref().getPrimaryRef().getId().equals(property.getIdentifier())) {
+
             DbReference secDbRef = new DbReference();
             secDbRef.setDb( property.getDatabase() );
             if ( property.getDatabase().equalsIgnoreCase( "GO" ) ) {
@@ -135,11 +143,28 @@ public class IntactInteractorConverter extends InteractorConverter<ExtendedInter
                 if ( property.getDatabase().equals( "uniprotkb" ) ) {
                     secDbRef.setDbAc( "MI:0486" );
                 }
+                if (property.getDatabase().equals("drugbank")) {
+                    secDbRef.setDbAc("MI:2002");
+                }
+                if (property.getDatabase().equals("pubmed")) {
+                    secDbRef.setDbAc("MI:0446");
+                }
+                if (property.getDatabase().equals("ensembl")) {
+                    secDbRef.setDbAc("MI:0476");
+                }
+                if (property.getDatabase().equals("refseq")) {
+                    secDbRef.setDbAc("MI:0481");
+                }
+                if (property.getDatabase().equals("chebi")) {
+                    secDbRef.setDbAc("MI:0474");
+                }
             }
             if ( property.hasText() ) {
                 secDbRef.setSecondary( property.getText() );
             }
             refs.add( secDbRef );
+
+            }
         }
         return refs;
     }

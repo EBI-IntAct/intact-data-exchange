@@ -243,7 +243,10 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
 
         List<Author> authors = new ArrayList<Author>();
         for ( ExperimentDescription experiment : interaction.getExperiments() ) {
-            final String label = experiment.getNames().getShortLabel();
+            String label = null;
+            if (experiment.getNames() != null) {
+                label = experiment.getNames().getShortLabel();
+            }
             if ( isWellFormattedExperimentShortlabel( label ) ) {
                 final StringBuilder sb = new StringBuilder();
                 final String[] values = label.split( "-" );
@@ -330,7 +333,10 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
         // expansion method
         final int expansionCount = ibi.getExpansionMethods().size();
         if( index <= expansionCount ) {
-            String expMethod = ibi.getExpansionMethods().get( index );
+            String expMethod = null;
+            if (ibi.getExpansionMethods().size() > 0) {
+                expMethod = ibi.getExpansionMethods().get(index);
+            }
             if( ! "-".equals( expMethod ) ) {
                 Attribute attr = new Attribute("expansion", expMethod);
                 interaction.getAttributes().add(attr);
@@ -423,7 +429,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
      * @param participant
      * @return list of properties
      */
-    private List<CrossReference> extractProperties( Participant participant ) throws IOException {
+   /* private List<CrossReference> extractProperties( Participant participant ) throws IOException {
         List<CrossReference> properties = new ArrayList<CrossReference>();
         for ( DbReference dbref : participant.getInteractor().getXref().getSecondaryRef() ) {
             String id, db, text = null;
@@ -444,5 +450,27 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             }
         }
         return properties;
+    }*/
+    private List<CrossReference> extractProperties(Participant participant) throws IOException {
+        List<CrossReference> properties = new ArrayList<CrossReference>();
+        for (DbReference dbref : participant.getInteractor().getXref().getAllDbReferences()) {
+            String id, db, text = null;
+
+            id = dbref.getId();
+            db = dbref.getDb();
+
+            if (finder != null && finder.isOntologySupported(db)) {
+                text = finder.getNameByIdentifier(id);
+            } else {
+                if (dbref.getRefType() != null) {
+                    text = dbref.getRefType();
+                } else if (dbref.getSecondary() != null) {
+                    text = dbref.getSecondary();
+                }
+            }
+            properties.add(new CrossReferenceImpl(db, id, text));
+        }
+        return properties;
     }
+
 }

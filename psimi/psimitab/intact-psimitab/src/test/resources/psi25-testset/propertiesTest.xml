@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<entrySet version="5" minorVersion="3" level="2" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <entry>
+        <source releaseDate="2008-11-14">
+            <names>
+                <shortLabel>European Bioinformatics Institute</shortLabel>
+            </names>
+            <attributeList>
+                <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom</attribute>
+                <attribute name="url">http://www.ebi.ac.uk</attribute>
+            </attributeList>
+        </source>
+        <interactionList>
+            <interaction id="5">
+                <names>
+                    <shortLabel>primId-primId-1</shortLabel>
+                </names>
+                <xref>
+                    <primaryRef refTypeAc="MI:0356" refType="identity" id="CrossReference{database='uniprotkb', identifier='primId_interactorA'}_CrossReference{database='uniprotkb', identifier='primId_interactorB'}" dbAc="MI:0469" db="unknown"/>
+                </xref>
+                <experimentList>
+                    <experimentDescription id="6">
+                        <bibref>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="9524" dbAc="MI:0446" db="pubmed"/>
+                            </xref>
+                        </bibref>
+                        <hostOrganismList>
+                            <hostOrganism ncbiTaxId="1">
+                                <names>
+                                    <shortLabel>label_oohpeyhv</shortLabel>
+                                </names>
+                            </hostOrganism>
+                        </hostOrganismList>
+                        <interactionDetectionMethod>
+                            <names>
+                                <shortLabel>cosedimentation</shortLabel>
+                                <fullName>cosedimentation</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0027" dbAc="MI:0488" db="psi-mi"/>
+                            </xref>
+                        </interactionDetectionMethod>
+                    </experimentDescription>
+                </experimentList>
+                <participantList>
+                    <participant id="3">
+                        <interactor id="1">
+                            <names>
+                                <shortLabel>primId_interactorA</shortLabel>
+                                <alias>VAOMWWI</alias>
+                            </names>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="primId_interactorA" dbAc="MI:0486" db="uniprotkb"/>
+                                <secondaryRef secondary="some textA" id="go:GO:0007028" dbAc="MI:0448" db="go"/>
+                                <secondaryRef secondary="see-also" id="IPR000867" dbAc="MI:0449" db="interpro"/>
+                                <secondaryRef secondary="secondary-ac" id="P26439" dbAc="MI:0486" db="uniprotkb"/>
+                            </xref>
+                            <interactorType>
+                                <names>
+                                    <shortLabel>protein</shortLabel>
+                                    <fullName>protein</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0326" dbAc="MI:0488" db="psi-mi"/>
+                                </xref>
+                            </interactorType>
+                            <organism ncbiTaxId="2">
+                                <names>
+                                    <shortLabel>label_duybqpdae</shortLabel>
+                                </names>
+                            </organism>
+                        </interactor>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488" db="psi-mi"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>bait</shortLabel>
+                                    <fullName>bait</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0496" dbAc="MI:0488" db="psi-mi"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <parameterList>
+                            <parameter uncertainty="0.0" unit="kelvin" term="temperature" factor="302.0" exponent="0" base="10">
+                                <experimentRef>0</experimentRef>
+                            </parameter>
+                        </parameterList>
+                    </participant>
+                    <participant id="4">
+                        <interactor id="2">
+                            <names>
+                                <shortLabel>primId_interactorB</shortLabel>
+                                <alias>UIQUUXDRN</alias>
+                            </names>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="primId_interactorB" dbAc="MI:0486" db="uniprotkb"/>
+                                <secondaryRef secondary="some textB" id="go:GO:0008032" dbAc="MI:0448" db="go"/>
+                            </xref>
+                            <interactorType>
+                                <names>
+                                    <shortLabel>protein</shortLabel>
+                                    <fullName>protein</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0326" dbAc="MI:0488" db="psi-mi"/>
+                                </xref>
+                            </interactorType>
+                            <organism ncbiTaxId="3">
+                                <names>
+                                    <shortLabel>label_feqwg</shortLabel>
+                                </names>
+                            </organism>
+                        </interactor>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488" db="psi-mi"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>prey</shortLabel>
+                                    <fullName>prey</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0498" dbAc="MI:0488" db="psi-mi"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <parameterList>
+                            <parameter uncertainty="0.0" unit="kelvin" term="temperature" factor="302.0" exponent="0" base="10">
+                                <experimentRef>0</experimentRef>
+                            </parameter>
+                        </parameterList>
+                    </participant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>direct interaction</shortLabel>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0407" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </interactionType>
+                <modelled>false</modelled>
+                <intraMolecular>false</intraMolecular>
+                <negative>false</negative>
+                <attributeList>
+                    <attribute name="dataset">-</attribute>
+                </attributeList>
+            </interaction>
+        </interactionList>
+    </entry>
+</entrySet>
