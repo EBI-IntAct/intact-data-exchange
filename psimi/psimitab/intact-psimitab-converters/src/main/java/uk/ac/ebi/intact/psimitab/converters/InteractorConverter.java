@@ -128,6 +128,9 @@ public class InteractorConverter {
 
         // properties
         List<CrossReference> properties = xConverter.toCrossReferences( intactInteractor.getXrefs(), false, true );
+        Collection<CrossReference> identifiersWithText = xRefConverter.toCrossReferences( intactInteractor.getXrefs(), true, true );
+        properties.addAll(identifiersWithText);
+        
         // if molecule type is small molecule, export all chebi ids to that list.
         if( CvObjectUtils.isSmallMoleculeType( intactInteractor.getCvInteractorType() ) ) {
             final Collection<InteractorXref> chebiXrefs =

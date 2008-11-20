@@ -96,7 +96,15 @@ public class CrossReferenceConverter<T extends Xref> {
 
         if (id != null && db != null) {
             String secondaryId = (withText && xref.getSecondaryId() != null) ? xref.getSecondaryId() : null;
-            ref = CrossReferenceFactory.getInstance().build(db, id, secondaryId);
+            String cvXrefQualifier = (withText && xref.getCvXrefQualifier() != null) ? xref.getCvXrefQualifier().getShortLabel() : null;
+
+            if (secondaryId != null) {
+                ref = CrossReferenceFactory.getInstance().build(db, id, secondaryId);
+            } else if (cvXrefQualifier != null) {
+                ref = CrossReferenceFactory.getInstance().build(db, id, cvXrefQualifier);
+            } else {
+                ref = CrossReferenceFactory.getInstance().build(db, id, null);
+            }
         }
         return ref;
     }
