@@ -67,7 +67,11 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         CvXrefQualifier secAc = new CvXrefQualifier(getMockBuilder().createInstitution("MI:1234","ebi"),CvXrefQualifier.SECONDARY_AC);
         interactorA.addXref(getMockBuilder().createXref(interactorA,"P26439", secAc,uniprotDb));
 
-        Assert.assertEquals(4,interactorA.getXrefs().size());
+        CvDatabase intactDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT);
+        CvXrefQualifier intactIdentity = new CvXrefQualifier(getMockBuilder().createInstitution("MI:1234","ebi"),CvXrefQualifier.IDENTITY);
+        interactorA.addXref(getMockBuilder().createXref(interactorA,"EBI-12345", intactIdentity,intactDb));
+
+        Assert.assertEquals(5,interactorA.getXrefs().size());
         Assert.assertEquals(2,interactorB.getXrefs().size());
 
         Assert.assertEquals(1,XrefUtils.getIdentityXrefs(interactorA).size());
@@ -76,22 +80,26 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         //Database to Mitab
         InteractionConverter interactionConverter = new InteractionConverter();
         IntactBinaryInteraction intactBi = interactionConverter.toBinaryInteraction( binaryInteraction );
+        Assert.assertTrue("No identifier in PropertyA",checkIfPropertiesHasIdentity(intactBi.getInteractorA().getProperties()));
+        Assert.assertTrue("No identifier in PropertyB",checkIfPropertiesHasIdentity(intactBi.getInteractorB().getProperties()));
+
+        Assert.assertEquals(2,checkNumberOfIdentifiersInProperties(intactBi.getInteractorA().getProperties()));
+        Assert.assertEquals(1,checkNumberOfIdentifiersInProperties(intactBi.getInteractorB().getProperties()));
 
         List<CrossReference> propertiesA = intactBi.getInteractorA().getProperties();
-        Assert.assertEquals(4,propertiesA.size());
+        Assert.assertEquals(5,propertiesA.size());
 
         List<CrossReference> propertiesB = intactBi.getInteractorB().getProperties();
         Assert.assertEquals(2,propertiesB.size());
-        Assert.assertTrue("No identifier in Property",checkIfPropertiesHasIdentity(intactBi));
 
         /*final IntactDocumentDefinition docDef = new IntactDocumentDefinition();
         final String line = docDef.interactionToString(intactBi);
         System.out.println(line);*/
     }
 
-    private boolean checkIfPropertiesHasIdentity(IntactBinaryInteraction dbi) {
+    private boolean checkIfPropertiesHasIdentity(Collection<CrossReference> crossReferences) {
         boolean hasIdentifierInProperty = false;
-        for (CrossReference crossReference : dbi.getInteractorA().getProperties()) {
+        for (CrossReference crossReference : crossReferences) {
             if (crossReference.getText().equals("identity")) {
                 hasIdentifierInProperty = true;
             }
@@ -99,4 +107,13 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         return hasIdentifierInProperty;
     }
 
+     private int  checkNumberOfIdentifiersInProperties(Collection<CrossReference> crossReferences) {
+        int hasIdentifierInPropertyCounter = 0;
+        for (CrossReference crossReference : crossReferences) {
+            if (crossReference.getText().equals("identity")) {
+                hasIdentifierInPropertyCounter++;
+            }
+        }
+        return hasIdentifierInPropertyCounter;
+    }
 }

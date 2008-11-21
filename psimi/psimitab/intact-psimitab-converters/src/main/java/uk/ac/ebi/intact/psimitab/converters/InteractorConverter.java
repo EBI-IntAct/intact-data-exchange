@@ -128,6 +128,7 @@ public class InteractorConverter {
 
         // properties
         List<CrossReference> properties = xConverter.toCrossReferences( intactInteractor.getXrefs(), false, true );
+        //get again the identifiers with text
         Collection<CrossReference> identifiersWithText = xRefConverter.toCrossReferences( intactInteractor.getXrefs(), true, true );
         properties.addAll(identifiersWithText);
         
