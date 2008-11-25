@@ -21,6 +21,7 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceFactory;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.Xref;
+import uk.ac.ebi.intact.model.CvDatabase;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,6 +69,45 @@ public class CrossReferenceConverter<T extends Xref> {
         }
         return crossReferences;
     }
+
+   /**
+     * Converts a Collection of Xrefs into a suitable format for PSIMITAB filtering out only the particular CvDatabase
+     *
+     * @param xrefs        is a Collection of intact.model.Xref
+     * @param onlyIdentity if is true only CrossReferences with CvXrefQualifier equals identiy will be returned
+     *                     if is false all CrossReferences without CvXrefQualifier equals identiy will be returned
+     * @param databaseFilterMiRef the MI id of the Database to be filtered for
+     * @return Non null list of CrossReferences sorted by CvXrefQualifier
+     */
+    public List<CrossReference> toCrossReferences(Collection<T> xrefs, boolean onlyIdentity, boolean withText, String databaseFilterMiRef) {
+        if (xrefs == null) {
+            throw new IllegalArgumentException("Xref must not be null. ");
+        }
+        if (databaseFilterMiRef == null) {
+            throw new NullPointerException("You must give a non null databaseFilterMiRef");
+        }
+
+        List<CrossReference> crossReferences = new ArrayList<CrossReference>();
+
+        for (Xref xref : xrefs) {
+
+            if (xref.getCvDatabase() != null && databaseFilterMiRef.equals(xref.getCvDatabase().getIdentifier())) {
+                if (onlyIdentity) {
+                    if (xref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                        CrossReference ref = createCrossReference(xref, withText);
+                        if (ref != null) crossReferences.add(ref);
+                    }
+                } else {
+                    if (xref.getCvXrefQualifier() == null || !CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                        CrossReference ref = createCrossReference(xref, withText);
+                        if (ref != null) crossReferences.add(ref);
+                    }
+                }
+            }
+        }
+        return crossReferences;
+    }
+
 
     /**
      * Converts a Collection of Xrefs into a suitable format for PSIMITAB

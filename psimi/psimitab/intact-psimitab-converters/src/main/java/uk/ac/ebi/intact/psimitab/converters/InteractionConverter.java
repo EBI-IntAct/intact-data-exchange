@@ -151,7 +151,7 @@ public class InteractionConverter {
 
         // set source database list
         if ( interaction.getOwner() != null && interaction.getOwner().getXrefs() != null ) {
-            List<CrossReference> sourceDatabases = xConverter.toCrossReferences( interaction.getOwner().getXrefs(), true, false );
+            List<CrossReference> sourceDatabases = xConverter.toCrossReferences( interaction.getOwner().getXrefs(), true, false,CvDatabase.PSI_MI_MI_REF );
             if ( !sourceDatabases.isEmpty() ){
                 for (CrossReference sourceXref : sourceDatabases) {
                     sourceXref.setText(interaction.getOwner().getShortLabel());
