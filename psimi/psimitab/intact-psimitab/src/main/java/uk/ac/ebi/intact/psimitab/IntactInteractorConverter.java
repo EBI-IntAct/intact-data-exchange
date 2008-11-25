@@ -123,12 +123,12 @@ public class IntactInteractorConverter extends InteractorConverter<ExtendedInter
     private Collection<DbReference> getSecondaryRefs( Interactor interactor,List<CrossReference> properties ) {
         Collection<DbReference> refs = new ArrayList<DbReference>();
         for ( CrossReference property : properties ) {
+              //boolean isIdentity =  "identity".equals(property.getText());
+              boolean isPrimaryRef = interactor.getXref().getPrimaryRef().getId().equals(property.getIdentifier());
 
-           // if(!"identity".equals(property.getText())){
-            if(!interactor.getXref().getPrimaryRef().getId().equals(property.getIdentifier())) {
-
-            DbReference secDbRef = new DbReference();
-            secDbRef.setDb( property.getDatabase() );
+            if (!isPrimaryRef) {
+                DbReference secDbRef = new DbReference();
+                secDbRef.setDb(property.getDatabase());
             if ( property.getDatabase().equalsIgnoreCase( "GO" ) ) {
                 secDbRef.setId( property.getDatabase().concat( ":".concat( property.getIdentifier() ) ) );
                 secDbRef.setDbAc( "MI:0448" );
