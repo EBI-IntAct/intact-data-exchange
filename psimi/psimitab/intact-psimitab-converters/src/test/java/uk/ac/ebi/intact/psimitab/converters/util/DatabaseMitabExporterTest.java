@@ -46,7 +46,7 @@ import java.util.Arrays;
 import psidev.psi.mi.search.SearchResult;
 
 /**
- * TODO comment that class header
+ * DatabaseMitabExporter Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -308,7 +308,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         e1.setBioSource( getMockBuilder().createBioSource( 9606, "human" ) );
         final Experiment e2 = getMockBuilder().createExperimentEmpty();
         e2.setCvInteraction( inferred );
-        e2.setBioSource( getMockBuilder().createBioSource( 9999, "alian" ) );
+        e2.setBioSource( getMockBuilder().createBioSource( 9999, "alien" ) );
 
         // Let's create interactions
 
@@ -321,6 +321,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
 
         final Interaction interaction4 = getMockBuilder().createInteraction( "p9-p1-2",  p9, p1, e2 );
         interaction1.setCvInteractionType( physical );
+        
         PersisterHelper.saveOrUpdate( interaction1, interaction4 );
 
         Assert.assertEquals(3, getDaoFactory().getInteractorDao( ProteinImpl.class ).countAll());

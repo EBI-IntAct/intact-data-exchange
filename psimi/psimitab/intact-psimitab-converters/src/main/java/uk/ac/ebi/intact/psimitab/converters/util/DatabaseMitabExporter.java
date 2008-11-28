@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
-import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.builder.Row;
 import uk.ac.ebi.intact.business.IntactTransactionException;
@@ -34,6 +33,7 @@ import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 import uk.ac.ebi.intact.psimitab.OntologyNameFinder;
 import uk.ac.ebi.intact.psimitab.PsimitabTools;
+import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.search.IntactInteractorIndexWriter;
@@ -109,7 +109,7 @@ public class DatabaseMitabExporter {
             eta = new ETACalculator( interactorTotalCount );
         }
 
-        // create the ontologies index
+        // build the interaction clusters
 
         IndexWriter interactionIndexWriter = null;
         IndexWriter interactorIndexWriter = null;
@@ -134,6 +134,8 @@ public class DatabaseMitabExporter {
 
         Intact2BinaryInteractionConverter converter = new Intact2BinaryInteractionConverter();
 
+        final BinaryInteractionClusterBuilder clusterBuilder = new BinaryInteractionClusterBuilder();
+        
         int firstResult = 0;
         int maxResults = 1;
         int interactionCount = 0;
@@ -171,9 +173,8 @@ public class DatabaseMitabExporter {
                 Collection<IntactBinaryInteraction> binaryInteractions = converter.convert(interactions);
                 enrich(binaryInteractions);
 
-                final IntactDocumentDefinition docDef = new IntactDocumentDefinition();
 
-                if ( log.isTraceEnabled() ) log.trace( "Processing " + binaryInteractions.size() + " interactions..." );
+                if ( log.isTraceEnabled() ) log.trace( "Storing " + binaryInteractions.size() + " interactions..." );
 
                 int count = 0;
                 for (IntactBinaryInteraction bi : binaryInteractions) {
@@ -182,62 +183,7 @@ public class DatabaseMitabExporter {
                         log.trace( "Processing interaction #" + count );
                     }
 
-                    flipInteractorsIfNecessary(bi);
-
-                    final Row row = docDef.createInteractionRowConverter().createRow( bi );
-
-                    // here we could save some processing by converting first the line to a Row,
-                    // and then converting tow to string and giving this row to the indexers
-
-                    final String line = row.toString();
-                    mitabWriter.write(line+ NEW_LINE);
-
-                    if (interactionIndexer != null) {
-                        if ( log.isTraceEnabled() ) log.trace( "Indexing interaction..." );
-                        long start  = System.currentTimeMillis();
-                        interactionIndexer.addBinaryInteractionToIndex(interactionIndexWriter, row );
-                        long stop  = System.currentTimeMillis();
-                        if ( log.isTraceEnabled() ) log.trace( "Took " + (stop - start) + "ms" );
-                    }
-
-                    if (interactorIndexer != null) {
-                        if ( log.isTraceEnabled() ) log.trace( "Indexing interactor..." );
-                        long start  = System.currentTimeMillis();
-                        interactorIndexer.addBinaryInteractionToIndex(interactorIndexWriter, bi );
-                        long stop  = System.currentTimeMillis();
-                        if ( log.isTraceEnabled() ) log.trace( "Took " + (stop - start) + "ms" );
-                    }
-
-                    interactionCount++;
-
-                    if (interactorCount % 50 == 0) {
-                        if (eta != null) {
-                            if ( log.isDebugEnabled() ) {
-                                log.debug( "Processed "+interactorCount+"/"+interactorTotalCount+
-                                           " [ETA: " + eta.printETA( interactorCount ) +"]");
-                            }
-                        }
-                    }
-
-                    if (interactorCount % 500 == 0) {
-                        if (log.isDebugEnabled()) log.debug("Auto optimization of the interactor index");
-                        if (interactorIndexWriter != null) {
-                            interactorIndexWriter.optimize();
-                        }
-                    }
-
-                    if (interactionCount % 100 == 0) {
-                        if (log.isDebugEnabled()) log.debug("Processed "+interactionCount+" interactions ("+interactorCount+" interactors)");
-                        mitabWriter.flush();
-
-                        if (interactionIndexWriter != null) {
-                            interactionIndexWriter.flush();
-                        }
-
-                        if (interactorIndexWriter != null) {
-                            interactorIndexWriter.flush();
-                        }
-                    }
+                    clusterBuilder.addBinaryInteraction( bi );
                 }
 
                 interactorCount++;
@@ -246,6 +192,92 @@ public class DatabaseMitabExporter {
             dataContext.commitTransaction();
 
         } while (!interactors.isEmpty());
+
+        // Now that we have the clusters built, let's browse then and generate the index
+
+        final IntactDocumentDefinition docDef = new IntactDocumentDefinition();
+
+        final Iterator<ProteinPair> proteinPairIterator = clusterBuilder.iterate();
+
+        final IntactClusterInteractorPairProcessor interactorPairProcessor = new IntactClusterInteractorPairProcessor();
+
+        if ( log.isTraceEnabled() ) {
+            log.trace( "About to process " + clusterBuilder.countProteinPairs() + " protein pairs..." );
+        }
+
+        while ( proteinPairIterator.hasNext() ) {
+            ProteinPair proteinPair = proteinPairIterator.next();
+            final Collection<IntactBinaryInteraction> interactions = interactorPairProcessor.process( proteinPair.getInteractions() );
+            if ( log.isTraceEnabled() ) {
+                log.debug( "Indexing "+interactions.size()+" interaction for interactors: " + proteinPair.getKey() );
+            }
+            int count = interactions.size();
+            for ( IntactBinaryInteraction bi : interactions ) {
+
+                count++;
+                if ( log.isTraceEnabled() ) {
+                    log.trace( "Processing interaction #" + count );
+                }
+
+                flipInteractorsIfNecessary(bi);
+
+                final Row row = docDef.createInteractionRowConverter().createRow( bi );
+
+                // here we could save some processing by converting first the line to a Row,
+                // and then converting tow to string and giving this row to the indexers
+
+                final String line = row.toString();
+                mitabWriter.write(line+ NEW_LINE);
+
+                if (interactionIndexer != null) {
+                    if ( log.isTraceEnabled() ) log.trace( "Indexing interaction..." );
+                    long start  = System.currentTimeMillis();
+                    interactionIndexer.addBinaryInteractionToIndex(interactionIndexWriter, row );
+                    long stop  = System.currentTimeMillis();
+                    if ( log.isTraceEnabled() ) log.trace( "Took " + (stop - start) + "ms" );
+                }
+
+                if (interactorIndexer != null) {
+                    if ( log.isTraceEnabled() ) log.trace( "Indexing interactor..." );
+                    long start  = System.currentTimeMillis();
+                    interactorIndexer.addBinaryInteractionToIndex(interactorIndexWriter, bi );
+                    long stop  = System.currentTimeMillis();
+                    if ( log.isTraceEnabled() ) log.trace( "Took " + (stop - start) + "ms" );
+                }
+
+                interactionCount++;
+
+                if (interactorCount % 50 == 0) {
+                    if (eta != null) {
+                        if ( log.isDebugEnabled() ) {
+                            log.debug( "Processed "+interactorCount+"/"+interactorTotalCount+
+                                       " [ETA: " + eta.printETA( interactorCount ) +"]");
+                        }
+                    }
+                }
+
+                if (interactorCount % 500 == 0) {
+                    if (log.isDebugEnabled()) log.debug("Auto optimization of the interactor index");
+                    if (interactorIndexWriter != null) {
+                        interactorIndexWriter.optimize();
+                    }
+                }
+
+                if (interactionCount % 100 == 0) {
+                    if (log.isDebugEnabled()) log.debug("Processed "+interactionCount+" interactions ("+interactorCount+" interactors)");
+                    mitabWriter.flush();
+
+                    if (interactionIndexWriter != null) {
+                        interactionIndexWriter.flush();
+                    }
+
+                    if (interactorIndexWriter != null) {
+                        interactorIndexWriter.flush();
+                    }
+                }
+            }
+        } // protein pairs
+
 
         mitabWriter.flush();
 
@@ -313,4 +345,5 @@ public class DatabaseMitabExporter {
 
         return q.getResultList();
     }
+
 }
