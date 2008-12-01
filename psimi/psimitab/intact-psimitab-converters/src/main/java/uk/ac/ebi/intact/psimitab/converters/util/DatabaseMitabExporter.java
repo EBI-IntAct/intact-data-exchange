@@ -36,6 +36,7 @@ import uk.ac.ebi.intact.psimitab.PsimitabTools;
 import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
+import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
 import uk.ac.ebi.intact.psimitab.search.IntactInteractorIndexWriter;
 import uk.ac.ebi.intact.psimitab.search.IntactPsimiTabIndexWriter;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
@@ -132,7 +133,9 @@ public class DatabaseMitabExporter {
 
         List<? extends Interactor> interactors = null;
 
-        Intact2BinaryInteractionConverter converter = new Intact2BinaryInteractionConverter();
+        Intact2BinaryInteractionConverter converter =
+                new Intact2BinaryInteractionConverter(new SpokeWithoutBaitExpansion(),
+                                                      null); // no clustering at this stage.
 
         final BinaryInteractionClusterBuilder clusterBuilder = new BinaryInteractionClusterBuilder();
         
