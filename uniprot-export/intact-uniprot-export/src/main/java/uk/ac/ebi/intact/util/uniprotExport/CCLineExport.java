@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
  */
 public class CCLineExport extends LineExport {
 
+     private static final Pattern PATTERN = Pattern.compile("DR\\s+IntAct;\\s+(\\w+);.*");
     ///////////////////////////////
     // Inner class
 
@@ -145,7 +146,7 @@ public class CCLineExport extends LineExport {
         Collection<ProteinImpl> proteins = getProteinByXref(uniprotID, getUniprot(), getIdentity() );
 
         if (proteins.size() == 0) {
-            throw new IntactException("the ID " + uniprotID + " didn't return the expected number of protein: " +
+            throw new IntactException("the ID '" + uniprotID + "' didn't return the expected number of protein: " +
                                       proteins.size() + ". Abort.");
         }
         spliceVariants.clear();
@@ -1154,14 +1155,23 @@ public class CCLineExport extends LineExport {
 
             // format of that line is: UniprotID \t IntAct \t UniprotId \t -
             // eg. P000001 Intact P00001 -
+            //format changed to
+            // eg: DR   IntAct; P14712; -.
 
-            Pattern pattern = Pattern.compile("\\S+");
-            Matcher matcher = pattern.matcher(line);
+           /* Pattern pattern = Pattern.compile("\\S+");
+            Matcher matcher = pattern.matcher(line);*/
 
-            if (matcher.find()) {
-                String uniprotID = matcher.group();
+            Matcher matcher = PATTERN.matcher(line);
+
+            if (matcher.matches()) {
+                String uniprotID = matcher.group(1);
                 proteins.add(uniprotID);
             }
+
+            /*if (matcher.find()) {
+                String uniprotID = matcher.group();
+                proteins.add(uniprotID);
+            }*/
         }
 
         is.close();

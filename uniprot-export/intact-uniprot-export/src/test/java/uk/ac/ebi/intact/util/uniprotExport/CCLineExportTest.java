@@ -14,6 +14,8 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class CCLineExportTest {
 
@@ -161,4 +163,23 @@ public class CCLineExportTest {
         Assert.assertEquals( "MAFK", ( ccLines.get( 5 ) ).getGeneName() );
         Assert.assertEquals( "V-MAF", ( ccLines.get( 6 ) ).getGeneName() );
     }
+
+    @Test
+    public void parseDRLine() {
+
+        String testStr = "DR   IntAct; Q9ZUA1; -.";
+
+        System.out.println("testStr " + testStr);
+
+        Pattern pattern = Pattern.compile("DR\\s+IntAct;\\s+(\\w+);.*");
+
+        Matcher matcher = pattern.matcher(testStr);
+
+        if(matcher.matches()){
+            System.out.println(" "+ matcher.group(1));
+        }
+
+    }
+
+
 }
