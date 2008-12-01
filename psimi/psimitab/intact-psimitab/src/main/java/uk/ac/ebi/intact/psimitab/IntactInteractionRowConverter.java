@@ -23,18 +23,17 @@ import uk.ac.ebi.intact.psimitab.model.Annotation;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.psimitab.model.Parameter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
- * TODO comment that class header
+ * Intact's interaction row converter.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
 public class IntactInteractionRowConverter extends AbstractInteractionRowConverter<IntactBinaryInteraction> {
+
+    public static final String EMPTY_COLUMN = String.valueOf( Column.EMPTY_COLUMN );
 
     protected IntactBinaryInteraction newBinaryInteraction(Interactor interactorA, Interactor interactorB) {
         return new IntactBinaryInteraction((ExtendedInteractor)interactorA, (ExtendedInteractor)interactorB);
@@ -68,7 +67,11 @@ public class IntactInteractionRowConverter extends AbstractInteractionRowConvert
         row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getInteractorA().getInteractorType() ) );
         row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getInteractorB().getInteractorType() ) );
         row.appendColumn( ParseUtils.createColumnFromCrossReferences( interaction.getHostOrganism() ) );
-        row.appendColumn( createColumnFromStrings( interaction.getExpansionMethods() ) );
+
+        final List<String> expansionMethods = interaction.getExpansionMethods();
+        String method = resolveToSingleExpansionMethod( expansionMethods );
+        row.appendColumn( createColumnFromStrings( Arrays.asList( method ) ) );
+
         row.appendColumn( createColumnFromStrings( interaction.getDataset() ) );
         row.appendColumn( createColumnFromAnnotations( interaction.getInteractorA().getAnnotations() ) );
         row.appendColumn( createColumnFromAnnotations( interaction.getInteractorB().getAnnotations() ) );
@@ -77,6 +80,50 @@ public class IntactInteractionRowConverter extends AbstractInteractionRowConvert
         row.appendColumn( createColumnFromParameters( interaction.getParameters() ) );
 
         return row;
+    }
+
+    /**
+     * Make sure that we have a single expansion method.
+     * eg. If all currently present methods are spoke, then write spoke, otherwise, nothing.
+     * @param expansionMethods
+     * @return
+     */
+    private String resolveToSingleExpansionMethod( List<String> expansionMethods ) {
+
+        Set<String> nonRedundantMethods = new HashSet<String>( expansionMethods );
+
+        boolean hadRealBinaryInteraction = false;
+        if( nonRedundantMethods.contains( EMPTY_COLUMN ) ) {
+            nonRedundantMethods.remove( EMPTY_COLUMN );
+            hadRealBinaryInteraction = true;
+        }
+
+        String singleMethod = null;
+
+        switch( nonRedundantMethods.size() ) {
+
+            case 0:
+                singleMethod = EMPTY_COLUMN;
+                break;
+
+            case 1:
+                if( hadRealBinaryInteraction ) {
+                    singleMethod = EMPTY_COLUMN;
+                } else {
+                    singleMethod = nonRedundantMethods.iterator().next();
+                }
+                break;
+
+            default:
+                StringBuilder sb = new StringBuilder( 64 );
+                for ( String method : nonRedundantMethods ) {
+                    sb.append( "'" ).append( method ).append( "'" ).append( " " );
+                }
+                // TODO unfortunately one cannot print the whole interaction here as it would be calling this code and loop...
+                throw new IllegalStateException( "Binary interaction containing more than 2 specific expansion methods: " + sb.toString()  );
+        }
+
+        return singleMethod;
     }
 
     @Override

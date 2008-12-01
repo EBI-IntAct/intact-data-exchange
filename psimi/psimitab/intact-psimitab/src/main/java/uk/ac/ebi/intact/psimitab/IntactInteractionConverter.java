@@ -26,6 +26,7 @@ import psidev.psi.mi.tab.converter.xml2tab.InteractorConverter;
 import psidev.psi.mi.tab.expansion.ExpansionStrategy;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.builder.Column;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.InteractionDetectionMethod;
 import psidev.psi.mi.xml.model.Organism;
@@ -48,6 +49,8 @@ import net.sf.ehcache.CacheManager;
  * @version $Id$
  */
 public class IntactInteractionConverter extends InteractionConverter<IntactBinaryInteraction> {
+
+    public static final String EMPTY_COLUMN = String.valueOf( Column.EMPTY_COLUMN );
 
     private static final Log log = LogFactory.getLog( IntactInteractionConverter.class );
 
@@ -337,7 +340,7 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
             if (ibi.getExpansionMethods().size() > 0) {
                 expMethod = ibi.getExpansionMethods().get(index);
             }
-            if( ! "-".equals( expMethod ) ) {
+            if( ! EMPTY_COLUMN.equals( expMethod ) ) {
                 Attribute attr = new Attribute("expansion", expMethod);
                 interaction.getAttributes().add(attr);
             }
