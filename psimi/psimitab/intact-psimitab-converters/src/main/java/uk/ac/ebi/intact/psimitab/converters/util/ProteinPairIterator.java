@@ -16,20 +16,25 @@
 package uk.ac.ebi.intact.psimitab.converters.util;
 
 import net.sf.ehcache.Cache;
+import net.sf.ehcache.Element;
 
 import java.util.Iterator;
 import java.util.Collection;
 
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * Iterator of ProteinPair.
-*
-* @author Samuel Kerrien (skerrien@ebi.ac.uk)
-* @version $Id$
-* @since 2.0.2
-*/
+ *
+ * @author Samuel Kerrien (skerrien@ebi.ac.uk)
+ * @version $Id$
+ * @since 2.0.2
+ */
 public class ProteinPairIterator implements Iterator<ProteinPair> {
+    
+    private static final Log log = LogFactory.getLog( ProteinPairIterator.class );
 
     private Cache cache;
     private Iterator iterator;
@@ -48,8 +53,12 @@ public class ProteinPairIterator implements Iterator<ProteinPair> {
 
     public ProteinPair next() {
         String key = ( String ) iterator.next();
-        Collection<IntactBinaryInteraction> interactions =
-                ( Collection<IntactBinaryInteraction> ) cache.get( key ).getValue();
+        final Element element = cache.get( key );
+        if( element == null ) {
+            throw new NullPointerException( "Could not find an element in cache for key: '" + key + "'. " +
+                                            "Could it be that some element expired from the cache ?" );
+        }
+        Collection<IntactBinaryInteraction> interactions = ( Collection<IntactBinaryInteraction> ) element.getValue();
         return new ProteinPair( key, interactions );
     }
 

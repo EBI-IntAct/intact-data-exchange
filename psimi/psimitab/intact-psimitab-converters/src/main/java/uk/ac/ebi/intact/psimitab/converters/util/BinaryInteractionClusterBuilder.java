@@ -103,7 +103,7 @@ class BinaryInteractionClusterBuilder {
             element = new Element( key, interactions );
             cache.put( element );
         }
-
+        
         interactions = ( Collection<IntactBinaryInteraction> ) element.getValue();
         interactions.add( ibi );
     }

@@ -302,21 +302,21 @@
             />
 
     <!--
-    Interaction Cluster Cache.
+     Interaction Cluster Cache.
 
-    This cache contains a maximum in memory of 5000 elements, and will expire an element if it is idle for more than
-    5 minutes and lives for more than 10 minutes.
+     This cache contains a maximum in memory of 1000 elements, and will never expire. The cache should keep it's values
+     until we get rid of the cache.
 
-    If there are more than 5000 elements it will overflow to the disk cache, which in this configuration will go to
-    wherever java.io.tmp is defined on your system. On a standard Linux system this will be /tmp".
+     If there are more than 1000 elements it will overflow to the disk cache, which in this configuration will go to
+     wherever java.io.tmp is defined on your system. On a standard Linux system this will be /tmp".
     -->
     <cache name="interaction-cluster-cache"
-           maxElementsInMemory="5000"
+           maxElementsInMemory="1000"
            eternal="false"
            overflowToDisk="true"
-           timeToIdleSeconds="300"
-           timeToLiveSeconds="600"
-           memoryStoreEvictionPolicy="LFU"
+           timeToIdleSeconds="0"
+           timeToLiveSeconds="0"
+           memoryStoreEvictionPolicy="LRU"
             />
 
 </ehcache>
