@@ -14,7 +14,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 
 public class CCLineExportTest {
@@ -164,20 +164,32 @@ public class CCLineExportTest {
         Assert.assertEquals( "V-MAF", ( ccLines.get( 6 ) ).getGeneName() );
     }
 
+
     @Test
-    public void parseDRLine() {
+    public void regexTestForDrLine() {
+        String drLine1 = "DR   IntAct;  Q9SWI1; -.";
+        String drLine2 = "DR   IntAct; Q21774-2; -.";
+        String drLine3 = "DR   IntAct;  Q9SWI1-3; -.";
 
-        String testStr = "DR   IntAct; Q9ZUA1; -.";
+        List<String> drLines = new ArrayList<String>();
+        drLines.add( drLine1 );
+        drLines.add( drLine2 );
+        drLines.add( drLine3 );
 
-        System.out.println("testStr " + testStr);
-
-        Pattern pattern = Pattern.compile("DR\\s+IntAct;\\s+(\\w+);.*");
-
-        Matcher matcher = pattern.matcher(testStr);
-
-        if(matcher.matches()){
-            System.out.println(" "+ matcher.group(1));
+        List<String> proteins = new ArrayList<String>();
+        for ( String drLine : drLines ) {
+            Matcher matcher = CCLineExport.DRPATTERN.matcher( drLine );
+            if ( matcher.matches() ) {
+                String uniprotID = matcher.group( 1 );
+                proteins.add( uniprotID );
+            }
         }
+
+        for ( String protein : proteins ) {
+            System.out.println( " protein "+protein );
+        }
+
+        Assert.assertEquals(3,proteins.size());
 
     }
 

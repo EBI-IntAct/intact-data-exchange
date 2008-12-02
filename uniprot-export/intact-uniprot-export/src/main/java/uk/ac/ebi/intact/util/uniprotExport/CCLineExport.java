@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  */
 public class CCLineExport extends LineExport {
 
-     private static final Pattern PATTERN = Pattern.compile("DR\\s+IntAct;\\s+(\\w+);.*");
+     public static final Pattern DRPATTERN = Pattern.compile("DR\\s+IntAct;\\s+(.*?);.*");
     ///////////////////////////////
     // Inner class
 
@@ -1161,7 +1161,7 @@ public class CCLineExport extends LineExport {
            /* Pattern pattern = Pattern.compile("\\S+");
             Matcher matcher = pattern.matcher(line);*/
 
-            Matcher matcher = PATTERN.matcher(line);
+            Matcher matcher = DRPATTERN.matcher(line);
 
             if (matcher.matches()) {
                 String uniprotID = matcher.group(1);

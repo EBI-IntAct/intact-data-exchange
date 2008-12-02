@@ -8,20 +8,13 @@ package uk.ac.ebi.intact.util.uniprotExport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.*;
-import uk.ac.ebi.intact.context.IntactContext;
-import uk.ac.ebi.intact.config.CvPrimer;
-import uk.ac.ebi.intact.config.impl.EssentialCvPrimer;
-import uk.ac.ebi.intact.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
-import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.model.*;
 
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
+
 
 /**
  * TODO comment this!
