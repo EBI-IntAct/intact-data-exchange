@@ -181,6 +181,7 @@ public class CCLineExportTest {
             Matcher matcher = CCLineExport.DRPATTERN.matcher( drLine );
             if ( matcher.matches() ) {
                 String uniprotID = matcher.group( 1 );
+                uniprotID = uniprotID.trim();
                 proteins.add( uniprotID );
             }
         }

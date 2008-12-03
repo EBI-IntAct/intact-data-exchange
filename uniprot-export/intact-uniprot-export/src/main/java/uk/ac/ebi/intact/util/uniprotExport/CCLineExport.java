@@ -1164,8 +1164,9 @@ public class CCLineExport extends LineExport {
             Matcher matcher = DRPATTERN.matcher(line);
 
             if (matcher.matches()) {
-                String uniprotID = matcher.group(1);
-                proteins.add(uniprotID);
+                String uniprotID = matcher.group( 1 );
+                uniprotID = uniprotID.trim();
+                proteins.add( uniprotID );
             }
 
             /*if (matcher.find()) {
