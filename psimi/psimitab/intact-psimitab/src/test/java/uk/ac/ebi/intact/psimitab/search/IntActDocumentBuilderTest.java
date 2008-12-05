@@ -5,21 +5,23 @@ package uk.ac.ebi.intact.psimitab.search;
 
 
 import junit.framework.Assert;
-import org.apache.lucene.document.Document;
+import org.apache.lucene.document.*;
 import org.apache.lucene.store.Directory;
 import org.junit.*;
 import psidev.psi.mi.search.util.DocumentBuilder;
-import psidev.psi.mi.tab.model.builder.Column;
-import psidev.psi.mi.tab.model.builder.CrossReferenceFieldBuilder;
+import psidev.psi.mi.tab.model.builder.*;
 import psidev.psi.mi.tab.model.builder.Field;
-import psidev.psi.mi.tab.model.builder.FieldBuilder;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
+import uk.ac.ebi.intact.psimitab.rsc.RelevanceScoreCalculator;
+import uk.ac.ebi.intact.psimitab.rsc.RelevanceScoreCalculatorImpl;
 import uk.ac.ebi.intact.psimitab.model.Annotation;
 import uk.ac.ebi.intact.psimitab.model.Parameter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * IntActDocumentBuilder Tester.
@@ -61,7 +63,7 @@ public class IntActDocumentBuilderTest {
         DocumentBuilder builder = new IntactDocumentBuilder();
         Document doc = builder.createDocumentFromPsimiTabLine( psiMiTabLine );
 
-        Assert.assertEquals( 64, doc.getFields().size() );
+        Assert.assertEquals( 66, doc.getFields().size() );
     }
 
     @Test
@@ -186,4 +188,62 @@ public class IntActDocumentBuilderTest {
         Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0043231\"(intracellular membrane-bounded organelle)" ) ) );
         Assert.assertTrue( fieldsWithParentsProperties.contains( fb.createField( "go:\"GO:0005575\"(cellular_component)") ) );
     }
+
+    @Test
+    public void testCreateDocumentFromPsimiTabLineWithNameAndScore() throws Exception {
+        String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)\tMI:0499(unspecified role)\tinterpro:IPR004829|interpro:IPR010790|interpro:IPR001664|uniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716|uniprotkb:Q540Z7|uniprotkb:Q63368\tgo:0005737|go:0030056|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
+        final IntactDocumentDefinition documentDefinition = new IntactDocumentDefinition();
+        final RowBuilder rowBuilder = documentDefinition.createRowBuilder();
+        final Row row = rowBuilder.createRow( psiMiTabLine );
+
+        RelevanceScoreCalculator rsc = new RelevanceScoreCalculatorImpl( getTestProperties());
+        IntactDocumentBuilder builder = new IntactDocumentBuilder(rsc );
+        Document doc = builder.createDocument( row );
+        Assert.assertEquals( 68, doc.getFields().size() );
+
+        final org.apache.lucene.document.Field nameField = doc.getField( "nameA" );
+        final org.apache.lucene.document.Field nameFieldSorted = doc.getField( "nameA_s" );
+        final org.apache.lucene.document.Field rscField = doc.getField( "relevancescore" );
+        final org.apache.lucene.document.Field rscFieldSorted = doc.getField( "relevancescore_s" );
+
+        Assert.assertEquals(true,nameField.isIndexed());
+        Assert.assertEquals(true,nameField.isStored());
+
+        Assert.assertEquals(true,nameFieldSorted.isIndexed());
+        Assert.assertEquals(false,nameFieldSorted.isStored());
+        Assert.assertEquals(false,nameFieldSorted.isTokenized());
+
+        Assert.assertEquals(true,rscField.isIndexed());
+        Assert.assertEquals(true,rscField.isStored());
+
+        Assert.assertEquals(true,rscFieldSorted.isIndexed());
+        Assert.assertEquals(false,rscFieldSorted.isStored());
+        Assert.assertEquals(false,rscFieldSorted.isTokenized());
+
+    }
+
+
+    @Test
+    public void testGetNameA() throws Exception{
+
+        String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)\tMI:0499(unspecified role)\tinterpro:IPR004829|interpro:IPR010790|interpro:IPR001664|uniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716|uniprotkb:Q540Z7|uniprotkb:Q63368\tgo:0005737|go:0030056|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-\tnameA\tMT-ER-BR";
+        final IntactDocumentDefinition documentDefinition = new IntactDocumentDefinition();
+        final RowBuilder rowBuilder = documentDefinition.createRowBuilder();
+        final Row row = rowBuilder.createRow( psiMiTabLine );
+        IntactDocumentBuilder builder = new IntactDocumentBuilder( );
+        Assert.assertEquals("Nfh",builder.getNameA( row ));
+    }
+
+
+    private Properties getTestProperties(){
+
+        Properties properties = new Properties();
+        properties.put("protein-small molecule","A");
+        properties.put("protein-protein","B");
+        properties.put("drug-drug target","C");
+        properties.put("bait-prey","D");
+
+        return properties;
+    }
+
 }

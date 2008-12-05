@@ -19,6 +19,8 @@ import org.junit.Test;
 import org.junit.Assert;
 
 import java.util.Properties;
+import java.util.Collections;
+import java.util.Arrays;
 
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 import psidev.psi.mi.tab.model.builder.RowBuilder;
@@ -73,9 +75,7 @@ public class RelevanceScoreCalculatorTest {
         Assert.assertEquals(8, properties.size());
         Assert.assertEquals("SM8-RL7",rscScore);
 
-        /*for ( Object o : properties.keySet() ) {
-            System.out.println(o.toString() +  "  " + properties.getProperty( o.toString() ));
-        }*/
+        printProperties( properties );
 
     }
 
@@ -124,11 +124,16 @@ public class RelevanceScoreCalculatorTest {
         Assert.assertEquals(8, properties.size());
         Assert.assertEquals("A-C",rscScore);
 
-       /* for ( Object o : properties.keySet() ) {
-            System.out.println(o.toString() +  "  " + properties.getProperty( o.toString() ));
-        }*/
+        printProperties( properties );
 
 
+    }
+
+
+    private void printProperties( Properties properties ) {
+        if ( properties != null ) {
+            properties.list( System.out );
+        }
     }
 
 }

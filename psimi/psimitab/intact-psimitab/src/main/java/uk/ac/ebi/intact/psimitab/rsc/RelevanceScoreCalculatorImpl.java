@@ -29,6 +29,16 @@ import org.apache.commons.lang.StringUtils;
  * based on the properties(interactortype, experimentrole and biologicalrole)
  * RSC should also include Name but calculateScore doesn't handle this
  *
+ * InteractorType = The interactorTypes for the given InteractorA(eg: Protein) and InteractorB(eg: Small Molecule)
+ * is stored in the Property as Protein-Small Molecule. Similarly all the combinations are stored.
+ * All the combinations are ranked and given relevance score (usually by curators) and stored in .properties file
+ * Whenever calculateScore encounters allready existing combination it returns the relavance score for the same and if not
+ * if gives a default relavance score for that type (eg: SM1, SM2...)
+ *
+ * For Roles = Take Experimental Role of A and Biological role of A, if one of it is unspecified role and other one is stored in property(mergeRole method does that)
+ * similarly Take Experimental Role of B and Biological role of B, if one of it is unspecified role and other one is stored in property(mergeRole method does that)
+ *   
+ *
  * @author Prem Anand (prem@ebi.ac.uk)
  * @version $Id$
  * @since 2.0.2-SNAPSHOT

@@ -9,15 +9,14 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import psidev.psi.mi.search.util.AbstractInteractionDocumentBuilder;
 import psidev.psi.mi.tab.converter.txt2tab.MitabLineException;
-import psidev.psi.mi.tab.model.builder.Column;
-import psidev.psi.mi.tab.model.builder.MitabDocumentDefinition;
-import psidev.psi.mi.tab.model.builder.Row;
-import psidev.psi.mi.tab.model.builder.RowBuilder;
+import psidev.psi.mi.tab.model.builder.*;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import uk.ac.ebi.intact.bridges.ontologies.term.LazyLoadedOntologyTerm;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
+import uk.ac.ebi.intact.psimitab.rsc.RelevanceScoreCalculator;
+import uk.ac.ebi.intact.psimitab.rsc.RelevanceScoreCalculatorImpl;
 import uk.ac.ebi.intact.util.ols.OlsUtils;
 
 import java.io.IOException;
@@ -48,6 +47,12 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
      */
     private Set<String> expandableOntologies;
 
+
+    /**
+     * Relevance Score Calculator
+     */
+    private RelevanceScoreCalculator relevanceScoreCalculator;
+
     //////////////////
     // Constructors
 
@@ -63,6 +68,13 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
         for (String ontologyToExpand : ontologiesToExpand) {
             addExpandableOntology(ontologyToExpand);
         }
+    }
+
+    //for relevance score
+    public IntactDocumentBuilder(RelevanceScoreCalculator rsc){
+        this();
+        this.relevanceScoreCalculator = rsc;
+
     }
 
     ///////////////////////////
@@ -262,7 +274,78 @@ go:"GO:0014911"(positive regulation of smooth muscle cell migration)|
         doc.add( new Field( "type", interactionTypesExtended.toString(),
                             Field.Store.YES,
                             Field.Index.TOKENIZED ) );
+
+        /**
+         * add columns for name and relevance score
+         * getNameA, rsc and add to the doc
+         */
+
+        String name = getNameA( row );
+
+        if ( name != null ) {
+
+            name = name.toLowerCase();
+            doc.add( new Field( "nameA",
+                                name,
+                                Field.Store.YES,
+                                Field.Index.TOKENIZED ) );
+
+            doc.add( new Field( "nameA_s",
+                                name,
+                                Field.Store.NO,
+                                Field.Index.UN_TOKENIZED ) );
+        }
+        //get RSC and add tothe doc
+        if ( relevanceScoreCalculator != null ) {
+
+            String rscString = relevanceScoreCalculator.calculateScore( row ) + "-" + name;
+
+            doc.add( new Field( "relevancescore",
+                                rscString,
+                                Field.Store.YES,
+                                Field.Index.TOKENIZED ) );
+            doc.add( new Field( "relevancescore_s",
+                                rscString,
+                                Field.Store.NO,
+                                Field.Index.UN_TOKENIZED ) );
+        }
+
+
         return doc;
+    }
+
+    /**
+     * Gets the name for interactorA, getting the first available after evaluating in this order:
+     * alias > gene name > commercial name
+     * @param  row
+     * @return name of interactorA
+     */
+    protected String getNameA( Row row ) {
+        String nameA = null;
+        //aliases
+        Column aliasesA = row.getColumnByIndex( MitabDocumentDefinition.ALIAS_INTERACTOR_A );
+        for ( psidev.psi.mi.tab.model.builder.Field field : aliasesA.getFields() ) {
+            if ( field.getValue() != null ) {
+                nameA = field.getValue();
+            }
+        }
+
+        if ( nameA == null ) {
+            //alternative identifiers
+            Column altIdA = row.getColumnByIndex( MitabDocumentDefinition.ALTID_INTERACTOR_A );
+            for ( psidev.psi.mi.tab.model.builder.Field field : altIdA.getFields() ) {
+                if ( "gene name".equals( field.getDescription() ) ) {
+                    nameA = field.getValue();
+                }
+
+                if ( nameA == null ) {
+                    if ( "commercial name".equals( field.getDescription() ) ) {
+                        nameA = field.getValue();
+                    }
+                }
+            }
+        }
+        return nameA;
     }
 
     public void setDisableExpandInteractorsProperties( boolean disable ) {
