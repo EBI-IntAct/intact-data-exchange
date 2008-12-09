@@ -21,12 +21,14 @@ import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Interaction;
 import psidev.psi.mi.xml.model.Parameter;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterMessage;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Xref;
+import uk.ac.ebi.intact.model.clone.IntactCloner;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
 /**
@@ -306,5 +308,36 @@ public class InteractionConverterTest extends AbstractConverterTest {
 
         Assert.assertNotNull(psiInteraction.getXref());
         Assert.assertEquals("testinstitution", psiInteraction.getXref().getPrimaryRef().getDb());
+    }
+
+    @Test
+    public void roundtrip_baitPraySameInteractor() throws Exception {
+        Protein prot = getMockBuilder().createProteinRandom();
+        Protein protCopy = new IntactCloner().clone(prot);
+
+        PersisterHelper.saveOrUpdate(protCopy);
+
+        Component bait = getMockBuilder().createComponentBait(prot);
+        Component prey = getMockBuilder().createComponentPrey(prot);
+
+        uk.ac.ebi.intact.model.Interaction intactInteraction = getMockBuilder().createInteraction(bait, prey);
+
+        Assert.assertEquals(2, intactInteraction.getComponents().size());
+        Assert.assertEquals(1, getDaoFactory().getProteinDao().countAll());
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        Interaction psiInteraction = converter.intactToPsi( intactInteraction);
+
+        Assert.assertEquals(2, psiInteraction.getParticipants().size());
+
+        uk.ac.ebi.intact.model.Interaction reInteraction = converter.psiToIntact(psiInteraction);
+
+        Assert.assertEquals(2, reInteraction.getComponents().size());
+
+        PersisterHelper.saveOrUpdate(reInteraction);
+
+        Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(1, getDaoFactory().getProteinDao().countAll());
+        Assert.assertEquals(2, getDaoFactory().getComponentDao().countAll());
     }
 }
