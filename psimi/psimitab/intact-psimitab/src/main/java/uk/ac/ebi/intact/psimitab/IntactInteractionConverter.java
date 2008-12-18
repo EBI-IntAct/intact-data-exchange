@@ -335,17 +335,15 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
 
         // expansion method
         final int expansionCount = ibi.getExpansionMethods().size();
-        if( index <= expansionCount ) {
-            String expMethod = null;
-            if (ibi.getExpansionMethods().size() > 0) {
-                expMethod = ibi.getExpansionMethods().get(index);
-            }
+
+        if (expansionCount > 1) {
+            if (log.isErrorEnabled()) log.error("More than 1 expansion method found: "+ibi);
+        } else if (expansionCount == 1){
+            String expMethod = ibi.getExpansionMethods().iterator().next();
             if( ! EMPTY_COLUMN.equals( expMethod ) ) {
                 Attribute attr = new Attribute("expansion", expMethod);
                 interaction.getAttributes().add(attr);
             }
-        } else {
-            log.warn( "Could not fetch an expansion method at index " + index + " only " + expansionCount + " found." );
         }
 
         // dataset -- there could be many: add them all
