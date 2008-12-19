@@ -113,6 +113,14 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         BioSource organism = new OrganismConverter( getInstitution() ).psiToIntact( psiOrganism );
         CvInteractorType interactorType = new InteractorTypeConverter( getInstitution() ).psiToIntact( psiInteractorType );
 
+        // MI identifier
+        String typeId = null;
+
+        if (psiInteractorType.getXref() != null && psiInteractorType.getXref().getPrimaryRef() != null) {
+            typeId = psiInteractorType.getXref().getPrimaryRef().getId();
+        }
+
+        // label
         String interactorTypeLabel = psiInteractorType.getNames().getShortLabel();
 
         // in dip files, it seams that the type is stored in the full name and the short label is empty
@@ -120,20 +128,27 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             interactorTypeLabel = psiInteractorType.getNames().getFullName();
         }
 
+        // using the mi identifier and the shortlabel to identify the type of interactor
         Interactor interactor = null;
 
-        if ( interactorTypeLabel.equals( CvInteractorType.PROTEIN ) ) {
+        if ( CvInteractorType.PROTEIN_MI_REF.equals(typeId) ||
+             interactorTypeLabel.equals( CvInteractorType.PROTEIN ) ) {
             interactor = new ProteinImpl( getInstitution(), organism, shortLabel, interactorType );
-        } else if ( interactorTypeLabel.equals( "peptide" ) ) { // found in dip
+        } else if ( CvInteractorType.PEPTIDE_MI_REF.equals(typeId) ||
+                    interactorTypeLabel.equals( "peptide" ) ) { // found in dip
             interactor = new ProteinImpl( getInstitution(), organism, shortLabel, interactorType );
-        } else if ( interactorTypeLabel.equals( CvInteractorType.SMALL_MOLECULE ) ) {
+        } else if ( CvInteractorType.SMALL_MOLECULE_MI_REF.equals(typeId) ||
+                    interactorTypeLabel.equals( CvInteractorType.SMALL_MOLECULE ) ) {
             interactor = new SmallMoleculeImpl( shortLabel, getInstitution(), interactorType );
             interactor.setBioSource( organism );
         } else
-        if ( interactorTypeLabel.equals( CvInteractorType.NUCLEIC_ACID ) || interactorTypeLabel.equals( CvInteractorType.DNA ) ) {
+        if ( CvInteractorType.NUCLEIC_ACID_MI_REF.equals(typeId) ||
+             CvInteractorType.DNA_MI_REF.equals(typeId) ||
+             interactorTypeLabel.equals( CvInteractorType.NUCLEIC_ACID ) ||
+             interactorTypeLabel.equals( CvInteractorType.DNA ) ) {
             interactor = new NucleicAcidImpl( getInstitution(), organism, shortLabel, interactorType );
         } else {
-            throw new PsiConversionException( "Interaction of unexpected type: " + interactorTypeLabel );
+            throw new PsiConversionException( "Interactor of unexpected type: " + typeId+" ("+interactorTypeLabel+")" );
         }
 
         return interactor;
