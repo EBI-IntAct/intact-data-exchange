@@ -211,4 +211,17 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         Assert.assertEquals(new DateTime("2006-09-20"), PsiExchange.toDateTime(date2));
     }
 
+    @Test
+    public void importIntoIntact_participantBaitPreySameInteractior() throws Exception {
+        PsimiXmlReader reader = new PsimiXmlReader();
+        EntrySet set = reader.read(PsiExchangeTest.class.getResourceAsStream("/xml/2participants_sameInteractor.xml"));
+
+        PsiExchange.importIntoIntact(set);
+
+        Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(1, getDaoFactory().getProteinDao().countAll());
+        Assert.assertEquals(2, getDaoFactory().getComponentDao().countAll());
+        Assert.assertEquals(2, getDaoFactory().getInteractionDao().getByShortLabel("sft2-sft2").getComponents().size());
+    }
+
 }
