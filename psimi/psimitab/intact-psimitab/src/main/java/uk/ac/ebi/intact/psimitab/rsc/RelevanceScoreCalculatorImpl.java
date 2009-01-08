@@ -66,33 +66,38 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
          * Experimental Role
          ****************/
         final Column experimentRoleA = row.getColumnByIndex( IntactDocumentDefinition.EXPERIMENTAL_ROLE_A );
-        List<String> exprolesA = getDescriptionFromColumn( experimentRoleA );
+        Set<String> exprolesA = getDescriptionFromColumn( experimentRoleA );
+        if ( exprolesA != null && exprolesA.size() > 1 ) {
+            removeUnspecifiedRole( exprolesA );
+        }
         String expRoleA = joinRoles( exprolesA );
 
         final Column experimentRoleB = row.getColumnByIndex( IntactDocumentDefinition.EXPERIMENTAL_ROLE_B );
-        List<String> exprolesB = getDescriptionFromColumn( experimentRoleB );
+        Set<String> exprolesB = getDescriptionFromColumn( experimentRoleB );
+        if ( exprolesB != null && exprolesB.size() > 1) {
+            removeUnspecifiedRole( exprolesA );
+        }
+
         String expRoleB = joinRoles( exprolesB );
 
         /*****************
          * Biological Role
          ****************/
         final Column biologicalRoleA = row.getColumnByIndex( IntactDocumentDefinition.BIOLOGICAL_ROLE_A );
-        List<String> biorolesA = getDescriptionFromColumn( biologicalRoleA );
+        Set<String> biorolesA = getDescriptionFromColumn( biologicalRoleA );
+        if ( biorolesA != null && biorolesA.size() > 1 ) {
+            removeUnspecifiedRole( biorolesA );
+        }
+        String bioRoleA = joinRoles( biorolesA );
 
         final Column biologicalRoleB = row.getColumnByIndex( IntactDocumentDefinition.BIOLOGICAL_ROLE_B );
-        List<String> biorolesB = getDescriptionFromColumn( biologicalRoleB );
-
-        String bioRoleA;
-        String bioRoleB;
-        if ( biorolesA != null && biorolesA.size() == 1 && biorolesB != null && biorolesB.size() == 1 ) {
-             bioRoleA = biorolesA.iterator().next();
-             bioRoleB = biorolesB.iterator().next();
-
-        } else {
-            throw new IllegalStateException( "Either one of the biorole is missing for an interactor or it has more than one biorole " + row.toString() );
+        Set<String> biorolesB = getDescriptionFromColumn( biologicalRoleB );
+         if(biorolesB!=null && biorolesB.size() > 1){
+            removeUnspecifiedRole( biorolesB );
         }
+        String bioRoleB = joinRoles( biorolesB );
 
-        //merge Roles
+      //merge Roles
         String mergedRoleA = mergeRole( expRoleA, bioRoleA );
         addToProperties( mergedRoleA, DEFAULT_ROLE_PREFIX );
 
@@ -108,8 +113,8 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
         final Column typeA = row.getColumnByIndex( IntactDocumentDefinition.INTERACTOR_TYPE_A );
         final Column typeB = row.getColumnByIndex( IntactDocumentDefinition.INTERACTOR_TYPE_B );
 
-        List<String> typesA = getDescriptionFromColumn( typeA );
-        List<String> typesB = getDescriptionFromColumn( typeB );
+        Set<String> typesA = getDescriptionFromColumn( typeA );
+        Set<String> typesB = getDescriptionFromColumn( typeB );
 
         String mergedType;
         if ( typesA != null && typesA.size() == 1 && typesB != null && typesB.size() == 1 ) {
@@ -126,8 +131,14 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
         return mergeStrings( rscScoreType, rscScoreRoleA_B );
     }
 
-   
 
+    private void removeUnspecifiedRole( Set<String> roles ) {
+
+        if ( roles.contains( UNSPECIFIED_ROLE ) ) {
+            roles.remove( UNSPECIFIED_ROLE );
+        }
+
+    }
     private String addToProperties( String property, String defaultKey ) {
 
         if ( rscProperties.containsKey( property ) ) {
@@ -147,9 +158,9 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
         return rscProperties;
     }
 
-    private List<String> getDescriptionFromColumn( Column column ) {
+    private Set<String> getDescriptionFromColumn( Column column ) {
 
-        List<String> descriptions = new ArrayList<String>();
+        Set<String> descriptions = new HashSet<String>();
         for ( Field field : column.getFields() ) {
             if ( field.getDescription() != null ) {
                 descriptions.add( field.getDescription() );
@@ -158,10 +169,10 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
         return descriptions;
     }
 
-    private String joinRoles( List<String> roles ) {
+    private String joinRoles( Set<String> roles ) {
         String role;
         if ( roles.size() > 1 ) {
-            Collections.sort( roles );
+            Collections.sort( new ArrayList<String>(roles) );
             role = StringUtils.join( roles.toArray(), "," );
         } else {
             role = roles.iterator().next();

@@ -64,6 +64,7 @@ public class IntactDocumentBuilder extends AbstractInteractionDocumentBuilder<In
     public IntactDocumentBuilder( OntologyIndexSearcher ontologySearcher, String[] ontologiesToExpand ) throws IOException {
         this();
         this.ontologySearcher = ontologySearcher;
+        this.relevanceScoreCalculator = new RelevanceScoreCalculatorImpl( );
 
         for (String ontologyToExpand : ontologiesToExpand) {
             addExpandableOntology(ontologyToExpand);
