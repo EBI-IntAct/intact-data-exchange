@@ -225,7 +225,14 @@ public class IntactInteractionRowConverter extends AbstractInteractionRowConvert
     }
 
     protected Field createFieldFromAnnotation( Annotation annotation ) {
-        return new Field( annotation.getType(), annotation.getText() );
+        return new Field( annotation.getType(), removeCarriageReturnFromText(annotation.getText()) );
+    }
+
+    protected String removeCarriageReturnFromText( String text ) {
+        if ( text != null ) {
+            text = text.replaceAll( "\\n\\r|\\n", " " );
+        }
+        return text;
     }
 
     protected Field createFieldFromParameter( Parameter parameter ) {

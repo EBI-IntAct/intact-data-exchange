@@ -12,7 +12,9 @@ import psidev.psi.mi.tab.mock.PsimiTabMockBuilder;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.builder.Column;
 import psidev.psi.mi.tab.model.builder.Row;
+import psidev.psi.mi.tab.model.builder.Field;
 import uk.ac.ebi.intact.psimitab.mock.IntactPsimiTabMockBuilder;
+import uk.ac.ebi.intact.psimitab.model.Annotation;
 
 import java.util.List;
 
@@ -112,5 +114,20 @@ public class IntactInteractionRowConverterTest {
         methods.add( "Matrix" );
 
         converter.createRow( interaction );
+    }
+
+    @Test
+    public void removeLineCharacterFromAnnotationTest() throws Exception {
+        IntactInteractionRowConverter converter = new IntactInteractionRowConverter();
+        Annotation annotation = new Annotation( "comment", "test\ntext\n test\n\rtext" );
+
+        Assert.assertTrue( annotation.getText().contains( "\n" ) );
+        Assert.assertTrue( annotation.getText().contains( "\r" ) );
+
+        Field field = converter.createFieldFromAnnotation( annotation );
+
+        Assert.assertFalse( field.getValue().contains( "\n" ) );
+        Assert.assertFalse( field.getValue().contains( "\r" ) );
+
     }
 }
