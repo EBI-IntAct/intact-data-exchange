@@ -20,6 +20,10 @@ import psidev.psi.mi.tab.model.builder.Column;
 import psidev.psi.mi.tab.model.builder.Field;
 
 import java.util.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.FileInputStream;
 
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 import org.apache.commons.lang.StringUtils;
@@ -153,6 +157,31 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
 
     }
 
+
+    public boolean writePropertiesFile( File propertiesFile ) throws IOException {
+        final Properties properties = getWeights();
+        if ( properties != null ) {
+            try {
+                properties.store( new FileOutputStream( propertiesFile ), null );
+            } catch ( IOException e ) {
+                throw new IOException( "IOException thrown when writing Rsc Properties File" );
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public Properties readPropertiesFile( File propertiesFile ) throws IOException {
+        Properties properties = new Properties();
+        try {
+            properties.load( new FileInputStream( propertiesFile ) );
+        } catch ( IOException e ) {
+            throw new IOException( "IOException thrown when reading Rsc Properties File" );
+        }
+        return properties;
+    }
 
     public Properties getWeights() {
         return rscProperties;

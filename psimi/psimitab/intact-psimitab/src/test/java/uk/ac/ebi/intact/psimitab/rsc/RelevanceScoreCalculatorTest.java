@@ -21,6 +21,7 @@ import org.junit.Assert;
 import java.util.Properties;
 import java.util.Collections;
 import java.util.Arrays;
+import java.io.File;
 
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 import psidev.psi.mi.tab.model.builder.RowBuilder;
@@ -79,6 +80,14 @@ public class RelevanceScoreCalculatorTest {
 
         printProperties( properties );
 
+        //write and read properties here
+        File tempFile = File.createTempFile( "relevancescore", ".properties" );
+        boolean success = rsc.writePropertiesFile( tempFile );
+        Assert.assertTrue( success );
+
+        Properties properties_ = rsc.readPropertiesFile( tempFile );
+        printProperties( properties_ );
+        Assert.assertEquals( 8, properties_.size() );
     }
 
     @Test

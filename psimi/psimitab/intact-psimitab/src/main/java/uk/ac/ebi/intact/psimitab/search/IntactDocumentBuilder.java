@@ -484,4 +484,8 @@ go:"GO:0014911"(positive regulation of smooth muscle cell migration)|
 
         return sb.toString();
     }
+
+    public RelevanceScoreCalculator getRelevanceScoreCalculator(){
+        return this.relevanceScoreCalculator;
+    }
 }
