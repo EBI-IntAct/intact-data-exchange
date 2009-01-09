@@ -33,12 +33,14 @@ import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 import uk.ac.ebi.intact.psimitab.OntologyNameFinder;
 import uk.ac.ebi.intact.psimitab.PsimitabTools;
+import uk.ac.ebi.intact.psimitab.rsc.RelevanceScoreCalculator;
 import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
 import uk.ac.ebi.intact.psimitab.search.IntactInteractorIndexWriter;
 import uk.ac.ebi.intact.psimitab.search.IntactPsimiTabIndexWriter;
+import uk.ac.ebi.intact.psimitab.search.IntactDocumentBuilder;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.commons.util.ETACalculator;
@@ -46,6 +48,8 @@ import uk.ac.ebi.intact.commons.util.ETACalculator;
 import javax.persistence.Query;
 import java.io.IOException;
 import java.io.Writer;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.*;
 
 /**
@@ -64,6 +68,9 @@ public class DatabaseMitabExporter {
     private final OntologyIndexSearcher ontologiesIndexSearcher;
     private final OntologyNameFinder nameFinder;
     private final String[] ontologiesToExpand;
+
+    private IntactPsimiTabIndexWriter interactionIndexer;
+    private IntactInteractorIndexWriter interactorIndexer;
 
     public DatabaseMitabExporter(OntologyIndexSearcher ontologiesIndexSearcher, String ... supportedOntologies) {
         this.ontologiesIndexSearcher = ontologiesIndexSearcher;
@@ -114,9 +121,6 @@ public class DatabaseMitabExporter {
 
         IndexWriter interactionIndexWriter = null;
         IndexWriter interactorIndexWriter = null;
-
-        IntactPsimiTabIndexWriter interactionIndexer = null;
-        IntactInteractorIndexWriter interactorIndexer = null;
 
         if (interactionDirectory != null) {
             interactionIndexWriter = new IndexWriter(interactionDirectory, new StandardAnalyzer(), true);
@@ -347,6 +351,14 @@ public class DatabaseMitabExporter {
         q.setMaxResults(maxResults);
 
         return q.getResultList();
+    }
+
+    public IntactPsimiTabIndexWriter getIntactPsimiTabIndexWriter() {
+        return this.interactionIndexer;
+    }
+
+    public IntactInteractorIndexWriter getIntactInteractorIndexWriter() {
+        return this.interactorIndexer;
     }
 
 }
