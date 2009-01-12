@@ -90,7 +90,7 @@ public class PsiEnricherTest {
         Entry entry = enrichedSet.getEntries().iterator().next();
         
         Assert.assertEquals(3, entry.getInteractions().size());
-        Assert.assertEquals(3, entry.getExperiments().size());
-        Assert.assertEquals(3, entry.getInteractors().size());
+        Assert.assertEquals(0, entry.getExperiments().size()); // compacted
+        Assert.assertEquals(0, entry.getInteractors().size()); // compacted
     }
 }
