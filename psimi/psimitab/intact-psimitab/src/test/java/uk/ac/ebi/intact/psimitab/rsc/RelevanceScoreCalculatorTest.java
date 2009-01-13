@@ -54,7 +54,7 @@ public class RelevanceScoreCalculatorTest {
         Properties properties = rsc.getWeights();
 
         Assert.assertEquals(4, properties.size());
-        Assert.assertEquals("SM4-RL3",rscScore);
+        Assert.assertEquals("SM1-RL3",rscScore);
 
         //DrugPort mitabline
         //small molecule- protein interaction  expRoleA=drug expRoleB=drug target bioRoleA=unspecified role bioRoleB=unspecified role
@@ -65,7 +65,7 @@ public class RelevanceScoreCalculatorTest {
         properties = rsc.getWeights();
 
         Assert.assertEquals(8, properties.size());
-        Assert.assertEquals("SM8-RL7",rscScore);
+        Assert.assertEquals("SM2-RL6",rscScore);
 
 
         //repeat imatinib line ...the count of properties should not change and u should get the same score
@@ -76,7 +76,7 @@ public class RelevanceScoreCalculatorTest {
         properties = rsc.getWeights();
 
         Assert.assertEquals(8, properties.size());
-        Assert.assertEquals("SM8-RL7",rscScore);
+        Assert.assertEquals("SM2-RL6",rscScore);
 
         printProperties( properties );
 
@@ -93,14 +93,11 @@ public class RelevanceScoreCalculatorTest {
     @Test
     public void getRscScoreTestWithInitializedProperties() throws Exception {
 
-        Properties properties = new Properties();
-        properties.put("protein-small molecule","A");
-        properties.put("protein-protein","B");
-        properties.put("drug-drug target","C");
-        properties.put("bait-prey","D");
+        Properties properties = getTestProperties();
 
         //Protein-Protein interaction with expRoleA=prey expRoleB=bait bioRoleA=unspecified role bioRoleB=unspecified role
         String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)\tMI:0499(unspecified role)\tinterpro:IPR004829|interpro:IPR010790|interpro:IPR001664|uniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716|uniprotkb:Q540Z7|uniprotkb:Q63368\tgo:0005737|go:0030056|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
+        //String psiMiTabLine = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)|MI:0499(unspecified role)\tMI:0499(unspecified role)|MI:0499(unspecified role)\tinterpro:IPR004829|interpro:IPR010790|interpro:IPR001664|uniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716|uniprotkb:Q540Z7|uniprotkb:Q63368\tgo:0005737|go:0030056|go:0005200|go:0045104|interpro:IPR001589|interpro:IPR001715|interpro:IPR002048|interpro:IPR001101|uniprotkb:Q60845|uniprotkb:Q9WU50|go:0008090|go:0015629|go:0015630|go:0060053|go:0008017|go:0031122|go:0031110|ensembl:ENSMUSG00000026131\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
 
         final IntactDocumentDefinition documentDefinition = new IntactDocumentDefinition();
         final RowBuilder rowBuilder = documentDefinition.createRowBuilder();
@@ -140,6 +137,45 @@ public class RelevanceScoreCalculatorTest {
 
     }
 
+
+    @Test
+    public void addToPropertiesTest() throws Exception{
+
+       Properties properties = getTestProperties();
+       RelevanceScoreCalculatorImpl rsc = new RelevanceScoreCalculatorImpl(properties);
+       Properties loadedProperties = rsc.getWeights();
+       Assert.assertEquals(4,loadedProperties.size());
+
+       String propertyString = rsc.addToProperties("testproperty","TP" );
+       Assert.assertEquals(propertyString,"TP1");
+       propertyString = rsc.addToProperties("testproperty","TP" );
+       Assert.assertEquals(propertyString,"TP1");
+       propertyString = rsc.addToProperties("testproperty2","TP" );
+       Assert.assertEquals(propertyString,"TP2");
+       propertyString = rsc.addToProperties("newproperty","NP" );
+       Assert.assertEquals(propertyString,"NP1");
+
+        //already existing one
+       propertyString = rsc.addToProperties("protein-smallmolecule","SM" );
+       Assert.assertEquals(propertyString,"A");
+
+
+
+
+
+
+    }
+
+
+    private Properties getTestProperties(){
+
+        Properties properties = new Properties();
+        properties.put("protein-smallmolecule","A");
+        properties.put("protein-protein","B");
+        properties.put("drug-drugtarget","C");
+        properties.put("bait-prey","D");
+        return properties;
+    }
 
     private void printProperties( Properties properties ) {
         if ( properties != null ) {

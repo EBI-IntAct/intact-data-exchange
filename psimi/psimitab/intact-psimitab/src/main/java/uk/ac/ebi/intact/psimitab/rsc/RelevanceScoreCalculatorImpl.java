@@ -103,12 +103,22 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
 
       //merge Roles
         String mergedRoleA = mergeRole( expRoleA, bioRoleA );
+        //remove white spaces as the properties.store method will add escate character
+        if(mergedRoleA!=null){
+            mergedRoleA = mergedRoleA.replaceAll( "\\s+","" );
+        }
         addToProperties( mergedRoleA, DEFAULT_ROLE_PREFIX );
 
         String mergedRoleB = mergeRole( expRoleB, bioRoleB );
+        if(mergedRoleB!=null){
+            mergedRoleB = mergedRoleB.replaceAll( "\\s+","" );
+        }
         addToProperties( mergedRoleB, DEFAULT_ROLE_PREFIX );
 
         String mergedRoleA_B = mergeRole (mergedRoleA,mergedRoleB);
+        if(mergedRoleA_B!=null){
+            mergedRoleA_B.replaceAll( "\\s+","" );
+        }
         String rscScoreRoleA_B = addToProperties( mergedRoleA_B, DEFAULT_ROLE_PREFIX );
 
         /*****************
@@ -129,6 +139,9 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
             throw new IllegalStateException( "Either one of the interactorType is missing for an interactor or it has more than one type " + row.toString() );
         }
 
+        if(mergedType!=null){
+            mergedType = mergedType.replaceAll( "\\s+","" );
+        }
         String rscScoreType = addToProperties( mergedType, DEFAULT_TYPE_PREFIX );
 
 
@@ -143,20 +156,38 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
         }
 
     }
-    private String addToProperties( String property, String defaultKey ) {
+
+    protected String addToProperties( String property, String defaultKey ) {
 
         if ( rscProperties.containsKey( property ) ) {
             return rscProperties.getProperty( property );
         } else {
             //add to the properties  and return value
-            int incrementor = rscProperties.size();
-            incrementor++;
+            final Collection<Object> values = rscProperties.values();
+
+            int incrementor = 1;
+
+            if ( values != null && values.size() > 0 ) {
+                incrementor = getNextIncrementor( values, defaultKey );
+            }
             rscProperties.put( property, defaultKey + incrementor );
             return rscProperties.getProperty( property );
         }
 
     }
 
+    private int getNextIncrementor(Collection<Object> values, String defaultKey){
+
+        int index = 1;
+
+        for ( Object value : values ) {
+             String valueStr = (String)value;
+            if(valueStr.startsWith( defaultKey )){
+                index++;
+            }
+        }
+      return index;
+    }
 
     public boolean writePropertiesFile( File propertiesFile ) throws IOException {
         final Properties properties = getWeights();
@@ -213,6 +244,10 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
 
     private String mergeRole( String roleA, String roleB ) {
         String mergedRole;
+
+        if(UNSPECIFIED_ROLE.equals( roleA ) && UNSPECIFIED_ROLE.equals( roleB )){
+            return "unspecifiedrole";
+        }
 
         if ( UNSPECIFIED_ROLE.equals( roleA ) ) {
             mergedRole = roleB;
