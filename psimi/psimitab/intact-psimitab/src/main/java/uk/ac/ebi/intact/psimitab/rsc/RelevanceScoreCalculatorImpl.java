@@ -79,7 +79,7 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
         final Column experimentRoleB = row.getColumnByIndex( IntactDocumentDefinition.EXPERIMENTAL_ROLE_B );
         Set<String> exprolesB = getDescriptionFromColumn( experimentRoleB );
         if ( exprolesB != null && exprolesB.size() > 1) {
-            removeUnspecifiedRole( exprolesA );
+            removeUnspecifiedRole( exprolesB );
         }
 
         String expRoleB = joinRoles( exprolesB );
