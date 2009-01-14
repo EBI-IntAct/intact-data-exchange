@@ -107,13 +107,13 @@ public class RelevanceScoreCalculatorImpl implements RelevanceScoreCalculator {
         if(mergedRoleA!=null){
             mergedRoleA = mergedRoleA.replaceAll( "\\s+","" );
         }
-        addToProperties( mergedRoleA, DEFAULT_ROLE_PREFIX );
+        //addToProperties( mergedRoleA, DEFAULT_ROLE_PREFIX );
 
         String mergedRoleB = mergeRole( expRoleB, bioRoleB );
         if(mergedRoleB!=null){
             mergedRoleB = mergedRoleB.replaceAll( "\\s+","" );
         }
-        addToProperties( mergedRoleB, DEFAULT_ROLE_PREFIX );
+        //addToProperties( mergedRoleB, DEFAULT_ROLE_PREFIX );
 
         String mergedRoleA_B = mergeRole (mergedRoleA,mergedRoleB);
         if(mergedRoleA_B!=null){
