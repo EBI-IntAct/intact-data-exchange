@@ -19,8 +19,6 @@ import org.junit.Test;
 import org.junit.Assert;
 
 import java.util.Properties;
-import java.util.Collections;
-import java.util.Arrays;
 import java.io.File;
 
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
@@ -53,8 +51,8 @@ public class RelevanceScoreCalculatorTest {
         String rscScore = rsc.calculateScore(row1);
         Properties properties = rsc.getWeights();
 
-        Assert.assertEquals(4, properties.size());
-        Assert.assertEquals("SM1-RL3",rscScore);
+        Assert.assertEquals(2, properties.size());
+        Assert.assertEquals("SM1-RL1",rscScore);
 
         //DrugPort mitabline
         //small molecule- protein interaction  expRoleA=drug expRoleB=drug target bioRoleA=unspecified role bioRoleB=unspecified role
@@ -64,8 +62,8 @@ public class RelevanceScoreCalculatorTest {
         rscScore = rsc.calculateScore(row2);
         properties = rsc.getWeights();
 
-        Assert.assertEquals(8, properties.size());
-        Assert.assertEquals("SM2-RL6",rscScore);
+        Assert.assertEquals(4, properties.size());
+        Assert.assertEquals("SM2-RL2",rscScore);
 
 
         //repeat imatinib line ...the count of properties should not change and u should get the same score
@@ -75,8 +73,8 @@ public class RelevanceScoreCalculatorTest {
         rscScore = rsc.calculateScore(row3);
         properties = rsc.getWeights();
 
-        Assert.assertEquals(8, properties.size());
-        Assert.assertEquals("SM2-RL6",rscScore);
+        Assert.assertEquals(4, properties.size());
+        Assert.assertEquals("SM2-RL2",rscScore);
 
         printProperties( properties );
 
@@ -87,7 +85,7 @@ public class RelevanceScoreCalculatorTest {
 
         Properties properties_ = rsc.readPropertiesFile( tempFile );
         printProperties( properties_ );
-        Assert.assertEquals( 8, properties_.size() );
+        Assert.assertEquals( 4, properties_.size() );
     }
 
     @Test
@@ -107,7 +105,7 @@ public class RelevanceScoreCalculatorTest {
         String rscScore = rsc.calculateScore(row1);
         properties = rsc.getWeights();
 
-        Assert.assertEquals(6, properties.size());
+        Assert.assertEquals(4, properties.size());
         Assert.assertEquals("B-D",rscScore);
 
         //DrugPort mitabline
@@ -118,7 +116,7 @@ public class RelevanceScoreCalculatorTest {
         rscScore = rsc.calculateScore(row2);
         properties = rsc.getWeights();
 
-        Assert.assertEquals(8, properties.size());
+        Assert.assertEquals(4, properties.size());
         Assert.assertEquals("A-C",rscScore);
 
 
@@ -129,7 +127,7 @@ public class RelevanceScoreCalculatorTest {
         rscScore = rsc.calculateScore(row3);
         properties = rsc.getWeights();
 
-        Assert.assertEquals(8, properties.size());
+        Assert.assertEquals(4, properties.size());
         Assert.assertEquals("A-C",rscScore);
 
         printProperties( properties );
