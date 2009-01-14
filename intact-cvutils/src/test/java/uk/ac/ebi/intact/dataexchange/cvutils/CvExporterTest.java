@@ -57,7 +57,8 @@ public class CvExporterTest {
     @Before
     public void prepareCvs() throws OBOParseException, IOException, PsiLoaderException, IntactTransactionException {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvExporterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         log.debug( oboSession.getObjects().size() );
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
@@ -84,10 +85,9 @@ public class CvExporterTest {
 
          */
 
-
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvExporterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
-
 
         OBOObject readOBOObj = ( OBOObject ) oboSession.getObject( "MI:0244" );
         CvObject cvObject = ontologyBuilder.toCvObject( readOBOObj );
@@ -118,9 +118,11 @@ public class CvExporterTest {
         OBOSession oboSession = downloadCv.convertToOBOSession( allCvs );
         // Create temp directory
         File tempDir = new File( "temp" );
-        tempDir.mkdir();
+        boolean success = tempDir.mkdir();
+        if(success){
         File outFile = File.createTempFile( "test", ".obo", tempDir );
         downloadCv.writeOBOFile( oboSession, outFile );
+        }
 
     }//end method
 
@@ -159,10 +161,12 @@ public class CvExporterTest {
         cvExporter.getOboSession().addObject( obj2 );
 
         File tempDir = new File( "temp" );
-        tempDir.mkdir();
+        boolean success = tempDir.mkdir();
+        if(success){
         File outFile = File.createTempFile( "test", ".obo" );
         outFile.deleteOnExit();
         downloadCv.writeOBOFile( cvExporter.getOboSession(), outFile );
+        }   
 
 
     }//end method

@@ -48,30 +48,22 @@ public class CvObjectOntologyBuilderTest {
     @Test
     public void build_default() throws Exception {
 
-
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvObjectOntologyBuilderTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
-
-
         Assert.assertEquals( 16, ontologyBuilder.getRootOBOObjects().size() );
-
 
         int allOrphanCvs = ontologyBuilder.getOrphanCvObjects().size();
         Assert.assertEquals( 54, allOrphanCvs );
-
 
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
         int allCvsSize = allCvs.size();
         Assert.assertEquals( 987, allCvsSize );
 
-      
-
-
         List<CvDagObject> orderedList = ontologyBuilder.getAllOrderedCvs( allCvs );
         Assert.assertEquals( 987, orderedList.size() );
-
 
         for ( CvDagObject cvdag : orderedList ) {
             log.debug( "CvDag: \t" + cvdag.getMiIdentifier() + "\t" + cvdag.getObjClass() + "\t" + cvdag.getShortLabel() );
@@ -157,7 +149,8 @@ public class CvObjectOntologyBuilderTest {
     public void categoryTest() throws Exception
 
     {
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvObjectOntologyBuilderTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         log.debug( oboSession.getObjects().size() );
 
         OBOObject interactionDetection = ( OBOObject ) oboSession.getObject( "MI:0001" );
@@ -187,7 +180,8 @@ public class CvObjectOntologyBuilderTest {
     @Test
     public void build_subset_drugable() throws Exception {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvObjectOntologyBuilderTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         log.debug( oboSession.getObjects().size() );
 
 
@@ -263,7 +257,8 @@ public class CvObjectOntologyBuilderTest {
     @Test
     public void build_subset_psi() throws Exception {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvObjectOntologyBuilderTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         if ( log.isDebugEnabled() ) log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
@@ -278,10 +273,8 @@ public class CvObjectOntologyBuilderTest {
 
         for ( CvDagObject cvDag : allPsimiCvs ) {
 
-//            log.info( cvDag.getMiIdentifier() + " -> " + cvDag.getShortLabel() );
             OBOObject psimi = ( OBOObject ) oboSession.getObject( cvDag.getMiIdentifier() );
             Assert.assertTrue( ontologyBuilder.checkIfCategorySubset( psimi, oboCatPsi ) );
-//            log.info( "isTrue PSI Term:  " + ontologyBuilder.checkIfCategorySubset( psimi, oboCatPsi ) );
             psiMis.add( psimi.getID() );
         }
 
@@ -308,7 +301,8 @@ public class CvObjectOntologyBuilderTest {
     @Test
     public void regex_test() throws Exception {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvObjectOntologyBuilderTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
@@ -330,7 +324,8 @@ public class CvObjectOntologyBuilderTest {
     @Test
     public void definition_test() throws Exception {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvObjectOntologyBuilderTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
@@ -489,7 +484,8 @@ public class CvObjectOntologyBuilderTest {
 
     @Test
       public void build_cvsWithSameMi() throws Exception {
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvObjectOntologyBuilderTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         log.debug( oboSession.getObjects().size() );
 
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );

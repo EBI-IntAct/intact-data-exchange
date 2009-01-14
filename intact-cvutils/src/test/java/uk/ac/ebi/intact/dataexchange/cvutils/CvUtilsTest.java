@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.obo.datamodel.OBOSession;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
@@ -46,7 +47,9 @@ public class CvUtilsTest extends IntactBasicTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        ontology = new CvObjectOntologyBuilder( OboUtils.createOBOSessionFromDefault( "1.51" ) ).getAllCvs();
+        OBOSession oboSession = OboUtils.createOBOSession( CvUtilsTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
+        CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
+        ontology = ontologyBuilder.getAllCvs();
     }
 
     @Test

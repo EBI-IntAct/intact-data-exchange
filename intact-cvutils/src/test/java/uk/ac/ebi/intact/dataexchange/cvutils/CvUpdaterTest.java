@@ -68,12 +68,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     @Test
     public void reportDirectlyFromOBOFile() throws Exception {
 
-        //URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
-        String revision = "1.51";
-        URL url = new URL( OboUtils.PSI_MI_OBO_LOCATION + "?revision=" + revision );
-        log.debug( "url " + url );
+        BufferedReader in = new BufferedReader( new InputStreamReader( CvUpdaterTest.class.getResourceAsStream("/ontologies/psi-mi25-1_51.obo" ) ) );
 
-        BufferedReader in = new BufferedReader( new InputStreamReader( url.openStream() ) );
         String inputLine;
 
         int termCounter = 0;
@@ -113,7 +109,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     @Test
     public void isConstraintViolatedTest() throws Exception {
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvUpdaterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
@@ -315,7 +312,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             Assert.assertEquals( existingCv.getAnnotations().size(), 0 );
         }//end for
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvUpdaterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
 
@@ -369,7 +367,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( 3, cvsBeforeUpdate );
 
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvUpdaterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvObject> orphanCvs = ontologyBuilder.getOrphanCvObjects();
@@ -407,7 +406,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     @Test
     public void checkAnnotationUpdated() throws Exception {
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.52" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.52" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvUpdaterTest.class.getResource("/ontologies/psi-mi25-1_52.obo" ));
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
 
@@ -479,7 +479,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     @Test
     public void cvDatabasesWithoutAnnotationsOnFirstPass() throws Exception {
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvUpdaterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
         InputStream is = CvUpdaterTest.class.getResourceAsStream( "/additional-annotations.csv" );
 
@@ -508,7 +509,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         beginTransaction();
 
-        OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
+        OBOSession oboSession = OboUtils.createOBOSession( CvUpdaterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
 
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
