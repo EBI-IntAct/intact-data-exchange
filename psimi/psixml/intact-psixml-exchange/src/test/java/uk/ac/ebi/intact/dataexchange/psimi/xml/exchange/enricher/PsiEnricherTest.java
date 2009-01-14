@@ -18,15 +18,13 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher;
 import org.junit.Test;
 import org.junit.Assert;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
-import uk.ac.ebi.intact.model.Experiment;
 
 import java.io.*;
 
 import psidev.psi.mi.xml.PsimiXmlReader;
+import psidev.psi.mi.xml.stylesheets.XslTransformerUtils;
 import psidev.psi.mi.xml.model.EntrySet;
 import psidev.psi.mi.xml.model.Entry;
-import psidev.psi.mi.xml.model.ExperimentDescription;
-import psidev.psi.mi.stylesheets.XslTransformerUtils;
 
 /**
  * TODO comment this
@@ -90,7 +88,7 @@ public class PsiEnricherTest {
         Entry entry = enrichedSet.getEntries().iterator().next();
         
         Assert.assertEquals(3, entry.getInteractions().size());
-        Assert.assertEquals(0, entry.getExperiments().size()); // compacted
-        Assert.assertEquals(0, entry.getInteractors().size()); // compacted
+        Assert.assertEquals(3, entry.getExperiments().size());
+        Assert.assertEquals(3, entry.getInteractors().size()); 
     }
 }
