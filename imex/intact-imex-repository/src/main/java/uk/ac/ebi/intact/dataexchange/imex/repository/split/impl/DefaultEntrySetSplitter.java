@@ -15,9 +15,6 @@ import uk.ac.ebi.intact.dataexchange.imex.repository.model.ValidationMessage;
 import uk.ac.ebi.intact.dataexchange.imex.repository.split.EntrySetSplitter;
 import uk.ac.ebi.intact.dataexchange.imex.repository.util.RepoEntryUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.PsiExchange;
-import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
-import uk.ac.ebi.intact.util.psivalidator.PsiValidatorMessage;
-import uk.ac.ebi.intact.util.psivalidator.PsiValidatorReport;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,18 +71,21 @@ public class DefaultEntrySetSplitter implements EntrySetSplitter
 
                 writer.write(entrySetToWrite, splittedFile);
 
-                PsiValidatorReport report = PsiValidator.validate(splittedFile);
-                repoEntry.setValid(report.isValid());
+                // TODO Enable validation again, using the latest validator
+                log.warn("PSI-MI XML validation has been disabled, while the new validator is implemented");
 
-                if (!report.isValid()) {
-                    for (PsiValidatorMessage psiValidatorMessage : report.getMessages()) {
-                        ValidationMessage validationMessage = new ValidationMessage();
-                        validationMessage.setText(psiValidatorMessage.toString());
-                        repoEntry.addMessage(validationMessage);
-                    }
+                //PsiValidatorReport report = PsiValidator.validate(splittedFile);
+                //repoEntry.setValid(report.isValid());
 
-                    RepoEntryUtils.failEntry(repoEntry, "Failed PSI Validation", report.toString());
-                }
+//                if (!report.isValid()) {
+//                    for (PsiValidatorMessage psiValidatorMessage : report.getMessages()) {
+//                        ValidationMessage validationMessage = new ValidationMessage();
+//                        validationMessage.setText(psiValidatorMessage.toString());
+//                        repoEntry.addMessage(validationMessage);
+//                    }
+//
+//                    RepoEntryUtils.failEntry(repoEntry, "Failed PSI Validation", report.toString());
+//                }
  
                 ImexRepositoryContext.getInstance().getImexServiceProvider()
                         .getRepoEntryService().saveRepoEntry(repoEntry);
