@@ -1,0 +1,55 @@
+- Statistics for mitab files -
+
+See mitab.MitabStats.java and mitab.MitabUtils.java
+
+1) You can use internal library
+For each mitab file you consider, you have to collect the elements you want to count (e.g. interactions or publications).
+Then you use the processSet method which apply on collection and you give a name for the type of elements you are considering (to distinguish the different generated files if you apply it for interactions and the to publications).
+
+Collection a = collectPublis(MitabFiles.MITAB_INTACT); // or collectTwoInteractors(mitab1); for interactions
+Collection b = collectPublis(MitabFiles.MITAB_MINT_CLUSTERED);
+Collection c = collectPublis(MitabFiles.MITAB_DIP_CLUSTERED);
+processSets(a, b, c, true, "publis.");
+
+note: the boolean parameter is if you want to print all groups in different files.
+Seems not really pertinent... 
+
+2) You can use the external tool VennMaster
+You just have to create an input file (ps is a PrintStream) with all elements you want to count (e.g. interactions or publications) from each database (IntAct, MINT, DIP).
+
+		MitabUtils.toVennListFormat(MITAB_INTACT, "IntAct", ps);
+		MitabUtils.toVennListFormat(MITAB_MINT_CLUSTERED, "MINT", ps);
+		MitabUtils.toVennListFormat(MITAB_DIP_COMPLETED, "DIP", ps);
+		
+And to import it into VennMaster.
+
+
+External resoure: VennMaster
+=================
+A tool for drawing area proportional Euler diagrams.
+I have used it to draw Venn diagrams for the numbers of interactions or publications in the 3 databases IntAct, MINT and DIP.
+It is easy to use, you just have to create an input file (extension .list)with all elements of different group listed with the group they are in :
+
+7227_A1Z7C4.1-O44783	DIP
+7227_O44783-Q8IRV8.1	DIP
+7227_Q960S0.1-Q9VHB5.1	DIP
+7227_O44783-Q9VK56.4	DIP
+7227_Q8IR55-Q9VB22	IntAct
+4932_P26786-P32074	IntAct
+7227_P16163-Q9VK94	IntAct
+36329_Q8IEI6-Q8IEI6	IntAct
+4932_P19454-P19454	MINT
+4932_P38348-P38348	MINT
+2190_Q58739-Q60381	MINT
+7227_Q9V588-Q9V588	MINT
+4932_P49018-P49018	MINT
+
+Then the partition is created with all sizes of the different subgroups (intersection between different groups).
+Elements are grouped together according to their idenifier (the first column).
+You can export these numbers in a text file. You can also export the graphic representation.
+
+
+http://www.informatik.uni-ulm.de/ni/mitarbeiter/HKestler/vennm/doc.html#explore;
+
+
+

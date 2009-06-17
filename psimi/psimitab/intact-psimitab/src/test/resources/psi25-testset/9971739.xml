@@ -1,0 +1,1374 @@
+<entrySet level="2" minorVersion="3" version="5"
+          xmlns="net:sf:psidev:mi"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
+    <entry>
+        <source releaseDate="2007-10-26">
+            <names>
+                <shortLabel>European Bioinformatics Institute</shortLabel>
+            </names>
+            <bibref>
+                <xref>
+                    <primaryRef db="pubmed" dbAc="MI:0446" id="14681455" refType="primary-reference"
+                                refTypeAc="MI:0358"/>
+                </xref>
+            </bibref>
+            <xref>
+                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0469" refType="primary-reference" refTypeAc="MI:0358"/>
+            </xref>
+            <attributeList>
+                <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United
+                    Kingdom
+                </attribute>
+                <attribute name="url">http://www.ebi.ac.uk</attribute>
+            </attributeList>
+        </source>
+        <experimentList>
+            <experimentDescription id="2">
+                <names>
+                    <shortLabel>leung-1999-1</shortLabel>
+                    <fullName>The intermediate filament protein peripherin is the specific interaction partner of mouse
+                        BPAG1-n (dystonin) in neurons.
+                    </fullName>
+                </names>
+                <bibref>
+                    <xref>
+                        <primaryRef db="pubmed" dbAc="MI:0446" id="9971739" refType="primary-reference"
+                                    refTypeAc="MI:0358"/>
+                    </xref>
+                </bibref>
+                <xref>
+                    <primaryRef db="intact" dbAc="MI:0469" id="EBI-446075" refType="identity" refTypeAc="MI:0356"
+                                secondary="leung-1999-1"/>
+                    <secondaryRef db="newt" dbAc="MI:0247" id="10116" refType="target-species" secondary="rat"/>
+                    <secondaryRef db="newt" dbAc="MI:0247" id="10090" refType="target-species" secondary="mouse"/>
+                </xref>
+                <hostOrganismList>
+                    <hostOrganism ncbiTaxId="4932">
+                        <names>
+                            <shortLabel>yeast</shortLabel>
+                            <fullName>Saccharomyces cerevisiae</fullName>
+                        </names>
+                    </hostOrganism>
+                </hostOrganismList>
+                <interactionDetectionMethod>
+                    <names>
+                        <shortLabel>2 hybrid</shortLabel>
+                        <fullName>two hybrid</fullName>
+                        <alias>2H</alias>
+                        <alias>two-hybrid</alias>
+                        <alias>2h</alias>
+                        <alias>2H</alias>
+                        <alias>two-hybrid</alias>
+                        <alias>2h</alias>
+                        <alias>classical two hybrid</alias>
+                        <alias>yeast two hybrid</alias>
+                        <alias>2-hybrid</alias>
+                        <alias>classical two hybrid</alias>
+                        <alias>yeast two hybrid</alias>
+                        <alias>2-hybrid</alias>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0018" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="12634794" refType="method reference"
+                                      refTypeAc="MI:0357"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="10967325" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="1946372" refType="method reference"
+                                      refTypeAc="MI:0357"/>
+                    </xref>
+                </interactionDetectionMethod>
+                <participantIdentificationMethod>
+                    <names>
+                        <shortLabel>predetermined</shortLabel>
+                        <fullName>predetermined participant</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0396" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="7940758" refType="go-definition-ref"
+                                      refTypeAc="MI:0242"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                    </xref>
+                </participantIdentificationMethod>
+                <attributeList>
+                    <attribute name="author-list">Leung CL., Sun D., Liem RK.</attribute>
+                    <attribute name="publication year">1999</attribute>
+                    <attribute name="journal">J. Cell Biol. (0021-9525)</attribute>
+                </attributeList>
+            </experimentDescription>
+            <experimentDescription id="21">
+                <names>
+                    <shortLabel>leung-1999-2</shortLabel>
+                    <fullName>The intermediate filament protein peripherin is the specific interaction partner of mouse
+                        BPAG1-n (dystonin) in neurons.
+                    </fullName>
+                </names>
+                <bibref>
+                    <xref>
+                        <primaryRef db="pubmed" dbAc="MI:0446" id="9971739" refType="primary-reference"
+                                    refTypeAc="MI:0358"/>
+                    </xref>
+                </bibref>
+                <xref>
+                    <primaryRef db="intact" dbAc="MI:0469" id="EBI-446268" refType="identity" refTypeAc="MI:0356"
+                                secondary="leung-1999-2"/>
+                    <secondaryRef db="newt" dbAc="MI:0247" id="10116" refType="target-species" secondary="rat"/>
+                    <secondaryRef db="newt" dbAc="MI:0247" id="10090" refType="target-species" secondary="mouse"/>
+                </xref>
+                <hostOrganismList>
+                    <hostOrganism ncbiTaxId="9606">
+                        <names>
+                            <shortLabel>human-sw13</shortLabel>
+                            <fullName>human sw13 cells from bone</fullName>
+                        </names>
+                        <cellType>
+                            <names>
+                                <shortLabel>sw13</shortLabel>
+                                <fullName>SW1353</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="cabri" dbAc="MI:0246" id="ICLC HTL99008" refType="identity"
+                                            refTypeAc="MI:0356"/>
+                                <secondaryRef db="intact" dbAc="MI:0469" id="IA:0095" refType="identity"
+                                              refTypeAc="MI:0356"/>
+                            </xref>
+                        </cellType>
+                    </hostOrganism>
+                </hostOrganismList>
+                <interactionDetectionMethod>
+                    <names>
+                        <shortLabel>imaging techniques</shortLabel>
+                        <fullName>imaging techniques</fullName>
+                        <alias>microscopy</alias>
+                        <alias>microscopy</alias>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0428" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                    </xref>
+                </interactionDetectionMethod>
+                <participantIdentificationMethod>
+                    <names>
+                        <shortLabel>immunostaining</shortLabel>
+                        <fullName>immunostaining</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0422" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                    </xref>
+                </participantIdentificationMethod>
+                <attributeList>
+                    <attribute name="author-list">Leung CL., Sun D., Liem RK.</attribute>
+                    <attribute name="publication year">1999</attribute>
+                    <attribute name="journal">J. Cell Biol. (0021-9525)</attribute>
+                </attributeList>
+            </experimentDescription>
+            <experimentDescription id="27">
+                <names>
+                    <shortLabel>leung-1999-3</shortLabel>
+                    <fullName>The intermediate filament protein peripherin is the specific interaction partner of mouse
+                        BPAG1-n (dystonin) in neurons.
+                    </fullName>
+                </names>
+                <bibref>
+                    <xref>
+                        <primaryRef db="pubmed" dbAc="MI:0446" id="9971739" refType="primary-reference"
+                                    refTypeAc="MI:0358"/>
+                    </xref>
+                </bibref>
+                <xref>
+                    <primaryRef db="intact" dbAc="MI:0469" id="EBI-446282" refType="identity" refTypeAc="MI:0356"
+                                secondary="leung-1999-3"/>
+                    <secondaryRef db="newt" dbAc="MI:0247" id="10116" refType="target-species" secondary="rat"/>
+                    <secondaryRef db="newt" dbAc="MI:0247" id="10090" refType="target-species" secondary="mouse"/>
+                </xref>
+                <hostOrganismList>
+                    <hostOrganism ncbiTaxId="-1">
+                        <names>
+                            <shortLabel>in vitro</shortLabel>
+                        </names>
+                    </hostOrganism>
+                </hostOrganismList>
+                <interactionDetectionMethod>
+                    <names>
+                        <shortLabel>far western blotting</shortLabel>
+                        <fullName>far western blotting</fullName>
+                        <alias>Affinity blotting</alias>
+                        <alias>Affinity blotting</alias>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0047" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="7708014" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                    </xref>
+                </interactionDetectionMethod>
+                <participantIdentificationMethod>
+                    <names>
+                        <shortLabel>monoclonal western</shortLabel>
+                        <fullName>monoclonal antibody western blot</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0072" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                    </xref>
+                </participantIdentificationMethod>
+                <attributeList>
+                    <attribute name="author-list">Leung CL., Sun D., Liem RK.</attribute>
+                    <attribute name="publication year">1999</attribute>
+                    <attribute name="journal">J. Cell Biol. (0021-9525)</attribute>
+                </attributeList>
+            </experimentDescription>
+        </experimentList>
+        <interactorList>
+            <interactor id="4">
+                <names>
+                    <shortLabel>bpaeb_mouse</shortLabel>
+                    <fullName>Bullous pemphigoid antigen 1, isoforms 6/7</fullName>
+                    <alias type="gene name" typeAc="MI:0301">Dst</alias>
+                    <alias type="gene name synonym" typeAc="MI:0302">Bpag1</alias>
+                </names>
+                <xref>
+                    <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q60824" refType="identity" refTypeAc="MI:0356"
+                                version="SP_66"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0005737" secondary="C:cytoplasm"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0030056" secondary="C:hemidesmosome"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0005200" secondary="F:structural constituent of cy"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0045104" secondary="P:intermediate filament cytosk"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001589" secondary="Actbind_actnin"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001715" secondary="Calponin-like"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR002048" secondary="EF-hand"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001101" secondary="Plectin_repeat"/>
+                    <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q60845" refType="secondary-ac" refTypeAc="MI:0360"
+                                  version="SP_66"/>
+                    <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q9WU50" refType="secondary-ac" refTypeAc="MI:0360"
+                                  version="SP_66"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0008090" secondary="P:retrograde axon cargo transp"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0015629"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0015630"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0060053"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0008017"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0031122"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0031110"/>
+                    <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSMUSG00000026131"/>
+                    <secondaryRef db="intact" dbAc="MI:0469" id="EBI-446159" refType="identity" refTypeAc="MI:0356"
+                                  secondary="bpaeb_mouse"/>
+                </xref>
+                <interactorType>
+                    <names>
+                        <shortLabel>protein</shortLabel>
+                        <fullName>protein</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                        <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+                    </xref>
+                </interactorType>
+                <organism ncbiTaxId="10090">
+                    <names>
+                        <shortLabel>mouse</shortLabel>
+                        <fullName>Mus musculus</fullName>
+                    </names>
+                </organism>
+                <sequence>
+                    RRFPRFAETLQHPMCSLPLVAPAGHRRHHRLLLLLAPQAPERETSDEIVFSGRSRSRDAALRSHHFRSEGFRASPRHIRRRVAAAAAARLEEVKPVVKVHHQSEQESSGRKRRIKKNSRVQPEFYHSVQGASTRRPSSGNASYRCSMSSSADFSDEDDFSQKSGSASPAPGDTLPWNLPKHERSKRKIQGGSVLDPAERAVLRIADERDKVQKKTFTKWINQHLMKVRKHVNDLYEDLRDGHNLISLLEVLSGDTLPREKGRMRFHRLQNVQIALDYLKRRQVKLVNIRNDDITDGNPKLTLGLIWTIILHFQISDIHVTGESEDMSAKERLLLWTQQATEGYAGVRCENFTTCWRDGKLFNAIIHKYRPDLIDMNTVAVQSNLANLEHAFYVAEKIGVIRLLDPEDVDVSSPDEKSVITYVSSLYDAFPKVPEGGEGIGANDVEVKWIEYQNMVNYLIQWIRHHVVTMSERTFPNNPLELKALYNQYLQFKEKEIPPKEMEKSKIKRLYKLLEIWIEFGRIKLLQGYHPNDIEKEWGKLIIAMLEREKALRPEVERLDMLQQIATRVQRDSVSCEDKLILARNALQSDSKRLESGVQFQNEAEIAGYILECENLLRQHVIDVQILIDGKYYQADQLVQRVAKLRDEIMALRNECSSVYSKGRMLTTEQTKLMISGITQSLNSGFANLVSEFKQKCDQQSMIIQKTEKEVRSLSAELSASKEEKRREEQKAQLQRAQVQELNDRLKRVQDELHLKTIEEQMTHRKMILLQEESDKFKRSADEFRKKMEKLMESKVVTETDLSGIKHDFVSLQRENFRAQENAKLWETNIRELERQLQCYREKMQQGPPVEANHYQKCRRLEEELLAQRREVENLKQKMDQQIKEHEHQLLRLQCEIQKKSTTQDHTFASAFDTAGRECHHPAEISPGNSGHLNLKTRLPLSRWTQEPHQTEGKWPHRAAEQLPKEVQFRQPGAPLDRESSQPCYSEYFSQTSTELQITFDDKNPITRLSELETMREQALHPSRPPVTYQDDKLERELVKLLTPLEIAKNKQCGMHTEVTTLKQEKRLGSSAGGWMLEGCRTSGGLKGDFLKKSVEPEASPSLDLNQACSVRDEEFQFQGLRHTVTGRQLVEAKLLDMRTVEQLRLGLKTVEEVQRSLSKFLTKATSIAGLYLESSKEKMSFTSAAQKIIIDKMIALAFLEAQAATGFIIDPVSGQTYCVEDAVLHGIVDPEFRSRLLEAEKAVLGYSHASKTLSVFQAMENRMLDRKKGKHILEAQIASGGVIDPVRGVRVPPEMAVQQGLLNNAVLQFLHEPSSNTRVFPNPNNKQALYYSELLQICVFDVDCQCFLLPFGEREISNLNIEKTHKIAVVDTKTGAELTAFEAFQRNLIDKGIYLELSGQQYQWKEATFFDSYGHPSHMLTDTKTGLQFNISEAVEQGTLDKALVQKYQEGLTTLTELADFLLSKVVPKKDLHSPIAGYWLTASGERISLLKASRRNLVDRVTALRCLEAQICTGGIIDPLTGKKYRVAEALHRGLVDEGFAQQLRQCELVITGISHPVSNKMMSVVEAVNANIISKEMGMRCLEFQYLTGGLIEPKVFSRLTIEEALHVGIIDVLIATRLKDQKSYVRDIMCPQTKRKLTYKEALEKADFDFHTGLKLLEVSEPLGTGISNLYYSSQ
+                </sequence>
+            </interactor>
+            <interactor id="7">
+                <names>
+                    <shortLabel>peri_rat</shortLabel>
+                    <fullName>Peripherin</fullName>
+                    <alias type="gene name" typeAc="MI:0301">Prph</alias>
+                    <alias type="gene name synonym" typeAc="MI:0302">Prph1</alias>
+                </names>
+                <xref>
+                    <primaryRef db="uniprotkb" dbAc="MI:0486" id="P21807" refType="identity" refTypeAc="MI:0356"
+                                version="SP_63"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR006821" secondary="Filament_head"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001664" secondary="IF"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR002957" secondary="Keratin_I"/>
+                    <secondaryRef db="go" dbAc="MI:0448" id="GO:0005515" secondary="F:protein binding"/>
+                    <secondaryRef db="rgd" dbAc="MI:0483" id="3414"/>
+                    <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSRNOG00000015643"/>
+                    <secondaryRef db="intact" dbAc="MI:0469" id="EBI-446227" refType="identity" refTypeAc="MI:0356"
+                                  secondary="peri_rat"/>
+                </xref>
+                <interactorType>
+                    <names>
+                        <shortLabel>protein</shortLabel>
+                        <fullName>protein</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                        <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+                    </xref>
+                </interactorType>
+                <organism ncbiTaxId="10116">
+                    <names>
+                        <shortLabel>rat</shortLabel>
+                        <fullName>Rattus norvegicus</fullName>
+                    </names>
+                </organism>
+                <sequence>
+                    MSHHSSGLRSSISSTSYRRTFGPPPSLSPGAFSYSSSSRFSSSRLLGSGSPSSSARLGSFRAPRAGALRLPSERLDFSMAEALNQEFLATRSNEKQELQELNDRFANFIEKVRFLEQQNAALRGELSQARGQEPARADQLCQQELRELRRELELLGRERDRVQVERDGLAEDLGALKQRLEEETRKREDAEHNLVLFRKDVDDATLSRLELERKIESLMDEIEFLKKLHEEELRDLQVSVESQQVQQVEVEATVKPELTAALRDIRAQYENIAAKNLQEAEEWYKSKYADLSDAANRNHEALRQAKQEMNESRRQIQSLTCEVDGLRGTNEALLRQLRELEEQFALEAGGYQAGAARLEEELRQLKEEMARHLREYQELLNVKMALDIEIATYRKLLEGEESRISVPVHSFASLSLKTTVPEVEPPQDSHSRKMVLIRTIETRDGEKVVTESQKEQHSELDKSSIHSY
+                </sequence>
+            </interactor>
+            <interactor id="12">
+                <names>
+                    <shortLabel>nfl_rat</shortLabel>
+                    <fullName>Neurofilament light polypeptide</fullName>
+                    <alias type="gene name" typeAc="MI:0301">Nefl</alias>
+                    <alias type="gene name synonym" typeAc="MI:0302">Nf68</alias>
+                    <alias type="gene name synonym" typeAc="MI:0302">Nfl</alias>
+                </names>
+                <xref>
+                    <primaryRef db="uniprotkb" dbAc="MI:0486" id="P19527" refType="identity" refTypeAc="MI:0356"
+                                version="SP_75"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR006821" secondary="Filament_head"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001664" secondary="IF"/>
+                    <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q63367" refType="secondary-ac" refTypeAc="MI:0360"
+                                  version="SP_75"/>
+                    <secondaryRef db="rgd" dbAc="MI:0483" id="621458"/>
+                    <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSRNOG00000013658"/>
+                    <secondaryRef db="intact" dbAc="MI:0469" id="EBI-446360" refType="identity" refTypeAc="MI:0356"
+                                  secondary="nfl_rat"/>
+                </xref>
+                <interactorType>
+                    <names>
+                        <shortLabel>protein</shortLabel>
+                        <fullName>protein</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                        <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+                    </xref>
+                </interactorType>
+                <organism ncbiTaxId="10116">
+                    <names>
+                        <shortLabel>rat</shortLabel>
+                        <fullName>Rattus norvegicus</fullName>
+                    </names>
+                </organism>
+                <sequence>
+                    MSSFSYEPYFSTSYKRRYVETPRVHISSVRSGYSTARSAYSSYSAPVSSSLSVRRSYSSSSGSLMPSLENLDLSQVAAISNDLKSIRTQEKAQLQDLNDRFASFIERVHELEQQNKVLEAELLVLRQKHSEPSRFRALYEQEIRDLRLAAEDATNEKQALQGEREGLEETLRNLQARYEEEVLSREDAEGRLMEARKGADEAALARAELEKRIDSLMDEIAFLKKVHEEEIAELQAQIQYAQISVEMDVSSKPDLSAALKDIRAQYEKLAAKNMQNAEEWFKSRFTVLTESAAKNTDAVRAAKDEVSESRRLLKAKTLEIEACRGMNEALEKQLQELEDKQNADISAMQDTINKLENELRSTKSEMARYLKEYQDLLNVKMALDIEIAAYRKLLEGEETRLSFTSVGSITSGYSQSSQVFGRSAYSGLQSSSYLMSARAFPAYYTSHVQEEQSEVEETIEATKAEEAKDEPPSEGEAEEEEKEKEEGEEEEGAEEEEAAKDESEDAKEEEGGEGEEEDTKESEEEEKKEESAGEEQAAKKKD
+                </sequence>
+            </interactor>
+            <interactor id="16">
+                <names>
+                    <shortLabel>nfh_rat</shortLabel>
+                    <fullName>Neurofilament heavy polypeptide</fullName>
+                    <alias type="gene name" typeAc="MI:0301">Nefh</alias>
+                    <alias type="gene name synonym" typeAc="MI:0302">Nfh</alias>
+                </names>
+                <xref>
+                    <primaryRef db="uniprotkb" dbAc="MI:0486" id="P16884" refType="identity" refTypeAc="MI:0356"
+                                version="SP_78"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR004829" secondary="Csurface_antigen"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR010790" secondary="DUF1388"/>
+                    <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001664" secondary="IF"/>
+                    <secondaryRef db="uniprotkb" dbAc="MI:0486" id="O35482" refType="secondary-ac" refTypeAc="MI:0360"
+                                  version="SP_78"/>
+                    <secondaryRef db="rgd" dbAc="MI:0483" id="3159"/>
+                    <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSRNOG00000008716"/>
+                    <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q540Z7" refType="secondary-ac" refTypeAc="MI:0360"
+                                  version="SP_78"/>
+                    <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q63368" refType="secondary-ac" refTypeAc="MI:0360"
+                                  version="SP_78"/>
+                    <secondaryRef db="intact" dbAc="MI:0469" id="EBI-446344" refType="identity" refTypeAc="MI:0356"
+                                  secondary="nfh_rat"/>
+                </xref>
+                <interactorType>
+                    <names>
+                        <shortLabel>protein</shortLabel>
+                        <fullName>protein</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                        <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+                    </xref>
+                </interactorType>
+                <organism ncbiTaxId="10116">
+                    <names>
+                        <shortLabel>rat</shortLabel>
+                        <fullName>Rattus norvegicus</fullName>
+                    </names>
+                </organism>
+                <sequence>
+                    MMSFGSADALLGAPFAPLHGGGSLHYALSRKAGAGGTRSAAGSSSGFHSWARTSVSSVSASPSRFRGAASSTDSLDTLSNGPEGCVAAVAARSEKEQLQALNDRFAGYIDKVRQLEAHNRTLEGEAAALRQQKGRAAMGELYEREVREMRGAVLRLGAARGHVRLEQEHLLEDIAHVRQRLDEEARQREEAEAAARALARFAQEAEAARVELQKKAQALQEECGYLRRHHQEEVGELLGQIQGCGAAQAQAQAEARDALKCDVTSALREIRAQLEGHTVQSTLQSEEWFRVRLDRLSEAAKVNTDAMRSAQEEITEYRRQLQARTTELEALKSTKESLERQRSELEDRHQVDMASYQDAIQQLDNELRNTKWEMAAQLREYQDLLNVKMALDIEIAAYRKLLEGEECRIGFGPSPFSLTEGLPKIPSMSTHIKVKSEEKIKVVEKSEKETVIVEEQTEEIQVTEEVTEEEDKEAQGEEEEEAEEGGEEAATTSPPAEEAASPEKETKSPVKEEAKSPAEAKSPAEAKSPAEAKSPAEVKSPAEVKSPAEAKSPAEAKSPAEVKSPAEVKSPAEAKSPAEAKSPAEVKSPATVKSPGEAKSPAEAKSPAEVKSPVEAKSPAEAKSPASVKSPGEAKSPAEAKSPAEVKSPATVKSPVEAKSPAEVKSPVTVKSPAEAKSPVEVKSPASVKSPSEAKSPAGAKSPAEAKSPVVAKSPAEAKSPAEAKPPAEAKSPAEAKSPAEAKSPAEAKSPAEAKSPVEVKSPEKAKSPVKEGAKSLAEAKSPEKAKSPVKEEIKPPAEVKSPEKAKSPMKEEAKSPEKAKTLDVKSPEAKTPAKEEAKRPADIRSPEQVKSPAKEEAKSPEKEETRTEKVAPKKEEVKSPVEEVKAKEPPKKVEEEKTPATPKTEVKESKKDEAPKEAQKPKAEEKEPLTEKPKDSPGEAKKEEAKEKKAAAPEEETPAKLGVKEEAKPKEKAEDAKAKEPSKPSEKEKPKKEEVPAAPEKKDTKEEKTTESKKPEEKPKMEAKAKEEDKGLPQEPSKPKTEKAEKSSSTDQKDSQPSEKAPEDKAAKGDK
+                </sequence>
+            </interactor>
+        </interactorList>
+        <interactionList>
+            <interaction id="1">
+                <names>
+                    <shortLabel>dst-prph-1</shortLabel>
+                    <fullName>Two-hybrid analysis of interactions between mBPAG1-n (DST) and Peripherin</fullName>
+                </names>
+                <xref>
+                    <primaryRef db="intact" dbAc="MI:0469" id="EBI-446225" refType="identity" refTypeAc="MI:0356"
+                                secondary="dst-prph-1"/>
+                </xref>
+                <experimentList>
+                    <experimentRef>2</experimentRef>
+                </experimentList>
+                <participantList>
+                    <participant id="3">
+                        <interactorRef>4</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity"
+                                            refTypeAc="MI:0356"/>
+                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                              refTypeAc="MI:0358"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>bait</shortLabel>
+                                    <fullName>bait</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity"
+                                                refTypeAc="MI:0356"/>
+                                    <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                                  refTypeAc="MI:0358"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <featureList>
+                            <feature id="5">
+                                <names>
+                                    <shortLabel>c-terminus</shortLabel>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <shortLabel>binding site</shortLabel>
+                                        <fullName>binding site</fullName>
+                                    </names>
+                                    <xref>
+                                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0117" refType="identity"
+                                                    refTypeAc="MI:0356"/>
+                                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                      refType="primary-reference" refTypeAc="MI:0358"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <shortLabel>c-terminal</shortLabel>
+                                                <fullName>c-terminal position</fullName>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0334" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="0"/>
+                                        <endStatus>
+                                            <names>
+                                                <shortLabel>c-terminal</shortLabel>
+                                                <fullName>c-terminal position</fullName>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0334" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="0"/>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                        </featureList>
+                    </participant>
+                    <participant id="6">
+                        <interactorRef>7</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity"
+                                            refTypeAc="MI:0356"/>
+                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                              refTypeAc="MI:0358"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>prey</shortLabel>
+                                    <fullName>prey</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity"
+                                                refTypeAc="MI:0356"/>
+                                    <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                                  refTypeAc="MI:0358"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                    </participant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>physical interaction</shortLabel>
+                        <fullName>physical interaction</fullName>
+                        <alias>aggregation</alias>
+                        <alias>aggregation</alias>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                    </xref>
+                </interactionType>
+                <attributeList>
+                    <attribute name="kd">0.0</attribute>
+                </attributeList>
+            </interaction>
+            <interaction id="8">
+                <names>
+                    <shortLabel>dst-nfl-1</shortLabel>
+                    <fullName>Two-hybrid analysis of interactions between mBPAG1-n (DST) and tailless NF-L</fullName>
+                </names>
+                <xref>
+                    <primaryRef db="intact" dbAc="MI:0469" id="EBI-446339" refType="identity" refTypeAc="MI:0356"
+                                secondary="dst-nfl-1"/>
+                </xref>
+                <experimentList>
+                    <experimentRef>2</experimentRef>
+                </experimentList>
+                <participantList>
+                    <participant id="9">
+                        <interactorRef>4</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity"
+                                            refTypeAc="MI:0356"/>
+                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                              refTypeAc="MI:0358"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>bait</shortLabel>
+                                    <fullName>bait</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity"
+                                                refTypeAc="MI:0356"/>
+                                    <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                                  refTypeAc="MI:0358"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <featureList>
+                            <feature id="10">
+                                <names>
+                                    <shortLabel>c-terminus</shortLabel>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <shortLabel>binding site</shortLabel>
+                                        <fullName>binding site</fullName>
+                                    </names>
+                                    <xref>
+                                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0117" refType="identity"
+                                                    refTypeAc="MI:0356"/>
+                                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                      refType="primary-reference" refTypeAc="MI:0358"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <shortLabel>c-terminal</shortLabel>
+                                                <fullName>c-terminal position</fullName>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0334" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="0"/>
+                                        <endStatus>
+                                            <names>
+                                                <shortLabel>c-terminal</shortLabel>
+                                                <fullName>c-terminal position</fullName>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0334" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="0"/>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                        </featureList>
+                    </participant>
+                    <participant id="11">
+                        <interactorRef>12</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity"
+                                            refTypeAc="MI:0356"/>
+                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                              refTypeAc="MI:0358"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>prey</shortLabel>
+                                    <fullName>prey</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity"
+                                                refTypeAc="MI:0356"/>
+                                    <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                                  refTypeAc="MI:0358"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <featureList>
+                            <feature id="13">
+                                <names>
+                                    <shortLabel>n-terminus</shortLabel>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <shortLabel>binding site</shortLabel>
+                                        <fullName>binding site</fullName>
+                                    </names>
+                                    <xref>
+                                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0117" refType="identity"
+                                                    refTypeAc="MI:0356"/>
+                                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                      refType="primary-reference" refTypeAc="MI:0358"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <shortLabel>certain</shortLabel>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="2"/>
+                                        <endStatus>
+                                            <names>
+                                                <shortLabel>certain</shortLabel>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="416"/>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                        </featureList>
+                    </participant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>physical interaction</shortLabel>
+                        <fullName>physical interaction</fullName>
+                        <alias>aggregation</alias>
+                        <alias>aggregation</alias>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                    </xref>
+                </interactionType>
+                <attributeList>
+                    <attribute name="comment">interaction only if NF-L C-terminal region (tail) is deleted</attribute>
+                    <attribute name="kd">0.0</attribute>
+                </attributeList>
+            </interaction>
+            <interaction id="14">
+                <names>
+                    <shortLabel>dst-nfh-1</shortLabel>
+                    <fullName>Two-hybrid analysis of interactions between mBPAG1-n (DST) and tailless NF-H</fullName>
+                </names>
+                <xref>
+                    <primaryRef db="intact" dbAc="MI:0469" id="EBI-446356" refType="identity" refTypeAc="MI:0356"
+                                secondary="dst-nfh-1"/>
+                </xref>
+                <experimentList>
+                    <experimentRef>2</experimentRef>
+                </experimentList>
+                <participantList>
+                    <participant id="15">
+                        <interactorRef>16</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity"
+                                            refTypeAc="MI:0356"/>
+                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                              refTypeAc="MI:0358"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>prey</shortLabel>
+                                    <fullName>prey</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity"
+                                                refTypeAc="MI:0356"/>
+                                    <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                                  refTypeAc="MI:0358"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <featureList>
+                            <feature id="17">
+                                <names>
+                                    <shortLabel>n-terminus</shortLabel>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <shortLabel>binding site</shortLabel>
+                                        <fullName>binding site</fullName>
+                                    </names>
+                                    <xref>
+                                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0117" refType="identity"
+                                                    refTypeAc="MI:0356"/>
+                                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                      refType="primary-reference" refTypeAc="MI:0358"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <shortLabel>certain</shortLabel>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="1"/>
+                                        <endStatus>
+                                            <names>
+                                                <shortLabel>certain</shortLabel>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="645"/>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                        </featureList>
+                    </participant>
+                    <participant id="18">
+                        <interactorRef>4</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity"
+                                            refTypeAc="MI:0356"/>
+                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                              refTypeAc="MI:0358"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>bait</shortLabel>
+                                    <fullName>bait</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity"
+                                                refTypeAc="MI:0356"/>
+                                    <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                                  refTypeAc="MI:0358"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <featureList>
+                            <feature id="19">
+                                <names>
+                                    <shortLabel>c-terminus</shortLabel>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <shortLabel>binding site</shortLabel>
+                                        <fullName>binding site</fullName>
+                                    </names>
+                                    <xref>
+                                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0117" refType="identity"
+                                                    refTypeAc="MI:0356"/>
+                                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                      refType="primary-reference" refTypeAc="MI:0358"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <shortLabel>c-terminal</shortLabel>
+                                                <fullName>c-terminal position</fullName>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0334" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="0"/>
+                                        <endStatus>
+                                            <names>
+                                                <shortLabel>c-terminal</shortLabel>
+                                                <fullName>c-terminal position</fullName>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0334" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="0"/>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                        </featureList>
+                    </participant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>physical interaction</shortLabel>
+                        <fullName>physical interaction</fullName>
+                        <alias>aggregation</alias>
+                        <alias>aggregation</alias>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                    </xref>
+                </interactionType>
+                <attributeList>
+                    <attribute name="comment">Interaction occurs only if NF-H C-terminal region (tail) is deleted
+                    </attribute>
+                    <attribute name="kd">0.0</attribute>
+                </attributeList>
+            </interaction>
+            <interaction id="20">
+                <names>
+                    <shortLabel>dst-prph-2</shortLabel>
+                    <fullName>mBPAG1-n (DST) and Peripherin colocalisation</fullName>
+                </names>
+                <xref>
+                    <primaryRef db="intact" dbAc="MI:0469" id="EBI-446245" refType="identity" refTypeAc="MI:0356"
+                                secondary="dst-prph-2"/>
+                </xref>
+                <experimentList>
+                    <experimentRef>21</experimentRef>
+                </experimentList>
+                <participantList>
+                    <participant id="22">
+                        <interactorRef>7</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity"
+                                            refTypeAc="MI:0356"/>
+                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                              refTypeAc="MI:0358"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>neutral component</shortLabel>
+                                    <fullName>neutral component</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0497" refType="identity"
+                                                refTypeAc="MI:0356"/>
+                                    <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                                  refTypeAc="MI:0358"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                    </participant>
+                    <participant id="23">
+                        <interactorRef>4</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity"
+                                            refTypeAc="MI:0356"/>
+                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                              refTypeAc="MI:0358"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>neutral component</shortLabel>
+                                    <fullName>neutral component</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0497" refType="identity"
+                                                refTypeAc="MI:0356"/>
+                                    <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                                  refTypeAc="MI:0358"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <featureList>
+                            <feature id="24">
+                                <names>
+                                    <shortLabel>c-terminus</shortLabel>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <shortLabel>binding site</shortLabel>
+                                        <fullName>binding site</fullName>
+                                    </names>
+                                    <xref>
+                                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0117" refType="identity"
+                                                    refTypeAc="MI:0356"/>
+                                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                      refType="primary-reference" refTypeAc="MI:0358"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <shortLabel>c-terminal</shortLabel>
+                                                <fullName>c-terminal position</fullName>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0334" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="0"/>
+                                        <endStatus>
+                                            <names>
+                                                <shortLabel>c-terminal</shortLabel>
+                                                <fullName>c-terminal position</fullName>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0334" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="0"/>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                            <feature id="25">
+                                <names>
+                                    <shortLabel>region</shortLabel>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <shortLabel>flag tag</shortLabel>
+                                        <fullName>flag tag</fullName>
+                                        <alias>FLAG-tagged</alias>
+                                        <alias>DYKDDDDKV epitope tag</alias>
+                                        <alias>FLAG</alias>
+                                        <alias>FLAG</alias>
+                                        <alias>FLAG-tagged</alias>
+                                        <alias>DYKDDDDKV epitope tag</alias>
+                                    </names>
+                                    <xref>
+                                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0518" refType="identity"
+                                                    refTypeAc="MI:0356"/>
+                                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                      refType="primary-reference" refTypeAc="MI:0358"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <shortLabel>undetermined</shortLabel>
+                                                <fullName>undetermined sequence position</fullName>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0339" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="0"/>
+                                        <endStatus>
+                                            <names>
+                                                <shortLabel>undetermined</shortLabel>
+                                                <fullName>undetermined sequence position</fullName>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0339" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="0"/>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                        </featureList>
+                    </participant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>colocalization</shortLabel>
+                        <fullName>colocalization</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0403" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                    </xref>
+                </interactionType>
+                <attributeList>
+                    <attribute name="kd">0.0</attribute>
+                </attributeList>
+            </interaction>
+            <interaction id="26">
+                <names>
+                    <shortLabel>dst-prph-3</shortLabel>
+                    <fullName>mBPAG1-n binds to Peripherin in a far western blotting</fullName>
+                </names>
+                <xref>
+                    <primaryRef db="intact" dbAc="MI:0469" id="EBI-446286" refType="identity" refTypeAc="MI:0356"
+                                secondary="dst-prph-3"/>
+                </xref>
+                <experimentList>
+                    <experimentRef>27</experimentRef>
+                </experimentList>
+                <participantList>
+                    <participant id="28">
+                        <interactorRef>4</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity"
+                                            refTypeAc="MI:0356"/>
+                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                              refTypeAc="MI:0358"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>bait</shortLabel>
+                                    <fullName>bait</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity"
+                                                refTypeAc="MI:0356"/>
+                                    <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                                  refTypeAc="MI:0358"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <featureList>
+                            <feature id="29">
+                                <names>
+                                    <shortLabel>region</shortLabel>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <shortLabel>flag tag</shortLabel>
+                                        <fullName>flag tag</fullName>
+                                        <alias>FLAG-tagged</alias>
+                                        <alias>DYKDDDDKV epitope tag</alias>
+                                        <alias>FLAG</alias>
+                                        <alias>FLAG</alias>
+                                        <alias>FLAG-tagged</alias>
+                                        <alias>DYKDDDDKV epitope tag</alias>
+                                    </names>
+                                    <xref>
+                                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0518" refType="identity"
+                                                    refTypeAc="MI:0356"/>
+                                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                      refType="primary-reference" refTypeAc="MI:0358"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <shortLabel>undetermined</shortLabel>
+                                                <fullName>undetermined sequence position</fullName>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0339" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="0"/>
+                                        <endStatus>
+                                            <names>
+                                                <shortLabel>undetermined</shortLabel>
+                                                <fullName>undetermined sequence position</fullName>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0339" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="0"/>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                            <feature id="30">
+                                <names>
+                                    <shortLabel>c-terminus</shortLabel>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <shortLabel>binding site</shortLabel>
+                                        <fullName>binding site</fullName>
+                                    </names>
+                                    <xref>
+                                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0117" refType="identity"
+                                                    refTypeAc="MI:0356"/>
+                                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                      refType="primary-reference" refTypeAc="MI:0358"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <shortLabel>c-terminal</shortLabel>
+                                                <fullName>c-terminal position</fullName>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0334" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="0"/>
+                                        <endStatus>
+                                            <names>
+                                                <shortLabel>c-terminal</shortLabel>
+                                                <fullName>c-terminal position</fullName>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                                <alias>c-terminus</alias>
+                                                <alias>c-term</alias>
+                                                <alias>carboxy-terminus</alias>
+                                            </names>
+                                            <xref>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0334" refType="identity"
+                                                            refTypeAc="MI:0356"/>
+                                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292"
+                                                              refType="primary-reference" refTypeAc="MI:0358"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="0"/>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                        </featureList>
+                        <hostOrganismList>
+                            <hostOrganism ncbiTaxId="10090">
+                                <names>
+                                    <shortLabel>mouse</shortLabel>
+                                    <fullName>Mus musculus</fullName>
+                                </names>
+                            </hostOrganism>
+                        </hostOrganismList>
+                    </participant>
+                    <participant id="31">
+                        <interactorRef>7</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity"
+                                            refTypeAc="MI:0356"/>
+                                <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                              refTypeAc="MI:0358"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>prey</shortLabel>
+                                    <fullName>prey</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity"
+                                                refTypeAc="MI:0356"/>
+                                    <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                                  refTypeAc="MI:0358"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <hostOrganismList>
+                            <hostOrganism ncbiTaxId="10116">
+                                <names>
+                                    <shortLabel>rat</shortLabel>
+                                    <fullName>Rattus norvegicus</fullName>
+                                </names>
+                            </hostOrganism>
+                        </hostOrganismList>
+                    </participant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>physical interaction</shortLabel>
+                        <fullName>physical interaction</fullName>
+                        <alias>aggregation</alias>
+                        <alias>aggregation</alias>
+                    </names>
+                    <xref>
+                        <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+                        <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference"
+                                      refTypeAc="MI:0358"/>
+                    </xref>
+                </interactionType>
+                <attributeList>
+                    <attribute name="kd">0.0</attribute>
+                </attributeList>
+            </interaction>
+        </interactionList>
+    </entry>
+</entrySet>

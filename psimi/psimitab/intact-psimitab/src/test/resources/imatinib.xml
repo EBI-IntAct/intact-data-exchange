@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<entrySet version="5" minorVersion="3" level="2"
+          xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="net:sf:psidev:mi">
+    <entry>
+        <source releaseDate="2008-09-01">
+            <names>
+                <shortLabel>European Bioinformatics Institute</shortLabel>
+            </names>
+            <attributeList>
+                <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United
+                    Kingdom
+                </attribute>
+
+                <attribute name="url">http://wwwdev.ebi.ac.uk</attribute>
+            </attributeList>
+        </source>
+        <experimentList>
+            <experimentDescription id="151">
+                <names>
+                    <shortLabel>-</shortLabel>
+                </names>
+
+                <bibref>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="18048412" dbAc="MI:0446"
+                                    db="pubmed"/>
+                    </xref>
+                </bibref>
+                <hostOrganismList>
+                    <hostOrganism ncbiTaxId="-3">
+                        <names>
+                            <shortLabel>unknown</shortLabel>
+
+                        </names>
+                    </hostOrganism>
+                </hostOrganismList>
+                <interactionDetectionMethod>
+                    <names>
+                        <shortLabel>experimental interac</shortLabel>
+                        <fullName>experimental interac</fullName>
+                    </names>
+
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0045" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </interactionDetectionMethod>
+                <attributeList>
+                    <attribute name="author-list">-</attribute>
+                </attributeList>
+            </experimentDescription>
+
+        </experimentList>
+        <interactorList>
+            <interactor id="0">
+                <names>
+                    <shortLabel>4212</shortLabel>
+                </names>
+                <xref>
+                    <primaryRef id="4212" db="pubchem"/>
+
+                    <secondaryRef id="DB01204" db="drugbank"/>
+                    <secondaryRef id="DGI-128756" db="intact"/>
+                    <secondaryRef id="APRD00371" db="drugbank"/>
+                    <secondaryRef id="16750460" db="pubmed"/>
+                    <secondaryRef id="02244614" db="din"/>
+                </xref>
+                <interactorType>
+                    <names>
+                        <shortLabel>small molecule</shortLabel>
+
+                        <fullName>small molecule</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0328" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </interactorType>
+                <organism ncbiTaxId="-1">
+                    <names>
+
+                        <shortLabel>unknown</shortLabel>
+                    </names>
+                </organism>
+                <attributeList>
+                    <attribute name="biotech prep">An anthracenedione-derived antineoplastic agent. [PubChem]
+                    </attribute>
+                    <attribute name="drug type">Small Molecule; Approved</attribute>
+                    <attribute name="drug category">Antineoplastic Agents; Analgesics</attribute>
+
+                    <attribute name="disease indication">For the treatment of secondary (chronic) progressive,
+                        progressive relapsing, or worsening relapsing-remitting multiple sclerosis
+                    </attribute>
+                    <attribute name="pharmacology">Mitoxantrone has been shown in vitro to inhibit B cell, T cell, and
+                        macrophage proliferation and impair antigen presentation, as well as the secretion of interferon
+                        gamma, TNFa, and IL-2.
+                    </attribute>
+                    <attribute name="mechanism of action">Mitoxantrone, a DNA-reactive agent that intercalates into
+                        deoxyribonucleic acid (DNA) through hydrogen bonding, causes crosslinks and strand breaks.
+                        Mitoxantrone also interferes with ribonucleic acid (RNA) and is a potent inhibitor of
+                        topoisomerase II, an enzyme responsible for uncoiling and repairing damaged DNA. It has a
+                        cytocidal effect on both proliferating and nonproliferating cultured human cells, suggesting
+                        lack of cell cycle phase specificity.
+                    </attribute>
+                    <attribute name="comment">drug absorption (MI:2045): Poorly absorbed following oral administration
+                    </attribute>
+                    <attribute name="toxicity attribute name">Severe leukopenia with infection.</attribute>
+                    <attribute name="comment">plasma protein binding (MI:2047):78%</attribute>
+
+                    <attribute name="drug metabolism">Hepatic</attribute>
+                    <attribute name="comment">elimination half life (MI:2049): 75 hours</attribute>
+                    <attribute name="dosage form">Solution Intravenous</attribute>
+                    <attribute name="organisms affected">Humans and other mammals</attribute>
+                    <attribute name="inchi id">
+                        InChI=1/C22H28N4O6/c27-11-9-23-5-7-25-13-1-2-14(26-8-6-24-10-12-28)18-17(13)21(31)19-15(29)3-4-16(30)20(19)22(18)32/h1-4,23-30H,5-12H2
+                    </attribute>
+                    <attribute name="url">http://www.rxlist.com/cgi/generic2/mitoxantrone.htm</attribute>
+
+                    <attribute name="comment">average molecular weight (MI:2155): 444.4809</attribute>
+                    <attribute name="comment">monoisotopic molecular weight (MI:2156): 444.2009</attribute>
+                    <attribute name="comment">predicted h2o solubility (MI:2158): 7.34e-01 mg/mL [ALOGPS]</attribute>
+                </attributeList>
+            </interactor>
+            <interactor id="0">
+                <names>
+
+                    <shortLabel>Q9UNQ0</shortLabel>
+                    <alias>ABCG2</alias>
+                </names>
+                <xref>
+                    <primaryRef refTypeAc="MI:0356" refType="identity" id="Q9UNQ0" dbAc="MI:0486" db="uniprotkb"/>
+                    <secondaryRef id="DGI-71907" db="intact"/>
+                </xref>
+                <interactorType>
+
+                    <names>
+                        <shortLabel>protein</shortLabel>
+                        <fullName>protein</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0326" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </interactorType>
+
+                <organism ncbiTaxId="9606">
+                    <names>
+                        <shortLabel>human</shortLabel>
+                    </names>
+                </organism>
+            </interactor>
+        </interactorList>
+        <interactionList>
+
+            <interaction id="152">
+                <names>
+                    <shortLabel>4212-Q9UNQ0-1</shortLabel>
+                </names>
+                <xref>
+                    <primaryRef id="DGI-128818" dbAc="psi-mi:MI:1002" db="intact"/>
+                </xref>
+                <experimentList>
+
+                    <experimentDescription id="151">
+                        <names>
+                            <shortLabel>-</shortLabel>
+                        </names>
+                        <bibref>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="18048412" dbAc="MI:0446"
+                                            db="pubmed"/>
+                            </xref>
+
+                        </bibref>
+                        <hostOrganismList>
+                            <hostOrganism ncbiTaxId="-3">
+                                <names>
+                                    <shortLabel>unknown</shortLabel>
+                                </names>
+                            </hostOrganism>
+                        </hostOrganismList>
+
+                        <interactionDetectionMethod>
+                            <names>
+                                <shortLabel>experimental interac</shortLabel>
+                                <fullName>experimental interac</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0045" dbAc="MI:0488"
+                                            db="psi-mi"/>
+                            </xref>
+
+                        </interactionDetectionMethod>
+                        <attributeList>
+                            <attribute name="author-list">-</attribute>
+                        </attributeList>
+                    </experimentDescription>
+                </experimentList>
+                <participantList>
+                    <participant id="0">
+
+                        <interactor id="0">
+                            <names>
+                                <shortLabel>4212</shortLabel>
+                            </names>
+                            <xref>
+                                <primaryRef id="4212" db="pubchem"/>
+                                <secondaryRef id="DB01204" db="drugbank"/>
+                                <secondaryRef id="DGI-128756" db="intact"/>
+
+                                <secondaryRef id="APRD00371" db="drugbank"/>
+                                <secondaryRef id="16750460" db="pubmed"/>
+                                <secondaryRef id="02244614" db="din"/>
+                            </xref>
+                            <interactorType>
+                                <names>
+                                    <shortLabel>small molecule</shortLabel>
+                                    <fullName>small molecule</fullName>
+
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0328" dbAc="MI:0488"
+                                                db="psi-mi"/>
+                                </xref>
+                            </interactorType>
+                            <organism ncbiTaxId="-1">
+                                <names>
+                                    <shortLabel>unknown</shortLabel>
+
+                                </names>
+                            </organism>
+                            <attributeList>
+                                <attribute name="biotech prep">An anthracenedione-derived antineoplastic agent.
+                                    [PubChem]
+                                </attribute>
+                                <attribute name="drug type">Small Molecule; Approved</attribute>
+                                <attribute name="drug category">Antineoplastic Agents; Analgesics</attribute>
+                                <attribute name="disease indication">For the treatment of secondary (chronic)
+                                    progressive, progressive relapsing, or worsening relapsing-remitting multiple
+                                    sclerosis
+                                </attribute>
+
+                                <attribute name="pharmacology">Mitoxantrone has been shown in vitro to inhibit B cell, T
+                                    cell, and macrophage proliferation and impair antigen presentation, as well as the
+                                    secretion of interferon gamma, TNFa, and IL-2.
+                                </attribute>
+                                <attribute name="mechanism of action">Mitoxantrone, a DNA-reactive agent that
+                                    intercalates into deoxyribonucleic acid (DNA) through hydrogen bonding, causes
+                                    crosslinks and strand breaks. Mitoxantrone also interferes with ribonucleic acid
+                                    (RNA) and is a potent inhibitor of topoisomerase II, an enzyme responsible for
+                                    uncoiling and repairing damaged DNA. It has a cytocidal effect on both proliferating
+                                    and nonproliferating cultured human cells, suggesting lack of cell cycle phase
+                                    specificity.
+                                </attribute>
+                                <attribute name="comment">drug absorption (MI:2045): Poorly absorbed following oral
+                                    administration
+                                </attribute>
+                                <attribute name="toxicity attribute name">Severe leukopenia with infection.</attribute>
+                                <attribute name="comment">plasma protein binding (MI:2047):78%</attribute>
+                                <attribute name="drug metabolism">Hepatic</attribute>
+
+                                <attribute name="comment">elimination half life (MI:2049): 75 hours</attribute>
+                                <attribute name="dosage form">Solution Intravenous</attribute>
+                                <attribute name="organisms affected">Humans and other mammals</attribute>
+                                <attribute name="inchi id">
+                                    InChI=1/C22H28N4O6/c27-11-9-23-5-7-25-13-1-2-14(26-8-6-24-10-12-28)18-17(13)21(31)19-15(29)3-4-16(30)20(19)22(18)32/h1-4,23-30H,5-12H2
+                                </attribute>
+                                <attribute name="url">http://www.rxlist.com/cgi/generic2/mitoxantrone.htm</attribute>
+                                <attribute name="comment">average molecular weight (MI:2155): 444.4809</attribute>
+
+                                <attribute name="comment">monoisotopic molecular weight (MI:2156): 444.2009</attribute>
+                                <attribute name="comment">predicted h2o solubility (MI:2158): 7.34e-01 mg/mL [ALOGPS]
+                                </attribute>
+                            </attributeList>
+                        </interactor>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+
+                                <fullName>unspecified role</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488"
+                                            db="psi-mi"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+
+                                <names>
+                                    <shortLabel>drug</shortLabel>
+                                    <fullName>drug</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:1094" dbAc="MI:0488"
+                                                db="psi-mi"/>
+                                </xref>
+                            </experimentalRole>
+
+                        </experimentalRoleList>
+                    </participant>
+                    <participant id="0">
+                        <interactor id="0">
+                            <names>
+                                <shortLabel>Q9UNQ0</shortLabel>
+                                <alias>ABCG2</alias>
+                            </names>
+
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="Q9UNQ0" dbAc="MI:0486"
+                                            db="uniprotkb"/>
+                                <secondaryRef id="DGI-71907" db="intact"/>
+                            </xref>
+                            <interactorType>
+                                <names>
+                                    <shortLabel>protein</shortLabel>
+                                    <fullName>protein</fullName>
+
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0326" dbAc="MI:0488"
+                                                db="psi-mi"/>
+                                </xref>
+                            </interactorType>
+                            <organism ncbiTaxId="9606">
+                                <names>
+                                    <shortLabel>human</shortLabel>
+
+                                </names>
+                            </organism>
+                        </interactor>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                                <fullName>unspecified role</fullName>
+                            </names>
+
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488"
+                                            db="psi-mi"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>drug target</shortLabel>
+
+                                    <fullName>drug target</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:1095" dbAc="MI:0488"
+                                                db="psi-mi"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                    </participant>
+
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>direct interaction</shortLabel>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0407" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+
+                </interactionType>
+                <modelled>false</modelled>
+                <intraMolecular>false</intraMolecular>
+                <negative>false</negative>
+                <attributeList>
+                    <attribute name="expansion">-</attribute>
+                    <attribute name="dataset">DrugBank - a knowledgebase for drugs, drug actions and drug targets.
+                    </attribute>
+
+                </attributeList>
+            </interaction>
+        </interactionList>
+    </entry>
+</entrySet>

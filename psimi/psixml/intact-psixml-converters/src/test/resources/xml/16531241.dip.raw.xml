@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<entrySet version="5" minorVersion="3" level="2" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="net:sf:psidev:mi">
+    <entry>
+        <source releaseDate="2006-11-01">
+            <names>
+                <shortLabel>DIP</shortLabel>
+                <fullName>DIP Database at UCLA-DOE Institute for Genomics And Proteomics</fullName>
+            </names>
+            <attributeList>
+                <attribute name="email">
+                    dip@mbi.ucla.edu
+                </attribute>
+                <attribute name="postalAddress">
+                    611 Young Drive East; Los Angeles, CA 90095; USA
+                </attribute>
+                <attribute name="url">
+                    http://dip.doe-mbi.ucla.edu/
+                </attribute>
+            </attributeList>
+        </source>
+        <experimentList>
+            <experimentDescription id="5">
+                <bibref>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="16531241" dbAc="MI:0446" db="pubmed"/>
+                    </xref>
+                </bibref>
+                <xref>
+                    <primaryRef refTypeAc="MI:0356" refType="identity" id="DIP:66151X" dbAc="MI:0465" db="dip"/>
+                </xref>
+                <hostOrganismList>
+                    <hostOrganism ncbiTaxId="562">
+                        <names>
+                            <shortLabel>Escherichia coli</shortLabel>
+                            <fullName>Escherichia coli</fullName>
+                        </names>
+                    </hostOrganism>
+                </hostOrganismList>
+                <interactionDetectionMethod>
+                    <names>
+                        <fullName>x-ray crystallography</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0114" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </interactionDetectionMethod>
+            </experimentDescription>
+        </experimentList>
+        <interactorList>
+            <interactor id="3">
+                <names>
+                    <shortLabel>AcrA</shortLabel>
+                    <fullName>Acriflavine resistance protein A</fullName>
+                </names>
+                <xref>
+                    <primaryRef refTypeAc="MI:0356" refType="identity" id="P0AE06" dbAc="MI:0486" db="uniprot knowledge base"/>
+                    <secondaryRef refTypeAc="MI:0356" refType="identity" id="DIP:29039N" dbAc="MI:0465" db="dip"/>
+                </xref>
+                <interactorType>
+                    <names>
+                        <fullName>protein</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0326" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </interactorType>
+                <organism ncbiTaxId="562">
+                    <names>
+                        <shortLabel>Escherichia coli</shortLabel>
+                        <fullName>Escherichia coli</fullName>
+                    </names>
+                </organism>
+            </interactor>
+        </interactorList>
+        <interactionList>
+            <interaction imexId="IM-8341" id="1">
+                <xref>
+                    <primaryRef refTypeAc="MI:0356" refType="identity" id="DIP:57040E" dbAc="MI:0465" db="dip"/>
+                </xref>
+                <experimentList>
+                    <experimentRef>5</experimentRef>
+                </experimentList>
+                <participantList>
+                    <participant id="2">
+                        <names>
+                            <shortLabel>AcrA</shortLabel>
+                        </names>
+                        <interactorRef>3</interactorRef>
+                        <participantIdentificationMethodList>
+                            <participantIdentificationMethod>
+                                <names>
+                                    <fullName>predetermined participant</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0396" dbAc="MI:0488" db="psi-mi"/>
+                                </xref>
+                            </participantIdentificationMethod>
+                        </participantIdentificationMethodList>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                            </names>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488" db="psi-mi"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <fullName>unspecified role</fullName>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488" db="psi-mi"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <featureList>
+                            <feature id="4">
+                                <names>
+                                    <fullName>Region 45-312</fullName>
+                                </names>
+                                <featureType>
+                                    <names>
+                                        <fullName>binding site</fullName>
+                                    </names>
+                                    <xref>
+                                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0117" dbAc="MI:0488" db="psi-mi"/>
+                                    </xref>
+                                </featureType>
+                                <featureRangeList>
+                                    <featureRange>
+                                        <startStatus>
+                                            <names>
+                                                <fullName>certain sequence position</fullName>
+                                            </names>
+                                            <xref>
+                                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
+                                            </xref>
+                                        </startStatus>
+                                        <begin position="45"/>
+                                        <endStatus>
+                                            <names>
+                                                <fullName>certain sequence position</fullName>
+                                            </names>
+                                            <xref>
+                                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
+                                            </xref>
+                                        </endStatus>
+                                        <end position="312"/>
+                                        <isLink>false</isLink>
+                                    </featureRange>
+                                </featureRangeList>
+                            </feature>
+                        </featureList>
+                        <hostOrganismList>
+                            <hostOrganism ncbiTaxId="562">
+                                <names>
+                                    <shortLabel>Escherichia coli</shortLabel>
+                                    <fullName>Escherichia coli</fullName>
+                                </names>
+                            </hostOrganism>
+                        </hostOrganismList>
+                    </participant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <fullName>direct interaction</fullName>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0407" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </interactionType>
+                <modelled>false</modelled>
+                <intraMolecular>false</intraMolecular>
+                <negative>false</negative>
+            </interaction>
+        </interactionList>
+    </entry>
+</entrySet>

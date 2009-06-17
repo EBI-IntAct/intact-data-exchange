@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="EBI search engine export">
+
+    <bannerLeft>
+        <name>EB-eye export</name>
+    </bannerLeft>
+
+    <skin>
+        <groupId>uk.ac.ebi.skins</groupId>
+        <artifactId>ebi-skin</artifactId>
+    </skin>
+
+    <body>
+        <links>
+            <item name="IntAct" href="http://www.ebi.ac.uk/intact"/>
+            <item name="Development Site" href="http://www.ebi.ac.uk/~intact/devsite"/>
+        </links>
+
+        <menu name="Site">
+            <item name="Go Back Home" href="http://www.ebi.ac.uk/~intact/devsite"/>
+        </menu>
+
+        ${reports}
+
+    </body>
+</project>

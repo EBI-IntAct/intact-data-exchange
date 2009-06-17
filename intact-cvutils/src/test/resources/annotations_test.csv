@@ -1,0 +1,5 @@
+# Cv shortlabel,Cv fullname,Cv Class,Cv identifier,CvTopic shortlabel,Annotation's text ,apply to children 
+alias type,alias type,uk.ac.ebi.intact.model.CvAliasType,MI:0300,hidden,Root term deprecated during manual curation as too unspecific.,FALSE
+3d-r-factors,3d-r-factors,uk.ac.ebi.intact.model.CvTopic,MI:0631,used-in-class,uk.ac.ebi.intact.model.Interaction,FALSE
+
+

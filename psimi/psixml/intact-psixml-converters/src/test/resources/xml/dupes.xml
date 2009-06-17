@@ -1,0 +1,1393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- created using XmlMakerFlattener v1.0 (http://cvs.sourceforge.net/viewcvs.py/psidev/psi/mi/tools/) -->
+<entrySet level="2" version="5" minorVersion="3" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
+	<entry>
+		<source releaseDate="2007-10-25">
+			<bibref>
+				<xref>
+					<primaryRef db="pubmed" dbAc="MI:0446" id="14681455" refType="primary-reference" refTypeAc="MI:0358"/>
+				</xref>
+			</bibref>
+			<attributeList>
+				<attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom</attribute>
+			</attributeList>
+		</source>
+		<availabilityList>
+			<availability id="1"/>
+		</availabilityList>
+		<experimentList>
+			<experimentDescription id="1">
+				<names>
+					<shortLabel>whitworth-2007-1</shortLabel>
+					<fullName>Protein-protein interactions between two-component system transmitter and receiver domains of Myxococcus xanthus.</fullName>
+				</names>
+				<bibref>
+					<xref>
+						<primaryRef db="pubmed" dbAc="MI:0446" id="unassigned53" refType="primary-reference" refTypeAc="MI:0358"/>
+					</xref>
+				</bibref>
+				<hostOrganismList>
+					<hostOrganism ncbiTaxId="4932">
+						<names>
+							<shortLabel>yeast</shortLabel>
+						</names>
+					</hostOrganism>
+				</hostOrganismList>
+				<interactionDetectionMethod>
+					<names>
+						<shortLabel>2 hybrid</shortLabel>
+					</names>
+					<xref>
+						<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0018" refType="identity" refTypeAc="MI:0356"/>
+					</xref>
+				</interactionDetectionMethod>
+				<participantIdentificationMethod>
+					<names>
+						<shortLabel>predetermined</shortLabel>
+					</names>
+					<xref>
+						<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0396" refType="identity" refTypeAc="MI:0356"/>
+					</xref>
+				</participantIdentificationMethod>
+			</experimentDescription>
+		</experimentList>
+		<interactionList>
+			<interaction id="20">
+				<availabilityRef>1</availabilityRef>
+				<experimentList>
+					<experimentRef>1</experimentRef>
+				</experimentList>
+				<participantList>
+					<participant id="8">
+						<interactor id="2">
+							<names>
+								<shortLabel>EBI-1397767</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="intact" dbAc="MI:0469" id="EBI-1397767" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>bait</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="5">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="1" end="1"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="114" end="114"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+					<participant id="17">
+						<interactor id="11">
+							<names>
+								<shortLabel>Q1D948</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="uniprotkb" dbAc="MI:0486" id="Q1D948" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>prey</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="14">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="311" end="311"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="391" end="391"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+				</participantList>
+				<interactionType>
+					<names>
+						<shortLabel>physical interaction</shortLabel>
+					</names>
+					<xref>
+						<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+					</xref>
+				</interactionType>
+				<attributeList>
+					<attribute name="author-confidence">weak</attribute>
+				</attributeList>
+			</interaction>
+			<interaction id="41">
+				<availabilityRef>1</availabilityRef>
+				<experimentList>
+					<experimentRef>1</experimentRef>
+				</experimentList>
+				<participantList>
+					<participant id="29">
+						<interactor id="23">
+							<names>
+								<shortLabel>EBI-1397767</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="intact" dbAc="MI:0469" id="EBI-1397767" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>bait</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="26">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="1" end="1"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="114" end="114"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+					<participant id="38">
+						<interactor id="32">
+							<names>
+								<shortLabel>Q1D948</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="uniprotkb" dbAc="MI:0486" id="Q1D948" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>prey</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="35">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="581" end="581"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="715" end="715"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+				</participantList>
+				<interactionType>
+					<names>
+						<shortLabel>physical interaction</shortLabel>
+					</names>
+					<xref>
+						<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+					</xref>
+				</interactionType>
+				<attributeList>
+					<attribute name="author-confidence">medium</attribute>
+				</attributeList>
+			</interaction>
+			<interaction id="62">
+				<availabilityRef>1</availabilityRef>
+				<experimentList>
+					<experimentRef>1</experimentRef>
+				</experimentList>
+				<participantList>
+					<participant id="50">
+						<interactor id="44">
+							<names>
+								<shortLabel>EBI-1397767</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="intact" dbAc="MI:0469" id="EBI-1397767" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>bait</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="47">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="1" end="1"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="114" end="114"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+					<participant id="59">
+						<interactor id="53">
+							<names>
+								<shortLabel>Q1D948</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="uniprotkb" dbAc="MI:0486" id="Q1D948" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>prey</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="56">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="581" end="581"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="715" end="715"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+				</participantList>
+				<interactionType>
+					<names>
+						<shortLabel>physical interaction</shortLabel>
+					</names>
+					<xref>
+						<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+					</xref>
+				</interactionType>
+				<attributeList>
+					<attribute name="author-confidence">strong in presence of IntAct</attribute>
+				</attributeList>
+			</interaction>
+			<interaction id="83">
+				<availabilityRef>1</availabilityRef>
+				<experimentList>
+					<experimentRef>1</experimentRef>
+				</experimentList>
+				<participantList>
+					<participant id="71">
+						<interactor id="65">
+							<names>
+								<shortLabel>EBI-1397767</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="intact" dbAc="MI:0469" id="EBI-1397767" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>bait</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="68">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="1" end="1"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="114" end="114"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+					<participant id="80">
+						<interactor id="74">
+							<names>
+								<shortLabel>Q1CWW4</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="uniprotkb" dbAc="MI:0486" id="Q1CWW4" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>prey</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="77">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="534" end="534"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="627" end="627"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+				</participantList>
+				<interactionType>
+					<names>
+						<shortLabel>physical interaction</shortLabel>
+					</names>
+					<xref>
+						<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+					</xref>
+				</interactionType>
+				<attributeList>
+					<attribute name="author-confidence">medium</attribute>
+				</attributeList>
+			</interaction>
+			<interaction id="104">
+				<availabilityRef>1</availabilityRef>
+				<experimentList>
+					<experimentRef>1</experimentRef>
+				</experimentList>
+				<participantList>
+					<participant id="92">
+						<interactor id="86">
+							<names>
+								<shortLabel>EBI-1397767</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="intact" dbAc="MI:0469" id="EBI-1397767" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>bait</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="89">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="1" end="1"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="114" end="114"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+					<participant id="101">
+						<interactor id="95">
+							<names>
+								<shortLabel>Q1CWW4</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="uniprotkb" dbAc="MI:0486" id="Q1CWW4" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>prey</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="98">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="534" end="534"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="627" end="627"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+				</participantList>
+				<interactionType>
+					<names>
+						<shortLabel>physical interaction</shortLabel>
+					</names>
+					<xref>
+						<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+					</xref>
+				</interactionType>
+				<attributeList>
+					<attribute name="author-confidence">medium</attribute>
+				</attributeList>
+			</interaction>
+			<interaction id="125">
+				<availabilityRef>1</availabilityRef>
+				<experimentList>
+					<experimentRef>1</experimentRef>
+				</experimentList>
+				<participantList>
+					<participant id="113">
+						<interactor id="107">
+							<names>
+								<shortLabel>Q1D948</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="uniprotkb" dbAc="MI:0486" id="Q1D948" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>bait</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="110">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="311" end="311"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="391" end="391"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+					<participant id="122">
+						<interactor id="116">
+							<names>
+								<shortLabel>Q1D948</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="uniprotkb" dbAc="MI:0486" id="Q1D948" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>prey</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="119">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="311" end="311"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="391" end="391"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+				</participantList>
+				<interactionType>
+					<names>
+						<shortLabel>physical interaction</shortLabel>
+					</names>
+					<xref>
+						<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+					</xref>
+				</interactionType>
+				<attributeList>
+					<attribute name="author-confidence">strong</attribute>
+				</attributeList>
+			</interaction>
+			<interaction id="146">
+				<availabilityRef>1</availabilityRef>
+				<experimentList>
+					<experimentRef>1</experimentRef>
+				</experimentList>
+				<participantList>
+					<participant id="134">
+						<interactor id="128">
+							<names>
+								<shortLabel>Q1CWA4</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="uniprotkb" dbAc="MI:0486" id="Q1CWA4" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>bait</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="131">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="792" end="792"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="886" end="886"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+					<participant id="143">
+						<interactor id="137">
+							<names>
+								<shortLabel>EBI-1397767</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="intact" dbAc="MI:0469" id="EBI-1397767" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>prey</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="140">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="1" end="1"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="114" end="114"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+				</participantList>
+				<interactionType>
+					<names>
+						<shortLabel>physical interaction</shortLabel>
+					</names>
+					<xref>
+						<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+					</xref>
+				</interactionType>
+				<attributeList>
+					<attribute name="author-confidence">weak</attribute>
+				</attributeList>
+			</interaction>
+			<interaction id="167">
+				<availabilityRef>1</availabilityRef>
+				<experimentList>
+					<experimentRef>1</experimentRef>
+				</experimentList>
+				<participantList>
+					<participant id="155">
+						<interactor id="149">
+							<names>
+								<shortLabel>EBI-1397767</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="intact" dbAc="MI:0469" id="EBI-1397767" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>bait</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="152">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="1" end="1"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="114" end="114"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+					<participant id="164">
+						<interactor id="158">
+							<names>
+								<shortLabel>Q1CWA4</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="uniprotkb" dbAc="MI:0486" id="Q1CWA4" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+							<interactorType>
+								<names>
+									<shortLabel>protein</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</interactorType>
+							<organism ncbiTaxId="246197"/>
+						</interactor>
+						<biologicalRole>
+							<names>
+								<shortLabel>unspecified role</shortLabel>
+							</names>
+							<xref>
+								<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+							</xref>
+						</biologicalRole>
+						<experimentalRoleList>
+							<experimentalRole>
+								<names>
+									<shortLabel>prey</shortLabel>
+								</names>
+								<xref>
+									<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+								</xref>
+							</experimentalRole>
+						</experimentalRoleList>
+						<featureList>
+							<feature id="161">
+								<names>
+									<shortLabel>region</shortLabel>
+								</names>
+								<featureType>
+									<names>
+										<shortLabel>sufficient to bind</shortLabel>
+									</names>
+									<xref>
+										<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+									</xref>
+								</featureType>
+								<featureRangeList>
+									<featureRange>
+										<startStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</startStatus>
+										<beginInterval begin="792" end="792"/>
+										<endStatus>
+											<names>
+												<shortLabel>certain</shortLabel>
+											</names>
+											<xref>
+												<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+											</xref>
+										</endStatus>
+										<endInterval begin="886" end="886"/>
+									</featureRange>
+								</featureRangeList>
+							</feature>
+						</featureList>
+					</participant>
+				</participantList>
+				<interactionType>
+					<names>
+						<shortLabel>physical interaction</shortLabel>
+					</names>
+					<xref>
+						<primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0218" refType="identity" refTypeAc="MI:0356"/>
+					</xref>
+				</interactionType>
+				<attributeList>
+					<attribute name="author-confidence">weak</attribute>
+				</attributeList>
+			</interaction>
+		</interactionList>
+	</entry>
+</entrySet>

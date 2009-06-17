@@ -1,0 +1,8 @@
+25753	sdhA	1367951	IGI0000SDH1	Q00711	Succinate dehydrogenase [ubiquinone] flavoprotein subunit, mitochondrial precursor	40	S.cerevisiae
+143821	frdB	1367952	IGI0000SDH2	P21801	Succinate dehydrogenase [ubiquinone] iron-sulfur subunit, mitochondrial precursor	40	S.cerevisiae
+25753	sdhA	972049	IGI0000sdhA	P0AC41	Succinate dehydrogenase flavoprotein subunit	22574	E.coli ATCC 27325
+25753	sdhA	102769	IGI0000sdhA	P0AC41	Succinate dehydrogenase flavoprotein subunit	18	 E.coli K12
+121748	sdhB	102779	IGI0000sdhB	P07014	Succinate dehydrogenase iron-sulfur subunit	18	E.coli K12
+25753	sdhA	724247	IGI0000frdA	P73479	Succinate dehydrogenase flavoprotein subunit	41	Synechocystis sp.
+143821	frdB	727635	IGI0000sdhB	Q55431	Succinate dehydrogenase iron-sulfur protein	41	Synechocystis sp.
+121748	sdhB	724419	IGI0000sdhB	P73723	Succinate dehydrogenase iron-sulphur protein subunit	41	Synechocystis sp.
