@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -32,7 +33,7 @@ import java.util.Collection;
 import java.util.ArrayList;
 
 /**
- * TODO comment this
+ * Participant converter.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -76,8 +77,11 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         participant.setBiologicalRole(bioRole);
 
         psidev.psi.mi.xml.model.Interactor interactor = new InteractorConverter(getInstitution()).intactToPsi(intactObject.getInteractor());
-        participant.setInteractor(interactor);
-        participant.setInteractorRef(new InteractorRef(interactor.getId()));
+        if( ConverterContext.getInstance().isGenerateExpandedXml() ) {
+            participant.setInteractor(interactor);
+        } else {
+            participant.setInteractorRef(new InteractorRef(interactor.getId()));
+        }
 
         for (CvIdentification participantDetectionMethod : intactObject.getParticipantDetectionMethods()) {
             ParticipantIdentificationMethodConverter pimConverter = new ParticipantIdentificationMethodConverter(getInstitution());
@@ -203,6 +207,4 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
 
         return component;
     }
-
-
 }

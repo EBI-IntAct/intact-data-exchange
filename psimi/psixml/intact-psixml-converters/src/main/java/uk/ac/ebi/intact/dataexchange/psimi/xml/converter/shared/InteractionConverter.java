@@ -204,11 +204,16 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             interaction.setImexId(imexXref.getPrimaryId());
         }
 
+
+
         ExperimentConverter experimentConverter = new ExperimentConverter(getInstitution());
         for (Experiment exp : intactObject.getExperiments()) {
             ExperimentDescription expDescription = experimentConverter.intactToPsi(exp);
-            interaction.getExperiments().add(expDescription);
-            interaction.getExperimentRefs().add(new ExperimentRef(expDescription.getId()));
+            if( ConverterContext.getInstance().isGenerateExpandedXml() ) {
+                interaction.getExperiments().add(expDescription);
+            } else {
+                interaction.getExperimentRefs().add(new ExperimentRef(expDescription.getId()));
+            }
         }
 
         ParticipantConverter participantConverter = new ParticipantConverter(getInstitution());

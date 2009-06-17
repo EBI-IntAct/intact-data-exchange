@@ -19,15 +19,22 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import psidev.psi.mi.xml.model.EntrySet;
+import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Feature;
+import uk.ac.ebi.intact.model.Interactor;
+import uk.ac.ebi.intact.model.Alias;
+import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.core.util.DebugUtil;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ImexExportProfile;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ExportProfile;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -180,8 +187,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
         StringWriter writer = new StringWriter();
         psiExchange.exportToPsiXml(writer, entry);
-
-        
+        System.out.println( writer.getBuffer().toString() );
     }
 
     @Test
@@ -220,7 +226,6 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         Assert.assertEquals(2, getDaoFactory().getComponentDao().countAll());
         Assert.assertEquals(2, getDaoFactory().getInteractionDao().getByShortLabel("sft2-sft2").getComponents().size());
     }
-
 
     @Test
     public void importIntoIntact_withMultipleFeatures() throws Exception {
@@ -289,5 +294,65 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
     }
 
+    @Test
+    public void exportCompact() throws Exception {
+        Interaction mockInteraction = getMockBuilder().createInteractionRandomBinary();
+        Experiment exp = mockInteraction.getExperiments().iterator().next();
+        exp.addXref(getMockBuilder().createPrimaryReferenceXref(exp, "1234567"));
 
+        IntactEntry entry = new IntactEntry(Arrays.asList(mockInteraction));
+
+        final ConverterContext context = ConverterContext.getInstance();
+        context.configure( new ExportProfile() {
+            public void configure( ConverterContext context ) {
+                context.setGenerateExpandedXml( false );
+            }
+        } );
+
+        final EntrySet es = psiExchange.exportToEntrySet( entry );
+        final Entry e = es.getEntries().iterator().next();
+
+        Assert.assertEquals( 1, e.getExperiments().size() );
+        Assert.assertEquals( 2, e.getInteractors().size() );
+
+        final psidev.psi.mi.xml.model.Interaction i = e.getInteractions().iterator().next();
+        Assert.assertEquals( 0, i.getExperiments().size());
+        Assert.assertEquals( 1, i.getExperimentRefs().size());
+
+        for ( Participant p : i.getParticipants() ) {
+            Assert.assertNull( p.getInteractor() );
+            Assert.assertNotNull( p.getInteractorRef() );
+        }
+    }
+
+    @Test
+    public void exportExpanded() throws Exception {
+        Interaction mockInteraction = getMockBuilder().createInteractionRandomBinary();
+        Experiment exp = mockInteraction.getExperiments().iterator().next();
+        exp.addXref(getMockBuilder().createPrimaryReferenceXref(exp, "1234567"));
+
+        IntactEntry entry = new IntactEntry(Arrays.asList(mockInteraction));
+
+        final ConverterContext context = ConverterContext.getInstance();
+        context.configure( new ExportProfile() {
+            public void configure( ConverterContext context ) {
+                context.setGenerateExpandedXml( true );
+            }
+        } );
+
+        final EntrySet es = psiExchange.exportToEntrySet( entry );
+        final Entry e = es.getEntries().iterator().next();
+
+        Assert.assertEquals( 0, e.getExperiments().size() );
+        Assert.assertEquals( 0, e.getInteractors().size() );
+
+        final psidev.psi.mi.xml.model.Interaction i = e.getInteractions().iterator().next();
+        Assert.assertEquals( 1, i.getExperiments().size());
+        Assert.assertEquals( 0, i.getExperimentRefs().size());
+
+        for ( Participant p : i.getParticipants() ) {
+            Assert.assertNotNull( p.getInteractor() );
+            Assert.assertNull( p.getInteractorRef() );
+        }
+    }
 }

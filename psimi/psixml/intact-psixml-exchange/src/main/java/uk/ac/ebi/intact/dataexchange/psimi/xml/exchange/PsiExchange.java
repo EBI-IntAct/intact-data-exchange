@@ -16,7 +16,7 @@ import psidev.psi.mi.xml.xmlindex.IndexedEntry;
 import psidev.psi.mi.xml.model.EntrySet;
 
 /**
- * TODO comment that class header
+ * Psi Exchange definition.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$

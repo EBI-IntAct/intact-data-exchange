@@ -27,7 +27,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 
 /**
- * TODO comment this
+ * Experiment converter.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$

@@ -59,7 +59,7 @@ import java.util.List;
 import java.util.Iterator;
 
 /**
- * Imports/exports data between an IntAct-model database and PSI XML
+ * Imports/exports data between an IntAct-model database and PSI XML.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -105,7 +105,6 @@ public class PsiExchangeImpl implements PsiExchange {
 
         return stats;
     }
-
 
     @Transactional
     public PersisterStatistics importIntoIntact(IndexedEntry entry) throws ImportException {
@@ -162,7 +161,6 @@ public class PsiExchangeImpl implements PsiExchange {
     public PersisterStatistics importIntoIntact(Interaction interaction) {
         return persisterHelper.save(interaction);
     }
-
 
     /**
      * Imports an EntrySet into intact
@@ -229,7 +227,6 @@ public class PsiExchangeImpl implements PsiExchange {
         return importStats;
     }
 
-
     private PersisterStatistics merge(PersisterStatistics stats1, PersisterStatistics stats2) {
         PersisterStatistics mergedStats = new PersisterStatistics();
         mergedStats.getDuplicatesMap().putAll(stats1.getDuplicatesMap());
@@ -256,7 +253,6 @@ public class PsiExchangeImpl implements PsiExchange {
     public void importIntoIntact(IntactEntry entry) throws PersisterException {
         persisterHelper.save(entry);
     }
-
 
     /**
      * Export to PSI XML
@@ -328,7 +324,6 @@ public class PsiExchangeImpl implements PsiExchange {
     private EntrySet createEntrySet(Collection<Entry> entry) {
         return new EntrySet(entry, 2, 5, 3);
     }
-
 
     /**
      * Gets the release dates from a PSI-MI XML file
