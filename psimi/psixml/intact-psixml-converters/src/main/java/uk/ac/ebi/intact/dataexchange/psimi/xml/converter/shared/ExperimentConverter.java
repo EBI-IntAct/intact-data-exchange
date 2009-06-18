@@ -85,8 +85,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(primaryRef.getRefTypeAc()) ||
             !CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())) {
             final String message = "Bibref in ExperimentDescription [PSI Id=" + psiObject.getId() + "] " +
-                                   "should be a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
-                                   "with points to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + "): " + primaryRef;
+                                   "should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
+                                   "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + "): " + primaryRef;
             log.error(message);
 
             addMessageToContext(MessageLevel.WARN, message+". Fixed.", true);

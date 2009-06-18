@@ -30,6 +30,8 @@ import psidev.psi.mi.xml.model.Names;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ExportProfile;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
@@ -42,7 +44,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 /**
- * TODO comment this
+ * EntryConverter Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -198,6 +200,13 @@ public class EntryConverterTest extends AbstractConverterTest {
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = reader.read(is);
 
+        final ConverterContext context = ConverterContext.getInstance();
+        context.configure( new ExportProfile() {
+            public void configure( ConverterContext context ) {
+                context.setGenerateExpandedXml( true );
+            }
+        } );
+
         EntryConverter entryConverter = new EntryConverter();
 
         for (Entry beforeRountripEntry : entrySet.getEntries())  {
@@ -212,8 +221,12 @@ public class EntryConverterTest extends AbstractConverterTest {
             Assert.assertEquals(institutionShortLabel, intactEntry.getInteractors().iterator().next().getOwner().getShortLabel());
 
             assertEquals("Number of interactions should be the same", beforeRountripEntry.getInteractions().size(), afterRoundtripEntry.getInteractions().size());
-            assertEquals("Number of experiments should be the same", PsiConverterUtils.nonRedundantExperimentsFromPsiEntry(beforeRountripEntry).size(), afterRoundtripEntry.getExperiments().size());
-            assertEquals("Number of interactors should be the same", PsiConverterUtils.nonRedundantInteractorsFromPsiEntry(beforeRountripEntry).size(), afterRoundtripEntry.getInteractors().size());
+            assertEquals("Number of experiments should be the same",
+                         PsiConverterUtils.nonRedundantExperimentsFromPsiEntry( beforeRountripEntry ).size(),
+                         PsiConverterUtils.nonRedundantExperimentsFromPsiEntry( afterRoundtripEntry ).size());
+            assertEquals("Number of interactors should be the same",
+                         PsiConverterUtils.nonRedundantInteractorsFromPsiEntry(beforeRountripEntry).size(),
+                         PsiConverterUtils.nonRedundantInteractorsFromPsiEntry(afterRoundtripEntry).size());
         }
        
     }

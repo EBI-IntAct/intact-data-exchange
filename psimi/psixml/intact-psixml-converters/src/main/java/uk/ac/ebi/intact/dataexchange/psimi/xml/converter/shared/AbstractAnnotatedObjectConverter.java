@@ -26,7 +26,7 @@ import uk.ac.ebi.intact.model.util.XrefUtils;
 import java.util.Collection;
 
 /**
- * TODO comment this
+ * Abstract Annotated Object Converter.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -43,7 +43,6 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         this.intactClass = intactClass;
         this.psiClass = psiClass;
     }
-
 
     public A psiToIntact(T psiObject) {
         A intactObject = (A) ConversionCache.getElement(psiObject);
@@ -65,7 +64,6 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
 
         return intactObject;
     }
-
 
     public T intactToPsi(A intactObject) {
         T psiObject = (T) ConversionCache.getElement(intactObject);

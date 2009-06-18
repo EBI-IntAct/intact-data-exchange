@@ -303,6 +303,8 @@ public class InteractionConverterTest extends AbstractConverterTest {
         uk.ac.ebi.intact.model.Interaction intactInteraction = new IntactMockBuilder().createDeterministicInteraction();
         intactInteraction.setAc("OTHER-12345");
 
+        ConverterContext.getInstance().setDefaultInstitutionForAcs( new Institution("intact") );
+
         InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
         Interaction psiInteraction = converter.intactToPsi( intactInteraction);
 

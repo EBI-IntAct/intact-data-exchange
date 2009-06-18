@@ -26,7 +26,7 @@
             <dependency>
                 <groupId>psidev.psi.mi</groupId>
                 <artifactId>psi25-xml</artifactId>
-                <version>1.7.4</version>
+                <version>1.7.5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -50,6 +50,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 
 </project>

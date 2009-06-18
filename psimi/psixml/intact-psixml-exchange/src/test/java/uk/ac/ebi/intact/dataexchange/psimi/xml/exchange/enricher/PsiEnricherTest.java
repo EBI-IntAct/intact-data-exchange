@@ -19,17 +19,20 @@ import org.junit.Test;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 
 import java.io.*;
 
 import psidev.psi.mi.xml.PsimiXmlReader;
+import psidev.psi.mi.xml.PsimiXmlForm;
+import psidev.psi.mi.xml.converter.config.PsimiXmlConverterConfig;
 import psidev.psi.mi.xml.stylesheets.XslTransformerUtils;
 import psidev.psi.mi.xml.model.EntrySet;
 import psidev.psi.mi.xml.model.Entry;
 
 /**
- * TODO comment this
+ * PsiEnricher Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -59,7 +62,7 @@ public class PsiEnricherTest extends IntactBasicTestCase {
 
     @Test
     public void enrichFile_similarExp() throws Exception {
-        final String pathToXml = "/xml/similarExperiments.dip.raw.xml";
+        final String pathToXml = "/xml/similarExperiments.dip.raw.xml";  // compact XML
 
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet originalSet = reader.read(PsiEnricherTest.class.getResourceAsStream(pathToXml));
@@ -78,9 +81,11 @@ public class PsiEnricherTest extends IntactBasicTestCase {
         config.setUpdateInteractionShortLabels(true);
 
         // the actual method
+        ConverterContext.getInstance().setGenerateExpandedXml( true );
         psiEnricher.enrichPsiXml(PsiEnricherTest.class.getResourceAsStream(pathToXml), writer, config);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+
         ByteArrayOutputStream expandedBaos = new ByteArrayOutputStream();
 
         XslTransformerUtils.compactPsiMi25(bais, expandedBaos);
@@ -88,12 +93,24 @@ public class PsiEnricherTest extends IntactBasicTestCase {
         ByteArrayInputStream expandedBais = new ByteArrayInputStream(expandedBaos.toByteArray());
 
         reader = new PsimiXmlReader();
-        EntrySet enrichedSet = reader.read(expandedBais);
+        PsimiXmlConverterConfig converterConfig = new PsimiXmlConverterConfig();
+		converterConfig.setXmlForm( PsimiXmlForm.FORM_EXPANDED);
+		psidev.psi.mi.xml.converter.ConverterContext.getInstance().setConverterConfig(converterConfig);
 
+        EntrySet enrichedSet = reader.read(expandedBais);
         Entry entry = enrichedSet.getEntries().iterator().next();
-        
+
         Assert.assertEquals(3, entry.getInteractions().size());
         Assert.assertEquals(3, entry.getExperiments().size());
-        Assert.assertEquals(3, entry.getInteractors().size()); 
+        Assert.assertEquals(3, entry.getInteractors().size());
+    }
+
+    private void printInputStream( InputStream bais ) throws IOException {
+        InputStreamReader myreader = new InputStreamReader( bais );
+        BufferedReader br = new BufferedReader( myreader );
+        String line = null;
+        while( (line = br.readLine()) != null ) {
+            System.out.println( line );
+        }
     }
 }

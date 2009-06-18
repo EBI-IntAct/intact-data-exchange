@@ -36,7 +36,7 @@ import uk.ac.ebi.intact.model.util.XrefUtils;
 import java.util.*;
 
 /**
- * TODO comment this
+ * Interaction Converter.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -203,8 +203,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         if (imexXref != null) {
             interaction.setImexId(imexXref.getPrimaryId());
         }
-
-
 
         ExperimentConverter experimentConverter = new ExperimentConverter(getInstitution());
         for (Experiment exp : intactObject.getExperiments()) {
