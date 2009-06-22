@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.imex;
 
 import org.junit.Test;
+import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import uk.ac.ebi.intact.core.context.IntactContext;
@@ -26,6 +27,7 @@ public class ImexReadDataExportTest extends IntactBasicTestCase {
     private ImexExporter exporter;
 
     @Test
+    @Ignore
     public void export() throws Exception {
 
         DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
