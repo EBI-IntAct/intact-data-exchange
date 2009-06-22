@@ -207,7 +207,9 @@ public class IntactInteractionRowConverter extends AbstractInteractionRowConvert
     protected List<String> createStringsFromColumn( Column column ) {
         List<String> strings = new ArrayList<String>( );
         for ( Field field : column.getFields() ) {
-            strings.add( field.getValue() );
+            if (field != null) {
+                strings.add( field.getValue() );
+            }
         }
         return strings;
     }
