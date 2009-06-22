@@ -88,6 +88,10 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
 
         Entry entry = new Entry();
 
+        if( intactObject.getInteractions().size() == 0 ) {
+            throw new IllegalArgumentException( "You must give an IntactEntry with at least one interaction." );
+        }
+
         Interaction firstInteraction = intactObject.getInteractions().iterator().next();
         Institution institution = firstInteraction.getOwner();
 
