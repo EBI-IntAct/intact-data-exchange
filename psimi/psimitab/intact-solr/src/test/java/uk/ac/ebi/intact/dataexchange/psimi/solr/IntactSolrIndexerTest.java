@@ -16,6 +16,11 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.core.SolrCore;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.junit.After;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
@@ -180,6 +185,9 @@ public class IntactSolrIndexerTest {
         Assert.assertTrue(expandedTaxidA.contains("taxid:9605(Homo)"));
         Assert.assertTrue(expandedTaxidA.contains("taxid:9604(Hominidae)"));
         Assert.assertTrue(expandedTaxidA.contains("taxid:9606(Human)"));
+
+        System.out.println("\n\nspecies: "+doc.getFieldValues("species"));
+        System.out.println("\n\nspecies_id"+doc.getFieldValues("species_id"));
     }
 
     @Test
@@ -193,6 +201,30 @@ public class IntactSolrIndexerTest {
         indexer.indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
 
         assertCount(1, "Nefh*");
+    }
+
+    @Test
+    public void toSolrDocument_taxonomy_expansion() throws Exception {
+        String mitabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
+                              "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
+                              "\ttaxid:9606(human)\ttaxid:9606(human)\tMI:0218(physical interaction)\tMI:0469(intact)" +
+                              "\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
+                              "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tGO:012345\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
+
+        OntologyIterator taxonomyIterator = new UniprotTaxonomyOntologyIterator(IntactSolrSearcherTest.class.getResourceAsStream("/META-INF/hominidae-taxonomy.tsv"));
+
+        IntactSolrIndexer solrIndexer = new IntactSolrIndexer(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB), solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        solrIndexer.indexOntology(taxonomyIterator);
+        solrIndexer.indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
+
+        SolrServer pubCore = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
+        QueryResponse queryResponse = pubCore.query(new SolrQuery("P16884"));
+
+        SolrDocument doc = queryResponse.getResults().get(0);
+
+        Assert.assertEquals(12, doc.getFieldValues("species").size());
+        Assert.assertEquals(12, doc.getFieldValues("species_id").size());
+
     }
 
     private void assertCount(Number count, String searchQuery) throws IntactSolrException {
