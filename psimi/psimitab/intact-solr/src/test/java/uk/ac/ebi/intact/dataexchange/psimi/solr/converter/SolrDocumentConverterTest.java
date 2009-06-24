@@ -114,7 +114,7 @@ public class SolrDocumentConverterTest {
 
      @Test
     public void geneName() throws Exception {
-        String psiMiTabLine = "intact:EBI-12345\tintact:EBI-54321|uniprotkb:P12345\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
+        String psiMiTabLine = "intact:EBI-12345\tintact:EBI-54321|uniprotkb:P12345\tuniprotkb:Nefh(gene name synonym)\tuniprotkb:Dst(gene name synonym)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
                               "\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)" +
                               "\tintact:EBI-446356|irefindex:arigidblabla(" + FieldNames.RIGID + ")\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
