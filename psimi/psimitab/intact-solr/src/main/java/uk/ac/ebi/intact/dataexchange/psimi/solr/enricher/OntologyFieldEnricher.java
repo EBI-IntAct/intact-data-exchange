@@ -15,21 +15,24 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
+import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.solr.client.solrj.SolrServerException;
 import psidev.psi.mi.tab.model.builder.Field;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.LazyLoadedOntologyTerm;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
 
 import java.util.*;
-
-import org.apache.commons.collections.map.LRUMap;
-import org.apache.solr.client.solrj.SolrServerException;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
 public class OntologyFieldEnricher extends BaseFieldEnricher {
+
+    private static final Log log = LogFactory.getLog( OntologyFieldEnricher.class );
 
     public OntologySearcher ontologySearcher;
 
@@ -44,6 +47,21 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
 
         cvCache = new LRUMap(10000);
         ontologyTermCache = new LRUMap(10000);
+    }
+
+    @Override
+    public boolean isExpandableOntology(String name) {
+        if (expandableOntologies == null) {
+            try {
+                expandableOntologies = ontologySearcher.getOntologyNames();
+            } catch (SolrServerException e) {
+                if (log.isErrorEnabled()) log.error("Problem getting list of ontology names: "+e.getMessage());
+                return false;
+            }
+            expandableOntologies.add("taxid");
+        }
+
+        return expandableOntologies.contains(name);
     }
 
     public Field enrich(Field field) throws Exception {

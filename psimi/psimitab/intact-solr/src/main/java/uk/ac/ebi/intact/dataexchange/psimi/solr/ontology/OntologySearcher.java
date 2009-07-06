@@ -18,7 +18,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.params.FacetParams;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Searches the ontology, using a SolrServer pointing to an ontology core.
@@ -34,7 +39,6 @@ public class OntologySearcher {
         this.solrServer = solrServer;
     }
 
-
     public QueryResponse search(SolrQuery query) throws SolrServerException{
         return solrServer.query(query);
     }
@@ -45,6 +49,29 @@ public class OntologySearcher {
 
     public QueryResponse searchByParentId(String id, Integer firstResult, Integer maxResults) throws SolrServerException {
         return searchById(OntologyFieldNames.PARENT_ID, id, firstResult, maxResults);
+    }
+
+    public Set<String> getOntologyNames() throws SolrServerException {
+        SolrQuery query = new SolrQuery("*:*");
+        query.setStart(0);
+        query.setRows(0);
+        query.setFacet(true);
+        query.setParam(FacetParams.FACET_FIELD, "ontology");
+
+        QueryResponse response = search(query);
+        FacetField facetField = response.getFacetField("ontology");
+
+        if (facetField.getValues() == null) {
+            return new HashSet<String>();
+        }
+
+        Set<String> ontologyNames = new HashSet<String>();
+
+        for (FacetField.Count c : facetField.getValues()) {
+            ontologyNames.add(c.getName());
+        }
+
+        return ontologyNames;
     }
 
     private QueryResponse searchById(String fieldId, String id, Integer firstResult, Integer maxResults) throws SolrServerException {

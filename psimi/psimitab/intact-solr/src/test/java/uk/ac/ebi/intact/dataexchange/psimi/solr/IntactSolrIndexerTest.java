@@ -15,12 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.core.SolrCore;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrInputDocument;
 import org.junit.After;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
@@ -38,6 +37,7 @@ import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -118,6 +118,11 @@ public class IntactSolrIndexerTest {
                               "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tgo:\""+goTermToExpand+"\"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
 
         OntologySearcher ontologySearcher = new OntologySearcher(solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+
+        final Set<String> ontologyNames = ontologySearcher.getOntologyNames();
+        Assert.assertEquals(1, ontologyNames.size());
+        Assert.assertEquals("go", ontologyNames.iterator().next());
+
         SolrDocumentConverter converter = new SolrDocumentConverter(new IntactDocumentDefinition(), ontologySearcher);
 
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
@@ -185,9 +190,6 @@ public class IntactSolrIndexerTest {
         Assert.assertTrue(expandedTaxidA.contains("taxid:9605(Homo)"));
         Assert.assertTrue(expandedTaxidA.contains("taxid:9604(Hominidae)"));
         Assert.assertTrue(expandedTaxidA.contains("taxid:9606(Human)"));
-
-        System.out.println("\n\nspecies: "+doc.getFieldValues("species"));
-        System.out.println("\n\nspecies_id"+doc.getFieldValues("species_id"));
     }
 
     @Test

@@ -21,17 +21,19 @@ import org.apache.solr.common.SolrInputDocument;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.builder.*;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.FieldNames;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.FieldEnricher;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BaseFieldEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.ByInteractorTypeRowDataAdder;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.GeneNameSelectiveAdder;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.IdSelectiveAdder;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.TypeFieldFilter;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BaseFieldEnricher;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.FieldEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.OntologyFieldEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Converts from Row to SolrDocument and viceversa.
@@ -267,31 +269,32 @@ public class SolrDocumentConverter {
                     throw new SolrServerException("Problem enriching field: "+field, e);
                 }
 
-                doc.addField(field.getType(), field.getValue());
+                addField(doc, field.getType(), field.getValue());
 
                 if (field.getDescription() != null) {
-                    doc.addField("spell", field.getDescription());
+                    addField(doc, "spell", field.getDescription());
                 }
 
                 boolean includeItself = true;
 
                 for (Field parentField : fieldEnricher.getAllParents(field, includeItself)) {
                     addExpandedFields(doc, fieldName, parentField);
+                    addExpandedFields(doc, field.getType(), parentField);
                 }
             }
 
             if (expandableColumn) {
-                doc.addField(fieldName+"_exact", field.toString(), boost);
-                doc.addField(fieldName+"_exact_id", field.getValue(), boost);
+                addField(doc, fieldName+"_exact", field.toString(), boost);
+                addField(doc, fieldName+"_exact_id", field.getValue(), boost);
             }
             addDescriptionField(doc, field.getType(), field);
-            doc.addField(fieldName, field.toString(), boost);
-            doc.addField(fieldName+"_ms", field.toString(), boost);
+            addField(doc, fieldName, field.toString(), boost);
+            addField(doc, fieldName+"_ms", field.toString(), boost);
 
             if (field.getType() != null) {
-                doc.addField(field.getType()+"_xref", field.getValue(), boost);
-                doc.addField(fieldName+"_"+field.getType()+"_xref", field.getValue(), boost);
-                doc.addField(fieldName+"_"+field.getType()+"_xref_ms", field.toString(), boost);
+                addField(doc, field.getType()+"_xref", field.getValue(), boost);
+                addField(doc, fieldName+"_"+field.getType()+"_xref", field.getValue(), boost);
+                addField(doc, fieldName+"_"+field.getType()+"_xref_ms", field.toString(), boost);
             }
 
             addDescriptionField(doc, field.getType(), field);
@@ -309,7 +312,7 @@ public class SolrDocumentConverter {
         }
 
         for (Field field : fields) {
-            doc.addField(fieldName, field.getValue());
+            addField(doc, fieldName, field.getValue());
         }
     }
 
@@ -342,11 +345,23 @@ public class SolrDocumentConverter {
     }
 
     private void addExpandedField(SolrInputDocument doc, Field field, String fieldPrefix) {
-        doc.addField(fieldPrefix+"_expanded", field.toString());
-        doc.addField(fieldPrefix+"_expanded_id", field.getValue());
-        doc.addField(fieldPrefix+"_expanded_ms", field.toString());
+        addField(doc, fieldPrefix+"_expanded", field.toString());
+        addField(doc, fieldPrefix+"_expanded_id", field.getValue());
+        addField(doc, fieldPrefix+"_expanded_ms", field.toString());
 
         addDescriptionField(doc, fieldPrefix+"_expanded", field);
+    }
+
+    private void addField(SolrInputDocument doc, String fieldName, String value) {
+        addField(doc, fieldName, value, 1.0f);
+    }
+
+    private void addField(SolrInputDocument doc, String fieldName, String value, float boost) {
+        final Collection<Object> existingValues = doc.getFieldValues(fieldName);
+
+        if (existingValues == null || !existingValues.contains(value)) {
+            doc.addField(fieldName, value, boost);
+        }
     }
 
     private void addDescriptionField(SolrInputDocument doc, String fieldPrefix, Field field) {

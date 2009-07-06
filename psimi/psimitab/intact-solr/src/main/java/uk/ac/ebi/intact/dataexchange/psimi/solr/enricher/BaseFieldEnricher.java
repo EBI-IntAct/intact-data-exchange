@@ -15,12 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
-import psidev.psi.mi.tab.model.builder.Field;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.FieldNames;
-
-import java.util.*;
-
 import org.apache.solr.client.solrj.SolrServerException;
+import psidev.psi.mi.tab.model.builder.Field;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -28,19 +27,7 @@ import org.apache.solr.client.solrj.SolrServerException;
  */
 public class BaseFieldEnricher implements FieldEnricher {
 
-    private Set<String> expandableOntologies;
-
     public BaseFieldEnricher() {
-        expandableOntologies = new HashSet<String>( );
-        createDefaultExpandableOntologies();
-    }
-
-    private void createDefaultExpandableOntologies() {
-        expandableOntologies.add( FieldNames.DB_GO );
-        expandableOntologies.add( FieldNames.DB_INTERPRO );
-        expandableOntologies.add( FieldNames.DB_CHEBI );
-        expandableOntologies.add( FieldNames.DB_PSIMI );
-        expandableOntologies.add( "taxid" );
     }
 
     public Field enrich(Field field) throws Exception {
@@ -56,7 +43,7 @@ public class BaseFieldEnricher implements FieldEnricher {
     }
 
      public boolean isExpandableOntology( String name ) {
-        return ( expandableOntologies.contains( name ) );
+        return false;
     }
 
 
