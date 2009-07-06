@@ -446,8 +446,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Institution institution = IntactContext.getCurrentInstance().getInstitution();
         final Annotation annotation = getMockBuilder().createAnnotation("nowhere", "IA:0999", "postaladdress");
         institution.addAnnotation(annotation);
-        persisterHelper.saveInNewTransaction(annotation.getCvTopic());
-        persisterHelper.saveInNewTransaction(institution);
+        persisterHelper.save(annotation.getCvTopic());
+        persisterHelper.save(institution);
 
         //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
         OBOSession oboSession = OboUtils.createOBOSession( CvUpdaterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
