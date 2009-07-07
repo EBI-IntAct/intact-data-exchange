@@ -52,13 +52,17 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
     @Override
     public boolean isExpandableOntology(String name) {
         if (expandableOntologies == null) {
-            try {
-                expandableOntologies = ontologySearcher.getOntologyNames();
-            } catch (SolrServerException e) {
-                if (log.isErrorEnabled()) log.error("Problem getting list of ontology names: "+e.getMessage());
-                return false;
+            if (ontologySearcher == null) {
+                expandableOntologies = new HashSet<String>();
+            } else {
+                try {
+                    expandableOntologies = ontologySearcher.getOntologyNames();
+                } catch (SolrServerException e) {
+                    if (log.isErrorEnabled()) log.error("Problem getting list of ontology names: "+e.getMessage());
+                    return false;
+                }
+                expandableOntologies.add("taxid");
             }
-            expandableOntologies.add("taxid");
         }
 
         return expandableOntologies.contains(name);
