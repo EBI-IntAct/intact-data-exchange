@@ -15,23 +15,31 @@
  */
 package uk.ac.ebi.intact.task;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.After;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.model.Experiment;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.Experiment;
+import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.Protein;
 
 import javax.annotation.Resource;
+import java.io.File;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -59,20 +67,44 @@ public class MitabCreationTests extends IntactBasicTestCase {
 
     @After
     public void after() throws Exception {
+        solrJettyRunner.join();
         solrJettyRunner.stop();
     }
 
     @Test
     public void writeMitab() throws Exception {
-        Experiment exp = getMockBuilder().createExperimentRandom(5);
+        FileUtils.deleteDirectory(new File("target/lala-lucene"));
+        
+        Experiment exp = getMockBuilder().createExperimentRandom(3);
         persisterHelper.save(exp);
 
-        Assert.assertEquals(5, getDaoFactory().getInteractionDao().countAll());
+        Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
+        Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
+        Protein proteinC = getMockBuilder().createProtein("Q00002", "protC");
+
+        Interaction interaction = getMockBuilder().createInteraction(
+                getMockBuilder().createComponentBait(proteinA),
+                getMockBuilder().createComponentPrey(proteinB),
+                getMockBuilder().createComponentPrey(proteinC));
+
+        CvDatabase goDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO);
+        proteinA.addXref(getMockBuilder().createXref(proteinA, "GO:0030246", null, goDb));
+
+        persisterHelper.save(interaction);
+
+        Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
 
         Job job = (Job) applicationContext.getBean("createMitabJob");
 
         JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
-        System.out.println(jobExecution);
+
+        final SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
+
+        Assert.assertEquals(5L, solrServer.query(new SolrQuery("*:*")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrServer.query(new SolrQuery("P12345")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrServer.query(new SolrQuery("Q00002")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrServer.query(new SolrQuery("go:\"GO:0003674\"")).getResults().getNumFound());
+
     }
     
 
