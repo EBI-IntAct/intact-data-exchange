@@ -280,6 +280,7 @@ public class SolrDocumentConverter {
                 for (Field parentField : fieldEnricher.getAllParents(field, includeItself)) {
                     addExpandedFields(doc, fieldName, parentField);
                     addExpandedFields(doc, field.getType(), parentField);
+                    addField(doc, field.getType(), parentField.getValue());
                 }
             }
 
