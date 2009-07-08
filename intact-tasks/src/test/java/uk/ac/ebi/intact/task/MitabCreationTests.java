@@ -67,7 +67,10 @@ public class MitabCreationTests extends IntactBasicTestCase {
 
     @After
     public void after() throws Exception {
-        solrJettyRunner.join();
+
+        // uncommenting this will cause the test to hang - which might be used to perform extra solr query.
+//        solrJettyRunner.join();
+
         solrJettyRunner.stop();
     }
 
@@ -97,6 +100,8 @@ public class MitabCreationTests extends IntactBasicTestCase {
         Job job = (Job) applicationContext.getBean("createMitabJob");
 
         JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+        Assert.assertTrue( jobExecution.getAllFailureExceptions().isEmpty() );
+        Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
 
         final SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
 
@@ -104,9 +109,5 @@ public class MitabCreationTests extends IntactBasicTestCase {
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("P12345")).getResults().getNumFound());
         Assert.assertEquals(1L, solrServer.query(new SolrQuery("Q00002")).getResults().getNumFound());
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("go:\"GO:0003674\"")).getResults().getNumFound());
-
     }
-    
-
-
 }
