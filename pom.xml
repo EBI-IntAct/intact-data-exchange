@@ -23,9 +23,9 @@
     </properties>
 
     <scm>
-        <connection>scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/data-exchange/trunk</connection>
-        <developerConnection>scm:svn:https://intact.svn.sourceforge.net/svnroot/intact/repo/data-exchange/trunk</developerConnection>
-        <url>http://svn.sourceforge.net/viewcvs.cgi/intact/repo/data-exchange/trunk</url>
+        <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk</connection>
+        <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk</developerConnection>
+        <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk</url>
     </scm>
 
     <modules>
