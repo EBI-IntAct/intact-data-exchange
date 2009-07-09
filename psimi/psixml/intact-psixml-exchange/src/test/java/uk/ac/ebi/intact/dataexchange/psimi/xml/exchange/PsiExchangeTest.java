@@ -33,7 +33,6 @@ import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.core.util.DebugUtil;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ImexExportProfile;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ExportProfile;
 
 import java.io.StringWriter;
@@ -41,7 +40,7 @@ import java.io.Writer;
 import java.util.*;
 
 /**
- * TODO comment this
+ * PsiExchange Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
