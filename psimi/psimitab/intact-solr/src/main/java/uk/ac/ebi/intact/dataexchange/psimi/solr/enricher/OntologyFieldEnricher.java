@@ -27,6 +27,8 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
 import java.util.*;
 
 /**
+ * Ontology field enricher.
+ *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
@@ -127,7 +129,11 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
             return ontologyTermCache.get(id);
         }
 
-        return new LazyLoadedOntologyTerm(ontologySearcher, id, name);
+        final LazyLoadedOntologyTerm term = new LazyLoadedOntologyTerm(ontologySearcher, id, name);
+
+        ontologyTermCache.put( id, term );
+
+        return term;
     }
 
     private List<psidev.psi.mi.tab.model.builder.Field> convertTermsToFields( String type, Set<OntologyTerm> terms ) {
@@ -147,6 +153,4 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
                 new Field( type, term.getId(), term.getName() );
         return field;
     }
-
-
 }
