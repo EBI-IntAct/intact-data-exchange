@@ -33,6 +33,9 @@ import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
 import java.io.*;
 import java.net.MalformedURLException;
+import java.util.logging.LogManager;
+import java.util.logging.Level;
+import java.util.Enumeration;
 
 /**
  * Indexes information into a SOLR server
@@ -62,6 +65,8 @@ public class IntactSolrIndexer {
     public IntactSolrIndexer(SolrServer solrServer) {
         this.solrServer = solrServer;
         this.converter = new SolrDocumentConverter(new IntactDocumentDefinition());
+
+        SolrLogger.readFromLog4j();
     }
 
     public IntactSolrIndexer(String solrServerUrl, String ontologySolrServerUrl) throws MalformedURLException {
@@ -69,7 +74,7 @@ public class IntactSolrIndexer {
     }
 
     public IntactSolrIndexer(SolrServer solrServer, SolrServer ontologySolrServer) {
-        this.solrServer = solrServer;
+        this(solrServer);
         this.ontologySolrServer = ontologySolrServer;
         this.converter = new SolrDocumentConverter(new IntactDocumentDefinition(), new OntologySearcher(ontologySolrServer));
     }
@@ -180,8 +185,6 @@ public class IntactSolrIndexer {
      */
     public int indexMitab(BufferedReader reader, boolean hasHeader, Integer firstLine, Integer batchSize) throws IOException, IntactSolrException {
         int lineCount = 0;
-
-        if ( log.isDebugEnabled() ) log.debug( "indexMitab( reader, "+ hasHeader +", "+firstLine+", "+ batchSize +" )" );
 
         int first = (firstLine == null)? 0 : firstLine;
         int lastRes = (batchSize == null)? Integer.MAX_VALUE : batchSize;
