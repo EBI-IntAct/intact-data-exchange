@@ -21,9 +21,11 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
+import org.apache.commons.collections.map.LRUMap;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
 
 /**
  * Searches the ontology, using a SolrServer pointing to an ontology core.
@@ -34,9 +36,14 @@ import java.util.Set;
 public class OntologySearcher {
 
     private SolrServer solrServer;
+    private Map<String,QueryResponse> childSearchesMap;
+    private Map<String,QueryResponse> parentSearchesMap;
 
     public OntologySearcher(SolrServer solrServer) {
         this.solrServer = solrServer;
+
+        childSearchesMap = new LRUMap(5000);
+        parentSearchesMap = new LRUMap(5000);
     }
 
     public QueryResponse search(SolrQuery query) throws SolrServerException{
@@ -44,11 +51,27 @@ public class OntologySearcher {
     }
 
     public QueryResponse searchByChildId(String id, Integer firstResult, Integer maxResults) throws SolrServerException {
-        return searchById(OntologyFieldNames.CHILD_ID, id, firstResult, maxResults);
+        if (childSearchesMap.containsKey(id)) {
+            return childSearchesMap.get(id);
+        }
+
+        QueryResponse queryResponse = searchById(OntologyFieldNames.CHILD_ID, id, firstResult, maxResults);
+
+        childSearchesMap.put(id, queryResponse);
+
+        return queryResponse;
     }
 
     public QueryResponse searchByParentId(String id, Integer firstResult, Integer maxResults) throws SolrServerException {
-        return searchById(OntologyFieldNames.PARENT_ID, id, firstResult, maxResults);
+        if (parentSearchesMap.containsKey(id)) {
+            return parentSearchesMap.get(id);
+        }
+
+        QueryResponse queryResponse = searchById(OntologyFieldNames.PARENT_ID, id, firstResult, maxResults);
+
+        parentSearchesMap.put(id, queryResponse);
+
+        return queryResponse;
     }
 
     public Set<String> getOntologyNames() throws SolrServerException {
