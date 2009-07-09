@@ -51,7 +51,7 @@ public final class SolrLogger {
             
             setLevel(level);
         } else {
-            setLevel(Level.FINE);
+            setLevel(Level.WARNING);
         }
     }
 
