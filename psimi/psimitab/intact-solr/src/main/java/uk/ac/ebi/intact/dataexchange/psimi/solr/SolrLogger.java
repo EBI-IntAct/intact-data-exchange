@@ -35,7 +35,7 @@ public final class SolrLogger {
     public static void readFromLog4j() {
         Logger logger = org.apache.log4j.LogManager.getLogger("org.apache.solr");
 
-        if (logger != null) {
+        if (logger != null && logger.getLevel() != null) {
             String log4jLevelStr = logger.getLevel().toString();
             Level level;
 
