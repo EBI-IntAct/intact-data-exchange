@@ -20,17 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.JarURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.logging.LogManager;
-import java.util.logging.Level;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
+import sun.net.www.protocol.file.FileURLConnection;
 
 /**
  * Creates a filesystem to host a solr home with IntAct configuration.
@@ -57,32 +54,23 @@ public class SolrHomeBuilder {
             throw new IllegalStateException("Problem loading properties", e);
         }
 
+        SolrLogger.readFromLog4j();
+
         String repo = props.getProperty("intact.solr.home.repositoryBase");
+        String localRepo = "file://"+new File(System.getProperty("user.home"), ".m2/repository").toString();
         String groupId = props.getProperty("intact.solr.home.groupId");
         String artifactId = "intact-solr-home";
         String version = props.getProperty("intact.solr.home.version");
 
-        StringBuilder url = new StringBuilder(256);
-        url.append(repo);
-
-        if (version.endsWith("-SNAPSHOT")) {
-            url.append("_snapshots");
+        if (exists(repo, groupId, artifactId, version)) {
+            solrHomeJar = createJarUrl(repo, groupId, artifactId, version);
+        } else if (exists(localRepo, groupId, artifactId, version)) {
+            solrHomeJar = createJarUrl(localRepo, groupId, artifactId, version);
+        } else if (!version.endsWith("-SNAPSHOT") && exists(repo, groupId, artifactId, version+"-SNAPSHOT")){
+            solrHomeJar = createJarUrl(repo, groupId, artifactId, version+"-SNAPSHOT");
+        } else {
+            throw new IllegalStateException("SolrHomeJar not found");
         }
-        
-        url.append("/");
-        url.append(groupId.replaceAll("\\.", "/")).append("/");
-        url.append(artifactId).append("/");
-        url.append(version).append("/");
-        url.append("intact-solr-home-").append(version).append(".jar");
-
-        try {
-            solrHomeJar = new URL("jar:" + url.toString() + "!/");
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Problem creating url: "+url, e);
-        }
-
-        SolrLogger.readFromLog4j();
-
     }
 
     public SolrHomeBuilder(URL solrHomeJar) {
@@ -99,6 +87,53 @@ public class SolrHomeBuilder {
         this.solrHomeJar = solrHomeJar;
 
         SolrLogger.readFromLog4j();
+    }
+
+    private URL createJarUrl(String repo, String groupId, String artifactId, String version) {
+        return createUrl(repo, groupId, artifactId, version, "jar:", "!/");
+    }
+
+    private URL createHttpUrl(String repo, String groupId, String artifactId, String version) {
+        return createUrl(repo, groupId, artifactId, version, "", "");
+    }
+
+    private boolean exists(String repo, String groupId, String artifactId, String version) {
+        URL url = createHttpUrl(repo, groupId, artifactId, version);
+        try {
+            URLConnection urlConnection = url.openConnection();
+            if (urlConnection instanceof HttpURLConnection) {
+                int responseCode = ((HttpURLConnection) urlConnection).getResponseCode();
+                return (responseCode == 200);
+            } else {
+                boolean exists = urlConnection.getContentLength() > 0;
+                return exists;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Problem checking if jar exists: " + url, e);
+        }
+    }
+
+    private URL createUrl(String repo, String groupId, String artifactId, String version, String prefix, String suffix) {
+        StringBuilder sb = new StringBuilder(256);
+        sb.append(prefix);
+        sb.append(repo);
+
+        if (version.endsWith("-SNAPSHOT") && repo.startsWith("http://")) {
+            sb.append("_snapshots");
+        }
+
+        sb.append("/");
+        sb.append(groupId.replaceAll("\\.", "/")).append("/");
+        sb.append(artifactId).append("/");
+        sb.append(version).append("/");
+        sb.append("intact-solr-home-").append(version).append(".jar");
+        sb.append(suffix);
+
+        try {
+            return new URL(sb.toString());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Problem creating url: "+ sb, e);
+        }
     }
 
     public void install(File solrWorkingDir) throws IOException {
