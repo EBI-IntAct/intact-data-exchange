@@ -15,25 +15,22 @@
  */
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
- 
-import uk.ac.ebi.intact.core.context.DataContext;
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.business.IntactTransactionException;
+import uk.ac.ebi.intact.context.DataContext;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfo;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.core.persistence.util.CgLibUtil;
+import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.persistence.util.CgLibUtil;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service allowing to retreive annotation info dataset from the intact database.
@@ -42,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @version $Id$
  * @since 2.0.1
  */
-@Component
 public class AnnotationInfoDatasetService {
 
     private static final int MAX_CV_BATCH_SIZE = 50;
@@ -73,8 +69,12 @@ public class AnnotationInfoDatasetService {
      * @throws AnnotationInfoDatasetServiceException
      *
      */
-    @Transactional
     public AnnotationInfoDataset retrieveAnnotationInfoDataset( Collection<CvTopic> topics, Date after ) throws AnnotationInfoDatasetServiceException {
+
+        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+        final boolean inTransaction = dataContext.isTransactionActive();
+
+        if ( !inTransaction ) dataContext.beginTransaction();
 
         AnnotationInfoDataset dataset = new AnnotationInfoDataset();
 
@@ -98,7 +98,7 @@ public class AnnotationInfoDatasetService {
                         AnnotationInfo ai = new AnnotationInfo( cvObject.getShortLabel(),
                                                                 cvObject.getFullName(),
                                                                 CgLibUtil.getRealClassName( cvObject ).getName(),
-                                                                cvObject.getIdentifier(),
+                                                                cvObject.getMiIdentifier(),
                                                                 annotation.getCvTopic().getShortLabel(),
                                                                 annotation.getAnnotationText(),
                                                                 false );
@@ -110,6 +110,12 @@ public class AnnotationInfoDatasetService {
             currentIdx += terms.size();
 
         } while ( currentIdx < termCount - 1 );
+
+        try {
+            if ( !inTransaction ) dataContext.commitTransaction();
+        } catch ( IntactTransactionException e ) {
+            throw new AnnotationInfoDatasetServiceException( e );
+        }
 
         return dataset;
     }

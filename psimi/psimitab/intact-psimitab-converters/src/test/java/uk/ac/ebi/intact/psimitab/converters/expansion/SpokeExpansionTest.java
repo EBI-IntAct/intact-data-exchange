@@ -22,7 +22,7 @@ import java.util.List;
 public class SpokeExpansionTest extends IntactBasicTestCase {
 
     @Test
-    public void expandTest_1() throws Exception{
+    public void expandTest_1() {
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
         Component preyComponent1 = getMockBuilder().createComponentPrey( getMockBuilder().createProteinRandom() );
@@ -49,7 +49,7 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
-    public void expandTest_2() throws Exception{
+    public void expandTest_2() {
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
         Component preyComponent = getMockBuilder().createComponentPrey( getMockBuilder().createProteinRandom() );
@@ -61,18 +61,20 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
         assertEquals( 1, interactions.size() );
     }
 
-    @Test (expected = NotExpandableInteractionException.class)
-    public void expandTest_3() throws Exception{
+    @Test
+    public void expandTest_3() {
 
         // relies on the fact that the created component have role: neutral
         Interaction interaction = getMockBuilder().createInteraction( "neutral1", "neutral2", "neutral3" );
         
         SpokeExpansion spokeExpansion = new SpokeExpansion();
         Collection<Interaction> interactions = spokeExpansion.expand( interaction );
+        assertNotNull( interactions );
+        assertEquals( 0, interactions.size() );
     }
 
     @Test
-    public void expandTest_4() throws Exception{
+    public void expandTest_4() {
 
         Component selfComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
         selfComponent.getCvExperimentalRole().setShortLabel(CvExperimentalRole.SELF);
@@ -89,9 +91,6 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
         interaction.setComponents( selfComponents );
 
         SpokeExpansion spokeExpansion = new SpokeExpansion();
-
-        assertTrue(spokeExpansion.isExpandable(interaction));
-
         Collection<Interaction> interactions = spokeExpansion.expand( interaction );
         assertNotNull( interactions );
         assertEquals( 1, interactions.size() );

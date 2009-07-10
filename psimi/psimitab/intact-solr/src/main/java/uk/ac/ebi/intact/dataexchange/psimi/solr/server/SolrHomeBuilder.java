@@ -25,12 +25,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.logging.LogManager;
-import java.util.logging.Level;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
 
 /**
  * Creates a filesystem to host a solr home with IntAct configuration.
@@ -81,8 +77,6 @@ public class SolrHomeBuilder {
             throw new RuntimeException("Problem creating url: "+url, e);
         }
 
-        SolrLogger.readFromLog4j();
-
     }
 
     public SolrHomeBuilder(URL solrHomeJar) {
@@ -97,8 +91,6 @@ public class SolrHomeBuilder {
         }
 
         this.solrHomeJar = solrHomeJar;
-
-        SolrLogger.readFromLog4j();
     }
 
     public void install(File solrWorkingDir) throws IOException {

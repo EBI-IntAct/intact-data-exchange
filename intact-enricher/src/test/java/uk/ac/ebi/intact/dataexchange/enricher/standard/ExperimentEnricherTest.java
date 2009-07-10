@@ -15,12 +15,14 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.clone.IntactCloner;
 
 /**
  * TODO comment this
@@ -29,10 +31,21 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
  * @version $Id$
  */
 
-public class ExperimentEnricherTest extends EnricherBasicTestCase {
+public class ExperimentEnricherTest extends IntactBasicTestCase {
 
-    @Autowired
     private ExperimentEnricher enricher;
+
+    @Before
+    public void beforeMethod() {
+        enricher = ExperimentEnricher.getInstance();
+    }
+
+    @After
+    public void afterMethod() {
+        enricher.close();
+        enricher = null;
+    }
+
 
     @Test
     public void enrich_pub() {
@@ -50,7 +63,7 @@ public class ExperimentEnricherTest extends EnricherBasicTestCase {
         Assert.assertEquals("The flexible loop of Bcl-2 is required for molecular interaction with immunosuppressant FK-506 binding protein 38 (FKBP38).", experiment.getFullName());
         Assert.assertEquals(2, experiment.getAnnotations().size());
 
-        Assert.assertEquals("dip", experiment.getOwner().getShortLabel());
+        Assert.assertEquals("DIP", experiment.getOwner().getShortLabel());
     }
 
     @Test

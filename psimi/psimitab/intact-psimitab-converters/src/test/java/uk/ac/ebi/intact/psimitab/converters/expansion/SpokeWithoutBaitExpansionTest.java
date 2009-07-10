@@ -21,7 +21,7 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
 
 
     @Test
-    public void expandTest_1() throws Exception{
+    public void expandTest_1() {
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
         Component preyComponent1 = getMockBuilder().createComponentPrey( getMockBuilder().createProteinRandom() );
@@ -48,7 +48,7 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
-    public void expandTest_2() throws Exception{
+    public void expandTest_2() {
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
         Component preyComponent = getMockBuilder().createComponentPrey( getMockBuilder().createProteinRandom() );
@@ -61,7 +61,7 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
-    public void expandTest_3() throws Exception {
+    public void expandTest_3() {
 
         // relies on the fact that the created component have role: neutral
         Interaction interaction = getMockBuilder().createInteraction( "neutral1", "neutral2", "neutral3" );
@@ -72,7 +72,7 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
-    public void expandTest_4() throws Exception{
+    public void expandTest_4() {
 
         // generate a interaction with only one Component
         Component selfComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());

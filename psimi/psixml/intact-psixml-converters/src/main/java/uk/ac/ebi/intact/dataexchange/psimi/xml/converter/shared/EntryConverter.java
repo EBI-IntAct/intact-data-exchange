@@ -25,13 +25,12 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Entry Converter.
+ * TODO comment this
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -88,10 +87,6 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
 
         Entry entry = new Entry();
 
-        if( intactObject.getInteractions().size() == 0 ) {
-            throw new IllegalArgumentException( "You must give an IntactEntry with at least one interaction." );
-        }
-
         Interaction firstInteraction = intactObject.getInteractions().iterator().next();
         Institution institution = firstInteraction.getOwner();
 
@@ -106,39 +101,18 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
             psidev.psi.mi.xml.model.Interaction interaction = interactionConverter.intactToPsi(intactInteracton);
             entry.getInteractions().add(interaction);
 
-            if( ConverterContext.getInstance().isGenerateCompactXml() ) {
-
-                for ( Component component : intactInteracton.getComponents() ) {
-                    psidev.psi.mi.xml.model.Interactor interactor =
-                            new InteractorConverter(getInstitution()).intactToPsi( component.getInteractor() );
-                    if ( ! contains( entry.getInteractors(), interactor ) ) {
-                        entry.getInteractors().add( interactor );
-                    }
+            for (Participant participant : interaction.getParticipants()) {
+                if (!contains(entry.getInteractors(), participant.getInteractor())) {
+                    entry.getInteractors().add(participant.getInteractor());
                 }
-
-//                for (Participant participant : interaction.getParticipants()) {
-//                    if (!contains(entry.getInteractors(), participant.getInteractor())) {
-//                        entry.getInteractors().add(participant.getInteractor());
-//                    }
-//                }
             }
 
-            if( ConverterContext.getInstance().isGenerateCompactXml() ) {
-
-                for ( uk.ac.ebi.intact.model.Experiment e : intactInteracton.getExperiments() ) {
-                    ExperimentConverter experimentConverter = new ExperimentConverter(getInstitution());
-                    final ExperimentDescription experimentDesc = experimentConverter.intactToPsi( e );
-                    if (!contains(entry.getExperiments(), experimentDesc)) {
-                        entry.getExperiments().add( experimentDesc );
-                    }
+            for (ExperimentDescription experimentDesc : interaction.getExperiments()) {
+                if (!contains(entry.getExperiments(), experimentDesc)) {
+                    entry.getExperiments().add(experimentDesc);
                 }
-
-//                for (ExperimentDescription experimentDesc : interaction.getExperiments()) {
-//                    if (!contains(entry.getExperiments(), experimentDesc)) {
-//                        entry.getExperiments().add(experimentDesc);
-//                    }
-//                }
             }
+
         }
 
         ConversionCache.clear();
@@ -153,7 +127,7 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
 
     public boolean contains(Collection<? extends HasId> idElements, HasId hasId) {
         for (HasId idElement : idElements) {
-            if (idElement != null && idElement.getId() == hasId.getId()) {
+            if (idElement.getId() == hasId.getId()) {
                 return true;
             }
         }

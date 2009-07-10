@@ -38,8 +38,8 @@ public class UrlSolrParamsTest {
 
         Assert.assertEquals("*:*", solrQuery.getQuery());
         Assert.assertEquals("rigid asc", solrQuery.getSortField());
-        Assert.assertEquals(Integer.valueOf(30), solrQuery.getRows());
-        Assert.assertEquals(Integer.valueOf(0), solrQuery.getStart());
+        Assert.assertEquals(30, solrQuery.getRows());
+        Assert.assertEquals(0, solrQuery.getStart());
 
         Assert.assertTrue(Arrays.asList(solrQuery.getFilterQueries()).contains("+go_expanded_id:(\"GO:0048511\")"));
         Assert.assertTrue(Arrays.asList(solrQuery.getFilterQueries()).contains("+dataset:(\"Cancer\")"));

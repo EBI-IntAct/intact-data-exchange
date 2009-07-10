@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.obo.dataadapter.OBOParseException;
 import org.obo.datamodel.*;
 import org.obo.datamodel.impl.*;
- 
+import uk.ac.ebi.intact.business.IntactTransactionException;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.CvDagObject;
@@ -57,7 +57,7 @@ public class CvExporterTest {
     private List<CvDagObject> allCvs;
 
     @Before
-    public void prepareCvs() throws OBOParseException, IOException, PsiLoaderException {
+    public void prepareCvs() throws OBOParseException, IOException, PsiLoaderException, IntactTransactionException {
 
         //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
         OBOSession oboSession = OboUtils.createOBOSession( CvExporterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));

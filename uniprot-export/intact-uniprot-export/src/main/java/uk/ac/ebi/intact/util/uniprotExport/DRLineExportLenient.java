@@ -6,8 +6,8 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
 import org.apache.commons.cli.*;
-import uk.ac.ebi.intact.core.IntactException;
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.business.IntactException;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 
 import java.io.*;

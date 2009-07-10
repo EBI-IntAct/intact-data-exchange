@@ -19,21 +19,17 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.junit.Assert;
 import org.junit.Test;
-import org.obo.datamodel.IdentifiedObject;
-import org.obo.datamodel.OBOObject;
-import org.obo.datamodel.OBOSession;
-import org.obo.datamodel.TermCategory;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import org.obo.datamodel.*;
 import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
+import uk.ac.ebi.intact.dataexchange.cvutils.services.OntologyMergerImpl;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -43,7 +39,7 @@ import java.util.List;
  * @version $Id$
  * @since 2.0.1
  */
-public class CvObjectOntologyBuilderTest extends IntactBasicTestCase{
+public class CvObjectOntologyBuilderTest {
 
     private static int counter = 1;
 

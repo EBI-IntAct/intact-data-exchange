@@ -6,11 +6,11 @@
 package uk.ac.ebi.intact.externalservices.searchengine;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.core.persistence.util.CgLibUtil;
+import uk.ac.ebi.intact.persistence.dao.CvObjectDao;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.persistence.util.CgLibUtil;
 
 import java.io.*;
 import java.text.SimpleDateFormat;

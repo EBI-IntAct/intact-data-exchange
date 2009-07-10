@@ -15,10 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvExperimentalPreparation;
@@ -29,10 +30,20 @@ import uk.ac.ebi.intact.model.CvExperimentalPreparation;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class ComponentEnricherTest extends EnricherBasicTestCase {
+public class ComponentEnricherTest extends IntactBasicTestCase {
 
-    @Autowired
-    private ComponentEnricher enricher;
+     private ComponentEnricher enricher;
+
+    @Before
+    public void beforeMethod() {
+        enricher = ComponentEnricher.getInstance();
+    }
+
+    @After
+    public void afterMethod() {
+        enricher.close();
+        enricher = null;
+    }
 
     @Test
     public void enrich_default() throws Exception {

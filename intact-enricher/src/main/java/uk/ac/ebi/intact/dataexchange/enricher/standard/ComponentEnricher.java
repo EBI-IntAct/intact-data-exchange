@@ -15,11 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvExperimentalPreparation;
-import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.CvIdentification;
 
 /**
@@ -28,33 +25,37 @@ import uk.ac.ebi.intact.model.CvIdentification;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
 public class ComponentEnricher extends AnnotatedObjectEnricher<Component>{
 
-    @Autowired
-    private BioSourceEnricher bioSourceEnricher;
+     private static ThreadLocal<ComponentEnricher> instance = new ThreadLocal<ComponentEnricher>() {
+        @Override
+        protected ComponentEnricher initialValue() {
+            return new ComponentEnricher();
+        }
+    };
 
-    @Autowired
-    private InteractorEnricher interactorEnricher;
+    public static ComponentEnricher getInstance() {
+        return instance.get();
+    }
 
-    @Autowired
-    private CvObjectEnricher cvObjectEnricher;
-
-    public ComponentEnricher() {
+    protected ComponentEnricher() {
     }
 
     public void enrich(Component objectToEnrich) {
         if (objectToEnrich.getExpressedIn() != null) {
+            BioSourceEnricher bioSourceEnricher = BioSourceEnricher.getInstance();
             bioSourceEnricher.enrich(objectToEnrich.getExpressedIn());
         }
 
+        InteractorEnricher interactorEnricher = InteractorEnricher.getInstance();
         interactorEnricher.enrich(objectToEnrich.getInteractor());
 
+        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
         if (objectToEnrich.getCvBiologicalRole() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvBiologicalRole());
         }
-        for (CvExperimentalRole expRole : objectToEnrich.getExperimentalRoles()) {
-            cvObjectEnricher.enrich(expRole);
+        if (objectToEnrich.getCvExperimentalRole() != null) {
+            cvObjectEnricher.enrich(objectToEnrich.getCvExperimentalRole());
         }
         for (CvExperimentalPreparation experimentalPreparation : objectToEnrich.getExperimentalPreparations()) {
             cvObjectEnricher.enrich(experimentalPreparation);

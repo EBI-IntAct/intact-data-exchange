@@ -20,30 +20,30 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.model.builder.Row;
-import uk.ac.ebi.intact.commons.util.ETACalculator;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
-import uk.ac.ebi.intact.irefindex.seguid.RigidGenerator;
-import uk.ac.ebi.intact.irefindex.seguid.RogidGenerator;
-import uk.ac.ebi.intact.irefindex.seguid.SeguidException;
+import uk.ac.ebi.intact.business.IntactTransactionException;
+import uk.ac.ebi.intact.context.DataContext;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 import uk.ac.ebi.intact.psimitab.PsimitabTools;
-import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
-import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
-import uk.ac.ebi.intact.psimitab.converters.expansion.NotExpandableInteractionException;
-import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
+import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
+import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
+import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.commons.util.ETACalculator;
+import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
+import uk.ac.ebi.intact.irefindex.seguid.RogidGenerator;
+import uk.ac.ebi.intact.irefindex.seguid.SeguidException;
+import uk.ac.ebi.intact.irefindex.seguid.RigidGenerator;
 
 import javax.persistence.Query;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Creates a MITAB file where each line represents a single interaction. Data is retrieved from the database and
@@ -52,7 +52,6 @@ import java.util.List;
  * @author Samuel Kerrien (skerrien@ebi.ac.uk)
  * @version $Id$
  */
-@Deprecated
 public class DatabaseSimpleMitabExporter {
 
     private static final Log log = LogFactory.getLog( DatabaseSimpleMitabExporter.class );
@@ -65,9 +64,11 @@ public class DatabaseSimpleMitabExporter {
     public DatabaseSimpleMitabExporter() {
     }
 
-    public void exportAllInteractions(Writer mitabWriter) throws IOException {
+    public void exportAllInteractions(Writer mitabWriter) throws IOException, IntactTransactionException {
+        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
         final int interactionCount = daoFactory.getInteractorDao( InteractionImpl.class ).countAll();
+        IntactContext.getCurrentInstance().getDataContext().commitTransaction();
 
         final String allInteractorsHql = "from InteractorImpl where objclass = '" + InteractionImpl.class.getName()+"'";
         exportInteractions(allInteractorsHql, interactionCount, mitabWriter);
@@ -75,7 +76,7 @@ public class DatabaseSimpleMitabExporter {
 
     public void exportInteractions(String interactionHqlQuery,
                                    int interactionTotalCount,
-                                   Writer mitabWriter) throws IOException {
+                                   Writer mitabWriter) throws IOException, IntactTransactionException {
 
         if (interactionHqlQuery == null) {
             throw new NullPointerException("Query for interactions is null: interactionQuery");
@@ -95,9 +96,13 @@ public class DatabaseSimpleMitabExporter {
 
         // build the interaction clusters
 
+        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
         List<? extends Interaction> interactions = null;
 
-        InteractionConverter converter = new InteractionConverter();
+        Intact2BinaryInteractionConverter converter =
+                new Intact2BinaryInteractionConverter(null,  // no expansion here
+                                                      null); // no clustering at this stage.
 
         int firstResult = 0;
         int maxResults = 1;
@@ -108,6 +113,7 @@ public class DatabaseSimpleMitabExporter {
         final ExpansionStrategy expansion = new SpokeWithoutBaitExpansion();
 
         do {
+            dataContext.beginTransaction();
             interactions = findInteractions(interactionHqlQuery, firstResult, maxResults);
 
             firstResult = firstResult + maxResults;
@@ -116,26 +122,15 @@ public class DatabaseSimpleMitabExporter {
 
                 if (log.isTraceEnabled()) log.trace("Processing interaction: "+interaction.getShortLabel());
 
-                if (!expansion.isExpandable(interaction)) {
-                    if (log.isTraceEnabled()) log.trace("\tNot expandable. Skipped");
-                    continue;
-                }
-
                 // expand our interaction into binary
-                final Collection<Interaction> expandedInteractions;
-
-                try {
-                    expandedInteractions = expansion.expand( interaction );
-                } catch (NotExpandableInteractionException e) {
-                    throw new IllegalStateException("Should be expandable as we checked just before");
-                }
-
+                final Collection<Interaction> expandedInteractions = expansion.expand( interaction );
                 final boolean isExpanded = expandedInteractions.size() > 1;
                 if (log.isTraceEnabled()) log.trace( expansion.getName() + " generated "+ expandedInteractions.size() + " binary interactions");
 
                 for ( Interaction expandedInteraction : expandedInteractions ) {
-                    
-                    final IntactBinaryInteraction mitabInteraction = converter.toBinaryInteraction( expandedInteraction );
+
+                    final Collection<IntactBinaryInteraction> mitabInteractions = converter.convert( expandedInteraction );
+                    final IntactBinaryInteraction mitabInteraction = mitabInteractions.iterator().next();
 
                     //adding the expansion strategy here
                     if ( isExpanded ) {
@@ -192,6 +187,8 @@ public class DatabaseSimpleMitabExporter {
                     mitabWriter.flush();
                 }
             }
+
+            dataContext.commitTransaction();
 
         } while (!interactions.isEmpty());
 

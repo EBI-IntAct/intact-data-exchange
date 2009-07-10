@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.AnnotationConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractionConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractorConverterConfig;
@@ -20,8 +20,6 @@ import uk.ac.ebi.intact.model.Institution;
 public class ConverterContext {
 
     public static final Log log = LogFactory.getLog(ConverterContext.class);
-
-    private boolean generateExpandedXml;
 
     private InteractorConverterConfig configInteractor;
     
@@ -49,7 +47,6 @@ public class ConverterContext {
     }
 
     private ConverterContext() {
-        this.generateExpandedXml = false;
         this.configInteractor = new InteractorConverterConfig();
         this.configAnnotation = new AnnotationConverterConfig();
         this.configInteraction = new InteractionConverterConfig();
@@ -58,25 +55,10 @@ public class ConverterContext {
         resetLocation();
     }
 
-    public void configure( ExportProfile profile ) {
-        profile.configure( this );
-    }
-
-    public boolean isGenerateExpandedXml() {
-        return generateExpandedXml;
-    }
-
-    public boolean isGenerateCompactXml() {
-        return ! generateExpandedXml;
-    }
-
-    public void setGenerateExpandedXml( boolean generateExpandedXml ) {
-        this.generateExpandedXml = generateExpandedXml;
-    }
-
     public InteractorConverterConfig getInteractorConfig() {
         return configInteractor;
     }
+
 
     public AnnotationConverterConfig getAnnotationConfig() {
         return configAnnotation;

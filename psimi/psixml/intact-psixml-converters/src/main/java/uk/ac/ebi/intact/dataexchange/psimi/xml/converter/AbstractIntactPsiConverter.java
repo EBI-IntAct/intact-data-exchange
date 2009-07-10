@@ -15,7 +15,7 @@ import psidev.psi.mi.xml.model.Interaction;
 import java.util.Collection;
 
 /**
- * Abstract Intact Psi Converter.
+ * TODO comment this
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$

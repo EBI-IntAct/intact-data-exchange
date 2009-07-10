@@ -17,14 +17,13 @@ package uk.ac.ebi.intact.util.uniprotExport;
 
 import org.junit.After;
 import org.junit.Before;
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.core.config.CvPrimer;
-import uk.ac.ebi.intact.core.config.impl.SmallCvPrimer;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.config.impl.EssentialCvPrimer;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.CvTopic;
@@ -38,18 +37,34 @@ import uk.ac.ebi.intact.model.CvAliasType;
  */
 public abstract class UniprotExportTestCase extends IntactBasicTestCase {
 
+    @After
+    public void tearDown() throws Exception {
+        IntactContext.getCurrentInstance().getDataContext().commitAllActiveTransactions();
+    }
 
     @Before
     public void setUp() throws Exception {
-        IntactMockBuilder builder = new IntactMockBuilder();
-        final CvDatabase uniprotkb = builder.createCvObject(CvDatabase.class, CvDatabase.UNIPROT_MI_REF, CvDatabase.UNIPROT);
-        final CvXrefQualifier isoformParent = builder.createCvObject(CvXrefQualifier.class, CvXrefQualifier.ISOFORM_PARENT_MI_REF, CvXrefQualifier.ISOFORM_PARENT);
-        final CvTopic noUniprotUpdate = builder.createCvObject(CvTopic.class, null, CvTopic.NON_UNIPROT);
-        final CvTopic negative = builder.createCvObject(CvTopic.class, null, CvTopic.NEGATIVE);
-        final CvTopic ccNote = builder.createCvObject(CvTopic.class, null, "uniprot-cc-note");
-        final CvAliasType locusName = builder.createCvObject(CvAliasType.class, CvAliasType.LOCUS_NAME_MI_REF, "locus name");
-        final CvAliasType orfName = builder.createCvObject(CvAliasType.class, CvAliasType.ORF_NAME_MI_REF, "orf name");
+        SchemaUtils.createSchema( true );
+        IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
-        PersisterHelper.saveOrUpdate(uniprotkb, isoformParent, noUniprotUpdate, negative, ccNote, locusName, orfName);
+        DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+        EssentialCvPrimer cvPrimer = new EssentialCvPrimer( daoFactory ){
+            @Override
+            public void createCVs() {
+                super.createCVs();
+
+                IntactMockBuilder builder = new IntactMockBuilder( );
+                final CvDatabase uniprotkb = builder.createCvObject( CvDatabase.class, CvDatabase.UNIPROT_MI_REF, CvDatabase.UNIPROT );
+                final CvXrefQualifier isoformParent = builder.createCvObject( CvXrefQualifier.class, CvXrefQualifier.ISOFORM_PARENT_MI_REF, CvXrefQualifier.ISOFORM_PARENT );
+                final CvTopic noUniprotUpdate = builder.createCvObject( CvTopic.class, null, CvTopic.NON_UNIPROT );
+                final CvTopic negative = builder.createCvObject( CvTopic.class, null, CvTopic.NEGATIVE );
+                final CvTopic ccNote = builder.createCvObject( CvTopic.class, null, "uniprot-cc-note" );
+                final CvAliasType locusName = builder.createCvObject( CvAliasType.class, CvAliasType.LOCUS_NAME_MI_REF, "locus name" );
+                final CvAliasType orfName = builder.createCvObject( CvAliasType.class, CvAliasType.ORF_NAME_MI_REF, "orf name" );
+
+                PersisterHelper.saveOrUpdate( uniprotkb, isoformParent, noUniprotUpdate, negative, ccNote, locusName, orfName );
+            }
+        };
+        cvPrimer.createCVs();
     }
 }

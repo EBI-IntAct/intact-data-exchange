@@ -110,7 +110,7 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         final Parameter ip = bi.getParameters().iterator().next();
 
         Assert.assertEquals("kD", ip.getType());
-        Assert.assertEquals(4d, ip.getFactor(), 0d);
+        Assert.assertEquals(4d, ip.getFactor());
         Assert.assertEquals("kilodalton", ip.getUnit());
 
 

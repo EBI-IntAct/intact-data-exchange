@@ -16,23 +16,22 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.context.IntactContext;
+import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactUnit;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
+import java.util.Date;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -40,20 +39,20 @@ import java.util.List;
  */
 public class CvUtilsTest extends IntactBasicTestCase {
 
-    private List<CvDagObject> ontology;
 
-    @Autowired
-    private PersisterHelper persisterHelper;
 
-    @Before
-    public void before() throws Exception {
+
+    private static List<CvDagObject> ontology;
+
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
         OBOSession oboSession = OboUtils.createOBOSession( CvUtilsTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
         CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
         ontology = ontologyBuilder.getAllCvs();
     }
 
     @Test
-    @DirtiesContext
     public void findLowerCommonAncestor() throws Exception {
         Assert.assertEquals( "MI:0116", CvUtils.findLowestCommonAncestor( ontology, "MI:0252", "MI:0505" ) );
         Assert.assertEquals( "MI:0505", CvUtils.findLowestCommonAncestor( ontology, "MI:0253", "MI:0505" ) );
@@ -64,40 +63,43 @@ public class CvUtilsTest extends IntactBasicTestCase {
 
 
     @Test
-    @DirtiesContext
     public void getCvsInIntactNotInPsiAndDateTest() throws Exception {
+        new IntactUnit().createSchema( true );
+
         String DATE_FORMAT = "yyyy-MM-dd";
         SimpleDateFormat sdf = new SimpleDateFormat( DATE_FORMAT );
 
         Institution owner = IntactContext.getCurrentInstance().getInstitution();
 
+        beginTransaction();
+
         CvObject twoHybrid = CvObjectUtils.createCvObject( owner, CvInteraction.class, "MI:0018", "two hybrid" );
         twoHybrid.setCreated( sdf.parse( "2008-06-17" ) );
-        persisterHelper.save( twoHybrid );
+        PersisterHelper.saveOrUpdate( twoHybrid );
 
         CvObject exp = CvObjectUtils.createCvObject( owner, CvInteraction.class, "MI:0045", "experimental interac" );
         exp.setCreated( sdf.parse( "2008-06-18" ) );
-        persisterHelper.save(exp );
+        PersisterHelper.saveOrUpdate( exp );
 
         CvObject negative = CvObjectUtils.createCvObject( owner, CvTopic.class, null, "negative" );
-        negative.setCreated( sdf.parse( "2008-06-20" ) );
-        persisterHelper.save( negative );
+        negative.setCreated( sdf.parse( "2008-06-19" ) );
+        PersisterHelper.saveOrUpdate( negative );
 
         CvObject positive = CvObjectUtils.createCvObject( owner, CvTopic.class, null, "positive" );
         positive.setCreated( sdf.parse( "2008-06-20" ) );
-        persisterHelper.save( positive );
+        PersisterHelper.saveOrUpdate( positive );
 
         CvObject hippocampus = CvObjectUtils.createCvObject( owner, CvTissue.class, null, "hippocampus" );
         hippocampus.setCreated( sdf.parse( "2008-06-21" ) );
-        persisterHelper.save( hippocampus );
+        PersisterHelper.saveOrUpdate( hippocampus );
 
         CvObject pc12 = CvObjectUtils.createCvObject( owner, CvCellType.class, null, "pc12" );
         pc12.setCreated( sdf.parse( "2008-06-22" ) );
-        persisterHelper.save( pc12 );
+        PersisterHelper.saveOrUpdate( pc12 );
 
         Collection<String> exclusionList = new ArrayList<String>();
-        exclusionList.add( CvCellType.class.getName() );
-        exclusionList.add( CvTissue.class.getName() );
+        exclusionList.add( "uk.ac.ebi.intact.model.CvCellType" );
+        exclusionList.add( "uk.ac.ebi.intact.model.CvTissue" );
 
 
         List<CvObject> notInPsiCvs = CvUtils.getCvsInIntactNotInPsi(exclusionList);
@@ -110,13 +112,16 @@ public class CvUtilsTest extends IntactBasicTestCase {
         List<CvObject> cvsbefore = CvUtils.getCVsAddedBefore( cutoffDate,null );
         Assert.assertEquals( 2, cvsbefore.size() );
 
-        // it should be 6+3 terms(intact+identity+psi-mi)
+        // it should be 3+3 terms(intact+identity+psi-mi)
         List<CvObject> cvsafter = CvUtils.getCvsAddedAfter( cutoffDate,null );
-        Assert.assertEquals( 10, cvsafter.size() );
+        Assert.assertEquals( 6, cvsafter.size() );
 
         //with exclusion list
         List<CvObject> cvsafterWithExclusion = CvUtils.getCvsAddedAfter( cutoffDate,exclusionList );
-        Assert.assertEquals( 8, cvsafterWithExclusion.size() );
+        Assert.assertEquals( 4, cvsafterWithExclusion.size() );
+
+        //one term which is added on the date provided (2008-06-19) is left out
+        commitTransaction();
     
     }
 

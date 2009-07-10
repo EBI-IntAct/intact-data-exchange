@@ -17,9 +17,9 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.model.EntrySet;
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 
 import java.io.File;

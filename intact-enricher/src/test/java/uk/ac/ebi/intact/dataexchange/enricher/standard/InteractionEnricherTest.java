@@ -15,10 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.model.Experiment;
@@ -31,14 +32,21 @@ import uk.ac.ebi.intact.model.Interactor;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InteractionEnricherTest extends EnricherBasicTestCase {
+public class InteractionEnricherTest extends IntactBasicTestCase {
 
-    @Autowired
     private InteractionEnricher enricher;
 
-    @Autowired
-    private EnricherContext enricherContext;
-    
+    @Before
+    public void beforeMethod() {
+        enricher = InteractionEnricher.getInstance();
+    }
+
+    @After
+    public void afterMethod() {
+        enricher.close();
+        enricher = null;
+    }
+
     @Test
     public void enrich_default() {
         BioSource ecoli = getMockBuilder().createBioSource(83333, "lala");
@@ -67,7 +75,7 @@ public class InteractionEnricherTest extends EnricherBasicTestCase {
 
         Interaction interaction = getMockBuilder().createInteraction("myInteraction", interactor1, interactor2, experiment);
 
-        enricherContext.getConfig().setUpdateInteractionShortLabels(true);
+        EnricherContext.getInstance().getConfig().setUpdateInteractionShortLabels(true);
 
         enricher.enrich(interaction);
 
@@ -88,7 +96,7 @@ public class InteractionEnricherTest extends EnricherBasicTestCase {
 
         Interaction interaction = getMockBuilder().createInteraction("myInteraction", interactor1, interactor2, experiment);
 
-        enricherContext.getConfig().setUpdateInteractionShortLabels(true);
+        EnricherContext.getInstance().getConfig().setUpdateInteractionShortLabels(true);
 
         enricher.enrich(interaction);
 

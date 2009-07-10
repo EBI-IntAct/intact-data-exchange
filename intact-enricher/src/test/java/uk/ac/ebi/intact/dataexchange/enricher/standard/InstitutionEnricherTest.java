@@ -15,12 +15,17 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.model.BioSource;
+import uk.ac.ebi.intact.model.Protein;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.util.ProteinUtils;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
 /**
@@ -30,10 +35,21 @@ import uk.ac.ebi.intact.model.util.XrefUtils;
  * @version $Id$
  */
 
-public class InstitutionEnricherTest extends EnricherBasicTestCase {
+public class InstitutionEnricherTest extends IntactBasicTestCase {
 
-    @Autowired
     private InstitutionEnricher enricher;
+
+    @Before
+    public void beforeMethod() {
+        enricher = InstitutionEnricher.getInstance();
+    }
+
+    @After
+    public void afterMethod() {
+        enricher.close();
+        enricher = null;
+    }
+
 
     @Test
     public void enrich_intact() {
@@ -41,28 +57,28 @@ public class InstitutionEnricherTest extends EnricherBasicTestCase {
 
         enricher.enrich(ebi);
 
-        Assert.assertEquals("intact", ebi.getShortLabel());
+        Assert.assertEquals("IntAct", ebi.getShortLabel());
         Assert.assertEquals(CvDatabase.INTACT_MI_REF, XrefUtils.getPsiMiIdentityXref(ebi).getPrimaryId());
     }
 
     @Test
     public void enrich_mint() {
-        Institution mint = new Institution("mint");
+        Institution ebi = new Institution("mint");
 
-        enricher.enrich(mint);
+        enricher.enrich(ebi);
 
-        Assert.assertEquals("mint", mint.getShortLabel());
-        Assert.assertEquals(CvDatabase.MINT_MI_REF, XrefUtils.getPsiMiIdentityXref(mint).getPrimaryId());
+        Assert.assertEquals("MINT", ebi.getShortLabel());
+        Assert.assertEquals(CvDatabase.MINT_MI_REF, XrefUtils.getPsiMiIdentityXref(ebi).getPrimaryId());
     }
     
     @Test
     public void enrich_dip() {
-        Institution dip = new Institution("ucla");
+        Institution ebi = new Institution("ucla");
 
-        enricher.enrich(dip);
+        enricher.enrich(ebi);
 
-        Assert.assertEquals("dip", dip.getShortLabel());
-        Assert.assertEquals(CvDatabase.DIP_MI_REF, XrefUtils.getPsiMiIdentityXref(dip).getPrimaryId());
+        Assert.assertEquals("DIP", ebi.getShortLabel());
+        Assert.assertEquals(CvDatabase.DIP_MI_REF, XrefUtils.getPsiMiIdentityXref(ebi).getPrimaryId());
     }
 
 }

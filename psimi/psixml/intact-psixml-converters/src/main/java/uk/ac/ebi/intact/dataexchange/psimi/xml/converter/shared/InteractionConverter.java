@@ -36,7 +36,7 @@ import uk.ac.ebi.intact.model.util.XrefUtils;
 import java.util.*;
 
 /**
- * Interaction Converter.
+ * TODO comment this
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -207,11 +207,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         ExperimentConverter experimentConverter = new ExperimentConverter(getInstitution());
         for (Experiment exp : intactObject.getExperiments()) {
             ExperimentDescription expDescription = experimentConverter.intactToPsi(exp);
-            if( ConverterContext.getInstance().isGenerateExpandedXml() ) {
-                interaction.getExperiments().add(expDescription);
-            } else {
-                interaction.getExperimentRefs().add(new ExperimentRef(expDescription.getId()));
-            }
+            interaction.getExperiments().add(expDescription);
+            interaction.getExperimentRefs().add(new ExperimentRef(expDescription.getId()));
         }
 
         ParticipantConverter participantConverter = new ParticipantConverter(getInstitution());

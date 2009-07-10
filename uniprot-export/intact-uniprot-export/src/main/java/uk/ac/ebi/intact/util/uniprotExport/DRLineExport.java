@@ -6,8 +6,8 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
 import org.apache.commons.cli.*;
-import uk.ac.ebi.intact.core.IntactException;
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.business.IntactException;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.util.MemoryMonitor;
 
@@ -350,7 +350,7 @@ public class DRLineExport extends LineExport {
      * @return a distinct set of Uniprot ID of the protein eligible to export in Swiss-Prot.
      *
      * @throws java.sql.SQLException error when handling the JDBC connection or query.
-     * @throws uk.ac.ebi.intact.core.business.IntactException
+     * @throws uk.ac.ebi.intact.business.IntactException
      *
      * @throws uk.ac.ebi.intact.util.uniprotExport.CCLineExport.DatabaseContentException
      *                               if the initialisation process failed (CV not found)

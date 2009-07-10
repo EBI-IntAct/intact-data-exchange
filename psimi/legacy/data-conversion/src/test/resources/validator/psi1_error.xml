@@ -1,0 +1,101 @@
+<entrySet level="1" version="1" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/xml/src/MIF.xsd">
+  <entry>
+    <source releaseDate="2006-08-18">
+      <names>
+        <shortLabel>European Bioinformatics Institute</shortLabel>
+      </names>
+      <bibref>
+        <xref>
+          <primaryRef db="pubmed" id="14681455"/>
+        </xref>
+      </bibref>
+      <xref>
+        <primaryRef db="psi-mi" id="MI:0469"/>
+      </xref>
+      <attributeList>
+        <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom</attribute>
+        <attribute name="url">http://www.ebi.ac.uk</attribute>
+      </attributeList>
+    </source>
+    <experimentList>
+      <experimentDescription id="EBI-603511">
+        <names>
+          <shortLabel>abdul_manan-1999-1</shortLabel>
+          <fullName>Structure of Cdc42 in complex with the GTPase-binding domain of the &apos;Wiskott-Aldrich syndrome&apos; protein.</fullName>
+        </names>
+        <bibref>
+          <xref>
+            <primaryRef db="pubmed" id="10360578"/>
+          </xref>
+        </bibref>
+        <xref>
+          <primaryRef db="intact" id="EBI-603511" secondary="abdul_manan-1999-1"/>
+          <secondaryRef db="newt" id="9606" secondary="human"/>
+        </xref>
+        <hostOrganism ncbiTaxId="-1">
+          <names>
+            <shortLabel>in vitro</shortLabel>
+          </names>
+        </hostOrganism>
+        <interactionDetection>
+          <names>
+            <shortLabel>nmr</shortLabel>
+            <fullName>nuclear magnetic resonance</fullName>
+          </names>
+          <xref>
+            <primaryRef db="psi-mi" id="MI:0077"/>
+            <secondaryRef db="pubmed" id="12120505"/>
+            <secondaryRef db="pubmed" id="12062432"/>
+          </xref>
+        </interactionDetection>
+        <participantDetection>
+          <names>
+            <shortLabel>predetermined</shortLabel>
+            <fullName>predetermined participant</fullName>
+          </names>
+          <xref>
+            <primaryRef db="psi-mi" id="MI:0396"/>
+            <secondaryRef db="pubmed" id="7940758"/>
+            <secondaryRef db="pubmed" id="14755292"/>
+          </xref>
+        </participantDetection>
+        <attributeList>
+          <attribute name="author-list">Abdul-Manan N., Aghazadeh B., Liu GA., Majumdar A., Ouerfelli O., Siminovitch KA., Rosen MK.</attribute>
+          <attribute name="publication-year">1999</attribute>
+          <attribute name="journal">Nature (0028-0836)</attribute>
+        </attributeList>
+      </experimentDescription>
+    </experimentList>
+    <interactorList/>
+    <interactionList>
+      <interaction>
+        <names>
+          <shortLabel>wasp-cdc42-1</shortLabel>
+          <fullName>RMN: structure of Cdc42 in complex with the effector WASP</fullName>
+        </names>
+        <experimentList>
+          <experimentRef ref="EBI-603511"/>
+        </experimentList>
+        <participantList/>
+        <interactionType>
+          <names>
+            <shortLabel>aggregation</shortLabel>
+            <fullName>aggregation</fullName>
+          </names>
+          <xref>
+            <primaryRef db="psi-mi" id="MI:0191"/>
+          </xref>
+        </interactionType>
+        <xref>
+          <primaryRef db="intact" id="EBI-603513" secondary="wasp-cdc42-1"/>
+          <secondaryRef db="pdb" id="1cee"/>
+          <secondaryRef db="go" id="GO:0007015" secondary="actin filament organization"/>
+        </xref>
+        <attributeList>
+          <attribute name="3d-structure">The non hydrolysable GTP analogue GMPPPCP and Mg are bound to Cdc42</attribute>
+          <attribute name="kd">1.0</attribute>
+        </attributeList>
+      </interaction>
+    </interactionList>
+  </entry>
+</entrySet>

@@ -15,25 +15,23 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.converter;
 
+import org.apache.commons.collections.map.LRUMap;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.builder.*;
+import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.FieldNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.ByInteractorTypeRowDataAdder;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.GeneNameSelectiveAdder;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.IdSelectiveAdder;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.TypeFieldFilter;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BaseFieldEnricher;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.FieldEnricher;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.OntologyFieldEnricher;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.LazyLoadedOntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Converts from Row to SolrDocument and viceversa.
@@ -45,28 +43,49 @@ public class SolrDocumentConverter {
 
     private DocumentDefinition documentDefintion;
 
+    private Map<String,Collection<Field>> cvCache;
+    private Map<String,OntologyTerm> ontologyTermCache;
+
+    private Set<String> expandableOntologies;
+
     /**
      * Access to the Ontology index.
      */
-    private FieldEnricher fieldEnricher;
+    private OntologySearcher ontologySearcher;
 
     public SolrDocumentConverter() {
         this(new IntactDocumentDefinition());
     }
 
     public SolrDocumentConverter(DocumentDefinition documentDefintion) {
+        expandableOntologies = new HashSet<String>( );
+        createDefaultExpandableOntologies();
+
         this.documentDefintion = documentDefintion;
-        this.fieldEnricher = new BaseFieldEnricher();
+        cvCache = new LRUMap(10000);
+        ontologyTermCache = new LRUMap(10000);
     }
 
     public SolrDocumentConverter(DocumentDefinition documentDefintion,
-                                 FieldEnricher fieldEnricher) {
+                                 OntologySearcher ontologySearcher) {
         this(documentDefintion);
-        this.fieldEnricher = fieldEnricher;
+        this.ontologySearcher = ontologySearcher;
     }
 
-    public SolrDocumentConverter(DocumentDefinition documentDefintion, OntologySearcher ontologySearcher) {
-        this(documentDefintion, new OntologyFieldEnricher(ontologySearcher));
+    private void createDefaultExpandableOntologies() {
+        expandableOntologies.add( FieldNames.DB_GO );
+        expandableOntologies.add( FieldNames.DB_INTERPRO );
+        expandableOntologies.add( FieldNames.DB_CHEBI );
+        expandableOntologies.add( FieldNames.DB_PSIMI );
+        expandableOntologies.add( "taxid" );
+    }
+
+    public Set<String> getExpandableOntologies() {
+        return expandableOntologies;
+    }
+
+    public void setExpandableOntologies( Set<String> expandableOntologies ) {
+        this.expandableOntologies = expandableOntologies;
     }
 
     public SolrInputDocument toSolrDocument(String mitabLine) throws SolrServerException {
@@ -262,40 +281,34 @@ public class SolrDocumentConverter {
         Column column = row.getColumnByIndex( columnIndex );
 
         for (Field field : column.getFields()) {
-            if (fieldEnricher.isExpandableOntology(field.getType())) {
-                try {
-                    field = fieldEnricher.enrich(field);
-                } catch (Exception e) {
-                    throw new SolrServerException("Problem enriching field: "+field, e);
-                }
+            if (isExpandableOntology(field.getType())) {
+                field = enrichField(field);
 
-                addField(doc, field.getType(), field.getValue());
+                doc.addField(field.getType(), field.getValue());
 
                 if (field.getDescription() != null) {
-                    addField(doc, "spell", field.getDescription());
+                    doc.addField("spell", field.getDescription());
                 }
 
                 boolean includeItself = true;
 
-                for (Field parentField : fieldEnricher.getAllParents(field, includeItself)) {
+                for (Field parentField : getAllParents(field, includeItself)) {
                     addExpandedFields(doc, fieldName, parentField);
-                    addExpandedFields(doc, field.getType(), parentField);
-                    addField(doc, field.getType(), parentField.getValue());
                 }
             }
 
             if (expandableColumn) {
-                addField(doc, fieldName+"_exact", field.toString(), boost);
-                addField(doc, fieldName+"_exact_id", field.getValue(), boost);
+                doc.addField(fieldName+"_exact", field.toString(), boost);
+                doc.addField(fieldName+"_exact_id", field.getValue(), boost);
             }
             addDescriptionField(doc, field.getType(), field);
-            addField(doc, fieldName, field.toString(), boost);
-            addField(doc, fieldName+"_ms", field.toString(), boost);
+            doc.addField(fieldName, field.toString(), boost);
+            doc.addField(fieldName+"_ms", field.toString(), boost);
 
             if (field.getType() != null) {
-                addField(doc, field.getType()+"_xref", field.getValue(), boost);
-                addField(doc, fieldName+"_"+field.getType()+"_xref", field.getValue(), boost);
-                addField(doc, fieldName+"_"+field.getType()+"_xref_ms", field.toString(), boost);
+                doc.addField(field.getType()+"_xref", field.getValue(), boost);
+                doc.addField(fieldName+"_"+field.getType()+"_xref", field.getValue(), boost);
+                doc.addField(fieldName+"_"+field.getType()+"_xref_ms", field.toString(), boost);
             }
 
             addDescriptionField(doc, field.getType(), field);
@@ -304,6 +317,27 @@ public class SolrDocumentConverter {
         }
     }
 
+    private Field enrichField(Field field) throws SolrServerException {
+        if (field == null) return null;
+        
+        final OntologyTerm ontologyTerm = findOntologyTerm(field);
+
+        if (ontologyTerm == null) return field;
+
+        return new Field(field.getType(), ontologyTerm.getId(), ontologyTerm.getName());
+    }
+
+    private OntologyTerm findOntologyTerm(Field field) throws SolrServerException {
+        if (ontologySearcher == null) {
+            return null;
+        }
+
+        if (ontologyTermCache.containsKey(field.getValue())) {
+            return ontologyTermCache.get(field.getValue());
+        }
+
+        return new LazyLoadedOntologyTerm(ontologySearcher, field.getValue(), field.getDescription());
+    }
 
     private void addFilteredField(Row row, SolrInputDocument doc, String fieldName, int columnIndex, FieldFilter filter) {
         Collection<Field> fields = getFieldsFromColumn(row, columnIndex, filter);
@@ -313,7 +347,7 @@ public class SolrDocumentConverter {
         }
 
         for (Field field : fields) {
-            addField(doc, fieldName, field.getValue());
+            doc.addField(fieldName, field.getValue());
         }
     }
 
@@ -346,23 +380,11 @@ public class SolrDocumentConverter {
     }
 
     private void addExpandedField(SolrInputDocument doc, Field field, String fieldPrefix) {
-        addField(doc, fieldPrefix+"_expanded", field.toString());
-        addField(doc, fieldPrefix+"_expanded_id", field.getValue());
-        addField(doc, fieldPrefix+"_expanded_ms", field.toString());
+        doc.addField(fieldPrefix+"_expanded", field.toString());
+        doc.addField(fieldPrefix+"_expanded_id", field.getValue());
+        doc.addField(fieldPrefix+"_expanded_ms", field.toString());
 
         addDescriptionField(doc, fieldPrefix+"_expanded", field);
-    }
-
-    private void addField(SolrInputDocument doc, String fieldName, String value) {
-        addField(doc, fieldName, value, 1.0f);
-    }
-
-    private void addField(SolrInputDocument doc, String fieldName, String value, float boost) {
-        final Collection<Object> existingValues = doc.getFieldValues(fieldName);
-
-        if (existingValues == null || !existingValues.contains(value)) {
-            doc.addField(fieldName, value, boost);
-        }
     }
 
     private void addDescriptionField(SolrInputDocument doc, String fieldPrefix, Field field) {
@@ -373,7 +395,61 @@ public class SolrDocumentConverter {
         }
     }
 
+    private boolean isExpandableOntology( String name ) {
+        return ( expandableOntologies.contains( name ) );
+    }
 
+    /**
+     * @param field         the field for which we want to get the parents
+     * @param includeItself if true, the passed field will be part of the collection (its description updated from the index)
+     * @return list of cv terms with parents and itself
+     */
+    private Collection<Field> getAllParents(psidev.psi.mi.tab.model.builder.Field field, boolean includeItself) throws SolrServerException {
+        if (ontologySearcher == null) {
+            return Collections.EMPTY_LIST;
+        }
 
-   
+        List<psidev.psi.mi.tab.model.builder.Field> allParents = null;
+
+        final String type = field.getType();
+
+        String identifier = field.getValue();
+
+        if (cvCache.containsKey(identifier)) {
+            return cvCache.get(identifier);
+        }
+
+        // fetch parents and fill the field list
+        final OntologyTerm ontologyTerm = findOntologyTerm(field);
+        final Set<OntologyTerm> parents = ontologyTerm.getAllParentsToRoot();
+
+        allParents = convertTermsToFields(type, parents);
+
+        if (includeItself) {
+            Field updatedItself = convertTermToField(type, ontologyTerm);
+            allParents.add(updatedItself);
+        }
+
+        cvCache.put(identifier, allParents);
+
+        return (allParents != null ? allParents : Collections.EMPTY_LIST);
+    }
+
+    private List<psidev.psi.mi.tab.model.builder.Field> convertTermsToFields( String type, Set<OntologyTerm> terms ) {
+        List<psidev.psi.mi.tab.model.builder.Field> fields =
+                new ArrayList<psidev.psi.mi.tab.model.builder.Field>( terms.size());
+
+        for ( OntologyTerm term : terms ) {
+            Field field = convertTermToField(type, term);
+            fields.add( field );
+        }
+
+        return fields;
+    }
+
+    private Field convertTermToField(String type, OntologyTerm term) {
+        Field field =
+                new Field( type, term.getId(), term.getName() );
+        return field;
+    }
 }

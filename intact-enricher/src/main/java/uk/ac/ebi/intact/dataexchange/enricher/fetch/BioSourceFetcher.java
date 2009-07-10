@@ -19,12 +19,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import uk.ac.ebi.intact.bridges.taxonomy.OLSTaxonomyService;
-import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyService;
-import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
-import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
+import uk.ac.ebi.intact.bridges.taxonomy.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 
@@ -34,7 +29,6 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
 public class BioSourceFetcher {
 
     /**
@@ -42,8 +36,16 @@ public class BioSourceFetcher {
      */
     public static final Log log = LogFactory.getLog(BioSourceFetcher.class);
 
-    @Autowired
-    private EnricherContext enricherContext;
+    private static ThreadLocal<BioSourceFetcher> instance = new ThreadLocal<BioSourceFetcher>() {
+        @Override
+        protected BioSourceFetcher initialValue() {
+            return new BioSourceFetcher();
+        }
+    };
+
+    public static BioSourceFetcher getInstance() {
+        return instance.get();
+    }
 
     private TaxonomyService taxonomyService;
 
@@ -52,7 +54,7 @@ public class BioSourceFetcher {
     }
 
     public TaxonomyTerm fetchByTaxId(int taxId) {
-        Cache bioSourceCache = enricherContext.getCache("BioSource");
+        Cache bioSourceCache = EnricherContext.getInstance().getCache("BioSource");
 
         TaxonomyTerm term = null;
 

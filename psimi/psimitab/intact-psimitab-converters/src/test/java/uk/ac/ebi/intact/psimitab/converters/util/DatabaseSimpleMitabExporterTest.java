@@ -19,7 +19,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.util.SchemaUtils;
@@ -42,11 +42,13 @@ public class DatabaseSimpleMitabExporterTest extends IntactBasicTestCase {
     @Before
     public void before() throws Exception {
         exporter = new DatabaseSimpleMitabExporter();
+        SchemaUtils.createSchema();
     }
 
     @After
     public void after() throws Exception {
         exporter = null;
+        IntactContext.closeCurrentInstance();
     }
 
     @Test

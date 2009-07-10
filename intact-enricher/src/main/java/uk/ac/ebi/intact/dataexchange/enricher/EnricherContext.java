@@ -19,16 +19,18 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.obo.dataadapter.OBOParseException;
 import org.obo.datamodel.OBOSession;
-import org.springframework.beans.factory.DisposableBean;
-import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
+import org.obo.dataadapter.OBOParseException;
+import uk.ac.ebi.intact.dataexchange.cvutils.PSILoader;
 import uk.ac.ebi.intact.dataexchange.cvutils.PsiLoaderException;
+import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
+import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.model.CvDagObject;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -39,7 +41,7 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class EnricherContext implements DisposableBean {
+public class EnricherContext {
 
     /**
      * Sets up a logger for that class.
@@ -49,8 +51,19 @@ public class EnricherContext implements DisposableBean {
     private EnricherConfig config;
     private List<CvDagObject> ontology;
 
-    public EnricherContext(EnricherConfig enricherConfig) {
-        this.config = enricherConfig;
+    private static ThreadLocal<EnricherContext> instance = new ThreadLocal<EnricherContext>() {
+        @Override
+        protected EnricherContext initialValue() {
+            return new EnricherContext();
+        }
+    };
+
+    public static EnricherContext getInstance() {
+        return instance.get();
+    }
+
+    private EnricherContext() {
+        this.config = new EnricherConfig();
 
         InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/META-INF/ehcache-enricher.xml");
         CacheManager.create(ehcacheConfig);
@@ -111,15 +124,8 @@ public class EnricherContext implements DisposableBean {
     }
 
     public void close() {
-        try {
-            destroy();
-        } catch (Exception e) {
-            throw new EnricherException(e);
-        }
-    }
-
-    public void destroy() throws Exception {
         if (log.isDebugEnabled()) log.debug("Clearing all caches from CacheManager");
         CacheManager.getInstance().clearAll();
     }
+
 }

@@ -7,13 +7,11 @@ package uk.ac.ebi.intact.externalservices.searchengine;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.transaction.TransactionStatus;
-
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.business.IntactTransactionException;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.core.persistence.dao.InteractorDao;
-import uk.ac.ebi.intact.core.IntactTransactionException;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.persistence.dao.InteractorDao;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,12 +83,11 @@ public class InteractorIndexExporter extends AbstractIndexExporter<Interactor> {
 
             InteractorDao<InteractorImpl> interactorDao = daoFactory.getInteractorDao();
 
-            TransactionStatus transactionStatus =
-                    IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+            IntactContext.getCurrentInstance().getDataContext().beginTransaction();
             count = interactorDao.countInteractorInvolvedInInteraction();
 
             try {
-                IntactContext.getCurrentInstance().getDataContext().commitTransaction(transactionStatus);
+                IntactContext.getCurrentInstance().getDataContext().commitTransaction();
             } catch ( IntactTransactionException e ) {
                 throw new IndexerException( "Error while closing transaction.", e );
             }
@@ -107,8 +104,7 @@ public class InteractorIndexExporter extends AbstractIndexExporter<Interactor> {
         while ( current < count ) {
             DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
             InteractorDao pdao = daoFactory.getInteractorDao();
-            TransactionStatus transactionStatus =
-                    IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+            IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
             List<Interactor> interactors = pdao.getInteractorInvolvedInInteraction( current, CHUNK_SIZE );
 
@@ -123,7 +119,7 @@ public class InteractorIndexExporter extends AbstractIndexExporter<Interactor> {
             }
 
             try {
-                IntactContext.getCurrentInstance().getDataContext().commitTransaction(transactionStatus);
+                IntactContext.getCurrentInstance().getDataContext().commitTransaction();
             } catch ( IntactTransactionException e ) {
                 throw new IndexerException( "Error when closing transaction.", e );
             }

@@ -7,13 +7,11 @@ package uk.ac.ebi.intact.externalservices.searchengine;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.transaction.TransactionStatus;
-
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.business.IntactTransactionException;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.core.persistence.dao.InteractionDao;
-import uk.ac.ebi.intact.core.IntactTransactionException;
+import uk.ac.ebi.intact.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.persistence.dao.InteractionDao;
 
 import java.io.File;
 import java.io.IOException;
@@ -179,8 +177,7 @@ public class InteractionIndexExporter extends AbstractIndexExporter<Interaction>
         while ( current < count ) {
             DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
             InteractionDao idao = daoFactory.getInteractionDao();
-
-            TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+            IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
             List<InteractionImpl> interactions = idao.getAll( current, CHUNK_SIZE );
 
@@ -195,7 +192,7 @@ public class InteractionIndexExporter extends AbstractIndexExporter<Interaction>
             }
 
             try {
-                IntactContext.getCurrentInstance().getDataContext().commitTransaction(transactionStatus);
+                IntactContext.getCurrentInstance().getDataContext().commitTransaction();
             } catch ( IntactTransactionException e ) {
                 throw new IndexerException( e );
             }
@@ -208,13 +205,13 @@ public class InteractionIndexExporter extends AbstractIndexExporter<Interaction>
             DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
             InteractionDao idao = daoFactory.getInteractionDao();
 
-            TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+            IntactContext.getCurrentInstance().getDataContext().beginTransaction();
             // TODO do not take into account interactor that do not interact.
 
             count = idao.countAll();
 
             try {
-                IntactContext.getCurrentInstance().getDataContext().commitTransaction(transactionStatus);
+                IntactContext.getCurrentInstance().getDataContext().commitTransaction();
             } catch ( IntactTransactionException e ) {
                 throw new IndexerException( e );
             }

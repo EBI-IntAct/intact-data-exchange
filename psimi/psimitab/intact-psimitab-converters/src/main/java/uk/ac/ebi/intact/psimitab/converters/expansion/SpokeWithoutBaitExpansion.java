@@ -66,11 +66,6 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
         return interactions;
     }
 
-    @Override
-    public boolean isExpandable(Interaction interaction) {
-        return isExpandableBasic(interaction);
-    }
-
     ////////////////////////////
     // Private methods
 

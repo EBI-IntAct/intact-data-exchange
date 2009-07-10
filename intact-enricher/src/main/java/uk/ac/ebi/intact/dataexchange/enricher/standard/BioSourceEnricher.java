@@ -15,8 +15,6 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.BioSourceFetcher;
@@ -35,16 +33,20 @@ import uk.ac.ebi.intact.model.util.XrefUtils;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
 public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
 
-    @Autowired
-    private BioSourceFetcher bioSourceFetcher;
+     private static ThreadLocal<BioSourceEnricher> instance = new ThreadLocal<BioSourceEnricher>() {
+        @Override
+        protected BioSourceEnricher initialValue() {
+            return new BioSourceEnricher();
+        }
+    };
 
-    @Autowired
-    private CvObjectEnricher cvObjectEnricher;
+    public static BioSourceEnricher getInstance() {
+        return instance.get();
+    }
 
-    public BioSourceEnricher() {
+    protected BioSourceEnricher() {
     }
 
     public void enrich(BioSource objectToEnrich) {
@@ -56,7 +58,7 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
             throw new EnricherException("Biosource has an invalid taxid: "+taxId+" ("+objectToEnrich.getFullName()+")");
         }
 
-        TaxonomyTerm term = bioSourceFetcher.fetchByTaxId(taxId);
+        TaxonomyTerm term = BioSourceFetcher.getInstance().fetchByTaxId(taxId);
 
         String label = term.getCommonName();
         String fullName = term.getScientificName();
@@ -74,6 +76,7 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
             objectToEnrich.setFullName(fullName);
         }
 
+        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
         if (objectToEnrich.getCvCellType() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvCellType());
         }

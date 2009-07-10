@@ -41,7 +41,7 @@ public class GeneNameSelectiveAdder implements RowDataSelectiveAdder {
 
     private void addGeneNames(SolrInputDocument doc, Column column) {
         for (Field field : column.getFields()) {
-            if ("uniprotkb".equals(field.getType()) && "gene name synonym".equals(field.getDescription())) {
+            if ("uniprotkb".equals(field.getType()) && "gene name".equals(field.getDescription())) {
                 doc.addField(FieldNames.GENE_NAME, field.getValue());
             }
         }

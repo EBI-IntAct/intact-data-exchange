@@ -20,14 +20,13 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Controller;
-import uk.ac.ebi.chebi.webapps.chebiWS.client.ChebiWebServiceClient;
-import uk.ac.ebi.chebi.webapps.chebiWS.model.ChebiWebServiceFault_Exception;
-import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
 import uk.ac.ebi.intact.uniprot.service.UniprotRemoteService;
 import uk.ac.ebi.intact.uniprot.service.UniprotService;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
+import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
+import uk.ac.ebi.chebi.webapps.chebiWS.model.ChebiWebServiceFault_Exception;
+import uk.ac.ebi.chebi.webapps.chebiWS.client.ChebiWebServiceClient;
 
 import java.util.Collection;
 
@@ -37,13 +36,22 @@ import java.util.Collection;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
 public class InteractorFetcher {
 
     private static final Log log = LogFactory.getLog(InteractorFetcher.class);
 
+    private static ThreadLocal<InteractorFetcher> instance = new ThreadLocal<InteractorFetcher>() {
+        @Override
+        protected InteractorFetcher initialValue() {
+            return new InteractorFetcher();
+        }
+    };
     private UniprotService uniprotRemoteService;
     private ChebiWebServiceClient chebiServiceClient;
+
+    public static InteractorFetcher getInstance() {
+        return instance.get();
+    }
 
     public InteractorFetcher() {
         uniprotRemoteService = new UniprotRemoteService();

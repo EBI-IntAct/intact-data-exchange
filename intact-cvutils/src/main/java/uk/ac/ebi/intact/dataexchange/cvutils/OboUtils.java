@@ -12,6 +12,8 @@ import org.apache.commons.logging.Log;
 import org.bbop.dataadapter.DataAdapterException;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDatasetFactory;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
+import uk.ac.ebi.intact.model.CvDagObject;
 
 import java.io.*;
 import java.net.URL;
@@ -93,6 +95,34 @@ public class OboUtils {
 
     public static AnnotationInfoDataset createAnnotationInfoDatasetFromResource( InputStream is, char separator, char delimiter ) throws IOException {
         return AnnotationInfoDatasetFactory.buildFromCsv( is, separator, delimiter );
+    }
+
+    @Deprecated
+    public static IntactOntology createOntologyFromOboLatestPsiMi() throws IOException, PsiLoaderException {
+        URL url = new URL( PSI_MI_OBO_LOCATION_OLD );
+        return createOntologyFromObo( url );
+    }
+
+    @Deprecated
+    public static IntactOntology createOntologyFromOboDefault( int revision ) throws IOException, PsiLoaderException {
+        URL url = new URL( PSI_MI_OBO_LOCATION_OLD + "?revision=" + revision );
+        return createOntologyFromObo( url );
+    }
+
+    @Deprecated
+    public static IntactOntology createOntologyFromObo( URL url ) throws IOException, PsiLoaderException {
+        PSILoader psi = new PSILoader();
+        IntactOntology ontology = psi.parseOboFile( url );
+
+        return ontology;
+    }
+
+    @Deprecated
+    public static IntactOntology createOntologyFromObo( File oboFile ) throws IOException, PsiLoaderException {
+        PSILoader psi = new PSILoader();
+        IntactOntology ontology = psi.parseOboFile( oboFile );
+
+        return ontology;
     }
 
     //////////////////////////

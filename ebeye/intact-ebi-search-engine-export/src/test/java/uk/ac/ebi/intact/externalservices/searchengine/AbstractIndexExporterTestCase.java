@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.externalservices.searchengine;
 import org.junit.Before;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactUnit;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
 
@@ -29,8 +30,15 @@ import uk.ac.ebi.intact.model.Interaction;
  */
 public abstract class AbstractIndexExporterTestCase extends IntactBasicTestCase {
 
+    @Before
+    public void resetSchema() throws Exception {
+        new IntactUnit().createSchema();
+    }
+
     protected void persistExperiment(Experiment experiment) throws Exception {
+        beginTransaction();
         PersisterHelper.saveOrUpdate(experiment);
+        commitTransaction();
     }
 
 }

@@ -20,7 +20,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.bbop.dataadapter.DataAdapterException;
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.util.LogUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.CvExporter;
 import uk.ac.ebi.intact.model.CvObject;

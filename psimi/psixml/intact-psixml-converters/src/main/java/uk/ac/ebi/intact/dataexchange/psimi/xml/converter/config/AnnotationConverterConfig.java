@@ -14,6 +14,8 @@ import uk.ac.ebi.intact.model.CvTopic;
  */
 public class AnnotationConverterConfig {
 
+
+
     /**
      * Only export Interactor Xref that have a CvDatabase that is in the list.
      */

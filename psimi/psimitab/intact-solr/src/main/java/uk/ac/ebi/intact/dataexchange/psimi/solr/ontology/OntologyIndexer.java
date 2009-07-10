@@ -23,12 +23,8 @@ import uk.ac.ebi.intact.bridges.ontologies.iterator.OboOntologyIterator;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.OntologyIterator;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.UniprotTaxonomyOntologyIterator;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.IntactSolrException;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
 
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.logging.LogManager;
-import java.util.logging.Level;
 
 /**
  * Indexes in a SOLR instance the ontologies passed as URL. The created index is useful
@@ -43,8 +39,6 @@ public class OntologyIndexer {
 
     public OntologyIndexer(SolrServer solrServer) {
         this.solrServer = solrServer;
-
-        SolrLogger.readFromLog4j();
     }
 
     public void indexObo(OntologyMapping[] ontologyMappings) throws IntactSolrException {

@@ -15,8 +15,6 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import uk.ac.ebi.intact.core.persister.DefaultEntityStateCopier;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
 import uk.ac.ebi.intact.model.CvObject;
@@ -28,13 +26,20 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
 public class CvObjectEnricher extends AnnotatedObjectEnricher<CvObject> {
 
-    @Autowired
-    private CvObjectFetcher cvObjectFetcher;
+    private static ThreadLocal<CvObjectEnricher> instance = new ThreadLocal<CvObjectEnricher>() {
+        @Override
+        protected CvObjectEnricher initialValue() {
+            return new CvObjectEnricher();
+        }
+    };
+
+    public static CvObjectEnricher getInstance() {
+        return instance.get();
+    }
     
-    public CvObjectEnricher() {
+    protected CvObjectEnricher() {
     }
 
     public void enrich(CvObject objectToEnrich) {
@@ -43,9 +48,9 @@ public class CvObjectEnricher extends AnnotatedObjectEnricher<CvObject> {
         CvObject referenceTerm;
 
         if (id != null) {
-            referenceTerm = cvObjectFetcher.fetchByTermId(objectToEnrich.getClass(), id);
+            referenceTerm = CvObjectFetcher.getInstance().fetchByTermId(objectToEnrich.getClass(), id);
         } else {
-            referenceTerm = cvObjectFetcher.fetchByShortLabel(objectToEnrich.getClass(), objectToEnrich.getShortLabel());
+            referenceTerm = CvObjectFetcher.getInstance().fetchByShortLabel(objectToEnrich.getClass(), objectToEnrich.getShortLabel());
         }
 
         if (referenceTerm != null) {

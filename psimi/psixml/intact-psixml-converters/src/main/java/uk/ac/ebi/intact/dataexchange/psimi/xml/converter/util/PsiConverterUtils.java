@@ -241,15 +241,13 @@ public class PsiConverterUtils {
     public static Collection<ExperimentDescription> nonRedundantExperimentsFromPsiEntry(Entry psiEntry) {
         Map<Integer,ExperimentDescription> nonRedundantExps = new HashMap<Integer,ExperimentDescription>();
 
-        if( ConverterContext.getInstance().isGenerateCompactXml() ) {
-            for (ExperimentDescription expDesc : psiEntry.getExperiments()) {
-                nonRedundantExps.put(expDesc.getId(), expDesc);
-            }
-        } else {
-            for (psidev.psi.mi.xml.model.Interaction interaction : psiEntry.getInteractions()) {
-                for (ExperimentDescription exp : interaction.getExperiments()) {
-                    nonRedundantExps.put(exp.getId(), exp);
-                }
+        for (ExperimentDescription expDesc : psiEntry.getExperiments()) {
+            nonRedundantExps.put(expDesc.getId(), expDesc);
+        }
+
+        for (psidev.psi.mi.xml.model.Interaction interaction : psiEntry.getInteractions()) {
+            for (ExperimentDescription exp : interaction.getExperiments()) {
+                nonRedundantExps.put(exp.getId(), exp);
             }
         }
 
@@ -259,16 +257,14 @@ public class PsiConverterUtils {
     public static Collection<psidev.psi.mi.xml.model.Interactor> nonRedundantInteractorsFromPsiEntry(Entry psiEntry) {
         Map<Integer, psidev.psi.mi.xml.model.Interactor> nonRedundantInteractors = new HashMap<Integer, psidev.psi.mi.xml.model.Interactor>();
 
-        if( ConverterContext.getInstance().isGenerateExpandedXml() ) {
-            // iterate to get the unique experiments/interactors
-            for (psidev.psi.mi.xml.model.Interaction interaction : psiEntry.getInteractions()) {
-                for (Participant participant : interaction.getParticipants()) {
-                    nonRedundantInteractors.put(participant.getInteractor().getId(), participant.getInteractor());
-                }
-            }
-        } else {
-            for ( psidev.psi.mi.xml.model.Interactor interactor : psiEntry.getInteractors() ) {
-                nonRedundantInteractors.put( interactor.getId(), interactor );
+        for (psidev.psi.mi.xml.model.Interactor interactor : psiEntry.getInteractors()) {
+            nonRedundantInteractors.put(interactor.getId(), interactor);
+        }
+
+        // iterate to get the unique experiments/interactors
+        for (psidev.psi.mi.xml.model.Interaction interaction : psiEntry.getInteractions()) {
+            for (Participant participant : interaction.getParticipants()) {
+                nonRedundantInteractors.put(participant.getInteractor().getId(), participant.getInteractor());
             }
         }
 

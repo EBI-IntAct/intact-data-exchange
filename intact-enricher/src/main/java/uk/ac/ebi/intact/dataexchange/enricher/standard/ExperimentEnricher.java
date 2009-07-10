@@ -17,9 +17,9 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.CvTerm;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.IntactOntology;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.ExperimentFetcher;
@@ -31,8 +31,8 @@ import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
 import uk.ac.ebi.intact.util.cdb.InvalidPubmedException;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.List;
 
 /**
  * TODO comment this
@@ -40,7 +40,6 @@ import java.util.Set;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
 public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
 
     /**
@@ -48,26 +47,26 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
      */
     private static final Log log = LogFactory.getLog(ExperimentEnricher.class);
 
-    @Autowired
-    private CvObjectFetcher cvObjectFetcher;
+     private static ThreadLocal<ExperimentEnricher> instance = new ThreadLocal<ExperimentEnricher>() {
+        @Override
+        protected ExperimentEnricher initialValue() {
+            return new ExperimentEnricher();
+        }
+    };
 
-    @Autowired
-    private ExperimentFetcher experimentFetcher;
+    public static ExperimentEnricher getInstance() {
+        return instance.get();
+    }
 
-    @Autowired
-    private CvObjectEnricher cvObjectEnricher;
-
-    @Autowired
-    private BioSourceEnricher bioSourceEnricher;
-
-    @Autowired
-    private EnricherContext enricherContext;
-
-    public ExperimentEnricher() {
+    protected ExperimentEnricher() {
     }
 
     public void enrich(Experiment objectToEnrich) {
+        
+        BioSourceEnricher bioSourceEnricher = BioSourceEnricher.getInstance();
         bioSourceEnricher.enrich(objectToEnrich.getBioSource());
+
+        CvObjectEnricher cvObjectEnricher = CvObjectEnricher.getInstance();
 
         if (objectToEnrich.getCvInteraction() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvInteraction());
@@ -78,7 +77,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
 
         
         // populate the experiment using the pubmed id
-        if (enricherContext.getConfig().isUpdateExperiments()) {
+        if (EnricherContext.getInstance().getConfig().isUpdateExperiments()) {
             String pubmedId = ExperimentUtils.getPubmedId(objectToEnrich);
             try {
                 Long.parseLong(pubmedId);
@@ -98,7 +97,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
             String detMethodMi = calculateParticipantDetMethod(objectToEnrich);
 
             if (detMethodMi != null) {
-                CvIdentification detMethod = cvObjectFetcher.fetchByTermId(CvIdentification.class, detMethodMi);
+                CvIdentification detMethod = CvObjectFetcher.getInstance().fetchByTermId(CvIdentification.class, detMethodMi);
                 objectToEnrich.setCvIdentification(detMethod);
             }
         }
@@ -113,7 +112,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
     }
 
     protected void populateExperiment(Experiment experiment, String pubmedId) throws Exception {
-        ExperimentAutoFill autoFill = experimentFetcher.fetchByPubmedId(pubmedId);
+        ExperimentAutoFill autoFill = ExperimentFetcher.getInstance().fetchByPubmedId(pubmedId);
 
         if (autoFill != null) {
             experiment.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(autoFill.getShortlabel(false)));
@@ -140,7 +139,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
 
     private boolean experimentAnnotationsContainTopic(Experiment experiment, String miIdentifier) {
         for (Annotation annot : experiment.getAnnotations()) {
-            if (miIdentifier.equals(annot.getCvTopic().getIdentifier())) {
+            if (miIdentifier.equals(annot.getCvTopic().getMiIdentifier())) {
                 return true;
             }
         }
@@ -153,8 +152,8 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         for (Interaction interaction : experiment.getInteractions()) {
             for (Component component : interaction.getComponents()) {
                 for (CvIdentification partDetMethod : component.getParticipantDetectionMethods()) {
-                    if (partDetMethod.getIdentifier() != null) {
-                        detMethodMis.add(partDetMethod.getIdentifier());
+                    if (partDetMethod.getMiIdentifier() != null) {
+                        detMethodMis.add(partDetMethod.getMiIdentifier());
                     }
                 }
             }
@@ -163,7 +162,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         if (detMethodMis.size() == 1) {
             return detMethodMis.iterator().next();
         } else if (detMethodMis.size() > 1) {
-            List<CvDagObject> ontology = enricherContext.getIntactOntology();
+            List<CvDagObject> ontology = EnricherContext.getInstance().getIntactOntology();
 
             return CvUtils.findLowestCommonAncestor(ontology, detMethodMis.toArray(new String[detMethodMis.size()]));
         }
@@ -175,12 +174,12 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
 
     protected void fixPubmedXrefIfNecessary(Experiment experiment) {
         for (ExperimentXref xref : experiment.getXrefs()) {
-            if (CvDatabase.PUBMED_MI_REF.equals(xref.getCvDatabase().getIdentifier())) {
-                if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+            if (CvDatabase.PUBMED_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
+                if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getMiIdentifier())) {
                     log.warn("Fixing wrong xref qualifier for xref to pubmed: "+xref.getCvXrefQualifier().getShortLabel());
 
                     CvXrefQualifier primaryRef = CvObjectUtils.createCvObject(experiment.getOwner(), CvXrefQualifier.class, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE);
-                    cvObjectEnricher.enrich(primaryRef);
+                    CvObjectEnricher.getInstance().enrich(primaryRef);
 
                     xref.setCvXrefQualifier(primaryRef);
                 }

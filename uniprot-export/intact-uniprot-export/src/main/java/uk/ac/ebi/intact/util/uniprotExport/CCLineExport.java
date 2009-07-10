@@ -6,13 +6,11 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
 import org.apache.commons.cli.*;
-import org.springframework.transaction.TransactionStatus;
-import uk.ac.ebi.intact.core.IntactException;
- 
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.IntactTransactionException;
+import uk.ac.ebi.intact.business.IntactException;
+import uk.ac.ebi.intact.business.IntactTransactionException;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.core.persistence.dao.XrefDao;
+import uk.ac.ebi.intact.persistence.dao.XrefDao;
 import uk.ac.ebi.intact.util.MemoryMonitor;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
@@ -852,6 +850,8 @@ public class CCLineExport extends LineExport {
     public void generateCCLines(Collection<String> uniprotIDs) throws IntactException,
                                                                       SQLException, IOException {
 
+        getOut().println("NOTE: Forced autobegin transaction");
+        IntactContext.getCurrentInstance().getConfig().setAutoBeginTransaction(true);
 
         int count = uniprotIDs.size();
         int idProcessed = 0;
@@ -860,8 +860,6 @@ public class CCLineExport extends LineExport {
 
         // iterate over the Uniprot ID of the proteins that have been selected for DR export.
         for (String uniprot_ID : uniprotIDs) {
-            TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-
             idProcessed++;
 
             if ((idProcessed % 50) == 0) {
@@ -1100,7 +1098,7 @@ public class CCLineExport extends LineExport {
 
             try {
                 getOut().println("Finished. Committing transaction");
-                IntactContext.getCurrentInstance().getDataContext().commitTransaction(transactionStatus);
+                IntactContext.getCurrentInstance().getDataContext().commitTransaction();
             } catch (IntactTransactionException e) {
                 e.printStackTrace();
             }

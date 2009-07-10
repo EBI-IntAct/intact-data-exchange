@@ -53,11 +53,7 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
      * @return a non null collection of interaction, in case the expansion is not possible, we may return an empty
      *         collection.
      */
-    public Collection<Interaction> expand(Interaction interaction) throws NotExpandableInteractionException{
-        if (!isExpandable(interaction)) {
-            throw new NotExpandableInteractionException("Interaction is not expandable: "+interaction);
-        }
-
+    public Collection<Interaction> expand(Interaction interaction) {
         Collection<Interaction> interactions = new ArrayList<Interaction>();
         Collection<Component> components = interaction.getComponents();
 
@@ -67,9 +63,8 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
             if (interaction.getComponents().size() == 1) {
                 // single Interaction
                 Component singleComponent = components.iterator().next();
-
-                if (singleComponent.getStoichiometry() >= 2 ||
-                        containsRole(singleComponent.getExperimentalRoles(), new String[] {CvExperimentalRole.SELF_PSI_REF, PUTATIVE_SELF_PSI_REF})) {
+                if (singleComponent.getCvExperimentalRole() != null && CvExperimentalRole.SELF_PSI_REF
+                        .equals(singleComponent.getCvExperimentalRole().getIdentifier())) {
                     Interaction newSelfInteraction = buildInteraction(interaction, singleComponent, singleComponent);
                     interactions.add(newSelfInteraction);
                 }
@@ -103,27 +98,6 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
 
 
         return interactions;
-    }
-
-    @Override
-    public boolean isExpandable(Interaction interaction) {
-        if (!super.isExpandable(interaction)) {
-            return false;
-        }
-
-        if (interaction.getComponents().size() > 1) {
-            boolean containsBait = false;
-
-            for (Component component : interaction.getComponents()) {
-                if (containsRole(component.getExperimentalRoles(), new String[] {CvExperimentalRole.BAIT_PSI_REF})) {
-                    containsBait = true;
-                    break;
-                }
-            }
-
-            return containsBait;
-        }
-        return true;
     }
 
     public String getName() {

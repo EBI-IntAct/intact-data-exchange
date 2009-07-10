@@ -15,7 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
-import uk.ac.ebi.intact.core.IntactException;
+import uk.ac.ebi.intact.business.IntactException;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectBuilder;

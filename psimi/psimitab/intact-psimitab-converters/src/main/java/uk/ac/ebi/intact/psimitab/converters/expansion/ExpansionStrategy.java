@@ -35,7 +35,7 @@ public interface ExpansionStrategy {
      * @return a non null collection of interaction, in case the expansion is not possible, we may return an empty
      *         collection.
      */
-    public Collection<Interaction> expand( Interaction interaction ) throws NotExpandableInteractionException;
+    public Collection<Interaction> expand( Interaction interaction );
 
     /**
      * Gets the method of the ExpansionStrategy
@@ -43,11 +43,4 @@ public interface ExpansionStrategy {
      * @return spoke, matrix or none
      */
     public String getName();
-
-    /**
-     * Returns true if the interaction can be expanded
-     * @param interaction The interaction to check
-     * @return true if it can be expanded
-     */
-    public boolean isExpandable( Interaction interaction );
 }

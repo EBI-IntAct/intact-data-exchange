@@ -58,7 +58,7 @@ public class ComponentConverterTest extends IntactBasicTestCase {
         Assert.assertEquals("MI:0836", param.getCvParameterType().getIdentifier());
         Assert.assertEquals("kelvin", param.getCvParameterUnit().getShortLabel());
         Assert.assertEquals("MI:0838", param.getCvParameterUnit().getIdentifier());
-        Assert.assertEquals(275d, param.getFactor(), 0d);
+        Assert.assertEquals(275d, param.getFactor());
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ComponentConverterTest extends IntactBasicTestCase {
 
         Assert.assertEquals(1, participant.getParameters().size());
         Parameter param = participant.getParameters().iterator().next();
-        Assert.assertEquals(302d, param.getFactor(), 0d);
+        Assert.assertEquals(302d, param.getFactor());
         Assert.assertEquals("temperature", param.getTerm());
         Assert.assertEquals("MI:0836", param.getTermAc());
         Assert.assertEquals("kelvin", param.getUnit());

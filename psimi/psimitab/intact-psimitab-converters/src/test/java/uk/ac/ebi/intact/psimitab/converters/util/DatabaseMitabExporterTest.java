@@ -28,7 +28,7 @@ import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.OntologyIterator;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.OboOntologyIterator;
 import uk.ac.ebi.intact.bridges.ontologies.util.OntologyUtils;
-import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.util.SchemaUtils;
@@ -79,6 +79,13 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
     @Before
     public void before() throws Exception {
         exporter = new DatabaseMitabExporter(ontologyIndexSearcher, "go");
+        SchemaUtils.createSchema();
+    }
+
+    @After
+    public void after() throws Exception {
+        exporter = null;
+        IntactContext.closeCurrentInstance();
     }
 
     private static OntologyIndexSearcher createGoSlimIndexSearcher() throws OBOParseException, IOException {
