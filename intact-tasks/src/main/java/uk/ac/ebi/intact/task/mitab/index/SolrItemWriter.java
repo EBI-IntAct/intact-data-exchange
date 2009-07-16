@@ -41,6 +41,9 @@ public class SolrItemWriter implements BinaryInteractionItemWriter, ItemStream{
     private Resource ontologiesSolrUrl;
     private DocumentDefinition documentDefinition;
 
+    private OntologySearcher ontologySearcher;
+    private SolrServer interactionSolrServer;
+
     public void write(List<? extends BinaryInteraction> items) throws Exception {
         if (interactionsSolrUrl == null) {
             throw new NullPointerException("No 'interactionsSolrUrl' configured for SolrItemWriter");
@@ -53,14 +56,7 @@ public class SolrItemWriter implements BinaryInteractionItemWriter, ItemStream{
             return;
         }
 
-        SolrServer interactionsSolrServer = new CommonsHttpSolrServer(interactionsSolrUrl.getURL());
-
-        OntologySearcher ontologySearcher = null;
-
-        if (ontologiesSolrUrl != null) {
-            SolrServer ontologiesSolrServer = new CommonsHttpSolrServer(ontologiesSolrUrl.getURL());
-            ontologySearcher = new OntologySearcher(ontologiesSolrServer);
-        }
+        SolrServer interactionsSolrServer = getInteractionsSolrServer();
 
         SolrDocumentConverter solrDocumentConverter = new SolrDocumentConverter(documentDefinition, ontologySearcher);
 
@@ -71,6 +67,14 @@ public class SolrItemWriter implements BinaryInteractionItemWriter, ItemStream{
     }
 
     public void open(ExecutionContext executionContext) throws ItemStreamException {
+        try {
+            if (ontologiesSolrUrl != null) {
+                SolrServer ontologiesSolrServer = new CommonsHttpSolrServer(ontologiesSolrUrl.getURL());
+                ontologySearcher = new OntologySearcher(ontologiesSolrServer);
+            }
+        } catch (IOException e) {
+            throw new ItemStreamException("Problem with ontology solr server: "+ontologiesSolrUrl, e);
+        }
     }
 
     public void update(ExecutionContext executionContext) throws ItemStreamException {
@@ -87,11 +91,15 @@ public class SolrItemWriter implements BinaryInteractionItemWriter, ItemStream{
     }
 
     public SolrServer getInteractionsSolrServer() throws IOException {
-        if (interactionsSolrUrl == null) {
-            throw new NullPointerException("No 'interactionsSolrUrl' configured for SolrItemWriter");
+        if (interactionSolrServer == null) {
+            if (interactionsSolrUrl == null) {
+                throw new NullPointerException("No 'interactionsSolrUrl' configured for SolrItemWriter");
+            }
+
+            interactionSolrServer = new CommonsHttpSolrServer(interactionsSolrUrl.getURL());
         }
 
-        return new CommonsHttpSolrServer(interactionsSolrUrl.getURL());
+        return interactionSolrServer;
     }
 
     public void setInteractionsSolrUrl(Resource interactionsSolrUrl) {

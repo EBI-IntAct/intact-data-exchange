@@ -32,13 +32,19 @@ public class OntologyEnricherItemProcessor implements ItemProcessor<BinaryIntera
 
     private Resource ontologiesSolrUrl;
 
+    private BinaryInteractionEnricher enricher;
+
     public BinaryInteraction process(BinaryInteraction item) throws Exception {
-        if (ontologiesSolrUrl == null) {
-            throw new NullPointerException("ontologiesSolrUrl is null");
+        if (enricher == null) {
+
+            if (ontologiesSolrUrl == null) {
+                throw new NullPointerException("ontologiesSolrUrl is null");
+            }
+            
+            SolrServer ontologiesSolrServer = new CommonsHttpSolrServer(ontologiesSolrUrl.getURL());
+            OntologySearcher ontologySearcher = new OntologySearcher(ontologiesSolrServer);
+            enricher = new OntologyBinaryInteractionEnricher(ontologySearcher);
         }
-        SolrServer ontologiesSolrServer = new CommonsHttpSolrServer(ontologiesSolrUrl.getURL());
-        OntologySearcher ontologySearcher = new OntologySearcher(ontologiesSolrServer);
-        BinaryInteractionEnricher enricher = new OntologyBinaryInteractionEnricher(ontologySearcher);
 
         enricher.enrich(item);
 
@@ -47,5 +53,9 @@ public class OntologyEnricherItemProcessor implements ItemProcessor<BinaryIntera
 
     public void setOntologiesSolrUrl(Resource ontologiesSolrUrl) {
         this.ontologiesSolrUrl = ontologiesSolrUrl;
+    }
+
+    public void setEnricher(BinaryInteractionEnricher enricher) {
+        this.enricher = enricher;
     }
 }
