@@ -38,12 +38,13 @@ public class OntologySearcher {
     private SolrServer solrServer;
     private Map<String,QueryResponse> childSearchesMap;
     private Map<String,QueryResponse> parentSearchesMap;
+    private Set<String> ontologyNames;
 
     public OntologySearcher(SolrServer solrServer) {
         this.solrServer = solrServer;
 
-        childSearchesMap = new LRUMap(5000);
-        parentSearchesMap = new LRUMap(5000);
+        childSearchesMap = new LRUMap(10000);
+        parentSearchesMap = new LRUMap(10000);
     }
 
     public QueryResponse search(SolrQuery query) throws SolrServerException{
@@ -75,23 +76,25 @@ public class OntologySearcher {
     }
 
     public Set<String> getOntologyNames() throws SolrServerException {
-        SolrQuery query = new SolrQuery("*:*");
-        query.setStart(0);
-        query.setRows(0);
-        query.setFacet(true);
-        query.setParam(FacetParams.FACET_FIELD, "ontology");
+        if (ontologyNames == null) {
+            SolrQuery query = new SolrQuery("*:*");
+            query.setStart(0);
+            query.setRows(0);
+            query.setFacet(true);
+            query.setParam(FacetParams.FACET_FIELD, "ontology");
 
-        QueryResponse response = search(query);
-        FacetField facetField = response.getFacetField("ontology");
+            QueryResponse response = search(query);
+            FacetField facetField = response.getFacetField("ontology");
 
-        if (facetField.getValues() == null) {
-            return new HashSet<String>();
-        }
+            if (facetField.getValues() == null) {
+                return new HashSet<String>();
+            }
 
-        Set<String> ontologyNames = new HashSet<String>();
+            ontologyNames = new HashSet<String>();
 
-        for (FacetField.Count c : facetField.getValues()) {
-            ontologyNames.add(c.getName());
+            for (FacetField.Count c : facetField.getValues()) {
+                ontologyNames.add(c.getName());
+            }
         }
 
         return ontologyNames;
