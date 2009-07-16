@@ -39,6 +39,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * PSI converter utilities.
  *
@@ -47,6 +50,9 @@ import java.util.HashMap;
  */
 public class PsiConverterUtils {
 
+    private static final Log log = LogFactory.getLog(PsiConverterUtils.class);
+
+	
     private PsiConverterUtils() {
     }
 
@@ -154,14 +160,33 @@ public class PsiConverterUtils {
         // normally the primary reference is the identity reference, but for bibliographic references
         // it is the primary-reference and it does not contain secondary refs
         if ( xrefContainer instanceof Bibref ) {
-            final DbReference primaryRef = getPrimaryReference( dbRefs, CvDatabase.PUBMED_MI_REF);
+            final DbReference primaryPubmedRef = getPrimaryReference( dbRefs , CvDatabase.PUBMED_MI_REF );
 
-            if (primaryRef != null) {
-                xref.setPrimaryRef( primaryRef );
+            if (primaryPubmedRef != null) {
+                xref.setPrimaryRef( primaryPubmedRef );
             } else {
-                throw new UnsupportedConversionException("No primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
-                                                         "to Pubmed (dbAc="+ CvDatabase.PUBMED_MI_REF+") could be found in "+xrefContainer.getClass().getSimpleName()+
-                        ": "+xrefContainer+", located at: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString());
+            	final DbReference primaryDoiRef = getPrimaryReference( dbRefs , CvDatabase.DOI_MI_REF );
+            	
+            	if (primaryDoiRef != null) {
+            		xref.setPrimaryRef(primaryDoiRef);
+            		
+                   	if (log.isWarnEnabled()) log.warn("Primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
+                            " found in "+xrefContainer.getClass().getSimpleName()+
+                            ": "+xrefContainer+", located at: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString()+
+                            " is neither a reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") nor a DOI (dbAc=" + CvDatabase.DOI_MI_REF + ")");
+
+            		
+            	} else {
+                    final DbReference primaryRef = getPrimaryReference( dbRefs );
+
+                    if (primaryRef != null) {
+                    	xref.setPrimaryRef(primaryRef);
+                    } else  {
+                    	if (log.isWarnEnabled()) log.warn("No primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
+                                                         " could be found in "+xrefContainer.getClass().getSimpleName()+
+                                                         ": "+xrefContainer+", located at: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString());
+                    }
+            	}
             }
         } else {
             // remove the primary ref from the collection if it is a experiment

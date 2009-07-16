@@ -83,11 +83,13 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         // fail if the primary reference does not point to Pubmed and primary-reference
         final DbReference primaryRef = psiObject.getBibref().getXref().getPrimaryRef();
         if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(primaryRef.getRefTypeAc()) ||
-            !CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())) {
+            (!CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())
+            		&& !CvDatabase.DOI_MI_REF.equals(primaryRef.getDbAc()))            
+            ) {
             final String message = "Bibref in ExperimentDescription [PSI Id=" + psiObject.getId() + "] " +
                                    "should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
-                                   "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + "): " + primaryRef;
-            log.error(message);
+                                   "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + "): " + primaryRef;
+            log.warn(message);
 
             addMessageToContext(MessageLevel.WARN, message+". Fixed.", true);
         }
