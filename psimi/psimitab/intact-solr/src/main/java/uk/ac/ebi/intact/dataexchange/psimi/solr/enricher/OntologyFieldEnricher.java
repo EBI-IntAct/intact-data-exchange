@@ -47,7 +47,7 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
         super();
         this.ontologySearcher = ontologySearcher;
 
-        cvCache = new LRUMap(10000);
+        cvCache = new LRUMap(50000);
         ontologyTermCache = new LRUMap(10000);
     }
 
@@ -63,7 +63,9 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
                     if (log.isErrorEnabled()) log.error("Problem getting list of ontology names: "+e.getMessage());
                     return false;
                 }
-                expandableOntologies.add("taxid");
+                if (expandableOntologies.contains("uniprot taxonomy")) {
+                    expandableOntologies.add("taxid");
+                }
             }
         }
 
