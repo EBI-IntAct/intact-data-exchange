@@ -233,7 +233,7 @@
       class="solr.FastLRUCache"
       size="200000"
       initialSize="10000"
-      autowarmCount="2048"/>
+      autowarmCount="4096"/>
 
     <!-- Cache used to hold field values that are quickly accessible
          by document id.  The fieldValueCache is created by default
@@ -250,17 +250,17 @@
          document ids (DocList) based on a query, a sort, and the range
          of documents requested.  -->
     <queryResultCache
-      class="solr.LRUCache"
-      size="512"
-      initialSize="512"
-      autowarmCount="32"/>
+      class="solr.FastLRUCache"
+      size="200000"
+      initialSize="10000"
+      autowarmCount="4096"/>
 
   <!-- documentCache caches Lucene Document objects (the stored fields for each document).
        Since Lucene internal document ids are transient, this cache will not be autowarmed.  -->
     <documentCache
-      class="solr.LRUCache"
-      size="512"
-      initialSize="512"
+      class="solr.FastLRUCache"
+      size="200000"
+      initialSize="10000"
       autowarmCount="0"/>
 
     <!-- If true, stored fields that are not requested will be loaded lazily.
@@ -269,7 +269,7 @@
     not load all stored fields, especially if the skipped fields are large compressed
     text fields.
     -->
-    <enableLazyFieldLoading>true</enableLazyFieldLoading>
+    <enableLazyFieldLoading>false</enableLazyFieldLoading>
 
     <!-- Example of a generic cache.  These caches may be accessed by name
          through SolrIndexSearcher.getCache(),cacheLookup(), and cacheInsert().
