@@ -65,7 +65,7 @@ public class OntologyIndexerTest  {
         SolrQuery query = new SolrQuery("*:*");
         QueryResponse queryResponse = solrServer.query(query);
 
-        Assert.assertEquals(1799, queryResponse.getResults().getNumFound());
+        Assert.assertEquals(990, queryResponse.getResults().getNumFound());
     }
 
      @Test

@@ -15,20 +15,17 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
-import org.junit.*;
 import org.apache.solr.client.solrj.SolrServer;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
-import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
+import org.junit.*;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
-import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexWriter;
+import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
 
 import java.net.URL;
-import java.util.Set;
-import java.util.Iterator;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * TODO comment that class header
@@ -86,7 +83,7 @@ public class LazyLoadedOntologyTermTest {
     public void rootNode() throws Exception {
         OntologyTerm term = new LazyLoadedOntologyTerm(searcher, "GO:0008150");
 
-        Assert.assertEquals(term.getName(), "biological_process");
+        Assert.assertEquals("biological_process", term.getName());
 
         Assert.assertEquals(0, term.getParents().size());
         Assert.assertEquals(21, term.getChildren().size());

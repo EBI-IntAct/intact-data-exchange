@@ -26,9 +26,6 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.IntactSolrException;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
 
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.logging.LogManager;
-import java.util.logging.Level;
 
 /**
  * Indexes in a SOLR instance the ontologies passed as URL. The created index is useful
@@ -48,12 +45,20 @@ public class OntologyIndexer {
     }
 
     public void indexObo(OntologyMapping[] ontologyMappings) throws IntactSolrException {
+       indexObo(ontologyMappings, new DefaultDocumentFilter());
+    }
+
+    public void indexObo(OntologyMapping[] ontologyMappings, DocumentFilter documentFilter) throws IntactSolrException {
        for (OntologyMapping om : ontologyMappings) {
-           indexObo(om.getName(), om.getUrl());
+           indexObo(om.getName(), om.getUrl(), documentFilter);
        }
     }
 
     public void indexObo(String ontologyName, URL oboUrl) throws IntactSolrException {
+        indexObo(ontologyName, oboUrl, new DefaultDocumentFilter());
+    }
+
+    public void indexObo(String ontologyName, URL oboUrl, DocumentFilter documentFilter) throws IntactSolrException {
         OntologyIterator oboIterator;
         try {
             oboIterator = new OboOntologyIterator(ontologyName, oboUrl);
@@ -61,7 +66,7 @@ public class OntologyIndexer {
             throw new IntactSolrException("Problem creating OBO iterator for: "+ontologyName+" URL: "+oboUrl, e);
         }
 
-        indexOntology(oboIterator);
+        indexOntology(oboIterator, documentFilter);
     }
 
     public void indexUniprotTaxonomy() throws IntactSolrException {
@@ -76,11 +81,15 @@ public class OntologyIndexer {
     }
 
     public void indexOntology(OntologyIterator ontologyIterator) {
+        indexOntology(ontologyIterator, new DefaultDocumentFilter());
+    }
+
+    public void indexOntology(OntologyIterator ontologyIterator, DocumentFilter documentFilter) {
         int i = 0;
 
         while (ontologyIterator.hasNext()) {
             OntologyDocument doc = ontologyIterator.next();
-            index(doc);
+            index(doc, documentFilter);
 
             i++;
 
@@ -93,6 +102,14 @@ public class OntologyIndexer {
     }
 
     public void index(OntologyDocument ontologyDocument) throws IntactSolrException {
+         index(ontologyDocument, new DefaultDocumentFilter());
+    }
+
+    public void index(OntologyDocument ontologyDocument, DocumentFilter documentFilter) throws IntactSolrException {
+        if (documentFilter != null && !documentFilter.accept(ontologyDocument)) {
+            return;
+        }
+
         SolrInputDocument doc = new SolrInputDocument();
 
         String uniqueKey = ontologyDocument.getOntology() + "_" + ontologyDocument.getParentId() + "_" + ontologyDocument.getChildId() + "_" + ontologyDocument.getRelationshipType();

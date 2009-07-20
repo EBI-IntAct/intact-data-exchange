@@ -21,7 +21,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
-import uk.ac.ebi.intact.bridges.ontologies.FieldName;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 
 import java.io.IOException;
@@ -85,7 +84,7 @@ public class LazyLoadedOntologyTerm implements OntologyTerm {
         this.parents = new ArrayList<OntologyTerm>();
 
         try {
-            final QueryResponse queryResponse = searchQuery(FieldName.CHILDREN_ID, includeCyclic);
+            final QueryResponse queryResponse = searcher.searchByChildId(id, 0, Integer.MAX_VALUE);
 
             parents.addAll(processParentsHits(queryResponse, id));
         } catch (Exception e) {
@@ -107,7 +106,7 @@ public class LazyLoadedOntologyTerm implements OntologyTerm {
         this.children = new ArrayList<OntologyTerm>();
 
         try {
-            final QueryResponse queryResponse = searchQuery(FieldName.PARENT_ID, includeCyclic);
+            final QueryResponse queryResponse = searcher.searchByParentId(id, 0, Integer.MAX_VALUE);
             children.addAll(processChildrenHits(queryResponse, id));
         } catch (Exception e) {
             throw new IllegalStateException("Problem getting children for document: "+id, e);
@@ -117,25 +116,17 @@ public class LazyLoadedOntologyTerm implements OntologyTerm {
     }
 
     private QueryResponse searchQuery(String idFieldName, boolean includeCyclic) throws SolrServerException {
-//        BooleanQuery query = new BooleanQuery();
-//        query.add(new TermQuery(new Term(idFieldName, id)), BooleanClause.Occur.MUST);
-//        query.add(new TermQuery(new Term(FieldName.RELATIONSHIP_CYCLIC, String.valueOf(includeCyclic))), BooleanClause.Occur.MUST);
-//        query.add(new TermQuery(new Term(FieldName.RELATIONSHIP_TYPE, "OBO_REL:is_a")), BooleanClause.Occur.MUST);
-//
-//        if (!includeCyclic) {
-//            query.add(new TermQuery(new Term(FieldName.RELATIONSHIP_TYPE, "disjoint_from")), BooleanClause.Occur.MUST_NOT);
-//        }
 
         SolrQuery query = new SolrQuery(idFieldName+":\""+id+"\"");
         query.setRows(Integer.MAX_VALUE);
-        query.addFilterQuery("+"+OntologyFieldNames.CYCLIC+":"+String.valueOf(includeCyclic));
-        query.addFilterQuery("+"+OntologyFieldNames.RELATIONSHIP_TYPE+":\"OBO_REL:is_a\"");
+//        query.addFilterQuery("+"+OntologyFieldNames.CYCLIC+":"+String.valueOf(includeCyclic));
+//        query.addFilterQuery("+"+OntologyFieldNames.RELATIONSHIP_TYPE+":\"OBO_REL:is_a\"");
+//
+//        if (!includeCyclic) {
+//            query.addFilterQuery("-"+OntologyFieldNames.RELATIONSHIP_TYPE+":disjoint_from");
+//        }
 
-        if (!includeCyclic) {
-            query.addFilterQuery("-"+OntologyFieldNames.RELATIONSHIP_TYPE+":disjoint_from");
-        }
-
-        query.setSortField(OntologyFieldNames.CHILD_NAME+"_s", SolrQuery.ORDER.asc);
+//        query.setSortField(OntologyFieldNames.CHILD_NAME+"_s", SolrQuery.ORDER.asc);
 
         return searcher.search(query);
     }
