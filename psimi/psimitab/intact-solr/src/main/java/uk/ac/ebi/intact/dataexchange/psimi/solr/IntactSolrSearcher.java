@@ -17,7 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -64,11 +64,13 @@ public class IntactSolrSearcher {
     public SolrSearchResult search(SolrQuery originalQuery) throws IntactSolrException {
         SolrQuery query = originalQuery.getCopy();
 
+        String[] fields = (String[]) ArrayUtils.add(FieldNames.DATA_FIELDS, "pkey");
+
         if(query.getFields()!=null){
-            query.setFields(query.getFields()+StringUtils.join(FieldNames.DATA_FIELDS, ", ")+", pkey");
-        }else{
-            query.setFields(StringUtils.join(FieldNames.DATA_FIELDS, ", ")+", pkey" );
+            fields = (String[]) ArrayUtils.add(fields, query.getFields().split(","));
         }
+
+        query.setFields(fields);
 
         // if using a wildcard query we convert to lower case
         // as of http://mail-archives.apache.org/mod_mbox/lucene-solr-user/200903.mbox/%3CFD3AFB65-AEC1-40B2-A0A4-7E14A519AB05@ehatchersolutions.com%3E
