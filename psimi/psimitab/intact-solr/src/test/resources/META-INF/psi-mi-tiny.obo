@@ -1,0 +1,52 @@
+format-version: 1.2
+date: 28:07:2008 18:51
+saved-by: luisa
+auto-generated-by: OBO-Edit 1.101
+subsetdef: Drugable "Drugable Genome Project"
+subsetdef: PSI-MI slim "Subset of PSI-MI"
+synonymtypedef: PSI-MI-alternate "Alternate label curated by PSI-MI" EXACT
+synonymtypedef: PSI-MI-short "Unique short label curated by PSI-MI" EXACT
+default-namespace: PSI-MI
+remark: $Id: psi-mi25.obo,v 1.52 2008/07/28 17:54:57 luisa_montecchi Exp $
+remark: Notes:
+remark: Each of the top level terms in this file is the root term of an independent controlled vocabulary
+remark: mapping an element of the PSI Molecular Interaction XML schema.
+remark: To facilitate handling, they all have been merged in this file, though they
+remark: are essentially independent CVs describing different aspects of molecular interactions.
+remark: The PSI MI schema defines short labels for controlled vocabulary terms.
+remark: Where possible, short labels are reported as exact synonyms of a term in this file,
+remark: The last accession number used in this file is stored in a separate file,
+remark: psi-mi.lastac.
+remark: It MUST be updated when this file is updated.
+remark: This file is published by the PSI MI working group see http://psidev.sourceforge.net/
+remark: Author Luisa Montecchi Palazzi luisa@ebi.ac.uk
+
+[Term]
+id: MI:0000
+name: molecular interaction
+def: "Controlled vocabularies originally created for protein protein interactions, extended to other molecules interactions." [PMID:14755292]
+subset: Drugable
+subset: PSI-MI slim
+synonym: "mi" EXACT PSI-MI-short []
+
+[Term]
+id: MI:0001
+name: interaction detection method
+def: "Method to determine the interaction." [PMID:14755292]
+subset: Drugable
+subset: PSI-MI slim
+synonym: "interaction detect" EXACT PSI-MI-short []
+relationship: part_of MI:0000 ! molecular interaction
+
+[Term]
+id: MI:0045
+name: experimental interaction detection
+def: "Methods based on laboratory experiments." [PMID:14755292]
+subset: PSI-MI slim
+synonym: "experimental interac" EXACT PSI-MI-short []
+is_a: MI:0001 ! interaction detection method
+
+[Typedef]
+id: part_of
+name: part of
+is_transitive: true

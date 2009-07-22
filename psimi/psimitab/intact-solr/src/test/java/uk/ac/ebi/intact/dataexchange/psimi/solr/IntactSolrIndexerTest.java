@@ -55,7 +55,6 @@ public class IntactSolrIndexerTest {
 
         indexer = new IntactSolrIndexer(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB),
                                         solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
-
     }
 
     @After
@@ -133,7 +132,6 @@ public class IntactSolrIndexerTest {
         Assert.assertTrue(expandedGoIds.contains(goTermToExpand));
         Assert.assertTrue(expandedGoIds.contains("GO:0003674"));
         Assert.assertTrue(expandedGoIds.contains("GO:0005488"));
-
     }
 
     @Test
@@ -226,7 +224,6 @@ public class IntactSolrIndexerTest {
 
         Assert.assertEquals(12, doc.getFieldValues("species").size());
         Assert.assertEquals(12, doc.getFieldValues("species_id").size());
-
     }
 
     private void assertCount(Number count, String searchQuery) throws IntactSolrException {
@@ -263,6 +260,5 @@ public class IntactSolrIndexerTest {
         }
 
         assertCount(200, "*:*");
-
     }
 }

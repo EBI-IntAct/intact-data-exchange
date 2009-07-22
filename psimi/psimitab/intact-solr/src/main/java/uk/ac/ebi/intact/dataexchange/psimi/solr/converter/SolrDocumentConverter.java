@@ -36,7 +36,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Converts from Row to SolrDocument and viceversa.
+ * Converts from Row to SolrDocument and vice-versa.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -300,7 +300,6 @@ public class SolrDocumentConverter {
 
             addDescriptionField(doc, field.getType(), field);
             addDescriptionField(doc, fieldName, field);
-
         }
     }
 
@@ -372,8 +371,4 @@ public class SolrDocumentConverter {
             doc.addField(fieldPrefix+"_desc_s", field.getDescription());
         }
     }
-
-
-
-   
 }

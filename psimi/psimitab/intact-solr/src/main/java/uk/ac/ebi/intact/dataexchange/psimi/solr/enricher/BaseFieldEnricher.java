@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
+ * Field enricher that doesn't enrich anything.
+ *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
@@ -42,10 +44,7 @@ public class BaseFieldEnricher implements FieldEnricher {
         return fields;
     }
 
-     public boolean isExpandableOntology( String name ) {
+    public boolean isExpandableOntology( String name ) {
         return false;
     }
-
-
-
 }

@@ -32,7 +32,7 @@ import java.util.Collection;
  */
 public class OntologyBinaryInteractionEnricher implements BinaryInteractionEnricher{
 
-    private OntologyFieldEnricher fieldEnricher;
+    private final OntologyFieldEnricher fieldEnricher;
 
     public OntologyBinaryInteractionEnricher(OntologySearcher ontologySearcher) {
         this.fieldEnricher = new OntologyFieldEnricher(ontologySearcher);

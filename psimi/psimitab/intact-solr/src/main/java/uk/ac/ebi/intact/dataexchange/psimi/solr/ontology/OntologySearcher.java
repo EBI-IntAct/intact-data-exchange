@@ -26,6 +26,7 @@ import org.apache.commons.collections.map.LRUMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Map;
+import java.util.Collections;
 
 /**
  * Searches the ontology, using a SolrServer pointing to an ontology core.
@@ -35,44 +36,48 @@ import java.util.Map;
  */
 public class OntologySearcher {
 
-    private SolrServer solrServer;
-    private Map<String,QueryResponse> childSearchesMap;
-    private Map<String,QueryResponse> parentSearchesMap;
+    private static final int CHILDREN_CACHE_SIZE = 10000;
+    private static final int PARENTS_CACHE_SIZE = 10000;
+
+    private final SolrServer solrServer;
+    private final Map<String,QueryResponse> childSearchesMap;
+    private final Map<String,QueryResponse> parentSearchesMap;
     private Set<String> ontologyNames;
 
     public OntologySearcher(SolrServer solrServer) {
+        if ( solrServer == null ) {
+            throw new IllegalArgumentException( "You must give a non null solrServer" );
+        }
+
         this.solrServer = solrServer;
 
-        childSearchesMap = new LRUMap(10000);
-        parentSearchesMap = new LRUMap(10000);
+        childSearchesMap = new LRUMap( CHILDREN_CACHE_SIZE );
+        parentSearchesMap = new LRUMap( PARENTS_CACHE_SIZE );
     }
 
     public QueryResponse search(SolrQuery query) throws SolrServerException{
         return solrServer.query(query);
     }
 
-    public QueryResponse searchByChildId(String id, Integer firstResult, Integer maxResults) throws SolrServerException {
-        if (childSearchesMap.containsKey(id)) {
-            return childSearchesMap.get(id);
+    private QueryResponse searchById( String id, Integer firstResult, Integer maxResults,
+                                      final String fieldId, Map<String,QueryResponse> cache ) throws SolrServerException {
+        if (cache.containsKey(id)) {
+            return cache.get(id);
         }
 
-        QueryResponse queryResponse = searchById(OntologyFieldNames.CHILD_ID, id, firstResult, maxResults);
+        QueryResponse queryResponse = searchById( fieldId, id, firstResult, maxResults);
 
-        childSearchesMap.put(id, queryResponse);
+        cache.put(id, queryResponse);
 
         return queryResponse;
     }
 
+    public QueryResponse searchByChildId(String id, Integer firstResult, Integer maxResults) throws SolrServerException {
+        return searchById( id, firstResult, maxResults, OntologyFieldNames.CHILD_ID, childSearchesMap );
+    }
+
     public QueryResponse searchByParentId(String id, Integer firstResult, Integer maxResults) throws SolrServerException {
-        if (parentSearchesMap.containsKey(id)) {
-            return parentSearchesMap.get(id);
-        }
-
-        QueryResponse queryResponse = searchById(OntologyFieldNames.PARENT_ID, id, firstResult, maxResults);
-
-        parentSearchesMap.put(id, queryResponse);
-
-        return queryResponse;
+        return searchById( id, firstResult, maxResults, OntologyFieldNames.PARENT_ID, parentSearchesMap );
     }
 
     public Set<String> getOntologyNames() throws SolrServerException {
@@ -87,10 +92,10 @@ public class OntologySearcher {
             FacetField facetField = response.getFacetField("ontology");
 
             if (facetField.getValues() == null) {
-                return new HashSet<String>();
+                return Collections.EMPTY_SET;//Ênew HashSet<String>();
             }
 
-            ontologyNames = new HashSet<String>();
+            ontologyNames = new HashSet<String>( facetField.getValues().size() );
 
             for (FacetField.Count c : facetField.getValues()) {
                 ontologyNames.add(c.getName());

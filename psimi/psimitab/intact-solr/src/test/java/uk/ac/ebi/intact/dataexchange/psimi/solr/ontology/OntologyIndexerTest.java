@@ -30,14 +30,14 @@ import java.net.URL;
 
 
 /**
- * TODO comment that class header
+ * OntologyIndexer Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
 public class OntologyIndexerTest  {
 
-     private SolrJettyRunner solrJettyRunner;
+    private SolrJettyRunner solrJettyRunner;
 
     @Before
     public void before() throws Exception {
@@ -49,7 +49,7 @@ public class OntologyIndexerTest  {
 
     @After
     public void after() throws Exception {
-        //solrJettyRunner.join();
+//        solrJettyRunner.join();
         solrJettyRunner.stop();
         solrJettyRunner = null;
     }
@@ -65,7 +65,46 @@ public class OntologyIndexerTest  {
         SolrQuery query = new SolrQuery("*:*");
         QueryResponse queryResponse = solrServer.query(query);
 
-        Assert.assertEquals(990, queryResponse.getResults().getNumFound());
+        // 990 is_a relationship, and likely 793 leaf terms (I didn't count them by hand ;))
+        Assert.assertEquals(1783, queryResponse.getResults().getNumFound());
+    }
+
+    @Test
+    public void testTinyIndexObo() throws Exception{
+        SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+
+        OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
+
+        ontologyIndexer.indexObo("psi-mi", OntologyIndexerTest.class.getResource( "/META-INF/psi-mi-tiny.obo" ) );
+
+        SolrQuery query = new SolrQuery("*:*");
+        QueryResponse queryResponse = solrServer.query(query);
+
+        // 3 terms, 2 relationship (1 is_a, 1 part_of)
+        Assert.assertEquals( 3, queryResponse.getResults().getNumFound() );
+    }
+
+    @Test
+    public void testSmallIndexObo() throws Exception{
+        SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+
+        OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
+
+        ontologyIndexer.indexObo("psi-mi", OntologyIndexerTest.class.getResource( "/META-INF/psi-mi-small.obo" ) );
+
+        SolrQuery query = new SolrQuery("*:*");
+        QueryResponse queryResponse = solrServer.query(query);
+
+        // 6 terms, 2 relationship (4 is_a, 2 part_of)
+
+        //                   MI:0000
+        //                  /       \
+        //      ______MI:0001      MI:0002
+        //     |       |    \     /
+        // MI:0045  MI:0063  MI:0362
+
+        // expected: root + count(is_a relationship) + count(leafs): 1 + 4 + 3
+        Assert.assertEquals( 8, queryResponse.getResults().getNumFound() );
     }
 
      @Test

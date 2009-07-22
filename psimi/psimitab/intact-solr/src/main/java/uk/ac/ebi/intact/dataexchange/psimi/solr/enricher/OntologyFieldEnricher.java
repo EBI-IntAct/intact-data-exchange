@@ -36,10 +36,10 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
 
     private static final Log log = LogFactory.getLog( OntologyFieldEnricher.class );
 
-    public OntologySearcher ontologySearcher;
+    public final OntologySearcher ontologySearcher;
 
-    private Map<String, Collection<Field>> cvCache;
-    private Map<String,OntologyTerm> ontologyTermCache;
+    private final Map<String, Collection<Field>> cvCache;
+    private final Map<String,OntologyTerm> ontologyTermCache;
 
     private Set<String> expandableOntologies;
 
@@ -52,7 +52,7 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
     }
 
     @Override
-    public boolean isExpandableOntology(String name) {
+    public boolean isExpandableOntology( final String name ) {
         if (expandableOntologies == null) {
             if (ontologySearcher == null) {
                 expandableOntologies = new HashSet<String>();
@@ -60,7 +60,7 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
                 try {
                     expandableOntologies = ontologySearcher.getOntologyNames();
                 } catch (SolrServerException e) {
-                    if (log.isErrorEnabled()) log.error("Problem getting list of ontology names: "+e.getMessage());
+                    if (log.isErrorEnabled()) log.error("Problem getting list of ontology names: " +e.getMessage(), e);
                     return false;
                 }
                 if (expandableOntologies.contains("uniprot taxonomy")) {
@@ -73,13 +73,13 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
     }
 
     public Field enrich(Field field) throws Exception {
-         if (field == null) return null;
+        if (field == null) return null;
 
         final OntologyTerm ontologyTerm = findOntologyTerm(field);
 
         if (ontologyTerm == null) return field;
 
-        return new Field(field.getType(), ontologyTerm.getId(), ontologyTerm.getName());
+        return convertTermToField( field.getType(), ontologyTerm );
     }
 
     /**
@@ -151,8 +151,6 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
     }
 
     private Field convertTermToField(String type, OntologyTerm term) {
-        Field field =
-                new Field( type, term.getId(), term.getName() );
-        return field;
+        return new Field( type, term.getId(), term.getName() );
     }
 }

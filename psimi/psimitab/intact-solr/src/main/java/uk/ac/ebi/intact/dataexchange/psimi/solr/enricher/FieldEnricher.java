@@ -7,6 +7,8 @@ import java.util.Collection;
 import org.apache.solr.client.solrj.SolrServerException;
 
 /**
+ * Definition of a field enricher.
+ *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */

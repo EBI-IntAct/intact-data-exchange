@@ -21,6 +21,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 
 import java.io.IOException;
@@ -35,10 +36,10 @@ import java.util.*;
  */
 public class LazyLoadedOntologyTerm implements OntologyTerm {
 
-    private OntologySearcher searcher;
+    private final OntologySearcher searcher;
 
-    private String id;
-    private String name;
+    private final String id;
+    private final String name;
 
     private List<OntologyTerm> parents;
     private List<OntologyTerm> children;
@@ -79,16 +80,14 @@ public class LazyLoadedOntologyTerm implements OntologyTerm {
     public List<OntologyTerm> getParents(boolean includeCyclic) {
         if (parents != null) {
             return parents;
-       }
-
-        this.parents = new ArrayList<OntologyTerm>();
+        }
 
         try {
             final QueryResponse queryResponse = searcher.searchByChildId(id, 0, Integer.MAX_VALUE);
-
+            this.parents = new ArrayList<OntologyTerm>( queryResponse.getResults().size() );
             parents.addAll(processParentsHits(queryResponse, id));
         } catch (Exception e) {
-            throw new IllegalStateException("Problem getting parents for document: "+id, e);
+            throw new IllegalStateException("Problem getting parents for document: " + id, e);
         }
 
         return parents;
@@ -165,16 +164,21 @@ public class LazyLoadedOntologyTerm implements OntologyTerm {
         return terms;
     }
 
-    private List<OntologyTerm> processParentsHits(QueryResponse queryResponse, String id) throws IOException, SolrServerException {
-        List<OntologyTerm> terms = new ArrayList<OntologyTerm>();
+    private List<OntologyTerm> processOntologyTermHits( final QueryResponse queryResponse,
+                                                        final String id,
+                                                        final String termIdKey,
+                                                        final String termNameKey ) throws SolrServerException {
+        
+        final SolrDocumentList results = queryResponse.getResults();
+        List<OntologyTerm> terms = new ArrayList<OntologyTerm>( results.size() );
 
-        List<String> processedIds = new ArrayList<String>();
+        List<String> processedIds = new ArrayList<String>( results.size() + 1 );
         processedIds.add(id);
 
-        for (SolrDocument solrDocument : queryResponse.getResults()) {
+        for ( SolrDocument solrDocument : results ) {
 
-            String parentId = (String) solrDocument.getFieldValue(OntologyFieldNames.PARENT_ID);
-            String parentName = (String) solrDocument.getFieldValue(OntologyFieldNames.PARENT_NAME);
+            String parentId = (String) solrDocument.getFieldValue( termIdKey );
+            String parentName = (String) solrDocument.getFieldValue( termNameKey );
 
             if (parentId != null && !processedIds.contains(parentId)) {
                 terms.add(newInternalOntologyTerm(searcher, parentId, parentName));
@@ -185,28 +189,26 @@ public class LazyLoadedOntologyTerm implements OntologyTerm {
         return terms;
     }
 
-    private List<OntologyTerm> processChildrenHits(QueryResponse queryResponse, String id) throws IOException, SolrServerException {
-        List<OntologyTerm> terms = new ArrayList<OntologyTerm>();
-
-        List<String> processedIds = new ArrayList<String>();
-        processedIds.add(id);
-
-        for (SolrDocument solrDocument : queryResponse.getResults()) {
-
-            String childId = (String) solrDocument.getFieldValue(OntologyFieldNames.CHILD_ID);
-            String childName = (String) solrDocument.getFieldValue(OntologyFieldNames.CHILD_NAME);
-
-            if (childId != null && !processedIds.contains(childId)) {
-                terms.add(newInternalOntologyTerm(searcher, childId, childName));
-                processedIds.add(childId);
-            }
-        }
-
-        return terms;
+    private List<OntologyTerm> processParentsHits(QueryResponse queryResponse, String id) throws IOException,
+                                                                                                 SolrServerException {
+        return processOntologyTermHits( queryResponse,
+                                        id,
+                                        OntologyFieldNames.PARENT_ID,
+                                        OntologyFieldNames.PARENT_NAME );
     }
 
-    protected OntologyTerm newInternalOntologyTerm(OntologySearcher searcher, String id, String name) throws SolrServerException {
-        return new LazyLoadedOntologyTerm(searcher, id, name);
+    private List<OntologyTerm> processChildrenHits(QueryResponse queryResponse, String id) throws IOException,
+                                                                                                  SolrServerException {
+        return processOntologyTermHits( queryResponse,
+                                        id,
+                                        OntologyFieldNames.CHILD_ID,
+                                        OntologyFieldNames.CHILD_NAME );
+    }
+
+    protected OntologyTerm newInternalOntologyTerm(OntologySearcher searcher,
+                                                   String id,
+                                                   String name) throws SolrServerException {
+        return new LazyLoadedOntologyTerm( searcher, id, name );
     }
 
     @Override
@@ -238,4 +240,3 @@ public class LazyLoadedOntologyTerm implements OntologyTerm {
         return sb.toString();
     }
 }
-

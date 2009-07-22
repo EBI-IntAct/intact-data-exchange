@@ -18,6 +18,8 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
 
 /**
+ * Default document filtering based on relationship types of documents.
+ *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
@@ -33,8 +35,8 @@ public class DefaultDocumentFilter implements DocumentFilter {
         if (ontologyDocument.getRelationshipType() == null) {
             return true;
         }
-        
-        return (ontologyDocument.getRelationshipType().contains("is_a") &&
-                !ontologyDocument.isCyclicRelationship());
+
+        final String type = ontologyDocument.getRelationshipType();
+        return (( type.equals("is_a") || type.equals("OBO_REL:is_a")) && !ontologyDocument.isCyclicRelationship());
     }
 }
