@@ -66,7 +66,6 @@ public class OntologyBinaryInteractionEnricherTest {
 
         CrossReference xref = new CrossReferenceImpl("go", "GO:0030246", "lalala");
         enricher.enrich(xref);
-        System.out.println(xref);
 
         Assert.assertEquals("go", xref.getDatabase());
         Assert.assertEquals("GO:0030246", xref.getIdentifier());
