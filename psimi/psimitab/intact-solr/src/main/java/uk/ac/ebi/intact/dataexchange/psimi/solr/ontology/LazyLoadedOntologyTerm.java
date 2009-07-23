@@ -79,17 +79,20 @@ public class LazyLoadedOntologyTerm implements OntologyTerm {
 
     public List<OntologyTerm> getParents(boolean includeCyclic) {
         if (parents != null) {
+            System.out.println( "parents.size() = " + parents.size() + " CACHED!!");
             return parents;
         }
 
         try {
             final QueryResponse queryResponse = searcher.searchByChildId(id, 0, Integer.MAX_VALUE);
+            System.out.println( "searcher.searchByChildId('"+ id +"') returned " + queryResponse.getResults().size() + " elements");
             this.parents = new ArrayList<OntologyTerm>( queryResponse.getResults().size() );
             parents.addAll(processParentsHits(queryResponse, id));
         } catch (Exception e) {
             throw new IllegalStateException("Problem getting parents for document: " + id, e);
         }
 
+        System.out.println( "parents.size() = " + parents.size() );
         return parents;
     }
 
@@ -135,15 +138,23 @@ public class LazyLoadedOntologyTerm implements OntologyTerm {
     }
 
     protected Set<OntologyTerm> getAllParentsToRoot(OntologyTerm ontologyTerm) {
+        return getAllParentsToRoot( ontologyTerm, "" );
+    }
+
+    private Set<OntologyTerm> getAllParentsToRoot(OntologyTerm ontologyTerm, String prefix ) {
         Set<OntologyTerm> parents = new HashSet<OntologyTerm>();
+
+        System.out.println( prefix + ontologyTerm.getName() + " ("+ ontologyTerm.getId() +")" );
 
         for (OntologyTerm parent : ontologyTerm.getParents()) {
             parents.add(parent);
-            parents.addAll(getAllParentsToRoot(parent));
+            parents.addAll(getAllParentsToRoot(parent, prefix + "  "));
         }
 
         return parents;
     }
+
+
 
     public Collection<OntologyTerm> getChildrenAtDepth(int depth) {
         return getChildren(this, 0, depth).get(depth);

@@ -39,23 +39,7 @@ import java.util.Collection;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class IntactSolrSearcherTest {
-
-    private SolrJettyRunner solrJettyRunner;
-
-    @Before
-    public void before() throws Exception {
-        solrJettyRunner = new SolrJettyRunner();
-        
-        solrJettyRunner.start();
-    }
-
-    @After
-    public void after() throws Exception {
-        //solrJettyRunner.join();
-        solrJettyRunner.stop();
-        solrJettyRunner = null;
-    }
+public class IntactSolrSearcherTest extends AbstractSolrTestCase {
 
     @Test
     public void search() throws Exception  {
@@ -88,7 +72,7 @@ public class IntactSolrSearcherTest {
                 .addFacetField("intact_byInteractorType_mi0326")
                 .addFacetField("intact_byInteractorType_mi0328");
 
-        QueryResponse response = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB).query(query);
+        QueryResponse response = getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB).query(query);
 
         FacetField ffProt = response.getFacetField("intact_byInteractorType_mi0326");
         Assert.assertEquals(129, ffProt.getValueCount());
@@ -105,7 +89,7 @@ public class IntactSolrSearcherTest {
 
         SolrQuery query = new SolrQuery("*:*");
 
-        IntactSolrSearcher searcher = new IntactSolrSearcher(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB));
+        IntactSolrSearcher searcher = new IntactSolrSearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
 
         Assert.assertEquals(129, searcher.searchInteractors(query, "MI:0326").size());
         Assert.assertEquals(5, searcher.searchInteractors(query, "MI:0328").size());
@@ -134,14 +118,15 @@ public class IntactSolrSearcherTest {
                 "interpro:IPR001849|interpro:IPR011993|ensembl:ENSG00000169047|rcsb pdb:1IRS|rcsb pdb:1K3A|rcsb pdb:1QQG" +
                 "\tintact:EBI-711879\tMI:0326(protein)\tMI:0326(protein)\ttaxid:-1(in vitro)\t-\t-\t-";
 
-        IntactSolrIndexer indexer = new IntactSolrIndexer(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB), solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB),
+                                                          getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
         indexer.indexOntologies(new OntologyMapping[] {
                 new OntologyMapping("go", IntactSolrIndexerTest.class.getResource("/META-INF/goslim_generic.obo"))});
         indexer.indexMitab(new ByteArrayInputStream(mitab.getBytes()), false);
 
         SolrQuery solrQuery = new SolrQuery("P35568");
 
-        IntactSolrSearcher searcher = new IntactSolrSearcher(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB));
+        IntactSolrSearcher searcher = new IntactSolrSearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
 
         SolrSearchResult result = searcher.search(solrQuery);
 
@@ -233,14 +218,14 @@ public class IntactSolrSearcherTest {
     }
 
     private void assertCount(Number count, String searchQuery) throws IntactSolrException {
-        IntactSolrSearcher searcher = new IntactSolrSearcher(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB));
+        IntactSolrSearcher searcher = new IntactSolrSearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
         SolrSearchResult result = searcher.search(searchQuery, null, null);
 
         assertEquals(count, result.getTotalCount());
     }
 
     private void indexFromClasspath(String resource, boolean hasHeader) throws IOException, IntactSolrException {
-        IntactSolrIndexer indexer = new IntactSolrIndexer(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB));
+        IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
         indexer.indexMitabFromClasspath(resource, hasHeader);
     }
 
@@ -252,7 +237,7 @@ public class IntactSolrSearcherTest {
 
         SolrQuery query = new SolrQuery( "P20053" );
 
-        IntactSolrSearcher searcher = new IntactSolrSearcher( solrJettyRunner.getSolrServer( CoreNames.CORE_PUB ) );
+        IntactSolrSearcher searcher = new IntactSolrSearcher( getSolrJettyRunner().getSolrServer( CoreNames.CORE_PUB ) );
 
         Assert.assertEquals( 34, searcher.searchInteractors( query, "MI:0326" ).size() );
 
@@ -264,7 +249,7 @@ public class IntactSolrSearcherTest {
                 .addFacetField( "intact_byInteractorType_mi0326" )
                 .addFacetField( "intact_byInteractorType_mi0328" );
 
-        QueryResponse response = solrJettyRunner.getSolrServer( CoreNames.CORE_PUB ).query( queryFacetted );
+        QueryResponse response = getSolrJettyRunner().getSolrServer( CoreNames.CORE_PUB ).query( queryFacetted );
 
         boolean ebi340 = false;
         boolean ebi421 = false;

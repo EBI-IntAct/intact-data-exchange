@@ -37,6 +37,12 @@ public class DefaultDocumentFilter implements DocumentFilter {
         }
 
         final String type = ontologyDocument.getRelationshipType();
-        return (( type.equals("is_a") || type.equals("OBO_REL:is_a")) && !ontologyDocument.isCyclicRelationship());
+        // note that the types are ordered by decreasing likelyhood of appearence to improve performance
+        return (    type.equals( "OBO_REL:is_a" )
+                 || type.equals( "part_of" )
+                 || type.equals( "is_a" )
+                 || type.equals( "OBO_REL:part_of" )
+               )
+               && ! ontologyDocument.isCyclicRelationship();
     }
 }

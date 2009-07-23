@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * TODO comment that class header
+ * LazyLoadedOntologyTerm Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -86,14 +86,14 @@ public class LazyLoadedOntologyTermTest {
         Assert.assertEquals("biological_process", term.getName());
 
         Assert.assertEquals(0, term.getParents().size());
-        Assert.assertEquals(21, term.getChildren().size());
+        Assert.assertEquals(23, term.getChildren().size());
 
         Assert.assertEquals("GO:0000003", term.getChildren().get(0).getId());
-        Assert.assertEquals("GO:0006950", term.getChildren().get(1).getId());
-        Assert.assertEquals("GO:0007154", term.getChildren().get(3).getId());
-        Assert.assertEquals("cell cycle", term.getChildren().get(2).getName());
-        Assert.assertEquals("cell communication", term.getChildren().get(3).getName());
-        Assert.assertEquals("GO:0050789", term.getChildren().get(20).getId());
+        Assert.assertEquals("GO:0006810", term.getChildren().get(1).getId());
+        Assert.assertEquals("GO:0007049", term.getChildren().get(3).getId());
+        Assert.assertEquals("response to stress", term.getChildren().get(2).getName());
+        Assert.assertEquals("cell cycle", term.getChildren().get(3).getName());
+        Assert.assertEquals("GO:0040007", term.getChildren().get(20).getId());
     }
 
     @Test
@@ -125,10 +125,10 @@ public class LazyLoadedOntologyTermTest {
         OntologyTerm term = new LazyLoadedOntologyTerm(searcher, "GO:0008150");
 
         final Collection<OntologyTerm> children = term.getChildrenAtDepth(1);
-        Assert.assertEquals(21, children.size());
+        Assert.assertEquals(23, children.size());
 
         final Collection<OntologyTerm> grandChildren = term.getChildrenAtDepth(2);
-        Assert.assertEquals(12, grandChildren.size());
+        Assert.assertEquals(15, grandChildren.size());
 
         final Collection<OntologyTerm> itself = term.getChildrenAtDepth(0);
         Assert.assertEquals(1, itself.size());

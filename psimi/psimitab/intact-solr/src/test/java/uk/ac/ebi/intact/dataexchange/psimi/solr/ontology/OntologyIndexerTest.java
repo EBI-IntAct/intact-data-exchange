@@ -42,9 +42,7 @@ public class OntologyIndexerTest  {
     @Before
     public void before() throws Exception {
         solrJettyRunner = new SolrJettyRunner();
-
         solrJettyRunner.start();
-
     }
 
     @After
@@ -66,7 +64,7 @@ public class OntologyIndexerTest  {
         QueryResponse queryResponse = solrServer.query(query);
 
         // 990 is_a relationship, and likely 793 leaf terms (I didn't count them by hand ;))
-        Assert.assertEquals(1783, queryResponse.getResults().getNumFound());
+        Assert.assertEquals(1799, queryResponse.getResults().getNumFound());
     }
 
     @Test
@@ -81,7 +79,7 @@ public class OntologyIndexerTest  {
         QueryResponse queryResponse = solrServer.query(query);
 
         // 3 terms, 2 relationship (1 is_a, 1 part_of)
-        Assert.assertEquals( 3, queryResponse.getResults().getNumFound() );
+        Assert.assertEquals( 4, queryResponse.getResults().getNumFound() );
     }
 
     @Test
@@ -103,11 +101,11 @@ public class OntologyIndexerTest  {
         //     |       |    \     /
         // MI:0045  MI:0063  MI:0362
 
-        // expected: root + count(is_a relationship) + count(leafs): 1 + 4 + 3
-        Assert.assertEquals( 8, queryResponse.getResults().getNumFound() );
+        // expected: root + count(is_a/part_of relationship) + count(leafs): 1 + 6 + 3
+        Assert.assertEquals( 10, queryResponse.getResults().getNumFound() );
     }
 
-     @Test
+    @Test
     public void testIndexTaxonomy() throws Exception{
         SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
 

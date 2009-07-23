@@ -40,8 +40,10 @@ public class OntologySearcher {
     private static final int PARENTS_CACHE_SIZE = 10000;
 
     private final SolrServer solrServer;
+
     private final Map<String,QueryResponse> childSearchesMap;
     private final Map<String,QueryResponse> parentSearchesMap;
+
     private Set<String> ontologyNames;
 
     public OntologySearcher(SolrServer solrServer) {
@@ -61,21 +63,43 @@ public class OntologySearcher {
 
     private QueryResponse searchById( String id, Integer firstResult, Integer maxResults,
                                       final String fieldId, Map<String,QueryResponse> cache ) throws SolrServerException {
-        if (cache.containsKey(id)) {
-            return cache.get(id);
+        // We need to include the maxResult in the key as we do different maxResult for
+        // the same term, hence we could end up getting the wrong number of term.
+        final String key = id + maxResults;
+
+        if (cache.containsKey(key)) {
+            return cache.get(key);
         }
 
         QueryResponse queryResponse = searchById( fieldId, id, firstResult, maxResults);
 
-        cache.put(id, queryResponse);
+        cache.put(key, queryResponse);
 
         return queryResponse;
     }
 
+    /**
+     * Search by child id so return parent relationship.
+     *
+     * @param id
+     * @param firstResult
+     * @param maxResults
+     * @return
+     * @throws SolrServerException
+     */
     public QueryResponse searchByChildId(String id, Integer firstResult, Integer maxResults) throws SolrServerException {
         return searchById( id, firstResult, maxResults, OntologyFieldNames.CHILD_ID, childSearchesMap );
     }
 
+    /**
+     * Search by parent Id so returns children relationship.
+     *
+     * @param id
+     * @param firstResult
+     * @param maxResults
+     * @return
+     * @throws SolrServerException
+     */
     public QueryResponse searchByParentId(String id, Integer firstResult, Integer maxResults) throws SolrServerException {
         return searchById( id, firstResult, maxResults, OntologyFieldNames.PARENT_ID, parentSearchesMap );
     }

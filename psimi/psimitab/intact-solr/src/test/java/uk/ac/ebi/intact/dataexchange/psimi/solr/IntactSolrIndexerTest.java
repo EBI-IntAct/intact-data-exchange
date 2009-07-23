@@ -43,43 +43,23 @@ import java.util.Set;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class IntactSolrIndexerTest {
-
-    private SolrJettyRunner solrJettyRunner;
-    private IntactSolrIndexer indexer;
-
-    @Before
-    public void before() throws Exception {
-        solrJettyRunner = new SolrJettyRunner();
-        solrJettyRunner.start();
-
-        indexer = new IntactSolrIndexer(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB),
-                                        solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
-    }
-
-    @After
-    public void after() throws Exception {
-        solrJettyRunner.stop();
-        solrJettyRunner = null;
-
-        indexer = null;
-    }
+public class IntactSolrIndexerTest extends AbstractSolrTestCase {
 
     @Test
     public void indexMitabFromClasspath() throws Exception {
-        indexer.indexMitabFromClasspath("/mitab_samples/intact200.txt", true);
+        getIndexer().indexMitabFromClasspath("/mitab_samples/intact200.txt", true);
         assertCount(200, "*:*");
     }
 
     @Test
     public void indexMitabFromClasspath2() throws Exception {
-        indexer.indexMitabFromClasspath("/mitab_samples/intact200.txt", true, 10, 20);
+        getIndexer().indexMitabFromClasspath("/mitab_samples/intact200.txt", true, 10, 20);
         assertCount(20, "*:*");
     }
     
     @Test
     public void indexMitabFromClasspath3() throws Exception {
-        indexer.indexMitabFromClasspath("/mitab_samples/intact200.txt", true, 190, 20);
+        getIndexer().indexMitabFromClasspath("/mitab_samples/intact200.txt", true, 190, 20);
         assertCount(10, "*:*");
     }
 
@@ -98,14 +78,14 @@ public class IntactSolrIndexerTest {
                            "isoform-comment:May be produced by alternative promoter usage\t" +
                            "isoform-comment:May be produced at very low levels due to a premature stop codon in the mRNA, leading to nonsense-mediated mRNA decay\t-\t-\t-";
 
-        indexer.indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
+        getIndexer().indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
 
         assertCount(1, "*:*");
     }
 
     @Test
     public void toSolrDocument_goExpansion() throws Exception {
-        indexer.indexOntologies(new OntologyMapping[] {
+        getIndexer().indexOntologies(new OntologyMapping[] {
                 new OntologyMapping("go", IntactSolrIndexerTest.class.getResource("/META-INF/goslim_generic.obo"))
         });
 
@@ -116,7 +96,7 @@ public class IntactSolrIndexerTest {
                               "\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
                               "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tgo:\""+goTermToExpand+"\"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
 
-        OntologySearcher ontologySearcher = new OntologySearcher(solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
 
         final Set<String> ontologyNames = ontologySearcher.getOntologyNames();
         Assert.assertEquals(1, ontologyNames.size());
@@ -136,7 +116,7 @@ public class IntactSolrIndexerTest {
 
     @Test
     public void toSolrDocument_goDescriptionUpdate() throws Exception {
-        indexer.indexOntologies(new OntologyMapping[] {
+        getIndexer().indexOntologies(new OntologyMapping[] {
                 new OntologyMapping("go", IntactSolrIndexerTest.class.getResource("/META-INF/goslim_generic.obo"))
         });
 
@@ -147,7 +127,7 @@ public class IntactSolrIndexerTest {
                               "\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
                               "\tMI:0499(unspecified role)\tinterpro:IPR004829|\t"+goTermToExpand+"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
 
-        OntologySearcher ontologySearcher = new OntologySearcher(solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
         SolrDocumentConverter converter = new SolrDocumentConverter(new IntactDocumentDefinition(), ontologySearcher);
 
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
@@ -175,9 +155,9 @@ public class IntactSolrIndexerTest {
                 "\tintact:EBI-711879\tMI:0326(protein)\tMI:0326(protein)\ttaxid:-1(in vitro)\t-\t-\t-";
 
         OntologyIterator taxonomyIterator = new UniprotTaxonomyOntologyIterator(IntactSolrSearcherTest.class.getResourceAsStream("/META-INF/hominidae-taxonomy.tsv"));
-        indexer.indexOntology(taxonomyIterator);
+        getIndexer().indexOntology(taxonomyIterator);
 
-        OntologySearcher ontologySearcher = new OntologySearcher(solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
         SolrDocumentConverter converter = new SolrDocumentConverter(new IntactDocumentDefinition(), ontologySearcher);
 
         SolrInputDocument doc = converter.toSolrDocument(mitab);
@@ -198,7 +178,7 @@ public class IntactSolrIndexerTest {
                               "\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
                               "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tGO:012345\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
         
-        indexer.indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
+        getIndexer().indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
 
         assertCount(1, "Nefh*");
     }
@@ -213,11 +193,11 @@ public class IntactSolrIndexerTest {
 
         OntologyIterator taxonomyIterator = new UniprotTaxonomyOntologyIterator(IntactSolrSearcherTest.class.getResourceAsStream("/META-INF/hominidae-taxonomy.tsv"));
 
-        IntactSolrIndexer solrIndexer = new IntactSolrIndexer(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB), solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
-        solrIndexer.indexOntology(taxonomyIterator);
-        solrIndexer.indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
+        IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB), getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        indexer.indexOntology(taxonomyIterator);
+        indexer.indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
 
-        SolrServer pubCore = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
+        SolrServer pubCore = getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB);
         QueryResponse queryResponse = pubCore.query(new SolrQuery("P16884"));
 
         SolrDocument doc = queryResponse.getResults().get(0);
@@ -227,7 +207,7 @@ public class IntactSolrIndexerTest {
     }
 
     private void assertCount(Number count, String searchQuery) throws IntactSolrException {
-        IntactSolrSearcher searcher = new IntactSolrSearcher(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB));
+        IntactSolrSearcher searcher = new IntactSolrSearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
         SolrSearchResult result = searcher.search(searchQuery, null, null);
 
         assertEquals(count.longValue(), result.getTotalCount());
@@ -235,14 +215,14 @@ public class IntactSolrIndexerTest {
 
     @Test
     public void retrying() throws Exception {
-        solrJettyRunner.stop();
+        getSolrJettyRunner().stop();
 
         Thread t = new Thread() {
 
             @Override
             public void run() {
                 try {
-                    indexer.indexMitabFromClasspath("/mitab_samples/intact200.txt", true);
+                    getIndexer().indexMitabFromClasspath("/mitab_samples/intact200.txt", true);
                 } catch (IOException e) {
                     Assert.fail("An IOException was thrown");
                 }
@@ -253,7 +233,7 @@ public class IntactSolrIndexerTest {
         
         Thread.sleep(5*1000);
 
-        solrJettyRunner.start();
+        getSolrJettyRunner().start();
 
         while (t.isAlive()) {
            Thread.sleep(500);
