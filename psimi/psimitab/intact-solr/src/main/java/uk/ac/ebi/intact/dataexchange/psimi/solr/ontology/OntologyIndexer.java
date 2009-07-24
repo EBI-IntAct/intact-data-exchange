@@ -17,6 +17,8 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.OboOntologyIterator;
@@ -35,6 +37,8 @@ import java.net.URL;
  * @version $Id$
  */
 public class OntologyIndexer {
+
+    private static final Log log = LogFactory.getLog( OntologyIndexer.class );
 
     private SolrServer solrServer;
 
@@ -60,6 +64,9 @@ public class OntologyIndexer {
 
     public void indexObo(String ontologyName, URL oboUrl, DocumentFilter documentFilter) throws IntactSolrException {
         OntologyIterator oboIterator;
+
+        if ( log.isInfoEnabled() ) log.info( "Starting to index " + ontologyName + " from " + oboUrl );
+
         try {
             oboIterator = new OboOntologyIterator(ontologyName, oboUrl);
         } catch (Throwable e) {
@@ -72,6 +79,7 @@ public class OntologyIndexer {
     public void indexUniprotTaxonomy() throws IntactSolrException {
         OntologyIterator ontologyIterator;
         try {
+            if ( log.isInfoEnabled() ) log.info( "Starting to index uniprot taxonomy" );
             ontologyIterator = new UniprotTaxonomyOntologyIterator();
         } catch (Throwable e) {
             throw new IntactSolrException("Problem creating default Uniprot taxonomy iterator", e);
@@ -95,10 +103,13 @@ public class OntologyIndexer {
 
             if (i % 100 == 0) {
                 commitSolr(false);
+                if ( log.isInfoEnabled() ) log.info( i + " terms processed" );
             }
         }
 
         commitSolr(true);
+        
+        if ( log.isInfoEnabled() ) log.info( "Completed processing of " + i + " terms." );
     }
 
     public void index(OntologyDocument ontologyDocument) throws IntactSolrException {
