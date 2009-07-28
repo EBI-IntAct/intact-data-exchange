@@ -49,7 +49,7 @@ public class ConverterContext {
     }
 
     private ConverterContext() {
-        this.generateExpandedXml = false;
+        this.generateExpandedXml = true;
         this.configInteractor = new InteractorConverterConfig();
         this.configAnnotation = new AnnotationConverterConfig();
         this.configInteraction = new InteractionConverterConfig();

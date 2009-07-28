@@ -44,6 +44,8 @@ public class ComponentConverterTest extends IntactBasicTestCase {
         Component component = participantConverter.psiToIntact(participant);
 
         Assert.assertNotNull(component);
+        Assert.assertNotNull(component.getInteractor());
+        Assert.assertNotNull(component.getInteraction());
         Assert.assertEquals(1, component.getExperimentalRoles().size());
         Assert.assertNull(component.getExpressedIn());
 
@@ -70,6 +72,8 @@ public class ComponentConverterTest extends IntactBasicTestCase {
         Participant participant = participantConverter.intactToPsi(component);
 
         Assert.assertNotNull(participant);
+        Assert.assertNotNull(participant.getInteractor());
+        Assert.assertNull(participant.getInteraction()); // we don't go upwars in the conversion
         Assert.assertEquals(1, participant.getExperimentalRoles().size());
         Assert.assertEquals(1, participant.getHostOrganisms().size());
 
