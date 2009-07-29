@@ -393,10 +393,9 @@ public class CCLineExport extends LineExport {
         Set<String> pubmeds = getPumedIds( eligibleExperiments, false );
         if(!pubmeds.isEmpty()) {
             buffer.append("(");
-            buffer.append("PubMed:");
             for ( Iterator<String> iterator = pubmeds.iterator(); iterator.hasNext(); ) {
                 String pubmed = iterator.next();
-                buffer.append( pubmed );
+                buffer.append("PubMed:").append( pubmed );
                 if(iterator.hasNext()) {
                    buffer.append( ", " );
                 }
