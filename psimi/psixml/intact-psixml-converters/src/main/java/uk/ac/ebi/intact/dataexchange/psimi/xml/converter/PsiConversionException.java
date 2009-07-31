@@ -18,7 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationTree;
 
 /**
- * TODO comment this
+ * Psi Conversion Exception.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$

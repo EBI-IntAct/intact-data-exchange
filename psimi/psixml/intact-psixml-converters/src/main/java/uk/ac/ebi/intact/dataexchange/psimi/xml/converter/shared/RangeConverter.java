@@ -19,12 +19,13 @@ import psidev.psi.mi.xml.model.Interval;
 import psidev.psi.mi.xml.model.Position;
 import psidev.psi.mi.xml.model.RangeStatus;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.model.CvFuzzyType;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.Range;
 
 /**
- * TODO comment this
+ * Range Converter.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -34,7 +35,6 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
     public RangeConverter(Institution institution) {
         super(institution);
     }
-
 
     public Range psiToIntact(psidev.psi.mi.xml.model.Range psiObject) {
         Integer beginIntervalFrom = null;
@@ -67,6 +67,9 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
 
         String seq = null;
 
+        if( beginIntervalFrom == null || endIntervalTo == null ) {
+            throw new PsiConversionException( "Cannot convert a Range without specific location (begin, end) to the IntAct data model." );
+        }
         Range range = new Range(getInstitution(), beginIntervalFrom, endIntervalTo, seq);
         range.setFromIntervalStart(beginIntervalFrom);
         range.setFromIntervalEnd(beginIntervalTo);
@@ -130,7 +133,6 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
             RangeStatus endStatus = fuzzyTypeConverter.intactToPsi(toFuzzyType);
             psiRange.setEndStatus(endStatus);
         }
-
 
         return psiRange;
     }
