@@ -20,7 +20,7 @@ import org.junit.Test;
 import psidev.psi.mi.xml.model.*;
 
 /**
- * TODO comment this
+ * FeatureConverter Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -55,6 +55,5 @@ public class FeatureConverterTest extends AbstractConverterTest {
             Assert.assertEquals(psiFeature.getFeatureType().getNames().getShortLabel(), feature.getCvFeatureType().getShortLabel());
             Assert.assertEquals(psiFeature.getRanges().size(), feature.getRanges().size());
         }
-
     }
 }
