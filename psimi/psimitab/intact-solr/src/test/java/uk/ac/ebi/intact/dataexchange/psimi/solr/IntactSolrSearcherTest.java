@@ -18,13 +18,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.junit.After;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
+import uk.ac.ebi.intact.bridges.ontologies.iterator.OntologyIterator;
+import uk.ac.ebi.intact.bridges.ontologies.iterator.UniprotTaxonomyOntologyIterator;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
@@ -122,6 +121,10 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
                                                           getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
         indexer.indexOntologies(new OntologyMapping[] {
                 new OntologyMapping("go", IntactSolrIndexerTest.class.getResource("/META-INF/goslim_generic.obo"))});
+
+        OntologyIterator taxonomyIterator = new UniprotTaxonomyOntologyIterator(IntactSolrSearcherTest.class.getResourceAsStream("/META-INF/hominidae-taxonomy.tsv"));
+        indexer.indexOntology(taxonomyIterator);
+
         indexer.indexMitab(new ByteArrayInputStream(mitab.getBytes()), false);
 
         SolrQuery solrQuery = new SolrQuery("P35568");
@@ -161,10 +164,10 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         Assert.assertEquals("pubmed", get(0, binaryInteraction.getPublications()).getDatabase());
         Assert.assertEquals("9606", get(0, ia.getOrganism().getIdentifiers()).getIdentifier());
         Assert.assertEquals("taxid", get(0, ia.getOrganism().getIdentifiers()).getDatabase());
-        Assert.assertEquals("human", get(0, ia.getOrganism().getIdentifiers()).getText());
+        Assert.assertEquals("Human", get(0, ia.getOrganism().getIdentifiers()).getText());
         Assert.assertEquals("9606", get(0, ib.getOrganism().getIdentifiers()).getIdentifier());
         Assert.assertEquals("taxid", get(0, ib.getOrganism().getIdentifiers()).getDatabase());
-        Assert.assertEquals("human", get(0, ib.getOrganism().getIdentifiers()).getText());
+        Assert.assertEquals("Human", get(0, ib.getOrganism().getIdentifiers()).getText());
         Assert.assertEquals("MI:0217", get(0, binaryInteraction.getInteractionTypes()).getIdentifier());
         Assert.assertEquals("psi-mi", get(0, binaryInteraction.getInteractionTypes()).getDatabase());
         Assert.assertEquals("phosphorylation", get(0, binaryInteraction.getInteractionTypes()).getText());
