@@ -26,6 +26,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.Resource;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
+import uk.ac.ebi.intact.bridges.ontologies.iterator.UniprotTaxonomyOntologyIterator;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologyIndexer;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public class OntologyPopulatorTasklet implements Tasklet{
 
     private Resource ontologiesSolrUrl;
     private List<OntologyMapping> oboOntologyMappings;
+    private List<OntologyMapping> taxonomyOntologyMappings;
     private boolean indexUniprotTaxonomy;
 
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -48,8 +50,18 @@ public class OntologyPopulatorTasklet implements Tasklet{
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(ontologiesSolrServer);
 
+        if (taxonomyOntologyMappings != null) {
+            indexUniprotTaxonomy = true;
+        }
+
         if (indexUniprotTaxonomy) {
-            ontologyIndexer.indexUniprotTaxonomy();
+            if (taxonomyOntologyMappings == null) {
+                ontologyIndexer.indexUniprotTaxonomy();
+            } else {
+                for (OntologyMapping om : taxonomyOntologyMappings) {
+                    ontologyIndexer.indexOntology(new UniprotTaxonomyOntologyIterator(om.getUrl()));
+                }
+            }
         }
 
         ontologyIndexer.indexObo(oboOntologyMappings.toArray(new OntologyMapping[oboOntologyMappings.size()]));
@@ -78,5 +90,9 @@ public class OntologyPopulatorTasklet implements Tasklet{
 
     public void setIndexUniprotTaxonomy(boolean indexUniprotTaxonomy) {
         this.indexUniprotTaxonomy = indexUniprotTaxonomy;
+    }
+
+    public void setTaxonomyOntologyMappings(List<OntologyMapping> taxonomyOntologyMappings) {
+        this.taxonomyOntologyMappings = taxonomyOntologyMappings;
     }
 }

@@ -78,7 +78,15 @@
                 </bean>
                 <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyMappingFactoryBean">
                     <property name="name" value="go"/>
-                    <property name="resource" value="http://www.geneontology.org/GO_slims/goslim_generic.obo"/>
+                    <property name="resource" value="classpath:/META-INF/goslim_generic.obo"/>
+                </bean>
+            </list>
+        </property>
+        <property name="taxonomyOntologyMappings">
+            <list>
+                <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyMappingFactoryBean">
+                    <property name="name" value="uniprot taxonomy"/>
+                    <property name="resource" value="classpath:/META-INF/hominidae-taxonomy.tsv"/>
                 </bean>
             </list>
         </property>

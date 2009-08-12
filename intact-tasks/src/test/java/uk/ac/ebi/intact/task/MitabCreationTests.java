@@ -69,7 +69,7 @@ public class MitabCreationTests extends IntactBasicTestCase {
     public void after() throws Exception {
 
         // uncommenting this will cause the test to hang - which might be used to perform extra solr query.
-//        solrJettyRunner.join();
+       // solrJettyRunner.join();
 
         solrJettyRunner.stop();
     }
@@ -93,6 +93,8 @@ public class MitabCreationTests extends IntactBasicTestCase {
         CvDatabase goDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO);
         proteinA.addXref(getMockBuilder().createXref(proteinA, "GO:0030246", null, goDb));
 
+        proteinA.getBioSource().setTaxId("9606");
+
         persisterHelper.save(interaction);
 
         Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
@@ -109,5 +111,6 @@ public class MitabCreationTests extends IntactBasicTestCase {
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("P12345")).getResults().getNumFound());
         Assert.assertEquals(1L, solrServer.query(new SolrQuery("Q00002")).getResults().getNumFound());
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("go:\"GO:0003674\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrServer.query(new SolrQuery("species:Catarrhini")).getResults().getNumFound());
     }
 }
