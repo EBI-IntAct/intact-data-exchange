@@ -25,6 +25,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
@@ -39,7 +40,7 @@ import java.util.List;
 import java.util.Iterator;
 
 /**
- * Main utility to enrich a Psi file with additional information from the intact database and external sources
+ * Main utility to enrich a Psi file with additional information from the intact database and external sources.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -82,6 +83,10 @@ public class PsiEnricherImpl implements PsiEnricher {
         } catch (PsimiXmlReaderException e) {
             throw new PsiEnricherException("Problem reading source PSI", e);
         }
+
+        // make sure the converted XML is going to be expanded.
+        boolean wasGenerateExpandedXml = ConverterContext.getInstance().isGenerateExpandedXml();
+        ConverterContext.getInstance().setGenerateExpandedXml( true );
 
         enricherContext.setConfig(config);
 
@@ -134,9 +139,12 @@ public class PsiEnricherImpl implements PsiEnricher {
             throw new PsiEnricherException("Problem enriching data", ee);
         } catch (Exception e) {
             throw new PsiEnricherException("Problem writing output PSI", e);
+        } finally {
+
+            // Reset the expansion to what it was prior to running this.
+            ConverterContext.getInstance().setGenerateExpandedXml( wasGenerateExpandedXml );
         }
     }
-
 
     public EntrySet enrichEntrySet(EntrySet entrySet, EnricherConfig config) {
         EntrySet enrichedSet = new EntrySet();
@@ -164,7 +172,6 @@ public class PsiEnricherImpl implements PsiEnricher {
         enrichedEntry.getSource().setReleaseDate(entry.getSource().getReleaseDate());
 
         return enrichedEntry;
-
     }
 
     private EntrySet readEntrySet(InputStream is) throws IOException {
@@ -186,5 +193,4 @@ public class PsiEnricherImpl implements PsiEnricher {
             throw new PsiEnricherException(e);
         }
     }
-
 }
