@@ -38,11 +38,14 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
         exp.addXref(getMockBuilder().createXref(exp, "IM-1234", imexPrimary, imex));
 
+        interaction.addXref(getMockBuilder().createXref(interaction,  "IM-1234-1", imexPrimary, imex));
+
         BinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
 
         assertNotNull( bi );
 
         Assert.assertEquals(2, bi.getPublications().size());  // imex and pubmed
+        Assert.assertEquals(2, bi.getInteractionAcs().size());
     }
 
     @Test

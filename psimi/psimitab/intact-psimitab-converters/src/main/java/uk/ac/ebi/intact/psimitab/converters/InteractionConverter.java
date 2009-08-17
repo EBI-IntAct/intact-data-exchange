@@ -166,8 +166,19 @@ public class InteractionConverter {
         List<CrossReference> interactionAcs = new ArrayList<CrossReference>();
         if ( interaction.getAc() != null ) {
             interactionAcs.add( CrossReferenceFactory.getInstance().build( CvDatabase.INTACT, interaction.getAc() ) );
-            bi.setInteractionAcs( interactionAcs );
         }
+
+        // imex
+        for (InteractorXref xref : interaction.getXrefs()) {
+            if (xref.getCvXrefQualifier() != null) {
+                if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier()) ||
+                    CvXrefQualifier.IMEX_EVIDENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                    interactionAcs.add(CrossReferenceFactory.getInstance().build( CvDatabase.IMEX, xref.getPrimaryId() ));
+                }
+            }
+        }
+
+        bi.setInteractionAcs( interactionAcs );
 
         // set interaction type list
         if ( interaction.getCvInteractionType() != null ) {
