@@ -24,10 +24,7 @@ import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Interaction Converter.
@@ -81,12 +78,15 @@ public class InteractionConverter {
 
         final Collection<Experiment> experiments = interaction.getExperiments();
         
-        // set authors
         List<Author> authors = new ArrayList<Author>();
-        if ( experiments != null ) {
-            if (!experiments.isEmpty()) {
-                Experiment experiment = experiments.iterator().next();
+        List<InteractionDetectionMethod> detectionMethods = new ArrayList<InteractionDetectionMethod>();
+        Set<CrossReference> publications = new HashSet<CrossReference>();
+        List<CrossReference> hostOrganisms = new ArrayList<CrossReference>();
+        List<String> datasets = new ArrayList<String>();
 
+        if ( experiments != null ) {
+            for (Experiment experiment : experiments) {
+                if (authors.isEmpty()) {
                 Annotation authorAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.AUTHOR_LIST_MI_REF);
                 Annotation yearAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.PUBLICATION_YEAR_MI_REF);
 
@@ -101,21 +101,66 @@ public class InteractionConverter {
                 }
 
                 authors.add(new AuthorImpl(authorText));
-            }
-        }
-        bi.setAuthors( authors );
-
-        // set interaction detection method
-        List<InteractionDetectionMethod> detectionMethods = new ArrayList<InteractionDetectionMethod>();
-        if ( experiments != null ) {
-            for ( Experiment experiment : experiments) {
-                if ( experiment.getCvInteraction() != null ) {
-                    detectionMethods.add( ( InteractionDetectionMethod ) cvObjectConverter.
-                            toCrossReference( InteractionDetectionMethodImpl.class, experiment.getCvInteraction() ) );
                 }
+
+                // det methods
+                if (experiment.getCvInteraction() != null) {
+                    detectionMethods.add((InteractionDetectionMethod) cvObjectConverter.
+                            toCrossReference(InteractionDetectionMethodImpl.class, experiment.getCvInteraction()));
+                }
+
+                // publications and imex at the publication level
+                Collection<Xref> expAndPublicationXrefs = new HashSet<Xref>();
+                expAndPublicationXrefs.addAll(experiment.getXrefs());
+
+                if (experiment.getPublication() != null) {
+                    expAndPublicationXrefs.addAll(experiment.getPublication().getXrefs());
+                }
+
+                for (Xref xref : expAndPublicationXrefs) {
+                    if (xref.getCvXrefQualifier() != null && xref.getCvDatabase().getShortLabel() != null) {
+                        // publications
+                        if (CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                            CrossReference publication = CrossReferenceFactory.getInstance()
+                                    .build(xref.getCvDatabase().getShortLabel(), xref.getPrimaryId());
+                            publications.add(publication);
+                        }
+                        // imexId
+                        else if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                            CrossReference publication = CrossReferenceFactory.getInstance()
+                                    .build(xref.getCvDatabase().getShortLabel(), xref.getPrimaryId());
+                            publications.add(publication);
+                        }
+                    }
+                }
+
+                // host organism
+                String id = experiment.getBioSource().getTaxId();
+                if (id != null) {
+                    String text = experiment.getBioSource().getShortLabel();
+                    hostOrganisms.add(CrossReferenceFactory.getInstance().build(TAXID, id, text));
+                }
+
+                // datasets
+                 for ( Annotation annotation : experiment.getAnnotations() ) {
+                    if ( CvTopic.DATASET_MI_REF.equals(annotation.getCvTopic().getIdentifier()) ) {
+                        datasets.add( annotation.getAnnotationText() );
+                    }
+                }
+
+                // imex identifiers
+
             }
+
+
         }
+
+        bi.setAuthors( authors );
         bi.setDetectionMethods( detectionMethods );
+        bi.setPublications( new ArrayList<CrossReference>(publications) );
+        bi.setHostOrganism( hostOrganisms );
+        bi.setDataset( datasets );
+
 
         // set interaction acs list
         List<CrossReference> interactionAcs = new ArrayList<CrossReference>();
@@ -132,23 +177,6 @@ public class InteractionConverter {
             bi.setInteractionTypes( interactionTypes );
         }
 
-        // set publication list
-        List<CrossReference> publications = new ArrayList<CrossReference>();
-        if ( experiments != null ) {
-            for ( Experiment experiment : experiments) {
-                    for ( Xref xref : experiment.getXrefs() ) {
-                        if ( xref.getCvXrefQualifier() != null && xref.getCvDatabase().getShortLabel() != null ) {
-                            if ( CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier()) ) {
-                                CrossReference publication = CrossReferenceFactory.getInstance()
-                                        .build( xref.getCvDatabase().getShortLabel(), xref.getPrimaryId() );
-                                publications.add( publication );
-                            }
-                        }
-                }
-            }
-        }
-        bi.setPublications( publications );
-
         // set source database list
         if ( interaction.getOwner() != null && interaction.getOwner().getXrefs() != null ) {
             List<CrossReference> sourceDatabases = xConverter.toCrossReferences( interaction.getOwner().getXrefs(), true, false,CvDatabase.PSI_MI_MI_REF );
@@ -164,30 +192,6 @@ public class InteractionConverter {
         }
 
         // process extended
-
-        // set host organism
-        List<CrossReference> hostOrganisms = new ArrayList<CrossReference>();
-        for ( Experiment experiment : experiments) {
-            String id = experiment.getBioSource().getTaxId();
-            if ( id != null ) {
-                String text = experiment.getBioSource().getShortLabel();
-                hostOrganisms.add( CrossReferenceFactory.getInstance().build( TAXID, id, text ) );
-            }
-        }
-        bi.setHostOrganism( hostOrganisms );
-
-        // set dataset
-        if ( experiments != null ) {
-            List<String> datasets = new ArrayList<String>();
-            for ( Experiment experiment : experiments) {
-                for ( Annotation annotation : experiment.getAnnotations() ) {
-                    if ( CvTopic.DATASET_MI_REF.equals(annotation.getCvTopic().getIdentifier()) ) {
-                        datasets.add( annotation.getAnnotationText() );
-                    }
-                }
-            }
-            bi.setDataset( datasets );
-        }
 
         // expansion
         if (expansionStrategy != null && isExpanded) {

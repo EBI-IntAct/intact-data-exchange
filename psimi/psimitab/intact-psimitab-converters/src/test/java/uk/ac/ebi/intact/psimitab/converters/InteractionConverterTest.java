@@ -1,22 +1,18 @@
 package uk.ac.ebi.intact.psimitab.converters;
 
+import org.junit.Assert;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
-import org.junit.Assert;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.Interactor;
-import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.psimitab.model.Parameter;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
+import uk.ac.ebi.intact.psimitab.model.Parameter;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * InteractionConverter Tester.
@@ -37,9 +33,38 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         i.next().getInteractor().setAc( "EBI-xxxxxxx" );
         i.next().getInteractor().setAc( "EBI-yyyyyyy" );
 
+        Experiment exp = interaction.getExperiments().iterator().next();
+        CvDatabase imex = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
+        CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
+        exp.addXref(getMockBuilder().createXref(exp, "IM-1234", imexPrimary, imex));
+
         BinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
 
         assertNotNull( bi );
+
+        Assert.assertEquals(2, bi.getPublications().size());  // imex and pubmed
+    }
+
+    @Test
+    public void convertToMitab_imexInPub() throws Exception {
+        InteractionConverter interactionConverter = new InteractionConverter();
+
+        final Interaction interaction = getMockBuilder().createInteractionRandomBinary();
+        interaction.setAc( "EBI-zzzzzzz" );
+        Iterator<Component> i = interaction.getComponents().iterator();
+        i.next().getInteractor().setAc( "EBI-xxxxxxx" );
+        i.next().getInteractor().setAc( "EBI-yyyyyyy" );
+
+        Publication pub = interaction.getExperiments().iterator().next().getPublication();
+        CvDatabase imex = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
+        CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
+        pub.addXref(getMockBuilder().createXref(pub, "IM-1234", imexPrimary, imex));
+
+        BinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
+
+        assertNotNull( bi );
+
+        Assert.assertEquals(2, bi.getPublications().size());  // imex and pubmed
     }
 
     @Test
