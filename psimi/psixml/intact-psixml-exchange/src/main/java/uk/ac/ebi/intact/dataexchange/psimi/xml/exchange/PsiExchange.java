@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
 import psidev.psi.mi.xml.xmlindex.IndexedEntry;
 import psidev.psi.mi.xml.model.EntrySet;
+import psidev.psi.mi.xml.PsimiXmlForm;
+import psidev.psi.mi.xml.PsimiXmlVersion;
 
 /**
  * Psi Exchange definition.
@@ -42,4 +44,12 @@ public interface PsiExchange {
     void exportToPsiXml(File file, IntactEntry... intactEntries);
 
     EntrySet exportToEntrySet(IntactEntry... intactEntries);
+
+    public PsimiXmlForm getXmlForm();
+
+    public void setXmlForm(PsimiXmlForm xmlForm);
+
+    public PsimiXmlVersion getPsiVersion();
+
+    public void setPsiVersion(PsimiXmlVersion psiVersion);
 }

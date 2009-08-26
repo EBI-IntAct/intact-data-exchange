@@ -26,9 +26,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
-import psidev.psi.mi.xml.PsimiXmlWriter;
-import psidev.psi.mi.xml.PsimiXmlLightweightReader;
-import psidev.psi.mi.xml.PsimiXmlReaderException;
+import psidev.psi.mi.xml.*;
 import psidev.psi.mi.xml.xmlindex.IndexedEntry;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
@@ -68,6 +66,8 @@ public class PsiExchangeImpl implements PsiExchange {
 
     private PersisterHelper persisterHelper;
     private IntactContext intactContext;
+    private PsimiXmlForm xmlForm;
+    private PsimiXmlVersion psiVersion;
 
     /**
      * Sets up a logger for that class.
@@ -77,6 +77,33 @@ public class PsiExchangeImpl implements PsiExchange {
     public PsiExchangeImpl(IntactContext intactContext) {
         this.intactContext = intactContext;
         this.persisterHelper = intactContext.getPersisterHelper();
+        this.xmlForm = PsimiXmlForm.FORM_COMPACT;
+        this.psiVersion = PsimiXmlVersion.VERSION_254;
+    }
+
+    /////////////////////
+    // PsiExchange
+
+    public PsimiXmlForm getXmlForm() {
+        return xmlForm;
+    }
+
+    public void setXmlForm(PsimiXmlForm xmlForm) {
+        if (xmlForm == null) {
+            throw new IllegalArgumentException("You must give a non null xmlForm");
+        }
+        this.xmlForm = xmlForm;
+    }
+
+    public PsimiXmlVersion getPsiVersion() {
+        return psiVersion;
+    }
+
+    public void setPsiVersion(PsimiXmlVersion psiVersion) {
+        if (psiVersion == null) {
+            throw new IllegalArgumentException("You must give a non null psiVersion");
+        }
+        this.psiVersion = psiVersion;
     }
 
     /**
@@ -265,7 +292,7 @@ public class PsiExchangeImpl implements PsiExchange {
         OutputStream os = new ByteArrayOutputStream();
         EntrySet entrySet = exportToEntrySet(intactEntries);
 
-        PsimiXmlWriter writer = new PsimiXmlWriter();
+        PsimiXmlWriter writer = new PsimiXmlWriter(psiVersion, xmlForm);
 
         try {
             writer.write(entrySet, os);
@@ -285,7 +312,7 @@ public class PsiExchangeImpl implements PsiExchange {
     public void exportToPsiXml(Writer writer, IntactEntry... intactEntries) {
         EntrySet entrySet = exportToEntrySet(intactEntries);
 
-        PsimiXmlWriter psimiXmlWriter = new PsimiXmlWriter();
+        PsimiXmlWriter psimiXmlWriter = new PsimiXmlWriter(psiVersion, xmlForm);
 
         try {
             psimiXmlWriter.write(entrySet, writer);
