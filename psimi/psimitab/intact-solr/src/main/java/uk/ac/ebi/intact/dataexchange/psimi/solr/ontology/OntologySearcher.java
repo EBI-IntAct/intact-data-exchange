@@ -46,7 +46,7 @@ public class OntologySearcher {
 
     private Set<String> ontologyNames;
 
-    public OntologySearcher(SolrServer solrServer) {
+    public  OntologySearcher(SolrServer solrServer) {
         if ( solrServer == null ) {
             throw new IllegalArgumentException( "You must give a non null solrServer" );
         }

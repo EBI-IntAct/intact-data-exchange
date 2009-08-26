@@ -33,12 +33,9 @@ import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
 import java.io.*;
 import java.net.MalformedURLException;
-import java.util.logging.LogManager;
-import java.util.logging.Level;
-import java.util.Enumeration;
 
 /**
- * Indexes information into a SOLR server
+ * Indexes information into a SOLR server.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -274,7 +271,15 @@ public class IntactSolrIndexer {
     private void commitSolr(boolean optimize, int retriesLeft) throws IOException, IntactSolrException {
         try {
             solrServer.commit();
-            if (optimize) solrServer.optimize();
+
+            if (optimize) {
+                solrServer.optimize();
+
+                // Recommendations are that all searchers are closed and reopened when Solr index is optimized
+                // as files on the file system can be deleted and create NFS Stale File Handles.
+//                this.converter
+                
+            }
 
         } catch ( SolrServerException e ) {
 
