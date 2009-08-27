@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.task.mitab.index;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
@@ -96,7 +97,7 @@ public class SolrItemWriter implements BinaryInteractionItemWriter, ItemStream{
                 throw new NullPointerException("No 'interactionsSolrUrl' configured for SolrItemWriter");
             }
 
-            interactionSolrServer = new CommonsHttpSolrServer(interactionsSolrUrl.getURL());
+            interactionSolrServer = new StreamingUpdateSolrServer(interactionsSolrUrl.getURL().toString(), 20, Runtime.getRuntime().availableProcessors());
         }
 
         return interactionSolrServer;
