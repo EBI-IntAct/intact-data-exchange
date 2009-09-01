@@ -77,12 +77,18 @@ public class PsiEnricherTest extends IntactBasicTestCase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Writer writer = new OutputStreamWriter(baos);
 
+        Writer sw = new StringWriter();
+
         EnricherConfig config = new EnricherConfig();
         config.setUpdateInteractionShortLabels(true);
 
         // the actual method
-        ConverterContext.getInstance().setGenerateExpandedXml( true );
-        psiEnricher.enrichPsiXml(PsiEnricherTest.class.getResourceAsStream(pathToXml), writer, config);
+        System.out.println( "ConverterContext.getInstance().isGenerateExpandedXml(): " + ConverterContext.getInstance().isGenerateExpandedXml() );
+//        ConverterContext.getInstance().setGenerateExpandedXml( true );
+        psiEnricher.enrichPsiXml(PsiEnricherTest.class.getResourceAsStream(pathToXml), sw, config);
+        System.out.println(sw.toString());
+
+        if( true ) return;
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
@@ -94,7 +100,8 @@ public class PsiEnricherTest extends IntactBasicTestCase {
 
         reader = new PsimiXmlReader();
         PsimiXmlConverterConfig converterConfig = new PsimiXmlConverterConfig();
-		converterConfig.setXmlForm( PsimiXmlForm.FORM_EXPANDED);
+        System.out.println("converterConfig.getXmlForm(): " + converterConfig.getXmlForm() );
+		 converterConfig.setXmlForm( PsimiXmlForm.FORM_COMPACT);
 		psidev.psi.mi.xml.converter.ConverterContext.getInstance().setConverterConfig(converterConfig);
 
         EntrySet enrichedSet = reader.read(expandedBais);

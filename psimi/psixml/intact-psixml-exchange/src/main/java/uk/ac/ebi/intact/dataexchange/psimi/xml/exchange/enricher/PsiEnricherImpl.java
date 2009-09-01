@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher;
 
 import psidev.psi.mi.xml.*;
+import psidev.psi.mi.xml.converter.config.PsimiXmlConverterConfig;
 import psidev.psi.mi.xml.xmlindex.IndexedEntry;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
@@ -84,9 +85,10 @@ public class PsiEnricherImpl implements PsiEnricher {
             throw new PsiEnricherException("Problem reading source PSI", e);
         }
 
-        // make sure the converted XML is going to be expanded.
-        boolean wasGenerateExpandedXml = ConverterContext.getInstance().isGenerateExpandedXml();
-        ConverterContext.getInstance().setGenerateExpandedXml( true );
+        // make sure the written XML is going to be expanded.
+        final PsimiXmlConverterConfig xmlConverterConfig = psidev.psi.mi.xml.converter.ConverterContext.getInstance().getConverterConfig();
+        final PsimiXmlForm originalXmlForm = xmlConverterConfig.getXmlForm();
+        xmlConverterConfig.setXmlForm(PsimiXmlForm.FORM_EXPANDED);
 
         enricherContext.setConfig(config);
 
@@ -142,7 +144,7 @@ public class PsiEnricherImpl implements PsiEnricher {
         } finally {
 
             // Reset the expansion to what it was prior to running this.
-            ConverterContext.getInstance().setGenerateExpandedXml( wasGenerateExpandedXml );
+            xmlConverterConfig.setXmlForm(originalXmlForm);
         }
     }
 
