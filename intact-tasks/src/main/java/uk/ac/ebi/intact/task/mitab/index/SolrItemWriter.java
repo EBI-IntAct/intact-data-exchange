@@ -97,7 +97,7 @@ public class SolrItemWriter implements BinaryInteractionItemWriter, ItemStream{
                 throw new NullPointerException("No 'interactionsSolrUrl' configured for SolrItemWriter");
             }
 
-            interactionSolrServer = new StreamingUpdateSolrServer(interactionsSolrUrl.getURL().toString(), 20, Runtime.getRuntime().availableProcessors());
+            interactionSolrServer = new CommonsHttpSolrServer(interactionsSolrUrl.getURL());
         }
 
         return interactionSolrServer;
