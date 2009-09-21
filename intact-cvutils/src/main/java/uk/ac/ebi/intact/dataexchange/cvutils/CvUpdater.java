@@ -73,8 +73,14 @@ public class CvUpdater {
 
 
     public CvUpdater() throws IOException, OBOParseException {
+        if (!IntactContext.currentInstanceExists()) {
+            throw new IllegalStateException("To instantiate a CvUpdated using no arguments, an instance of IntactContext must exist");
+        }
+        
         this.processed = new HashMap<String, CvObject>();
         this.stats = new CvUpdaterStatistics();
+        this.intactContext = IntactContext.getCurrentInstance();
+        this.persisterHelper = intactContext.getPersisterHelper();
     }
 
     public CvUpdater(IntactContext intactContext) {
