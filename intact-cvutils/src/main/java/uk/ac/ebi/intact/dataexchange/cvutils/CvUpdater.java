@@ -236,7 +236,6 @@ public class CvUpdater {
                                                                   null,
                                                                   annotInfo.getTopicShortLabel() );
 
-                        System.out.println("Creating: "+topic);
                         IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                                 .getCvObjectDao(CvTopic.class).persist(topic);
 
