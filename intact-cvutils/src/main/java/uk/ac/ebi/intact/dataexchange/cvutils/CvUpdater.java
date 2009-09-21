@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obo.dataadapter.OBOParseException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.TransactionStatus;
 import uk.ac.ebi.intact.core.annotations.IntactFlushMode;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
@@ -127,7 +128,6 @@ public class CvUpdater {
      * @return An object containing some statistics about the update
      */
     @Transactional
-    @IntactFlushMode(FlushModeType.COMMIT)
     public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allValidCvs, AnnotationInfoDataset annotationInfoDataset ) {
 
         if ( allValidCvs == null ) {
@@ -153,14 +153,22 @@ public class CvUpdater {
 
         if (log.isDebugEnabled()) log.debug( "Size of CV list after removin' obsolete terms: " + cleanedList.size() );
 
-         // update the cvs using the annotation info dataset
+        final TransactionStatus transactionStatus = intactContext.getDataContext().beginTransaction();
+        // update the cvs using the annotation info dataset
         updateCVsUsingAnnotationDataset( cleanedList, annotationInfoDataset );
 
+        intactContext.getDataContext().commitTransaction(transactionStatus);
+
+        final TransactionStatus transactionStatus2 = intactContext.getDataContext().beginTransaction();
+        intactContext.getDaoFactory().getEntityManager().setFlushMode(FlushModeType.COMMIT);
+        
         CorePersister corePersister = persisterHelper.getCorePersister();
         corePersister.setUpdateWithoutAcEnabled(true);
 
-        PersisterStatistics persisterStats = persisterHelper.saveOrUpdate( cleanedList.toArray( new CvObject[cleanedList.size()] ) );
+        PersisterStatistics persisterStats = persisterHelper.save( cleanedList.toArray( new CvObject[cleanedList.size()] ) );
         addCvObjectsToUpdaterStats( persisterStats, stats );
+
+        intactContext.getDataContext().commitTransaction(transactionStatus2);
 
         if ( log.isDebugEnabled() ) {
             log.debug( "Persisted: " + persisterStats );
@@ -169,7 +177,7 @@ public class CvUpdater {
         }
 
         // set autoupdate to what it was before the CV update.
-        //entityManager.setFlushMode(FlushModeType.AUTO);
+        intactContext.getDaoFactory().getEntityManager().setFlushMode(FlushModeType.AUTO);
 
         return stats;
     } //end method
@@ -206,7 +214,7 @@ public class CvUpdater {
         return CvObjectOntologyBuilder.mi2Class.keySet().contains( identity );
     }
 
-    private void updateCVsUsingAnnotationDataset( List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset ) {
+    public void updateCVsUsingAnnotationDataset( List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset ) {
 
         for ( CvDagObject cvObject : allCvs ) {
             final String identity = CvObjectUtils.getIdentity( cvObject );
@@ -228,6 +236,7 @@ public class CvUpdater {
                                                                   null,
                                                                   annotInfo.getTopicShortLabel() );
 
+                        System.out.println("Creating: "+topic);
                         IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
                                 .getCvObjectDao(CvTopic.class).persist(topic);
 
