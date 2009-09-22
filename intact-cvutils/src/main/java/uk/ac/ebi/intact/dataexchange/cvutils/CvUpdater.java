@@ -170,6 +170,8 @@ public class CvUpdater {
 
         intactContext.getDataContext().commitTransaction(transactionStatus2);
 
+        intactContext.getDaoFactory().getEntityManager().clear();
+
         if ( log.isDebugEnabled() ) {
             log.debug( "Persisted: " + persisterStats );
             log.debug( "Processed: " + processed.size() );
@@ -214,6 +216,7 @@ public class CvUpdater {
         return CvObjectOntologyBuilder.mi2Class.keySet().contains( identity );
     }
 
+    @IntactFlushMode(FlushModeType.COMMIT)
     public void updateCVsUsingAnnotationDataset( List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset ) {
 
         for ( CvDagObject cvObject : allCvs ) {

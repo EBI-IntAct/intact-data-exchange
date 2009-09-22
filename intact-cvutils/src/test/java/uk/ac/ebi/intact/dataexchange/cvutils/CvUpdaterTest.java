@@ -21,11 +21,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.annotations.IntactFlushMode;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDatasetFactory;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
@@ -33,6 +35,7 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.clone.IntactCloner;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
+import javax.persistence.FlushModeType;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -130,6 +133,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void updatingWithNewAnnotations() throws Exception {
 
         CvObjectDao<CvObject> cvObjectDao;
@@ -245,18 +249,17 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         final int cvCountAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
 
-        Assert.assertEquals( "2 CvObjects expected to be created during update: hidden and obsolete & 1 Cvobject updated used-in-class ",
-                             cvsBeforeUpdate + 2, cvCountAfterUpdate );
+        Assert.assertEquals( cvsBeforeUpdate + 2, cvCountAfterUpdate );
 
         //again call cvupdate and this time it should ignore the annotations
         
         cvUpdater.createOrUpdateCVs( list, annotationDataset );
         
-        Assert.assertEquals( "2 CvObjects expected to be created during update: hidden and obsolete & 1 Cvobject updated used-in-class ",
-                             cvsBeforeUpdate + 2, cvCountAfterUpdate );
+        Assert.assertEquals( cvsBeforeUpdate + 2, cvCountAfterUpdate );
     }
 
     @Test
+    @DirtiesContext
     public void obsoleteAggregationTest() throws Exception {
 
         List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
@@ -327,6 +330,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void createOrUpdateCVsTest() throws Exception {
 
         //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
