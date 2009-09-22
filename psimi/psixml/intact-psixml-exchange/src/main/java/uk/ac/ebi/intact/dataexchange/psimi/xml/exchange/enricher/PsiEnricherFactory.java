@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
+package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher;
 
 import org.springframework.context.ApplicationContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 
 /**
- * Factory to create PsiExchange objects.
+ * Factory to create PsiEnricher objects.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public final class PsiExchangeFactory {
+public final class PsiEnricherFactory {
 
-    private PsiExchangeFactory() {}
+    private PsiEnricherFactory() {}
 
-    public static PsiExchange createPsiExchange(IntactContext intactContext) {
-        return createPsiExchange(intactContext.getSpringContext());
+    public static PsiEnricher createPsiEnricher(IntactContext intactContext) {
+        return createPsiEnricher(intactContext.getSpringContext());
     }
 
-    public static PsiExchange createPsiExchange(ApplicationContext applicationContext) {
-        return (PsiExchange) applicationContext.getBean("psiExchange");
+    public static PsiEnricher createPsiEnricher(ApplicationContext springContext) {
+        return (PsiEnricher) springContext.getBean("psiEnricher");
     }
 
 }
