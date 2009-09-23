@@ -18,6 +18,7 @@
 
     <properties>
         <currentVersion>${version}</currentVersion>
+        <psimi.version>1.7.6</psimi.version>
     </properties>
 
     <modules>
@@ -34,7 +35,12 @@
             <dependency>
                 <groupId>psidev.psi.mi</groupId>
                 <artifactId>psimitab</artifactId>
-                <version>1.7.6-SNAPSHOT</version>
+                <version>${psimi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>psidev.psi.mi</groupId>
+                <artifactId>psimitab-search</artifactId>
+                <version>${psimi.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
