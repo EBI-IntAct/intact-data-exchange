@@ -37,6 +37,7 @@
         <module>ebeye</module>
         <module>pdbe</module>
         <module>intact-tasks</module>
+        <module>imex</module>
     </modules>
 
     <build>
