@@ -5,7 +5,6 @@ import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ImexExportProfile;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.PsiExchange;
 import psidev.psi.mi.xml.model.EntrySet;
 import org.springframework.beans.factory.annotation.Autowired;
