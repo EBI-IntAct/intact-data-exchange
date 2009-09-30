@@ -73,8 +73,8 @@ public class InteractionExpansionCompositeProcessor implements ItemProcessor<Int
         } else {
             try {
                 interactions = expansionStategy.expand(item);
-            } catch (NotExpandableInteractionException e) {
-                throw new InteractionExpansionException(e);
+            } catch (Throwable e) {
+                throw new InteractionExpansionException("Problem expanding interaction: "+item, e);
             }
             expanded = true;
         }
