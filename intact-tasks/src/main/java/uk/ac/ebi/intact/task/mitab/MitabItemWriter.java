@@ -36,66 +36,79 @@ import java.util.List;
  */
 public class MitabItemWriter implements BinaryInteractionItemWriter, ItemStream {
 
-    private Writer outputWriter;
-    private boolean header = true;
-    private boolean firstAccess = true;
+    private File outputFile;
+       private Writer outputWriter;
+       private boolean header = true;
+       private boolean firstAccess = true;
 
-    public void write(List<? extends BinaryInteraction> items) throws Exception {
-        PsimiTabWriter writer;
+       public void write(List<? extends BinaryInteraction> items) throws Exception {
+           PsimiTabWriter writer;
 
-        if (items.isEmpty()) {
-            return;
-        }
+           if (items.isEmpty()) {
+               return;
+           }
 
-        BinaryInteraction firstInteraction = items.iterator().next();
+           BinaryInteraction firstInteraction = items.iterator().next();
 
-        if (firstInteraction instanceof IntactBinaryInteraction) {
-            writer = new IntactPsimiTabWriter();
-        } else {
-            writer = new PsimiTabWriter();
-        }
+           if (firstInteraction instanceof IntactBinaryInteraction) {
+               writer = new IntactPsimiTabWriter();
+           } else {
+               writer = new PsimiTabWriter();
+           }
 
-        writer.setHeaderEnabled(false);
+           if (header && firstAccess) {
+               writer.setHeaderEnabled(true);
+               firstAccess = false;
+           } else {
+               writer.setHeaderEnabled(false);
+           }
 
-        if (header && firstAccess) {
-            writer.setHeaderEnabled(true);
-            firstAccess = false;
-        }
+           writer.write(new ArrayList<BinaryInteraction>(items), outputWriter);
 
-        writer.write(new ArrayList<BinaryInteraction>(items), outputWriter);
-        outputWriter.flush();
-    }
+       }
 
-    public void open(ExecutionContext executionContext) throws ItemStreamException {
+       public void open(ExecutionContext executionContext) throws ItemStreamException {
+           if (outputFile == null) throw new NullPointerException("An outputFile is needed for the writer");
+           if (outputFile.exists() && !outputFile.canWrite()) throw new IllegalArgumentException("Cannot write to file: "+outputFile);
 
-    }
+           if (isFileNotEmpty()) {
+               header = false;
+           }
 
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
+            try {
+               outputFile.getParentFile().mkdirs();
+               outputWriter = new FileWriter(outputFile, true);
+           } catch (IOException e) {
+               throw new IllegalArgumentException("Problem creating writer with file: "+outputFile, e);
+           }
+       }
 
-    }
+       private boolean isFileNotEmpty() {
+           return outputFile.exists() && outputFile.length() > 0;
+       }
 
-    public void close() throws ItemStreamException {
-        try {
-            outputWriter.close();
-        } catch (IOException e) {
-            throw new ItemStreamException("Problem closing writer", e);
-        }
-    }
+       public void update(ExecutionContext executionContext) throws ItemStreamException {
+           try {
+               outputWriter.flush();
+           } catch (IOException e) {
+               throw new ItemStreamException("Problem flushing writer", e);
+           }
+       }
 
-    public void setOutputWriter(Writer outputWriter) {
-        this.outputWriter = outputWriter;
-    }
+       public void close() throws ItemStreamException {
+           try {
+               outputWriter.close();
+           } catch (IOException e) {
+               throw new ItemStreamException("Problem closing writer", e);
+           }
+       }
 
-    public void setHeader(boolean header) {
-        this.header = header;
-    }
+       public void setHeader(boolean header) {
+           this.header = header;
+       }
 
-    public void setOutputFile(File file) {
-        try {
-            file.getParentFile().mkdirs();
-            setOutputWriter(new FileWriter(file));
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Problem creating writer with file: "+file, e);
-        }
-    }
-}
+       public void setOutputFile(File file) {
+           this.outputFile = file;
+       }
+   }
+    
