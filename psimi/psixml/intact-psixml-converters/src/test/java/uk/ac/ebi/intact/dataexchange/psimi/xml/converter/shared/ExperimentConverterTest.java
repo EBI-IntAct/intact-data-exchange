@@ -60,7 +60,7 @@ public class ExperimentConverterTest extends AbstractConverterTest {
         Assert.assertEquals(1, exp.getXrefs().size());
     }
 
-    @Test (expected = UnsupportedConversionException.class)
+    @Test
     public void psiToIntact_incorrectBibref() {
         ExperimentDescription expDesc = PsiMockFactory.createMockExperiment();
         final DbReference primaryRef = PsiMockFactory.createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.DIP, CvDatabase.DIP_MI_REF);
