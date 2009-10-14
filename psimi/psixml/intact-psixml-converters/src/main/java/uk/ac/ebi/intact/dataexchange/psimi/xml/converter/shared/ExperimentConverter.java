@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.MessageLevel;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
@@ -81,17 +80,27 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         IntactConverterUtils.populateXref(psiObject.getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
 
         // fail if the primary reference does not point to Pubmed and primary-reference
-        final DbReference primaryRef = psiObject.getBibref().getXref().getPrimaryRef();
-        if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(primaryRef.getRefTypeAc()) ||
-            (!CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())
-            		&& !CvDatabase.DOI_MI_REF.equals(primaryRef.getDbAc()))            
-            ) {
-            final String message = "Bibref in ExperimentDescription [PSI Id=" + psiObject.getId() + "] " +
-                                   "should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
+        boolean hasValidPrimaryRef = true;
+        final Bibref bibref = psiObject.getBibref();
+        if( bibref != null && bibref.getXref() != null ) {
+            final DbReference primaryRef = bibref.getXref().getPrimaryRef();
+            if ( ! hasValidPrimaryRef( primaryRef ) ) {
+                final String message = "Bibref in ExperimentDescription [PSI Id=" + psiObject.getId() + "] " +
+                                       "should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
+                                       "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + "): " + primaryRef;
+                log.warn(message);
+                addMessageToContext(MessageLevel.WARN, message, true);
+
+                hasValidPrimaryRef = false;
+            }
+        } else {
+            final String message = "No bibref defined in ExperimentDescription [PSI Id=" + psiObject.getId() + "]. " +
+                                   "It should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
                                    "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + "): " + primaryRef;
             log.warn(message);
+                addMessageToContext(MessageLevel.WARN, message, true);
 
-            addMessageToContext(MessageLevel.WARN, message+". Fixed.", true);
+            hasValidPrimaryRef = false;
         }
 
         IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
@@ -105,8 +114,10 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             experiment.setCvIdentification(cvParticipantIdentification);
         }
 
-        Publication publication = createPublication(psiObject);
-        experiment.setPublication(publication);
+        if( hasValidPrimaryRef ) {
+            Publication publication = createPublication(psiObject);
+            experiment.setPublication(publication);
+        }
 
         psiEndConversion(psiObject);
 
@@ -156,18 +167,29 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         return expDesc;
     }
 
+    private boolean hasValidPrimaryRef( DbReference primaryRef ) {
+        if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(primaryRef.getRefTypeAc()) ||
+                (!CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())
+                        && !CvDatabase.DOI_MI_REF.equals(primaryRef.getDbAc()))
+                ) {
+            return false;
+        }
+        return true;
+    }
+
     private Publication createPublication(ExperimentDescription experiment) {
         final DbReference primaryRef = experiment.getBibref().getXref().getPrimaryRef();
 
         final String dbac = primaryRef.getDbAc();
-        if (!CvDatabase.PUBMED_MI_REF.equals( dbac ) && !CvDatabase.DOI_MI_REF.equals( dbac )) {
-            throw new UnsupportedConversionException("The bibref (bibliographic xref) of the experiment is not " +
-                                                     "pointing to pubmed or doi (expected dbAc to be "+
-                                                     CvDatabase.PUBMED_MI_REF + " or " + CvDatabase.DOI_MI_REF +
-                                                     "). Experiment PSI Id: "+ experiment.getId() + ", ref found: db=" +
-                                                     primaryRef.getDb()+ ", dbAc=" + primaryRef.getDbAc() +
-                                                     ", id=" + primaryRef.getId());
+
+        if (! hasValidPrimaryRef(primaryRef) ) {
+            final String message = "Could not build a Publication from ExperimentDescription [PSI Id=" + experiment.getId() + "] " +
+                                   "as it should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
+                                   "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + "): " + primaryRef;
+            log.warn(message);
+            addMessageToContext(MessageLevel.WARN, message, true);
         }
+
 
         String pubId = primaryRef.getId();
 
