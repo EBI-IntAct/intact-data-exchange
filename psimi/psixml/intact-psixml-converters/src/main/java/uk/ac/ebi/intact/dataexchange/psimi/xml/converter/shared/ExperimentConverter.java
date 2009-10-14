@@ -96,7 +96,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         } else {
             final String message = "No bibref defined in ExperimentDescription [PSI Id=" + psiObject.getId() + "]. " +
                                    "It should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
-                                   "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + "): " + primaryRef;
+                                   "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + ")";
             log.warn(message);
                 addMessageToContext(MessageLevel.WARN, message, true);
 
