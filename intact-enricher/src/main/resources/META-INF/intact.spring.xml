@@ -10,10 +10,12 @@
 
     <context:component-scan base-package="uk.ac.ebi.intact.dataexchange.enricher"/>
 
-    <bean name="enricherConfig" class="uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig"/>
+    <bean id="enricherConfig" class="uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig"/>
 
-    <bean name="enricherContext" class="uk.ac.ebi.intact.dataexchange.enricher.EnricherContext">
+    <bean id="enricherContext" class="uk.ac.ebi.intact.dataexchange.enricher.EnricherContext">
         <constructor-arg ref="enricherConfig"/>
     </bean>
+
+    <bean id="enricherCacheManager" class="uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCacheManager"/>
 
 </beans>

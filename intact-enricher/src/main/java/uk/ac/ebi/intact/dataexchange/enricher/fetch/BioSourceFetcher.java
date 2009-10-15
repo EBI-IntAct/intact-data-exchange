@@ -15,8 +15,6 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +23,7 @@ import uk.ac.ebi.intact.bridges.taxonomy.OLSTaxonomyService;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyService;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
+import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 
@@ -52,19 +51,12 @@ public class BioSourceFetcher {
     }
 
     public TaxonomyTerm fetchByTaxId(int taxId) {
-        Cache bioSourceCache = enricherContext.getCache("BioSource");
+        EnricherCache bioSourceCache = enricherContext.getCacheManager().getCache("BioSource");
 
         TaxonomyTerm term = null;
 
         if (bioSourceCache.isKeyInCache(taxId)) {
-            final Element element = bioSourceCache.get(taxId);
-
-            if (element != null) {
-                term = (TaxonomyTerm) element.getObjectValue();
-            } else {
-               if (log.isDebugEnabled())
-                    log.debug("TaxId was found in the cache but the element returned was null: "+taxId);
-            }
+            term = (TaxonomyTerm) bioSourceCache.get(taxId);
         }
 
         if (term == null) {
@@ -73,7 +65,7 @@ public class BioSourceFetcher {
             } catch (TaxonomyServiceException e) {
                 throw new EnricherException(e);
             }
-            bioSourceCache.put(new Element(taxId, term));
+            bioSourceCache.put(taxId, term);
         }
 
         return term;

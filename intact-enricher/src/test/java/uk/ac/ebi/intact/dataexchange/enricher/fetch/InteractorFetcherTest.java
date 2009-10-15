@@ -15,12 +15,12 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
-import net.sf.ehcache.CacheManager;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
+import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
 
@@ -40,8 +40,9 @@ public class InteractorFetcherTest extends EnricherBasicTestCase {
 
     @Test
     public void fetchFromUniprot() throws Exception {
-        enricherContext.getCache("Interactor").getStatistics().clearStatistics();
-        
+        final EnricherCache cache = enricherContext.getCacheManager().getCache("Interactor");
+        cache.clearStatistics();
+
         UniprotProtein uniprotProtein = fetcher.fetchInteractorFromUniprot("MK01_HUMAN", 9606);
         Assert.assertNotNull(uniprotProtein);
         Assert.assertEquals("P28482", uniprotProtein.getPrimaryAc());
@@ -50,13 +51,13 @@ public class InteractorFetcherTest extends EnricherBasicTestCase {
         Assert.assertNotNull(uniprotProtein);
         Assert.assertEquals("P28482", uniprotProtein.getPrimaryAc());
 
-        Assert.assertEquals(1, CacheManager.getInstance().getCache("Interactor").getStatistics().getInMemoryHits());
+        Assert.assertEquals(1, cache.getInMemoryHits());
     }
 
     @Test
     public void fetchFromChebi() throws Exception {
-
-        enricherContext.getCache( "Interactor" ).getStatistics().clearStatistics();
+        final EnricherCache cache = enricherContext.getCacheManager().getCache("Interactor");
+        cache.clearStatistics();
 
         Entity smallMoleculeEntity = fetcher.fetchInteractorFromChebi( "CHEBI:16851" );
         Assert.assertNotNull( smallMoleculeEntity );
@@ -68,7 +69,7 @@ public class InteractorFetcherTest extends EnricherBasicTestCase {
         Assert.assertEquals( "1-phosphatidyl-1D-myo-inositol 3,5-bisphosphate", smallMoleculeEntity.getChebiAsciiName() );
 
 
-        Assert.assertEquals( 1, CacheManager.getInstance().getCache( "Interactor" ).getStatistics().getInMemoryHits() );
+        Assert.assertEquals( 1, cache.getInMemoryHits() );
 
     }
 }

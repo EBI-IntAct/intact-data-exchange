@@ -15,12 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.model.CvDagObject;
 import uk.ac.ebi.intact.model.CvObject;
@@ -48,22 +47,14 @@ public class CvObjectFetcher {
     }
 
     public <T extends CvObject> T fetchByTermId(Class<T> objClass, String termId) {
-        Cache cache = enricherContext.getCache("CvObject");
+        EnricherCache cache = enricherContext.getCacheManager().getCache("CvObject");
 
         T term = null;
 
         String key = objClass.getSimpleName()+"_"+termId;
 
         if (cache.isKeyInCache(termId)) {
-            final Element element = cache.get(termId);
-
-            if (element != null) {
-                term = (T) element.getObjectValue();
-            } else {
-                if (log.isDebugEnabled())
-                    log.debug("Term was found in the cache but the element returned was null: "+termId);
-            }
-
+            term = (T) cache.get(termId);
         }
 
         if (term == null) {
@@ -71,7 +62,7 @@ public class CvObjectFetcher {
             term = searchById(ontology, objClass, termId);
 
             if (term != null) {
-                cache.put(new Element(key, term));
+                cache.put(key, term);
             }
         }
 
@@ -83,22 +74,22 @@ public class CvObjectFetcher {
             return null;
         }
 
-        Cache cache = enricherContext.getCache("CvObject");
+        EnricherCache cache = enricherContext.getCacheManager().getCache("CvObject");
 
         String key = cvClass.getSimpleName()+"_"+label;
 
         T term;
 
         if (cache.isKeyInCache(key)) {
-            term = (T) cache.get(key).getObjectValue();
+            term = (T) cache.get(key);
         } else {
             List<CvDagObject> ontology = enricherContext.getIntactOntology();
 
             term = searchByLabel(ontology, cvClass, label);
 
             if (term != null) {
-                cache.put(new Element(key, term));
-                cache.put(new Element(cvClass.getSimpleName()+"_"+term.getMiIdentifier(), term));
+                cache.put(key, term);
+                cache.put(cvClass.getSimpleName()+"_"+term.getIdentifier(), term);
             }
         }
 
@@ -107,7 +98,7 @@ public class CvObjectFetcher {
 
     private <T extends CvObject> T searchById(List<CvDagObject> ontology, Class<T> objClass, String termId) {
         for (CvObject cv : ontology) {
-            if (objClass.getName().equals(cv.getObjClass()) && termId.equals(cv.getMiIdentifier())) {
+            if (objClass.getName().equals(cv.getObjClass()) && termId.equals(cv.getIdentifier())) {
                 return (T) cv;
             }
         }

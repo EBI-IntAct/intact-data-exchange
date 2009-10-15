@@ -15,12 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
@@ -48,16 +47,12 @@ public class ExperimentFetcher {
     }
 
     public ExperimentAutoFill fetchByPubmedId(String pubmedId) {
-        Cache experimentCache = enricherContext.getCache("Experiment");
+        EnricherCache experimentCache = enricherContext.getCacheManager().getCache("Experiment");
 
         ExperimentAutoFill autoFill = null;
 
         if (experimentCache.isKeyInCache(pubmedId)) {
-            final Element element = experimentCache.get(pubmedId);
-
-            if (element != null) {
-                autoFill = (ExperimentAutoFill) element.getObjectValue();
-            }
+            autoFill = (ExperimentAutoFill) experimentCache.get(pubmedId);
         }
 
         if (autoFill == null) {
@@ -68,7 +63,7 @@ public class ExperimentFetcher {
             } catch (UnexpectedException e) {
                 throw new EnricherException(e);
             } finally {
-                experimentCache.put(new Element(pubmedId, autoFill));
+                experimentCache.put(pubmedId, autoFill);
             }
         }
 

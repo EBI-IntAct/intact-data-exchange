@@ -15,11 +15,12 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import org.springframework.stereotype.Controller;
+import uk.ac.ebi.intact.model.Alias;
+import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.InstitutionXref;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.util.Collection;

@@ -15,15 +15,15 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import uk.ac.ebi.chebi.webapps.chebiWS.client.ChebiWebServiceClient;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.ChebiWebServiceFault_Exception;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
+import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
 import uk.ac.ebi.intact.uniprot.service.UniprotRemoteService;
@@ -42,6 +42,9 @@ public class InteractorFetcher {
 
     private static final Log log = LogFactory.getLog(InteractorFetcher.class);
 
+    @Autowired
+    private EnricherContext enricherContext;
+
     private UniprotService uniprotRemoteService;
     private ChebiWebServiceClient chebiServiceClient;
 
@@ -55,7 +58,7 @@ public class InteractorFetcher {
             throw new NullPointerException("Trying to fetch a protein with null uniprotId");
         }
 
-        Cache interactorCache = CacheManager.getInstance().getCache("Interactor");
+        EnricherCache interactorCache = enricherContext.getCacheManager().getCache("Interactor");
 
         if (interactorCache == null) {
             throw new IllegalStateException("Interactor cache was not found, when fetching: "+uniprotId);
@@ -66,13 +69,7 @@ public class InteractorFetcher {
         String cacheKey = cacheKey(uniprotId, taxId);
 
         if (interactorCache.isKeyInCache(cacheKey)) {
-            final Element element = interactorCache.get(cacheKey);
-
-            if (element != null) {
-                uniprotProtein = (UniprotProtein) element.getObjectValue();
-            } else {
-                if (log.isDebugEnabled())
-                    log.debug("Interactor was found in the cache but the element returned was null: "+uniprotId);            }
+            uniprotProtein = (UniprotProtein) interactorCache.get(cacheKey);
         }
 
         if (uniprotProtein == null) {
@@ -93,7 +90,7 @@ public class InteractorFetcher {
             }
 
             if (uniprotProtein != null) {
-                interactorCache.put(new Element(cacheKey(uniprotId, taxId), uniprotProtein));
+                interactorCache.put(cacheKey(uniprotId, taxId), uniprotProtein);
             }
         }
 
@@ -107,21 +104,14 @@ public class InteractorFetcher {
             throw new NullPointerException( "You must give a non null chebiId" );
         }
 
-        Cache interactorCache = CacheManager.getInstance().getCache( "Interactor" );
+        EnricherCache interactorCache = enricherContext.getCacheManager().getCache( "Interactor" );
         Entity smallMoleculeEntity = null;
 
 
         String cacheKey = chebiId;
 
         if ( interactorCache.isKeyInCache( cacheKey ) ) {
-            final Element element = interactorCache.get( cacheKey );
-
-            if ( element != null ) {
-                smallMoleculeEntity = ( Entity ) element.getObjectValue();
-            } else {
-                if ( log.isDebugEnabled() )
-                    log.debug( "SmallMoleculeEntity was found in the cache but the element returned was null: " + chebiId );
-            }
+            smallMoleculeEntity = (Entity) interactorCache.get( cacheKey );
         }
 
         if ( smallMoleculeEntity == null ) {
@@ -135,7 +125,7 @@ public class InteractorFetcher {
             }
 
             if ( smallMoleculeEntity != null ) {
-                interactorCache.put( new Element( chebiId, smallMoleculeEntity ) );
+                interactorCache.put( chebiId, smallMoleculeEntity );
             }
         }
         return smallMoleculeEntity;

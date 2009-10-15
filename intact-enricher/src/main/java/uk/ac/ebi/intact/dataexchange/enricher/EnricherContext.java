@@ -15,20 +15,20 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher;
 
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obo.dataadapter.OBOParseException;
 import org.obo.datamodel.OBOSession;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.PsiLoaderException;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
+import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCacheManager;
 import uk.ac.ebi.intact.model.CvDagObject;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -46,14 +46,14 @@ public class EnricherContext implements DisposableBean {
      */
     public static final Log log = LogFactory.getLog(EnricherContext.class);
 
+    @Autowired
+    private EnricherCacheManager enricherCacheManager;
+
     private EnricherConfig config;
     private List<CvDagObject> ontology;
 
     public EnricherContext(EnricherConfig enricherConfig) {
         this.config = enricherConfig;
-
-        InputStream ehcacheConfig = EnricherContext.class.getResourceAsStream("/META-INF/ehcache-enricher.xml");
-        CacheManager.create(ehcacheConfig);
     }
 
     public EnricherConfig getConfig() {
@@ -64,16 +64,9 @@ public class EnricherContext implements DisposableBean {
         this.config = config;
     }
 
-    public Cache getCache(String name) {
-        Cache cache = CacheManager.getInstance().getCache(name);
-
-        if (cache == null) {
-            throw new EnricherException("Cache not found: "+name);
-        }
-
-        return cache;
+    public EnricherCacheManager getCacheManager() {
+        return enricherCacheManager;
     }
-
 
     public List<CvDagObject> getIntactOntology() {
         if (ontology == null) {
