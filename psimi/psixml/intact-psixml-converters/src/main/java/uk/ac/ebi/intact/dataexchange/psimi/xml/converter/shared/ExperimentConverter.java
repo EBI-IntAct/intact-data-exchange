@@ -103,7 +103,9 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             hasValidPrimaryRef = false;
         }
 
-        IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
+        if( psiObject.getBibref() != null && psiObject.getBibref().getXref() != null ) {
+            IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
+        }
         IntactConverterUtils.populateAnnotations(psiObject, experiment, getInstitution());
         
         experiment.setCvInteraction(cvInteractionDetectionMethod);
