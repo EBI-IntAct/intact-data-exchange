@@ -15,6 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiMiPopulator;
@@ -24,12 +26,14 @@ import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
- * TODO comment this
+ * Alias converter.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
 public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<A, psidev.psi.mi.xml.model.Alias> {
+
+    private static final Log log = LogFactory.getLog( AliasConverter.class );
 
     private Class<A> aliasClass;
 
@@ -55,7 +59,12 @@ public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<
             cvAliasType = new CvAliasType(getInstitution(), aliasType);
 
             PsiMiPopulator psiMiPopulator = new PsiMiPopulator(getInstitution());
+            if( aliasTypeAc != null ) {
             psiMiPopulator.populateWithPsiMi(cvAliasType, aliasTypeAc);
+            } else {
+                if ( log.isWarnEnabled() ) log.warn( "Attempting to build an Alias ("+ aliasType +
+                                                     ") without nameAc, this will result in a CvTopic without Xref" );
+            }
         }
 
         A alias = newAliasInstance(aliasClass, cvAliasType, name);
@@ -100,6 +109,4 @@ public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<
 
         return alias;
     }
-
-
 }

@@ -66,6 +66,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             bioSource = new OrganismConverter(experiment.getOwner()).psiToIntact(hostOrganism);
         }
 
+
         InteractionDetectionMethod idm = psiObject.getInteractionDetectionMethod();
         CvInteraction cvInteractionDetectionMethod = new InteractionDetectionMethodConverter(getInstitution()).psiToIntact(idm);
 
@@ -75,7 +76,6 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         if (bioSource != null) {
             experiment.setBioSource(bioSource);
         }
-
         IntactConverterUtils.populateNames(psiObject.getNames(), experiment);
         IntactConverterUtils.populateXref(psiObject.getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
 
