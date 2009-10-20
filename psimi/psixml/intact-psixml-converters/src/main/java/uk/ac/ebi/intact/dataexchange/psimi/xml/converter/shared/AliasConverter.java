@@ -22,6 +22,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiMiPopulator;
 import uk.ac.ebi.intact.model.Alias;
 import uk.ac.ebi.intact.model.CvAliasType;
+import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
@@ -86,10 +87,14 @@ public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<
 
         if (cvAliasType != null) {
             String aliasType = cvAliasType.getShortLabel();
-            String aliasTypeAc = CvObjectUtils.getPsiMiIdentityXref(cvAliasType).getPrimaryId();
+
+            final CvObjectXref xref = CvObjectUtils.getPsiMiIdentityXref( cvAliasType );
+            if( xref != null ) {
+                String aliasTypeAc = xref.getPrimaryId();
+                psiAlias.setTypeAc(aliasTypeAc);
+            }
 
             psiAlias.setType(aliasType);
-            psiAlias.setTypeAc(aliasTypeAc);
         }
 
         intactEndConversion(intactObject);
