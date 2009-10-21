@@ -49,6 +49,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     private static final Log log = LogFactory.getLog(InteractionConverter.class);
 
     private static ThreadLocal<List<CvDagObject>> ontology = new ThreadLocal<List<CvDagObject>>();
+    private static final String MODELLED = "modelled";
+    private static final String INTRA_MOLECULAR = "intra-molecular";
+    private static final String NEGATIVE = "negative";
 
     private static List<CvDagObject> getCurrentOntology() {
         if (ontology.get() == null) {
@@ -133,6 +136,25 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         // update experiment participant detection method if necessary
         updateExperimentParticipantDetectionMethod(interaction);
 
+        // negative
+        if( psiObject.isNegative() ) {
+            interaction.addAnnotation( new Annotation( getInstitution(),
+                                                       new CvTopic( getInstitution(), NEGATIVE ),
+                                                       "true" ) );
+        }
+
+        if( psiObject.isIntraMolecular() ) {
+            interaction.addAnnotation( new Annotation( getInstitution(),
+                                                       new CvTopic( getInstitution(), INTRA_MOLECULAR ),
+                                                       "true" ) );
+        }
+
+        if( psiObject.isModelled() ) {
+            interaction.addAnnotation( new Annotation( getInstitution(),
+                                                       new CvTopic( getInstitution(), MODELLED ),
+                                                       "true" ) );
+        }
+
         psiEndConversion(psiObject);
 
         failIfInconsistentConversion(interaction, psiObject);
@@ -160,7 +182,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
     private boolean alreadyContainsImexXref(Interaction interaction) {
         return getImexXref(interaction) != null;
-
     }
 
     protected void fixSourceReferenceXrefsIfNecessary(Interaction interaction) {
@@ -185,7 +206,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
             addMessageToContext(MessageLevel.WARN, "Interaction identity xref found pointing to the source database. It should be of type 'source-reference'. Fixed.", true);
         }
-        
     }
 
     public psidev.psi.mi.xml.model.Interaction intactToPsi(Interaction intactObject) {
@@ -241,11 +261,25 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             interaction.getParameters().add(parameter);
         }
 
+        interaction.setNegative( hasAnnotation( intactObject, NEGATIVE, "true" ) );
+        interaction.setIntraMolecular( hasAnnotation( intactObject, INTRA_MOLECULAR, "true" ) );
+        interaction.setModelled( hasAnnotation( intactObject, MODELLED, "true" ) );
+
         intactEndConversion(intactObject);
 
         failIfInconsistentConversion(intactObject, interaction);
 
         return interaction;
+    }
+
+    private boolean hasAnnotation( Interaction interaction, String topicShortlabel, String text ) {
+        for ( Annotation annotation : interaction.getAnnotations() ) {
+            if( annotation.getCvTopic().getShortLabel().equals( topicShortlabel )
+                && ( text != null && text.equals( annotation.getAnnotationText() ) )) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void updateExperimentParticipantDetectionMethod(Interaction interaction) {
