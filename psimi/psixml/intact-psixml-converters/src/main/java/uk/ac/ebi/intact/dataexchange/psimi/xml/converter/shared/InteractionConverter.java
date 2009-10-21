@@ -52,6 +52,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     private static final String MODELLED = "modelled";
     private static final String INTRA_MOLECULAR = "intra-molecular";
     private static final String NEGATIVE = "negative";
+    private static final String TRUE = "true";
 
     private static List<CvDagObject> getCurrentOntology() {
         if (ontology.get() == null) {
@@ -140,19 +141,19 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         if( psiObject.isNegative() ) {
             interaction.addAnnotation( new Annotation( getInstitution(),
                                                        new CvTopic( getInstitution(), NEGATIVE ),
-                                                       "true" ) );
+                                                       TRUE ) );
         }
 
         if( psiObject.isIntraMolecular() ) {
             interaction.addAnnotation( new Annotation( getInstitution(),
                                                        new CvTopic( getInstitution(), INTRA_MOLECULAR ),
-                                                       "true" ) );
+                                                       TRUE ) );
         }
 
         if( psiObject.isModelled() ) {
             interaction.addAnnotation( new Annotation( getInstitution(),
                                                        new CvTopic( getInstitution(), MODELLED ),
-                                                       "true" ) );
+                                                       TRUE ) );
         }
 
         psiEndConversion(psiObject);
@@ -261,9 +262,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             interaction.getParameters().add(parameter);
         }
 
-        interaction.setNegative( hasAnnotation( intactObject, NEGATIVE, "true" ) );
-        interaction.setIntraMolecular( hasAnnotation( intactObject, INTRA_MOLECULAR, "true" ) );
-        interaction.setModelled( hasAnnotation( intactObject, MODELLED, "true" ) );
+        interaction.setNegative( hasAnnotation( intactObject, NEGATIVE, TRUE ) );
+        interaction.setIntraMolecular( hasAnnotation( intactObject, INTRA_MOLECULAR, TRUE ) );
+        interaction.setModelled( hasAnnotation( intactObject, MODELLED, TRUE ) );
 
         intactEndConversion(intactObject);
 
