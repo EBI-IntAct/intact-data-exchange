@@ -138,7 +138,7 @@ public class CvUpdater {
          try {
              oboSession = OboUtils.createOBOSessionFromLatestMi();
          } catch (OBOParseException e) {
-             throw new IOException(e);
+             throw new IOException("Problem creating OBO session from latest MI: "+e.getMessage());
          }
 
          AnnotationInfoDataset annotationInfoDataset = OboUtils.createAnnotationInfoDatasetFromResource(new FileInputStream(CvUpdaterStatistics.class.getResource("/dgi/additional-annotations.csv").getFile()));
