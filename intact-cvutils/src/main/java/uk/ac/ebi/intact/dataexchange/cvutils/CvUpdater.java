@@ -22,6 +22,7 @@ import org.apache.commons.collections.bag.HashBag;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obo.dataadapter.OBOParseException;
+import org.obo.datamodel.OBOSession;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.annotations.IntactFlushMode;
 import uk.ac.ebi.intact.core.context.IntactContext;
@@ -38,6 +39,7 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.FlushModeType;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -72,22 +74,27 @@ public class CvUpdater {
     private Map<String,CvTopic> createdNonMiTopics = new HashMap<String,CvTopic>();
 
 
-    public CvUpdater() throws IOException, OBOParseException {
+    protected CvUpdater() throws IOException, OBOParseException {
         if (!IntactContext.currentInstanceExists()) {
             throw new IllegalStateException("To instantiate a CvUpdated using no arguments, an instance of IntactContext must exist");
         }
-        
+
         this.processed = new HashMap<String, CvObject>();
         this.stats = new CvUpdaterStatistics();
         this.intactContext = IntactContext.getCurrentInstance();
         this.persisterHelper = intactContext.getPersisterHelper();
     }
 
-    public CvUpdater(IntactContext intactContext) {
+
+    protected CvUpdater(IntactContext intactContext) {
         this.processed = new HashMap<String, CvObject>();
         this.stats = new CvUpdaterStatistics();
         this.intactContext = intactContext;
         this.persisterHelper = intactContext.getPersisterHelper();
+    }
+
+    public static CvUpdater createInstance(IntactContext intactContext) {
+        return (CvUpdater) intactContext.getSpringContext().getBean("cvUpdater");
     }
 
     @PostConstruct
@@ -119,6 +126,28 @@ public class CvUpdater {
         return createOrUpdateCVs( allCvs, new AnnotationInfoDataset() );
     }
 
+     /**
+     * Starts the creation and update of CVs by using the latest available CVs from internet
+     *
+     * @return An object containing some statistics about the update
+     */
+    @Transactional
+    @IntactFlushMode(FlushModeType.COMMIT)
+    public CvUpdaterStatistics executeUpdateWithLatestCVs() throws IOException{
+         OBOSession oboSession = null;
+         try {
+             oboSession = OboUtils.createOBOSessionFromLatestMi();
+         } catch (OBOParseException e) {
+             throw new IOException(e);
+         }
+
+         AnnotationInfoDataset annotationInfoDataset = OboUtils.createAnnotationInfoDatasetFromResource(new FileInputStream(CvUpdaterStatistics.class.getResource("/dgi/additional-annotations.csv").getFile()));
+
+         CvObjectOntologyBuilder builder = new CvObjectOntologyBuilder(oboSession);
+
+         return createOrUpdateCVs(builder.getAllCvs(), annotationInfoDataset);
+     }
+
     /**
      * Starts the creation and update of CVs by using the CVobject List provided
      *
@@ -147,11 +176,11 @@ public class CvUpdater {
 
         //first step remove the orphan cvs that are not existing in database
         List<CvDagObject> cleanedList = ( List<CvDagObject> ) CollectionUtils.subtract( allValidCvs, orphanCvList );
-        if (log.isDebugEnabled()) log.debug( "Size of CV list after removin' orphans: " + cleanedList.size() );
+        if (log.isDebugEnabled()) log.debug( "Size of CV list after removing orphans: " + cleanedList.size() );
         //second step remove the orphan cvs that are are already existing in the database
         cleanedList = ( List<CvDagObject> ) CollectionUtils.subtract( cleanedList, alreadyExistingObsoleteCvList );
 
-        if (log.isDebugEnabled()) log.debug( "Size of CV list after removin' obsolete terms: " + cleanedList.size() );
+        if (log.isDebugEnabled()) log.debug( "Size of CV list after removing obsolete terms: " + cleanedList.size() );
 
         CorePersister corePersister = persisterHelper.getCorePersister();
         corePersister.setUpdateWithoutAcEnabled(true);
@@ -196,7 +225,12 @@ public class CvUpdater {
                 if ( cvDag.getParents() == null || cvDag.getParents().isEmpty() ) {
                     addCvObjectToStatsIfObsolete( cvDag );
 
-                    boolean cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted( cvDag, stats );
+                    boolean cvObjectsWithSameId = false;
+                    try {
+                        cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted( cvDag, stats );
+                    } catch (Throwable e) {
+                        throw new RuntimeException("Problem checking orphan: "+cvDag.getShortLabel()+" ("+cvDag.getIdentifier()+")");
+                    }
 
                     if ( cvObjectsWithSameId ) {
                         alreadyExistingObsoleteCvList.add( cvDag );
@@ -390,7 +424,7 @@ public class CvUpdater {
                     existingCv.addAnnotation( annotation );
                     stats.addUpdatedCv( existingCv );
 
-                    persisterHelper.saveOrUpdate( obsoleteTopic );
+                    persisterHelper.save( obsoleteTopic );
                     
                     stats.addCreatedCv( obsoleteTopic );
                 } //end if
