@@ -90,11 +90,16 @@ public class IntactInteractorConverter extends InteractorConverter<ExtendedInter
         participant.setId( IdentifierGenerator.getInstance().nextId() );
         participant.setInteractor( interactor );
 
-        CrossReference expRoleXref = extInteractor.getExperimentalRoles().get(index);
-        participant.getExperimentalRoles().add(xrefConverter.fromMitab(expRoleXref, ExperimentalRole.class));
 
-        CrossReference bioRoleXref = extInteractor.getBiologicalRoles().get(index);
-        participant.setBiologicalRole(xrefConverter.fromMitab(bioRoleXref, BiologicalRole.class));
+        if( ! extInteractor.getExperimentalRoles().isEmpty() ) {
+            CrossReference expRoleXref = extInteractor.getExperimentalRoles().get(0);
+            participant.getExperimentalRoles().add(xrefConverter.fromMitab(expRoleXref, ExperimentalRole.class));
+        }
+
+        if( ! extInteractor.getBiologicalRoles().isEmpty() ) {
+            CrossReference bioRoleXref = extInteractor.getBiologicalRoles().get(0);
+            participant.setBiologicalRole(xrefConverter.fromMitab(bioRoleXref, BiologicalRole.class));
+        }
 
         CrossReference interactorType = extInteractor.getInteractorType();
         participant.getInteractor().setInteractorType(xrefConverter.fromMitab(interactorType, InteractorType.class));
