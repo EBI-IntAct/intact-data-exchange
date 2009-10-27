@@ -49,7 +49,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
     public Component psiToIntact(Participant psiObject) {
         Interaction interaction = new InteractionConverter(getInstitution()).psiToIntact(psiObject.getInteraction());
 
-        Component component = newComponent(getInstitution(), psiObject, interaction);
+        Component component = IntactConverterUtils.newComponent(getInstitution(), psiObject, interaction);
         return component;
     }
 
@@ -127,84 +127,5 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         }
 
         return participant;
-    }
-
-    protected static Component newComponent(Institution institution, Participant participant, Interaction interaction) {
-        Interactor interactor = new InteractorConverter(institution).psiToIntact(participant.getInteractor());
-
-        BiologicalRole psiBioRole = participant.getBiologicalRole();
-        if (psiBioRole == null) {
-            psiBioRole = PsiConverterUtils.createUnspecifiedBiologicalRole();
-        }
-        CvBiologicalRole biologicalRole = new BiologicalRoleConverter(institution).psiToIntact(psiBioRole);
-
-        if (participant.getExperimentalRoles().size() > 1) {
-            throw new UnsupportedConversionException("Cannot convert participants with more than one experimental role: "+participant);
-        }
-
-        // only the first experimental role
-        Collection<ExperimentalRole> roles = new ArrayList<ExperimentalRole>(2);
-
-        if (participant.getExperimentalRoles().isEmpty()) {
-            if (log.isWarnEnabled()) log.warn("Participant without experimental roles: " + participant);
-
-            roles.add(PsiConverterUtils.createUnspecifiedExperimentalRole());
-        } else {
-            roles = participant.getExperimentalRoles();
-        }
-
-        Collection<CvExperimentalRole> intactExpRoles = new ArrayList<CvExperimentalRole>(roles.size());
-
-        for (ExperimentalRole role : roles) {
-            CvExperimentalRole experimentalRole = new ExperimentalRoleConverter(institution).psiToIntact(role);
-            intactExpRoles.add(experimentalRole);
-        }
-
-        Component component = new Component(institution, interaction, interactor, intactExpRoles.iterator().next(), biologicalRole);
-        component.setExperimentalRoles(intactExpRoles);
-
-        IntactConverterUtils.populateAnnotations(participant, component, institution);
-
-        FeatureConverter featureConverter = new FeatureConverter(institution);
-
-        for (psidev.psi.mi.xml.model.Feature psiFeature : participant.getFeatures()) {
-            Feature feature = featureConverter.psiToIntact(psiFeature);
-            component.getBindingDomains().add(feature);
-            feature.setComponent(component);
-        }
-
-        for (ParticipantIdentificationMethod pim : participant.getParticipantIdentificationMethods()) {
-            ParticipantIdentificationMethodConverter pimConverter = new ParticipantIdentificationMethodConverter(institution);
-            CvIdentification cvIdentification = pimConverter.psiToIntact(pim);
-            component.getParticipantDetectionMethods().add(cvIdentification);
-        }
-
-        for (ExperimentalPreparation expPrep : participant.getExperimentalPreparations()) {
-            CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation> epConverter =
-                    new CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation>(institution, CvExperimentalPreparation.class, ExperimentalPreparation.class);
-            CvExperimentalPreparation cvExpPrep = epConverter.psiToIntact(expPrep);
-            component.getExperimentalPreparations().add(cvExpPrep);
-        }
-
-        if (!participant.getHostOrganisms().isEmpty()) {
-            HostOrganism hostOrganism = participant.getHostOrganisms().iterator().next();
-            Organism organism = new Organism();
-            organism.setNcbiTaxId(hostOrganism.getNcbiTaxId());
-            organism.setNames(hostOrganism.getNames());
-            organism.setCellType(hostOrganism.getCellType());
-            organism.setCompartment(hostOrganism.getCompartment());
-            organism.setTissue(hostOrganism.getTissue());
-
-            BioSource bioSource = new OrganismConverter(institution).psiToIntact(organism);
-            component.setExpressedIn(bioSource);
-        }
-
-        ParticipantParameterConverter paramConverter= new ParticipantParameterConverter(institution);
-        for (psidev.psi.mi.xml.model.Parameter psiParameter : participant.getParameters()){
-            ComponentParameter parameter = paramConverter.psiToIntact( psiParameter );
-            component.addParameter(parameter);
-        }
-
-        return component;
     }
 }

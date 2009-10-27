@@ -17,9 +17,11 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Assert;
 import org.junit.Test;
+import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Interaction;
 import psidev.psi.mi.xml.model.Parameter;
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
@@ -31,8 +33,11 @@ import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.clone.IntactCloner;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
+import java.io.File;
+import java.io.FileWriter;
+
 /**
- * TODO comment this
+ * InteractionConverter Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -263,7 +268,6 @@ public class InteractionConverterTest extends AbstractConverterTest {
         Assert.assertEquals(2, ConverterContext.getInstance().getReport().getMessages().size());
     }
 
-
     @Test
     public void intactTopsi_default() throws Exception {
         uk.ac.ebi.intact.model.Interaction intactInteraction = new IntactMockBuilder().createDeterministicInteraction();
@@ -341,5 +345,54 @@ public class InteractionConverterTest extends AbstractConverterTest {
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
         Assert.assertEquals(1, getDaoFactory().getProteinDao().countAll());
         Assert.assertEquals(2, getDaoFactory().getComponentDao().countAll());
+    }
+
+    @Test
+    public void roudtrip() throws Exception {
+
+        File file = new File( InteractionConverterTest.class.getResource( "/xml/17845854.xml" ).getFile());
+        Assert.assertNotNull( file );
+
+        final EntrySet entrySet = new PsimiXmlReader().read( file );
+        Assert.assertNotNull( entrySet );
+        Assert.assertEquals( 1, entrySet.getEntries().size() );
+        final Entry entry = entrySet.getEntries().iterator().next();
+
+        EntryConverter entryConverter = new EntryConverter( );
+        final IntactEntry intactEntry = entryConverter.psiToIntact( entry );
+        final Entry roundtripedEntry = entryConverter.intactToPsi( intactEntry );
+
+        Assert.assertNotNull( roundtripedEntry );
+        Assert.assertEquals( 0, roundtripedEntry.getExperiments().size() );
+        Assert.assertEquals( 0, roundtripedEntry.getInteractors().size() );
+        Assert.assertEquals( 1, roundtripedEntry.getInteractions().size() );
+        Interaction roundtripedInteraction = roundtripedEntry.getInteractions().iterator().next();
+        Assert.assertEquals( 1, roundtripedInteraction.getExperiments().size() );
+        Assert.assertEquals( 2, roundtripedInteraction.getParticipants().size() );
+
+        Participant smp = getParticipantByMoleculeType( roundtripedInteraction, "small molecule", "MI:0328" );
+        Assert.assertNotNull( smp );
+
+        Assert.assertEquals( 1, smp.getNames().getAliases().size() );
+        Assert.assertTrue( smp.hasXref() );
+        Assert.assertEquals( "EBI-999", smp.getXref().getPrimaryRef().getId() );
+        
+        Assert.assertEquals( 0, roundtripedInteraction.getAttributes().size() );
+
+        // TODO check with Anna that we actually need that feature before updating intact-core (major work!)
+        // confidence values
+//        Assert.assertEquals( 1, roundtripedInteraction.getConfidences().size() );
+    }
+
+    private Participant getParticipantByMoleculeType( Interaction interaction, String moleculeType, String moleculeTypeAc ) {
+        for ( Participant p : interaction.getParticipants() ) {
+            final InteractorType type = p.getInteractor().getInteractorType();
+            if( ( moleculeType != null && moleculeType.equals( type.getNames().getShortLabel() ) )
+                ||
+                ( moleculeTypeAc != null && moleculeTypeAc.equals( type.getXref().getPrimaryRef().getId() ) ) ) {
+                return p;
+            }
+        }
+        return null;
     }
 }

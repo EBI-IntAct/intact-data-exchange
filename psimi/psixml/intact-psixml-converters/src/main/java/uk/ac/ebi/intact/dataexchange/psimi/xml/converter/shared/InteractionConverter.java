@@ -52,6 +52,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     private static final String MODELLED = "modelled";
     private static final String INTRA_MOLECULAR = "intra-molecular";
     private static final String NEGATIVE = "negative";
+
     private static final String TRUE = "true";
 
     private static List<CvDagObject> getCurrentOntology() {
@@ -210,6 +211,11 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     }
 
     public psidev.psi.mi.xml.model.Interaction intactToPsi(Interaction intactObject) {
+
+        final boolean isNegative = removeAnnotation( intactObject, NEGATIVE, TRUE );
+        final boolean isIntraMolecular = removeAnnotation( intactObject, INTRA_MOLECULAR, TRUE );
+        final boolean isModelled = removeAnnotation( intactObject, MODELLED, TRUE );
+
         psidev.psi.mi.xml.model.Interaction interaction = super.intactToPsi(intactObject);
 
         if (!isNewPsiObjectCreated()) {
@@ -249,7 +255,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                                            this );
         interaction.getInteractionTypes().add(interactionType);
 
-
         ConfidenceConverter confidenceConverter = new ConfidenceConverter( getInstitution());
         for (Confidence conf : intactObject.getConfidences()){
             psidev.psi.mi.xml.model.Confidence confidence = confidenceConverter.intactToPsi( conf);
@@ -261,10 +266,10 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             psidev.psi.mi.xml.model.Parameter parameter = interactionParameterConverter.intactToPsi(param);
             interaction.getParameters().add(parameter);
         }
-
-        interaction.setNegative( hasAnnotation( intactObject, NEGATIVE, TRUE ) );
-        interaction.setIntraMolecular( hasAnnotation( intactObject, INTRA_MOLECULAR, TRUE ) );
-        interaction.setModelled( hasAnnotation( intactObject, MODELLED, TRUE ) );
+        
+        interaction.setNegative( isNegative );
+        interaction.setIntraMolecular( isIntraMolecular );
+        interaction.setModelled( isModelled );
 
         intactEndConversion(intactObject);
 
@@ -273,14 +278,18 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         return interaction;
     }
 
-    private boolean hasAnnotation( Interaction interaction, String topicShortlabel, String text ) {
-        for ( Annotation annotation : interaction.getAnnotations() ) {
-            if( annotation.getCvTopic().getShortLabel().equals( topicShortlabel )
-                && ( text != null && text.equals( annotation.getAnnotationText() ) )) {
-                return true;
+    private boolean removeAnnotation( Interaction interaction, String topicShortlabel, String text ) {
+        boolean found = false;
+        final Iterator<Annotation> it = interaction.getAnnotations().iterator();
+        while ( it.hasNext() ) {
+            Annotation annotation = it.next();
+            if ( annotation.getCvTopic().getShortLabel().equals( topicShortlabel )
+                 && ( text != null && text.equals( annotation.getAnnotationText() ) ) ) {
+                it.remove();
+                found = true;
             }
         }
-        return false;
+        return found;
     }
 
     private void updateExperimentParticipantDetectionMethod(Interaction interaction) {
@@ -377,7 +386,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                 throw new PsiConversionException("Participant without interactor found: "+participant+" in interaction: "+interaction);
             }
 
-            Component component = ParticipantConverter.newComponent(interaction.getOwner(), participant, interaction);
+            Component component = IntactConverterUtils.newComponent(interaction.getOwner(), participant, interaction);
             components.add(component);
         }
 

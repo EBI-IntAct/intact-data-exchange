@@ -17,24 +17,27 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.mi.xml.model.Attribute;
-import psidev.psi.mi.xml.model.AttributeContainer;
-import psidev.psi.mi.xml.model.DbReference;
-import psidev.psi.mi.xml.model.Names;
+import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.*;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Alias;
+import uk.ac.ebi.intact.model.Confidence;
+import uk.ac.ebi.intact.model.Feature;
+import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.Interactor;
+import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
 /**
- * TODO comment this
+ * Intact Converter Utils.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -142,7 +145,7 @@ public class IntactConverterUtils {
     }
 
     public static String getShortLabelFromNames(Names names) {
-        if (names == null) {
+        if ( names == null || names.getShortLabel() == null ) {
             return IntactConverterUtils.createTempShortLabel();
         }
 
@@ -155,7 +158,6 @@ public class IntactConverterUtils {
             if (fullName != null) {
                 if (log.isWarnEnabled()) log.warn("Short label is null. Using full name as short label: " + fullName);
                 shortLabel = fullName;
-
             } else {
                 throw new NullPointerException("Both fullName and shortLabel are null");
             }
@@ -177,7 +179,7 @@ public class IntactConverterUtils {
     }
 
     public static String createTempShortLabel() {
-        return InteractionUtils.INTERACTION_TEMP_LABEL_PREFIX + Math.abs(new Random().nextInt());
+        return AnnotatedObjectUtils.TEMP_LABEL_PREFIX + Math.abs(new Random().nextInt());
     }
 
     public static String createExperimentTempShortLabel() {
@@ -186,7 +188,7 @@ public class IntactConverterUtils {
 
     @Deprecated
     public static boolean isTempShortLabel(String label) {
-        return InteractionUtils.isTemporaryLabel(label);
+        return AnnotatedObjectUtils.isTemporaryLabel( label );
     }
 
     protected static Institution getInstitution(AnnotatedObject ao) {
@@ -195,5 +197,93 @@ public class IntactConverterUtils {
         } else {
             return ao.getOwner();
         }
+    }
+
+    public static Component newComponent(Institution institution, Participant participant, uk.ac.ebi.intact.model.Interaction interaction) {
+        Interactor interactor = new InteractorConverter(institution).psiToIntact(participant.getInteractor());
+
+        BiologicalRole psiBioRole = participant.getBiologicalRole();
+        if (psiBioRole == null) {
+            psiBioRole = PsiConverterUtils.createUnspecifiedBiologicalRole();
+        }
+        CvBiologicalRole biologicalRole = new BiologicalRoleConverter(institution).psiToIntact(psiBioRole);
+
+        if (participant.getExperimentalRoles().size() > 1) {
+            throw new UnsupportedConversionException("Cannot convert participants with more than one experimental role: "+participant);
+        }
+
+        // only the first experimental role
+        Collection<ExperimentalRole> roles = new ArrayList<ExperimentalRole>(2);
+
+        if (participant.getExperimentalRoles().isEmpty()) {
+            if (log.isWarnEnabled()) log.warn("Participant without experimental roles: " + participant);
+
+            roles.add(PsiConverterUtils.createUnspecifiedExperimentalRole());
+        } else {
+            roles = participant.getExperimentalRoles();
+        }
+
+        Collection<CvExperimentalRole> intactExpRoles = new ArrayList<CvExperimentalRole>(roles.size());
+
+        for (ExperimentalRole role : roles) {
+            CvExperimentalRole experimentalRole = new ExperimentalRoleConverter(institution).psiToIntact(role);
+            intactExpRoles.add(experimentalRole);
+        }
+
+        Component component = new Component(institution, interaction, interactor, intactExpRoles.iterator().next(), biologicalRole);
+
+        IntactConverterUtils.populateNames(participant.getNames(), component);
+        IntactConverterUtils.populateXref(participant.getXref(), component, new XrefConverter<ComponentXref>(institution, ComponentXref.class));
+        IntactConverterUtils.populateAnnotations(participant, component, institution);
+
+        component.setExperimentalRoles(intactExpRoles);
+
+        FeatureConverter featureConverter = new FeatureConverter(institution);
+
+        for (psidev.psi.mi.xml.model.Feature psiFeature : participant.getFeatures()) {
+            Feature feature = featureConverter.psiToIntact(psiFeature);
+            component.getBindingDomains().add(feature);
+            feature.setComponent(component);
+        }
+
+        for (ParticipantIdentificationMethod pim : participant.getParticipantIdentificationMethods()) {
+            ParticipantIdentificationMethodConverter pimConverter = new ParticipantIdentificationMethodConverter(institution);
+            CvIdentification cvIdentification = pimConverter.psiToIntact(pim);
+            component.getParticipantDetectionMethods().add(cvIdentification);
+        }
+
+        for (ExperimentalPreparation expPrep : participant.getExperimentalPreparations()) {
+            CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation> epConverter =
+                    new CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation>(institution, CvExperimentalPreparation.class, ExperimentalPreparation.class);
+            CvExperimentalPreparation cvExpPrep = epConverter.psiToIntact(expPrep);
+            component.getExperimentalPreparations().add(cvExpPrep);
+        }
+
+        if (!participant.getHostOrganisms().isEmpty()) {
+            HostOrganism hostOrganism = participant.getHostOrganisms().iterator().next();
+            Organism organism = new Organism();
+            organism.setNcbiTaxId(hostOrganism.getNcbiTaxId());
+            organism.setNames(hostOrganism.getNames());
+            organism.setCellType(hostOrganism.getCellType());
+            organism.setCompartment(hostOrganism.getCompartment());
+            organism.setTissue(hostOrganism.getTissue());
+
+            BioSource bioSource = new OrganismConverter(institution).psiToIntact(organism);
+            component.setExpressedIn(bioSource);
+        }
+
+        ParticipantParameterConverter paramConverter= new ParticipantParameterConverter(institution);
+        for (psidev.psi.mi.xml.model.Parameter psiParameter : participant.getParameters()){
+            ComponentParameter parameter = paramConverter.psiToIntact( psiParameter );
+            component.addParameter(parameter);
+        }
+
+//        ConfidenceConverter confConverter= new ConfidenceConverter( institution );
+//        for (psidev.psi.mi.xml.model.Confidence psiConfidence :  participant.getConfidenceList()){
+//           Confidence confidence = confConverter.psiToIntact( psiConfidence );
+//            component.Confidence( confidence);
+//        }
+
+        return component;
     }
 }

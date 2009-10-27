@@ -102,8 +102,8 @@ public class RangeConverterTest {
 
     @Test( expected= PsiConversionException.class )
     public void psiToIntact_no_position() throws Exception {
-        psidev.psi.mi.xml.model.Range psiObject = new Range( buildRangeStatus( "certain", "MI:0001" ),
-                                                             buildRangeStatus( "certain", "MI:0001" ),
+        psidev.psi.mi.xml.model.Range psiObject = new Range( buildRangeStatus( "certain", RangeConverter.CERTAIN ),
+                                                             buildRangeStatus( "certain", RangeConverter.CERTAIN ),
                                                              new Position(2),
                                                              new Interval(3,4));
         psiObject.setBegin( null );
