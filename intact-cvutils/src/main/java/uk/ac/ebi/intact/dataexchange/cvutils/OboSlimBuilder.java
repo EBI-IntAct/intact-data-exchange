@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URLConnection;
 import java.io.*;
 import java.util.Collection;
 import java.util.Set;
@@ -51,6 +52,7 @@ public class OboSlimBuilder {
 
     private boolean includeChildren;
 
+    private File cacheDirectory;
 
     private URL ontologyURL;
 
@@ -90,6 +92,10 @@ public class OboSlimBuilder {
         return includeChildren;
     }
 
+    public void setCacheDirectory( File cacheDirectory ) {
+        this.cacheDirectory = cacheDirectory;
+    }
+
     public Set<String> getTerms() {
         return terms;
     }
@@ -106,6 +112,24 @@ public class OboSlimBuilder {
         if ( log.isDebugEnabled() ) {
             log.debug( "Building a slim ontology based on " + terms.size() + " given term(s)..." );
         }
+
+        if( cacheDirectory != null ) {
+            String name = ontologyURL.getFile();
+            String cachedFilename = name.substring( name.lastIndexOf( "/" ), name.length() );
+            File cachedFile = new File( cacheDirectory, cachedFilename );
+
+            if( cachedFile.exists() ) {
+                System.out.println( "Using already existing file cached in: " + cachedFile.getAbsolutePath() );
+                ontologyURL = cachedFile.toURL();
+            } else {
+                System.out.println( "Saving ontology into" + cachedFile.getAbsolutePath() );
+
+                saveUrlToCache( ontologyURL, cachedFile );
+                ontologyURL = cachedFile.toURL();
+            }
+        }
+
+        System.out.println( "Reading ontology from: " + ontologyURL );
 
         final OBOSession session = OboUtils.createOBOSession( ontologyURL );
 
@@ -151,5 +175,37 @@ public class OboSlimBuilder {
         }
 
         OboUtils.saveSession( session2export, file );
+    }
+
+    private void saveUrlToCache( URL url, File cachedFile ) throws IOException {
+
+        final URLConnection con = url.openConnection();
+        final int downloadSize = con.getContentLength();
+
+        System.out.println( "Saving URL ("+ downloadSize/1024 +"K) to cache: " + cachedFile.getAbsolutePath() );
+        BufferedWriter out = new BufferedWriter( new FileWriter( cachedFile ) );
+
+        out.close();
+
+        BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream() ));
+        String inputLine;
+        while ((inputLine = in.readLine()) != null)
+            out.write( inputLine + "\n" );
+
+        in.close();
+        out.flush();
+        out.close();
+    }
+
+
+    public static void main( String[] args ) throws IOException, OBOParseException, DataAdapterException {
+        final OboSlimBuilder builder = new OboSlimBuilder();
+        builder.setIncludeChildren( true );
+        builder.setIncludeParents( true );
+        builder.setOboLocation( new URL( "http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo" ) );
+//        builder.setCacheDirectory( new File( "/Users/samuel/Desktop" ) );
+//        builder.addTerm( "GO:0019904" ); // protein domain specific binding
+        builder.addTerm( "GO:0000788" ); // nuclear exosome
+        builder.build( new File( "/Users/samuel/Desktop/GO_nuclear_exosome.obo" ) );
     }
 }
