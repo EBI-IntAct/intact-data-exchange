@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<entrySet minorVersion="3" version="5" level="2" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <entry>
+        <source releaseDate="2009-10-19+01:00">
+            <names>
+                <shortLabel>ChEMBL</shortLabel>
+                <fullName>ChEMBL</fullName>
+            </names>
+            <xref>
+                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0469" dbAc="MI:0488" db="psi-mi"/>
+            </xref>
+        </source>
+        <experimentList>
+            <experimentDescription id="3095288">
+                <names>
+                    <shortLabel>Binding affinity to E-selectin</shortLabel>
+                </names>
+                <bibref>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0358" refType="primary-reference" id="17845854" dbAc="MI:0446" db="pubmed"/>
+                    </xref>
+                </bibref>
+                <xref>
+                    <primaryRef refTypeAc="MI:0356" refType="identity" id="468136" dbAc="MI:0469" db="chembl"/>
+                </xref>
+                <hostOrganismList>
+                    <hostOrganism ncbiTaxId="-3">
+                        <names>
+                            <shortLabel>unknown</shortLabel>
+                        </names>
+                    </hostOrganism>
+                </hostOrganismList>
+                <interactionDetectionMethod>
+                    <names>
+                        <shortLabel>biochemical</shortLabel>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0401" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </interactionDetectionMethod>
+                <participantIdentificationMethod>
+                    <names>
+                        <shortLabel>predetermined</shortLabel>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0396" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </participantIdentificationMethod>
+                <attributeList>
+                    <attribute nameAc="MI:0627" name="exp-modification">Binding affinity to E-selectin</attribute>
+                </attributeList>
+            </experimentDescription>
+        </experimentList>
+        <interactorList>
+            <interactor id="3095293">
+                <names>
+                    <shortLabel>Selectin E</shortLabel>
+                    <alias type="gene name synonym" typeAc="MI:0302">E-selectin</alias>
+                    <alias type="gene name synonym" typeAc="MI:0302">Endothelial leukocyte adhesion molecule 1</alias>
+                    <alias type="gene name synonym" typeAc="MI:0302">Leukocyte-endothelial cell adhesion molecule 2</alias>
+                    <alias type="gene name synonym" typeAc="MI:0302">CD62 antigen-like family member E</alias>
+                    <alias type="gene name synonym" typeAc="MI:0302">CD_antigen=CD62E</alias>
+                    <alias type="gene name synonym" typeAc="MI:0302">ELAM-1</alias>
+                    <alias type="gene name synonym" typeAc="MI:0302">LECAM2</alias>
+                    <alias type="gene name" typeAc="MI:0301">SELE</alias>
+                    <alias type="gene name" typeAc="MI:0301">ELAM1</alias>
+                </names>
+                <xref>
+                    <primaryRef refTypeAc="MI:0356" refType="identity" version="15.4" id="P16581" dbAc="MI:0486" db="uniprotkb"/>
+                </xref>
+                <interactorType>
+                    <names>
+                        <shortLabel>protein</shortLabel>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0326" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </interactorType>
+                <organism ncbiTaxId="9606">
+                    <names>
+                        <shortLabel>Homo sapiens</shortLabel>
+                    </names>
+                </organism>
+                <sequence>MIASQFLSALTLVLLIKESGAWSYNTSTEAMTYDEASAYCQQRYTHLVAIQNKEEIEYLNSILSYSPSYYWIGIRKVNNVWVWVGTQKPLTEEAKNWAPGEPNNRQKDEDCVEIYIKREKDVGMWNDERCSKKKLALCYTAACTNTSCSGHGECVETINNYTCKCDPGFSGLKCEQIVNCTALESPEHGSLVCSHPLGNFSYNSSCSISCDRGYLPSSMETMQCMSSGEWSAPIPACNVVECDAVTNPANGFVECFQNPGSFPWNTTCTFDCEEGFELMGAQSLQCTSSGNWDNEKPTCKAVTCRAVRQPQNGSVRCSHSPAGEFTFKSSCNFTCEEGFMLQGPAQVECTTQGQWTQQIPVCEAFQCTALSNPERGYMNCLPSASGSFRYGSSCEFSCEQGFVLKGSKRLQCGPTGEWDNEKPTCEAVRCDAVHQPPKGLVRCAHSPIGEFTYKSSCAFSCEEGFELHGSTQLECTSQGQWTEEVPSCQVVKCSSLAVPGKINMSCSGEPVFGTVCKFACPEGWTLNGSAARTCGATGHWSGLLPTCEAPTESNIPLVAGLSAAGLSLLTLAPFLLWLRKCLRKAKKFVPASSCQSLESDGSYQKPSYIL</sequence>
+            </interactor>
+            <interactor id="3095291">
+                <names>
+                    <shortLabel>439875</shortLabel>
+                    <alias type="inchi id" typeAc="MI:2010">InChI=1/C31H52N2O23/c1-8-17(41)20(44)21(45)28(50-8)54-25-16(33-10(3)38)27(47)51-14(7-36)23(25)53-29-22(46)26(19(43)13(6-35)52-29)56-31(30(48)49)4-11(39)15(32-9(2)37)24(55-31)18(42)12(40)5-34/h8,11-29,34-36,39-47H,4-7H2,1-3H3,(H,32,37)(H,33,38)(H,48,49)/t8-,11-,12+,13+,14+,15+,16+,17+,18+,19-,20+,21-,22+,23+,24+,25+,26-,27+,28-,29-,31-/m0/s1</alias>
+                    <alias type="inchi key">NIGUVXFURDGQKZ-UQTBNESHBF</alias>
+                    <alias type="smile" typeAc="MI:2039">C[C@@H]1O[C@@H](O[C@@H]2[C@@H](NC(=O)C)[C@H](O)O[C@H](CO)[C@H]2O[C@@H]3O[C@H](CO)[C@H](O)[C@H](O[C@@]4(C[C@H](O)[C@@H](NC(=O)C)[C@@H](O4)[C@H](O)[C@H](O)CO)C(=O)O)[C@H]3O)[C@@H](O)[C@H](O)[C@@H]1O</alias>
+                </names>
+                <xref>
+                    <primaryRef refTypeAc="MI:0356" refType="identity" id="439875" dbAc="MI:0469" db="chembl"/>
+                </xref>
+                <interactorType>
+                    <names>
+                        <shortLabel>small molecule</shortLabel>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0328" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </interactorType>
+            </interactor>
+        </interactorList>
+        <interactionList>
+            <interaction id="3095289">
+                <xref>
+                    <primaryRef refTypeAc="MI:0685" refType="source reference" id="468136" dbAc="MI:0469" db="chembl"/>
+                </xref>
+                <experimentList>
+                    <experimentRef>3095288</experimentRef>
+                </experimentList>
+                <participantList>
+                    <participant id="3095290">
+                        <names>
+                            <alias type="author-given-name" typeAc="MI:0345">1</alias>
+                        </names>
+                        <xref>
+                            <primaryRef dbAc="MI:0469" db="intact" id="EBI-999" />
+                        </xref>
+                        <interactorRef>3095291</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                            </names>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488" db="psi-mi"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>unspecified role</shortLabel>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488" db="psi-mi"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                    </participant>
+                    <participant id="3095292">
+                        <interactorRef>3095293</interactorRef>
+                        <biologicalRole>
+                            <names>
+                                <shortLabel>unspecified role</shortLabel>
+                            </names>
+                            <xref>
+                                <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488" db="psi-mi"/>
+                            </xref>
+                        </biologicalRole>
+                        <experimentalRoleList>
+                            <experimentalRole>
+                                <names>
+                                    <shortLabel>unspecified role</shortLabel>
+                                </names>
+                                <xref>
+                                    <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0499" dbAc="MI:0488" db="psi-mi"/>
+                                </xref>
+                            </experimentalRole>
+                        </experimentalRoleList>
+                        <confidenceList>
+                            <confidence>
+                                <unit>
+                                    <names>
+                                        <shortLabel>chembl</shortLabel>
+                                        <fullName>ChEMBL given confidence</fullName>
+                                    </names>
+                                </unit>
+                                <value>high</value>
+                            </confidence>
+                        </confidenceList>
+                    </participant>
+                </participantList>
+                <interactionType>
+                    <names>
+                        <shortLabel>physical association</shortLabel>
+                    </names>
+                    <xref>
+                        <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0915" dbAc="MI:0488" db="psi-mi"/>
+                    </xref>
+                </interactionType>
+                <modelled>false</modelled>
+                <intraMolecular>false</intraMolecular>
+                <negative>true</negative>
+                <parameterList>
+                    <parameter factor="1000000.0" exponent="1" base="10" unitAc="UO:0000065" unit="nM" termAc="MI:0641" term="IC50">
+                        <experimentRef>3095288</experimentRef>
+                    </parameter>
+                </parameterList>
+            </interaction>
+        </interactionList>
+    </entry>
+</entrySet>
