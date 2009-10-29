@@ -21,6 +21,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
@@ -255,6 +258,26 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
+    public void updateShortLabel() throws Exception {
+        // in this test, we have "laladb" in the database. In the OBO file, the shortlabel is "msd pdb"
+        Institution owner = IntactContext.getCurrentInstance().getInstitution();
+
+        CvDagObject root = CvObjectUtils.createCvObject(owner, CvDatabase.class, "MI:0444", "root");
+        CvDagObject laladb = CvObjectUtils.createCvObject(owner, CvDatabase.class, "MI:0472", "laladb");
+        laladb.addParent(root);
+
+        persisterHelper.save(root, laladb);
+
+        cvUpdater.executeUpdate(OboUtils.createOBOSession(CvUpdaterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" )));
+
+        final CvObjectDao<CvDatabase> cvDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class);
+        CvDatabase msdpdb = cvDao.getByPsiMiRef("MI:0472");
+        
+        Assert.assertEquals("MI:0472", msdpdb.getIdentifier());
+        Assert.assertEquals("msd pdb", msdpdb.getShortLabel());
+    }
+
+    @Test
     public void obsoleteAggregationTest() throws Exception {
 
         List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
@@ -264,9 +287,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Institution owner = IntactContext.getCurrentInstance().getInstitution();
         CvDagObject aggregation = CvObjectUtils.createCvObject( owner, CvInteractionType.class, "MI:0191", "aggregation" );
 
-
         persisterHelper.save( aggregation );
-
 
         CvObjectDao<CvObject> cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao();
         Assert.assertEquals( cvsBeforeUpdate+1, cvObjectDao.countAll() );

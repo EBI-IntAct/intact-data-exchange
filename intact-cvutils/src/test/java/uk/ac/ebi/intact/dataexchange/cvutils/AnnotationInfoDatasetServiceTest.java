@@ -34,7 +34,7 @@ public class AnnotationInfoDatasetServiceTest extends IntactBasicTestCase {
         final CvInteraction i1 = getMockBuilder().createCvObject( CvInteraction.class, "MI:0006", "int1" );
         i1.addAnnotation( getMockBuilder().createAnnotation( "bla", comment ) );
 
-        PersisterHelper.saveOrUpdate( comment, remark, ft1, ft2, ft3, i1 );
+        getPersisterHelper().save( comment, remark, ft1, ft2, ft3, i1 );
 
         // Now retreive them
         AnnotationInfoDatasetService service = new AnnotationInfoDatasetService();

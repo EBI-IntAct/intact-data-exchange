@@ -122,6 +122,8 @@ public class CvUpdater {
      * @param allCvs List of all Cvs
      * @return An object containing some statistics about the update
      */
+    @Transactional
+    @IntactFlushMode(FlushModeType.COMMIT)
     public CvUpdaterStatistics createOrUpdateCVs( List<CvDagObject> allCvs ) {
         return createOrUpdateCVs( allCvs, new AnnotationInfoDataset() );
     }
@@ -142,10 +144,20 @@ public class CvUpdater {
          }
 
          AnnotationInfoDataset annotationInfoDataset = OboUtils.createAnnotationInfoDatasetFromResource(new FileInputStream(CvUpdaterStatistics.class.getResource("/dgi/additional-annotations.csv").getFile()));
+         return executeUpdate(oboSession, annotationInfoDataset);
+     }
 
+    @Transactional
+    @IntactFlushMode(FlushModeType.COMMIT)
+    public CvUpdaterStatistics executeUpdate(OBOSession oboSession, AnnotationInfoDataset annotationInfoDataset) throws IOException{
          CvObjectOntologyBuilder builder = new CvObjectOntologyBuilder(oboSession);
-
          return createOrUpdateCVs(builder.getAllCvs(), annotationInfoDataset);
+    }
+
+    @Transactional
+    @IntactFlushMode(FlushModeType.COMMIT)
+    public CvUpdaterStatistics executeUpdate(OBOSession oboSession) throws IOException{
+         return executeUpdate(oboSession, new AnnotationInfoDataset());
      }
 
     /**
@@ -182,35 +194,25 @@ public class CvUpdater {
 
         if (log.isDebugEnabled()) log.debug( "Size of CV list after removing obsolete terms: " + cleanedList.size() );
 
+
         CorePersister corePersister = persisterHelper.getCorePersister();
         corePersister.setUpdateWithoutAcEnabled(true);
 
-        //final TransactionStatus transactionStatus = intactContext.getDataContext().beginTransaction();
-        // update the cvs using the annotation info dataset
         updateCVsUsingAnnotationDataset( cleanedList, annotationInfoDataset, corePersister );
 
-        //intactContext.getDataContext().commitTransaction(transactionStatus);
+        CvObject[] cvObjects = cleanedList.toArray(new CvObject[cleanedList.size()]);
 
-         //intactContext.getDaoFactory().getEntityManager().clear();
+        corePersister.saveOrUpdate(cvObjects);
 
-        //final TransactionStatus transactionStatus2 = intactContext.getDataContext().beginTransaction();
-        //intactContext.getDaoFactory().getEntityManager().setFlushMode(FlushModeType.COMMIT);
+        PersisterStatistics persisterStats = corePersister.getStatistics();
         
-
-
-        PersisterStatistics persisterStats = persisterHelper.save( cleanedList.toArray( new CvObject[cleanedList.size()] ) );
         addCvObjectsToUpdaterStats( persisterStats, stats );
-
-        //intactContext.getDataContext().commitTransaction(transactionStatus2);
 
         if ( log.isDebugEnabled() ) {
             log.debug( "Persisted: " + persisterStats );
             log.debug( "Processed: " + processed.size() );
             log.debug( stats );
         }
-
-        // set autoupdate to what it was before the CV update.
-        //intactContext.getDaoFactory().getEntityManager().setFlushMode(FlushModeType.AUTO);
 
         return stats;
     } //end method
@@ -252,8 +254,7 @@ public class CvUpdater {
         return CvObjectOntologyBuilder.mi2Class.keySet().contains( identity );
     }
 
-    @IntactFlushMode(FlushModeType.COMMIT)
-    public void updateCVsUsingAnnotationDataset(List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset, CorePersister corePersister) {
+    protected void updateCVsUsingAnnotationDataset(List<CvDagObject> allCvs, AnnotationInfoDataset annotationInfoDataset, CorePersister corePersister) {
 
         for ( CvDagObject cvObject : allCvs ) {
             final String identity = CvObjectUtils.getIdentity( cvObject );
@@ -275,9 +276,6 @@ public class CvUpdater {
                                                                   null,
                                                                   annotInfo.getTopicShortLabel() );
 
-                        //IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                        //        .getCvObjectDao(CvTopic.class).persist(topic);
-                        //PersisterHelper persisterHelper = IntactContext.getCurrentInstance().getPersisterHelper();
                         corePersister.saveOrUpdate(topic);
 
                     }
