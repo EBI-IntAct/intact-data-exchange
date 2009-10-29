@@ -10,12 +10,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.*;
-import java.io.StringWriter;
-
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
+
+import java.io.StringWriter;
+import java.util.*;
 
 public class CcLineTest extends UniprotExportTestCase {
 
@@ -141,7 +140,7 @@ public class CcLineTest extends UniprotExportTestCase {
         interaction1.addExperiment( exp );
         interaction2.addExperiment( exp );
 
-        PersisterHelper.saveOrUpdate( q9swi1, p14712, p14713, p12345 );
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, p14712, p14713, p12345 );
         StringWriter ccWriter = new StringWriter();
         StringWriter goaWriter = new StringWriter();
         CCLineExport exporter = new CCLineExport( ccWriter, goaWriter );

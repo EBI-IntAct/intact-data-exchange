@@ -6,16 +6,13 @@
  
 package uk.ac.ebi.intact.util.uniprotExport;
 
+import junit.framework.Assert;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 
 import java.util.List;
 import java.util.Set;
-import java.sql.SQLException;
-
-import junit.framework.Assert;
 
 /**
  * DRLineExportLenient Tester.
@@ -62,7 +59,7 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         interaction1.addExperiment( exp );
         interaction2.addExperiment( exp );
 
-        PersisterHelper.saveOrUpdate( q9swi1, p14712, p14713, p12345 );
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, p14712, p14713, p12345 );
         DRLineExportLenient exporter = new DRLineExportLenient( );
 
         final List<ProteinImpl> allProteins = getDaoFactory().getProteinDao().getAll();
@@ -97,7 +94,7 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         exp.addAnnotation( annotation );
         interaction.addExperiment( exp );
 
-        PersisterHelper.saveOrUpdate( q9swi1, q98765 );
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, q98765 );
         DRLineExportLenient exporter = new DRLineExportLenient( );
 
         final List<ProteinImpl> allProteins = getDaoFactory().getProteinDao().getAll();
@@ -116,7 +113,7 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         final Protein q9swi1 = getMockBuilder().createProtein( "Q9SWI1", "Q9SWI1_HUMAN", human );
 
         final Protein p12345 = getMockBuilder().createProtein( "P12345", "P12345_HUMAN", human );
-        PersisterHelper.saveOrUpdate( p12345 );
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( p12345 );
 
         final Protein p12345_1 = getMockBuilder().createProteinSpliceVariant( p12345, "P12345-2", "P12345-2" );
 
@@ -127,7 +124,7 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         exp.addAnnotation( annotation );
         interaction.addExperiment( exp );
 
-        PersisterHelper.saveOrUpdate( q9swi1, p12345, p12345_1 );
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, p12345, p12345_1 );
         DRLineExportLenient exporter = new DRLineExportLenient( );
 
         final List<ProteinImpl> allProteins = getDaoFactory().getProteinDao().getAll();
@@ -160,7 +157,7 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         exp.addAnnotation( annotation );
         interaction.addExperiment( exp );
 
-        PersisterHelper.saveOrUpdate( q9swi1, nucleicacid );
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, nucleicacid );
         DRLineExportLenient exporter = new DRLineExportLenient( );
 
         final List<ProteinImpl> allProteins = getDaoFactory().getProteinDao().getAll();

@@ -7,8 +7,9 @@ package uk.ac.ebi.intact.util.uniprotExport;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.*;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import org.junit.Assert;
+import org.junit.Test;
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 
 import java.io.StringWriter;
@@ -62,7 +63,7 @@ public class CcLineExportDbTest extends UniprotExportTestCase {
         interaction1.addExperiment( exp );
         interaction2.addExperiment( exp );
 
-        PersisterHelper.saveOrUpdate( q9swi1, p14712, p14713, p12345 );
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, p14712, p14713, p12345 );
 
         StringWriter ccWriter = new StringWriter();
         Writer goaWriter = new StringWriter();
@@ -107,7 +108,7 @@ public class CcLineExportDbTest extends UniprotExportTestCase {
         final Protein p14712 = getMockBuilder().createProtein( "P14712", "P14712_HUMAN", mouse );
 
         final Protein p14713 = getMockBuilder().createProtein( "P14713", "P14713_HUMAN", human );
-        PersisterHelper.saveOrUpdate( p14713 );
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( p14713 );
 
         final Protein p14713_1 = getMockBuilder().createProtein( "P14712-1", "SV1", mouse );
         p14713_1.addXref( new InteractorXref( getMockBuilder().getInstitution(),
@@ -124,7 +125,7 @@ public class CcLineExportDbTest extends UniprotExportTestCase {
         exp.addAnnotation( annotation );
         interaction1.addExperiment( exp );
 
-        PersisterHelper.saveOrUpdate( p14712, q9swi1, p14713_1, p12345 );
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( p14712, q9swi1, p14713_1, p12345 );
 
         StringWriter ccWriter = new StringWriter();
         Writer goaWriter = new StringWriter();

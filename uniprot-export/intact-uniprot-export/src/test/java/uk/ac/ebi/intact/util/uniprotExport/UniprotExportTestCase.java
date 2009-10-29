@@ -15,20 +15,14 @@
  */
 package uk.ac.ebi.intact.util.uniprotExport;
 
-import org.junit.After;
 import org.junit.Before;
 import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.util.SchemaUtils;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.core.config.CvPrimer;
-import uk.ac.ebi.intact.core.config.impl.SmallCvPrimer;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.CvTopic;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.model.CvAliasType;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.CvTopic;
+import uk.ac.ebi.intact.model.CvXrefQualifier;
 
 /**
  * Abstract test that sets up the database for the uniprot export tests.
@@ -50,6 +44,6 @@ public abstract class UniprotExportTestCase extends IntactBasicTestCase {
         final CvAliasType locusName = builder.createCvObject(CvAliasType.class, CvAliasType.LOCUS_NAME_MI_REF, "locus name");
         final CvAliasType orfName = builder.createCvObject(CvAliasType.class, CvAliasType.ORF_NAME_MI_REF, "orf name");
 
-        PersisterHelper.saveOrUpdate(uniprotkb, isoformParent, noUniprotUpdate, negative, ccNote, locusName, orfName);
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate(uniprotkb, isoformParent, noUniprotUpdate, negative, ccNote, locusName, orfName);
     }
 }
