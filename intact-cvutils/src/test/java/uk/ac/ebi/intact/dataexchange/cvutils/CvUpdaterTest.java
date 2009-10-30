@@ -21,9 +21,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
@@ -375,7 +372,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         int totalCvsAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
 
         Assert.assertEquals( 938, totalCvsAfterUpdate );
-        Assert.assertEquals( 929, stats.getCreatedCvs().size() );
+        Assert.assertEquals( 932, stats.getCreatedCvs().size() );
 
         //54-1 obsolete term
         Assert.assertEquals( 53, stats.getOrphanCvs().size() );
@@ -393,7 +390,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         List<CvDagObject> cvs = ontologyBuilder.getAllCvs();
         cvs = cvs.subList(0,10);
-
 
         List<CvDagObject> copyOfCvs = new ArrayList<CvDagObject>( cvs.size() );
         IntactCloner cloner = new IntactCloner();
@@ -422,7 +418,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             }
         }
 
-        Assert.assertEquals( 1, updatedCvs.size() );   // identity cv is updated
+        Assert.assertEquals( 0, updatedCvs.size() );   
     }
 
     private boolean isSizeOfCollectionTheSame( CvObject cv1, CvObject cv2 ) {
