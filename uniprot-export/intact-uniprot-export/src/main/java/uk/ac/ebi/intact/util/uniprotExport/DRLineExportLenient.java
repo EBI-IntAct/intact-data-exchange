@@ -6,7 +6,6 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
 import org.apache.commons.cli.*;
-import uk.ac.ebi.intact.core.IntactException;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 
@@ -155,7 +154,6 @@ public class DRLineExportLenient extends LineExport {
      */
     public final Set<String> getEligibleProteins(int firstResult, int maxResults)
             throws SQLException,
-                   IntactException,
                    DatabaseContentException {
 
         List<ProteinImpl> proteins = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
@@ -172,14 +170,12 @@ public class DRLineExportLenient extends LineExport {
      * @return a distinct set of Uniprot ID of the protein eligible to export in Swiss-Prot.
      *
      * @throws java.sql.SQLException error when handling the JDBC connection or query.
-     * @throws uk.ac.ebi.intact.business.IntactException
      *
      * @throws uk.ac.ebi.intact.util.uniprotExport.CCLineExport.DatabaseContentException
      *                               if the initialisation process failed (CV not found)
      */
     public final Set<String> getEligibleProteins(Collection<ProteinImpl> proteins)
             throws SQLException,
-                   IntactException,
                    DatabaseContentException {
 
         if (proteins.isEmpty()) {
