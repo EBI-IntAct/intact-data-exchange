@@ -397,6 +397,15 @@ public class LineExport {
         return isoformParent;
     }
 
+    protected CvXrefQualifier getChainParent() {
+        if( isoformParent == null ) {
+            isoformParent = (CvXrefQualifier) getCvObject( CvXrefQualifier.class,
+                                                           "MI:0951",
+                                                           "chain-parent" );
+        }
+        return isoformParent;
+    }
+
     protected CvXrefQualifier getPrimaryReference() {
         if( primaryReference == null ) {
             primaryReference = (CvXrefQualifier) getCvObject( CvXrefQualifier.class,
@@ -541,8 +550,13 @@ public class LineExport {
         for (Iterator<InteractorXref> iterator = xrefs.iterator(); iterator.hasNext() && !found;) {
             Xref xref = iterator.next();
 
-            if (getIntact().equals(xref.getCvDatabase()) &&
-                getIsoformParent().equals(xref.getCvXrefQualifier())) {
+            if ( getIntact().equals( xref.getCvDatabase() )
+                 &&
+                 ( getIsoformParent().equals( xref.getCvXrefQualifier() )
+                   ||
+                   getChainParent().equals( xref.getCvXrefQualifier() )
+                 )
+                ) {
                 ac = xref.getPrimaryId();
                 found = true;
             }
