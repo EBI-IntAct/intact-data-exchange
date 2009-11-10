@@ -61,7 +61,7 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
             for ( int i = 0; i < components.length; i++ ) {
                 Component c1 = components[i];
                 for ( int j = ( i + 1 ); j < components.length; j++ ) {
-                    Component c2 = components[i];
+                    Component c2 = components[j];
                     // build a new interaction
                     Interaction newInteraction = buildInteraction( interaction, c1, c2 );
                     interactions.add( newInteraction );
