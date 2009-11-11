@@ -109,7 +109,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         CvDatabase goDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO);
         interactor.addXref(getMockBuilder().createXref(interactor, "GO:0007028", null, goDb));
 
-        PersisterHelper.saveOrUpdate(interaction);
+        getCorePersister().saveOrUpdate(interaction);
 
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
 
@@ -149,7 +149,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         p9.addXref( new InteractorXref( getMockBuilder().getInstitution(), go, "GO:0022904", "respiratory electron transport chain", null, null ) );
 
         final Interaction interaction = getMockBuilder().createInteraction( "p1-p9",  p1, p9, getMockBuilder().createExperimentEmpty() );
-        PersisterHelper.saveOrUpdate( interaction );
+        getCorePersister().saveOrUpdate( interaction );
 
         Assert.assertEquals(2, getDaoFactory().getInteractorDao( ProteinImpl.class ).countAll());
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
@@ -231,7 +231,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
 
         final Interaction interaction4 = getMockBuilder().createInteraction( "p9-p1-2",  p9, p1, e2 );
         interaction1.setCvInteractionType( physical );
-        PersisterHelper.saveOrUpdate( interaction1, interaction2, interaction3, interaction4 );
+        getCorePersister().saveOrUpdate( interaction1, interaction2, interaction3, interaction4 );
 
         Assert.assertEquals(3, getDaoFactory().getInteractorDao( ProteinImpl.class ).countAll());
         Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
@@ -315,7 +315,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         final Interaction interaction4 = getMockBuilder().createInteraction( "p9-p1-2",  p9, p1, e2 );
         interaction1.setCvInteractionType( physical );
         
-        PersisterHelper.saveOrUpdate( interaction1, interaction4 );
+        getCorePersister().saveOrUpdate( interaction1, interaction4 );
 
         Assert.assertEquals(3, getDaoFactory().getInteractorDao( ProteinImpl.class ).countAll());
         Assert.assertEquals(2, getDaoFactory().getInteractionDao().countAll());
@@ -390,7 +390,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
         CvDatabase goDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO);
         interactor.addXref(getMockBuilder().createXref(interactor, "GO:0007028", null, goDb));
 
-        PersisterHelper.saveOrUpdate(interaction);
+        getCorePersister().saveOrUpdate(interaction);
 
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
 

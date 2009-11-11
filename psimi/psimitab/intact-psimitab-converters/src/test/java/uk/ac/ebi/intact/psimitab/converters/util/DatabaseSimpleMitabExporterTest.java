@@ -65,7 +65,7 @@ public class DatabaseSimpleMitabExporterTest extends IntactBasicTestCase {
         CvDatabase goDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO);
         interactor.addXref(getMockBuilder().createXref(interactor, "GO:0007028", null, goDb));
 
-        PersisterHelper.saveOrUpdate( i1, i2, i3);
+        getCorePersister().saveOrUpdate( i1, i2, i3);
 
         Assert.assertEquals(3, getDaoFactory().getInteractionDao().countAll());
         Assert.assertEquals(4, getDaoFactory().getInteractorDao( ProteinImpl.class ).countAll());
@@ -98,20 +98,20 @@ public class DatabaseSimpleMitabExporterTest extends IntactBasicTestCase {
         final Component baitComponent = getMockBuilder().createComponentBait(interaction1, prot1 );
         final Component preyComponent = getMockBuilder().createComponentPrey(interaction1, prot1 );
 
-        PersisterHelper.saveOrUpdate( baitComponent );
-        PersisterHelper.saveOrUpdate( preyComponent );
+        getCorePersister().saveOrUpdate( baitComponent );
+        getCorePersister().saveOrUpdate( preyComponent );
 
         Assert.assertEquals( 1, getDaoFactory().getProteinDao().countAll() );
         Assert.assertEquals( 3, getDaoFactory().getComponentDao().countAll() );
 
         Protein prot2 = getMockBuilder().createDeterministicProtein( "Q3334", "q2" );
         Protein prot3 = getMockBuilder().createDeterministicProtein( "Q3335", "q3" );
-        PersisterHelper.saveOrUpdate( prot2,prot3 );
+        getCorePersister().saveOrUpdate( prot2,prot3 );
 
         Interaction interaction2 = getMockBuilder().createInteraction( prot2, prot3 );
         interaction2.setShortLabel( "q2-q3" );
 
-        PersisterHelper.saveOrUpdate( interaction1,interaction2 );
+        getCorePersister().saveOrUpdate( interaction1,interaction2 );
         Assert.assertEquals( 3, getDaoFactory().getProteinDao().countAll() );
 
         //p1,q2,q3, and interaction p1-p1 and interaction q2-q2
