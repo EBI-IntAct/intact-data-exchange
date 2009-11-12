@@ -21,20 +21,17 @@ import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Interaction;
 import psidev.psi.mi.xml.model.Parameter;
-import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterMessage;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
-import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.clone.IntactCloner;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.io.File;
-import java.io.FileWriter;
 
 /**
  * InteractionConverter Tester.
@@ -321,7 +318,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
         Protein prot = getMockBuilder().createProteinRandom();
         Protein protCopy = new IntactCloner().clone(prot);
 
-        PersisterHelper.saveOrUpdate(protCopy);
+        getCorePersister().saveOrUpdate(protCopy);
 
         Component bait = getMockBuilder().createComponentBait(prot);
         Component prey = getMockBuilder().createComponentPrey(prot);
@@ -340,7 +337,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
 
         Assert.assertEquals(2, reInteraction.getComponents().size());
 
-        PersisterHelper.saveOrUpdate(reInteraction);
+        getCorePersister().saveOrUpdate(reInteraction);
 
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
         Assert.assertEquals(1, getDaoFactory().getProteinDao().countAll());
