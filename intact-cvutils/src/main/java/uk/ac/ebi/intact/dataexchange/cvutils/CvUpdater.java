@@ -133,7 +133,7 @@ public class CvUpdater {
      * @return An object containing some statistics about the update
      */
     @Transactional
-    @IntactFlushMode(FlushModeType.COMMIT)
+    //@IntactFlushMode(FlushModeType.COMMIT)
     public CvUpdaterStatistics executeUpdateWithLatestCVs() throws IOException{
          OBOSession oboSession = null;
          try {
@@ -230,7 +230,7 @@ public class CvUpdater {
                     try {
                         cvObjectsWithSameId = checkAndMarkAsObsoleteIfExisted( cvDag, stats );
                     } catch (Throwable e) {
-                        throw new RuntimeException("Problem checking orphan: "+cvDag.getShortLabel()+" ("+cvDag.getIdentifier()+")");
+                        throw new RuntimeException("Problem checking orphan: "+cvDag.getShortLabel()+" ("+cvDag.getIdentifier()+")", e);
                     }
 
                     if ( cvObjectsWithSameId ) {
