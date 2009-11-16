@@ -133,7 +133,7 @@ public class CvUpdater {
      * @return An object containing some statistics about the update
      */
     @Transactional
-    //@IntactFlushMode(FlushModeType.COMMIT)
+    @IntactFlushMode(FlushModeType.COMMIT)
     public CvUpdaterStatistics executeUpdateWithLatestCVs() throws IOException{
          OBOSession oboSession = null;
          try {
@@ -192,7 +192,6 @@ public class CvUpdater {
         cleanedList = ( List<CvDagObject> ) CollectionUtils.subtract( cleanedList, alreadyExistingObsoleteCvList );
 
         if (log.isDebugEnabled()) log.debug( "Size of CV list after removing obsolete terms: " + cleanedList.size() );
-
 
         CorePersister corePersister = persisterHelper.getCorePersister();
         corePersister.setUpdateWithoutAcEnabled(true);

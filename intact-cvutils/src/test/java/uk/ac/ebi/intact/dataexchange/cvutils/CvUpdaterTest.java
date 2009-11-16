@@ -21,6 +21,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
@@ -343,43 +346,46 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void createOrUpdateCVsTest() throws Exception {
 
         //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
-        OBOSession oboSession = OboUtils.createOBOSession( CvUpdaterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" ));
-        CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder( oboSession );
+        final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+        OBOSession oboSession = OboUtils.createOBOSession(CvUpdaterTest.class.getResource("/ontologies/psi-mi25-1_51.obo"));
+        CvObjectOntologyBuilder ontologyBuilder = new CvObjectOntologyBuilder(oboSession);
 
         List<CvObject> orphanCvs = ontologyBuilder.getOrphanCvObjects();
-        Assert.assertEquals( 54, orphanCvs.size() );
+        Assert.assertEquals(54, orphanCvs.size());
 
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
-        Assert.assertEquals( 987, allCvs.size() );
+        Assert.assertEquals(987, allCvs.size());
 
-        InputStream is = CvUpdaterTest.class.getResourceAsStream( "/additional-annotations.csv" );
+        InputStream is = CvUpdaterTest.class.getResourceAsStream("/additional-annotations.csv");
 
-        if ( is == null ) {
-            throw new NullPointerException( "InputStream is null" );
+        if (is == null) {
+            throw new NullPointerException("InputStream is null");
         }
 
-        AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromResource( is );
+        AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromResource(is);
 
-        
-        
-        Assert.assertFalse( cvUpdater.isConstraintViolated( allCvs ) );
-        CvUpdaterStatistics stats = cvUpdater.createOrUpdateCVs( allCvs, annotationDataset );
-        
+        Assert.assertFalse(cvUpdater.isConstraintViolated(allCvs));
+        CvUpdaterStatistics stats = cvUpdater.createOrUpdateCVs(allCvs, annotationDataset);
 
+        IntactContext.getCurrentInstance().getDataContext().commitTransaction(transactionStatus);
+
+        final TransactionStatus transactionStatus2 = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         int totalCvsAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
 
-        Assert.assertEquals( 938, totalCvsAfterUpdate );
-        Assert.assertEquals( 932, stats.getCreatedCvs().size() );
+        Assert.assertEquals(938, totalCvsAfterUpdate);
+        Assert.assertEquals(932, stats.getCreatedCvs().size());
 
         //54-1 obsolete term
-        Assert.assertEquals( 53, stats.getOrphanCvs().size() );
-        Assert.assertEquals( 54, stats.getObsoleteCvs().size() );
+        Assert.assertEquals(53, stats.getOrphanCvs().size());
+        Assert.assertEquals(54, stats.getObsoleteCvs().size());
 
         //invalid terms are already filtered out
-        Assert.assertEquals( 0, stats.getInvalidTerms().size() );
+        Assert.assertEquals(0, stats.getInvalidTerms().size());
+        IntactContext.getCurrentInstance().getDataContext().commitTransaction(transactionStatus2);
     }
 
     @Test
