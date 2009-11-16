@@ -39,7 +39,6 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.FlushModeType;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -143,7 +142,7 @@ public class CvUpdater {
              throw new IOException("Problem creating OBO session from latest MI: "+e.getMessage());
          }
 
-         AnnotationInfoDataset annotationInfoDataset = OboUtils.createAnnotationInfoDatasetFromResource(new FileInputStream(CvUpdaterStatistics.class.getResource("/dgi/additional-annotations.csv").getFile()));
+         AnnotationInfoDataset annotationInfoDataset = OboUtils.createAnnotationInfoDatasetFromLatestResource();
          return executeUpdate(oboSession, annotationInfoDataset);
      }
 
