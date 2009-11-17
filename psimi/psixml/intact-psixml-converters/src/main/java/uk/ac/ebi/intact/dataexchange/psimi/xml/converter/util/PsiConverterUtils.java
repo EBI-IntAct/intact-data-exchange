@@ -84,7 +84,7 @@ public class PsiConverterUtils {
         names.setFullName( fullName );
 
         if ( !ConverterContext.getInstance().getInteractorConfig().isExcludeInteractorAliases() ) {
-            AliasConverter aliasConverter = new AliasConverter( ConverterContext.getInstance().getDefaultInstitutionForAcs(),
+            AliasConverter aliasConverter = new AliasConverter( annotatedObject.getOwner(),
                                                                 AnnotatedObjectUtils.getAliasClassType( annotatedObject.getClass() ) );
             for ( Alias alias : annotatedObject.getAliases() ) {
                 names.getAliases().add( aliasConverter.intactToPsi( alias ) );

@@ -1,16 +1,16 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter;
 
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.IntactEntry;
-import uk.ac.ebi.intact.model.IntactObject;
-import uk.ac.ebi.intact.model.InstitutionXref;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.XrefUtils;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationItem;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.InteractionLocationItem;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.HasId;
 import psidev.psi.mi.xml.model.Interaction;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.InteractionLocationItem;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationItem;
+import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.InstitutionXref;
+import uk.ac.ebi.intact.model.IntactObject;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.util.Collection;
 
@@ -21,6 +21,8 @@ import java.util.Collection;
  * @version $Id$
  */
 public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConverter<I, P> {
+
+    private static final Log log = LogFactory.getLog( AbstractIntactPsiConverter.class );
 
     private Institution institution;
     private String institutionPrimaryId;
@@ -48,7 +50,11 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
     protected void setInstitution(Institution institution)
     {
         this.institution = institution;
-        this.institutionPrimaryId = calculateInstitutionPrimaryId(institution);
+        try {
+            this.institutionPrimaryId = calculateInstitutionPrimaryId(institution);
+        } catch (Throwable e) {
+            log.error("Problem calculating primaryId for institution: "+institution.getShortLabel());
+        }
     }
 
     protected void failIfInconsistentConversion(I intactEntry, Entry P) {
