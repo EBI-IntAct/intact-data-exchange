@@ -15,13 +15,14 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Xref;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.AnnotationConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractorConverterConfig;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AliasConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.AnnotationConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.CvObjectConverter;
@@ -31,16 +32,11 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * PSI converter utilities.
@@ -88,7 +84,7 @@ public class PsiConverterUtils {
         names.setFullName( fullName );
 
         if ( !ConverterContext.getInstance().getInteractorConfig().isExcludeInteractorAliases() ) {
-            AliasConverter aliasConverter = new AliasConverter( annotatedObject.getOwner(),
+            AliasConverter aliasConverter = new AliasConverter( ConverterContext.getInstance().getDefaultInstitutionForAcs(),
                                                                 AnnotatedObjectUtils.getAliasClassType( annotatedObject.getClass() ) );
             for ( Alias alias : annotatedObject.getAliases() ) {
                 names.getAliases().add( aliasConverter.intactToPsi( alias ) );
