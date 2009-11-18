@@ -26,8 +26,13 @@ import uk.ac.ebi.intact.irefindex.seguid.RigidGenerator;
 import uk.ac.ebi.intact.irefindex.seguid.RogidGenerator;
 import uk.ac.ebi.intact.irefindex.seguid.SeguidException;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.clone.IntactCloner;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
+import uk.ac.ebi.intact.model.visitor.BaseIntactVisitor;
+import uk.ac.ebi.intact.model.visitor.DefaultTraverser;
+import uk.ac.ebi.intact.model.visitor.IntactObjectTraverser;
+import uk.ac.ebi.intact.model.visitor.IntactVisitor;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.PsimitabTools;
 import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
@@ -67,6 +72,14 @@ public class InteractionExpansionCompositeProcessor implements ItemProcessor<Int
         Collection<Interaction> interactions;
 
         boolean expanded = false;
+
+        // disconnect the interaction from the database, by cloning it
+        IntactCloner cloner = new IntactCloner( );
+        item = cloner.clone( item );
+
+        // remove all annotations that should not be exported to public views
+        final IntactObjectTraverser traverser = new DefaultTraverser();
+        traverser.traverse( item, new HiddenAnnotationCleanerVisitor() );
 
         if (InteractionUtils.isBinaryInteraction(item)) {
             interactions = Collections.singleton(item);

@@ -33,10 +33,7 @@ import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Protein;
+import uk.ac.ebi.intact.model.*;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -77,13 +74,24 @@ public class MitabCreationTests extends IntactBasicTestCase {
     @Test
     public void writeMitab() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
-        
+
+        CvTopic hidden = getMockBuilder().createCvObject( CvTopic.class, "MI:xxxx", "hidden" );
+
+        CvTopic internalRemark = getMockBuilder().createCvObject( CvTopic.class, "MI:yyyy", "internal-remark" );
+        internalRemark.addAnnotation( new Annotation(getIntactContext().getInstitution(), hidden, "" ) );
+
+        CvTopic noUniprotUpdate = getMockBuilder().createCvObject( CvTopic.class, "MI:zzzz", "no-uniprot-update" );
+        noUniprotUpdate.addAnnotation( new Annotation(getIntactContext().getInstitution(), hidden, "" ) );
+
         Experiment exp = getMockBuilder().createExperimentRandom(3);
+        exp.addAnnotation( new Annotation(exp.getOwner(), internalRemark, "some internal information" ) );
+
         persisterHelper.save(exp);
 
         Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
         Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
         Protein proteinC = getMockBuilder().createProtein("Q00002", "protC");
+        proteinC.addAnnotation( new Annotation(exp.getOwner(), noUniprotUpdate, "Could not map sequence" ) );
 
         Interaction interaction = getMockBuilder().createInteraction(
                 getMockBuilder().createComponentBait(proteinA),
@@ -112,5 +120,6 @@ public class MitabCreationTests extends IntactBasicTestCase {
         Assert.assertEquals(1L, solrServer.query(new SolrQuery("Q00002")).getResults().getNumFound());
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("go:\"GO:0003674\"")).getResults().getNumFound());
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("species:Catarrhini")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrServer.query(new SolrQuery("\"Could not map sequence\"")).getResults().getNumFound());
     }
 }
