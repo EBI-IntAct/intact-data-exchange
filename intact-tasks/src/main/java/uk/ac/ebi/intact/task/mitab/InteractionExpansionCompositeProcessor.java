@@ -74,8 +74,8 @@ public class InteractionExpansionCompositeProcessor implements ItemProcessor<Int
         boolean expanded = false;
 
         // disconnect the interaction from the database, by cloning it
-        IntactCloner cloner = new IntactCloner( );
-        item = cloner.clone( item );
+//        IntactCloner cloner = new IntactCloner();
+//        item = cloner.clone( item );
 
         // remove all annotations that should not be exported to public views
         final IntactObjectTraverser traverser = new DefaultTraverser();

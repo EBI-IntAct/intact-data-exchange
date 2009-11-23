@@ -91,6 +91,7 @@ public class MitabCreationTests extends IntactBasicTestCase {
         Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
         Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
         Protein proteinC = getMockBuilder().createProtein("Q00002", "protC");
+        proteinC.getAnnotations().clear();
         proteinC.addAnnotation( new Annotation(exp.getOwner(), noUniprotUpdate, "Could not map sequence" ) );
 
         Interaction interaction = getMockBuilder().createInteraction(
@@ -121,5 +122,16 @@ public class MitabCreationTests extends IntactBasicTestCase {
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("go:\"GO:0003674\"")).getResults().getNumFound());
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("species:Catarrhini")).getResults().getNumFound());
         Assert.assertEquals(0L, solrServer.query(new SolrQuery("\"Could not map sequence\"")).getResults().getNumFound());
+
+        // checking that the hidden annotation is still there
+        proteinC = getDaoFactory().getProteinDao().getByShortLabel( "protC" );
+        Assert.assertEquals(1, proteinC.getAnnotations().size());
+
+
+
+
+        //
+                       
+
     }
 }
