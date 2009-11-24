@@ -177,7 +177,7 @@ public class InteractorConverter {
         CrossReference interactorTypeA = cvObjectConverter.toCrossReference( intactInteractor.getCvInteractorType() );
         tabInteractor.setInteractorType( interactorTypeA );
 
-        // expermimental role & parameters
+        // experimental roles & parameters
         List<CrossReference> experimentRoles = new ArrayList<CrossReference>();
         List<CrossReference> biologicalRoles = new ArrayList<CrossReference>();
 
@@ -203,9 +203,11 @@ public class InteractorConverter {
         tabInteractor.setBiologicalRoles( biologicalRoles );
 
         // annotations
-        for (Annotation intactAnnotation : intactInteractor.getAnnotations()) {
+        Collection<Annotation> publicAnnotations = AnnotatedObjectUtils.getPublicAnnotations( intactInteractor );
+        for (Annotation intactAnnotation : publicAnnotations ) {
             uk.ac.ebi.intact.psimitab.model.Annotation annot =
-                    new uk.ac.ebi.intact.psimitab.model.Annotation(intactAnnotation.getCvTopic().getShortLabel(), intactAnnotation.getAnnotationText());
+                    new uk.ac.ebi.intact.psimitab.model.Annotation(intactAnnotation.getCvTopic().getShortLabel(),
+                                                                   intactAnnotation.getAnnotationText());
             tabInteractor.getAnnotations().add(annot);
         }
 
