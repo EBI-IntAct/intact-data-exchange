@@ -121,17 +121,10 @@ public class MitabCreationTests extends IntactBasicTestCase {
         Assert.assertEquals(1L, solrServer.query(new SolrQuery("Q00002")).getResults().getNumFound());
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("go:\"GO:0003674\"")).getResults().getNumFound());
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("species:Catarrhini")).getResults().getNumFound());
-        Assert.assertEquals(0L, solrServer.query(new SolrQuery("\"Could not map sequence\"")).getResults().getNumFound());
+        Assert.assertEquals(1L, solrServer.query(new SolrQuery("\"Could not map sequence\"")).getResults().getNumFound());
 
         // checking that the hidden annotation is still there
         proteinC = getDaoFactory().getProteinDao().getByShortLabel( "protC" );
         Assert.assertEquals(1, proteinC.getAnnotations().size());
-
-
-
-
-        //
-                       
-
     }
 }

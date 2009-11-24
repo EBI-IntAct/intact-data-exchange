@@ -78,8 +78,8 @@ public class InteractionExpansionCompositeProcessor implements ItemProcessor<Int
 //        item = cloner.clone( item );
 
         // remove all annotations that should not be exported to public views
-        final IntactObjectTraverser traverser = new DefaultTraverser();
-        traverser.traverse( item, new HiddenAnnotationCleanerVisitor() );
+//        final IntactObjectTraverser traverser = new DefaultTraverser();
+//        traverser.traverse( item, new HiddenAnnotationCleanerVisitor() );
 
         if (InteractionUtils.isBinaryInteraction(item)) {
             interactions = Collections.singleton(item);
