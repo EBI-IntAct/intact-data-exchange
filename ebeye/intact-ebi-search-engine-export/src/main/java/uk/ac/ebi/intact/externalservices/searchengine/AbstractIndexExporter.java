@@ -153,6 +153,7 @@ public abstract class AbstractIndexExporter<T extends AnnotatedObject> implement
     }
 
     protected void writeRef( Writer out, String db, String id, String indent ) throws IOException {
+        db = db.replaceAll( "/", "_" );
         out.write( indent + "<ref dbname=\"" + db + "\" dbkey=\"" + id + "\" />" + NEW_LINE );
     }
 
