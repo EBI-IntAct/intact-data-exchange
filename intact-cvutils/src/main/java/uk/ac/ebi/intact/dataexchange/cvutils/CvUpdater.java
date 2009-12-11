@@ -28,6 +28,7 @@ import uk.ac.ebi.intact.core.annotations.IntactFlushMode;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.core.persister.CorePersister;
+import uk.ac.ebi.intact.core.persister.PersisterException;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.core.persister.stats.StatsUnit;
@@ -420,8 +421,12 @@ public class CvUpdater {
                     existingCv.addAnnotation( annotation );
                     stats.addUpdatedCv( existingCv );
 
-                    persisterHelper.save( obsoleteTopic );
-                    
+                    try {
+                        persisterHelper.save( obsoleteTopic );
+                    } catch ( Throwable t ) {
+                        throw new PersisterException( "An error occurred while saving CvTopic( '"+ obsoleteTopic.getShortLabel() +"', '"+ obsoleteTopic.getIdentifier() +"' )", t );
+                    }
+
                     stats.addCreatedCv( obsoleteTopic );
                 } //end if
             }//end for
