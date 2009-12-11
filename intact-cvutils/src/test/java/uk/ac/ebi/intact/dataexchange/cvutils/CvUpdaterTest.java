@@ -34,6 +34,7 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDatasetFactory;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.clone.IntactCloner;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.io.BufferedReader;
@@ -130,6 +131,31 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         int cvsAfterPersist = allCvsCommittedAfter.size();
         //PersisterHelper is adding the intact, psi-mi and other terms+aggregation...
         Assert.assertEquals( cvsBeforeUpdate + 1, cvsAfterPersist );
+    }
+
+    @Test
+    public void obsoleteTest2() throws Exception {
+
+        Institution owner = IntactContext.getCurrentInstance().getInstitution();
+
+//        final CvTopic cvTopic = daoFactory.getCvObjectDao( CvTopic.class ).getByPsiMiRef( CvTopic.OBSOLETE_MI_REF );
+//        Assert.assertNotNull( cvTopic );
+//        daoFactory.getCvObjectDao( CvTopic.class ).delete( cvTopic );
+
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+        CvDagObject type = CvObjectUtils.createCvObject(owner, CvInteraction.class, "MI:0190", "interaction type");
+        CvDagObject physical = CvObjectUtils.createCvObject(owner, CvInteraction.class, "MI:0218", "physical interaction");
+        physical.addParent(type);
+
+        persisterHelper.save(type, physical);
+
+        cvUpdater.executeUpdate(OboUtils.createOBOSession(CvUpdaterTest.class.getResource("/ontologies/psi-mi25-1_51.obo" )));
+
+        final CvObjectDao<CvInteraction> cvDao = daoFactory.getCvObjectDao(CvInteraction.class);
+        CvInteraction physicalObsolete = cvDao.getByPsiMiRef("MI:0218");
+        Assert.assertNotNull( physicalObsolete );
+        final Annotation obsoloteAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel( physicalObsolete, CvTopic.OBSOLETE_MI_REF );
+        Assert.assertNotNull( obsoloteAnnot );
     }
 
     @Test
