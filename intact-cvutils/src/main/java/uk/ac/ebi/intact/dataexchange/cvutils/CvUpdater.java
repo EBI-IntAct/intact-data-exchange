@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.annotations.IntactFlushMode;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
+import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.core.persister.PersisterException;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
@@ -421,13 +422,15 @@ public class CvUpdater {
                     existingCv.addAnnotation( annotation );
                     stats.addUpdatedCv( existingCv );
 
-                    try {
-                        persisterHelper.save( obsoleteTopic );
-                    } catch ( Throwable t ) {
-                        throw new PersisterException( "An error occurred while saving CvTopic( '"+ obsoleteTopic.getShortLabel() +"', '"+ obsoleteTopic.getIdentifier() +"' )", t );
+                    if (obsoleteTopic.getAc() == null) {
+                        try {
+                            persisterHelper.save( obsoleteTopic );
+                        } catch ( Throwable t ) {
+                            throw new PersisterException( "An error occurred while saving CvTopic( '"+ obsoleteTopic.getShortLabel() +"', '"+ obsoleteTopic.getIdentifier() +"' )", t );
+                        }
+                        stats.addCreatedCv( obsoleteTopic );
                     }
 
-                    stats.addCreatedCv( obsoleteTopic );
                 } //end if
             }//end for
         }//end if
@@ -439,12 +442,15 @@ public class CvUpdater {
     }
 
     private CvTopic createCvTopicObsolete() {
-        if ( obsoleteTopic != null ) {
-            return obsoleteTopic;
-        }
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
 
-        obsoleteTopic = IntactContext.getCurrentInstance().getDataContext().getDaoFactory()
-                .getCvObjectDao( CvTopic.class ).getByPsiMiRef( CvTopic.OBSOLETE_MI_REF );
+        if ( obsoleteTopic != null ) {
+            if (daoFactory.getBaseDao().isTransient(obsoleteTopic) && obsoleteTopic.getAc() != null) {
+                obsoleteTopic = daoFactory.getCvObjectDao( CvTopic.class ).getByAc( obsoleteTopic.getAc() );
+            }
+        } else {
+            obsoleteTopic = daoFactory.getCvObjectDao( CvTopic.class ).getByPsiMiRef( CvTopic.OBSOLETE_MI_REF );
+        }
 
         if ( obsoleteTopic == null ) {
             // create the obsolete term (which is obsolete too!)
