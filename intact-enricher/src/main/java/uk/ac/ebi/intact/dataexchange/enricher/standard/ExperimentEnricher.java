@@ -75,7 +75,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         }
 
         final Collection<ExperimentXref> primaryRefs =
-                AnnotatedObjectUtils.searchXrefs( objectToEnrich, null, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF );
+                AnnotatedObjectUtils.searchXrefsByQualifier( objectToEnrich, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF );
 
         if( primaryRefs.isEmpty() ){
             // fix wrong xref qualifiers in pubmed xrefs if necessary
@@ -182,7 +182,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         for (ExperimentXref xref : experiment.getXrefs()) {
             if (CvDatabase.PUBMED_MI_REF.equals(xref.getCvDatabase().getIdentifier())) {
                 if ( xref.getCvXrefQualifier() == null ) {
-                    log.warn("Fixing wrong xref qualifier for xref to pubmed: "+xref.getCvXrefQualifier().getShortLabel());
+                    log.warn( "Fixing pubmed xref with no xref qualifier: "+xref.getPrimaryId() );
 
                     CvXrefQualifier primaryRef = CvObjectUtils.createCvObject(experiment.getOwner(),
                                                                               CvXrefQualifier.class,
