@@ -197,11 +197,16 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         InteractorAlias aliasGeneName = null;
 
         for (InteractorAlias currentAlias : interactor.getAliases()) {
-            String aliasTypePrimaryId = CvObjectUtils.getPsiMiIdentityXref(currentAlias.getCvAliasType()).getPrimaryId();
+            if( currentAlias.getCvAliasType() != null ) {
+                final CvObjectXref xref = CvObjectUtils.getPsiMiIdentityXref( currentAlias.getCvAliasType() );
+                if( xref != null ) {
+                    String aliasTypePrimaryId = xref.getPrimaryId();
 
-            if (aliasTypePrimaryId.equals(CvAliasType.GENE_NAME_MI_REF)) {
-                aliasGeneName = currentAlias;
-                break;
+                    if (aliasTypePrimaryId.equals(CvAliasType.GENE_NAME_MI_REF)) {
+                        aliasGeneName = currentAlias;
+                        break;
+                    }
+                }
             }
         }
 
