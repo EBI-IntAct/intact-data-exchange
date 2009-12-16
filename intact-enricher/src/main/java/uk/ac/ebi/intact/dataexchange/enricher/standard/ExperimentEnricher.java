@@ -30,6 +30,7 @@ import uk.ac.ebi.intact.model.util.ExperimentUtils;
 import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
 import uk.ac.ebi.intact.util.cdb.InvalidPubmedException;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -73,23 +74,27 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
             cvObjectEnricher.enrich(objectToEnrich.getCvInteraction());
         }
 
-        // fix wrong xref qualifiers in pubmed xrefs if necessary
-        fixPubmedXrefIfNecessary(objectToEnrich);
+        final Collection<ExperimentXref> primaryRefs =
+                AnnotatedObjectUtils.searchXrefs( objectToEnrich, null, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF );
 
+        if( primaryRefs.isEmpty() ){
+            // fix wrong xref qualifiers in pubmed xrefs if necessary
+            fixPubmedXrefIfNecessary(objectToEnrich);
+        }
         
         // populate the experiment using the pubmed id
         if (enricherContext.getConfig().isUpdateExperiments()) {
             String pubmedId = ExperimentUtils.getPubmedId(objectToEnrich);
             try {
                 Long.parseLong(pubmedId);
-
                 populateExperiment(objectToEnrich, pubmedId);
+
             } catch (InvalidPubmedException pe) {
-               log.error("Experiment with invalid pubmed cannot be enriched from citeXplore: "+pubmedId);
+               log.error("Experiment with invalid pubmed id cannot be enriched from citeXplore: "+pubmedId);
             } catch (NumberFormatException nfe) {
-                log.error("Experiment with invalid pubmed (it is not a number) cannot be enriched from citeXplore: "+pubmedId);
+                log.error("Experiment with invalid pubmed (not a number) cannot be enriched from citeXplore: "+pubmedId);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("An error occured while enriching experiment with PMID: "+pubmedId, e);
             }
         }
 
@@ -176,12 +181,14 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
     protected void fixPubmedXrefIfNecessary(Experiment experiment) {
         for (ExperimentXref xref : experiment.getXrefs()) {
             if (CvDatabase.PUBMED_MI_REF.equals(xref.getCvDatabase().getIdentifier())) {
-                if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                if ( xref.getCvXrefQualifier() == null ) {
                     log.warn("Fixing wrong xref qualifier for xref to pubmed: "+xref.getCvXrefQualifier().getShortLabel());
 
-                    CvXrefQualifier primaryRef = CvObjectUtils.createCvObject(experiment.getOwner(), CvXrefQualifier.class, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE);
+                    CvXrefQualifier primaryRef = CvObjectUtils.createCvObject(experiment.getOwner(),
+                                                                              CvXrefQualifier.class,
+                                                                              CvXrefQualifier.PRIMARY_REFERENCE_MI_REF,
+                                                                              CvXrefQualifier.PRIMARY_REFERENCE);
                     cvObjectEnricher.enrich(primaryRef);
-
                     xref.setCvXrefQualifier(primaryRef);
                 }
             }
