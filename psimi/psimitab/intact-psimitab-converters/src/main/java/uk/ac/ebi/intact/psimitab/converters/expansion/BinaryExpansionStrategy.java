@@ -57,6 +57,10 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
         components.add( c2 );
         newInteraction.setComponents( components );
 
+        newInteraction.setXrefs(interaction.getXrefs());
+        newInteraction.setAliases(interaction.getAliases());
+        newInteraction.setAnnotations(interaction.getAnnotations());
+
         return newInteraction;
     }
 

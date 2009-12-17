@@ -1,9 +1,9 @@
 package uk.ac.ebi.intact.psimitab.converters;
 
 import org.junit.Assert;
-import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * InteractionConverter Tester.
@@ -82,6 +84,25 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         BinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
 
         assertNotNull( bi );
+
+    }
+
+    @Test
+    public void convertToIntactMitab_imex() throws Exception {
+        InteractionConverter interactionConverter = new InteractionConverter();
+
+        final Interaction interaction = getMockBuilder().createInteractionRandomBinary();
+        
+        CvDatabase imexDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
+        CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
+        interaction.addXref(getMockBuilder().createXref(interaction, "IM-1234-1", imexPrimary, imexDb));
+
+        BinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
+
+        CrossReference xref = (CrossReference) bi.getInteractionAcs().iterator().next();
+
+        Assert.assertEquals("imex", xref.getDatabase());
+        Assert.assertEquals("IM-1234-1", xref.getIdentifier());
 
     }
 

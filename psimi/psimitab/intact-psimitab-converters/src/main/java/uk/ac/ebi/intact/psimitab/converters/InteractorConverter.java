@@ -15,20 +15,20 @@
  */
 package uk.ac.ebi.intact.psimitab.converters;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.Alias;
 import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Interactor;
-import static uk.ac.ebi.intact.model.CvAliasType.*;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.ProteinUtils;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
 import java.util.*;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+import static uk.ac.ebi.intact.model.CvAliasType.*;
 
 /**
  * Contains method to convert the IntactInteractor database data model to Intact psimitab data model
@@ -74,7 +74,9 @@ public class InteractorConverter {
         Collection<CrossReference> intactRefs =  removeIntactXrefs( identifiers );
 
         // add the intact AC of the interactor as an indentifier
-        identifiers.add( CrossReferenceFactory.getInstance().build( CvDatabase.INTACT, intactInteractor.getAc() ) );
+        if (intactInteractor.getAc() != null) {
+            identifiers.add( CrossReferenceFactory.getInstance().build( CvDatabase.INTACT, intactInteractor.getAc() ) );
+        }
         tabInteractor.setIdentifiers( identifiers );
 
         // alternative identifiers & aliases
