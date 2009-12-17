@@ -127,4 +127,34 @@ public class MitabCreationTests extends IntactBasicTestCase {
         proteinC = getDaoFactory().getProteinDao().getByShortLabel( "protC" );
         Assert.assertEquals(1, proteinC.getAnnotations().size());
     }
+
+     @Test
+    public void writeMitab_lala() throws Exception {
+
+        Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
+        Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
+        Protein proteinC = getMockBuilder().createProtein("Q00002", "protC");
+
+        Interaction interaction = getMockBuilder().createInteraction(
+                getMockBuilder().createComponentBait(proteinA),
+                getMockBuilder().createComponentPrey(proteinB),
+                getMockBuilder().createComponentPrey(proteinC));
+
+        CvDatabase imexDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
+        CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
+        interaction.addXref(getMockBuilder().createXref(interaction, "IM-1234-1", imexPrimary, imexDb));
+
+        persisterHelper.save(interaction);
+
+        Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
+
+        Job job = (Job) applicationContext.getBean("createMitabJob");
+
+        JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+        Assert.assertTrue( jobExecution.getAllFailureExceptions().isEmpty() );
+        Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
+
+        final SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
+        Assert.assertEquals(2L, solrServer.query(new SolrQuery("IM-1234-1")).getResults().getNumFound());
+    }
 }
