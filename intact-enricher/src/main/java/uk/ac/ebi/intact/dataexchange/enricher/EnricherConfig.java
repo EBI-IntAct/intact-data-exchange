@@ -16,7 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.enricher;
 
 /**
- * TODO comment this
+ * Enricher config.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -25,12 +25,12 @@ public class EnricherConfig {
 
     private boolean updateOrganisms = true;
     private boolean updateProteins = true;
+    private boolean updateSmallMolecules = true;
     private boolean updateExperiments = true;
     private boolean updateInteractionShortLabels = false;
     private String oboUrl = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
 
     public EnricherConfig() {
-
     }
 
     public boolean isUpdateOrganisms() {
@@ -47,6 +47,14 @@ public class EnricherConfig {
 
     public void setUpdateProteins(boolean updateProteins) {
         this.updateProteins = updateProteins;
+    }
+
+    public boolean isUpdateSmallMolecules() {
+        return updateSmallMolecules;
+    }
+
+    public void setUpdateSmallMolecules( boolean updateSmallMolecules ) {
+        this.updateSmallMolecules = updateSmallMolecules;
     }
 
     public String getOboUrl() {

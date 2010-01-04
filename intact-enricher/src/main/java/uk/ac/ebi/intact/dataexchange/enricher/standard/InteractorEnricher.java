@@ -20,6 +20,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
+import uk.ac.ebi.chebi.webapps.chebiWS.model.OntologyDataItem;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.InteractorFetcher;
 import uk.ac.ebi.intact.model.*;
@@ -52,20 +54,26 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
     @Autowired
     private CvObjectFetcher cvObjectFetcher;
 
+    @Autowired
+    private EnricherConfig enricherConfig;
+
     public InteractorEnricher() {
     }
 
     /**
+     * <pre>
      * If the interactor is an instance of Protein then,
-     1.	Update Biosource, if taxid is known, if not update it will -3 //unknown
-     2.	Get the UniprotXref from the interactor and fetch the UniprotProtein with  the uniprotId  using the UniprotRemoteService from intact-uniprot module in the bridges.
-     3.	Update the Interactor to be enriched with data from the returned UniprotProtein with xrefs, aliases, sequences, shortlabel and fullname.
-
-     If the interactor is an instance of Small molecule then,
-
-     1. Fetch the chemical entity from Chebi using the Chebi Web Service.
-     2. Update the shortlabel with ChebiAscii name.
-     3. Add Chebi Inchi id as annotation.
+     * 1.	Update Biosource, if taxid is known, if not update it will -3 //unknown
+     * 2.	Get the UniprotXref from the interactor and fetch the UniprotProtein with  the uniprotId  using the UniprotRemoteService from intact-uniprot module in the bridges.
+     * 3.	Update the Interactor to be enriched with data from the returned UniprotProtein with xrefs, aliases, sequences, shortlabel and fullname.
+     *
+     * If the interactor is an instance of Small molecule then,
+     *
+     * 1. Fetch the chemical entity from Chebi using the Chebi Web Service.
+     * 2. Update the shortlabel with ChebiAscii name.
+     * 3. Add Chebi Inchi id as annotation.
+     * </pre>
+     *
      * @param objectToEnrich Interactor
      */
     public void enrich(Interactor objectToEnrich) {
@@ -81,93 +89,115 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         }
 
         if (objectToEnrich instanceof Protein) {
-            Protein proteinToEnrich = (Protein) objectToEnrich;
 
-            UniprotProtein uniprotProt = null;
+            // TODO use the EnricherConfig to find out if we want to enrich the protein or not.
+            if( enricherConfig.isUpdateProteins() ) {
 
-            int taxId;
+                Protein proteinToEnrich = (Protein) objectToEnrich;
 
-            if (proteinToEnrich.getBioSource() != null) {
-               taxId = Integer.valueOf(proteinToEnrich.getBioSource().getTaxId());
-            } else {
-                taxId = -3; // unknown
-            }
-            
-            InteractorXref uniprotXref = ProteinUtils.getUniprotXref(proteinToEnrich);
+                UniprotProtein uniprotProt = null;
 
-            if (uniprotXref != null) {
-                String uniprotId = uniprotXref.getPrimaryId();
+                int taxId;
 
-                if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein: " + uniprotId + " (taxid:"+taxId+")"+" (taxid:"+taxId+")");
-
-                uniprotProt = interactorFetcher.fetchInteractorFromUniprot(uniprotId, taxId);
-
-            } else  {
-                if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein by shortLabel: "+proteinToEnrich.getShortLabel()+" (taxid:"+taxId+")");
-
-                if (proteinToEnrich.getShortLabel() != null) {
-                    uniprotProt = interactorFetcher.fetchInteractorFromUniprot(proteinToEnrich.getShortLabel(), taxId);
+                if (proteinToEnrich.getBioSource() != null) {
+                    taxId = Integer.valueOf(proteinToEnrich.getBioSource().getTaxId());
+                } else {
+                    taxId = -3; // unknown
                 }
+
+                InteractorXref uniprotXref = ProteinUtils.getUniprotXref(proteinToEnrich);
+
+                if (uniprotXref != null) {
+                    String uniprotId = uniprotXref.getPrimaryId();
+
+                    if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein: " + uniprotId + " (taxid:"+taxId+")");
+
+                    uniprotProt = interactorFetcher.fetchInteractorFromUniprot(uniprotId, taxId);
+
+                } else  {
+                    if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein by shortLabel: "+proteinToEnrich.getShortLabel()+" (taxid:"+taxId+")");
+
+                    if (proteinToEnrich.getShortLabel() != null) {
+                        uniprotProt = interactorFetcher.fetchInteractorFromUniprot(proteinToEnrich.getShortLabel(), taxId);
+                    }
+                }
+
+                if (uniprotProt != null) {
+                    updateXrefs(proteinToEnrich, uniprotProt);
+                    updateAliases(proteinToEnrich, uniprotProt);
+                    proteinToEnrich.setSequence(uniprotProt.getSequence());
+
+                    proteinToEnrich.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(uniprotProt.getId().toLowerCase()));
+                    proteinToEnrich.setFullName(uniprotProt.getDescription());
+
+                    Organism organism = uniprotProt.getOrganism();
+                    BioSource bioSource = new BioSource(objectToEnrich.getOwner(), organism.getName(), String.valueOf(organism.getTaxid()));
+                    proteinToEnrich.setBioSource(bioSource);
+                }
+
+                if (objectToEnrich.getBioSource() != null) {
+                    bioSourceEnricher.enrich(objectToEnrich.getBioSource());
+                }
+
             }
 
-            if (uniprotProt != null) {
-                updateXrefs(proteinToEnrich, uniprotProt);
-                updateAliases(proteinToEnrich, uniprotProt);
-                proteinToEnrich.setSequence(uniprotProt.getSequence());
+        } else if ( objectToEnrich instanceof SmallMolecule ) {
 
-                proteinToEnrich.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(uniprotProt.getId().toLowerCase()));
-                proteinToEnrich.setFullName(uniprotProt.getDescription());
-
-                Organism organism = uniprotProt.getOrganism();
-                BioSource bioSource = new BioSource(objectToEnrich.getOwner(), organism.getName(), String.valueOf(organism.getTaxid()));
-                proteinToEnrich.setBioSource(bioSource);
-            }
-
-            if (objectToEnrich.getBioSource() != null) {
-                bioSourceEnricher.enrich(objectToEnrich.getBioSource());
-            }
-
-        }
-
-        if ( objectToEnrich instanceof SmallMolecule ) {
             enrichWithChebi( objectToEnrich );
         }
-        super.enrich(objectToEnrich);
 
+        super.enrich(objectToEnrich);
     }
 
     /**
-     *  Enriches the small molecule with chebiAsciiName and inchi Annotation
+     * Enriches the small molecule with chebiAsciiName and inchi Annotation.
      * @param objectToEnrich SmallMolecule to be enriched
      */
     private void enrichWithChebi( Interactor objectToEnrich ) {
-        if ( objectToEnrich == null ) {
-            throw new NullPointerException( "You must give a non null objectToEnrich" );
-        }
-        if(!(objectToEnrich instanceof SmallMoleculeImpl)){
-          throw new IllegalStateException( "Interactor is not SmallMolecule"+objectToEnrich.getShortLabel());
-        }
-        SmallMolecule smallMoleculeToEnrich = ( SmallMolecule ) objectToEnrich;
-        final InteractorXref chebiXref = SmallMoleculeUtils.getChebiXref( smallMoleculeToEnrich );
 
-        if ( chebiXref != null ) {
-            String chebiId = chebiXref.getPrimaryId();
-            if ( log.isDebugEnabled() ) {
-                log.debug( "Enriching Chebi SmallMolecule: " + chebiId );
+        // check in the config whether we want to enrich small molecules or not
+        if( enricherConfig.isUpdateSmallMolecules() ) {
+
+            if ( objectToEnrich == null ) {
+                throw new NullPointerException( "You must give a non null objectToEnrich" );
             }
-            final Entity smallMoleculeChebiEntity = interactorFetcher.fetchInteractorFromChebi( chebiId );
+            if(!(objectToEnrich instanceof SmallMoleculeImpl)){
+                throw new IllegalStateException( "Interactor is not SmallMolecule"+objectToEnrich.getShortLabel());
+            }
 
-            if ( smallMoleculeChebiEntity != null ) {
-                String chebiAsciiName = smallMoleculeChebiEntity.getChebiAsciiName();
-                //update shortlabel
-                if ( chebiAsciiName != null ) {
-                    smallMoleculeToEnrich.setShortLabel( prepareSmallMoleculeShortLabel( chebiAsciiName ) );
+            SmallMolecule smallMoleculeToEnrich = ( SmallMolecule ) objectToEnrich;
+            final InteractorXref chebiXref = SmallMoleculeUtils.getChebiXref( smallMoleculeToEnrich );
+
+            if ( chebiXref != null ) {
+                String chebiId = chebiXref.getPrimaryId();
+                if ( log.isDebugEnabled() ) {
+                    log.debug( "Enriching Chebi SmallMolecule: " + chebiId );
                 }
-                String inchiId = smallMoleculeChebiEntity.getInchi();
-                //update annotation
-                CvTopic inchiCvTopic = cvObjectFetcher.fetchByTermId(CvTopic.class, CvTopic.INCHI_ID_MI_REF);
-                if(inchiCvTopic!=null){
-                updateAnnotations( smallMoleculeToEnrich,inchiCvTopic,inchiId);
+                final Entity smallMoleculeChebiEntity = interactorFetcher.fetchInteractorFromChebi( chebiId );
+
+                if ( smallMoleculeChebiEntity != null ) {
+                    String chebiAsciiName = smallMoleculeChebiEntity.getChebiAsciiName();
+                    //update shortlabel
+                    if ( chebiAsciiName != null ) {
+                        smallMoleculeToEnrich.setShortLabel( prepareSmallMoleculeShortLabel( chebiAsciiName ) );
+                    }
+
+                    //update annotation (inchi)
+                    String inchiId = smallMoleculeChebiEntity.getInchi();
+                    CvTopic inchiCvTopic = cvObjectFetcher.fetchByTermId( CvTopic.class, CvTopic.INCHI_ID_MI_REF );
+                    if( inchiCvTopic != null ){
+                        updateAnnotations( smallMoleculeToEnrich, inchiCvTopic, inchiId );
+                    }
+
+                    // update aliases (ontology role)
+                    CvTopic functionTopic = cvObjectFetcher.fetchByTermId( CvTopic.class, CvTopic.FUNCTION_MI_REF );
+                    if( functionTopic != null ) {
+                        for ( OntologyDataItem parent : smallMoleculeChebiEntity.getOntologyParents() ) {
+                            if( "has role".equals( parent.getType() ) ) {
+                                 updateAnnotations( smallMoleculeToEnrich, functionTopic, parent.getChebiName() );
+                            }
+                        }
+                    }
                 }
             }
         }

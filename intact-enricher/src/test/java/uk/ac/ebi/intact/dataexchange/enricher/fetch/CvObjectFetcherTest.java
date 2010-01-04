@@ -28,7 +28,7 @@ import uk.ac.ebi.intact.model.CvInteractorType;
 import uk.ac.ebi.intact.model.CvObject;
 
 /**
- * TODO comment this
+ * CvObjectFetcher Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -58,6 +58,6 @@ public class CvObjectFetcherTest extends EnricherBasicTestCase {
         Assert.assertNotNull(term);
         Assert.assertEquals(CvExperimentalRole.UNSPECIFIED, term.getShortLabel());
         Assert.assertEquals("unspecified role", term.getFullName());
-        Assert.assertEquals(CvExperimentalRole.UNSPECIFIED_PSI_REF, term.getMiIdentifier());
+        Assert.assertEquals(CvExperimentalRole.UNSPECIFIED_PSI_REF, term.getIdentifier());
     }
 }

@@ -32,7 +32,7 @@ import uk.ac.ebi.intact.uniprot.service.UniprotService;
 import java.util.Collection;
 
 /**
- * TODO comment this
+ * Interactor Fetcher.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -107,7 +107,6 @@ public class InteractorFetcher {
         EnricherCache interactorCache = enricherContext.getCacheManager().getCache( "Interactor" );
         Entity smallMoleculeEntity = null;
 
-
         String cacheKey = chebiId;
 
         if ( interactorCache.isKeyInCache( cacheKey ) ) {
@@ -116,12 +115,12 @@ public class InteractorFetcher {
 
         if ( smallMoleculeEntity == null ) {
             if ( log.isDebugEnabled() ) {
-                log.debug( "Retrieving SmallMoleculeEntity using Chebi Web Service" );
+                log.debug( "Retrieving SmallMoleculeEntity using Chebi Web Service: " + chebiId );
             }
             try {
                 smallMoleculeEntity = chebiServiceClient.getCompleteEntity( chebiId );
             } catch ( ChebiWebServiceFault_Exception e ) {
-                throw new EnricherException( "Retriving SmallMoleculeEntity failed for " + chebiId, e );
+                throw new EnricherException( "Retrieving SmallMoleculeEntity failed for " + chebiId, e );
             }
 
             if ( smallMoleculeEntity != null ) {
@@ -134,5 +133,4 @@ public class InteractorFetcher {
     private String cacheKey(String uniprotId, int taxId) {
         return uniprotId+"_"+taxId;
     }
-
 }

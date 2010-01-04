@@ -23,7 +23,7 @@ import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
- * TODO comment this
+ * CvObject enricher.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -55,7 +55,5 @@ public class CvObjectEnricher extends AnnotatedObjectEnricher<CvObject> {
             DefaultEntityStateCopier copier = new DefaultEntityStateCopier();
             copier.copy(referenceTerm, objectToEnrich);
         }
-
     }
-
 }
