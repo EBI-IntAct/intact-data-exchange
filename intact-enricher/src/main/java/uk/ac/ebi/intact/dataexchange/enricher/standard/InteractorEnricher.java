@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import uk.ac.ebi.chebi.webapps.chebiWS.model.DataItem;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.OntologyDataItem;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
@@ -30,6 +31,7 @@ import uk.ac.ebi.intact.uniprot.model.Organism;
 import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * This class enriches ie adds additional information to the Interactor by utilizing the webservices from UniProt and Chebi.
@@ -173,17 +175,35 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                 if ( log.isDebugEnabled() ) {
                     log.debug( "Enriching Chebi SmallMolecule: " + chebiId );
                 }
-                final Entity smallMoleculeChebiEntity = interactorFetcher.fetchInteractorFromChebi( chebiId );
+                final Entity chebiEntity = interactorFetcher.fetchInteractorFromChebi( chebiId );
 
-                if ( smallMoleculeChebiEntity != null ) {
-                    String chebiAsciiName = smallMoleculeChebiEntity.getChebiAsciiName();
-                    //update shortlabel
+                if ( chebiEntity != null ) {
+                    String chebiAsciiName = chebiEntity.getChebiAsciiName();
+                    // update shortlabel
                     if ( chebiAsciiName != null ) {
                         smallMoleculeToEnrich.setShortLabel( prepareSmallMoleculeShortLabel( chebiAsciiName ) );
                     }
 
+                    // Check on chebi identifier, and if need be fix their qualifiers
+                    if( enricherConfig.isUpdateSmallMoleculeChebiXrefs() ) {
+                        updateSmallMoleculeXrefs( objectToEnrich, chebiEntity );
+                    }
+
+                    // IUPAC name
+                    CvAliasType iupacAlias = cvObjectFetcher.fetchByTermId( CvAliasType.class, "MI:2007" );
+                    for ( DataItem item : chebiEntity.getIupacNames() ) {
+                        updateAliases( smallMoleculeToEnrich, iupacAlias, item.getData() );
+                    }
+
+                    for ( DataItem item : chebiEntity.getSynonyms() ) {
+                        boolean hasSameLabel = item.getData().toLowerCase().equals( smallMoleculeToEnrich.getShortLabel() );
+                        if( item.getType().equals( "INN" ) && ! hasSameLabel ) {
+                            updateAliases( smallMoleculeToEnrich, null, item.getData() );
+                        }
+                    }
+
                     //update annotation (inchi)
-                    String inchiId = smallMoleculeChebiEntity.getInchi();
+                    String inchiId = chebiEntity.getInchi();
                     CvTopic inchiCvTopic = cvObjectFetcher.fetchByTermId( CvTopic.class, CvTopic.INCHI_ID_MI_REF );
                     if( inchiCvTopic != null ){
                         updateAnnotations( smallMoleculeToEnrich, inchiCvTopic, inchiId );
@@ -192,7 +212,7 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                     // update aliases (ontology role)
                     CvTopic functionTopic = cvObjectFetcher.fetchByTermId( CvTopic.class, CvTopic.FUNCTION_MI_REF );
                     if( functionTopic != null ) {
-                        for ( OntologyDataItem parent : smallMoleculeChebiEntity.getOntologyParents() ) {
+                        for ( OntologyDataItem parent : chebiEntity.getOntologyParents() ) {
                             if( "has role".equals( parent.getType() ) ) {
                                  updateAnnotations( smallMoleculeToEnrich, functionTopic, parent.getChebiName() );
                             }
@@ -203,9 +223,62 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         }
     }
 
+    private void updateSmallMoleculeXrefs( Interactor objectToEnrich, Entity chebiEntity ) {
+        final CvXrefQualifier identity = cvObjectFetcher.fetchByTermId( CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF );
+        final CvXrefQualifier secondary = cvObjectFetcher.fetchByTermId( CvXrefQualifier.class, CvXrefQualifier.SECONDARY_AC_MI_REF );
+
+        // store chebi identifiers, so that we can identify the missing one in the given interactor.
+        List<String> chebiSecondaries = chebiEntity.getSecondaryChEBIIds();
+        String chebiPrimary = chebiEntity.getChebiId();
+
+        final Collection<InteractorXref> chebiRefs = AnnotatedObjectUtils.searchXrefs( objectToEnrich, CvDatabase.CHEBI_MI_REF, null );
+        for ( InteractorXref chebiRef : chebiRefs ) {
+            if( chebiPrimary != null && chebiPrimary.equals( chebiRef.getPrimaryId() ) ) {
+                chebiRef.setCvXrefQualifier( identity );
+                chebiPrimary = null;
+            } else if( chebiSecondaries.contains( chebiRef.getPrimaryId() ) ) {
+                chebiRef.setCvXrefQualifier( secondary );
+                chebiSecondaries.remove( chebiRef.getPrimaryId() );
+            } else {
+                log.warn( "Small molecule (ac:"+ objectToEnrich.getAc() +
+                          ", shortlabel:"+ objectToEnrich.getShortLabel() +") has a chebi ID ("+
+                          chebiRef.getPrimaryId() +") that isn't found in the corresponding ChEBI entity" );
+            }
+        }
+
+        // add missing identity
+        if( chebiPrimary != null ) {
+            InteractorXref xref =
+                    new InteractorXref( objectToEnrich.getOwner(),
+                                        cvObjectFetcher.fetchByTermId( CvDatabase.class, CvDatabase.CHEBI_MI_REF ),
+                                        chebiPrimary,
+                                        identity );
+            objectToEnrich.addXref( xref );
+        }
+
+        // add missing secondary identifier
+        for ( String chebiSecondary : chebiSecondaries ) {
+            InteractorXref xref =
+                    new InteractorXref( objectToEnrich.getOwner(),
+                                        cvObjectFetcher.fetchByTermId( CvDatabase.class, CvDatabase.CHEBI_MI_REF ),
+                                        chebiSecondary,
+                                        secondary );
+            objectToEnrich.addXref( xref );
+        }
+    }
+
     private void updateAnnotations( Interactor interactor, CvTopic cvTopic, String annotationText ) {
         Annotation annotation = new Annotation( interactor.getOwner(), cvTopic, annotationText );
-        interactor.addAnnotation( annotation );
+        if( ! interactor.getAnnotations().contains( annotation )) {
+            interactor.addAnnotation( annotation );
+        }
+    }
+
+    private void updateAliases( Interactor interactor, CvAliasType cvAlias, String aliasText ) {
+        InteractorAlias alias = new InteractorAlias( interactor.getOwner(), interactor, cvAlias, aliasText );
+        if( ! interactor.getAliases().contains( alias )) {
+            interactor.addAlias( alias );
+        }
     }
 
     /**

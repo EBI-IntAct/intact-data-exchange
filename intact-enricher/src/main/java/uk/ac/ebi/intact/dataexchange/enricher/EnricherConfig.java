@@ -29,6 +29,7 @@ public class EnricherConfig {
     private boolean updateExperiments = true;
     private boolean updateInteractionShortLabels = false;
     private String oboUrl = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
+    private boolean updateSmallMoleculeChebiXrefs = true;
 
     public EnricherConfig() {
     }
@@ -79,5 +80,13 @@ public class EnricherConfig {
 
     public void setUpdateExperiments(boolean updateExperiments) {
         this.updateExperiments = updateExperiments;
+    }
+
+    public boolean isUpdateSmallMoleculeChebiXrefs() {
+        return updateSmallMoleculeChebiXrefs;
+    }
+
+    public void setUpdateSmallMoleculeChebiXrefs( boolean updateSmallMoleculeChebiXrefs ) {
+        this.updateSmallMoleculeChebiXrefs = updateSmallMoleculeChebiXrefs;
     }
 }
