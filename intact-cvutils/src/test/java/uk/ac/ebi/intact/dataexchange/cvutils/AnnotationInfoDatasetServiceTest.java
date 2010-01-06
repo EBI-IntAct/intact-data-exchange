@@ -25,10 +25,6 @@ public class AnnotationInfoDatasetServiceTest extends IntactBasicTestCase {
     @Test
     public void retrieveAnnotationInfoDataset() throws Exception {
 
-        final int featureCount = getDaoFactory().getCvObjectDao( CvFeatureType.class ).countAll();
-        final int topicCount = getDaoFactory().getCvObjectDao( CvTopic.class ).countAll();
-        final int cvInteractionCount = getDaoFactory().getCvObjectDao( CvInteraction.class ).countAll();
-
         final CvTopic comment = getMockBuilder().createCvObject( CvTopic.class, "MI:9999", "comment" );
         final CvTopic remark = getMockBuilder().createCvObject( CvTopic.class, "MI:8888", "remark" );
 
