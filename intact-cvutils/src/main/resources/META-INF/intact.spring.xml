@@ -13,6 +13,6 @@
         <constructor-arg ref="intactContext"/>
     </bean>
 
-    <bean id="cvExported" class="uk.ac.ebi.intact.dataexchange.cvutils.CvExporter" scope="prototype"/>
+    <bean id="cvExporter" class="uk.ac.ebi.intact.dataexchange.cvutils.CvExporter" scope="prototype"/>
 
 </beans>
