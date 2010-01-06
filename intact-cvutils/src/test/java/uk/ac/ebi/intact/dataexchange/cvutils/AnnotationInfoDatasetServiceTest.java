@@ -4,12 +4,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfo;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.model.CvFeatureType;
 import uk.ac.ebi.intact.model.CvInteraction;
 import uk.ac.ebi.intact.model.CvTopic;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * AnnotationInfoDatasetService Tester.
@@ -23,25 +25,41 @@ public class AnnotationInfoDatasetServiceTest extends IntactBasicTestCase {
     @Test
     public void retrieveAnnotationInfoDataset() throws Exception {
 
-        final CvTopic comment = getMockBuilder().createCvObject( CvTopic.class, "MI:0001", "comment" );
-        final CvTopic remark = getMockBuilder().createCvObject( CvTopic.class, "MI:0002", "remark" );
+        final int featureCount = getDaoFactory().getCvObjectDao( CvFeatureType.class ).countAll();
+        final int topicCount = getDaoFactory().getCvObjectDao( CvTopic.class ).countAll();
+        final int cvInteractionCount = getDaoFactory().getCvObjectDao( CvInteraction.class ).countAll();
 
-        final CvFeatureType ft1 = getMockBuilder().createCvObject( CvFeatureType.class, "MI:0003", "ft1" );
+        final CvTopic comment = getMockBuilder().createCvObject( CvTopic.class, "MI:9999", "comment" );
+        final CvTopic remark = getMockBuilder().createCvObject( CvTopic.class, "MI:8888", "remark" );
+
+        final CvFeatureType ft1 = getMockBuilder().createCvObject( CvFeatureType.class, "MI:7777", "ft1" );
         ft1.addAnnotation( getMockBuilder().createAnnotation( "bla", comment ) );
-        final CvFeatureType ft2 = getMockBuilder().createCvObject( CvFeatureType.class, "MI:0004", "ft2" );
-        final CvFeatureType ft3 = getMockBuilder().createCvObject( CvFeatureType.class, "MI:0005", "ft3" );
+        final CvFeatureType ft2 = getMockBuilder().createCvObject( CvFeatureType.class, "MI:6666", "ft2" );
+        final CvFeatureType ft3 = getMockBuilder().createCvObject( CvFeatureType.class, "MI:5555", "ft3" );
 
-        final CvInteraction i1 = getMockBuilder().createCvObject( CvInteraction.class, "MI:0006", "int1" );
+        final CvInteraction i1 = getMockBuilder().createCvObject( CvInteraction.class, "MI:4444", "int1" );
         i1.addAnnotation( getMockBuilder().createAnnotation( "bla", comment ) );
 
-        getPersisterHelper().save( comment, remark, ft1, ft2, ft3, i1 );
+        getIntactContext().getCorePersister().saveOrUpdate( comment, remark, ft1, ft2, ft3, i1 );
 
-        // Now retreive them
+        // Now retrieve them
         AnnotationInfoDatasetService service = new AnnotationInfoDatasetService();
         final AnnotationInfoDataset dataset = service.retrieveAnnotationInfoDataset( Arrays.asList( comment ) );
 
         Assert.assertNotNull( dataset );
-        Assert.assertEquals( 2, dataset.getAllAnnotationInfoSortedByTypeAndLabel().size() );
 
+        assertHasDatasetGotCv( dataset.getAllAnnotationInfoSortedByTypeAndLabel(), "MI:7777" );
+        assertHasDatasetGotCv( dataset.getAllAnnotationInfoSortedByTypeAndLabel(), "MI:4444" );
+
+        Assert.assertEquals( 2, dataset.getAllAnnotationInfoSortedByTypeAndLabel().size() );
+    }
+
+    private void assertHasDatasetGotCv( Collection<AnnotationInfo> annotations, String mi ) {
+        for ( AnnotationInfo annotation : annotations ) {
+            if( annotation.getMi().equals( mi ) ) {
+                return;
+            }
+        }
+        Assert.fail( "Could not find CV term with identifier " + mi + " in the given dataset");
     }
 }

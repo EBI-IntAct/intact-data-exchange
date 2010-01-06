@@ -5,6 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfo;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 
@@ -22,7 +23,6 @@ import java.io.IOException;
 public class AnnotationInfoDatasetExporterTest {
 
     private static final Log log = LogFactory.getLog( AnnotationInfoDatasetExporterTest.class );
-
 
     private AnnotationInfoDataset buildDataset() {
         AnnotationInfoDataset dataset = new AnnotationInfoDataset();
@@ -57,5 +57,4 @@ public class AnnotationInfoDatasetExporterTest {
         exporter.exportCSV( dataset, os, false );
         Assert.assertEquals( dataset.getAll().size(), sb.toString().split( "\n" ).length );
     }
-
 }
