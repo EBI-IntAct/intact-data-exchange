@@ -18,13 +18,11 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.Interactor;
-import uk.ac.ebi.intact.model.CvObjectXref;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
- * TODO comment this
+ * InteractorConverter Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -44,5 +42,18 @@ public class InteractorConverterTest {
 
         Assert.assertEquals(psiInteractor.getNames().getAliases().size(), interactor.getAliases().size());
         Assert.assertNotNull(interactor.getOwner());
+    }
+
+    @Test
+    public void psiToIntact_trna() throws Exception {
+        Interactor psiInteractor = PsiMockFactory.createMockInteractor();
+        psiInteractor.getInteractorType().getXref().getPrimaryRef().setId( "MI:0325" ); // tRNA
+        psiInteractor.getInteractorType().getNames().setShortLabel( "tRNA" ); // tRNA
+
+        InteractorConverter interactorConverter = new InteractorConverter(new Institution("testInstitution"));
+
+        uk.ac.ebi.intact.model.Interactor interactor = interactorConverter.psiToIntact(psiInteractor);
+
+        Assert.assertTrue( interactor.getClass().getName(), interactor instanceof NucleicAcidImpl );
     }
 }

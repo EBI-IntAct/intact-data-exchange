@@ -24,6 +24,8 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.util.Crc64;
 
+import java.util.Set;
+
 /**
  * Interactor converter.
  *
@@ -131,6 +133,9 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         // using the mi identifier and the shortlabel to identify the type of interactor
         Interactor interactor = null;
 
+        Set<String> dnaMis = ConverterContext.getInstance().getDnaTypeMis();
+        Set<String> rnaMis = ConverterContext.getInstance().getRnaTypeMis();
+
         if ( CvInteractorType.PROTEIN_MI_REF.equals(typeId) ||
              interactorTypeLabel.equals( CvInteractorType.PROTEIN ) ) {
             interactor = new ProteinImpl( getInstitution(), organism, shortLabel, interactorType );
@@ -141,14 +146,13 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
                     interactorTypeLabel.equals( CvInteractorType.SMALL_MOLECULE ) ) {
             interactor = new SmallMoleculeImpl( shortLabel, getInstitution(), interactorType );
             interactor.setBioSource( organism );
-        } else
-        if ( CvInteractorType.NUCLEIC_ACID_MI_REF.equals(typeId) ||
-             CvInteractorType.DNA_MI_REF.equals(typeId) ||
-             interactorTypeLabel.equals( CvInteractorType.NUCLEIC_ACID ) ||
-             interactorTypeLabel.equals( CvInteractorType.DNA ) ) {
+        } else if ( dnaMis.contains(typeId) ||
+                    rnaMis.contains(typeId) ||
+                    interactorTypeLabel.equals( CvInteractorType.NUCLEIC_ACID ) ||
+                    interactorTypeLabel.equals( CvInteractorType.DNA ) ) {
             interactor = new NucleicAcidImpl( getInstitution(), organism, shortLabel, interactorType );
         } else {
-            throw new PsiConversionException( "Interactor of unexpected type: " + typeId+" ("+interactorTypeLabel+")" );
+            throw new PsiConversionException( "Interactor of unexpected type: " + typeId + " ("+interactorTypeLabel+")" );
         }
 
         return interactor;

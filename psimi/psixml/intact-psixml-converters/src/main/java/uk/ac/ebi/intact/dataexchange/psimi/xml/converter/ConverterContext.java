@@ -10,6 +10,10 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.DisabledLocati
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationTree;
 import uk.ac.ebi.intact.model.Institution;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Makes the configuration available to the current thread (through ThreadLocal).
  *
@@ -37,6 +41,9 @@ public class ConverterContext {
 
     private boolean locationInfoDisabled;
 
+    private Set<String> dnaTypeMis;
+    private Set<String> rnaTypeMis;
+
     private static ThreadLocal<ConverterContext> instance = new ThreadLocal<ConverterContext>() {
         @Override
         protected ConverterContext initialValue() {
@@ -56,6 +63,20 @@ public class ConverterContext {
         this.report = new ConverterReport();
 
         resetLocation();
+
+        // preload the CvInteractorTypes
+//        CvInteractorType dna = daoFactory.getCvObjectDao( CvInteractorType.class ).getByPsiMiRef( CvInteractorType.DNA_MI_REF );
+//        dnaTypeMis = CvObjectUtils.getChildrenMIs( dna );
+//        CvInteractorType rna = daoFactory.getCvObjectDao( CvInteractorType.class ).getByPsiMiRef( CvInteractorType.RNA_MI_REF );
+//        rnaTypeMis = CvObjectUtils.getChildrenMIs( rna );
+
+        // in order to avoid connection to the database, we list here all the MIs of DNA and RNA related terms
+        rnaTypeMis = new HashSet( Arrays.asList( "MI:0320", "MI:0321", "MI:0322", "MI:0323", "MI:0324",
+                                                 "MI:0325", "MI:0607", "MI:0608", "MI:0609", "MI:0610",
+                                                 "MI:0611", "MI:0679" ) );
+
+        dnaTypeMis = new HashSet( Arrays.asList( "MI:0319", "MI:0680", "MI:0681" ) );
+
     }
 
     public void configure( ExportProfile profile ) {
@@ -138,5 +159,13 @@ public class ConverterContext {
     public void setLocationInfoDisabled(boolean locationInfoDisabled) {
         this.locationInfoDisabled = locationInfoDisabled;
         resetLocation();
+    }
+
+    public Set<String> getDnaTypeMis() {
+        return dnaTypeMis;
+    }
+
+    public Set<String> getRnaTypeMis() {
+        return rnaTypeMis;
     }
 }

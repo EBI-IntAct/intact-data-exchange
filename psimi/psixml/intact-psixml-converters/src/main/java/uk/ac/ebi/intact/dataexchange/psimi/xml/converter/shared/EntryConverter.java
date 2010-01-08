@@ -100,7 +100,8 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         InstitutionConverter institutionConverter = new InstitutionConverter();
         entry.setSource(institutionConverter.intactToPsi(institution));
 
-        InteractionConverter interactionConverter = new InteractionConverter(getInstitution());
+        final InteractionConverter interactionConverter = new InteractionConverter(getInstitution());
+        final InteractorConverter interactorConverter = new InteractorConverter( getInstitution() );
 
         for (Interaction intactInteracton : intactObject.getInteractions()) {
             psidev.psi.mi.xml.model.Interaction interaction = interactionConverter.intactToPsi(intactInteracton);
@@ -110,7 +111,7 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
 
                 for ( Component component : intactInteracton.getComponents() ) {
                     psidev.psi.mi.xml.model.Interactor interactor =
-                            new InteractorConverter(getInstitution()).intactToPsi( component.getInteractor() );
+                            interactorConverter.intactToPsi( component.getInteractor() );
                     if ( ! contains( entry.getInteractors(), interactor ) ) {
                         entry.getInteractors().add( interactor );
                     }
