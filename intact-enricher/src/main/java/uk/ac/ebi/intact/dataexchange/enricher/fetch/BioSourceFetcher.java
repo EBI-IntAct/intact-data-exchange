@@ -23,9 +23,9 @@ import uk.ac.ebi.intact.bridges.taxonomy.OLSTaxonomyService;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyService;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
-import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
+import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 
 /**
  * TODO comment this
@@ -47,10 +47,13 @@ public class BioSourceFetcher {
     private TaxonomyService taxonomyService;
 
     public BioSourceFetcher() {
-        this.taxonomyService = new OLSTaxonomyService();
     }
 
     public TaxonomyTerm fetchByTaxId(int taxId) {
+        if (taxonomyService == null) {
+            taxonomyService = new OLSTaxonomyService();
+        }
+        
         EnricherCache bioSourceCache = enricherContext.getCacheManager().getCache("BioSource");
 
         TaxonomyTerm term = null;

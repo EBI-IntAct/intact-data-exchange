@@ -22,9 +22,9 @@ import org.springframework.stereotype.Controller;
 import uk.ac.ebi.chebi.webapps.chebiWS.client.ChebiWebServiceClient;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.ChebiWebServiceFault_Exception;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
-import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
+import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
 import uk.ac.ebi.intact.uniprot.service.UniprotRemoteService;
 import uk.ac.ebi.intact.uniprot.service.UniprotService;
@@ -49,13 +49,14 @@ public class InteractorFetcher {
     private ChebiWebServiceClient chebiServiceClient;
 
     public InteractorFetcher() {
-        uniprotRemoteService = new UniprotRemoteService();
-        chebiServiceClient = new ChebiWebServiceClient();
     }
 
     public UniprotProtein fetchInteractorFromUniprot(String uniprotId, int taxId) {
         if (uniprotId == null) {
             throw new NullPointerException("Trying to fetch a protein with null uniprotId");
+        }
+        if (uniprotRemoteService == null) {
+            uniprotRemoteService = new UniprotRemoteService();
         }
 
         EnricherCache interactorCache = enricherContext.getCacheManager().getCache("Interactor");
@@ -102,6 +103,10 @@ public class InteractorFetcher {
     public Entity fetchInteractorFromChebi( String chebiId ) {
         if ( chebiId == null ) {
             throw new NullPointerException( "You must give a non null chebiId" );
+        }
+
+        if (chebiServiceClient == null) {
+            chebiServiceClient = new ChebiWebServiceClient();
         }
 
         EnricherCache interactorCache = enricherContext.getCacheManager().getCache( "Interactor" );
