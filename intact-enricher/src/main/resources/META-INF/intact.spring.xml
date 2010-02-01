@@ -18,4 +18,9 @@
 
     <bean id="enricherCacheManager" class="uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCacheManager"/>
 
+    <bean id="cvObjectFetcher" class="uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher" lazy-init="true"/>
+    <bean id="experimentFetcher" class="uk.ac.ebi.intact.dataexchange.enricher.fetch.ExperimentFetcher" lazy-init="true"/>
+    <bean id="bioSourceFetcher" class="uk.ac.ebi.intact.dataexchange.enricher.fetch.BioSourceFetcher" lazy-init="true"/>
+    <bean id="interactorFetcher" class="uk.ac.ebi.intact.dataexchange.enricher.fetch.InteractorFetcher" lazy-init="true"/>
+
 </beans>

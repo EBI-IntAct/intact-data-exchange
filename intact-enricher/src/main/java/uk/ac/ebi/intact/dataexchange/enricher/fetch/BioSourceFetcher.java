@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import uk.ac.ebi.intact.bridges.taxonomy.OLSTaxonomyService;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyService;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
@@ -33,7 +32,6 @@ import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
 public class BioSourceFetcher {
 
     /**

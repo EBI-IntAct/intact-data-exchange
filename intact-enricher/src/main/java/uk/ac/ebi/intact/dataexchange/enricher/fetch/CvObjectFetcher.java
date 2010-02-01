@@ -18,9 +18,8 @@ package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
+import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 import uk.ac.ebi.intact.model.CvDagObject;
 import uk.ac.ebi.intact.model.CvObject;
 
@@ -32,7 +31,6 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
 public class CvObjectFetcher {
 
     /**
