@@ -151,6 +151,18 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
                     interactorTypeLabel.equals( CvInteractorType.NUCLEIC_ACID ) ||
                     interactorTypeLabel.equals( CvInteractorType.DNA ) ) {
             interactor = new NucleicAcidImpl( getInstitution(), organism, shortLabel, interactorType );
+        } else if ( CvInteractorType.BIOPOLYMER_MI_REF.equals(typeId) ||
+                    interactorTypeLabel.equals( CvInteractorType.BIOPOLYMER_MI_REF ) ) {
+            interactor = new BioPolymerImpl( shortLabel, getInstitution(), interactorType );
+            interactor.setBioSource( organism );
+        } else if ( CvInteractorType.POLYSACCHARIDE_MI_REF.equals(typeId) ||
+                    interactorTypeLabel.equals( CvInteractorType.POLYSACCHARIDE_MI_REF ) ) {
+            interactor = new PolySaccharideImpl( shortLabel, getInstitution(), interactorType );
+            interactor.setBioSource( organism );
+        } else if ( CvInteractorType.UNKNOWN_PARTICIPANT_MI_REF.equals(typeId) ||
+                    interactorTypeLabel.equals( CvInteractorType.UNKNOWN_PARTICIPANT_MI_REF ) ) {
+            interactor = new UnknownParticipantImpl( shortLabel, getInstitution(), interactorType );
+            interactor.setBioSource( organism );
         } else {
             throw new PsiConversionException( "Interactor of unexpected type: " + typeId + " ("+interactorTypeLabel+")" );
         }
