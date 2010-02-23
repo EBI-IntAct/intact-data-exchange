@@ -62,6 +62,18 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
+    public void indexMitabFromClasspath4() throws Exception {
+        getIndexer().indexMitabFromClasspath("/mitab_samples/intact200.txt", true);
+        assertCount(1, "EBI-1380413");
+        assertCount(36, "detmethod:\"*binding*\"");
+        assertCount(1, "+detmethod:\"*binding*\" +EBI-1380413");
+        assertCount(1, "detmethod:\"*binding*\" AND EBI-1380413");
+        assertCount(36, "detmethod:\"*binding*\" OR EBI-1380413");
+        assertCount(0, "detmethod:\"*binding*\" AND EBI-1381086");
+        assertCount(37, "detmethod:\"*binding*\" OR EBI-1381086");
+    }
+
+    @Test
     public void index1() throws Exception {
         // mitab line with annotations
         String mitabLine = "uniprotkb:Q7Z4T9-4|intact:EBI-2119735\tuniprotkb:Q92667-2|intact:EBI-2120060\tuniprotkb:AAT1-alpha(isoform synonym)|uniprotkb:q7z4t9-4|irefindex:+ReKZkaGc+yy9DYMbJ/aHHCMHmw9606(rogid)\t" +

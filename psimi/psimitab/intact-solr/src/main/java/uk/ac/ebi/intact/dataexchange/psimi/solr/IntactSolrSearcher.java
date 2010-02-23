@@ -75,7 +75,18 @@ public class IntactSolrSearcher {
         // if using a wildcard query we convert to lower case
         // as of http://mail-archives.apache.org/mod_mbox/lucene-solr-user/200903.mbox/%3CFD3AFB65-AEC1-40B2-A0A4-7E14A519AB05@ehatchersolutions.com%3E
         if (query.getQuery().contains("*")) {
-            query.setQuery(query.getQuery().toLowerCase());
+            String[] tokens = query.getQuery().split(" ");
+
+            StringBuilder sb = new StringBuilder(query.getQuery().length());
+
+            for (String token : tokens) {
+                if (token.contains("*")) {
+                    sb.append(token.toLowerCase());
+                }
+                sb.append(token).append(" ");
+            }
+
+            query.setQuery(sb.toString().trim());
         }
 
         QueryResponse queryResponse = executeQuery(query);
