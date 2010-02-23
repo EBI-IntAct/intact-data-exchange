@@ -82,8 +82,11 @@ public class IntactSolrSearcher {
             for (String token : tokens) {
                 if (token.contains("*")) {
                     sb.append(token.toLowerCase());
+                } else {
+                    sb.append(token);
                 }
-                sb.append(token).append(" ");
+
+                sb.append(" ");
             }
 
             query.setQuery(sb.toString().trim());
