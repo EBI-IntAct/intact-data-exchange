@@ -80,7 +80,7 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
             } else {
                 ConverterContext.getInstance().getLocation().newChild(new LocationItem(id, psiObject.getClass()));
             }
-        } else {
+        } else if (id != null) {
             ConverterContext.getInstance().getLocation().newChild(new LocationItem(id, psiObject.getClass()));
         }
     }

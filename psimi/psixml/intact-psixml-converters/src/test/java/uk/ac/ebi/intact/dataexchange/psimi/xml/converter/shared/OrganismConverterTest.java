@@ -17,9 +17,13 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Assert;
 import org.junit.Test;
+import psidev.psi.mi.xml.model.CellType;
 import psidev.psi.mi.xml.model.Organism;
+import psidev.psi.mi.xml.model.Tissue;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.BioSource;
+import uk.ac.ebi.intact.model.CvCellType;
+import uk.ac.ebi.intact.model.CvTissue;
 
 /**
  * TODO comment this
@@ -38,6 +42,52 @@ public class OrganismConverterTest extends IntactBasicTestCase {
 
         Assert.assertNotNull(bioSource);
         Assert.assertNotNull(bioSource.getOwner().getShortLabel());
+    }
+
+    @Test
+    public void psiToIntact_withCellType() throws Exception {
+        Organism organism = PsiMockFactory.createMockOrganism();
+        organism.setNcbiTaxId(9606);
+
+        final CellType type = PsiMockFactory.createCvType(CellType.class, null, "293");
+        organism.setCellType(type);
+
+        final Tissue tissue = PsiMockFactory.createCvType(Tissue.class, "IA:0191", "lalaTissue");
+        organism.setTissue(tissue);
+
+        OrganismConverter organismConverter = new OrganismConverter(getMockBuilder().getInstitution());
+        BioSource bioSource = organismConverter.psiToIntact(organism);
+
+        Assert.assertNotNull(bioSource);
+        Assert.assertEquals("9606", bioSource.getTaxId());
+        Assert.assertNotNull(bioSource.getOwner().getShortLabel());
+        Assert.assertNotNull(bioSource.getCvCellType());
+        Assert.assertNotNull(bioSource.getCvTissue());
+        Assert.assertEquals("293", bioSource.getCvCellType().getShortLabel());
+        Assert.assertEquals("lalatissue", bioSource.getCvTissue().getShortLabel());
+        Assert.assertEquals("IA:0191", bioSource.getCvTissue().getIdentifier());
+    }
+
+    @Test
+    public void intactToPsi_withCvs() throws Exception {
+        BioSource bioSource = getMockBuilder().createBioSource(9606, "human");
+        CvCellType cellType = getMockBuilder().createCvObject(CvCellType.class, null, "293");
+        CvTissue tissue = getMockBuilder().createCvObject(CvTissue.class, "IA:0191", "lalatissue");
+
+        bioSource.setCvCellType(cellType);
+        bioSource.setCvTissue(tissue);
+
+        OrganismConverter organismConverter = new OrganismConverter(getMockBuilder().getInstitution());
+        Organism organism = organismConverter.intactToPsi(bioSource);
+
+        Assert.assertNotNull(organism);
+        Assert.assertEquals(9606, organism.getNcbiTaxId());
+        Assert.assertEquals("human", organism.getNames().getShortLabel());
+        Assert.assertNotNull(organism.getCellType());
+        Assert.assertNotNull(organism.getTissue());
+        Assert.assertEquals("293", organism.getCellType().getNames().getShortLabel());
+        Assert.assertEquals("lalatissue", organism.getTissue().getNames().getShortLabel());
+        Assert.assertEquals("IA:0191", organism.getTissue().getXref().getPrimaryRef().getId());
     }
 
 }

@@ -320,7 +320,10 @@ public class PsiMockFactory {
     public static <C extends CvType> C createCvType(Class<C> cvTypeClass, String miRef, String label) {
         C cv = createCvType(cvTypeClass);
         cv.getNames().setShortLabel(label);
-        cv.getXref().setPrimaryRef(createDbReferencePsiMi(miRef));
+
+        if (miRef != null) {
+            cv.getXref().setPrimaryRef(createDbReferencePsiMi(miRef));
+        }
 
         return cv;
     }
