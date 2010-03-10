@@ -56,4 +56,19 @@ public class FeatureConverterTest extends AbstractConverterTest {
             Assert.assertEquals(psiFeature.getRanges().size(), feature.getRanges().size());
         }
     }
+
+    @Test
+    public void psiToIntact_feature() throws Exception {
+        Feature psiFeature = PsiMockFactory.createFeature();
+
+        FeatureConverter featureConverter = new FeatureConverter(getMockInstitution());
+            uk.ac.ebi.intact.model.Feature feature = featureConverter.psiToIntact(psiFeature);
+
+            Assert.assertNotNull(feature);
+            Assert.assertNotNull(feature.getOwner());
+            Assert.assertEquals(psiFeature.getNames().getShortLabel(), feature.getShortLabel());
+            Assert.assertEquals(psiFeature.getNames().getFullName(), feature.getFullName());        
+            Assert.assertEquals(psiFeature.getFeatureType().getNames().getShortLabel(), feature.getCvFeatureType().getShortLabel());
+            Assert.assertEquals(psiFeature.getRanges().size(), feature.getRanges().size());
+    }
 }

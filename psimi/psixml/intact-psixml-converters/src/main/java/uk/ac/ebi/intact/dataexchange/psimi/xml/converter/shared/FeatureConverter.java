@@ -15,13 +15,11 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import psidev.psi.mi.xml.model.*;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import psidev.psi.mi.xml.model.FeatureDetectionMethod;
+import psidev.psi.mi.xml.model.FeatureType;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Range;
-import uk.ac.ebi.intact.model.Feature;
 
 /**
  * TODO comment this
@@ -36,13 +34,14 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
     }
 
     public Feature psiToIntact(psidev.psi.mi.xml.model.Feature psiObject) {
-        String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
+        //String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
 
         // using the empty constructor because we don't have a Component instance to pass
         // to the standard parametrized constructor
         Feature feature = new Feature();
         feature.setOwner(getInstitution());
-        feature.setShortLabel(shortLabel);
+        IntactConverterUtils.populateNames(psiObject.getNames(), feature);
+        //feature.setShortLabel(shortLabel);
 
         if (psiObject.getFeatureType() != null) {
             CvObjectConverter<CvFeatureType,FeatureType> featureTypeConverter =
