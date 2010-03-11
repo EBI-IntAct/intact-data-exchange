@@ -22,6 +22,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.model.BioSourceXref;
+import uk.ac.ebi.intact.model.CvCellType;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
@@ -81,5 +82,16 @@ public class BioSourceEnricherTest extends EnricherBasicTestCase {
 
         Assert.assertEquals("archaeoglobus fulgid", organism.getShortLabel());
         Assert.assertEquals("Archaeoglobus fulgidus DSM 4304", organism.getFullName());
+    }
+
+    @Test
+    public void enrich_withCellType() throws Exception {
+        BioSource human = getMockBuilder().createBioSource(9606, "human_custom");
+        CvCellType cellType = getMockBuilder().createCvObject(CvCellType.class, "customId", "custom_cellType");
+        human.setCvCellType(cellType);
+
+        enricher.enrich(human);
+
+        Assert.assertEquals("human_custom", human.getShortLabel());
     }
 }

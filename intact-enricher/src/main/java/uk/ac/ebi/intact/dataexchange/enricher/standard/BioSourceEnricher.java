@@ -58,21 +58,26 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
 
         TaxonomyTerm term = bioSourceFetcher.fetchByTaxId(taxId);
 
-        String label = term.getCommonName();
-        String fullName = term.getScientificName();
 
-        if (label == null || label.length() == 0) {
-            label = fullName;
-        }
+        // update labels if no tissue or celltype are present
+        if (objectToEnrich.getCvTissue() == null &&
+                objectToEnrich.getCvCellType() == null) {
+            String label = term.getCommonName();
+            String fullName = term.getScientificName();
 
-        if (label != null) {
-            label = AnnotatedObjectUtils.prepareShortLabel(label.toLowerCase());
-            objectToEnrich.setShortLabel(label);
-        }
+            if (label == null || label.length() == 0) {
+                label = fullName;
+            }
 
-        if (fullName != null) {
-            objectToEnrich.setFullName(fullName);
-        }
+            if (label != null) {
+                label = AnnotatedObjectUtils.prepareShortLabel(label.toLowerCase());
+                objectToEnrich.setShortLabel(label);
+            }
+
+            if (fullName != null) {
+                objectToEnrich.setFullName(fullName);
+            }
+            }
 
         if (objectToEnrich.getCvCellType() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvCellType());
