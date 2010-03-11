@@ -19,25 +19,26 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.PsimiXmlReader;
-import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Feature;
-import uk.ac.ebi.intact.model.Interactor;
-import uk.ac.ebi.intact.model.Alias;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.core.context.IntactContext;
+import psidev.psi.mi.xml.model.Entry;
+import psidev.psi.mi.xml.model.EntrySet;
+import psidev.psi.mi.xml.model.Participant;
 import uk.ac.ebi.intact.core.context.DataContext;
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.core.util.DebugUtil;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ExportProfile;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * PsiExchange Tester.
@@ -143,6 +144,21 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         Assert.assertEquals(74, dipStats.getPersistedCount(InteractionImpl.class, false));
         Assert.assertEquals(96, getDaoFactory().getInteractionDao().countAll());
 
+    }
+
+    @Test
+    public void importXml_expressedIn() throws Exception {
+        PsimiXmlReader reader = new PsimiXmlReader();
+        EntrySet entrySet = reader.read(PsiExchangeTest.class.getResourceAsStream("/xml/expressedIn.xml"));
+        psiExchange.importIntoIntact(entrySet);
+
+        Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(1, getDaoFactory().getExperimentDao().countAll());
+        Assert.assertEquals(2, getDaoFactory().getComponentDao().countAll());
+        Assert.assertEquals(2, getDaoFactory().getProteinDao().countAll());
+
+        Assert.assertEquals(4, getDaoFactory().getBioSourceDao().countAll());
+        Assert.assertEquals(1, getDaoFactory().getCvObjectDao(CvCellType.class).countAll());
     }
 
     @Test

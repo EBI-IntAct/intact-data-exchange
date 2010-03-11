@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entrySet level="2" version="5" minorVersion="4">
+<entrySet level="2" version="5" minorVersion="4" xmlns="http://psi.hupo.org/mi/mif"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://psi.hupo.org/mi/mif http://psidev.sourceforge.net/mi/rel25/src/MIF254.xsd">
     <entry>
         <source>
             <names>
@@ -245,7 +247,7 @@
                                                 <shortLabel>undetermined sequence position</shortLabel>
                                             </names>
                                             <xref>
-                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0339" refType="identical object"/>
+                                                <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0339" refType="identical object" refTypeAc="MI:0356"/>
                                             </xref>
                                         </startStatus>
                                         <beginInterval begin="0" end="0"/>
