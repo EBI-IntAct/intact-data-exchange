@@ -40,6 +40,7 @@ public class ExperimentEnricherTest extends EnricherBasicTestCase {
 
         Publication publication = getMockBuilder().createPublication(pubmedId);
         Experiment experiment = getMockBuilder().createExperimentEmpty();
+        experiment.setShortLabel("lalalssla");
         experiment.setPublication(publication);
 
         experiment.setOwner(new Institution("ucla"));
@@ -96,7 +97,7 @@ public class ExperimentEnricherTest extends EnricherBasicTestCase {
     @Test
     public void enrich_wrongPubmedXrefQual() {
         Experiment experiment = getMockBuilder().createExperimentEmpty();
-        final String shortlabel = experiment.getShortLabel();
+        experiment.setShortLabel("lalalssla");
         experiment.getBioSource().setTaxId("83333");
         experiment.setPublication(null);
         experiment.getXrefs().clear();
