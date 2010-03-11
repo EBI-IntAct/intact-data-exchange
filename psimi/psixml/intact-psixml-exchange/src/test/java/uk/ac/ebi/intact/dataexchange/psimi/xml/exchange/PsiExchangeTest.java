@@ -30,6 +30,7 @@ import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.core.util.DebugUtil;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ExportProfile;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher.PsiEnricher;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
@@ -50,6 +51,9 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
     @Autowired
     private PsiExchange psiExchange;
+
+    @Autowired
+    private PsiEnricher psiEnricher;
     
     @Test
     public void importXml_intact2() throws Exception {
@@ -148,8 +152,23 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
     @Test
     public void importXml_expressedIn() throws Exception {
+        BioSource existingOrganism = getMockBuilder().createBioSource( 9606, "293" );
+
+        CvDatabase cabriDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.CABRI_MI_REF, CvDatabase.CABRI);
+        CvDatabase intactDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT);
+
+        final CvCellType cellType = getMockBuilder().createCvObject(CvCellType.class, null, "human-293");
+        cellType.getXrefs().clear();
+        cellType.addXref(getMockBuilder().createIdentityXref(cellType, "ACC 305", cabriDb));
+        cellType.addXref(getMockBuilder().createIdentityXref(cellType, "IA:0058", intactDb));
+
+        existingOrganism.setCvCellType(cellType);
+
+        getCorePersister().saveOrUpdate(existingOrganism);
+
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = reader.read(PsiExchangeTest.class.getResourceAsStream("/xml/expressedIn.xml"));
+
         psiExchange.importIntoIntact(entrySet);
 
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
