@@ -111,4 +111,19 @@ public class ExperimentEnricherTest extends EnricherBasicTestCase {
         Assert.assertEquals("kang-2005", experiment.getShortLabel());
         Assert.assertEquals(CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, experiment.getXrefs().iterator().next().getCvXrefQualifier().getIdentifier());
     }
+
+    @Test
+    public void enrich_alreadySyncedLabel() {
+        Experiment experiment = getMockBuilder().createExperimentEmpty();
+        experiment.setShortLabel("lala-2010-1");
+
+        CvDatabase pubmed = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.PUBMED_MI_REF, CvDatabase.PUBMED);
+        final ExperimentXref aXref = getMockBuilder().createIdentityXref( experiment, "15733859", pubmed );
+        aXref.setCvXrefQualifier( null );
+        experiment.addXref( aXref );
+
+        enricher.enrich(experiment);
+
+        Assert.assertEquals("lala-2010-1", experiment.getShortLabel());
+    }
 }

@@ -121,7 +121,9 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
         ExperimentAutoFill autoFill = experimentFetcher.fetchByPubmedId(pubmedId);
 
         if (autoFill != null) {
-            experiment.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(autoFill.getShortlabel(false)));
+            if (experiment.getShortLabel() == null || !ExperimentUtils.matchesSyncedLabel(experiment.getShortLabel())) {
+                experiment.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(autoFill.getShortlabel(false)));
+            }
             experiment.setFullName(autoFill.getFullname());
 
             if (!experimentAnnotationsContainTopic(experiment, CvTopic.AUTHOR_LIST_MI_REF)) {
