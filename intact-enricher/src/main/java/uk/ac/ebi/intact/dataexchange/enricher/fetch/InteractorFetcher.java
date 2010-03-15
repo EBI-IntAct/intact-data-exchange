@@ -74,7 +74,7 @@ public class InteractorFetcher {
         if (uniprotProtein == null) {
             if (log.isDebugEnabled()) log.debug("\t\tRemotely retrieving protein: "+uniprotId+" (taxid:"+taxId+")");
 
-            Collection<UniprotProtein> uniprotProteins = uniprotRemoteService.retrieve(uniprotId);
+            Collection<UniprotProtein> uniprotProteins = uniprotRemoteService.retrieve(uniprotId, false);
 
             // if only one result, return it. If more, return the one that matches the tax id
             if (uniprotProteins.size() == 1) {

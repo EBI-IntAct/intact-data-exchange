@@ -18,18 +18,10 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import uk.ac.ebi.chebi.webapps.chebiWS.client.ChebiWebServiceClient;
-import uk.ac.ebi.chebi.webapps.chebiWS.model.DataItem;
-import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
-import uk.ac.ebi.chebi.webapps.chebiWS.model.OntologyDataItem;
-import uk.ac.ebi.chebi.webapps.chebiWS.model.OntologyDataItemList;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.ProteinUtils;
-
-import java.util.List;
 
 /**
  * InteractorEnricher Tester.
@@ -269,20 +261,5 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
         Assert.assertNotNull(protein.getSequence());
         Assert.assertEquals("9606", protein.getBioSource().getTaxId());
         Assert.assertEquals("human", protein.getBioSource().getShortLabel());
-    }
-
-    @Test
-    public void yyy() throws Exception {
-
-        // Create client
-      ChebiWebServiceClient client = new ChebiWebServiceClient();
-      System.out.println("Invoking getCompleteEntity");
-      Entity entity = client.getCompleteEntity("CHEBI:18243");
-      System.out.println("GetName: " + entity.getChebiAsciiName());
-      List<DataItem> synonyms = entity.getSynonyms();
-      // List all synonyms
-      for ( DataItem dataItem : synonyms ) {
-        System.out.println("synonyms: " + dataItem.getData() + " ("+ dataItem.getType() +")");
-      }
     }
 }
