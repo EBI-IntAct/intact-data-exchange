@@ -331,7 +331,7 @@ public class PsiMockFactory {
     private static InteractorType createInteractorType() {
         InteractorType intType = createCvType(InteractorType.class);
         intType.getNames().setShortLabel(CvInteractorType.PROTEIN);
-
+        intType.getXref().getPrimaryRef().setId("MI:0326");
         return intType;
     }
 
