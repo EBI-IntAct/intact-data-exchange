@@ -97,8 +97,8 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
 
         InteractorType interactorType = ( InteractorType )
                 PsiConverterUtils.toCvType( intactObject.getCvInteractorType(),
-                                            new InteractorTypeConverter( getInstitution() ),
-                                            this );
+                        new InteractorTypeConverter( getInstitution() ),
+                        this );
         interactor.setInteractorType( interactorType );
 
         if (intactObject.getBioSource() != null) {
@@ -136,35 +136,53 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         Set<String> dnaMis = ConverterContext.getInstance().getDnaTypeMis();
         Set<String> rnaMis = ConverterContext.getInstance().getRnaTypeMis();
 
-        if ( CvInteractorType.PROTEIN_MI_REF.equals(typeId) ||
-             interactorTypeLabel.equals( CvInteractorType.PROTEIN ) ) {
-            interactor = new ProteinImpl( getInstitution(), organism, shortLabel, interactorType );
-        } else if ( CvInteractorType.PEPTIDE_MI_REF.equals(typeId) ||
-                    interactorTypeLabel.equals( "peptide" ) ) { // found in dip
-            interactor = new ProteinImpl( getInstitution(), organism, shortLabel, interactorType );
-        } else if ( CvInteractorType.SMALL_MOLECULE_MI_REF.equals(typeId) ||
-                    interactorTypeLabel.equals( CvInteractorType.SMALL_MOLECULE ) ) {
-            interactor = new SmallMoleculeImpl( shortLabel, getInstitution(), interactorType );
-            interactor.setBioSource( organism );
-        } else if ( dnaMis.contains(typeId) ||
-                    rnaMis.contains(typeId) ||
-                    interactorTypeLabel.equals( CvInteractorType.NUCLEIC_ACID ) ||
+        if (typeId != null){
+            if ( CvInteractorType.PROTEIN_MI_REF.equals(typeId)) {
+                interactor = new ProteinImpl( getInstitution(), organism, shortLabel, interactorType );
+            } else if ( CvInteractorType.PEPTIDE_MI_REF.equals(typeId)) { // found in dip
+                interactor = new ProteinImpl( getInstitution(), organism, shortLabel, interactorType );
+            } else if ( CvInteractorType.SMALL_MOLECULE_MI_REF.equals(typeId)) {
+                interactor = new SmallMoleculeImpl( shortLabel, getInstitution(), interactorType );
+                interactor.setBioSource( organism );
+            } else if ( dnaMis.contains(typeId) ||
+                    rnaMis.contains(typeId)) {
+                interactor = new NucleicAcidImpl( getInstitution(), organism, shortLabel, interactorType );
+            } else if ( CvInteractorType.BIOPOLYMER_MI_REF.equals(typeId)) {
+                interactor = new BioPolymerImpl( shortLabel, getInstitution(), interactorType );
+                interactor.setBioSource( organism );
+            } else if ( CvInteractorType.POLYSACCHARIDE_MI_REF.equals(typeId)) {
+                interactor = new PolySaccharideImpl( shortLabel, getInstitution(), interactorType );
+                interactor.setBioSource( organism );
+            } else if ( CvInteractorType.UNKNOWN_PARTICIPANT_MI_REF.equals(typeId)) {
+                interactor = new UnknownParticipantImpl( shortLabel, getInstitution(), interactorType );
+                interactor.setBioSource( organism );
+            } else {
+                throw new PsiConversionException( "Interactor of unexpected type: " + typeId + " ("+interactorTypeLabel+")" );
+            }
+        }
+        else{
+            if ( interactorTypeLabel.equals( CvInteractorType.PROTEIN ) ) {
+                interactor = new ProteinImpl( getInstitution(), organism, shortLabel, interactorType );
+            } else if (interactorTypeLabel.equals( "peptide" ) ) { // found in dip
+                interactor = new ProteinImpl( getInstitution(), organism, shortLabel, interactorType );
+            } else if ( interactorTypeLabel.equals( CvInteractorType.SMALL_MOLECULE ) ) {
+                interactor = new SmallMoleculeImpl( shortLabel, getInstitution(), interactorType );
+                interactor.setBioSource( organism );
+            } else if (interactorTypeLabel.equals( CvInteractorType.NUCLEIC_ACID ) ||
                     interactorTypeLabel.equals( CvInteractorType.DNA ) ) {
-            interactor = new NucleicAcidImpl( getInstitution(), organism, shortLabel, interactorType );
-        } else if ( CvInteractorType.BIOPOLYMER_MI_REF.equals(typeId) ||
-                    interactorTypeLabel.equals( CvInteractorType.BIOPOLYMER_MI_REF ) ) {
-            interactor = new BioPolymerImpl( shortLabel, getInstitution(), interactorType );
-            interactor.setBioSource( organism );
-        } else if ( CvInteractorType.POLYSACCHARIDE_MI_REF.equals(typeId) ||
-                    interactorTypeLabel.equals( CvInteractorType.POLYSACCHARIDE_MI_REF ) ) {
-            interactor = new PolySaccharideImpl( shortLabel, getInstitution(), interactorType );
-            interactor.setBioSource( organism );
-        } else if ( CvInteractorType.UNKNOWN_PARTICIPANT_MI_REF.equals(typeId) ||
-                    interactorTypeLabel.equals( CvInteractorType.UNKNOWN_PARTICIPANT_MI_REF ) ) {
-            interactor = new UnknownParticipantImpl( shortLabel, getInstitution(), interactorType );
-            interactor.setBioSource( organism );
-        } else {
-            throw new PsiConversionException( "Interactor of unexpected type: " + typeId + " ("+interactorTypeLabel+")" );
+                interactor = new NucleicAcidImpl( getInstitution(), organism, shortLabel, interactorType );
+            } else if ( interactorTypeLabel.equals( CvInteractorType.BIOPOLYMER_MI_REF ) ) {
+                interactor = new BioPolymerImpl( shortLabel, getInstitution(), interactorType );
+                interactor.setBioSource( organism );
+            } else if ( interactorTypeLabel.equals( CvInteractorType.POLYSACCHARIDE_MI_REF ) ) {
+                interactor = new PolySaccharideImpl( shortLabel, getInstitution(), interactorType );
+                interactor.setBioSource( organism );
+            } else if ( interactorTypeLabel.equals( CvInteractorType.UNKNOWN_PARTICIPANT_MI_REF ) ) {
+                interactor = new UnknownParticipantImpl( shortLabel, getInstitution(), interactorType );
+                interactor.setBioSource( organism );
+            } else {
+                throw new PsiConversionException( "Interactor of unexpected type: " + typeId + " ("+interactorTypeLabel+")" );
+            }
         }
 
         return interactor;

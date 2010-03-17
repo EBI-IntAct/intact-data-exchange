@@ -18,6 +18,8 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.Interactor;
+import psidev.psi.mi.xml.model.InteractorType;
+import psidev.psi.mi.xml.model.Organism;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
@@ -32,7 +34,7 @@ public class InteractorConverterTest {
     @Test
     public void psiToIntact_default() throws Exception {
         Interactor psiInteractor = PsiMockFactory.createMockInteractor();
-
+        psiInteractor.getInteractorType().getXref().getPrimaryRef().setId("MI:0326"); // The interactor type is protein but the ids was generated automatically.
         InteractorConverter interactorConverter = new InteractorConverter(new Institution("testInstitution"));
 
         uk.ac.ebi.intact.model.Interactor interactor = interactorConverter.psiToIntact(psiInteractor);
@@ -42,6 +44,52 @@ public class InteractorConverterTest {
 
         Assert.assertEquals(psiInteractor.getNames().getAliases().size(), interactor.getAliases().size());
         Assert.assertNotNull(interactor.getOwner());
+    }
+
+    @Test
+    public void create_peptide() throws Exception {
+
+        InteractorConverter interactorConverter = new InteractorConverter(new Institution("testInstitution"));
+
+        Organism organism = PsiMockFactory.createMockOrganism();
+        InteractorType interactorType = PsiMockFactory.createCvType(InteractorType.class, "MI:0327", "peptide");
+
+        uk.ac.ebi.intact.model.Interactor interactor = interactorConverter.newInteractorAccordingToType(organism, "interactorTest", interactorType);
+
+        Assert.assertEquals(true, interactor instanceof ProteinImpl);
+        Assert.assertEquals("peptide", interactor.getCvInteractorType().getShortLabel());
+    }
+
+    @Test
+    public void create_peptide_withShortLabel() throws Exception {
+
+        InteractorConverter interactorConverter = new InteractorConverter(new Institution("testInstitution"));
+
+        Organism organism = PsiMockFactory.createMockOrganism();
+        InteractorType interactorType = PsiMockFactory.createCvType(InteractorType.class, null, "peptide");
+
+        interactorType.setXref(null);
+
+        uk.ac.ebi.intact.model.Interactor interactor = interactorConverter.newInteractorAccordingToType(organism, "interactorTest", interactorType);
+
+        Assert.assertEquals(true, interactor instanceof ProteinImpl);
+        Assert.assertEquals("peptide", interactor.getCvInteractorType().getShortLabel());
+    }
+
+    @Test
+    public void create_protein_withShortLabel() throws Exception {
+
+        InteractorConverter interactorConverter = new InteractorConverter(new Institution("testInstitution"));
+
+        Organism organism = PsiMockFactory.createMockOrganism();
+        InteractorType interactorType = PsiMockFactory.createCvType(InteractorType.class, null, "protein");
+
+        interactorType.setXref(null);
+
+        uk.ac.ebi.intact.model.Interactor interactor = interactorConverter.newInteractorAccordingToType(organism, "interactorTest", interactorType);
+
+        Assert.assertEquals(true, interactor instanceof ProteinImpl);
+        Assert.assertEquals("protein", interactor.getCvInteractorType().getShortLabel());
     }
 
     @Test
