@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ import uk.ac.ebi.intact.model.*;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -110,7 +114,10 @@ public class MitabCreationTests extends IntactBasicTestCase {
 
         Job job = (Job) applicationContext.getBean("createMitabJob");
 
-        JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+        Map<String, JobParameter> params = new HashMap<String, JobParameter>(1);
+        params.put("date", new JobParameter(System.currentTimeMillis()));
+
+        JobExecution jobExecution = jobLauncher.run(job, new JobParameters(params));
         Assert.assertTrue( jobExecution.getAllFailureExceptions().isEmpty() );
         Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
 
@@ -121,7 +128,7 @@ public class MitabCreationTests extends IntactBasicTestCase {
         Assert.assertEquals(1L, solrServer.query(new SolrQuery("Q00002")).getResults().getNumFound());
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("go:\"GO:0003674\"")).getResults().getNumFound());
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("species:Catarrhini")).getResults().getNumFound());
-        Assert.assertEquals(1L, solrServer.query(new SolrQuery("\"Could not map sequence\"")).getResults().getNumFound());
+        Assert.assertEquals(0L, solrServer.query(new SolrQuery("\"Could not map sequence\"")).getResults().getNumFound());
 
         // checking that the hidden annotation is still there
         proteinC = getDaoFactory().getProteinDao().getByShortLabel( "protC" );
@@ -150,7 +157,10 @@ public class MitabCreationTests extends IntactBasicTestCase {
 
         Job job = (Job) applicationContext.getBean("createMitabJob");
 
-        JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+        Map<String, JobParameter> params = new HashMap<String, JobParameter>(1);
+        params.put("date", new JobParameter(System.currentTimeMillis()));
+
+        JobExecution jobExecution = jobLauncher.run(job, new JobParameters(params));
         Assert.assertTrue( jobExecution.getAllFailureExceptions().isEmpty() );
         Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
 
