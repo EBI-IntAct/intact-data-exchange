@@ -74,6 +74,10 @@ public class PsiExchangeImpl implements PsiExchange {
      */
     private static final Log log = LogFactory.getLog(PsiExchangeImpl.class);
 
+    public PsiExchangeImpl() {
+        this( IntactContext.getCurrentInstance() );
+    }
+
     public PsiExchangeImpl(IntactContext intactContext) {
         this.intactContext = intactContext;
         this.persisterHelper = intactContext.getPersisterHelper();
