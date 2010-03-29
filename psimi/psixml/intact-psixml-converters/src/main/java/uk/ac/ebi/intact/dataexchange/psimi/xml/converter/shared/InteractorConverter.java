@@ -171,13 +171,13 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             } else if (interactorTypeLabel.equals( CvInteractorType.NUCLEIC_ACID ) ||
                     interactorTypeLabel.equals( CvInteractorType.DNA ) ) {
                 interactor = new NucleicAcidImpl( getInstitution(), organism, shortLabel, interactorType );
-            } else if ( interactorTypeLabel.equals( CvInteractorType.BIOPOLYMER_MI_REF ) ) {
+            } else if ( interactorTypeLabel.equals( CvInteractorType.BIOPOLYMER ) ) {
                 interactor = new BioPolymerImpl( shortLabel, getInstitution(), interactorType );
                 interactor.setBioSource( organism );
-            } else if ( interactorTypeLabel.equals( CvInteractorType.POLYSACCHARIDE_MI_REF ) ) {
+            } else if ( interactorTypeLabel.equals( CvInteractorType.POLYSACCHARIDE ) ) {
                 interactor = new PolySaccharideImpl( shortLabel, getInstitution(), interactorType );
                 interactor.setBioSource( organism );
-            } else if ( interactorTypeLabel.equals( CvInteractorType.UNKNOWN_PARTICIPANT_MI_REF ) ) {
+            } else if ( interactorTypeLabel.equals( CvInteractorType.UNKNOWN_PARTICIPANT ) ) {
                 interactor = new UnknownParticipantImpl( shortLabel, getInstitution(), interactorType );
                 interactor.setBioSource( organism );
             } else {
