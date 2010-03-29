@@ -136,6 +136,9 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         Set<String> dnaMis = ConverterContext.getInstance().getDnaTypeMis();
         Set<String> rnaMis = ConverterContext.getInstance().getRnaTypeMis();
 
+        Set<String> dnaLabels = ConverterContext.getInstance().getDnaTypeLabels();
+        Set<String> rnaLabels = ConverterContext.getInstance().getRnaTypeLabels();
+        
         if (typeId != null){
             if ( CvInteractorType.PROTEIN_MI_REF.equals(typeId)) {
                 interactor = new ProteinImpl( getInstitution(), organism, shortLabel, interactorType );
@@ -144,7 +147,7 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             } else if ( CvInteractorType.SMALL_MOLECULE_MI_REF.equals(typeId)) {
                 interactor = new SmallMoleculeImpl( shortLabel, getInstitution(), interactorType );
                 interactor.setBioSource( organism );
-            } else if ( dnaMis.contains(typeId) ||
+            } else if ( CvInteractorType.NUCLEIC_ACID_MI_REF.equals(typeId) || dnaMis.contains(typeId) ||
                     rnaMis.contains(typeId)) {
                 interactor = new NucleicAcidImpl( getInstitution(), organism, shortLabel, interactorType );
             } else if ( CvInteractorType.BIOPOLYMER_MI_REF.equals(typeId)) {
@@ -168,8 +171,8 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             } else if ( interactorTypeLabel.equals( CvInteractorType.SMALL_MOLECULE ) ) {
                 interactor = new SmallMoleculeImpl( shortLabel, getInstitution(), interactorType );
                 interactor.setBioSource( organism );
-            } else if (interactorTypeLabel.equals( CvInteractorType.NUCLEIC_ACID ) ||
-                    interactorTypeLabel.equals( CvInteractorType.DNA ) ) {
+            } else if (CvInteractorType.NUCLEIC_ACID.equals(typeId) || dnaLabels.contains(typeId) ||
+                    rnaLabels.contains(typeId) ) {
                 interactor = new NucleicAcidImpl( getInstitution(), organism, shortLabel, interactorType );
             } else if ( interactorTypeLabel.equals( CvInteractorType.BIOPOLYMER ) ) {
                 interactor = new BioPolymerImpl( shortLabel, getInstitution(), interactorType );

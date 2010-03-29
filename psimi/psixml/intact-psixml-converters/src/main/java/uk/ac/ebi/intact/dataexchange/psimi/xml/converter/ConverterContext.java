@@ -44,6 +44,9 @@ public class ConverterContext {
     private Set<String> dnaTypeMis;
     private Set<String> rnaTypeMis;
 
+    private Set<String> dnaTypeLabels;
+    private Set<String> rnaTypeLabels;
+    
     private static ThreadLocal<ConverterContext> instance = new ThreadLocal<ConverterContext>() {
         @Override
         protected ConverterContext initialValue() {
@@ -75,7 +78,13 @@ public class ConverterContext {
                                                  "MI:0325", "MI:0607", "MI:0608", "MI:0609", "MI:0610",
                                                  "MI:0611", "MI:0679" ) );
 
+        rnaTypeLabels = new HashSet( Arrays.asList( "ribonucleic acid", "catalytic rna", "guide rna", "heterogeneous nuclear rna", "messenger rna", "transfer rna",
+                "small nuclear rna", "ribosomal rna", "small nucleolar rna", "small interfering rna", "signal recognition particle rna",
+                "poly adenine") );
+        
         dnaTypeMis = new HashSet( Arrays.asList( "MI:0319", "MI:0680", "MI:0681" ) );
+        
+        dnaTypeLabels = new HashSet( Arrays.asList( "deoxyribonucleic acid", "single stranded deoxyribonucleic acid", "double stranded deoxyribonucleic acid" ) );
 
     }
 
@@ -160,6 +169,15 @@ public class ConverterContext {
         this.locationInfoDisabled = locationInfoDisabled;
         resetLocation();
     }
+
+    public Set<String> getDnaTypeLabels() {
+        return dnaTypeLabels;
+    }
+
+    public Set<String> getRnaTypeLabels() {
+        return rnaTypeLabels;
+    }
+    
 
     public Set<String> getDnaTypeMis() {
         return dnaTypeMis;
