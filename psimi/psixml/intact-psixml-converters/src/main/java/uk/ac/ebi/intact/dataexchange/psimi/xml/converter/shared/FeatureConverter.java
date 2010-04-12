@@ -41,6 +41,7 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
         Feature feature = new Feature();
         feature.setOwner(getInstitution());
         IntactConverterUtils.populateNames(psiObject.getNames(), feature);
+        IntactConverterUtils.populateXref(psiObject.getXref(), feature, new XrefConverter<FeatureXref>(getInstitution(), FeatureXref.class));
         //feature.setShortLabel(shortLabel);
 
         if (psiObject.getFeatureType() != null) {
