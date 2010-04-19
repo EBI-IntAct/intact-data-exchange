@@ -13,7 +13,9 @@ import uk.ac.ebi.intact.model.Publication;
  * 
  * @author Arnaud Ceol
  *
+ * @deprecated this class was superseeded by
  */
+@Deprecated
 public class IMExIdAssigner {
 
 	public static final String IMExPrefix = "IM-";
