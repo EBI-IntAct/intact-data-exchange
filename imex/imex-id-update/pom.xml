@@ -15,13 +15,64 @@
 
     <name>IntAct Data Exchange :: IMEx :: IMEx Id update</name>
 
+    <profiles>
+         <profile>
+            <id>assign-imex-ids</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2048m</argument>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath/>
+                                <argument>-Djavax.net.ssl.trustStore=/Users/samuel/keystore/keystore</argument>
+                                <argument>-Djavax.net.ssl.keyStorePassword=240178</argument>
+                                <argument>uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexAssigner</argument>
+                                <argument>skerrien</argument>
+                                <argument>240178</argument>
+                                <argument>zpro</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 
 	<dependencies>
+
+         <dependency>
+             <groupId>com.oracle</groupId>
+             <artifactId>oracle-thin</artifactId>
+             <version>10.2.0.4</version>
+         </dependency>
 
 		<dependency>
 			<groupId>uk.ac.ebi.intact.core</groupId>
 			<artifactId>intact-core</artifactId>
 		</dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.intact.bridges</groupId>
+            <artifactId>intact-imexcentral</artifactId>
+            <version>2.1.2-SNAPSHOT</version>
+        </dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
