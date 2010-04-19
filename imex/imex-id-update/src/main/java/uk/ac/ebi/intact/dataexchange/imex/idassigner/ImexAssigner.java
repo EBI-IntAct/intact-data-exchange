@@ -200,10 +200,8 @@ public class ImexAssigner {
 
                 String imexId;
                 if ( ! containsPrimaryImexId( publication ) ) {
-//                    imexId = retrieveImexId();
 
-
-                    if( icImexId != null ) {
+                    if( ! icImexId.equals( "N/A" ) ) {
                         // already assigned, use it
                         System.out.println( "\tIMExCentral already had an ID for that publication, synchronizing..." );
                         imexId = icImexId;
