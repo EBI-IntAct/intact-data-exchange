@@ -43,9 +43,9 @@
                                 <argument>-Djavax.net.ssl.trustStore=/Users/samuel/keystore/keystore</argument>
                                 <argument>-Djavax.net.ssl.keyStorePassword=240178</argument>
                                 <argument>uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexAssigner</argument>
-                                <argument>skerrien</argument>
-                                <argument>240178</argument>
-                                <argument>zpro</argument>
+                                <argument>icUsername</argument>
+                                <argument>icPassword</argument>
+                                <argument>dbSID</argument>
                             </arguments>
                         </configuration>
                     </plugin>
