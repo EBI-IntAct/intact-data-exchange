@@ -16,11 +16,13 @@
 
 package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
+import edu.ucla.mbi.imex.central.ws.IcentralFault;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.TransactionStatus;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
+import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.model.*;
@@ -155,6 +157,8 @@ public class ImexAssigner {
         int imexIdMismatch = 0;
 
         for ( Publication publication : publications ) {
+
+            try {
 
             totalPublicationCount++;
 
@@ -335,6 +339,18 @@ public class ImexAssigner {
             } // IMEX exportable publication
 
             System.out.println( "-------------------------------------------------------------------------------" );
+
+            } catch ( ImexCentralException ice ) {
+
+                log.error( "An error occured while processing publication: " + publication.getPublicationId(), ice );
+
+                if( ice.getCause() instanceof IcentralFault ) {
+                    IcentralFault f = ((IcentralFault)ice.getCause());
+                    log.error( "This exception was thrown by UCLA's IMEx Central Web Service and provided the " +
+                               "following extra information. Error code: " + f.getFaultInfo().getFaultCode() +
+                               ". Message: '"+ f.getFaultInfo().getMessage() +"'.");
+                }
+            }
 
         } // all publications
 
