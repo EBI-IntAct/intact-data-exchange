@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -373,6 +374,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     @Test
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @DirtiesContext
     public void createOrUpdateCVsTest() throws Exception {
 
         //OBOSession oboSession = OboUtils.createOBOSessionFromDefault( "1.51" );
