@@ -21,14 +21,20 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.TransactionStatus;
+import uk.ac.ebi.intact.bridges.imexcentral.DefaultImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.*;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.FileImexUpdateReportHandler;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Publication;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
+import javax.swing.event.EventListenerList;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,6 +56,11 @@ public class ImexAssigner {
 
     public static final Pattern IMEX_INTERACTION_ID = Pattern.compile( "IM-\\d+-\\d+" );
 
+    // to allow listener
+    protected EventListenerList listenerList = new EventListenerList();
+
+    private ImexAssignerConfig imexUpdateConfig;
+
     private boolean dryRun = true;
 
     static List<String> excludedPublications = new ArrayList<String>();
@@ -68,57 +79,174 @@ public class ImexAssigner {
     private CvTopic fullCoverage;
     private CvTopic imexCuration;
 
-    public ImexAssigner() {
-        initializeCvs();
+    boolean isCvsInitialized;
+
+    private ImexCentralClient imexCentral;
+
+
+    //////////////////
+    // Constructors
+
+    public ImexAssigner( String icUsername, String icPassword, String icEndpoint ) throws ImexCentralException {
+        this.imexCentral = new DefaultImexCentralClient( icUsername, icPassword, icEndpoint );
+    }
+
+    public ImexAssigner( ImexCentralClient client ) {
+        this.imexCentral = client;
+    }
+
+    /////////////////////
+    // Listeners
+
+    protected void registerListeners() {
+        addListener( new LoggingImexUpdateListener() );
+
+        final File directory = imexUpdateConfig.getUpdateLogsDirectory();
+        if( directory != null ) {
+            final FileImexUpdateReportHandler handler;
+            try {
+                handler = new FileImexUpdateReportHandler( directory );
+            } catch ( IOException e ) {
+                throw new RuntimeException( "Filed to initialize ReportWriterListener: " + directory );
+            }
+            addListener( new ReportWriterListener( handler ) );
+        }
+    }
+
+    public void addListener( ImexUpdateListener listener) {
+        listenerList.add( ImexUpdateListener.class, listener);
+    }
+
+    public void removeListener( ImexUpdateListener listener) {
+        listenerList.remove( ImexUpdateListener.class, listener);
+    }
+
+    protected <T> List<T> getListeners(Class<T> listenerClass) {
+        List list = new ArrayList();
+
+        Object[] listeners = listenerList.getListenerList();
+
+        for (int i = 0; i < listeners.length; i += 2) {
+            if (listeners[i] == ImexUpdateListener.class) {
+                if (listenerClass.isAssignableFrom(listeners[i+1].getClass())) {
+                    list.add(listeners[i+1]);
+                }
+            }
+        }
+        return list;
+    }
+
+    private void registerListenersIfNotDoneYet() {
+        if (listenerList.getListenerCount() == 0) {
+            registerListeners();
+        }
+
+        if (listenerList.getListenerCount() == 0) {
+            throw new IllegalStateException("No listener registered for ProteinProcessor");
+        }
+    }
+
+    public void fireOnProcessPublication( ImexUpdateEvent evt) {
+        for (ImexUpdateListener listener : getListeners(ImexUpdateListener.class)) {
+            listener.onProcessPublication(evt);
+        }
+    }
+
+    public void fireOnPublicationUpToDate( ImexUpdateEvent evt) {
+        for (ImexUpdateListener listener : getListeners(ImexUpdateListener.class)) {
+            listener.onPublicationUpToDate(evt);
+        }
+    }
+
+    public void fireOnProcessImexPublication( ImexUpdateEvent evt) {
+        for (ImexUpdateListener listener : getListeners(ImexUpdateListener.class)) {
+            listener.onProcessImexPublication(evt);
+        }
+    }
+
+    public void fireOnNewImexIdAssignedToPublication( ImexUpdateEvent evt) {
+        for (ImexUpdateListener listener : getListeners(ImexUpdateListener.class)) {
+            listener.onImexIdAssignedToPublication(evt);
+        }
+    }
+
+    public void fireOnNewImexIdAssignedToInteraction( ImexUpdateEvent evt) {
+        for (ImexUpdateListener listener : getListeners(ImexUpdateListener.class)) {
+            listener.onImexIdAssignedToInteraction(evt);
+        }
+    }
+
+    public void fireOnImexIdMismatchFound( ImexUpdateEvent evt) {
+        for (ImexUpdateListener listener : getListeners(ImexUpdateListener.class)) {
+            listener.onImexIdMismatchFound(evt);
+        }
+    }
+
+    ////////////////////
+    // IMEx ID UPDATE
+
+
+    public ImexAssignerConfig getImexUpdateConfig() {
+        return imexUpdateConfig;
+    }
+
+    public void setImexUpdateConfig( ImexAssignerConfig imexUpdateConfig ) {
+        this.imexUpdateConfig = imexUpdateConfig;
     }
 
     private void initializeCvs() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
-        psimi = daoFactory.getCvObjectDao( CvDatabase.class ).getByPsiMiRef( CvDatabase.PSI_MI_MI_REF );
-        if ( psimi == null ) {
-            throw new IllegalArgumentException( "You must give a non null psimi" );
-        }
 
-        intact = daoFactory.getCvObjectDao( CvDatabase.class ).getByPsiMiRef( CvDatabase.INTACT_MI_REF );
-        if ( intact == null ) {
-            throw new IllegalArgumentException( "You must give a non null intact" );
-        }
+        if( ! isCvsInitialized ) {
 
-        imex = daoFactory.getCvObjectDao( CvDatabase.class ).getByPsiMiRef( CvDatabase.IMEX_MI_REF );
-        if ( imex == null ) {
-            throw new IllegalArgumentException( "You must give a non null imex" );
-        }
+            final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+            psimi = daoFactory.getCvObjectDao( CvDatabase.class ).getByPsiMiRef( CvDatabase.PSI_MI_MI_REF );
+            if ( psimi == null ) {
+                throw new IllegalArgumentException( "Could not find CV term:  psimi" );
+            }
 
-        imexPrimary = daoFactory.getCvObjectDao( CvXrefQualifier.class ).getByPsiMiRef( CvXrefQualifier.IMEX_PRIMARY_MI_REF );
-        if ( imexPrimary == null ) {
-            throw new IllegalArgumentException( "You must give a non null imexPrimary" );
-        }
+            intact = daoFactory.getCvObjectDao( CvDatabase.class ).getByPsiMiRef( CvDatabase.INTACT_MI_REF );
+            if ( intact == null ) {
+                throw new IllegalArgumentException( "Could not find CV term:  intact" );
+            }
 
-        imexSecondary = daoFactory.getCvObjectDao( CvXrefQualifier.class ).getByPsiMiRef( "MI:0952" );
-        if ( imexSecondary == null ) {
-            throw new IllegalArgumentException( "You must give a non null imexSecondary" );
-        }
+            imex = daoFactory.getCvObjectDao( CvDatabase.class ).getByPsiMiRef( CvDatabase.IMEX_MI_REF );
+            if ( imex == null ) {
+                throw new IllegalArgumentException( "Could not find CV term: imex" );
+            }
 
-        // TODO switch to MI when we get one !
-        imexSource = daoFactory.getCvObjectDao( CvXrefQualifier.class ).getByShortLabel( "imex source" );
-        if ( imexSource == null ) {
-            throw new IllegalArgumentException( "You must give a non null imexSource" );
-        }
+            imexPrimary = daoFactory.getCvObjectDao( CvXrefQualifier.class ).getByPsiMiRef( CvXrefQualifier.IMEX_PRIMARY_MI_REF );
+            if ( imexPrimary == null ) {
+                throw new IllegalArgumentException( "Could not find CV term: imexPrimary" );
+            }
 
-        // TODO switch to MI when we get one !
-        lastImexAssigned = daoFactory.getCvObjectDao( CvTopic.class ).getByShortLabel( "last-imex-assigned" );
-        if ( lastImexAssigned == null ) {
-            throw new IllegalArgumentException( "You must give a non null lastImexAssigned" );
-        }
+            imexSecondary = daoFactory.getCvObjectDao( CvXrefQualifier.class ).getByPsiMiRef( "MI:0952" );
+            if ( imexSecondary == null ) {
+                throw new IllegalArgumentException( "Could not find CV term: imexSecondary" );
+            }
 
-        imexCuration = daoFactory.getCvObjectDao( CvTopic.class ).getByPsiMiRef( "MI:0959" );
-        if ( imexCuration == null ) {
-            throw new IllegalArgumentException( "You must give a non null imexCuration" );
-        }
+            // TODO switch to MI when we get one !
+            imexSource = daoFactory.getCvObjectDao( CvXrefQualifier.class ).getByShortLabel( "imex source" );
+            if ( imexSource == null ) {
+                throw new IllegalArgumentException( "Could not find CV term: imexSource" );
+            }
 
-        fullCoverage = daoFactory.getCvObjectDao( CvTopic.class ).getByPsiMiRef( "MI:0957" );
-        if ( fullCoverage == null ) {
-            throw new IllegalArgumentException( "You must give a non null fullCoverage" );
+            // TODO switch to MI when we get one !
+            lastImexAssigned = daoFactory.getCvObjectDao( CvTopic.class ).getByShortLabel( "last-imex-assigned" );
+            if ( lastImexAssigned == null ) {
+                throw new IllegalArgumentException( "Could not find CV term: last-imex-assigned" );
+            }
+
+            imexCuration = daoFactory.getCvObjectDao( CvTopic.class ).getByPsiMiRef( "MI:0959" );
+            if ( imexCuration == null ) {
+                throw new IllegalArgumentException( "Could not find CV term: imexCuration" );
+            }
+
+            fullCoverage = daoFactory.getCvObjectDao( CvTopic.class ).getByPsiMiRef( "MI:0957" );
+            if ( fullCoverage == null ) {
+                throw new IllegalArgumentException( "Could not find CV term: fullCoverage" );
+            }
+
+            isCvsInitialized = true;
         }
     }
 
@@ -131,18 +259,22 @@ public class ImexAssigner {
         this.dryRun = dryRun;
     }
 
-    public void update( String icUsername, String icPassword ) throws Exception {
+    public void update() {
+
+        registerListenersIfNotDoneYet();
+
+        initializeCvs();
 
         // TODO implement a Report object
         // TODO implement a listener approach and default implementation logging updates in CSV files (like in protein-update)
         //      processed | imex-publication | updated-imex-publication
 
-        ImexCentralClient icc = new ImexCentralClient( icUsername, icPassword, ImexCentralClient.IC_TEST );
 
         final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
+        // TODO browse publication by smaller chunk to minimize memory usage.
         List<Publication> publications = daoFactory.getPublicationDao().getAll();
         int totalPublicationCount = 0;
         int imexPublicationCount = 0;
@@ -158,6 +290,8 @@ public class ImexAssigner {
 
         for ( Publication publication : publications ) {
 
+            fireOnProcessPublication( new ImexUpdateEvent( this, publication ) );
+
             try {
 
             totalPublicationCount++;
@@ -171,22 +305,25 @@ public class ImexAssigner {
             // Check if the publication is an imex candidate
             if ( isIntactImexExportable( publication ) ) {
 
+                fireOnProcessImexPublication( new ImexUpdateEvent( this, publication ) );
+
                 final String publicationId = publication.getPublicationId();
-                edu.ucla.mbi.imex.central.ws.Publication imexPublication = icc.getPublicationById( publicationId );
+                edu.ucla.mbi.imex.central.ws.Publication imexPublication = imexCentral.getPublicationById( publicationId );
                 if( imexPublication != null ) {
+
+                    // TODO fire publication registered in IMExCentral
+
                     System.out.println( "\tPublication already registered in the IMExCentral." );
                     System.out.println( "\t\t" + printImexPublication( imexPublication ) );
                 } else {
+
+                    // TODO fire register new publication in IMExCentral
+
                     System.out.println( "\tPublication not yet registered in the IMExCentral." );
-                    imexPublication = icc.createPublicationById( publicationId );
+                    imexPublication = imexCentral.createPublicationById( publicationId );
                     System.out.println( "\tCreating a new record in IMExCentral" );
                     System.out.println( "\t\t" + printImexPublication( imexPublication ) );
                 }
-
-                // TODO PublicationUtils.isAccepted( Publication p )
-                // TODO PublicationUtils.isToBeReviewed( Publication p )
-                // TODO PublicationUtils.isOnHold( Publication p )
-
 
                 // TODO update publications status according to accepted/on-hold/to-be-reviewed
                 // TODO creator is always ADMIN, update that to the real curators' login
@@ -212,7 +349,7 @@ public class ImexAssigner {
                     } else {
                         // request a new id from IMExCentral
                         System.out.println( "\tRequesting a new IMEx ID from IMExCentral..." );
-                        imexPublication = icc.getPublicationImexAccession( publicationId, true );
+                        imexPublication = imexCentral.getPublicationImexAccession( publicationId, true );
                         icImexId = imexPublication.getImexAccession();
                         imexId = icImexId;
                     }
@@ -226,18 +363,24 @@ public class ImexAssigner {
                     publication.addXref( pubXref );
                     if ( !dryRun ) daoFactory.getXrefDao().persist( pubXref );
 
+                    fireOnNewImexIdAssignedToPublication( new ImexUpdateEvent( this, publication ) );
+
                     System.out.println( "\tCreated publication's IMEx primary: " + imexId );
 
                 } else {
 
-                    // Retrieve IMEx id
-                    final Xref x = getPrimaryImexId( publication );
+                    // Retrieve local IMEx id
+                    final Xref x = ImexUtils.getPrimaryImexId( publication );
                     imexId = x.getPrimaryId();
 
                     if( ! imexId.equals( icImexId ) ) {
                         System.out.println( "\tERROR: the IMEx ID stored locally ("+imexId+") and the one in IMExCentral ("+icImexId+") are different" );
                         imexIdMismatch++;
+
+                        fireOnImexIdMismatchFound( new ImexUpdateEvent( this, publication, "IMExCentral: "+icImexId +" | LocalDB: " + imexId) );
                     }
+
+                    fireOnPublicationUpToDate( new ImexUpdateEvent( this, publication ) );
 
                     System.out.println( "\tFound publication's IMEx primary: " + imexId );
                 }
@@ -290,7 +433,7 @@ public class ImexAssigner {
                             }
 
 
-                            final Xref primaryXref = getPrimaryImexId( interaction );
+                            final Xref primaryXref = ImexUtils.getPrimaryImexId( interaction );
                             if ( primaryXref == null ) {
                                 // Create a new one
                                 lastImexId = addImexPrimary( daoFactory, interaction, imex, imexPrimary, imexId, lastImexId );
@@ -313,7 +456,7 @@ public class ImexAssigner {
 
                                     if ( !hasAssignedIdYet ) {
 
-                                        System.err.println( "Despite the fast that publication didn't have an " +
+                                        System.err.println( "Despite the fact that publication didn't have an " +
                                                             "annotation 'last-imex-assigned' some interaction do " +
                                                             "have IMEx ids assigned (e.g. " + primaryXref.getPrimaryId()
                                                             + "). There is a chance we are assigning the same IDs to " +
@@ -464,6 +607,11 @@ public class ImexAssigner {
 
         if ( !dryRun ) daoFactory.getXrefDao().persist( sourceXref );
 
+        fireOnNewImexIdAssignedToInteraction(
+                new ImexUpdateEvent( this,
+                                     interaction.getExperiments().iterator().next().getPublication(),
+                                     interaction, "" ) );
+
         System.out.println( "\t\tAdded IMEx primary on Interaction: " + newImexId );
 
         return lastImexId;
@@ -572,23 +720,7 @@ public class ImexAssigner {
     }
 
     public boolean containsPrimaryImexId( AnnotatedObject ao ) {
-        return getPrimaryImexId( ao ) != null;
-    }
-
-    public Xref getPrimaryImexId( AnnotatedObject ao ) {
-        final Collection<PublicationXref> xrefs = AnnotatedObjectUtils.searchXrefs( ao,
-                                                                                    CvDatabase.IMEX_MI_REF,
-                                                                                    CvXrefQualifier.IMEX_PRIMARY_MI_REF );
-        switch ( xrefs.size() ) {
-            case 0:
-                return null;
-            case 1:
-                return xrefs.iterator().next();
-            default:
-                throw new IllegalStateException( "Found " + xrefs.size() + " IMEx primary ids on " +
-                                                 ao.getClass().getSimpleName() + ": " + ao.getShortLabel() +
-                                                 "(" + ao.getAc() + ")" );
-        }
+        return ImexUtils.getPrimaryImexId( ao ) != null;
     }
 
     ////////////////////////
@@ -610,9 +742,15 @@ public class ImexAssigner {
         final String database = args[2];
         IntactContext.initContext( new String[]{"/META-INF/" + database + ".spring.xml"} );
 
-        ImexAssigner assigner = new ImexAssigner();
+        ImexAssigner assigner = new ImexAssigner( icUsername, icPassword, DefaultImexCentralClient.IC_TEST );
+
         assigner.setDryRun( true );
-        assigner.update( icUsername, icPassword );
+
+        final ImexAssignerConfig config = new ImexAssignerConfig();
+        config.setUpdateLogsDirectory( new File( "imex-update-logs" ) );
+        assigner.setImexUpdateConfig( config );
+
+        assigner.update();
     }
 }
 
