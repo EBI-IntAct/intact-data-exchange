@@ -373,7 +373,7 @@ public class ImexAssigner {
                     final Xref x = ImexUtils.getPrimaryImexId( publication );
                     imexId = x.getPrimaryId();
 
-                    if( ! imexId.equals( icImexId ) ) {
+                    if( ! icImexId.equals("N/A") &&  ! imexId.equals( icImexId ) ) {
                         System.out.println( "\tERROR: the IMEx ID stored locally ("+imexId+") and the one in IMExCentral ("+icImexId+") are different" );
                         imexIdMismatch++;
 
