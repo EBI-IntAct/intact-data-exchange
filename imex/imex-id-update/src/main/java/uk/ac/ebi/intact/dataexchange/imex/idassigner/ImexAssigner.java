@@ -493,6 +493,10 @@ public class ImexAssigner {
                                "following extra information. Error code: " + f.getFaultInfo().getFaultCode() +
                                ". Message: '"+ f.getFaultInfo().getMessage() +"'.");
                 }
+            } catch (Throwable t ) {
+
+//               TODO fireError();
+                log.error( "Error while processing publication: " + publication.getPublicationId(), t );
             }
 
         } // all publications
