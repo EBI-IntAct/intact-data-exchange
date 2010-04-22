@@ -35,10 +35,9 @@ import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -730,6 +729,8 @@ public class ImexAssigner {
     ////////////////////////
     // DEMO
 
+    private static DateFormat formatter = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+
     public static void main( String[] args ) throws Exception {
 
         if ( args.length < 3 ) {
@@ -751,7 +752,7 @@ public class ImexAssigner {
         assigner.setDryRun( true );
 
         final ImexAssignerConfig config = new ImexAssignerConfig();
-        config.setUpdateLogsDirectory( new File( "imex-update-logs" ) );
+        config.setUpdateLogsDirectory( new File( "imex-assigner-" + formatter.format( new Date() )) );
         assigner.setImexUpdateConfig( config );
 
         assigner.update();
