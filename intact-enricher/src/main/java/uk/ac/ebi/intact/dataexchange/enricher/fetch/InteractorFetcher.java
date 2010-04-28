@@ -122,8 +122,8 @@ public class InteractorFetcher {
             }
             try {
                 smallMoleculeEntity = chebiServiceClient.getCompleteEntity( chebiId );
-            } catch ( ChebiWebServiceFault_Exception e ) {
-                throw new EnricherException( "Retrieving SmallMoleculeEntity failed for " + chebiId, e );
+            } catch ( Throwable t ) {
+                throw new EnricherException( "Retrieving SmallMoleculeEntity failed for " + chebiId, t );
             }
 
             if ( smallMoleculeEntity != null ) {
