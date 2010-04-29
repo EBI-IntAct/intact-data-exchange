@@ -376,6 +376,7 @@
      <field name="parameterA" type="text" indexed="true" stored="true" multiValued="true"/>
      <field name="parameterB" type="text" indexed="true" stored="true" multiValued="true"/>
      <field name="parameter" type="text" indexed="true" stored="false" multiValued="true"/>
+     <field name="parameterInteraction" type="text" indexed="true" stored="true" multiValued="true"/>
 
      <!-- Other -->
 
@@ -598,6 +599,7 @@
 
     <copyField source="parameterA" dest="parameter"/>
     <copyField source="parameterB" dest="parameter"/>
+    <copyField source="parameterInteraction" dest="parameter"/>
 
     <copyField source="line" dest="mitab"/>
 

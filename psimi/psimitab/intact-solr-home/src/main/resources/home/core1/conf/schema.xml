@@ -376,6 +376,7 @@
      <field name="parameterA" type="text" indexed="true" stored="true" multiValued="true"/>
      <field name="parameterB" type="text" indexed="true" stored="true" multiValued="true"/>
      <field name="parameter" type="text" indexed="true" stored="false" multiValued="true"/>
+     <field name="parameterInteraction" type="text" indexed="true" stored="true" multiValued="true"/>
 
      <!-- Other -->
 
@@ -527,6 +528,7 @@
 
     <copyField source="type_exact" dest="type"/>
     <copyField source="type_expanded" dest="type"/>
+
     <copyField source="type_exact_id" dest="type_id"/>
     <copyField source="type_expanded_id" dest="type_id"/>
 
@@ -584,7 +586,7 @@
     <copyField source="typeB_exact" dest="interactorType"/>
     <copyField source="typeA_expanded_id" dest="interactorType_id"/>
     <copyField source="typeA_exact_id" dest="interactorType_id"/>
-    <copyField source="typeB_expanded_id" dest="interactorType_id"/>
+    <copyField source="typeB_expanded" dest="interactorType_id"/>
     <copyField source="typeB_exact_id" dest="interactorType_id"/>
 
     <copyField source="hostOrganism_expanded" dest="hostOrganism"/>
@@ -597,6 +599,7 @@
 
     <copyField source="parameterA" dest="parameter"/>
     <copyField source="parameterB" dest="parameter"/>
+    <copyField source="parameterInteraction" dest="parameter"/>
 
     <copyField source="line" dest="mitab"/>
 
