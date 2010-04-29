@@ -115,7 +115,10 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
                 "\tgo:\"GO:0030188\"|go:\"GO:0005159\"|" +
                 "go:\"GO:0005158\"|interpro:IPR002404|" +
                 "interpro:IPR001849|interpro:IPR011993|ensembl:ENSG00000169047|rcsb pdb:1IRS|rcsb pdb:1K3A|rcsb pdb:1QQG" +
-                "\tintact:EBI-711879\tMI:0326(protein)\tMI:0326(protein)\ttaxid:-1(in vitro)\t-\t-\t-";
+                "\tintact:EBI-711879\tMI:0326(protein)\tMI:0326(protein)\ttaxid:-1(in vitro)\texpansion:spoke\tdataset:\"happy data\"" +
+                "\tcaution:note1\tcaution:note2\ttemperature:1(celsius)\ttemperature:2(farenheit)\tkd:0.5";
+
+        Assert.assertEquals(31, mitab.split("\t").length);
 
         IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB),
                                                           getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
@@ -209,11 +212,21 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         Assert.assertEquals("-1", get(0, binaryInteraction.getHostOrganism()).getIdentifier());
         Assert.assertEquals("taxid", get(0, binaryInteraction.getHostOrganism()).getDatabase());
         Assert.assertEquals("in vitro", get(0, binaryInteraction.getHostOrganism()).getText());
-        Assert.assertEquals(0, ia.getAnnotations().size());
-        Assert.assertEquals(0, ib.getAnnotations().size());
-        Assert.assertEquals(0, ia.getParameters().size());
-        Assert.assertEquals(0, ib.getParameters().size());
-        Assert.assertEquals(0, binaryInteraction.getParameters().size());  
+        Assert.assertEquals(1, ia.getAnnotations().size());
+        Assert.assertEquals("caution", get(0, ia.getAnnotations()).getType());
+        Assert.assertEquals("note1", get(0, ia.getAnnotations()).getText());
+        Assert.assertEquals(1, ib.getAnnotations().size());
+        Assert.assertEquals("caution", get(0, ib.getAnnotations()).getType());
+        Assert.assertEquals("note2", get(0, ib.getAnnotations()).getText());
+        Assert.assertEquals(1, ia.getParameters().size());
+        Assert.assertEquals("temperature", get(0, ia.getParameters()).getType());
+        Assert.assertEquals("1", get(0, ia.getParameters()).getValue());
+        Assert.assertEquals(1, ib.getParameters().size());
+        Assert.assertEquals("temperature", get(0, ib.getParameters()).getType());
+        Assert.assertEquals("2", get(0, ib.getParameters()).getValue());
+        Assert.assertEquals(1, binaryInteraction.getParameters().size());
+        Assert.assertEquals("kd", get(0, binaryInteraction.getParameters()).getType());
+        Assert.assertEquals("0.5", get(0, binaryInteraction.getParameters()).getValue());
     }
 
     private <T> T get(int position, Collection<T> elements) {
