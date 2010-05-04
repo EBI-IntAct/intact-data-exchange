@@ -31,6 +31,7 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.FileImexUpdateReport
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Publication;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.ExperimentUtils;
 
 import javax.swing.event.EventListenerList;
 import java.io.File;
@@ -306,6 +307,8 @@ public class ImexAssigner {
 
                 fireOnProcessImexPublication( new ImexUpdateEvent( this, publication ) );
 
+                // TODO do we want to assign IMEx id to publiction if no interactions are exportable (no PPI)
+
                 final String publicationId = publication.getPublicationId();
                 edu.ucla.mbi.imex.central.ws.Publication imexPublication = imexCentral.getPublicationById( publicationId );
                 if( imexPublication != null ) {
@@ -315,7 +318,7 @@ public class ImexAssigner {
                     System.out.println( "\tPublication already registered in the IMExCentral." );
                     System.out.println( "\t\t" + printImexPublication( imexPublication ) );
                 } else {
-
+            
                     // TODO fire register new publication in IMExCentral
 
                     System.out.println( "\tPublication not yet registered in the IMExCentral." );
@@ -648,9 +651,6 @@ public class ImexAssigner {
         boolean atLeastOneExperimentWithPPI = false;
         for ( Experiment experiment : publication.getExperiments() ) {
 
-            // Note: once that boolean is true, the method is not executed anymore as || shortcuts evaluation
-            atLeastOneExperimentWithPPI = atLeastOneExperimentWithPPI || hasAtLeastOnePPI( experiment );
-
             if ( !matchesPublicationAndYear( experiment,
                                              Arrays.asList( "Cell (0092-8674)",
                                                             "Proteomics (1615-9853)",
@@ -658,6 +658,13 @@ public class ImexAssigner {
                                              2006 ) ) {
                 return false;
             }
+
+            if( ! ExperimentUtils.isAccepted( experiment ) ) {
+                return false;
+            }
+
+            // Note: once that boolean is true, the method is not executed anymore as || shortcuts evaluation
+            atLeastOneExperimentWithPPI = atLeastOneExperimentWithPPI || hasAtLeastOnePPI( experiment );
         }
 
         if ( !atLeastOneExperimentWithPPI ) {
