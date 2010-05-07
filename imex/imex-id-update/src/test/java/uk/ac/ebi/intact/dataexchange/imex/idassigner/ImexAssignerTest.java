@@ -38,6 +38,7 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         final Experiment experiment = getMockBuilder().createExperimentRandom( 2 );
         experiment.setPublication( null );
         addImexJournalAnnotations( experiment );
+        addAcceptedAnnotations( experiment );
         publication.addExperiment( experiment );
 
         getCorePersister().saveOrUpdate( publication );
@@ -69,6 +70,7 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         final Experiment experiment = getMockBuilder().createExperimentRandom( 2 );
         experiment.setPublication( null );
         addImexJournalAnnotations( experiment );
+        addAcceptedAnnotations( experiment );
         publication.addExperiment( experiment );
 
         getCorePersister().saveOrUpdate( publication );
@@ -103,6 +105,7 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         final Experiment experiment = getMockBuilder().createExperimentRandom( 2 );
         experiment.setPublication( null );
         addImexJournalAnnotations( experiment );
+        addAcceptedAnnotations( experiment );
         publication.addExperiment( experiment );
 
         getCorePersister().saveOrUpdate( publication );
@@ -138,5 +141,10 @@ public class ImexAssignerTest extends IntactBasicTestCase {
                                                              CvTopic.JOURNAL_MI_REF, CvTopic.JOURNAL ) );
         ao.addAnnotation( getMockBuilder().createAnnotation( "2007",
                                                              CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR ) );
+    }
+
+    private void addAcceptedAnnotations( AnnotatedObject ao ) {
+        ao.addAnnotation( getMockBuilder().createAnnotation( "By sandra today",
+                                                             "IA:xxxx", CvTopic.ACCEPTED ) );
     }
 }
