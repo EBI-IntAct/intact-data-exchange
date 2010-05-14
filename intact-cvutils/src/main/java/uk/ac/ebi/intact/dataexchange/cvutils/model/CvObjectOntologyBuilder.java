@@ -647,6 +647,14 @@ public class CvObjectOntologyBuilder {
             identifier = defDbxref.getDatabaseID();
             database = CvDatabase.NEWT;
             qualifier = CvXrefQualifier.IDENTITY;
+        } else if ( defDbxref.getDatabase().equalsIgnoreCase( "DeltaMass" ) ) {
+            identifier = defDbxref.getDatabaseID();
+            database = "DeltaMass";
+            qualifier = CvXrefQualifier.IDENTITY;
+        } else if ( defDbxref.getDatabase().equalsIgnoreCase( CvDatabase.CHEBI ) ) {
+            identifier = defDbxref.getDatabaseID();
+            database = CvDatabase.CHEBI;
+            qualifier = CvXrefQualifier.IDENTITY;
         } else {
             throw new IllegalArgumentException( "Unknown database: " + defDbxref.getDatabaseID() + " (" + defDbxref.getDatabase() + ")" );
         }
