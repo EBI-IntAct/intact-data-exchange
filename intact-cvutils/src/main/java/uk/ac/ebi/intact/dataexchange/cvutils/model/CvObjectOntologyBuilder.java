@@ -67,6 +67,7 @@ public class CvObjectOntologyBuilder {
 
 
     private CvDatabase nonMiCvDatabase;
+    private CvDatabase psimod;
 
     private Map<String, Set<String>> map4misWithMoreParent;
 
@@ -124,6 +125,8 @@ public class CvObjectOntologyBuilder {
         oboSession = oboSession_;
         this.nonMiCvDatabase = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
                                                              CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT );
+        this.psimod = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
+                                                             CvDatabase.class, "MI:0897", "psi-mod" );
         this.processed = Maps.newHashMap();
         this.map4misWithMoreParent = Maps.newHashMap();
         map4misWithMoreParent = initializeMisWithMoreParents();
@@ -710,6 +713,8 @@ public class CvObjectOntologyBuilder {
                 idXref.prepareParentMi();
             } else if (id.startsWith("IA")) {
                 idXref = XrefUtils.createIdentityXref(parent, id, nonMiCvDatabase);
+            } else if (id.startsWith("MOD")) {
+                idXref = XrefUtils.createIdentityXref(parent, id, psimod);
             } else {
                 if (log.isWarnEnabled()) log.warn("Uknown prefix for id: "+id+". Will store as a cross reference to database: "+nonMiCvDatabase.getShortLabel());
                 idXref = XrefUtils.createIdentityXref(parent, id, nonMiCvDatabase);
