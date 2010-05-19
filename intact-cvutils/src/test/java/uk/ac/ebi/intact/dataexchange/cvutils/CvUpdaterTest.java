@@ -515,16 +515,4 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertTrue(getDaoFactory().getCvObjectDao( CvInteraction.class ).getByPsiMiRef( "MI:0001" ) != null);
             
     }
-
-    @Test
-    public void executeUpdateWithCVs() throws Exception {
-        final File oboFile = new File( "/Users/samuel/Desktop/psi-mi25.obo" );
-        System.out.println( "oboFile.toURL()="+oboFile.toURL() );
-
-        OBOSession oboSession = OboUtils.createOBOSession( oboFile.toURL() );
-        final AnnotationInfoDataset aid = OboUtils.createAnnotationInfoDatasetFromResource( new FileInputStream( oboFile ) );
-
-        cvUpdater.executeUpdate( oboSession, aid );
-        Assert.assertTrue(getDaoFactory().getCvObjectDao( CvInteraction.class ).getByPsiMiRef( "MI:0001" ) != null);
-    }
 }
