@@ -126,7 +126,7 @@ public class CvObjectOntologyBuilder {
         this.nonMiCvDatabase = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
                                                              CvDatabase.class, CvDatabase.INTACT_MI_REF, CvDatabase.INTACT );
         this.psimod = CvObjectUtils.createCvObject( IntactContext.getCurrentInstance().getInstitution(),
-                                                             CvDatabase.class, "MI:0897", "psi-mod" );
+                                                    CvDatabase.class, CvDatabase.PSI_MOD_MI_REF, CvDatabase.PSI_MOD );
         this.processed = Maps.newHashMap();
         this.map4misWithMoreParent = Maps.newHashMap();
         map4misWithMoreParent = initializeMisWithMoreParents();
@@ -877,7 +877,13 @@ public class CvObjectOntologyBuilder {
                 databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.SO_MI_REF, CvDatabase.SO );
             } else if ( "psi-mod".equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
-                databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, "MI:0897", "psi-mod" );
+                databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.PSI_MOD_MI_REF, CvDatabase.PSI_MOD );
+            } else if ( "UNIMOD".equalsIgnoreCase( database ) ) {
+                qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
+                databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.UNIMOD_MI_REF, CvDatabase.UNIMOD );
+            } else if ( "DeltaMass".equalsIgnoreCase( database ) ) {
+                qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
+                databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.DELTAMASS_MI_REF, CvDatabase.DELTAMASS );
             } else if ( CvDatabase.NEWT.equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
                 databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.NEWT_MI_REF, CvDatabase.NEWT );

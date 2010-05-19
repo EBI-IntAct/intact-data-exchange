@@ -19,6 +19,7 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.obo.dataadapter.OBOParseException;
 import org.obo.datamodel.OBOSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -38,9 +39,8 @@ import uk.ac.ebi.intact.model.clone.IntactCloner;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -484,7 +484,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         cvUpdater.createOrUpdateCVs( ontologyBuilder.getAllCvs(), aid );
 
-        CvDatabase psiMod = getDaoFactory().getCvObjectDao( CvDatabase.class ).getByPsiMiRef( "MI:0897" );
+        CvDatabase psiMod = getDaoFactory().getCvObjectDao( CvDatabase.class ).getByPsiMiRef( CvDatabase.PSI_MOD_MI_REF );
         System.out.println( psiMod.getAnnotations() );
         Assert.assertEquals( 2, psiMod.getAnnotations().size() );
     }
@@ -507,5 +507,24 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         
         cvUpdater.createOrUpdateCVs(allCvs);
+    }
+
+    @Test
+    public void executeUpdateWithLatestCVs() throws Exception {
+        cvUpdater.executeUpdateWithLatestCVs();
+        Assert.assertTrue(getDaoFactory().getCvObjectDao( CvInteraction.class ).getByPsiMiRef( "MI:0001" ) != null);
+            
+    }
+
+    @Test
+    public void executeUpdateWithCVs() throws Exception {
+        final File oboFile = new File( "/Users/samuel/Desktop/psi-mi25.obo" );
+        System.out.println( "oboFile.toURL()="+oboFile.toURL() );
+
+        OBOSession oboSession = OboUtils.createOBOSession( oboFile.toURL() );
+        final AnnotationInfoDataset aid = OboUtils.createAnnotationInfoDatasetFromResource( new FileInputStream( oboFile ) );
+
+        cvUpdater.executeUpdate( oboSession, aid );
+        Assert.assertTrue(getDaoFactory().getCvObjectDao( CvInteraction.class ).getByPsiMiRef( "MI:0001" ) != null);
     }
 }
