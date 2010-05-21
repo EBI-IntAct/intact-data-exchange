@@ -6,12 +6,16 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.bridges.imexcentral.mock.MockImexCentralClient;
 import uk.ac.ebi.intact.core.config.CvPrimer;
+import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * ImexAssigner Tester.
@@ -54,20 +58,27 @@ public class ImexAssignerTest extends IntactBasicTestCase {
 
         assigner.update();
 
-        Assert.assertEquals( 2, countLines( "target/123456789/processed.csv" ) );
-        Assert.assertEquals( 2, countLines( "target/123456789/processed-imex.csv" ) );
-        Assert.assertEquals( 2, countLines( "target/123456789/publication-assigned.csv" ) );
-        Assert.assertEquals( 3, countLines( "target/123456789/interaction-assigned.csv" ) );
+        // check in the database
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        Assert.assertEquals( experiment.getShortLabel(), daoFactory.getExperimentDao().getByXref( "IM-1" ).getShortLabel() );
+        Assert.assertEquals( "123456789", daoFactory.getPublicationDao().getByXref( "IM-1" ).getShortLabel() );
+        Assert.assertEquals( 2, daoFactory.getInteractionDao().getByXrefLike( "IM-1-%" ).size() );
+
+        // check log files
+        Assert.assertEquals( 1, countLines( "target/123456789/processed.csv" ) );
+        Assert.assertEquals( 1, countLines( "target/123456789/processed-imex.csv" ) );
+        Assert.assertEquals( 1, countLines( "target/123456789/publication-assigned.csv" ) );
+        Assert.assertEquals( 2, countLines( "target/123456789/interaction-assigned.csv" ) );
     }
 
     @Test
     public void update_2() throws Exception {
 
-        // updates a publication that is not yet registered in IMEx Central
+        // updates a publication that is NOT YET registered in IMEx Central
 
         // make a publication that can be exported to IMEx
         final Publication publication = getMockBuilder().createPublication( "123456789" );
-        final Experiment experiment = getMockBuilder().createExperimentRandom( 2 );
+        final Experiment experiment = getMockBuilder().createExperimentRandom( 4 );
         experiment.setPublication( null );
         addImexJournalAnnotations( experiment );
         addAcceptedAnnotations( experiment );
@@ -86,10 +97,17 @@ public class ImexAssignerTest extends IntactBasicTestCase {
 
         assigner.update();
 
-        Assert.assertEquals( 2, countLines( "target/123456789_2/processed.csv" ) );
-        Assert.assertEquals( 2, countLines( "target/123456789_2/processed-imex.csv" ) );
-        Assert.assertEquals( 2, countLines( "target/123456789_2/publication-assigned.csv" ) );
-        Assert.assertEquals( 3, countLines( "target/123456789_2/interaction-assigned.csv" ) );
+        // check in the database
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        Assert.assertEquals( experiment.getShortLabel(), daoFactory.getExperimentDao().getByXref( "IM-1" ).getShortLabel() );
+        Assert.assertEquals( "123456789", daoFactory.getPublicationDao().getByXref( "IM-1" ).getShortLabel() );
+        Assert.assertEquals( 4, daoFactory.getInteractionDao().getByXrefLike( "IM-1-%" ).size() );
+
+        // check log files
+        Assert.assertEquals( 1, countLines( "target/123456789_2/processed.csv" ) );
+        Assert.assertEquals( 1, countLines( "target/123456789_2/processed-imex.csv" ) );
+        Assert.assertEquals( 1, countLines( "target/123456789_2/publication-assigned.csv" ) );
+        Assert.assertEquals( 4, countLines( "target/123456789_2/interaction-assigned.csv" ) );
     }
 
     @Test
@@ -100,9 +118,11 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         // make a publication that can be exported to IMEx
         final Publication publication = getMockBuilder().createPublication( "123456789" );
         CvDatabase imex = getMockBuilder().createCvObject( CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX );
-        CvXrefQualifier imexPrimary = getMockBuilder().createCvObject( CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY );
-        publication.addXref( getMockBuilder().createXref( publication, "IM-1", imexPrimary, imex ));
-        final Experiment experiment = getMockBuilder().createExperimentRandom( 2 );
+        CvXrefQualifier imexPrimary = getMockBuilder().createCvObject( CvXrefQualifier.class,
+                                                                       CvXrefQualifier.IMEX_PRIMARY_MI_REF,
+                                                                       CvXrefQualifier.IMEX_PRIMARY );
+        publication.addXref( getMockBuilder().createXref( publication, "IM-1", imexPrimary, imex ) );
+        final Experiment experiment = getMockBuilder().createExperimentRandom( 3 );
         experiment.setPublication( null );
         addImexJournalAnnotations( experiment );
         addAcceptedAnnotations( experiment );
@@ -121,19 +141,75 @@ public class ImexAssignerTest extends IntactBasicTestCase {
 
         assigner.update();
 
-        Assert.assertEquals( 2, countLines( "target/123456789_3/processed.csv" ) );
-        Assert.assertEquals( 2, countLines( "target/123456789_3/processed-imex.csv" ) );
+        // check in the database
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        Assert.assertEquals( experiment.getShortLabel(), daoFactory.getExperimentDao().getByXref( "IM-1" ).getShortLabel() );
+        Assert.assertEquals( "123456789", daoFactory.getPublicationDao().getByXref( "IM-1" ).getShortLabel() );
+        Assert.assertEquals( 3, daoFactory.getInteractionDao().getByXrefLike( "IM-1-%" ).size() );
+
+        // check log files
+        Assert.assertEquals( 1, countLines( "target/123456789_3/processed.csv" ) );
+        Assert.assertEquals( 1, countLines( "target/123456789_3/processed-imex.csv" ) );
         Assert.assertEquals( 0, countLines( "target/123456789_3/publication-assigned.csv" ) );
         Assert.assertEquals( 3, countLines( "target/123456789_3/interaction-assigned.csv" ) );
     }
 
+    @Test
+    public void update_4() throws Exception {
+
+        //  Publication not part of any IMEx covered journal, but IMEx id assigned manually by curator
+
+        final Publication publication = getMockBuilder().createPublication( "123456789" );
+        CvDatabase imex = getMockBuilder().createCvObject( CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX );
+        CvXrefQualifier imexPrimary = getMockBuilder().createCvObject( CvXrefQualifier.class,
+                                                                       CvXrefQualifier.IMEX_PRIMARY_MI_REF,
+                                                                       CvXrefQualifier.IMEX_PRIMARY );
+        final Experiment experiment = getMockBuilder().createExperimentRandom( 2 );
+        experiment.addXref( getMockBuilder().createXref( experiment, "IM-1", imexPrimary, imex ) );
+        experiment.setPublication( null );
+        addImexJournalAnnotations( experiment );
+        addAcceptedAnnotations( experiment );
+        publication.addExperiment( experiment );
+
+        getCorePersister().saveOrUpdate( publication );
+
+        // setup assigner
+        final MockImexCentralClient imexCentralClient = new MockImexCentralClient();
+        ImexAssigner assigner = new ImexAssigner( imexCentralClient );
+        assigner.setDryRun( false );
+        final ImexAssignerConfig config = new ImexAssignerConfig();
+        config.setUpdateLogsDirectory( new File( "target/123456789_4" ) );
+        assigner.setImexUpdateConfig( config );
+
+        assigner.update();
+
+        // check in the database
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        Assert.assertEquals( experiment.getShortLabel(), daoFactory.getExperimentDao().getByXref( "IM-1" ).getShortLabel() );
+        Assert.assertEquals( "123456789", daoFactory.getPublicationDao().getByXref( "IM-1" ).getShortLabel() );
+        Assert.assertEquals( 2, daoFactory.getInteractionDao().getByXrefLike( "IM-1-%" ).size() );
+
+        // check log files
+        Assert.assertEquals( 1, countLines( "target/123456789_4/processed.csv" ) );
+        Assert.assertEquals( 1, countLines( "target/123456789_4/processed-imex.csv" ) );
+        Assert.assertEquals( 1, countLines( "target/123456789_4/publication-assigned.csv" ) );
+        Assert.assertEquals( 2, countLines( "target/123456789_4/interaction-assigned.csv" ) );
+    }
+
     private int countLines( String resource ) throws IOException {
-        return IOUtils.readLines( new FileInputStream( resource ) ).size();
+        final List lines = IOUtils.readLines( new FileInputStream( resource ) );
+        for ( Iterator iterator = lines.iterator(); iterator.hasNext(); ) {
+            String line = ( String ) iterator.next();
+            if( line.startsWith( "#" ) ) {
+                iterator.remove();
+            }
+        }
+        return lines.size();
     }
 
     public void assertTsvLineContains( String line, int column, String expectedValue ) {
         final String[] columns = line.split( "\t" );
-        Assert.assertEquals( expectedValue, columns[ column + 1 ] );
+        Assert.assertEquals( expectedValue, columns[column + 1] );
     }
 
     private void addImexJournalAnnotations( AnnotatedObject ao ) {

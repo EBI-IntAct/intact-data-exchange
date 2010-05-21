@@ -302,12 +302,14 @@ public class ImexAssigner {
                 continue;
             }
 
+            // TODO what happens with unassigned pmids, when they get eventually a real PMID ?
+
             // Check if the publication is an imex candidate
-            if ( isIntactImexExportable( publication ) ) {
+            if ( isIntactImexExportable( publication ) || isCuratorTriggered( publication )) {
 
                 fireOnProcessImexPublication( new ImexUpdateEvent( this, publication ) );
 
-                // TODO do we want to assign IMEx id to publiction if no interactions are exportable (no PPI)
+                // TODO do we want to assign IMEx id to publication if no interactions are exportable (no PPI)
 
                 final String publicationId = publication.getPublicationId();
                 edu.ucla.mbi.imex.central.ws.Publication imexPublication = imexCentral.getPublicationById( publicationId );
@@ -673,6 +675,27 @@ public class ImexAssigner {
         }
 
         return true;
+    }
+
+    private boolean isCuratorTriggered( Publication publication ) {
+        final Collection<Experiment> experiments = publication.getExperiments();
+
+        boolean isCuratorTriggered = false;
+
+        // Irrespectively of the journal, if at least one experiment has an xref(db=imex, qualifier=imex-primary)
+        // we wil assign IMEx ids to it.
+
+        // search for an experiment with IMEx id
+        for ( Experiment experiment : experiments ) {
+            if( containsPrimaryImexId( experiment ) ) {
+                Xref imexIdXref = ImexUtils.getPrimaryImexId( experiment );
+                System.out.println( "Experiment '"+ experiment.getShortLabel() +"' has an IMEx id assigned, enable export of the whole publication." );
+                isCuratorTriggered = true;
+                break;
+            }
+        }
+
+        return isCuratorTriggered;
     }
 
     private boolean hasAtLeastOnePPI( Experiment experiment ) {
