@@ -777,7 +777,7 @@ public class ImexAssigner {
         final String database = args[2];
         IntactContext.initContext( new String[]{"/META-INF/" + database + ".spring.xml"} );
 
-        ImexAssigner assigner = new ImexAssigner( icUsername, icPassword, DefaultImexCentralClient.IC_TEST );
+        ImexAssigner assigner = new ImexAssigner( icUsername, icPassword, DefaultImexCentralClient.IC_PROD );
 
         assigner.setDryRun( true );
 
