@@ -44,7 +44,6 @@ public class ExperimentConverterTest extends AbstractConverterTest {
 
         Assert.assertEquals(1, exp.getXrefs().size());
         Assert.assertNotNull(exp.getPublication());
-        Assert.assertNotNull(exp.getBioSource().getOwner());
     }
 
     @Test

@@ -41,7 +41,6 @@ public class OrganismConverterTest extends IntactBasicTestCase {
         BioSource bioSource = organismConverter.psiToIntact(organism);
 
         Assert.assertNotNull(bioSource);
-        Assert.assertNotNull(bioSource.getOwner().getShortLabel());
     }
 
     @Test
@@ -60,7 +59,6 @@ public class OrganismConverterTest extends IntactBasicTestCase {
 
         Assert.assertNotNull(bioSource);
         Assert.assertEquals("9606", bioSource.getTaxId());
-        Assert.assertNotNull(bioSource.getOwner().getShortLabel());
         Assert.assertNotNull(bioSource.getCvCellType());
         Assert.assertNotNull(bioSource.getCvTissue());
         Assert.assertEquals("293", bioSource.getCvCellType().getShortLabel());
