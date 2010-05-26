@@ -178,6 +178,7 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         ImexAssigner assigner = new ImexAssigner( imexCentralClient );
         assigner.setDryRun( false );
         final ImexAssignerConfig config = new ImexAssignerConfig();
+
         config.setUpdateLogsDirectory( new File( "target/123456789_4" ) );
         assigner.setImexUpdateConfig( config );
 
@@ -194,6 +195,54 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         Assert.assertEquals( 1, countLines( "target/123456789_4/processed-imex.csv" ) );
         Assert.assertEquals( 1, countLines( "target/123456789_4/publication-assigned.csv" ) );
         Assert.assertEquals( 2, countLines( "target/123456789_4/interaction-assigned.csv" ) );
+    }
+
+    @Test
+    public void update_5() throws Exception {
+
+        // Publication created without IMEx ID and experiment with IMEx id.
+        // Experiment isn't part of an IMEx covered journal
+        // The experiment's IMEx ID should get assigned to the publication,
+
+        final Publication publication = getMockBuilder().createPublication( "123456789" );
+        CvDatabase imex = getMockBuilder().createCvObject( CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX );
+        CvXrefQualifier imexPrimary = getMockBuilder().createCvObject( CvXrefQualifier.class,
+                                                                       CvXrefQualifier.IMEX_PRIMARY_MI_REF,
+                                                                       CvXrefQualifier.IMEX_PRIMARY );
+        final Experiment experiment = getMockBuilder().createExperimentRandom( 2 );
+        experiment.addXref( getMockBuilder().createXref( experiment, "IM-1", imexPrimary, imex ) );
+        experiment.setPublication( null );
+        experiment.getAnnotations().clear();
+        addAcceptedAnnotations( experiment );
+        publication.addExperiment( experiment );
+
+        getCorePersister().saveOrUpdate( publication );
+
+        // setup assigner
+        final MockImexCentralClient imexCentralClient = new MockImexCentralClient();
+        imexCentralClient.initImexSequence( 3 );
+
+        ImexAssigner assigner = new ImexAssigner( imexCentralClient );
+        assigner.setDryRun( false );
+        final ImexAssignerConfig config = new ImexAssignerConfig();
+        config.setUpdateLogsDirectory( new File( "target/123456789_5" ) );
+        assigner.setImexUpdateConfig( config );
+
+        assigner.update();
+
+        Assert.assertEquals( 3, imexCentralClient.getNextSequenceValue() );
+
+        // check in the database
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        Assert.assertEquals( experiment.getShortLabel(), daoFactory.getExperimentDao().getByXref( "IM-1" ).getShortLabel() );
+        Assert.assertEquals( "123456789", daoFactory.getPublicationDao().getByXref( "IM-1" ).getShortLabel() );
+        Assert.assertEquals( 2, daoFactory.getInteractionDao().getByXrefLike( "IM-1-%" ).size() );
+
+        // check log files
+        Assert.assertEquals( 1, countLines( "target/123456789_5/processed.csv" ) );
+        Assert.assertEquals( 1, countLines( "target/123456789_5/processed-imex.csv" ) );
+        Assert.assertEquals( 1, countLines( "target/123456789_5/publication-assigned.csv" ) );
+        Assert.assertEquals( 2, countLines( "target/123456789_5/interaction-assigned.csv" ) );
     }
 
     private int countLines( String resource ) throws IOException {
