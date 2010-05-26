@@ -39,6 +39,7 @@ public class InstitutionEnricher extends AnnotatedObjectEnricher<Institution>{
     }
 
     public void enrich(Institution objectToEnrich) {
+        if (objectToEnrich == null) return;
 
         Collection<Institution> availableInstitutions = applicationContext.getBeansOfType(Institution.class).values();
 
