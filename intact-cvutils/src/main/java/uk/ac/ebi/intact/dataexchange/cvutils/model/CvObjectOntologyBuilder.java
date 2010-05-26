@@ -884,6 +884,9 @@ public class CvObjectOntologyBuilder {
             } else if ( "DeltaMass".equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
                 databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.DELTAMASS_MI_REF, CvDatabase.DELTAMASS );
+            } else if ( "chebi".equalsIgnoreCase( database ) ) {
+                qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
+                databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.CHEBI_MI_REF, CvDatabase.CHEBI );
             } else if ( CvDatabase.NEWT.equalsIgnoreCase( database ) ) {
                 qualifierCv = CvObjectUtils.createCvObject( owner, CvXrefQualifier.class, CvXrefQualifier.IDENTITY_MI_REF, qualifier );
                 databaseCv = CvObjectUtils.createCvObject( owner, CvDatabase.class, CvDatabase.NEWT_MI_REF, CvDatabase.NEWT );
