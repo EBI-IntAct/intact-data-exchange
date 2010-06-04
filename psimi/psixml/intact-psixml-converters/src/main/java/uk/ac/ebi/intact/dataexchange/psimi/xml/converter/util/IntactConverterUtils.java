@@ -22,15 +22,13 @@ import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.*;
-import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Alias;
-import uk.ac.ebi.intact.model.Confidence;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Feature;
-import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
+import uk.ac.ebi.intact.model.Range;
 import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.InteractionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -244,6 +242,15 @@ public class IntactConverterUtils {
             Feature feature = featureConverter.psiToIntact(psiFeature);
             component.getBindingDomains().add(feature);
             feature.setComponent(component);
+
+            if (interactor instanceof Polymer){
+                Polymer polymer = (Polymer) interactor;
+
+                for (Range r : feature.getRanges()){
+
+                    r.prepareSequence(polymer.getSequence());
+                }
+            }
         }
 
         for (ParticipantIdentificationMethod pim : participant.getParticipantIdentificationMethods()) {
