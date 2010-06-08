@@ -44,7 +44,7 @@
                 </names>
                 <xref>
                   <primaryRef db="pubmed" dbAc="MI:0446" id="3031469" refType="primary-reference" refTypeAc="MI:0358"/>
-                  <secondaryRef db="cabri" dbAc="MI:0246" id="ICLC HTL04001" refType="identity" refTypeAc="MI:0356"/>
+                  <secondaryRef db="cabri" dbAc="MI:0246" id="ACC 635" refType="identity" refTypeAc="MI:0356"/>
                   <secondaryRef db="intact" dbAc="MI:0469" id="IA:0074" refType="identity" refTypeAc="MI:0356"/>
                 </xref>
               </cellType>
@@ -73,7 +73,7 @@
           </participantIdentificationMethod>
           <attributeList>
             <attribute name="author-list">Zhang K., Shen X., Wu J., Sakaki K., Saunders T., Rutkowski DT., Back SH., Kaufman RJ.</attribute>
-            <attribute name="contact-email">kaufmanr@umich.edu</attribute>
+            <attribute name="contact-email" nameAc="MI:0634">kaufmanr@umich.edu</attribute>
             <attribute name="figure legend">6C</attribute>
             <attribute name="publication-year">2006</attribute>
             <attribute name="journal">Cell (0092-8674)</attribute>
@@ -105,7 +105,7 @@
                 </names>
                 <xref>
                   <primaryRef db="pubmed" dbAc="MI:0446" id="3031469" refType="primary-reference" refTypeAc="MI:0358"/>
-                  <secondaryRef db="cabri" dbAc="MI:0246" id="ICLC HTL04001" refType="identity" refTypeAc="MI:0356"/>
+                  <secondaryRef db="cabri" dbAc="MI:0246" id="ACC 635" refType="identity" refTypeAc="MI:0356"/>
                   <secondaryRef db="intact" dbAc="MI:0469" id="IA:0074" refType="identity" refTypeAc="MI:0356"/>
                 </xref>
               </cellType>
@@ -134,7 +134,7 @@
           </participantIdentificationMethod>
           <attributeList>
             <attribute name="author-list">Zhang K., Shen X., Wu J., Sakaki K., Saunders T., Rutkowski DT., Back SH., Kaufman RJ.</attribute>
-            <attribute name="contact-email">kaufmanr@umich.edu</attribute>
+            <attribute name="contact-email" nameAc="MI:0634">kaufmanr@umich.edu</attribute>
             <attribute name="figure legend">6C</attribute>
             <attribute name="publication-year">2006</attribute>
             <attribute name="journal">Cell (0092-8674)</attribute>
@@ -640,7 +640,7 @@
           </participantIdentificationMethod>
           <attributeList>
             <attribute name="author-list">Chang L., Kamata H., Solinas G., Luo JL., Maeda S., Venuprasad K., Liu YC., Karin M.</attribute>
-            <attribute name="contact-email">karinoffice@ucsd.edu</attribute>
+            <attribute name="contact-email" nameAc="MI:0634">karinoffice@ucsd.edu</attribute>
             <attribute name="figure legend">2D</attribute>
             <attribute name="publication-year">2006</attribute>
             <attribute name="journal">Cell (0092-8674)</attribute>
@@ -690,7 +690,7 @@
           </participantIdentificationMethod>
           <attributeList>
             <attribute name="author-list">Chang L., Kamata H., Solinas G., Luo JL., Maeda S., Venuprasad K., Liu YC., Karin M.</attribute>
-            <attribute name="contact-email">karinoffice@ucsd.edu</attribute>
+            <attribute name="contact-email" nameAc="MI:0634">karinoffice@ucsd.edu</attribute>
             <attribute name="figure legend">5A</attribute>
             <attribute name="publication-year">2006</attribute>
             <attribute name="journal">Cell (0092-8674)</attribute>
@@ -740,7 +740,7 @@
           </participantIdentificationMethod>
           <attributeList>
             <attribute name="author-list">Chang L., Kamata H., Solinas G., Luo JL., Maeda S., Venuprasad K., Liu YC., Karin M.</attribute>
-            <attribute name="contact-email">karinoffice@ucsd.edu</attribute>
+            <attribute name="contact-email" nameAc="MI:0634">karinoffice@ucsd.edu</attribute>
             <attribute name="figure legend">5A</attribute>
             <attribute name="negative"></attribute>
             <attribute name="publication-year">2006</attribute>

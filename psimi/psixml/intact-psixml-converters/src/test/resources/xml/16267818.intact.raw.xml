@@ -2448,7 +2448,7 @@
                                                 <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
                                             </xref>
                                         </endStatus>
-                                        <end position="976"/>
+                                        <end position="552"/>
                                         <isLink>false</isLink>
                                     </featureRange>
                                 </featureRangeList>
@@ -2827,7 +2827,7 @@
                                                 <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
                                             </xref>
                                         </endStatus>
-                                        <end position="976"/>
+                                        <end position="552"/>
                                         <isLink>false</isLink>
                                     </featureRange>
                                 </featureRangeList>

@@ -17,9 +17,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.model.EntrySet;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 
 import java.io.File;
@@ -31,11 +28,12 @@ import java.io.InputStream;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class AbstractPsiExchangeTest extends IntactBasicTestCase {
+public abstract class AbstractPsiExchangeTest extends IntactBasicTestCase {
 
     private static final String INTACT_FILE = "/xml/intact_2006-07-19.xml";
     private static final String MINT_FILE = "/xml/mint_2006-07-18.xml";
     private static final String DIP_FILE = "/xml/dip_2006-11-01.xml";
+    private static final String MOLCOLN_FILE = "/xml/MolcolnTest.xml";
 
     protected File getIntactFile() {
         return new File(AbstractPsiExchangeTest.class.getResource(INTACT_FILE).getFile());
@@ -61,6 +59,10 @@ public class AbstractPsiExchangeTest extends IntactBasicTestCase {
          return AbstractPsiExchangeTest.class.getResourceAsStream(DIP_FILE);
     }
 
+    protected InputStream getMolcolnStream() {
+         return AbstractPsiExchangeTest.class.getResourceAsStream(MOLCOLN_FILE);
+    }
+
     protected EntrySet getIntactEntrySet() throws Exception{
         PsimiXmlReader reader = new PsimiXmlReader();
         return reader.read(getIntactStream());
@@ -74,6 +76,11 @@ public class AbstractPsiExchangeTest extends IntactBasicTestCase {
     protected EntrySet getDipEntrySet() throws Exception{
         PsimiXmlReader reader = new PsimiXmlReader();
         return reader.read(getDipStream());
+    }
+
+     protected EntrySet getMolcolnEntrySet() throws Exception{
+        PsimiXmlReader reader = new PsimiXmlReader();
+        return reader.read(getMolcolnStream());
     }
 
 }

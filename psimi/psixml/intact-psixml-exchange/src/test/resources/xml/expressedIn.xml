@@ -57,8 +57,8 @@
                 </participantIdentificationMethod>
                 <attributeList>
                     <attribute name="contact-email" nameAc="MI:0634">satoj@my-pharm.ac.jp</attribute>
-                    <attribute name="journal" nameAc="MI:0885">Neuropathology and Applied Neurobiology</attribute>
-                    <attribute name="publication-year" nameAc="MI:0886">2009</attribute>
+                    <attribute name="journal">Neuropathology and Applied Neurobiology</attribute>
+                    <attribute name="publication-year">2009</attribute>
                     <attribute name="confidence-mapping" nameAc="MI:0622">The Z-score, an indicator for statistical
                         significance of binding specificity, was calculated as the background-subtracted signal
                         intensity value of the target protein minus the average of the background-subtracted signal
@@ -68,7 +68,7 @@
                     <attribute name="data-processing" nameAc="MI:0633">used Uniprot ID mapping to convert Entrez gene id
                         into uniprot Id
                     </attribute>
-                    <attribute name="author-list" nameAc="MI:0636">J. Satoh, S. Obayashi, T. Misawa, K. Sumiyoshi, K.
+                    <attribute name="author-list">J. Satoh, S. Obayashi, T. Misawa, K. Sumiyoshi, K.
                         Oosumi and H. Tabunoki
                     </attribute>
                     <attribute name="reviewer" nameAc="IA:0292">orchard</attribute>

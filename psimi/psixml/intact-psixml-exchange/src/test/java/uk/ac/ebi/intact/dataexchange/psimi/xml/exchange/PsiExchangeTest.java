@@ -19,6 +19,10 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
@@ -26,6 +30,8 @@ import psidev.psi.mi.xml.model.Participant;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.core.persister.Finder;
+import uk.ac.ebi.intact.core.persister.finder.DefaultFinder;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.core.util.DebugUtil;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
@@ -54,7 +60,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
     @Autowired
     private PsiEnricher psiEnricher;
-    
+
     @Test
     public void importXml_intact2() throws Exception {
         EntrySet set = getIntactEntrySet();
@@ -131,6 +137,26 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @Transactional( propagation = Propagation.NEVER )
+    public void importXml_Molcoln_sameOrganism() throws Exception {
+        TransactionStatus st = getDataContext().beginTransaction();
+
+        psiExchange.importIntoIntact(getMolcolnEntrySet());
+
+        getDataContext().commitTransaction(st);
+        int count = getDaoFactory().getInteractionDao().countAll();
+        int count2 = getDaoFactory().getExperimentDao().countAll();
+        int count3 = getDaoFactory().getInteractorDao().countAll();
+        int count4 = getDaoFactory().getBioSourceDao().countAll();
+        Assert.assertEquals(2, count);
+        Assert.assertEquals(2, count2);
+        Assert.assertEquals(4, count3);
+
+        Assert.assertEquals(2, count4);
+
+    }
+
+    @Test
     public void importXml_all() throws Exception {
         PersisterStatistics intactStatistics = psiExchange.importIntoIntact(getIntactStream());
 
@@ -191,7 +217,6 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         CvObjectXref identityXref = CvObjectUtils.getPsiMiIdentityXref(expRole);
 
         Assert.assertNotNull(identityXref);
-
     }
 
     @Test
@@ -201,13 +226,12 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         Interactor interactor = getDaoFactory().getInteractorDao().getByShortLabel("fadd_mouse");
 
         Alias alias = interactor.getAliases().iterator().next();
-      
+
         Assert.assertEquals("Fadd", alias.getName());
 
         CvObjectXref aliasTypeIdentXref = CvObjectUtils.getPsiMiIdentityXref(alias.getCvAliasType());
         Assert.assertNotNull(aliasTypeIdentXref);
         Assert.assertEquals(CvAliasType.GENE_NAME_MI_REF, aliasTypeIdentXref.getPrimaryId());
-
     }
 
     @Test
@@ -219,7 +243,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
         IntactEntry entry = new IntactEntry(Arrays.asList(mockInteraction));
 
-        StringWriter writer = new StringWriter();
+        StringWriter writer = new StringWriter( 1024 );
         psiExchange.exportToPsiXml(writer, entry);
         System.out.println( writer.getBuffer().toString() );
     }
