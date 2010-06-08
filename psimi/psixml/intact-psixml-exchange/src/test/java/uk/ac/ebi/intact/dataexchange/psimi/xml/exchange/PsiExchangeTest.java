@@ -62,6 +62,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     private PsiEnricher psiEnricher;
 
     @Test
+    @DirtiesContext
     public void importXml_intact2() throws Exception {
         EntrySet set = getIntactEntrySet();
 
@@ -85,6 +86,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void importXml_intact() throws Exception {
         EntrySet set = getIntactEntrySet();
 
@@ -96,6 +98,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void importXml_mint() throws Exception {
         PersisterStatistics stats = psiExchange.importIntoIntact(getMintEntrySet());
 
@@ -105,6 +108,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void importXml_mint_simplified() throws Exception {
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = reader.read(PsiExchangeTest.class.getResourceAsStream("/xml/mint_2006-07-18_simplified.xml"));
@@ -118,6 +122,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void importXml_dupes() throws Exception {
         PersisterStatistics stats = psiExchange.importIntoIntact(PsiExchangeTest.class.getResourceAsStream("/xml/dupes.xml"));
 
@@ -129,6 +134,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void importXml_dip() throws Exception {
         psiExchange.importIntoIntact(getDipEntrySet());
 
@@ -138,6 +144,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
     @Test
     @Transactional( propagation = Propagation.NEVER )
+    @DirtiesContext
     public void importXml_Molcoln_sameOrganism() throws Exception {
         TransactionStatus st = getDataContext().beginTransaction();
 
@@ -157,6 +164,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void importXml_all() throws Exception {
         PersisterStatistics intactStatistics = psiExchange.importIntoIntact(getIntactStream());
 
@@ -177,6 +185,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void importXml_expressedIn() throws Exception {
         BioSource existingOrganism = getMockBuilder().createBioSource( 9606, "293" );
 
@@ -207,6 +216,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void checkPsiMiIdentities() throws Exception {
         psiExchange.importIntoIntact(getIntactEntrySet());
 
@@ -220,6 +230,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void checkAliases() throws Exception {
         psiExchange.importIntoIntact(getIntactEntrySet());
 
@@ -235,6 +246,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void export() throws Exception {
 
         Interaction mockInteraction = getMockBuilder().createInteractionRandomBinary();
@@ -249,6 +261,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void getReleaseDates() throws Exception {
         PsiExchangeImpl psiExchangeImpl = new PsiExchangeImpl(getIntactContext());
 
@@ -262,6 +275,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void toDateTime() throws Exception {
         String date1 = "Wed Sep 20 11:54:49 PDT 2006";
         String date2 = "2006-09-20";
@@ -273,6 +287,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void importIntoIntact_participantBaitPreySameInteractior() throws Exception {
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet set = reader.read(PsiExchangeTest.class.getResourceAsStream("/xml/2participants_sameInteractor.xml"));
@@ -286,6 +301,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void importIntoIntact_withMultipleFeatures() throws Exception {
 
         PsimiXmlReader reader = new PsimiXmlReader();
@@ -353,6 +369,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void exportCompact() throws Exception {
         Interaction mockInteraction = getMockBuilder().createInteractionRandomBinary();
         Experiment exp = mockInteraction.getExperiments().iterator().next();
@@ -384,6 +401,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     }
 
     @Test
+    @DirtiesContext
     public void exportExpanded() throws Exception {
         Interaction mockInteraction = getMockBuilder().createInteractionRandomBinary();
         Experiment exp = mockInteraction.getExperiments().iterator().next();
