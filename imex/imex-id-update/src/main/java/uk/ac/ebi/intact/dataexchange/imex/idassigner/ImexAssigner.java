@@ -16,6 +16,7 @@
 
 package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
+import com.google.common.collect.Lists;
 import edu.ucla.mbi.imex.central.ws.IcentralFault;
 import edu.ucla.mbi.imex.central.ws.Identifier;
 import org.apache.commons.lang.StringUtils;
@@ -538,13 +539,14 @@ public class ImexAssigner {
                                         String logPrefix ) {
 
         Annotation fullCoverageAnnot = buildAnnotation( ao.getOwner(), fullCoverage, "Only protein-protein interactions" );
-        Annotation imexCurationAnnot = buildAnnotation( ao.getOwner(), imexCuration, "" );
+        Annotation imexCurationAnnot = buildAnnotation( ao.getOwner(), imexCuration, null );
 
         if ( !hasAnnotation( ao, fullCoverageAnnot ) ) {
             addNewAnnotation( daoFactory, ao, fullCoverageAnnot );
             System.out.println( logPrefix + "Added 'full coverage' annotation to " + ao.getClass().getSimpleName() + "." );
         } else {
             System.out.println( "Annotation 'full coverage' is already present on " + ao.getClass().getSimpleName() + ": " + ao.getShortLabel() );
+            checkDuplicate( ao, fullCoverageAnnot );
         }
 
         if ( !hasAnnotation( ao, imexCurationAnnot ) ) {
@@ -552,6 +554,40 @@ public class ImexAssigner {
             System.out.println( logPrefix + "Added 'imex curation' annotation to " + ao.getClass().getSimpleName() + "" );
         } else {
             System.out.println( "Annotation 'imex curation' is already present on " + ao.getClass().getSimpleName() + ": " + ao.getShortLabel() );
+            checkDuplicate( ao, imexCurationAnnot );
+        }
+    }
+
+    private void checkDuplicate(AnnotatedObject ao, Annotation annot) {
+
+        Collection<Annotation> collected = getAnnotations(ao, annot);
+        if(collected.size() > 1) {
+            Iterator<Annotation> iterator = collected.iterator();
+            iterator.next(); // skip first one
+            DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+            while (iterator.hasNext()) {
+                Annotation annotation = iterator.next();
+
+                ao.removeAnnotation( annotation );
+                update(ao);
+
+                System.out.println( "WARNING - Removed duplicated annotation '"+ annot.getCvTopic().getShortLabel() +"' on " +
+                                    ao.getClass().getSimpleName() + ": " + ao.getAc());
+                daoFactory.getAnnotationDao().delete( annotation );
+            }
+        }
+    }
+
+    private void update(AnnotatedObject ao) {
+        DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        if ( ao instanceof Publication) {
+            daoFactory.getPublicationDao().update( ( Publication ) ao );
+        } else if ( ao instanceof Experiment) {
+            daoFactory.getExperimentDao().update( ( Experiment ) ao );
+        } else if ( ao instanceof InteractionImpl) {
+            daoFactory.getInteractionDao().update( ( InteractionImpl ) ao );
+        } else {
+            throw new IllegalStateException( "Unsupported Object of type '" + ao.getClass().getSimpleName() + "', cannot add an annotation." );
         }
     }
 
@@ -575,31 +611,28 @@ public class ImexAssigner {
     }
 
     private boolean hasAnnotation( AnnotatedObject ao, Annotation a ) {
+        return ! getAnnotations(ao, a).isEmpty();
+    }
+
+    private Collection<Annotation> getAnnotations( AnnotatedObject ao, Annotation a ) {
+        Collection<Annotation> collected = Lists.newArrayList();
         for ( Annotation annotation : ao.getAnnotations() ) {
             if ( annotation.getCvTopic().equals( a.getCvTopic() ) ) {
                 final String t1 = annotation.getAnnotationText();
                 final String t2 = a.getAnnotationText();
                 if ( StringUtils.equals( t1, t2 ) ) {
-                    return true;
+                    collected.add( annotation );
                 }
             }
         }
-        return false;
+        return collected;
     }
 
     private void addNewAnnotation( DaoFactory daoFactory, AnnotatedObject ao, Annotation a ) {
         if ( !dryRun ) {
             daoFactory.getAnnotationDao().persist( a );
             ao.addAnnotation( a );
-            if ( ao instanceof Publication ) {
-                daoFactory.getPublicationDao().update( ( Publication ) ao );
-            } else if ( ao instanceof Experiment ) {
-                daoFactory.getExperimentDao().update( ( Experiment ) ao );
-            } else if ( ao instanceof InteractionImpl ) {
-                daoFactory.getInteractionDao().update( ( InteractionImpl ) ao );
-            } else {
-                throw new IllegalStateException( "Unsupported Object of type '" + ao.getClass().getSimpleName() + "', cannot add an annotation." );
-            }
+            update(ao);
         }
     }
 

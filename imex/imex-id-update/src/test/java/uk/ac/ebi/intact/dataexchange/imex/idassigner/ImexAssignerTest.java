@@ -256,6 +256,49 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         return lines.size();
     }
 
+    @Test
+    public void update_annotation_Already_Here_once() throws Exception {
+
+        // updates a publication that is registered in IMEx Central
+
+        // make a publication that can be exported to IMEx
+        final Publication publication = getMockBuilder().createPublication( "123456789" );
+        final Experiment experiment = getMockBuilder().createExperimentRandom( 2 );
+        experiment.setPublication( null );
+        addImexJournalAnnotations( experiment );
+        addAcceptedAnnotations( experiment );
+        publication.addExperiment( experiment );
+        addImexCuration( experiment );
+
+        getCorePersister().saveOrUpdate( publication );
+
+        // setup assigner
+        final MockImexCentralClient imexCentralClient = new MockImexCentralClient();
+        imexCentralClient.addPublication( "123456789", null, "NEW", "SAM" );
+        ImexAssigner assigner = new ImexAssigner( imexCentralClient );
+        assigner.setDryRun( false );
+        final ImexAssignerConfig config = new ImexAssignerConfig();
+        config.setUpdateLogsDirectory( new File( "target/123456789" ) );
+        assigner.setImexUpdateConfig( config );
+
+        assigner.update();
+
+        // check in the database
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        Experiment ex = daoFactory.getExperimentDao().getByXref( "IM-1" );
+
+        Assert.assertEquals( experiment.getShortLabel(), ex.getShortLabel() );
+
+        int numberImexCuration = 0;
+
+        for (Annotation a : ex.getAnnotations()){
+            if (a.getCvTopic().getShortLabel().equals("imex curation")){
+                numberImexCuration ++;
+            }
+        }
+        Assert.assertEquals(1, numberImexCuration);
+    }
+
     public void assertTsvLineContains( String line, int column, String expectedValue ) {
         final String[] columns = line.split( "\t" );
         Assert.assertEquals( expectedValue, columns[column + 1] );
@@ -271,5 +314,11 @@ public class ImexAssignerTest extends IntactBasicTestCase {
     private void addAcceptedAnnotations( AnnotatedObject ao ) {
         ao.addAnnotation( getMockBuilder().createAnnotation( "By sandra today",
                                                              "IA:xxxx", CvTopic.ACCEPTED ) );
+    }
+
+    private void addImexCuration( Experiment exp ){
+        Annotation a = getMockBuilder().createAnnotation( null,
+                                                             "MI:0959 ", "imex curation" );
+        exp.addAnnotation( a );
     }
 }
