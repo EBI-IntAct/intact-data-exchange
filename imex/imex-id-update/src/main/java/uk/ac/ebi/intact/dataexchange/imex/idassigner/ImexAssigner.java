@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
 import com.google.common.collect.Lists;
 import edu.ucla.mbi.imex.central.ws.IcentralFault;
-import edu.ucla.mbi.imex.central.ws.Identifier;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,10 +27,12 @@ import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.*;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateEvent;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateListener;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.LoggingImexUpdateListener;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ReportWriterListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.FileImexUpdateReportHandler;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Publication;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.ExperimentUtils;
 
@@ -570,10 +571,10 @@ public class ImexAssigner {
 
                 ao.removeAnnotation( annotation );
                 update(ao);
+                daoFactory.getAnnotationDao().delete( annotation );                
 
                 System.out.println( "WARNING - Removed duplicated annotation '"+ annot.getCvTopic().getShortLabel() +"' on " +
                                     ao.getClass().getSimpleName() + ": " + ao.getAc());
-                daoFactory.getAnnotationDao().delete( annotation );
             }
         }
     }

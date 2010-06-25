@@ -27,7 +27,7 @@ public class ImexCvPrimer extends SmallCvPrimer {
         getCvObject( CvXrefQualifier.class, "imex-secondary", "MI:0952" );
         getCvObject( CvXrefQualifier.class, "imex source" );
         getCvObject( CvTopic.class, "last-imex-assigned" );
-        getCvObject( CvTopic.class, "imex-curation", "MI:0959" );
+        getCvObject( CvTopic.class, "imex curation", "MI:0959" );
         getCvObject( CvTopic.class, "full-coverage", "MI:0957" );
     }
 }
