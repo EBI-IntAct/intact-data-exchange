@@ -23,6 +23,7 @@ import uk.ac.ebi.chebi.webapps.chebiWS.model.DataItem;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.OntologyDataItem;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.InteractorFetcher;
 import uk.ac.ebi.intact.model.*;
@@ -58,6 +59,9 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
 
     @Autowired
     private EnricherConfig enricherConfig;
+
+    @Autowired
+    private EnricherContext enricherContext;
 
     public InteractorEnricher() {
     }
@@ -158,6 +162,9 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
     private void enrichWithChebi( Interactor objectToEnrich ) {
 
         // check in the config whether we want to enrich small molecules or not
+        log.debug( "enricherConfig.isUpdateSmallMolecules()="+enricherConfig.isUpdateSmallMolecules() );
+        log.debug( "enricherContext.getConfig().isUpdateSmallMolecules()="+enricherContext.getConfig().isUpdateSmallMolecules() );
+
         if( enricherConfig.isUpdateSmallMolecules() ) {
 
             if ( objectToEnrich == null ) {
