@@ -40,12 +40,45 @@
                                 <!-- automatically creates the classpath using all project dependencies,
                                      also adding the project build directory -->
                                 <classpath/>
-                                <argument>-Djavax.net.ssl.trustStore=pathToKeystore</argument>
-                                <argument>-Djavax.net.ssl.keyStorePassword=keystorePassword</argument>
+                                <argument>-Djavax.net.ssl.trustStore=/Users/samuel/keystore/keystore</argument>
+                                <argument>-Djavax.net.ssl.keyStorePassword=icPassword</argument>
                                 <argument>uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexAssigner</argument>
-                                <argument>icUsername</argument>
+                                <argument>icUser</argument>
                                 <argument>icPassword</argument>
-                                <argument>dbInstance</argument>
+                                <argument>dbProfile</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+         <profile>
+            <id>create-missing-publications</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2048m</argument>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath/>
+                                <argument>uk.ac.ebi.intact.dataexchange.imex.idassigner.CreateMissingPublications</argument>
+                                <argument>db.profile</argument>
                             </arguments>
                         </configuration>
                     </plugin>
