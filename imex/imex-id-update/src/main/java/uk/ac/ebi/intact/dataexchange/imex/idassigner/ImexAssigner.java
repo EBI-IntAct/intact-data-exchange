@@ -688,11 +688,16 @@ public class ImexAssigner {
         boolean atLeastOneExperimentWithPPI = false;
         for ( Experiment experiment : publication.getExperiments() ) {
 
-            if ( !matchesPublicationAndYear( experiment,
-                                             Arrays.asList( "Cell (0092-8674)",
-                                                            "Proteomics (1615-9853)",
-                                                            "Cancer Cell (1535-6108)" ),
-                                             2006 ) ) {
+            final boolean publicationMatch = matchesPublicationAndYear( experiment,
+                                                                        Arrays.asList( "Cell (0092-8674)",
+                                                                                       "Proteomics (1615-9853)",
+                                                                                       "Cancer Cell (1535-6108)",
+                                                                                       "J Mol Signal." ),
+                                                                        2006 );
+
+            final boolean datasetMatch = hasDataset( experiment, Arrays.asList( "BioCreative - Critical Assessment of Information Extraction systems in Biology" ) );
+
+            if ( ! ( publicationMatch || datasetMatch ) ) {
                 return false;
             }
 
@@ -718,7 +723,7 @@ public class ImexAssigner {
         boolean isCuratorTriggered = false;
 
         // Irrespectively of the journal, if at least one experiment has an xref(db=imex, qualifier=imex-primary)
-        // we wil assign IMEx ids to it.
+        // we will assign IMEx ids to it.
 
         // search for an experiment with IMEx id
         Xref imexIdXref = null;
@@ -776,6 +781,21 @@ public class ImexAssigner {
         return true;
     }
 
+    private boolean hasDataset( Experiment experiment, List<String> datasetNames ) {
+        String dataset;
+        for ( Annotation annotation : experiment.getAnnotations() ) {
+            if ( CvTopic.DATASET_MI_REF.equals( annotation.getCvTopic().getIdentifier() ) &&
+                datasetNames.contains( annotation.getAnnotationText() ) ) {
+
+                dataset = annotation.getAnnotationText();
+                System.out.println( "\tExperiment '" + experiment.getShortLabel() + "' was annotated with dataset '" + dataset +
+                                    "', thus enabling IMEx export" );
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean matchesPublicationAndYear( Experiment experiment, List<String> journalNames, int fromYear ) {
         boolean acceptPub = false;
         boolean acceptYear = false;
@@ -784,7 +804,7 @@ public class ImexAssigner {
         int year = 0;
         for ( Annotation annotation : experiment.getAnnotations() ) {
             if ( CvTopic.JOURNAL_MI_REF.equals( annotation.getCvTopic().getIdentifier() ) &&
-                 journalNames.contains( annotation.getAnnotationText() ) ) {
+                journalNames.contains( annotation.getAnnotationText() ) ) {
 
                 journal = annotation.getAnnotationText();
                 acceptPub = true;
