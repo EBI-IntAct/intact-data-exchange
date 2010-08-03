@@ -26,6 +26,12 @@
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psimitab</artifactId>
             <version>1.5.0</version>
+            <exclusions>
+                <exclusion>
+                   <groupId>org.apache.commons</groupId>
+                   <artifactId>commons-io</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
