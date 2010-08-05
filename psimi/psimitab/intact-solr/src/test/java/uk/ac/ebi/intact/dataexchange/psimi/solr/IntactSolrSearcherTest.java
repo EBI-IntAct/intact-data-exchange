@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.junit.Assert;
@@ -101,6 +102,27 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         final SolrSearchResult result2 = searcher.search( query2 );
         assertEquals(3, result2.getTotalCount());
 
+
+
+    }
+
+    @Test
+    public void delete_by_pmid() throws Exception {
+        assertCount(0L, "*:*");
+
+        indexFromClasspath("/mitab_samples/p20053.txt", true);
+
+        final String miql = "pubid:11805826"; // Gavin et al.
+        assertCount(17L, miql );
+
+        final SolrServer server = getSolrJettyRunner().getSolrServer( CoreNames.CORE_PUB );
+        server.deleteByQuery( miql );
+
+        assertCount(17L, miql );
+
+        server.commit();
+
+        assertCount(0L, miql );
     }
 
     @Test
