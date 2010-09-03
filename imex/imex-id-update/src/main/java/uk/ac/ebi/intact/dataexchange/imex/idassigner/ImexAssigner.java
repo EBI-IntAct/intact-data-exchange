@@ -17,14 +17,13 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
 import com.google.common.collect.Lists;
-import edu.ucla.mbi.imex.central.ws.IcentralFault;
+import edu.ucla.mbi.imex.central.ws.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hupo.psi.mi.psicquic.wsclient.PsicquicSimpleClient;
 import org.springframework.transaction.TransactionStatus;
-import uk.ac.ebi.intact.bridges.imexcentral.DefaultImexCentralClient;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
+import uk.ac.ebi.intact.bridges.imexcentral.*;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateEvent;
@@ -33,8 +32,10 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.LoggingImexUpdateL
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ReportWriterListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.FileImexUpdateReportHandler;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Publication;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.ExperimentUtils;
+import uk.ac.ebi.intact.model.util.PublicationUtils;
 
 import javax.swing.event.EventListenerList;
 import java.io.File;
@@ -85,6 +86,7 @@ public class ImexAssigner {
     boolean isCvsInitialized;
 
     private ImexCentralClient imexCentral;
+    private static final String INTACT_PSICQUIC_REST_URL = "http://www.ebi.ac.uk/Tools/webservices/psicquic/intact/webservices/current/search/";
 
 
     //////////////////
@@ -291,6 +293,11 @@ public class ImexAssigner {
         int badLastImexAssigned = 0;
         int imexIdMismatch = 0;
 
+        int publicationInProgressCount = 0;
+        int publicationReleasedCount = 0;
+        int publicationAcceptedButNotReleasedCount = 0;
+
+
         for ( Publication publication : publications ) {
 
             fireOnProcessPublication( new ImexUpdateEvent( this, publication ) );
@@ -305,8 +312,6 @@ public class ImexAssigner {
                 continue;
             }
 
-            // TODO what happens with unassigned pmids, when they get eventually a real PMID ?
-
             // Check if the publication is an imex candidate
             if ( isIntactImexExportable( publication ) || isCuratorTriggered( publication, daoFactory ) ) {
 
@@ -316,24 +321,97 @@ public class ImexAssigner {
 
                 final String publicationId = publication.getPublicationId();
                 edu.ucla.mbi.imex.central.ws.Publication imexPublication = imexCentral.getPublicationById( publicationId );
+
+                if( imexPublication == null ) {
+                    // attempt a search by IMEx id as the publication could have gone from 'unassigned' to a real PMID
+                    final Xref x = ImexUtils.getPrimaryImexId( publication );
+                    if( x != null ) {
+                        String imexId = x.getPrimaryId();
+                        imexPublication = imexCentral.getPublicationById( imexId );
+
+                        if( imexPublication != null ) {
+                            System.out.println( "Could not find this publication by PMID ("+ publicationId +") but did by IMEx id ("+ imexId +"). " +
+                                                "It may be that the PMID was changes in IntAct since the record was registered." );
+
+                            // TODO update the PMID to what is currently in IntAct
+//                        imexPublication.setIdentifier( publicationId );
+                        } else {
+                            System.err.println( "WARNING - This publication has an IMEx id that isn't registered in IMEx Central ("+imexCentral.getEndpoint()+")" );
+                        }
+                    }
+                }
+
                 if( imexPublication != null ) {
 
                     // TODO fire publication registered in IMExCentral
 
                     System.out.println( "\tPublication already registered in the IMExCentral." );
                     System.out.println( "\t\t" + printImexPublication( imexPublication ) );
+
                 } else {
             
                     // TODO fire register new publication in IMExCentral
 
                     System.out.println( "\tPublication not yet registered in the IMExCentral." );
-                    imexPublication = imexCentral.createPublicationById( publicationId );
-                    System.out.println( "\tCreating a new record in IMExCentral" );
-                    System.out.println( "\t\t" + printImexPublication( imexPublication ) );
+
+                    // FIXME this is breaking on unassigned publications !!!!
+                    if( publicationId.startsWith( "unassigned" ) ) {
+                        // this is a pre-publication, IMEx central doesn't support that yet. Skip registration
+                        System.out.println( "\tSkipping registration in IMEx Central until it supports pre-publication with internal ID: " + publicationId );
+                    } else {
+                        imexPublication = imexCentral.createPublicationById( publicationId );
+                        System.out.println( "\tCreating a new record in IMExCentral" );
+                        System.out.println( "\t\t" + printImexPublication( imexPublication ) );
+                    }
                 }
 
-                // TODO update publications status according to accepted/on-hold/to-be-reviewed
-                // TODO creator is always ADMIN, update that to the real curators' login
+                // update publications status
+
+                PublicationStatus intactStatus = getPublicationStatus( publication );
+                switch( intactStatus ) {
+                    case INPROGRESS:
+                        publicationInProgressCount++;
+                        break;
+                    case PROCESSED:
+                        publicationAcceptedButNotReleasedCount++;
+                        break;
+                    case RELEASED:
+                        publicationReleasedCount++;
+                        break;
+                    default:
+                }
+
+                if( imexPublication != null && ! intactStatus.toString().equals( imexPublication.getStatus() ) ) {
+
+                    // TODO fire publication status changed
+
+                    System.out.println( "\tAttempting to update IMEx publication status from '" +
+                                        imexPublication.getStatus() + "' to '" + intactStatus + "' ..." );
+
+                    imexCentral.updatePublicationStatus( publicationId, intactStatus, null );
+                }
+
+                // TODO only update adminGroup/adminUser when the value is different
+
+                final String institution = "INTACT";
+                imexCentral.updatePublicationAdminGroup( publicationId, Operation.ADD, institution );
+                System.out.println( "Updated publication admin group to: " + institution );
+
+                // Note: we assume the curators' login in intact are the same in IMExCentral. Also they must be all lowercase in IMExCentral.
+                String curator = getPublicationCreator( publication ).toLowerCase();
+                try {
+                    imexCentral.updatePublicationAdminUser( publicationId, Operation.ADD, curator );
+                    System.out.println( "Updated publication admin user to: " + curator );
+                } catch ( ImexCentralException e ) {
+                    IcentralFault f = (IcentralFault) e.getCause();
+                    if( f.getFaultInfo().getFaultCode() == 10 ) {
+                        // unknown user, we automaticaly reassigne this record to user phantom
+                        curator = "phantom";  // this will apply to all curators that have left the group
+                        imexCentral.updatePublicationAdminUser( publicationId, Operation.ADD, curator );
+                        System.out.println( "Updated publication admin user to: " + curator );
+                    }
+                }
+
 
                 imexPublicationCount++;
 
@@ -381,7 +459,7 @@ public class ImexAssigner {
                     imexId = x.getPrimaryId();
 
                     if( ! icImexId.equals("N/A") &&  ! imexId.equals( icImexId ) ) {
-                        System.out.println( "\tERROR: the IMEx ID stored locally ("+imexId+") and the one in IMExCentral ("+icImexId+") are different" );
+                        System.out.println( "\tERROR: the IMEx ID stored locally ("+imexId+") and the one in IMExCentral ("+icImexId+", "+ imexCentral.getEndpoint() +") are different" );
                         imexIdMismatch++;
 
                         fireOnImexIdMismatchFound( new ImexUpdateEvent( this, publication, "IMExCentral: "+icImexId +" | LocalDB: " + imexId) );
@@ -500,10 +578,12 @@ public class ImexAssigner {
                                "following extra information. Error code: " + f.getFaultInfo().getFaultCode() +
                                ". Message: '"+ f.getFaultInfo().getMessage() +"'.");
                 }
+
             } catch (Throwable t ) {
 
 //               TODO fireError();
                 log.error( "Error while processing publication: " + publication.getPublicationId(), t );
+                t.printStackTrace();
             }
 
         } // all publications
@@ -523,6 +603,70 @@ public class ImexAssigner {
 
         System.out.println( "Outdated 'last-imex-assigned':" + badLastImexAssigned );
         System.out.println( "Mismatching IMEx ID:          " + imexIdMismatch );
+
+        System.out.println( "Publication processed (! accepted)    : " + publicationInProgressCount );
+        System.out.println( "Publication completed but not released: " + publicationAcceptedButNotReleasedCount );
+        System.out.println( "Publication released (PSICQUIC)       : " + publicationReleasedCount );
+    }
+
+    private String getPublicationCreator( Publication publication ) {
+
+        Experiment firstExperiment = null;
+        // search for first experiment
+        for ( Experiment exp : publication.getExperiments() ) {
+            if( exp.getShortLabel().endsWith( "-1" )) {
+                firstExperiment = exp;
+                break;
+            }
+        }
+
+        // pick the curator's name
+        if( firstExperiment != null ) {
+            return firstExperiment.getCreator();
+        }
+
+        // not found
+        return null;
+    }
+
+    private PublicationStatus getPublicationStatus( Publication publication ) {
+        // IMEx central has currently the following publication states available:
+        // NEW / RESERVED / INPROGRESS / RELEASED / DISCARDED / INCOMPLETE / PROCESSED
+
+        // in IntAct we can map to these statuses using the following annotation topics:
+        //     not accepted                     --> INPROGRESS
+        //     accepted                         --> PROCESSED
+        //     accepted + available on PSICQUIC --> RELEASED         (needs a run of the tool post release !!)
+
+        PublicationStatus status;
+
+        final boolean accepted = PublicationUtils.isAccepted( publication );
+
+        if( ! accepted ) {
+
+            status = PublicationStatus.INPROGRESS;
+
+        } else {
+
+            status = PublicationStatus.PROCESSED;
+
+            System.out.println( "The publication was accepted, now checking if it is already released." );
+            PsicquicSimpleClient client = new PsicquicSimpleClient( INTACT_PSICQUIC_REST_URL );
+            final String publicationId = publication.getShortLabel();
+            try {
+
+                final long count = client.countByQuery("pubid:" + publicationId);
+                if(count > 0) {
+                    status = PublicationStatus.RELEASED;
+                }
+
+            } catch ( IOException e ) {
+                System.err.println( "Failed to query IntAct PSICQUIC for PMID: " + publicationId );
+                e.printStackTrace();
+            }
+        }
+
+        return status;
     }
 
     private String printImexPublication( edu.ucla.mbi.imex.central.ws.Publication imexPublications ) {
@@ -857,7 +1001,7 @@ public class ImexAssigner {
         final String database = args[2];
         IntactContext.initContext( new String[]{"/META-INF/" + database + ".spring.xml"} );
 
-        ImexAssigner assigner = new ImexAssigner( icUsername, icPassword, DefaultImexCentralClient.IC_PROD );
+        ImexAssigner assigner = new ImexAssigner( icUsername, icPassword, DefaultImexCentralClient.IC_TEST );
 
         assigner.setDryRun( true );
 
