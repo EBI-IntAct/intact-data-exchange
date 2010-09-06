@@ -20,28 +20,27 @@ import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Propagation;
 import psidev.psi.mi.xml.*;
-import psidev.psi.mi.xml.xmlindex.IndexedEntry;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 import psidev.psi.mi.xml.model.Source;
+import psidev.psi.mi.xml.xmlindex.IndexedEntry;
 import uk.ac.ebi.intact.core.IntactException;
- 
 import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.core.persister.PersisterException;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher.PsiEnricherException;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
@@ -53,8 +52,8 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Imports/exports data between an IntAct-model database and PSI XML.
@@ -64,7 +63,7 @@ import java.util.Iterator;
  */
 public class PsiExchangeImpl implements PsiExchange {
 
-    private PersisterHelper persisterHelper;
+    private CorePersister corePersister;
     private IntactContext intactContext;
     private PsimiXmlForm xmlForm;
     private PsimiXmlVersion psiVersion;
@@ -80,7 +79,7 @@ public class PsiExchangeImpl implements PsiExchange {
 
     public PsiExchangeImpl(IntactContext intactContext) {
         this.intactContext = intactContext;
-        this.persisterHelper = intactContext.getPersisterHelper();
+        this.corePersister = intactContext.getCorePersister();
         this.xmlForm = PsimiXmlForm.FORM_COMPACT;
         this.psiVersion = PsimiXmlVersion.VERSION_254;
     }
@@ -142,6 +141,7 @@ public class PsiExchangeImpl implements PsiExchange {
         long startTime = System.currentTimeMillis();
 
         ConversionCache.clear();
+        corePersister.getStatistics().reset();
 
         PersisterStatistics importStats = new PersisterStatistics();
 
@@ -190,7 +190,7 @@ public class PsiExchangeImpl implements PsiExchange {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public PersisterStatistics importIntoIntact(Interaction interaction) {
-        return persisterHelper.save(interaction);
+        return corePersister.saveOrUpdate(interaction);
     }
 
     /**
@@ -282,7 +282,7 @@ public class PsiExchangeImpl implements PsiExchange {
      * @throws PersisterException thrown if there are problems persisting the data in the intact-model database
      */
     public void importIntoIntact(IntactEntry entry) throws PersisterException {
-        persisterHelper.save(entry);
+        corePersister.saveOrUpdate(entry);
     }
 
     /**
