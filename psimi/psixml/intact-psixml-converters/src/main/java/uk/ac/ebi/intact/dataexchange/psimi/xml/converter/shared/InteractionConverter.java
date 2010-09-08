@@ -83,81 +83,87 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         psiStartConversion(psiObject);
 
-        // This has to be before anything else (e.g. when creating xrefs)
-        interaction.setOwner(getInstitution());
+        try {
 
-        String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
+            // This has to be before anything else (e.g. when creating xrefs)
+            interaction.setOwner(getInstitution());
 
-        Collection<Experiment> experiments = getExperiments(psiObject);
+            String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
 
-        // only gets the first interaction type
-        CvInteractionType interactionType = getInteractionType(psiObject);
+            Collection<Experiment> experiments = getExperiments(psiObject);
 
-        interaction.setShortLabel(shortLabel);
-        interaction.setExperiments(experiments);
-        interaction.setCvInteractionType(interactionType);
+            // only gets the first interaction type
+            CvInteractionType interactionType = getInteractionType(psiObject);
 
-        // interactor type is always "interaction" for interactions
-        CvInteractorType interactorType = CvObjectUtils.createCvObject(getInstitution(), CvInteractorType.class, CvInteractorType.INTERACTION_MI_REF, CvInteractorType.INTERACTION);
-        interaction.setCvInteractorType(interactorType);
+            interaction.setShortLabel(shortLabel);
+            interaction.setExperiments(experiments);
+            interaction.setCvInteractionType(interactionType);
 
-        IntactConverterUtils.populateNames(psiObject.getNames(), interaction);
-        IntactConverterUtils.populateXref(psiObject.getXref(), interaction, new XrefConverter<InteractorXref>(getInstitution(), InteractorXref.class));
-        IntactConverterUtils.populateAnnotations(psiObject, interaction, getInstitution());
+            // interactor type is always "interaction" for interactions
+            CvInteractorType interactorType = CvObjectUtils.createCvObject(getInstitution(), CvInteractorType.class, CvInteractorType.INTERACTION_MI_REF, CvInteractorType.INTERACTION);
+            interaction.setCvInteractorType(interactorType);
 
-        // imexId
-        String imexId = psiObject.getImexId();
-        if (imexId != null && !alreadyContainsImexXref(interaction)) {
-            final InteractorXref imexXref = createImexXref(interaction, imexId);
-            interaction.addXref(imexXref);
-        }
+            IntactConverterUtils.populateNames(psiObject.getNames(), interaction);
+            IntactConverterUtils.populateXref(psiObject.getXref(), interaction, new XrefConverter<InteractorXref>(getInstitution(), InteractorXref.class));
+            IntactConverterUtils.populateAnnotations(psiObject, interaction, getInstitution());
 
-        // note: with the first IMEx conversions, the source-database xref was wrongly
-        // marked as an "identity" xref instead of source-database. This is meant to fix that on the fly
-        if (ConverterContext.getInstance().getInteractionConfig().isAutoFixSourceReferences()) {
-            fixSourceReferenceXrefsIfNecessary(interaction);
-        }
+            // imexId
+            String imexId = psiObject.getImexId();
+            if (imexId != null && !alreadyContainsImexXref(interaction)) {
+                final InteractorXref imexXref = createImexXref(interaction, imexId);
+                interaction.addXref(imexXref);
+            }
 
-        // components, created after the interaction, as we need the interaction to create them
-        Collection<Component> components = getComponents(interaction, psiObject);
-        interaction.setComponents(components);
+            // note: with the first IMEx conversions, the source-database xref was wrongly
+            // marked as an "identity" xref instead of source-database. This is meant to fix that on the fly
+            if (ConverterContext.getInstance().getInteractionConfig().isAutoFixSourceReferences()) {
+                fixSourceReferenceXrefsIfNecessary(interaction);
+            }
 
-        ConfidenceConverter confConverter= new ConfidenceConverter( getInstitution());
-        for (psidev.psi.mi.xml.model.Confidence psiConfidence :  psiObject.getConfidences()){
-           Confidence confidence = confConverter.psiToIntact( psiConfidence );
-            interaction.addConfidence( confidence);
-        }
+            // components, created after the interaction, as we need the interaction to create them
+            Collection<Component> components = getComponents(interaction, psiObject);
+            interaction.setComponents(components);
 
-        // parameter conversion
-        InteractionParameterConverter paramConverter= new InteractionParameterConverter( getInstitution());
-        for (psidev.psi.mi.xml.model.Parameter psiParameter :  psiObject.getParameters()){
-            InteractionParameter parameter = paramConverter.psiToIntact( psiParameter );
-            interaction.addParameter(parameter);
-        }
+            ConfidenceConverter confConverter= new ConfidenceConverter( getInstitution());
+            for (psidev.psi.mi.xml.model.Confidence psiConfidence :  psiObject.getConfidences()){
+               Confidence confidence = confConverter.psiToIntact( psiConfidence );
+                interaction.addConfidence( confidence);
+            }
 
-        // update experiment participant detection method if necessary
-        updateExperimentParticipantDetectionMethod(interaction);
+            // parameter conversion
+            InteractionParameterConverter paramConverter= new InteractionParameterConverter( getInstitution());
+            for (psidev.psi.mi.xml.model.Parameter psiParameter :  psiObject.getParameters()){
+                InteractionParameter parameter = paramConverter.psiToIntact( psiParameter );
+                interaction.addParameter(parameter);
+            }
 
-        // negative
-        if( psiObject.isNegative() ) {
-            interaction.addAnnotation( new Annotation( getInstitution(),
-                                                       new CvTopic( getInstitution(), NEGATIVE ),
-                                                       TRUE ) );
-        }
+            // update experiment participant detection method if necessary
+            updateExperimentParticipantDetectionMethod(interaction);
 
-        if( psiObject.isIntraMolecular() ) {
-            interaction.addAnnotation( new Annotation( getInstitution(),
-                                                       new CvTopic( getInstitution(), INTRA_MOLECULAR ),
-                                                       TRUE ) );
-        }
+            // negative
+            if( psiObject.isNegative() ) {
+                interaction.addAnnotation( new Annotation( getInstitution(),
+                                                           new CvTopic( getInstitution(), NEGATIVE ),
+                                                           TRUE ) );
+            }
 
-        if( psiObject.isModelled() ) {
-            interaction.addAnnotation( new Annotation( getInstitution(),
-                                                       new CvTopic( getInstitution(), MODELLED ),
-                                                       TRUE ) );
+            if( psiObject.isIntraMolecular() ) {
+                interaction.addAnnotation( new Annotation( getInstitution(),
+                                                           new CvTopic( getInstitution(), INTRA_MOLECULAR ),
+                                                           TRUE ) );
+            }
+
+            if( psiObject.isModelled() ) {
+                interaction.addAnnotation( new Annotation( getInstitution(),
+                                                           new CvTopic( getInstitution(), MODELLED ),
+                                                           TRUE ) );
+            }
+        } catch (Throwable t) {
+            throw new PsiConversionException("Problem converting PSI interaction to Intact: "+psiObject.getNames(), t);
         }
 
         psiEndConversion(psiObject);
+
 
         failIfInconsistentConversion(interaction, psiObject);
 
