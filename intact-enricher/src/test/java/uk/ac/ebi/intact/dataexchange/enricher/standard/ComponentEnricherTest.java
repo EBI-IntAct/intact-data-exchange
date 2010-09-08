@@ -19,9 +19,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
-import uk.ac.ebi.intact.model.BioSource;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.CvExperimentalPreparation;
+import uk.ac.ebi.intact.model.*;
 
 /**
  * TODO comment this
@@ -70,5 +68,53 @@ public class ComponentEnricherTest extends EnricherBasicTestCase {
 
         CvExperimentalPreparation enrichedExperimentalPreparation = comp.getExperimentalPreparations().iterator().next();
         Assert.assertEquals(CvExperimentalPreparation.PURIFIED, enrichedExperimentalPreparation.getShortLabel());
+    }
+
+    @Test
+    public void enrich_range_nTerminal() throws Exception {
+        BioSource human = getMockBuilder().createBioSource(9606, "unknown");
+        Protein protein = getMockBuilder().createProtein("P18850", "unknownName", human);
+
+        Component comp = getMockBuilder().createInteractionRandomBinary().getComponents().iterator().next();
+        comp.setInteractor(protein);
+
+        Feature feature = getMockBuilder().createFeature("aFeature",
+                getMockBuilder().createCvObject(CvFeatureType.class, CvFeatureType.EXPERIMENTAL_FEATURE_MI_REF, CvFeatureType.EXPERIMENTAL_FEATURE));
+        Range range = getMockBuilder().createRange(50,50, 60, 60);
+        range.setFromCvFuzzyType(getMockBuilder().createCvObject(CvFuzzyType.class, CvFuzzyType.N_TERMINAL_MI_REF, CvFuzzyType.N_TERMINAL));
+
+        feature.addRange(range);
+
+        comp.getBindingDomains().clear();
+        comp.addBindingDomain(feature);
+
+        enricher.enrich(comp);
+
+        Assert.assertEquals(1, range.getFromIntervalStart());
+        Assert.assertEquals(1, range.getFromIntervalEnd());
+    }
+
+    @Test
+    public void enrich_range_cTerminal() throws Exception {
+        BioSource human = getMockBuilder().createBioSource(9606, "unknown");
+        Protein protein = getMockBuilder().createProtein("P18850", "unknownName", human);
+
+        Component comp = getMockBuilder().createInteractionRandomBinary().getComponents().iterator().next();
+        comp.setInteractor(protein);
+
+        Feature feature = getMockBuilder().createFeature("aFeature",
+                getMockBuilder().createCvObject(CvFeatureType.class, CvFeatureType.EXPERIMENTAL_FEATURE_MI_REF, CvFeatureType.EXPERIMENTAL_FEATURE));
+        Range range = getMockBuilder().createRange(50,50, 60, 60);
+        range.setToCvFuzzyType(getMockBuilder().createCvObject(CvFuzzyType.class, CvFuzzyType.C_TERMINAL_MI_REF, CvFuzzyType.C_TERMINAL));
+
+        feature.addRange(range);
+
+        comp.getBindingDomains().clear();
+        comp.addBindingDomain(feature);
+
+        enricher.enrich(comp);
+
+        Assert.assertEquals(670, range.getToIntervalStart());
+        Assert.assertEquals(670, range.getToIntervalEnd());
     }
 }

@@ -131,7 +131,7 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                 if (uniprotProt != null) {
                     updateXrefs(proteinToEnrich, uniprotProt);
                     updateAliases(proteinToEnrich, uniprotProt);
-                    proteinToEnrich.setSequence(uniprotProt.getSequence());
+                    updateSequence(proteinToEnrich, uniprotProt);
 
                     proteinToEnrich.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(uniprotProt.getId().toLowerCase()));
                     proteinToEnrich.setFullName(uniprotProt.getDescription());
@@ -154,6 +154,7 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
 
         super.enrich(objectToEnrich);
     }
+
 
     /**
      * Enriches the small molecule with chebiAsciiName and inchi Annotation.
@@ -286,6 +287,12 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         if( ! interactor.getAliases().contains( alias )) {
             interactor.addAlias( alias );
         }
+    }
+
+     private void updateSequence(Protein proteinToEnrich, UniprotProtein uniprotProt) {
+         if (uniprotProt.getSequence() != null && !uniprotProt.getSequence().equals(proteinToEnrich.getSequence())) {
+            proteinToEnrich.setSequence(uniprotProt.getSequence());
+         }
     }
 
     /**
