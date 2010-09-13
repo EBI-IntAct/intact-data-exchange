@@ -228,7 +228,7 @@
                                                 <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
                                             </xref>
                                         </startStatus>
-                                        <begin position="0"/>
+                                        <begin position="1"/>
                                         <endStatus>
                                             <names>
                                                 <shortLabel>certain</shortLabel>
@@ -237,7 +237,7 @@
                                                 <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
                                             </xref>
                                         </endStatus>
-                                        <end position="0"/>
+                                        <end position="1"/>
                                         <isLink>false</isLink>
                                     </featureRange>
                                 </featureRangeList>
@@ -343,7 +343,7 @@
                                                 <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
                                             </xref>
                                         </startStatus>
-                                        <begin position="0"/>
+                                        <begin position="2"/>
                                         <endStatus>
                                             <names>
                                                 <shortLabel>certain</shortLabel>
@@ -352,7 +352,7 @@
                                                 <primaryRef refTypeAc="MI:0356" refType="identity" id="MI:0335" dbAc="MI:0488" db="psi-mi"/>
                                             </xref>
                                         </endStatus>
-                                        <end position="0"/>
+                                        <end position="2"/>
                                         <isLink>false</isLink>
                                     </featureRange>
                                 </featureRangeList>

@@ -53,8 +53,8 @@ public class RangeConverterTest {
     public void psiToIntact_interval_diff() throws Exception {
         psidev.psi.mi.xml.model.Range psiObject = new Range( new Interval(3, 4),
                                                              new Interval(1, 2),
-                                                             buildRangeStatus( "certain", "MI:0001" ),
-                                                             buildRangeStatus( "certain", "MI:0001" ));
+                                                             buildRangeStatus( "range", "MI:0338" ),
+                                                             buildRangeStatus( "range", "MI:0338" ));
 
         final RangeConverter converter = new RangeConverter(new Institution());
 
@@ -68,9 +68,9 @@ public class RangeConverterTest {
 
     @Test
     public void psiToIntact_interval_position() throws Exception {
-        psidev.psi.mi.xml.model.Range psiObject = new Range( buildRangeStatus( "certain", "MI:0001" ),
+        psidev.psi.mi.xml.model.Range psiObject = new Range( buildRangeStatus( "range", "MI:0338" ),
                                                              new Interval(2,3),
-                                                             buildRangeStatus( "certain", "MI:0001" ),
+                                                             buildRangeStatus( "certain", "MI:0335" ),
                                                              new Position(4));
 
         final RangeConverter converter = new RangeConverter(new Institution());
@@ -85,8 +85,8 @@ public class RangeConverterTest {
 
     @Test
     public void psiToIntact_position_interval() throws Exception {
-        psidev.psi.mi.xml.model.Range psiObject = new Range( buildRangeStatus( "certain", "MI:0001" ),
-                                                             buildRangeStatus( "certain", "MI:0001" ),
+        psidev.psi.mi.xml.model.Range psiObject = new Range( buildRangeStatus( "certain", "MI:0335" ),
+                                                             buildRangeStatus( "range", "MI:0338" ),
                                                              new Position(2),
                                                              new Interval(3,4));
 

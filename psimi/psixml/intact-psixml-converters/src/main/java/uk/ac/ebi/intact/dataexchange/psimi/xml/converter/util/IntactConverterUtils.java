@@ -245,10 +245,13 @@ public class IntactConverterUtils {
 
             if (interactor instanceof Polymer){
                 Polymer polymer = (Polymer) interactor;
+                String sequence = polymer.getSequence();
 
-                for (Range r : feature.getRanges()){
+                if (sequence != null){
+                    for (Range r : feature.getRanges()){
 
-                    r.prepareSequence(polymer.getSequence());
+                        r.prepareSequence(polymer.getSequence());
+                    }
                 }
             }
         }
