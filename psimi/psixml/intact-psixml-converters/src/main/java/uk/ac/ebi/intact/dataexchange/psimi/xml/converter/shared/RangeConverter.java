@@ -241,30 +241,6 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
     public psidev.psi.mi.xml.model.Range intactToPsi(Range intactObject) {
         psidev.psi.mi.xml.model.Range psiRange = new psidev.psi.mi.xml.model.Range();
 
-        // get the positions
-        long beginIntervalFrom = intactObject.getFromIntervalStart();
-        long beginIntervalTo = intactObject.getFromIntervalEnd();
-        long endIntervalFrom = intactObject.getToIntervalStart();
-        long endIntervalTo = intactObject.getToIntervalEnd();
-
-        if( beginIntervalFrom != 0 ) {
-            psiRange.setBegin(new Position(beginIntervalFrom));
-        }
-
-        if( endIntervalTo != 0 ) {
-            psiRange.setEnd(new Position(endIntervalTo));
-        }
-
-        if ( beginIntervalTo > beginIntervalFrom && beginIntervalTo != 0 ) {
-            Interval beginInterval = new Interval(beginIntervalFrom, beginIntervalTo);
-            psiRange.setBeginInterval(beginInterval);
-        }
-
-        if ( endIntervalTo > endIntervalFrom && endIntervalTo != 0 ) {
-            Interval endInterval = new Interval(endIntervalFrom, endIntervalTo);
-            psiRange.setEndInterval(endInterval);
-        }
-
         // set the range status
         CvObjectConverter<CvFuzzyType,RangeStatus> fuzzyTypeConverter =
                 new CvObjectConverter<CvFuzzyType,RangeStatus>( getInstitution(),
@@ -283,6 +259,42 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         if (toFuzzyType != null) {
             RangeStatus endStatus = fuzzyTypeConverter.intactToPsi(toFuzzyType);
             psiRange.setEndStatus(endStatus);
+        }
+
+        // get the positions
+        long beginIntervalFrom = intactObject.getFromIntervalStart();
+        long beginIntervalTo = intactObject.getFromIntervalEnd();
+        long endIntervalFrom = intactObject.getToIntervalStart();
+        long endIntervalTo = intactObject.getToIntervalEnd();
+
+        // we have a start interval
+        if ( beginIntervalTo > beginIntervalFrom && beginIntervalTo != 0 ) {
+            Interval beginInterval = new Interval(beginIntervalFrom, beginIntervalTo);
+            psiRange.setBeginInterval(beginInterval);
+        }
+        // a range always have a start interval
+        else if (fromFuzzyType.isRange()){
+            Interval beginInterval = new Interval(beginIntervalFrom, beginIntervalTo);
+            psiRange.setBeginInterval(beginInterval);
+        }
+        // we have a single position
+        else if( beginIntervalFrom != 0 ) {
+            psiRange.setBegin(new Position(beginIntervalFrom));
+        }
+
+        // we have an end interval
+        if ( endIntervalTo > endIntervalFrom && endIntervalTo != 0 ) {
+            Interval endInterval = new Interval(endIntervalFrom, endIntervalTo);
+            psiRange.setEndInterval(endInterval);
+        }
+        // a range always have an end interval
+        else if (toFuzzyType.isRange()){
+            Interval endInterval = new Interval(endIntervalFrom, endIntervalTo);
+            psiRange.setEndInterval(endInterval);
+        }
+        // we have a single position
+        else if( endIntervalTo != 0 ) {
+            psiRange.setEnd(new Position(endIntervalTo));
         }
 
         return psiRange;
