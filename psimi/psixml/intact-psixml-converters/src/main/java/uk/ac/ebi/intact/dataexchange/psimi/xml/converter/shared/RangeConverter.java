@@ -219,7 +219,7 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
     }
 
     private boolean isRaggedNTerminal( RangeStatus rangeStatus ) {
-        if ( isStatusOfType( rangeStatus, RAGGED_NTERMINUS, RAGGED_NTERMINUS ) ) {
+        if ( isStatusOfType( rangeStatus, RAGGED_NTERMINUS_MI_REF, RAGGED_NTERMINUS ) ) {
             return true;
         }
         return false;
