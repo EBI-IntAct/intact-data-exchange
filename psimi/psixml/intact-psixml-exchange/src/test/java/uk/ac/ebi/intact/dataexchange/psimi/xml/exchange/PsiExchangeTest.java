@@ -102,9 +102,9 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
     public void importXml_mint() throws Exception {
         PersisterStatistics stats = psiExchange.importIntoIntact(getMintEntrySet());
 
-        Assert.assertEquals(16, stats.getPersistedCount(InteractionImpl.class, false));
+        Assert.assertEquals(17, stats.getPersistedCount(InteractionImpl.class, false));
         Assert.assertEquals(1, stats.getDuplicatesCount(InteractionImpl.class, false));
-        Assert.assertEquals(16, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(17, getDaoFactory().getInteractionDao().countAll());
     }
 
     @Test
@@ -173,14 +173,14 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
 
         PersisterStatistics mintStats = psiExchange.importIntoIntact(getMintStream());
 
-        Assert.assertEquals(16, mintStats.getPersistedCount(InteractionImpl.class, false));
+        Assert.assertEquals(17, mintStats.getPersistedCount(InteractionImpl.class, false));
         Assert.assertEquals(1, mintStats.getDuplicatesCount(InteractionImpl.class, false));
-        Assert.assertEquals(22, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(23, getDaoFactory().getInteractionDao().countAll());
 
         PersisterStatistics dipStats = psiExchange.importIntoIntact(getDipStream());
 
         Assert.assertEquals(74, dipStats.getPersistedCount(InteractionImpl.class, false));
-        Assert.assertEquals(96, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(97, getDaoFactory().getInteractionDao().countAll());
 
     }
 

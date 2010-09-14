@@ -332,7 +332,7 @@
                                                             refTypeAc="MI:0356"/>
                                             </xref>
                                         </startStatus>
-                                        <begin position="0"/>
+                                        <begin position="1"/>
                                         <endStatus>
                                             <names>
                                                 <shortLabel>certain</shortLabel>
@@ -342,7 +342,7 @@
                                                             refTypeAc="MI:0356"/>
                                             </xref>
                                         </endStatus>
-                                        <end position="0"/>
+                                        <end position="1"/>
                                     </featureRange>
                                 </featureRangeList>
                             </feature>
@@ -473,7 +473,7 @@
                                                             refTypeAc="MI:0356"/>
                                             </xref>
                                         </startStatus>
-                                        <begin position="0"/>
+                                        <begin position="2"/>
                                         <endStatus>
                                             <names>
                                                 <shortLabel>certain</shortLabel>
@@ -483,7 +483,7 @@
                                                             refTypeAc="MI:0356"/>
                                             </xref>
                                         </endStatus>
-                                        <end position="0"/>
+                                        <end position="2"/>
                                     </featureRange>
                                 </featureRangeList>
                             </feature>
@@ -606,7 +606,7 @@
                                                             refTypeAc="MI:0356"/>
                                             </xref>
                                         </startStatus>
-                                        <begin position="0"/>
+                                        <begin position="4"/>
                                         <endStatus>
                                             <names>
                                                 <shortLabel>certain</shortLabel>
@@ -616,7 +616,7 @@
                                                             refTypeAc="MI:0356"/>
                                             </xref>
                                         </endStatus>
-                                        <end position="0"/>
+                                        <end position="4"/>
                                     </featureRange>
                                 </featureRangeList>
                             </feature>
@@ -747,7 +747,7 @@
                                                             refTypeAc="MI:0356"/>
                                             </xref>
                                         </startStatus>
-                                        <begin position="0"/>
+                                        <begin position="1"/>
                                         <endStatus>
                                             <names>
                                                 <shortLabel>certain</shortLabel>
@@ -757,7 +757,7 @@
                                                             refTypeAc="MI:0356"/>
                                             </xref>
                                         </endStatus>
-                                        <end position="0"/>
+                                        <end position="1"/>
                                     </featureRange>
                                 </featureRangeList>
                             </feature>
