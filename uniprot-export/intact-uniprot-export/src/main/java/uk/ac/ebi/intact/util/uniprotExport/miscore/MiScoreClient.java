@@ -53,31 +53,39 @@ public class MiScoreClient {
         // the chunk of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
 
+        System.out.println(interactions.size() + " interactions in IntAct will be processed.");
+
         // we process all the interactions of the list per chunk of 200 interactions
         while (i < interactions.size()){
             // we clear the previous chunk
             binaryInteractions.clear();
 
+            System.out.println("Process the interactions " + i + " to " + Math.min(i+199, interactions.size()) + "...");
+
             // we computes the MI cluster score for 200 interactions at one time
             for (int j = i; j<i+200 && j<interactions.size();j++){
-
                 // get the IntAct interaction object
                 String interactionAc = interactions.get(j);
                 Interaction intactInteraction = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionAc);
 
-                // the interaction can be converted into binary interaction
-                if (this.interactionConverter.getExpansionStrategy().isExpandable(intactInteraction)){
-                    try {
-                        // we convert the interaction in binary interaction
-                        Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
-                        binaryInteractions.addAll(toBinary);
-                    } catch (Exception e) {
+                if (intactInteraction != null){
+                    // the interaction can be converted into binary interaction
+                    if (this.interactionConverter.getExpansionStrategy().isExpandable(intactInteraction)){
+                        try {
+                            // we convert the interaction in binary interaction
+                            Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
+                            binaryInteractions.addAll(toBinary);
+                        } catch (Exception e) {
+                            System.out.println("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
+                        }
+                    }
+                    // if the interaction cannot be converted into binary interaction, we ignore the interaction.
+                    else {
                         System.out.println("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
                     }
                 }
-                // if the interaction cannot be converted into binary interaction, we ignore the interaction.
                 else {
-                    System.out.println("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
+                    System.out.println("The interaction " + interactionAc + " doesn't exist in the database and is excluded.");                    
                 }
             }
 
@@ -101,8 +109,12 @@ public class MiScoreClient {
                 }
             }
             i += 200;
+
+            int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
+            System.out.println("Still " + interactionsToProcess + " interactions to process in IntAct.");
         }
 
+        System.out.println("Saving the scores ...");
         // saves the scores
         this.interactionClusterScore.saveScores(fileName);
     }
@@ -129,9 +141,13 @@ public class MiScoreClient {
             int i = 0;
             Set<BinaryInteraction> binaryInteractions = new HashSet<BinaryInteraction>();
 
+            System.out.println(interactions.size() + " interactions in IntAct will be processed.");
+
             // each interaction will be processed
             while (i < interactions.size()){
                 binaryInteractions.clear();
+
+                System.out.println("Process the interactions " + i + " to " + Math.min(i+199, interactions.size()) + "...");
 
                 for (int j = i; j<i+200 && j<interactions.size();j++){
 
@@ -155,12 +171,14 @@ public class MiScoreClient {
                 // filter the computed scores
                 extractMiScoreForBinaryInteractions(binaryInteractions, writer1, writer2, interactionIdentifiersExported, interactionIdentifiersAlreadyProcessed);
                 i += 200;
+                int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
+                System.out.println("Still " + interactionsToProcess + " interactions to process in IntAct.");
             }
 
             // close the writers
             writer1.close();
             writer2.close();
-            
+
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("We cannot write the results in " + fileContainingDataExported + " or " + fileContainingDataNotExported);
@@ -190,7 +208,7 @@ public class MiScoreClient {
 
             // filter the scores for each interaction
             for (Map.Entry<Integer, EncoreInteraction> entry : this.interactionClusterScore.getInteractionMapping().entrySet()){
-                 // the interaction Id
+                // the interaction Id
                 int interactionId = entry.getKey();
                 // the Encore interaction
                 EncoreInteraction encoreInteraction = entry.getValue();
@@ -214,7 +232,7 @@ public class MiScoreClient {
                     else {
                         writer2.write(interactionId + "-" + encoreInteraction.getInteractorA() + "-" + encoreInteraction.getInteractorB() + ":" + score);
                     }
-                    interactionIdentifiersAlreadyProcessed.add(interactionId);                    
+                    interactionIdentifiersAlreadyProcessed.add(interactionId);
                 }
             }
 

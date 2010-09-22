@@ -48,7 +48,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
             int scoreListSize = this.getInteractionMapping().size();
             scoreList = new String[scoreListSize];
             scoreListCSV = "";
-            String delimiter = ",";
+            String delimiter = "\n";
             int i = 0;
             for(EncoreInteraction eI:this.getInteractionMapping().values()){
                 List<Confidence> confidenceValues = eI.getConfidenceValues();
@@ -62,7 +62,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
                     logger.error("No score for this interaction: " + eI.getId());
                 }
                 scoreList[i] = eI.getId() + "-" +eI.getInteractorA() + "-" + eI.getInteractorB() + ":" + score;
-                scoreListCSV = scoreListCSV + score;
+                scoreListCSV = scoreListCSV + scoreList[i];
                 i++;
                 if(scoreListSize > i){
                     scoreListCSV = scoreListCSV + delimiter;

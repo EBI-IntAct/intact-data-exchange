@@ -181,28 +181,28 @@ public class InteractionExtractorForMIScore extends LineExport {
 
             // get the IntAct interaction object
             if (interaction != null){
-                getOut().println("\t\t Interaction: Shortlabel:" + interaction.getShortLabel() + "  AC: " + interaction.getAc());
+                System.out.println("\t\t Interaction: Shortlabel:" + interaction.getShortLabel() + "  AC: " + interaction.getAc());
 
                 Collection experiments = interaction.getExperiments();
 
                 int expCount = experiments.size();
-                getOut().println("\t\t\t interaction related to " + expCount + " experiment" + (expCount > 1 ? "s" : "") + ".");
+                System.out.println("\t\t\t interaction related to " + expCount + " experiment" + (expCount > 1 ? "s" : "") + ".");
 
                 for (Iterator iterator2 = experiments.iterator(); iterator2.hasNext();) {
                     Experiment experiment = (Experiment) iterator2.next();
 
                     boolean experimentExport = false;
-                    getOut().println("\t\t\t\t Experiment: Shortlabel:" + experiment.getShortLabel() + "  AC: " + experiment.getAc());
+                    System.out.println("\t\t\t\t Experiment: Shortlabel:" + experiment.getShortLabel() + "  AC: " + experiment.getAc());
 
                     ExperimentStatus experimentStatus = getCCLineExperimentExportStatus(experiment, "\t\t\t\t\t");
                     if (experimentStatus.doNotExport()) {
                         // forbid export for all interactions of that experiment (and their proteins).
-                        getOut().println("\t\t\t\t\t No interactions of that experiment will be exported.");
+                        System.out.println("\t\t\t\t\t No interactions of that experiment will be exported.");
 
                     } else if (experimentStatus.doExport()) {
                         // Authorise export for all interactions of that experiment (and their proteins),
                         // This overwrite the setting of the CvInteraction concerning the export.
-                        getOut().println("\t\t\t\t\t All interaction of that experiment will be exported.");
+                        System.out.println("\t\t\t\t\t All interaction of that experiment will be exported.");
 
                         experimentExport = true;
 
@@ -222,7 +222,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                             if (authorConfidenceTopic.equals(annotation.getCvTopic())) {
                                 String text = annotation.getAnnotationText();
 
-                                getOut().println("\t\t\t Interaction has " + authorConfidenceTopic.getShortLabel() + ": '" + text + "'");
+                                System.out.println("\t\t\t Interaction has " + authorConfidenceTopic.getShortLabel() + ": '" + text + "'");
 
                                 if (text != null) {
                                     text = text.trim();
@@ -232,7 +232,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                                     String kw = (String) iterator4.next();
                                     // NOT case sensitive
 
-                                    getOut().println("\t\t\t\t Compare it with '" + kw + "'");
+                                    System.out.println("\t\t\t\t Compare it with '" + kw + "'");
 
                                     if (kw.equalsIgnoreCase(text)) {
                                         annotationFound = true;
@@ -251,16 +251,16 @@ public class InteractionExtractorForMIScore extends LineExport {
                             */
 
                             experimentExport = true;
-                            getOut().println("\t\t\t that interaction is eligible for export in the context of a large scale experiment");
+                            System.out.println("\t\t\t that interaction is eligible for export in the context of a large scale experiment");
 
                         } else {
 
-                            getOut().println("\t\t\t interaction not eligible");
+                            System.out.println("\t\t\t interaction not eligible");
                         }
 
                     } else if (experimentStatus.isNotSpecified()) {
 
-                        getOut().println("\t\t\t\t No experiment status, check the experimental method.");
+                        System.out.println("\t\t\t\t No experiment status, check the experimental method.");
 
                         // Then check the experimental method (CvInteraction)
                         // Nothing specified at the experiment level, check for the method (CvInteraction)
@@ -288,7 +288,7 @@ public class InteractionExtractorForMIScore extends LineExport {
 
                         } else if (methodStatus.isConditionalExport()) {
 
-                            getOut().println("\t\t\t\t As conditional export, check the count of distinct experiment for that method.");
+                            System.out.println("\t\t\t\t As conditional export, check the count of distinct experiment for that method.");
 
                             // if the threshold is not reached, iterates over all available interactions to check if
                             // there is (are) one (many) that could allow to reach the threshold.
@@ -304,7 +304,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                             for (Iterator iterator = experiments.iterator(); iterator.hasNext();) {
                                 Experiment experiment1 = (Experiment) iterator.next();
 
-                                getOut().println("\t\t\t\t Experiment: Shortlabel:" + experiment1.getShortLabel() + "  AC: " + experiment1.getAc());
+                                System.out.println("\t\t\t\t Experiment: Shortlabel:" + experiment1.getShortLabel() + "  AC: " + experiment1.getAc());
 
                                 CvInteraction method = experiment1.getCvInteraction();
 
@@ -337,14 +337,14 @@ public class InteractionExtractorForMIScore extends LineExport {
                                 String interaction2ac = interactionAcs.get(j);
                                 Interaction interaction2 = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interaction2ac);
 
-                                getOut().println("\t\t Interaction: Shortlabel:" + interaction2.getShortLabel() + "  AC: " + interaction2.getAc());
+                                System.out.println("\t\t Interaction: Shortlabel:" + interaction2.getShortLabel() + "  AC: " + interaction2.getAc());
 
                                 Collection experiments2 = interaction2.getExperiments();
 
                                 for (Iterator iterator6 = experiments2.iterator(); iterator6.hasNext() && !enoughExperimentFound;)
                                 {
                                     Experiment experiment2 = (Experiment) iterator6.next();
-                                    getOut().println("\t\t\t\t Experiment: Shortlabel:" + experiment2.getShortLabel() + "  AC: " + experiment2.getAc());
+                                    System.out.println("\t\t\t\t Experiment: Shortlabel:" + experiment2.getShortLabel() + "  AC: " + experiment2.getAc());
 
                                     CvInteraction method = experiment2.getCvInteraction();
 
@@ -355,16 +355,16 @@ public class InteractionExtractorForMIScore extends LineExport {
                                     }
                                 } // j's experiments
 
-                                getOut().println("\t\t\t\t " + cvInteraction.getShortLabel() + ", threshold: " +
+                                System.out.println("\t\t\t\t " + cvInteraction.getShortLabel() + ", threshold: " +
                                         threshold + " #experiment: " +
                                         (experimentAcs == null ? "none" : "" + experimentAcs.size()));
                             } // j
 
                             if (enoughExperimentFound) {
-                                getOut().println("\t\t\t\t Enough experiemnt found");
+                                System.out.println("\t\t\t\t Enough experiemnt found");
                                 experimentExport = true;
                             } else {
-                                getOut().println("\t\t\t\t Not enough experiemnt found");
+                                System.out.println("\t\t\t\t Not enough experiemnt found");
                             }
 
                         } // conditional status
@@ -395,7 +395,8 @@ public class InteractionExtractorForMIScore extends LineExport {
         // the participants have a uniprot 'identity' cross reference
         // the participants are proteins
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery("select distinct(i.ac) from InteractionImpl i join i.components c join c.interactor p " +
-                "where i.ac not in (select distinct(i2.ac) from Component c2 join c2.interaction i2 join c2.interactor p2 join p2.annotations a " +
+                "where i.ac in (select distinct(comp.interaction.ac) from Component comp)" +
+                "and i.ac not in (select distinct(i2.ac) from Component c2 join c2.interaction i2 join c2.interactor p2 join p2.annotations a " +
                 "where a.cvTopic.shortLabel = :noUniprotUpdate) " +
                 "and i.ac not in (select distinct(i3.ac) from Component c3 join c3.interaction i3 join i3.annotations a2 " +
                 "where a2.cvTopic.shortLabel = :negative) " +
