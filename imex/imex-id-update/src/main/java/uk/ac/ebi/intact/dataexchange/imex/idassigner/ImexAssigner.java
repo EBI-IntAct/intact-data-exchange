@@ -836,7 +836,8 @@ public class ImexAssigner {
                                                                         Arrays.asList( "Cell (0092-8674)",
                                                                                        "Proteomics (1615-9853)",
                                                                                        "Cancer Cell (1535-6108)",
-                                                                                       "J Mol Signal." ),
+                                                                                       "J Mol Signal.",
+                                                                                       "Oncogene (0950-9232)"),
                                                                         2006 );
 
             final boolean datasetMatch = hasDataset( experiment, Arrays.asList( "BioCreative - Critical Assessment of Information Extraction systems in Biology" ) );
