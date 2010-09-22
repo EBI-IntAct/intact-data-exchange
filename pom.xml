@@ -38,7 +38,8 @@
         <module>pdbe</module>
         <module>intact-tasks</module>
         <!--<module>imex</module>-->
-    </modules>
+    <module>maven-intact-mi-cluster-score</module>
+  </modules>
 
     <build>
         <plugins>
