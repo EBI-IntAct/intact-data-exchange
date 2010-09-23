@@ -1,14 +1,13 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
-import com.google.common.collect.Multimap;
 import com.google.common.collect.ArrayListMultimap;
-
-import java.util.*;
-
+import com.google.common.collect.Multimap;
 import uk.ac.ebi.intact.core.persister.stats.StatsUnit;
 import uk.ac.ebi.intact.core.persister.stats.StatsUnitFactory;
 import uk.ac.ebi.intact.core.persister.stats.impl.CvObjectStatsUnit;
 import uk.ac.ebi.intact.model.CvObject;
+
+import java.util.*;
 
 /**
  * Summary of statistics for the CvUpdater
@@ -29,8 +28,8 @@ public class CvUpdaterStatistics {
 
     public CvUpdaterStatistics() {
         this.rootCvs = new ArrayList<StatsUnit>();
-        this.createdCvs = new ArrayListMultimap<Class,StatsUnit>();
-        this.updatedCvs = new ArrayListMultimap<Class,StatsUnit>();
+        this.createdCvs = ArrayListMultimap.create();
+        this.updatedCvs = ArrayListMultimap.create();
         this.orphanCvs = new ArrayList<StatsUnit>();
         this.obsoleteCvs = new HashMap<String,String>();
         this.invalidTerms = new HashMap<String,String>();

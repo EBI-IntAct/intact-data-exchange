@@ -15,18 +15,17 @@
  */
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.model.CvDagObject;
-import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-
+import uk.ac.ebi.intact.model.CvDagObject;
+import uk.ac.ebi.intact.model.CvObject;
 
 import java.util.*;
 
@@ -87,7 +86,7 @@ public class CvUtils {
             throw new IllegalArgumentException( "At least two children have to be provided to find a common parent" );
         }
 
-        Multimap<String, String> cvMap = new LinkedListMultimap<String, String>();
+        Multimap<String, String> cvMap = LinkedHashMultimap.create();
 
         // get all the parents for each child
         for ( CvDagObject child : children ) {
