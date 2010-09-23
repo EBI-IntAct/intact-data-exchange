@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.model.CvFuzzyType;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.Range;
@@ -47,6 +48,8 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
     public static final String UNDETERMINED = "undetermined";
     public static final String CTERMINAL = "c-terminal";
     public static final String NTERMINAL = "n-terminal";
+    public static final String CTERMINAL_REGION = "c-terminal region";
+    public static final String NTERMINAL_REGION = "n-terminal region";
     public static final String RAGGED_NTERMINUS = "ragged n-terminus";
 
     public RangeConverter(Institution institution) {
@@ -54,6 +57,7 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
     }
 
     public Range psiToIntact(psidev.psi.mi.xml.model.Range psiObject) {
+
         Integer beginIntervalFrom = null;
         Integer beginIntervalTo = null;
         Integer endIntervalFrom = null;
@@ -88,18 +92,18 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
                 new CvObjectConverter<CvFuzzyType,RangeStatus>(getInstitution(), CvFuzzyType.class, RangeStatus.class);
 
         final RangeStatus startStatus = psiObject.getStartStatus();
-
-        CvFuzzyType fromFuzzyType = null;
-        if (startStatus != null) {
-            fromFuzzyType = fuzzyTypeConverter.psiToIntact(startStatus);
-        }
-
         final RangeStatus endStatus = psiObject.getEndStatus();
 
-        CvFuzzyType toFuzzyType = null;
-        if (endStatus != null) {
-            toFuzzyType = fuzzyTypeConverter.psiToIntact(endStatus);
+        if (startStatus == null){
+            throw new PsiConversionException("We couldn't find a start status for the position (" + beginIntervalFrom + "-" + beginIntervalTo + ")");
         }
+        if (endStatus == null){
+            throw new PsiConversionException("We couldn't find a end status for the position (" + endIntervalFrom + "-" + endIntervalTo + ")");
+        }
+
+        CvFuzzyType fromFuzzyType = fuzzyTypeConverter.psiToIntact(startStatus);
+        CvFuzzyType toFuzzyType = fuzzyTypeConverter.psiToIntact(endStatus);
+
         String seq = null;
 
         // if the positions are null but the range status is 'range', 'less-than', 'greater-than', 'certain' or 'ragged n-terminus' it is an error
@@ -123,35 +127,34 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         }
 
         // create the range
-        Range range = new Range(getInstitution(), beginIntervalFrom, beginIntervalTo, endIntervalFrom, endIntervalTo, seq);
-        range.setFromCvFuzzyType(fromFuzzyType);
-        range.setToCvFuzzyType(toFuzzyType);
+        Range range = new Range(fromFuzzyType, beginIntervalFrom, beginIntervalTo, toFuzzyType, endIntervalFrom, endIntervalTo, seq);
+        range.setOwner(getInstitution());
 
         // check possible errors
-        if (fromFuzzyType.isUndetermined() && (beginIntervalFrom > 0 || beginIntervalTo > 0 || beginIntervalFrom != beginIntervalTo)){
+        if ((fromFuzzyType.isUndetermined() || fromFuzzyType.isCTerminalRegion() || fromFuzzyType.isNTerminalRegion()) && (beginIntervalFrom > 0 || beginIntervalTo > 0 || beginIntervalFrom != beginIntervalTo)){
             throw new PsiConversionException( "Cannot convert the range " + range.toString() + ". The start position is undetermined and we should have a position null" +
-                    " or equal to 0 instead of "+beginIntervalFrom+". A position interval is not allowed for this status.");
+                    " or equal to 0 instead of "+beginIntervalFrom+"-"+beginIntervalTo+". A position interval is not allowed for this status.");
         }
         else if (fromFuzzyType.isNTerminal() && (beginIntervalFrom > 1 || beginIntervalTo > 1 || beginIntervalFrom != beginIntervalTo) ){
             throw new PsiConversionException( "Cannot convert the range " + range.toString() + ". The start position is n-terminal and we should have a position equal to 1" +
-                    " instead of "+beginIntervalFrom+". A position interval is not allowed for this status.");
+                    " instead of "+beginIntervalFrom+"-"+beginIntervalTo+". A position interval is not allowed for this status.");
         }
         else if (fromFuzzyType.isCTerminal() && (beginIntervalFrom < 0 || beginIntervalTo < 0 || beginIntervalFrom != beginIntervalTo) ){
             throw new PsiConversionException( "Cannot convert the range " + range.toString() + ". The start position is c-terminal and we should have a position equal to the sequence length" +
-                    " (or 0 if we don't know the sequence length) instead of "+beginIntervalFrom+". A position interval is not allowed for this status.");
+                    " (or 0 if we don't know the sequence length) instead of "+beginIntervalFrom+"-"+beginIntervalTo+". A position interval is not allowed for this status.");
         }
 
-        if (toFuzzyType.isUndetermined() && (endIntervalFrom > 0 || endIntervalTo > 0 || endIntervalFrom != endIntervalTo)){
+        if ((toFuzzyType.isUndetermined() || toFuzzyType.isCTerminalRegion() || toFuzzyType.isNTerminalRegion()) && (endIntervalFrom > 0 || endIntervalTo > 0 || endIntervalFrom != endIntervalTo)){
             throw new PsiConversionException( "Cannot convert the range " + range.toString() + ". The end position is undetermined and we should have a position null" +
-                    " or equal to 0. A position interval is not allowed for this status.");
+                    " or equal to 0 instead of "+endIntervalFrom+"-"+endIntervalTo+". A position interval is not allowed for this status.");
         }
         else if (toFuzzyType.isNTerminal() && (endIntervalFrom > 1 || endIntervalTo > 1 || endIntervalFrom != endIntervalTo) ){
             throw new PsiConversionException( "Cannot convert the range " + range.toString() + ". The end position is n-terminal and we should have a position equal to 1" +
-                    " instead of "+endIntervalTo+". A position interval is not allowed for this status.");
+                    " instead of "+endIntervalFrom+"-"+endIntervalTo+". A position interval is not allowed for this status.");
         }
         else if (toFuzzyType.isCTerminal() && (endIntervalFrom < 0 || endIntervalTo < 0 || endIntervalFrom != endIntervalTo) ){
             throw new PsiConversionException( "Cannot convert the range " + range.toString() + ". The start position is c-terminal and we should have a position equal to the sequence length" +
-                    " (or 0 if we don't know the sequence length) instead of "+endIntervalTo+". A position interval is not allowed for this status.");
+                    " (or 0 if we don't know the sequence length) instead of "+endIntervalFrom+"-"+endIntervalTo+". A position interval is not allowed for this status.");
         }
 
         // correct positions for undetermined, n-terminal or c-terminal
@@ -218,6 +221,20 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         return false;
     }
 
+    private boolean isCTerminalRegion( RangeStatus rangeStatus ) {
+        if ( isStatusOfType( rangeStatus, CTERMINAL_REGION, null ) ) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isNTerminalRegion( RangeStatus rangeStatus ) {
+        if ( isStatusOfType( rangeStatus, NTERMINAL_REGION, null ) ) {
+            return true;
+        }
+        return false;
+    }
+
     private boolean isRaggedNTerminal( RangeStatus rangeStatus ) {
         if ( isStatusOfType( rangeStatus, RAGGED_NTERMINUS_MI_REF, RAGGED_NTERMINUS ) ) {
             return true;
@@ -226,7 +243,7 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
     }
 
     private boolean isStatusOfType( RangeStatus status, String psimiName, String psimiIdentifier ) {
-        if ( status.getXref() != null ) {
+        if ( status.getXref() != null && psimiIdentifier != null) {
             final DbReference ref = status.getXref().getPrimaryRef();
             return psimiIdentifier.equalsIgnoreCase( ref.getId() );
         }
