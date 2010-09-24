@@ -75,6 +75,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                         if (experimentStatus.doNotExport()) {
                             // forbid export for all interactions of that experiment (and their proteins).
                             System.out.println("\t\t\t\t\t No interactions of that experiment will be exported.");
+                            experimentNotExported.add(experiment);
                         }
                         // we can export the experiment
                         else if (experimentStatus.doExport()) {
@@ -149,9 +150,6 @@ public class InteractionExtractorForMIScore extends LineExport {
                             eligibleInteractions.add(interaction.getAc());
 
                         }
-                        else {
-                            experimentNotExported.add(experiment);
-                        }
                     }
 
                 } // i's experiments
@@ -170,6 +168,8 @@ public class InteractionExtractorForMIScore extends LineExport {
      * @param eligibleInteractions : the list of interactions which are elligible for a uniprot export
      */
     private void processEligibleExperimentsWithCurrentRules(List<String> interactionAcs, List<String> eligibleInteractions) {
+        // set of experiments not exported
+        Set<Experiment> experimentNotExported = new HashSet<Experiment>();
 
         // process each interaction of the list
         final int interactionCount = interactionAcs.size();
@@ -184,182 +184,184 @@ public class InteractionExtractorForMIScore extends LineExport {
 
                 Collection experiments = interaction.getExperiments();
 
-                int expCount = experiments.size();
-
                 for (Iterator iterator2 = experiments.iterator(); iterator2.hasNext();) {
                     Experiment experiment = (Experiment) iterator2.next();
 
                     boolean experimentExport = false;
+                    // this experiment was not already processed or can be exported
+                    if (!experimentNotExported.contains(experiment)){
 
-                    ExperimentStatus experimentStatus = getCCLineExperimentExportStatus(experiment, "\t\t\t\t\t");
-                    if (experimentStatus.doNotExport()) {
-                        // forbid export for all interactions of that experiment (and their proteins).
-                        System.out.println("\t\t\t\t\t No interactions of that experiment will be exported.");
+                        ExperimentStatus experimentStatus = getCCLineExperimentExportStatus(experiment, "\t\t\t\t\t");
+                        if (experimentStatus.doNotExport()) {
+                            // forbid export for all interactions of that experiment (and their proteins).
+                            System.out.println("\t\t\t\t\t No interactions of that experiment will be exported.");
+                            experimentNotExported.add(experiment);
 
-                    } else if (experimentStatus.doExport()) {
-                        // Authorise export for all interactions of that experiment (and their proteins),
-                        // This overwrite the setting of the CvInteraction concerning the export.
+                        } else if (experimentStatus.doExport()) {
+                            // Authorise export for all interactions of that experiment (and their proteins),
+                            // This overwrite the setting of the CvInteraction concerning the export.
 
-                        experimentExport = true;
+                            experimentExport = true;
 
-                    } else if (experimentStatus.isLargeScale()) {
+                        } else if (experimentStatus.isLargeScale()) {
 
-                        // if my interaction has one of those keywords as annotation for DR line export, do export.
-                        Collection keywords = experimentStatus.getKeywords();
-                        Collection annotations = interaction.getAnnotations();
-                        boolean annotationFound = false;
+                            // if my interaction has one of those keywords as annotation for DR line export, do export.
+                            Collection keywords = experimentStatus.getKeywords();
+                            Collection annotations = interaction.getAnnotations();
+                            boolean annotationFound = false;
 
-                        CvTopic authorConfidenceTopic = getAuthorConfidence();
+                            CvTopic authorConfidenceTopic = getAuthorConfidence();
 
-                        // We assume here that an interaction has a single Annotation of type 'uniprot-dr-export'.
-                        for (Iterator iterator3 = annotations.iterator(); iterator3.hasNext() && !annotationFound;) {
-                            final Annotation annotation = (Annotation) iterator3.next();
+                            // We assume here that an interaction has a single Annotation of type 'uniprot-dr-export'.
+                            for (Iterator iterator3 = annotations.iterator(); iterator3.hasNext() && !annotationFound;) {
+                                final Annotation annotation = (Annotation) iterator3.next();
 
-                            if (authorConfidenceTopic.equals(annotation.getCvTopic())) {
-                                String text = annotation.getAnnotationText();
+                                if (authorConfidenceTopic.equals(annotation.getCvTopic())) {
+                                    String text = annotation.getAnnotationText();
 
-                                System.out.println("\t\t\t Interaction has " + authorConfidenceTopic.getShortLabel() + ": '" + text + "'");
+                                    System.out.println("\t\t\t Interaction has " + authorConfidenceTopic.getShortLabel() + ": '" + text + "'");
 
-                                if (text != null) {
-                                    text = text.trim();
-                                }
+                                    if (text != null) {
+                                        text = text.trim();
+                                    }
 
-                                for (Iterator iterator4 = keywords.iterator(); iterator4.hasNext() && !annotationFound;) {
-                                    String kw = (String) iterator4.next();
-                                    // NOT case sensitive
+                                    for (Iterator iterator4 = keywords.iterator(); iterator4.hasNext() && !annotationFound;) {
+                                        String kw = (String) iterator4.next();
+                                        // NOT case sensitive
 
-                                    System.out.println("\t\t\t\t Compare it with '" + kw + "'");
+                                        System.out.println("\t\t\t\t Compare it with '" + kw + "'");
 
-                                    if (kw.equalsIgnoreCase(text)) {
-                                        annotationFound = true;
-                                        getOut().println("\t\t\t\t\t Equals !");
+                                        if (kw.equalsIgnoreCase(text)) {
+                                            annotationFound = true;
+                                            System.out.println("\t\t\t\t\t Equals !");
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        if (annotationFound) {
+                            if (annotationFound) {
 
-                            /*
-                            * We don't need to check an eventual threshold on the method level because
-                            * in the current state, the annotation is on the experiment level that is
-                            * lower and hence is dominant on the method's one.
-                            */
+                                /*
+                                * We don't need to check an eventual threshold on the method level because
+                                * in the current state, the annotation is on the experiment level that is
+                                * lower and hence is dominant on the method's one.
+                                */
 
-                            experimentExport = true;
+                                experimentExport = true;
 
-                        } else {
+                            } else {
 
-                            System.out.println("\t\t\t interaction not eligible");
-                        }
-
-                    } else if (experimentStatus.isNotSpecified()) {
-
-                        System.out.println("\t\t\t\t No experiment status, check the experimental method.");
-
-                        // Then check the experimental method (CvInteraction)
-                        // Nothing specified at the experiment level, check for the method (CvInteraction)
-                        CvInteraction cvInteraction = experiment.getCvInteraction();
-
-                        if (null == cvInteraction) {
-                            // we need to check because cvInteraction is not mandatory in an experiment.
-                            continue; // skip it, go to next experiment
-                        }
-
-                        CvInteractionStatus methodStatus = getMethodExportStatus(cvInteraction, "\t\t");
-
-                        if (methodStatus.doExport()) {
-
-                            experimentExport = true;
-
-                        } else if (methodStatus.doNotExport()) {
-
-                            // do nothing
-
-                        } else if (methodStatus.isNotSpecified()) {
-
-                            // we should never get in here but just in case...
-                            // do nothing
-
-                        } else if (methodStatus.isConditionalExport()) {
-
-                            // if the threshold is not reached, iterates over all available interactions to check if
-                            // there is (are) one (many) that could allow to reach the threshold.
-
-                            int threshold = methodStatus.getMinimumOccurence();
-
-                            // we create a non redondant set of experiment identifier
-                            // TODO couldn't that be a static collection that we empty regularly ?
-                            Set experimentAcs = new HashSet(threshold);
-
-                            // check if there are other experiments attached to the current interaction that validate it.
-                            boolean enoughExperimentFound = false;
-                            for (Iterator iterator = experiments.iterator(); iterator.hasNext();) {
-                                Experiment experiment1 = (Experiment) iterator.next();
-
-                                CvInteraction method = experiment1.getCvInteraction();
-
-                                if (cvInteraction.equals(method)) {
-                                    experimentAcs.add(experiment1.getAc());
-
-                                    // we only update if we found one
-                                    enoughExperimentFound = (experimentAcs.size() >= threshold);
-                                }
+                                System.out.println("\t\t\t interaction not eligible");
                             }
 
-                            for (int j = 0; j < interactionCount && !enoughExperimentFound; j++) {
+                        } else if (experimentStatus.isNotSpecified()) {
 
-                                if (i == j) {
-                                    continue;
-                                }
+                            System.out.println("\t\t\t\t No experiment status, check the experimental method.");
 
-                                //
-                                // Have that conditionalMethods at the interaction scope.
-                                //
-                                // for a interaction
-                                //      for each experiment e
-                                //          if e.CvInteraction <> cvInteraction -> continue
-                                //          else is experiment already processed ? if no, add and check the count >= threashold.
-                                //                                                 if reached, stop, esle carry on.
-                                //
+                            // Then check the experimental method (CvInteraction)
+                            // Nothing specified at the experiment level, check for the method (CvInteraction)
+                            CvInteraction cvInteraction = experiment.getCvInteraction();
 
-                                String interaction2ac = interactionAcs.get(j);
-                                Interaction interaction2 = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interaction2ac);
+                            if (null == cvInteraction) {
+                                // we need to check because cvInteraction is not mandatory in an experiment.
+                                continue; // skip it, go to next experiment
+                            }
 
+                            CvInteractionStatus methodStatus = getMethodExportStatus(cvInteraction, "\t\t");
 
-                                Collection experiments2 = interaction2.getExperiments();
+                            if (methodStatus.doExport()) {
 
-                                for (Iterator iterator6 = experiments2.iterator(); iterator6.hasNext() && !enoughExperimentFound;)
-                                {
-                                    Experiment experiment2 = (Experiment) iterator6.next();
+                                experimentExport = true;
 
-                                    CvInteraction method = experiment2.getCvInteraction();
+                            } else if (methodStatus.doNotExport()) {
+
+                                experimentNotExported.add(experiment);
+
+                            } else if (methodStatus.isNotSpecified()) {
+
+                                experimentNotExported.add(experiment);
+
+                            } else if (methodStatus.isConditionalExport()) {
+
+                                // if the threshold is not reached, iterates over all available interactions to check if
+                                // there is (are) one (many) that could allow to reach the threshold.
+
+                                int threshold = methodStatus.getMinimumOccurence();
+
+                                // we create a non redondant set of experiment identifier
+                                // TODO couldn't that be a static collection that we empty regularly ?
+                                Set experimentAcs = new HashSet(threshold);
+
+                                // check if there are other experiments attached to the current interaction that validate it.
+                                boolean enoughExperimentFound = false;
+                                for (Iterator iterator = experiments.iterator(); iterator.hasNext();) {
+                                    Experiment experiment1 = (Experiment) iterator.next();
+
+                                    CvInteraction method = experiment1.getCvInteraction();
 
                                     if (cvInteraction.equals(method)) {
-                                        experimentAcs.add(experiment2.getAc());
+                                        experimentAcs.add(experiment1.getAc());
+
                                         // we only update if we found one
                                         enoughExperimentFound = (experimentAcs.size() >= threshold);
                                     }
-                                } // j's experiments
+                                }
 
-                                System.out.println("\t\t\t\t " + cvInteraction.getShortLabel() + ", threshold: " +
-                                        threshold + " #experiment: " +
-                                        (experimentAcs == null ? "none" : "" + experimentAcs.size()));
-                            } // j
+                                for (int j = 0; j < interactionCount && !enoughExperimentFound; j++) {
 
-                            if (enoughExperimentFound) {
-                                experimentExport = true;
-                            } else {
-                                System.out.println("\t\t\t\t Not enough experiemnt found");
-                            }
+                                    if (i == j) {
+                                        continue;
+                                    }
 
-                        } // conditional status
-                    } // experiment status not specified
+                                    //
+                                    // Have that conditionalMethods at the interaction scope.
+                                    //
+                                    // for a interaction
+                                    //      for each experiment e
+                                    //          if e.CvInteraction <> cvInteraction -> continue
+                                    //          else is experiment already processed ? if no, add and check the count >= threashold.
+                                    //                                                 if reached, stop, esle carry on.
+                                    //
 
-                    if (experimentExport) {
-                        eligibleInteractions.add(interaction.getAc());
+                                    String interaction2ac = interactionAcs.get(j);
+                                    Interaction interaction2 = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interaction2ac);
 
+
+                                    Collection experiments2 = interaction2.getExperiments();
+
+                                    for (Iterator iterator6 = experiments2.iterator(); iterator6.hasNext() && !enoughExperimentFound;)
+                                    {
+                                        Experiment experiment2 = (Experiment) iterator6.next();
+
+                                        CvInteraction method = experiment2.getCvInteraction();
+
+                                        if (cvInteraction.equals(method)) {
+                                            experimentAcs.add(experiment2.getAc());
+                                            // we only update if we found one
+                                            enoughExperimentFound = (experimentAcs.size() >= threshold);
+                                        }
+                                    } // j's experiments
+
+                                    System.out.println("\t\t\t\t " + cvInteraction.getShortLabel() + ", threshold: " +
+                                            threshold + " #experiment: " +
+                                            (experimentAcs == null ? "none" : "" + experimentAcs.size()));
+                                } // j
+
+                                if (enoughExperimentFound) {
+                                    experimentExport = true;
+                                } else {
+                                    System.out.println("\t\t\t\t Not enough experiemnt found");
+                                }
+
+                            } // conditional status
+                        } // experiment status not specified
+
+                        if (experimentExport) {
+                            eligibleInteractions.add(interaction.getAc());
+
+                        }
                     }
+
                 } // i's experiments
             }
         } // i
@@ -411,7 +413,7 @@ public class InteractionExtractorForMIScore extends LineExport {
             interactions = extractInteractionsPossibleToExport(query.getResultList());
         }
         dataContext.commitTransaction(transactionStatus);
-        
+
         return interactions;
     }
 
