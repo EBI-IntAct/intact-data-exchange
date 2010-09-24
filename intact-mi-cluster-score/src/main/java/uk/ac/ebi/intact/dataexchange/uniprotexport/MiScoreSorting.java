@@ -1,7 +1,5 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport;
 
-import org.springframework.transaction.TransactionStatus;
-import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.InteractionExtractorForMIScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreClient;
@@ -15,10 +13,10 @@ import java.util.List;
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
- * @since <pre>16-Sep-2010</pre>
+ * @since <pre>24-Sep-2010</pre>
  */
 
-public class MiScoreComputing {
+public class MiScoreSorting {
 
     public static void main( String[] args ) throws IOException {
 
@@ -45,19 +43,14 @@ public class MiScoreComputing {
 
         try {
 
-            System.out.println("export interactions from intact");
-            List<String> elligibleBinaryInteractions = interactionExtractor.extractInteractionsPossibleToExport(false);
-
-            System.out.println("computes MI score");
+            System.out.println("create MI score client");
             MiScoreClient scoreClient = new MiScoreClient();
-
-            scoreClient.computeMiScoresFor(elligibleBinaryInteractions, fileTotal);
 
             System.out.println("export interactions from intact with current rules");
             List<String> exportedBinaryInteractions = interactionExtractor.extractInteractionsPossibleToExport(true);
 
-            System.out.println("export interactions from intact");
-            scoreClient.extractMiScoresFor(exportedBinaryInteractions, fileDataExported, fileDataNotExported);
+            System.out.println("export interactions scores");
+            scoreClient.extractMiScoresFromFile(exportedBinaryInteractions, fileTotal, fileDataExported, fileDataNotExported);
 
         } catch (SQLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
