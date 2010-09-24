@@ -30,6 +30,11 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
     protected String fileName;
     private MIOntology MIO = new MIOntology();
 
+    public IntActInteractionClusterScore(){
+        super();
+        setMappingIdDbNames("uniprotkb");
+    }
+
     @Override
     public void runService() {
         logger.debug("runService");
