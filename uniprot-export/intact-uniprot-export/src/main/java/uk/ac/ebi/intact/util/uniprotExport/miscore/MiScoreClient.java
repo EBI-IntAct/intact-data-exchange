@@ -343,7 +343,7 @@ public class MiScoreClient {
                 binaryInteractions.clear();
 
                 // converts the interactions into binary interactions and increments the index in the list of interactions
-                i = convertIntoBinaryInteractions(interactions, i, (List)binaryInteractions);
+                i = convertIntoBinaryInteractions(interactions, i, binaryInteractions);
 
                 // filter the computed scores
                 extractMiScoreForBinaryInteractions(binaryInteractions, writer1, writer2, interactionIdentifiersExported, interactionIdentifiersAlreadyProcessed);
