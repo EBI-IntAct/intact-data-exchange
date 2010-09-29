@@ -18,7 +18,7 @@
 
     <properties>
         <currentVersion>${version}</currentVersion>
-        <psimi.version>1.7.6</psimi.version>
+        <psimi.version>1.7.8-SNAPSHOT</psimi.version>
     </properties>
 
     <modules>
