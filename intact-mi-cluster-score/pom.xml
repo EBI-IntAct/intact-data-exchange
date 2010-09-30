@@ -54,12 +54,16 @@
                                      also adding the project build directory -->
                                 <classpath/>
                                 <argument>uk.ac.ebi.intact.dataexchange.uniprotexport.MiScoreComputing</argument>
-                                <!-- The file to validate, when a directory is given, process all files with an extension .xml recursively -->
+                                <!-- The file which will contain the mi-scores-->
                                 <argument>${file1}</argument>
-                                <!-- Apply validation given scope (xml, cv, mimix, imex) -->
+                                <!-- The file which will contain the mi scores of the interactions currently exoirted in uniprot -->
                                 <argument>${file2}</argument>
-                                <!-- If specified, only output messages that are of the same level or more severe -->
+                                <!-- The file which will contain the mi scores of the data not exported in uniprot -->
                                 <argument>${file3}</argument>
+                                <!-- The file which will contain the list of interaction ac which are eligible for a uniprot export-->
+                                <argument>${file4}</argument>
+                                <!-- The file which will contain the list of interaction ac which are currently exported in uniprot  -->
+                                <argument>${file5}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -91,12 +95,14 @@
                                      also adding the project build directory -->
                                 <classpath/>
                                 <argument>uk.ac.ebi.intact.dataexchange.uniprotexport.MiScoreSorting</argument>
-                                <!-- The file to validate, when a directory is given, process all files with an extension .xml recursively -->
+                                <!-- The file which will contain the mi-scores-->
                                 <argument>${file1}</argument>
-                                <!-- Apply validation given scope (xml, cv, mimix, imex) -->
+                                <!-- The file which will contain the mi scores of the interactions currently exoirted in uniprot -->
                                 <argument>${file2}</argument>
-                                <!-- If specified, only output messages that are of the same level or more severe -->
+                                <!-- The file which will contain the mi scores of the data not exported in uniprot -->
                                 <argument>${file3}</argument>
+                                <!-- The file which will contain the list of interaction ac which are exported in uniprot-->
+                                <argument>${file4}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
