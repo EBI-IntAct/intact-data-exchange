@@ -14,7 +14,7 @@ import uk.ac.ebi.intact.util.uniprotExport.event.DrLineProcessedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.NonBinaryInteractionFoundEvent;
 
 import javax.persistence.Query;
-import java.io.IOException;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -370,11 +370,12 @@ public class InteractionExtractorForMIScore extends LineExport {
     /**
      * Extracts the interactions which are possible to export in uniprot
      * @param useCurrentRules : boolean value to know if we want to use the existing rules on the interaction detection method for exporting interactions in uniprot
+     * @param fileForListOfInteractions : the name of the file where we want to write the list of interactions Acs possible to export
      * @return the list of IntAct interaction accessions of the interactions which can be exported using the rules on the interaction detection method or not
      * @throws SQLException
      * @throws IOException
      */
-    public List<String> extractInteractionsPossibleToExport(boolean useCurrentRules) throws SQLException, IOException {
+    public List<String> extractInteractionsPossibleToExport(boolean useCurrentRules, String fileForListOfInteractions) throws SQLException, IOException {
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
@@ -407,10 +408,10 @@ public class InteractionExtractorForMIScore extends LineExport {
 
         // if we want to apply the current rules on the interaction detection method
         if (useCurrentRules){
-            interactions = extractInteractionsCurrentlyExported(query.getResultList());
+            interactions = extractInteractionsCurrentlyExported(query.getResultList(), fileForListOfInteractions);
         }
         else {
-            interactions = extractInteractionsPossibleToExport(query.getResultList());
+            interactions = extractInteractionsPossibleToExport(query.getResultList(), fileForListOfInteractions);
         }
         dataContext.commitTransaction(transactionStatus);
 
@@ -420,16 +421,26 @@ public class InteractionExtractorForMIScore extends LineExport {
     /**
      * This method is ignoring the current rules on the interaction detection method to decide if an interaction can be exported or not
      * @param potentiallyEligibleInteraction : the list of interaction accessions to process
+     * @param fileForListOfInteractions : the name of the file where we want to write the list of interactions Acs possible to export
      * @return the list of interactions accessions which can be exported in uniprot
      * @throws SQLException
      * @throws IOException
      */
-    public List<String> extractInteractionsPossibleToExport(List<String> potentiallyEligibleInteraction) throws SQLException, IOException {
+    public List<String> extractInteractionsPossibleToExport(List<String> potentiallyEligibleInteraction, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(potentiallyEligibleInteraction.size() + " interactions to process.");
         List<String> eligibleInteractions = new ArrayList<String>();
 
         processEligibleExperiments(potentiallyEligibleInteraction, eligibleInteractions );
+
+        FileWriter writer = new FileWriter(fileForListOfInteractions);
+
+        for (String ac : eligibleInteractions){
+            writer.write(ac + "\n");
+            writer.flush();
+        }
+
+        writer.close();
 
         return eligibleInteractions;
     }
@@ -437,16 +448,53 @@ public class InteractionExtractorForMIScore extends LineExport {
     /**
      * This method is using the current rules on the interaction detection method to decide if an interaction can be exported or not
      * @param potentiallyEligibleInteraction : the list of interaction accessions to process
+     * @param fileForListOfInteractions : the name of the file where we want to write the list of interactions Acs currently exported
      * @return the list of interactions accessions which are exported in uniprot
      * @throws SQLException
      * @throws IOException
      */
-    public List<String> extractInteractionsCurrentlyExported(List<String> potentiallyEligibleInteraction) throws SQLException, IOException {
+    public List<String> extractInteractionsCurrentlyExported(List<String> potentiallyEligibleInteraction, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(potentiallyEligibleInteraction.size() + " interactions to process.");
         List<String> eligibleInteractions = new ArrayList<String>();
 
         processEligibleExperimentsWithCurrentRules(potentiallyEligibleInteraction, eligibleInteractions );
+
+        FileWriter writer = new FileWriter(fileForListOfInteractions);
+
+        for (String ac : eligibleInteractions){
+            writer.write(ac + "\n");
+            writer.flush();
+        }
+
+        writer.close();
         return eligibleInteractions;
+    }
+
+    /**
+     * @param fileName : the list of interaction accessions to process in a file
+     * @return the list of interactions accessions listed in a file
+     * @throws SQLException
+     * @throws IOException
+     */
+    public List<String> extractInteractionsFromFile(String fileName) throws SQLException, IOException {
+
+        File file = new File(fileName);
+
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+
+        String line = reader.readLine();
+        List<String> potentiallyElligibleInteractions = new ArrayList<String>();
+
+        while (line != null){
+            potentiallyElligibleInteractions.add(line);
+            line = reader.readLine();
+        }
+
+        reader.close();
+
+        System.out.println(potentiallyElligibleInteractions.size() + " interactions to process.");
+
+        return potentiallyElligibleInteractions;
     }
 }

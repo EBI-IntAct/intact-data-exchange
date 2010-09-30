@@ -271,7 +271,7 @@ public class MiScoreClient {
         try {
 
             // we extract the score results from the file
-            Map<String, Double> totalNiScore = buildMapOfMiScoreFromFile(fileContainingDataExported);
+            Map<String, Double> totalNiScore = buildMapOfMiScoreFromFile(fileContainingTotalScore);
 
             // list of interactions ids exported in uniprot
             Set<String> interactionIdentifiersExported = new HashSet<String>();
@@ -380,6 +380,12 @@ public class MiScoreClient {
             String sourceIdDbName = xref.getDatabase();
 
             if (UNIPROT_DATABASE.equalsIgnoreCase(sourceIdDbName)){
+
+                if (acc.contains("-")){
+                    int index = acc.indexOf("-");
+
+                    return acc.substring(0, index);
+                }
                 return acc;
             }
 
