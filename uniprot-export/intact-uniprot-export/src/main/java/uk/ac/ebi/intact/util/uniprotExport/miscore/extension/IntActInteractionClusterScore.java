@@ -1,18 +1,21 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.extension;
 
 import org.apache.log4j.Logger;
+import psidev.psi.mi.tab.PsimiTabWriter;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Confidence;
+import psidev.psi.mi.xml.converter.ConverterException;
+import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
 import uk.ac.ebi.enfin.mi.score.ols.MIOntology;
 import uk.ac.ebi.enfin.mi.score.scores.MIScore;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Extension of the InteractionClusterScore : use a different format to export the scores
@@ -27,12 +30,13 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
     private static final Logger logger = Logger.getLogger(IntActInteractionClusterScore.class);
     private String[] scoreList = null;
     private String scoreListCSV;
-    protected String fileName;
-    private MIOntology MIO = new MIOntology();
+
+    private PsimiTabWriter writer;
 
     public IntActInteractionClusterScore(){
         super();
         setMappingIdDbNames("uniprotkb");
+        writer = new PsimiTabWriter();
     }
 
     @Override
@@ -87,15 +91,34 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
 
     @Override
     public void saveScores(String fileName){
+        /* Retrieve results */
+        Map<Integer, EncoreInteraction> interactionMapping = getInteractionMapping();
+        Map<Integer, BinaryInteraction> binaryInteractionMapping = new HashMap<Integer,BinaryInteraction>();
+        Encore2Binary iConverter = new Encore2Binary(getMappingIdDbNames());
+
+        for(int mappingId:interactionMapping.keySet()){
+            EncoreInteraction eI = interactionMapping.get(mappingId);
+            BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
+            binaryInteractionMapping.put(mappingId,bI);
+        }
+
+        File file = new File(fileName);
+        try {
+            writer.write(binaryInteractionMapping.values(), file);
+        } catch (Exception e) {
+            logger.error("It is not possible to write the results in the mitab file " + fileName);
+            e.printStackTrace();
+        }
+
         if(scoreList == null){
             getScoresPerInteraction();
         }
         try{
             // Create file
-            FileWriter fstream = new FileWriter(fileName);
+            FileWriter fstream = new FileWriter(fileName + "_log.txt");
             BufferedWriter out = new BufferedWriter(fstream);
             out.write(scoreListCSV);
-            logger.info("Saving scores on ... " + fileName);
+            logger.info("Saving scores on ... " + fileName + "_log.txt");
             //Close the output stream
             out.close();
         }catch (Exception e){//Catch exception if any
@@ -103,4 +126,42 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         }
     }
 
+    public void saveScoresForSpecificInteractions(String fileName, Collection<Integer> interactionIds){
+
+        if(scoreList == null){
+            getScoresPerInteraction();
+        }
+        try{
+            // Create file
+            FileWriter fstream = new FileWriter(fileName + "_log.txt");
+            BufferedWriter out = new BufferedWriter(fstream);
+            out.write(scoreListCSV);
+            logger.info("Saving scores on ... " + fileName + "_log.txt");
+            //Close the output stream
+            out.close();
+        }catch (Exception e){//Catch exception if any
+            logger.error("Error: " + e.getMessage());
+        }
+        
+        /* Retrieve results */
+        Map<Integer, EncoreInteraction> interactionMapping = getInteractionMapping();
+        Map<Integer, BinaryInteraction> binaryInteractionMapping = new HashMap<Integer,BinaryInteraction>();
+        Encore2Binary iConverter = new Encore2Binary(getMappingIdDbNames());
+
+        for(Integer mappingId:interactionIds){
+            EncoreInteraction eI = interactionMapping.get(mappingId);
+            BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
+            binaryInteractionMapping.put(mappingId,bI);
+        }
+
+        File file = new File(fileName);
+        try {
+
+            writer.write(binaryInteractionMapping.values(), file);
+
+        } catch (Exception e) {
+            logger.error("It is not possible to write the results in the mitab file " + fileName);
+            e.printStackTrace();
+        }
+    }
 }

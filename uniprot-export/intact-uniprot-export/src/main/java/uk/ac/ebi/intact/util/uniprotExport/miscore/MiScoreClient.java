@@ -3,10 +3,8 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Interaction;
@@ -196,7 +194,7 @@ public class MiScoreClient {
      * @return Map containing for each interaction as String interactorA-interactorB a MI score
      * @throws IOException
      */
-    private Map<String,Double> buildMapOfMiScoreFromFile(String fileName) throws IOException {
+    /*private Map<String,Double> buildMapOfMiScoreFromFile(String fileName) throws IOException {
 
         // the buffer reader
         BufferedReader reader = new BufferedReader(new FileReader(fileName));
@@ -255,19 +253,9 @@ public class MiScoreClient {
         reader.close();
 
         return totalMiScore;
-    }
+    }*/
 
-
-    /**
-     * Extracts the MI cluster score for each interaction exported in uniprot and write the results in a file. the results for the interactions not exported in uniprot
-     * is also written in a file. This supposes that the MI score has been computed for all the interactions in IntAct before.
-     * The computed scores of all the interactions is extracted from a file.
-     *  @param interactions : the list of interactions currently exported in uniprot
-     * @param fileContainingTotalScore : the file containing the mi score results
-     * @param fileContainingDataExported : the files for the score results of the interactions exported in uniprot
-     * @param fileContainingDataNotExported : the files for the score results of the interactions not exported in uniprot
-     */
-    public void extractMiScoresFromFile(List<String> interactions, String fileContainingTotalScore, String fileContainingDataExported, String fileContainingDataNotExported){
+    /*public void extractMiScoresFromFile(List<String> interactions, String fileContainingTotalScore, String fileContainingData){
         try {
 
             // we extract the score results from the file
@@ -279,9 +267,7 @@ public class MiScoreClient {
             Set<String> interactionIdentifiersAlreadyProcessed = new HashSet<String>();
 
             // file writer for interactions exported in uniprot
-            FileWriter writer1 = new FileWriter(fileContainingDataExported);
-            // file writer for interactions not exported in uniprot
-            FileWriter writer2 = new FileWriter(fileContainingDataNotExported);
+            FileWriter writer1 = new FileWriter(fileContainingData);
 
             int i = 0;
             Set<BinaryInteraction> binaryInteractions = new HashSet<BinaryInteraction>();
@@ -297,7 +283,7 @@ public class MiScoreClient {
                 i = convertIntoBinaryInteractions(interactions, i, binaryInteractions);
 
                 // filter the computed scores
-                extractMiScoreForBinaryInteractionsFromFile(binaryInteractions, writer1, writer2, interactionIdentifiersExported, interactionIdentifiersAlreadyProcessed, totalNiScore);
+                extractMiScoreForBinaryInteractionsFromFile(binaryInteractions, interactionIdentifiersExported, totalNiScore);
                 //i += 200;
                 int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
                 System.out.println("Still " + interactionsToProcess + " interactions to process in IntAct.");
@@ -305,13 +291,57 @@ public class MiScoreClient {
 
             // close the writers
             writer1.close();
-            writer2.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("We cannot write the results in " + fileContainingData);
+        }
+    }*/
+
+
+    /**
+     * Extracts the MI cluster score for each interaction exported in uniprot and write the results in a file. the results for the interactions not exported in uniprot
+     * is also written in a file. This supposes that the MI score has been computed for all the interactions in IntAct before.
+     * The computed scores of all the interactions is extracted from a file.
+     *  @param interactions : the list of interactions currently exported in uniprot
+     * @param fileContainingTotalScore : the file containing the mi score results
+     * @param fileContainingDataExported : the files for the score results of the interactions exported in uniprot
+     * @param fileContainingDataNotExported : the files for the score results of the interactions not exported in uniprot
+     */
+    /*public void extractMiScoresFromFile(List<String> interactions, String fileContainingTotalScore, String fileContainingDataExported, String fileContainingDataNotExported){
+        try {
+
+            // we extract the score results from the file
+            Map<String, Double> totalNiScore = buildMapOfMiScoreFromFile(fileContainingTotalScore);
+
+            // list of interactions ids exported in uniprot
+            Set<String> interactionIdentifiersExported = new HashSet<String>();
+
+            int i = 0;
+            Set<BinaryInteraction> binaryInteractions = new HashSet<BinaryInteraction>();
+
+            System.out.println(interactions.size() + " interactions in IntAct will be processed.");
+
+            // each interaction will be processed
+            while (i < interactions.size()){
+                // we clear the previous binary interactions to keep only 200 binary interaction at the same time
+                binaryInteractions.clear();
+
+                // converts the interactions into binary interactions and increments the index in the list of interactions
+                i = convertIntoBinaryInteractions(interactions, i, binaryInteractions);
+
+                // filter the computed scores
+                extractMiScoreForBinaryInteractionsFromFile(binaryInteractions, interactionIdentifiersExported, totalNiScore);
+                //i += 200;
+                int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
+                System.out.println("Still " + interactionsToProcess + " interactions to process in IntAct.");
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("We cannot write the results in " + fileContainingDataExported + " or " + fileContainingDataNotExported);
         }
-    }
+    }*/
 
     /**
      * Extracts the MI cluster score for each interaction exported in uniprot and write the results in a file. the results for the interactions not exported in uniprot
@@ -321,45 +351,32 @@ public class MiScoreClient {
      * @param fileContainingDataNotExported : the files for the score results of the interactions not exported in uniprot
      */
     public void extractMiScoresFor(List<String> interactions, String fileContainingDataExported, String fileContainingDataNotExported){
-        try {
-            // list of interactions ids exported in uniprot
-            Set<Integer> interactionIdentifiersExported = new HashSet<Integer>();
-            // list of interactions ids not exported in uniprot
-            Set<Integer> interactionIdentifiersAlreadyProcessed = new HashSet<Integer>();
 
-            // file writer for interactions exported in uniprot
-            FileWriter writer1 = new FileWriter(fileContainingDataExported);
-            // file writer for interactions not exported in uniprot
-            FileWriter writer2 = new FileWriter(fileContainingDataNotExported);
+        // list of interactions ids exported in uniprot
+        Set<Integer> interactionIdentifiersExported = new HashSet<Integer>();
 
-            int i = 0;
-            Set<BinaryInteraction> binaryInteractions = new HashSet<BinaryInteraction>();
+        int i = 0;
+        Set<BinaryInteraction> binaryInteractions = new HashSet<BinaryInteraction>();
 
-            System.out.println(interactions.size() + " interactions in IntAct will be processed.");
+        System.out.println(interactions.size() + " interactions in IntAct will be processed.");
 
-            // each interaction will be processed
-            while (i < interactions.size()){
-                // we clear the previous binary interactions to keep only 200 binary interaction at the same time
-                binaryInteractions.clear();
+        // each interaction will be processed
+        while (i < interactions.size()){
+            // we clear the previous binary interactions to keep only 200 binary interaction at the same time
+            binaryInteractions.clear();
 
-                // converts the interactions into binary interactions and increments the index in the list of interactions
-                i = convertIntoBinaryInteractions(interactions, i, binaryInteractions);
+            // converts the interactions into binary interactions and increments the index in the list of interactions
+            i = convertIntoBinaryInteractions(interactions, i, binaryInteractions);
 
-                // filter the computed scores
-                extractMiScoreForBinaryInteractions(binaryInteractions, writer1, writer2, interactionIdentifiersExported, interactionIdentifiersAlreadyProcessed);
-                //i += 200;
-                int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
-                System.out.println("Still " + interactionsToProcess + " interactions to process in IntAct.");
-            }
-
-            // close the writers
-            writer1.close();
-            writer2.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("We cannot write the results in " + fileContainingDataExported + " or " + fileContainingDataNotExported);
+            // filter the computed scores
+            extractEncoreInteractionIdForBinaryInteractions(binaryInteractions, interactionIdentifiersExported);
+            //i += 200;
+            int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
+            System.out.println("Still " + interactionsToProcess + " interactions to process in IntAct.");
         }
+
+        this.interactionClusterScore.saveScoresForSpecificInteractions(fileContainingDataExported + "_mitab.csv", interactionIdentifiersExported);
+        this.interactionClusterScore.saveScoresForSpecificInteractions(fileContainingDataNotExported + "_mitab.csv", CollectionUtils.subtract(this.interactionClusterScore.getInteractorMapping().keySet(), interactionIdentifiersExported));
     }
 
     /**
@@ -380,12 +397,6 @@ public class MiScoreClient {
             String sourceIdDbName = xref.getDatabase();
 
             if (UNIPROT_DATABASE.equalsIgnoreCase(sourceIdDbName)){
-
-                if (acc.contains("-")){
-                    int index = acc.indexOf("-");
-
-                    return acc.substring(0, index);
-                }
                 return acc;
             }
 
@@ -396,160 +407,81 @@ public class MiScoreClient {
     /**
      * Extract the MI score of the binary interactions and write them in a file
      * @param binaryInteractions : binary interactions exported in uniprot
-     * @param writer1 : writer for the interactions exported in uniprot
-     * @param writer2 : writer for the interactions not exported in uniprot
      * @param interactionIdentifiersExported : the list of interaction ids exported in uniprot
-     * @param interactionIdentifiersAlreadyProcessed : the list of interactions already processed
      */
-    private void extractMiScoreForBinaryInteractions(Set<BinaryInteraction> binaryInteractions, FileWriter writer1, FileWriter writer2, Set<Integer> interactionIdentifiersExported, Set<Integer> interactionIdentifiersAlreadyProcessed){
+    private void extractEncoreInteractionIdForBinaryInteractions(Set<BinaryInteraction> binaryInteractions, Set<Integer> interactionIdentifiersExported){
 
-        try {
+        // for each binary interaction exported in uniprot, add the Encore interaction Id to the list of exported interactions
+        for (BinaryInteraction binary : binaryInteractions){
+            // get the name of the interactor A
+            String A = extractUniprotAccessionFrom(binary.getInteractorA());
+            // get the name of the interactor B
+            String B = extractUniprotAccessionFrom(binary.getInteractorB());
 
-            // for each binary interaction exported in uniprot, add the Encore interaction Id to the list of exported interactions
-            for (BinaryInteraction binary : binaryInteractions){
-                // get the name of the interactor A
-                String A = extractUniprotAccessionFrom(binary.getInteractorA());
-                // get the name of the interactor B
-                String B = extractUniprotAccessionFrom(binary.getInteractorB());
+            // both interactors should have a uniprot accession
+            if (A != null && B != null){
+                // we extract the list of interaction Ids for the interactor A
+                List<Integer> listOfInteractionsA = this.interactionClusterScore.getInteractorMapping().get(A);
+                // we extract the list of interaction Ids for the interactor B
+                List<Integer> listOfInteractionsB = this.interactionClusterScore.getInteractorMapping().get(B);
 
-                // both interactors should have a uniprot accession
-                if (A != null && B != null){
-                    // we extract the list of interaction Ids for the interactor A
-                    List<Integer> listOfInteractionsA = this.interactionClusterScore.getInteractorMapping().get(A);
-                    // we extract the list of interaction Ids for the interactor B
-                    List<Integer> listOfInteractionsB = this.interactionClusterScore.getInteractorMapping().get(B);
-
-                    // if A and B are involved in interactions having a MI score
-                    if (listOfInteractionsA != null && listOfInteractionsB != null){
-                        // add all the interaction ids for interactor A with interactor B
-                        Collection<Integer> intersection = CollectionUtils.intersection(listOfInteractionsA, listOfInteractionsB);
-                        interactionIdentifiersExported.addAll(intersection);
-                    }
-                    else {
-                        System.out.println(A + " and " + B + " doesn't have a MI score and the interaction is excluded.");
-                    }
+                // if A and B are involved in interactions having a MI score
+                if (listOfInteractionsA != null && listOfInteractionsB != null){
+                    // add all the interaction ids for interactor A with interactor B
+                    Collection<Integer> intersection = CollectionUtils.intersection(listOfInteractionsA, listOfInteractionsB);
+                    interactionIdentifiersExported.addAll(intersection);
                 }
                 else {
-                    throw new IllegalArgumentException("the list of binary interactions contains a binary interaction having one of its interactors whithout any uniprot accessions and this interaction cannot be taken into account.");
+                    System.out.println(A + " and " + B + " doesn't have a MI score and the interaction is excluded.");
                 }
             }
-
-            // filter the scores for each interaction
-            for (Map.Entry<Integer, EncoreInteraction> entry : this.interactionClusterScore.getInteractionMapping().entrySet()){
-                // the interaction Id
-                int interactionId = entry.getKey();
-                // the Encore interaction
-                EncoreInteraction encoreInteraction = entry.getValue();
-
-                // extract the Mi score value for this interaction
-                List<Confidence> confidenceValues = encoreInteraction.getConfidenceValues();
-                Double score = null;
-                for(Confidence confidenceValue:confidenceValues){
-                    if(confidenceValue.getType().equalsIgnoreCase("intactPsiscore")){
-                        score = Double.parseDouble(confidenceValue.getValue());
-                    }
-                }
-
-                // if this interaction has not already been processed
-                if (!interactionIdentifiersAlreadyProcessed.contains(interactionId)){
-                    // if the interaction has been exported in uniprot, use the writer 1
-                    if (interactionIdentifiersExported.contains(interactionId)){
-                        writer1.write(interactionId + "-" + encoreInteraction.getInteractorA() + "-" + encoreInteraction.getInteractorB() + ":" + score + "\n");
-                    }
-                    // if the interaction has not been exported in uniprot, use the writer 2
-                    else {
-                        writer2.write(interactionId + "-" + encoreInteraction.getInteractorA() + "-" + encoreInteraction.getInteractorB() + ":" + score + "\n");
-                    }
-                    interactionIdentifiersAlreadyProcessed.add(interactionId);
-                }
+            else {
+                throw new IllegalArgumentException("the list of binary interactions contains a binary interaction having one of its interactors whithout any uniprot accessions and this interaction cannot be taken into account.");
             }
-
-            // flush the writers
-            writer1.flush();
-            writer2.flush();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("We cannot write the results");
         }
     }
 
     /**
      * Extract the MI score of the binary interactions and write them in a file. The scores have been read from a file.
      * @param binaryInteractions : binary interactions exported in uniprot
-     * @param writer1 : writer for the interactions exported in uniprot
-     * @param writer2 : writer for the interactions not exported in uniprot
      * @param interactionIdentifiersExported : the list of interaction ids exported in uniprot
-     * @param interactionIdentifiersAlreadyProcessed : the list of interactions already processed
      * @param  totalInteractionScore : map containing the interactions and their MI scores extracted from a file
      */
-    private void extractMiScoreForBinaryInteractionsFromFile(Set<BinaryInteraction> binaryInteractions, FileWriter writer1, FileWriter writer2, Set<String> interactionIdentifiersExported, Set<String> interactionIdentifiersAlreadyProcessed, Map<String, Double> totalInteractionScore){
+    /*private void extractMiScoreForBinaryInteractionsFromFile(Set<BinaryInteraction> binaryInteractions, Set<String> interactionIdentifiersExported, Map<String, Double> totalInteractionScore){
 
-        try {
+        // for each binary interaction exported in uniprot, add the interaction Id to the list of exported interactions
+        for (BinaryInteraction binary : binaryInteractions){
+            // get the name of the interactor A
+            String A = extractUniprotAccessionFrom(binary.getInteractorA());
+            // get the name of the interactor B
+            String B = extractUniprotAccessionFrom(binary.getInteractorB());
 
-            // for each binary interaction exported in uniprot, add the interaction Id to the list of exported interactions
-            for (BinaryInteraction binary : binaryInteractions){
-                // get the name of the interactor A
-                String A = extractUniprotAccessionFrom(binary.getInteractorA());
-                // get the name of the interactor B
-                String B = extractUniprotAccessionFrom(binary.getInteractorB());
+            // both interactors should have a uniprot accession
+            if (A != null && B != null){
+                // the interaction key is composed of the two interactor names
+                String interactionString = A + "-" + B;
 
-                // both interactors should have a uniprot accession
-                if (A != null && B != null){
-                    // the interaction key is composed of the two interactor names
-                    String interactionString = A + "-" + B;
+                // we get the matching score for the interaction
+                Double interactionScore = totalInteractionScore.get(interactionString);
 
-                    // we get the matching score for the interaction
-                    Double interactionScore = totalInteractionScore.get(interactionString);
+                // the interaction score can be null because the interactor names were in a different order in the file
+                if (interactionScore == null){
+                    interactionString = B + "-" + A;
+                    interactionScore = totalInteractionScore.get(interactionString);
+                }
 
-                    // the interaction score can be null because the interactor names were in a different order in the file
-                    if (interactionScore == null){
-                        interactionString = B + "-" + A;
-                        interactionScore = totalInteractionScore.get(interactionString);
-                    }
-
-                    // the interaction score should not be null
-                    if (interactionScore != null){
-                        // add all the interaction ids for interactor A with interactor B
-                        interactionIdentifiersExported.add(interactionString);
-                    }
-                    else {
-                        System.out.println(A + " and " + B + " doesn't have a MI score and the interaction is excluded.");
-                    }                    
+                // the interaction score should not be null
+                if (interactionScore != null){
+                    // add all the interaction ids for interactor A with interactor B
+                    interactionIdentifiersExported.add(interactionString);
                 }
                 else {
                     System.out.println(A + " and " + B + " doesn't have a MI score and the interaction is excluded.");
                 }
             }
-
-            // filter the scores for each interaction
-            for (Map.Entry<String, Double> entry : totalInteractionScore.entrySet()){
-                // the interaction name
-                String interaction = entry.getKey();
-                // extract the Mi score value for this interaction
-                Double score = entry.getValue();
-
-                // if this interaction has not already been processed
-                if (!interactionIdentifiersAlreadyProcessed.contains(interaction)){
-                    // if the interaction has been exported in uniprot, use the writer 1
-                    if (interactionIdentifiersExported.contains(interaction)){
-                        writer1.write(interaction + "-" + ":" + score + "\n");
-                    }
-                    // if the interaction has not been exported in uniprot, use the writer 2
-                    else {
-                        writer2.write(interaction + ":" + score + "\n");
-                    }
-                    interactionIdentifiersAlreadyProcessed.add(interaction);
-                }
+            else {
+                System.out.println(A + " and " + B + " doesn't have a MI score and the interaction is excluded.");
             }
-
-            // flush the writers
-            writer1.flush();
-            writer2.flush();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("We cannot write the results");
         }
-    }
+    }*/
 }
