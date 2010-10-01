@@ -376,7 +376,7 @@ public class MiScoreClient {
         }
 
         this.interactionClusterScore.saveScoresForSpecificInteractions(fileContainingDataExported + "_mitab.csv", interactionIdentifiersExported);
-        this.interactionClusterScore.saveScoresForSpecificInteractions(fileContainingDataNotExported + "_mitab.csv", CollectionUtils.subtract(this.interactionClusterScore.getInteractorMapping().keySet(), interactionIdentifiersExported));
+        this.interactionClusterScore.saveScoresForSpecificInteractions(fileContainingDataNotExported + "_mitab.csv", CollectionUtils.subtract(this.interactionClusterScore.getInteractionMapping().keySet(), interactionIdentifiersExported));
     }
 
     /**
