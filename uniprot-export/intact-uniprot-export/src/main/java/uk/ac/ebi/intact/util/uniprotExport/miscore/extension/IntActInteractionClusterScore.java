@@ -82,6 +82,45 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
     }
 
     /**
+     *
+     * @return a list of formatted scores for each interaction
+     */
+    public String[] getScoresPerInteraction(Collection<Integer> interactionIds){
+        if(this.getInteractionMapping() == null){
+            runService();
+        }
+        if(scoreList == null){
+            int scoreListSize = interactionIds.size();
+            scoreList = new String[scoreListSize];
+            scoreListCSV = "";
+            String delimiter = "\n";
+
+            int i = 0;
+            for (Integer eId : interactionIds){
+                EncoreInteraction eI = this.getInteractionMapping().get(eId);
+
+                List<Confidence> confidenceValues = eI.getConfidenceValues();
+                Double score = null;
+                for(Confidence confidenceValue:confidenceValues){
+                    if(confidenceValue.getType().equalsIgnoreCase("intactPsiscore")){
+                        score = Double.parseDouble(confidenceValue.getValue());
+                    }
+                }
+                if(score == null){
+                    logger.error("No score for this interaction: " + eI.getId());
+                }
+                scoreList[i] = eI.getId() + "-" +eI.getInteractorA() + "-" + eI.getInteractorB() + ":" + score;
+                scoreListCSV = scoreListCSV + scoreList[i];
+                i++;
+                if(scoreListSize > i){
+                    scoreListCSV = scoreListCSV + delimiter;
+                }
+            }
+        }
+        return scoreList;
+    }
+
+    /**
      * Saves the score using a formatted String for each interaction
      */
     public void saveScores(){
@@ -129,7 +168,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
     public void saveScoresForSpecificInteractions(String fileName, Collection<Integer> interactionIds){
 
         if(scoreList == null){
-            getScoresPerInteraction();
+            getScoresPerInteraction(interactionIds);
         }
         try{
             // Create file
@@ -142,7 +181,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         }catch (Exception e){//Catch exception if any
             logger.error("Error: " + e.getMessage());
         }
-        
+
         /* Retrieve results */
         Map<Integer, EncoreInteraction> interactionMapping = getInteractionMapping();
         Map<Integer, BinaryInteraction> binaryInteractionMapping = new HashMap<Integer,BinaryInteraction>();
