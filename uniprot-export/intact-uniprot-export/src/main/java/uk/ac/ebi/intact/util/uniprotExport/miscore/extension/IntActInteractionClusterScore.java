@@ -99,21 +99,23 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
             for (Integer eId : interactionIds){
                 EncoreInteraction eI = this.getInteractionMapping().get(eId);
 
-                List<Confidence> confidenceValues = eI.getConfidenceValues();
-                Double score = null;
-                for(Confidence confidenceValue:confidenceValues){
-                    if(confidenceValue.getType().equalsIgnoreCase("intactPsiscore")){
-                        score = Double.parseDouble(confidenceValue.getValue());
+                if (eI != null){
+                    List<Confidence> confidenceValues = eI.getConfidenceValues();
+                    Double score = null;
+                    for(Confidence confidenceValue:confidenceValues){
+                        if(confidenceValue.getType().equalsIgnoreCase("intactPsiscore")){
+                            score = Double.parseDouble(confidenceValue.getValue());
+                        }
                     }
-                }
-                if(score == null){
-                    logger.error("No score for this interaction: " + eI.getId());
-                }
-                scoreList[i] = eI.getId() + "-" +eI.getInteractorA() + "-" + eI.getInteractorB() + ":" + score;
-                scoreListCSV = scoreListCSV + scoreList[i];
-                i++;
-                if(scoreListSize > i){
-                    scoreListCSV = scoreListCSV + delimiter;
+                    if(score == null){
+                        logger.error("No score for this interaction: " + eI.getId());
+                    }
+                    scoreList[i] = eI.getId() + "-" +eI.getInteractorA() + "-" + eI.getInteractorB() + ":" + score;
+                    scoreListCSV = scoreListCSV + scoreList[i];
+                    i++;
+                    if(scoreListSize > i){
+                        scoreListCSV = scoreListCSV + delimiter;
+                    }
                 }
             }
         }
