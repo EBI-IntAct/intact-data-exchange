@@ -52,12 +52,12 @@ public class MiScoreComputing {
         try {
 
             System.out.println("export interactions from intact");
-            List<String> elligibleBinaryInteractions = interactionExtractor.extractInteractionsPossibleToExport(false, fileInteractionEligible);
+            List<String> eligibleBinaryInteractions = interactionExtractor.extractInteractionsPossibleToExport(false, fileInteractionEligible);
 
             System.out.println("computes MI score");
             MiScoreClient scoreClient = new MiScoreClient();
 
-            scoreClient.computeMiScoresFor(elligibleBinaryInteractions, fileTotal);
+            scoreClient.computeMiScoresFor(eligibleBinaryInteractions, fileTotal);
 
             System.out.println("export interactions from intact with current rules");
             List<String> exportedBinaryInteractions = interactionExtractor.extractInteractionsPossibleToExport(true, fileInteractionExported);

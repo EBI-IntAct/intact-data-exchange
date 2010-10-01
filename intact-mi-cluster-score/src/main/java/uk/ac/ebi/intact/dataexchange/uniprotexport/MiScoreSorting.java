@@ -21,7 +21,7 @@ public class MiScoreSorting {
     public static void main( String[] args ) throws IOException {
 
         // three possible arguments
-        if( args.length != 3 ) {
+        if( args.length != 4 ) {
             System.err.println( "Usage: MiScoreComputing <file1> <file2> <file3>" );
             System.err.println( "Usage: <file1> file containing all the scores" );
             System.err.println( "Usage: <file2> file containing all the scores of the interactions exported in uniprot" );
@@ -50,11 +50,12 @@ public class MiScoreSorting {
             MiScoreClient scoreClient = new MiScoreClient();
 
             System.out.println("export interactions from intact with current rules");
-            List<String> exportedBinaryInteractions = interactionExtractor.extractInteractionsPossibleToExport(true, fileInteractionExported);
+            //List<String> exportedBinaryInteractions = interactionExtractor.extractInteractionsPossibleToExport(true, fileInteractionExported);
             //List<String> exportedBinaryInteractions = interactionExtractor.extractInteractionsFromFile("/home/marine/Desktop/Intact_interactions_exported.txt");
+            List<String> exportedBinaryInteractions = interactionExtractor.extractInteractionsWithoutRulesForInteractionDetectionMethod(fileInteractionExported);
 
             System.out.println("export interactions scores");
-            scoreClient.extractMiScoresFromFile(exportedBinaryInteractions, fileTotal, fileDataExported, fileDataNotExported);
+            scoreClient.extractMiScoresFromFile(exportedBinaryInteractions, fileTotal, fileDataExported);
 
         } catch (SQLException e) {
             e.printStackTrace(); 
