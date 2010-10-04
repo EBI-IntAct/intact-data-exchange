@@ -16,7 +16,11 @@
 package uk.ac.ebi.intact.psimitab;
 
 import psidev.psi.mi.tab.converter.xml2tab.Xml2Tab;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.xml.PsimiXmlReader;
+import psidev.psi.mi.xml.model.EntrySet;
+
+import java.util.Collection;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -30,5 +34,12 @@ public class IntactXml2Tab extends Xml2Tab {
 
     public IntactXml2Tab() {
         super(new IntactInteractionConverter() );
+    }
+
+    @Override
+    protected void processAfterConversion(BinaryInteraction binaryInteraction, boolean expanded) {
+        if (expanded) {
+            ((IntactBinaryInteraction)binaryInteraction).getExpansionMethods().add(getExpansionStrategy().getName());
+        }
     }
 }

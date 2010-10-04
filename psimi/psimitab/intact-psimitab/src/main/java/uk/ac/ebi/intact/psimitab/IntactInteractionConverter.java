@@ -82,21 +82,16 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
         return interactorConverter;
     }
 
-    public BinaryInteraction toMitab( Interaction interaction,
-                                      final ExpansionStrategy expansionStrategy,
-                                      final boolean isExpanded ) throws TabConversionException {
+    @Override
+    public BinaryInteraction toMitab( Interaction interaction ) throws TabConversionException {
 
-        IntactBinaryInteraction binaryInteraction = (IntactBinaryInteraction) super.toMitab(interaction, expansionStrategy, isExpanded);
+        IntactBinaryInteraction binaryInteraction = (IntactBinaryInteraction) super.toMitab(interaction);
 
         try {
             process(binaryInteraction, interaction);
         } catch ( IOException e ) {
             throw new TabConversionException( "An error occured while processing binary interaction: " +
                                               binaryInteraction, e );
-        }
-
-        if (isExpanded) {
-            binaryInteraction.getExpansionMethods().add(expansionStrategy.getName());
         }
 
         return binaryInteraction;

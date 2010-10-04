@@ -299,8 +299,8 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
         IntactBinaryInteraction interaction = (IntactBinaryInteraction) interactions.iterator().next();
-        Assert.assertNotNull( interaction.getExpansionMethod() );
-        assertEquals( SpokeExpansion.EXPANSION_NAME, interaction.getExpansionMethod() );
+        Assert.assertFalse( interaction.getExpansionMethods().isEmpty() );
+        assertEquals( SpokeExpansion.EXPANSION_NAME, interaction.getExpansionMethods().iterator().next() );
     }
 
     @Test
@@ -319,7 +319,7 @@ public class ConvertXml2TabTest extends AbstractPsimitabTestCase {
         Collection<BinaryInteraction> interactions = xml2tab.convert( xmlFile, false );
 
         IntactBinaryInteraction interaction = (IntactBinaryInteraction) interactions.iterator().next();
-        assertEquals( null, interaction.getExpansionMethod() );
+        assertTrue( interaction.getExpansionMethods().isEmpty() );
     }
 
     @Test

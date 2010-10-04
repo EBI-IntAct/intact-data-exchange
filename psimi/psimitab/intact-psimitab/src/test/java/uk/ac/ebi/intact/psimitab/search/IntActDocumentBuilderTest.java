@@ -63,7 +63,7 @@ public class IntActDocumentBuilderTest {
         DocumentBuilder builder = new IntactDocumentBuilder();
         Document doc = builder.createDocumentFromPsimiTabLine( psiMiTabLine );
 
-        Assert.assertEquals( 68, doc.getFields().size() );
+        Assert.assertEquals( 76, doc.getFields().size() );
     }
 
     @Test
