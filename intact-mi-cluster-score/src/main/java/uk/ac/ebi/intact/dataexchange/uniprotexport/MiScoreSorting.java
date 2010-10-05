@@ -55,7 +55,7 @@ public class MiScoreSorting {
             List<String> exportedBinaryInteractions = interactionExtractor.extractInteractionsWithoutRulesForInteractionDetectionMethod(fileInteractionExported);
 
             System.out.println("export interactions scores");
-            scoreClient.extractMiScoresFromFile(exportedBinaryInteractions, fileTotal, fileDataExported);
+            //scoreClient.extractMiScoresFromFile(exportedBinaryInteractions, fileTotal, fileDataExported);
 
         } catch (SQLException e) {
             e.printStackTrace(); 
