@@ -85,7 +85,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
      *
      * @return a list of formatted scores for each interaction
      */
-    public String[] getScoresPerInteraction(Collection<Integer> interactionIds){
+    public String getScoresPerInteraction(Collection<Integer> interactionIds, String scoreListCSV, String [] scoreList){
         if(this.getInteractionMapping() == null){
             runService();
         }
@@ -119,7 +119,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
                 }
             }
         }
-        return scoreList;
+        return scoreListCSV;
     }
 
     /**
@@ -169,9 +169,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
 
     public void saveScoresForSpecificInteractions(String fileName, Collection<Integer> interactionIds){
 
-        if(scoreList == null){
-            getScoresPerInteraction(interactionIds);
-        }
+        String scoreListCSV = getScoresPerInteraction(interactionIds, null, null);
         try{
             // Create file
             FileWriter fstream = new FileWriter(fileName + "_log.txt");
