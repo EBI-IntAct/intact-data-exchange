@@ -50,6 +50,36 @@ public class InteractionExtractorForMIScore extends LineExport {
         return query.getResultList();
     }
 
+    private List<String> getInteractionsFromReleasedExperimentsToBeProcessedForUniprotExport(){
+
+        // we want all the interactions which :
+        // no participant has a 'no-uniprot-update' annotation
+        // the interaction doesn't have any 'negative' annotation
+        // the participants have a uniprot 'identity' cross reference
+        // the participants are proteins
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery("select distinct(i.ac) from InteractionImpl i join i.components c join c.interactor p " +
+                "where i.ac in (select ie from Component c5 join c5.interaction ie join ie.experiments e join e.annotations an " +
+                "where an.cvTopic.shortLabel = :accepted)" +
+                "and i.ac not in (select distinct(i2.ac) from Component c2 join c2.interaction i2 join c2.interactor p2 join p2.annotations a " +
+                "where a.cvTopic.shortLabel = :noUniprotUpdate) " +
+                "and i.ac not in (select distinct(i3.ac) from Component c3 join c3.interaction i3 join i3.annotations a2 " +
+                "where a2.cvTopic.shortLabel = :negative) " +
+                "and i.ac not in (select distinct(i4.ac) from Component c4 join c4.interaction i4 join c4.interactor p3 " +
+                "where p3.ac not in (select distinct(p4.ac) from InteractorImpl p4 join p4.xrefs refs " +
+                "where refs.cvDatabase.identifier = :uniprot " +
+                "and refs.cvXrefQualifier.identifier = :identity)" +
+                "or p3.ac in (select distinct(p5.ac) from InteractorImpl p5 " +
+                "where p5.objClass <> :protein))");
+        query.setParameter("accepted", CvTopic.ACCEPTED);
+        query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
+        query.setParameter("negative", CvTopic.NEGATIVE);
+        query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
+        query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
+        query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
+
+        return query.getResultList();
+    }
+
     private boolean hasPassedDrExportAnnotation(Interaction interaction, Experiment experiment){
 
         // the interaction exists in IntAct
@@ -353,7 +383,33 @@ public class InteractionExtractorForMIScore extends LineExport {
         else {
             interactions = extractInteractionsPossibleToExport(interactionsToBeProcessedForExport, fileForListOfInteractions);
         }
-        System.out.println(interactions.size() + " will be kept for Mi scoring.");        
+        System.out.println(interactions.size() + " will be kept for Mi scoring.");
+
+        dataContext.commitTransaction(transactionStatus);
+
+        return interactions;
+    }
+
+    public List<String> extractInteractionsFromReleasedExperimentsPossibleToExport(boolean useCurrentRules, String fileForListOfInteractions) throws SQLException, IOException {
+
+        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
+
+        List<String> interactionsToBeProcessedForExport = getInteractionsFromReleasedExperimentsToBeProcessedForUniprotExport();
+
+        System.out.println(interactionsToBeProcessedForExport.size() + " will be processed for a possible uniprot export.");
+
+        List<String> interactions;
+
+        // if we want to apply the current rules on the interaction detection method
+        if (useCurrentRules){
+            interactions = extractInteractionsCurrentlyExported(interactionsToBeProcessedForExport, fileForListOfInteractions);
+        }
+        else {
+            interactions = extractInteractionsPossibleToExport(interactionsToBeProcessedForExport, fileForListOfInteractions);
+        }
+        System.out.println(interactions.size() + " will be kept for Mi scoring.");
 
         dataContext.commitTransaction(transactionStatus);
 
@@ -373,7 +429,7 @@ public class InteractionExtractorForMIScore extends LineExport {
         List<String> interactions = extractInteractionsWithoutRuleForInteractionDetectionMethod(interactionsToBeProcessedForExport, fileForListOfInteractions);
 
         System.out.println(interactions.size() + " will be kept for Mi scoring.");
-        
+
         dataContext.commitTransaction(transactionStatus);
 
         return interactions;
