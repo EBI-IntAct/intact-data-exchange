@@ -173,7 +173,7 @@ public class MiScoreClient {
             while (numberOfBinaryInteractions < binaryInteractions.size()){
                 try {
                     // we compute the MI cluster score
-                    this.interactionClusterScore.setBinaryInteractionList(binaryInteractions.subList(numberOfBinaryInteractions, numberOfBinaryInteractions + Math.min(range - 1, binaryInteractions.size() - numberOfBinaryInteractions)));
+                    this.interactionClusterScore.setBinaryInteractionList(binaryInteractions.subList(numberOfBinaryInteractions, numberOfBinaryInteractions + Math.min(range, binaryInteractions.size() - numberOfBinaryInteractions)));
                     this.interactionClusterScore.runService();
                 } catch (Exception e){
                     System.out.println("The score cannot be computed for the list of binary interactions of size " + binaryInteractions.size());

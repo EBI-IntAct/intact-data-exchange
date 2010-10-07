@@ -37,12 +37,37 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         super();
         setMappingIdDbNames("uniprotkb");
         writer = new PsimiTabWriter();
+
+        setDirectInteractionWeight_3();
+        //setDirectInteractionWeight_5();
     }
 
     @Override
     public void runService() {
         logger.debug("runService");
         super.runService();
+    }
+
+    public void setDirectInteractionWeight_5(){
+        Map<String,Float> customOntologyTypeScores = new HashMap<String,Float>();
+        customOntologyTypeScores.put("MI:0208", 0.05f);
+        customOntologyTypeScores.put("MI:0403", 0.20f);
+        customOntologyTypeScores.put("MI:0914", 0.20f);
+        customOntologyTypeScores.put("MI:0915", 0.40f);
+        customOntologyTypeScores.put("MI:0407", 1.00f);
+        customOntologyTypeScores.put("unknown", 0.02f);
+        super.setCustomOntologyTypeScores(customOntologyTypeScores);
+    }
+
+    public void setDirectInteractionWeight_3(){
+        Map<String,Float> customOntologyTypeScores = new HashMap<String,Float>();
+        customOntologyTypeScores.put("MI:0208", 0.08f);
+        customOntologyTypeScores.put("MI:0403", 0.33f);
+        customOntologyTypeScores.put("MI:0914", 0.33f);
+        customOntologyTypeScores.put("MI:0915", 0.67f);
+        customOntologyTypeScores.put("MI:0407", 1.00f);
+        customOntologyTypeScores.put("unknown", 0.03f);
+        super.setCustomOntologyTypeScores(customOntologyTypeScores);
     }
 
     /**

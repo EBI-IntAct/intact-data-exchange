@@ -59,7 +59,9 @@ public class InteractionExtractorForMIScore extends LineExport {
         // the participants are proteins
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery("select distinct(i.ac) from InteractionImpl i join i.components c join c.interactor p " +
                 "where i.ac in (select ie from Component c5 join c5.interaction ie join ie.experiments e join e.annotations an " +
-                "where an.cvTopic.shortLabel = :accepted)" +
+                "where an.cvTopic.shortLabel = :accepted) " +
+                "and i.ac not in (select ie from Component c5 join c5.interaction ie join ie.experiments e join e.annotations an " +
+                "where an.cvTopic.shortLabel = :onhold)" +
                 "and i.ac not in (select distinct(i2.ac) from Component c2 join c2.interaction i2 join c2.interactor p2 join p2.annotations a " +
                 "where a.cvTopic.shortLabel = :noUniprotUpdate) " +
                 "and i.ac not in (select distinct(i3.ac) from Component c3 join c3.interaction i3 join i3.annotations a2 " +
@@ -71,6 +73,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                 "or p3.ac in (select distinct(p5.ac) from InteractorImpl p5 " +
                 "where p5.objClass <> :protein))");
         query.setParameter("accepted", CvTopic.ACCEPTED);
+        query.setParameter("onhold", CvTopic.ON_HOLD);
         query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
         query.setParameter("negative", CvTopic.NEGATIVE);
         query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
