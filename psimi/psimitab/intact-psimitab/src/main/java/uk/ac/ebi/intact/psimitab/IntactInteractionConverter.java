@@ -18,11 +18,9 @@ package uk.ac.ebi.intact.psimitab;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.mi.tab.converter.tab2xml.XmlConversionException;
-import psidev.psi.mi.tab.converter.xml2tab.CrossReferenceConverter;
 import psidev.psi.mi.tab.converter.xml2tab.InteractionConverter;
-import psidev.psi.mi.tab.converter.xml2tab.TabConversionException;
 import psidev.psi.mi.tab.converter.xml2tab.InteractorConverter;
+import psidev.psi.mi.tab.converter.xml2tab.TabConversionException;
 import psidev.psi.mi.tab.expansion.ExpansionStrategy;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Interactor;
@@ -30,17 +28,15 @@ import psidev.psi.mi.tab.model.builder.Column;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.InteractionDetectionMethod;
 import psidev.psi.mi.xml.model.Organism;
+import uk.ac.ebi.intact.psimitab.model.Annotation;
+import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.psimitab.model.Parameter;
-import uk.ac.ebi.intact.psimitab.model.*;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.rmi.RemoteException;
-import java.util.*;
-import java.util.regex.Pattern;
 import java.io.IOException;
-
-import net.sf.ehcache.CacheManager;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Interaction converter.
@@ -80,6 +76,14 @@ public class IntactInteractionConverter extends InteractionConverter<IntactBinar
 
     public InteractorConverter<?> getInteractorConverter() {
         return interactorConverter;
+    }
+
+    /**
+     * @deprecated Use toMitab(interaction) method instead
+     */
+    @Deprecated
+    public BinaryInteraction toMitab( Interaction interaction, ExpansionStrategy strategy, boolean isExpanded) throws TabConversionException {
+        return toMitab(interaction);
     }
 
     @Override
