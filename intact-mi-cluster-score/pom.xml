@@ -160,4 +160,13 @@
             <version>3.2</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+              <id>intact.nexus</id>
+              <name>IntAct Nexus</name>
+              <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
+
 </project>
