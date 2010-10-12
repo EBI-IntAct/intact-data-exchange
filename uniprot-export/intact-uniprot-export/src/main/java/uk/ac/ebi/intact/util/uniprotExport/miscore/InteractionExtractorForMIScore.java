@@ -60,7 +60,7 @@ public class InteractionExtractorForMIScore extends LineExport {
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery("select distinct(i.ac) from InteractionImpl i join i.components c join c.interactor p " +
                 "where i.ac in (select ie from Component c5 join c5.interaction ie join ie.experiments e join e.annotations an " +
                 "where an.cvTopic.shortLabel = :accepted) " +
-                "and i.ac not in (select ie from Component c5 join c5.interaction ie join ie.experiments e join e.annotations an " +
+                "and i.ac not in (select ie from Component c6 join c6.interaction ie join ie.experiments e join e.annotations an " +
                 "where an.cvTopic.shortLabel = :onhold)" +
                 "and i.ac not in (select distinct(i2.ac) from Component c2 join c2.interaction i2 join c2.interactor p2 join p2.annotations a " +
                 "where a.cvTopic.shortLabel = :noUniprotUpdate) " +
