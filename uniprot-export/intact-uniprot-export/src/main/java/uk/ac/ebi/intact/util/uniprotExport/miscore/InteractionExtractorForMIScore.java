@@ -24,12 +24,33 @@ public class InteractionExtractorForMIScore extends LineExport {
 
     private List<String> getInteractionsToBeProcessedForUniprotExport(){
 
+        // interactions associated with components
+        String interactionsInvolvedInComponents = "select distinct(c1.interaction.ac) from Component c1";
+        // interactions with at least one interactor with the annotation 'no-uniprot-update'
+        String interactionsInvolvingInteractorsNoUniprotUpdate = "select distinct(i2.ac) from Component c2 join " +
+                "c2.interaction as i2 join c2.interactor as p join p.annotations as a where a.cvTopic.shortLabel = :noUniprotUpdate";
+        // negative interactions
+        String negativeInteractions = "select distinct(i3.ac) from Component c3 join c3.interaction as i3 join " +
+                "i3.annotations as a2 where a2.cvTopic.shortLabel = :negative";
+        // interactors with an uniprot identity cross reference
+        String interactorUniprotIdentity = "select distinct(p2.ac) from InteractorImpl p2 join p2.xrefs as refs where " +
+                "refs.cvDatabase.identifier = :uniprot and refs.cvXrefQualifier.identifier = :identity";
+        // interactors which are not a protein
+        String nonProteinInteractor = "select distinct(p3.ac) from InteractorImpl p3 where p3.objClass <> :protein)";
+        // interactions with at least one interactor which either doesn't have any uniprot identity cross reference or is not a protein
+        String interactionInvolvingNonUniprotOrNonProtein = "select distinct(i4.ac) from Component c4 join " +
+                "c4.interaction as i4 join c4.interactor as p4 where p4.ac not in ("+interactorUniprotIdentity+") or p4.ac " +
+                "in ("+nonProteinInteractor+")";
+
+        String queryString = "select distinct(i.ac) from InteractionImpl i where i.ac in ("+interactionsInvolvedInComponents + ") " +
+                "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") and i.ac not in ("+negativeInteractions+") " +
+                "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+")";
         // we want all the interactions which :
         // no participant has a 'no-uniprot-update' annotation
         // the interaction doesn't have any 'negative' annotation
         // the participants have a uniprot 'identity' cross reference
         // the participants are proteins
-        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery("select distinct(i.ac) from InteractionImpl i join i.components c join c.interactor p " +
+        /*Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery("select distinct(i.ac) from InteractionImpl i join i.components c join c.interactor p " +
                 "where i.ac in (select distinct(comp.interaction.ac) from Component comp)" +
                 "and i.ac not in (select distinct(i2.ac) from Component c2 join c2.interaction i2 join c2.interactor p2 join p2.annotations a " +
                 "where a.cvTopic.shortLabel = :noUniprotUpdate) " +
@@ -40,7 +61,9 @@ public class InteractionExtractorForMIScore extends LineExport {
                 "where refs.cvDatabase.identifier = :uniprot " +
                 "and refs.cvXrefQualifier.identifier = :identity)" +
                 "or p3.ac in (select distinct(p5.ac) from InteractorImpl p5 " +
-                "where p5.objClass <> :protein))");
+                "where p5.objClass <> :protein))");*/
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
+
         query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
         query.setParameter("negative", CvTopic.NEGATIVE);
         query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
@@ -52,12 +75,38 @@ public class InteractionExtractorForMIScore extends LineExport {
 
     private List<String> getInteractionsFromReleasedExperimentsToBeProcessedForUniprotExport(){
 
+        // interactions with at least one 'accepted' experiment
+        String interactionsAccepted = "select distinct(i2.ac) from Component c1 join c1.interaction as i2 join i2.experiments as e " +
+                "join e.annotations as an where an.cvTopic.shortLabel = :accepted";
+        // interactions with at least one experiment 'on-hold'
+        String interactionsOnHold = "select distinct(i3.ac) from Component c2 join c2.interaction as i3 join i3.experiments" +
+                " as e2 join e2.annotations as an2 where an2.cvTopic.shortLabel = :onhold";
+        // interactions with at least one interactor with the annotation 'no-uniprot-update'
+        String interactionsInvolvingInteractorsNoUniprotUpdate = "select distinct(i4.ac) from Component c3 join " +
+                "c3.interaction as i4 join c3.interactor as p join p.annotations as a where a.cvTopic.shortLabel = :noUniprotUpdate";
+        // negative interactions
+        String negativeInteractions = "select distinct(i5.ac) from Component c4 join c4.interaction as i5 join " +
+                "i5.annotations as a2 where a2.cvTopic.shortLabel = :negative";
+        // interactors with an uniprot identity cross reference
+        String interactorUniprotIdentity = "select distinct(p2.ac) from InteractorImpl p2 join p2.xrefs as refs where " +
+                "refs.cvDatabase.identifier = :uniprot and refs.cvXrefQualifier.identifier = :identity";
+        // interactors which are not a protein
+        String nonProteinInteractor = "select distinct(p3.ac) from InteractorImpl p3 where p3.objClass <> :protein)";
+        // interactions with at least one interactor which either doesn't have any uniprot identity cross reference or is not a protein
+        String interactionInvolvingNonUniprotOrNonProtein = "select distinct(i6.ac) from Component c5 join " +
+                "c5.interaction as i6 join c5.interactor as p4 where p4.ac not in ("+interactorUniprotIdentity+") or p4.ac " +
+                "in ("+nonProteinInteractor+")";
+
+        String queryString = "select distinct(i.ac) from InteractionImpl i where i.ac in ("+interactionsAccepted + ") " +
+                "and i.ac not in ("+interactionsOnHold+") and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") and i.ac not in ("+negativeInteractions+") " +
+                "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+")";
+
         // we want all the interactions which :
         // no participant has a 'no-uniprot-update' annotation
         // the interaction doesn't have any 'negative' annotation
         // the participants have a uniprot 'identity' cross reference
         // the participants are proteins
-        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery("select distinct(i.ac) from InteractionImpl i join i.components c join c.interactor p " +
+        /*Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery("select distinct(i.ac) from InteractionImpl i join i.components c join c.interactor p " +
                 "where i.ac in (select ie from Component c5 join c5.interaction ie join ie.experiments e join e.annotations an " +
                 "where an.cvTopic.shortLabel = :accepted) " +
                 "and i.ac not in (select ie from Component c6 join c6.interaction ie join ie.experiments e join e.annotations an " +
@@ -71,7 +120,9 @@ public class InteractionExtractorForMIScore extends LineExport {
                 "where refs.cvDatabase.identifier = :uniprot " +
                 "and refs.cvXrefQualifier.identifier = :identity)" +
                 "or p3.ac in (select distinct(p5.ac) from InteractorImpl p5 " +
-                "where p5.objClass <> :protein))");
+                "where p5.objClass <> :protein))");*/
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
+
         query.setParameter("accepted", CvTopic.ACCEPTED);
         query.setParameter("onhold", CvTopic.ON_HOLD);
         query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
