@@ -44,7 +44,7 @@ public class MiScoreComputing {
         System.out.println( "filename with interactions acs eligible for uniprot export = " + fileInteractionEligible );
         System.out.println( "filename with interactions acs currently exported in uniprot = " + fileInteractionExported );
 
-        String database = "zpro";
+        String database = "enzpro";
         IntactContext.initContext(new String[] {"/META-INF/"+database+".spring.xml"});
 
         InteractionExtractorForMIScore interactionExtractor = new InteractionExtractorForMIScore();
@@ -52,7 +52,7 @@ public class MiScoreComputing {
         try {
 
             System.out.println("export interactions from intact");
-            List<String> eligibleBinaryInteractions = interactionExtractor.extractInteractionsPossibleToExport(false, fileInteractionEligible);
+            List<String> eligibleBinaryInteractions = interactionExtractor.extractInteractionsFromReleasedExperimentsPossibleToExport(fileInteractionEligible);
 
             System.out.println("computes MI score");
             MiScoreClient scoreClient = new MiScoreClient();
@@ -60,10 +60,10 @@ public class MiScoreComputing {
             scoreClient.computeMiScoresFor(eligibleBinaryInteractions, fileTotal);
 
             System.out.println("export interactions from intact with current rules");
-            List<String> exportedBinaryInteractions = interactionExtractor.extractInteractionsPossibleToExport(true, fileInteractionExported);
+            List<Integer> exportedBinaryInteractions = interactionExtractor.extractInteractionsFromReleasedExperimentsExportedInUniprot(scoreClient.getInteractionClusterScore(), fileInteractionExported);
 
             System.out.println("export interactions from intact");
-            scoreClient.extractMiScoresFor(exportedBinaryInteractions, fileDataExported, fileDataNotExported);
+            scoreClient.extractComputedMiScoresFor(exportedBinaryInteractions, fileDataExported, fileDataNotExported);
 
         } catch (SQLException e) {
             e.printStackTrace();
