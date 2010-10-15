@@ -38,8 +38,8 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         setMappingIdDbNames("uniprotkb");
         writer = new PsimiTabWriter();
 
-        //setDirectInteractionWeight_3();
-        setDirectInteractionWeight_5();
+        setDirectInteractionWeight_3();
+        //setDirectInteractionWeight_5();
     }
 
     @Override

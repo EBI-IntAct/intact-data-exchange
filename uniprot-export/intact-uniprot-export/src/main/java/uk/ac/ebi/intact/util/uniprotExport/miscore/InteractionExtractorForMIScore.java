@@ -1,10 +1,13 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore;
 
 import org.springframework.transaction.TransactionStatus;
+import psidev.psi.mi.tab.model.CrossReference;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
 
 import javax.persistence.Query;
 import java.io.*;
@@ -22,7 +25,7 @@ import java.util.*;
 
 public class InteractionExtractorForMIScore extends LineExport {
 
-    private List<String> getInteractionsToBeProcessedForUniprotExport(){
+    private List<String> getInteractionAcsToBeProcessedForUniprotExport(){
 
         // interactions associated with components
         String interactionsInvolvedInComponents = "select distinct(c1.interaction.ac) from Component c1";
@@ -42,9 +45,28 @@ public class InteractionExtractorForMIScore extends LineExport {
                 "c4.interaction as i4 join c4.interactor as p4 where p4.ac not in ("+interactorUniprotIdentity+") or p4.ac " +
                 "in ("+nonProteinInteractor+")";
 
+        String interactionsFromExperimentNoExport = "select distinct(i7.ac) from InteractionImpl i7 " +
+                "join i7.experiments as e3 join e3.annotations as an3 where an3.cvTopic.shortLabel = :drExport " +
+                "and trim(upper(an3.annotationText)) = :no";
+        String interactionsFromExperimentExportYes = "select distinct(i8.ac) from InteractionImpl i8 " +
+                "join i8.experiments as e4 join e4.annotations as an4 where an4.cvTopic.shortLabel = :drExport " +
+                "and trim(upper(an4.annotationText)) = :yes";
+        String interactionsFromExperimentExportConditional = "select distinct(i9.ac) from InteractionImpl i9 " +
+                "join i9.annotations as an5 join i9.experiments as e5 join e5.annotations as an6 where " +
+                "an6.cvTopic.shortLabel = :drExport and an5.cvTopic.identifier = :confidence and trim(upper(an5.annotationText)) = trim(upper(an6.annotationText))";
+        String interactionsFromExperimentExportSpecified = "select distinct(i10.ac) from InteractionImpl i10 " +
+                "join i10.experiments as e6 join e6.annotations as an7 where an7.cvTopic.shortLabel = :drExport";
+
+        String interactionsDrExportNotPassed = "select distinct(i11.ac) from InteractionImpl i11 " +
+                "where i11.ac in (" + interactionsFromExperimentExportSpecified + ") " +
+                "and i11.ac not in (" + interactionsFromExperimentExportYes + ") " +
+                "and i11.ac not in ("+interactionsFromExperimentExportConditional+")";
+
         String queryString = "select distinct(i.ac) from InteractionImpl i where i.ac in ("+interactionsInvolvedInComponents + ") " +
                 "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") and i.ac not in ("+negativeInteractions+") " +
-                "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+")";
+                "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+") " +
+                "and i.ac not in (" + interactionsDrExportNotPassed + ") " +
+                "and i.ac not in (" + interactionsFromExperimentNoExport + ")";
         // we want all the interactions which :
         // no participant has a 'no-uniprot-update' annotation
         // the interaction doesn't have any 'negative' annotation
@@ -65,6 +87,10 @@ public class InteractionExtractorForMIScore extends LineExport {
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
 
         query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
+        query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
+        query.setParameter("no", "NO");
+        query.setParameter("yes", "YES");
+        query.setParameter("confidence", CvTopic.AUTHOR_CONFIDENCE_MI_REF);
         query.setParameter("negative", CvTopic.NEGATIVE);
         query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
         query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
@@ -73,11 +99,11 @@ public class InteractionExtractorForMIScore extends LineExport {
         return query.getResultList();
     }
 
-    private List<String> getInteractionsFromReleasedExperimentsToBeProcessedForUniprotExport(){
+    private List<String> getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport(){
 
         // interactions with at least one 'accepted' experiment
         String interactionsAccepted = "select distinct(i2.ac) from Component c1 join c1.interaction as i2 join i2.experiments as e " +
-                "join e.annotations as an where an.cvTopic.shortLabel = :accepted";
+                "join e.annotations as an where an.cvTopic.shortLabel = :accepted or trunc(e.created) < to_date(:september2005, :dateFormat)";
         // interactions with at least one experiment 'on-hold'
         String interactionsOnHold = "select distinct(i3.ac) from Component c2 join c2.interaction as i3 join i3.experiments" +
                 " as e2 join e2.annotations as an2 where an2.cvTopic.shortLabel = :onhold";
@@ -97,8 +123,30 @@ public class InteractionExtractorForMIScore extends LineExport {
                 "c5.interaction as i6 join c5.interactor as p4 where p4.ac not in ("+interactorUniprotIdentity+") or p4.ac " +
                 "in ("+nonProteinInteractor+")";
 
-        String queryString = "select distinct(i.ac) from InteractionImpl i where i.ac in ("+interactionsAccepted + ") " +
-                "and i.ac not in ("+interactionsOnHold+") and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") and i.ac not in ("+negativeInteractions+") " +
+        String interactionsFromExperimentNoExport = "select distinct(i7.ac) from InteractionImpl i7 " +
+                "join i7.experiments as e3 join e3.annotations as an3 where an3.cvTopic.shortLabel = :drExport " +
+                "and trim(upper(an3.annotationText)) = :no";
+        String interactionsFromExperimentExportYes = "select distinct(i8.ac) from InteractionImpl i8 " +
+                "join i8.experiments as e4 join e4.annotations as an4 where an4.cvTopic.shortLabel = :drExport " +
+                "and trim(upper(an4.annotationText)) = :yes";
+        String interactionsFromExperimentExportConditional = "select distinct(i9.ac) from InteractionImpl i9 " +
+                "join i9.annotations as an5 join i9.experiments as e5 join e5.annotations as an6 where " +
+                "an6.cvTopic.shortLabel = :drExport and an5.cvTopic.identifier = :confidence and trim(upper(an5.annotationText)) = trim(upper(an6.annotationText))";
+        String interactionsFromExperimentExportSpecified = "select distinct(i10.ac) from InteractionImpl i10 " +
+                "join i10.experiments as e6 join e6.annotations as an7 where an7.cvTopic.shortLabel = :drExport";
+
+        String interactionsDrExportNotPassed = "select distinct(i11.ac) from InteractionImpl i11 " +
+                "where i11.ac in (" + interactionsFromExperimentExportSpecified + ") " +
+                "and i11.ac not in (" + interactionsFromExperimentExportYes + ") " +
+                "and i11.ac not in ("+interactionsFromExperimentExportConditional+")";
+
+        String queryString = "select distinct(i.ac) from InteractionImpl i " +
+                "where i.ac in ("+interactionsAccepted + ") " +
+                "and i.ac not in ("+interactionsOnHold+") " +
+                "and i.ac not in (" + interactionsDrExportNotPassed + ") " +
+                "and i.ac not in (" + interactionsFromExperimentNoExport + ") " +
+                "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") " +
+                "and i.ac not in ("+negativeInteractions+") " +
                 "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+")";
 
         // we want all the interactions which :
@@ -124,7 +172,13 @@ public class InteractionExtractorForMIScore extends LineExport {
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
 
         query.setParameter("accepted", CvTopic.ACCEPTED);
+        query.setParameter("september2005", "01/09/2005");
+        query.setParameter("dateFormat", "dd/mm/yyyy");
         query.setParameter("onhold", CvTopic.ON_HOLD);
+        query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
+        query.setParameter("no", "NO");
+        query.setParameter("yes", "YES");
+        query.setParameter("confidence", CvTopic.AUTHOR_CONFIDENCE_MI_REF);
         query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
         query.setParameter("negative", CvTopic.NEGATIVE);
         query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
@@ -233,7 +287,9 @@ public class InteractionExtractorForMIScore extends LineExport {
 
                 CvInteraction method = experiment1.getCvInteraction();
 
-                if (cvInteraction.equals(method)) {
+                LineExport.ExperimentStatus experimentStatus = super.getCCLineExperimentExportStatus(experiment1, "\t\t\t\t");
+
+                if (cvInteraction.equals(method) && !experimentStatus.doNotExport()) {
                     experimentAcs.add(experiment1.getAc());
 
                     // we only update if we found one
@@ -269,7 +325,9 @@ public class InteractionExtractorForMIScore extends LineExport {
 
                     CvInteraction method = experiment2.getCvInteraction();
 
-                    if (cvInteraction.equals(method)) {
+                    LineExport.ExperimentStatus experimentStatus = super.getCCLineExperimentExportStatus(experiment2, "\t\t\t\t");
+
+                    if (cvInteraction.equals(method) && !experimentStatus.doNotExport()) {
                         experimentAcs.add(experiment2.getAc());
                         // we only update if we found one
                         enoughExperimentFound = (experimentAcs.size() >= threshold);
@@ -277,6 +335,55 @@ public class InteractionExtractorForMIScore extends LineExport {
                 } // j's experiments
 
             } // j
+
+            if (enoughExperimentFound) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasPassedInteractionDetectionMethodRules(EncoreInteraction interaction, Experiment experiment){
+        // Then check the experimental method (CvInteraction)
+        // Nothing specified at the experiment level, check for the method (CvInteraction)
+        CvInteraction cvInteraction = experiment.getCvInteraction();
+
+        if (null == cvInteraction) {
+            return false;
+        }
+
+        CvInteractionStatus methodStatus = getMethodExportStatus(cvInteraction, "\t\t");
+
+        if (methodStatus.doExport()) {
+            return true;
+        }
+        else if (methodStatus.isConditionalExport()) {
+
+            // if the threshold is not reached, iterates over all available interactions to check if
+            // there is (are) one (many) that could allow to reach the threshold.
+
+            int threshold = methodStatus.getMinimumOccurence();
+
+            // we create a non redondant set of experiment identifier
+            // TODO couldn't that be a static collection that we empty regularly ?
+            int experimentAcs = 0;
+
+            // check if there are other experiments attached to the current interaction that validate it.
+            boolean enoughExperimentFound = false;
+            Set<String> interactionDetections = interaction.getMethodToPubmed().keySet();
+            List<CvIdentification> methods = IntactContext.getCurrentInstance().getDaoFactory().getCvObjectDao(CvIdentification.class).getByPsiMiRefCollection(interactionDetections);
+
+            for (Iterator iterator = methods.iterator(); iterator.hasNext();) {
+
+                CvIdentification method = (CvIdentification) iterator.next();
+
+                if (cvInteraction.equals(method)) {
+                    experimentAcs++;
+
+                    // we only update if we found one
+                    enoughExperimentFound = (experimentAcs >= threshold);
+                }
+            }
 
             if (enoughExperimentFound) {
                 return true;
@@ -358,8 +465,51 @@ public class InteractionExtractorForMIScore extends LineExport {
                         }
 
                     }
-                    else if (hasPassedDrExportAnnotation(interaction, experiment)){
+                    //else if (hasPassedDrExportAnnotation(interaction, experiment)){
+                    else {
                         eligibleInteractions.add(interaction.getAc());
+                        break;
+                    }
+                } // i's experiments
+            }
+        } // i
+    }
+
+    private void processEligibleExperimentsWithCurrentRules(IntActInteractionClusterScore cluster, List<Integer> eligibleInteractions) {
+
+        // process each interaction of the list
+        for (Map.Entry<Integer, EncoreInteraction> interactionEntry : cluster.getInteractionMapping().entrySet()) {
+
+            EncoreInteraction interaction = interactionEntry.getValue();
+
+            // get the Encore interaction object
+            if (interaction != null){
+                System.out.println("\t\t Interaction: Id:" + interaction.getId());
+
+                Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
+
+                Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
+                Collection<Experiment> experiments = new ArrayList<Experiment>();
+
+                for (Interaction inter : interactions){
+                    experiments.addAll(inter.getExperiments());
+                }
+
+                for (Iterator iterator2 = experiments.iterator(); iterator2.hasNext();) {
+                    Experiment experiment = (Experiment) iterator2.next();
+
+                    LineExport.ExperimentStatus experimentStatus = super.getCCLineExperimentExportStatus(experiment, "\t\t\t\t");
+
+                    if (experimentStatus.isNotSpecified()){
+                        if (hasPassedInteractionDetectionMethodRules(interaction, experiment)){
+                            eligibleInteractions.add(interactionEntry.getKey());
+                            break;
+                        }
+
+                    }
+                    //else if (hasPassedDrExportAnnotation(interaction, experiment)){
+                    else {
+                        eligibleInteractions.add(interactionEntry.getKey());
                         break;
                     }
                 } // i's experiments
@@ -410,33 +560,17 @@ public class InteractionExtractorForMIScore extends LineExport {
         } // i
     }
 
-    /**
-     * Extracts the interactions which are possible to export in uniprot
-     * @param useCurrentRules : boolean value to know if we want to use the existing rules on the interaction detection method for exporting interactions in uniprot
-     * @param fileForListOfInteractions : the name of the file where we want to write the list of interactions Acs possible to export
-     * @return the list of IntAct interaction accessions of the interactions which can be exported using the rules on the interaction detection method or not
-     * @throws SQLException
-     * @throws IOException
-     */
-    public List<String> extractInteractionsPossibleToExport(boolean useCurrentRules, String fileForListOfInteractions) throws SQLException, IOException {
+    public List<String> extractInteractionsFromReleasedExperimentsPossibleToExport(String fileForListOfInteractions) throws SQLException, IOException {
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
         TransactionStatus transactionStatus = dataContext.beginTransaction();
 
-        List<String> interactionsToBeProcessedForExport = getInteractionsToBeProcessedForUniprotExport();
+        List<String> interactionsToBeProcessedForExport = getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
 
         System.out.println(interactionsToBeProcessedForExport.size() + " will be processed for a possible uniprot export.");
 
-        List<String> interactions;
-
-        // if we want to apply the current rules on the interaction detection method
-        if (useCurrentRules){
-            interactions = extractInteractionsCurrentlyExported(interactionsToBeProcessedForExport, fileForListOfInteractions);
-        }
-        else {
-            interactions = extractInteractionsPossibleToExport(interactionsToBeProcessedForExport, fileForListOfInteractions);
-        }
+        List<String> interactions = extractInteractionsPossibleToExport(interactionsToBeProcessedForExport, fileForListOfInteractions);
         System.out.println(interactions.size() + " will be kept for Mi scoring.");
 
         dataContext.commitTransaction(transactionStatus);
@@ -444,25 +578,15 @@ public class InteractionExtractorForMIScore extends LineExport {
         return interactions;
     }
 
-    public List<String> extractInteractionsFromReleasedExperimentsPossibleToExport(boolean useCurrentRules, String fileForListOfInteractions) throws SQLException, IOException {
+    public List<Integer> extractInteractionsFromReleasedExperimentsExportedInUniprot(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
         TransactionStatus transactionStatus = dataContext.beginTransaction();
 
-        List<String> interactionsToBeProcessedForExport = getInteractionsFromReleasedExperimentsToBeProcessedForUniprotExport();
+        System.out.println(cluster.getInteractionMapping().size() + " will be processed for a possible uniprot export.");
 
-        System.out.println(interactionsToBeProcessedForExport.size() + " will be processed for a possible uniprot export.");
-
-        List<String> interactions;
-
-        // if we want to apply the current rules on the interaction detection method
-        if (useCurrentRules){
-            interactions = extractInteractionsCurrentlyExported(interactionsToBeProcessedForExport, fileForListOfInteractions);
-        }
-        else {
-            interactions = extractInteractionsPossibleToExport(interactionsToBeProcessedForExport, fileForListOfInteractions);
-        }
+        List<Integer> interactions = extractInteractionsCurrentlyExported(cluster, fileForListOfInteractions);
         System.out.println(interactions.size() + " will be kept for Mi scoring.");
 
         dataContext.commitTransaction(transactionStatus);
@@ -476,7 +600,7 @@ public class InteractionExtractorForMIScore extends LineExport {
 
         TransactionStatus transactionStatus = dataContext.beginTransaction();
 
-        List<String> interactionsToBeProcessedForExport = getInteractionsToBeProcessedForUniprotExport();
+        List<String> interactionsToBeProcessedForExport = getInteractionAcsToBeProcessedForUniprotExport();
 
         System.out.println(interactionsToBeProcessedForExport.size() + " will be processed for a possible uniprot export.");
 
@@ -500,42 +624,50 @@ public class InteractionExtractorForMIScore extends LineExport {
     private List<String> extractInteractionsPossibleToExport(List<String> potentiallyEligibleInteraction, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(potentiallyEligibleInteraction.size() + " interactions to process.");
-        List<String> eligibleInteractions = new ArrayList<String>();
+        //List<String> eligibleInteractions = new ArrayList<String>();
 
-        processEligibleExperiments(potentiallyEligibleInteraction, eligibleInteractions );
+        //processEligibleExperiments(potentiallyEligibleInteraction, eligibleInteractions );
 
         FileWriter writer = new FileWriter(fileForListOfInteractions);
 
-        for (String ac : eligibleInteractions){
+        for (String ac : potentiallyEligibleInteraction){
             writer.write(ac + "\n");
             writer.flush();
         }
 
         writer.close();
 
-        return eligibleInteractions;
+        return potentiallyEligibleInteraction;
     }
 
     /**
      * This method is using the current rules on the interaction detection method to decide if an interaction can be exported or not
-     * @param potentiallyEligibleInteraction : the list of interaction accessions to process
+     * @param cluster : the cluster containing the list of interaction to process
      * @param fileForListOfInteractions : the name of the file where we want to write the list of interactions Acs currently exported
-     * @return the list of interactions accessions which are exported in uniprot
+     * @return the list of encore interactions id which are exported in uniprot
      * @throws SQLException
      * @throws IOException
      */
-    private List<String> extractInteractionsCurrentlyExported(List<String> potentiallyEligibleInteraction, String fileForListOfInteractions) throws SQLException, IOException {
+    private List<Integer> extractInteractionsCurrentlyExported(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
 
-        System.out.println(potentiallyEligibleInteraction.size() + " interactions to process.");
-        List<String> eligibleInteractions = new ArrayList<String>();
+        System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
+        List<Integer> eligibleInteractions = new ArrayList<Integer>();
 
-        processEligibleExperimentsWithCurrentRules(potentiallyEligibleInteraction, eligibleInteractions );
+        processEligibleExperimentsWithCurrentRules(cluster, eligibleInteractions );
 
         FileWriter writer = new FileWriter(fileForListOfInteractions);
 
-        for (String ac : eligibleInteractions){
-            writer.write(ac + "\n");
-            writer.flush();
+        for (Integer id : eligibleInteractions){
+            EncoreInteraction interaction = cluster.getInteractionMapping().get(id);
+
+            List<CrossReference> refs = interaction.getSourceDatabases();
+            for (CrossReference ref : refs){
+                if (ref.getDatabase().equals("intact")){
+                    writer.write(ref.getIdentifier() + "\n");
+                    writer.flush();
+                    break;
+                }
+            }
         }
 
         writer.close();

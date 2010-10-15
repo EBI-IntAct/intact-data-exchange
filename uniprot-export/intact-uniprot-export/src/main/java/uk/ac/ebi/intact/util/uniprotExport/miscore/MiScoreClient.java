@@ -381,6 +381,21 @@ public class MiScoreClient {
     }
 
     /**
+     * Extracts the MI cluster score for each interaction exported in uniprot and write the results in a file. the results for the interactions not exported in uniprot
+     * is also written in a file. This supposes that the MI score has been computed for all the interactions in IntAct before.
+     * @param interactionIds : the list of interaction ids currently exported in uniprot
+     * @param fileContainingDataExported : the files for the score results of the interactions exported in uniprot
+     * @param fileContainingDataNotExported : the files for the score results of the interactions not exported in uniprot
+     */
+    public void extractComputedMiScoresFor(List<Integer> interactionIds, String fileContainingDataExported, String fileContainingDataNotExported){
+
+        System.out.println(interactionIds.size() + " interactions in IntAct will be processed.");
+
+        this.interactionClusterScore.saveScoresForSpecificInteractions(fileContainingDataExported + "_mitab.csv", interactionIds);
+        this.interactionClusterScore.saveScoresForSpecificInteractions(fileContainingDataNotExported + "_mitab.csv", CollectionUtils.subtract(this.interactionClusterScore.getInteractionMapping().keySet(), interactionIds));
+    }
+
+    /**
      *
      * @param interactor : the interactorn to identify in uniprot
      * @return the uniprot accession of this interactor
@@ -442,6 +457,9 @@ public class MiScoreClient {
         }
     }
 
+    public IntActInteractionClusterScore getInteractionClusterScore() {
+        return interactionClusterScore;
+    }
     /**
      * Extract the MI score of the binary interactions and write them in a file. The scores have been read from a file.
      * @param binaryInteractions : binary interactions exported in uniprot
