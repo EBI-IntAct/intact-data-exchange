@@ -40,7 +40,7 @@
         <module>pdbe</module>
         <module>intact-tasks</module>
         <!--<module>imex</module>-->
-        <module>intact-mi-cluster-score</module>
+        <!--<module>intact-mi-cluster-score</module>-->
   </modules>
 
     <build>
