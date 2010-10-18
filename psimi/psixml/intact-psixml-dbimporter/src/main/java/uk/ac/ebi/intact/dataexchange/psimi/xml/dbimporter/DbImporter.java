@@ -96,7 +96,10 @@ public class DbImporter {
 
         InputStream is = new FileInputStream(fileToImport);
 
-        File tempFile = new File("psiEnriched-"+System.currentTimeMillis()+".xml");
+        String name = fileToImport.getName().replaceAll( ".xml", "" );
+        File tempFile = new File(name + "-enriched-"+System.currentTimeMillis()+".xml");
+        System.out.println( "Enriching file in: " + tempFile.getAbsolutePath() );
+
         Writer writer = new FileWriter(tempFile);
 
         PsiEnricher psiEnricher = (PsiEnricher) IntactContext.getCurrentInstance().getSpringContext().getBean("psiEnricher");
