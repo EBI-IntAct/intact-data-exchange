@@ -20,6 +20,8 @@ import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.Attributes;
@@ -129,8 +131,12 @@ public class PsiExchangeImpl implements PsiExchange {
         PersisterStatistics stats = new PersisterStatistics();
 
         for (IndexedEntry indexedEntry : indexedEntries) {
+            final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
             PersisterStatistics localStats = importIntoIntact(indexedEntry);
             stats = merge(stats, localStats);
+
+            IntactContext.getCurrentInstance().getDataContext().commitTransaction(transactionStatus);
         }
 
         return stats;

@@ -17,8 +17,8 @@
     <description>PSI MI TAB Master POM</description>
 
     <properties>
-        <currentVersion>${version}</currentVersion>
-        <psimi.version>1.7.8-SNAPSHOT</psimi.version>
+        <currentVersion>${project.version}</currentVersion>
+        <psimi.version>1.7.8</psimi.version>
     </properties>
 
     <modules>

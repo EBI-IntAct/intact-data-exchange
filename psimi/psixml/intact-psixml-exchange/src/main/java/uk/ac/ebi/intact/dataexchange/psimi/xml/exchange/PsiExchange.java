@@ -27,10 +27,8 @@ public interface PsiExchange {
 
     PersisterStatistics importIntoIntact(InputStream psiXmlStream) throws PersisterException;
 
-    @Transactional
     PersisterStatistics importIntoIntact(IndexedEntry entry) throws ImportException;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     PersisterStatistics importIntoIntact(Interaction interaction);
 
     PersisterStatistics importIntoIntact(EntrySet entrySet) throws ImportException;
