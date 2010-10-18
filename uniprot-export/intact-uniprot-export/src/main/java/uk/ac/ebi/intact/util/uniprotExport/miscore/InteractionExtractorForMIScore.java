@@ -433,6 +433,32 @@ public class InteractionExtractorForMIScore extends LineExport {
         } // i
     }
 
+    private void processEligibleBinaryInteractions(List<String> interactionAcs, List<String> eligibleInteractions) {
+
+        // process each interaction of the list
+        final int interactionCount = interactionAcs.size();
+        for (int i = 0; i < interactionCount; i++) {
+
+            // get the IntAct interaction object
+            String interactionAc = interactionAcs.get(i);
+            Interaction interaction = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionAc);
+
+            // the interaction exists in IntAct
+            if (interaction != null){
+                System.out.println("\t\t Interaction: Shortlabel:" + interaction.getShortLabel() + "  AC: " + interaction.getAc());
+
+                if (isBinary(interaction)){
+                    eligibleInteractions.add(interactionAc);
+                }
+            }
+            // the interaction doesn't exist in IntAct
+            else {
+                System.out.println("\t\t\t That interaction "+interactionAc +" is null, skip it.");
+                continue; // skip that interaction
+            }
+        } // i
+    }
+
     /**
      * This method processes the interactionAcs to determine if each interaction is exported in uniprot (uniprot-dr-export is ok and interaction detection method is ok)
      * @param interactionAcs : the list of interaction accessions in IntAct we want to process
@@ -669,6 +695,25 @@ public class InteractionExtractorForMIScore extends LineExport {
         }
 
         writer.close();
+        return eligibleInteractions;
+    }
+
+    private List<String> extractBinaryInteractionsPossibleToExport(List<String> potentiallyEligibleInteraction, String fileForListOfInteractions) throws SQLException, IOException {
+
+        System.out.println(potentiallyEligibleInteraction.size() + " interactions to process.");
+        List<String> eligibleInteractions = new ArrayList<String>();
+
+        processEligibleBinaryInteractions(potentiallyEligibleInteraction, eligibleInteractions );
+
+        FileWriter writer = new FileWriter(fileForListOfInteractions);
+
+        for (String ac : potentiallyEligibleInteraction){
+            writer.write(ac + "\n");
+            writer.flush();
+        }
+
+        writer.close();
+
         return eligibleInteractions;
     }
 
