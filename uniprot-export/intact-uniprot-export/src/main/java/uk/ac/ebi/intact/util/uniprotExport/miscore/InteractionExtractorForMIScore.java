@@ -343,10 +343,8 @@ public class InteractionExtractorForMIScore extends LineExport {
         return false;
     }
 
-    private boolean hasPassedInteractionDetectionMethodRules(EncoreInteraction interaction, Experiment experiment, Collection<Experiment> experiments){
+    private boolean hasPassedInteractionDetectionMethodRules(CvInteraction cvInteraction, Collection<Experiment> experiments){
         // Then check the experimental method (CvInteraction)
-        // Nothing specified at the experiment level, check for the method (CvInteraction)
-        CvInteraction cvInteraction = experiment.getCvInteraction();
 
         if (null == cvInteraction) {
             return false;
@@ -515,7 +513,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                 Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
 
                 Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
-                Collection<Experiment> experiments = new ArrayList<Experiment>();
+                Set<Experiment> experiments = new HashSet<Experiment>();
 
                 for (Interaction inter : interactions){
                     experiments.addAll(inter.getExperiments());
@@ -527,7 +525,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                     LineExport.ExperimentStatus experimentStatus = super.getCCLineExperimentExportStatus(experiment, "\t\t\t\t");
 
                     if (experimentStatus.isNotSpecified()){
-                        if (hasPassedInteractionDetectionMethodRules(interaction, experiment, experiments)){
+                        if (hasPassedInteractionDetectionMethodRules(experiment.getCvInteraction(), experiments)){
                             eligibleInteractions.add(interactionEntry.getKey());
                             break;
                         }
@@ -698,7 +696,7 @@ public class InteractionExtractorForMIScore extends LineExport {
         return eligibleInteractions;
     }
 
-    private List<String> extractBinaryInteractionsPossibleToExport(List<String> potentiallyEligibleInteraction, String fileForListOfInteractions) throws SQLException, IOException {
+    public List<String> extractBinaryInteractionsPossibleToExport(List<String> potentiallyEligibleInteraction, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(potentiallyEligibleInteraction.size() + " interactions to process.");
         List<String> eligibleInteractions = new ArrayList<String>();
