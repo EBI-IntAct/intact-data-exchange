@@ -23,6 +23,7 @@
                 <configuration>
                     <!-- need more memory than the default for our unit tests -->
                     <argLine>-Xmx256m</argLine>
+                    <forkMode>always</forkMode>
                 </configuration>
             </plugin>
         </plugins>
