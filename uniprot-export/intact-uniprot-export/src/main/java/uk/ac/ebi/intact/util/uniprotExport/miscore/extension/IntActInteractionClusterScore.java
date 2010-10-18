@@ -10,6 +10,7 @@ import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
 import uk.ac.ebi.enfin.mi.score.ols.MIOntology;
 import uk.ac.ebi.enfin.mi.score.scores.MIScore;
+import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -217,7 +218,6 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
             BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
             binaryInteractionMapping.put(mappingId,bI);
         }
-
         File file = new File(fileName);
         try {
 

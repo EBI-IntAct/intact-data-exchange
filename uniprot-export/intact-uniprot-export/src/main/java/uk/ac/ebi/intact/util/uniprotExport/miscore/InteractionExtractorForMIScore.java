@@ -371,17 +371,26 @@ public class InteractionExtractorForMIScore extends LineExport {
             // check if there are other experiments attached to the current interaction that validate it.
             boolean enoughExperimentFound = false;
             Set<String> interactionDetections = interaction.getMethodToPubmed().keySet();
-            List<CvIdentification> methods = IntactContext.getCurrentInstance().getDaoFactory().getCvObjectDao(CvIdentification.class).getByPsiMiRefCollection(interactionDetections);
+            List<CvInteraction> methods = IntactContext.getCurrentInstance().getDaoFactory().getCvObjectDao(CvInteraction.class).getByPsiMiRefCollection(interactionDetections);
 
             for (Iterator iterator = methods.iterator(); iterator.hasNext();) {
 
-                CvIdentification method = (CvIdentification) iterator.next();
+                CvInteraction method = (CvInteraction) iterator.next();
 
                 if (cvInteraction.equals(method)) {
-                    experimentAcs++;
+                    int sizeOfExperiments = 0;
+
+                    if (interaction.getMethodToPubmed().get(cvInteraction.getIdentifier())!= null){
+                       sizeOfExperiments = interaction.getMethodToPubmed().get(cvInteraction.getIdentifier()).size();
+                    }
+                    else {
+                        throw new IllegalStateException("The CvIdentification " + cvInteraction.getIdentifier() + " cannot be found in the list of methods for this interaction");
+                    }
+                    experimentAcs+=sizeOfExperiments;
 
                     // we only update if we found one
                     enoughExperimentFound = (experimentAcs >= threshold);
+                    break;
                 }
             }
 
@@ -660,13 +669,11 @@ public class InteractionExtractorForMIScore extends LineExport {
         for (Integer id : eligibleInteractions){
             EncoreInteraction interaction = cluster.getInteractionMapping().get(id);
 
-            List<CrossReference> refs = interaction.getSourceDatabases();
-            for (CrossReference ref : refs){
-                if (ref.getDatabase().equals("intact")){
-                    writer.write(ref.getIdentifier() + "\n");
-                    writer.flush();
-                    break;
-                }
+            Map<String, String> refs = interaction.getExperimentToPubmed();
+            for (String ref : refs.keySet()){
+                writer.write(ref + "\n");
+                writer.flush();
+                break;
             }
         }
 
