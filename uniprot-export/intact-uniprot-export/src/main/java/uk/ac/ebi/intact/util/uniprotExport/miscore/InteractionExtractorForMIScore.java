@@ -343,7 +343,7 @@ public class InteractionExtractorForMIScore extends LineExport {
         return false;
     }
 
-    private boolean hasPassedInteractionDetectionMethodRules(EncoreInteraction interaction, Experiment experiment){
+    private boolean hasPassedInteractionDetectionMethodRules(EncoreInteraction interaction, Experiment experiment, Collection<Experiment> experiments){
         // Then check the experimental method (CvInteraction)
         // Nothing specified at the experiment level, check for the method (CvInteraction)
         CvInteraction cvInteraction = experiment.getCvInteraction();
@@ -370,27 +370,18 @@ public class InteractionExtractorForMIScore extends LineExport {
 
             // check if there are other experiments attached to the current interaction that validate it.
             boolean enoughExperimentFound = false;
-            Set<String> interactionDetections = interaction.getMethodToPubmed().keySet();
-            List<CvInteraction> methods = IntactContext.getCurrentInstance().getDaoFactory().getCvObjectDao(CvInteraction.class).getByPsiMiRefCollection(interactionDetections);
 
-            for (Iterator iterator = methods.iterator(); iterator.hasNext();) {
+            for (Iterator iterator = experiments.iterator(); iterator.hasNext();) {
 
-                CvInteraction method = (CvInteraction) iterator.next();
+                Experiment e = (Experiment) iterator.next();
+                CvInteraction method = e.getCvInteraction();
 
                 if (cvInteraction.equals(method)) {
-                    int sizeOfExperiments = 0;
 
-                    if (interaction.getMethodToPubmed().get(cvInteraction.getIdentifier())!= null){
-                       sizeOfExperiments = interaction.getMethodToPubmed().get(cvInteraction.getIdentifier()).size();
-                    }
-                    else {
-                        throw new IllegalStateException("The CvIdentification " + cvInteraction.getIdentifier() + " cannot be found in the list of methods for this interaction");
-                    }
-                    experimentAcs+=sizeOfExperiments;
+                    experimentAcs++;
 
                     // we only update if we found one
                     enoughExperimentFound = (experimentAcs >= threshold);
-                    break;
                 }
             }
 
@@ -510,7 +501,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                     LineExport.ExperimentStatus experimentStatus = super.getCCLineExperimentExportStatus(experiment, "\t\t\t\t");
 
                     if (experimentStatus.isNotSpecified()){
-                        if (hasPassedInteractionDetectionMethodRules(interaction, experiment)){
+                        if (hasPassedInteractionDetectionMethodRules(interaction, experiment, experiments)){
                             eligibleInteractions.add(interactionEntry.getKey());
                             break;
                         }
