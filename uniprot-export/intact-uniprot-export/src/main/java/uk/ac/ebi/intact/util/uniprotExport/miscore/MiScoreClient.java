@@ -116,7 +116,6 @@ public class MiScoreClient {
         int k = 0;
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
-
         TransactionStatus transactionStatus = dataContext.beginTransaction();
 
         // we want to stp when the list of binary interactions exceeds MAX_NUMBER_INTERACTIONS or reaches the end of the list of interactions
@@ -152,8 +151,8 @@ public class MiScoreClient {
             // we increments the index in the interaction list
             i++;
         }
-
         dataContext.commitTransaction(transactionStatus);
+        
         return i;
     }
 

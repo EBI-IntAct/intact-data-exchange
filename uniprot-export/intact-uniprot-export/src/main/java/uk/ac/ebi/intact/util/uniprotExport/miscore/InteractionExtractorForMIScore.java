@@ -403,6 +403,8 @@ public class InteractionExtractorForMIScore extends LineExport {
 
             // get the IntAct interaction object
             String interactionAc = interactionAcs.get(i);
+            TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+
             Interaction interaction = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionAc);
 
             // the interaction exists in IntAct
@@ -428,6 +430,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                 System.out.println("\t\t\t That interaction "+interactionAc +" is null, skip it.");
                 continue; // skip that interaction
             }
+            IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
         } // i
     }
 
@@ -436,7 +439,8 @@ public class InteractionExtractorForMIScore extends LineExport {
         // process each interaction of the list
         final int interactionCount = interactionAcs.size();
         for (int i = 0; i < interactionCount; i++) {
-
+            TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+            
             // get the IntAct interaction object
             String interactionAc = interactionAcs.get(i);
             Interaction interaction = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionAc);
@@ -454,6 +458,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                 System.out.println("\t\t\t That interaction "+interactionAc +" is null, skip it.");
                 continue; // skip that interaction
             }
+            IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
         } // i
     }
 
@@ -469,6 +474,8 @@ public class InteractionExtractorForMIScore extends LineExport {
         for (int i = 0; i < interactionCount; i++) {
 
             String interactionAc = interactionAcs.get(i);
+            TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+
             Interaction interaction = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionAc);
 
             // get the IntAct interaction object
@@ -496,6 +503,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                     }
                 } // i's experiments
             }
+            IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
         } // i
     }
 
@@ -511,6 +519,8 @@ public class InteractionExtractorForMIScore extends LineExport {
                 System.out.println("\t\t Interaction: Id:" + interaction.getId());
 
                 Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
+
+                TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
                 Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
                 Set<Experiment> experiments = new HashSet<Experiment>();
@@ -537,6 +547,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                         break;
                     }
                 } // i's experiments
+                IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
             }
         } // i
     }
@@ -606,14 +617,10 @@ public class InteractionExtractorForMIScore extends LineExport {
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
-        TransactionStatus transactionStatus = dataContext.beginTransaction();
-
         System.out.println(cluster.getInteractionMapping().size() + " will be processed for a possible uniprot export.");
 
         List<Integer> interactions = extractInteractionsCurrentlyExported(cluster, fileForListOfInteractions);
         System.out.println(interactions.size() + " will be kept for Mi scoring.");
-
-        dataContext.commitTransaction(transactionStatus);
 
         return interactions;
     }
