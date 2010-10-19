@@ -116,7 +116,7 @@ public class OntologySearcher {
             FacetField facetField = response.getFacetField("ontology");
 
             if (facetField.getValues() == null) {
-                return Collections.EMPTY_SET;//Ênew HashSet<String>();
+                return Collections.EMPTY_SET;
             }
 
             ontologyNames = new HashSet<String>( facetField.getValues().size() );
