@@ -30,6 +30,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
@@ -195,24 +196,28 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     protected void fixSourceReferenceXrefsIfNecessary(Interaction interaction) {
         InteractorXref xrefToFix = null;
 
-        // if the qualifier is identity, we will check if the owner identity MI is the same as the database MI
-        for (InteractorXref xref : interaction.getXrefs()) {
-            if (xref.getCvXrefQualifier() != null &&
-                    getInstitutionPrimaryId() != null &&
-                    getInstitutionPrimaryId().equals(xref.getCvDatabase().getIdentifier()) &&
-                    !CvXrefQualifier.SOURCE_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+        if( ConverterContext.getInstance().isAutoFixInteractionSourceReference() ) {
 
-                xrefToFix = xref;
-                break;
+            // Look up source reference xref and only try to fix identity if there is no source ref present.
+            // if the qualifier is identity, we will check if the owner identity MI is the same as the database MI
+            for (InteractorXref xref : interaction.getXrefs()) {
+                if (xref.getCvXrefQualifier() != null &&
+                        getInstitutionPrimaryId() != null &&
+                        getInstitutionPrimaryId().equals( xref.getPrimaryId() ) &&
+                        !CvXrefQualifier.SOURCE_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+
+                    xrefToFix = xref;
+                    break;
+                }
             }
-        }
 
-        if (xrefToFix != null) {
-            log.warn("Interaction identity xref found pointing to the source database. It should be of type 'source-reference'. Will be fixed automatically: "+xrefToFix);
-            CvXrefQualifier sourceReference = CvObjectUtils.createCvObject(interaction.getOwner(), CvXrefQualifier.class, CvXrefQualifier.SOURCE_REFERENCE_MI_REF, CvXrefQualifier.SOURCE_REFERENCE);
-            xrefToFix.setCvXrefQualifier(sourceReference);
+            if ( xrefToFix != null ) {
+                log.warn("Interaction identity xref found pointing to the source database. It should be of type 'source-reference'. Will be fixed automatically: "+xrefToFix);
+                CvXrefQualifier sourceReference = CvObjectUtils.createCvObject(interaction.getOwner(), CvXrefQualifier.class, CvXrefQualifier.SOURCE_REFERENCE_MI_REF, CvXrefQualifier.SOURCE_REFERENCE);
+                xrefToFix.setCvXrefQualifier(sourceReference);
 
-            addMessageToContext(MessageLevel.WARN, "Interaction identity xref found pointing to the source database. It should be of type 'source-reference'. Fixed.", true);
+                addMessageToContext(MessageLevel.WARN, "Interaction identity xref found pointing to the source database. It should be of type 'source-reference'. Fixed.", true);
+            }
         }
     }
 

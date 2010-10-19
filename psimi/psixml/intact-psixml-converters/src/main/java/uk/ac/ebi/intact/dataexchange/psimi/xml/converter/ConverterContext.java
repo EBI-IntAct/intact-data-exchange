@@ -41,6 +41,8 @@ public class ConverterContext {
 
     private boolean locationInfoDisabled;
 
+    private boolean autoFixInteractionSourceReference;
+
     private Set<String> dnaTypeMis;
     private Set<String> rnaTypeMis;
 
@@ -64,6 +66,7 @@ public class ConverterContext {
         this.configAnnotation = new AnnotationConverterConfig();
         this.configInteraction = new InteractionConverterConfig();
         this.report = new ConverterReport();
+        this.autoFixInteractionSourceReference = true;
 
         resetLocation();
 
@@ -185,5 +188,13 @@ public class ConverterContext {
 
     public Set<String> getRnaTypeMis() {
         return rnaTypeMis;
+    }
+
+    public boolean isAutoFixInteractionSourceReference() {
+        return autoFixInteractionSourceReference;
+    }
+
+    public void setAutoFixInteractionSourceReference(boolean autoFixInteractionSourceReference) {
+        this.autoFixInteractionSourceReference = autoFixInteractionSourceReference;
     }
 }

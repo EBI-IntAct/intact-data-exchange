@@ -215,8 +215,9 @@ public class InteractionConverterTest extends AbstractConverterTest {
     public void psiToIntact_fixSourceReferenceXrefs() throws Exception {
         Interaction psiInteraction = PsiMockFactory.createMockInteraction();
 
-        final DbReference dbRef = PsiMockFactory.createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.DIP, CvDatabase.DIP_MI_REF);
-        dbRef.setId("DIP:12345");
+        final DbReference dbRef = PsiMockFactory.createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF);
+//        final DbReference dbRef = PsiMockFactory.createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.DIP, CvDatabase.DIP_MI_REF);
+        dbRef.setId(CvDatabase.DIP_MI_REF);
         psiInteraction.getXref().getSecondaryRef().clear();
         psiInteraction.getXref().setPrimaryRef(dbRef);
 
@@ -247,8 +248,8 @@ public class InteractionConverterTest extends AbstractConverterTest {
 
         entry.getInteractions().add(psiInteraction);
 
-        final DbReference dbRef = PsiMockFactory.createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.DIP, CvDatabase.DIP_MI_REF);
-        dbRef.setId("DIP:12345");
+        final DbReference dbRef = PsiMockFactory.createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF);
+        dbRef.setId(CvDatabase.DIP_MI_REF);
         psiInteraction.getXref().getSecondaryRef().clear();
         psiInteraction.getXref().setPrimaryRef(dbRef);
 
