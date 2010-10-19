@@ -709,7 +709,7 @@ public class InteractionExtractorForMIScore extends LineExport {
 
         FileWriter writer = new FileWriter(fileForListOfInteractions);
 
-        for (String ac : potentiallyEligibleInteraction){
+        for (String ac : eligibleInteractions){
             writer.write(ac + "\n");
             writer.flush();
         }
