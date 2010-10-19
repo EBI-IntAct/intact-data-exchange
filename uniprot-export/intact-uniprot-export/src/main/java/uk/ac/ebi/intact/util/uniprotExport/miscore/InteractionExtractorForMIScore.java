@@ -615,8 +615,6 @@ public class InteractionExtractorForMIScore extends LineExport {
 
     public List<Integer> extractInteractionsFromReleasedExperimentsExportedInUniprot(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
 
-        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
-
         System.out.println(cluster.getInteractionMapping().size() + " will be processed for a possible uniprot export.");
 
         List<Integer> interactions = extractInteractionsCurrentlyExported(cluster, fileForListOfInteractions);
@@ -695,7 +693,6 @@ public class InteractionExtractorForMIScore extends LineExport {
             for (String ref : refs.keySet()){
                 writer.write(ref + "\n");
                 writer.flush();
-                break;
             }
         }
 
