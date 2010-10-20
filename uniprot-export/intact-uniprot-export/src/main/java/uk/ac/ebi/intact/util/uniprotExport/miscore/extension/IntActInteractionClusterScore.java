@@ -49,6 +49,18 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         super.runService();
     }
 
+    public void setPublicationWeight(float weight){
+        super.setPublicationWeight(weight);
+    }
+
+    public void setMethodWeight(float weight){
+        super.setMethodWeight(weight);
+    }
+
+    public void setTypeWeight(float weight){
+        super.setTypeWeight(weight);
+    }
+
     public void setDirectInteractionWeight_5(){
         Map<String,Float> customOntologyTypeScores = new HashMap<String,Float>();
         customOntologyTypeScores.put("MI:0208", 0.05f);
