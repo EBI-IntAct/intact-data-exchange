@@ -440,7 +440,7 @@ public class InteractionExtractorForMIScore extends LineExport {
         final int interactionCount = interactionAcs.size();
         for (int i = 0; i < interactionCount; i++) {
             TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-            
+
             // get the IntAct interaction object
             String interactionAc = interactionAcs.get(i);
             Interaction interaction = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionAc);
@@ -552,6 +552,43 @@ public class InteractionExtractorForMIScore extends LineExport {
         } // i
     }
 
+    private void processEligibleExperimentsWithRulesOnInteractionMethodForAllExperiment(IntActInteractionClusterScore cluster, List<Integer> eligibleInteractions) {
+
+        // process each interaction of the list
+        for (Map.Entry<Integer, EncoreInteraction> interactionEntry : cluster.getInteractionMapping().entrySet()) {
+
+            EncoreInteraction interaction = interactionEntry.getValue();
+
+            // get the Encore interaction object
+            if (interaction != null){
+                System.out.println("\t\t Interaction: Id:" + interaction.getId());
+
+                Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
+
+                TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+
+                Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
+                Set<Experiment> experiments = new HashSet<Experiment>();
+
+                for (Interaction inter : interactions){
+                    experiments.addAll(inter.getExperiments());
+                }
+
+                for (Iterator iterator2 = experiments.iterator(); iterator2.hasNext();) {
+                    Experiment experiment = (Experiment) iterator2.next();
+
+                    LineExport.ExperimentStatus experimentStatus = super.getCCLineExperimentExportStatus(experiment, "\t\t\t\t");
+
+                    if (hasPassedInteractionDetectionMethodRules(experiment.getCvInteraction(), experiments)){
+                        eligibleInteractions.add(interactionEntry.getKey());
+                        break;
+                    }
+                } // i's experiments
+                IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
+            }
+        } // i
+    }
+
     /**
      * This method processes the interactionAcs to determine if each interaction is exported in uniprot (uniprot-dr-export is ok and interaction detection method is ok)
      * @param interactionAcs : the list of interaction accessions in IntAct we want to process
@@ -613,16 +650,6 @@ public class InteractionExtractorForMIScore extends LineExport {
         return interactions;
     }
 
-    public List<Integer> extractInteractionsFromReleasedExperimentsExportedInUniprot(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
-
-        System.out.println(cluster.getInteractionMapping().size() + " will be processed for a possible uniprot export.");
-
-        List<Integer> interactions = extractInteractionsCurrentlyExported(cluster, fileForListOfInteractions);
-        System.out.println(interactions.size() + " will be kept for Mi scoring.");
-
-        return interactions;
-    }
-
     public List<String> extractInteractionsWithoutRulesForInteractionDetectionMethod(String fileForListOfInteractions) throws SQLException, IOException {
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
@@ -677,12 +704,35 @@ public class InteractionExtractorForMIScore extends LineExport {
      * @throws SQLException
      * @throws IOException
      */
-    private List<Integer> extractInteractionsCurrentlyExported(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
+    public List<Integer> extractInteractionsCurrentlyExported(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
         List<Integer> eligibleInteractions = new ArrayList<Integer>();
 
         processEligibleExperimentsWithCurrentRules(cluster, eligibleInteractions );
+
+        FileWriter writer = new FileWriter(fileForListOfInteractions);
+
+        for (Integer id : eligibleInteractions){
+            EncoreInteraction interaction = cluster.getInteractionMapping().get(id);
+
+            Map<String, String> refs = interaction.getExperimentToPubmed();
+            for (String ref : refs.keySet()){
+                writer.write(ref + "\n");
+                writer.flush();
+            }
+        }
+
+        writer.close();
+        return eligibleInteractions;
+    }
+
+    public List<Integer> extractInteractionsExportedWithRulesOnInteractionMethodForAllExperiment(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
+
+        System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
+        List<Integer> eligibleInteractions = new ArrayList<Integer>();
+
+        processEligibleExperimentsWithRulesOnInteractionMethodForAllExperiment(cluster, eligibleInteractions );
 
         FileWriter writer = new FileWriter(fileForListOfInteractions);
 
