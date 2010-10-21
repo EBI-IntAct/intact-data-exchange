@@ -120,7 +120,11 @@
             <version>2.3.0</version>
         </dependency>
 
-        <!-- Database drivers - Comment/uncomment the one/s you need -->
+        <dependency>
+           <groupId>org.slf4j</groupId>
+           <artifactId>slf4j-log4j12</artifactId>
+           <version>1.5.8</version>
+        </dependency>
 
         <!-- PostgreSQL -->
         <dependency>

@@ -57,13 +57,14 @@ public class MiScoreComputing {
             System.out.println("computes MI score");
             MiScoreClient scoreClient1 = new MiScoreClient();
             scoreClient1.getInteractionClusterScore().setDirectInteractionWeight_3();
-            scoreClient1.getInteractionClusterScore().setPublicationWeight(0.5f);
-            scoreClient1.getInteractionClusterScore().setMethodWeight(0.8f);
+            //scoreClient1.getInteractionClusterScore().setPublicationWeight(0.5f);
+            //scoreClient1.getInteractionClusterScore().setMethodWeight(0.8f);
 
             scoreClient1.computeMiScoresFor(eligibleBinaryInteractions, fileTotal);
 
             System.out.println("export interactions from intact with current rules on interaction detection method");
-            List<Integer> exportedBinaryInteractions = interactionExtractor.extractInteractionsFromReleasedExperimentsExportedInUniprot(scoreClient1.getInteractionClusterScore(), fileInteractionExported);
+            List<Integer> exportedBinaryInteractions = interactionExtractor.extractInteractionsExportedWithRulesOnInteractionMethodForAllExperiment(scoreClient1.getInteractionClusterScore(), fileInteractionExported);
+            //List<Integer> exportedBinaryInteractions = interactionExtractor.extractInteractionsCurrentlyExported(scoreClient1.getInteractionClusterScore(), fileInteractionExported);
 
             System.out.println("export interactions from intact");
             scoreClient1.extractComputedMiScoresFor(exportedBinaryInteractions, fileDataExported, fileDataNotExported);
@@ -75,13 +76,14 @@ public class MiScoreComputing {
             System.out.println("computes MI score only binary interactions");
             MiScoreClient scoreClient2 = new MiScoreClient();
             scoreClient2.getInteractionClusterScore().setDirectInteractionWeight_3();
-            scoreClient2.getInteractionClusterScore().setPublicationWeight(0.5f);
-            scoreClient2.getInteractionClusterScore().setMethodWeight(0.8f);
+            //scoreClient2.getInteractionClusterScore().setPublicationWeight(0.5f);
+            //scoreClient2.getInteractionClusterScore().setMethodWeight(0.8f);
 
             scoreClient2.computeMiScoresFor(eligibleBinary, fileTotal + "_only_binary.txt");
 
             System.out.println("export only binary interactions from intact with current rules on interaction detection method");
-            List<Integer> exportedBinary = interactionExtractor.extractInteractionsFromReleasedExperimentsExportedInUniprot(scoreClient2.getInteractionClusterScore(), fileInteractionExported + "_only_binary.txt");
+            List<Integer> exportedBinary = interactionExtractor.extractInteractionsExportedWithRulesOnInteractionMethodForAllExperiment(scoreClient2.getInteractionClusterScore(), fileInteractionExported + "_only_binary.txt");
+            //List<Integer> exportedBinary = interactionExtractor.extractInteractionsCurrentlyExported(scoreClient2.getInteractionClusterScore(), fileInteractionExported + "_only_binary.txt");
 
             System.out.println("export vinary interactions from intact");
             scoreClient2.extractComputedMiScoresFor(exportedBinary, fileDataExported + "_only_binary.txt", fileDataNotExported + "_only_binary.txt");
