@@ -511,16 +511,16 @@ public class MiScoreClient {
      * @throws IOException
      * @throws SQLException
      */
-    public void computeMiScoreForAllReleasedPPIInteractionsExcludingLowConfidence(String fileInteractionEligible, String fileTotal, String fileInteractionExported, String fileDataExported, String fileDataNotExported) throws IOException, SQLException {
+    public void computeMiScoreForAllReleasedHighConfidencePPIInteractions(String fileInteractionEligible, String fileTotal, String fileInteractionExported, String fileDataExported, String fileDataNotExported) throws IOException, SQLException {
         InteractionExtractorForMIScore extractor = new InteractionExtractorForMIScore();
 
         System.out.println("export all interactions from intact which passed the dr export annotation");
-        List<String> eligibleBinaryInteractions = extractor.extractInteractionsFromReleasedExperimentsPossibleToExport(fileInteractionEligible);
+        List<String> eligibleBinaryInteractions = extractor.collectInteractionsFromReleasedExperimentsPossibleToExport(fileInteractionEligible);
 
         System.out.println("computes MI score");
         computeMiScoresFor(eligibleBinaryInteractions, fileTotal);
 
-        List<Integer> exportedBinaryInteractions = extractor.extractInteractionsExportedWithRulesOnInteractionMethodForAllExperiment(this.interactionClusterScore, fileInteractionExported);
+        List<Integer> exportedBinaryInteractions = extractor.extractInteractionsExportedWithCurrentRulesForAllExperiment(this.interactionClusterScore, fileInteractionExported);
 
         System.out.println("export interactions from intact");
         extractComputedMiScoresFor(exportedBinaryInteractions, fileDataExported, fileDataNotExported);
@@ -530,12 +530,12 @@ public class MiScoreClient {
         InteractionExtractorForMIScore extractor = new InteractionExtractorForMIScore();
 
         System.out.println("export all interactions from intact which passed the dr export annotation");
-        List<String> eligibleBinaryInteractions = extractor.extractInteractionsFromReleasedExperiments(fileInteractionEligible);
+        List<String> eligibleBinaryInteractions = extractor.collectInteractionsFromReleasedExperiments(fileInteractionEligible);
 
         System.out.println("computes MI score");
         computeMiScoresFor(eligibleBinaryInteractions, fileTotal);
 
-        List<Integer> exportedBinaryInteractions = extractor.extractInteractionsCurrentlyExportedScoreForAllInteractions(this.interactionClusterScore, fileInteractionExported);
+        List<Integer> exportedBinaryInteractions = extractor.extractInteractionsCurrentlyExportedWithScoreOfAllInteractions(this.interactionClusterScore, fileInteractionExported);
 
         System.out.println("export interactions from intact");
         extractComputedMiScoresFor(exportedBinaryInteractions, fileDataExported, fileDataNotExported);
@@ -545,23 +545,23 @@ public class MiScoreClient {
         InteractionExtractorForMIScore extractor = new InteractionExtractorForMIScore();
 
         System.out.println("export all interactions from intact which passed the dr export annotation");
-        List<String> eligibleBinaryInteractions = extractor.extractInteractionsFromReleasedExperimentsPossibleToExportContainingNoUniprotProteins(fileInteractionEligible);
+        List<String> eligibleBinaryInteractions = extractor.collectInteractionsFromReleasedExperimentsContainingNoUniprotProteinsPossibleToExport(fileInteractionEligible);
 
         System.out.println("computes MI score");
         computeMiScoresFor(eligibleBinaryInteractions, fileTotal);
 
-        List<Integer> exportedBinaryInteractions = extractor.extractInteractionsCurrentlyExportedScoreForAllInteractions(this.interactionClusterScore, fileInteractionExported);
+        List<Integer> exportedBinaryInteractions = extractor.extractInteractionsExportedWithCurrentRulesForAllExperimentContainingNoUniprotProteins(this.interactionClusterScore, fileInteractionExported);
 
         System.out.println("export interactions from intact");
         extractComputedMiScoresFor(exportedBinaryInteractions, fileDataExported, fileDataNotExported);
     }
 
-    public void computeMiScoreForReleasedBinaryPPIInteractionsExcludingLowConfidence(String fileTotalInteractionEligible, String fileBinaryInteractionEligible, String fileTotalScore, String fileInteractionExported, String fileDataExported, String fileDataNotExported) throws IOException, SQLException {
+    public void computeMiScoreForReleasedHighConfidenceBinaryPPIInteractions(String fileTotalInteractionEligible, String fileBinaryInteractionEligible, String fileTotalScore, String fileInteractionExported, String fileDataExported, String fileDataNotExported) throws IOException, SQLException {
         InteractionExtractorForMIScore extractor = new InteractionExtractorForMIScore();
 
         // all interactions
         System.out.println("export all interactions from intact which passed the dr export annotation");
-        List<String> eligibleBinaryInteractions = extractor.extractInteractionsFromReleasedExperimentsPossibleToExport(fileTotalInteractionEligible);
+        List<String> eligibleBinaryInteractions = extractor.collectInteractionsFromReleasedExperimentsPossibleToExport(fileTotalInteractionEligible);
 
         // filter binary
         System.out.println("extract only binary interactions from intact which passed the dr export annotation");
@@ -571,7 +571,7 @@ public class MiScoreClient {
         computeMiScoresFor(eligibleBinary, fileTotalScore);
 
         System.out.println("export only binary interactions from intact with current rules on interaction detection method");
-        List<Integer> exportedBinary = extractor.extractInteractionsExportedWithRulesOnInteractionMethodForAllExperiment(this.interactionClusterScore, fileInteractionExported);
+        List<Integer> exportedBinary = extractor.extractInteractionsExportedWithCurrentRulesForAllExperiment(this.interactionClusterScore, fileInteractionExported);
 
         System.out.println("export binary interactions from intact");
         extractComputedMiScoresFor(exportedBinary, fileDataExported, fileDataNotExported);
@@ -582,7 +582,7 @@ public class MiScoreClient {
 
         // all interactions
         System.out.println("export all interactions from intact which passed the dr export annotation");
-        List<String> eligibleBinaryInteractions = extractor.extractInteractionsFromReleasedExperiments(fileTotalInteractionEligible);
+        List<String> eligibleBinaryInteractions = extractor.collectInteractionsFromReleasedExperiments(fileTotalInteractionEligible);
 
         // filter binary
         System.out.println("extract only binary interactions from intact which passed the dr export annotation");
@@ -592,7 +592,7 @@ public class MiScoreClient {
         computeMiScoresFor(eligibleBinary, fileTotalScore);
 
         System.out.println("export only binary interactions from intact with current rules on interaction detection method");
-        List<Integer> exportedBinary = extractor.extractInteractionsCurrentlyExportedScoreForAllInteractions(this.interactionClusterScore, fileInteractionExported);
+        List<Integer> exportedBinary = extractor.extractInteractionsCurrentlyExportedWithScoreOfAllInteractions(this.interactionClusterScore, fileInteractionExported);
 
         System.out.println("export binary interactions from intact");
         extractComputedMiScoresFor(exportedBinary, fileDataExported, fileDataNotExported);
