@@ -171,19 +171,10 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
     @Override
     public void saveScores(String fileName){
         /* Retrieve results */
-        Map<Integer, EncoreInteraction> interactionMapping = getInteractionMapping();
-        Map<Integer, BinaryInteraction> binaryInteractionMapping = new HashMap<Integer,BinaryInteraction>();
-        Encore2Binary iConverter = new Encore2Binary(getMappingIdDbNames());
 
-        for(int mappingId:interactionMapping.keySet()){
-            EncoreInteraction eI = interactionMapping.get(mappingId);
-            BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
-            binaryInteractionMapping.put(mappingId,bI);
-        }
-
-        File file = new File(fileName);
         try {
-            writer.write(binaryInteractionMapping.values(), file);
+            super.saveScoreInMitab(fileName);
+
         } catch (Exception e) {
             logger.error("It is not possible to write the results in the mitab file " + fileName);
             e.printStackTrace();
@@ -221,19 +212,20 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         }
 
         /* Retrieve results */
+
         Map<Integer, EncoreInteraction> interactionMapping = getInteractionMapping();
-        Map<Integer, BinaryInteraction> binaryInteractionMapping = new HashMap<Integer,BinaryInteraction>();
         Encore2Binary iConverter = new Encore2Binary(getMappingIdDbNames());
 
-        for(Integer mappingId:interactionIds){
-            EncoreInteraction eI = interactionMapping.get(mappingId);
-            BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
-            binaryInteractionMapping.put(mappingId,bI);
-        }
-        File file = new File(fileName);
         try {
+            File file = new File(fileName);
 
-            writer.write(binaryInteractionMapping.values(), file);
+            for(Integer mappingId:interactionIds){
+                EncoreInteraction eI = interactionMapping.get(mappingId);
+                if (eI != null){
+                    BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
+                    writer.writeOrAppend(bI, file, false);
+                }
+            }
 
         } catch (Exception e) {
             logger.error("It is not possible to write the results in the mitab file " + fileName);
