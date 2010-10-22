@@ -1,7 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore;
 
 import org.springframework.transaction.TransactionStatus;
-import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
@@ -25,6 +24,11 @@ import java.util.*;
 
 public class InteractionExtractorForMIScore extends LineExport {
 
+    /**
+     *
+     * @return the list of interaction accessions which are involving only uniprot proteins, are not negative and
+     * which passed the dr-export annotation at the level of the experiment
+     */
     private List<String> getInteractionAcsToBeProcessedForUniprotExport(){
 
         // interactions associated with components
@@ -99,6 +103,11 @@ public class InteractionExtractorForMIScore extends LineExport {
         return query.getResultList();
     }
 
+    /**
+     *
+     * @return the list of interaction accessions which are publicly released, which are involving only uniprot proteins, are not negative and
+     * which passed the dr-export annotation at the level of the experiment
+     */
     private List<String> getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport(){
 
         // interactions with at least one 'accepted' experiment
@@ -188,6 +197,83 @@ public class InteractionExtractorForMIScore extends LineExport {
         return query.getResultList();
     }
 
+    /**
+     *
+     * @return the list of interaction accessions which are involving only uniprot proteins, are not negative and
+     * which are publicly released
+     */
+    private List<String> getInteractionAcsFromReleasedExperimentsNoFilterDrExport(){
+
+        // interactions with at least one 'accepted' experiment
+        String interactionsAccepted = "select distinct(i2.ac) from Component c1 join c1.interaction as i2 join i2.experiments as e " +
+                "join e.annotations as an where an.cvTopic.shortLabel = :accepted or trunc(e.created) < to_date(:september2005, :dateFormat)";
+        // interactions with at least one experiment 'on-hold'
+        String interactionsOnHold = "select distinct(i3.ac) from Component c2 join c2.interaction as i3 join i3.experiments" +
+                " as e2 join e2.annotations as an2 where an2.cvTopic.shortLabel = :onhold";
+        // interactions with at least one interactor with the annotation 'no-uniprot-update'
+        String interactionsInvolvingInteractorsNoUniprotUpdate = "select distinct(i4.ac) from Component c3 join " +
+                "c3.interaction as i4 join c3.interactor as p join p.annotations as a where a.cvTopic.shortLabel = :noUniprotUpdate";
+        // negative interactions
+        String negativeInteractions = "select distinct(i5.ac) from Component c4 join c4.interaction as i5 join " +
+                "i5.annotations as a2 where a2.cvTopic.shortLabel = :negative";
+        // interactors with an uniprot identity cross reference
+        String interactorUniprotIdentity = "select distinct(p2.ac) from InteractorImpl p2 join p2.xrefs as refs where " +
+                "refs.cvDatabase.identifier = :uniprot and refs.cvXrefQualifier.identifier = :identity";
+        // interactors which are not a protein
+        String nonProteinInteractor = "select distinct(p3.ac) from InteractorImpl p3 where p3.objClass <> :protein)";
+        // interactions with at least one interactor which either doesn't have any uniprot identity cross reference or is not a protein
+        String interactionInvolvingNonUniprotOrNonProtein = "select distinct(i6.ac) from Component c5 join " +
+                "c5.interaction as i6 join c5.interactor as p4 where p4.ac not in ("+interactorUniprotIdentity+") or p4.ac " +
+                "in ("+nonProteinInteractor+")";
+
+        String queryString = "select distinct(i.ac) from InteractionImpl i " +
+                "where i.ac in ("+interactionsAccepted + ") " +
+                "and i.ac not in ("+interactionsOnHold+") " +
+                "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") " +
+                "and i.ac not in ("+negativeInteractions+") " +
+                "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+")";
+
+        // we want all the interactions which :
+        // no participant has a 'no-uniprot-update' annotation
+        // the interaction doesn't have any 'negative' annotation
+        // the participants have a uniprot 'identity' cross reference
+        // the participants are proteins
+        /*Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery("select distinct(i.ac) from InteractionImpl i join i.components c join c.interactor p " +
+                "where i.ac in (select ie from Component c5 join c5.interaction ie join ie.experiments e join e.annotations an " +
+                "where an.cvTopic.shortLabel = :accepted) " +
+                "and i.ac not in (select ie from Component c6 join c6.interaction ie join ie.experiments e join e.annotations an " +
+                "where an.cvTopic.shortLabel = :onhold)" +
+                "and i.ac not in (select distinct(i2.ac) from Component c2 join c2.interaction i2 join c2.interactor p2 join p2.annotations a " +
+                "where a.cvTopic.shortLabel = :noUniprotUpdate) " +
+                "and i.ac not in (select distinct(i3.ac) from Component c3 join c3.interaction i3 join i3.annotations a2 " +
+                "where a2.cvTopic.shortLabel = :negative) " +
+                "and i.ac not in (select distinct(i4.ac) from Component c4 join c4.interaction i4 join c4.interactor p3 " +
+                "where p3.ac not in (select distinct(p4.ac) from InteractorImpl p4 join p4.xrefs refs " +
+                "where refs.cvDatabase.identifier = :uniprot " +
+                "and refs.cvXrefQualifier.identifier = :identity)" +
+                "or p3.ac in (select distinct(p5.ac) from InteractorImpl p5 " +
+                "where p5.objClass <> :protein))");*/
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
+
+        query.setParameter("accepted", CvTopic.ACCEPTED);
+        query.setParameter("september2005", "01/09/2005");
+        query.setParameter("dateFormat", "dd/mm/yyyy");
+        query.setParameter("onhold", CvTopic.ON_HOLD);
+        query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
+        query.setParameter("negative", CvTopic.NEGATIVE);
+        query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
+        query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
+        query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
+
+        return query.getResultList();
+    }
+
+    /**
+     *
+     * @param interaction : the interaction to check
+     * @param experiment : one experiment reporting this interaction
+     * @return true if the interaction passed the dr-export constraint (if it exists) of this experiment
+     */
     private boolean hasPassedDrExportAnnotation(Interaction interaction, Experiment experiment){
 
         // the interaction exists in IntAct
@@ -255,6 +341,14 @@ public class InteractionExtractorForMIScore extends LineExport {
         return false;
     }
 
+    /**
+     * 
+     * @param interaction : the interaction to check
+     * @param experiment : the experiment reporting this interaction
+     * @param currentIndexOfInteraction : the index of this interaction among the lits of interactions
+     * @param interactionAcs : the list of interaction accessions
+     * @return  true if the interaction passed the dr-export constraints at the level of the interaction detection method
+     */
     private boolean hasPassedInteractionDetectionMethodRules(Interaction interaction, Experiment experiment, int currentIndexOfInteraction, List<String> interactionAcs){
         // Then check the experimental method (CvInteraction)
         // Nothing specified at the experiment level, check for the method (CvInteraction)
@@ -343,6 +437,12 @@ public class InteractionExtractorForMIScore extends LineExport {
         return false;
     }
 
+    /**
+     *
+     * @param cvInteraction : the interaction detection method
+     * @param experiments : the list of experiments reporting the same interaction
+     * @return true if the interaction passed the dr-export constraints on the interaction detection method
+     */
     private boolean hasPassedInteractionDetectionMethodRules(CvInteraction cvInteraction, Collection<Experiment> experiments){
         // Then check the experimental method (CvInteraction)
 
@@ -434,6 +534,11 @@ public class InteractionExtractorForMIScore extends LineExport {
         } // i
     }
 
+    /**
+     * Filter the binary interactions of a given list of interactions and return a list composed with only binary interactions
+     * @param interactionAcs : the list of interaction accessions
+     * @param eligibleInteractions : the list of eligible interactions for uniprot export
+     */
     private void processEligibleBinaryInteractions(List<String> interactionAcs, List<String> eligibleInteractions) {
 
         // process each interaction of the list
@@ -507,6 +612,11 @@ public class InteractionExtractorForMIScore extends LineExport {
         } // i
     }
 
+    /**
+     * Apply the rules on the interaction detection method for the interactions in the cluster with no uniprot-dr-export annotation
+     * @param cluster : the cluster containing the interactions
+     * @param eligibleInteractions : the list of eligible encore interaction ids for uniprot export
+     */
     private void processEligibleExperimentsWithCurrentRules(IntActInteractionClusterScore cluster, List<Integer> eligibleInteractions) {
 
         // process each interaction of the list
@@ -552,7 +662,65 @@ public class InteractionExtractorForMIScore extends LineExport {
         } // i
     }
 
-    private void processEligibleExperimentsWithRulesOnInteractionMethodForAllExperiment(IntActInteractionClusterScore cluster, List<Integer> eligibleInteractions) {
+    /**
+     * Apply the rules at the experiment level (dr-export annotation) and the rules on the interaction detection method for the interactions in the cluster with no uniprot-dr-export annotation
+     * @param cluster : the cluster containing the interactions
+     * @param eligibleInteractions : the list of eligible encore interaction ids for uniprot export
+     */
+    private void processEligibleExperiments(IntActInteractionClusterScore cluster, List<Integer> eligibleInteractions) {
+
+        // process each interaction of the list
+        for (Map.Entry<Integer, EncoreInteraction> interactionEntry : cluster.getInteractionMapping().entrySet()) {
+
+            EncoreInteraction interaction = interactionEntry.getValue();
+
+            // get the Encore interaction object
+            if (interaction != null){
+                System.out.println("\t\t Interaction: Id:" + interaction.getId());
+
+                Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
+
+                TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+
+                Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
+                Set<Experiment> experiments = new HashSet<Experiment>();
+
+                for (Interaction inter : interactions){
+                    experiments.addAll(inter.getExperiments());
+                }
+
+                for (Iterator iterator2 = interactions.iterator(); iterator2.hasNext();) {
+
+                    Interaction intactInteraction = (Interaction) iterator2.next();
+
+                    Collection<Experiment> experimentsForInteraction = intactInteraction.getExperiments();
+
+                    for (Experiment e : experimentsForInteraction){
+                        if (!hasPassedDrExportAnnotation(intactInteraction, e)){
+                            experiments.remove(e);
+                        }
+                    }
+                } // i's interactions
+
+                for (Iterator iterator = experiments.iterator(); iterator.hasNext();) {
+                    Experiment experiment = (Experiment) iterator.next();
+
+                    if (hasPassedInteractionDetectionMethodRules(experiment.getCvInteraction(), experiments)){
+                        eligibleInteractions.add(interactionEntry.getKey());
+                        break;
+                    }
+                } // i's experiments
+                IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
+            }
+        } // i
+    }
+
+    /**
+     * Apply the rules on the interaction detection method for all the interactions in the cluster
+     * @param cluster : the cluster containing the interactions
+     * @param eligibleInteractions : the list of eligible encore interaction ids for uniprot export
+     */
+    private void processEligibleExperimentsWithCurrentRulesForAllExperiment(IntActInteractionClusterScore cluster, List<Integer> eligibleInteractions) {
 
         // process each interaction of the list
         for (Map.Entry<Integer, EncoreInteraction> interactionEntry : cluster.getInteractionMapping().entrySet()) {
@@ -577,8 +745,6 @@ public class InteractionExtractorForMIScore extends LineExport {
                 for (Iterator iterator2 = experiments.iterator(); iterator2.hasNext();) {
                     Experiment experiment = (Experiment) iterator2.next();
 
-                    LineExport.ExperimentStatus experimentStatus = super.getCCLineExperimentExportStatus(experiment, "\t\t\t\t");
-
                     if (hasPassedInteractionDetectionMethodRules(experiment.getCvInteraction(), experiments)){
                         eligibleInteractions.add(interactionEntry.getKey());
                         break;
@@ -590,48 +756,13 @@ public class InteractionExtractorForMIScore extends LineExport {
     }
 
     /**
-     * This method processes the interactionAcs to determine if each interaction is exported in uniprot (uniprot-dr-export is ok and interaction detection method is ok)
-     * @param interactionAcs : the list of interaction accessions in IntAct we want to process
-     * @param eligibleInteractions : the list of interactions which are elligible for a uniprot export
+     * This method will get the interactions from released experiment which can be processed for uniprot export and which passed the
+     * dr export constraints at the level of the experiment. Write the interaction accessions in a file
+     * @param fileForListOfInteractions
+     * @return the list of interaction Acs which are elligible for uniprot export
+     * @throws SQLException
+     * @throws IOException
      */
-    private void collectEligibleInteractionsWithoutRulesForInteractionDetectionMethod(List<String> interactionAcs, List<String> eligibleInteractions) {
-
-        // process each interaction of the list
-        final int interactionCount = interactionAcs.size();
-        for (int i = 0; i < interactionCount; i++) {
-
-            String interactionAc = interactionAcs.get(i);
-            Interaction interaction = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionAc);
-
-            // get the IntAct interaction object
-            if (interaction != null){
-                System.out.println("\t\t Interaction: Shortlabel:" + interaction.getShortLabel() + "  AC: " + interaction.getAc());
-
-                Collection experiments = interaction.getExperiments();
-
-                for (Iterator iterator2 = experiments.iterator(); iterator2.hasNext();) {
-                    Experiment experiment = (Experiment) iterator2.next();
-
-                    LineExport.ExperimentStatus experimentStatus = super.getCCLineExperimentExportStatus(experiment, "\t\t\t\t");
-
-                    if (experimentStatus.isNotSpecified()){
-
-                        CvInteraction cvInteraction = experiment.getCvInteraction();
-
-                        if (null != cvInteraction) {
-                            CvInteractionStatus methodStatus = getMethodExportStatus(cvInteraction, "\t\t");
-
-                            if (methodStatus.isNotSpecified()) {
-                                eligibleInteractions.add(interaction.getAc());
-                                break;
-                            }
-                        }
-                    }
-                } // i's experiments
-            }
-        } // i
-    }
-
     public List<String> extractInteractionsFromReleasedExperimentsPossibleToExport(String fileForListOfInteractions) throws SQLException, IOException {
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
@@ -650,27 +781,9 @@ public class InteractionExtractorForMIScore extends LineExport {
         return interactions;
     }
 
-    public List<String> extractInteractionsWithoutRulesForInteractionDetectionMethod(String fileForListOfInteractions) throws SQLException, IOException {
-
-        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
-
-        TransactionStatus transactionStatus = dataContext.beginTransaction();
-
-        List<String> interactionsToBeProcessedForExport = getInteractionAcsToBeProcessedForUniprotExport();
-
-        System.out.println(interactionsToBeProcessedForExport.size() + " will be processed for a possible uniprot export.");
-
-        List<String> interactions = extractInteractionsWithoutRuleForInteractionDetectionMethod(interactionsToBeProcessedForExport, fileForListOfInteractions);
-
-        System.out.println(interactions.size() + " will be kept for Mi scoring.");
-
-        dataContext.commitTransaction(transactionStatus);
-
-        return interactions;
-    }
-
     /**
      * This method is ignoring the current rules on the interaction detection method to decide if an interaction can be exported or not
+     * Write the interaction accessions in a file
      * @param potentiallyEligibleInteraction : the list of interaction accessions to process
      * @param fileForListOfInteractions : the name of the file where we want to write the list of interactions Acs possible to export
      * @return the list of interactions accessions which can be exported in uniprot
@@ -680,9 +793,6 @@ public class InteractionExtractorForMIScore extends LineExport {
     private List<String> extractInteractionsPossibleToExport(List<String> potentiallyEligibleInteraction, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(potentiallyEligibleInteraction.size() + " interactions to process.");
-        //List<String> eligibleInteractions = new ArrayList<String>();
-
-        //processEligibleExperiments(potentiallyEligibleInteraction, eligibleInteractions );
 
         FileWriter writer = new FileWriter(fileForListOfInteractions);
 
@@ -698,12 +808,15 @@ public class InteractionExtractorForMIScore extends LineExport {
 
     /**
      * This method is using the current rules on the interaction detection method to decide if an interaction can be exported or not
+     * Write the interaction accessions in a file
      * @param cluster : the cluster containing the list of interaction to process
      * @param fileForListOfInteractions : the name of the file where we want to write the list of interactions Acs currently exported
      * @return the list of encore interactions id which are exported in uniprot
      * @throws SQLException
      * @throws IOException
+     * @deprecated : contains a bug because export interaction of high confidence without looking at the interaction detection method
      */
+    @Deprecated
     public List<Integer> extractInteractionsCurrentlyExported(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
@@ -727,12 +840,20 @@ public class InteractionExtractorForMIScore extends LineExport {
         return eligibleInteractions;
     }
 
-    public List<Integer> extractInteractionsExportedWithRulesOnInteractionMethodForAllExperiment(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
+    /**
+     *
+     * @param cluster
+     * @param fileForListOfInteractions
+     * @return the list of Encore interaction ids which can be exported in uniprot. The mi score has been computed for all the interactions, even those with low confidence
+     * @throws SQLException
+     * @throws IOException
+     */
+    public List<Integer> extractInteractionsCurrentlyExportedScoreForAllInteractions(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
         List<Integer> eligibleInteractions = new ArrayList<Integer>();
 
-        processEligibleExperimentsWithRulesOnInteractionMethodForAllExperiment(cluster, eligibleInteractions );
+        processEligibleExperiments(cluster, eligibleInteractions );
 
         FileWriter writer = new FileWriter(fileForListOfInteractions);
 
@@ -750,6 +871,48 @@ public class InteractionExtractorForMIScore extends LineExport {
         return eligibleInteractions;
     }
 
+    /**
+     *
+     * @param cluster
+     * @param fileForListOfInteractions
+     * @return the list of Encore interaction ids which can be exported in uniprot. The mi score has been computed for the interactions which passed the dr export constraints at the level of the experiment
+     * Write the interaction accessions in a file
+     * @throws SQLException
+     * @throws IOException
+     */
+    public List<Integer> extractInteractionsExportedWithRulesOnInteractionMethodForAllExperiment(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
+
+        System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
+        List<Integer> eligibleInteractions = new ArrayList<Integer>();
+
+        processEligibleExperimentsWithCurrentRulesForAllExperiment(cluster, eligibleInteractions );
+
+        FileWriter writer = new FileWriter(fileForListOfInteractions);
+
+        for (Integer id : eligibleInteractions){
+            EncoreInteraction interaction = cluster.getInteractionMapping().get(id);
+
+            Map<String, String> refs = interaction.getExperimentToPubmed();
+            for (String ref : refs.keySet()){
+                writer.write(ref + "\n");
+                writer.flush();
+            }
+        }
+
+        writer.close();
+        return eligibleInteractions;
+    }
+
+    /**
+     *
+     * @param potentiallyEligibleInteraction
+     * @param fileForListOfInteractions
+     * @return the list of interaction accessions which can be exported in uniprot. The mi score has been computed for the interactions which passed the dr export constraints at the level of the experiment
+     * and which are binary
+     * Write the interaction accessions in a file
+     * @throws SQLException
+     * @throws IOException
+     */
     public List<String> extractBinaryInteractionsPossibleToExport(List<String> potentiallyEligibleInteraction, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(potentiallyEligibleInteraction.size() + " interactions to process.");
@@ -766,32 +929,6 @@ public class InteractionExtractorForMIScore extends LineExport {
 
         writer.close();
 
-        return eligibleInteractions;
-    }
-
-    /**
-     * This method is using the current rules on the interaction detection method and only return interactions with an interaction detection method undetermined
-     * @param potentiallyEligibleInteraction : the list of interaction accessions to process
-     * @param fileForListOfInteractions : the name of the file where we want to write the list of interactions Acs currently exported
-     * @return the list of interactions accessions which are exported in uniprot
-     * @throws SQLException
-     * @throws IOException
-     */
-    private List<String> extractInteractionsWithoutRuleForInteractionDetectionMethod(List<String> potentiallyEligibleInteraction, String fileForListOfInteractions) throws SQLException, IOException {
-
-        System.out.println(potentiallyEligibleInteraction.size() + " interactions to process.");
-        List<String> eligibleInteractions = new ArrayList<String>();
-
-        collectEligibleInteractionsWithoutRulesForInteractionDetectionMethod(potentiallyEligibleInteraction, eligibleInteractions );
-
-        FileWriter writer = new FileWriter(fileForListOfInteractions);
-
-        for (String ac : eligibleInteractions){
-            writer.write(ac + "\n");
-            writer.flush();
-        }
-
-        writer.close();
         return eligibleInteractions;
     }
 
