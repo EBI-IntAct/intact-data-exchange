@@ -66,45 +66,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>sort-mi-score</id>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <executable>java</executable>
-                            <arguments>
-                                <argument>-Xmx2024m</argument>
-                                <argument>-classpath</argument>
-                                <!-- automatically creates the classpath using all project dependencies,
-                                     also adding the project build directory -->
-                                <classpath/>
-                                <argument>uk.ac.ebi.intact.dataexchange.uniprotexport.MiScoreSorting</argument>
-                                <!-- The file which will contain the mi-scores-->
-                                <argument>${file1}</argument>
-                                <!-- The file which will contain the mi scores of the interactions currently exoirted in uniprot -->
-                                <argument>${file2}</argument>
-                                <!-- The file which will contain the mi scores of the data not exported in uniprot -->
-                                <argument>${file3}</argument>
-                                <!-- The file which will contain the list of interaction ac which are exported in uniprot-->
-                                <argument>${file4}</argument>
-                            </arguments>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 
     <dependencies>
