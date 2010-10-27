@@ -471,6 +471,9 @@ public class InteractionExtractorForMIScore extends LineExport {
                         if (!hasPassedDrExportAnnotation(intactInteraction, e)){
                             experiments.remove(e);
                         }
+                        else if (!experiments.contains(e)){
+                            experiments.add(e);
+                        }
                     }
                 } // i's interactions
 
