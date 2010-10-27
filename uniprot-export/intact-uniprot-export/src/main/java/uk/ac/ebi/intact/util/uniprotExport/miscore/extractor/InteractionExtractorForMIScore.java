@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.util.uniprotExport.miscore;
+package uk.ac.ebi.intact.util.uniprotExport.miscore.extractor;
 
 import org.springframework.transaction.TransactionStatus;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
@@ -6,7 +6,9 @@ import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreClient;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.IntactQueryProvider;
 
 import java.io.*;
 import java.sql.SQLException;
