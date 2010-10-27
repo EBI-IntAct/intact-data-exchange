@@ -272,6 +272,9 @@ public class IntactQueryProvider {
      * which passed the dr-export annotation at the level of the experiment
      */
     public List<String> getInteractionAcsToBeProcessedForUniprotExport(){
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
 
         String queryString = "select distinct(i.ac) from InteractionImpl i where i.ac in ("+interactionInvolvedInComponents + ") " +
                 "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") and i.ac not in ("+negativeInteractions+") " +
@@ -295,7 +298,11 @@ public class IntactQueryProvider {
         query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
         query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
 
-        return query.getResultList();
+        List<String> interactions = query.getResultList();
+
+        dataContext.commitTransaction(transactionStatus);
+
+        return interactions;
     }
 
     /**
@@ -304,6 +311,9 @@ public class IntactQueryProvider {
      * which passed the dr-export annotation at the level of the experiment
      */
     public List<String> getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport(){
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
 
         String queryString = "select distinct(i.ac) from InteractionImpl i " +
                 "where i.ac in ("+interactionsAccepted + ") " +
@@ -335,7 +345,11 @@ public class IntactQueryProvider {
         query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
         query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
 
-        return query.getResultList();
+        List<String> interactions = query.getResultList();
+
+        dataContext.commitTransaction(transactionStatus);
+
+        return interactions;
     }
 
     /**
@@ -344,6 +358,9 @@ public class IntactQueryProvider {
      * which passed the dr-export annotation at the level of the experiment
      */
     public List<String> getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport(){
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
 
         String queryString = "select distinct(i.ac) from InteractionImpl i " +
                 "where i.ac in ("+interactionsAccepted + ") " +
@@ -374,7 +391,11 @@ public class IntactQueryProvider {
         query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
         query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
 
-        return query.getResultList();
+        List<String> interactions = query.getResultList();
+
+        dataContext.commitTransaction(transactionStatus);
+
+        return interactions;
     }
 
     /**
@@ -383,7 +404,10 @@ public class IntactQueryProvider {
      * which are publicly released
      */
     public List<String> getInteractionAcsFromReleasedExperimentsNoFilterDrExport(){
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
+        
         String queryString = "select distinct(i.ac) from InteractionImpl i " +
                 "where i.ac in ("+interactionsAccepted + ") " +
                 "and i.ac not in ("+interactionsOnHold+") " +
@@ -408,7 +432,11 @@ public class IntactQueryProvider {
         query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
         query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
 
-        return query.getResultList();
+        List<String> interactions = query.getResultList();
+
+        dataContext.commitTransaction(transactionStatus);
+
+        return interactions;
     }
 
 }

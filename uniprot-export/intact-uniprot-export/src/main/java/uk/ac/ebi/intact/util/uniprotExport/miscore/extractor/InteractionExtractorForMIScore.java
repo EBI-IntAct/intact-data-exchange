@@ -578,10 +578,6 @@ public class InteractionExtractorForMIScore extends LineExport {
      */
     public List<String> collectInteractionsFromReleasedExperimentsPossibleToExport(String fileForListOfInteractions) throws SQLException, IOException {
 
-        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
-
-        TransactionStatus transactionStatus = dataContext.beginTransaction();
-
         List<String> interactionsToBeProcessedForExport = this.queryProvider.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
 
         System.out.println(interactionsToBeProcessedForExport.size() + " will be processed for a possible uniprot export.");
@@ -596,22 +592,14 @@ public class InteractionExtractorForMIScore extends LineExport {
         writer.close();
         System.out.println(interactionsToBeProcessedForExport.size() + " will be kept for Mi scoring.");
 
-        dataContext.commitTransaction(transactionStatus);
-
         return interactionsToBeProcessedForExport;
     }
 
     public List<String> collectInteractionsFromReleasedExperimentsContainingNoUniprotProteinsPossibleToExport(String fileForListOfInteractions) throws SQLException, IOException {
 
-        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
-
-        TransactionStatus transactionStatus = dataContext.beginTransaction();
-
         List<String> interactionsToBeProcessedForExport = this.queryProvider.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
 
         System.out.println(interactionsToBeProcessedForExport.size() + " will be processed for a possible uniprot export.");
-
-        dataContext.commitTransaction(transactionStatus);
 
         FileWriter writer = new FileWriter(fileForListOfInteractions);
 
@@ -627,15 +615,10 @@ public class InteractionExtractorForMIScore extends LineExport {
 
     public List<String> collectInteractionsFromReleasedExperiments(String fileForListOfInteractions) throws SQLException, IOException {
 
-        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
-
-        TransactionStatus transactionStatus = dataContext.beginTransaction();
 
         List<String> interactionsToBeProcessedForExport = this.queryProvider.getInteractionAcsFromReleasedExperimentsNoFilterDrExport();
 
         System.out.println(interactionsToBeProcessedForExport.size() + " will be processed for a possible uniprot export.");
-
-        dataContext.commitTransaction(transactionStatus);
 
         FileWriter writer = new FileWriter(fileForListOfInteractions);
 
