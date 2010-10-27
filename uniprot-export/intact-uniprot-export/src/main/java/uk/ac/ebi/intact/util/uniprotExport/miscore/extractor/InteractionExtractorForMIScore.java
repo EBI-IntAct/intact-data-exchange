@@ -457,10 +457,6 @@ public class InteractionExtractorForMIScore extends LineExport {
                 Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
                 Set<Experiment> experiments = new HashSet<Experiment>();
 
-                for (Interaction inter : interactions){
-                    experiments.addAll(inter.getExperiments());
-                }
-
                 for (Iterator iterator2 = interactions.iterator(); iterator2.hasNext();) {
 
                     Interaction intactInteraction = (Interaction) iterator2.next();
@@ -468,10 +464,7 @@ public class InteractionExtractorForMIScore extends LineExport {
                     Collection<Experiment> experimentsForInteraction = intactInteraction.getExperiments();
 
                     for (Experiment e : experimentsForInteraction){
-                        if (!hasPassedDrExportAnnotation(intactInteraction, e)){
-                            experiments.remove(e);
-                        }
-                        else if (!experiments.contains(e)){
+                        if (hasPassedDrExportAnnotation(intactInteraction, e)){
                             experiments.add(e);
                         }
                     }
