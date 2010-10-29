@@ -45,8 +45,6 @@ public class MiScoreComputing {
         String database = "enzpro";
         IntactContext.initContext(new String[] {"/META-INF/"+database+".spring.xml"});
 
-        InteractionExtractorForMIScore interactionExtractor = new InteractionExtractorForMIScore();
-
         try {
 
             System.out.println("computes MI score fro all binary interactions");
