@@ -832,17 +832,24 @@ public class ImexAssigner {
         boolean atLeastOneExperimentWithPPI = false;
         for ( Experiment experiment : publication.getExperiments() ) {
 
-            final boolean publicationMatch = matchesPublicationAndYear( experiment,
-                                                                        Arrays.asList( "Cell (0092-8674)",
-                                                                                       "Proteomics (1615-9853)",
-                                                                                       "Cancer Cell (1535-6108)",
-                                                                                       "J Mol Signal.",
-                                                                                       "Oncogene (0950-9232)"),
-                                                                        2006 );
+            final boolean intactJournalMatch = matchesPublicationAndYear( experiment,
+                                                                          Arrays.asList( "Cell (0092-8674)",
+                                                                                         "Proteomics (1615-9853)",
+                                                                                         "Cancer Cell (1535-6108)",
+                                                                                         "J Mol Signal."),
+                                                                          2006);
 
-            final boolean datasetMatch = hasDataset( experiment, Arrays.asList( "BioCreative - Critical Assessment of Information Extraction systems in Biology" ) );
+            final boolean i2dJournalMatch = matchesPublicationAndYear( experiment,
+                                                                       Arrays.asList( "Oncogene (0950-9232)" ),
+                                                                       2006 );
 
-            if ( ! ( publicationMatch || datasetMatch ) ) {
+            final boolean molconJournalMatch = matchesPublicationAndYear( experiment,
+                                                                          Arrays.asList( "Mol. Cancer"),
+                                                                          2010 );
+
+            final boolean datasetMatch = hasDataset(experiment, Arrays.asList("BioCreative - Critical Assessment of Information Extraction systems in Biology"));
+
+            if ( ! ( intactJournalMatch || i2dJournalMatch || molconJournalMatch || datasetMatch ) ) {
                 return false;
             }
 
