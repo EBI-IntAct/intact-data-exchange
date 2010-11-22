@@ -3,6 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.InteractionDetectionMethod;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
@@ -10,6 +11,7 @@ import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.IntactQueryProvider;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractorForMIScore;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,13 +33,15 @@ import java.util.*;
 public class MiScoreFilterForUniprotExport {
 
     private IntactQueryProvider queryProvider;
-    private Set<String> trueBinaryInteractions;
+    private Map<String, String> trueBinaryInteractions;
     private Set<String> eligibleInteractionsForUniprotExport;
-    private Set<Integer> interactionsToBeExported;
+    private List<Integer> interactionsToBeExported;
     private IntactPsimiTabReader mitabReader;
-    private static final double EXPORT_THRESHOLD = 0.4;
+    private static final double EXPORT_THRESHOLD = 0.43;
     private static final String CONFIDENCE_NAME = "intactPsiscore";
     private static final String INTACT = "intact";
+    private static final String COLOCALIZATION = "MI:0403";
+
     /**
      * the interaction cluster score
      */
@@ -45,9 +49,9 @@ public class MiScoreFilterForUniprotExport {
 
     public MiScoreFilterForUniprotExport(){
         queryProvider = new IntactQueryProvider();
-        trueBinaryInteractions = new HashSet<String>();
+        trueBinaryInteractions = new HashMap<String, String>();
         eligibleInteractionsForUniprotExport = new HashSet<String>();
-        interactionsToBeExported = new HashSet<Integer>();
+        interactionsToBeExported = new ArrayList<Integer>();
         interactionClusterScore = new IntActInteractionClusterScore();
         mitabReader = new IntactPsimiTabReader(true);
 
@@ -101,51 +105,18 @@ public class MiScoreFilterForUniprotExport {
 
                     if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
                         interactionToProcess.add(interaction);
+
+                        List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
+                        String detectionMI = detectionMethods.iterator().next().getIdentifier();
+
                         if (interaction.getExpansionMethods().isEmpty()){
-                            this.trueBinaryInteractions.add(intactAc);
+                            this.trueBinaryInteractions.put(intactAc, detectionMI);
                         }
                     }
                 }
             }
             this.interactionClusterScore.setBinaryInteractionList(interactionToProcess);
             this.interactionClusterScore.runService();
-        }
-    }
-
-    private void extractInteractionsForUniprotExport() throws UniprotExportException {
-        this.interactionsToBeExported.clear();
-
-        if (this.interactionClusterScore.getInteractionMapping() == null){
-            throw new UniprotExportException("Before exporting interactions in Uniprot, it is mandatory to compute the mi score of the interactions possible to export. " +
-                    "Currently no mi cluster score has been computed.");
-        }
-        else if (this.interactionClusterScore.getInteractionMapping().isEmpty()){
-            throw new UniprotExportException("Before exporting interactions in Uniprot, it is mandatory to compute the mi score of the interactions possible to export. " +
-                    "Currently no mi cluster score has been computed.");
-        }
-
-        for (Map.Entry<Integer, EncoreInteraction> entry : this.interactionClusterScore.getInteractionMapping().entrySet()){
-            EncoreInteraction interaction = entry.getValue();
-
-            double score = getMiClusterScoreFor(interaction);
-
-            if (score >= EXPORT_THRESHOLD){
-
-                if (interaction.getExperimentToDatabase() == null){
-                    throw new UniprotExportException("The interaction " + entry.getKey() + ":" + interaction.getInteractorA() + "-" + interaction.getInteractorB() +" doesn't have any references to IntAct.");
-                }
-                List<String> intactInteractions = interaction.getExperimentToDatabase().get(INTACT);
-
-                if (intactInteractions.isEmpty()){
-                    throw new UniprotExportException("The interaction " + entry.getKey() + ":" + interaction.getInteractorA() + "-" + interaction.getInteractorB() +" doesn't have any references to IntAct.");
-                }
-
-                for (String ac : intactInteractions){
-                    if (trueBinaryInteractions.contains(ac)){
-                        interactionsToBeExported.add(entry.getKey());
-                    }
-                }
-            }
         }
     }
 
@@ -163,8 +134,10 @@ public class MiScoreFilterForUniprotExport {
 
     public void processUniprotExport(String mitab, String fileExport) throws UniprotExportException {
         try {
+            InteractionExtractorForMIScore extractor = new InteractionExtractorForMIScore();
+
             computeMiScoreInteractionEligibleUniprotExport(mitab);
-            extractInteractionsForUniprotExport();
+            this.interactionsToBeExported = extractor.processExportWithMiClusterScore(this.interactionClusterScore, this.trueBinaryInteractions, true);
 
             this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);
         } catch (IOException e) {
@@ -174,7 +147,7 @@ public class MiScoreFilterForUniprotExport {
         }
     }
 
-    public Set<String> getTrueBinaryInteractions() {
+    public Map<String, String> getTrueBinaryInteractions() {
         return trueBinaryInteractions;
     }
 

@@ -52,7 +52,7 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
             scores = new double[scoreList.size()];
             int i = 0;
             for(Object score:scoreList){
-                scores[i] = Double.parseDouble(score.toString()) * 100;
+                scores[i] = Double.parseDouble(score.toString());
                 i++;
             }
             fstream.close();
@@ -75,6 +75,10 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
         miH.createChart();
     }
 
+    /**
+     * Create a chart with the results of mi cluster score
+     * @param diagrammName
+     */
     public void createChart(String diagrammName) {
         IntActMiScoreHistogram miH = new IntActMiScoreHistogram();
         miH.setTitle("Score distribution for " + scores.length + " clustered interactions from " + fileName);

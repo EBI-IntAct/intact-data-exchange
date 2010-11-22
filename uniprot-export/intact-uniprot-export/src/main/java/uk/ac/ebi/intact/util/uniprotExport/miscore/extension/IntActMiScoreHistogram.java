@@ -28,15 +28,15 @@ public class IntActMiScoreHistogram extends MiscoreHistogram{
 
     public void createChart(String pngFileName){
         HistogramDataset dataset = new HistogramDataset();
-        dataset.setType(HistogramType.RELATIVE_FREQUENCY);
-        setNumberOfBars(100);
-        setMinimumScore(10);
-        setMaximumScore(80);
+        dataset.setType(HistogramType.FREQUENCY);
+        setNumberOfBars(20);
+        setMinimumScore(0);
+        setMaximumScore(1);
         
         dataset.addSeries(getTitle(),getValues(),getNumberOfBars(),getMinimumScore(),getMaximumScore());
         String plotTitle = getTitle();
         String xaxis = "Score";
-        String yaxis = "% of interactions";
+        String yaxis = "Number of interactions";
         PlotOrientation orientation = PlotOrientation.VERTICAL;
         boolean show = false;
         boolean toolTips = false;

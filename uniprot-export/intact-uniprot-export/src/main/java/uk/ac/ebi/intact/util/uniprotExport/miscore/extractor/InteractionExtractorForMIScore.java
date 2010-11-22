@@ -1,12 +1,15 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.extractor;
 
 import org.springframework.transaction.TransactionStatus;
+import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreClient;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.IntactQueryProvider;
 
@@ -26,6 +29,10 @@ import java.util.*;
 public class InteractionExtractorForMIScore extends LineExport {
 
     private IntactQueryProvider queryProvider;
+    private static final double EXPORT_THRESHOLD = 0.43;
+    private static final String CONFIDENCE_NAME = "intactPsiscore";
+    private static final String INTACT = "intact";
+    private static final String COLOCALIZATION = "MI:0403";
 
     public InteractionExtractorForMIScore(){
         this.queryProvider = new IntactQueryProvider();
@@ -595,6 +602,13 @@ public class InteractionExtractorForMIScore extends LineExport {
         return interactionsToBeProcessedForExport;
     }
 
+    /**
+     * Collect all the interactions from released experiments which passed the dr-export filter but can contain non uniprot proteins
+     * @param fileForListOfInteractions
+     * @return
+     * @throws SQLException
+     * @throws IOException
+     */
     public List<String> collectInteractionsFromReleasedExperimentsContainingNoUniprotProteinsPossibleToExport(String fileForListOfInteractions) throws SQLException, IOException {
 
         List<String> interactionsToBeProcessedForExport = this.queryProvider.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
@@ -613,6 +627,13 @@ public class InteractionExtractorForMIScore extends LineExport {
         return interactionsToBeProcessedForExport;
     }
 
+    /**
+     * Collect all the interactions from released experiments without adding the filter on dr-export
+     * @param fileForListOfInteractions
+     * @return
+     * @throws SQLException
+     * @throws IOException
+     */
     public List<String> collectInteractionsFromReleasedExperiments(String fileForListOfInteractions) throws SQLException, IOException {
 
 
@@ -729,6 +750,15 @@ public class InteractionExtractorForMIScore extends LineExport {
         return eligibleInteractions;
     }
 
+    /**
+     * Collect all interactions from released experiments and then apply a filter on non uniprot proteins.
+     * It will apply the current rule for uniprot export and return the list of interactions which passed all the filters
+     * @param cluster
+     * @param fileForListOfInteractions
+     * @return
+     * @throws SQLException
+     * @throws IOException
+     */
     public List<Integer> extractInteractionsExportedWithCurrentRulesForAllExperimentContainingNoUniprotProteins(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
@@ -806,5 +836,69 @@ public class InteractionExtractorForMIScore extends LineExport {
         System.out.println(potentiallyElligibleInteractions.size() + " interactions to process.");
 
         return potentiallyElligibleInteractions;
+    }
+
+    /**
+     *
+     * @param interaction
+     * @return the computed Mi cluster score for this interaction
+     */
+    private double getMiClusterScoreFor(EncoreInteraction interaction){
+        List<psidev.psi.mi.tab.model.Confidence> confidenceValues = interaction.getConfidenceValues();
+        double score = 0;
+        for(psidev.psi.mi.tab.model.Confidence confidenceValue:confidenceValues){
+            if(confidenceValue.getType().equalsIgnoreCase(CONFIDENCE_NAME)){
+                score = Double.parseDouble(confidenceValue.getValue());
+            }
+        }
+
+        return score;
+    }
+
+    /**
+     * For each binary interaction in the intactMiClusterScore : filter on a threshold value of the score and then, depending on 'filterBinary',
+     * will add a filter on true binary interaction
+     * @param clusterScore
+     * @param trueBinaryInteractions
+     * @param filterBinary
+     * @return
+     * @throws UniprotExportException
+     */
+    public List<Integer> processExportWithMiClusterScore(IntActInteractionClusterScore clusterScore, Map<String, String> trueBinaryInteractions, boolean filterBinary) throws UniprotExportException {
+        List<Integer> interactionsPossibleToExport = new ArrayList<Integer>();
+
+        for (Map.Entry<Integer, EncoreInteraction> entry : clusterScore.getInteractionMapping().entrySet()){
+            EncoreInteraction encore = entry.getValue();
+
+            double score = getMiClusterScoreFor(encore);
+
+            if (score >= EXPORT_THRESHOLD){
+
+                if (encore.getExperimentToDatabase() == null){
+                    throw new UniprotExportException("The interaction " + entry.getKey() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
+                }
+                List<String> intactInteractions = encore.getExperimentToDatabase().get(INTACT);
+
+                if (intactInteractions.isEmpty()){
+                    throw new UniprotExportException("The interaction " + entry.getKey() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
+                }
+
+                for (String ac : intactInteractions){
+                    if (filterBinary){
+                        if (trueBinaryInteractions.containsKey(ac)){
+
+                            if (!trueBinaryInteractions.get(ac).equalsIgnoreCase(COLOCALIZATION)){
+                                interactionsPossibleToExport.add(entry.getKey());
+                            }
+                        }
+                    }
+                    else{
+                        interactionsPossibleToExport.add(entry.getKey());
+                    }
+                }
+            }
+        }
+
+        return interactionsPossibleToExport;
     }
 }

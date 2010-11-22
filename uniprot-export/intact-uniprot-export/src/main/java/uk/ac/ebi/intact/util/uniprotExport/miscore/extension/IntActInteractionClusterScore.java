@@ -40,6 +40,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         writer = new PsimiTabWriter();
 
         setDirectInteractionWeight_3();
+        initializeMethodWeights();
         //setDirectInteractionWeight_5();
     }
 
@@ -49,22 +50,53 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         super.runService();
     }
 
+    /**
+     * Set the weight of the publication
+     * @param weight
+     */
     public void setPublicationWeight(float weight){
         super.setPublicationWeight(weight);
     }
 
+    /**
+     * Set the weight of the method
+     * @param weight
+     */
     public void setMethodWeight(float weight){
         super.setMethodWeight(weight);
     }
 
+    /**
+     * Set the weight of the interaction type
+     * @param weight
+     */
     public void setTypeWeight(float weight){
         super.setTypeWeight(weight);
     }
 
+    /**
+     * Initialises the weight of each method and decrease the weight of imaging techniques
+     */
+    private void initializeMethodWeights(){
+
+        HashMap<String,Float> customOntologyMethodScores = new HashMap<String,Float>();
+        customOntologyMethodScores.put("MI:0013", 1.00f); // cv1 // biophysical
+        customOntologyMethodScores.put("MI:0090", 0.66f); // cv2 // protein complementation assay
+        customOntologyMethodScores.put("MI:0254", 0.10f); // cv3 // genetic interference
+        customOntologyMethodScores.put("MI:0255", 0.10f); // cv4 // post transcriptional interference
+        customOntologyMethodScores.put("MI:0401", 1.00f); // cv5 // biochemical
+        customOntologyMethodScores.put("MI:0428", 0.20f); // cv6 // imagining technique
+        customOntologyMethodScores.put("unknown", 0.05f); // cv7 // unknown
+        super.setCustomOntologyMethodScores(customOntologyMethodScores);
+    }
+
+    /**
+     * The best weight for the interactions types is direct interaction : 5.
+     */
     public void setDirectInteractionWeight_5(){
         Map<String,Float> customOntologyTypeScores = new HashMap<String,Float>();
         customOntologyTypeScores.put("MI:0208", 0.05f);
-        customOntologyTypeScores.put("MI:0403", 0.20f);
+        customOntologyTypeScores.put("MI:0403", 0.03f); // colocalization
         customOntologyTypeScores.put("MI:0914", 0.20f);
         customOntologyTypeScores.put("MI:0915", 0.40f);
         customOntologyTypeScores.put("MI:0407", 1.00f);
@@ -72,10 +104,13 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         super.setCustomOntologyTypeScores(customOntologyTypeScores);
     }
 
+    /**
+     * The best weight for the interactions types is direct interaction : 3.
+     */
     public void setDirectInteractionWeight_3(){
         Map<String,Float> customOntologyTypeScores = new HashMap<String,Float>();
         customOntologyTypeScores.put("MI:0208", 0.08f);
-        customOntologyTypeScores.put("MI:0403", 0.33f);
+        customOntologyTypeScores.put("MI:0403", 0.05f); // colocalization
         customOntologyTypeScores.put("MI:0914", 0.33f);
         customOntologyTypeScores.put("MI:0915", 0.67f);
         customOntologyTypeScores.put("MI:0407", 1.00f);
@@ -196,6 +231,11 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         }
     }
 
+    /**
+     * Save the scores of the specific interaction ids
+     * @param fileName
+     * @param interactionIds
+     */
     public void saveScoresForSpecificInteractions(String fileName, Collection<Integer> interactionIds){
 
         String scoreListCSV = getScoresPerInteraction(interactionIds, null, null);
