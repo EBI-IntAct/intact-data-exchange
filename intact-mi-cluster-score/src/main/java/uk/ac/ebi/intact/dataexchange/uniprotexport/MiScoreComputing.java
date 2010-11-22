@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.dataexchange.uniprotexport;
 
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreClient;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractorForMIScore;
 
 import java.io.IOException;
@@ -47,14 +48,15 @@ public class MiScoreComputing {
 
         try {
 
-            System.out.println("computes MI score fro all binary interactions");
-            MiScoreClient scoreClient4 = new MiScoreClient();
-            scoreClient4.getInteractionClusterScore().setDirectInteractionWeight_3();
+            System.out.println("computes MI score for all interactions");
+            MiScoreClient scoreClient = new MiScoreClient();
 
-            scoreClient4.computeMiScoreForReleasedBinaryPPIInteractions(fileInteractionEligible, fileInteractionEligible + "_only_binary.txt", fileTotal, fileInteractionExported, fileDataExported, fileDataNotExported);
+            scoreClient.processExportWithFilterOnBinaryInteraction(fileInteractionEligible, fileTotal, fileDataExported, fileDataNotExported);
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (UniprotExportException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 }
