@@ -48,10 +48,15 @@ public class MiScoreComputing {
 
         try {
 
-            System.out.println("computes MI score for all interactions");
+            System.out.println("computes MI score for all interactions and process them with both filters on mi score and binary interactions");
             MiScoreClient scoreClient = new MiScoreClient();
 
             scoreClient.processExportWithFilterOnBinaryInteraction(fileInteractionEligible, fileTotal, fileDataExported, fileDataNotExported);
+
+            System.out.println("computes MI score for all interactions and process them with no filters on mi score and binary interactions");
+            MiScoreClient scoreClient2 = new MiScoreClient();
+
+            scoreClient2.processExportWithoutFilterOnBinaryInteraction(fileInteractionEligible+"_no_filter", fileTotal +"_no_filter", fileDataExported +"_no_filter", fileDataNotExported +"_no_filter");
 
         } catch (SQLException e) {
             e.printStackTrace();
