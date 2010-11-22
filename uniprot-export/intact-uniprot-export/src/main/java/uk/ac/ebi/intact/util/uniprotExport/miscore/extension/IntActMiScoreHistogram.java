@@ -29,7 +29,7 @@ public class IntActMiScoreHistogram extends MiscoreHistogram{
     public void createChart(String pngFileName){
         HistogramDataset dataset = new HistogramDataset();
         dataset.setType(HistogramType.FREQUENCY);
-        setNumberOfBars(20);
+        setNumberOfBars(100);
         setMinimumScore(0);
         setMaximumScore(1);
         

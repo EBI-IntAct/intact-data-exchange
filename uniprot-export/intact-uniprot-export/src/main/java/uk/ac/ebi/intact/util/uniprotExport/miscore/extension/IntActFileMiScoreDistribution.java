@@ -70,7 +70,7 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
     public void createChart() {
         IntActMiScoreHistogram miH = new IntActMiScoreHistogram();
         miH.setTitle("Score distribution for " + scores.length + " clustered interactions from " + fileName);
-        miH.setNumberOfBars(20);
+        miH.setNumberOfBars(100);
         miH.setValues(getScores());
         miH.createChart();
     }
@@ -82,7 +82,7 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
     public void createChart(String diagrammName) {
         IntActMiScoreHistogram miH = new IntActMiScoreHistogram();
         miH.setTitle("Score distribution for " + scores.length + " clustered interactions from " + fileName);
-        miH.setNumberOfBars(20);
+        miH.setNumberOfBars(100);
         miH.setValues(getScores());
         miH.createChart(diagrammName);
     }
