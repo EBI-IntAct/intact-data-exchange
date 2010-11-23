@@ -367,7 +367,6 @@ public class IntactQueryProvider {
                 "and i.ac not in ("+interactionsOnHold+") " +
                 "and i.ac not in (" + interactionsDrExportNotPassed + ") " +
                 "and i.ac not in (" + interactionsFromExperimentNoExport + ") " +
-                "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") " +
                 "and i.ac not in ("+negativeInteractions+") ";
 
         // we want all the interactions which :
@@ -385,11 +384,7 @@ public class IntactQueryProvider {
         query.setParameter("no", "NO");
         query.setParameter("yes", "YES");
         query.setParameter("confidence", CvTopic.AUTHOR_CONFIDENCE_MI_REF);
-        query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
         query.setParameter("negative", CvTopic.NEGATIVE);
-        query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
-        query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
-        query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
 
         List<String> interactions = query.getResultList();
 

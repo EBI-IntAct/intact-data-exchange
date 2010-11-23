@@ -107,7 +107,6 @@ public class MiScoreClient {
         System.out.println("Saving the scores ...");
         // saves the scores
         this.interactionClusterScore.saveScores(fileName);
-        convertResultsIntoDiagram(fileName + ".png", fileName);
     }
 
     /**
@@ -143,7 +142,6 @@ public class MiScoreClient {
         System.out.println("Saving the scores ...");
         // saves the scores
         this.interactionClusterScore.saveScores(fileName);
-        convertResultsIntoDiagram(fileName + ".png", fileName);
     }
 
     /**
@@ -509,9 +507,7 @@ public class MiScoreClient {
         String fileName1 = fileContainingDataExported + "_mitab.csv";
         String fileName2 = fileContainingDataNotExported + "_mitab.csv";
         this.interactionClusterScore.saveScoresForSpecificInteractions(fileName1, interactionIdentifiersExported);
-        convertResultsIntoDiagram(fileName1 + ".png", fileName1);
         this.interactionClusterScore.saveScoresForSpecificInteractions(fileName2, CollectionUtils.subtract(this.interactionClusterScore.getInteractionMapping().keySet(), interactionIdentifiersExported));
-        convertResultsIntoDiagram(fileName2 + ".png", fileName2);
     }
 
     /**
@@ -528,11 +524,8 @@ public class MiScoreClient {
         String fileName1 = fileContainingDataExported + "_mitab.csv";
         String fileName2 = fileContainingDataNotExported + "_mitab.csv";
         
-        this.interactionClusterScore.saveScoresForSpecificInteractions(fileContainingDataExported + "_mitab.csv", interactionIds);
-        convertResultsIntoDiagram(fileName1 + ".png", fileName1);
-        this.interactionClusterScore.saveScoresForSpecificInteractions(fileContainingDataNotExported + "_mitab.csv", CollectionUtils.subtract(this.interactionClusterScore.getInteractionMapping().keySet(), interactionIds));
-        convertResultsIntoDiagram(fileName2 + ".png", fileName2);
-
+        this.interactionClusterScore.saveScoresForSpecificInteractions(fileName1, interactionIds);
+        this.interactionClusterScore.saveScoresForSpecificInteractions(fileName2, CollectionUtils.subtract(this.interactionClusterScore.getInteractionMapping().keySet(), interactionIds));
     }
 
     /**

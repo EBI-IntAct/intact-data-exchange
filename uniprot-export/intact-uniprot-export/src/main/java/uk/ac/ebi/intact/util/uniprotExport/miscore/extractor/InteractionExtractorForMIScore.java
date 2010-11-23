@@ -611,7 +611,7 @@ public class InteractionExtractorForMIScore extends LineExport {
      */
     public List<String> collectInteractionsFromReleasedExperimentsContainingNoUniprotProteinsPossibleToExport(String fileForListOfInteractions) throws SQLException, IOException {
 
-        List<String> interactionsToBeProcessedForExport = this.queryProvider.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
+        List<String> interactionsToBeProcessedForExport = this.queryProvider.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport();
 
         System.out.println(interactionsToBeProcessedForExport.size() + " will be processed for a possible uniprot export.");
 
@@ -877,7 +877,9 @@ public class InteractionExtractorForMIScore extends LineExport {
                 if (encore.getExperimentToDatabase() == null){
                     throw new UniprotExportException("The interaction " + entry.getKey() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
                 }
-                List<String> intactInteractions = encore.getExperimentToDatabase().get(INTACT);
+                List<String> intactInteractions = new ArrayList<String>();
+                
+                intactInteractions.addAll(encore.getExperimentToPubmed().keySet());
 
                 if (intactInteractions.isEmpty()){
                     throw new UniprotExportException("The interaction " + entry.getKey() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
