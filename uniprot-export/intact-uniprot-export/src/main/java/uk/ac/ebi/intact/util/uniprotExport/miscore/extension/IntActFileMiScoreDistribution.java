@@ -87,4 +87,17 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
         miH.createChart(diagrammName);
     }
 
+    /**
+     * Create a chart with the results of mi cluster score
+     * @param diagrammName
+     */
+    public void createChart(String diagrammName, String title, int numberOfBars, int min, int max) {
+        IntActMiScoreHistogram miH = new IntActMiScoreHistogram();
+        miH.setTitle(title);
+        miH.setNumberOfBars(numberOfBars);
+        miH.setMaximumScore(max);
+        miH.setMinimumScore(min);
+        miH.setValues(getScores());
+        miH.createChart(diagrammName);
+    }
 }
