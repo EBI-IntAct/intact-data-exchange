@@ -891,6 +891,7 @@ public class InteractionExtractorForMIScore extends LineExport {
 
                             if (!trueBinaryInteractions.get(ac).equalsIgnoreCase(COLOCALIZATION)){
                                 interactionsPossibleToExport.add(entry.getKey());
+                                break;
                             }
                         }
                     }
