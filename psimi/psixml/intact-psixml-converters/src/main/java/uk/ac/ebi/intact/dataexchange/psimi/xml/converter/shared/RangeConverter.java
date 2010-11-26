@@ -40,6 +40,8 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
     public static final String CTERMINAL_MI_REF = "MI:0334";
     public static final String NTERMINAL_MI_REF = "MI:0340";
     public static final String RAGGED_NTERMINUS_MI_REF = "MI:0341";
+    public static final String CTERMINAL_REGION_MI_REF = "MI:1039";
+    public static final String NTERMINAL_REGION_MI_REF = "MI:1040";
 
     public static final String CERTAIN = "certain";
     public static final String MORE_THAN = "greater-than";
@@ -222,21 +224,21 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
     }
 
     private boolean isCTerminalRegion( RangeStatus rangeStatus ) {
-        if ( isStatusOfType( rangeStatus, CTERMINAL_REGION, null ) ) {
+        if ( isStatusOfType( rangeStatus, CTERMINAL_REGION, CTERMINAL_REGION_MI_REF ) ) {
             return true;
         }
         return false;
     }
 
     private boolean isNTerminalRegion( RangeStatus rangeStatus ) {
-        if ( isStatusOfType( rangeStatus, NTERMINAL_REGION, null ) ) {
+        if ( isStatusOfType( rangeStatus, NTERMINAL_REGION, NTERMINAL_REGION_MI_REF ) ) {
             return true;
         }
         return false;
     }
 
     private boolean isRaggedNTerminal( RangeStatus rangeStatus ) {
-        if ( isStatusOfType( rangeStatus, RAGGED_NTERMINUS_MI_REF, RAGGED_NTERMINUS ) ) {
+        if ( isStatusOfType( rangeStatus, RAGGED_NTERMINUS, RAGGED_NTERMINUS_MI_REF ) ) {
             return true;
         }
         return false;
