@@ -100,18 +100,6 @@ public class RangeConverterTest {
         Assert.assertEquals( 4, intactObject.getToIntervalEnd() );
     }
 
-    @Test( expected= PsiConversionException.class )
-    public void psiToIntact_no_position() throws Exception {
-        psidev.psi.mi.xml.model.Range psiObject = new Range( buildRangeStatus( "certain", RangeConverter.CERTAIN ),
-                                                             buildRangeStatus( "certain", RangeConverter.CERTAIN ),
-                                                             new Position(2),
-                                                             new Interval(3,4));
-        psiObject.setBegin( null );
-        psiObject.setEndInterval( null );
-        final RangeConverter converter = new RangeConverter(new Institution());
-        converter.psiToIntact( psiObject );
-    }
-
     @Test
     public void intactToPsi() throws Exception {
     }

@@ -159,14 +159,9 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
             throw new PsiConversionException( "Cannot convert the range " + range.toString() + ". The start position is c-terminal and we should have a position equal to the sequence length" +
                     " (or 0 if we don't know the sequence length) instead of "+endIntervalFrom+"-"+endIntervalTo+". A position interval is not allowed for this status.");
         }
-
+        
         // correct positions for undetermined, n-terminal or c-terminal
         FeatureUtils.correctRangePositionsAccordingToType(range, seq);
-
-        // check if it is a bad range
-        if (FeatureUtils.isABadRange(range, seq)){
-            throw new PsiConversionException( "Cannot convert the range " + range.toString() + "." + FeatureUtils.getBadRangeInfo(range, seq) );
-        }
 
         return range;
     }
@@ -255,10 +250,10 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
 
                 if (ref.getDbAc() != null){
                     if (ref.getDbAc().equals(CvDatabase.PSI_MI_MI_REF)){
-                         hasMiNumber = true;
+                        hasMiNumber = true;
                     }
                     else if (ref.getDb().equalsIgnoreCase(CvDatabase.PSI_MI)){
-                         hasMiNumber = true;
+                        hasMiNumber = true;
                     }
                 }
             }

@@ -2,13 +2,15 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.xml.model.Feature;
-import psidev.psi.mi.xml.model.Names;
-import psidev.psi.mi.xml.model.Participant;
-import psidev.psi.mi.xml.model.Range;
+import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.PsiMockFactory;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.XrefConverter;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Feature;
+import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.Range;
+import uk.ac.ebi.intact.model.Xref;
 
 /**
  * IntactConverterUtils Tester.
@@ -51,12 +53,24 @@ public class IntactConverterUtilsTest extends IntactBasicTestCase {
     }
 
     @Test
+    public void populateXRefs_CvFuzzyType() throws Exception {
+        final Institution institution = getMockBuilder().createInstitution( "MI:zzzz", "institution" );
+        final CvFuzzyType n_terminal = new CvFuzzyType();
+
+        psidev.psi.mi.xml.model.Xref ref = new psidev.psi.mi.xml.model.Xref();
+        ref.setPrimaryRef(new DbReference(CvDatabase.INTACT, CvDatabase.INTACT_MI_REF, "IA:xxxx", CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF));
+        IntactConverterUtils.populateXref( ref, n_terminal, new XrefConverter<CvObjectXref>(institution, CvObjectXref.class));
+
+        Assert.assertEquals( CvDatabase.INTACT, n_terminal.getXrefs().iterator().next().getCvDatabase().getShortLabel() );
+    }
+
+    @Test
     public void convert_featureRanges_sequence(){
         Institution institution = getMockBuilder().createInstitution( "MI:zzzz", "institution" );
         Interaction interaction = getMockBuilder().createDeterministicInteraction();
         Participant p = PsiMockFactory.createMockParticipant(new psidev.psi.mi.xml.model.Interaction());
-        Feature f = PsiMockFactory.createFeature();
-        Range r = PsiMockFactory.createRange(); // position 1-5
+        psidev.psi.mi.xml.model.Feature f = PsiMockFactory.createFeature();
+        psidev.psi.mi.xml.model.Range r = PsiMockFactory.createRange(); // position 1-5
 
         String s = "KTTPPSVYPLAPGCGDTTGSSVTLGCLVKGYFPESVTVTWNSGSLSSSVHTFPALLQSGL" +
                 "YTMSSSVTVPSSTWPSQTVTCSVAHPASSTTVDKKLEPSGPISTINPCPPCKECHKCPAP" +
