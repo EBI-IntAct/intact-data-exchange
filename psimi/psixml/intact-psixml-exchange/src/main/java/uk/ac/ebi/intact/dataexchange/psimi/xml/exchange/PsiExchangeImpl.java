@@ -44,10 +44,8 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConve
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher.PsiEnricherException;
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.IntactEntry;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.InteractionImpl;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.FeatureUtils;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -175,6 +173,8 @@ public class PsiExchangeImpl implements PsiExchange {
             psidev.psi.mi.xml.model.Interaction psiInteraction = iterator.next();
 
             Interaction interaction = interactionConverter.psiToIntact(psiInteraction);
+
+            checkValidFeatures(interaction);
             ConversionCache.clear();
 
             // mark the interaction to save or update
@@ -238,6 +238,9 @@ public class PsiExchangeImpl implements PsiExchange {
                 Interaction interaction = null;
                 try {
                     interaction = interactionConverter.psiToIntact(psiInteraction);
+
+                    checkValidFeatures(interaction);
+
                 } catch (PsiConversionException e) {
                     throw new PersisterException("Problem converting PSI interaction: " + psiInteraction, e);
                 }
@@ -258,10 +261,73 @@ public class PsiExchangeImpl implements PsiExchange {
 
         if (log.isDebugEnabled()) {
             log.debug("Processed " + interactionCount + " interactions (" + importStats.getPersistedCount(InteractionImpl.class, false) + " persisted, " + importStats.getDuplicatesCount(InteractionImpl.class, false) + " duplicated (ignored)) in " +
-                      (System.currentTimeMillis() - startTime) + "ms");
+                    (System.currentTimeMillis() - startTime) + "ms");
         }
 
         return importStats;
+    }
+
+    private void checkValidFeatures(Interaction interaction){
+        boolean canCheck = PsiExchangeContext.getCurrentInstance().isSanityCheckEnabled();
+
+        if (canCheck){
+
+            Collection<Component> components = interaction.getComponents();
+
+            for (Component c : components){
+                Collection<Feature> features = c.getBindingDomains();
+                Interactor i = c.getInteractor();
+
+                String seq = null;
+
+                if (i instanceof Polymer){
+                    Polymer polymer = (Polymer) i;
+                    seq = polymer.getSequence();
+                }
+
+                for (Feature f : features){
+                    Collection<Range> ranges = f.getRanges();
+
+                    for (Range r : ranges){
+                        CvFuzzyType fromStatus = findCvFuzzyTypeInDatabase(r.getFromCvFuzzyType());
+                        CvFuzzyType toStatus = findCvFuzzyTypeInDatabase(r.getToCvFuzzyType());
+
+                        if (fromStatus != null){
+                            r.setFromCvFuzzyType(fromStatus);
+                        }
+
+                        if (toStatus != null){
+                            r.setToCvFuzzyType(toStatus);
+                        }
+                        
+                        // correct positions for undetermined, n-terminal or c-terminal
+                        FeatureUtils.correctRangePositionsAccordingToType(r, seq);
+
+                        // check if it is a bad range
+                        if (FeatureUtils.isABadRange(r, seq)){
+                            throw new PersisterException( "Cannot convert the range " + r.toString() + ". " + FeatureUtils.getBadRangeInfo(r, seq) );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private CvFuzzyType findCvFuzzyTypeInDatabase(CvFuzzyType type){
+        if(type == null){
+            return null;
+        }
+
+        CvFuzzyType status = null;
+
+        if (type.getIdentifier() != null){
+            status = intactContext.getDaoFactory().getCvObjectDao(CvFuzzyType.class).getByIdentifier(type.getIdentifier());
+        }
+        else if (type.getShortLabel() != null){
+            status = intactContext.getDaoFactory().getCvObjectDao(CvFuzzyType.class).getByShortLabel(type.getShortLabel());
+        }
+
+        return status;
     }
 
     private PersisterStatistics merge(PersisterStatistics stats1, PersisterStatistics stats2) {
@@ -282,7 +348,7 @@ public class PsiExchangeImpl implements PsiExchange {
      * Imports an IntactEntry into intact
      *
      * @param entry  the intact entry to import
-     * 
+     *
      * @return report of the import
      *
      * @throws PersisterException thrown if there are problems persisting the data in the intact-model database
