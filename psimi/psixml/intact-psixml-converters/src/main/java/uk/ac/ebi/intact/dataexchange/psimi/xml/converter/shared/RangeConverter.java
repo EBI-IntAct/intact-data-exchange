@@ -19,6 +19,7 @@ import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
+import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvFuzzyType;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.Range;
@@ -245,7 +246,25 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
     }
 
     private boolean isStatusOfType( RangeStatus status, String psimiName, String psimiIdentifier ) {
-        if ( status.getXref() != null && psimiIdentifier != null) {
+
+        boolean hasMiNumber = false;
+
+        if (status.getXref() != null){
+            if (status.getXref().getPrimaryRef() != null){
+                final DbReference ref = status.getXref().getPrimaryRef();
+
+                if (ref.getDbAc() != null){
+                    if (ref.getDbAc().equals(CvDatabase.PSI_MI_MI_REF)){
+                         hasMiNumber = true;
+                    }
+                    else if (ref.getDb().equalsIgnoreCase(CvDatabase.PSI_MI)){
+                         hasMiNumber = true;
+                    }
+                }
+            }
+        }
+
+        if ( status.getXref() != null && psimiIdentifier != null && hasMiNumber) {
             final DbReference ref = status.getXref().getPrimaryRef();
             return psimiIdentifier.equalsIgnoreCase( ref.getId() );
         }
