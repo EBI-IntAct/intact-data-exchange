@@ -832,20 +832,20 @@ public class ImexAssigner {
         boolean atLeastOneExperimentWithPPI = false;
         for ( Experiment experiment : publication.getExperiments() ) {
 
-            final boolean intactJournalMatch = matchesPublicationAndYear( experiment,
-                                                                          Arrays.asList( "Cell (0092-8674)",
-                                                                                         "Proteomics (1615-9853)",
-                                                                                         "Cancer Cell (1535-6108)",
-                                                                                         "J Mol Signal."),
-                                                                          2006);
-
-            final boolean i2dJournalMatch = matchesPublicationAndYear( experiment,
-                                                                       Arrays.asList( "Oncogene (0950-9232)" ),
+            final boolean intactJournalMatch = matchesJournalsAndYear( experiment,
+                                                                       Arrays.asList( "Cell (0092-8674)",
+                                                                                      "Proteomics (1615-9853)",
+                                                                                      "Cancer Cell (1535-6108)",
+                                                                                      "J Mol Signal." ),
                                                                        2006 );
 
-            final boolean molconJournalMatch = matchesPublicationAndYear( experiment,
-                                                                          Arrays.asList( "Mol. Cancer"),
-                                                                          2010 );
+            final boolean i2dJournalMatch = matchesJournalsAndYear( experiment,
+                                                                    Arrays.asList( "Oncogene (0950-9232)" ),
+                                                                    2006 );
+
+            final boolean molconJournalMatch = matchesJournalsAndYear( experiment,
+                                                                       Arrays.asList( "Mol. Cancer" ),
+                                                                       2010 );
 
             final boolean datasetMatch = hasDataset(experiment, Arrays.asList("BioCreative - Critical Assessment of Information Extraction systems in Biology"));
 
@@ -934,27 +934,54 @@ public class ImexAssigner {
     }
 
     private boolean hasDataset( Experiment experiment, List<String> datasetNames ) {
+
+        // note that if found in experiment, the publication is not checked on as we use || rather than |
+        return hasDataset( (AnnotatedObject) experiment, datasetNames ) ||
+               hasDataset( experiment.getPublication(), datasetNames );
+    }
+
+    private boolean hasDataset( AnnotatedObject ao, List<String> datasetNames ) {
         String dataset;
-        for ( Annotation annotation : experiment.getAnnotations() ) {
+        if( ao == null ) {
+            return false;
+        }
+
+        final String name = ao.getClass().getSimpleName();
+        for ( Annotation annotation : ao.getAnnotations() ) {
             if ( CvTopic.DATASET_MI_REF.equals( annotation.getCvTopic().getIdentifier() ) &&
                 datasetNames.contains( annotation.getAnnotationText() ) ) {
 
                 dataset = annotation.getAnnotationText();
-                System.out.println( "\tExperiment '" + experiment.getShortLabel() + "' was annotated with dataset '" + dataset +
+                System.out.println( "\t"+name+" '" + ao.getShortLabel() + "' was annotated with dataset '" + dataset +
                                     "', thus enabling IMEx export" );
                 return true;
             }
         }
+
         return false;
     }
 
-    private boolean matchesPublicationAndYear( Experiment experiment, List<String> journalNames, int fromYear ) {
+    private boolean matchesJournalsAndYear( Experiment experiment, List<String> journalNames, int fromYear ) {
+
+        // note that if found in experiment, the publication is not checked on as we use || rather than |
+        return matchesJournalsAndYear( (AnnotatedObject) experiment, journalNames, fromYear ) ||
+               matchesJournalsAndYear( experiment.getPublication(), journalNames, fromYear );
+    }
+
+    private boolean matchesJournalsAndYear( AnnotatedObject ao, List<String> journalNames, int fromYear ) {
+
+        if( ao == null ) {
+            return false;
+        }
+
         boolean acceptPub = false;
         boolean acceptYear = false;
 
+        final String name = ao.getClass().getSimpleName();
+
         String journal = null;
         int year = 0;
-        for ( Annotation annotation : experiment.getAnnotations() ) {
+        for ( Annotation annotation : ao.getAnnotations() ) {
             if ( CvTopic.JOURNAL_MI_REF.equals( annotation.getCvTopic().getIdentifier() ) &&
                 journalNames.contains( annotation.getAnnotationText() ) ) {
 
@@ -973,13 +1000,13 @@ public class ImexAssigner {
             }
 
             if ( acceptPub && acceptYear ) {
-                System.out.println( "\tExperiment '" + experiment.getShortLabel() + "' was annotated from '" + journal +
+                System.out.println( "\t"+ name +" '" + ao.getShortLabel() + "' was annotated from '" + journal +
                                     "' from " + year + ", thus enabling IMEx export" );
                 return true;
             }
         } // annotations
 
-        System.out.println( "\tExperiment '" + experiment.getShortLabel() +
+        System.out.println( "\t"+ name +" '" + ao.getShortLabel() +
                             "' was not annotated from an IMEx exportable journal" );
         return false;
     }
