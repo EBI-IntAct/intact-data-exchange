@@ -36,7 +36,7 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
         try {
             writeDefaultLine( reportHandler.getProcessedWriter(), evt.getPublication(), evt.getMessage() );
         } catch ( IOException e ) {
-            throw new ProcessorException( e );
+            throw new ProcessorException("Error while processing publication " + evt.getPublication().getShortLabel(), e );
         }
     }
 
@@ -45,7 +45,7 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
         try {
             writeDefaultLine( reportHandler.getProcessImexPublicationWriter(), evt.getPublication(), evt.getMessage() );
         } catch ( IOException e ) {
-            throw new ProcessorException( e );
+            throw new ProcessorException( "Error while processing publication " + evt.getPublication().getShortLabel(), e );
         }
     }
 
@@ -54,7 +54,7 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
         try {
             writeDefaultLine( reportHandler.getPublicationUpToDateWriter(), evt.getPublication(), evt.getMessage() );
         } catch ( IOException e ) {
-            throw new ProcessorException( e );
+            throw new ProcessorException( "Error while processing publication " + evt.getPublication().getShortLabel(), e );
         }
     }
 
@@ -63,7 +63,7 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
         try {
             writeDefaultLine( reportHandler.getImexIdAssignedToPublicationWriter(), evt.getPublication(), evt.getMessage() );
         } catch ( IOException e ) {
-            throw new ProcessorException( e );
+            throw new ProcessorException( "Error while processing publication " + evt.getPublication().getShortLabel(), e );
         }
     }
 
@@ -90,7 +90,7 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
             writer.flush();
 
         } catch ( IOException e ) {
-            throw new ProcessorException( e );
+            throw new ProcessorException( "Error while processing publication " + evt.getPublication().getShortLabel(), e );
         }
     }
 
@@ -99,7 +99,7 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
         try {
             writeDefaultLine( reportHandler.getImexIdMismatchFoundWriter(), evt.getPublication(), evt.getMessage() );
         } catch ( IOException e ) {
-            throw new ProcessorException( e );
+            throw new ProcessorException( "Error while processing publication " + evt.getPublication().getShortLabel(), e );
         }
     }
 

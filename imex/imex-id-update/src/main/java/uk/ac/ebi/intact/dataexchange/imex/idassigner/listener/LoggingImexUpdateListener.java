@@ -16,31 +16,31 @@ public class LoggingImexUpdateListener extends AbstractImexUpdateListener {
 
     @Override
     public void onProcessPublication( ImexUpdateEvent evt ) {
-        log.info( "Process" );
+        log.info( "Process " + evt.getPublication().getShortLabel() );
     }
 
     @Override
     public void onProcessImexPublication( ImexUpdateEvent evt ) {
-        log.info( "onProcessImexPublication" );
+        log.info( "onProcessImexPublication " + evt.getPublication().getShortLabel() );
     }
 
     @Override
     public void onPublicationUpToDate( ImexUpdateEvent evt ) {
-        log.info( "onPublicationUpToDate" );
+        log.info( "onPublicationUpToDate " + evt.getPublication().getShortLabel() );
     }
 
     @Override
     public void onImexIdAssignedToPublication( ImexUpdateEvent iue ) {
-        log.info( "NewImexIdAssigned" );
+        log.info( "NewImexIdAssigned " + iue.getPublication().getShortLabel() + ": " + iue.getMessage() );
     }
 
     @Override
-    public void onImexIdAssignedToInteraction( ImexUpdateEvent evt ) {
-        log.info( "onImexIdAssignedToInteraction" );
+    public void onImexIdAssignedToInteraction( ImexUpdateEvent iue ) {
+        log.info( "onImexIdAssignedToInteraction " + iue.getPublication().getShortLabel() + ": " + iue.getMessage() );
     }
 
     @Override
     public void onImexIdMismatchFound( ImexUpdateEvent iue ) {
-        log.info( "IMEx id mismatch" );
+        log.info( "IMEx id mismatch " + iue.getPublication().getShortLabel() + ": " + iue.getMessage() );
     }
 }
