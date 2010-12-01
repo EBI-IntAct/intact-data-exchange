@@ -274,13 +274,6 @@ public class ImexAssigner {
         // TODO implement a listener approach and default implementation logging updates in CSV files (like in protein-update)
         //      processed | imex-publication | updated-imex-publication
 
-
-        final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
-
-        // TODO browse publication by smaller chunk to minimize memory usage.
-        List<Publication> publications = daoFactory.getPublicationDao().getAll();
         int totalPublicationCount = 0;
         int imexPublicationCount = 0;
         int imexExperimentCount = 0;
@@ -297,8 +290,16 @@ public class ImexAssigner {
         int publicationReleasedCount = 0;
         int publicationAcceptedButNotReleasedCount = 0;
 
+        final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
+        // TODO browse publication by smaller chunk to minimize memory usage.
+        List<Publication> publications = daoFactory.getPublicationDao().getAll();
+        final int overallPublicationCount = publications.size();
+        System.out.println("Starting to process " + totalPublicationCount +" publication(s).");
         for ( Publication publication : publications ) {
+
+            System.out.println( "About to process publication: " + publication.getShortLabel()+"..." );
 
             fireOnProcessPublication( new ImexUpdateEvent( this, publication ) );
 
@@ -306,7 +307,7 @@ public class ImexAssigner {
 
             totalPublicationCount++;
 
-            System.out.println( "Publication: " + publication.getShortLabel() );
+            System.out.println( "["+totalPublicationCount+"/"+overallPublicationCount+"] Publication: " + publication.getShortLabel() );
             if ( excludedPublications.contains( publication.getShortLabel() ) ) {
                 System.err.println( "Publication excluded by user ... skipping." );
                 continue;
