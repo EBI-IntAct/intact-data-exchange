@@ -104,4 +104,19 @@ public class InteractorConverterTest {
 
         Assert.assertTrue( interactor.getClass().getName(), interactor instanceof NucleicAcidImpl );
     }
+
+    @Test
+    public void psiToIntact_noUniprot() throws Exception {
+        Interactor psiInteractor = PsiMockFactory.createMockInteractor();
+        psiInteractor.getInteractorType().getNames().setShortLabel( "protein" ); // protein
+
+        InteractorConverter interactorConverter = new InteractorConverter(new Institution("testInstitution"));
+
+        Assert.assertTrue(psiInteractor.getAttributes().isEmpty());
+
+        uk.ac.ebi.intact.model.Interactor interactor = interactorConverter.psiToIntact(psiInteractor);
+
+        Assert.assertTrue(interactor.getAnnotations().size() == 1);
+        Assert.assertEquals(CvTopic.NON_UNIPROT, interactor.getAnnotations().iterator().next().getCvTopic().getShortLabel());
+    }
 }

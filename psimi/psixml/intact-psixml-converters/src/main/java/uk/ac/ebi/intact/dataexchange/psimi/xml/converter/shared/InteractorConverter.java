@@ -17,11 +17,14 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.InteractorType;
 import psidev.psi.mi.xml.model.Organism;
+import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.ProteinUtils;
 import uk.ac.ebi.intact.util.Crc64;
 
 import java.util.Set;
@@ -65,6 +68,30 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             Polymer polymer = ( Polymer ) interactor;
             polymer.setSequence( sequence );
             polymer.setCrc64( Crc64.getCrc64( sequence ) );
+
+        }
+
+        // no uniprot update?
+        if (interactor instanceof Protein){
+            Protein protein = (Protein) interactor;
+
+            InteractorXref uniprotIdentity = ProteinUtils.getUniprotXref(protein);
+
+            if (uniprotIdentity == null){
+                boolean hasNoUniprotUpdate = false;
+
+                for (Annotation a : protein.getAnnotations()){
+                    if (CvTopic.NON_UNIPROT.equalsIgnoreCase(a.getCvTopic().getShortLabel())){
+                        hasNoUniprotUpdate = true;
+                    }
+                }
+
+                if (!hasNoUniprotUpdate){
+                    CvTopic noUniprotUpdate = CvObjectUtils.createCvObject(protein.getOwner(), CvTopic.class, null, CvTopic.NON_UNIPROT);
+                    Annotation noUniprot = new Annotation(noUniprotUpdate);
+                    protein.addAnnotation(noUniprot);
+                }
+            }
         }
 
         psiEndConversion(psiObject);
@@ -138,7 +165,7 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
 
         Set<String> dnaLabels = ConverterContext.getInstance().getDnaTypeLabels();
         Set<String> rnaLabels = ConverterContext.getInstance().getRnaTypeLabels();
-        
+
         if (typeId != null){
             if ( CvInteractorType.PROTEIN_MI_REF.equals(typeId)) {
                 interactor = new ProteinImpl( getInstitution(), organism, shortLabel, interactorType );
