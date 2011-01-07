@@ -88,7 +88,7 @@ public class DbImporter {
     public static File enrich(File fileToImport) throws IOException {
         EnricherConfig enricherConfig = new EnricherConfig();
         enricherConfig.setUpdateInteractionShortLabels(true);
-        enricherConfig.setUpdateExperiments(false);
+        enricherConfig.setUpdateExperiments(true);
 
         //EnricherContext.getInstance().getConfig().setUpdateInteractionShortLabels(true);
 
