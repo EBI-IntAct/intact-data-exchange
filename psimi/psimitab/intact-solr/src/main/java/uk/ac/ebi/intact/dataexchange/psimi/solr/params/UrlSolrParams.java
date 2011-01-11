@@ -52,7 +52,7 @@ public class UrlSolrParams extends MultiMapSolrParams {
 
     private static Multimap<String, String> getQueryMap(String query) {
         String[] params = query.split("&");
-        Multimap<String, String> map = new HashMultimap<String, String>();
+        Multimap<String, String> map = HashMultimap.create();
 
         for (String param : params) {
             String name = param.split("=")[0];

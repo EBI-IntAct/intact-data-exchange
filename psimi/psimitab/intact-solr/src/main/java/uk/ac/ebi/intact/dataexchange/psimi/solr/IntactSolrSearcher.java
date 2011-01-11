@@ -109,7 +109,7 @@ public class IntactSolrSearcher {
         query.setFacetLimit(Integer.MAX_VALUE);
         query.setFacetSort(FacetParams.FACET_SORT_COUNT);
 
-        Multimap<String,InteractorIdCount> interactors = new HashMultimap<String,InteractorIdCount>();
+        Multimap<String,InteractorIdCount> interactors = HashMultimap.create();
 
         Map<String,String> fieldNameToTypeMap = new HashMap<String,String>(interactorTypeMis.length);
 

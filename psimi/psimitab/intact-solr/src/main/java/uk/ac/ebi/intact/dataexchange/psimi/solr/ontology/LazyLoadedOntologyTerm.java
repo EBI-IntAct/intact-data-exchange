@@ -164,10 +164,10 @@ public class LazyLoadedOntologyTerm implements OntologyTerm {
 
     protected Multimap<Integer, OntologyTerm> getChildren(OntologyTerm term, int currentDepth, int maxDepth) {
         if (currentDepth > maxDepth) {
-            return new HashMultimap<Integer,OntologyTerm>();
+            return HashMultimap.create();
         }
 
-        Multimap<Integer,OntologyTerm> terms = new HashMultimap<Integer,OntologyTerm>();
+        Multimap<Integer,OntologyTerm> terms = HashMultimap.create();
         terms.put(currentDepth, term);
 
         for (OntologyTerm child : term.getChildren()) {
