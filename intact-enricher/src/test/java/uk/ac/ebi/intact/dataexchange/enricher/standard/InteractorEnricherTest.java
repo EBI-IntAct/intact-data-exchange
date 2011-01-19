@@ -218,10 +218,13 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
 
         enricher.enrich(protein);
 
-        Assert.assertEquals("atf6a_human", protein.getShortLabel());
-        Assert.assertEquals("Cyclic AMP-dependent transcription factor ATF-6 alpha", protein.getFullName());
+        // don't enrich when no cross references
 
-        Assert.assertFalse(protein.getXrefs().isEmpty());
+        Assert.assertEquals("atf6a_human", protein.getShortLabel());
+        //Assert.assertEquals("Cyclic AMP-dependent transcription factor ATF-6 alpha", protein.getFullName());
+        Assert.assertEquals(null, protein.getFullName());
+
+        Assert.assertTrue(protein.getXrefs().isEmpty());
     }
 
     @Test
@@ -246,7 +249,7 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
 
         enricher.enrich(protein);
 
-        Assert.assertEquals("EBI12345", protein.getShortLabel());
+        Assert.assertEquals("ebi12345", protein.getShortLabel());
     }
 
     @Test
