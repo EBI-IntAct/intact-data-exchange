@@ -120,13 +120,13 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
 
                     uniprotProt = interactorFetcher.fetchInteractorFromUniprot(uniprotId, taxId);
 
-                } else  {
-                    if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein by shortLabel: "+proteinToEnrich.getShortLabel()+" (taxid:"+taxId+")");
+                } //else  {
+                    //if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein by shortLabel: "+proteinToEnrich.getShortLabel()+" (taxid:"+taxId+")");
 
-                    if (proteinToEnrich.getShortLabel() != null) {
-                        uniprotProt = interactorFetcher.fetchInteractorFromUniprot(proteinToEnrich.getShortLabel(), taxId);
-                    }
-                }
+                    //if (proteinToEnrich.getShortLabel() != null) {
+                        //uniprotProt = interactorFetcher.fetchInteractorFromUniprot(proteinToEnrich.getShortLabel(), taxId);
+                    //}
+                //}
 
                 if (uniprotProt != null) {
                     updateXrefs(proteinToEnrich, uniprotProt);
@@ -139,6 +139,13 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                     Organism organism = uniprotProt.getOrganism();
                     BioSource bioSource = new BioSource(objectToEnrich.getOwner(), organism.getName(), String.valueOf(organism.getTaxid()));
                     proteinToEnrich.setBioSource(bioSource);
+                }
+                else {
+                    String shortlabel = proteinToEnrich.getShortLabel();
+
+                    if (shortlabel != null){
+                        proteinToEnrich.setShortLabel(proteinToEnrich.getShortLabel().toLowerCase());                        
+                    }
                 }
 
                 if (objectToEnrich.getBioSource() != null) {

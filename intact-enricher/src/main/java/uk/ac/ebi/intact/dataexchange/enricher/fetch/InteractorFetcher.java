@@ -28,6 +28,7 @@ import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
 import uk.ac.ebi.intact.uniprot.service.UniprotRemoteService;
 import uk.ac.ebi.intact.uniprot.service.UniprotService;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -80,11 +81,19 @@ public class InteractorFetcher {
             if (uniprotProteins.size() == 1) {
                 uniprotProtein = uniprotProteins.iterator().next();
             } else {
+                Collection<UniprotProtein> proteinsWithSameTaxId = new ArrayList<UniprotProtein>(uniprotProteins.size());
+
                  for (UniprotProtein candidate : uniprotProteins) {
                     if (candidate.getOrganism().getTaxid() == taxId) {
-                        uniprotProtein = candidate;
-                        break;
+                        proteinsWithSameTaxId.add(candidate);
                     }
+                }
+
+                if (proteinsWithSameTaxId.size() == 1){
+                    uniprotProtein = proteinsWithSameTaxId.iterator().next();
+                }
+                else {
+                    log.error(proteinsWithSameTaxId.size() + " different uniprot entries are matching the uniprot ac " + uniprotId + " and the taxId " + taxId + ". We cannot enrich this protein.");
                 }
             }
 
