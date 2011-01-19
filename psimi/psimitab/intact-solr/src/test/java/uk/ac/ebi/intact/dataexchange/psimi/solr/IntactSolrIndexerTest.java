@@ -76,21 +76,21 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     @Test
     public void index1() throws Exception {
         // mitab line with annotations
-        String mitabLine = "uniprotkb:Q7Z4T9-4|intact:EBI-2119735\tuniprotkb:Q92667-2|intact:EBI-2120060\tuniprotkb:AAT1-alpha(isoform synonym)|uniprotkb:q7z4t9-4|irefindex:+ReKZkaGc+yy9DYMbJ/aHHCMHmw9606(rogid)\t" +
-                           "uniprotkb:S-AKAP84(isoform synonym)|uniprotkb:q92667-2|irefindex:iV8hJ/bPZ/NLER8WZj02X6SD+mw9606(rogid)\t-\t-\t" +
-                           "psi-mi:\"MI:0007\"(anti tag coip)\tYukitake et al. (2002)\tpubmed:12223483\ttaxid:9606(human)\t" +
-                           "taxid:9606(human)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0469\"(IntAct)\t" +
-                           "intact:EBI-2120363|irefindex:T3w4Q7GYZthAQDYDWB84nhCnkNQ(rigid)\t-\tpsi-mi:\"MI:0498\"(prey)\t" +
-                           "psi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\t" +
-                           "intact:EBI-2119657(isoform-parent)|uniprotkb:Q7Z4T9-4(identity)\t" +
-                           "intact:EBI-2119593(isoform-parent)|uniprotkb:Q92667-2(identity)\tpsi-mi:\"MI:0326\"(protein)\t" +
-                           "psi-mi:\"MI:0326\"(protein)\ttaxid:-1(in vitro)\t-\t-\t" +
+        String mitabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
+                              "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
+                              "\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)" +
+                              "\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
+                              "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tgo:\"GO:0030246\"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-\t" +
                            "isoform-comment:May be produced by alternative promoter usage\t" +
                            "isoform-comment:May be produced at very low levels due to a premature stop codon in the mRNA, leading to nonsense-mediated mRNA decay\t-\t-\t-";
 
         getIndexer().indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
 
         assertCount(1, "*:*");
+        assertCount(1, "id:P16884");
+        assertCount(1, "identifier:P16884");
+        assertCount(0, "id:Nfh");
+        assertCount(1, "identifier:Nfh");
     }
 
     @Test
