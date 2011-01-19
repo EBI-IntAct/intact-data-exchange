@@ -505,6 +505,8 @@
     <copyField source="altidB" dest="altid"/>
     <copyField source="aliasA" dest="alias"/>
     <copyField source="aliasB" dest="alias"/>
+    <copyField source="aliasA" dest="identifier"/>
+    <copyField source="aliasB" dest="identifier"/>
 
     <copyField source="taxidA_exact" dest="taxidA"/>
     <copyField source="taxidA_expanded" dest="taxidA"/>
