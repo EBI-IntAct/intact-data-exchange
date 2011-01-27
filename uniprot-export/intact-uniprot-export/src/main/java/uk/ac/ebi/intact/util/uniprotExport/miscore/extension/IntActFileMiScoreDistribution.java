@@ -72,6 +72,8 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
         miH.setTitle("Score distribution for " + scores.length + " clustered interactions from " + fileName);
         miH.setNumberOfBars(100);
         miH.setValues(getScores());
+        miH.setMaximumScore(1);
+        miH.setMinimumScore(0);
         miH.createChart();
     }
 
@@ -83,6 +85,8 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
         IntActMiScoreHistogram miH = new IntActMiScoreHistogram();
         miH.setTitle("Score distribution for " + scores.length + " clustered interactions from " + fileName);
         miH.setNumberOfBars(100);
+        miH.setMaximumScore(1);
+        miH.setMinimumScore(0);
         miH.setValues(getScores());
         miH.createChart(diagrammName);
     }
@@ -91,13 +95,19 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
      * Create a chart with the results of mi cluster score
      * @param diagrammName
      */
-    public void createChart(String diagrammName, String title, int numberOfBars, int min, int max) {
+    public void createChart(String diagrammName, String title, int numberOfBars, double min, double max) {
         IntActMiScoreHistogram miH = new IntActMiScoreHistogram();
         miH.setTitle(title);
         miH.setNumberOfBars(numberOfBars);
-        miH.setMaximumScore(max);
-        miH.setMinimumScore(min);
+        miH.setMaxScore(max);
+        miH.setMinScore(min);
         miH.setValues(getScores());
         miH.createChart(diagrammName);
     }
+
+    public static void main(String args[]){
+        IntActFileMiScoreDistribution scoreDistribution = new IntActFileMiScoreDistribution("/home/marine/Desktop/miCluster_score_results/new_results/excluded.txt");
+        scoreDistribution.createChart("/home/marine/Desktop/excluded_0.43_1_confidence.png", "Detail of the scores for excluded interactions with confidence between 0.43 and 1", 100, 0.43, 1);
+    }
+
 }

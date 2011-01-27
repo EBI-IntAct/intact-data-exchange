@@ -4,19 +4,17 @@ import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Confidence;
-import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
-import uk.ac.ebi.enfin.mi.score.ols.MIOntology;
-import uk.ac.ebi.enfin.mi.score.scores.MIScore;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Extension of the InteractionClusterScore : use a different format to export the scores
@@ -33,6 +31,10 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
     private String scoreListCSV;
 
     private PsimiTabWriter writer;
+
+    private Map<String, String> geneNames = new HashMap<String, String>();
+    private Map<String, String> organismNames = new HashMap<String, String>();
+    private Map<String, String> organismTaxIds = new HashMap<String, String>();
 
     public IntActInteractionClusterScore(){
         super();
@@ -271,5 +273,25 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
             logger.error("It is not possible to write the results in the mitab file " + fileName);
             e.printStackTrace();
         }
+    }
+
+    public Map<String, String> getGeneNames() {
+        return geneNames;
+    }
+
+    public Map<String, String> getOrganismNames() {
+        return organismNames;
+    }
+
+    public Map<String, String> getOrganismTaxIds() {
+        return organismTaxIds;
+    }
+
+    public void clear(){
+        this.getGeneNames().clear();
+        this.getOrganismNames().clear();
+        this.getOrganismTaxIds().clear();
+        this.getInteractionMapping().clear();
+        this.getInteractorMapping().clear();
     }
 }

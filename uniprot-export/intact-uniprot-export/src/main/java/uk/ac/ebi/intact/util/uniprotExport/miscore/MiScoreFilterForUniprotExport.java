@@ -1,11 +1,9 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore;
 
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.Confidence;
-import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.InteractionDetectionMethod;
+import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
@@ -41,6 +39,9 @@ public class MiScoreFilterForUniprotExport {
     private static final String CONFIDENCE_NAME = "intactPsiscore";
     private static final String INTACT = "intact";
     private static final String COLOCALIZATION = "MI:0403";
+    private static final String UNIPROT = "uniprotkb";
+    private final static String TAXID = "taxid";
+    private final static String FEATURE_CHAIN = "-PRO_";
 
     /**
      * the interaction cluster score
@@ -60,6 +61,7 @@ public class MiScoreFilterForUniprotExport {
 
     private void computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
         this.trueBinaryInteractions.clear();
+        this.interactionClusterScore.clear();
 
         File mitab = new File(mitabFile);
         Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitab));
@@ -86,16 +88,25 @@ public class MiScoreFilterForUniprotExport {
 
                 if (interactorA != null){
                     for (CrossReference refA : interactorA.getIdentifiers()){
-                        if (refA.getDatabase().equalsIgnoreCase("uniprotkb")){
+                        if (UNIPROT.equalsIgnoreCase(refA.getDatabase())){
                             uniprotA = refA.getIdentifier();
+                            if (uniprotA.contains(FEATURE_CHAIN)){
+                                uniprotA = refA.getIdentifier().substring(0, uniprotA.indexOf(FEATURE_CHAIN));
+                            }
+
                             break;
                         }
                     }
                 }
                 if (interactorB != null){
                     for (CrossReference refB : interactorB.getIdentifiers()){
-                        if (refB.getDatabase().equalsIgnoreCase("uniprotkb")){
+                        if (UNIPROT.equalsIgnoreCase(refB.getDatabase())){
                             uniprotB = refB.getIdentifier();
+
+                            if (uniprotB.contains(FEATURE_CHAIN)){
+                                uniprotB = refB.getIdentifier().substring(0, uniprotB.indexOf(FEATURE_CHAIN));
+                            }
+
                             break;
                         }
                     }
@@ -105,6 +116,9 @@ public class MiScoreFilterForUniprotExport {
 
                     if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
                         interactionToProcess.add(interaction);
+
+                        processGeneNames(interactorA, uniprotA, interactorB, uniprotB);
+                        processOrganisms(interactorA, uniprotA, interactorB, uniprotB);
 
                         List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
                         String detectionMI = detectionMethods.iterator().next().getIdentifier();
@@ -120,6 +134,72 @@ public class MiScoreFilterForUniprotExport {
         }
     }
 
+    private void processGeneNames(ExtendedInteractor interactorA, String intactA, ExtendedInteractor interactorB, String intactB) {
+        String geneNameA = retrieveInteractorGeneName(interactorA);
+        String geneNameB = retrieveInteractorGeneName(interactorB);
+
+        this.interactionClusterScore.getGeneNames().put(intactA, geneNameA);
+        this.interactionClusterScore.getGeneNames().put(intactB, geneNameB);
+    }
+
+    private void processOrganisms(ExtendedInteractor interactorA, String intactA, ExtendedInteractor interactorB, String intactB) {
+        processTaxIdFrom(interactorA, intactA);
+        processTaxIdFrom(interactorB, intactB);
+    }
+
+    private void processTaxIdFrom(ExtendedInteractor interactor, String uniprot){
+
+        Organism organism = interactor.getOrganism();
+
+        String taxId = organism.getTaxid() != null ? organism.getTaxid() : "-";
+        this.interactionClusterScore.getOrganismTaxIds().put(uniprot, taxId);
+
+        String organismName = "-";
+        if (!organism.getIdentifiers().isEmpty()){
+            CrossReference ref = organism.getIdentifiers().iterator().next();
+
+            if (ref.hasText()){
+                organismName = ref.getText();
+            }
+        }
+        this.interactionClusterScore.getOrganismNames().put(uniprot, organismName);
+    }
+
+    private String retrieveInteractorGeneName(ExtendedInteractor interactor){
+        Collection<Alias> aliases = interactor.getAliases();
+        String geneName = null;
+
+        if (aliases.isEmpty()) {
+
+            Collection<CrossReference> otherIdentifiers = interactor.getAlternativeIdentifiers();
+            // then look for locus
+            String locusName = null;
+            String orf = null;
+
+            for (CrossReference ref : otherIdentifiers){
+                if (UNIPROT.equalsIgnoreCase(ref.getDatabase())){
+                    if (CvAliasType.LOCUS_NAME.equalsIgnoreCase(ref.getText())){
+                        locusName = ref.getIdentifier();
+                    }
+                    else if (CvAliasType.ORF_NAME.equalsIgnoreCase(ref.getText())){
+                        orf = ref.getIdentifier();
+                    }
+                }
+            }
+
+            geneName = locusName != null ? locusName : orf;
+
+        } else {
+            geneName = aliases.iterator().next().getName();
+        }
+
+        if( geneName == null ) {
+            geneName = "-";
+        }
+
+        return geneName;
+    }
+
     private double getMiClusterScoreFor(EncoreInteraction interaction){
         List<Confidence> confidenceValues = interaction.getConfidenceValues();
         double score = 0;
@@ -132,7 +212,7 @@ public class MiScoreFilterForUniprotExport {
         return score;
     }
 
-    public void processUniprotExport(String mitab, String fileExport) throws UniprotExportException {
+    public void runUniprotExport(String mitab, String fileExport, String ccFile) throws UniprotExportException {
         try {
             InteractionExtractorForMIScore extractor = new InteractionExtractorForMIScore();
 
@@ -140,6 +220,10 @@ public class MiScoreFilterForUniprotExport {
             this.interactionsToBeExported = extractor.processExportWithMiClusterScore(this.interactionClusterScore, this.trueBinaryInteractions, true);
 
             this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);
+
+            CCLineWriter ccWriter = new CCLineWriter(this.interactionClusterScore, ccFile);
+            ccWriter.write();
+
         } catch (IOException e) {
             throw new UniprotExportException("It was not possible to convert the data in the mitab file " + mitab + " in an InputStream", e);
         } catch (ConverterException e) {

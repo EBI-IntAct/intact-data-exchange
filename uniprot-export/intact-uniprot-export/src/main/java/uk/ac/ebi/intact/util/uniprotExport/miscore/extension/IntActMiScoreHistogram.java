@@ -11,10 +11,15 @@ import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
+import org.jfree.ui.RectangleInsets;
 import uk.ac.ebi.enfin.mi.score.distribution.MiscoreHistogram;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * The class to display the score distribution
@@ -25,15 +30,33 @@ import java.io.IOException;
  */
 
 public class IntActMiScoreHistogram extends MiscoreHistogram{
+    double minScore = 0;
+    double maxScore = 1;
+
+    public double[] getValuesBetween(double min, double max){
+        List<Double> subset = new ArrayList<Double>();
+
+        for (double v : getValues()){
+            if (v <= max && v >= min){
+                subset.add(v);
+            }
+        }
+
+        double [] subsetValues = new double [subset.size()];
+
+        for (int i = 0; i < subset.size(); i++){
+            subsetValues[i] = subset.get(i);
+        }
+
+        return subsetValues;
+    }
 
     public void createChart(String pngFileName){
         HistogramDataset dataset = new HistogramDataset();
         dataset.setType(HistogramType.FREQUENCY);
-        setNumberOfBars(100);
-        setMinimumScore(0);
-        setMaximumScore(1);
-        
-        dataset.addSeries(getTitle(),getValues(),getNumberOfBars(),getMinimumScore(),getMaximumScore());
+
+        double [] values = getValuesBetween(getMinScore(), getMaxScore());
+        dataset.addSeries(getTitle(), values,getNumberOfBars(),getMinScore(),getMaxScore());
         String plotTitle = getTitle();
         String xaxis = "Score";
         String yaxis = "Number of interactions";
@@ -46,6 +69,7 @@ public class IntActMiScoreHistogram extends MiscoreHistogram{
 
         // get a reference to the plot for further customisation...
         final XYPlot plot = chart.getXYPlot();
+        RectangleInsets rs = plot.getInsets();
         plot.getRangeAxis().setAutoRange(true);
 
         try {
@@ -53,5 +77,21 @@ public class IntActMiScoreHistogram extends MiscoreHistogram{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public double getMinScore() {
+        return minScore;
+    }
+
+    public void setMinScore(double minScore) {
+        this.minScore = minScore;
+    }
+
+    public double getMaxScore() {
+        return maxScore;
+    }
+
+    public void setMaxScore(double maxScore) {
+        this.maxScore = maxScore;
     }
 }
