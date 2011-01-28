@@ -8,12 +8,12 @@ import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.DRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.GOLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.writer.DRLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.writer.GOLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.IntactQueryProvider;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractorForMIScore;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.CCLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.writer.CCLineConverter;
 
 import java.io.File;
 import java.io.FileInputStream;

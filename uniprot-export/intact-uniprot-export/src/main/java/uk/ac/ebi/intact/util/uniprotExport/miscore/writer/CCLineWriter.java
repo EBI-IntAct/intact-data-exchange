@@ -20,7 +20,7 @@ import java.util.*;
  * @since <pre>27/01/11</pre>
  */
 
-public class CCLineWriter extends AbstractWriter{
+public class CCLineWriter extends AbstractConverter {
 
     public CCLineWriter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
         super(clusterScore, fileName);

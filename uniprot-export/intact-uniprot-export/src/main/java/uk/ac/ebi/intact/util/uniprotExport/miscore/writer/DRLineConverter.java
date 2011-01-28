@@ -1,6 +1,8 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.writer;
 
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.writers.DRLineWriter;
+import uk.ac.ebi.intact.util.uniprotExport.writers.DRLineWriterImpl;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -15,10 +17,12 @@ import java.util.Set;
  * @since <pre>28/01/11</pre>
  */
 
-public class DRLineWriter extends AbstractWriter{
+public class DRLineConverter extends AbstractConverter {
 
-    public DRLineWriter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
+    private DRLineWriter writer;
+    public DRLineConverter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
         super(clusterScore, fileName);
+        this.writer = new DRLineWriterImpl(fileName);
     }
 
     public void write() throws IOException {
@@ -48,21 +52,8 @@ public class DRLineWriter extends AbstractWriter{
                 }
             }
 
-            writeDRLine(parent, numberInteractions);
+            writer.writeDRLine(parent, numberInteractions);
             interactors.removeAll(processedInteractors);
         }
-    }
-
-    private void writeDRLine(String uniprotAc, int interactions) throws IOException {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append("DR   ");
-        sb.append("IntAct; ");
-        sb.append(uniprotAc).append("; ");
-        sb.append(interactions+".");
-        sb.append(NEW_LINE);
-
-        writer.write(sb.toString());
-        writer.flush();
     }
 }
