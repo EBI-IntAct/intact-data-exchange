@@ -11,10 +11,7 @@ import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Extension of the InteractionClusterScore : use a different format to export the scores
@@ -33,8 +30,9 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
     private PsimiTabWriter writer;
 
     private Map<String, String> geneNames = new HashMap<String, String>();
-    private Map<String, String> organismNames = new HashMap<String, String>();
-    private Map<String, String> organismTaxIds = new HashMap<String, String>();
+    private Map<String, String> miTerms = new HashMap<String, String>();
+    private Map<String, Map.Entry<String,String>> spokeExpandedInteractions = new HashMap<String, Map.Entry<String,String>>();;
+    private List<String> colocalizations = new ArrayList<String>();
 
     public IntActInteractionClusterScore(){
         super();
@@ -279,18 +277,23 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         return geneNames;
     }
 
-    public Map<String, String> getOrganismNames() {
-        return organismNames;
+    public Map<String, String> getMiTerms() {
+        return miTerms;
     }
 
-    public Map<String, String> getOrganismTaxIds() {
-        return organismTaxIds;
+    public Map<String, Map.Entry<String, String>> getSpokeExpandedInteractions() {
+        return spokeExpandedInteractions;
+    }
+
+    public List<String> getColocalizations() {
+        return colocalizations;
     }
 
     public void clear(){
         this.getGeneNames().clear();
-        this.getOrganismNames().clear();
-        this.getOrganismTaxIds().clear();
+        this.getSpokeExpandedInteractions().clear();
+        this.colocalizations.clear();
+        this.getMiTerms().clear();
         this.getInteractionMapping().clear();
         this.getInteractorMapping().clear();
     }

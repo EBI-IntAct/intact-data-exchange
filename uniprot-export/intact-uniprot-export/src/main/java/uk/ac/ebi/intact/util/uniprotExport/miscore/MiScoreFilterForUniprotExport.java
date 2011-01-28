@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore;
 
+import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
@@ -31,7 +32,6 @@ import java.util.*;
 public class MiScoreFilterForUniprotExport {
 
     private IntactQueryProvider queryProvider;
-    private Map<String, String> trueBinaryInteractions;
     private Set<String> eligibleInteractionsForUniprotExport;
     private List<Integer> interactionsToBeExported;
     private IntactPsimiTabReader mitabReader;
@@ -40,7 +40,6 @@ public class MiScoreFilterForUniprotExport {
     private static final String INTACT = "intact";
     private static final String COLOCALIZATION = "MI:0403";
     private static final String UNIPROT = "uniprotkb";
-    private final static String TAXID = "taxid";
     private final static String FEATURE_CHAIN = "-PRO_";
 
     /**
@@ -50,7 +49,6 @@ public class MiScoreFilterForUniprotExport {
 
     public MiScoreFilterForUniprotExport(){
         queryProvider = new IntactQueryProvider();
-        trueBinaryInteractions = new HashMap<String, String>();
         eligibleInteractionsForUniprotExport = new HashSet<String>();
         interactionsToBeExported = new ArrayList<Integer>();
         interactionClusterScore = new IntActInteractionClusterScore();
@@ -60,7 +58,6 @@ public class MiScoreFilterForUniprotExport {
     }
 
     private void computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
-        this.trueBinaryInteractions.clear();
         this.interactionClusterScore.clear();
 
         File mitab = new File(mitabFile);
@@ -118,13 +115,21 @@ public class MiScoreFilterForUniprotExport {
                         interactionToProcess.add(interaction);
 
                         processGeneNames(interactorA, uniprotA, interactorB, uniprotB);
-                        processOrganisms(interactorA, uniprotA, interactorB, uniprotB);
+                        processMiTerms(interaction);
 
                         List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
                         String detectionMI = detectionMethods.iterator().next().getIdentifier();
 
-                        if (interaction.getExpansionMethods().isEmpty()){
-                            this.trueBinaryInteractions.put(intactAc, detectionMI);
+                        List<InteractionType> interactionTypes = interaction.getInteractionTypes();
+                        String typeMi = interactionTypes.iterator().next().getIdentifier();
+
+                        if (!interaction.getExpansionMethods().isEmpty()){
+
+                            Map.Entry<String, String> entry = new DefaultMapEntry(detectionMI, typeMi);
+                            this.interactionClusterScore.getSpokeExpandedInteractions().put(intactAc, entry);
+                        }
+                        else if (COLOCALIZATION.equals(detectionMI)){
+                            this.interactionClusterScore.getColocalizations().add(intactAc);
                         }
                     }
                 }
@@ -134,35 +139,39 @@ public class MiScoreFilterForUniprotExport {
         }
     }
 
+    private void processMiTerms(BinaryInteraction interaction){
+        List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
+
+        Map<String, String> miTerms = this.interactionClusterScore.getMiTerms();
+
+        for (InteractionDetectionMethod method : detectionMethods){
+            if (!miTerms.containsKey(method.getIdentifier())){
+                String methodName = method.getText() != null ? method.getText() : "-";
+                miTerms.put(method.getIdentifier(), methodName);
+            }
+        }
+
+        List<InteractionType> types = interaction.getInteractionTypes();
+
+        for (InteractionType type : types){
+            if (!miTerms.containsKey(type.getIdentifier())){
+                String methodName = type.getText() != null ? type.getText() : "-";
+                miTerms.put(type.getIdentifier(), methodName);
+            }
+        }
+    }
     private void processGeneNames(ExtendedInteractor interactorA, String intactA, ExtendedInteractor interactorB, String intactB) {
         String geneNameA = retrieveInteractorGeneName(interactorA);
         String geneNameB = retrieveInteractorGeneName(interactorB);
 
-        this.interactionClusterScore.getGeneNames().put(intactA, geneNameA);
-        this.interactionClusterScore.getGeneNames().put(intactB, geneNameB);
-    }
+        Map<String, String> geneNames = this.interactionClusterScore.getGeneNames();
 
-    private void processOrganisms(ExtendedInteractor interactorA, String intactA, ExtendedInteractor interactorB, String intactB) {
-        processTaxIdFrom(interactorA, intactA);
-        processTaxIdFrom(interactorB, intactB);
-    }
-
-    private void processTaxIdFrom(ExtendedInteractor interactor, String uniprot){
-
-        Organism organism = interactor.getOrganism();
-
-        String taxId = organism.getTaxid() != null ? organism.getTaxid() : "-";
-        this.interactionClusterScore.getOrganismTaxIds().put(uniprot, taxId);
-
-        String organismName = "-";
-        if (!organism.getIdentifiers().isEmpty()){
-            CrossReference ref = organism.getIdentifiers().iterator().next();
-
-            if (ref.hasText()){
-                organismName = ref.getText();
-            }
+        if (!geneNames.containsKey(geneNameA)){
+            this.interactionClusterScore.getGeneNames().put(intactA, geneNameA);
         }
-        this.interactionClusterScore.getOrganismNames().put(uniprot, organismName);
+        if (!geneNames.containsKey(geneNameB)){
+            this.interactionClusterScore.getGeneNames().put(intactB, geneNameB);
+        }
     }
 
     private String retrieveInteractorGeneName(ExtendedInteractor interactor){
@@ -217,7 +226,7 @@ public class MiScoreFilterForUniprotExport {
             InteractionExtractorForMIScore extractor = new InteractionExtractorForMIScore();
 
             computeMiScoreInteractionEligibleUniprotExport(mitab);
-            this.interactionsToBeExported = extractor.processExportWithMiClusterScore(this.interactionClusterScore, this.trueBinaryInteractions, true);
+            this.interactionsToBeExported = extractor.processExportWithMiClusterScore(this.interactionClusterScore, true);
 
             this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);
 
@@ -229,10 +238,6 @@ public class MiScoreFilterForUniprotExport {
         } catch (ConverterException e) {
             throw new UniprotExportException("It was not possible to iterate the binary interactions in the mitab file " + mitab, e);
         }
-    }
-
-    public Map<String, String> getTrueBinaryInteractions() {
-        return trueBinaryInteractions;
     }
 
     public Set<String> getEligibleInteractionsForUniprotExport() {

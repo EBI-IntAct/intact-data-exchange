@@ -1,17 +1,13 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.extractor;
 
 import org.springframework.transaction.TransactionStatus;
-import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreClient;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.IntactQueryProvider;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -31,8 +27,6 @@ public class InteractionExtractorForMIScore extends LineExport {
     private IntactQueryProvider queryProvider;
     private static final double EXPORT_THRESHOLD = 0.43;
     private static final String CONFIDENCE_NAME = "intactPsiscore";
-    private static final String INTACT = "intact";
-    private static final String COLOCALIZATION = "MI:0403";
 
     public InteractionExtractorForMIScore(){
         this.queryProvider = new IntactQueryProvider();
@@ -859,13 +853,14 @@ public class InteractionExtractorForMIScore extends LineExport {
      * For each binary interaction in the intactMiClusterScore : filter on a threshold value of the score and then, depending on 'filterBinary',
      * will add a filter on true binary interaction
      * @param clusterScore
-     * @param trueBinaryInteractions
      * @param filterBinary
      * @return
      * @throws UniprotExportException
      */
-    public List<Integer> processExportWithMiClusterScore(IntActInteractionClusterScore clusterScore, Map<String, String> trueBinaryInteractions, boolean filterBinary) throws UniprotExportException {
+    public List<Integer> processExportWithMiClusterScore(IntActInteractionClusterScore clusterScore, boolean filterBinary) throws UniprotExportException {
         List<Integer> interactionsPossibleToExport = new ArrayList<Integer>();
+        Map<String, Map.Entry<String, String>> spokeExpandedInteractions = clusterScore.getSpokeExpandedInteractions();
+        List<String> colocalizations = clusterScore.getColocalizations();
 
         for (Map.Entry<Integer, EncoreInteraction> entry : clusterScore.getInteractionMapping().entrySet()){
             EncoreInteraction encore = entry.getValue();
@@ -887,9 +882,9 @@ public class InteractionExtractorForMIScore extends LineExport {
 
                 for (String ac : intactInteractions){
                     if (filterBinary){
-                        if (trueBinaryInteractions.containsKey(ac)){
+                        if (!spokeExpandedInteractions.containsKey(ac)){
 
-                            if (!trueBinaryInteractions.get(ac).equalsIgnoreCase(COLOCALIZATION)){
+                            if (!colocalizations.contains(ac)){
                                 interactionsPossibleToExport.add(entry.getKey());
                                 break;
                             }

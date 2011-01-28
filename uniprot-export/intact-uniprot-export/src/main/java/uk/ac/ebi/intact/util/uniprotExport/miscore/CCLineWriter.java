@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore;
 
+import org.apache.commons.collections.CollectionUtils;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.CcLine;
@@ -28,6 +29,7 @@ public class CCLineWriter {
     private final static String UNIPROT = "uniprotkb";
     protected static final String NEW_LINE = System.getProperty("line.separator");
     protected EventListenerList listenerList = new EventListenerList();
+    private final static String TAXID = "taxid";
 
     /**
      * Use to out the CC lines in a file.
@@ -71,9 +73,6 @@ public class CCLineWriter {
                 Collections.sort(ccLines);
 
                 StringBuffer sb = new StringBuffer(128 * ccLines.size());
-
-                sb.append("AC").append("   ").append(uniprotAc);
-                sb.append(NEW_LINE);
 
                 sb.append("CC   -!- INTERACTION:");
                 sb.append(NEW_LINE);
@@ -138,6 +137,23 @@ public class CCLineWriter {
         return pubmeds;
     }
 
+    private String [] extractOrganismFrom(Collection<CrossReference> references){
+
+        String taxId = "-";
+        String organismName = "-";
+
+        for (CrossReference ref : references){
+            if (TAXID.equalsIgnoreCase(ref.getDatabase())){
+                taxId = ref.getIdentifier();
+                if (ref.getText() != null){
+                     organismName = ref.getText();
+                }
+            }
+        }
+
+        return new String [] {taxId, organismName};
+    }
+
     /**
      * Format introduced on July 29th 2009.
      *
@@ -163,20 +179,6 @@ public class CCLineWriter {
 
         buffer.append("CC       Interact=Yes ");
 
-        // collect all pubmeds and format them
-        Set<String> pubmeds = extractPubmedIdentifiersFrom(interaction);
-        if(!pubmeds.isEmpty()) {
-            buffer.append("(");
-            for ( Iterator<String> iterator = pubmeds.iterator(); iterator.hasNext(); ) {
-                String pubmed = iterator.next();
-                buffer.append("PubMed:").append( pubmed );
-                if(iterator.hasNext()) {
-                    buffer.append( ", " );
-                }
-            }
-            buffer.append(");");
-        }
-
         buffer.append(" Xref=IntAct:").append( uniprot1 ).append(',').append(uniprot2).append(';');
         buffer.append(NEW_LINE);
 
@@ -190,11 +192,21 @@ public class CCLineWriter {
         buffer.append( geneName2 ).append(' ').append( '[' ).append( uniprot2 ).append( ']' ).append( ';' );
 
         // handle protein originating from different organism
-        String taxId1 = this.clusterScore.getOrganismTaxIds().get(uniprot1);
-        String taxId2 = this.clusterScore.getOrganismTaxIds().get(uniprot2);
+        String [] organismsA;
+        String [] organismsB;
+        if (interaction.getInteractorA().equals(uniprot1)){
+            organismsA = extractOrganismFrom(interaction.getOrganismsA());
+            organismsB = extractOrganismFrom(interaction.getOrganismsB());
+        }
+        else {
+            organismsA = extractOrganismFrom(interaction.getOrganismsB());
+            organismsB = extractOrganismFrom(interaction.getOrganismsA());
+        }
+        String taxId1 = organismsA[0];
+        String taxId2 = organismsB[0];
 
-        String organism1 = this.clusterScore.getOrganismNames().get(uniprot1);
-        String organism2 = this.clusterScore.getOrganismNames().get(uniprot2);
+        String organism1 = organismsA[1];
+        String organism2 = organismsB[1];
 
         if (!taxId1.equalsIgnoreCase(taxId2)) {
             buffer.append(" Organism=");
@@ -203,6 +215,36 @@ public class CCLineWriter {
         }
 
         buffer.append(NEW_LINE);
+
+        // collect all pubmeds and format them
+        Map<String, List<String>> typeToPubmed = interaction.getTypeToPubmed();
+        Map<String, List<String>> methodToPubmed = interaction.getMethodToPubmed();
+        Map<String, String> interactionToPubmed = interaction.getExperimentToPubmed();
+
+        for (Map.Entry<String, List<String>> typeEntry : typeToPubmed.entrySet()){
+            List<String> pubmeds1 = typeEntry.getValue();
+            String type = this.clusterScore.getMiTerms().get(typeEntry.getKey());
+
+            for (Map.Entry<String, List<String>> methodEntry : methodToPubmed.entrySet()){
+                List<String> pubmeds2 = methodEntry.getValue();
+                String method = this.clusterScore.getMiTerms().get(methodEntry.getKey());
+
+                Collection<String> associatedPubmeds = CollectionUtils.intersection(pubmeds1, pubmeds2);
+
+                if (!associatedPubmeds.isEmpty()){
+                    buffer.append("CC         InteractionType="+type+"; Method="+method+"; Source=");
+
+                    for (String pid : associatedPubmeds){
+                        buffer.append("Pubmed:"+pid+", ");
+                    }
+
+                    buffer.deleteCharAt(buffer.length() - 1);
+                    buffer.deleteCharAt(buffer.length() - 1);
+                    buffer.append(";");
+                }
+                buffer.append(NEW_LINE);
+            }
+        }
 
         return new CcLine(buffer.toString(), geneName1, uniprot2);
     }
