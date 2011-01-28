@@ -12,6 +12,7 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionCl
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.IntactQueryProvider;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractorForMIScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.writer.CCLineWriter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.writer.DRLineWriter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.writer.GOLineWriter;
 
 import java.io.File;
@@ -229,6 +230,9 @@ public class MiScoreFilterForUniprotExport {
 
             computeMiScoreInteractionEligibleUniprotExport(mitab);
             this.interactionsToBeExported = extractor.processExportWithMiClusterScore(this.interactionClusterScore, true);
+
+            DRLineWriter drWriter = new DRLineWriter(this.interactionClusterScore, drFile);
+            drWriter.write();
 
             CCLineWriter ccWriter = new CCLineWriter(this.interactionClusterScore, ccFile);
             ccWriter.write();
