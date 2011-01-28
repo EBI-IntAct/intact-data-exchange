@@ -49,50 +49,64 @@ public class CCLineWriter {
         this.clusterScore = clusterScore;
     }
 
+    private void writeCCLineTitle(StringBuffer sb){
+        sb.append("CC   -!- INTERACTION:");
+        sb.append(NEW_LINE);
+    }
+
+    private void writeCCLines(List<CcLine> ccLines, String uniprotAc) throws IOException {
+        if (!ccLines.isEmpty()){
+            Collections.sort(ccLines);
+
+            StringBuffer sb = new StringBuffer(128 * ccLines.size());
+
+            writeCCLineTitle(sb);
+
+            for ( CcLine ccLine : ccLines ) {
+                sb.append(ccLine.getCcLine());
+            }
+
+            sb.append("//");
+            sb.append(NEW_LINE);
+
+            String ccs = sb.toString();
+
+            // write the content in the output file.
+            ccWriter.write(ccs);
+            ccWriter.flush();
+            // fire the event
+            fireCcLineCreatedEvent(new CcLineCreatedEvent(this, uniprotAc, ccLines));
+        }
+    }
+
+    private List<CcLine> convertInteractionsIntoCCLines(Map.Entry<String, List<Integer>> interactor){
+        String uniprotAc = interactor.getKey();
+        List<Integer> interactions = interactor.getValue();
+
+        List<CcLine> ccLines = new ArrayList<CcLine>();
+
+        for (Integer interactionId : interactions){
+            EncoreInteraction interaction = this.clusterScore.getInteractionMapping().get(interactionId);
+
+            if (interaction != null){
+                CcLine line = createCCLine(interaction, uniprotAc);
+
+                if (line != null){
+                    ccLines.add(line);
+                }
+            }
+        }
+
+        return ccLines;
+    }
+
     public void write() throws IOException {
 
         for (Map.Entry<String, List<Integer>> interactor : this.clusterScore.getInteractorMapping().entrySet()){
-            String uniprotAc = interactor.getKey();
-            List<Integer> interactions = interactor.getValue();
 
-            List<CcLine> ccLines = new ArrayList<CcLine>();
+            List<CcLine> ccLines = convertInteractionsIntoCCLines(interactor);
 
-            for (Integer interactionId : interactions){
-                EncoreInteraction interaction = this.clusterScore.getInteractionMapping().get(interactionId);
-
-                if (interaction != null){
-                    CcLine line = createCCLine(interaction, uniprotAc);
-
-                    if (line != null){
-                        ccLines.add(line);
-                    }
-                }
-            }
-
-            if (!ccLines.isEmpty()){
-                Collections.sort(ccLines);
-
-                StringBuffer sb = new StringBuffer(128 * ccLines.size());
-
-                sb.append("CC   -!- INTERACTION:");
-                sb.append(NEW_LINE);
-
-                for ( CcLine ccLine : ccLines ) {
-                    sb.append(ccLine.getCcLine());
-                }
-
-                sb.append("//");
-                sb.append(NEW_LINE);
-
-                String ccs = sb.toString();
-
-                // write the content in the output file.
-                ccWriter.write(ccs);
-                ccWriter.flush();
-
-                // fire the event
-                fireCcLineCreatedEvent(new CcLineCreatedEvent(this, uniprotAc, ccLines));
-            }
+            writeCCLines(ccLines, interactor.getKey());
         }
     }
 
@@ -123,20 +137,6 @@ public class CCLineWriter {
         return null;
     }
 
-    private Set<String> extractPubmedIdentifiersFrom(EncoreInteraction interaction){
-        List<CrossReference> publications = interaction.getPublicationIds();
-        Set<String> pubmeds = new HashSet<String>(publications.size());
-
-        for (CrossReference ref : publications){
-            if (ref.getDatabase() != null && ref.getIdentifier() != null){
-                if (ref.getDatabase().equalsIgnoreCase(PUBMED)){
-                    pubmeds.add(ref.getIdentifier());
-                }
-            }
-        }
-        return pubmeds;
-    }
-
     private String [] extractOrganismFrom(Collection<CrossReference> references){
 
         String taxId = "-";
@@ -146,12 +146,56 @@ public class CCLineWriter {
             if (TAXID.equalsIgnoreCase(ref.getDatabase())){
                 taxId = ref.getIdentifier();
                 if (ref.getText() != null){
-                     organismName = ref.getText();
+                    organismName = ref.getText();
                 }
             }
         }
 
         return new String [] {taxId, organismName};
+    }
+
+    private Map<String, Map<String, String>> collectPubmedAffectedBySpokeExpansion(EncoreInteraction interaction){
+        Map<String, String> interactionToPubmed = interaction.getExperimentToPubmed();
+        Map<String, Map<String, String>> pubmedHavingSpokeExpansion = new HashMap<String, Map<String, String>>();
+
+        for (Map.Entry<String, String> ip : interactionToPubmed.entrySet()){
+            String ac = ip.getKey();
+            String pubmed = ip.getValue();
+
+            if (this.clusterScore.getSpokeExpandedInteractions().containsKey(ac)){
+                Map.Entry<String, String> methodType = this.clusterScore.getSpokeExpandedInteractions().get(ac);
+
+                if (pubmedHavingSpokeExpansion.containsKey(pubmed)){
+                    Map<String, String> map = pubmedHavingSpokeExpansion.get(pubmed);
+                    map.put(methodType.getKey(), methodType.getValue());
+                }
+                else {
+                    Map<String, String> map = new HashMap<String, String>();
+                    map.put(methodType.getKey(), methodType.getValue());
+                    pubmedHavingSpokeExpansion.put(pubmed, map);
+                }
+            }
+        }
+
+        return pubmedHavingSpokeExpansion;
+    }
+
+    private Collection<String> collectSpokeExpandedInteractions(Map<String, Map<String, String>> pubmedsHavingSpokeExpansion, Collection<String> associatedPubmed, String detectionMi, String typeMi){
+        Collection<String> currentSpokeExpandedInteractions = new ArrayList<String>();
+
+        for (String pubmed : associatedPubmed){
+            if (pubmedsHavingSpokeExpansion.containsKey(pubmed)){
+                Map<String, String> methodToTypeMap = pubmedsHavingSpokeExpansion.get(pubmed);
+
+                if (methodToTypeMap.containsKey(detectionMi)){
+                    if (methodToTypeMap.get(detectionMi).equals(typeMi)){
+                        currentSpokeExpandedInteractions.add(pubmed);
+                    }
+                }
+            }
+        }
+
+        return currentSpokeExpandedInteractions;
     }
 
     /**
@@ -177,21 +221,11 @@ public class CCLineWriter {
 
         StringBuffer buffer = new StringBuffer(256); // average size is 160 char
 
-        buffer.append("CC       Interact=Yes ");
-
-        buffer.append(" Xref=IntAct:").append( uniprot1 ).append(',').append(uniprot2).append(';');
-        buffer.append(NEW_LINE);
-
-        buffer.append("CC         Protein1=");
+        // extract gene names
         String geneName1 = this.clusterScore.getGeneNames().get(uniprot1);
-        buffer.append( geneName1 ).append(' ').append( '[' ).append( uniprot1 ).append( ']' ).append( ';' );
-        buffer.append(NEW_LINE);
-
-        buffer.append("CC         Protein2=");
         String geneName2 = this.clusterScore.getGeneNames().get(uniprot2);
-        buffer.append( geneName2 ).append(' ').append( '[' ).append( uniprot2 ).append( ']' ).append( ';' );
 
-        // handle protein originating from different organism
+        // extract organisms
         String [] organismsA;
         String [] organismsB;
         if (interaction.getInteractorA().equals(uniprot1)){
@@ -205,21 +239,30 @@ public class CCLineWriter {
         String taxId1 = organismsA[0];
         String taxId2 = organismsB[0];
 
-        String organism1 = organismsA[1];
         String organism2 = organismsB[1];
 
-        if (!taxId1.equalsIgnoreCase(taxId2)) {
-            buffer.append(" Organism=");
-            buffer.append( organism2 ).append( " [NCBI_TaxID=" ).append( taxId2 ).append( "]" );
-            buffer.append(';');
-        }
-
-        buffer.append(NEW_LINE);
-
-        // collect all pubmeds and format them
+        // collect all pubmeds and spoke expanded information
         Map<String, List<String>> typeToPubmed = interaction.getTypeToPubmed();
         Map<String, List<String>> methodToPubmed = interaction.getMethodToPubmed();
-        Map<String, String> interactionToPubmed = interaction.getExperimentToPubmed();
+
+        Map<String, Map<String, String>> pubmedsHavingSpokeExpansion = collectPubmedAffectedBySpokeExpansion(interaction);
+
+        // write introduction
+        writeInteractionIntroduction(true, uniprot1, uniprot2, buffer);
+
+        // write first protein
+        writeFirstProtein(uniprot1, geneName1, buffer);
+
+        // write second protein
+        writeSecondProtein(uniprot2, geneName2, taxId1, taxId2, organism2, buffer);
+
+        // write the deatils of the interaction
+        writeInteractionDetails(buffer, typeToPubmed, methodToPubmed, pubmedsHavingSpokeExpansion);
+
+        return new CcLine(buffer.toString(), geneName1, uniprot2);
+    }
+
+    private void writeInteractionDetails(StringBuffer buffer, Map<String, List<String>> typeToPubmed, Map<String, List<String>> methodToPubmed, Map<String, Map<String, String>> pubmedsHavingSpokeExpansion) {
 
         for (Map.Entry<String, List<String>> typeEntry : typeToPubmed.entrySet()){
             List<String> pubmeds1 = typeEntry.getValue();
@@ -232,21 +275,68 @@ public class CCLineWriter {
                 Collection<String> associatedPubmeds = CollectionUtils.intersection(pubmeds1, pubmeds2);
 
                 if (!associatedPubmeds.isEmpty()){
-                    buffer.append("CC         InteractionType="+type+"; Method="+method+"; Source=");
 
-                    for (String pid : associatedPubmeds){
-                        buffer.append("Pubmed:"+pid+", ");
+                    Collection<String> spokeExpandedPubmeds = collectSpokeExpandedInteractions(pubmedsHavingSpokeExpansion, associatedPubmeds, method, type);
+                    Collection<String> binaryInteractions = CollectionUtils.subtract(associatedPubmeds, spokeExpandedPubmeds);
+
+                    if (!spokeExpandedPubmeds.isEmpty()){
+                        writeSpokeExpandedInteractions(buffer, type, method, spokeExpandedPubmeds);
                     }
-
-                    buffer.deleteCharAt(buffer.length() - 1);
-                    buffer.deleteCharAt(buffer.length() - 1);
-                    buffer.append(";");
+                    writeBinaryInteraction(buffer, type, method, binaryInteractions);
                 }
-                buffer.append(NEW_LINE);
             }
         }
+    }
 
-        return new CcLine(buffer.toString(), geneName1, uniprot2);
+    private void writeBinaryInteraction(StringBuffer buffer, String type, String method, Collection<String> binaryInteractions) {
+        buffer.append("CC         InteractionType="+type+"; Method="+method+"; Source=");
+
+        for (String pid : binaryInteractions){
+            buffer.append("Pubmed:"+pid+", ");
+        }
+        buffer.deleteCharAt(buffer.length() - 1);
+        buffer.deleteCharAt(buffer.length() - 1);
+        buffer.append(";");
+        buffer.append(NEW_LINE);
+    }
+
+    private void writeSpokeExpandedInteractions(StringBuffer buffer, String type, String method, Collection<String> spokeExpandedPubmeds) {
+        buffer.append("CC         InteractionType="+type+"; Method="+method+"; Expansion=Spoke; Source=");
+
+        for (String pid : spokeExpandedPubmeds){
+            buffer.append("Pubmed:"+pid+", ");
+        }
+
+        buffer.deleteCharAt(buffer.length() - 1);
+        buffer.deleteCharAt(buffer.length() - 1);
+        buffer.append(";");
+        buffer.append(NEW_LINE);
+    }
+
+    private void writeSecondProtein(String uniprot2, String geneName2, String taxId1, String taxId2, String organism2, StringBuffer buffer) {
+        buffer.append("CC         Protein2=");
+        buffer.append( geneName2 ).append(' ').append( '[' ).append( uniprot2 ).append( ']' ).append( ';' );
+
+        if (!taxId1.equalsIgnoreCase(taxId2)) {
+            buffer.append(" Organism=");
+            buffer.append( organism2 ).append( " [NCBI_TaxID=" ).append( taxId2 ).append( "]" );
+            buffer.append(';');
+        }
+
+        buffer.append(NEW_LINE);
+    }
+
+    private void writeFirstProtein(String uniprot1, String geneName1, StringBuffer buffer) {
+        buffer.append("CC         Protein1=");
+        buffer.append( geneName1 ).append(' ').append( '[' ).append( uniprot1 ).append( ']' ).append( ';' );
+        buffer.append(NEW_LINE);
+    }
+
+    private void writeInteractionIntroduction(boolean doesInteract, String uniprot1, String uniprot2, StringBuffer buffer) {
+        buffer.append("CC       Interact="+ (doesInteract ? "yes" : "no") +"; ");
+
+        buffer.append(" Xref=IntAct:").append( uniprot1 ).append(',').append(uniprot2).append(';');
+        buffer.append(NEW_LINE);
     }
 
     void fireCcLineCreatedEvent(CcLineCreatedEvent evt) {
