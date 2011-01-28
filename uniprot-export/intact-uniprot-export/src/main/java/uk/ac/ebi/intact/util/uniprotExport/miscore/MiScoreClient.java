@@ -395,7 +395,7 @@ public class MiScoreClient {
             // list of interactions ids not exported in uniprot
             Set<String> interactionIdentifiersAlreadyProcessed = new HashSet<String>();
 
-            // file writer for interactions exported in uniprot
+            // file converters for interactions exported in uniprot
             FileWriter writer1 = new FileWriter(fileContainingData);
 
             int i = 0;

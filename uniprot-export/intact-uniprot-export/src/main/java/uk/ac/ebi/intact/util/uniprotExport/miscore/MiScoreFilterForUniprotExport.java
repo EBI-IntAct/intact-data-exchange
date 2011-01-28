@@ -8,12 +8,12 @@ import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.DRLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.GOLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.IntactQueryProvider;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractorForMIScore;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.writer.CCLineWriter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.writer.DRLineWriter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.writer.GOLineWriter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.CCLineConverter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -231,13 +231,13 @@ public class MiScoreFilterForUniprotExport {
             computeMiScoreInteractionEligibleUniprotExport(mitab);
             this.interactionsToBeExported = extractor.processExportWithMiClusterScore(this.interactionClusterScore, true);
 
-            DRLineWriter drWriter = new DRLineWriter(this.interactionClusterScore, drFile);
+            DRLineConverter drWriter = new DRLineConverter(this.interactionClusterScore, drFile);
             drWriter.write();
 
-            CCLineWriter ccWriter = new CCLineWriter(this.interactionClusterScore, ccFile);
+            CCLineConverter ccWriter = new CCLineConverter(this.interactionClusterScore, ccFile);
             ccWriter.write();
 
-            GOLineWriter goWriter = new GOLineWriter(this.interactionClusterScore, goFile);
+            GOLineConverter goWriter = new GOLineConverter(this.interactionClusterScore, goFile);
             goWriter.write();
 
             //this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);

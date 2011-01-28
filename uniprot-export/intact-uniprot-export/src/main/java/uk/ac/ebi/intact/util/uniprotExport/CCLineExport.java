@@ -98,11 +98,11 @@ public class CCLineExport extends LineExport {
         super(config, out);
 
         if (ccWriter == null) {
-            throw new NullPointerException("You must give a CC Line writer.");
+            throw new NullPointerException("You must give a CC Line converters.");
         }
 
         if (goWriter == null) {
-            throw new NullPointerException("You must give a GO Line writer.");
+            throw new NullPointerException("You must give a GO Line converters.");
         }
 
         this.ccWriter = ccWriter;
