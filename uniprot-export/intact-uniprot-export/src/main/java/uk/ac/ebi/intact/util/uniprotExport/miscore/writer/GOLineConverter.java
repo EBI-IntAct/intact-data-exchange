@@ -18,9 +18,9 @@ import java.util.Set;
  * @since <pre>28/01/11</pre>
  */
 
-public class GOLineWriter extends AbstractConverter {
+public class GOLineConverter extends AbstractConverter {
 
-    public GOLineWriter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
+    public GOLineConverter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
         super(clusterScore, fileName);
     }
 

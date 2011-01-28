@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.util.uniprotExport.miscore.writer;
+package uk.ac.ebi.intact.util.uniprotExport.writers;
 
 import java.util.*;
 

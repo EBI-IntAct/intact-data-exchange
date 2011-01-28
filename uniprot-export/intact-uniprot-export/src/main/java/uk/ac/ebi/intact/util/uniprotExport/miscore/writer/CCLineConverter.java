@@ -8,6 +8,7 @@ import uk.ac.ebi.intact.util.uniprotExport.CcLine;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -20,9 +21,9 @@ import java.util.*;
  * @since <pre>27/01/11</pre>
  */
 
-public class CCLineWriter extends AbstractConverter {
+public class CCLineConverter extends AbstractConverter {
 
-    public CCLineWriter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
+    public CCLineConverter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
         super(clusterScore, fileName);
     }
 
