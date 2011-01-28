@@ -11,6 +11,8 @@ import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.IntactQueryProvider;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractorForMIScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.writer.CCLineWriter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.writer.GOLineWriter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -221,17 +223,20 @@ public class MiScoreFilterForUniprotExport {
         return score;
     }
 
-    public void runUniprotExport(String mitab, String fileExport, String ccFile) throws UniprotExportException {
+    public void runUniprotExport(String mitab, String drFile, String ccFile, String goFile) throws UniprotExportException {
         try {
             InteractionExtractorForMIScore extractor = new InteractionExtractorForMIScore();
 
             computeMiScoreInteractionEligibleUniprotExport(mitab);
             this.interactionsToBeExported = extractor.processExportWithMiClusterScore(this.interactionClusterScore, true);
 
-            this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);
-
             CCLineWriter ccWriter = new CCLineWriter(this.interactionClusterScore, ccFile);
             ccWriter.write();
+
+            GOLineWriter goWriter = new GOLineWriter(this.interactionClusterScore, goFile);
+            goWriter.write();
+
+            //this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);
 
         } catch (IOException e) {
             throw new UniprotExportException("It was not possible to convert the data in the mitab file " + mitab + " in an InputStream", e);

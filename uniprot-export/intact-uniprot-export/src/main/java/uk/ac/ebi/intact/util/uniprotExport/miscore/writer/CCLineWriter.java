@@ -1,6 +1,7 @@
-package uk.ac.ebi.intact.util.uniprotExport.miscore;
+package uk.ac.ebi.intact.util.uniprotExport.miscore.writer;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.CcLine;
@@ -8,10 +9,7 @@ import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
 
-import javax.swing.event.EventListenerList;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.*;
 
 /**
@@ -22,31 +20,14 @@ import java.util.*;
  * @since <pre>27/01/11</pre>
  */
 
-public class CCLineWriter {
-
-    private IntActInteractionClusterScore clusterScore;
-    private final static String PUBMED = "pubmed";
-    private final static String UNIPROT = "uniprotkb";
-    protected static final String NEW_LINE = System.getProperty("line.separator");
-    protected EventListenerList listenerList = new EventListenerList();
-    private final static String TAXID = "taxid";
-
-    /**
-     * Use to out the CC lines in a file.
-     */
-    private Writer ccWriter;
+public class CCLineWriter extends AbstractWriter{
 
     public CCLineWriter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
-        this.clusterScore = clusterScore;
-        ccWriter = new FileWriter(fileName);
+        super(clusterScore, fileName);
     }
 
     public IntActInteractionClusterScore getClusterScore() {
         return clusterScore;
-    }
-
-    public void setClusterScore(IntActInteractionClusterScore clusterScore) {
-        this.clusterScore = clusterScore;
     }
 
     private void writeCCLineTitle(StringBuffer sb){
@@ -72,8 +53,8 @@ public class CCLineWriter {
             String ccs = sb.toString();
 
             // write the content in the output file.
-            ccWriter.write(ccs);
-            ccWriter.flush();
+            writer.write(ccs);
+            writer.flush();
             // fire the event
             fireCcLineCreatedEvent(new CcLineCreatedEvent(this, uniprotAc, ccLines));
         }
@@ -154,48 +135,59 @@ public class CCLineWriter {
         return new String [] {taxId, organismName};
     }
 
-    private Map<String, Map<String, String>> collectPubmedAffectedBySpokeExpansion(EncoreInteraction interaction){
+    private Map<Map.Entry<String, String>, Set<String>> collectSpokeExpandedInteractions(EncoreInteraction interaction){
         Map<String, String> interactionToPubmed = interaction.getExperimentToPubmed();
-        Map<String, Map<String, String>> pubmedHavingSpokeExpansion = new HashMap<String, Map<String, String>>();
+        Map<String, List<String>> pubmedToInteraction = WriterUtils.invertMapOfTypeStringToString(interactionToPubmed);
 
-        for (Map.Entry<String, String> ip : interactionToPubmed.entrySet()){
-            String ac = ip.getKey();
-            String pubmed = ip.getValue();
+        Map<Map.Entry<String, String>, List<String>> spokeExpandedInteractions = WriterUtils.invertMapFromKeySelection(this.getClusterScore().getSpokeExpandedInteractions(), interactionToPubmed.keySet());
+        Map<Map.Entry<String, String>, Set<String>> spokeExpandedPubmeds = new HashMap<Map.Entry<String, String>, Set<String>>();
 
-            if (this.clusterScore.getSpokeExpandedInteractions().containsKey(ac)){
-                Map.Entry<String, String> methodType = this.clusterScore.getSpokeExpandedInteractions().get(ac);
+        for (Map.Entry<Map.Entry<String, String>, List<String>> ip : spokeExpandedInteractions.entrySet()){
+            Map.Entry<String, String> detType = ip.getKey();
+            List<String> interactionAcs = ip.getValue();
+            List<String> duplicatedInteractions = new ArrayList(interactionAcs);
 
-                if (pubmedHavingSpokeExpansion.containsKey(pubmed)){
-                    Map<String, String> map = pubmedHavingSpokeExpansion.get(pubmed);
-                    map.put(methodType.getKey(), methodType.getValue());
-                }
-                else {
-                    Map<String, String> map = new HashMap<String, String>();
-                    map.put(methodType.getKey(), methodType.getValue());
-                    pubmedHavingSpokeExpansion.put(pubmed, map);
+            Set<String> pubmedIds = new HashSet<String>(interactionAcs.size());
+
+            for (String interactionAc : duplicatedInteractions){
+                String pubmedAc = interactionToPubmed.get(interactionAc);
+
+                List<String> otherInteractions = pubmedToInteraction.get(pubmedAc);
+
+                if (interactionAcs.containsAll(otherInteractions)){
+                    pubmedIds.add(pubmedAc);
                 }
             }
+
+            spokeExpandedPubmeds.put(detType, pubmedIds);
         }
 
-        return pubmedHavingSpokeExpansion;
+        return spokeExpandedPubmeds;
     }
 
-    private Collection<String> collectSpokeExpandedInteractions(Map<String, Map<String, String>> pubmedsHavingSpokeExpansion, Collection<String> associatedPubmed, String detectionMi, String typeMi){
-        Collection<String> currentSpokeExpandedInteractions = new ArrayList<String>();
+    public Map<Map.Entry<String, String>, Set<String>> collectDistinctInteractionDetails(EncoreInteraction interaction){
+        Map<String, List<String>> typeToPubmed = interaction.getTypeToPubmed();
+        Map<String, List<String>> methodToPubmed = interaction.getMethodToPubmed();
+        Map<Map.Entry<String, String>, Set<String>> distinctLines = new HashMap<Map.Entry<String, String>, Set<String>>();
 
-        for (String pubmed : associatedPubmed){
-            if (pubmedsHavingSpokeExpansion.containsKey(pubmed)){
-                Map<String, String> methodToTypeMap = pubmedsHavingSpokeExpansion.get(pubmed);
+        for (Map.Entry<String, List<String>> methodEntry : methodToPubmed.entrySet()){
+            List<String> pubmeds1 = methodEntry.getValue();
+            String method = this.clusterScore.getMiTerms().get(methodEntry.getKey());
 
-                if (methodToTypeMap.containsKey(detectionMi)){
-                    if (methodToTypeMap.get(detectionMi).equals(typeMi)){
-                        currentSpokeExpandedInteractions.add(pubmed);
-                    }
+            for (Map.Entry<String, List<String>> typeEntry : typeToPubmed.entrySet()){
+                List<String> pubmeds2 = typeEntry.getValue();
+                String type = this.clusterScore.getMiTerms().get(typeEntry.getKey());
+
+                Set<String> associatedPubmeds = new HashSet(CollectionUtils.intersection(pubmeds1, pubmeds2));
+
+                if (!associatedPubmeds.isEmpty()){
+
+                    distinctLines.put(new DefaultMapEntry(method, type), associatedPubmeds);
                 }
             }
         }
 
-        return currentSpokeExpandedInteractions;
+        return distinctLines;
     }
 
     /**
@@ -241,12 +233,6 @@ public class CCLineWriter {
 
         String organism2 = organismsB[1];
 
-        // collect all pubmeds and spoke expanded information
-        Map<String, List<String>> typeToPubmed = interaction.getTypeToPubmed();
-        Map<String, List<String>> methodToPubmed = interaction.getMethodToPubmed();
-
-        Map<String, Map<String, String>> pubmedsHavingSpokeExpansion = collectPubmedAffectedBySpokeExpansion(interaction);
-
         // write introduction
         writeInteractionIntroduction(true, uniprot1, uniprot2, buffer);
 
@@ -257,33 +243,35 @@ public class CCLineWriter {
         writeSecondProtein(uniprot2, geneName2, taxId1, taxId2, organism2, buffer);
 
         // write the deatils of the interaction
-        writeInteractionDetails(buffer, typeToPubmed, methodToPubmed, pubmedsHavingSpokeExpansion);
+        writeInteractionDetails(buffer, interaction);
 
         return new CcLine(buffer.toString(), geneName1, uniprot2);
     }
 
-    private void writeInteractionDetails(StringBuffer buffer, Map<String, List<String>> typeToPubmed, Map<String, List<String>> methodToPubmed, Map<String, Map<String, String>> pubmedsHavingSpokeExpansion) {
+    private void writeInteractionDetails(StringBuffer buffer, EncoreInteraction interaction) {
 
-        for (Map.Entry<String, List<String>> typeEntry : typeToPubmed.entrySet()){
-            List<String> pubmeds1 = typeEntry.getValue();
-            String type = this.clusterScore.getMiTerms().get(typeEntry.getKey());
+        // collect all pubmeds and spoke expanded information
+        Map<String, List<String>> typeToPubmed = interaction.getTypeToPubmed();
+        Map<String, List<String>> methodToPubmed = interaction.getMethodToPubmed();
 
-            for (Map.Entry<String, List<String>> methodEntry : methodToPubmed.entrySet()){
-                List<String> pubmeds2 = methodEntry.getValue();
-                String method = this.clusterScore.getMiTerms().get(methodEntry.getKey());
+        Map<Map.Entry<String, String>, Set<String>> distinctInformationDetails = collectDistinctInteractionDetails(interaction);
+        Map<Map.Entry<String, String>, Set<String>> distinctInformationDetailsWithSpokeExpanded = collectSpokeExpandedInteractions(interaction);
 
-                Collection<String> associatedPubmeds = CollectionUtils.intersection(pubmeds1, pubmeds2);
+        for (Map.Entry<Map.Entry<String, String>, Set<String>> detail : distinctInformationDetails.entrySet()){
+            String type = detail.getKey().getValue();
+            String method = detail.getKey().getKey();
 
-                if (!associatedPubmeds.isEmpty()){
+            if (distinctInformationDetailsWithSpokeExpanded.containsKey(detail.getKey())){
+                Collection<String> pubmedsWithoutExpansion =  CollectionUtils.subtract(detail.getValue(), distinctInformationDetailsWithSpokeExpanded.get(detail.getKey()));
 
-                    Collection<String> spokeExpandedPubmeds = collectSpokeExpandedInteractions(pubmedsHavingSpokeExpansion, associatedPubmeds, method, type);
-                    Collection<String> binaryInteractions = CollectionUtils.subtract(associatedPubmeds, spokeExpandedPubmeds);
+                writeSpokeExpandedInteractions(buffer, type, method, distinctInformationDetailsWithSpokeExpanded.get(detail.getKey()));
 
-                    if (!spokeExpandedPubmeds.isEmpty()){
-                        writeSpokeExpandedInteractions(buffer, type, method, spokeExpandedPubmeds);
-                    }
-                    writeBinaryInteraction(buffer, type, method, binaryInteractions);
+                if (!pubmedsWithoutExpansion.isEmpty()){
+                    writeBinaryInteraction(buffer, type, method, pubmedsWithoutExpansion);
                 }
+            }
+            else{
+                writeBinaryInteraction(buffer, type, method, detail.getValue());
             }
         }
     }
