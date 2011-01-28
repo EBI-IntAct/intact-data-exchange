@@ -12,6 +12,11 @@ import java.util.*;
 
 public class WriterUtils {
 
+    public static final String NEW_LINE = System.getProperty("line.separator");
+    public static final char TABULATION = '\t';
+    public static final String PUBMED = "pubmed";
+    public static final String UNIPROT = "uniprotkb";
+
     public static Map<String, List<String>> invertMapOfTypeStringToString (Map<String, String> mapToInvert){
         Map<String, List<String>> invertedMap = new HashMap<String, List<String>>();
 
