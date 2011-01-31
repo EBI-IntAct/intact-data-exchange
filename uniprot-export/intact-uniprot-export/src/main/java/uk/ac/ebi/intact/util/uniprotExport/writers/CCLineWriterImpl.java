@@ -8,11 +8,12 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.InteractionDetails;
 import javax.swing.event.EventListenerList;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
 /**
- * Default converters for CCLines
+ * Default writer for CCLines
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -21,9 +22,17 @@ import java.util.SortedSet;
 
 public class CCLineWriterImpl implements CCLineWriter{
 
+    /**
+     * The file writer
+     */
     private FileWriter writer;
     protected EventListenerList listenerList = new EventListenerList();
 
+    /**
+     * Create a new CCLine writer with a fileName
+     * @param fileName
+     * @throws IOException
+     */
     public CCLineWriterImpl(String fileName) throws IOException {
         writer = new FileWriter(fileName);
     }
@@ -31,14 +40,18 @@ public class CCLineWriterImpl implements CCLineWriter{
     @Override
     public void writeCCLine(CCParameters parameters) throws IOException {
 
+        // if parameter not null, write it
         if (parameters != null){
 
             StringBuffer sb = new StringBuffer();
 
+            // write the title
             writeCCLineTitle(sb);
 
+            // write the content
             writeCCLineParameters(parameters, sb);
 
+            // write the end
             sb.append("//");
             sb.append(WriterUtils.NEW_LINE);
 
@@ -50,6 +63,25 @@ public class CCLineWriterImpl implements CCLineWriter{
         }
     }
 
+    @Override
+    public void writeCCLines(List<CCParameters> CCLines, String fileName) throws IOException {
+        // initialize the current writer with the fileName
+        this.writer = new FileWriter(fileName, true);
+
+        // write each CCParameter
+        for (CCParameters parameter : CCLines){
+            writeCCLine(parameter);
+        }
+
+        // close the current writer
+        this.writer.close();
+    }
+
+    /**
+     * Write the content of the CC line
+     * @param parameters : the parameters
+     * @param sb : the string buffer
+     */
     public void writeCCLineParameters(CCParameters parameters, StringBuffer sb) {
 
         // write introduction
@@ -62,7 +94,7 @@ public class CCLineWriterImpl implements CCLineWriter{
         writeSecondProtein(parameters.getSecondInteractor(), parameters.getSecondGeneName(),
                 parameters.getFirstTaxId(), parameters.getSecondTaxId(), parameters.getSecondOrganismName(), sb);
 
-        // write the deatils of the interaction
+        // write the details of the interaction
         writeInteractionDetails(sb, parameters.getInteractionDetails());
     }
 
@@ -71,6 +103,10 @@ public class CCLineWriterImpl implements CCLineWriter{
         this.writer.close();
     }
 
+    /**
+     * Write the CC line title
+     * @param sb
+     */
     private void writeCCLineTitle(StringBuffer sb){
         sb.append("CC   -!- INTERACTION:");
         sb.append(WriterUtils.NEW_LINE);
@@ -96,6 +132,13 @@ public class CCLineWriterImpl implements CCLineWriter{
         listenerList.remove(CcLineEventListener.class, eventListener);
     }
 
+    /**
+     * Write the introduction of a CC line
+     * @param doesInteract
+     * @param uniprot1
+     * @param uniprot2
+     * @param buffer
+     */
     private void writeInteractionIntroduction(boolean doesInteract, String uniprot1, String uniprot2, StringBuffer buffer) {
         buffer.append("CC       Interact="+ (doesInteract ? "yes" : "no") +"; ");
 
@@ -103,12 +146,27 @@ public class CCLineWriterImpl implements CCLineWriter{
         buffer.append(WriterUtils.NEW_LINE);
     }
 
+    /**
+     * Write the first protein of a CCLine
+     * @param uniprot1
+     * @param geneName1
+     * @param buffer
+     */
     private void writeFirstProtein(String uniprot1, String geneName1, StringBuffer buffer) {
         buffer.append("CC         Protein1=");
         buffer.append( geneName1 ).append(' ').append( '[' ).append( uniprot1 ).append( ']' ).append( ';' );
         buffer.append(WriterUtils.NEW_LINE);
     }
 
+    /**
+     * Write the second protein of a CCLine
+     * @param uniprot2
+     * @param geneName2
+     * @param taxId1
+     * @param taxId2
+     * @param organism2
+     * @param buffer
+     */
     private void writeSecondProtein(String uniprot2, String geneName2, String taxId1, String taxId2, String organism2, StringBuffer buffer) {
         buffer.append("CC         Protein2=");
         buffer.append( geneName2 ).append(' ').append( '[' ).append( uniprot2 ).append( ']' ).append( ';' );
@@ -122,6 +180,11 @@ public class CCLineWriterImpl implements CCLineWriter{
         buffer.append(WriterUtils.NEW_LINE);
     }
 
+    /**
+     * Write the details of a binary interaction
+     * @param buffer
+     * @param interactionDetails
+     */
     private void writeInteractionDetails(StringBuffer buffer, SortedSet<InteractionDetails> interactionDetails) {
 
         // collect all pubmeds and spoke expanded information
@@ -138,6 +201,13 @@ public class CCLineWriterImpl implements CCLineWriter{
         }
     }
 
+    /**
+     * Write the details of a spoke expanded interaction
+     * @param buffer
+     * @param type
+     * @param method
+     * @param spokeExpandedPubmeds
+     */
     private void writeSpokeExpandedInteractions(StringBuffer buffer, String type, String method, Set<String> spokeExpandedPubmeds) {
         buffer.append("CC         InteractionType="+type+"; Method="+method+"; Expansion=Spoke; Source=");
 
@@ -151,6 +221,13 @@ public class CCLineWriterImpl implements CCLineWriter{
         buffer.append(WriterUtils.NEW_LINE);
     }
 
+    /**
+     * write the details of a true binary interaction
+     * @param buffer
+     * @param type
+     * @param method
+     * @param binaryInteractions
+     */
     private void writeBinaryInteraction(StringBuffer buffer, String type, String method, Set<String> binaryInteractions) {
         buffer.append("CC         InteractionType="+type+"; Method="+method+"; Source=");
 

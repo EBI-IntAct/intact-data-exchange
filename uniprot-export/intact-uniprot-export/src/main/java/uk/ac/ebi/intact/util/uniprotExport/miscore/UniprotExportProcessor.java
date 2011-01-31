@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore;
 
+import org.apache.commons.collections.CollectionUtils;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.EncoreInteractionToCCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.EncoreInteractionToGoLineConverter;
@@ -12,9 +13,9 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.writers.*;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,13 +60,14 @@ public class UniprotExportProcessor {
         CCLineWriter ccWriter = new CCLineWriterImpl(CCFile);
         GOLineWriter goWriter = new GOLineWriterImpl(GOFile);
 
-        for (Map.Entry<Integer, EncoreInteraction> interaction : clusterScore.getInteractionMapping().entrySet()){
+        for (Integer interactionId : this.filter.getInteractionsToBeExported()){
+            EncoreInteraction interaction = clusterScore.getInteractionMapping().get(interactionId);
 
-            CCParameters ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interaction.getValue(), this.filter.getContext());
+            CCParameters ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interaction, this.filter.getContext());
 
             ccWriter.writeCCLine(ccParameters);
 
-            GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction.getValue());
+            GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
 
             goWriter.writeGOLine(goParameters);
         }
@@ -78,9 +80,10 @@ public class UniprotExportProcessor {
 
         CCLineWriter ccWriter = new CCLineWriterImpl(CCFile);
 
-        for (Map.Entry<Integer, EncoreInteraction> interaction : clusterScore.getInteractionMapping().entrySet()){
+        for (Integer interactionId : this.filter.getInteractionsToBeExported()){
+            EncoreInteraction interaction = clusterScore.getInteractionMapping().get(interactionId);
 
-            CCParameters ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interaction.getValue(), this.filter.getContext());
+            CCParameters ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interaction, this.filter.getContext());
 
             ccWriter.writeCCLine(ccParameters);
         }
@@ -92,9 +95,10 @@ public class UniprotExportProcessor {
 
         GOLineWriter goWriter = new GOLineWriterImpl(GOFile);
 
-        for (Map.Entry<Integer, EncoreInteraction> interaction : clusterScore.getInteractionMapping().entrySet()){
+        for (Integer interactionId : this.filter.getInteractionsToBeExported()){
+            EncoreInteraction interaction = clusterScore.getInteractionMapping().get(interactionId);
 
-            GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction.getValue());
+            GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
 
             goWriter.writeGOLine(goParameters);
         }
@@ -120,14 +124,19 @@ public class UniprotExportProcessor {
                 parent = interactorAc.substring(0, interactorAc.indexOf("-"));
             }
 
-            int numberInteractions = clusterScore.getInteractorMapping().get(interactorAc).size();
+            Collection<Integer> exportedInteractions = CollectionUtils.intersection(this.filter.getInteractionsToBeExported(), clusterScore.getInteractorMapping().get(interactorAc));
+            int numberInteractions = exportedInteractions.size();
 
             while (interactorIterator.hasNext()){
+                exportedInteractions.clear();
+
                 String nextInteractor = interactorIterator.next();
 
                 if (nextInteractor.startsWith(parent)){
                     processedInteractors.add(nextInteractor);
-                    numberInteractions += clusterScore.getInteractorMapping().get(nextInteractor).size();
+
+                    exportedInteractions = CollectionUtils.intersection(this.filter.getInteractionsToBeExported(), clusterScore.getInteractorMapping().get(nextInteractor));
+                    numberInteractions += exportedInteractions.size();
                 }
             }
 

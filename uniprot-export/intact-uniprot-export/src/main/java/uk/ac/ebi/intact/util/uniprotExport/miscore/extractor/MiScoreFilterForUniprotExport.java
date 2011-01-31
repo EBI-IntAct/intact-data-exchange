@@ -245,4 +245,8 @@ public class MiScoreFilterForUniprotExport {
     public MiClusterContext getContext() {
         return context;
     }
+
+    public List<Integer> getInteractionsToBeExported() {
+        return interactionsToBeExported;
+    }
 }
