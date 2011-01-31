@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.util.uniprotExport.miscore;
+package uk.ac.ebi.intact.util.uniprotExport.miscore.extractor;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.transaction.TransactionStatus;
@@ -10,6 +10,7 @@ import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActFileMiScoreDistribution;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractorForMIScore;
@@ -113,7 +114,7 @@ public class MiScoreClient {
      * Computes the Mi score for the interactions involving only uniprot proteins
      * @param interactions
      * @param fileName
-     * @throws UniprotExportException
+     * @throws uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException
      */
     public void processExportWithFilterOnNonUniprot(List<String> interactions, String fileName) throws UniprotExportException {
         List<Integer> interactionsPossibleToExport = new ArrayList<Integer>();

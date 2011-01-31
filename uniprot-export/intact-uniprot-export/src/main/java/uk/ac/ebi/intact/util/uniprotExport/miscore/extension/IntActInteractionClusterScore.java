@@ -29,11 +29,6 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
 
     private PsimiTabWriter writer;
 
-    private Map<String, String> geneNames = new HashMap<String, String>();
-    private Map<String, String> miTerms = new HashMap<String, String>();
-    private Map<String, Map.Entry<String,String>> interactionToType_Method = new HashMap<String, Map.Entry<String,String>>();;
-    private List<String> spokeExpandedInteractions = new ArrayList<String>();
-
     public IntActInteractionClusterScore(){
         super();
         setMappingIdDbNames("uniprotkb");
@@ -273,27 +268,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         }
     }
 
-    public Map<String, String> getGeneNames() {
-        return geneNames;
-    }
-
-    public Map<String, String> getMiTerms() {
-        return miTerms;
-    }
-
-    public Map<String, Map.Entry<String, String>> getInteractionToType_Method() {
-        return interactionToType_Method;
-    }
-
-    public List<String> getSpokeExpandedInteractions() {
-        return spokeExpandedInteractions;
-    }
-
     public void clear(){
-        this.getGeneNames().clear();
-        this.getInteractionToType_Method().clear();
-        this.spokeExpandedInteractions.clear();
-        this.getMiTerms().clear();
         this.getInteractionMapping().clear();
         this.getInteractorMapping().clear();
     }

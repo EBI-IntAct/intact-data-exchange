@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.util.uniprotExport.miscore;
+package uk.ac.ebi.intact.util.uniprotExport.miscore.extractor;
 
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import psidev.psi.mi.tab.model.*;
@@ -8,12 +8,9 @@ import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.MiClusterToCCLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.MiClusterToDRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.MiClusterToGOLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.MiClusterContext;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.IntactQueryProvider;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractorForMIScore;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,29 +35,25 @@ public class MiScoreFilterForUniprotExport {
     private Set<String> eligibleInteractionsForUniprotExport;
     private List<Integer> interactionsToBeExported;
     private IntactPsimiTabReader mitabReader;
-    private static final double EXPORT_THRESHOLD = 0.43;
     private static final String CONFIDENCE_NAME = "intactPsiscore";
     private static final String INTACT = "intact";
     private static final String UNIPROT = "uniprotkb";
     private final static String FEATURE_CHAIN = "-PRO_";
 
-    /**
-     * the interaction cluster score
-     */
-    private IntActInteractionClusterScore interactionClusterScore;
+    private MiClusterContext context;
 
     public MiScoreFilterForUniprotExport(){
         queryProvider = new IntactQueryProvider();
         eligibleInteractionsForUniprotExport = new HashSet<String>();
         interactionsToBeExported = new ArrayList<Integer>();
-        interactionClusterScore = new IntActInteractionClusterScore();
         mitabReader = new IntactPsimiTabReader(true);
 
+        context = new MiClusterContext();
         eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport());
     }
 
-    private void computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
-        this.interactionClusterScore.clear();
+    private IntActInteractionClusterScore computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
+        IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
 
         File mitab = new File(mitabFile);
         Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitab));
@@ -126,24 +119,26 @@ public class MiScoreFilterForUniprotExport {
                         String typeMi = interactionTypes.iterator().next().getIdentifier();
 
                         Map.Entry<String, String> entry = new DefaultMapEntry(detectionMI, typeMi);
-                        this.interactionClusterScore.getInteractionToType_Method().put(intactAc, entry);
+                        this.context.getInteractionToType_Method().put(intactAc, entry);
 
                         if (!interaction.getExpansionMethods().isEmpty()){
 
-                            this.interactionClusterScore.getSpokeExpandedInteractions().add(intactAc);
+                            this.context.getSpokeExpandedInteractions().add(intactAc);
                         }
                     }
                 }
             }
-            this.interactionClusterScore.setBinaryInteractionList(interactionToProcess);
-            this.interactionClusterScore.runService();
+            clusterScore.setBinaryInteractionList(interactionToProcess);
+            clusterScore.runService();
         }
+
+        return clusterScore;
     }
 
     private void processMiTerms(BinaryInteraction interaction){
         List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
 
-        Map<String, String> miTerms = this.interactionClusterScore.getMiTerms();
+        Map<String, String> miTerms = this.context.getMiTerms();
 
         for (InteractionDetectionMethod method : detectionMethods){
             if (!miTerms.containsKey(method.getIdentifier())){
@@ -165,13 +160,13 @@ public class MiScoreFilterForUniprotExport {
         String geneNameA = retrieveInteractorGeneName(interactorA);
         String geneNameB = retrieveInteractorGeneName(interactorB);
 
-        Map<String, String> geneNames = this.interactionClusterScore.getGeneNames();
+        Map<String, String> geneNames = this.context.getGeneNames();
 
         if (!geneNames.containsKey(geneNameA)){
-            this.interactionClusterScore.getGeneNames().put(intactA, geneNameA);
+            this.context.getGeneNames().put(intactA, geneNameA);
         }
         if (!geneNames.containsKey(geneNameB)){
-            this.interactionClusterScore.getGeneNames().put(intactB, geneNameB);
+            this.context.getGeneNames().put(intactB, geneNameB);
         }
     }
 
@@ -222,24 +217,16 @@ public class MiScoreFilterForUniprotExport {
         return score;
     }
 
-    public void runUniprotExport(String mitab, String drFile, String ccFile, String goFile) throws UniprotExportException {
+    public IntActInteractionClusterScore exportInteractionsFrom(String mitab) throws UniprotExportException {
         try {
             InteractionExtractorForMIScore extractor = new InteractionExtractorForMIScore();
 
-            computeMiScoreInteractionEligibleUniprotExport(mitab);
-            this.interactionsToBeExported = extractor.processExportWithMiClusterScore(this.interactionClusterScore, true);
-
-            MiClusterToDRLineConverter drWriter = new MiClusterToDRLineConverter(this.interactionClusterScore, drFile);
-            drWriter.write();
-
-            MiClusterToCCLineConverter ccWriter = new MiClusterToCCLineConverter(this.interactionClusterScore, ccFile);
-            ccWriter.write();
-
-            MiClusterToGOLineConverter goWriter = new MiClusterToGOLineConverter(this.interactionClusterScore, goFile);
-            goWriter.write();
+            IntActInteractionClusterScore clusterScore = computeMiScoreInteractionEligibleUniprotExport(mitab);
+            this.interactionsToBeExported = extractor.processExportWithMiClusterScore(this.context, clusterScore, true);
 
             //this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);
 
+            return clusterScore;
         } catch (IOException e) {
             throw new UniprotExportException("It was not possible to convert the data in the mitab file " + mitab + " in an InputStream", e);
         } catch (ConverterException e) {
@@ -253,5 +240,9 @@ public class MiScoreFilterForUniprotExport {
 
     public IntactQueryProvider getQueryProvider() {
         return queryProvider;
+    }
+
+    public MiClusterContext getContext() {
+        return context;
     }
 }

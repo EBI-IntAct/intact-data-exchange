@@ -5,7 +5,7 @@ import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreClient;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
 
@@ -853,17 +853,18 @@ public class InteractionExtractorForMIScore extends LineExport {
     /**
      * For each binary interaction in the intactMiClusterScore : filter on a threshold value of the score and then, depending on 'filterBinary',
      * will add a filter on true binary interaction
-     * @param clusterScore
+     * @param context
+     * @param miScore
      * @param filterBinary
      * @return
      * @throws UniprotExportException
      */
-    public List<Integer> processExportWithMiClusterScore(IntActInteractionClusterScore clusterScore, boolean filterBinary) throws UniprotExportException {
+    public List<Integer> processExportWithMiClusterScore(MiClusterContext context, IntActInteractionClusterScore miScore, boolean filterBinary) throws UniprotExportException {
         List<Integer> interactionsPossibleToExport = new ArrayList<Integer>();
-        Map<String, Map.Entry<String, String>> interactionType_Method = clusterScore.getInteractionToType_Method();
-        List<String> spokeExpandedInteractions = clusterScore.getSpokeExpandedInteractions();
+        Map<String, Map.Entry<String, String>> interactionType_Method = context.getInteractionToType_Method();
+        List<String> spokeExpandedInteractions = context.getSpokeExpandedInteractions();
 
-        for (Map.Entry<Integer, EncoreInteraction> entry : clusterScore.getInteractionMapping().entrySet()){
+        for (Map.Entry<Integer, EncoreInteraction> entry : miScore.getInteractionMapping().entrySet()){
             EncoreInteraction encore = entry.getValue();
 
             double score = getMiClusterScoreFor(encore);
