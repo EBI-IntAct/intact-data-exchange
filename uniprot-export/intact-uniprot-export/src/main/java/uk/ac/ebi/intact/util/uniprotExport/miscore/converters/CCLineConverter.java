@@ -116,7 +116,7 @@ public class CCLineConverter extends AbstractConverter {
         Map<Map.Entry<String, String>, Set<String>> spokeExpandedPubmeds = new HashMap<Map.Entry<String, String>, Set<String>>();
 
         for (Map.Entry<Map.Entry<String, String>, List<String>> ip : spokeExpandedInteractions.entrySet()){
-            Map.Entry<String, String> detType = ip.getKey();
+            Map.Entry<String, String> detType = new DefaultMapEntry(this.clusterScore.getMiTerms().get(ip.getKey().getKey()), this.clusterScore.getMiTerms().get(ip.getKey().getValue()));
             List<String> interactionAcs = ip.getValue();
             List<String> duplicatedInteractions = new ArrayList(interactionAcs);
 
