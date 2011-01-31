@@ -5,7 +5,7 @@ import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParametersImpl;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.InteractionDetails;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -118,7 +118,7 @@ public class EncoreInteractionToCCLineConverter {
         return distinctLines;
     }
 
-    public CCParameters convertInteractionsIntoCCLines(EncoreInteraction interaction, MiClusterContext context){
+    public CCParametersImpl convertInteractionsIntoCCLines(EncoreInteraction interaction, MiClusterContext context){
 
         String uniprot1 = interaction.getInteractorA(WriterUtils.UNIPROT);
         String uniprot2 = interaction.getInteractorB(WriterUtils.UNIPROT);
@@ -149,7 +149,7 @@ public class EncoreInteractionToCCLineConverter {
             // collect all pubmeds and spoke expanded information
             SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
 
-            return new CCParameters(uniprot1, uniprot2, geneName1, geneName2, taxId1, taxId2, organism1, organism2, sortedInteractionDetails);
+            return new CCParametersImpl(uniprot1, uniprot2, geneName1, geneName2, taxId1, taxId2, organism1, organism2, sortedInteractionDetails);
         }
 
         return null;

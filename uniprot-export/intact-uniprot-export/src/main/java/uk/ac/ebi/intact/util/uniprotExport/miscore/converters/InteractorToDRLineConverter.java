@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.converters;
 
-import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParametersImpl;
 
 import java.io.IOException;
 
@@ -14,10 +14,10 @@ import java.io.IOException;
 
 public class InteractorToDRLineConverter {
 
-    public DRParameters convertInteractorToDRLine(String interactorAc, int numberInteractions) throws IOException {
+    public DRParametersImpl convertInteractorToDRLine(String interactorAc, int numberInteractions) throws IOException {
 
         if (interactorAc != null){
-            return new DRParameters(interactorAc, numberInteractions);
+            return new DRParametersImpl(interactorAc, numberInteractions);
         }
 
         return null;
