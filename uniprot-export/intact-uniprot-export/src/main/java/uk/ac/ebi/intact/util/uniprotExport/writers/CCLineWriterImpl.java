@@ -1,16 +1,15 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
-import uk.ac.ebi.intact.util.uniprotExport.CcLine;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.InteractionDetails;
 
 import javax.swing.event.EventListenerList;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Default converters for CCLines
@@ -30,50 +29,15 @@ public class CCLineWriterImpl implements CCLineWriter{
     }
 
     @Override
-    public void writeCCLine(String uniprotAc1, List<CcLine> ccLines) throws IOException {
+    public void writeCCLine(CCParameters parameters) throws IOException {
 
-        writeCCLines(ccLines, uniprotAc1);
-    }
+        if (parameters != null){
 
-    @Override
-    public CcLine createCCline(String uniprot1, String geneName1, String taxId1, String uniprot2,
-                               String geneName2, String taxId2, String organismName2,
-                               Map<Map.Entry<String, String>, Set<String>> trueBinaryInteractionDetails,
-                               Map<Map.Entry<String, String>, Set<String>> spokeExpandedInteractionDetails) {
-
-        StringBuffer buffer = new StringBuffer(256); // average size is 160 char
-
-        // write introduction
-        writeInteractionIntroduction(true, uniprot1, uniprot2, buffer);
-
-        // write first protein
-        writeFirstProtein(uniprot1, geneName1, buffer);
-
-        // write second protein
-        writeSecondProtein(uniprot2, geneName2, taxId1, taxId2, organismName2, buffer);
-
-        // write the deatils of the interaction
-        writeInteractionDetails(buffer, trueBinaryInteractionDetails, spokeExpandedInteractionDetails);
-
-        return new CcLine(buffer.toString(), geneName1, uniprot2);
-    }
-
-    @Override
-    public void close() throws IOException {
-        this.writer.close();
-    }
-
-    private void writeCCLines(List<CcLine> ccLines, String uniprotAc) throws IOException {
-        if (!ccLines.isEmpty()){
-            Collections.sort(ccLines);
-
-            StringBuffer sb = new StringBuffer(128 * ccLines.size());
+            StringBuffer sb = new StringBuffer();
 
             writeCCLineTitle(sb);
 
-            for ( CcLine ccLine : ccLines ) {
-                sb.append(ccLine.getCcLine());
-            }
+            writeCCLineParameters(parameters, sb);
 
             sb.append("//");
             sb.append(WriterUtils.NEW_LINE);
@@ -83,9 +47,28 @@ public class CCLineWriterImpl implements CCLineWriter{
             // write the content in the output file.
             writer.write(ccs);
             writer.flush();
-            // fire the event
-            fireCcLineCreatedEvent(new CcLineCreatedEvent(this, uniprotAc, ccLines));
         }
+    }
+
+    public void writeCCLineParameters(CCParameters parameters, StringBuffer sb) {
+
+        // write introduction
+        writeInteractionIntroduction(true, parameters.getFirstInteractor(), parameters.getSecondInteractor(), sb);
+
+        // write first protein
+        writeFirstProtein(parameters.getFirstInteractor(), parameters.getFirstGeneName(), sb);
+
+        // write second protein
+        writeSecondProtein(parameters.getSecondInteractor(), parameters.getSecondGeneName(),
+                parameters.getFirstTaxId(), parameters.getSecondTaxId(), parameters.getSecondOrganismName(), sb);
+
+        // write the deatils of the interaction
+        writeInteractionDetails(sb, parameters.getInteractionDetails());
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.writer.close();
     }
 
     private void writeCCLineTitle(StringBuffer sb){
@@ -139,22 +122,19 @@ public class CCLineWriterImpl implements CCLineWriter{
         buffer.append(WriterUtils.NEW_LINE);
     }
 
-    private void writeInteractionDetails(StringBuffer buffer, Map<Map.Entry<String, String>, Set<String>> trueBinaryInteractionDetails,
-                               Map<Map.Entry<String, String>, Set<String>> spokeExpandedInteractionDetails) {
+    private void writeInteractionDetails(StringBuffer buffer, SortedSet<InteractionDetails> interactionDetails) {
 
         // collect all pubmeds and spoke expanded information
-        for (Map.Entry<Map.Entry<String, String>, Set<String>> detail : spokeExpandedInteractionDetails.entrySet()){
-            String type = detail.getKey().getValue();
-            String method = detail.getKey().getKey();
+        for (InteractionDetails details : interactionDetails){
+            String type = details.getInteractionType();
+            String method = details.getDetectionMethod();
 
-            writeSpokeExpandedInteractions(buffer, type, method, detail.getValue());
-        }
-
-        for (Map.Entry<Map.Entry<String, String>, Set<String>> detail : trueBinaryInteractionDetails.entrySet()){
-            String type = detail.getKey().getValue();
-            String method = detail.getKey().getKey();
-
-            writeBinaryInteraction(buffer, type, method, detail.getValue());
+            if (details.isSpokeExpanded()){
+                writeSpokeExpandedInteractions(buffer, type, method, details.getPubmedIds());
+            }
+            else{
+                writeBinaryInteraction(buffer, type, method, details.getPubmedIds());
+            }
         }
     }
 
