@@ -2,9 +2,10 @@ package uk.ac.ebi.intact.util.uniprotExport.writers;
 
 import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
 
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,18 +18,22 @@ import java.util.Set;
 
 public class GOLineWriterImpl implements GOLineWriter{
 
-    private FileWriter writer;
+    /**
+     * The writer
+     */
+    private OutputStreamWriter writer;
 
-    public GOLineWriterImpl(String fileName) throws IOException {
-        writer = new FileWriter(fileName);
+    public GOLineWriterImpl(OutputStreamWriter outputStream) throws IOException {
+        if (outputStream == null){
+             throw new IllegalArgumentException("You must give a non null OutputStream writer");
+        }
+        writer = outputStream;
     }
 
     @Override
     public void writeGOLine(GOParameters parameters) throws IOException {
+        // if the parameter is not null, we can write the go line
         if (parameters != null){
-            // build a pipe separated list of pubmed IDs
-            StringBuffer pubmedBuffer = new StringBuffer();
-            writePubmedLine(parameters.getPubmedIds(), pubmedBuffer);
             String uniprot1 = parameters.getFirstProtein();
             String uniprot2 = parameters.getSecondProtein();
 
@@ -38,23 +43,31 @@ public class GOLineWriterImpl implements GOLineWriter{
             }
 
             // generate the line
-            StringBuffer line = new StringBuffer();
-
-            writeGOLine(uniprot1, uniprot2, self, pubmedBuffer, line);
+            writeGOLine(uniprot1, uniprot2, self, parameters.getPubmedIds());
 
             if (!self) {
                 // write the reverse
 
-                writeGOLine(uniprot2, uniprot1, self, pubmedBuffer, line);
+                writeGOLine(uniprot2, uniprot1, self, parameters.getPubmedIds());
             }
 
-            // write into the GO file
-            writer.write(line.toString());
             writer.flush();
         }
     }
 
-    private void writePubmedLine(Set<String> pubmedIds, StringBuffer sb){
+    @Override
+    public void writeGOLines(List<GOParameters> GOLines) throws IOException {
+        for (GOParameters parameter : GOLines){
+            writeGOLine(parameter);
+        }
+    }
+
+    /**
+     * Write a list of pubmed ids
+     * @param pubmedIds
+     * @throws IOException
+     */
+    private void writePubmedLine(Set<String> pubmedIds) throws IOException {
 
         if (pubmedIds.isEmpty()) {
             System.out.println("ERROR: No PubMed ID found in that set of experiments. ");
@@ -64,53 +77,88 @@ public class GOLineWriterImpl implements GOLineWriter{
         // build a pipe separated list of pubmed IDs
         for (Iterator iterator = pubmedIds.iterator(); iterator.hasNext();) {
             String pubmed = (String) iterator.next();
-            sb.append("PMID:").append(pubmed);
+            writer.write("PMID:");
+            writer.write(pubmed);
             if (iterator.hasNext()) {
-                sb.append('|');
+                writer.write('|');
             }
         }
 
-        sb.append(WriterUtils.TABULATION);
+        writer.write(WriterUtils.TABULATION);
     }
 
-    private void writeGOLine(String uniprot1, String uniprot2, boolean self, StringBuffer pubmedBuffer, StringBuffer line){
-        writeFirstInteractor(uniprot1, line);
+    /**
+     * Write the GO line
+     * @param uniprot1
+     * @param uniprot2
+     * @param self
+     * @param pubmedBuffer
+     * @throws IOException
+     */
+    private void writeGOLine(String uniprot1, String uniprot2, boolean self, Set<String> pubmedBuffer) throws IOException {
+        // first interactor
+        writeFirstInteractor(uniprot1);
 
-        writeBindingType(uniprot1, uniprot2, line, self);
+        // binding type
+        writeBindingType(self);
 
-        writeGeneralLine(uniprot2, pubmedBuffer, line);
+        // write information
+        writeGeneralLine(uniprot2, pubmedBuffer);
 
     }
 
-    private void writeGeneralLine(String uniprot2, StringBuffer pubmedBuffer, StringBuffer line) {
-        line.append(pubmedBuffer.toString()); // DB:Reference
+    /**
+     * Write details of GO line
+     * @param uniprot2
+     * @param pubmedBuffer
+     * @throws IOException
+     */
+    private void writeGeneralLine(String uniprot2, Set<String> pubmedBuffer) throws IOException {
+        writePubmedLine(pubmedBuffer);
 
-        line.append("IPI").append(WriterUtils.TABULATION); // Evidence
-        line.append("UniProt:").append(uniprot2).append(WriterUtils.TABULATION); // with
-        line.append(WriterUtils.TABULATION); // Aspect
-        line.append(WriterUtils.TABULATION); // DB_Object_name
-        line.append(WriterUtils.TABULATION); // synonym
-        line.append(WriterUtils.TABULATION); // DB_object_type
-        line.append(WriterUtils.TABULATION); // Taxon_ID
-        line.append(WriterUtils.TABULATION); // Date
-        line.append("IntAct");   // Assigned By
-        line.append(WriterUtils.NEW_LINE);
+        writer.write("IPI");
+        writer.write(WriterUtils.TABULATION); // Evidence
+        writer.write("UniProt:");
+        writer.write(uniprot2);
+        writer.write(WriterUtils.TABULATION); // with
+        writer.write(WriterUtils.TABULATION); // Aspect
+        writer.write(WriterUtils.TABULATION); // DB_Object_name
+        writer.write(WriterUtils.TABULATION); // synonym
+        writer.write(WriterUtils.TABULATION); // DB_object_type
+        writer.write(WriterUtils.TABULATION); // Taxon_ID
+        writer.write(WriterUtils.TABULATION); // Date
+        writer.write("IntAct");   // Assigned By
+        writer.write(WriterUtils.NEW_LINE);
     }
 
-    private void writeBindingType(String uniprot1, String uniprot2, StringBuffer line, boolean self) {
+    /**
+     * Write binding type
+     * @param self
+     * @throws IOException
+     */
+    private void writeBindingType(boolean self) throws IOException {
         if (self) {
-            line.append("GO:0042802").append(WriterUtils.TABULATION); // GoId - protein self binding
+            writer.write("GO:0042802");
+            writer.write(WriterUtils.TABULATION); // GoId - protein self binding
             self = true;
         } else {
-            line.append("GO:0005515").append(WriterUtils.TABULATION); // GoId - protein binding
+            writer.write("GO:0005515");
+            writer.write(WriterUtils.TABULATION); // GoId - protein binding
         }
     }
 
-    private void writeFirstInteractor(String uniprot1, StringBuffer sb) {
-        sb.append("UniProt").append(WriterUtils.TABULATION); // DB
-        sb.append(uniprot1).append(WriterUtils.TABULATION); // DB_object_ID
-        sb.append(WriterUtils.TABULATION); // DB_Object_symbol
-        sb.append(WriterUtils.TABULATION); // Qualifier
+    /**
+     * Write the first interactor
+     * @param uniprot1
+     * @throws IOException
+     */
+    private void writeFirstInteractor(String uniprot1) throws IOException {
+        writer.write("UniProt");
+        writer.write(WriterUtils.TABULATION); // DB
+        writer.write(uniprot1);
+        writer.write(WriterUtils.TABULATION); // DB_object_ID
+        writer.write(WriterUtils.TABULATION); // DB_Object_symbol
+        writer.write(WriterUtils.TABULATION); // Qualifier
     }
 
     @Override

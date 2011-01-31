@@ -23,12 +23,11 @@ public interface CCLineWriter {
     public void writeCCLine(CCParameters parameters) throws IOException;
 
     /**
-     * Write all the CC lines in a file which is closed at the end
+     * Write a list of CC lines
      * @param CCLines : a list of CC lines
-     * @param fileName : the name of the output file
      * @throws IOException
      */
-    public void writeCCLines(List<CCParameters> CCLines, String fileName) throws IOException;
+    public void writeCCLines(List<CCParameters> CCLines) throws IOException;
 
     /**
      * Close the current writer

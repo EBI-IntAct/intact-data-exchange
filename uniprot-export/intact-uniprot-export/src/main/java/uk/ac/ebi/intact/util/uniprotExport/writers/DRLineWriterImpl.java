@@ -2,8 +2,8 @@ package uk.ac.ebi.intact.util.uniprotExport.writers;
 
 import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
 
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 /**
@@ -17,28 +17,28 @@ import java.util.List;
 public class DRLineWriterImpl implements DRLineWriter{
 
     /**
-     * The current fileWriter
+     * The writer
      */
-    private FileWriter writer;
+    private OutputStreamWriter writer;
 
-    public DRLineWriterImpl(String fileName) throws IOException {
-        writer = new FileWriter(fileName);
+    public DRLineWriterImpl(OutputStreamWriter outputStream) throws IOException {
+        if (outputStream == null){
+             throw new IllegalArgumentException("You must give a non null OutputStream writer");
+        }
+        writer = outputStream;
     }
 
     @Override
     public void writeDRLine(DRParameters parameters) throws IOException {
         // if the parameter is not null, write the DR line
         if (parameters != null){
-            StringBuffer sb = new StringBuffer();
-
             // write the title of a DR line
-            writeDRTitle(sb);
+            writeDRTitle();
 
             // write the content of a DR line
-            writeDRLineParameters(parameters, sb);
+            writeDRLineParameters(parameters);
 
             // write and flush
-            writer.write(sb.toString());
             writer.flush();
         }
     }
@@ -46,32 +46,28 @@ public class DRLineWriterImpl implements DRLineWriter{
     /**
      * Write the content of a DR line
      * @param parameters
-     * @param sb
      */
-    private void writeDRLineParameters(DRParameters parameters, StringBuffer sb) {
-        sb.append(parameters.getUniprotAc()).append("; ");
-        sb.append((parameters.getNumberOfInteractions() > 0 ? parameters.getNumberOfInteractions() : "-")+".");
-        sb.append(WriterUtils.NEW_LINE);
+    private void writeDRLineParameters(DRParameters parameters) throws IOException {
+        writer.write(parameters.getUniprotAc());
+        writer.write("; ");
+        writer.write((parameters.getNumberOfInteractions() > 0 ? Integer.toString(parameters.getNumberOfInteractions()) : "-"));
+        writer.write(".");
+        writer.write(WriterUtils.NEW_LINE);
     }
 
     /**
      * Write the title of a DR line
-     * @param sb
      */
-    private void writeDRTitle(StringBuffer sb) {
-        sb.append("DR   ");
-        sb.append("IntAct; ");
+    private void writeDRTitle() throws IOException {
+        writer.write("DR   IntAct; ");
     }
 
     @Override
-    public void writeDRLines(List<DRParameters> DRLines, String fileName) throws IOException {
-        this.writer = new FileWriter(fileName, true);
+    public void writeDRLines(List<DRParameters> DRLines) throws IOException {
 
         for (DRParameters parameter : DRLines){
             writeDRLine(parameter);
         }
-
-        this.writer.close();
     }
 
     @Override

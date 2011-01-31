@@ -3,9 +3,10 @@ package uk.ac.ebi.intact.util.uniprotExport.writers;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
- * Interfae for the GOLine writers
+ * Interface for the GOLine writers
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -14,7 +15,23 @@ import java.io.IOException;
 
 public interface GOLineWriter {
 
+    /**
+     * Write a GO line
+     * @param parameters : the parameters of a GO line
+     * @throws IOException
+     */
     public void writeGOLine(GOParameters parameters) throws IOException;
 
+    /**
+     * Write a list GO lines
+     * @param GOLines : a list of GO lines
+     * @throws IOException
+     */
+    public void writeGOLines(List<GOParameters> GOLines) throws IOException;
+
+    /**
+     * Close the current writer
+     * @throws IOException
+     */
     public void close() throws IOException;
 }

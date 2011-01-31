@@ -6,8 +6,8 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.InteractionDetails;
 
 import javax.swing.event.EventListenerList;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -23,18 +23,21 @@ import java.util.SortedSet;
 public class CCLineWriterImpl implements CCLineWriter{
 
     /**
-     * The file writer
+     * The writer
      */
-    private FileWriter writer;
+    private OutputStreamWriter writer;
     protected EventListenerList listenerList = new EventListenerList();
 
     /**
      * Create a new CCLine writer with a fileName
-     * @param fileName
+     * @param outputStream : the outputStreamWriter
      * @throws IOException
      */
-    public CCLineWriterImpl(String fileName) throws IOException {
-        writer = new FileWriter(fileName);
+    public CCLineWriterImpl(OutputStreamWriter outputStream) throws IOException {
+        if (outputStream == null){
+             throw new IllegalArgumentException("You must give a non null OutputStream writer");
+        }
+        writer = outputStream;
     }
 
     @Override
@@ -43,59 +46,46 @@ public class CCLineWriterImpl implements CCLineWriter{
         // if parameter not null, write it
         if (parameters != null){
 
-            StringBuffer sb = new StringBuffer();
-
             // write the title
-            writeCCLineTitle(sb);
+            writeCCLineTitle();
 
             // write the content
-            writeCCLineParameters(parameters, sb);
+            writeCCLineParameters(parameters);
 
-            // write the end
-            sb.append("//");
-            sb.append(WriterUtils.NEW_LINE);
-
-            String ccs = sb.toString();
-
-            // write the content in the output file.
-            writer.write(ccs);
             writer.flush();
         }
     }
 
     @Override
-    public void writeCCLines(List<CCParameters> CCLines, String fileName) throws IOException {
-        // initialize the current writer with the fileName
-        this.writer = new FileWriter(fileName, true);
+    public void writeCCLines(List<CCParameters> CCLines) throws IOException {
 
         // write each CCParameter
         for (CCParameters parameter : CCLines){
             writeCCLine(parameter);
         }
-
-        // close the current writer
-        this.writer.close();
     }
 
     /**
      * Write the content of the CC line
      * @param parameters : the parameters
-     * @param sb : the string buffer
      */
-    public void writeCCLineParameters(CCParameters parameters, StringBuffer sb) {
+    public void writeCCLineParameters(CCParameters parameters) throws IOException {
 
         // write introduction
-        writeInteractionIntroduction(true, parameters.getFirstInteractor(), parameters.getSecondInteractor(), sb);
+        writeInteractionIntroduction(true, parameters.getFirstInteractor(), parameters.getSecondInteractor());
 
         // write first protein
-        writeFirstProtein(parameters.getFirstInteractor(), parameters.getFirstGeneName(), sb);
+        writeFirstProtein(parameters.getFirstInteractor(), parameters.getFirstGeneName());
 
         // write second protein
         writeSecondProtein(parameters.getSecondInteractor(), parameters.getSecondGeneName(),
-                parameters.getFirstTaxId(), parameters.getSecondTaxId(), parameters.getSecondOrganismName(), sb);
+                parameters.getFirstTaxId(), parameters.getSecondTaxId(), parameters.getSecondOrganismName());
 
         // write the details of the interaction
-        writeInteractionDetails(sb, parameters.getInteractionDetails());
+        writeInteractionDetails(parameters.getInteractionDetails());
+
+        writer.write("//");
+        writer.write(WriterUtils.NEW_LINE);
     }
 
     @Override
@@ -105,11 +95,10 @@ public class CCLineWriterImpl implements CCLineWriter{
 
     /**
      * Write the CC line title
-     * @param sb
      */
-    private void writeCCLineTitle(StringBuffer sb){
-        sb.append("CC   -!- INTERACTION:");
-        sb.append(WriterUtils.NEW_LINE);
+    private void writeCCLineTitle() throws IOException {
+        writer.write("CC   -!- INTERACTION:");
+        writer.write(WriterUtils.NEW_LINE);
     }
 
     void fireCcLineCreatedEvent(CcLineCreatedEvent evt) {
@@ -137,25 +126,32 @@ public class CCLineWriterImpl implements CCLineWriter{
      * @param doesInteract
      * @param uniprot1
      * @param uniprot2
-     * @param buffer
      */
-    private void writeInteractionIntroduction(boolean doesInteract, String uniprot1, String uniprot2, StringBuffer buffer) {
-        buffer.append("CC       Interact="+ (doesInteract ? "yes" : "no") +"; ");
+    private void writeInteractionIntroduction(boolean doesInteract, String uniprot1, String uniprot2) throws IOException {
+        writer.write("CC       Interact=");
+        writer.write((doesInteract ? "yes" : "no"));
+        writer.write("; ");
 
-        buffer.append(" Xref=IntAct:").append( uniprot1 ).append(',').append(uniprot2).append(';');
-        buffer.append(WriterUtils.NEW_LINE);
+        writer.write(" Xref=IntAct:");
+        writer.write( uniprot1 );
+        writer.write(',');
+        writer.write(uniprot2);
+        writer.write(';');
+        writer.write(WriterUtils.NEW_LINE);
     }
 
     /**
      * Write the first protein of a CCLine
      * @param uniprot1
      * @param geneName1
-     * @param buffer
      */
-    private void writeFirstProtein(String uniprot1, String geneName1, StringBuffer buffer) {
-        buffer.append("CC         Protein1=");
-        buffer.append( geneName1 ).append(' ').append( '[' ).append( uniprot1 ).append( ']' ).append( ';' );
-        buffer.append(WriterUtils.NEW_LINE);
+    private void writeFirstProtein(String uniprot1, String geneName1) throws IOException {
+        writer.write("CC         Protein1=");
+        writer.write(geneName1);
+        writer.write(" [");
+        writer.write( uniprot1 );
+        writer.write( "];" );
+        writer.write(WriterUtils.NEW_LINE);
     }
 
     /**
@@ -165,27 +161,30 @@ public class CCLineWriterImpl implements CCLineWriter{
      * @param taxId1
      * @param taxId2
      * @param organism2
-     * @param buffer
      */
-    private void writeSecondProtein(String uniprot2, String geneName2, String taxId1, String taxId2, String organism2, StringBuffer buffer) {
-        buffer.append("CC         Protein2=");
-        buffer.append( geneName2 ).append(' ').append( '[' ).append( uniprot2 ).append( ']' ).append( ';' );
+    private void writeSecondProtein(String uniprot2, String geneName2, String taxId1, String taxId2, String organism2) throws IOException {
+        writer.write("CC         Protein2=");
+        writer.write(geneName2);
+        writer.write(" [");
+        writer.write( uniprot2 );
+        writer.write("];");
 
         if (!taxId1.equalsIgnoreCase(taxId2)) {
-            buffer.append(" Organism=");
-            buffer.append( organism2 ).append( " [NCBI_TaxID=" ).append( taxId2 ).append( "]" );
-            buffer.append(';');
+            writer.write(" Organism=");
+            writer.write(organism2);
+            writer.write( " [NCBI_TaxID=" );
+            writer.write( taxId2 );
+            writer.write( "];" );
         }
 
-        buffer.append(WriterUtils.NEW_LINE);
+        writer.write(WriterUtils.NEW_LINE);
     }
 
     /**
      * Write the details of a binary interaction
-     * @param buffer
      * @param interactionDetails
      */
-    private void writeInteractionDetails(StringBuffer buffer, SortedSet<InteractionDetails> interactionDetails) {
+    private void writeInteractionDetails(SortedSet<InteractionDetails> interactionDetails) throws IOException {
 
         // collect all pubmeds and spoke expanded information
         for (InteractionDetails details : interactionDetails){
@@ -193,50 +192,71 @@ public class CCLineWriterImpl implements CCLineWriter{
             String method = details.getDetectionMethod();
 
             if (details.isSpokeExpanded()){
-                writeSpokeExpandedInteractions(buffer, type, method, details.getPubmedIds());
+                writeSpokeExpandedInteractions(type, method, details.getPubmedIds());
             }
             else{
-                writeBinaryInteraction(buffer, type, method, details.getPubmedIds());
+                writeBinaryInteraction(type, method, details.getPubmedIds());
             }
         }
     }
 
     /**
      * Write the details of a spoke expanded interaction
-     * @param buffer
      * @param type
      * @param method
      * @param spokeExpandedPubmeds
      */
-    private void writeSpokeExpandedInteractions(StringBuffer buffer, String type, String method, Set<String> spokeExpandedPubmeds) {
-        buffer.append("CC         InteractionType="+type+"; Method="+method+"; Expansion=Spoke; Source=");
+    private void writeSpokeExpandedInteractions(String type, String method, Set<String> spokeExpandedPubmeds) throws IOException {
+        writer.write("CC         InteractionType=");
+        writer.write(type);
+        writer.write("; Method=");
+        writer.write(method);
+        writer.write("; Expansion=Spoke; Source=");
 
+        int index = 0;
+        int size = spokeExpandedPubmeds.size();
         for (String pid : spokeExpandedPubmeds){
-            buffer.append("Pubmed:"+pid+", ");
-        }
+            index++;
+            writer.write("Pubmed:");
+            writer.write(pid);
 
-        buffer.deleteCharAt(buffer.length() - 1);
-        buffer.deleteCharAt(buffer.length() - 1);
-        buffer.append(";");
-        buffer.append(WriterUtils.NEW_LINE);
+            if (index == size){
+                writer.write(";");
+            }
+            else{
+                writer.write(", ");
+            }
+        }
+        writer.write(WriterUtils.NEW_LINE);
     }
 
     /**
      * write the details of a true binary interaction
-     * @param buffer
      * @param type
      * @param method
      * @param binaryInteractions
      */
-    private void writeBinaryInteraction(StringBuffer buffer, String type, String method, Set<String> binaryInteractions) {
-        buffer.append("CC         InteractionType="+type+"; Method="+method+"; Source=");
+    private void writeBinaryInteraction(String type, String method, Set<String> binaryInteractions) throws IOException {
+        writer.write("CC         InteractionType=");
+        writer.write(type);
+        writer.write("; Method=");
+        writer.write(method);
+        writer.write("; Source=");
 
+        int index = 0;
+        int size = binaryInteractions.size();
         for (String pid : binaryInteractions){
-            buffer.append("Pubmed:"+pid+", ");
+            index++;
+            writer.write("Pubmed:");
+            writer.write(pid);
+
+            if (index == size){
+                writer.write(";");
+            }
+            else{
+                writer.write(", ");
+            }
         }
-        buffer.deleteCharAt(buffer.length() - 1);
-        buffer.deleteCharAt(buffer.length() - 1);
-        buffer.append(";");
-        buffer.append(WriterUtils.NEW_LINE);
+        writer.write(WriterUtils.NEW_LINE);
     }
 }

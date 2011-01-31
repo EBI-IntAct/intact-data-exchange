@@ -23,12 +23,11 @@ public interface DRLineWriter {
     public void writeDRLine(DRParameters parameters) throws IOException;
 
     /**
-     * Write all the DR lines in a file which is closed at the end
+     * Write a list DR lines
      * @param DRLines : a list of DR lines
-     * @param fileName : the name of the output file
      * @throws IOException
      */
-    public void writeDRLines(List<DRParameters> DRLines, String fileName) throws IOException;
+    public void writeDRLines(List<DRParameters> DRLines) throws IOException;
 
     /**
      * Close the current writer
