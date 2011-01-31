@@ -52,6 +52,8 @@ public class MiClusterToGOLineConverter extends AbstractConverter {
             GOParameters parameters = new GOParameters(uniprot1, uniprot2, pubmedIds);
             writer.writeGOLine(parameters);
         }
+
+        writer.close();
     }
 
     public void write() throws IOException {

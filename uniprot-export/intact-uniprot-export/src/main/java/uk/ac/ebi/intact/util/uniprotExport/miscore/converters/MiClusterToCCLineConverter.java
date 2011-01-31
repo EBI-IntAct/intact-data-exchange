@@ -79,6 +79,8 @@ public class MiClusterToCCLineConverter extends AbstractConverter {
 
             writer.writeCCLine(parameters);
         }
+
+        writer.close();
     }
 
     private String [] extractOrganismFrom(Collection<CrossReference> references){

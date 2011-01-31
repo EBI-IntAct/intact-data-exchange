@@ -57,5 +57,7 @@ public class MiClusterToDRLineConverter extends AbstractConverter {
             writer.writeDRLine(parameter);
             interactors.removeAll(processedInteractors);
         }
+
+        writer.close();
     }
 }
