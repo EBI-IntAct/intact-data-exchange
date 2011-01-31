@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * TODO comment this
+ * Converts an EncoreInteraction into a GOParameter
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -19,6 +19,11 @@ import java.util.Set;
 
 public class EncoreInteractionToGoLineConverter {
 
+    /**
+     *
+     * @param interaction
+     * @return a set of pubmed Ids for this interaction
+     */
     private Set<String> extractPubmedIdsFrom(EncoreInteraction interaction){
         Set<String> pubmedIds = new HashSet<String>(interaction.getPublicationIds().size());
 
@@ -31,14 +36,22 @@ public class EncoreInteractionToGoLineConverter {
         return pubmedIds;
     }
 
+    /**
+     * Converts an EncoreInteraction into GOParameters
+     * @param interaction
+     * @return The converted GOParameters
+     */
     public GOParameters convertInteractionIntoGOParameters(EncoreInteraction interaction){
+        // extract the uniprot acs of the firts and second interactors
         String uniprot1 = interaction.getInteractorA(WriterUtils.UNIPROT);
         String uniprot2 = interaction.getInteractorB(WriterUtils.UNIPROT);
 
+        // if the uniprot acs are not null, it is possible to create a GOParameter
         if (uniprot1 != null && uniprot2 != null){
             // build a pipe separated list of pubmed IDs
             Set<String> pubmedIds = extractPubmedIdsFrom(interaction);
 
+            // if the list of pubmed ids is not empty, the GOParameter is created
             if (!pubmedIds.isEmpty()){
                 GOParameters parameters = new GOParametersImpl(uniprot1, uniprot2, pubmedIds);
 

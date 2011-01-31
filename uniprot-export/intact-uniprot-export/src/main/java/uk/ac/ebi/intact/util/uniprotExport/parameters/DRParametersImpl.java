@@ -14,9 +14,7 @@ public class DRParametersImpl implements DRParameters{
     public int numberOfInteractions;
 
     public DRParametersImpl(String uniprotAc, int numberOfInteractions){
-        if (uniprotAc == null){
-            throw new IllegalArgumentException("A DR parameter must have a non null uniprot AC");
-        }
+
         this.uniprotAc = uniprotAc;
         this.numberOfInteractions = numberOfInteractions;
     }

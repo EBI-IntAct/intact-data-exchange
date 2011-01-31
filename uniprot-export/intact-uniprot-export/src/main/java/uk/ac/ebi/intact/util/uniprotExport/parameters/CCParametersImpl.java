@@ -29,13 +29,7 @@ public class CCParametersImpl implements CCParameters{
     public CCParametersImpl(String firstInteractor, String secondInteractor, String firstGeneName,
                             String secondGeneName, String firstTaxId, String secondTaxId,
                             String firstOrganismName, String secondOrganismName, SortedSet<InteractionDetails> interactionDetails){
-        if (firstInteractor == null){
-            throw new IllegalArgumentException("The CCLine parameters need a non null first interactor.");
-        }
-        else if (secondInteractor == null){
-            throw new IllegalArgumentException("The CCLine parameters need a non null second interactor.");
-        }
-        else if (firstTaxId == null){
+        if (firstTaxId == null){
             throw new IllegalArgumentException("The CCLine parameters need a non null first taxId.");
         }
         else if (secondTaxId == null){
