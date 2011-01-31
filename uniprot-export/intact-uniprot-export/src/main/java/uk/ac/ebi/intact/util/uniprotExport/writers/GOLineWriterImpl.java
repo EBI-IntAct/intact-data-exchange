@@ -1,5 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
+import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
@@ -22,30 +24,36 @@ public class GOLineWriterImpl implements GOLineWriter{
     }
 
     @Override
-    public void writeGOLine(String uniprot1, String uniprot2, Set<String> pubmedIds) throws IOException {
-        // build a pipe separated list of pubmed IDs
-        StringBuffer pubmedBuffer = new StringBuffer();
-        writePubmedLine(pubmedIds, pubmedBuffer);
+    public void writeGOLine(GOParameters parameters) throws IOException {
+        if (parameters != null && parameters.getFirstProtein() != null
+                && parameters.getSecondProtein() != null && parameters.getPubmedIds() != null
+                && !parameters.getPubmedIds().isEmpty()){
+            // build a pipe separated list of pubmed IDs
+            StringBuffer pubmedBuffer = new StringBuffer();
+            writePubmedLine(parameters.getPubmedIds(), pubmedBuffer);
+            String uniprot1 = parameters.getFirstProtein();
+            String uniprot2 = parameters.getSecondProtein();
 
-        boolean self = false;
-        if (uniprot1.equals(uniprot2)){
-            self = true;
+            boolean self = false;
+            if (uniprot1.equals(uniprot2)){
+                self = true;
+            }
+
+            // generate the line
+            StringBuffer line = new StringBuffer();
+
+            writeGOLine(uniprot1, uniprot2, self, pubmedBuffer, line);
+
+            if (!self) {
+                // write the reverse
+
+                writeGOLine(uniprot2, uniprot1, self, pubmedBuffer, line);
+            }
+
+            // write into the GO file
+            writer.write(line.toString());
+            writer.flush();
         }
-
-        // generate the line
-        StringBuffer line = new StringBuffer();
-
-        writeGOLine(uniprot1, uniprot2, self, pubmedBuffer, line);
-
-        if (!self) {
-            // write the reverse
-
-            writeGOLine(uniprot2, uniprot1, self, pubmedBuffer, line);
-        }
-
-        // write into the GO file
-        writer.write(line.toString());
-        writer.flush();
     }
 
     private void writePubmedLine(Set<String> pubmedIds, StringBuffer sb){

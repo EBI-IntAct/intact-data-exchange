@@ -1,7 +1,8 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
+import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
+
 import java.io.IOException;
-import java.util.Set;
 
 /**
  * Interfae for the GOLine writers
@@ -13,7 +14,7 @@ import java.util.Set;
 
 public interface GOLineWriter {
 
-    public void writeGOLine(String uniprot1, String uniprot2, Set<String> pubmedIds) throws IOException;
+    public void writeGOLine(GOParameters parameters) throws IOException;
 
     public void close() throws IOException;
 }

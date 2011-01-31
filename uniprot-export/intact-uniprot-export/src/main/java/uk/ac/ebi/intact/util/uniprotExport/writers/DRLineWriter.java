@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
-import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameter;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public interface DRLineWriter {
 
-    public void writeDRLine(DRParameter parameters) throws IOException;
+    public void writeDRLine(DRParameters parameters) throws IOException;
 
     public void close() throws IOException;
 

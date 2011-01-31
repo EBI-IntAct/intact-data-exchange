@@ -8,12 +8,15 @@ package uk.ac.ebi.intact.util.uniprotExport.parameters;
  * @since <pre>31/01/11</pre>
  */
 
-public class DRParameter {
+public class DRParameters {
 
     public String uniprotAc;
     public int numberOfInteractions;
 
-    public DRParameter(String uniprotAc, int numberOfInteractions){
+    public DRParameters(String uniprotAc, int numberOfInteractions){
+        if (uniprotAc == null){
+            throw new IllegalArgumentException("A DR parameter must have a non null uniprot AC");
+        }
         this.uniprotAc = uniprotAc;
         this.numberOfInteractions = numberOfInteractions;
     }

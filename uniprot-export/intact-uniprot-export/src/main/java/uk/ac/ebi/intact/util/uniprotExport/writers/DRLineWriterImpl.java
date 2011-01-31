@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
-import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameter;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class DRLineWriterImpl implements DRLineWriter{
     }
 
     @Override
-    public void writeDRLine(DRParameter parameters) throws IOException {
+    public void writeDRLine(DRParameters parameters) throws IOException {
         if (parameters != null && parameters.getUniprotAc() != null){
             StringBuffer sb = new StringBuffer();
 

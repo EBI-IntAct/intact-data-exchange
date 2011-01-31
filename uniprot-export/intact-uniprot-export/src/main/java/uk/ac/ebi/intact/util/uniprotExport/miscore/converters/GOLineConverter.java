@@ -3,6 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore.converters;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.writers.GOLineWriter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.GOLineWriterImpl;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
@@ -48,7 +49,8 @@ public class GOLineConverter extends AbstractConverter {
             // build a pipe separated list of pubmed IDs
             Set<String> pubmedIds = extractPubmedIdsFrom(interaction);
 
-            writer.writeGOLine(uniprot1, uniprot2, pubmedIds);
+            GOParameters parameters = new GOParameters(uniprot1, uniprot2, pubmedIds);
+            writer.writeGOLine(parameters);
         }
     }
 

@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.converters;
 
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameter;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.writers.DRLineWriter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.DRLineWriterImpl;
 
@@ -53,7 +53,7 @@ public class DRLineConverter extends AbstractConverter {
                 }
             }
 
-            DRParameter parameter = new DRParameter(parent, numberInteractions);
+            DRParameters parameter = new DRParameters(parent, numberInteractions);
             writer.writeDRLine(parameter);
             interactors.removeAll(processedInteractors);
         }
