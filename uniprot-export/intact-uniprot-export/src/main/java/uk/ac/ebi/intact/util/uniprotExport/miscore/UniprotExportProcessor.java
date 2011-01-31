@@ -140,9 +140,11 @@ public class UniprotExportProcessor {
                 }
             }
 
-            DRParameters parameter = this.drConverter.convertInteractorToDRLine(parent, numberInteractions);
-            drWriter.writeDRLine(parameter);
-            interactors.removeAll(processedInteractors);
+            if (numberInteractions > 0){
+                DRParameters parameter = this.drConverter.convertInteractorToDRLine(parent, numberInteractions);
+                drWriter.writeDRLine(parameter);
+                interactors.removeAll(processedInteractors);
+            }
         }
 
         drWriter.close();
