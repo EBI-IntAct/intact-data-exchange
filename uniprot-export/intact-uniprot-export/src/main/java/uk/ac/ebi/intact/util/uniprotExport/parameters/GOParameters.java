@@ -40,23 +40,11 @@ public class GOParameters {
         return firstProtein;
     }
 
-    public void setFirstProtein(String firstProtein) {
-        this.firstProtein = firstProtein;
-    }
-
     public String getSecondProtein() {
         return secondProtein;
     }
 
-    public void setSecondProtein(String secondProtein) {
-        this.secondProtein = secondProtein;
-    }
-
     public Set<String> getPubmedIds() {
         return pubmedIds;
-    }
-
-    public void setPubmedIds(Set<String> pubmedIds) {
-        this.pubmedIds = pubmedIds;
     }
 }

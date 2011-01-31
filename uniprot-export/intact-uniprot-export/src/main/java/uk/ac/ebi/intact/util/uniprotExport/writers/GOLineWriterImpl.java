@@ -25,9 +25,7 @@ public class GOLineWriterImpl implements GOLineWriter{
 
     @Override
     public void writeGOLine(GOParameters parameters) throws IOException {
-        if (parameters != null && parameters.getFirstProtein() != null
-                && parameters.getSecondProtein() != null && parameters.getPubmedIds() != null
-                && !parameters.getPubmedIds().isEmpty()){
+        if (parameters != null){
             // build a pipe separated list of pubmed IDs
             StringBuffer pubmedBuffer = new StringBuffer();
             writePubmedLine(parameters.getPubmedIds(), pubmedBuffer);

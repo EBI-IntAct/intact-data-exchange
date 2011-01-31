@@ -23,7 +23,7 @@ public class DRLineWriterImpl implements DRLineWriter{
 
     @Override
     public void writeDRLine(DRParameters parameters) throws IOException {
-        if (parameters != null && parameters.getUniprotAc() != null){
+        if (parameters != null){
             StringBuffer sb = new StringBuffer();
 
             sb.append("DR   ");

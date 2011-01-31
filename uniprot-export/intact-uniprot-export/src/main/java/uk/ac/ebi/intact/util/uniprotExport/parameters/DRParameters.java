@@ -25,15 +25,7 @@ public class DRParameters {
         return uniprotAc;
     }
 
-    public void setUniprotAc(String uniprotAc) {
-        this.uniprotAc = uniprotAc;
-    }
-
     public int getNumberOfInteractions() {
         return numberOfInteractions;
-    }
-
-    public void setNumberOfInteractions(int numberOfInteractions) {
-        this.numberOfInteractions = numberOfInteractions;
     }
 }
