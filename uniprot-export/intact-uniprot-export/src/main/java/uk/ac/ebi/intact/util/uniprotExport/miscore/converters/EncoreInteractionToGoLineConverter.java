@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore.converters;
 
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParametersImpl;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -30,7 +31,7 @@ public class EncoreInteractionToGoLineConverter {
         return pubmedIds;
     }
 
-    public GOParametersImpl convertInteractionIntoGOParameters(EncoreInteraction interaction){
+    public GOParameters convertInteractionIntoGOParameters(EncoreInteraction interaction){
         String uniprot1 = interaction.getInteractorA(WriterUtils.UNIPROT);
         String uniprot2 = interaction.getInteractorB(WriterUtils.UNIPROT);
 
@@ -39,7 +40,7 @@ public class EncoreInteractionToGoLineConverter {
             Set<String> pubmedIds = extractPubmedIdsFrom(interaction);
 
             if (!pubmedIds.isEmpty()){
-                GOParametersImpl parameters = new GOParametersImpl(uniprot1, uniprot2, pubmedIds);
+                GOParameters parameters = new GOParametersImpl(uniprot1, uniprot2, pubmedIds);
 
                 return parameters;
             }

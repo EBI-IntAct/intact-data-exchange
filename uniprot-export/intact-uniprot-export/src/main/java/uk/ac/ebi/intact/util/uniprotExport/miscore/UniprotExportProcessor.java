@@ -7,11 +7,10 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.EncoreInteractionT
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.InteractorToDRLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.MiScoreFilterForUniprotExport;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParametersImpl;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParametersImpl;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParametersImpl;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.writers.*;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -57,17 +56,17 @@ public class UniprotExportProcessor {
 
     public void exportCCAndGOLines(IntActInteractionClusterScore clusterScore, String CCFile, String GOFile) throws IOException {
 
-        CCLineWriter ccWriter = new CCLineWriterImpl(CCFile);
-        GOLineWriter goWriter = new GOLineWriterImpl(GOFile);
+        CCLineWriter ccWriter = new CCLineWriterImpl(new FileWriter(CCFile));
+        GOLineWriter goWriter = new GOLineWriterImpl(new FileWriter(GOFile));
 
         for (Integer interactionId : this.filter.getInteractionsToBeExported()){
             EncoreInteraction interaction = clusterScore.getInteractionMapping().get(interactionId);
 
-            CCParametersImpl ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interaction, this.filter.getContext());
+            CCParameters ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interaction, this.filter.getContext());
 
             ccWriter.writeCCLine(ccParameters);
 
-            GOParametersImpl goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
+            GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
 
             goWriter.writeGOLine(goParameters);
         }
@@ -78,12 +77,12 @@ public class UniprotExportProcessor {
 
     public void exportCCLines(IntActInteractionClusterScore clusterScore, String CCFile) throws IOException {
 
-        CCLineWriter ccWriter = new CCLineWriterImpl(CCFile);
+        CCLineWriter ccWriter = new CCLineWriterImpl(new FileWriter(CCFile));
 
         for (Integer interactionId : this.filter.getInteractionsToBeExported()){
             EncoreInteraction interaction = clusterScore.getInteractionMapping().get(interactionId);
 
-            CCParametersImpl ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interaction, this.filter.getContext());
+            CCParameters ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interaction, this.filter.getContext());
 
             ccWriter.writeCCLine(ccParameters);
         }
@@ -93,12 +92,12 @@ public class UniprotExportProcessor {
 
     public void exportGOLines(IntActInteractionClusterScore clusterScore, String GOFile) throws IOException {
 
-        GOLineWriter goWriter = new GOLineWriterImpl(GOFile);
+        GOLineWriter goWriter = new GOLineWriterImpl(new FileWriter(GOFile));
 
         for (Integer interactionId : this.filter.getInteractionsToBeExported()){
             EncoreInteraction interaction = clusterScore.getInteractionMapping().get(interactionId);
 
-            GOParametersImpl goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
+            GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
 
             goWriter.writeGOLine(goParameters);
         }
@@ -107,7 +106,7 @@ public class UniprotExportProcessor {
     }
 
     public void exportDRLines(IntActInteractionClusterScore clusterScore, String DRFile) throws IOException {
-        DRLineWriter drWriter = new DRLineWriterImpl(DRFile);
+        DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
 
         Set<String> interactors = new HashSet(clusterScore.getInteractorMapping().keySet());
         Set<String> processedInteractors = new HashSet<String>();
@@ -141,7 +140,7 @@ public class UniprotExportProcessor {
             }
 
             if (numberInteractions > 0){
-                DRParametersImpl parameter = this.drConverter.convertInteractorToDRLine(parent, numberInteractions);
+                DRParameters parameter = this.drConverter.convertInteractorToDRLine(parent, numberInteractions);
                 drWriter.writeDRLine(parameter);
                 interactors.removeAll(processedInteractors);
             }
