@@ -12,9 +12,21 @@ import java.util.Set;
 
 public interface GOParameters {
 
+    /**
+     * The uniprot ac of the first protein
+     * @return
+     */
     public String getFirstProtein();
 
+    /**
+     * The uniprot ac of the second protein
+     * @return
+     */
     public String getSecondProtein();
 
+    /**
+     * The list of publication ids
+     * @return
+     */
     public Set<String> getPubmedIds();
 }

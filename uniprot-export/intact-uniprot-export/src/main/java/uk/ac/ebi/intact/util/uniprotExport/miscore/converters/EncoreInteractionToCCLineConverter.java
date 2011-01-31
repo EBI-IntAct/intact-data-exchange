@@ -6,7 +6,7 @@ import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParametersImpl;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.InteractionDetails;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.InteractionDetailsImpl;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.util.*;
@@ -38,7 +38,7 @@ public class EncoreInteractionToCCLineConverter {
         return new String [] {taxId, organismName};
     }
 
-    private SortedSet<InteractionDetails> sortInteractionDetails(EncoreInteraction interaction, MiClusterContext context){
+    private SortedSet<InteractionDetailsImpl> sortInteractionDetails(EncoreInteraction interaction, MiClusterContext context){
 
         Map<String, String> interactionToPubmed = interaction.getExperimentToPubmed();
         Map<String, List<String>> pubmedToInteraction = WriterUtils.invertMapOfTypeStringToString(interactionToPubmed);
@@ -46,7 +46,7 @@ public class EncoreInteractionToCCLineConverter {
         Map<Map.Entry<String, String>, Set<String>> distinctInformationDetails = collectDistinctInteractionDetails(interaction, context);
 
         Map<Map.Entry<String, String>, List<String>> method_typeToInteractions = WriterUtils.invertMapFromKeySelection(context.getInteractionToType_Method(), interactionToPubmed.keySet());
-        SortedSet<InteractionDetails> sortedInteractionDetails = new TreeSet<InteractionDetails>();
+        SortedSet<InteractionDetailsImpl> sortedInteractionDetails = new TreeSet<InteractionDetailsImpl>();
 
         for (Map.Entry<Map.Entry<String, String>, Set<String>> ip : distinctInformationDetails.entrySet()){
             String type = context.getMiTerms().get(ip.getKey().getValue());
@@ -80,12 +80,12 @@ public class EncoreInteractionToCCLineConverter {
             }
 
             if (!pubmedSpokeExpanded.isEmpty()){
-                InteractionDetails details = new InteractionDetails(type, method, true, pubmedSpokeExpanded);
+                InteractionDetailsImpl details = new InteractionDetailsImpl(type, method, true, pubmedSpokeExpanded);
                 sortedInteractionDetails.add(details);
             }
 
             if (!pubmedTrueBinary.isEmpty()){
-                InteractionDetails details = new InteractionDetails(type, method, false, pubmedSpokeExpanded);
+                InteractionDetailsImpl details = new InteractionDetailsImpl(type, method, false, pubmedSpokeExpanded);
                 sortedInteractionDetails.add(details);
             }
         }
@@ -147,7 +147,7 @@ public class EncoreInteractionToCCLineConverter {
             String organism2 = organismsB[1];
 
             // collect all pubmeds and spoke expanded information
-            SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
+            SortedSet<InteractionDetailsImpl> sortedInteractionDetails = sortInteractionDetails(interaction, context);
 
             return new CCParametersImpl(uniprot1, uniprot2, geneName1, geneName2, taxId1, taxId2, organism1, organism2, sortedInteractionDetails);
         }

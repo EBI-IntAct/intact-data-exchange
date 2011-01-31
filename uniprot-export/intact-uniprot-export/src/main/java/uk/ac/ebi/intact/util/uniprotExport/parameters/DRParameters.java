@@ -10,7 +10,15 @@ package uk.ac.ebi.intact.util.uniprotExport.parameters;
 
 public interface DRParameters {
 
+    /**
+     * The uniprot ac
+     * @return
+     */
     public String getUniprotAc();
 
+    /**
+     * The number of interactions
+     * @return
+     */
     public int getNumberOfInteractions();
 }

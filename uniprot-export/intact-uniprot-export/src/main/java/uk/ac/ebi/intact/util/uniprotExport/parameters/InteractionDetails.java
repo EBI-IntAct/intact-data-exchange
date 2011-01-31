@@ -3,142 +3,36 @@ package uk.ac.ebi.intact.util.uniprotExport.parameters;
 import java.util.Set;
 
 /**
- * Contains the details of a binary interaction (interaction type, detection method, list of pubmeds for spoke expanded data, list of pubmeds for non spoke expanded data)
+ * The interface to implement for interaction details
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>31/01/11</pre>
  */
 
-public class InteractionDetails implements Comparable<InteractionDetails>{
+public interface InteractionDetails extends Comparable<InteractionDetails> {
 
-    private String interactionType;
-    private String detectionMethod;
+    /**
+     * The interaction type
+     * @return
+     */
+    public String getInteractionType();
 
-    private boolean isSpokeExpanded;
+    /**
+     * The detection method
+     * @return
+     */
+    public String getDetectionMethod();
 
-    private Set<String> pubmedIds;
+    /**
+     * the boolean value to know if it is spoke expanded
+     * @return
+     */
+    public boolean isSpokeExpanded();
 
-    public InteractionDetails(String interactionType, String detectionMethod, boolean isSpokeExpanded,
-                              Set<String> pubmedIds){
-
-        if (interactionType == null){
-            throw  new IllegalArgumentException("The InteractionDetails must contain a non null interaction type.");
-        }
-        else if (detectionMethod == null){
-            throw  new IllegalArgumentException("The InteractionDetails must contain a non null detection method.");
-        }
-        else if (pubmedIds == null){
-            throw  new IllegalArgumentException("The InteractionDetails must contain a non null set of Pubmed Ids.");
-        }
-        else if (pubmedIds.isEmpty()){
-            throw  new IllegalArgumentException("The InteractionDetails must contain a non empty set of Pubmed Ids.");
-        }
-
-        this.interactionType = interactionType;
-        this.detectionMethod = detectionMethod;
-        this.isSpokeExpanded = isSpokeExpanded;
-        this.pubmedIds = pubmedIds;
-
-    }
-    @Override
-    public int compareTo(InteractionDetails o) {
-        final int BEFORE = -1;
-        final int EQUAL = 0;
-        final int AFTER = 1;
-
-        if ( this == o ) return EQUAL;
-
-        int comparison = this.detectionMethod.compareTo(o.getDetectionMethod());
-        if ( comparison != EQUAL ) {
-            if (this.isSpokeExpanded == o.isSpokeExpanded()){
-                return comparison;
-            }
-            else if (this.isSpokeExpanded && !o.isSpokeExpanded){
-                return BEFORE;
-            }
-            else {
-                return AFTER;
-            }
-        }
-
-        comparison = this.interactionType.compareTo(o.getInteractionType());
-        if ( comparison != EQUAL ) {
-            if (this.isSpokeExpanded == o.isSpokeExpanded()){
-                return comparison;
-            }
-            else if (this.isSpokeExpanded && !o.isSpokeExpanded){
-                return BEFORE;
-            }
-            else {
-                return AFTER;
-            }
-        }
-
-        if (this.isSpokeExpanded == o.isSpokeExpanded()){
-            return EQUAL;
-        }
-        else if (this.isSpokeExpanded && !o.isSpokeExpanded){
-            return BEFORE;
-        }
-        else {
-            return AFTER;
-        }
-    }
-
-    public String getInteractionType() {
-        return interactionType;
-    }
-
-    public String getDetectionMethod() {
-        return detectionMethod;
-    }
-
-    public boolean isSpokeExpanded() {
-        return isSpokeExpanded;
-    }
-
-    public Set<String> getPubmedIds() {
-        return pubmedIds;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        InteractionDetails details2 = (InteractionDetails) o;
-
-        if (!getDetectionMethod().equals(details2.getDetectionMethod()))
-        {
-            return false;
-        }
-        if (!getInteractionType().equals(details2.getInteractionType()))
-        {
-            return false;
-        }
-        if (isSpokeExpanded() != details2.isSpokeExpanded())
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result;
-        result = detectionMethod.hashCode();
-        result = 31 * result + interactionType.hashCode();
-        result = 31 * result + Boolean.valueOf(isSpokeExpanded).hashCode();
-        return result;
-    }
+    /**
+     * The list of pubmed ids
+     * @return
+     */
+    public Set<String> getPubmedIds();
 }

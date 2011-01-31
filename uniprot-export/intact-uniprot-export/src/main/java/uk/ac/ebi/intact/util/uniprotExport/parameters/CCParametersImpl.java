@@ -12,24 +12,12 @@ import java.util.*;
 
 public class CCParametersImpl implements CCParameters{
 
-    /**
-     * the uniprot AC of the first interactor
-     */
     private String firstInteractor;
 
-    /**
-     * the uniprot AC of the second interactor
-     */
     private String secondInteractor;
 
-    /**
-     * The gene name of the first interactor
-     */
     private String firstGeneName;
 
-    /**
-     * The gene name of the second interactor
-     */
     private String secondGeneName;
     private String firstTaxId;
     private String secondTaxId;
