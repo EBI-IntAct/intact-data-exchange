@@ -31,8 +31,8 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
 
     private Map<String, String> geneNames = new HashMap<String, String>();
     private Map<String, String> miTerms = new HashMap<String, String>();
-    private Map<String, Map.Entry<String,String>> spokeExpandedInteractions = new HashMap<String, Map.Entry<String,String>>();;
-    private List<String> colocalizations = new ArrayList<String>();
+    private Map<String, Map.Entry<String,String>> interactionToType_Method = new HashMap<String, Map.Entry<String,String>>();;
+    private List<String> spokeExpandedInteractions = new ArrayList<String>();
 
     public IntActInteractionClusterScore(){
         super();
@@ -281,18 +281,18 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         return miTerms;
     }
 
-    public Map<String, Map.Entry<String, String>> getSpokeExpandedInteractions() {
-        return spokeExpandedInteractions;
+    public Map<String, Map.Entry<String, String>> getInteractionToType_Method() {
+        return interactionToType_Method;
     }
 
-    public List<String> getColocalizations() {
-        return colocalizations;
+    public List<String> getSpokeExpandedInteractions() {
+        return spokeExpandedInteractions;
     }
 
     public void clear(){
         this.getGeneNames().clear();
-        this.getSpokeExpandedInteractions().clear();
-        this.colocalizations.clear();
+        this.getInteractionToType_Method().clear();
+        this.spokeExpandedInteractions.clear();
         this.getMiTerms().clear();
         this.getInteractionMapping().clear();
         this.getInteractorMapping().clear();

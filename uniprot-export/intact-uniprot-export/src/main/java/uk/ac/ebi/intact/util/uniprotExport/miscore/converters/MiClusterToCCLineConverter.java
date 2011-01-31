@@ -22,10 +22,10 @@ import java.util.*;
  * @since <pre>27/01/11</pre>
  */
 
-public class CCLineConverter extends AbstractConverter {
+public class MiClusterToCCLineConverter extends AbstractConverter {
 
     private CCLineWriter writer;
-    public CCLineConverter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
+    public MiClusterToCCLineConverter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
         super(clusterScore, fileName);
         writer = new CCLineWriterImpl(fileName);
     }
@@ -105,7 +105,7 @@ public class CCLineConverter extends AbstractConverter {
 
         Map<Map.Entry<String, String>, Set<String>> distinctInformationDetails = collectDistinctInteractionDetails(interaction);
 
-        Map<Map.Entry<String, String>, List<String>> spokeExpandedInteractions = WriterUtils.invertMapFromKeySelection(this.getClusterScore().getSpokeExpandedInteractions(), interactionToPubmed.keySet());
+        Map<Map.Entry<String, String>, List<String>> method_typeToInteractions = WriterUtils.invertMapFromKeySelection(this.getClusterScore().getInteractionToType_Method(), interactionToPubmed.keySet());
         SortedSet<InteractionDetails> sortedInteractionDetails = new TreeSet<InteractionDetails>();
 
         for (Map.Entry<Map.Entry<String, String>, Set<String>> ip : distinctInformationDetails.entrySet()){
@@ -118,20 +118,20 @@ public class CCLineConverter extends AbstractConverter {
             Set<String> pubmedSpokeExpanded = new HashSet<String>(duplicatedPubmedIds.size());
             Set<String> pubmedTrueBinary = new HashSet<String>(duplicatedPubmedIds.size());
 
-            List<String> spokeExpandedInteractionAcs = spokeExpandedInteractions.get(ip);
+            List<String> totalInteractions = method_typeToInteractions.get(ip);
 
             for (String pubmedId : duplicatedPubmedIds){
-                List<String> interactionAcs = pubmedToInteraction.get(pubmedId);
+                List<String> interactionForPubmedAndTypeAndMethod = new ArrayList(CollectionUtils.intersection(pubmedToInteraction.get(pubmedId), totalInteractions));
 
-                boolean isSpokeExpanded = false;
+                int numberSpokeExpanded = 0;
 
-                for (String intAc : interactionAcs){
-                    if (spokeExpandedInteractionAcs.contains(intAc)){
-                        isSpokeExpanded = true;
+                for (String intAc : interactionForPubmedAndTypeAndMethod){
+                    if (this.clusterScore.getSpokeExpandedInteractions().contains(intAc)){
+                        numberSpokeExpanded++;
                     }
                 }
 
-                if (isSpokeExpanded){
+                if (numberSpokeExpanded == interactionForPubmedAndTypeAndMethod.size()){
                     pubmedSpokeExpanded.add(pubmedId);
                 }
                 else {

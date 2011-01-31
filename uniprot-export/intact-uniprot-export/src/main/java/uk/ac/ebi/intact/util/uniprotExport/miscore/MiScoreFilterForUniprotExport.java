@@ -8,9 +8,9 @@ import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.CCLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.DRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.GOLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.MiClusterToCCLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.MiClusterToDRLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.MiClusterToGOLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.IntactQueryProvider;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractorForMIScore;
@@ -41,7 +41,6 @@ public class MiScoreFilterForUniprotExport {
     private static final double EXPORT_THRESHOLD = 0.43;
     private static final String CONFIDENCE_NAME = "intactPsiscore";
     private static final String INTACT = "intact";
-    private static final String COLOCALIZATION = "MI:0403";
     private static final String UNIPROT = "uniprotkb";
     private final static String FEATURE_CHAIN = "-PRO_";
 
@@ -126,13 +125,12 @@ public class MiScoreFilterForUniprotExport {
                         List<InteractionType> interactionTypes = interaction.getInteractionTypes();
                         String typeMi = interactionTypes.iterator().next().getIdentifier();
 
+                        Map.Entry<String, String> entry = new DefaultMapEntry(detectionMI, typeMi);
+                        this.interactionClusterScore.getInteractionToType_Method().put(intactAc, entry);
+
                         if (!interaction.getExpansionMethods().isEmpty()){
 
-                            Map.Entry<String, String> entry = new DefaultMapEntry(detectionMI, typeMi);
-                            this.interactionClusterScore.getSpokeExpandedInteractions().put(intactAc, entry);
-                        }
-                        else if (COLOCALIZATION.equals(detectionMI)){
-                            this.interactionClusterScore.getColocalizations().add(intactAc);
+                            this.interactionClusterScore.getSpokeExpandedInteractions().add(intactAc);
                         }
                     }
                 }
@@ -231,13 +229,13 @@ public class MiScoreFilterForUniprotExport {
             computeMiScoreInteractionEligibleUniprotExport(mitab);
             this.interactionsToBeExported = extractor.processExportWithMiClusterScore(this.interactionClusterScore, true);
 
-            DRLineConverter drWriter = new DRLineConverter(this.interactionClusterScore, drFile);
+            MiClusterToDRLineConverter drWriter = new MiClusterToDRLineConverter(this.interactionClusterScore, drFile);
             drWriter.write();
 
-            CCLineConverter ccWriter = new CCLineConverter(this.interactionClusterScore, ccFile);
+            MiClusterToCCLineConverter ccWriter = new MiClusterToCCLineConverter(this.interactionClusterScore, ccFile);
             ccWriter.write();
 
-            GOLineConverter goWriter = new GOLineConverter(this.interactionClusterScore, goFile);
+            MiClusterToGOLineConverter goWriter = new MiClusterToGOLineConverter(this.interactionClusterScore, goFile);
             goWriter.write();
 
             //this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);

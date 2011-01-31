@@ -21,10 +21,10 @@ import java.util.Set;
  * @since <pre>28/01/11</pre>
  */
 
-public class GOLineConverter extends AbstractConverter {
+public class MiClusterToGOLineConverter extends AbstractConverter {
 
     private GOLineWriter writer;
-    public GOLineConverter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
+    public MiClusterToGOLineConverter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
         super(clusterScore, fileName);
         this.writer = new GOLineWriterImpl(fileName);
     }

@@ -18,10 +18,10 @@ import java.util.Set;
  * @since <pre>28/01/11</pre>
  */
 
-public class DRLineConverter extends AbstractConverter {
+public class MiClusterToDRLineConverter extends AbstractConverter {
 
     private DRLineWriter writer;
-    public DRLineConverter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
+    public MiClusterToDRLineConverter(IntActInteractionClusterScore clusterScore, String fileName) throws IOException {
         super(clusterScore, fileName);
         this.writer = new DRLineWriterImpl(fileName);
     }

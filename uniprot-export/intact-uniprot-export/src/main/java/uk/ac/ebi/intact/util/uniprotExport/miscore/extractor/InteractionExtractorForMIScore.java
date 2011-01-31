@@ -27,6 +27,7 @@ public class InteractionExtractorForMIScore extends LineExport {
     private IntactQueryProvider queryProvider;
     private static final double EXPORT_THRESHOLD = 0.43;
     private static final String CONFIDENCE_NAME = "intactPsiscore";
+    private static final String COLOCALIZATION = "MI:0403";
 
     public InteractionExtractorForMIScore(){
         this.queryProvider = new IntactQueryProvider();
@@ -859,8 +860,8 @@ public class InteractionExtractorForMIScore extends LineExport {
      */
     public List<Integer> processExportWithMiClusterScore(IntActInteractionClusterScore clusterScore, boolean filterBinary) throws UniprotExportException {
         List<Integer> interactionsPossibleToExport = new ArrayList<Integer>();
-        Map<String, Map.Entry<String, String>> spokeExpandedInteractions = clusterScore.getSpokeExpandedInteractions();
-        List<String> colocalizations = clusterScore.getColocalizations();
+        Map<String, Map.Entry<String, String>> interactionType_Method = clusterScore.getInteractionToType_Method();
+        List<String> spokeExpandedInteractions = clusterScore.getSpokeExpandedInteractions();
 
         for (Map.Entry<Integer, EncoreInteraction> entry : clusterScore.getInteractionMapping().entrySet()){
             EncoreInteraction encore = entry.getValue();
@@ -882,9 +883,11 @@ public class InteractionExtractorForMIScore extends LineExport {
 
                 for (String ac : intactInteractions){
                     if (filterBinary){
-                        if (!spokeExpandedInteractions.containsKey(ac)){
+                        if (!spokeExpandedInteractions.contains(ac)){
 
-                            if (!colocalizations.contains(ac)){
+                            String method = interactionType_Method.get(ac).getKey();
+
+                            if (!method.equals(COLOCALIZATION)){
                                 interactionsPossibleToExport.add(entry.getKey());
                                 break;
                             }
