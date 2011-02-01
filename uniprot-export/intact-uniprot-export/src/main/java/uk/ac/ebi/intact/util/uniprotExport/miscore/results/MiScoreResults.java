@@ -1,13 +1,10 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.results;
 
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
-
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * TODO comment this
+ * Results of the uniprot export using mi cluster score
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

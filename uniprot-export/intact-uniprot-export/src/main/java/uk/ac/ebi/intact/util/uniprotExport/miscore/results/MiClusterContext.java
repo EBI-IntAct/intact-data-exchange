@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO comment this
+ * Context of the cluster
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
