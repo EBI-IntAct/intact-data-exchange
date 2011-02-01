@@ -248,6 +248,7 @@ public class IntactFilter implements InteractionFilter{
 
                             if (uniprotA != null && uniprotB != null){
 
+                                FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
                                 binaryInteractions.add(binary);
                             }
                         }

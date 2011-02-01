@@ -4,16 +4,15 @@ import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.QueryFactory;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -112,7 +111,7 @@ public class MitabFilter implements InteractionFilter{
                     if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
                         interactionToProcess.add(interaction);
 
-                        processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+                        FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
                         processMiTerms(interaction, context);
 
                         List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
@@ -158,54 +157,6 @@ public class MitabFilter implements InteractionFilter{
                 miTerms.put(type.getIdentifier(), methodName);
             }
         }
-    }
-    private void processGeneNames(ExtendedInteractor interactorA, String intactA, ExtendedInteractor interactorB, String intactB, MiClusterContext context) {
-        String geneNameA = retrieveInteractorGeneName(interactorA);
-        String geneNameB = retrieveInteractorGeneName(interactorB);
-
-        Map<String, String> geneNames = context.getGeneNames();
-
-        if (!geneNames.containsKey(geneNameA)){
-            context.getGeneNames().put(intactA, geneNameA);
-        }
-        if (!geneNames.containsKey(geneNameB)){
-            context.getGeneNames().put(intactB, geneNameB);
-        }
-    }
-
-    private String retrieveInteractorGeneName(ExtendedInteractor interactor){
-        Collection<Alias> aliases = interactor.getAliases();
-        String geneName = null;
-
-        if (aliases.isEmpty()) {
-
-            Collection<CrossReference> otherIdentifiers = interactor.getAlternativeIdentifiers();
-            // then look for locus
-            String locusName = null;
-            String orf = null;
-
-            for (CrossReference ref : otherIdentifiers){
-                if (UNIPROT.equalsIgnoreCase(ref.getDatabase())){
-                    if (CvAliasType.LOCUS_NAME.equalsIgnoreCase(ref.getText())){
-                        locusName = ref.getIdentifier();
-                    }
-                    else if (CvAliasType.ORF_NAME.equalsIgnoreCase(ref.getText())){
-                        orf = ref.getIdentifier();
-                    }
-                }
-            }
-
-            geneName = locusName != null ? locusName : orf;
-
-        } else {
-            geneName = aliases.iterator().next().getName();
-        }
-
-        if( geneName == null ) {
-            geneName = "-";
-        }
-
-        return geneName;
     }
 
     private double getMiClusterScoreFor(EncoreInteraction interaction){
