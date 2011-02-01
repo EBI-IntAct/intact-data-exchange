@@ -68,6 +68,8 @@
                                 <argument>${ccfile}</argument>
                                 <!-- The name of the GO file  -->
                                 <argument>${gofile}</argument>
+                                <!-- The name of the database  -->
+                                <argument>${database}</argument>
                             </arguments>
                         </configuration>
                     </plugin>

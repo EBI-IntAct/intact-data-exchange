@@ -27,7 +27,7 @@ public class UniprotExporter {
 
         // Six possible arguments
         if( args.length != 6 ) {
-            System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <goFile>" );
+            System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <goFile> <database>" );
             System.err.println( "Usage: <rule> is the type of rule we want to use to export the interaction to uniprot. " +
                     "Can be 'detection_method' if we want the rules based on detection method or 'mi_score' if we want the rules based on mi score" );
             System.err.println( "Usage: <source> is the source of the binary interactions we want to export." +
@@ -36,6 +36,7 @@ public class UniprotExporter {
             System.err.println( "Usage: <drFile> the name of the file which will contain the DR lines");
             System.err.println( "Usage: <ccFile> the name of the file which will contain the CC lines");
             System.err.println( "Usage: <goFile> the name of the file which will contain the GO lines");
+            System.err.println( "Usage: <database> the database instance which will be used to extract supplementary information");
 
             System.exit( 1 );
         }
@@ -52,6 +53,7 @@ public class UniprotExporter {
         String drFile = args[2];
         String ccFile = args[3];
         String goFile = args[4];
+        String database = args[5];
 
         if (sourceType.contains(":")){
             int index = args[1].indexOf(":");
@@ -75,6 +77,8 @@ public class UniprotExporter {
         System.out.println( "CC file = " + ccFile );
         System.out.println( "GO file = " + goFile );
 
+        System.out.println( "database = " + database );
+
         if (mitabFile != null){
             System.out.println( "MITAB file = " + mitabFile );
         }
@@ -89,7 +93,6 @@ public class UniprotExporter {
 
         UniprotExportProcessor processor = new UniprotExportProcessor(filter);
 
-        String database = "enzpro";
         IntactContext.initContext(new String[]{"/META-INF/" + database + ".spring.xml"});
 
         try {
