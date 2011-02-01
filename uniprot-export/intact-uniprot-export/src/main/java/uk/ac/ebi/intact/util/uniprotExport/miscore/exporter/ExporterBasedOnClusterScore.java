@@ -2,13 +2,12 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is extracting interactions in Intact which are only PPI interactions, non negative and dr-uniprot-export annotation is taken into account.
@@ -19,13 +18,13 @@ import java.util.Map;
  * @since <pre>16-Sep-2010</pre>
  */
 
-public class ExtractorBasedOnClusterScore extends LineExport {
+public class ExporterBasedOnClusterScore extends LineExport implements InteractionExporter{
 
     private static final double EXPORT_THRESHOLD = 0.43;
     private static final String CONFIDENCE_NAME = "intactPsiscore";
     private static final String COLOCALIZATION = "MI:0403";
 
-    public ExtractorBasedOnClusterScore(){
+    public ExporterBasedOnClusterScore(){
     }
 
     /**
@@ -48,14 +47,15 @@ public class ExtractorBasedOnClusterScore extends LineExport {
     /**
      * For each binary interaction in the intactMiClusterScore : filter on a threshold value of the score and then, depending on 'filterBinary',
      * will add a filter on true binary interaction
-     * @param context
-     * @param miScore
      * @param filterBinary
      * @return
      * @throws UniprotExportException
      */
-    public List<Integer> processExportWithMiClusterScore(MiClusterContext context, IntActInteractionClusterScore miScore, boolean filterBinary) throws UniprotExportException {
-        List<Integer> interactionsPossibleToExport = new ArrayList<Integer>();
+    public Set<Integer> processExport(MiScoreResults results, boolean filterBinary) throws UniprotExportException {
+        MiClusterContext context = results.getClusterContext();
+        IntActInteractionClusterScore miScore = results.getClusterScore();
+
+        Set<Integer> interactionsPossibleToExport = new HashSet<Integer>();
         Map<String, Map.Entry<String, String>> interactionType_Method = context.getInteractionToType_Method();
         List<String> spokeExpandedInteractions = context.getSpokeExpandedInteractions();
 
@@ -97,5 +97,10 @@ public class ExtractorBasedOnClusterScore extends LineExport {
         }
 
         return interactionsPossibleToExport;
+    }
+
+    @Override
+    public void exportInteractions(MiScoreResults results) throws UniprotExportException {
+        results.setInteractionsToExport(processExport(results, true));
     }
 }

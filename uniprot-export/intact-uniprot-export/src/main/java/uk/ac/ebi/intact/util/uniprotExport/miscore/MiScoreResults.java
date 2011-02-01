@@ -3,6 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -35,6 +36,19 @@ public class MiScoreResults {
         this.interactionsToExport = interactionsToExport;
     }
 
+    public MiScoreResults(IntActInteractionClusterScore clusterScore, MiClusterContext clusterContext){
+        if (clusterScore == null){
+             throw  new IllegalArgumentException("The mi cluster object must be non null.");
+        }
+        if (clusterContext == null){
+             throw  new IllegalArgumentException("The mi cluster context must be non null.");
+        }
+
+        this.clusterContext = clusterContext;
+        this.clusterScore = clusterScore;
+        this.interactionsToExport = new HashSet<Integer>();
+    }
+
     public IntActInteractionClusterScore getClusterScore() {
         return clusterScore;
     }
@@ -45,5 +59,11 @@ public class MiScoreResults {
 
     public Set<Integer> getInteractionsToExport() {
         return interactionsToExport;
+    }
+
+    public void setInteractionsToExport(Set<Integer> interactionsToExport) {
+        if (interactionsToExport != null){
+            this.interactionsToExport = interactionsToExport;
+        }
     }
 }

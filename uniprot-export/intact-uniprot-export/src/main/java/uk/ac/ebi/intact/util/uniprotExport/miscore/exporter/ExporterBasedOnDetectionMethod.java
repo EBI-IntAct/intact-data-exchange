@@ -5,6 +5,8 @@ import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.IntactInteractionFilter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 
@@ -21,14 +23,11 @@ import java.util.*;
  * @since <pre>01/02/11</pre>
  */
 
-public class ExtractorBasedOnDetectionMethod extends LineExport{
+public class ExporterBasedOnDetectionMethod extends LineExport implements InteractionExporter{
 
     private QueryFactory queryProvider;
-    private static final double EXPORT_THRESHOLD = 0.43;
-    private static final String CONFIDENCE_NAME = "intactPsiscore";
-    private static final String COLOCALIZATION = "MI:0403";
 
-    public ExtractorBasedOnDetectionMethod(){
+    public ExporterBasedOnDetectionMethod(){
         this.queryProvider = new QueryFactory();
     }
 
@@ -123,7 +122,7 @@ public class ExtractorBasedOnDetectionMethod extends LineExport{
      * @param cluster : the cluster containing the interactions
      * @param eligibleInteractions : the list of eligible encore interaction ids for uniprot export
      */
-    private void processEligibleExperiments(IntActInteractionClusterScore cluster, List<Integer> eligibleInteractions) {
+    private void processEligibleExperiments(IntActInteractionClusterScore cluster, Set<Integer> eligibleInteractions) {
 
         // process each interaction of the list
         for (Map.Entry<Integer, EncoreInteraction> interactionEntry : cluster.getInteractionMapping().entrySet()) {
@@ -264,44 +263,12 @@ public class ExtractorBasedOnDetectionMethod extends LineExport{
      * @throws SQLException
      * @throws IOException
      */
-    public List<Integer> extractEligibleInteractionsFrom(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
+    public Set<Integer> extractEligibleInteractionsFrom(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
-        List<Integer> eligibleInteractions = new ArrayList<Integer>();
+        Set<Integer> eligibleInteractions = new HashSet<Integer>();
 
         processEligibleExperiments(cluster, eligibleInteractions);
-
-        FileWriter writer = new FileWriter(fileForListOfInteractions);
-
-        for (Integer id : eligibleInteractions){
-            EncoreInteraction interaction = cluster.getInteractionMapping().get(id);
-
-            Map<String, String> refs = interaction.getExperimentToPubmed();
-            for (String ref : refs.keySet()){
-                writer.write(ref + "\n");
-                writer.flush();
-            }
-        }
-
-        writer.close();
-        return eligibleInteractions;
-    }
-
-    /**
-     * Collect all interactions from released experiments and then apply a filter on non uniprot proteins.
-     * It will apply the current rule for uniprot export and return the list of interactions which passed all the filters
-     * @param cluster
-     * @param fileForListOfInteractions
-     * @return
-     * @throws SQLException
-     * @throws IOException
-     */
-    public List<Integer> filterNoUniprotProteinsAndExtractEligibleInteractions(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
-
-        System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
-        List<Integer> eligibleInteractions = new ArrayList<Integer>();
-
-        filterNoUniprotProteinsAndProcessEligibleExperiments(cluster, eligibleInteractions);
 
         FileWriter writer = new FileWriter(fileForListOfInteractions);
 
@@ -346,5 +313,14 @@ public class ExtractorBasedOnDetectionMethod extends LineExport{
         writer.close();
 
         return eligibleInteractions;
+    }
+
+    @Override
+    public void exportInteractions(MiScoreResults results) throws UniprotExportException {
+        Set<Integer> eligibleInteractions = new HashSet<Integer>();
+
+        processEligibleExperiments(results.getClusterScore(), eligibleInteractions);
+
+        results.setInteractionsToExport(eligibleInteractions);
     }
 }

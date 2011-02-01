@@ -12,7 +12,7 @@ import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.ExtractorBasedOnDetectionMethod;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.ExporterBasedOnDetectionMethod;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActFileMiScoreDistribution;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
@@ -43,14 +43,14 @@ public class IntactInteractionFilter {
 
     public static final String UNIPROT_DATABASE = "uniprotkb";
 
-    private ExtractorBasedOnDetectionMethod extractor;
+    private ExporterBasedOnDetectionMethod extractor;
 
     /**
      * we create a new IntactInteractionFilter
      */
     public IntactInteractionFilter(){
         this.interactionConverter = new Intact2BinaryInteractionConverter();
-        extractor = new ExtractorBasedOnDetectionMethod();
+        extractor = new ExporterBasedOnDetectionMethod();
     }
 
     /**
@@ -511,7 +511,7 @@ public class IntactInteractionFilter {
      * @param fileContainingDataExported : the files for the score results of the interactions exported in uniprot
      * @param fileContainingDataNotExported : the files for the score results of the interactions not exported in uniprot
      */
-    public void extractComputedMiScoresFor(List<Integer> interactionIds, String fileContainingDataExported, String fileContainingDataNotExported, IntActInteractionClusterScore clusterScore){
+    public void extractComputedMiScoresFor(Set<Integer> interactionIds, String fileContainingDataExported, String fileContainingDataNotExported, IntActInteractionClusterScore clusterScore){
 
         System.out.println(interactionIds.size() + " interactions in IntAct will be processed.");
 
@@ -600,7 +600,7 @@ public class IntactInteractionFilter {
         MiScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
         results.getClusterScore().saveScores(fileTotal);
 
-        List<Integer> exportedBinaryInteractions = extractor.extractEligibleInteractionsFrom(results.getClusterScore(), fileInteractionExported);
+        Set<Integer> exportedBinaryInteractions = extractor.extractEligibleInteractionsFrom(results.getClusterScore(), fileInteractionExported);
         results.getInteractionsToExport().addAll(exportedBinaryInteractions);
 
         System.out.println("export interactions from intact");
@@ -619,7 +619,7 @@ public class IntactInteractionFilter {
         MiScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
         results.getClusterScore().saveScores(fileTotal);
 
-        List<Integer> exportedInteractions = extractor.extractEligibleInteractionsFrom(results.getClusterScore(), fileInteractionEligible);
+        Set<Integer> exportedInteractions = extractor.extractEligibleInteractionsFrom(results.getClusterScore(), fileInteractionEligible);
         results.getInteractionsToExport().addAll(exportedInteractions);
 
         System.out.println("export binary interactions from intact");
@@ -637,7 +637,7 @@ public class IntactInteractionFilter {
         MiScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
         results.getClusterScore().saveScores(fileTotal);
 
-        List<Integer> exportedInteractions = extractor.extractEligibleInteractionsFrom(results.getClusterScore(), fileInteractionEligible);
+        Set<Integer> exportedInteractions = extractor.extractEligibleInteractionsFrom(results.getClusterScore(), fileInteractionEligible);
         results.getInteractionsToExport().addAll(exportedInteractions);
 
         System.out.println("export binary interactions from intact");
