@@ -8,12 +8,20 @@
     </parent>
 
     <artifactId>intact-mi-cluster-score</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>2.1.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
 
     <name>IntAct Data Exchange :: Intact MI cluster score</name>
     <description>IntAct CC/DR line export for UniProt using the Mi cluster score</description>
+
+    <properties>
+        <rule>intact</rule>
+        <source>mi_score</source>
+        <drfile>$INTACT/local/data/released/current/various/uniprotlinks.dat</drfile>
+        <ccfile>$INTACT/local/data/released/current/various/uniprotcomments.dat</ccfile>
+        <gofile>$INTACT/local/data/released/current/various/gene_association.goa_intact.gz</gofile>
+    </properties>
 
     <build>
         <resources>
@@ -26,7 +34,7 @@
 
     <profiles>
         <profile>
-            <id>compute-mi-score</id>
+            <id>uniprot-export</id>
 
             <build>
                 <plugins>
@@ -49,17 +57,17 @@
                                 <!-- automatically creates the classpath using all project dependencies,
                                      also adding the project build directory -->
                                 <classpath/>
-                                <argument>uk.ac.ebi.intact.dataexchange.uniprotexport.MiScoreComputing</argument>
-                                <!-- The file which will contain the mi-scores-->
-                                <argument>${file1}</argument>
-                                <!-- The file which will contain the mi scores of the interactions currently exoirted in uniprot -->
-                                <argument>${file2}</argument>
-                                <!-- The file which will contain the mi scores of the data not exported in uniprot -->
-                                <argument>${file3}</argument>
-                                <!-- The file which will contain the list of interaction ac which are eligible for a uniprot export-->
-                                <argument>${file4}</argument>
-                                <!-- The file which will contain the list of interaction ac which are currently exported in uniprot  -->
-                                <argument>${file5}</argument>
+                                <argument>uk.ac.ebi.intact.dataexchange.uniprotexport.UniprotExporter</argument>
+                                <!-- The export rules (detection_method or mi_score)-->
+                                <argument>${rule}</argument>
+                                <!-- The source of the binary interactions (intact or mitab:fileName) -->
+                                <argument>${source}</argument>
+                                <!-- The name of the DR file -->
+                                <argument>${drfile}</argument>
+                                <!-- The name of the CC file-->
+                                <argument>${ccfile}</argument>
+                                <!-- The name of the GO file  -->
+                                <argument>${gofile}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
