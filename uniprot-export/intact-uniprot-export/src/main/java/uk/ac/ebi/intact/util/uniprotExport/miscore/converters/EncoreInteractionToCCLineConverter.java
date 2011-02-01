@@ -64,7 +64,7 @@ public class EncoreInteractionToCCLineConverter {
         Map<Map.Entry<String, String>, Set<String>> distinctInformationDetails = collectDistinctInteractionDetails(interaction, context);
 
         // map which associates a couple {interaction detection method, interaction type} to a set of IntAct interaction Acs
-        Map<Map.Entry<String, String>, List<String>> method_typeToInteractions = WriterUtils.invertMapFromKeySelection(context.getInteractionToType_Method(), interactionToPubmed.keySet());
+        Map<Map.Entry<String, String>, List<String>> method_typeToInteractions = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), interactionToPubmed.keySet());
 
         // the list with the interaction details
         SortedSet<InteractionDetails> sortedInteractionDetails = new TreeSet<InteractionDetails>();

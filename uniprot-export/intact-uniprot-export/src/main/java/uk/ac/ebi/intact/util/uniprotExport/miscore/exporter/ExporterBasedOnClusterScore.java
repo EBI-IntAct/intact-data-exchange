@@ -56,8 +56,8 @@ public class ExporterBasedOnClusterScore implements InteractionExporter{
         IntActInteractionClusterScore miScore = results.getClusterScore();
 
         Set<Integer> interactionsPossibleToExport = new HashSet<Integer>();
-        Map<String, Map.Entry<String, String>> interactionType_Method = context.getInteractionToType_Method();
-        List<String> spokeExpandedInteractions = context.getSpokeExpandedInteractions();
+        Map<String, Map.Entry<String, String>> interactionType_Method = context.getInteractionToMethod_type();
+        Set<String> spokeExpandedInteractions = context.getSpokeExpandedInteractions();
 
         for (Map.Entry<Integer, EncoreInteraction> entry : miScore.getInteractionMapping().entrySet()){
             EncoreInteraction encore = entry.getValue();

@@ -315,7 +315,7 @@ public class IntactFilter implements InteractionFilter{
             context.getMiTerms().put(typeMi, interactionTypes.iterator().next().getText());
         }
 
-        context.getInteractionToType_Method().put(interactionAc, new DefaultMapEntry(detectionMI, typeMi));
+        context.getInteractionToMethod_type().put(interactionAc, new DefaultMapEntry(detectionMI, typeMi));
 
         if (toBinary.size() > 1){
 

@@ -121,7 +121,7 @@ public class MitabFilter implements InteractionFilter{
                         String typeMi = interactionTypes.iterator().next().getIdentifier();
 
                         Map.Entry<String, String> entry = new DefaultMapEntry(detectionMI, typeMi);
-                        context.getInteractionToType_Method().put(intactAc, entry);
+                        context.getInteractionToMethod_type().put(intactAc, entry);
 
                         if (!interaction.getExpansionMethods().isEmpty()){
 

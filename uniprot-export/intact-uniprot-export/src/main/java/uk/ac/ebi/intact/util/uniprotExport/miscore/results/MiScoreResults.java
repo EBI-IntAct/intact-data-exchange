@@ -46,14 +46,26 @@ public class MiScoreResults {
         this.interactionsToExport = new HashSet<Integer>();
     }
 
+    /**
+     *
+     * @return the cluster with computed mi scores for each interaction
+     */
     public IntActInteractionClusterScore getClusterScore() {
         return clusterScore;
     }
 
+    /**
+     *
+     * @return the context of the cluster
+     */
     public MiClusterContext getClusterContext() {
         return clusterContext;
     }
 
+    /**
+     *
+     * @return the list of Encore identifiers of the interactions which will be exported
+     */
     public Set<Integer> getInteractionsToExport() {
         return interactionsToExport;
     }
