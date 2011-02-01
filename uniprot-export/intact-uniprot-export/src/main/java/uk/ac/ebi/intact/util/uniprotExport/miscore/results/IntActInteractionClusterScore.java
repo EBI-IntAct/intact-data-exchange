@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.util.uniprotExport.miscore.extension;
+package uk.ac.ebi.intact.util.uniprotExport.miscore.results;
 
 import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.PsimiTabWriter;

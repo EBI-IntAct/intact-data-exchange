@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.util.uniprotExport.miscore;
+package uk.ac.ebi.intact.util.uniprotExport.miscore.results;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore;
 
-import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 
 import java.util.Set;
 

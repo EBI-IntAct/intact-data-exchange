@@ -4,7 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.MiClusterContext;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParametersImpl;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.InteractionDetails;

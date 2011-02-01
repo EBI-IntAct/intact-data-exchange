@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.util.uniprotExport.miscore.extractor;
+package uk.ac.ebi.intact.util.uniprotExport.miscore.filter;
 
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import psidev.psi.mi.tab.model.*;
@@ -8,10 +8,12 @@ import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.MiClusterContext;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractor;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.QueryFactory;
 
 import java.io.File;
 import java.io.FileInputStream;

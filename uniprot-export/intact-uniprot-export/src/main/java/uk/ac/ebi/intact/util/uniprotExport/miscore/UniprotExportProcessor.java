@@ -5,7 +5,7 @@ import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.EncoreInteractionToCCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.EncoreInteractionToGoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.InteractorToDRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.MitabInteractionFilter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.MitabInteractionFilter;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;

@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.util.uniprotExport.miscore.extractor;
+package uk.ac.ebi.intact.util.uniprotExport.miscore.filter;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
@@ -10,10 +10,11 @@ import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.MiClusterContext;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActFileMiScoreDistribution;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractor;
 
 import java.io.*;
 import java.sql.SQLException;
