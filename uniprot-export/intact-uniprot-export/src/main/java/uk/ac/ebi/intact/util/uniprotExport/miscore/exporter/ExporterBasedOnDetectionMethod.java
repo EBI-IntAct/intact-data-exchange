@@ -5,9 +5,9 @@ import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.IntactFilter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.IntactInteractionFilter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 
 import java.io.*;
@@ -177,8 +177,8 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
             if (interaction != null){
                 System.out.println("\t\t Interaction: Id:" + interaction.getId());
 
-                String A = interaction.getInteractorA(IntactInteractionFilter.UNIPROT_DATABASE);
-                String B = interaction.getInteractorB(IntactInteractionFilter.UNIPROT_DATABASE);
+                String A = interaction.getInteractorA(IntactFilter.UNIPROT_DATABASE);
+                String B = interaction.getInteractorB(IntactFilter.UNIPROT_DATABASE);
 
                 if (A != null && B!= null){
                     Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();

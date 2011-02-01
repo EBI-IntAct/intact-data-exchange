@@ -21,18 +21,14 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * This class will process uniprot-export of binary interactions (both spoke expanded and truly binary interactions)
- * The rules are simpler than for the CCline export :
- * - Starts with the MITAB file generated during the release. It contains all the released binary interactions in IntAct (contains spoke expanded as well)
- * - Computes the mi cluster score for all the interactions passing the dr-export constraint at the level of the experiment and which are composed of two uniprot proteins.
- * - Excludes the binary interactions with a score lower than the EXPORT_THRESHOLD
- * - Export only binary interactions containing at least one truly binary interaction in IntAct (not only spoke expanded)
+ * This filter is selecting binary interactions eligible for uniprot export from a mitab file and
+ * will compute the mi score of each binary interaction
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>22-Oct-2010</pre>
  */
 
-public class MitabInteractionFilter implements InteractionFilter{
+public class MitabFilter implements InteractionFilter{
 
     private QueryFactory queryProvider;
     private Set<String> eligibleInteractionsForUniprotExport;
@@ -46,7 +42,7 @@ public class MitabInteractionFilter implements InteractionFilter{
 
     private String mitab;
 
-    public MitabInteractionFilter(InteractionExporter exporter, String mitab){
+    public MitabFilter(InteractionExporter exporter, String mitab){
         queryProvider = new QueryFactory();
         eligibleInteractionsForUniprotExport = new HashSet<String>();
         mitabReader = new IntactPsimiTabReader(true);
