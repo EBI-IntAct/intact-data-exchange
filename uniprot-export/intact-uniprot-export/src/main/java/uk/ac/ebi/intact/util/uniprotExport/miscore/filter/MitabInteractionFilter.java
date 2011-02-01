@@ -8,11 +8,11 @@ import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.ExtractorBasedOnClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.InteractionExtractor;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extractor.QueryFactory;
 
 import java.io.File;
@@ -219,7 +219,7 @@ public class MitabInteractionFilter {
 
     public MiScoreResults exportInteractionsFrom(String mitab) throws UniprotExportException {
         try {
-            InteractionExtractor extractor = new InteractionExtractor();
+            ExtractorBasedOnClusterScore extractor = new ExtractorBasedOnClusterScore();
 
             MiScoreResults clusterResults = computeMiScoreInteractionEligibleUniprotExport(mitab);
             clusterResults.getInteractionsToExport().addAll(extractor.processExportWithMiClusterScore(clusterResults.getClusterContext(), clusterResults.getClusterScore(), true));
