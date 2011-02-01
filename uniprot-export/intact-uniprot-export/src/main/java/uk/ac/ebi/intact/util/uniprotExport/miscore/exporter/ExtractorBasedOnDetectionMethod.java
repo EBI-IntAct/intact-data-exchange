@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.util.uniprotExport.miscore.extractor;
+package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
 import org.springframework.transaction.TransactionStatus;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
