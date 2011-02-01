@@ -167,6 +167,30 @@ public class IntactFilter implements InteractionFilter{
                         Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
                         processClusterContext(context, interactionAc, toBinary);
 
+                        for (IntactBinaryInteraction binary : toBinary){
+
+                            ExtendedInteractor interactorA = binary.getInteractorA();
+                            String uniprotA = null;
+                            ExtendedInteractor interactorB = binary.getInteractorB();
+                            String uniprotB = null;
+
+                            for (CrossReference refA : interactorA.getIdentifiers()){
+                                if (refA.getDatabase().equalsIgnoreCase("uniprotkb")){
+                                    uniprotA = refA.getIdentifier();
+                                    break;
+                                }
+                            }
+                            for (CrossReference refB : interactorB.getIdentifiers()){
+                                if (refB.getDatabase().equalsIgnoreCase("uniprotkb")){
+                                    uniprotB = refB.getIdentifier();
+                                    break;
+                                }
+                            }
+
+                            FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+
+                        }
+
                         binaryInteractions.addAll(toBinary);
                     } catch (Exception e) {
                         System.out.println("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
