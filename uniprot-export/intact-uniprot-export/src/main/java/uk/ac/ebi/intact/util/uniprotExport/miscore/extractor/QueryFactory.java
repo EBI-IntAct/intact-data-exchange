@@ -11,14 +11,14 @@ import javax.persistence.Query;
 import java.util.List;
 
 /**
- * TODO comment this
+ * The class provides pre-formatted queries for extracting proteins from the database with specific criteria
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>22-Oct-2010</pre>
  */
 
-public class IntactQueryProvider {
+public class QueryFactory {
 
     private final String interactionInvolvedInComponents = "select distinct(c1.interaction.ac) from Component c1";
 

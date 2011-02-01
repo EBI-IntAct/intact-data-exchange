@@ -22,15 +22,15 @@ import java.util.*;
  * @since <pre>16-Sep-2010</pre>
  */
 
-public class InteractionExtractorForMIScore extends LineExport {
+public class InteractionExtractor extends LineExport {
 
-    private IntactQueryProvider queryProvider;
+    private QueryFactory queryProvider;
     private static final double EXPORT_THRESHOLD = 0.43;
     private static final String CONFIDENCE_NAME = "intactPsiscore";
     private static final String COLOCALIZATION = "MI:0403";
 
-    public InteractionExtractorForMIScore(){
-        this.queryProvider = new IntactQueryProvider();
+    public InteractionExtractor(){
+        this.queryProvider = new QueryFactory();
     }
 
     /**
@@ -541,8 +541,8 @@ public class InteractionExtractorForMIScore extends LineExport {
             if (interaction != null){
                 System.out.println("\t\t Interaction: Id:" + interaction.getId());
 
-                String A = interaction.getInteractorA(MiScoreClient.UNIPROT_DATABASE);
-                String B = interaction.getInteractorB(MiScoreClient.UNIPROT_DATABASE);
+                String A = interaction.getInteractorA(IntactInteractionFilter.UNIPROT_DATABASE);
+                String B = interaction.getInteractorB(IntactInteractionFilter.UNIPROT_DATABASE);
 
                 if (A != null && B!= null){
                     Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
