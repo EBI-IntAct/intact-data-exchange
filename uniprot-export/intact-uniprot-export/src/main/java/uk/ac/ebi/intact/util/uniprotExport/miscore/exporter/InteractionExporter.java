@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
-import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 
 /**
@@ -13,5 +13,5 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 
 public interface InteractionExporter {
 
-    public void exportInteractions(MiScoreResults results) throws UniprotExportException;
+    public void exportInteractionsFrom(MiScoreResults results) throws UniprotExportException;
 }

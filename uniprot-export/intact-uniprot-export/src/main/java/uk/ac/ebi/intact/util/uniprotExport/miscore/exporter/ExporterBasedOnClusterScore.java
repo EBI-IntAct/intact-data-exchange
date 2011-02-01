@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
@@ -100,7 +100,7 @@ public class ExporterBasedOnClusterScore extends LineExport implements Interacti
     }
 
     @Override
-    public void exportInteractions(MiScoreResults results) throws UniprotExportException {
+    public void exportInteractionsFrom(MiScoreResults results) throws UniprotExportException {
         results.setInteractionsToExport(processExport(results, true));
     }
 }

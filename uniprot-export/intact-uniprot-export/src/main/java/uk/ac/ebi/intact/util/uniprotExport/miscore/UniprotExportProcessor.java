@@ -5,7 +5,8 @@ import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.EncoreInteractionToCCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.EncoreInteractionToGoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.InteractorToDRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.MitabInteractionFilter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.InteractionFilter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
@@ -32,20 +33,20 @@ public class UniprotExportProcessor {
     private EncoreInteractionToCCLineConverter ccConverter;
     private InteractorToDRLineConverter drConverter;
 
-    private MitabInteractionFilter filter;
+    private InteractionFilter filter;
 
-    public UniprotExportProcessor(){
+    public UniprotExportProcessor(InteractionFilter filter){
 
         goConverter = new EncoreInteractionToGoLineConverter();
         ccConverter = new EncoreInteractionToCCLineConverter();
         drConverter = new InteractorToDRLineConverter();
 
-        this.filter = new MitabInteractionFilter();
+        this.filter = filter;
     }
 
-    public void runUniprotExport(String mitabFile, String DRFile, String CCFile, String GOFile) throws UniprotExportException {
+    public void runUniprotExport(String DRFile, String CCFile, String GOFile) throws UniprotExportException {
 
-        MiScoreResults results = filter.exportInteractionsFrom(mitabFile);
+        MiScoreResults results = filter.exportInteractions();
 
         try {
             exportDRLines(results, DRFile);
@@ -172,5 +173,13 @@ public class UniprotExportProcessor {
 
     public void setDrConverter(InteractorToDRLineConverter drConverter) {
         this.drConverter = drConverter;
+    }
+
+    public InteractionFilter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(InteractionFilter filter) {
+        this.filter = filter;
     }
 }

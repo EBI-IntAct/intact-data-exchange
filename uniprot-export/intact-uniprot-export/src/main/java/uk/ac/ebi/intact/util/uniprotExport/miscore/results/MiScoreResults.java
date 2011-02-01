@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.util.uniprotExport.miscore;
+package uk.ac.ebi.intact.util.uniprotExport.miscore.results;
 
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;

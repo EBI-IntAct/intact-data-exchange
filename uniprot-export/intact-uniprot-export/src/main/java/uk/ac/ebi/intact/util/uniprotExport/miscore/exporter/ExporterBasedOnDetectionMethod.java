@@ -5,7 +5,7 @@ import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.IntactInteractionFilter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
@@ -316,7 +316,7 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
     }
 
     @Override
-    public void exportInteractions(MiScoreResults results) throws UniprotExportException {
+    public void exportInteractionsFrom(MiScoreResults results) throws UniprotExportException {
         Set<Integer> eligibleInteractions = new HashSet<Integer>();
 
         processEligibleExperiments(results.getClusterScore(), eligibleInteractions);

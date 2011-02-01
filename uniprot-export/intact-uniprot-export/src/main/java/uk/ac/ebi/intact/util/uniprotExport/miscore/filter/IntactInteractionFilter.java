@@ -10,9 +10,11 @@ import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.ExporterBasedOnDetectionMethod;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.QueryFactory;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActFileMiScoreDistribution;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
@@ -29,7 +31,7 @@ import java.util.*;
  * @since <pre>15-Sep-2010</pre>
  */
 
-public class IntactInteractionFilter {
+public class IntactInteractionFilter implements InteractionFilter{
 
     /**
      * the binary interaction converter
@@ -43,14 +45,16 @@ public class IntactInteractionFilter {
 
     public static final String UNIPROT_DATABASE = "uniprotkb";
 
-    private ExporterBasedOnDetectionMethod extractor;
+    private InteractionExporter exporter;
+    private QueryFactory queryFactory;
 
     /**
      * we create a new IntactInteractionFilter
      */
-    public IntactInteractionFilter(){
+    public IntactInteractionFilter(InteractionExporter exporter){
         this.interactionConverter = new Intact2BinaryInteractionConverter();
-        extractor = new ExporterBasedOnDetectionMethod();
+        this.exporter = exporter;
+        this.queryFactory = new QueryFactory();
     }
 
     /**
@@ -591,20 +595,19 @@ public class IntactInteractionFilter {
      * @throws IOException
      * @throws SQLException
      */
-    public MiScoreResults exportReleasedHighConfidencePPIInteractions(String fileInteractionEligible, String fileTotal, String fileInteractionExported, String fileDataExported, String fileDataNotExported) throws IOException, SQLException {
+    public MiScoreResults exportReleasedHighConfidencePPIInteractions(String fileInteractionEligible, String fileTotal, String fileInteractionExported, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {
 
         System.out.println("export all interactions from intact which passed the dr export annotation");
-        List<String> eligibleBinaryInteractions = extractor.filterOnNonUnprotProteinsAndCollectInteractionsFromReleasedExperiments(fileInteractionEligible);
+        List<String> eligibleBinaryInteractions = this.queryFactory.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
 
         System.out.println("computes MI score");
         MiScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
         results.getClusterScore().saveScores(fileTotal);
 
-        Set<Integer> exportedBinaryInteractions = extractor.extractEligibleInteractionsFrom(results.getClusterScore(), fileInteractionExported);
-        results.getInteractionsToExport().addAll(exportedBinaryInteractions);
+        exporter.exportInteractionsFrom(results);
 
         System.out.println("export interactions from intact");
-        extractComputedMiScoresFor(exportedBinaryInteractions, fileDataExported, fileDataNotExported, results.getClusterScore());
+        extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getClusterScore());
 
         return results;
     }
@@ -612,37 +615,64 @@ public class IntactInteractionFilter {
     public MiScoreResults exportReleasedHighConfidenceTrueBinaryInteractions(String fileInteractionEligible, String fileTotal, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {
 
         System.out.println("export all interactions from intact which passed the dr export annotation");
-        List<String> eligibleInteractions = extractor.filterOnNonUnprotProteinsAndCollectInteractionsFromReleasedExperiments(fileInteractionEligible);
-        List<String> eligibleBinaryInteractions = extractor.filterBinaryInteractionsFrom(eligibleInteractions, fileInteractionEligible);
+        List<String> eligibleInteractions = this.queryFactory.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
 
-        System.out.println("computes MI score");
-        MiScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
-        results.getClusterScore().saveScores(fileTotal);
+        if (this.exporter instanceof ExporterBasedOnDetectionMethod){
+            ExporterBasedOnDetectionMethod extractor = (ExporterBasedOnDetectionMethod) this.exporter;
+            List<String> eligibleBinaryInteractions = extractor.filterBinaryInteractionsFrom(eligibleInteractions, fileInteractionEligible);
 
-        Set<Integer> exportedInteractions = extractor.extractEligibleInteractionsFrom(results.getClusterScore(), fileInteractionEligible);
-        results.getInteractionsToExport().addAll(exportedInteractions);
+            System.out.println("computes MI score");
+            MiScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
+            results.getClusterScore().saveScores(fileTotal);
 
-        System.out.println("export binary interactions from intact");
-        extractComputedMiScoresFor(exportedInteractions, fileDataExported, fileDataNotExported, results.getClusterScore());
+            exporter.exportInteractionsFrom(results);
 
-        return results;
+            System.out.println("export binary interactions from intact");
+            extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getClusterScore());
+
+            return results;
+        }
+
+        return null;
     }
 
     public MiScoreResults exportAllReleasedHighConfidencePPIInteractions(String fileInteractionEligible, String fileTotal, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {
 
         System.out.println("export all interactions from intact which passed the dr export annotation");
-        List<String> eligibleBinaryInteractions = extractor.collectAllInteractionsFromReleasedExperiments(fileInteractionEligible);
+        List<String> eligibleBinaryInteractions = this.queryFactory.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport();
 
         System.out.println("computes MI score");
         MiScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
         results.getClusterScore().saveScores(fileTotal);
 
-        Set<Integer> exportedInteractions = extractor.extractEligibleInteractionsFrom(results.getClusterScore(), fileInteractionEligible);
-        results.getInteractionsToExport().addAll(exportedInteractions);
+        exporter.exportInteractionsFrom(results);
 
         System.out.println("export binary interactions from intact");
-        extractComputedMiScoresFor(exportedInteractions, fileDataExported, fileDataNotExported, results.getClusterScore());
+        extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getClusterScore());
 
         return results;
+    }
+
+    @Override
+    public MiScoreResults exportInteractions() throws UniprotExportException {
+        System.out.println("export all interactions from intact which passed the dr export annotation");
+        List<String> eligibleBinaryInteractions = this.queryFactory.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport();
+
+        System.out.println("computes MI score");
+        MiScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
+
+        exporter.exportInteractionsFrom(results);
+
+        return results;
+    }
+
+    @Override
+    public InteractionExporter getInteractionExporter() {
+        return this.exporter;
+    }
+
+    @Override
+    public void setInteractionExporter(InteractionExporter exporter) {
+        this.exporter = exporter;
     }
 }

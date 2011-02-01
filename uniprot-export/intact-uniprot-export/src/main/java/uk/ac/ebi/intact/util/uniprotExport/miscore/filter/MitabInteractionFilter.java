@@ -8,12 +8,12 @@ import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.ExporterBasedOnClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.QueryFactory;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.MiScoreResults;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +32,7 @@ import java.util.*;
  * @since <pre>22-Oct-2010</pre>
  */
 
-public class MitabInteractionFilter {
+public class MitabInteractionFilter implements InteractionFilter{
 
     private QueryFactory queryProvider;
     private Set<String> eligibleInteractionsForUniprotExport;
@@ -42,10 +42,17 @@ public class MitabInteractionFilter {
     private static final String UNIPROT = "uniprotkb";
     private final static String FEATURE_CHAIN = "-PRO_";
 
-    public MitabInteractionFilter(){
+    private InteractionExporter exporter;
+
+    private String mitab;
+
+    public MitabInteractionFilter(InteractionExporter exporter, String mitab){
         queryProvider = new QueryFactory();
         eligibleInteractionsForUniprotExport = new HashSet<String>();
         mitabReader = new IntactPsimiTabReader(true);
+        this.exporter = exporter;
+
+        this.mitab = mitab;
 
         eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport());
     }
@@ -219,10 +226,9 @@ public class MitabInteractionFilter {
 
     public MiScoreResults exportInteractionsFrom(String mitab) throws UniprotExportException {
         try {
-            ExporterBasedOnClusterScore extractor = new ExporterBasedOnClusterScore();
 
             MiScoreResults clusterResults = computeMiScoreInteractionEligibleUniprotExport(mitab);
-            clusterResults.getInteractionsToExport().addAll(extractor.processExportFrom(clusterResults.getClusterContext(), clusterResults.getClusterScore(), true));
+            exporter.exportInteractionsFrom(clusterResults);
 
             //this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);
 
@@ -240,5 +246,20 @@ public class MitabInteractionFilter {
 
     public QueryFactory getQueryProvider() {
         return queryProvider;
+    }
+
+    @Override
+    public MiScoreResults exportInteractions() throws UniprotExportException {
+        return exportInteractionsFrom(mitab);
+    }
+
+    @Override
+    public InteractionExporter getInteractionExporter() {
+        return this.exporter;
+    }
+
+    @Override
+    public void setInteractionExporter(InteractionExporter exporter) {
+        this.exporter = exporter;
     }
 }
