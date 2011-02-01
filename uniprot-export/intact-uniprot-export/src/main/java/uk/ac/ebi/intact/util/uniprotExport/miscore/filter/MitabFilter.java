@@ -55,7 +55,6 @@ public class MitabFilter implements InteractionFilter{
     private MiScoreResults computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
         MiClusterContext context = new MiClusterContext();
-        Set<Integer> interactionsToExport = new HashSet<Integer>();
 
         File mitab = new File(mitabFile);
         Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitab));
@@ -134,7 +133,7 @@ public class MitabFilter implements InteractionFilter{
             clusterScore.runService();
         }
 
-        return new MiScoreResults(clusterScore, context, interactionsToExport);
+        return new MiScoreResults(clusterScore, context);
     }
 
     private void processMiTerms(BinaryInteraction interaction, MiClusterContext context){

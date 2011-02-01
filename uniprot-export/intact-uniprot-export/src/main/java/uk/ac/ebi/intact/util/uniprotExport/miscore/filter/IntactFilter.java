@@ -75,9 +75,8 @@ public class IntactFilter implements InteractionFilter{
     public MiScoreResults computeMiScoresFor(List<String> interactions){
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
         MiClusterContext context = new MiClusterContext();
-        Set<Integer> interactionsToExport = new HashSet<Integer>();
 
-        MiScoreResults results = new MiScoreResults(clusterScore, context, interactionsToExport);
+        MiScoreResults results = new MiScoreResults(clusterScore, context);
         int i = 0;
         // the list of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
@@ -110,9 +109,8 @@ public class IntactFilter implements InteractionFilter{
     public MiScoreResults processExportWithFilterOnNonUniprot(List<String> interactions) throws UniprotExportException {
         MiClusterContext context = new MiClusterContext();
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
-        Set<Integer> interactionsToExport = new HashSet<Integer>();
 
-        MiScoreResults results = new MiScoreResults(clusterScore, context, interactionsToExport);
+        MiScoreResults results = new MiScoreResults(clusterScore, context);
         int i = 0;
         // the list of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
