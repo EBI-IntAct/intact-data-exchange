@@ -15,8 +15,12 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * This class is extracting interactions in Intact which are only PPI interactions, non negative and dr-uniprot-export annotation is taken into account.
- * It is also taking into account the current rules on the interaction detection method (dr-export = 'yes', 'no' or condition).
+ * This exporter will use rules on the interaction detection methods of each interaction. It will look at the
+ * 'uniprot-dr-export' annotation attched to each interaction detection method which can be :
+ * - no : the interaction detection method cannot be exported. If one binary interaction contains only this interaction
+ * detection method, it will not be exported.
+ * - yes : the interaction detection method can be exported. If one binary interaction has at least one interaction detection method with export = yes, the interaction is exported
+ * - condition : conditional export (number of interactions having this method, etc.)
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

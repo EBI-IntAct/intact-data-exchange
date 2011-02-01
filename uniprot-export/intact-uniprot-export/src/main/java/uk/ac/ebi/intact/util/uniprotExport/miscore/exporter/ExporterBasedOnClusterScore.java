@@ -1,24 +1,24 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.intact.util.uniprotExport.LineExport;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 
 import java.util.*;
 
 /**
- * This class is extracting interactions in Intact which are only PPI interactions, non negative and dr-uniprot-export annotation is taken into account.
- * It is also possible to extract the interactions exported in uniprot with current rules on the interaction detection method.
- *
+ * This exporter is respecting the following rules :
+ * - a binary interaction is eligible for uniprot export if has a MI score superior or equal to a threshold value
+ * - the binary interaction must have at least one evidence that this interaction is a true binary interaction (and not spoke expanded)
+ * and this evidence must be different from colocalization
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>16-Sep-2010</pre>
  */
 
-public class ExporterBasedOnClusterScore extends LineExport implements InteractionExporter{
+public class ExporterBasedOnClusterScore implements InteractionExporter{
 
     private static final double EXPORT_THRESHOLD = 0.43;
     private static final String CONFIDENCE_NAME = "intactPsiscore";
