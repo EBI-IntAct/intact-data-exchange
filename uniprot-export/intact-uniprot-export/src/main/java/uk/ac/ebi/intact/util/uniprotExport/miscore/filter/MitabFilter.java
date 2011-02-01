@@ -52,6 +52,17 @@ public class MitabFilter implements InteractionFilter{
         eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport());
     }
 
+    public MitabFilter(InteractionExporter exporter){
+        queryProvider = new QueryFactory();
+        eligibleInteractionsForUniprotExport = new HashSet<String>();
+        mitabReader = new IntactPsimiTabReader(true);
+        this.exporter = exporter;
+
+        this.mitab = null;
+
+        eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport());
+    }
+
     private MiScoreResults computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
         MiClusterContext context = new MiClusterContext();
@@ -207,5 +218,13 @@ public class MitabFilter implements InteractionFilter{
     @Override
     public void setInteractionExporter(InteractionExporter exporter) {
         this.exporter = exporter;
+    }
+
+    public String getMitab() {
+        return mitab;
+    }
+
+    public void setMitab(String mitab) {
+        this.mitab = mitab;
     }
 }
