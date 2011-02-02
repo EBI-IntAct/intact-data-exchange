@@ -18,6 +18,7 @@ public class WriterUtils {
     public static final String INTACT = "intact";
     public static final String UNIPROT = "uniprotkb";
     public static final String TAXID = "taxId";
+    public static final String CHAIN_PREFIX = "-PRO_";
 
     public static Map<String, List<String>> invertMapOfTypeStringToString (Map<String, String> mapToInvert){
         Map<String, List<String>> invertedMap = new HashMap<String, List<String>>();

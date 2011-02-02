@@ -1,10 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParametersImpl;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParametersImpl;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,6 +47,35 @@ public class UniprotExportBase extends IntactBasicTestCase {
         parameters.add(parameter1);
         parameters.add(parameter2);
         parameters.add(parameter3);
+
+        return parameters;
+    }
+
+    public List<CCParameters> createCCParameters(){
+
+        List<CCParameters> parameters = new ArrayList<CCParameters>(3);
+
+        String uniprotAc1 = "Q9NET8";
+        String uniprotAc2 = "Q22534";
+        String uniprotAc4 = "Q17862";
+        String uniprotAc5 = "P33327";
+
+        String pmid1 = "14704431";
+        String pmid2 = "18467557";
+
+        Set<String> publications1 = new HashSet<String>(1);
+        publications1.add(pmid1);
+
+        Set<String> publications2 = new HashSet<String>(1);
+        publications2.add(pmid2);
+
+        //CCParameters parameter1 = new GOParametersImpl(uniprotAc1, uniprotAc2, publications1);
+        //GOParameters parameter2 = new GOParametersImpl(uniprotAc1, uniprotAc4, publications1);
+        //GOParameters parameter3 = new GOParametersImpl(uniprotAc5, uniprotAc5, publications2);
+
+       // parameters.add(parameter1);
+        //parameters.add(parameter2);
+        //parameters.add(parameter3);
 
         return parameters;
     }

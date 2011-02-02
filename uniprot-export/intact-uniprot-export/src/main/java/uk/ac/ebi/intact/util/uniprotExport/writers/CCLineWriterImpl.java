@@ -147,12 +147,12 @@ public class CCLineWriterImpl implements CCLineWriter{
      */
     private void writeInteractionIntroduction(boolean doesInteract, String uniprot1, String intact1, String uniprot2, String intact2) throws IOException {
         writer.write("CC       Interact=");
-        writer.write((doesInteract ? "yes" : "no"));
+        writer.write((doesInteract ? "Yes" : "No"));
         writer.write("; ");
 
         writer.write(" Xref=IntAct:");
         writer.write( intact1 );
-        writer.write(',');
+        writer.write(", IntAct:");
         writer.write(intact2);
         writer.write(';');
         writer.write(WriterUtils.NEW_LINE);
@@ -167,6 +167,18 @@ public class CCLineWriterImpl implements CCLineWriter{
         writer.write("CC         Protein1=");
         writer.write(geneName1);
         writer.write(" [");
+        if (uniprot1.contains(WriterUtils.CHAIN_PREFIX)){
+            int indexOfChain = uniprot1.indexOf(WriterUtils.CHAIN_PREFIX);
+            String parent = uniprot1.substring(0, indexOfChain);
+            String chainId = uniprot1.substring(indexOfChain + 1);
+
+            writer.write( parent );
+            writer.write( ":" );
+            writer.write( chainId );
+        }
+        else {
+           writer.write( uniprot1 );
+        }
         writer.write( uniprot1 );
         writer.write( "];" );
         writer.write(WriterUtils.NEW_LINE);
@@ -184,13 +196,24 @@ public class CCLineWriterImpl implements CCLineWriter{
         writer.write("CC         Protein2=");
         writer.write(geneName2);
         writer.write(" [");
-        writer.write( uniprot2 );
+        if (uniprot2.contains(WriterUtils.CHAIN_PREFIX)){
+            int indexOfChain = uniprot2.indexOf(WriterUtils.CHAIN_PREFIX);
+            String parent = uniprot2.substring(0, indexOfChain);
+            String chainId = uniprot2.substring(indexOfChain + 1);
+
+            writer.write( parent );
+            writer.write( ":" );
+            writer.write( chainId );
+        }
+        else {
+           writer.write( uniprot2 );
+        }
         writer.write("];");
 
         if (!taxId1.equalsIgnoreCase(taxId2)) {
             writer.write(" Organism=");
             writer.write(organism2);
-            writer.write( " [NCBI_TaxID=" );
+            writer.write( " [NCBI_TaxID:" );
             writer.write( taxId2 );
             writer.write( "];" );
         }

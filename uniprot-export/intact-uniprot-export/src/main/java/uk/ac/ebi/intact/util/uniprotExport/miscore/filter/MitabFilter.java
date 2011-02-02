@@ -94,9 +94,9 @@ public class MitabFilter implements InteractionFilter{
                     for (CrossReference refA : interactorA.getIdentifiers()){
                         if (UNIPROT.equalsIgnoreCase(refA.getDatabase())){
                             uniprotA = refA.getIdentifier();
-                            if (uniprotA.contains(FEATURE_CHAIN)){
-                                uniprotA = refA.getIdentifier().substring(0, uniprotA.indexOf(FEATURE_CHAIN));
-                            }
+                            //if (uniprotA.contains(FEATURE_CHAIN)){
+                                //uniprotA = refA.getIdentifier().substring(0, uniprotA.indexOf(FEATURE_CHAIN));
+                            //}
 
                             break;
                         }
@@ -107,9 +107,9 @@ public class MitabFilter implements InteractionFilter{
                         if (UNIPROT.equalsIgnoreCase(refB.getDatabase())){
                             uniprotB = refB.getIdentifier();
 
-                            if (uniprotB.contains(FEATURE_CHAIN)){
-                                uniprotB = refB.getIdentifier().substring(0, uniprotB.indexOf(FEATURE_CHAIN));
-                            }
+                            //if (uniprotB.contains(FEATURE_CHAIN)){
+                                //uniprotB = refB.getIdentifier().substring(0, uniprotB.indexOf(FEATURE_CHAIN));
+                            //}
 
                             break;
                         }
