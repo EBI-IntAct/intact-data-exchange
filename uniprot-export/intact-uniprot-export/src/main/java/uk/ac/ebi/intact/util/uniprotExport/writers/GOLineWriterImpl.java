@@ -105,6 +105,8 @@ public class GOLineWriterImpl implements GOLineWriter{
         // write information
         writeGeneralLine(uniprot2, pubmedBuffer);
 
+        writer.flush();
+
     }
 
     /**

@@ -5,10 +5,7 @@ import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParametersImpl;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.InteractionDetails;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.InteractionDetailsImpl;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.util.*;
@@ -179,42 +176,90 @@ public class EncoreInteractionToCCLineConverter {
         return distinctLines;
     }
 
+    private String extractIntactAcFromAccs(Map<String, String> interactorAccs){
+        String interactorAcc = null;
+        for(Map.Entry<String, String> entry : interactorAccs.entrySet()){
+            if(WriterUtils.INTACT.equalsIgnoreCase(entry.getKey())){
+                interactorAcc =  entry.getValue();
+                break;
+            }
+        }
+
+        return interactorAcc;
+    }
+
     /**
      * Converts an EncoreInteraction into a CCParameter
-     * @param interaction
-     * @param context
+
      * @return the converted CCParameter
      */
-    public CCParameters convertInteractionsIntoCCLines(EncoreInteraction interaction, MiClusterContext context){
+    public CCParameters convertInteractionsIntoCCLines(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
+        String firstIntactAc = null;
+        String geneName1 = context.getGeneNames().get(firstInteractor);
+        String taxId1 = null;
 
-        // get the uniprot acs of the first and second interactors
-        String uniprot1 = interaction.getInteractorA(WriterUtils.UNIPROT);
-        String uniprot2 = interaction.getInteractorB(WriterUtils.UNIPROT);
+        List<SecondCCInteractor> secondCCInteractors = new ArrayList<SecondCCInteractor>(interactions.size());
 
-        // if the uniprot acs are not null, it is possible to convert into a CCParameters
-        if (uniprot1 != null && uniprot2 != null){
-            // extract gene names (present in the context and not in the interaction)
-            String geneName1 = context.getGeneNames().get(uniprot1);
-            String geneName2 = context.getGeneNames().get(uniprot2);
+        if (!interactions.isEmpty()){
 
-            // extract organisms
-            String [] organismsA;
-            String [] organismsB;
-            organismsA = extractOrganismFrom(interaction.getOrganismsA());
-            organismsB = extractOrganismFrom(interaction.getOrganismsB());
+            for (EncoreInteraction interaction : interactions){
+                // get the uniprot acs of the first and second interactors
+                String uniprot1 = interaction.getInteractorA();
+                String uniprot2 = interaction.getInteractorB();
 
-            // extract taxIds
-            String taxId1 = organismsA[0];
-            String taxId2 = organismsB[0];
+                String intact1 = extractIntactAcFromAccs(interaction.getInteractorAccsA());
+                String intact2 = extractIntactAcFromAccs(interaction.getInteractorAccsB());
 
-            // extract organism names
-            String organism1 = organismsA[1];
-            String organism2 = organismsB[1];
+                // if the uniprot acs are not null, it is possible to convert into a CCParameters
+                if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
+                    // extract second interactor
+                    String secondUniprot = null;
 
-            // collect all pubmeds and spoke expanded information
-            SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
+                    String secondIntactAc = null;
 
-            return new CCParametersImpl(uniprot1, uniprot2, geneName1, geneName2, taxId1, taxId2, organism1, organism2, sortedInteractionDetails);
+                    // extract gene names (present in the context and not in the interaction)
+                    String geneName2 = null;
+                    // extract organisms
+                    String [] organismsA;
+                    String [] organismsB;
+                    organismsA = extractOrganismFrom(interaction.getOrganismsA());
+                    organismsB = extractOrganismFrom(interaction.getOrganismsB());
+                    // extract taxIds
+                    String taxId2 = null;
+
+                    // extract organism names
+                    String organism2 = null;
+
+                    if (uniprot1.equals(firstInteractor)){
+                        secondUniprot = uniprot2;
+                        geneName2 = context.getGeneNames().get(uniprot2);
+                        taxId2 = organismsB[0];
+                        organism2 = organismsB[1];
+                        secondIntactAc = intact2;
+
+                        taxId1 = organismsA[0];
+                        firstIntactAc = intact1;
+                    }
+                    else{
+                        secondUniprot = uniprot1;
+                        geneName2 = context.getGeneNames().get(uniprot1);
+                        taxId2 = organismsA[0];
+                        organism2 = organismsA[1];
+                        secondIntactAc = intact1;
+
+                        taxId1 = organismsB[0];
+                        firstIntactAc = intact2;
+                    }
+
+                    // collect all pubmeds and spoke expanded information
+                    SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
+
+                    SecondCCInteractor secondCCInteractor = new SecondCCInteractorImpl(secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
+                    secondCCInteractors.add(secondCCInteractor);
+                }
+            }
+
+            return new CCParametersImpl(firstInteractor, firstIntactAc,geneName1, taxId1, secondCCInteractors);
         }
 
         return null;

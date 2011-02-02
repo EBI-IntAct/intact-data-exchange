@@ -4,6 +4,7 @@ import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.InteractionDetails;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.SecondCCInteractor;
 
 import javax.swing.event.EventListenerList;
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class CCLineWriterImpl implements CCLineWriter{
      */
     public CCLineWriterImpl(OutputStreamWriter outputStream) throws IOException {
         if (outputStream == null){
-             throw new IllegalArgumentException("You must give a non null OutputStream writer");
+            throw new IllegalArgumentException("You must give a non null OutputStream writer");
         }
         writer = outputStream;
     }
@@ -47,7 +48,7 @@ public class CCLineWriterImpl implements CCLineWriter{
         if (parameters != null){
 
             // write the title
-            writeCCLineTitle();
+            writeCCLineTitle(parameters.getFirstInteractor());
 
             // write the content
             writeCCLineParameters(parameters);
@@ -71,19 +72,24 @@ public class CCLineWriterImpl implements CCLineWriter{
      */
     public void writeCCLineParameters(CCParameters parameters) throws IOException {
 
-        // write introduction
-        writeInteractionIntroduction(true, parameters.getFirstInteractor(), parameters.getSecondInteractor());
+        String firstUniprotAc = parameters.getFirstInteractor();
+        String firstIntactAc = parameters.getFirstIntacAc();
+        String firstTaxId = parameters.getFirstTaxId();
 
-        // write first protein
-        writeFirstProtein(parameters.getFirstInteractor(), parameters.getFirstGeneName());
+        for (SecondCCInteractor secondInteractor : parameters.getSecondCCInteractors()){
+            // write introduction
+            writeInteractionIntroduction(true, firstUniprotAc, firstIntactAc, secondInteractor.getSecondInteractor(), secondInteractor.getSecondIntactAc());
 
-        // write second protein
-        writeSecondProtein(parameters.getSecondInteractor(), parameters.getSecondGeneName(),
-                parameters.getFirstTaxId(), parameters.getSecondTaxId(), parameters.getSecondOrganismName());
+            // write first protein
+            writeFirstProtein(firstUniprotAc, firstIntactAc);
 
-        // write the details of the interaction
-        writeInteractionDetails(parameters.getInteractionDetails());
+            // write second protein
+            writeSecondProtein(secondInteractor.getSecondInteractor(), secondInteractor.getSecondGeneName(),
+                    firstTaxId, secondInteractor.getSecondTaxId(), secondInteractor.getSecondOrganismName());
 
+            // write the details of the interaction
+            writeInteractionDetails(secondInteractor.getInteractionDetails());
+        }
         writer.write("//");
         writer.write(WriterUtils.NEW_LINE);
     }
@@ -95,8 +101,12 @@ public class CCLineWriterImpl implements CCLineWriter{
 
     /**
      * Write the CC line title
+     * @param uniprot1
      */
-    private void writeCCLineTitle() throws IOException {
+    private void writeCCLineTitle(String uniprot1) throws IOException {
+        writer.write("AC   ");
+        writer.write(uniprot1);
+        writer.write(WriterUtils.NEW_LINE);
         writer.write("CC   -!- INTERACTION:");
         writer.write(WriterUtils.NEW_LINE);
     }
@@ -125,17 +135,19 @@ public class CCLineWriterImpl implements CCLineWriter{
      * Write the introduction of a CC line
      * @param doesInteract
      * @param uniprot1
+     * @param intact1
      * @param uniprot2
+     * @param intact2
      */
-    private void writeInteractionIntroduction(boolean doesInteract, String uniprot1, String uniprot2) throws IOException {
+    private void writeInteractionIntroduction(boolean doesInteract, String uniprot1, String intact1, String uniprot2, String intact2) throws IOException {
         writer.write("CC       Interact=");
         writer.write((doesInteract ? "yes" : "no"));
         writer.write("; ");
 
         writer.write(" Xref=IntAct:");
-        writer.write( uniprot1 );
+        writer.write( intact1 );
         writer.write(',');
-        writer.write(uniprot2);
+        writer.write(intact2);
         writer.write(';');
         writer.write(WriterUtils.NEW_LINE);
     }

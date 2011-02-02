@@ -14,96 +14,61 @@ public class CCParametersImpl implements CCParameters{
 
     private String firstInteractor;
 
-    private String secondInteractor;
+    private String firstIntact;
 
     private String firstGeneName;
 
-    private String secondGeneName;
     private String firstTaxId;
-    private String secondTaxId;
     private String firstOrganismName;
-    private String secondOrganismName;
 
-    private SortedSet<InteractionDetails> interactionDetails;
+    private List<SecondCCInteractor> secondCCinteractors;
 
-    public CCParametersImpl(String firstInteractor, String secondInteractor, String firstGeneName,
-                            String secondGeneName, String firstTaxId, String secondTaxId,
-                            String firstOrganismName, String secondOrganismName, SortedSet<InteractionDetails> interactionDetails){
+    public CCParametersImpl(String firstInteractor, String firstIntactAc, String firstGeneName,
+                            String firstTaxId, List<SecondCCInteractor> secondInteractors){
         if (firstTaxId == null){
             throw new IllegalArgumentException("The CCLine parameters need a non null first taxId.");
         }
-        else if (secondTaxId == null){
-            throw new IllegalArgumentException("The CCLine parameters need a non null second taxId.");
+        else if (secondInteractors == null){
+            throw new IllegalArgumentException("The CCLine parameters need a non null list of second interactors.");
         }
 
         this.firstInteractor = firstInteractor;
-        this.secondInteractor = secondInteractor;
+        this.firstIntact = firstIntactAc != null ? firstIntactAc : "-";
 
         this.firstGeneName = firstGeneName != null ? firstGeneName : "-";
-        this.secondGeneName = secondGeneName != null ? secondGeneName : "-";
-        this.firstOrganismName = firstOrganismName != null ? firstOrganismName : "-";
-        this.secondOrganismName = secondOrganismName != null ? secondOrganismName : "-";
         this.firstTaxId = firstTaxId;
-        this.secondTaxId = secondTaxId;
 
-        if (interactionDetails == null){
-             this.interactionDetails = new TreeSet<InteractionDetails>();
-        }
-        else {
-            this.interactionDetails = interactionDetails;
-        }
+        this.secondCCinteractors = secondInteractors;
     }
 
-
+    @Override
     public String getFirstInteractor() {
         return firstInteractor;
     }
 
-    public String getSecondInteractor() {
-        return secondInteractor;
+    @Override
+    public String getFirstIntacAc() {
+        return this.firstIntact;
     }
 
     public String getFirstGeneName() {
         return firstGeneName;
     }
 
-    public String getSecondGeneName() {
-        return secondGeneName;
-    }
-
     public String getFirstTaxId() {
         return firstTaxId;
     }
 
-    public String getSecondTaxId() {
-        return secondTaxId;
-    }
-
-    public String getFirstOrganismName() {
-        return firstOrganismName;
-    }
-
-    public String getSecondOrganismName() {
-        return secondOrganismName;
-    }
-
-    public SortedSet<InteractionDetails> getInteractionDetails() {
-        return interactionDetails;
+    @Override
+    public List<SecondCCInteractor> getSecondCCInteractors() {
+        return this.secondCCinteractors;
     }
 
     public void setFirstGeneName(String firstGeneName) {
         this.firstGeneName = firstGeneName;
     }
 
-    public void setSecondGeneName(String secondGeneName) {
-        this.secondGeneName = secondGeneName;
-    }
-
     public void setFirstOrganismName(String firstOrganismName) {
         this.firstOrganismName = firstOrganismName;
-    }
-
-    public void setSecondOrganismName(String secondOrganismName) {
-        this.secondOrganismName = secondOrganismName;
     }
 }

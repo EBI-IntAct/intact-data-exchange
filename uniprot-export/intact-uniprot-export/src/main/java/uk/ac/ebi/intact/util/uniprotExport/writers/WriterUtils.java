@@ -13,8 +13,9 @@ import java.util.*;
 public class WriterUtils {
 
     public static final String NEW_LINE = System.getProperty("line.separator");
-    public static final char TABULATION = '\t';
+    public static final String TABULATION = "\t";
     public static final String PUBMED = "pubmed";
+    public static final String INTACT = "intact";
     public static final String UNIPROT = "uniprotkb";
     public static final String TAXID = "taxId";
 

@@ -14,10 +14,7 @@ import uk.ac.ebi.intact.util.uniprotExport.writers.*;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * TODO comment this
@@ -50,41 +47,30 @@ public class UniprotExportProcessor {
 
         try {
             exportDRLines(results, DRFile);
-            exportCCAndGOLines(results, CCFile, GOFile);
+            exportCCLines(results, CCFile);
+            exportGOLines(results, GOFile);
         } catch (IOException e) {
             throw new UniprotExportException("Impossible to write the results of uniprot export in " + DRFile + " or " + CCFile + " or " + GOFile, e);
         }
     }
 
-    public void exportCCAndGOLines(MiScoreResults results, String CCFile, String GOFile) throws IOException {
-
-        CCLineWriter ccWriter = new CCLineWriterImpl(new FileWriter(CCFile));
-        GOLineWriter goWriter = new GOLineWriterImpl(new FileWriter(GOFile));
-
-        for (Integer interactionId : results.getInteractionsToExport()){
-            EncoreInteraction interaction = results.getClusterScore().getInteractionMapping().get(interactionId);
-
-            CCParameters ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interaction, results.getClusterContext());
-
-            ccWriter.writeCCLine(ccParameters);
-
-            GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
-
-            goWriter.writeGOLine(goParameters);
-        }
-
-        ccWriter.close();
-        goWriter.close();
-    }
-
     public void exportCCLines(MiScoreResults results, String CCFile) throws IOException {
 
         CCLineWriter ccWriter = new CCLineWriterImpl(new FileWriter(CCFile));
+        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
 
-        for (Integer interactionId : results.getInteractionsToExport()){
-            EncoreInteraction interaction = results.getClusterScore().getInteractionMapping().get(interactionId);
+        for (Map.Entry<String, List<Integer>> interactor : results.getClusterScore().getInteractorMapping().entrySet()){
+            interactions.clear();
 
-            CCParameters ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interaction, results.getClusterContext());
+            for (Integer interactionId : interactor.getValue()){
+                EncoreInteraction interaction = results.getClusterScore().getInteractionMapping().get(interactionId);
+
+                if (interaction != null){
+                    interactions.add(interaction);
+                }
+            }
+
+            CCParameters ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interactions, results.getClusterContext(), interactor.getKey());
 
             ccWriter.writeCCLine(ccParameters);
         }
