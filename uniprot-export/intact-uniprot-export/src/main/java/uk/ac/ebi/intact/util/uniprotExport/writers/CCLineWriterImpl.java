@@ -105,7 +105,13 @@ public class CCLineWriterImpl implements CCLineWriter{
      */
     private void writeCCLineTitle(String uniprot1) throws IOException {
         writer.write("AC   ");
-        writer.write(uniprot1);
+        if (uniprot1.contains("-")){
+            String uniprotParent = uniprot1.substring(0, uniprot1.indexOf("-"));
+            writer.write(uniprotParent);
+        }
+        else{
+            writer.write(uniprot1);
+        }
         writer.write(WriterUtils.NEW_LINE);
         writer.write("CC   -!- INTERACTION:");
         writer.write(WriterUtils.NEW_LINE);

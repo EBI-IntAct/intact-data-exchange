@@ -3,7 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.writers;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -11,29 +11,29 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Tester of the GOLineWriter
+ * Tester of DRLine writer
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>02/02/11</pre>
  */
 
-public class GOLineWriterTest extends UniprotExportBase{
+public class DRLineWriterTest extends UniprotExportBase{
 
     @Test
-    public void test_go_export(){
-        List<GOParameters> parameters = createGOParameters();
+    public void test_dr_export(){
+        List<DRParameters> parameters = createDRParameters();
 
         try {
-            File testFile = new File("GoTest.txt");
+            File testFile = new File("DrTest.txt");
             FileWriter test = new FileWriter(testFile);
-            GOLineWriter writer = new GOLineWriterImpl(test);
+            DRLineWriter writer = new DRLineWriterImpl(test);
 
-            writer.writeGOLines(parameters);
+            writer.writeDRLines(parameters);
 
             writer.close();
 
-            File template = new File(GOLineWriterTest.class.getResource("/go_file_test.txt").getFile());
+            File template = new File(GOLineWriterTest.class.getResource("/dr_file_test.txt").getFile());
 
             Assert.assertTrue(areFilesEqual(testFile, template));
 

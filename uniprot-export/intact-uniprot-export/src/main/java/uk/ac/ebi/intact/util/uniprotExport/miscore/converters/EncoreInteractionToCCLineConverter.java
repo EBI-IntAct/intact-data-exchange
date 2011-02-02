@@ -230,7 +230,7 @@ public class EncoreInteractionToCCLineConverter {
                     // extract organism names
                     String organism2 = null;
 
-                    if (uniprot1.equals(firstInteractor)){
+                    if (uniprot1.startsWith(firstInteractor)){
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
                         taxId2 = organismsB[0];

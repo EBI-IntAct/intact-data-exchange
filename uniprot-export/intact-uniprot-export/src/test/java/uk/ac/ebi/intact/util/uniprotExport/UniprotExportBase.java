@@ -1,10 +1,15 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParametersImpl;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParametersImpl;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,6 +50,28 @@ public class UniprotExportBase extends IntactBasicTestCase {
         parameters.add(parameter1);
         parameters.add(parameter2);
         parameters.add(parameter3);
+
+        return parameters;
+    }
+
+    public List<DRParameters> createDRParameters(){
+
+        List<DRParameters> parameters = new ArrayList<DRParameters>(3);
+
+        String uniprotAc1 = "Q9NET8";
+        String uniprotAc2 = "Q22534";
+        String uniprotAc4 = "Q17862";
+        String uniprotAc5 = "P33327";
+
+        DRParameters parameter1 = new DRParametersImpl(uniprotAc1, 2);
+        DRParameters parameter2 = new DRParametersImpl(uniprotAc2, 1);
+        DRParameters parameter3 = new DRParametersImpl(uniprotAc4, 1);
+        DRParameters parameter4 = new DRParametersImpl(uniprotAc5, 1);
+
+        parameters.add(parameter1);
+        parameters.add(parameter2);
+        parameters.add(parameter3);
+        parameters.add(parameter4);
 
         return parameters;
     }

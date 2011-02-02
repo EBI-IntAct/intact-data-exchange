@@ -46,15 +46,14 @@ public class UniprotExportProcessor {
         MiScoreResults results = filter.exportInteractions();
 
         try {
-            exportDRLines(results, DRFile);
-            exportCCLines(results, CCFile);
+            exportDRAndCCLines(results, DRFile, CCFile);
             exportGOLines(results, GOFile);
         } catch (IOException e) {
             throw new UniprotExportException("Impossible to write the results of uniprot export in " + DRFile + " or " + CCFile + " or " + GOFile, e);
         }
     }
 
-    public void exportCCLines(MiScoreResults results, String CCFile) throws IOException {
+    /*public void exportCCLines(MiScoreResults results, String CCFile) throws IOException {
 
         CCLineWriter ccWriter = new CCLineWriterImpl(new FileWriter(CCFile));
         List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
@@ -76,7 +75,7 @@ public class UniprotExportProcessor {
         }
 
         ccWriter.close();
-    }
+    }*/
 
     public void exportGOLines(MiScoreResults results, String GOFile) throws IOException {
 
@@ -134,6 +133,76 @@ public class UniprotExportProcessor {
             }
         }
 
+        drWriter.close();
+    }
+
+    public void exportDRAndCCLines(MiScoreResults results, String DRFile, String CCFile) throws IOException {
+        DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
+
+        Set<String> interactors = new HashSet(results.getClusterScore().getInteractorMapping().keySet());
+        Set<String> processedInteractors = new HashSet<String>();
+
+        CCLineWriter ccWriter = new CCLineWriterImpl(new FileWriter(CCFile));
+        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
+
+        while (!interactors.isEmpty()){
+            processedInteractors.clear();
+            interactions.clear();
+
+            Iterator<String> interactorIterator = interactors.iterator();
+
+            String interactorAc = interactorIterator.next();
+            processedInteractors.add(interactorAc);
+
+            String parent = interactorAc;
+            if (interactorAc.contains("-")){
+                parent = interactorAc.substring(0, interactorAc.indexOf("-"));
+            }
+
+            Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getClusterScore().getInteractorMapping().get(interactorAc));
+            int numberInteractions = exportedInteractions.size();
+
+            for (Integer interactionId : exportedInteractions){
+                EncoreInteraction interaction = results.getClusterScore().getInteractionMapping().get(interactionId);
+
+                if (interaction != null){
+                    interactions.add(interaction);
+                }
+            }
+
+            while (interactorIterator.hasNext()){
+                exportedInteractions.clear();
+
+                String nextInteractor = interactorIterator.next();
+
+                if (nextInteractor.startsWith(parent)){
+                    processedInteractors.add(nextInteractor);
+
+                    exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getClusterScore().getInteractorMapping().get(nextInteractor));
+                    numberInteractions += exportedInteractions.size();
+
+                    for (Integer interactionId : exportedInteractions){
+                        EncoreInteraction interaction = results.getClusterScore().getInteractionMapping().get(interactionId);
+
+                        if (interaction != null){
+                            interactions.add(interaction);
+                        }
+                    }
+                }
+            }
+
+            if (numberInteractions > 0){
+
+                CCParameters ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interactions, results.getClusterContext(), parent);
+                ccWriter.writeCCLine(ccParameters);
+
+                DRParameters parameter = this.drConverter.convertInteractorToDRLine(parent, numberInteractions);
+                drWriter.writeDRLine(parameter);
+                interactors.removeAll(processedInteractors);
+            }
+        }
+
+        ccWriter.close();
         drWriter.close();
     }
 
