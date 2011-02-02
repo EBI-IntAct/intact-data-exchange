@@ -152,7 +152,7 @@ public class CCLineWriterImpl implements CCLineWriter{
 
         writer.write(" Xref=IntAct:");
         writer.write( intact1 );
-        writer.write(", IntAct:");
+        writer.write(",");
         writer.write(intact2);
         writer.write(';');
         writer.write(WriterUtils.NEW_LINE);
