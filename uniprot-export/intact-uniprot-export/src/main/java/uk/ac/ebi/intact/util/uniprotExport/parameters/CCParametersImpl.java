@@ -14,8 +14,6 @@ public class CCParametersImpl implements CCParameters{
 
     private String firstInteractor;
 
-    private String firstIntact;
-
     private String firstGeneName;
 
     private String firstTaxId;
@@ -23,7 +21,7 @@ public class CCParametersImpl implements CCParameters{
 
     private List<SecondCCInteractor> secondCCinteractors;
 
-    public CCParametersImpl(String firstInteractor, String firstIntactAc, String firstGeneName,
+    public CCParametersImpl(String firstInteractor, String firstGeneName,
                             String firstTaxId, List<SecondCCInteractor> secondInteractors){
         if (firstTaxId == null){
             throw new IllegalArgumentException("The CCLine parameters need a non null first taxId.");
@@ -33,7 +31,6 @@ public class CCParametersImpl implements CCParameters{
         }
 
         this.firstInteractor = firstInteractor;
-        this.firstIntact = firstIntactAc != null ? firstIntactAc : "-";
 
         this.firstGeneName = firstGeneName != null ? firstGeneName : "-";
         this.firstTaxId = firstTaxId;
@@ -44,11 +41,6 @@ public class CCParametersImpl implements CCParameters{
     @Override
     public String getFirstInteractor() {
         return firstInteractor;
-    }
-
-    @Override
-    public String getFirstIntacAc() {
-        return this.firstIntact;
     }
 
     public String getFirstGeneName() {

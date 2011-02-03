@@ -13,6 +13,11 @@ import java.util.SortedSet;
 public interface SecondCCInteractor {
 
     /**
+     * the Intact AC of the first interactor
+     */
+    public String getFirstIntacAc();
+
+    /**
      * the uniprot AC of the second interactor
      */
     public String getSecondInteractor();

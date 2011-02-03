@@ -16,6 +16,7 @@ public class SecondCCInteractorImpl implements SecondCCInteractor{
     private String secondInteractor;
 
     private String secondIntact;
+    private String firstIntact;
 
     private String secondGeneName;
     private String secondTaxId;
@@ -23,7 +24,7 @@ public class SecondCCInteractorImpl implements SecondCCInteractor{
 
     private SortedSet<InteractionDetails> interactionDetails;
 
-    public SecondCCInteractorImpl(String secondInteractor, String secondIntactAc, String secondGeneName,
+    public SecondCCInteractorImpl(String secondInteractor, String firstIntactAc, String secondIntactAc, String secondGeneName,
                                   String secondTaxId, String secondOrganismName,
                                   SortedSet<InteractionDetails> interactionDetails){
         if (secondTaxId == null){
@@ -31,6 +32,7 @@ public class SecondCCInteractorImpl implements SecondCCInteractor{
         }
 
         this.secondInteractor = secondInteractor;
+        this.firstIntact = firstIntactAc != null ? firstIntactAc : "-";
         this.secondIntact = secondIntactAc != null ? secondIntactAc : "-";
 
         this.secondGeneName = secondGeneName != null ? secondGeneName : "-";
@@ -73,5 +75,10 @@ public class SecondCCInteractorImpl implements SecondCCInteractor{
     @Override
     public SortedSet<InteractionDetails> getInteractionDetails() {
         return this.interactionDetails;
+    }
+
+    @Override
+    public String getFirstIntacAc() {
+        return this.firstIntact;
     }
 }

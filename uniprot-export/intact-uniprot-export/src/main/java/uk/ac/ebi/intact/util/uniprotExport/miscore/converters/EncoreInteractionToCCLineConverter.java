@@ -254,12 +254,12 @@ public class EncoreInteractionToCCLineConverter {
                     // collect all pubmeds and spoke expanded information
                     SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
 
-                    SecondCCInteractor secondCCInteractor = new SecondCCInteractorImpl(secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
+                    SecondCCInteractor secondCCInteractor = new SecondCCInteractorImpl(secondUniprot, firstIntactAc, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
                     secondCCInteractors.add(secondCCInteractor);
                 }
             }
 
-            return new CCParametersImpl(firstInteractor, firstIntactAc,geneName1, taxId1, secondCCInteractors);
+            return new CCParametersImpl(firstInteractor, geneName1, taxId1, secondCCInteractors);
         }
 
         return null;

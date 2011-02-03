@@ -1,0 +1,40 @@
+AC   P28548
+CC   -!- INTERACTION:
+CC       Interact=Yes; Xref=IntAct:EBI-317777,EBI-327642;
+CC         Protein1=kin-10 [P28548-1];
+CC         Protein2=	pat-12 [Q22534];
+CC         InteractionType=physical association; Method=two hybrid pooling; Source=PubMed:14704431
+CC       Interact=Yes; Xref=IntAct:EBI-317778,EBI-311862;
+CC         Protein1=kin-10 [P28548-2];
+CC         Protein2=eya-1 [O17670];
+CC         InteractionType=physical association; Method=two hybrid pooling; Source=PubMed:14704431, PubMed:15199141
+CC       Interact=Yes; Xref=IntAct:EBI-317779,EBI-311862;
+CC         Protein1=kin-10 [P28548:PRO_0000068244];
+CC         Protein2=atf-2 [Q21361];
+CC         InteractionType=association; Method=anti bait coimmunoprecipitation; Expansion=Spoke; Source=PubMed:18212739
+CC         InteractionType=physical association; Method=two hybrid pooling; Source=PubMed:14704431
+CC         InteractionType=physical association; Method=coimmunoprecipitation; Source=PubMed:15115758, PubMed:15199141
+//
+AC   Q22534
+CC   -!- INTERACTION:
+CC       Interact=Yes; Xref=IntAct:EBI-327642,EBI-317777;
+CC         Protein1=pat-12 [Q22534];
+CC         Protein2=kin-10 [P28548-1];
+CC         InteractionType=physical association; Method=two hybrid pooling; Source=PubMed:14704431
+//
+AC   O17670
+CC   -!- INTERACTION:
+CC       Interact=Yes; Xref=IntAct:EBI-311862,EBI-317778;
+CC         Protein1=eya-1 [O17670];
+CC         Protein2=kin-10 [P28548-2];
+CC         InteractionType=physical association; Method=two hybrid pooling; Source=PubMed:14704431, PubMed:15199141
+//
+AC   Q21361
+CC   -!- INTERACTION:
+CC       Interact=Yes; Xref=IntAct:EBI-311862,EBI-317779;
+CC         Protein1=atf-2 [Q21361];
+CC         Protein2=kin-10 [P28548:PRO_0000068244];
+CC         InteractionType=association; Method=anti bait coimmunoprecipitation; Expansion=Spoke; Source=PubMed:18212739
+CC         InteractionType=physical association; Method=two hybrid pooling; Source=PubMed:14704431
+CC         InteractionType=physical association; Method=coimmunoprecipitation; Source=PubMed:15115758, PubMed:15199141
+//

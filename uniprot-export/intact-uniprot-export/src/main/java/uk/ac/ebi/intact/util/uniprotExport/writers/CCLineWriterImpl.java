@@ -73,10 +73,11 @@ public class CCLineWriterImpl implements CCLineWriter{
     public void writeCCLineParameters(CCParameters parameters) throws IOException {
 
         String firstUniprotAc = parameters.getFirstInteractor();
-        String firstIntactAc = parameters.getFirstIntacAc();
         String firstTaxId = parameters.getFirstTaxId();
 
         for (SecondCCInteractor secondInteractor : parameters.getSecondCCInteractors()){
+            String firstIntactAc = secondInteractor.getFirstIntacAc();
+
             // write introduction
             writeInteractionIntroduction(true, firstUniprotAc, firstIntactAc, secondInteractor.getSecondInteractor(), secondInteractor.getSecondIntactAc());
 
@@ -258,7 +259,7 @@ public class CCLineWriterImpl implements CCLineWriter{
         int size = spokeExpandedPubmeds.size();
         for (String pid : spokeExpandedPubmeds){
             index++;
-            writer.write("Pubmed:");
+            writer.write("PubMed:");
             writer.write(pid);
 
             if (index == size){

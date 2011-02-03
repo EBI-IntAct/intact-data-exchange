@@ -18,11 +18,6 @@ public interface CCParameters {
     public String getFirstInteractor();
 
     /**
-     * the Intact AC of the first interactor
-     */
-    public String getFirstIntacAc();
-
-    /**
      * The gene name of the first interactor
      */
     public String getFirstGeneName();
