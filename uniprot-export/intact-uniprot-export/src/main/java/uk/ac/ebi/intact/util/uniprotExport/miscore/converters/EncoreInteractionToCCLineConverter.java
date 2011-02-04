@@ -212,6 +212,8 @@ public class EncoreInteractionToCCLineConverter {
 
                 // if the uniprot acs are not null, it is possible to convert into a CCParameters
                 if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
+                    // the complete uniprot ac of the first interactor
+                    String firstUniprot = null;
                     // extract second interactor
                     String secondUniprot = null;
 
@@ -231,6 +233,7 @@ public class EncoreInteractionToCCLineConverter {
                     String organism2 = null;
 
                     if (uniprot1.startsWith(firstInteractor)){
+                        firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
                         taxId2 = organismsB[0];
@@ -241,6 +244,7 @@ public class EncoreInteractionToCCLineConverter {
                         firstIntactAc = intact1;
                     }
                     else{
+                        firstUniprot = uniprot2;
                         secondUniprot = uniprot1;
                         geneName2 = context.getGeneNames().get(uniprot1);
                         taxId2 = organismsA[0];
@@ -254,7 +258,7 @@ public class EncoreInteractionToCCLineConverter {
                     // collect all pubmeds and spoke expanded information
                     SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
 
-                    SecondCCInteractor secondCCInteractor = new SecondCCInteractorImpl(secondUniprot, firstIntactAc, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
+                    SecondCCInteractor secondCCInteractor = new SecondCCInteractorImpl(firstUniprot, secondUniprot, firstIntactAc, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
                     secondCCInteractors.add(secondCCInteractor);
                 }
             }

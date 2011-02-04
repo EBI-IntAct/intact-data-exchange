@@ -3,7 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.writers;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParameters;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -22,18 +22,18 @@ public class CCLineWriterTest extends UniprotExportBase{
 
     @Test
     public void test_cc_export(){
-        List<DRParameters> parameters = createDRParameters();
+        List<CCParameters> parameters = createCCParameters();
 
         try {
-            File testFile = new File("DrTest.txt");
+            File testFile = new File("CcTest.txt");
             FileWriter test = new FileWriter(testFile);
-            DRLineWriter writer = new DRLineWriterImpl(test);
+            CCLineWriter writer = new CCLineWriterImpl(test);
 
-            writer.writeDRLines(parameters);
+            writer.writeCCLines(parameters);
 
             writer.close();
 
-            File template = new File(GOLineWriterTest.class.getResource("/dr_file_test.txt").getFile());
+            File template = new File(CCLineWriterTest.class.getResource("/cc_file_test.txt").getFile());
 
             Assert.assertTrue(areFilesEqual(testFile, template));
 

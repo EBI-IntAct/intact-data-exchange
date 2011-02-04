@@ -82,7 +82,7 @@ public class CCLineWriterImpl implements CCLineWriter{
             writeInteractionIntroduction(true, firstUniprotAc, firstIntactAc, secondInteractor.getSecondInteractor(), secondInteractor.getSecondIntactAc());
 
             // write first protein
-            writeFirstProtein(firstUniprotAc, firstIntactAc);
+            writeFirstProtein(secondInteractor.getFirstInteractor(), parameters.getFirstGeneName());
 
             // write second protein
             writeSecondProtein(secondInteractor.getSecondInteractor(), secondInteractor.getSecondGeneName(),
@@ -151,7 +151,7 @@ public class CCLineWriterImpl implements CCLineWriter{
         writer.write((doesInteract ? "Yes" : "No"));
         writer.write("; ");
 
-        writer.write(" Xref=IntAct:");
+        writer.write("Xref=IntAct:");
         writer.write( intact1 );
         writer.write(",");
         writer.write(intact2);
@@ -180,7 +180,6 @@ public class CCLineWriterImpl implements CCLineWriter{
         else {
            writer.write( uniprot1 );
         }
-        writer.write( uniprot1 );
         writer.write( "];" );
         writer.write(WriterUtils.NEW_LINE);
     }
@@ -289,7 +288,7 @@ public class CCLineWriterImpl implements CCLineWriter{
         int size = binaryInteractions.size();
         for (String pid : binaryInteractions){
             index++;
-            writer.write("Pubmed:");
+            writer.write("PubMed:");
             writer.write(pid);
 
             if (index == size){

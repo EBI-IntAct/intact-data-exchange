@@ -18,6 +18,12 @@ public interface SecondCCInteractor {
     public String getFirstIntacAc();
 
     /**
+     * The uniprot ac of the first interactor (can be isoform and feature chain)
+     * @return
+     */
+    public String getFirstInteractor();
+
+    /**
      * the uniprot AC of the second interactor
      */
     public String getSecondInteractor();

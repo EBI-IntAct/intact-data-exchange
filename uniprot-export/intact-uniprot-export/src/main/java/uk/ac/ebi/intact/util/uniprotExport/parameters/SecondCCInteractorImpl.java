@@ -13,6 +13,8 @@ import java.util.TreeSet;
 
 public class SecondCCInteractorImpl implements SecondCCInteractor{
 
+    // duplicated line because of splice variants and feature chains!!!
+    private String firstInteractor;
     private String secondInteractor;
 
     private String secondIntact;
@@ -24,13 +26,14 @@ public class SecondCCInteractorImpl implements SecondCCInteractor{
 
     private SortedSet<InteractionDetails> interactionDetails;
 
-    public SecondCCInteractorImpl(String secondInteractor, String firstIntactAc, String secondIntactAc, String secondGeneName,
+    public SecondCCInteractorImpl(String firstInteractor, String secondInteractor, String firstIntactAc, String secondIntactAc, String secondGeneName,
                                   String secondTaxId, String secondOrganismName,
                                   SortedSet<InteractionDetails> interactionDetails){
         if (secondTaxId == null){
             throw new IllegalArgumentException("The CCLine parameters need a non null second taxId.");
         }
 
+        this.firstInteractor = firstInteractor;
         this.secondInteractor = secondInteractor;
         this.firstIntact = firstIntactAc != null ? firstIntactAc : "-";
         this.secondIntact = secondIntactAc != null ? secondIntactAc : "-";
@@ -80,5 +83,10 @@ public class SecondCCInteractorImpl implements SecondCCInteractor{
     @Override
     public String getFirstIntacAc() {
         return this.firstIntact;
+    }
+
+    @Override
+    public String getFirstInteractor() {
+        return this.firstInteractor;
     }
 }
