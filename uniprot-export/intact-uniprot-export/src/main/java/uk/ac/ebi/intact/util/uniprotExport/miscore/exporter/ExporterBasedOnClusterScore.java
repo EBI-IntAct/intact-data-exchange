@@ -3,6 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 
@@ -56,7 +57,7 @@ public class ExporterBasedOnClusterScore implements InteractionExporter{
         IntActInteractionClusterScore miScore = results.getClusterScore();
 
         Set<Integer> interactionsPossibleToExport = new HashSet<Integer>();
-        Map<String, Map.Entry<String, String>> interactionType_Method = context.getInteractionToMethod_type();
+        Map<String, MethodAndTypePair> interactionType_Method = context.getInteractionToMethod_type();
         Set<String> spokeExpandedInteractions = context.getSpokeExpandedInteractions();
 
         for (Map.Entry<Integer, EncoreInteraction> entry : miScore.getInteractionMapping().entrySet()){
@@ -81,7 +82,7 @@ public class ExporterBasedOnClusterScore implements InteractionExporter{
                     if (filterBinary){
                         if (!spokeExpandedInteractions.contains(ac)){
 
-                            String method = interactionType_Method.get(ac).getKey();
+                            String method = interactionType_Method.get(ac).getMethod();
 
                             if (!method.equals(COLOCALIZATION)){
                                 interactionsPossibleToExport.add(entry.getKey());

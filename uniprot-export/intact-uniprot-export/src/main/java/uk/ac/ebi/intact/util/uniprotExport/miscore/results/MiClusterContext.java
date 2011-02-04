@@ -1,6 +1,9 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.results;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Context of the cluster
@@ -14,7 +17,7 @@ public class MiClusterContext {
 
     private Map<String, String> geneNames = new HashMap<String, String>();
     private Map<String, String> miTerms = new HashMap<String, String>();
-    private Map<String, Map.Entry<String,String>> interactionToType_Method = new HashMap<String, Map.Entry<String,String>>();;
+    private Map<String, MethodAndTypePair> interactionToType_Method = new HashMap<String, MethodAndTypePair>();
     private Set<String> spokeExpandedInteractions = new HashSet<String>();
 
     /**
@@ -37,7 +40,7 @@ public class MiClusterContext {
      *
      * @return Map associating an Intact interaction AC to a couple {method, interaction type}
      */
-    public Map<String, Map.Entry<String, String>> getInteractionToMethod_type() {
+    public Map<String, MethodAndTypePair> getInteractionToMethod_type() {
         return interactionToType_Method;
     }
 

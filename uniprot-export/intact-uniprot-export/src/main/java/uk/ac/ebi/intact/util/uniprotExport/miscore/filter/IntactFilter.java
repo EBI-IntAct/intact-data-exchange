@@ -1,7 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.filter;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.intact.core.context.DataContext;
@@ -10,18 +9,22 @@ import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.ExporterBasedOnDetectionMethod;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.QueryFactory;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActFileMiScoreDistribution;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This filter is selecting interactions eligible for uniprot export from IntAct.
@@ -313,7 +316,7 @@ public class IntactFilter implements InteractionFilter{
             context.getMiTerms().put(typeMi, interactionTypes.iterator().next().getText());
         }
 
-        context.getInteractionToMethod_type().put(interactionAc, new DefaultMapEntry(detectionMI, typeMi));
+        context.getInteractionToMethod_type().put(interactionAc, new MethodAndTypePair(detectionMI, typeMi));
 
         if (toBinary.size() > 1){
 

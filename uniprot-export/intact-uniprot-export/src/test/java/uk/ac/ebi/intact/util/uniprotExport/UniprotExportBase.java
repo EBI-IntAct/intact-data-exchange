@@ -4,6 +4,7 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.*;
 
@@ -219,6 +220,9 @@ public class UniprotExportBase extends IntactBasicTestCase {
         interaction.setPublicationIds(publications);
         interaction.setOrganismsA(organismA);
         interaction.setOrganismsB(organismB);
+        interaction.setExperimentToPubmed(experimentToPubmed);
+        interaction.setTypeToPubmed(type2Pubmed);
+        interaction.setMethodToPubmed(method2Pubmed);
 
         return interaction;
     }
@@ -261,6 +265,9 @@ public class UniprotExportBase extends IntactBasicTestCase {
         interaction.setPublicationIds(publications);
         interaction.setOrganismsA(organismA);
         interaction.setOrganismsB(organismA);
+        interaction.setExperimentToPubmed(experimentToPubmed);
+        interaction.setTypeToPubmed(type2Pubmed);
+        interaction.setMethodToPubmed(method2Pubmed);
 
         return interaction;
     }
@@ -300,13 +307,10 @@ public class UniprotExportBase extends IntactBasicTestCase {
 
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx4", "14704431");
-        experimentToPubmed.put("EBI-xxxxxx5", "14704431");
         experimentToPubmed.put("EBI-xxxxxx6", "15199141");
         experimentToPubmed.put("EBI-xxxxxx7", "15199141");
-        experimentToPubmed.put("EBI-xxxxxx8", "15199141");
-        experimentToPubmed.put("EBI-xxxxxx9", "18212739");
-        experimentToPubmed.put("EBI-xxxxxx10", "15115758");
-        experimentToPubmed.put("EBI-xxxxxx11", "15115758");
+        experimentToPubmed.put("EBI-xxxxxx8", "18212739");
+        experimentToPubmed.put("EBI-xxxxxx9", "15115758");
 
         Collection<CrossReference> organismA = new ArrayList<CrossReference>();
         CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
@@ -325,6 +329,9 @@ public class UniprotExportBase extends IntactBasicTestCase {
         interaction.setPublicationIds(publications);
         interaction.setOrganismsA(organismA);
         interaction.setOrganismsB(organismB);
+        interaction.setExperimentToPubmed(experimentToPubmed);
+        interaction.setTypeToPubmed(type2Pubmed);
+        interaction.setMethodToPubmed(method2Pubmed);
 
         return interaction;
     }
@@ -356,7 +363,16 @@ public class UniprotExportBase extends IntactBasicTestCase {
         context.getMiTerms().put("MI:0006", "anti bait coimmunoprecipitation");
         context.getMiTerms().put("MI:0019", "coimmunoprecipitation");
 
-        context.getSpokeExpandedInteractions().add("EBI-xxxxxx9");
+        context.getSpokeExpandedInteractions().add("EBI-xxxxxx8");
+
+        context.getInteractionToMethod_type().put("EBI-xxxxxx1", new MethodAndTypePair("MI:0398", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx2", new MethodAndTypePair("MI:0398", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx3", new MethodAndTypePair("MI:0398", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx4", new MethodAndTypePair("MI:0398", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx6", new MethodAndTypePair("MI:0398", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx7", new MethodAndTypePair("MI:0019", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx8", new MethodAndTypePair("MI:0006", "MI:0914"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx9", new MethodAndTypePair("MI:0019", "MI:0915"));
 
         return context;
     }

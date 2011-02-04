@@ -29,6 +29,17 @@ public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
 
         String firstInteractor = "P28548";
 
+        /*MethodAndTypePair mp1 = new MethodAndTypePair("MI:0398", "MI:0915");
+        List<String> pubmeds = new ArrayList<String>();
+        pubmeds.add("123456789");
+
+        Map<MethodAndTypePair, List<String>> map = new HashMap<MethodAndTypePair, List<String>> ();
+        map.put(mp1, pubmeds);
+
+        MethodAndTypePair mp2 = new MethodAndTypePair("MI:0398", "MI:0915");
+        boolean contain = map.containsKey(mp2);
+
+        List<String> ps = map.get(mp2);*/
 
         CCParameters parameters = converter.convertInteractionsIntoCCLines(interactions, context, firstInteractor);
         Assert.assertNotNull(parameters);

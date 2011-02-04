@@ -17,7 +17,6 @@ public class CCParametersImpl implements CCParameters{
     private String firstGeneName;
 
     private String firstTaxId;
-    private String firstOrganismName;
 
     private List<SecondCCInteractor> secondCCinteractors;
 
@@ -58,9 +57,5 @@ public class CCParametersImpl implements CCParameters{
 
     public void setFirstGeneName(String firstGeneName) {
         this.firstGeneName = firstGeneName;
-    }
-
-    public void setFirstOrganismName(String firstOrganismName) {
-        this.firstOrganismName = firstOrganismName;
     }
 }

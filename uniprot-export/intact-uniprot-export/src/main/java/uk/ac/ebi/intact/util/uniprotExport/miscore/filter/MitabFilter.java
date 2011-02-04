@@ -1,6 +1,5 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.filter;
 
-import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
@@ -11,6 +10,7 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.QueryFactory;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 
@@ -130,7 +130,7 @@ public class MitabFilter implements InteractionFilter{
                         List<InteractionType> interactionTypes = interaction.getInteractionTypes();
                         String typeMi = interactionTypes.iterator().next().getIdentifier();
 
-                        Map.Entry<String, String> entry = new DefaultMapEntry(detectionMI, typeMi);
+                        MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
                         context.getInteractionToMethod_type().put(intactAc, entry);
 
                         if (!interaction.getExpansionMethods().isEmpty()){

@@ -1,10 +1,10 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.converters;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
@@ -59,10 +59,10 @@ public class EncoreInteractionToCCLineConverter {
         Map<String, List<String>> pubmedToInteraction = WriterUtils.invertMapOfTypeStringToString(interactionToPubmed);
 
         // map which associates a couple {interaction detection method, interaction type} to a set of Pubmed ids
-        Map<Map.Entry<String, String>, Set<String>> distinctInformationDetails = collectDistinctInteractionDetails(interaction, context);
+        Map<MethodAndTypePair, Set<String>> distinctInformationDetails = collectDistinctInteractionDetails(interaction, context);
 
         // map which associates a couple {interaction detection method, interaction type} to a set of IntAct interaction Acs
-        Map<Map.Entry<String, String>, List<String>> method_typeToInteractions = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), interactionToPubmed.keySet());
+        Map<MethodAndTypePair, List<String>> method_typeToInteractions = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), interactionToPubmed.keySet());
 
         // the list with the interaction details
         SortedSet<InteractionDetails> sortedInteractionDetails = new TreeSet<InteractionDetails>();
@@ -71,12 +71,12 @@ public class EncoreInteractionToCCLineConverter {
         // - pubmed ids only associated with spoke expanded interactions
         // - pubmed ids only associated with true binary interactions
         // - pubmed ids associated with both spoke expanded and true binary interactions. In this case, we consider the pubmed id as only associated with true binary interaction
-        for (Map.Entry<Map.Entry<String, String>, Set<String>> ip : distinctInformationDetails.entrySet()){
+        for (Map.Entry<MethodAndTypePair, Set<String>> ip : distinctInformationDetails.entrySet()){
             // the method is the key of the entry
-            String method = context.getMiTerms().get(ip.getKey().getValue());
+            String method = context.getMiTerms().get(ip.getKey().getMethod());
 
             // the type is the value of the entry
-            String type = context.getMiTerms().get(ip.getKey().getKey());
+            String type = context.getMiTerms().get(ip.getKey().getType());
 
             // the list of pubmed ids associated with the couple {method, type}
             Set<String> pubmedIds = ip.getValue();
@@ -87,7 +87,7 @@ public class EncoreInteractionToCCLineConverter {
             Set<String> pubmedTrueBinary = new HashSet<String>(pubmedIds.size());
 
             // the list of IntAct interaction acs associated with the couple {method, type}
-            List<String> totalInteractions = method_typeToInteractions.get(ip);
+            List<String> totalInteractions = method_typeToInteractions.get(ip.getKey());
 
             // for each pubmed associated with couple {method, type}
             for (String pubmedId : pubmedIds){
@@ -123,7 +123,7 @@ public class EncoreInteractionToCCLineConverter {
 
             // if we have true binary interactions, create an InteractionDetails 'true binary' and add it to the list of InteractionDetails
             if (!pubmedTrueBinary.isEmpty()){
-                InteractionDetails details = new InteractionDetailsImpl(type, method, false, pubmedSpokeExpanded);
+                InteractionDetails details = new InteractionDetailsImpl(type, method, false, pubmedTrueBinary);
                 sortedInteractionDetails.add(details);
             }
         }
@@ -139,7 +139,7 @@ public class EncoreInteractionToCCLineConverter {
      * - key = couple {method, type}
      * - value = set of pubmed ids
      */
-    public Map<Map.Entry<String, String>, Set<String>> collectDistinctInteractionDetails(EncoreInteraction interaction, MiClusterContext context){
+    public Map<MethodAndTypePair, Set<String>> collectDistinctInteractionDetails(EncoreInteraction interaction, MiClusterContext context){
         // map which associates the interaction type to the pubmed id
         Map<String, List<String>> typeToPubmed = interaction.getTypeToPubmed();
 
@@ -147,21 +147,21 @@ public class EncoreInteractionToCCLineConverter {
         Map<String, List<String>> methodToPubmed = interaction.getMethodToPubmed();
 
         // the map which is a merge of the two previous maps
-        Map<Map.Entry<String, String>, Set<String>> distinctLines = new HashMap<Map.Entry<String, String>, Set<String>>();
+        Map<MethodAndTypePair, Set<String>> distinctLines = new HashMap<MethodAndTypePair, Set<String>>();
 
         // for each method of this interaction
         for (Map.Entry<String, List<String>> methodEntry : methodToPubmed.entrySet()){
             // list of pubmeds associated with this method
             List<String> pubmeds1 = methodEntry.getValue();
             // the name of the method
-            String method = context.getMiTerms().get(methodEntry.getKey());
+            String method = methodEntry.getKey();
 
             // for each interaction type of this interaction
             for (Map.Entry<String, List<String>> typeEntry : typeToPubmed.entrySet()){
                 // list of pubmeds associated with this interaction type
                 List<String> pubmeds2 = typeEntry.getValue();
                 // the name of the interaction type
-                String type = context.getMiTerms().get(typeEntry.getKey());
+                String type = typeEntry.getKey();
 
                 // the list of pubmed ids associated with the couple {method, type}
                 Set<String> associatedPubmeds = new HashSet(CollectionUtils.intersection(pubmeds1, pubmeds2));
@@ -169,7 +169,7 @@ public class EncoreInteractionToCCLineConverter {
                 // if it is not empty, we can add a new entry in the map
                 if (!associatedPubmeds.isEmpty()){
 
-                    distinctLines.put(new DefaultMapEntry(method, type), associatedPubmeds);
+                    distinctLines.put(new MethodAndTypePair(method, type), associatedPubmeds);
                 }
             }
         }

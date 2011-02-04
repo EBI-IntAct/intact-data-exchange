@@ -1,5 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
+
 import java.util.*;
 
 /**
@@ -40,13 +42,13 @@ public class WriterUtils {
         return invertedMap;
     }
 
-    public static Map<Map.Entry<String, String>, List<String>> invertMapFromKeySelection (Map<String, Map.Entry<String, String>> mapToInvert, Set<String> keySelection){
-        Map<Map.Entry<String, String>, List<String>> invertedMap = new HashMap<Map.Entry<String, String>, List<String>>();
+    public static Map<MethodAndTypePair, List<String>> invertMapFromKeySelection (Map<String, MethodAndTypePair> mapToInvert, Set<String> keySelection){
+        Map<MethodAndTypePair, List<String>> invertedMap = new HashMap<MethodAndTypePair, List<String>>();
 
         for (String selectedKey : keySelection){
 
             if (mapToInvert.containsKey(selectedKey)){
-                Map.Entry<String, String> value = mapToInvert.get(selectedKey);
+                MethodAndTypePair value = mapToInvert.get(selectedKey);
 
                 if (invertedMap.containsKey(value)){
                     List<String> values = invertedMap.get(value);
