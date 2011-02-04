@@ -4,6 +4,7 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.*;
 
 import java.io.BufferedReader;
@@ -190,6 +191,25 @@ public class UniprotExportBase extends IntactBasicTestCase {
         interactorB.put("uniprotkb", "Q22534");
         interactorB.put("intact", "EBI-327642");
 
+        List<String> pubmeds = new ArrayList<String>();
+        pubmeds.add("14704431");
+
+        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
+        type2Pubmed.put("MI:0915", pubmeds);
+        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
+        method2Pubmed.put("MI:0398", pubmeds);
+
+        Map<String, String> experimentToPubmed = new HashMap<String, String>();
+        experimentToPubmed.put("EBI-xxxxxx1", "14704431");
+
+        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
+        organismA.add(orgA);
+
+        Collection<CrossReference> organismB = new ArrayList<CrossReference>();
+        CrossReference orgB = new CrossReferenceImpl("taxid", "9606", "Homo sapiens");
+        organismB.add(orgB);
+
         List<CrossReference> publications = new ArrayList<CrossReference>(1);
         CrossReference ref = new CrossReferenceImpl("pubmed", "14704431");
         publications.add(ref);
@@ -197,8 +217,148 @@ public class UniprotExportBase extends IntactBasicTestCase {
         interaction.setInteractorAccsA(interactorA);
         interaction.setInteractorAccsB(interactorB);
         interaction.setPublicationIds(publications);
+        interaction.setOrganismsA(organismA);
+        interaction.setOrganismsB(organismB);
 
         return interaction;
+    }
+
+    public EncoreInteraction createSecondEncoreInteraction(){
+        EncoreInteraction interaction = new EncoreInteraction();
+
+        Map<String, String> interactorA = new HashMap<String, String>();
+        interactorA.put("uniprotkb", "P28548-2");
+        interactorA.put("intact", "EBI-317778");
+        Map<String, String> interactorB = new HashMap<String, String>();
+        interactorB.put("uniprotkb", "O17670");
+        interactorB.put("intact", "EBI-311862");
+
+        List<String> pubmeds = new ArrayList<String>();
+        pubmeds.add("14704431");
+        pubmeds.add("15199141");
+
+        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
+        type2Pubmed.put("MI:0915", pubmeds);
+        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
+        method2Pubmed.put("MI:0398", pubmeds);
+
+        Map<String, String> experimentToPubmed = new HashMap<String, String>();
+        experimentToPubmed.put("EBI-xxxxxx2", "14704431");
+        experimentToPubmed.put("EBI-xxxxxx3", "15199141");
+
+        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
+        organismA.add(orgA);
+
+        List<CrossReference> publications = new ArrayList<CrossReference>(1);
+        CrossReference ref = new CrossReferenceImpl("pubmed", "14704431");
+        CrossReference ref2 = new CrossReferenceImpl("pubmed", "15199141");
+        publications.add(ref);
+        publications.add(ref2);
+
+        interaction.setInteractorAccsA(interactorA);
+        interaction.setInteractorAccsB(interactorB);
+        interaction.setPublicationIds(publications);
+        interaction.setOrganismsA(organismA);
+        interaction.setOrganismsB(organismA);
+
+        return interaction;
+    }
+
+    public EncoreInteraction createThirdEncoreInteraction(){
+        EncoreInteraction interaction = new EncoreInteraction();
+
+        Map<String, String> interactorA = new HashMap<String, String>();
+        interactorA.put("uniprotkb", "P28548-PRO_0000068244");
+        interactorA.put("intact", "EBI-317779");
+        Map<String, String> interactorB = new HashMap<String, String>();
+        interactorB.put("uniprotkb", "Q21361");
+        interactorB.put("intact", "EBI-311862");
+
+        List<String> pubmeds1 = new ArrayList<String>();
+        pubmeds1.add("14704431");
+        pubmeds1.add("15199141");
+        List<String> pubmeds2 = new ArrayList<String>();
+        pubmeds2.add("18212739");
+        List<String> pubmeds3 = new ArrayList<String>();
+        pubmeds3.add("14704431");
+        pubmeds3.add("15199141");
+        pubmeds3.add("15115758");
+        List<String> pubmeds4 = new ArrayList<String>();
+        pubmeds4.add("18212739");
+        List<String> pubmeds5 = new ArrayList<String>();
+        pubmeds5.add("15199141");
+        pubmeds5.add("15115758");
+
+        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
+        type2Pubmed.put("MI:0914", pubmeds2);
+        type2Pubmed.put("MI:0915", pubmeds3);
+        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
+        method2Pubmed.put("MI:0398", pubmeds1);
+        method2Pubmed.put("MI:0006", pubmeds4);
+        method2Pubmed.put("MI:0019", pubmeds5);
+
+        Map<String, String> experimentToPubmed = new HashMap<String, String>();
+        experimentToPubmed.put("EBI-xxxxxx4", "14704431");
+        experimentToPubmed.put("EBI-xxxxxx5", "14704431");
+        experimentToPubmed.put("EBI-xxxxxx6", "15199141");
+        experimentToPubmed.put("EBI-xxxxxx7", "15199141");
+        experimentToPubmed.put("EBI-xxxxxx8", "15199141");
+        experimentToPubmed.put("EBI-xxxxxx9", "18212739");
+        experimentToPubmed.put("EBI-xxxxxx10", "15115758");
+        experimentToPubmed.put("EBI-xxxxxx11", "15115758");
+
+        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
+        organismA.add(orgA);
+
+        Collection<CrossReference> organismB = new ArrayList<CrossReference>();
+        CrossReference orgB = new CrossReferenceImpl("taxid", "9606", "Homo sapiens");
+        organismB.add(orgB);
+
+        List<CrossReference> publications = new ArrayList<CrossReference>(1);
+        CrossReference ref = new CrossReferenceImpl("pubmed", "14704431");
+        publications.add(ref);
+
+        interaction.setInteractorAccsA(interactorA);
+        interaction.setInteractorAccsB(interactorB);
+        interaction.setPublicationIds(publications);
+        interaction.setOrganismsA(organismA);
+        interaction.setOrganismsB(organismB);
+
+        return interaction;
+    }
+
+    public List<EncoreInteraction> createEncoreInteractions(){
+        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
+
+        interactions.add(createEncoreInteraction());
+        interactions.add(createSecondEncoreInteraction());
+        interactions.add(createThirdEncoreInteraction());
+
+        return interactions;
+    }
+
+    public MiClusterContext createClusterContext(){
+        MiClusterContext context = new MiClusterContext();
+
+        context.getGeneNames().put("P28548","Kin-10");
+        context.getGeneNames().put("P28548-1","Kin-10");
+        context.getGeneNames().put("P28548-2","Kin-10");
+        context.getGeneNames().put("P28548-PRO_0000068244","Kin-10");
+        context.getGeneNames().put("Q22534","pat-12");
+        context.getGeneNames().put("O17670","eya-1");
+        context.getGeneNames().put("Q21361","atf-2");
+
+        context.getMiTerms().put("MI:0398", "two hybrid pooling");
+        context.getMiTerms().put("MI:0915", "physical association");
+        context.getMiTerms().put("MI:0914", "association");
+        context.getMiTerms().put("MI:0006", "anti bait coimmunoprecipitation");
+        context.getMiTerms().put("MI:0019", "coimmunoprecipitation");
+
+        context.getSpokeExpandedInteractions().add("EBI-xxxxxx9");
+
+        return context;
     }
 
     public boolean areFilesEqual (File file1, File file2) throws IOException {
