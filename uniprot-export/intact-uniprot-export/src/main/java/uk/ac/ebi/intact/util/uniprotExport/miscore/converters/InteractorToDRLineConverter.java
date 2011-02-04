@@ -22,7 +22,7 @@ public class InteractorToDRLineConverter {
      * @return the converted DRParameter
      * @throws IOException
      */
-    public DRParameters convertInteractorToDRLine(String interactorAc, int numberInteractions) throws IOException {
+    public DRParameters convertInteractorToDRLine(String interactorAc, int numberInteractions){
 
         // if the interactor ac is not null, we can create a DRParameter
         if (interactorAc != null){

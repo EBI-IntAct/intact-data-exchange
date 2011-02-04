@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
@@ -176,18 +177,6 @@ public class EncoreInteractionToCCLineConverter {
         return distinctLines;
     }
 
-    private String extractIntactAcFromAccs(Map<String, String> interactorAccs){
-        String interactorAcc = null;
-        for(Map.Entry<String, String> entry : interactorAccs.entrySet()){
-            if(WriterUtils.INTACT.equalsIgnoreCase(entry.getKey())){
-                interactorAcc =  entry.getValue();
-                break;
-            }
-        }
-
-        return interactorAcc;
-    }
-
     /**
      * Converts an EncoreInteraction into a CCParameter
 
@@ -204,11 +193,14 @@ public class EncoreInteractionToCCLineConverter {
 
             for (EncoreInteraction interaction : interactions){
                 // get the uniprot acs of the first and second interactors
-                String uniprot1 = interaction.getInteractorA();
-                String uniprot2 = interaction.getInteractorB();
+                String [] interactorA = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsA());
+                String [] interactorB = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsB());
 
-                String intact1 = extractIntactAcFromAccs(interaction.getInteractorAccsA());
-                String intact2 = extractIntactAcFromAccs(interaction.getInteractorAccsB());
+                String uniprot1 = interactorA[0];
+                String uniprot2 = interactorB[0];
+
+                String intact1 = interactorA[1];
+                String intact2 = interactorB[1];
 
                 // if the uniprot acs are not null, it is possible to convert into a CCParameters
                 if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){

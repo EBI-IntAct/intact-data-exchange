@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore.converters;
 
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.GOParametersImpl;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
@@ -43,8 +44,11 @@ public class EncoreInteractionToGoLineConverter {
      */
     public GOParameters convertInteractionIntoGOParameters(EncoreInteraction interaction){
         // extract the uniprot acs of the firts and second interactors
-        String uniprot1 = interaction.getInteractorA(WriterUtils.UNIPROT);
-        String uniprot2 = interaction.getInteractorB(WriterUtils.UNIPROT);
+        String [] interactorA = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsA());
+        String [] interactorB = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsB());
+
+        String uniprot1 = interactorA[0];
+        String uniprot2 = interactorB[0];
 
         // if the uniprot acs are not null, it is possible to create a GOParameter
         if (uniprot1 != null && uniprot2 != null){

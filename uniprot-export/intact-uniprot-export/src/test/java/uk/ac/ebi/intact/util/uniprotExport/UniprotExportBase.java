@@ -1,5 +1,8 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.*;
 
@@ -175,6 +178,27 @@ public class UniprotExportBase extends IntactBasicTestCase {
         parameters.add(parameter4);
 
         return parameters;
+    }
+
+    public EncoreInteraction createEncoreInteraction(){
+        EncoreInteraction interaction = new EncoreInteraction();
+
+        Map<String, String> interactorA = new HashMap<String, String>();
+        interactorA.put("uniprotkb", "P28548-1");
+        interactorA.put("intact", "EBI-317777");
+        Map<String, String> interactorB = new HashMap<String, String>();
+        interactorB.put("uniprotkb", "Q22534");
+        interactorB.put("intact", "EBI-327642");
+
+        List<CrossReference> publications = new ArrayList<CrossReference>(1);
+        CrossReference ref = new CrossReferenceImpl("pubmed", "14704431");
+        publications.add(ref);
+
+        interaction.setInteractorAccsA(interactorA);
+        interaction.setInteractorAccsB(interactorB);
+        interaction.setPublicationIds(publications);
+
+        return interaction;
     }
 
     public boolean areFilesEqual (File file1, File file2) throws IOException {

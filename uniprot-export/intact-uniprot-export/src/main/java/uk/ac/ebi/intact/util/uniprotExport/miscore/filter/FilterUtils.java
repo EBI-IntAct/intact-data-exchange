@@ -5,6 +5,7 @@ import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
+import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -67,5 +68,20 @@ public class FilterUtils {
         }
 
         return geneName;
+    }
+
+    public static String [] extractUniprotAndIntactAcFromAccs(Map<String, String> interactorAccs){
+        String interactorAcc = null;
+        String intactAc = null;
+        for(Map.Entry<String, String> entry : interactorAccs.entrySet()){
+            if(WriterUtils.INTACT.equalsIgnoreCase(entry.getKey())){
+                intactAc =  entry.getValue();
+            }
+            else if(WriterUtils.UNIPROT.equalsIgnoreCase(entry.getKey())){
+                interactorAcc =  entry.getValue();
+            }
+        }
+
+        return new String [] {interactorAcc, intactAc};
     }
 }
