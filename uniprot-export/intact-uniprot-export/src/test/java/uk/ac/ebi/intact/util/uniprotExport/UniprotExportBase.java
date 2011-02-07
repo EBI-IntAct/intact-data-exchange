@@ -5,6 +5,10 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.model.Annotation;
+import uk.ac.ebi.intact.model.CvInteraction;
+import uk.ac.ebi.intact.model.CvTopic;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
@@ -523,7 +527,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         context.getSpokeExpandedInteractions().add("EBI-xxxxxx8");
         context.getSpokeExpandedInteractions().add("EBI-xxxxxx11");
 
-        context.getInteractionToMethod_type().put("EBI-xxxxxx1", new MethodAndTypePair("MI:0398", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx1", new MethodAndTypePair("MI:0676", "MI:0915"));
         context.getInteractionToMethod_type().put("EBI-xxxxxx2", new MethodAndTypePair("MI:0398", "MI:0915"));
         context.getInteractionToMethod_type().put("EBI-xxxxxx3", new MethodAndTypePair("MI:0398", "MI:0915"));
         context.getInteractionToMethod_type().put("EBI-xxxxxx4", new MethodAndTypePair("MI:0398", "MI:0915"));
@@ -541,8 +545,9 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     public IntActInteractionClusterScore createClusterForExportBasedOnMiScore(){
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
-        interactions.add(createEncoreInteractionHighScoreSpokeExpanded()); // two hybrid pooling : export = conditional, 2 and doesn't pass
-        interactions.add(createEncoreInteractionHighScoreColocalization()); // colocalization has an export no
+        interactions.add(createEncoreInteractionLowScore());
+        interactions.add(createEncoreInteractionHighScoreSpokeExpanded());
+        interactions.add(createEncoreInteractionHighScoreColocalization());
 
         return createCluster(interactions);
     }
@@ -550,9 +555,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     public IntActInteractionClusterScore createClusterForExportBasedOnDetectionMethod(){
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
-        interactions.add(createEncoreInteractionLowScore());
-        interactions.add(createEncoreInteractionHighScoreSpokeExpanded());
-        interactions.add(createEncoreInteractionHighScoreColocalization());
+        interactions.add(createEncoreInteractionHighScoreSpokeExpanded());  // two hybrid pooling : export = conditional, 2 and doesn't pass
+        interactions.add(createEncoreInteractionHighScoreColocalization()); // colocalization has an export no
 
         return createCluster(interactions);
     }
@@ -605,6 +609,39 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         MiScoreResults results = new MiScoreResults(clsuterScore, context);
 
         return results;
+    }
+
+    public void createDatabaseContext(){
+        CvTopic dr_export = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT);
+        getCorePersister().saveOrUpdate(dr_export);
+
+        CvInteraction method = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvInteraction.class, "MI:0398", "two hybrid pooling");
+        Annotation annotation1 = new Annotation(dr_export, "2");
+        method.addAnnotation(annotation1);
+
+        CvInteraction method2 = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvInteraction.class, "MI:0006", "anti bait coimmunoprecipitation");
+        Annotation annotation2 = new Annotation(dr_export, "yes");
+        method2.addAnnotation(annotation2);
+
+        CvInteraction method3 = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvInteraction.class, "MI:0019", "coimmunoprecipitation");
+        Annotation annotation3 = new Annotation(dr_export, "yes");
+        method3.addAnnotation(annotation3);
+
+        CvInteraction method4 = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvInteraction.class, "MI:0403", "colocalization");
+        Annotation annotation4 = new Annotation(dr_export, "no");
+        method4.addAnnotation(annotation4);
+
+        CvInteraction method5 = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvInteraction.class, "MI:0676", "tandem affinity purification");
+        Annotation annotation5 = new Annotation(dr_export, "yes");
+        method5.addAnnotation(annotation5);
+
+        getCorePersister().saveOrUpdate(method, method2, method3, method4, method5);
     }
 
     public boolean areFilesEqual (File file1, File file2) throws IOException {

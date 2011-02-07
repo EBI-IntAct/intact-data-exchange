@@ -2,6 +2,10 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import uk.ac.ebi.intact.model.CvInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
@@ -15,11 +19,16 @@ import java.util.Set;
  * @version $Id$
  * @since <pre>07/02/11</pre>
  */
-
 public class ExporterBasedOnDetectionMethodTest extends UniprotExportBase {
 
     @Test
+    @DirtiesContext
+    @Transactional(propagation = Propagation.NEVER)
     public void test_simulation() throws UniprotExportException {
+        createDatabaseContext();
+
+        Assert.assertEquals(5, getDaoFactory().getCvObjectDao(CvInteraction.class).getAll().size());
+
         ExporterBasedOnDetectionMethod exporter = new ExporterBasedOnDetectionMethod();
 
         MiScoreResults results = createMiScoreResultsForDetectionMethodExport();
@@ -29,7 +38,7 @@ public class ExporterBasedOnDetectionMethodTest extends UniprotExportBase {
         Set<Integer> interactionsExported = results.getInteractionsToExport();
 
         Assert.assertNotNull(interactionsExported);
-        //Assert.assertEquals(3, interactionsExported.size());
+        Assert.assertEquals(3, interactionsExported.size());
 
         boolean isValid = true;
 

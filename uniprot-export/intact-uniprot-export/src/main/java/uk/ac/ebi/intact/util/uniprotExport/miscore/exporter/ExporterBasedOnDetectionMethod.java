@@ -40,12 +40,12 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
     }
 
     private void buildCvInteractionStatusCache(){
-        List<String []> methodStatus = this.queryProvider.getMethodStatusInIntact();
+        List<Object []> methodStatus = this.queryProvider.getMethodStatusInIntact();
 
-        for (String [] method : methodStatus){
+        for (Object [] method : methodStatus){
             if (method.length == 2){
-                String methodMi = method[0];
-                String export = method[1];
+                String methodMi = (String) method[0];
+                String export = (String) method[1];
 
                 if (cvInteractionExportStatusCache.containsKey(methodMi)) {
 

@@ -62,9 +62,9 @@ public class QueryFactory {
 
     // select status of the different methods in IntAct
     private final String methodStatus = "select ci.identifier, a.annotationText from CvInteraction ci join ci.annotations as a join a.cvTopic as ct" +
-            " where ct.cvTopic = :export";
+            " where ct.shortLabel = :export";
 
-    public List<String[]> getMethodStatusInIntact() {
+    public List<Object[]> getMethodStatusInIntact() {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
         TransactionStatus transactionStatus = dataContext.beginTransaction();
@@ -72,7 +72,7 @@ public class QueryFactory {
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(methodStatus);
         query.setParameter("export", CvTopic.UNIPROT_DR_EXPORT);
 
-        List<String []> methods = query.getResultList();
+        List<Object []> methods = query.getResultList();
 
         dataContext.commitTransaction(transactionStatus);
 
