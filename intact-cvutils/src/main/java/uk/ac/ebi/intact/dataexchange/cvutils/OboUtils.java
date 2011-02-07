@@ -1,27 +1,28 @@
 package uk.ac.ebi.intact.dataexchange.cvutils;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bbop.dataadapter.DataAdapterException;
 import org.obo.dataadapter.DefaultOBOParser;
+import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.dataadapter.OBOParseEngine;
 import org.obo.dataadapter.OBOParseException;
-import org.obo.dataadapter.OBOFileAdapter;
-import org.obo.datamodel.OBOSession;
-import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.Link;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.bbop.dataadapter.DataAdapterException;
+import org.obo.datamodel.OBOObject;
+import org.obo.datamodel.OBOSession;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDatasetFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * Set of methods to deal with OBO files
@@ -36,8 +37,10 @@ public class OboUtils {
     private static final String PSI_MI_OBO_LOCATION_OLD = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/psi-mi25-4intact.obo";
     private static final String PSI_MI_LOCAL_ANNOTATIONS = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/additional-annotations.csv";
 
-    //file location for OBO file pointing directly to psi cvs
-    public static final String PSI_MI_OBO_LOCATION = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
+    //file location for OBO file pointing directly to psi cvs (not working! redirect to the intact web page)
+    //public static final String PSI_MI_OBO_LOCATION = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
+
+    public static final String PSI_MI_OBO_LOCATION = "http://www.ebi.ac.uk/~intact/psi/mi/rel25/data/psi-mi25.obo";
 
     private OboUtils() {}
 
