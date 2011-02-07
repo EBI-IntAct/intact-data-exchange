@@ -58,7 +58,10 @@ public final class SolrLogger {
     public static void setLevel(Level level) {
         Enumeration<String> loggerNames = LogManager.getLogManager().getLoggerNames();
         while (loggerNames.hasMoreElements()) {
-            LogManager.getLogManager().getLogger(loggerNames.nextElement()).setLevel(level);
+            final java.util.logging.Logger logger = LogManager.getLogManager().getLogger( loggerNames.nextElement() );
+            if( logger != null ) {
+                logger.setLevel( level );
+            }
         }
     }
 }
