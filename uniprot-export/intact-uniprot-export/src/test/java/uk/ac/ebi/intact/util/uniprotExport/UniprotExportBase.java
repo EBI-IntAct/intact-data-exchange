@@ -1,11 +1,15 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
+import psidev.psi.mi.tab.model.ConfidenceImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.*;
 
 import java.io.BufferedReader;
@@ -198,7 +202,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
         type2Pubmed.put("MI:0915", pubmeds);
         Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
-        method2Pubmed.put("MI:0398", pubmeds);
+        method2Pubmed.put("MI:0676", pubmeds);
 
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx1", "14704431");
@@ -215,6 +219,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         CrossReference ref = new CrossReferenceImpl("pubmed", "14704431");
         publications.add(ref);
 
+        interaction.setId(1);
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.6"));
         interaction.setInteractorAccsA(interactorA);
         interaction.setInteractorAccsB(interactorB);
         interaction.setPublicationIds(publications);
@@ -260,6 +266,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         publications.add(ref);
         publications.add(ref2);
 
+        interaction.setId(2);
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.7"));
         interaction.setInteractorAccsA(interactorA);
         interaction.setInteractorAccsB(interactorB);
         interaction.setPublicationIds(publications);
@@ -324,6 +332,149 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         CrossReference ref = new CrossReferenceImpl("pubmed", "14704431");
         publications.add(ref);
 
+        interaction.setId(3);
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.8"));
+        interaction.setInteractorAccsA(interactorA);
+        interaction.setInteractorAccsB(interactorB);
+        interaction.setPublicationIds(publications);
+        interaction.setOrganismsA(organismA);
+        interaction.setOrganismsB(organismB);
+        interaction.setExperimentToPubmed(experimentToPubmed);
+        interaction.setTypeToPubmed(type2Pubmed);
+        interaction.setMethodToPubmed(method2Pubmed);
+
+        return interaction;
+    }
+
+    public EncoreInteraction createEncoreInteractionLowScore(){
+        EncoreInteraction interaction = new EncoreInteraction();
+
+        Map<String, String> interactorA = new HashMap<String, String>();
+        interactorA.put("uniprotkb", "P12345");
+        interactorA.put("intact", "EBI-317780");
+        Map<String, String> interactorB = new HashMap<String, String>();
+        interactorB.put("uniprotkb", "P12346");
+        interactorB.put("intact", "EBI-311863");
+
+        List<String> pubmeds1 = new ArrayList<String>();
+        pubmeds1.add("19705531");
+
+        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
+        type2Pubmed.put("MI:0914", pubmeds1);
+        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
+        method2Pubmed.put("MI:0019", pubmeds1);
+
+        Map<String, String> experimentToPubmed = new HashMap<String, String>();
+        experimentToPubmed.put("EBI-xxxxxx10", "19705531");
+
+        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
+        organismA.add(orgA);
+
+        Collection<CrossReference> organismB = new ArrayList<CrossReference>();
+        CrossReference orgB = new CrossReferenceImpl("taxid", "9606", "Homo sapiens");
+        organismB.add(orgB);
+
+        List<CrossReference> publications = new ArrayList<CrossReference>(1);
+        CrossReference ref = new CrossReferenceImpl("pubmed", "19705531");
+        publications.add(ref);
+
+        interaction.setId(4);
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.3"));
+        interaction.setInteractorAccsA(interactorA);
+        interaction.setInteractorAccsB(interactorB);
+        interaction.setPublicationIds(publications);
+        interaction.setOrganismsA(organismA);
+        interaction.setOrganismsB(organismB);
+        interaction.setExperimentToPubmed(experimentToPubmed);
+        interaction.setTypeToPubmed(type2Pubmed);
+        interaction.setMethodToPubmed(method2Pubmed);
+
+        return interaction;
+    }
+
+    public EncoreInteraction createEncoreInteractionHighScoreSpokeExpanded(){
+        EncoreInteraction interaction = new EncoreInteraction();
+
+        Map<String, String> interactorA = new HashMap<String, String>();
+        interactorA.put("uniprotkb", "P12346");
+        interactorA.put("intact", "EBI-317781");
+        Map<String, String> interactorB = new HashMap<String, String>();
+        interactorB.put("uniprotkb", "P12347");
+        interactorB.put("intact", "EBI-311864");
+
+        List<String> pubmeds1 = new ArrayList<String>();
+        pubmeds1.add("19705532");
+
+        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
+        type2Pubmed.put("MI:0914", pubmeds1);
+        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
+        method2Pubmed.put("MI:0398", pubmeds1);
+
+        Map<String, String> experimentToPubmed = new HashMap<String, String>();
+        experimentToPubmed.put("EBI-xxxxxx11", "19705532");
+
+        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
+        organismA.add(orgA);
+
+        Collection<CrossReference> organismB = new ArrayList<CrossReference>();
+        CrossReference orgB = new CrossReferenceImpl("taxid", "9606", "Homo sapiens");
+        organismB.add(orgB);
+
+        List<CrossReference> publications = new ArrayList<CrossReference>(1);
+        CrossReference ref = new CrossReferenceImpl("pubmed", "19705532");
+        publications.add(ref);
+
+        interaction.setId(5);
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.5"));
+        interaction.setInteractorAccsA(interactorA);
+        interaction.setInteractorAccsB(interactorB);
+        interaction.setPublicationIds(publications);
+        interaction.setOrganismsA(organismA);
+        interaction.setOrganismsB(organismB);
+        interaction.setExperimentToPubmed(experimentToPubmed);
+        interaction.setTypeToPubmed(type2Pubmed);
+        interaction.setMethodToPubmed(method2Pubmed);
+
+        return interaction;
+    }
+
+    public EncoreInteraction createEncoreInteractionHighScoreColocalization(){
+        EncoreInteraction interaction = new EncoreInteraction();
+
+        Map<String, String> interactorA = new HashMap<String, String>();
+        interactorA.put("uniprotkb", "P12347");
+        interactorA.put("intact", "EBI-317782");
+        Map<String, String> interactorB = new HashMap<String, String>();
+        interactorB.put("uniprotkb", "P12348");
+        interactorB.put("intact", "EBI-311865");
+
+        List<String> pubmeds1 = new ArrayList<String>();
+        pubmeds1.add("19705533");
+
+        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
+        type2Pubmed.put("MI:0403", pubmeds1);
+        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
+        method2Pubmed.put("MI:0403", pubmeds1);
+
+        Map<String, String> experimentToPubmed = new HashMap<String, String>();
+        experimentToPubmed.put("EBI-xxxxxx12", "19705533");
+
+        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
+        organismA.add(orgA);
+
+        Collection<CrossReference> organismB = new ArrayList<CrossReference>();
+        CrossReference orgB = new CrossReferenceImpl("taxid", "9606", "Homo sapiens");
+        organismB.add(orgB);
+
+        List<CrossReference> publications = new ArrayList<CrossReference>(1);
+        CrossReference ref = new CrossReferenceImpl("pubmed", "19705533");
+        publications.add(ref);
+
+        interaction.setId(6);
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.7"));
         interaction.setInteractorAccsA(interactorA);
         interaction.setInteractorAccsB(interactorB);
         interaction.setPublicationIds(publications);
@@ -356,14 +507,21 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         context.getGeneNames().put("Q22534","pat-12");
         context.getGeneNames().put("O17670","eya-1");
         context.getGeneNames().put("Q21361","atf-2");
+        context.getGeneNames().put("P12345","name-1");
+        context.getGeneNames().put("P12346","name-2");
+        context.getGeneNames().put("P12347","name-3");
+        context.getGeneNames().put("P12348","name-4");
 
-        context.getMiTerms().put("MI:0398", "two hybrid pooling");
+        context.getMiTerms().put("MI:0398", "two hybrid pooling"); // condition export = 2
         context.getMiTerms().put("MI:0915", "physical association");
         context.getMiTerms().put("MI:0914", "association");
         context.getMiTerms().put("MI:0006", "anti bait coimmunoprecipitation");
         context.getMiTerms().put("MI:0019", "coimmunoprecipitation");
+        context.getMiTerms().put("MI:0403", "colocalization");
+        context.getMiTerms().put("MI:0676","tandem affinity purification");
 
         context.getSpokeExpandedInteractions().add("EBI-xxxxxx8");
+        context.getSpokeExpandedInteractions().add("EBI-xxxxxx11");
 
         context.getInteractionToMethod_type().put("EBI-xxxxxx1", new MethodAndTypePair("MI:0398", "MI:0915"));
         context.getInteractionToMethod_type().put("EBI-xxxxxx2", new MethodAndTypePair("MI:0398", "MI:0915"));
@@ -373,8 +531,80 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         context.getInteractionToMethod_type().put("EBI-xxxxxx7", new MethodAndTypePair("MI:0019", "MI:0915"));
         context.getInteractionToMethod_type().put("EBI-xxxxxx8", new MethodAndTypePair("MI:0006", "MI:0914"));
         context.getInteractionToMethod_type().put("EBI-xxxxxx9", new MethodAndTypePair("MI:0019", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx10", new MethodAndTypePair("MI:0019", "MI:0914"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx11", new MethodAndTypePair("MI:0019", "MI:0914"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx12", new MethodAndTypePair("MI:0403", "MI:0403"));
 
         return context;
+    }
+
+    public IntActInteractionClusterScore createClusterForExportBasedOnMiScore(){
+
+        List<EncoreInteraction> interactions = createEncoreInteractions();
+        interactions.add(createEncoreInteractionHighScoreSpokeExpanded()); // two hybrid pooling : export = conditional, 2 and doesn't pass
+        interactions.add(createEncoreInteractionHighScoreColocalization()); // colocalization has an export no
+
+        return createCluster(interactions);
+    }
+
+    public IntActInteractionClusterScore createClusterForExportBasedOnDetectionMethod(){
+
+        List<EncoreInteraction> interactions = createEncoreInteractions();
+        interactions.add(createEncoreInteractionLowScore());
+        interactions.add(createEncoreInteractionHighScoreSpokeExpanded());
+        interactions.add(createEncoreInteractionHighScoreColocalization());
+
+        return createCluster(interactions);
+    }
+
+    private IntActInteractionClusterScore createCluster(List<EncoreInteraction> interactions){
+        IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
+        clusterScore.setInteractionMapping(new HashMap<Integer, EncoreInteraction>());
+        clusterScore.setInteractorMapping(new HashMap<String, List<Integer>>());
+
+        for (EncoreInteraction interaction : interactions){
+            clusterScore.getInteractionMapping().put(interaction.getId(), interaction);
+
+            String interactorA = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsA())[0];
+            String interactorB = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsB())[0];
+
+            if (clusterScore.getInteractorMapping().containsKey(interactorA)){
+                clusterScore.getInteractorMapping().get(interactorA).add(interaction.getId());
+            }
+            else{
+                List<Integer> interactionIds = new ArrayList<Integer>();
+                interactionIds.add(interaction.getId());
+                clusterScore.getInteractorMapping().put(interactorA, interactionIds);
+            }
+
+            if (clusterScore.getInteractorMapping().containsKey(interactorB)){
+                clusterScore.getInteractorMapping().get(interactorB).add(interaction.getId());
+            }
+            else{
+                List<Integer> interactionIds = new ArrayList<Integer>();
+                interactionIds.add(interaction.getId());
+                clusterScore.getInteractorMapping().put(interactorB, interactionIds);
+            }
+        }
+        return clusterScore;
+    }
+
+    public MiScoreResults createMiScoreResultsForMiScoreExport(){
+        IntActInteractionClusterScore clsuterScore = createClusterForExportBasedOnMiScore();
+        MiClusterContext context = createClusterContext();
+
+        MiScoreResults results = new MiScoreResults(clsuterScore, context);
+
+        return results;
+    }
+
+    public MiScoreResults createMiScoreResultsForDetectionMethodExport(){
+        IntActInteractionClusterScore clsuterScore = createClusterForExportBasedOnDetectionMethod();
+        MiClusterContext context = createClusterContext();
+
+        MiScoreResults results = new MiScoreResults(clsuterScore, context);
+
+        return results;
     }
 
     public boolean areFilesEqual (File file1, File file2) throws IOException {
