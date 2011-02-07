@@ -6,9 +6,12 @@ import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.IntactFilter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -33,15 +36,73 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
 
     public ExporterBasedOnDetectionMethod(){
         this.queryProvider = new QueryFactory();
+        buildCvInteractionStatusCache();
+    }
+
+    private void buildCvInteractionStatusCache(){
+        List<String []> methodStatus = this.queryProvider.getMethodStatusInIntact();
+
+        for (String [] method : methodStatus){
+            if (method.length == 2){
+                String methodMi = method[0];
+                String export = method[1];
+
+                if (cvInteractionExportStatusCache.containsKey(methodMi)) {
+
+                    if (!cvInteractionExportStatusCache.get(methodMi).doNotExport()){
+                        cvInteractionExportStatusCache.put(methodMi, new CvInteractionStatus(CvInteractionStatus.DO_NOT_EXPORT));
+                    }
+                } else {
+
+                    if (null != export) {
+                        export = export.toLowerCase().trim();
+                    }
+
+                    if (METHOD_EXPORT_KEYWORK_EXPORT.equals(export)) {
+
+                        cvInteractionExportStatusCache.put(methodMi, new CvInteractionStatus(CvInteractionStatus.EXPORT));
+
+                    } else if (METHOD_EXPORT_KEYWORK_DO_NOT_EXPORT.equals(export)) {
+
+                        cvInteractionExportStatusCache.put(methodMi, new CvInteractionStatus(CvInteractionStatus.DO_NOT_EXPORT));
+
+                    } else {
+
+                        // it must be an integer value, let's check it.
+                        try {
+                            Integer value = new Integer(export);
+                            int i = value;
+
+                            if (i >= 2) {
+
+                                // value is >= 2
+                                cvInteractionExportStatusCache.put(methodMi, new CvInteractionStatus(CvInteractionStatus.CONDITIONAL_EXPORT, i));
+
+                            } else if (i == 1) {
+
+                                cvInteractionExportStatusCache.put(methodMi, new CvInteractionStatus(CvInteractionStatus.EXPORT));
+
+                            } else {
+                                cvInteractionExportStatusCache.put(methodMi, new CvInteractionStatus(CvInteractionStatus.DO_NOT_EXPORT));
+                            }
+
+                        } catch (NumberFormatException e) {
+                            // not an integer !
+
+                            cvInteractionExportStatusCache.put(methodMi, new CvInteractionStatus(CvInteractionStatus.DO_NOT_EXPORT));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
      *
      * @param cvInteraction : the interaction detection method
-     * @param experiments : the list of experiments reporting the same interaction
      * @return true if the interaction passed the dr-export constraints on the interaction detection method
      */
-    private boolean hasPassedInteractionDetectionMethodRules(CvInteraction cvInteraction, Collection<Experiment> experiments){
+    /*private boolean hasPassedInteractionDetectionMethodRules(CvInteraction cvInteraction, Collection<Experiment> experiments){
         // Then check the experimental method (CvInteraction)
 
         if (null == cvInteraction) {
@@ -86,6 +147,64 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
             }
         }
         return false;
+    } */
+
+    public final CvInteractionStatus getMethodExportStatus(final String cvInteraction, String logPrefix) {
+
+        CvInteractionStatus status = null;
+
+        // cache the CvInteraction status
+        if (null != cvInteraction) {
+
+            CvInteractionStatus cache = cvInteractionExportStatusCache.get(cvInteraction);
+            if (null != cache) {
+
+                status = cache;
+
+            } else {
+
+                if (config.isIgnoreUniprotDrExportAnnotation()) {
+                    status = new CvInteractionStatus(CvInteractionStatus.EXPORT);
+                } else {
+
+                    status = new CvInteractionStatus(CvInteractionStatus.DO_NOT_EXPORT);
+                }
+            }
+        }
+
+        System.out.println("\t\t CvInteractionExport status: " + status);
+
+        return status;
+    }
+
+    /**
+     *
+     * @return true if the interaction passed the dr-export constraints on the interaction detection method
+     */
+    private boolean hasPassedInteractionDetectionMethodRules(String methodMi, int numberOfExperiments){
+        // Then check the experimental method (CvInteraction)
+
+        if (null == methodMi) {
+            return false;
+        }
+
+        LineExport.CvInteractionStatus methodStatus = getMethodExportStatus(methodMi, "\t\t");
+
+        if (methodStatus.doExport()) {
+            return true;
+        }
+        else if (methodStatus.isConditionalExport()) {
+
+            // if the threshold is not reached, iterates over all available interactions to check if
+            // there is (are) one (many) that could allow to reach the threshold.
+
+            int threshold = methodStatus.getMinimumOccurence();
+
+            if (numberOfExperiments >= threshold) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -121,12 +240,28 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
         } // i
     }
 
+    private int computeNumberOfExperimentsHavingDetectionMethod(String method, MiClusterContext context, EncoreInteraction interaction){
+
+        Map<MethodAndTypePair, List<String>> invertedMap = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), interaction.getExperimentToPubmed().keySet());
+
+        int numberOfExperiment = 0;
+
+        for (Map.Entry<MethodAndTypePair, List<String>> entry : invertedMap.entrySet()){
+
+            if (entry.getKey().getMethod().equals(method)){
+                numberOfExperiment += entry.getValue().size();
+            }
+        }
+
+        return numberOfExperiment;
+    }
+
     /**
      * Apply the rules on the interaction detection method for all the interactions in the cluster
      * @param cluster : the cluster containing the interactions
      * @param eligibleInteractions : the list of eligible encore interaction ids for uniprot export
      */
-    private void processEligibleExperiments(IntActInteractionClusterScore cluster, Set<Integer> eligibleInteractions) {
+    private void processEligibleExperiments(IntActInteractionClusterScore cluster, MiClusterContext context, Set<Integer> eligibleInteractions) {
 
         // process each interaction of the list
         for (Map.Entry<Integer, EncoreInteraction> interactionEntry : cluster.getInteractionMapping().entrySet()) {
@@ -137,11 +272,21 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
             if (interaction != null){
                 System.out.println("\t\t Interaction: Id:" + interaction.getId());
 
-                Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
+                //Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
 
-                TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+                //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
-                Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
+                Set<String> detectionMethods = interaction.getMethodToPubmed().keySet();
+
+                for (String method : detectionMethods){
+                    int numberOfExperimentWithThisMethod = computeNumberOfExperimentsHavingDetectionMethod(method, context, interaction);
+
+                    if (hasPassedInteractionDetectionMethodRules(method, numberOfExperimentWithThisMethod)){
+                        eligibleInteractions.add(interactionEntry.getKey());
+                        break;
+                    }
+                }
+                /*Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
                 Set<Experiment> experiments = new HashSet<Experiment>();
 
                 for (Interaction inter : interactions){
@@ -155,8 +300,8 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
                         eligibleInteractions.add(interactionEntry.getKey());
                         break;
                     }
-                } // i's experiments
-                IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
+                } // i's experiments*/
+                //IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
             }
         } // i
     }
@@ -166,7 +311,7 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
      * @param cluster
      * @param eligibleInteractions
      */
-    private void filterNoUniprotProteinsAndProcessEligibleExperiments(IntActInteractionClusterScore cluster, List<Integer> eligibleInteractions) {
+    private void filterNoUniprotProteinsAndProcessEligibleExperiments(IntActInteractionClusterScore cluster, MiClusterContext context, List<Integer> eligibleInteractions) {
 
         // process each interaction of the list
         for (Map.Entry<Integer, EncoreInteraction> interactionEntry : cluster.getInteractionMapping().entrySet()) {
@@ -181,11 +326,22 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
                 String B = interaction.getInteractorB(IntactFilter.UNIPROT_DATABASE);
 
                 if (A != null && B!= null){
-                    Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
+                    //Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
 
-                    TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+                    //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
-                    Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
+                    Set<String> detectionMethods = interaction.getMethodToPubmed().keySet();
+
+                    for (String method : detectionMethods){
+                        int numberOfExperimentWithThisMethod = computeNumberOfExperimentsHavingDetectionMethod(method, context, interaction);
+
+                        if (hasPassedInteractionDetectionMethodRules(method, numberOfExperimentWithThisMethod)){
+                            eligibleInteractions.add(interactionEntry.getKey());
+                            break;
+                        }
+                    }
+
+                    /*Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
                     Set<Experiment> experiments = new HashSet<Experiment>();
 
                     for (Interaction inter : interactions){
@@ -199,8 +355,8 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
                             eligibleInteractions.add(interactionEntry.getKey());
                             break;
                         }
-                    } // i's experiments
-                    IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
+                    } // i's experiments*/
+                    //IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
                 }
             }
         } // i
@@ -267,12 +423,12 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
      * @throws SQLException
      * @throws IOException
      */
-    public Set<Integer> extractEligibleInteractionsFrom(IntActInteractionClusterScore cluster, String fileForListOfInteractions) throws SQLException, IOException {
+    public Set<Integer> extractEligibleInteractionsFrom(IntActInteractionClusterScore cluster, MiClusterContext context, String fileForListOfInteractions) throws SQLException, IOException {
 
         System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
         Set<Integer> eligibleInteractions = new HashSet<Integer>();
 
-        processEligibleExperiments(cluster, eligibleInteractions);
+        processEligibleExperiments(cluster, context, eligibleInteractions);
 
         FileWriter writer = new FileWriter(fileForListOfInteractions);
 
@@ -323,7 +479,7 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
     public void exportInteractionsFrom(MiScoreResults results) throws UniprotExportException {
         Set<Integer> eligibleInteractions = new HashSet<Integer>();
 
-        processEligibleExperiments(results.getClusterScore(), eligibleInteractions);
+        processEligibleExperiments(results.getClusterScore(), results.getClusterContext(), eligibleInteractions);
 
         results.setInteractionsToExport(eligibleInteractions);
     }

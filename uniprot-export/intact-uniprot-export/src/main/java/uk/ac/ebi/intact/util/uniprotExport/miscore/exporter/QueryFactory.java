@@ -60,6 +60,24 @@ public class QueryFactory {
     private final String interactionsOnHold = "select distinct(i3.ac) from Component c2 join c2.interaction as i3 join i3.experiments" +
             " as e2 join e2.annotations as an2 where an2.cvTopic.shortLabel = :onhold";
 
+    // select status of the different methods in IntAct
+    private final String methodStatus = "select ci.identifier, a.annotationText from CvInteraction ci join ci.annotations as a join a.cvTopic as ct" +
+            " where ct.cvTopic = :export";
+
+    public List<String[]> getMethodStatusInIntact() {
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
+
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(methodStatus);
+        query.setParameter("export", CvTopic.UNIPROT_DR_EXPORT);
+
+        List<String []> methods = query.getResultList();
+
+        dataContext.commitTransaction(transactionStatus);
+
+        return methods;
+    }
 
     public List<String> getInteractionInvolvedInComponents() {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
@@ -223,7 +241,6 @@ public class QueryFactory {
 
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(interactionsDrExportNotPassed);
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
-        query.setParameter("no", "NO");
         query.setParameter("yes", "YES");
         query.setParameter("confidence", CvTopic.AUTHOR_CONFIDENCE_MI_REF);
 

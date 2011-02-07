@@ -10,11 +10,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.core.IntactException;
 import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
+import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
-import uk.ac.ebi.intact.core.persistence.util.CgLibUtil;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -272,7 +271,7 @@ public class LineExport {
     protected BufferedWriter outputBufferedWriter;
     protected FileWriter outputFileWriter;
 
-    private LineExportConfig config;
+    protected LineExportConfig config;
     private PrintStream out;
 
     public LineExport() {
@@ -450,7 +449,7 @@ public class LineExport {
         return negative;
     }
 
-    private CvTopic getUniprotDrExport() {
+    protected CvTopic getUniprotDrExport() {
         if ( uniprotDrExport == null ) {
             uniprotDrExport = ( CvTopic ) getCvObject( CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT );
         }
