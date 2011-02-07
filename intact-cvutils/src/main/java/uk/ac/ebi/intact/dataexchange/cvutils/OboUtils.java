@@ -34,8 +34,10 @@ public class OboUtils {
 
     private static final Log log = LogFactory.getLog( OboUtils.class );
 
-    private static final String PSI_MI_OBO_LOCATION_OLD = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/psi-mi25-4intact.obo";
-    private static final String PSI_MI_LOCAL_ANNOTATIONS = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/additional-annotations.csv";
+    //private static final String PSI_MI_OBO_LOCATION_OLD = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/psi-mi25-4intact.obo";
+    private static final String PSI_MI_OBO_LOCATION_OLD = "http://intact.googlecode.com/svn/repo/utils/data/controlledVocab/psi-mi25-4intact.obo";
+    //private static final String PSI_MI_LOCAL_ANNOTATIONS = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/additional-annotations.csv";
+    private static final String PSI_MI_LOCAL_ANNOTATIONS = "http://intact.googlecode.com/svn/repo/utils/data/controlledVocab/additional-annotations.csv";
 
     //file location for OBO file pointing directly to psi cvs (not working! redirect to the intact web page)
     //public static final String PSI_MI_OBO_LOCATION = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
