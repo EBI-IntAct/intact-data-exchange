@@ -5,9 +5,7 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.model.Annotation;
-import uk.ac.ebi.intact.model.CvInteraction;
-import uk.ac.ebi.intact.model.CvTopic;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
@@ -31,6 +29,11 @@ import java.util.*;
  */
 
 public abstract class UniprotExportBase extends IntactBasicTestCase {
+
+    protected String interaction1 = null;
+    protected String interaction2 = null;
+    protected String interaction3 = null;
+    protected String interaction4 = null;
 
     public List<GOParameters> createGOParameters(){
 
@@ -612,10 +615,20 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     }
 
     public void createDatabaseContext(){
+        // dr export and confidence annotation topic
         CvTopic dr_export = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
                 CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT);
         getCorePersister().saveOrUpdate(dr_export);
 
+        CvTopic confidence = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvTopic.class, CvTopic.AUTHOR_CONFIDENCE_MI_REF, CvTopic.AUTHOR_CONFIDENCE_MI_REF);
+        getCorePersister().saveOrUpdate(confidence);
+
+        CvTopic accepted = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvTopic.class, null, CvTopic.ACCEPTED);
+        getCorePersister().saveOrUpdate(accepted);
+
+        // the different methods and their export status
         CvInteraction method = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
                 CvInteraction.class, "MI:0398", "two hybrid pooling");
         Annotation annotation1 = new Annotation(dr_export, "2");
@@ -642,6 +655,44 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         method5.addAnnotation(annotation5);
 
         getCorePersister().saveOrUpdate(method, method2, method3, method4, method5);
+
+        // several experiments and their export status
+        Experiment experiment_yes = getMockBuilder().createExperimentRandom(1);
+        Annotation expAnn1 = new Annotation(dr_export, "yes");
+        experiment_yes.addAnnotation(expAnn1);
+        Annotation expAnnAcc1 = new Annotation(accepted, null);
+        experiment_yes.addAnnotation(expAnnAcc1);
+        interaction1 = experiment_yes.getInteractions().iterator().next().getAc();
+
+        Experiment experiment_no = getMockBuilder().createExperimentRandom(1);
+        Annotation expAnn2 = new Annotation(dr_export, "no");
+        experiment_no.addAnnotation(expAnn2);
+        Annotation expAnnAcc2 = new Annotation(accepted, null);
+        experiment_no.addAnnotation(expAnnAcc2);
+        interaction2 = experiment_no.getInteractions().iterator().next().getAc();
+
+        Experiment experiment_condition = getMockBuilder().createExperimentRandom(2);
+        Annotation expAnn3 = new Annotation(dr_export, "high");
+        experiment_condition.addAnnotation(expAnn3);
+        Annotation expAnnAcc3 = new Annotation(accepted, null);
+        experiment_condition.addAnnotation(expAnnAcc3);
+
+        int index = 3;
+        for (Interaction interaction : experiment_condition.getInteractions()){
+            if (index == 3){
+                Annotation confidence1 = new Annotation(confidence, "high");
+                interaction.addAnnotation(confidence1);
+                interaction3 = interaction.getAc();
+            }
+            else {
+                Annotation confidence2 = new Annotation(confidence, "low");
+                interaction.addAnnotation(confidence2);
+                interaction4 = interaction.getAc();
+            }
+            index++;
+        }
+
+        getCorePersister().saveOrUpdate(experiment_yes, experiment_condition, experiment_no);
     }
 
     public boolean areFilesEqual (File file1, File file2) throws IOException {

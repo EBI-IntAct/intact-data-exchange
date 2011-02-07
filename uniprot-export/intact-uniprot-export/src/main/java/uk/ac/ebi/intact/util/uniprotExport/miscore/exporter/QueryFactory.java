@@ -55,7 +55,7 @@ public class QueryFactory {
             "and i11.ac not in ("+interactionsFromExperimentExportConditional+")";
 
     private final String interactionsAccepted = "select distinct(i2.ac) from Component c1 join c1.interaction as i2 join i2.experiments as e " +
-            "join e.annotations as an where an.cvTopic.shortLabel = :accepted or trunc(e.created) < to_date(:september2005, :dateFormat)";
+            "join e.annotations as an where an.cvTopic.shortLabel = :accepted";
     // interactions with at least one experiment 'on-hold'
     private final String interactionsOnHold = "select distinct(i3.ac) from Component c2 join c2.interaction as i3 join i3.experiments" +
             " as e2 join e2.annotations as an2 where an2.cvTopic.shortLabel = :onhold";
@@ -258,8 +258,8 @@ public class QueryFactory {
 
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(interactionsAccepted);
         query.setParameter("accepted", CvTopic.ACCEPTED);
-        query.setParameter("september2005", "01/09/2005");
-        query.setParameter("dateFormat", "dd/mm/yyyy");
+        //query.setParameter("september2005", "01/09/2005");
+        //query.setParameter("dateFormat", "dd/mm/yyyy");
 
         List<String> interactions = query.getResultList();
 
@@ -349,8 +349,8 @@ public class QueryFactory {
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
 
         query.setParameter("accepted", CvTopic.ACCEPTED);
-        query.setParameter("september2005", "01/09/2005");
-        query.setParameter("dateFormat", "dd/mm/yyyy");
+        //query.setParameter("september2005", "01/09/2005");
+        //query.setParameter("dateFormat", "dd/mm/yyyy");
         query.setParameter("onhold", CvTopic.ON_HOLD);
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
         query.setParameter("no", "NO");
@@ -394,8 +394,8 @@ public class QueryFactory {
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
 
         query.setParameter("accepted", CvTopic.ACCEPTED);
-        query.setParameter("september2005", "01/09/2005");
-        query.setParameter("dateFormat", "dd/mm/yyyy");
+        //query.setParameter("september2005", "01/09/2005");
+        //query.setParameter("dateFormat", "dd/mm/yyyy");
         query.setParameter("onhold", CvTopic.ON_HOLD);
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
         query.setParameter("no", "NO");
@@ -435,8 +435,8 @@ public class QueryFactory {
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
 
         query.setParameter("accepted", CvTopic.ACCEPTED);
-        query.setParameter("september2005", "01/09/2005");
-        query.setParameter("dateFormat", "dd/mm/yyyy");
+        //query.setParameter("september2005", "01/09/2005");
+        //query.setParameter("dateFormat", "dd/mm/yyyy");
         query.setParameter("onhold", CvTopic.ON_HOLD);
         query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
         query.setParameter("negative", CvTopic.NEGATIVE);
