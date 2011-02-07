@@ -15,14 +15,14 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * TODO comment this
+ * Class with samples and utility methods for testing
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>02/02/11</pre>
  */
 
-public class UniprotExportBase extends IntactBasicTestCase {
+public abstract class UniprotExportBase extends IntactBasicTestCase {
 
     public List<GOParameters> createGOParameters(){
 
