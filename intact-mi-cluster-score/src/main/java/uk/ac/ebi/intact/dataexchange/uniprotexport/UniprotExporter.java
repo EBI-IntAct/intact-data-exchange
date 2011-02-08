@@ -9,7 +9,7 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportProcessor;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.InteractionFilter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.MitabFilter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.NonClusteredMitabFilter;
 
 import java.io.IOException;
 
@@ -86,8 +86,8 @@ public class UniprotExporter {
         InteractionExporter exporter = InteractionExporterFactory.createInteractionExporter(rule);
         InteractionFilter filter = InteractionFilterFactory.createInteractionFilter(source, exporter);
 
-        if (mitabFile != null && filter instanceof MitabFilter){
-             MitabFilter mitabFilter = (MitabFilter) filter;
+        if (mitabFile != null && filter instanceof NonClusteredMitabFilter){
+             NonClusteredMitabFilter mitabFilter = (NonClusteredMitabFilter) filter;
             mitabFilter.setMitab(mitabFile);
         }
 

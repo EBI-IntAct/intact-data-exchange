@@ -4,7 +4,7 @@ import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.InteractionSource;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.IntactFilter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.InteractionFilter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.MitabFilter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.NonClusteredMitabFilter;
 
 /**
  * TODO comment this
@@ -22,7 +22,7 @@ public class InteractionFilterFactory {
             case intact:
                 return new IntactFilter(exporter);
             case mitab:
-                return new MitabFilter(exporter);
+                return new NonClusteredMitabFilter(exporter);
             default:
                 return null;
         }

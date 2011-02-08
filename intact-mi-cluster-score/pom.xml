@@ -76,6 +76,45 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>binary-export</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2024m</argument>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath/>
+                                <argument>uk.ac.ebi.intact.dataexchange.uniprotexport.ClusteredMitabExporter</argument>
+                                <!-- The export rules (detection_method or mi_score)-->
+                                <argument>${rule}</argument>
+                                <!-- The source of the binary interactions (intact or mitab:fileName) -->
+                                <argument>${mitab}</argument>
+                                <!-- The name of the log file -->
+                                <argument>${log}</argument>
+                                <!-- The name of the database  -->
+                                <argument>${database}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>
