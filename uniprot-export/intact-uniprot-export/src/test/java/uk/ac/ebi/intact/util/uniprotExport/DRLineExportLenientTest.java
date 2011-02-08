@@ -59,7 +59,7 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         interaction1.addExperiment( exp );
         interaction2.addExperiment( exp );
 
-        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, p14712, p14713, p12345 );
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, p14712, p14713, p12345, interaction1, interaction2, exp );
         DRLineExportLenient exporter = new DRLineExportLenient( );
 
         final List<ProteinImpl> allProteins = getDaoFactory().getProteinDao().getAll();
@@ -94,7 +94,7 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         exp.addAnnotation( annotation );
         interaction.addExperiment( exp );
 
-        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, q98765 );
+        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, q98765, interaction, exp );
         DRLineExportLenient exporter = new DRLineExportLenient( );
 
         final List<ProteinImpl> allProteins = getDaoFactory().getProteinDao().getAll();

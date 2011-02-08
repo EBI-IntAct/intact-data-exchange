@@ -521,7 +521,7 @@ public class LineExport {
         Collection<InteractorXref> xrefs = protein.getXrefs();
 
         for (InteractorXref xref : xrefs) {
-            if (getUniprot().equals(xref.getCvDatabase()) &&
+            if (getUniprot().getIdentifier().equals(xref.getCvDatabase().getIdentifier()) &&
                 getIdentity().equals(xref.getCvXrefQualifier())) {
                 uniprotId = xref.getPrimaryId();
                 break;
