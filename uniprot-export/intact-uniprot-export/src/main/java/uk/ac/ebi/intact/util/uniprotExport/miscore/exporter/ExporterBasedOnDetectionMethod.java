@@ -4,7 +4,7 @@ import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.util.uniprotExport.CvInteractionStatus;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
@@ -12,10 +12,13 @@ import uk.ac.ebi.intact.util.uniprotExport.LineExportConfig;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.IntactFilter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.BinaryClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportContext;
+import uk.ac.ebi.intact.util.uniprotExport.results.IntactCluster;
+import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.io.FileWriter;
@@ -252,7 +255,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         } // i
     }
 
-    private int computeNumberOfExperimentsHavingDetectionMethod(String method, MiClusterContext context, EncoreInteraction interaction){
+    private int computeNumberOfExperimentsHavingDetectionMethod(String method, ExportContext context, EncoreInteraction interaction){
 
         Map<MethodAndTypePair, List<String>> invertedMap = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), interaction.getExperimentToPubmed().keySet());
 
@@ -268,7 +271,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         return numberOfExperiment;
     }
 
-    private int computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(String method, MiClusterContext context, BinaryInteraction interaction){
+    private int computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(String method, ExportContext context, BinaryInteraction interaction){
         Set<String> intactAcs = FilterUtils.extractIntactAcFrom(interaction.getInteractionAcs());
 
         Map<MethodAndTypePair, List<String>> invertedMap = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), intactAcs);
@@ -290,17 +293,26 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
      * @param cluster : the cluster containing the interactions
      * @param eligibleInteractions : the list of eligible encore interaction ids for uniprot export
      */
-    private void processEligibleExperiments(IntActInteractionClusterScore cluster, MiClusterContext context, Set<Integer> eligibleInteractions) throws UniprotExportException {
+    private void processEligibleExperiments(IntactCluster cluster, ExportContext context, Set<Integer> eligibleInteractions) throws UniprotExportException {
 
-        // process each interaction of the list
-        for (Map.Entry<Integer, EncoreInteraction> interactionEntry : cluster.getInteractionMapping().entrySet()) {
+        if (cluster instanceof BinaryClusterScore){
+            BinaryClusterScore clusterScore = (BinaryClusterScore) cluster;
 
-            EncoreInteraction interaction = interactionEntry.getValue();
+            for (Map.Entry<Integer, BinaryInteraction> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
-            if(canExportEncoreInteraction(interaction, context)){
-                eligibleInteractions.add(interactionEntry.getKey());
+                if (canExportBinaryInteraction(entry.getValue(), context)){
+                    eligibleInteractions.add(entry.getKey());
+                }
             }
-        } // i
+        }
+        else {
+            for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
+
+                if (canExportEncoreInteraction(entry.getValue(), context)){
+                    eligibleInteractions.add(entry.getKey());
+                }
+            }
+        }
     }
 
     /**
@@ -473,16 +485,16 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     }
 
     @Override
-    public void exportInteractionsFrom(MiScoreResults results) throws UniprotExportException {
+    public void exportInteractionsFrom(UniprotExportResults results) throws UniprotExportException {
         Set<Integer> eligibleInteractions = new HashSet<Integer>();
 
-        processEligibleExperiments(results.getClusterScore(), results.getClusterContext(), eligibleInteractions);
+        processEligibleExperiments(results.getCluster(), results.getExportContext(), eligibleInteractions);
 
         results.setInteractionsToExport(eligibleInteractions);
     }
 
     @Override
-    public boolean canExportEncoreInteraction(EncoreInteraction interaction, MiClusterContext context) throws UniprotExportException {
+    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context) throws UniprotExportException {
 
         System.out.println("\t\t Interaction: Id:" + interaction.getId());
 
@@ -520,7 +532,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     }
 
     @Override
-    public boolean canExportEBinaryInteraction(BinaryInteraction interaction, MiClusterContext context) throws UniprotExportException {
+    public boolean canExportBinaryInteraction(BinaryInteraction interaction, ExportContext context) throws UniprotExportException {
 
         Set<String> detectionMethods = new HashSet(interaction.getDetectionMethods());
 

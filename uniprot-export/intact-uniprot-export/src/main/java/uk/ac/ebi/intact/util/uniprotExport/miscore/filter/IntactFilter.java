@@ -17,7 +17,8 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActFileMiScoreDi
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -35,7 +36,7 @@ import java.util.Set;
  * @since <pre>15-Sep-2010</pre>
  */
 
-public class IntactFilter implements InteractionFilter{
+public class IntactFilter implements EncoreInteractionFilter {
 
     /**
      * the binary interaction converter
@@ -75,11 +76,11 @@ public class IntactFilter implements InteractionFilter{
      * Computes the MI cluster score for the list of interactions
      * @param interactions : the list of interactions for what we want to compute the MI cluster score
      */
-    public MiScoreResults computeMiScoresFor(List<String> interactions){
+    public MiClusterScoreResults computeMiScoresFor(List<String> interactions){
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
         MiClusterContext context = new MiClusterContext();
 
-        MiScoreResults results = new MiScoreResults(clusterScore, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(clusterScore, context);
         int i = 0;
         // the list of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
@@ -109,11 +110,11 @@ public class IntactFilter implements InteractionFilter{
      * @param interactions
      * @throws uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException
      */
-    public MiScoreResults processExportWithFilterOnNonUniprot(List<String> interactions) throws UniprotExportException {
+    public MiClusterScoreResults processExportWithFilterOnNonUniprot(List<String> interactions) throws UniprotExportException {
         MiClusterContext context = new MiClusterContext();
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
 
-        MiScoreResults results = new MiScoreResults(clusterScore, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(clusterScore, context);
         int i = 0;
         // the list of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
@@ -598,24 +599,23 @@ public class IntactFilter implements InteractionFilter{
      * @throws IOException
      * @throws SQLException
      */
-    public MiScoreResults exportReleasedHighConfidencePPIInteractions(String fileInteractionEligible, String fileTotal, String fileInteractionExported, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {
+    public UniprotExportResults exportReleasedHighConfidencePPIInteractions(String fileInteractionEligible, String fileTotal, String fileInteractionExported, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {
 
         System.out.println("export all interactions from intact which passed the dr export annotation");
         List<String> eligibleBinaryInteractions = this.queryFactory.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
 
         System.out.println("computes MI score");
-        MiScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
-        results.getClusterScore().saveScores(fileTotal);
-
+        MiClusterScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
         exporter.exportInteractionsFrom(results);
 
-        System.out.println("export interactions from intact");
-        extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getClusterScore());
+        results.getCluster().saveScores(fileTotal);
+        System.out.println("export binary interactions from intact");
+        extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getCluster());
 
         return results;
     }
 
-    public MiScoreResults exportReleasedHighConfidenceTrueBinaryInteractions(String fileInteractionEligible, String fileTotal, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {
+    public MiClusterScoreResults exportReleasedHighConfidenceTrueBinaryInteractions(String fileInteractionEligible, String fileTotal, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {
 
         System.out.println("export all interactions from intact which passed the dr export annotation");
         List<String> eligibleInteractions = this.queryFactory.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
@@ -625,13 +625,12 @@ public class IntactFilter implements InteractionFilter{
             List<String> eligibleBinaryInteractions = extractor.filterBinaryInteractionsFrom(eligibleInteractions, fileInteractionEligible);
 
             System.out.println("computes MI score");
-            MiScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
-            results.getClusterScore().saveScores(fileTotal);
-
+            MiClusterScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
             exporter.exportInteractionsFrom(results);
 
+            results.getCluster().saveScores(fileTotal);
             System.out.println("export binary interactions from intact");
-            extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getClusterScore());
+            extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getCluster());
 
             return results;
         }
@@ -639,30 +638,29 @@ public class IntactFilter implements InteractionFilter{
         return null;
     }
 
-    public MiScoreResults exportAllReleasedHighConfidencePPIInteractions(String fileInteractionEligible, String fileTotal, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {
+    public MiClusterScoreResults exportAllReleasedHighConfidencePPIInteractions(String fileInteractionEligible, String fileTotal, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {
 
         System.out.println("export all interactions from intact which passed the dr export annotation");
         List<String> eligibleBinaryInteractions = this.queryFactory.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport();
 
         System.out.println("computes MI score");
-        MiScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
-        results.getClusterScore().saveScores(fileTotal);
-
+        MiClusterScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
         exporter.exportInteractionsFrom(results);
 
+        results.getCluster().saveScores(fileTotal);
         System.out.println("export binary interactions from intact");
-        extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getClusterScore());
+        extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getCluster());
 
         return results;
     }
 
     @Override
-    public MiScoreResults exportInteractions() throws UniprotExportException {
+    public MiClusterScoreResults exportInteractions() throws UniprotExportException {
         System.out.println("export all interactions from intact which passed the dr export annotation");
         List<String> eligibleBinaryInteractions = this.queryFactory.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport();
 
         System.out.println("computes MI score");
-        MiScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
+        MiClusterScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
 
         exporter.exportInteractionsFrom(results);
 

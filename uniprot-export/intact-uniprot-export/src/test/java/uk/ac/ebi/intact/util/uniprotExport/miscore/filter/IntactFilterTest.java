@@ -10,7 +10,7 @@ import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.ExporterBasedOnDetectionMethod;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults;
 
 import java.util.Set;
 
@@ -35,9 +35,9 @@ public class IntactFilterTest extends UniprotExportBase{
 
         IntactFilter filter = new IntactFilter(new ExporterBasedOnDetectionMethod());
 
-        MiScoreResults results = filter.exportInteractions();
+        MiClusterScoreResults results = filter.exportInteractions();
 
-        InteractionClusterScore clusterScore = results.getClusterScore();
+        InteractionClusterScore clusterScore = results.getCluster();
 
         // compute score for interactions with valid dr-export
         Assert.assertNotNull(clusterScore);

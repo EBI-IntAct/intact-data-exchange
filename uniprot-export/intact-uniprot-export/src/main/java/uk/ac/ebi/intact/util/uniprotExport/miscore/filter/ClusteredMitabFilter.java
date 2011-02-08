@@ -1,9 +1,11 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.filter;
 
 import org.springframework.transaction.TransactionStatus;
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.InteractionDetectionMethod;
+import psidev.psi.mi.tab.model.InteractionType;
 import psidev.psi.mi.xml.converter.ConverterException;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.InteractionDao;
 import uk.ac.ebi.intact.model.CvInteraction;
@@ -17,10 +19,7 @@ import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.QueryFactory;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +34,7 @@ import java.util.*;
  * @since <pre>08/02/11</pre>
  */
 
-public class ClusteredMitabFilter implements InteractionFilter {
+public class ClusteredMitabFilter extends AbstractMitabFilter implements BinaryInteractionFilter{
     protected QueryFactory queryProvider;
     protected Set<String> eligibleInteractionsForUniprotExport;
     protected IntactPsimiTabReader mitabReader;
@@ -48,38 +47,24 @@ public class ClusteredMitabFilter implements InteractionFilter {
     protected String mitab;
 
     public ClusteredMitabFilter(InteractionExporter exporter, String mitab){
-        queryProvider = new QueryFactory();
-        mitabReader = new IntactPsimiTabReader(true);
-        this.exporter = exporter;
-
-        this.mitab = mitab;
-
-        eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport());
+        super(exporter, mitab);
     }
 
     public ClusteredMitabFilter(InteractionExporter exporter){
-        queryProvider = new QueryFactory();
-        eligibleInteractionsForUniprotExport = new HashSet<String>();
-        mitabReader = new IntactPsimiTabReader(true);
-        this.exporter = exporter;
-
-        this.mitab = null;
-
-        eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport());
+        super(exporter);
     }
 
-    private MiScoreResults computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
-        IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
+    protected BinaryClusterScoreResults clusterMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
+        BinaryClusterScore clusterScore = new BinaryClusterScore();
         MiClusterContext context = new MiClusterContext();
 
         File mitab = new File(mitabFile);
         Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitab));
 
-        List<BinaryInteraction> interactionToProcess = new ArrayList<BinaryInteraction>();
+        Integer binaryIdentifier = 1;
 
         while (iterator.hasNext()){
-            interactionToProcess.clear();
-            while (interactionToProcess.size() < 200 && iterator.hasNext()){
+            while (iterator.hasNext()){
                 IntactBinaryInteraction interaction = (IntactBinaryInteraction) iterator.next();
 
                 Set<String> intactAcs = FilterUtils.extractIntactAcFrom(interaction.getInteractionAcs());
@@ -152,7 +137,6 @@ public class ClusteredMitabFilter implements InteractionFilter {
                     }
 
                     if (canBeProcessed){
-                        interactionToProcess.add(interaction);
 
                         FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
 
@@ -161,16 +145,36 @@ public class ClusteredMitabFilter implements InteractionFilter {
                         }
 
                         processMiTerms(interaction, context);
+                        clusterScore.getBinaryInteractionCluster().put(binaryIdentifier, interaction);
+
+                        if (clusterScore.getInteractorCluster().containsKey(uniprotA)){
+                            clusterScore.getInteractorCluster().get(uniprotA).add(binaryIdentifier);
+                        }
+                        else{
+                            List<Integer> interactionIds = new ArrayList<Integer>();
+                            interactionIds.add(binaryIdentifier);
+                            clusterScore.getInteractorCluster().put(uniprotA, interactionIds);
+                        }
+
+                        if (clusterScore.getInteractorCluster().containsKey(uniprotB)){
+                            clusterScore.getInteractorCluster().get(uniprotB).add(binaryIdentifier);
+                        }
+                        else{
+                            List<Integer> interactionIds = new ArrayList<Integer>();
+                            interactionIds.add(binaryIdentifier);
+                            clusterScore.getInteractorCluster().put(uniprotB, interactionIds);
+                        }
                     }
 
                     IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
+
                 }
             }
-            clusterScore.setBinaryInteractionList(interactionToProcess);
-            clusterScore.runService();
+
+            binaryIdentifier++;
         }
 
-        return new MiScoreResults(clusterScore, context);
+        return new BinaryClusterScoreResults(clusterScore, context);
     }
 
     protected void removeNotExportedInteractionEvidencesFrom(IntactBinaryInteraction binary, List<InteractionImpl> exportedInteractionEvidences){
@@ -217,44 +221,10 @@ public class ClusteredMitabFilter implements InteractionFilter {
         binary.getInteractionTypes().removeAll(typeToRemove);
     }
 
-    protected void processMiTerms(BinaryInteraction interaction, MiClusterContext context){
-        List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
-
-        Map<String, String> miTerms = context.getMiTerms();
-
-        for (InteractionDetectionMethod method : detectionMethods){
-            if (!miTerms.containsKey(method.getIdentifier())){
-                String methodName = method.getText() != null ? method.getText() : "-";
-                miTerms.put(method.getIdentifier(), methodName);
-            }
-        }
-
-        List<InteractionType> types = interaction.getInteractionTypes();
-
-        for (InteractionType type : types){
-            if (!miTerms.containsKey(type.getIdentifier())){
-                String methodName = type.getText() != null ? type.getText() : "-";
-                miTerms.put(type.getIdentifier(), methodName);
-            }
-        }
-    }
-
-    protected double getMiClusterScoreFor(EncoreInteraction interaction){
-        List<Confidence> confidenceValues = interaction.getConfidenceValues();
-        double score = 0;
-        for(Confidence confidenceValue:confidenceValues){
-            if(confidenceValue.getType().equalsIgnoreCase(CONFIDENCE_NAME)){
-                score = Double.parseDouble(confidenceValue.getValue());
-            }
-        }
-
-        return score;
-    }
-
-    public MiScoreResults exportInteractionsFrom(String mitab) throws UniprotExportException {
+    public BinaryClusterScoreResults exportInteractionsFrom(String mitab) throws UniprotExportException {
         try {
 
-            MiScoreResults clusterResults = computeMiScoreInteractionEligibleUniprotExport(mitab);
+            BinaryClusterScoreResults clusterResults = clusterMiScoreInteractionEligibleUniprotExport(mitab);
             exporter.exportInteractionsFrom(clusterResults);
 
             //this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);
@@ -267,34 +237,15 @@ public class ClusteredMitabFilter implements InteractionFilter {
         }
     }
 
-    public Set<String> getEligibleInteractionsForUniprotExport() {
-        return eligibleInteractionsForUniprotExport;
-    }
-
-    public QueryFactory getQueryProvider() {
-        return queryProvider;
-    }
-
-    @Override
-    public MiScoreResults exportInteractions() throws UniprotExportException {
+    public BinaryClusterScoreResults exportInteractions() throws UniprotExportException {
         return exportInteractionsFrom(mitab);
     }
 
-    @Override
     public InteractionExporter getInteractionExporter() {
         return this.exporter;
     }
 
-    @Override
     public void setInteractionExporter(InteractionExporter exporter) {
         this.exporter = exporter;
-    }
-
-    public String getMitab() {
-        return mitab;
-    }
-
-    public void setMitab(String mitab) {
-        this.mitab = mitab;
     }
 }

@@ -11,7 +11,7 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.*;
 
 import java.io.BufferedReader;
@@ -591,20 +591,20 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return clusterScore;
     }
 
-    public MiScoreResults createMiScoreResultsForMiScoreExport(){
+    public MiClusterScoreResults createMiScoreResultsForMiScoreExport(){
         IntActInteractionClusterScore clsuterScore = createClusterForExportBasedOnMiScore();
         MiClusterContext context = createClusterContext();
 
-        MiScoreResults results = new MiScoreResults(clsuterScore, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(clsuterScore, context);
 
         return results;
     }
 
-    public MiScoreResults createMiScoreResultsForDetectionMethodExport(){
+    public MiClusterScoreResults createMiScoreResultsForDetectionMethodExport(){
         IntActInteractionClusterScore clsuterScore = createClusterForExportBasedOnDetectionMethod();
         MiClusterContext context = createClusterContext();
 
-        MiScoreResults results = new MiScoreResults(clsuterScore, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(clsuterScore, context);
 
         return results;
     }

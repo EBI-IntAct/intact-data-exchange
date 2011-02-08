@@ -1,8 +1,8 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.filter;
 
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults;
 
 /**
  * Interface to implement for classes charged to export interactions from different sources (intact database, mitab file, etc.)
@@ -13,7 +13,7 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
  * @since <pre>01/02/11</pre>
  */
 
-public interface InteractionFilter {
+public interface EncoreInteractionFilter {
 
     /**
      * Compute the mi score of a set of binary interactions which are eligible for uniprot export and then apply several rules
@@ -21,7 +21,7 @@ public interface InteractionFilter {
      * @return the results of the export
      * @throws UniprotExportException
      */
-    public MiScoreResults exportInteractions() throws UniprotExportException;
+    public MiClusterScoreResults exportInteractions() throws UniprotExportException;
 
     /**
      *

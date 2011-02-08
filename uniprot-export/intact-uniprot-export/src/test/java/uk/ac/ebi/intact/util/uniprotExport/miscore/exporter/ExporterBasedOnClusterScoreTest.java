@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults;
 
 import java.util.Set;
 
@@ -22,7 +22,7 @@ public class ExporterBasedOnClusterScoreTest extends UniprotExportBase{
     public void test_simulation() throws UniprotExportException {
         ExporterBasedOnClusterScore exporter = new ExporterBasedOnClusterScore();
 
-        MiScoreResults results = createMiScoreResultsForMiScoreExport();
+        MiClusterScoreResults results = createMiScoreResultsForMiScoreExport();
 
         exporter.exportInteractionsFrom(results);
 

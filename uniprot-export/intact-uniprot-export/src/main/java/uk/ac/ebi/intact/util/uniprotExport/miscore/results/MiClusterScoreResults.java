@@ -1,5 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.results;
 
+import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,13 +13,13 @@ import java.util.Set;
  * @since <pre>01/02/11</pre>
  */
 
-public class MiScoreResults {
+public class MiClusterScoreResults implements UniprotExportResults{
 
     private IntActInteractionClusterScore clusterScore;
     private MiClusterContext clusterContext;
     private Set<Integer> interactionsToExport;
 
-    public MiScoreResults(IntActInteractionClusterScore clusterScore, MiClusterContext clusterContext, Set<Integer> interactionsToExport){
+    public MiClusterScoreResults(IntActInteractionClusterScore clusterScore, MiClusterContext clusterContext, Set<Integer> interactionsToExport){
         if (clusterScore == null){
              throw  new IllegalArgumentException("The mi cluster object must be non null.");
         }
@@ -33,7 +35,7 @@ public class MiScoreResults {
         this.interactionsToExport = interactionsToExport;
     }
 
-    public MiScoreResults(IntActInteractionClusterScore clusterScore, MiClusterContext clusterContext){
+    public MiClusterScoreResults(IntActInteractionClusterScore clusterScore, MiClusterContext clusterContext){
         if (clusterScore == null){
              throw  new IllegalArgumentException("The mi cluster object must be non null.");
         }
@@ -50,7 +52,7 @@ public class MiScoreResults {
      *
      * @return the cluster with computed mi scores for each interaction
      */
-    public IntActInteractionClusterScore getClusterScore() {
+    public IntActInteractionClusterScore getCluster() {
         return clusterScore;
     }
 
@@ -58,7 +60,7 @@ public class MiScoreResults {
      *
      * @return the context of the cluster
      */
-    public MiClusterContext getClusterContext() {
+    public MiClusterContext getExportContext() {
         return clusterContext;
     }
 

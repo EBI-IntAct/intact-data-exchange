@@ -1,10 +1,12 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.BinaryClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportContext;
+import uk.ac.ebi.intact.util.uniprotExport.results.IntactCluster;
+import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -20,25 +22,31 @@ import java.util.Set;
 
 public abstract class AbstractInteractionExporter implements InteractionExporter {
     @Override
-    public void exportInteractionsFrom(MiScoreResults results) throws UniprotExportException {
-        MiClusterContext context = results.getClusterContext();
-        IntActInteractionClusterScore miScore = results.getClusterScore();
+    public void exportInteractionsFrom(UniprotExportResults results) throws UniprotExportException {
+        ExportContext context = results.getExportContext();
+        IntactCluster cluster = results.getCluster();
 
         Set<Integer> interactionsPossibleToExport = new HashSet<Integer>();
 
-        for (Map.Entry<Integer, EncoreInteraction> entry : miScore.getInteractionMapping().entrySet()){
-            EncoreInteraction encore = entry.getValue();
+        if (cluster instanceof BinaryClusterScore){
+            BinaryClusterScore clusterScore = (BinaryClusterScore) cluster;
 
-            if (canExportEncoreInteraction(encore, context)){
-                interactionsPossibleToExport.add(entry.getKey());
+            for (Map.Entry<Integer, BinaryInteraction> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
+
+                if (canExportBinaryInteraction(entry.getValue(), context)){
+                    interactionsPossibleToExport.add(entry.getKey());
+                }
+            }
+        }
+        else {
+            for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
+
+                if (canExportEncoreInteraction(entry.getValue(), context)){
+                    interactionsPossibleToExport.add(entry.getKey());
+                }
             }
         }
 
         results.setInteractionsToExport(interactionsPossibleToExport);
-    }
-
-    @Override
-    public boolean canExportEncoreInteraction(EncoreInteraction interaction, MiClusterContext context) throws UniprotExportException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

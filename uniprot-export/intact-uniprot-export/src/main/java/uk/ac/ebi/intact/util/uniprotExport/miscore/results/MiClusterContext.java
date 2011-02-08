@@ -1,5 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.results;
 
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportContext;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,7 +15,7 @@ import java.util.Set;
  * @since <pre>31/01/11</pre>
  */
 
-public class MiClusterContext {
+public class MiClusterContext implements ExportContext{
 
     private Map<String, String> geneNames = new HashMap<String, String>();
     private Map<String, String> miTerms = new HashMap<String, String>();

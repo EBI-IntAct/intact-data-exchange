@@ -5,7 +5,7 @@ import psidev.psi.mi.tab.model.Confidence;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportContext;
 
 import java.util.HashSet;
 import java.util.List;
@@ -62,7 +62,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     }
 
     @Override
-    public boolean canExportEncoreInteraction(EncoreInteraction encore, MiClusterContext context) throws UniprotExportException {
+    public boolean canExportEncoreInteraction(EncoreInteraction encore, ExportContext context) throws UniprotExportException {
 
         double score = getMiClusterScoreFor(encore);
 
@@ -96,7 +96,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     }
 
     @Override
-    public boolean canExportEBinaryInteraction(BinaryInteraction interaction, MiClusterContext context) throws UniprotExportException {
+    public boolean canExportBinaryInteraction(BinaryInteraction interaction, ExportContext context) throws UniprotExportException {
         double score = getMiClusterScoreFor(interaction);
 
         if (score >= EXPORT_THRESHOLD){

@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.model.CvInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults;
 
 import java.util.Set;
 
@@ -31,7 +31,7 @@ public class ExporterBasedOnDetectionMethodTest extends UniprotExportBase {
 
         ExporterBasedOnDetectionMethod exporter = new ExporterBasedOnDetectionMethod();
 
-        MiScoreResults results = createMiScoreResultsForDetectionMethodExport();
+        MiClusterScoreResults results = createMiScoreResultsForDetectionMethodExport();
 
         exporter.exportInteractionsFrom(results);
 

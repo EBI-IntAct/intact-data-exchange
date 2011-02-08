@@ -2,13 +2,13 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportContext;
+import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 
 /**
  * Interface to implement for classes charged to apply rules for uniprot export.
- * The information about the interactions are in the MiScoreResults. It is up to the class to sort out
+ * The information about the interactions are in the MiClusterScoreResults. It is up to the class to sort out
  * which interaction can be exported and then fill the list of interactions to export in the result
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
@@ -24,7 +24,7 @@ public interface InteractionExporter {
      * @param results : contains the results of the clustering and information about the interactions
      * @throws UniprotExportException
      */
-    public void exportInteractionsFrom(MiScoreResults results) throws UniprotExportException;
+    public void exportInteractionsFrom(UniprotExportResults results) throws UniprotExportException;
 
     /**
      *
@@ -33,7 +33,7 @@ public interface InteractionExporter {
      * @return true if the encore interaction pass the uniprot export rules
      * @throws UniprotExportException
      */
-    public boolean canExportEncoreInteraction(EncoreInteraction interaction, MiClusterContext context) throws UniprotExportException;
+    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context) throws UniprotExportException;
 
     /**
      *
@@ -42,5 +42,5 @@ public interface InteractionExporter {
      * @return true if the binary interaction can be exported
      * @throws UniprotExportException
      */
-    public boolean canExportEBinaryInteraction(BinaryInteraction interaction, MiClusterContext context) throws UniprotExportException;
+    public boolean canExportBinaryInteraction(BinaryInteraction interaction, ExportContext context) throws UniprotExportException;
 }

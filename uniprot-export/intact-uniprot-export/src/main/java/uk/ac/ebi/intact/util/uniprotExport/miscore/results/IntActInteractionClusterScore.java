@@ -7,6 +7,7 @@ import psidev.psi.mi.tab.model.Confidence;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.results.IntactCluster;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,7 +22,7 @@ import java.util.*;
  * @since <pre>16-Sep-2010</pre>
  */
 
-public class IntActInteractionClusterScore extends InteractionClusterScore{
+public class IntActInteractionClusterScore extends InteractionClusterScore implements IntactCluster{
 
     private static final Logger logger = Logger.getLogger(IntActInteractionClusterScore.class);
     private String[] scoreList = null;
@@ -271,5 +272,32 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
     public void clear(){
         this.getInteractionMapping().clear();
         this.getInteractorMapping().clear();
+    }
+
+    @Override
+    public Map<Integer, EncoreInteraction> getEncoreInteractionCluster() {
+        return getInteractionMapping();
+    }
+
+    @Override
+    public Map<Integer, BinaryInteraction> getBinaryInteractionCluster() {
+        Encore2Binary iConverter = new Encore2Binary(getMappingIdDbNames());
+
+        Map<Integer, BinaryInteraction> binaryInteractionCluster = new HashMap<Integer, BinaryInteraction>();
+
+        for(Integer mappingId:getInteractionMapping().keySet()){
+            EncoreInteraction eI = getInteractionMapping().get(mappingId);
+            if (eI != null){
+                BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
+                binaryInteractionCluster.put(mappingId, bI);
+            }
+        }
+
+        return binaryInteractionCluster;
+    }
+
+    @Override
+    public Map<String, List<Integer>> getInteractorCluster() {
+        return getInteractorMapping();  //To change body of implemented methods use File | Settings | File Templates.
     }
 }
