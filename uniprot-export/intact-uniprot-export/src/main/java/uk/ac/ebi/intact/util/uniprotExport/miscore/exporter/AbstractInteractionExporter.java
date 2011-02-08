@@ -18,7 +18,7 @@ import java.util.Set;
  * @since <pre>08/02/11</pre>
  */
 
-public abstract class AbstractInteractionExporterImpl implements InteractionExporter {
+public abstract class AbstractInteractionExporter implements InteractionExporter {
     @Override
     public void exportInteractionsFrom(MiScoreResults results) throws UniprotExportException {
         MiClusterContext context = results.getClusterContext();

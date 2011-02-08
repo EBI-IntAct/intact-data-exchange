@@ -42,8 +42,8 @@ public class LineExport {
     //////////////////////////
     // Constants
 
-    protected static final String METHOD_EXPORT_KEYWORK_EXPORT = "yes";
-    protected static final String METHOD_EXPORT_KEYWORK_DO_NOT_EXPORT = "no";
+    public static final String METHOD_EXPORT_KEYWORK_EXPORT = "yes";
+    public static final String METHOD_EXPORT_KEYWORK_DO_NOT_EXPORT = "no";
 
     protected static final String EXPERIMENT_EXPORT_KEYWORK_EXPORT = "yes";
     protected static final String EXPERIMENT_EXPORT_KEYWORK_DO_NOT_EXPORT = "no";

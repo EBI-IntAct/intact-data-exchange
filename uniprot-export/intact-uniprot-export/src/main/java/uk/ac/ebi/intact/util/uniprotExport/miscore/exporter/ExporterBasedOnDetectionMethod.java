@@ -5,17 +5,21 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.InteractionUtils;
+import uk.ac.ebi.intact.util.uniprotExport.CvInteractionStatus;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
+import uk.ac.ebi.intact.util.uniprotExport.LineExportConfig;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.IntactFilter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -31,13 +35,20 @@ import java.util.*;
  * @version $Id$
  * @since <pre>01/02/11</pre>
  */
-public class ExporterBasedOnDetectionMethod extends LineExport implements InteractionExporter{
+public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter {
 
     private QueryFactory queryProvider;
+    protected LineExportConfig config;
+
+    /**
+     * Cache the CvInteraction property for the export. CvInteraction.ac -> CvInteractionStatus.
+     */
+    protected Map<String, CvInteractionStatus> cvInteractionExportStatusCache = new HashMap<String, CvInteractionStatus>();
 
     public ExporterBasedOnDetectionMethod(){
         this.queryProvider = new QueryFactory();
         buildCvInteractionStatusCache();
+        config = new LineExportConfig();
     }
 
     private void buildCvInteractionStatusCache(){
@@ -59,11 +70,11 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
                         export = export.toLowerCase().trim();
                     }
 
-                    if (METHOD_EXPORT_KEYWORK_EXPORT.equals(export)) {
+                    if (LineExport.METHOD_EXPORT_KEYWORK_EXPORT.equals(export)) {
 
                         cvInteractionExportStatusCache.put(methodMi, new CvInteractionStatus(CvInteractionStatus.EXPORT));
 
-                    } else if (METHOD_EXPORT_KEYWORK_DO_NOT_EXPORT.equals(export)) {
+                    } else if (LineExport.METHOD_EXPORT_KEYWORK_DO_NOT_EXPORT.equals(export)) {
 
                         cvInteractionExportStatusCache.put(methodMi, new CvInteractionStatus(CvInteractionStatus.DO_NOT_EXPORT));
 
@@ -189,7 +200,7 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
             return false;
         }
 
-        LineExport.CvInteractionStatus methodStatus = getMethodExportStatus(methodMi, "\t\t");
+        CvInteractionStatus methodStatus = getMethodExportStatus(methodMi, "\t\t");
 
         if (methodStatus.doExport()) {
             return true;
@@ -228,7 +239,7 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
             if (interaction != null){
                 System.out.println("\t\t Interaction: Shortlabel:" + interaction.getShortLabel() + "  AC: " + interaction.getAc());
 
-                if (isBinary(interaction)){
+                if (InteractionUtils.isBinaryInteraction(interaction)){
                     eligibleInteractions.add(interactionAc);
                 }
             }

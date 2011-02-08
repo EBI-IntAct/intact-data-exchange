@@ -21,7 +21,7 @@ import java.util.Set;
  * @since <pre>16-Sep-2010</pre>
  */
 
-public class ExporterBasedOnClusterScore extends AbstractInteractionExporterImpl {
+public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
 
     private static final double EXPORT_THRESHOLD = 0.43;
     private static final String CONFIDENCE_NAME = "intactPsiscore";
