@@ -99,12 +99,6 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         String pmid3 = "18212739";
         String pmid4 = "15115758";
 
-        String interactionType1 = "physical association";
-        String interactionType2 = "association";
-        String method1 = "two hybrid pooling";
-        String method2 = "anti bait coimmunoprecipitation";
-        String method3 = "coimmunoprecipitation";
-
         Set<String> publications1 = new TreeSet<String>();
         publications1.add(pmid1);
 
@@ -119,10 +113,11 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         publications4.add(pmid4);
         publications4.add(pmid2);
 
-        InteractionDetails detail1 = new InteractionDetailsImpl("physical association", "two hybrid pooling", false, publications1);
+        InteractionDetails detail1 = new InteractionDetailsImpl("physical association", "tandem affinity purification", false, publications1);
         InteractionDetails detail2 = new InteractionDetailsImpl("physical association", "two hybrid pooling", false, publications2);
         InteractionDetails detail3 = new InteractionDetailsImpl("association", "anti bait coimmunoprecipitation", true, publications3);
         InteractionDetails detail4 = new InteractionDetailsImpl("physical association", "coimmunoprecipitation", false, publications4);
+        InteractionDetails detail5 = new InteractionDetailsImpl("physical association", "two hybrid pooling", false, publications1);
 
         SortedSet<InteractionDetails> details1 = new TreeSet<InteractionDetails>();
         details1.add(detail1);
@@ -131,7 +126,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         details2.add(detail2);
 
         SortedSet<InteractionDetails> details3 = new TreeSet<InteractionDetails>();
-        details3.add(detail1);
+        details3.add(detail5);
         details3.add(detail3);
         details3.add(detail4);
 
@@ -615,6 +610,50 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     }
 
     public void createDatabaseContext(){
+        // dr export and confidence annotation topic
+        CvTopic dr_export = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT);
+        getCorePersister().saveOrUpdate(dr_export);
+
+        CvTopic confidence = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvTopic.class, CvTopic.AUTHOR_CONFIDENCE_MI_REF, CvTopic.AUTHOR_CONFIDENCE_MI_REF);
+        getCorePersister().saveOrUpdate(confidence);
+
+        CvTopic accepted = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvTopic.class, null, CvTopic.ACCEPTED);
+        getCorePersister().saveOrUpdate(accepted);
+
+        // the different methods and their export status
+        CvInteraction method = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvInteraction.class, "MI:0398", "two hybrid pooling");
+        Annotation annotation1 = new Annotation(dr_export, "2");
+        method.addAnnotation(annotation1);
+
+        CvInteraction method2 = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvInteraction.class, "MI:0006", "anti bait coimmunoprecipitation");
+        Annotation annotation2 = new Annotation(dr_export, "yes");
+        method2.addAnnotation(annotation2);
+
+        CvInteraction method3 = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvInteraction.class, "MI:0019", "coimmunoprecipitation");
+        Annotation annotation3 = new Annotation(dr_export, "yes");
+        method3.addAnnotation(annotation3);
+
+        CvInteraction method4 = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvInteraction.class, "MI:0403", "colocalization");
+        Annotation annotation4 = new Annotation(dr_export, "no");
+        method4.addAnnotation(annotation4);
+
+        CvInteraction method5 = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvInteraction.class, "MI:0676", "tandem affinity purification");
+        Annotation annotation5 = new Annotation(dr_export, "yes");
+        method5.addAnnotation(annotation5);
+
+        getCorePersister().saveOrUpdate(method, method2, method3, method4, method5);
+
+    }
+
+    public void createExperimentContext(){
         // dr export and confidence annotation topic
         CvTopic dr_export = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
                 CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT);

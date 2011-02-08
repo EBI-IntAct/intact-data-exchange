@@ -7,7 +7,10 @@ import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * TODO comment this
@@ -94,5 +97,22 @@ public class FilterUtils {
         }
 
         return intactAcs;
+    }
+
+    /**
+     *
+     * @param references
+     * @return a set of pubmed Ids for this interaction
+     */
+    public static Set<String> extractPubmedIdsFrom(Collection<CrossReference> references){
+        Set<String> pubmedIds = new HashSet<String>(references.size());
+
+        for (CrossReference ref : references){
+            if (WriterUtils.PUBMED.equalsIgnoreCase(ref.getDatabase())){
+                pubmedIds.add(ref.getIdentifier());
+            }
+        }
+
+        return pubmedIds;
     }
 }

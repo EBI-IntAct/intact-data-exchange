@@ -28,7 +28,7 @@ public class IntactFilterTest extends UniprotExportBase{
     @DirtiesContext
     @Transactional(propagation = Propagation.NEVER)
     public void test_simulation() throws UniprotExportException {
-        createDatabaseContext();
+        createExperimentContext();
 
         Assert.assertEquals(4, getDaoFactory().getInteractionDao().getAll().size());
         Assert.assertEquals(3, getDaoFactory().getExperimentDao().getAll().size());
