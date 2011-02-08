@@ -236,10 +236,10 @@ public class IntActInteractionClusterScore extends InteractionClusterScore{
         String scoreListCSV = getScoresPerInteraction(interactionIds, null, null);
         try{
             // Create file
-            FileWriter fstream = new FileWriter(fileName + "_log.txt");
+            FileWriter fstream = new FileWriter(fileName + ".txt");
             BufferedWriter out = new BufferedWriter(fstream);
             out.write(scoreListCSV);
-            logger.info("Saving scores on ... " + fileName + "_log.txt");
+            logger.info("Saving scores on ... " + fileName + ".txt");
             //Close the output stream
             out.close();
         }catch (Exception e){//Catch exception if any

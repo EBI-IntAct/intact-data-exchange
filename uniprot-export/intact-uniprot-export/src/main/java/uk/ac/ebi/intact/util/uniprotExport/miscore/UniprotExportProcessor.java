@@ -48,6 +48,8 @@ public class UniprotExportProcessor {
         try {
             exportDRAndCCLines(results, DRFile, CCFile);
             exportGOLines(results, GOFile);
+
+            results.getClusterScore().saveScoresForSpecificInteractions("uniprotExport.log", results.getInteractionsToExport());
         } catch (IOException e) {
             throw new UniprotExportException("Impossible to write the results of uniprot export in " + DRFile + " or " + CCFile + " or " + GOFile, e);
         }
