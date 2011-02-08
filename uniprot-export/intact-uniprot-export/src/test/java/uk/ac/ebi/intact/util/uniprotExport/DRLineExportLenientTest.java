@@ -8,7 +8,6 @@ package uk.ac.ebi.intact.util.uniprotExport;
 
 import junit.framework.Assert;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 
 import java.util.List;
@@ -59,7 +58,7 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         interaction1.addExperiment( exp );
         interaction2.addExperiment( exp );
 
-        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, p14712, p14713, p12345, interaction1, interaction2, exp );
+        getCorePersister().saveOrUpdate( q9swi1, p14712, p14713, p12345);
         DRLineExportLenient exporter = new DRLineExportLenient( );
 
         final List<ProteinImpl> allProteins = getDaoFactory().getProteinDao().getAll();
@@ -94,7 +93,7 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         exp.addAnnotation( annotation );
         interaction.addExperiment( exp );
 
-        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, q98765, interaction, exp );
+        getCorePersister().saveOrUpdate( q9swi1, q98765 );
         DRLineExportLenient exporter = new DRLineExportLenient( );
 
         final List<ProteinImpl> allProteins = getDaoFactory().getProteinDao().getAll();
@@ -111,9 +110,10 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         //             1 interactions involving a uniprot protein and a splice variant
         final BioSource human = getMockBuilder().createBioSource( 9606, "human" );
         final Protein q9swi1 = getMockBuilder().createProtein( "Q9SWI1", "Q9SWI1_HUMAN", human );
+        getCorePersister().saveOrUpdate( q9swi1 );
 
         final Protein p12345 = getMockBuilder().createProtein( "P12345", "P12345_HUMAN", human );
-        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( p12345 );
+        getCorePersister().saveOrUpdate( p12345 );
 
         final Protein p12345_1 = getMockBuilder().createProteinSpliceVariant( p12345, "P12345-2", "P12345-2" );
 
@@ -124,7 +124,7 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         exp.addAnnotation( annotation );
         interaction.addExperiment( exp );
 
-        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, p12345, p12345_1 );
+        getCorePersister().saveOrUpdate( q9swi1, p12345, p12345_1 );
         DRLineExportLenient exporter = new DRLineExportLenient( );
 
         final List<ProteinImpl> allProteins = getDaoFactory().getProteinDao().getAll();
@@ -157,7 +157,7 @@ public class DRLineExportLenientTest extends UniprotExportTestCase {
         exp.addAnnotation( annotation );
         interaction.addExperiment( exp );
 
-        IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate( q9swi1, nucleicacid );
+        getCorePersister().saveOrUpdate( q9swi1, nucleicacid );
         DRLineExportLenient exporter = new DRLineExportLenient( );
 
         final List<ProteinImpl> allProteins = getDaoFactory().getProteinDao().getAll();

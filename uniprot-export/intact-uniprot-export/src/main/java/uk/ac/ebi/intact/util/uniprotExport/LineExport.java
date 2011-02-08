@@ -14,6 +14,7 @@ import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
+import uk.ac.ebi.intact.uniprot.service.IdentifierChecker;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -305,7 +306,7 @@ public class LineExport {
      */
     private CvObject getCvObject(Class<CvTopic> clazz, String shortlabel)
             throws IntactException,
-                   DatabaseContentException {
+            DatabaseContentException {
 
         return getCvObject(clazz, null, shortlabel);
     }
@@ -324,7 +325,7 @@ public class LineExport {
      * @throws DatabaseContentException if the object is not found.
      */
     protected CvObject getCvObject(Class clazz, String mi, String shortlabel) throws IntactException,
-                                                                                     DatabaseContentException {
+            DatabaseContentException {
 
         if (mi == null && shortlabel == null) {
             throw new IllegalArgumentException("You must give at least a MI reference or a shortlabel of the CV you are looking for.");
@@ -381,8 +382,8 @@ public class LineExport {
     protected CvXrefQualifier getIdentity() {
         if( identity == null ) {
             identity = ( CvXrefQualifier ) getCvObject( CvXrefQualifier.class,
-                                                        CvXrefQualifier.IDENTITY_MI_REF,
-                                                        CvXrefQualifier.IDENTITY );
+                    CvXrefQualifier.IDENTITY_MI_REF,
+                    CvXrefQualifier.IDENTITY );
         }
         return identity;
     }
@@ -390,8 +391,8 @@ public class LineExport {
     protected CvXrefQualifier getIsoformParent() {
         if( isoformParent == null ) {
             isoformParent = (CvXrefQualifier) getCvObject( CvXrefQualifier.class,
-                                                           CvXrefQualifier.ISOFORM_PARENT_MI_REF,
-                                                           CvXrefQualifier.ISOFORM_PARENT );
+                    CvXrefQualifier.ISOFORM_PARENT_MI_REF,
+                    CvXrefQualifier.ISOFORM_PARENT );
         }
         return isoformParent;
     }
@@ -399,8 +400,8 @@ public class LineExport {
     protected CvXrefQualifier getChainParent() {
         if( isoformParent == null ) {
             isoformParent = (CvXrefQualifier) getCvObject( CvXrefQualifier.class,
-                                                           "MI:0951",
-                                                           "chain-parent" );
+                    "MI:0951",
+                    "chain-parent" );
         }
         return isoformParent;
     }
@@ -408,8 +409,8 @@ public class LineExport {
     protected CvXrefQualifier getPrimaryReference() {
         if( primaryReference == null ) {
             primaryReference = (CvXrefQualifier) getCvObject( CvXrefQualifier.class,
-                                                              CvXrefQualifier.PRIMARY_REFERENCE_MI_REF,
-                                                              CvXrefQualifier.PRIMARY_REFERENCE );
+                    CvXrefQualifier.PRIMARY_REFERENCE_MI_REF,
+                    CvXrefQualifier.PRIMARY_REFERENCE );
         }
         return primaryReference;
     }
@@ -522,7 +523,7 @@ public class LineExport {
 
         for (InteractorXref xref : xrefs) {
             if (getUniprot().getIdentifier().equals(xref.getCvDatabase().getIdentifier()) &&
-                getIdentity().equals(xref.getCvXrefQualifier())) {
+                    getIdentity().equals(xref.getCvXrefQualifier())) {
                 uniprotId = xref.getPrimaryId();
                 break;
             }
@@ -549,13 +550,13 @@ public class LineExport {
         for (Iterator<InteractorXref> iterator = xrefs.iterator(); iterator.hasNext() && !found;) {
             Xref xref = iterator.next();
 
-            if ( getIntact().equals( xref.getCvDatabase() )
-                 &&
-                 ( getIsoformParent().equals( xref.getCvXrefQualifier() )
-                   ||
-                   getChainParent().equals( xref.getCvXrefQualifier() )
-                 )
-                ) {
+            if ( getIntact().getIdentifier().equals( xref.getCvDatabase().getIdentifier() )
+                    &&
+                    ( getIsoformParent().getIdentifier().equals( xref.getCvXrefQualifier().getIdentifier() )
+                            ||
+                            getChainParent().getIdentifier().equals( xref.getCvXrefQualifier().getIdentifier() )
+                    )
+                    ) {
                 ac = xref.getPrimaryId();
                 found = true;
             }
@@ -592,14 +593,14 @@ public class LineExport {
                     master = proteins.iterator().next();
                 } else {
                     out.println("ERROR: Could not find the master protein (AC: " + ac +
-                                " ) of the splice variant AC: " + protein.getAc());
+                            " ) of the splice variant AC: " + protein.getAc());
                 }
             } else {
                 out.println("ERROR: An error occured when searching the IntAct database for Protein having the AC: " + ac);
             }
         } else {
             out.println("ERROR: Could not find a master protein AC in the Xrefs of the protein: " +
-                        protein.getAc() + ", " + protein.getShortLabel());
+                    protein.getAc() + ", " + protein.getShortLabel());
         }
 
         return master;
@@ -618,7 +619,7 @@ public class LineExport {
         List<Interaction> interactions = new ArrayList<Interaction>(componentsSize);
 
         out.println("Found " + componentsSize + " components for protein " + protein.getShortLabel()
-                    + ". Starting to get the interactions from those components.");
+                + ". Starting to get the interactions from those components.");
 
         for (Component component : components) {
             Interaction interaction = component.getInteraction();
@@ -665,7 +666,7 @@ public class LineExport {
         if (isBinaryInteraction) {
             // then test if all interactors are UniProt Proteins
             for (Iterator iterator = interaction.getComponents().iterator(); iterator.hasNext()
-                                                                             && isBinaryInteraction;) {
+                    && isBinaryInteraction;) {
                 Component component = (Component) iterator.next();
 
                 Interactor interactor = component.getInteractor();
@@ -679,7 +680,7 @@ public class LineExport {
                         isBinaryInteraction = false; // stop the loop, involve a protein without uniprot ID
 
                         out.println("\t\t\t Interaction is binary but doesn't involve only UniProt proteins (eg. " +
-                                    protein.getAc() + " / " + protein.getShortLabel() + "). ");
+                                protein.getAc() + " / " + protein.getShortLabel() + "). ");
                     } else {
 
                         // check that the protein doesn't have a no-uniprot-update annotation
@@ -687,7 +688,7 @@ public class LineExport {
                             isBinaryInteraction = false; // stop the loop, Protein having no-uniprot-update involved
 
                             out.println("\t\t\t Interaction is binary but at least one UniProt protein is flagged '" +
-                                        CvTopic.NON_UNIPROT + "' (eg. " + protein.getAc() + " / " + protein.getShortLabel() + "). ");
+                                    CvTopic.NON_UNIPROT + "' (eg. " + protein.getAc() + " / " + protein.getShortLabel() + "). ");
                         }
                     }
 
@@ -695,7 +696,7 @@ public class LineExport {
                     isBinaryInteraction = false; // stop the loop, that component doesn't involve a Protein
 
                     out.println("\t\t\t Interaction is binary but at least one partner is not a Protein (ie. " +
-                                interactor.getAc() + " / " + interactor.getShortLabel() + " / " + component.getClass() + "). ");
+                            interactor.getAc() + " / " + interactor.getShortLabel() + " / " + component.getClass() + "). ");
                 }
             } // components
         }
@@ -750,7 +751,7 @@ public class LineExport {
                         out.println(logPrefix + "\t\t\tIGNORING uniprot-dr-export check");
                         status = new CvInteractionStatus(CvInteractionStatus.EXPORT);
                     } else {
-                        
+
                         Annotation annotation = null;
                         CvTopic drExport = getUniprotDrExport();
                         for (Iterator<Annotation> iterator = annotations.iterator(); iterator.hasNext() && !multipleAnnotationFound;)
@@ -765,8 +766,8 @@ public class LineExport {
                                 if (found) {
                                     multipleAnnotationFound = true;
                                     out.println("ERROR: There are multiple annotation having Topic:" + CvTopic.UNIPROT_DR_EXPORT +
-                                                " in CvInteraction: " + cvInteraction.getShortLabel() +
-                                                ". \nWe do not export.");
+                                            " in CvInteraction: " + cvInteraction.getShortLabel() +
+                                            ". \nWe do not export.");
                                 } else {
                                     found = true;
                                     annotation = _annotation;
@@ -817,8 +818,8 @@ public class LineExport {
                                         } else if (i == 1) {
 
                                             String err = cvInteraction.getShortLabel() + " having annotation (" + CvTopic.UNIPROT_DR_EXPORT +
-                                                         ") has an annotationText like <integer value>. Value was: " + i +
-                                                         ", We consider it as to be exported.";
+                                                    ") has an annotationText like <integer value>. Value was: " + i +
+                                                    ", We consider it as to be exported.";
                                             out.println(err);
 
                                             status = new CvInteractionStatus(CvInteractionStatus.EXPORT);
@@ -828,8 +829,8 @@ public class LineExport {
                                             // i < 1
 
                                             String err = cvInteraction.getShortLabel() + " having annotation (" + CvTopic.UNIPROT_DR_EXPORT +
-                                                         ") has an annotationText like <integer value>. Value was: " + i +
-                                                         " However, having a value < 1 is not valid, We consider it as to be NOT exported.";
+                                                    ") has an annotationText like <integer value>. Value was: " + i +
+                                                    " However, having a value < 1 is not valid, We consider it as to be NOT exported.";
                                             out.println("ERROR: " + err);
 
                                             status = new CvInteractionStatus(CvInteractionStatus.DO_NOT_EXPORT);
@@ -839,8 +840,8 @@ public class LineExport {
                                     } catch (NumberFormatException e) {
                                         // not an integer !
                                         out.println("ERROR: " + cvInteraction.getShortLabel() + " having annotation (" + CvTopic.UNIPROT_DR_EXPORT +
-                                                    ") has an annotationText different from yes/no/<integer value> !!!" +
-                                                    " value was: '" + text + "'.");
+                                                ") has an annotationText different from yes/no/<integer value> !!!" +
+                                                " value was: '" + text + "'.");
                                         out.println(logPrefix + "\t\t\t not an integer:(" + text + ") found: do not export ");
 
                                         status = new CvInteractionStatus(CvInteractionStatus.DO_NOT_EXPORT);
@@ -849,7 +850,7 @@ public class LineExport {
                             } else {
                                 // no annotation found implies NO EXPORT !
                                 out.println("ERROR: " + cvInteraction.getShortLabel() +
-                                            " doesn't have an annotation: " + CvTopic.UNIPROT_DR_EXPORT);
+                                        " doesn't have an annotation: " + CvTopic.UNIPROT_DR_EXPORT);
                                 out.println(logPrefix + "\t\t\t not annotation found: do not export ");
 
                                 status = new CvInteractionStatus(CvInteractionStatus.DO_NOT_EXPORT);
@@ -1244,5 +1245,55 @@ public class LineExport {
 
     protected PrintStream getOut() {
         return out;
+    }
+
+    /**
+     * Assess if a protein is a splice variant or a chain on the basis of its uniprot AC as it uses the following
+     * format SPAC-\d+ if it has a isoform-parent and SPAC-PRO_\d+ if it is a chain.
+     * <br> Thought it doesn't mean we will find a master protein for it.
+     *
+     * @param protein the protein we are interrested in knowing if it is a splice variant or a chain.
+     *
+     * @return true if the name complies to the splice variant format.
+     */
+    protected boolean isChainOrIsoform(Protein protein) {
+        final String ac = getUniprotPrimaryAc( protein );
+        if (IdentifierChecker.isFeatureChainId(ac) || IdentifierChecker.isSpliceVariantId(ac)) {
+            // eg. Q62165-PRO_0000021067, not P12345-2
+            if (getMasterAc(protein) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the uniprot primary ID from Protein and Splice variant.
+     *
+     * @param protein the Protein for which we want the uniprot ID.
+     *
+     * @return the uniprot ID as a String or null if none is found (should not occur)
+     */
+    public String getUniprotPrimaryAc(final Protein protein) {
+
+        if (protAcToUniprotIdCache.containsKey(protein.getAc())) {
+            return protAcToUniprotIdCache.get(protein.getAc());
+        }
+
+        String uniprotId = null;
+
+        Collection<InteractorXref> xrefs = protein.getXrefs();
+
+        for (InteractorXref xref : xrefs) {
+            if (getUniprot().equals(xref.getCvDatabase()) &&
+                    getIdentity().equals(xref.getCvXrefQualifier())) {
+                uniprotId = xref.getPrimaryId();
+                break;
+            }
+        }
+
+        protAcToUniprotIdCache.put(protein.getAc(), uniprotId);
+
+        return uniprotId;
     }
 }
