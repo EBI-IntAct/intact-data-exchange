@@ -1,5 +1,8 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 
@@ -22,4 +25,22 @@ public interface InteractionExporter {
      * @throws UniprotExportException
      */
     public void exportInteractionsFrom(MiScoreResults results) throws UniprotExportException;
+
+    /**
+     *
+     * @param interaction
+     * @param context
+     * @return true if the encore interaction pass the uniprot export rules
+     * @throws UniprotExportException
+     */
+    public boolean canExportEncoreInteraction(EncoreInteraction interaction, MiClusterContext context) throws UniprotExportException;
+
+    /**
+     *
+     * @param interaction
+     * @param context
+     * @return true if the binary interaction can be exported
+     * @throws UniprotExportException
+     */
+    public boolean canExportEBinaryInteraction(BinaryInteraction interaction, MiClusterContext context) throws UniprotExportException;
 }

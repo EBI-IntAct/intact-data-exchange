@@ -1,10 +1,12 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
 import org.springframework.transaction.TransactionStatus;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.IntactFilter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
@@ -29,7 +31,6 @@ import java.util.*;
  * @version $Id$
  * @since <pre>01/02/11</pre>
  */
-
 public class ExporterBasedOnDetectionMethod extends LineExport implements InteractionExporter{
 
     private QueryFactory queryProvider;
@@ -256,52 +257,37 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
         return numberOfExperiment;
     }
 
+    private int computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(String method, MiClusterContext context, BinaryInteraction interaction){
+        Set<String> intactAcs = FilterUtils.extractIntactAcFrom(interaction.getInteractionAcs());
+
+        Map<MethodAndTypePair, List<String>> invertedMap = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), intactAcs);
+
+        int numberOfExperiment = 0;
+
+        for (Map.Entry<MethodAndTypePair, List<String>> entry : invertedMap.entrySet()){
+
+            if (entry.getKey().getMethod().equals(method)){
+                numberOfExperiment += entry.getValue().size();
+            }
+        }
+
+        return numberOfExperiment;
+    }
+
     /**
      * Apply the rules on the interaction detection method for all the interactions in the cluster
      * @param cluster : the cluster containing the interactions
      * @param eligibleInteractions : the list of eligible encore interaction ids for uniprot export
      */
-    private void processEligibleExperiments(IntActInteractionClusterScore cluster, MiClusterContext context, Set<Integer> eligibleInteractions) {
+    private void processEligibleExperiments(IntActInteractionClusterScore cluster, MiClusterContext context, Set<Integer> eligibleInteractions) throws UniprotExportException {
 
         // process each interaction of the list
         for (Map.Entry<Integer, EncoreInteraction> interactionEntry : cluster.getInteractionMapping().entrySet()) {
 
             EncoreInteraction interaction = interactionEntry.getValue();
 
-            // get the Encore interaction object
-            if (interaction != null){
-                System.out.println("\t\t Interaction: Id:" + interaction.getId());
-
-                //Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
-
-                //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-
-                Set<String> detectionMethods = interaction.getMethodToPubmed().keySet();
-
-                for (String method : detectionMethods){
-                    int numberOfExperimentWithThisMethod = computeNumberOfExperimentsHavingDetectionMethod(method, context, interaction);
-
-                    if (hasPassedInteractionDetectionMethodRules(method, numberOfExperimentWithThisMethod)){
-                        eligibleInteractions.add(interactionEntry.getKey());
-                        break;
-                    }
-                }
-                /*Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
-                Set<Experiment> experiments = new HashSet<Experiment>();
-
-                for (Interaction inter : interactions){
-                    experiments.addAll(inter.getExperiments());
-                }
-
-                for (Iterator iterator2 = experiments.iterator(); iterator2.hasNext();) {
-                    Experiment experiment = (Experiment) iterator2.next();
-
-                    if (hasPassedInteractionDetectionMethodRules(experiment.getCvInteraction(), experiments)){
-                        eligibleInteractions.add(interactionEntry.getKey());
-                        break;
-                    }
-                } // i's experiments*/
-                //IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
+            if(canExportEncoreInteraction(interaction, context)){
+                eligibleInteractions.add(interactionEntry.getKey());
             }
         } // i
     }
@@ -423,7 +409,7 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
      * @throws SQLException
      * @throws IOException
      */
-    public Set<Integer> extractEligibleInteractionsFrom(IntActInteractionClusterScore cluster, MiClusterContext context, String fileForListOfInteractions) throws SQLException, IOException {
+    public Set<Integer> extractEligibleInteractionsFrom(IntActInteractionClusterScore cluster, MiClusterContext context, String fileForListOfInteractions) throws SQLException, IOException, UniprotExportException {
 
         System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
         Set<Integer> eligibleInteractions = new HashSet<Integer>();
@@ -482,5 +468,59 @@ public class ExporterBasedOnDetectionMethod extends LineExport implements Intera
         processEligibleExperiments(results.getClusterScore(), results.getClusterContext(), eligibleInteractions);
 
         results.setInteractionsToExport(eligibleInteractions);
+    }
+
+    @Override
+    public boolean canExportEncoreInteraction(EncoreInteraction interaction, MiClusterContext context) throws UniprotExportException {
+
+        System.out.println("\t\t Interaction: Id:" + interaction.getId());
+
+        //Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
+
+        //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+
+        Set<String> detectionMethods = interaction.getMethodToPubmed().keySet();
+
+        for (String method : detectionMethods){
+            int numberOfExperimentWithThisMethod = computeNumberOfExperimentsHavingDetectionMethod(method, context, interaction);
+
+            if (hasPassedInteractionDetectionMethodRules(method, numberOfExperimentWithThisMethod)){
+                return true;
+            }
+        }
+        /*Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
+     Set<Experiment> experiments = new HashSet<Experiment>();
+
+     for (Interaction inter : interactions){
+         experiments.addAll(inter.getExperiments());
+     }
+
+     for (Iterator iterator2 = experiments.iterator(); iterator2.hasNext();) {
+         Experiment experiment = (Experiment) iterator2.next();
+
+         if (hasPassedInteractionDetectionMethodRules(experiment.getCvInteraction(), experiments)){
+             eligibleInteractions.add(interactionEntry.getKey());
+             break;
+         }
+     } // i's experiments*/
+        //IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
+
+        return false;
+    }
+
+    @Override
+    public boolean canExportEBinaryInteraction(BinaryInteraction interaction, MiClusterContext context) throws UniprotExportException {
+
+        Set<String> detectionMethods = new HashSet(interaction.getDetectionMethods());
+
+        for (String method : detectionMethods){
+            int numberOfExperimentWithThisMethod = computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(method, context, interaction);
+
+            if (hasPassedInteractionDetectionMethodRules(method, numberOfExperimentWithThisMethod)){
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -7,8 +7,7 @@ import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 /**
  * TODO comment this
@@ -83,5 +82,17 @@ public class FilterUtils {
         }
 
         return new String [] {interactorAcc, intactAc};
+    }
+
+    public static Set<String> extractIntactAcFrom(Collection<CrossReference> references){
+        Set<String> intactAcs = new HashSet<String>(references.size());
+
+        for(CrossReference ref : references){
+            if(WriterUtils.INTACT.equalsIgnoreCase(ref.getDatabase())){
+                intactAcs.add(ref.getIdentifier());
+            }
+        }
+
+        return intactAcs;
     }
 }

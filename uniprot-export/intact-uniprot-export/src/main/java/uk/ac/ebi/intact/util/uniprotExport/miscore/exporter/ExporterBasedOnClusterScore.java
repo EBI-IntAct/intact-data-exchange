@@ -1,13 +1,15 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Confidence;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiScoreResults;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This exporter is respecting the following rules :
@@ -19,7 +21,7 @@ import java.util.*;
  * @since <pre>16-Sep-2010</pre>
  */
 
-public class ExporterBasedOnClusterScore implements InteractionExporter{
+public class ExporterBasedOnClusterScore extends AbstractInteractionExporterImpl {
 
     private static final double EXPORT_THRESHOLD = 0.43;
     private static final String CONFIDENCE_NAME = "intactPsiscore";
@@ -35,8 +37,12 @@ public class ExporterBasedOnClusterScore implements InteractionExporter{
      */
     private double getMiClusterScoreFor(EncoreInteraction interaction){
         List<psidev.psi.mi.tab.model.Confidence> confidenceValues = interaction.getConfidenceValues();
+        return extractMiClusterScoreFrom(confidenceValues);
+    }
+
+    private double extractMiClusterScoreFrom(List<Confidence> confidenceValues) {
         double score = 0;
-        for(psidev.psi.mi.tab.model.Confidence confidenceValue:confidenceValues){
+        for(Confidence confidenceValue:confidenceValues){
             if(confidenceValue.getType().equalsIgnoreCase(CONFIDENCE_NAME)){
                 score = Double.parseDouble(confidenceValue.getValue());
             }
@@ -46,62 +52,75 @@ public class ExporterBasedOnClusterScore implements InteractionExporter{
     }
 
     /**
-     * For each binary interaction in the intactMiClusterScore : filter on a threshold value of the score and then, depending on 'filterBinary',
-     * will add a filter on true binary interaction
-     * @param filterBinary
-     * @return
-     * @throws UniprotExportException
+     *
+     * @param interaction
+     * @return the computed Mi cluster score for this interaction
      */
-    public Set<Integer> processExport(MiScoreResults results, boolean filterBinary) throws UniprotExportException {
-        MiClusterContext context = results.getClusterContext();
-        IntActInteractionClusterScore miScore = results.getClusterScore();
+    private double getMiClusterScoreFor(BinaryInteraction interaction){
+        List<psidev.psi.mi.tab.model.Confidence> confidenceValues = interaction.getConfidenceValues();
+        return extractMiClusterScoreFrom(confidenceValues);
+    }
 
-        Set<Integer> interactionsPossibleToExport = new HashSet<Integer>();
-        Map<String, MethodAndTypePair> interactionType_Method = context.getInteractionToMethod_type();
-        Set<String> spokeExpandedInteractions = context.getSpokeExpandedInteractions();
+    @Override
+    public boolean canExportEncoreInteraction(EncoreInteraction encore, MiClusterContext context) throws UniprotExportException {
 
-        for (Map.Entry<Integer, EncoreInteraction> entry : miScore.getInteractionMapping().entrySet()){
-            EncoreInteraction encore = entry.getValue();
+        double score = getMiClusterScoreFor(encore);
 
-            double score = getMiClusterScoreFor(encore);
+        if (score >= EXPORT_THRESHOLD){
 
-            if (score >= EXPORT_THRESHOLD){
+            if (encore.getExperimentToDatabase() == null){
+                throw new UniprotExportException("The interaction " + encore.getId() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
+            }
 
-                if (encore.getExperimentToDatabase() == null){
-                    throw new UniprotExportException("The interaction " + entry.getKey() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
-                }
-                List<String> intactInteractions = new ArrayList<String>();
-                
-                intactInteractions.addAll(encore.getExperimentToPubmed().keySet());
+            Set<String> intactInteractions = new HashSet<String>();
 
-                if (intactInteractions.isEmpty()){
-                    throw new UniprotExportException("The interaction " + entry.getKey() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
-                }
+            intactInteractions.addAll(encore.getExperimentToPubmed().keySet());
 
-                for (String ac : intactInteractions){
-                    if (filterBinary){
-                        if (!spokeExpandedInteractions.contains(ac)){
+            if (intactInteractions.isEmpty()){
+                throw new UniprotExportException("The interaction " + encore.getId() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
+            }
 
-                            String method = interactionType_Method.get(ac).getMethod();
+            for (String ac : intactInteractions){
+                if (!context.getSpokeExpandedInteractions().contains(ac)){
 
-                            if (!method.equals(COLOCALIZATION)){
-                                interactionsPossibleToExport.add(entry.getKey());
-                                break;
-                            }
-                        }
-                    }
-                    else{
-                        interactionsPossibleToExport.add(entry.getKey());
+                    String method = context.getInteractionToMethod_type().get(ac).getMethod();
+
+                    if (!method.equals(COLOCALIZATION)){
+                        return true;
                     }
                 }
             }
         }
 
-        return interactionsPossibleToExport;
+        return false;
     }
 
     @Override
-    public void exportInteractionsFrom(MiScoreResults results) throws UniprotExportException {
-        results.setInteractionsToExport(processExport(results, true));
+    public boolean canExportEBinaryInteraction(BinaryInteraction interaction, MiClusterContext context) throws UniprotExportException {
+        double score = getMiClusterScoreFor(interaction);
+
+        if (score >= EXPORT_THRESHOLD){
+
+            Set<String> intactInteractions = new HashSet<String>();
+
+            intactInteractions.addAll(FilterUtils.extractIntactAcFrom(interaction.getInteractionAcs()));
+
+            if (intactInteractions.isEmpty()){
+                throw new UniprotExportException("The interaction :" + interaction.getInteractorA().toString() + "-" + interaction.getInteractorB().toString() +" doesn't have any references to IntAct.");
+            }
+
+            for (String ac : intactInteractions){
+                if (!context.getSpokeExpandedInteractions().contains(ac)){
+
+                    String method = context.getInteractionToMethod_type().get(ac).getMethod();
+
+                    if (!method.equals(COLOCALIZATION)){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }
