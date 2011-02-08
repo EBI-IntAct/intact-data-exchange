@@ -29,7 +29,7 @@ import java.util.List;
  * @since <pre>22-Oct-2010</pre>
  */
 
-public class NonClusteredMitabFilter extends AbstractMitabFilter implements EncoreInteractionFilter {
+public class NonClusteredMitabFilter extends AbstractMitabFilter implements InteractionFilter {
 
     private InteractionExporter exporter;
 
@@ -133,7 +133,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter implements Enco
             MiClusterScoreResults clusterResults = computeMiScoreInteractionEligibleUniprotExport(mitab);
             exporter.exportInteractionsFrom(clusterResults);
 
-            //this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);
+            //this.interactionClusterScore.getScorePerInteractions(fileExport, this.interactionsToBeExported);
 
             return clusterResults;
         } catch (IOException e) {

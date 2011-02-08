@@ -5,7 +5,7 @@ import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.EncoreInteractionToCCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.EncoreInteractionToGoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.converters.InteractorToDRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.EncoreInteractionFilter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.InteractionFilter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.DRParameters;
@@ -30,9 +30,9 @@ public class UniprotExportProcessor {
     private EncoreInteractionToCCLineConverter ccConverter;
     private InteractorToDRLineConverter drConverter;
 
-    private EncoreInteractionFilter filter;
+    private InteractionFilter filter;
 
-    public UniprotExportProcessor(EncoreInteractionFilter filter){
+    public UniprotExportProcessor(InteractionFilter filter){
 
         goConverter = new EncoreInteractionToGoLineConverter();
         ccConverter = new EncoreInteractionToCCLineConverter();
@@ -49,7 +49,7 @@ public class UniprotExportProcessor {
             exportDRAndCCLines(results, DRFile, CCFile);
             exportGOLines(results, GOFile);
 
-            results.getCluster().saveScoresForSpecificInteractions("uniprotExport.log", results.getInteractionsToExport());
+            results.getCluster().saveClusteredInteractions("uniprotExport.log", results.getInteractionsToExport());
         } catch (IOException e) {
             throw new UniprotExportException("Impossible to write the results of uniprot export in " + DRFile + " or " + CCFile + " or " + GOFile, e);
         }
@@ -83,8 +83,10 @@ public class UniprotExportProcessor {
 
         GOLineWriter goWriter = new GOLineWriterImpl(new FileWriter(GOFile));
 
-        for (Integer interactionId : results.getInteractionsToExport()){
-            EncoreInteraction interaction = results.getCluster().getInteractionMapping().get(interactionId);
+        Map<Integer, EncoreInteraction> interactionMapping = results.getCluster().getEncoreInteractionCluster();
+
+        for (Integer interactionId : interactionMapping.keySet()){
+            EncoreInteraction interaction = interactionMapping.get(interactionId);
 
             GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
 
@@ -97,7 +99,7 @@ public class UniprotExportProcessor {
     public void exportDRLines(MiClusterScoreResults results, String DRFile) throws IOException {
         DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
 
-        Set<String> interactors = new HashSet(results.getCluster().getInteractorMapping().keySet());
+        Set<String> interactors = new HashSet(results.getCluster().getInteractorCluster().keySet());
         Set<String> processedInteractors = new HashSet<String>();
 
         while (!interactors.isEmpty()){
@@ -112,7 +114,7 @@ public class UniprotExportProcessor {
                 parent = interactorAc.substring(0, interactorAc.indexOf("-"));
             }
 
-            Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorMapping().get(interactorAc));
+            Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(interactorAc));
             int numberInteractions = exportedInteractions.size();
 
             while (interactorIterator.hasNext()){
@@ -123,7 +125,7 @@ public class UniprotExportProcessor {
                 if (nextInteractor.startsWith(parent)){
                     processedInteractors.add(nextInteractor);
 
-                    exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorMapping().get(nextInteractor));
+                    exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(nextInteractor));
                     numberInteractions += exportedInteractions.size();
                 }
             }
@@ -141,7 +143,7 @@ public class UniprotExportProcessor {
     public void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile) throws IOException {
         DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
 
-        Set<String> interactors = new HashSet(results.getCluster().getInteractorMapping().keySet());
+        Set<String> interactors = new HashSet(results.getCluster().getInteractorCluster().keySet());
         Set<String> processedInteractors = new HashSet<String>();
 
         CCLineWriter ccWriter = new CCLineWriterImpl(new FileWriter(CCFile));
@@ -161,11 +163,13 @@ public class UniprotExportProcessor {
                 parent = interactorAc.substring(0, interactorAc.indexOf("-"));
             }
 
-            Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorMapping().get(interactorAc));
+            Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(interactorAc));
             int numberInteractions = exportedInteractions.size();
 
+            Map<Integer, EncoreInteraction> interactionMapping = results.getCluster().getEncoreInteractionCluster();
+
             for (Integer interactionId : exportedInteractions){
-                EncoreInteraction interaction = results.getCluster().getInteractionMapping().get(interactionId);
+                EncoreInteraction interaction = interactionMapping.get(interactionId);
 
                 if (interaction != null){
                     interactions.add(interaction);
@@ -180,11 +184,11 @@ public class UniprotExportProcessor {
                 if (nextInteractor.startsWith(parent)){
                     processedInteractors.add(nextInteractor);
 
-                    exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorMapping().get(nextInteractor));
+                    exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(nextInteractor));
                     numberInteractions += exportedInteractions.size();
 
                     for (Integer interactionId : exportedInteractions){
-                        EncoreInteraction interaction = results.getCluster().getInteractionMapping().get(interactionId);
+                        EncoreInteraction interaction = interactionMapping.get(interactionId);
 
                         if (interaction != null){
                             interactions.add(interaction);
@@ -232,11 +236,11 @@ public class UniprotExportProcessor {
         this.drConverter = drConverter;
     }
 
-    public EncoreInteractionFilter getFilter() {
+    public InteractionFilter getFilter() {
         return filter;
     }
 
-    public void setFilter(EncoreInteractionFilter filter) {
+    public void setFilter(InteractionFilter filter) {
         this.filter = filter;
     }
 }

@@ -34,7 +34,7 @@ import java.util.*;
  * @since <pre>08/02/11</pre>
  */
 
-public class ClusteredMitabFilter extends AbstractMitabFilter implements BinaryInteractionFilter{
+public class ClusteredMitabFilter extends AbstractMitabFilter implements InteractionFilter{
     protected QueryFactory queryProvider;
     protected Set<String> eligibleInteractionsForUniprotExport;
     protected IntactPsimiTabReader mitabReader;
@@ -54,7 +54,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements BinaryI
         super(exporter);
     }
 
-    protected BinaryClusterScoreResults clusterMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
+    protected MiClusterScoreResults clusterMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
         BinaryClusterScore clusterScore = new BinaryClusterScore();
         MiClusterContext context = new MiClusterContext();
 
@@ -174,7 +174,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements BinaryI
             binaryIdentifier++;
         }
 
-        return new BinaryClusterScoreResults(clusterScore, context);
+        return new MiClusterScoreResults(clusterScore, context);
     }
 
     protected void removeNotExportedInteractionEvidencesFrom(IntactBinaryInteraction binary, List<InteractionImpl> exportedInteractionEvidences){
@@ -221,13 +221,13 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements BinaryI
         binary.getInteractionTypes().removeAll(typeToRemove);
     }
 
-    public BinaryClusterScoreResults exportInteractionsFrom(String mitab) throws UniprotExportException {
+    public MiClusterScoreResults exportInteractionsFrom(String mitab) throws UniprotExportException {
         try {
 
-            BinaryClusterScoreResults clusterResults = clusterMiScoreInteractionEligibleUniprotExport(mitab);
+            MiClusterScoreResults clusterResults = clusterMiScoreInteractionEligibleUniprotExport(mitab);
             exporter.exportInteractionsFrom(clusterResults);
 
-            //this.interactionClusterScore.saveScoresForSpecificInteractions(fileExport, this.interactionsToBeExported);
+            //this.interactionClusterScore.getScorePerInteractions(fileExport, this.interactionsToBeExported);
 
             return clusterResults;
         } catch (IOException e) {
@@ -237,7 +237,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements BinaryI
         }
     }
 
-    public BinaryClusterScoreResults exportInteractions() throws UniprotExportException {
+    public MiClusterScoreResults exportInteractions() throws UniprotExportException {
         return exportInteractionsFrom(mitab);
     }
 

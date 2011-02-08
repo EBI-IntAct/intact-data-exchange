@@ -227,12 +227,17 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
         }
     }
 
+    @Override
+    public void saveCluster(String fileName){
+        saveScores();
+    }
+
     /**
      * Save the scores of the specific interaction ids
      * @param fileName
      * @param interactionIds
      */
-    public void saveScoresForSpecificInteractions(String fileName, Collection<Integer> interactionIds){
+    public void saveClusteredInteractions(String fileName, Set<Integer> interactionIds){
 
         String scoreListCSV = getScoresPerInteraction(interactionIds, null, null);
         try{
@@ -298,6 +303,11 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
 
     @Override
     public Map<String, List<Integer>> getInteractorCluster() {
-        return getInteractorMapping();  //To change body of implemented methods use File | Settings | File Templates.
+        return getInteractorMapping();
+    }
+
+    @Override
+    public Set<Integer> getAllInteractionIds() {
+        return getInteractionMapping().keySet();
     }
 }

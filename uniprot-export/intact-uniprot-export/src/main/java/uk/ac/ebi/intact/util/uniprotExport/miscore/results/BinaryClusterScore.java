@@ -11,10 +11,7 @@ import uk.ac.ebi.intact.util.uniprotExport.results.IntactCluster;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Cluster containing binary interactions
@@ -63,11 +60,50 @@ public class BinaryClusterScore implements IntactCluster{
         return this.interactorMapping;
     }
 
+    @Override
+    public Set<Integer> getAllInteractionIds() {
+        return this.interactionMapping.keySet();
+    }
+
+    @Override
+    public void saveCluster(String fileName) {
+        String scoreListCSV = getScoresPerInteraction();
+        try{
+            // Create file
+            FileWriter fstream = new FileWriter(fileName + ".txt");
+            BufferedWriter out = new BufferedWriter(fstream);
+            out.write(scoreListCSV);
+            //Close the output stream
+            out.close();
+        }catch (Exception e){//Catch exception if any
+            logger.error("Error: " + e.getMessage());
+        }
+
+        /* Retrieve results */
+
+        Map<Integer, BinaryInteraction> interactionMapping = getBinaryInteractionCluster();
+
+        try {
+            File file = new File(fileName);
+
+            for(Integer mappingId:interactionMapping.keySet()){
+                BinaryInteraction eI = interactionMapping.get(mappingId);
+                if (eI != null){
+                    writer.writeOrAppend(eI, file, false);
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("It is not possible to write the results in the mitab file " + fileName);
+            e.printStackTrace();
+        }
+    }
+
     /**
      *
      * @return a list of formatted scores for each interaction
      */
-    public String getScoresPerInteraction(Collection<Integer> interactionIds, String scoreListCSV, String [] scoreList){
+    public String getScorePerInteractions(Collection<Integer> interactionIds, String scoreListCSV, String[] scoreList){
         if(scoreList == null){
             int scoreListSize = interactionIds.size();
             scoreList = new String[scoreListSize];
@@ -100,13 +136,44 @@ public class BinaryClusterScore implements IntactCluster{
     }
 
     /**
+     *
+     * @return a list of formatted scores for each interaction
+     */
+    public String getScoresPerInteraction(){
+
+        int scoreListSize = this.getBinaryInteractionCluster().size();
+        String [] scoreList = new String[scoreListSize];
+        String scoreListCSV = "";
+        String delimiter = "\n";
+        int i = 0;
+        for(Map.Entry<Integer, BinaryInteraction> eI:this.getBinaryInteractionCluster().entrySet()){
+            List<Confidence> confidenceValues = eI.getValue().getConfidenceValues();
+            Double score = null;
+            for(Confidence confidenceValue:confidenceValues){
+                if(confidenceValue.getType().equalsIgnoreCase("intactPsiscore")){
+                    score = Double.parseDouble(confidenceValue.getValue());
+                }
+            }
+
+            scoreList[i] = eI.getKey() + "-" +eI.getValue().getInteractorA().toString() + "-" + eI.getValue().getInteractorB().toString() + ":" + score;
+            scoreListCSV = scoreListCSV + scoreList[i];
+            i++;
+            if(scoreListSize > i){
+                scoreListCSV = scoreListCSV + delimiter;
+            }
+        }
+        return scoreListCSV;
+    }
+
+    /**
      * Save the scores of the specific interaction ids
      * @param fileName
      * @param interactionIds
      */
-    public void saveScoresForSpecificInteractions(String fileName, Collection<Integer> interactionIds){
+    @Override
+    public void saveClusteredInteractions(String fileName, Set<Integer> interactionIds){
 
-        String scoreListCSV = getScoresPerInteraction(interactionIds, null, null);
+        String scoreListCSV = getScorePerInteractions(interactionIds, null, null);
         try{
             // Create file
             FileWriter fstream = new FileWriter(fileName + ".txt");

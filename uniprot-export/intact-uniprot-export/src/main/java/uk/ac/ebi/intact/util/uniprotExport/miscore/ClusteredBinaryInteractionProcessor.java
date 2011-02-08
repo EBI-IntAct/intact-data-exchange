@@ -1,10 +1,10 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore;
 
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.BinaryInteractionFilter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.BinaryClusterScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.ClusteredMitabFilter;
+import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults;
 
 /**
- * TODO comment this
+ * This class will only apply export rules to a clustered mitab file having pre-computed mi scores
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -13,25 +13,25 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.results.BinaryClusterScoreRes
 
 public class ClusteredBinaryInteractionProcessor {
 
-    private BinaryInteractionFilter filter;
+    private ClusteredMitabFilter filter;
 
-    public ClusteredBinaryInteractionProcessor(BinaryInteractionFilter filter){
+    public ClusteredBinaryInteractionProcessor(ClusteredMitabFilter filter){
 
         this.filter = filter;
     }
 
     public void processClusteredBinaryInteractions(String logFile) throws UniprotExportException {
 
-        BinaryClusterScoreResults results = filter.exportInteractions();
+        MiClusterScoreResults results = filter.exportInteractions();
 
-        results.getCluster().saveScoresForSpecificInteractions(logFile, results.getInteractionsToExport());
+        results.getCluster().saveClusteredInteractions(logFile, results.getInteractionsToExport());
     }
 
-    public BinaryInteractionFilter getFilter() {
+    public ClusteredMitabFilter getFilter() {
         return filter;
     }
 
-    public void setFilter(BinaryInteractionFilter filter) {
+    public void setFilter(ClusteredMitabFilter filter) {
         this.filter = filter;
     }
 }

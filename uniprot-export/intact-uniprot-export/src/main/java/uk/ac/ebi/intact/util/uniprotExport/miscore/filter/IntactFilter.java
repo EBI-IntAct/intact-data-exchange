@@ -18,14 +18,12 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.results.IntActInteractionClus
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.results.IntactCluster;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This filter is selecting interactions eligible for uniprot export from IntAct.
@@ -36,7 +34,7 @@ import java.util.Set;
  * @since <pre>15-Sep-2010</pre>
  */
 
-public class IntactFilter implements EncoreInteractionFilter {
+public class IntactFilter implements InteractionFilter {
 
     /**
      * the binary interaction converter
@@ -519,15 +517,15 @@ public class IntactFilter implements EncoreInteractionFilter {
      * @param fileContainingDataExported : the files for the score results of the interactions exported in uniprot
      * @param fileContainingDataNotExported : the files for the score results of the interactions not exported in uniprot
      */
-    public void extractComputedMiScoresFor(Set<Integer> interactionIds, String fileContainingDataExported, String fileContainingDataNotExported, IntActInteractionClusterScore clusterScore){
+    public void extractComputedMiScoresFor(Set<Integer> interactionIds, String fileContainingDataExported, String fileContainingDataNotExported, IntactCluster clusterScore){
 
         System.out.println(interactionIds.size() + " interactions in IntAct will be processed.");
 
         String fileName1 = fileContainingDataExported + "_mitab.csv";
         String fileName2 = fileContainingDataNotExported + "_mitab.csv";
 
-        clusterScore.saveScoresForSpecificInteractions(fileName1, interactionIds);
-        clusterScore.saveScoresForSpecificInteractions(fileName2, CollectionUtils.subtract(clusterScore.getInteractionMapping().keySet(), interactionIds));
+        clusterScore.saveClusteredInteractions(fileName1, interactionIds);
+        clusterScore.saveClusteredInteractions(fileName2, new HashSet(CollectionUtils.subtract(clusterScore.getAllInteractionIds(), interactionIds)));
     }
 
     /**
@@ -608,7 +606,7 @@ public class IntactFilter implements EncoreInteractionFilter {
         MiClusterScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
         exporter.exportInteractionsFrom(results);
 
-        results.getCluster().saveScores(fileTotal);
+        results.getCluster().saveCluster(fileTotal);
         System.out.println("export binary interactions from intact");
         extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getCluster());
 
@@ -628,7 +626,7 @@ public class IntactFilter implements EncoreInteractionFilter {
             MiClusterScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
             exporter.exportInteractionsFrom(results);
 
-            results.getCluster().saveScores(fileTotal);
+            results.getCluster().saveCluster(fileTotal);
             System.out.println("export binary interactions from intact");
             extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getCluster());
 
@@ -647,7 +645,7 @@ public class IntactFilter implements EncoreInteractionFilter {
         MiClusterScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
         exporter.exportInteractionsFrom(results);
 
-        results.getCluster().saveScores(fileTotal);
+        results.getCluster().saveCluster(fileTotal);
         System.out.println("export binary interactions from intact");
         extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getCluster());
 

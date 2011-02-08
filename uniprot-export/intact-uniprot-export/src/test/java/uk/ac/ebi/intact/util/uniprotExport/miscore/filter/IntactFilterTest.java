@@ -6,11 +6,11 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.ExporterBasedOnDetectionMethod;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults;
+import uk.ac.ebi.intact.util.uniprotExport.results.IntactCluster;
 
 import java.util.Set;
 
@@ -37,15 +37,15 @@ public class IntactFilterTest extends UniprotExportBase{
 
         MiClusterScoreResults results = filter.exportInteractions();
 
-        InteractionClusterScore clusterScore = results.getCluster();
+        IntactCluster clusterScore = results.getCluster();
 
         // compute score for interactions with valid dr-export
         Assert.assertNotNull(clusterScore);
-        Assert.assertEquals(2, clusterScore.getInteractionMapping().size());
+        Assert.assertEquals(2, clusterScore.getAllInteractionIds().size());
 
         boolean isValid = true;
 
-        for (EncoreInteraction interaction : clusterScore.getInteractionMapping().values()){
+        for (EncoreInteraction interaction : clusterScore.getEncoreInteractionCluster().values()){
              Set<String> interactionAcs = interaction.getExperimentToPubmed().keySet();
 
             if (interactionAcs.contains(interaction2) || interactionAcs.contains(interaction4)){

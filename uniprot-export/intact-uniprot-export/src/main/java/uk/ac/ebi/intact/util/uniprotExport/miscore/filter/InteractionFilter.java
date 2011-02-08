@@ -13,7 +13,7 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults
  * @since <pre>01/02/11</pre>
  */
 
-public interface EncoreInteractionFilter {
+public interface InteractionFilter {
 
     /**
      * Compute the mi score of a set of binary interactions which are eligible for uniprot export and then apply several rules
