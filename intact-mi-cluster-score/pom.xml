@@ -105,8 +105,10 @@
                                 <argument>${rule}</argument>
                                 <!-- The source of the binary interactions (intact or mitab:fileName) -->
                                 <argument>${mitab}</argument>
-                                <!-- The name of the log file -->
-                                <argument>${log}</argument>
+                                <!-- The name of the log file containing exported interactions-->
+                                <argument>${fileExported}</argument>
+                                <!-- The name of the log file containing excluded interactions-->
+                                <argument>${fileExcluded}</argument>
                                 <!-- The name of the database  -->
                                 <argument>${database}</argument>
                             </arguments>

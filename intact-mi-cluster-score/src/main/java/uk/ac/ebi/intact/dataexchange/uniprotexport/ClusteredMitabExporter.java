@@ -23,16 +23,24 @@ public class ClusteredMitabExporter {
     public static void main( String[] args ) throws IOException {
 
         // Six possible arguments
-        if( args.length != 4 ) {
-            System.err.println( "Usage: UniprotExporter <rule> <mitabFile> <logFile> <database>" );
+        if( args.length != 5 ) {
+            System.err.println( "Usage: UniprotExporter <rule> <mitabFile> <fileExported> <fileExcluded> <database>" );
             System.err.println( "Usage: <rule> is the type of rule we want to use to export the interaction to uniprot. " +
                     "Can be 'detection_method' if we want the rules based on detection method or 'mi_score' if we want the rules based on mi score" );
             System.err.println( "Usage: <mitabFile> is the clustered mitab file with pre-computed mi scores" );
-            System.err.println( "Usage: <logFile> the name of the file which will contain the results of the export ");
+            System.err.println( "Usage: <fileExported> the name of the file which will contain the results of the export ");
+            System.err.println( "Usage: <fileExcluded> the name of the file which will contain the excluded interactions ");
             System.err.println( "Usage: <database> the database instance which will be used to extract supplementary information");
 
             System.exit( 1 );
         }
+        String clusteredMitab = args[1];
+        String fileExported = args[2];
+        String fileExcluded = args[3];
+        String database = args[4];
+
+        IntactContext.initContext(new String[]{"/META-INF/" + database + ".spring.xml"});
+
         final ExporterRule rule = InteractionExporterFactory.convertIntoExporterRule(args[0]);
 
         if (rule.equals(ExporterRule.none)){
@@ -41,13 +49,10 @@ public class ClusteredMitabExporter {
             System.exit( 1 );
         }
 
-        String clusteredMitab = args[1];
-        String logFile = args[2];
-        String database = args[3];
-
         System.out.println( "Exporter rule = " + rule.toString() );
         System.out.println( "Clustered mitab = " + clusteredMitab.toString() );
-        System.out.println( "Log file = " + logFile );
+        System.out.println( "file containing exported interactions = " + fileExported );
+        System.out.println( "file containing excluded interactions = " + fileExcluded );
 
         System.out.println( "database = " + database );
 
@@ -56,11 +61,9 @@ public class ClusteredMitabExporter {
 
         ClusteredBinaryInteractionProcessor processor = new ClusteredBinaryInteractionProcessor(filter);
 
-        IntactContext.initContext(new String[]{"/META-INF/" + database + ".spring.xml"});
-
         try {
 
-            processor.processClusteredBinaryInteractions(logFile);
+            processor.processClusteredBinaryInteractions(fileExported, fileExcluded);
 
         } catch (UniprotExportException e) {
             e.printStackTrace();

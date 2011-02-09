@@ -5,4 +5,4 @@ export MAVEN_OPTS
 
 echo "MAVEN_OPTS=$MAVEN_OPTS"
 
-mvn -U clean install -Pbinary-export -Drule=$1 -Dmitab=$2 -Dlog=$3 -Ddatabase=$4 -Dmaven.test.skip
+mvn clean install -Pbinary-export -Drule=$1 -Dmitab=$2 -DfileExported=$3 -DfileExcluded=$4 -Ddatabase=$5 -Dmaven.test.skip

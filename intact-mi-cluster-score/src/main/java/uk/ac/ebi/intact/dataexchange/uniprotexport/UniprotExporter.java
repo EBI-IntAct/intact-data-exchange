@@ -40,6 +40,15 @@ public class UniprotExporter {
 
             System.exit( 1 );
         }
+        String sourceType = args[1];
+        String mitabFile = null;
+        String drFile = args[2];
+        String ccFile = args[3];
+        String goFile = args[4];
+        String database = args[5];
+
+        IntactContext.initContext(new String[]{"/META-INF/" + database + ".spring.xml"});
+
         final ExporterRule rule = InteractionExporterFactory.convertIntoExporterRule(args[0]);
 
         if (rule.equals(ExporterRule.none)){
@@ -47,13 +56,6 @@ public class UniprotExporter {
                     "Can be 'detection_method' if we want the rules based on detection method or 'mi_score' if we want the rules based on mi score" );
             System.exit( 1 );
         }
-
-        String sourceType = args[1];
-        String mitabFile = null;
-        String drFile = args[2];
-        String ccFile = args[3];
-        String goFile = args[4];
-        String database = args[5];
 
         if (sourceType.contains(":")){
             int index = args[1].indexOf(":");
@@ -92,8 +94,6 @@ public class UniprotExporter {
         }
 
         UniprotExportProcessor processor = new UniprotExportProcessor(filter);
-
-        IntactContext.initContext(new String[]{"/META-INF/" + database + ".spring.xml"});
 
         try {
 
