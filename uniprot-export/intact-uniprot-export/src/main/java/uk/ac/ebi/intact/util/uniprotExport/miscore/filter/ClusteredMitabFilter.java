@@ -56,111 +56,111 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements Interac
         Integer binaryIdentifier = 1;
 
         while (iterator.hasNext()){
-            while (iterator.hasNext()){
-                BinaryInteraction<Interactor> interaction = iterator.next();
+            logger.info("processing binary interaction " + binaryIdentifier);
+            BinaryInteraction<Interactor> interaction = iterator.next();
 
-                Set<String> intactAcs = FilterUtils.extractIntactAcFrom(interaction.getInteractionAcs());
+            Set<String> intactAcs = FilterUtils.extractIntactAcFrom(interaction.getInteractionAcs());
 
-                Interactor interactorA = interaction.getInteractorA();
-                String uniprotA = null;
-                Interactor interactorB = interaction.getInteractorB();
-                String uniprotB = null;
+            Interactor interactorA = interaction.getInteractorA();
+            String uniprotA = null;
+            Interactor interactorB = interaction.getInteractorB();
+            String uniprotB = null;
 
-                if (interactorA != null){
-                    for (CrossReference refA : interactorA.getIdentifiers()){
-                        if (UNIPROT.equalsIgnoreCase(refA.getDatabase())){
-                            uniprotA = refA.getIdentifier();
+            if (interactorA != null){
+                for (CrossReference refA : interactorA.getIdentifiers()){
+                    if (UNIPROT.equalsIgnoreCase(refA.getDatabase())){
+                        uniprotA = refA.getIdentifier();
 
-                            break;
-                        }
+                        break;
                     }
                 }
-                if (interactorB != null){
-                    for (CrossReference refB : interactorB.getIdentifiers()){
-                        if (UNIPROT.equalsIgnoreCase(refB.getDatabase())){
-                            uniprotB = refB.getIdentifier();
+            }
+            if (interactorB != null){
+                for (CrossReference refB : interactorB.getIdentifiers()){
+                    if (UNIPROT.equalsIgnoreCase(refB.getDatabase())){
+                        uniprotB = refB.getIdentifier();
 
-                            break;
-                        }
+                        break;
                     }
                 }
+            }
 
-                if (!intactAcs.isEmpty() && uniprotA != null && uniprotB != null){
-                    TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-                    InteractionDao interactionDao = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao();
+            if (!intactAcs.isEmpty() && uniprotA != null && uniprotB != null){
+                TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+                InteractionDao interactionDao = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao();
 
-                    List<InteractionImpl> interactionsInIntact = interactionDao.getByAc(intactAcs);
-                    List<InteractionImpl> interactionsInIntactPassingExport = new ArrayList(interactionsInIntact);
+                List<InteractionImpl> interactionsInIntact = interactionDao.getByAc(intactAcs);
+                List<InteractionImpl> interactionsInIntactPassingExport = new ArrayList(interactionsInIntact);
 
-                    boolean canBeProcessed = false;
+                boolean canBeProcessed = false;
 
-                    for (InteractionImpl intact : interactionsInIntact){
-                        String intactAc = intact.getAc();
+                for (InteractionImpl intact : interactionsInIntact){
+                    String intactAc = intact.getAc();
 
-                        if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
-                            Collection<Experiment>  experiments = intact.getExperiments();
-                            if (experiments.size() == 1){
+                    if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
+                        Collection<Experiment>  experiments = intact.getExperiments();
+                        if (experiments.size() == 1){
 
-                                Experiment exp = experiments.iterator().next();
-                                CvInteraction detectionMethod = exp.getCvInteraction();
-                                CvInteractionType interactionType = intact.getCvInteractionType();
+                            Experiment exp = experiments.iterator().next();
+                            CvInteraction detectionMethod = exp.getCvInteraction();
+                            CvInteractionType interactionType = intact.getCvInteractionType();
 
-                                if (detectionMethod != null && interactionType != null){
-                                    canBeProcessed = true;
+                            if (detectionMethod != null && interactionType != null){
+                                canBeProcessed = true;
 
-                                    String detectionMI = detectionMethod.getIdentifier();
+                                String detectionMI = detectionMethod.getIdentifier();
 
-                                    String typeMi = interactionType.getIdentifier();
+                                String typeMi = interactionType.getIdentifier();
 
-                                    MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
-                                    context.getInteractionToMethod_type().put(intactAc, entry);
+                                MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
+                                context.getInteractionToMethod_type().put(intactAc, entry);
 
-                                    if (!InteractionUtils.isBinaryInteraction(intact)){
+                                if (!InteractionUtils.isBinaryInteraction(intact)){
 
-                                        context.getSpokeExpandedInteractions().add(intactAc);
-                                    }
+                                    context.getSpokeExpandedInteractions().add(intactAc);
                                 }
                             }
                         }
-                        else{
-                            interaction.getInteractionAcs().remove(intactAc);
-                            interactionsInIntactPassingExport.remove(intact);
-                        }
                     }
-
-                    if (canBeProcessed){
-
-                        FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
-
-                        if (interactionsInIntactPassingExport.size() < interactionsInIntact.size()){
-                             removeNotExportedInteractionEvidencesFrom(interaction, interactionsInIntactPassingExport);
-                        }
-
-                        processMiTerms(interaction, context);
-                        clusterScore.getBinaryInteractionCluster().put(binaryIdentifier, interaction);
-
-                        if (clusterScore.getInteractorCluster().containsKey(uniprotA)){
-                            clusterScore.getInteractorCluster().get(uniprotA).add(binaryIdentifier);
-                        }
-                        else{
-                            List<Integer> interactionIds = new ArrayList<Integer>();
-                            interactionIds.add(binaryIdentifier);
-                            clusterScore.getInteractorCluster().put(uniprotA, interactionIds);
-                        }
-
-                        if (clusterScore.getInteractorCluster().containsKey(uniprotB)){
-                            clusterScore.getInteractorCluster().get(uniprotB).add(binaryIdentifier);
-                        }
-                        else{
-                            List<Integer> interactionIds = new ArrayList<Integer>();
-                            interactionIds.add(binaryIdentifier);
-                            clusterScore.getInteractorCluster().put(uniprotB, interactionIds);
-                        }
+                    else{
+                        interaction.getInteractionAcs().remove(intactAc);
+                        interactionsInIntactPassingExport.remove(intact);
                     }
-
-                    IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
-
                 }
+
+                if (canBeProcessed){
+                    logger.info(interactionsInIntactPassingExport.size() + " intact interactions involving "+uniprotA+" and "+uniprotB+" are eligible for uniprot export");
+
+                    FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+
+                    if (interactionsInIntactPassingExport.size() < interactionsInIntact.size()){
+                        removeNotExportedInteractionEvidencesFrom(interaction, interactionsInIntactPassingExport);
+                    }
+
+                    processMiTerms(interaction, context);
+                    clusterScore.getBinaryInteractionCluster().put(binaryIdentifier, interaction);
+
+                    if (clusterScore.getInteractorCluster().containsKey(uniprotA)){
+                        clusterScore.getInteractorCluster().get(uniprotA).add(binaryIdentifier);
+                    }
+                    else{
+                        List<Integer> interactionIds = new ArrayList<Integer>();
+                        interactionIds.add(binaryIdentifier);
+                        clusterScore.getInteractorCluster().put(uniprotA, interactionIds);
+                    }
+
+                    if (clusterScore.getInteractorCluster().containsKey(uniprotB)){
+                        clusterScore.getInteractorCluster().get(uniprotB).add(binaryIdentifier);
+                    }
+                    else{
+                        List<Integer> interactionIds = new ArrayList<Integer>();
+                        interactionIds.add(binaryIdentifier);
+                        clusterScore.getInteractorCluster().put(uniprotB, interactionIds);
+                    }
+                }
+
+                IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
+
             }
 
             binaryIdentifier++;
