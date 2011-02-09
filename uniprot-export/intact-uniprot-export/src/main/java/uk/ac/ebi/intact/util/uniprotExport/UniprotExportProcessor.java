@@ -62,6 +62,8 @@ public class UniprotExportProcessor {
 
             logger.info("Save cluster informations in uniprotExport.log");
             results.getCluster().saveClusteredInteractions("uniprotExport.log", results.getInteractionsToExport());
+            logger.info("Save cluster informations in uniprotExport_excluded.log");
+            results.getCluster().saveClusteredInteractions("uniprotExport_excluded.log", new HashSet(CollectionUtils.subtract(results.getCluster().getAllInteractionIds(), results.getInteractionsToExport())));
         } catch (IOException e) {
             throw new UniprotExportException("Impossible to write the results of uniprot export in " + DRFile + " or " + CCFile + " or " + GOFile, e);
         }
