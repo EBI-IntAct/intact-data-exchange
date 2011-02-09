@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Confidence;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
@@ -285,10 +286,10 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
     }
 
     @Override
-    public Map<Integer, BinaryInteraction> getBinaryInteractionCluster() {
+    public Map<Integer, BinaryInteraction<Interactor>> getBinaryInteractionCluster() {
         Encore2Binary iConverter = new Encore2Binary(getMappingIdDbNames());
 
-        Map<Integer, BinaryInteraction> binaryInteractionCluster = new HashMap<Integer, BinaryInteraction>();
+        Map<Integer, BinaryInteraction<Interactor>> binaryInteractionCluster = new HashMap<Integer, BinaryInteraction<Interactor>>();
 
         for(Integer mappingId:getInteractionMapping().keySet()){
             EncoreInteraction eI = getInteractionMapping().get(mappingId);

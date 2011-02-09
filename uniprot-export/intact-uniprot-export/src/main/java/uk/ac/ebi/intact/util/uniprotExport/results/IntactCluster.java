@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.results;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public interface IntactCluster {
      *
      * @return map associating clustered interaction identifier associated with a binary interaction
      */
-    public Map<Integer, BinaryInteraction> getBinaryInteractionCluster();
+    public Map<Integer, BinaryInteraction<Interactor>> getBinaryInteractionCluster();
 
     /**
      *

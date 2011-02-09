@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Confidence;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.Binary2Encore;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.results.IntactCluster;
@@ -24,7 +25,7 @@ import java.util.*;
 public class BinaryClusterScore implements IntactCluster{
     private static final Logger logger = Logger.getLogger(BinaryClusterScore.class);
 
-    private Map<Integer, BinaryInteraction> interactionMapping = new HashMap<Integer, BinaryInteraction>();
+    private Map<Integer, BinaryInteraction<Interactor>> interactionMapping = new HashMap<Integer, BinaryInteraction<Interactor>>();
     private Map<String, List<Integer>> interactorMapping = new HashMap<String, List<Integer>>();
 
     private PsimiTabWriter writer;
@@ -34,7 +35,7 @@ public class BinaryClusterScore implements IntactCluster{
     }
 
     @Override
-    public Map<Integer, BinaryInteraction> getBinaryInteractionCluster() {
+    public Map<Integer, BinaryInteraction<Interactor>> getBinaryInteractionCluster() {
         return this.interactionMapping;
     }
 
@@ -81,7 +82,7 @@ public class BinaryClusterScore implements IntactCluster{
 
         /* Retrieve results */
 
-        Map<Integer, BinaryInteraction> interactionMapping = getBinaryInteractionCluster();
+        Map<Integer, BinaryInteraction<Interactor>> interactionMapping = getBinaryInteractionCluster();
 
         try {
             File file = new File(fileName);
@@ -146,7 +147,7 @@ public class BinaryClusterScore implements IntactCluster{
         String scoreListCSV = "";
         String delimiter = "\n";
         int i = 0;
-        for(Map.Entry<Integer, BinaryInteraction> eI:this.getBinaryInteractionCluster().entrySet()){
+        for(Map.Entry<Integer, BinaryInteraction<Interactor>> eI:this.getBinaryInteractionCluster().entrySet()){
             List<Confidence> confidenceValues = eI.getValue().getConfidenceValues();
             Double score = null;
             for(Confidence confidenceValue:confidenceValues){
@@ -187,7 +188,7 @@ public class BinaryClusterScore implements IntactCluster{
 
         /* Retrieve results */
 
-        Map<Integer, BinaryInteraction> interactionMapping = getBinaryInteractionCluster();
+        Map<Integer, BinaryInteraction<Interactor>> interactionMapping = getBinaryInteractionCluster();
 
         try {
             File file = new File(fileName);

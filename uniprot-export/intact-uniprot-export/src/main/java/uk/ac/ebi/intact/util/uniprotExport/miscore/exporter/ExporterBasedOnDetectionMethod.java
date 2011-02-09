@@ -2,6 +2,8 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
 import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.InteractionDetectionMethod;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Interaction;
@@ -298,7 +300,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         if (cluster instanceof BinaryClusterScore){
             BinaryClusterScore clusterScore = (BinaryClusterScore) cluster;
 
-            for (Map.Entry<Integer, BinaryInteraction> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
+            for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
                 if (canExportBinaryInteraction(entry.getValue(), context)){
                     eligibleInteractions.add(entry.getKey());
@@ -532,14 +534,14 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     }
 
     @Override
-    public boolean canExportBinaryInteraction(BinaryInteraction interaction, ExportContext context) throws UniprotExportException {
+    public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context) throws UniprotExportException {
 
-        Set<String> detectionMethods = new HashSet(interaction.getDetectionMethods());
+        Set<InteractionDetectionMethod> detectionMethods = new HashSet(interaction.getDetectionMethods());
 
-        for (String method : detectionMethods){
-            int numberOfExperimentWithThisMethod = computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(method, context, interaction);
+        for (InteractionDetectionMethod method : detectionMethods){
+            int numberOfExperimentWithThisMethod = computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(method.getIdentifier(), context, interaction);
 
-            if (hasPassedInteractionDetectionMethodRules(method, numberOfExperimentWithThisMethod)){
+            if (hasPassedInteractionDetectionMethodRules(method.getIdentifier(), numberOfExperimentWithThisMethod)){
                 return true;
             }
         }

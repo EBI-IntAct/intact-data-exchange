@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportContext;
@@ -42,5 +43,5 @@ public interface InteractionExporter {
      * @return true if the binary interaction can be exported
      * @throws UniprotExportException
      */
-    public boolean canExportBinaryInteraction(BinaryInteraction interaction, ExportContext context) throws UniprotExportException;
+    public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context) throws UniprotExportException;
 }

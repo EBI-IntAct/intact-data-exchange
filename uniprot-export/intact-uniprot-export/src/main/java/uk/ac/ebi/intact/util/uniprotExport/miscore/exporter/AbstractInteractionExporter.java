@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.exporter;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.BinaryClusterScore;
@@ -31,7 +32,7 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
         if (cluster instanceof BinaryClusterScore){
             BinaryClusterScore clusterScore = (BinaryClusterScore) cluster;
 
-            for (Map.Entry<Integer, BinaryInteraction> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
+            for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
                 if (canExportBinaryInteraction(entry.getValue(), context)){
                     interactionsPossibleToExport.add(entry.getKey());
