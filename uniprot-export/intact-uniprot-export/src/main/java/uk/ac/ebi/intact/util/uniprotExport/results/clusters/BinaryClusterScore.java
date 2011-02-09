@@ -155,7 +155,7 @@ public class BinaryClusterScore implements IntactCluster {
                 }
             }
 
-            scoreList[i] = eI.getKey() + "-" +eI.getValue().getInteractorA().toString() + "-" + eI.getValue().getInteractorB().toString() + ":" + score;
+            scoreList[i] = eI.getKey() + "-" + eI.getValue().getInteractorA().getIdentifiers().iterator().next().getIdentifier() + "-" + eI.getValue().getInteractorB().getIdentifiers().iterator().next().getIdentifier() + ":" + score;
             scoreListCSV = scoreListCSV + scoreList[i];
             i++;
             if(scoreListSize > i){
