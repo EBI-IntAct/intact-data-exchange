@@ -1,12 +1,11 @@
 package uk.ac.ebi.intact.util.uniprotExport.exporters.rules;
 
 import org.springframework.transaction.TransactionStatus;
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.InteractionDetectionMethod;
+import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.util.uniprotExport.CvInteractionStatus;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
@@ -502,7 +501,18 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
         System.out.println("\t\t Interaction: Id:" + interaction.getId());
 
-        //Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
+        Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
+        Set<String> trueBinaryInteractions = new HashSet<String>();
+
+        for (String intactAc : interactionsAcs){
+            if (!context.getSpokeExpandedInteractions().contains(intactAc)){
+                trueBinaryInteractions.add(intactAc);
+            }
+        }
+
+        if (trueBinaryInteractions.size() < interactionsAcs.size()){
+            removeSpokeExpandedInteractionEvidencesFrom(interaction, trueBinaryInteractions, context);
+        }
 
         //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
@@ -549,5 +559,81 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         }
 
         return false;
+    }
+
+    protected void removeSpokeExpandedInteractionEvidencesFrom(EncoreInteraction encore, Set<String> trueBinaryInteractions, ExportContext context){
+        List<CrossReference> publicationsToRemove = new ArrayList(encore.getPublicationIds());
+        List<String> publicationIdsToKeep = new ArrayList<String>(encore.getPublicationIds().size());
+        List<String> methodsToRemove = new ArrayList(encore.getMethodToPubmed().keySet());
+        List<String> typesToRemove = new ArrayList(encore.getTypeToPubmed().keySet());
+
+        for (String interactionAc : trueBinaryInteractions){
+
+            MethodAndTypePair pair = context.getInteractionToMethod_type().get(interactionAc);
+
+            String detectionMI = pair.getMethod();
+
+            String typeMi = pair.getType();
+
+            String pubmedId = encore.getExperimentToPubmed().get(interactionAc);
+
+            for (CrossReference ref : encore.getPublicationIds()){
+                if (ref.getIdentifier().equals(pubmedId)){
+                    publicationsToRemove.remove(ref);
+                    publicationIdsToKeep.add(ref.getIdentifier());
+                    break;
+                }
+            }
+
+            for (String method : encore.getMethodToPubmed().keySet()){
+                if (method.equals(detectionMI)){
+                    methodsToRemove.remove(method);
+                    break;
+                }
+            }
+
+            for (String type : encore.getTypeToPubmed().keySet()){
+                if (type.equals(typeMi)){
+                    typesToRemove.remove(type);
+                    break;
+                }
+            }
+        }
+
+        encore.getPublicationIds().removeAll(publicationsToRemove);
+
+        for (String methodToRemove : methodsToRemove){
+            encore.getMethodToPubmed().remove(methodToRemove);
+        }
+
+        for (String typeToRemove : typesToRemove){
+            encore.getTypeToPubmed().remove(typeToRemove);
+        }
+
+        List<String> pubmedsToRemove = new ArrayList<String>();
+
+        for (Map.Entry<String, List<String>> entry : encore.getMethodToPubmed().entrySet()){
+            pubmedsToRemove.clear();
+
+            for (String pubmed : entry.getValue()){
+                 if (!publicationIdsToKeep.contains(pubmed)){
+                     pubmedsToRemove.add(pubmed);
+                 }
+            }
+
+            entry.getValue().remove(pubmedsToRemove);
+        }
+
+        for (Map.Entry<String, List<String>> entry : encore.getTypeToPubmed().entrySet()){
+            pubmedsToRemove.clear();
+
+            for (String pubmed : entry.getValue()){
+                 if (!publicationIdsToKeep.contains(pubmed)){
+                     pubmedsToRemove.add(pubmed);
+                 }
+            }
+
+            entry.getValue().remove(pubmedsToRemove);
+        }
     }
 }

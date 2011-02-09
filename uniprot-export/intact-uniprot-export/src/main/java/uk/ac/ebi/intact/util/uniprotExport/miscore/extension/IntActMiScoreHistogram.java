@@ -1,24 +1,17 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.extension;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.*;
-import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
-import org.jfree.data.category.CategoryDataset;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
-import org.jfree.ui.RectangleInsets;
 import uk.ac.ebi.enfin.mi.score.distribution.MiscoreHistogram;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -51,6 +44,24 @@ public class IntActMiScoreHistogram extends MiscoreHistogram{
         return subsetValues;
     }
 
+    public static double[] extractValuesBetween(double [] values, double min, double max){
+        List<Double> subset = new ArrayList<Double>();
+
+        for (double v : values){
+            if (v <= max && v >= min){
+                subset.add(v);
+            }
+        }
+
+        double [] subsetValues = new double [subset.size()];
+
+        for (int i = 0; i < subset.size(); i++){
+            subsetValues[i] = subset.get(i);
+        }
+
+        return subsetValues;
+    }
+
     public void createChart(String pngFileName){
         HistogramDataset dataset = new HistogramDataset();
         dataset.setType(HistogramType.FREQUENCY);
@@ -69,7 +80,6 @@ public class IntActMiScoreHistogram extends MiscoreHistogram{
 
         // get a reference to the plot for further customisation...
         final XYPlot plot = chart.getXYPlot();
-        RectangleInsets rs = plot.getInsets();
         plot.getRangeAxis().setAutoRange(true);
 
         try {
