@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.exporters.rules;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Interactor;
@@ -567,6 +568,8 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         List<String> methodsToRemove = new ArrayList(encore.getMethodToPubmed().keySet());
         List<String> typesToRemove = new ArrayList(encore.getTypeToPubmed().keySet());
 
+        Collection<String> spokeExpandedInteractions = CollectionUtils.subtract(encore.getExperimentToPubmed().keySet(), trueBinaryInteractions);
+
         for (String interactionAc : trueBinaryInteractions){
 
             MethodAndTypePair pair = context.getInteractionToMethod_type().get(interactionAc);
@@ -634,6 +637,11 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             }
 
             entry.getValue().remove(pubmedsToRemove);
+        }
+
+        for (String interactionAc : spokeExpandedInteractions){
+            encore.getExperimentToPubmed().remove(interactionAc);
+            encore.getExperimentToDatabase().remove(interactionAc);
         }
     }
 }
