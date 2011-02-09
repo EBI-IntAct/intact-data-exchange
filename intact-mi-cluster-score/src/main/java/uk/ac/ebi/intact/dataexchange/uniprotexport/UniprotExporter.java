@@ -61,7 +61,7 @@ public class UniprotExporter {
             int index = args[1].indexOf(":");
             sourceType = args[1].substring(0, index);
 
-            mitabFile =  args[1].substring(index);
+            mitabFile =  args[1].substring(index + 1);
         }
 
         final InteractionSource source = InteractionFilterFactory.convertIntoInteractionSourceName(sourceType);
