@@ -37,8 +37,6 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter implements Inte
     private InteractionExporter exporter;
     protected IntactPsimiTabReader mitabReader;
 
-    private String mitab;
-
     public NonClusteredMitabFilter(InteractionExporter exporter, String mitab){
         super(exporter, mitab);
         this.mitabReader = new IntactPsimiTabReader(true);
