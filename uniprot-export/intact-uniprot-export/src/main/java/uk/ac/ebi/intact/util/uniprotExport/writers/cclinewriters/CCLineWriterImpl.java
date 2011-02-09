@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 
 /**
  * Default writer for CCLines
@@ -227,7 +226,7 @@ public class CCLineWriterImpl implements CCLineWriter {
      * Write the details of a binary interaction
      * @param interactionDetails
      */
-    private void writeInteractionDetails(SortedSet<InteractionDetails> interactionDetails) throws IOException {
+    private void writeInteractionDetails(Set<InteractionDetails> interactionDetails) throws IOException {
 
         // collect all pubmeds and spoke expanded information
         for (InteractionDetails details : interactionDetails){
