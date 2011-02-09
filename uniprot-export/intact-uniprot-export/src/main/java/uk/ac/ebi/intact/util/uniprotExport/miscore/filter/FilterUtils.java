@@ -2,8 +2,8 @@ package uk.ac.ebi.intact.util.uniprotExport.miscore.filter;
 
 import psidev.psi.mi.tab.model.Alias;
 import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.model.CvAliasType;
-import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -23,7 +23,7 @@ import java.util.Set;
 public class FilterUtils {
     private static final String UNIPROT = "uniprotkb";
 
-    public static void processGeneNames(ExtendedInteractor interactorA, String intactA, ExtendedInteractor interactorB, String intactB, MiClusterContext context) {
+    public static void processGeneNames(Interactor interactorA, String intactA, Interactor interactorB, String intactB, MiClusterContext context) {
         String geneNameA = retrieveInteractorGeneName(interactorA);
         String geneNameB = retrieveInteractorGeneName(interactorB);
 
@@ -37,7 +37,7 @@ public class FilterUtils {
         }
     }
 
-    public static String retrieveInteractorGeneName(ExtendedInteractor interactor){
+    public static String retrieveInteractorGeneName(Interactor interactor){
         Collection<Alias> aliases = interactor.getAliases();
         String geneName = null;
 

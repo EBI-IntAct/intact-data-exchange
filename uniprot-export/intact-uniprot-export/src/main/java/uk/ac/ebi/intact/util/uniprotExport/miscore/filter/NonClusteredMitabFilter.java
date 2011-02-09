@@ -6,6 +6,7 @@ import psidev.psi.mi.tab.model.InteractionDetectionMethod;
 import psidev.psi.mi.tab.model.InteractionType;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
@@ -32,15 +33,18 @@ import java.util.List;
 public class NonClusteredMitabFilter extends AbstractMitabFilter implements InteractionFilter {
 
     private InteractionExporter exporter;
+    protected IntactPsimiTabReader mitabReader;
 
     private String mitab;
 
     public NonClusteredMitabFilter(InteractionExporter exporter, String mitab){
         super(exporter, mitab);
+        this.mitabReader = new IntactPsimiTabReader(true);
     }
 
     public NonClusteredMitabFilter(InteractionExporter exporter){
         super(exporter);
+        this.mitabReader = new IntactPsimiTabReader(true);
     }
 
     protected MiClusterScoreResults computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {

@@ -5,7 +5,6 @@ import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.InteractionDetectionMethod;
 import psidev.psi.mi.tab.model.InteractionType;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.QueryFactory;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterContext;
@@ -25,8 +24,7 @@ import java.util.Set;
 
 public abstract class AbstractMitabFilter {
     protected QueryFactory queryProvider;
-    protected Set<String> eligibleInteractionsForUniprotExport;
-    protected IntactPsimiTabReader mitabReader;
+    protected Set<String> eligibleInteractionsForUniprotExport = new HashSet<String>();
     protected static final String CONFIDENCE_NAME = "intactPsiscore";
     protected static final String INTACT = "intact";
     protected static final String UNIPROT = "uniprotkb";
@@ -37,7 +35,6 @@ public abstract class AbstractMitabFilter {
 
     public AbstractMitabFilter(InteractionExporter exporter, String mitab){
         queryProvider = new QueryFactory();
-        mitabReader = new IntactPsimiTabReader(true);
         this.exporter = exporter;
 
         this.mitab = mitab;
@@ -47,8 +44,6 @@ public abstract class AbstractMitabFilter {
 
     public AbstractMitabFilter(InteractionExporter exporter){
         queryProvider = new QueryFactory();
-        eligibleInteractionsForUniprotExport = new HashSet<String>();
-        mitabReader = new IntactPsimiTabReader(true);
         this.exporter = exporter;
 
         this.mitab = null;

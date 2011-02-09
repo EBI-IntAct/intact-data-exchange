@@ -1,7 +1,11 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.log4j.Logger;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.ClusteredMitabFilter;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults;
+
+import java.util.HashSet;
 
 /**
  * This class will only apply export rules to a clustered mitab file having pre-computed mi scores
@@ -12,7 +16,7 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MiClusterScoreResults
  */
 
 public class ClusteredBinaryInteractionProcessor {
-
+    private static final Logger logger = Logger.getLogger(ClusteredBinaryInteractionProcessor.class);
     private ClusteredMitabFilter filter;
 
     public ClusteredBinaryInteractionProcessor(ClusteredMitabFilter filter){
@@ -20,11 +24,15 @@ public class ClusteredBinaryInteractionProcessor {
         this.filter = filter;
     }
 
-    public void processClusteredBinaryInteractions(String logFile) throws UniprotExportException {
+    public void processClusteredBinaryInteractions(String fileExported, String fileExcluded) throws UniprotExportException {
 
+        logger.info("Export binary interactions from a clustered mitab file");
         MiClusterScoreResults results = filter.exportInteractions();
 
-        results.getCluster().saveClusteredInteractions(logFile, results.getInteractionsToExport());
+        logger.info("Save results of exported interactions in " + fileExported);
+        results.getCluster().saveClusteredInteractions(fileExported, results.getInteractionsToExport());
+        logger.info("Save results of excluded interactions in " + fileExcluded);
+        results.getCluster().saveClusteredInteractions(fileExcluded, new HashSet(CollectionUtils.subtract(results.getCluster().getAllInteractionIds(), results.getInteractionsToExport())));
     }
 
     public ClusteredMitabFilter getFilter() {
