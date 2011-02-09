@@ -53,8 +53,8 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter implements Inte
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
         MiClusterContext context = new MiClusterContext();
 
-        File mitab = new File(mitabFile);
-        Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitab));
+        File mitabAsFile = new File(mitabFile);
+        Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitabAsFile));
 
         List<BinaryInteraction> interactionToProcess = new ArrayList<BinaryInteraction>();
 
