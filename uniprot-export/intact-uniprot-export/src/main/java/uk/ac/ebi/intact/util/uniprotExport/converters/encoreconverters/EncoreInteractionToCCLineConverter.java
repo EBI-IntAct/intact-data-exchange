@@ -260,4 +260,86 @@ public class EncoreInteractionToCCLineConverter {
 
         return null;
     }
+
+    public CCParameters convertInteractionsIntoOldCCLines(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
+        String firstIntactAc = null;
+        String geneName1 = context.getGeneNames().get(firstInteractor);
+        String taxId1 = null;
+
+        List<SecondCCInteractor> secondCCInteractors = new ArrayList<SecondCCInteractor>(interactions.size());
+
+        if (!interactions.isEmpty()){
+
+            for (EncoreInteraction interaction : interactions){
+                // get the uniprot acs of the first and second interactors
+                String [] interactorA = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsA());
+                String [] interactorB = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsB());
+
+                String uniprot1 = interactorA[0];
+                String uniprot2 = interactorB[0];
+
+                String intact1 = interactorA[1];
+                String intact2 = interactorB[1];
+
+                // if the uniprot acs are not null, it is possible to convert into a CCParameters
+                if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
+                    // the complete uniprot ac of the first interactor
+                    String firstUniprot = null;
+                    // extract second interactor
+                    String secondUniprot = null;
+
+                    String secondIntactAc = null;
+
+                    // extract gene names (present in the context and not in the interaction)
+                    String geneName2 = null;
+                    // extract organisms
+                    String [] organismsA;
+                    String [] organismsB;
+                    organismsA = extractOrganismFrom(interaction.getOrganismsA());
+                    organismsB = extractOrganismFrom(interaction.getOrganismsB());
+                    // extract taxIds
+                    String taxId2 = null;
+
+                    // extract organism names
+                    String organism2 = null;
+
+                    if (uniprot1.startsWith(firstInteractor)){
+                        firstUniprot = uniprot1;
+                        secondUniprot = uniprot2;
+                        geneName2 = context.getGeneNames().get(uniprot2);
+                        taxId2 = organismsB[0];
+                        organism2 = organismsB[1];
+                        secondIntactAc = intact2;
+
+                        taxId1 = organismsA[0];
+                        firstIntactAc = intact1;
+                    }
+                    else{
+                        firstUniprot = uniprot2;
+                        secondUniprot = uniprot1;
+                        geneName2 = context.getGeneNames().get(uniprot1);
+                        taxId2 = organismsA[0];
+                        organism2 = organismsA[1];
+                        secondIntactAc = intact1;
+
+                        taxId1 = organismsB[0];
+                        firstIntactAc = intact2;
+                    }
+
+                    // collect all pubmeds and spoke expanded information
+                    Set<InteractionDetails> sortedInteractionDetails = new HashSet<InteractionDetails>();
+
+                    OldInteractionDetails oldDetail = new OldInteractionDetails(interaction.getExperimentToPubmed().size());
+                    sortedInteractionDetails.add(oldDetail);
+
+                    SecondCCInteractor secondCCInteractor = new SecondCCInteractorImpl(firstUniprot, secondUniprot, firstIntactAc, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
+                    secondCCInteractors.add(secondCCInteractor);
+                }
+            }
+
+            return new CCParametersImpl(firstInteractor, geneName1, taxId1, secondCCInteractors);
+        }
+
+        return null;
+    }
 }

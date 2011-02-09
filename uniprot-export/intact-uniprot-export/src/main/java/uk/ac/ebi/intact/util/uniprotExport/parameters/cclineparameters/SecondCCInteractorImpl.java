@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
 
-import java.util.SortedSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -24,11 +24,11 @@ public class SecondCCInteractorImpl implements SecondCCInteractor{
     private String secondTaxId;
     private String secondOrganismName;
 
-    private SortedSet<InteractionDetails> interactionDetails;
+    private Set<InteractionDetails> interactionDetails;
 
     public SecondCCInteractorImpl(String firstInteractor, String secondInteractor, String firstIntactAc, String secondIntactAc, String secondGeneName,
                                   String secondTaxId, String secondOrganismName,
-                                  SortedSet<InteractionDetails> interactionDetails){
+                                  Set<InteractionDetails> interactionDetails){
         if (secondTaxId == null){
             throw new IllegalArgumentException("The CCLine parameters need a non null second taxId.");
         }
@@ -76,7 +76,7 @@ public class SecondCCInteractorImpl implements SecondCCInteractor{
     }
 
     @Override
-    public SortedSet<InteractionDetails> getInteractionDetails() {
+    public Set<InteractionDetails> getInteractionDetails() {
         return this.interactionDetails;
     }
 

@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
 
-import java.util.SortedSet;
+import java.util.Set;
 
 /**
  * Interface for the CC parameters attached to the second interactor
@@ -54,5 +54,5 @@ public interface SecondCCInteractor {
      * the list of interaction details
      * @return
      */
-    public SortedSet<InteractionDetails> getInteractionDetails();
+    public Set<InteractionDetails> getInteractionDetails();
 }

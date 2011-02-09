@@ -10,7 +10,7 @@ import java.util.Set;
  * @since <pre>31/01/11</pre>
  */
 
-public class InteractionDetailsImpl implements InteractionDetails{
+public class InteractionDetailsImpl implements Comparable<InteractionDetailsImpl>, InteractionDetails{
 
     private String interactionType;
     private String detectionMethod;
@@ -22,10 +22,8 @@ public class InteractionDetailsImpl implements InteractionDetails{
     public InteractionDetailsImpl(String interactionType, String detectionMethod, boolean isSpokeExpanded,
                                   Set<String> pubmedIds){
 
-        if (interactionType == null){
-            throw  new IllegalArgumentException("The InteractionDetailsImpl must contain a non null interaction type.");
-        }
-        else if (detectionMethod == null){
+
+        if (detectionMethod == null){
             throw  new IllegalArgumentException("The InteractionDetailsImpl must contain a non null detection method.");
         }
         else if (pubmedIds == null){
@@ -33,21 +31,25 @@ public class InteractionDetailsImpl implements InteractionDetails{
         }
         else if (pubmedIds.isEmpty()){
             throw  new IllegalArgumentException("The InteractionDetailsImpl must contain a non empty set of Pubmed Ids.");
+
         }
 
         this.interactionType = interactionType;
         this.detectionMethod = detectionMethod;
         this.isSpokeExpanded = isSpokeExpanded;
         this.pubmedIds = pubmedIds;
-
     }
     @Override
-    public int compareTo(InteractionDetails o) {
+    public int compareTo(InteractionDetailsImpl o) {
         final int BEFORE = -1;
         final int EQUAL = 0;
         final int AFTER = 1;
 
         if ( this == o ) return EQUAL;
+
+        if (o instanceof InteractionDetailsImpl){
+
+        }
 
         int comparison = this.detectionMethod.compareTo(o.getDetectionMethod());
         if ( comparison != EQUAL ) {

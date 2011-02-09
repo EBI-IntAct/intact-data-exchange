@@ -4,6 +4,7 @@ import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.InteractionDetails;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.InteractionDetailsImpl;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -230,14 +231,16 @@ public class CCLineWriterImpl implements CCLineWriter {
 
         // collect all pubmeds and spoke expanded information
         for (InteractionDetails details : interactionDetails){
-            String type = details.getInteractionType();
-            String method = details.getDetectionMethod();
+            InteractionDetailsImpl detailsImpl = (InteractionDetailsImpl) details;
 
-            if (details.isSpokeExpanded()){
-                writeSpokeExpandedInteractions(type, method, details.getPubmedIds());
+            String type = detailsImpl.getInteractionType();
+            String method = detailsImpl.getDetectionMethod();
+
+            if (detailsImpl.isSpokeExpanded()){
+                writeSpokeExpandedInteractions(type, method, detailsImpl.getPubmedIds());
             }
             else{
-                writeBinaryInteraction(type, method, details.getPubmedIds());
+                writeBinaryInteraction(type, method, detailsImpl.getPubmedIds());
             }
         }
     }

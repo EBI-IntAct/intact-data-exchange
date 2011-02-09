@@ -1,7 +1,5 @@
 package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
 
-import java.util.Set;
-
 /**
  * The interface to implement for interaction details
  *
@@ -10,29 +8,6 @@ import java.util.Set;
  * @since <pre>31/01/11</pre>
  */
 
-public interface InteractionDetails extends Comparable<InteractionDetails> {
+public interface InteractionDetails {
 
-    /**
-     * The interaction type
-     * @return
-     */
-    public String getInteractionType();
-
-    /**
-     * The detection method
-     * @return
-     */
-    public String getDetectionMethod();
-
-    /**
-     * the boolean value to know if it is spoke expanded
-     * @return
-     */
-    public boolean isSpokeExpanded();
-
-    /**
-     * The list of pubmed ids
-     * @return
-     */
-    public Set<String> getPubmedIds();
 }
