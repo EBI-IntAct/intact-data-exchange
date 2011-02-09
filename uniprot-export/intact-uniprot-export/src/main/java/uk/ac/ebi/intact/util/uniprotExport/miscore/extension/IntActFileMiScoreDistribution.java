@@ -1,15 +1,12 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.extension;
 
-import uk.ac.ebi.enfin.mi.score.distribution.FileMiscoreDistribution;
 import uk.ac.ebi.enfin.mi.score.distribution.MiscoreDistribution;
-import uk.ac.ebi.enfin.mi.score.distribution.MiscoreHistogram;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -106,8 +103,8 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
     }
 
     public static void main(String args[]){
-        IntActFileMiScoreDistribution scoreDistribution = new IntActFileMiScoreDistribution("/home/marine/Desktop/miCluster_score_results/new_results/excluded.txt");
-        scoreDistribution.createChart("/home/marine/Desktop/excluded_0.43_1_confidence.png", "Detail of the scores for excluded interactions with confidence between 0.43 and 1", 100, 0.43, 1);
+        IntActFileMiScoreDistribution scoreDistribution = new IntActFileMiScoreDistribution("/home/marine/Desktop/miCluster_score_results/new_results/exported/old_exported.txt");
+        scoreDistribution.createChart("/home/marine/Desktop/exported/old_exported.png", "Distribution of the mi score of exported interactions using rules on detection method", 100, 0, 1);
     }
 
 }

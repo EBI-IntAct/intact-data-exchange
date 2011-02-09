@@ -1,5 +1,8 @@
 package uk.ac.ebi.intact.util.uniprotExport.results;
 
+import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
+import uk.ac.ebi.intact.util.uniprotExport.results.contexts.ExportContext;
+
 import java.util.Set;
 
 /**

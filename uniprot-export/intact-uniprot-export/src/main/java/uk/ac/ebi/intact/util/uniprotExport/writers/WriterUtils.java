@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
-import uk.ac.ebi.intact.util.uniprotExport.miscore.results.MethodAndTypePair;
+import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 
 import java.util.*;
 

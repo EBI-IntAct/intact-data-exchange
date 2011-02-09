@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
 /**
- * TODO comment this
+ * The status of a CV detection method
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
