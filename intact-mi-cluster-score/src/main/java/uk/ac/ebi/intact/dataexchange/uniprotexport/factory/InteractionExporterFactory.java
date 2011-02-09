@@ -1,9 +1,9 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport.factory;
 
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.ExporterRule;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.ExporterBasedOnClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.ExporterBasedOnDetectionMethod;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
+import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
+import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 
 /**
  * TODO comment this

@@ -5,11 +5,11 @@ import uk.ac.ebi.intact.dataexchange.uniprotexport.factory.InteractionExporterFa
 import uk.ac.ebi.intact.dataexchange.uniprotexport.factory.InteractionFilterFactory;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.ExporterRule;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.InteractionSource;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportProcessor;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.InteractionFilter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.NonClusteredMitabFilter;
+import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
+import uk.ac.ebi.intact.util.uniprotExport.UniprotExportProcessor;
+import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
+import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
+import uk.ac.ebi.intact.util.uniprotExport.filters.mitab.NonClusteredMitabFilter;
 
 import java.io.IOException;
 
@@ -97,7 +97,7 @@ public class UniprotExporter {
 
         try {
 
-            processor.runUniprotExport(drFile, ccFile, goFile);
+            processor.runUniprotExport(drFile, ccFile, goFile, false);
 
         } catch (UniprotExportException e) {
             e.printStackTrace();

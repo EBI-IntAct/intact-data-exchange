@@ -1,10 +1,10 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport.factory;
 
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.InteractionSource;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.IntactFilter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.InteractionFilter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.NonClusteredMitabFilter;
+import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
+import uk.ac.ebi.intact.util.uniprotExport.filters.IntactFilter;
+import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
+import uk.ac.ebi.intact.util.uniprotExport.filters.mitab.NonClusteredMitabFilter;
 
 /**
  * TODO comment this

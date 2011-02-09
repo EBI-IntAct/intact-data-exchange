@@ -3,10 +3,10 @@ package uk.ac.ebi.intact.dataexchange.uniprotexport;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.factory.InteractionExporterFactory;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.ExporterRule;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.ClusteredBinaryInteractionProcessor;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.exporter.InteractionExporter;
-import uk.ac.ebi.intact.util.uniprotExport.miscore.filter.ClusteredMitabFilter;
+import uk.ac.ebi.intact.util.uniprotExport.ClusteredBinaryInteractionProcessor;
+import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
+import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
+import uk.ac.ebi.intact.util.uniprotExport.filters.mitab.ClusteredMitabFilter;
 
 import java.io.IOException;
 
