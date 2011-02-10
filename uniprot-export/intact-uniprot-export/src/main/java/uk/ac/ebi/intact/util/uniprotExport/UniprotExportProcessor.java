@@ -73,10 +73,11 @@ public class UniprotExportProcessor {
         MiClusterScoreResults results = filter.exportInteractions();
 
         try {
-            logger.info("Write DR and CC lines");
-            exportDRAndCCLines(results, DRFile, CCFile, version);
             logger.info("write GO lines");
             exportGOLines(results, GOFile);
+
+            logger.info("Write DR and CC lines");
+            exportDRAndCCLines(results, DRFile, CCFile, version);
 
             logger.info("Save cluster informations in uniprotExport.log");
             results.getCluster().saveClusteredInteractions("uniprotExport.log", results.getInteractionsToExport());
