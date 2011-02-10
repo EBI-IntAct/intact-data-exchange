@@ -92,7 +92,7 @@ public class UniprotExporter {
         InteractionFilter filter = InteractionFilterFactory.createInteractionFilter(source, exporter);
 
         if (mitabFile != null && filter instanceof NonClusteredMitabFilter){
-             NonClusteredMitabFilter mitabFilter = (NonClusteredMitabFilter) filter;
+            NonClusteredMitabFilter mitabFilter = (NonClusteredMitabFilter) filter;
             mitabFilter.setMitab(mitabFile);
         }
 
