@@ -7,6 +7,8 @@ import uk.ac.ebi.intact.util.uniprotExport.converters.InteractorToDRLineConverte
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
+import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
+import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters2;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
@@ -52,6 +54,20 @@ public class UniprotExportProcessor {
     }
 
     public void runUniprotExport(String DRFile, String CCFile, String GOFile, int version) throws UniprotExportException {
+        FilterConfig config = FilterContext.getInstance().getConfig();
+
+        if (version ==1){
+            config.setExcludeLowConfidenceInteractions(true);
+            config.setExcludeNegativeInteractions(true);
+            config.setExcludeNonUniprotInteractors(true);
+            config.setExcludeSpokeExpandedInteractions(true);
+        }
+        else{
+            config.setExcludeLowConfidenceInteractions(true);
+            config.setExcludeNegativeInteractions(false);
+            config.setExcludeNonUniprotInteractors(true);
+            config.setExcludeSpokeExpandedInteractions(false);
+        }
 
         logger.info("Export binary interactions from IntAct");
         MiClusterScoreResults results = filter.exportInteractions();
@@ -102,6 +118,8 @@ public class UniprotExportProcessor {
         Map<Integer, EncoreInteraction> interactionMapping = results.getCluster().getEncoreInteractionCluster();
 
         for (Integer interactionId : interactionMapping.keySet()){
+            logger.info("Write GO lines for " + interactionId);
+
             EncoreInteraction interaction = interactionMapping.get(interactionId);
 
             GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
@@ -223,6 +241,7 @@ public class UniprotExportProcessor {
             }
 
             if (numberInteractions > 0){
+                logger.info("Write DR and CC lines for " + parent);
                 if (version == 1){
                     CCParameters1 ccParameters = this.ccConverter.convertInteractionsIntoOldCCLines(interactions, results.getExportContext(), parent);
                     ccWriter1.writeCCLine(ccParameters);

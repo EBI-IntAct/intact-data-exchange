@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.exporters.rules;
 
+import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Confidence;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
@@ -23,6 +24,7 @@ import java.util.Set;
  */
 
 public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
+    private static final Logger logger = Logger.getLogger(ExporterBasedOnClusterScore.class);
 
     private static final double EXPORT_THRESHOLD = 0.43;
     private static final String CONFIDENCE_NAME = "intactPsiscore";
@@ -87,6 +89,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
                     String method = context.getInteractionToMethod_type().get(ac).getMethod();
 
                     if (!method.equals(COLOCALIZATION)){
+                        logger.info("The interaction " + encore.getId() + " passes the export rules");
                         return true;
                     }
                 }

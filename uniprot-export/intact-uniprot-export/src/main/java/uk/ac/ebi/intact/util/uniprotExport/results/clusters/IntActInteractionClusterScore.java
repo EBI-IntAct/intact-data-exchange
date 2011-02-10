@@ -239,6 +239,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
      */
     public void saveClusteredInteractions(String fileName, Set<Integer> interactionIds){
 
+        logger.info("Retrieving scores ...");
         String scoreListCSV = getScoresPerInteraction(interactionIds, null, null);
         try{
             // Create file
@@ -256,6 +257,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
 
         Map<Integer, EncoreInteraction> interactionMapping = getInteractionMapping();
         Encore2Binary iConverter = new Encore2Binary(getMappingIdDbNames());
+        logger.info("Saving in mitab...");
 
         try {
             File file = new File(fileName);
