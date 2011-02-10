@@ -8,12 +8,12 @@ package uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters;
  * @since <pre>31/01/11</pre>
  */
 
-public class DRParametersImpl implements DRParameters{
+public class DefaultDRParameters implements DRParameters{
 
     public String uniprotAc;
     public int numberOfInteractions;
 
-    public DRParametersImpl(String uniprotAc, int numberOfInteractions){
+    public DefaultDRParameters(String uniprotAc, int numberOfInteractions){
 
         this.uniprotAc = uniprotAc;
         this.numberOfInteractions = numberOfInteractions;

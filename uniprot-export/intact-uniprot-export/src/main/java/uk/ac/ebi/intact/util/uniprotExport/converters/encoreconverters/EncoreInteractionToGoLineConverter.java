@@ -3,8 +3,8 @@ package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParametersImpl;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.util.Set;
@@ -48,7 +48,7 @@ public class EncoreInteractionToGoLineConverter {
             // if the list of pubmed ids is not empty, the GOParameter is created
             if (!pubmedIds.isEmpty()){
                 logger.debug("convert GO parameters for " + uniprot1 + ", " + uniprot2 + ", " + pubmedIds.size() + " pubmed ids");
-                GOParameters parameters = new GOParametersImpl(uniprot1, uniprot2, pubmedIds);
+                GOParameters parameters = new DefaultGOParameters(uniprot1, uniprot2, pubmedIds);
 
                 return parameters;
             }

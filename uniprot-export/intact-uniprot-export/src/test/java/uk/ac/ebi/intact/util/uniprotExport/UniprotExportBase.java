@@ -10,9 +10,9 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParametersImpl;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DefaultDRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParametersImpl;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
@@ -57,9 +57,9 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         Set<String> publications2 = new HashSet<String>(1);
         publications2.add(pmid2);
 
-        GOParameters parameter1 = new GOParametersImpl(uniprotAc1, uniprotAc2, publications1);
-        GOParameters parameter2 = new GOParametersImpl(uniprotAc1, uniprotAc4, publications1);
-        GOParameters parameter3 = new GOParametersImpl(uniprotAc5, uniprotAc5, publications2);
+        GOParameters parameter1 = new DefaultGOParameters(uniprotAc1, uniprotAc2, publications1);
+        GOParameters parameter2 = new DefaultGOParameters(uniprotAc1, uniprotAc4, publications1);
+        GOParameters parameter3 = new DefaultGOParameters(uniprotAc5, uniprotAc5, publications2);
 
         parameters.add(parameter1);
         parameters.add(parameter2);
@@ -179,10 +179,10 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         String uniprotAc4 = "Q17862";
         String uniprotAc5 = "P33327";
 
-        DRParameters parameter1 = new DRParametersImpl(uniprotAc1, 2);
-        DRParameters parameter2 = new DRParametersImpl(uniprotAc2, 1);
-        DRParameters parameter3 = new DRParametersImpl(uniprotAc4, 1);
-        DRParameters parameter4 = new DRParametersImpl(uniprotAc5, 1);
+        DRParameters parameter1 = new DefaultDRParameters(uniprotAc1, 2);
+        DRParameters parameter2 = new DefaultDRParameters(uniprotAc2, 1);
+        DRParameters parameter3 = new DefaultDRParameters(uniprotAc4, 1);
+        DRParameters parameter4 = new DefaultDRParameters(uniprotAc5, 1);
 
         parameters.add(parameter1);
         parameters.add(parameter2);

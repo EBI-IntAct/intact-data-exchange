@@ -244,7 +244,12 @@ public class UniprotExportProcessor {
             }
         }
 
-        ccWriter2.close();
+        if (version == 1){
+           ccWriter1.close();
+        }
+        else{
+            ccWriter2.close();
+        }
         drWriter.close();
     }
 
