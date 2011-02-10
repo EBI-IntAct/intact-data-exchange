@@ -26,8 +26,8 @@ public class UniprotExporter {
     public static void main( String[] args ) throws IOException {
 
         // Six possible arguments
-        if( args.length != 6 ) {
-            System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <goFile> <database>" );
+        if( args.length != 7 ) {
+            System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <goFile> <database> <version>" );
             System.err.println( "Usage: <rule> is the type of rule we want to use to export the interaction to uniprot. " +
                     "Can be 'detection_method' if we want the rules based on detection method or 'mi_score' if we want the rules based on mi score" );
             System.err.println( "Usage: <source> is the source of the binary interactions we want to export." +
@@ -37,6 +37,7 @@ public class UniprotExporter {
             System.err.println( "Usage: <ccFile> the name of the file which will contain the CC lines");
             System.err.println( "Usage: <goFile> the name of the file which will contain the GO lines");
             System.err.println( "Usage: <database> the database instance which will be used to extract supplementary information");
+            System.err.println( "Usage: <version> the version of the CC line writers");
 
             System.exit( 1 );
         }
@@ -46,6 +47,7 @@ public class UniprotExporter {
         String ccFile = args[3];
         String goFile = args[4];
         String database = args[5];
+        int version = Integer.parseInt(args[6]);
 
         IntactContext.initContext(new String[]{"/META-INF/" + database + ".spring.xml"});
 
@@ -77,6 +79,7 @@ public class UniprotExporter {
         System.out.println( "Source = " + source.toString() );
         System.out.println( "DR file = " + drFile );
         System.out.println( "CC file = " + ccFile );
+        System.out.println( "Version of the CC writer = " + version );
         System.out.println( "GO file = " + goFile );
 
         System.out.println( "database = " + database );
@@ -97,7 +100,7 @@ public class UniprotExporter {
 
         try {
 
-            processor.runUniprotExport(drFile, ccFile, goFile, false);
+            processor.runUniprotExport(drFile, ccFile, goFile, version);
 
         } catch (UniprotExportException e) {
             e.printStackTrace();

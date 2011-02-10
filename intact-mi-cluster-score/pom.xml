@@ -21,6 +21,7 @@
         <drfile>$INTACT/local/data/released/current/various/uniprotlinks.dat</drfile>
         <ccfile>$INTACT/local/data/released/current/various/uniprotcomments.dat</ccfile>
         <gofile>$INTACT/local/data/released/current/various/gene_association.goa_intact.gz</gofile>
+        <version>1</version>
     </properties>
 
     <build>
@@ -70,6 +71,8 @@
                                 <argument>${gofile}</argument>
                                 <!-- The name of the database  -->
                                 <argument>${database}</argument>
+                                <!-- The version of the CC line writer  -->
+                                <argument>${version}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
