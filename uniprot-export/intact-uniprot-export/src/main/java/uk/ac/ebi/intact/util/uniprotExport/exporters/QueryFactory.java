@@ -6,6 +6,8 @@ import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
+import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 
 import javax.persistence.Query;
 import java.util.List;
@@ -371,6 +373,82 @@ public class QueryFactory {
 
     /**
      *
+     * @return the list of interaction accessions which are publicly released and pass the filtering options set in the FilterConfig
+     */
+    public List<String> getReleasedInteractionAcsPassingFilters(){
+        FilterConfig config = FilterContext.getInstance().getConfig();
+        boolean excludeSpokeExpanded = config.excludeSpokeExpandedInteractions();
+        boolean excludeNegativeInteractions = config.excludeNegativeInteractions();
+        boolean excludeLowConfidenceInteractions = config.excludeLowConfidenceInteractions();
+        boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
+
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
+
+        StringBuffer queryString = new StringBuffer();
+        queryString.append("select distinct(i.ac) from InteractionImpl i ");
+        queryString.append("where i.ac in (");
+        queryString.append(interactionsAccepted);
+        queryString.append(") and i.ac not in (");
+        queryString.append(interactionsOnHold);
+        queryString.append(") ");
+
+        if (excludeLowConfidenceInteractions){
+            queryString.append("and i.ac not in (");
+            queryString.append(interactionsDrExportNotPassed);
+            queryString.append(") and i.ac not in (");
+            queryString.append(interactionsFromExperimentNoExport);
+            queryString.append(") ");
+        }
+
+        if (excludeNegativeInteractions){
+            queryString.append("and i.ac not in (");
+            queryString.append(negativeInteractions);
+            queryString.append(") ");
+        }
+
+        if (excludeSpokeExpanded && excludeNonUniprotInteractors){
+            queryString.append("and i.ac not in (");
+            queryString.append(interactionsInvolvingInteractorsNoUniprotUpdate);
+            queryString.append(") and i.ac not in (");
+            queryString.append(interactionInvolvingNonUniprotOrNonProtein);
+            queryString.append(") ");
+        }
+
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString.toString());
+
+        query.setParameter("accepted", CvTopic.ACCEPTED);
+        query.setParameter("onhold", CvTopic.ON_HOLD);
+
+        if (excludeLowConfidenceInteractions){
+            query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
+            query.setParameter("no", "NO");
+            query.setParameter("yes", "YES");
+            query.setParameter("confidence", CvTopic.AUTHOR_CONFIDENCE_MI_REF);
+        }
+
+        if (excludeNegativeInteractions){
+            query.setParameter("negative", CvTopic.NEGATIVE);
+        }
+
+        if (excludeSpokeExpanded && excludeNonUniprotInteractors){
+            query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
+            query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
+            query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
+            query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
+        }
+
+
+        List<String> interactions = query.getResultList();
+
+        dataContext.commitTransaction(transactionStatus);
+
+        return interactions;
+    }
+
+    /**
+     *
      * @return the list of interaction accessions which are publicly released, which are involving only uniprot proteins, are not negative and
      * which passed the dr-export annotation at the level of the experiment
      */
@@ -419,7 +497,7 @@ public class QueryFactory {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
         TransactionStatus transactionStatus = dataContext.beginTransaction();
-        
+
         String queryString = "select distinct(i.ac) from InteractionImpl i " +
                 "where i.ac in ("+interactionsAccepted + ") " +
                 "and i.ac not in ("+interactionsOnHold+") " +

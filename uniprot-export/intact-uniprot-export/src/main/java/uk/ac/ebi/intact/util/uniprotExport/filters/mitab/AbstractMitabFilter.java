@@ -39,7 +39,7 @@ public abstract class AbstractMitabFilter {
 
         this.mitab = mitab;
 
-        eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport());
+        eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getReleasedInteractionAcsPassingFilters());
     }
 
     public AbstractMitabFilter(InteractionExporter exporter){
@@ -48,7 +48,7 @@ public abstract class AbstractMitabFilter {
 
         this.mitab = null;
 
-        eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport());
+        eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getReleasedInteractionAcsPassingFilters());
     }
 
     protected void processMiTerms(BinaryInteraction interaction, MiClusterContext context){

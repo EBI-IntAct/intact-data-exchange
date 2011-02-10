@@ -12,6 +12,8 @@ import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
+import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
+import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
@@ -49,6 +51,10 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter implements Inte
     protected MiClusterScoreResults computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
         MiClusterContext context = new MiClusterContext();
+
+        FilterConfig config = FilterContext.getInstance().getConfig();
+        boolean excludeSpokeExpanded = config.excludeSpokeExpandedInteractions();
+        boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
 
         File mitabAsFile = new File(mitabFile);
         Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitabAsFile));
@@ -99,27 +105,17 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter implements Inte
                     }
                 }
 
-                if (intactAc != null && uniprotA != null && uniprotB != null){
+                if (intactAc != null){
+                    if (excludeSpokeExpanded && excludeNonUniprotInteractors && uniprotA != null && uniprotB != null){
+                        processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB);
+                    }
+                    else if (excludeNonUniprotInteractors && uniprotA != null && uniprotB != null){
 
-                    if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
-                        interactionToProcess.add(interaction);
+                        processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded);
+                    }
+                    else if (!excludeNonUniprotInteractors){
 
-                        FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
-                        processMiTerms(interaction, context);
-
-                        List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
-                        String detectionMI = detectionMethods.iterator().next().getIdentifier();
-
-                        List<InteractionType> interactionTypes = interaction.getInteractionTypes();
-                        String typeMi = interactionTypes.iterator().next().getIdentifier();
-
-                        MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
-                        context.getInteractionToMethod_type().put(intactAc, entry);
-
-                        if (!interaction.getExpansionMethods().isEmpty()){
-
-                            context.getSpokeExpandedInteractions().add(intactAc);
-                        }
+                        processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded);
                     }
                 }
             }
@@ -128,6 +124,58 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter implements Inte
         }
 
         return new MiClusterScoreResults(clusterScore, context);
+    }
+
+    private void processClustering(MiClusterContext context, List<BinaryInteraction> interactionToProcess, IntactBinaryInteraction interaction, String intactAc, ExtendedInteractor interactorA, String uniprotA, ExtendedInteractor interactorB, String uniprotB, boolean excludedSpokeExpanded) {
+        if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
+
+            FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+            processMiTerms(interaction, context);
+
+            List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
+            String detectionMI = detectionMethods.iterator().next().getIdentifier();
+
+            List<InteractionType> interactionTypes = interaction.getInteractionTypes();
+            String typeMi = interactionTypes.iterator().next().getIdentifier();
+
+            MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
+            context.getInteractionToMethod_type().put(intactAc, entry);
+
+            if (!interaction.getExpansionMethods().isEmpty() && !excludedSpokeExpanded){
+                interactionToProcess.add(interaction);
+
+                context.getSpokeExpandedInteractions().add(intactAc);
+            }
+            else if (interaction.getExpansionMethods().isEmpty()) {
+                interactionToProcess.add(interaction);
+            }
+            else if (!interaction.getExpansionMethods().isEmpty()){
+                context.getSpokeExpandedInteractions().add(intactAc);
+            }
+        }
+    }
+
+    private void processClustering(MiClusterContext context, List<BinaryInteraction> interactionToProcess, IntactBinaryInteraction interaction, String intactAc, ExtendedInteractor interactorA, String uniprotA, ExtendedInteractor interactorB, String uniprotB) {
+        if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
+            interactionToProcess.add(interaction);
+
+            FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+            processMiTerms(interaction, context);
+
+            List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
+            String detectionMI = detectionMethods.iterator().next().getIdentifier();
+
+            List<InteractionType> interactionTypes = interaction.getInteractionTypes();
+            String typeMi = interactionTypes.iterator().next().getIdentifier();
+
+            MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
+            context.getInteractionToMethod_type().put(intactAc, entry);
+
+            if (!interaction.getExpansionMethods().isEmpty() ){
+
+                context.getSpokeExpandedInteractions().add(intactAc);
+            }
+        }
     }
 
     public MiClusterScoreResults exportInteractionsFrom(String mitab) throws UniprotExportException {

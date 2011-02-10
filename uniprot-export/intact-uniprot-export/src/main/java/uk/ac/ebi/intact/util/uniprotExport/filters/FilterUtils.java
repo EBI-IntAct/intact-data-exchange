@@ -5,7 +5,6 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.util.Collection;
@@ -30,10 +29,10 @@ public class FilterUtils {
 
         Map<String, String> geneNames = context.getGeneNames();
 
-        if (!geneNames.containsKey(geneNameA)){
+        if (geneNameA != null && !geneNames.containsKey(geneNameA)){
             context.getGeneNames().put(intactA, geneNameA);
         }
-        if (!geneNames.containsKey(geneNameB)){
+        if (geneNameB != null && !geneNames.containsKey(geneNameB)){
             context.getGeneNames().put(intactB, geneNameB);
         }
     }
