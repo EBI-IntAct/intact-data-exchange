@@ -103,7 +103,7 @@ public class UniprotExportProcessor {
                 }
             }
 
-            CCParameters2 ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interactions, results.getExportContext(), interactor.getKey());
+            CCParameters2 ccParameters = this.ccConverter.convertInteractionsIntoCCLinesVersion2(interactions, results.getExportContext(), interactor.getKey());
 
             ccWriter.writeCCLine(ccParameters);
         }
@@ -243,11 +243,11 @@ public class UniprotExportProcessor {
             if (numberInteractions > 0){
                 logger.info("Write DR and CC lines for " + parent);
                 if (version == 1){
-                    CCParameters1 ccParameters = this.ccConverter.convertInteractionsIntoOldCCLines(interactions, results.getExportContext(), parent);
+                    CCParameters1 ccParameters = this.ccConverter.convertInteractionsIntoCCLinesVersion1(interactions, results.getExportContext(), parent);
                     ccWriter1.writeCCLine(ccParameters);
                 }
                 else{
-                    CCParameters2 ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interactions, results.getExportContext(), parent);
+                    CCParameters2 ccParameters = this.ccConverter.convertInteractionsIntoCCLinesVersion2(interactions, results.getExportContext(), parent);
                     ccWriter2.writeCCLine(ccParameters);
                 }
 

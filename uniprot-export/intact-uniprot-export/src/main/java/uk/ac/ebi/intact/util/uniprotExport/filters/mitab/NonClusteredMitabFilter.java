@@ -184,8 +184,9 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter implements Inte
 
     public MiClusterScoreResults exportInteractionsFrom(String mitab) throws UniprotExportException {
         try {
-
+            logger.info("compute Mi score and process clustering");
             MiClusterScoreResults clusterResults = computeMiScoreInteractionEligibleUniprotExport(mitab);
+            logger.info("apply uniprot export rules");
             exporter.exportInteractionsFrom(clusterResults);
 
             //this.interactionClusterScore.getScorePerInteractions(fileExport, this.interactionsToBeExported);

@@ -41,7 +41,7 @@ public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
 
         List<String> ps = map.get(mp2);*/
 
-        CCParameters2 parameters = converter.convertInteractionsIntoCCLines(interactions, context, firstInteractor);
+        CCParameters2 parameters = converter.convertInteractionsIntoCCLinesVersion2(interactions, context, firstInteractor);
         Assert.assertNotNull(parameters);
         Assert.assertEquals("P28548", parameters.getMasterUniprotAc());
         Assert.assertEquals("Kin-10", parameters.getGeneName());

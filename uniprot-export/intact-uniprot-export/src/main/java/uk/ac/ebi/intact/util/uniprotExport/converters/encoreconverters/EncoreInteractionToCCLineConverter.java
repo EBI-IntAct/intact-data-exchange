@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
@@ -20,6 +21,7 @@ import java.util.*;
  */
 
 public class EncoreInteractionToCCLineConverter {
+    private static final Logger logger = Logger.getLogger(EncoreInteractionToCCLineConverter.class);
 
     /**
      *
@@ -182,7 +184,7 @@ public class EncoreInteractionToCCLineConverter {
 
      * @return the converted CCParameter
      */
-    public CCParameters2 convertInteractionsIntoCCLines(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
+    public CCParameters2 convertInteractionsIntoCCLinesVersion2(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
         String geneName1 = context.getGeneNames().get(firstInteractor);
         String taxId1 = null;
@@ -247,21 +249,39 @@ public class EncoreInteractionToCCLineConverter {
                         firstIntactAc = intact2;
                     }
 
-                    // collect all pubmeds and spoke expanded information
-                    SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
+                    if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null && organism2 != null){
+                        // collect all pubmeds and spoke expanded information
+                        SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
 
-                    SecondCCParameters2 secondCCInteractor = new DefaultSecondCCInteractor2(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
-                    secondCCInteractors.add(secondCCInteractor);
+                        if (!sortedInteractionDetails.isEmpty()){
+                            SecondCCParameters2 secondCCInteractor = new DefaultSecondCCInteractor2(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
+                            secondCCInteractors.add(secondCCInteractor);
+                        }
+                        else{
+                            logger.debug("Interaction " + interaction.getId() + " doesn't have any interaction details.");
+                        }
+                    }
+                    else{
+                        logger.debug("Interaction " + interaction.getId() + " has one of the gene names or taxIds which is null.");
+                    }
+                }
+                else{
+                    logger.debug("Interaction " + interaction.getId() + " has one of the unipprot acs/ intact acs which is null.");
                 }
             }
 
-            return new DefaultCCParameters2(firstInteractor, geneName1, taxId1, secondCCInteractors);
+            if (!secondCCInteractors.isEmpty()){
+                return new DefaultCCParameters2(firstInteractor, geneName1, taxId1, secondCCInteractors);
+            }
+
         }
+
+        logger.debug("Interactor " + firstInteractor + " doesn't have any valid second CC parameters and will be skipped.");
 
         return null;
     }
 
-    public CCParameters1 convertInteractionsIntoOldCCLines(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
+    public CCParameters1 convertInteractionsIntoCCLinesVersion1(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
         String geneName1 = context.getGeneNames().get(firstInteractor);
         String taxId1 = null;
@@ -321,15 +341,32 @@ public class EncoreInteractionToCCLineConverter {
                         firstIntactAc = intact2;
                     }
 
-                    int numberEvidences = interaction.getExperimentToPubmed().size();
+                    if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null){
+                        int numberEvidences = interaction.getExperimentToPubmed().size();
 
-                    SecondCCParameters1 secondCCInteractor = new DefaultSecondCCParameters1(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
-                    secondCCInteractors.add(secondCCInteractor);
+                        if (numberEvidences > 0){
+                            SecondCCParameters1 secondCCInteractor = new DefaultSecondCCParameters1(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
+                            secondCCInteractors.add(secondCCInteractor);
+                        }
+                        else{
+                            logger.debug("Interaction " + interaction.getId() + " doesn't have valid evidences.");
+                        }
+                    }
+                    else{
+                        logger.debug("Interaction " + interaction.getId() + " has one of the gene names or taxIds which is null.");
+                    }
+                }
+                else{
+                    logger.debug("Interaction " + interaction.getId() + " has one of the unipprot acs/ intact acs which is null.");
                 }
             }
 
-            return new DefaultCCParameters1(firstInteractor, geneName1, taxId1, secondCCInteractors);
+            if (!secondCCInteractors.isEmpty()){
+                return new DefaultCCParameters1(firstInteractor, geneName1, taxId1, secondCCInteractors);
+            }
         }
+
+        logger.debug("Interactor " + firstInteractor + " doesn't have any valid second CC parameters and will be skipped.");
 
         return null;
     }
