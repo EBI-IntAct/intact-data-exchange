@@ -110,6 +110,7 @@ public class DefaultCCLineWriter1 implements CCLineWriter1  {
         }
         writer.write("//");
         writer.write(WriterUtils.NEW_LINE);
+        writer.flush();
     }
 
     @Override

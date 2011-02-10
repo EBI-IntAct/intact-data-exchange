@@ -133,7 +133,7 @@ public class UniprotExportProcessor {
     public void exportDRLines(MiClusterScoreResults results, String DRFile) throws IOException {
         DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
 
-        Set<String> interactors = new HashSet(results.getCluster().getInteractorCluster().keySet());
+        SortedSet<String> interactors = new TreeSet(results.getCluster().getInteractorCluster().keySet());
         Set<String> processedInteractors = new HashSet<String>();
 
         while (!interactors.isEmpty()){
@@ -177,8 +177,7 @@ public class UniprotExportProcessor {
     public void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile, int version) throws IOException {
         DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
 
-        Set<String> interactors = new HashSet(results.getCluster().getInteractorCluster().keySet());
-        Set<String> processedInteractors = new HashSet<String>();
+        Set<String> interactors = new TreeSet(results.getCluster().getInteractorCluster().keySet());
 
         CCLineWriter1 ccWriter1 = null;
         CCLineWriter2 ccWriter2 = null;
@@ -192,73 +191,76 @@ public class UniprotExportProcessor {
 
         List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
 
-        while (!interactors.isEmpty()){
-            processedInteractors.clear();
-            interactions.clear();
-
-            Iterator<String> interactorIterator = interactors.iterator();
-
-            String interactorAc = interactorIterator.next();
-            processedInteractors.add(interactorAc);
-
-            String parent = interactorAc;
-            if (interactorAc.contains("-")){
-                parent = interactorAc.substring(0, interactorAc.indexOf("-"));
-            }
-
-            Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(interactorAc));
-            int numberInteractions = exportedInteractions.size();
-
+        if (!interactors.isEmpty()){
+            String parentAc = null;
             Map<Integer, EncoreInteraction> interactionMapping = results.getCluster().getEncoreInteractionCluster();
 
-            for (Integer interactionId : exportedInteractions){
-                EncoreInteraction interaction = interactionMapping.get(interactionId);
+            for (String interactor : interactors){
+                interactions.clear();
+                int numberInteractions = 0;
 
-                if (interaction != null){
-                    interactions.add(interaction);
-                }
-            }
-
-            while (interactorIterator.hasNext()){
-                exportedInteractions.clear();
-
-                String nextInteractor = interactorIterator.next();
-
-                if (nextInteractor.startsWith(parent)){
-                    processedInteractors.add(nextInteractor);
-
-                    exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(nextInteractor));
-                    numberInteractions += exportedInteractions.size();
-
-                    for (Integer interactionId : exportedInteractions){
-                        EncoreInteraction interaction = interactionMapping.get(interactionId);
-
-                        if (interaction != null){
-                            interactions.add(interaction);
-                        }
+                if (parentAc == null){
+                    parentAc = interactor;
+                    if (interactor.contains("-")){
+                        parentAc = interactor.substring(0, interactor.indexOf("-"));
                     }
                 }
-            }
 
-            if (numberInteractions > 0){
-                logger.info("Write DR and CC lines for " + parent);
-                if (version == 1){
-                    CCParameters1 ccParameters = this.ccConverter.convertInteractionsIntoCCLinesVersion1(interactions, results.getExportContext(), parent);
-                    ccWriter1.writeCCLine(ccParameters);
+                // while the interactor starts with the same ac, increments the exported interactions
+                if (interactor.startsWith(parentAc)){
+                    int numberExported = collectInteractions(results, interactions, interactionMapping, interactor);
+                    numberInteractions += numberExported;
                 }
+                // flushes the exported interactions of the previous interactor and process the new interactor
                 else{
-                    CCParameters2 ccParameters = this.ccConverter.convertInteractionsIntoCCLinesVersion2(interactions, results.getExportContext(), parent);
-                    ccWriter2.writeCCLine(ccParameters);
-                }
+                    // write if the number of interactions is superior to 0
+                    if (numberInteractions > 0){
+                        logger.info("Write DR and CC lines for " + parentAc);
+                        if (version == 1){
+                            CCParameters1 ccParameters = this.ccConverter.convertInteractionsIntoCCLinesVersion1(interactions, results.getExportContext(), parentAc);
+                            ccWriter1.writeCCLine(ccParameters);
+                        }
+                        else{
+                            CCParameters2 ccParameters = this.ccConverter.convertInteractionsIntoCCLinesVersion2(interactions, results.getExportContext(), parentAc);
+                            ccWriter2.writeCCLine(ccParameters);
+                        }
 
-                DRParameters parameter = this.drConverter.convertInteractorToDRLine(parent, numberInteractions);
-                drWriter.writeDRLine(parameter);
-                interactors.removeAll(processedInteractors);
+                        DRParameters parameter = this.drConverter.convertInteractorToDRLine(parentAc, numberInteractions);
+                        drWriter.writeDRLine(parameter);
+                    }
+
+                    // clean the global variables, so we can process the new interactor
+                    numberInteractions = 0;
+                    interactions.clear();
+
+                    parentAc = interactor;
+                    if (interactor.contains("-")){
+                        parentAc = interactor.substring(0, interactor.indexOf("-"));
+                    }
+
+                    int numberExported = collectInteractions(results, interactions, interactionMapping, interactor);
+                    numberInteractions += numberExported;
+                }
             }
         }
 
         ccWriter2.close();
         drWriter.close();
+    }
+
+    private int collectInteractions(MiClusterScoreResults results, List<EncoreInteraction> interactions, Map<Integer, EncoreInteraction> interactionMapping, String interactor) {
+        Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(interactor));
+        int numberInteractions = exportedInteractions.size();
+
+        for (Integer interactionId : exportedInteractions){
+            EncoreInteraction interaction = interactionMapping.get(interactionId);
+
+            if (interaction != null){
+                interactions.add(interaction);
+            }
+        }
+
+        return numberInteractions;
     }
 
     public EncoreInteractionToGoLineConverter getGoConverter() {

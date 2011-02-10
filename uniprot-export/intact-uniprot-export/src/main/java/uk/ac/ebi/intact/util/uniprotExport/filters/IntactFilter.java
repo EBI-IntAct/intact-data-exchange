@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.filters;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.intact.core.context.DataContext;
@@ -37,6 +38,8 @@ import java.util.*;
  */
 
 public class IntactFilter implements InteractionFilter {
+
+    private static final Logger logger = Logger.getLogger(IntactFilter.class);
 
     /**
      * the binary interaction converter
@@ -123,7 +126,7 @@ public class IntactFilter implements InteractionFilter {
         // the list of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
 
-        System.out.println(interactions.size() + " interactions in IntAct will be processed.");
+        logger.info(interactions.size() + " interactions in IntAct will be processed.");
 
         // we process all the interactions of the list per chunk of 200 interactions
         while (i < interactions.size()){
@@ -142,7 +145,7 @@ public class IntactFilter implements InteractionFilter {
             processMiClustering(binaryInteractions, MAX_NUMBER_INTERACTION, clusterScore);
 
             int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
-            System.out.println("Still " + interactionsToProcess + " interactions to process in IntAct.");
+            logger.info("Still " + interactionsToProcess + " interactions to process in IntAct.");
         }
 
         return results;
@@ -684,14 +687,17 @@ public class IntactFilter implements InteractionFilter {
 
     @Override
     public MiClusterScoreResults exportInteractions() throws UniprotExportException {
-        System.out.println("export all interactions from intact which passed the dr export annotation");
-
+        logger.info("Filtering interactions for uniprot export... \n");
         List<String> eligibleBinaryInteractions = this.queryFactory.getReleasedInteractionAcsPassingFilters();
+        logger.info(eligibleBinaryInteractions.size() + " intact interactions passed the filters \n");
 
-        System.out.println("computes MI score");
+        System.out.println("Clustering interactions... \n");
         MiClusterScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
+        System.out.println("Clustered " + results.getCluster().getAllInteractionIds().size() + " binary interactions");
 
+        System.out.println("Exporting interactions... \n");
         exporter.exportInteractionsFrom(results);
+        System.out.println(results.getInteractionsToExport().size() + " binary interactions to export");
 
         return results;
     }
