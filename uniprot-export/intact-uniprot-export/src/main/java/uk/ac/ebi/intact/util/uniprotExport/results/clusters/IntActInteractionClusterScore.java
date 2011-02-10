@@ -229,7 +229,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
 
     @Override
     public void saveCluster(String fileName){
-        saveScores();
+        saveScores(fileName);
     }
 
     /**

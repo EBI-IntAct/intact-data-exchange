@@ -3,7 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters;
 import java.util.Set;
 
 /**
- * TODO comment this
+ * GO parameters must provide uniprot acs of the first and second protein and a list of pubmed Ids
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters;
 
 /**
- * TODO comment this
+ * The DR parameters should provide the uniprot ac and a number of interactions
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
