@@ -108,14 +108,15 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter implements Inte
 
                 if (intactAc != null){
                     if (excludeSpokeExpanded && excludeNonUniprotInteractors && uniprotA != null && uniprotB != null){
+                        logger.info("Processing interaction " + intactAc);
                         processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB);
                     }
                     else if (excludeNonUniprotInteractors && uniprotA != null && uniprotB != null){
-
+                        logger.info("Processing interaction " + intactAc);
                         processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded);
                     }
                     else if (!excludeNonUniprotInteractors){
-
+                        logger.info("Processing interaction " + intactAc);
                         processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded);
                     }
                 }
@@ -184,10 +185,11 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter implements Inte
 
     public MiClusterScoreResults exportInteractionsFrom(String mitab) throws UniprotExportException {
         try {
-            logger.info("compute Mi score and process clustering");
+            logger.info("Filtering and clustering interactions for uniprot export... \n");
             MiClusterScoreResults clusterResults = computeMiScoreInteractionEligibleUniprotExport(mitab);
-            logger.info("apply uniprot export rules");
+            logger.info("Exporting interactions... \n");
             exporter.exportInteractionsFrom(clusterResults);
+            logger.info(clusterResults.getInteractionsToExport().size() + " binary interactions to export");
 
             //this.interactionClusterScore.getScorePerInteractions(fileExport, this.interactionsToBeExported);
 

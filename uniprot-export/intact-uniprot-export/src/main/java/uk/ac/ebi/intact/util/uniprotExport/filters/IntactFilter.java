@@ -180,6 +180,7 @@ public class IntactFilter implements InteractionFilter {
                         // we convert the interaction in binary interaction
                         Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
                         if (toBinary.size() == 1){
+                            logger.info("Processing interaction " + interactionAc);
                             processClusterContext(context, interactionAc, toBinary);
 
                             for (IntactBinaryInteraction binary : toBinary){
@@ -209,19 +210,19 @@ public class IntactFilter implements InteractionFilter {
                             binaryInteractions.addAll(toBinary);
                         }
                         else {
-                            System.out.println("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " is not a true binary interaction and is excluded.");
+                            logger.info("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " is not a true binary interaction and is excluded.");
                         }
                     } catch (Exception e) {
-                        System.out.println("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
+                        logger.error("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.", e);
                     }
                 }
                 // if the interaction cannot be converted into binary interaction, we ignore the interaction.
                 else {
-                    System.out.println("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
+                    logger.info("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
                 }
             }
             else {
-                System.out.println("The interaction " + interactionAc + " doesn't exist in the database and is excluded.");
+                logger.error("The interaction " + interactionAc + " doesn't exist in the database and is excluded.");
             }
 
             // we increments the number of binary interactions
@@ -269,22 +270,24 @@ public class IntactFilter implements InteractionFilter {
                         Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
 
                         if (excludeSpokeExpanded && toBinary.size() == 1){
+                            logger.info("Processing interaction " + interactionAc);
                             processClustering(binaryInteractions, context, interactionAc, toBinary, excludeNonUniprotInteractors);
                         }
                         else if (!excludeSpokeExpanded){
+                            logger.info("Processing interaction " + interactionAc);
                             processClustering(binaryInteractions, context, interactionAc, toBinary, excludeNonUniprotInteractors);
                         }
                     } catch (Exception e) {
-                        System.out.println("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
+                        logger.error("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.", e);
                     }
                 }
                 // if the interaction cannot be converted into binary interaction, we ignore the interaction.
                 else {
-                    System.out.println("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
+                    logger.info("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
                 }
             }
             else {
-                System.out.println("The interaction " + interactionAc + " doesn't exist in the database and is excluded.");
+                logger.error("The interaction " + interactionAc + " doesn't exist in the database and is excluded.");
             }
 
             // we increments the number of binary interactions
@@ -691,13 +694,13 @@ public class IntactFilter implements InteractionFilter {
         List<String> eligibleBinaryInteractions = this.queryFactory.getReleasedInteractionAcsPassingFilters();
         logger.info(eligibleBinaryInteractions.size() + " intact interactions passed the filters \n");
 
-        System.out.println("Clustering interactions... \n");
+        logger.info("Clustering interactions... \n");
         MiClusterScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
-        System.out.println("Clustered " + results.getCluster().getAllInteractionIds().size() + " binary interactions");
+        logger.info("Clustered " + results.getCluster().getAllInteractionIds().size() + " binary interactions");
 
-        System.out.println("Exporting interactions... \n");
+        logger.info("Exporting interactions... \n");
         exporter.exportInteractionsFrom(results);
-        System.out.println(results.getInteractionsToExport().size() + " binary interactions to export");
+        logger.info(results.getInteractionsToExport().size() + " binary interactions to export");
 
         return results;
     }
