@@ -2,9 +2,8 @@ package uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters;
 
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.OldInteractionDetails;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCInteractor;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import javax.swing.event.EventListenerList;
@@ -13,14 +12,14 @@ import java.io.OutputStreamWriter;
 import java.util.List;
 
 /**
- * Writer of the old CC line format
+ * Default Writer of the CC line format (version 1)
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>09/02/11</pre>
  */
 
-public class OldCCLineWriterImpl implements CCLineWriter  {
+public class DefaultCCLineWriter1 implements CCLineWriter1  {
 
     /**
      * The writer
@@ -33,7 +32,7 @@ public class OldCCLineWriterImpl implements CCLineWriter  {
      * @param outputStream : the outputStreamWriter
      * @throws IOException
      */
-    public OldCCLineWriterImpl(OutputStreamWriter outputStream) throws IOException {
+    public DefaultCCLineWriter1(OutputStreamWriter outputStream) throws IOException {
         if (outputStream == null){
             throw new IllegalArgumentException("You must give a non null OutputStream writer");
         }
@@ -41,13 +40,13 @@ public class OldCCLineWriterImpl implements CCLineWriter  {
     }
 
     @Override
-    public void writeCCLine(CCParameters parameters) throws IOException {
+    public void writeCCLine(CCParameters1 parameters) throws IOException {
 
         // if parameter not null, write it
         if (parameters != null){
 
             // write the title
-            writeCCLineTitle(parameters.getFirstInteractor());
+            writeCCLineTitle(parameters.getMasterUniprotAc());
 
             // write the content
             writeCCLineParameters(parameters);
@@ -57,10 +56,10 @@ public class OldCCLineWriterImpl implements CCLineWriter  {
     }
 
     @Override
-    public void writeCCLines(List<CCParameters> CCLines) throws IOException {
+    public void writeCCLines(List<CCParameters1> CCLines) throws IOException {
 
         // write each CCParameter
-        for (CCParameters parameter : CCLines){
+        for (CCParameters1 parameter : CCLines){
             writeCCLine(parameter);
         }
     }
@@ -69,27 +68,27 @@ public class OldCCLineWriterImpl implements CCLineWriter  {
      * Write the content of the CC line
      * @param parameters : the parameters
      */
-    public void writeCCLineParameters(CCParameters parameters) throws IOException {
+    public void writeCCLineParameters(CCParameters1 parameters) throws IOException {
 
-        String firstUniprotAc = parameters.getFirstInteractor();
-        String firstTaxId = parameters.getFirstTaxId();
+        String firstUniprotAc = parameters.getMasterUniprotAc();
+        String firstTaxId = parameters.getTaxId();
 
-        for (SecondCCInteractor secondInteractor : parameters.getSecondCCInteractors()){
+        for (SecondCCParameters1 secondInteractor : parameters.getSecondCCParameters()){
             writer.write("CC       ");
 
-            if (firstUniprotAc.equals(secondInteractor.getSecondInteractor())) {
+            if (firstUniprotAc.equals(secondInteractor.getSecondUniprotAc())) {
 
                 writer.write("Self");
 
             } else {
 
-                writer.write(secondInteractor.getSecondInteractor());
+                writer.write(secondInteractor.getSecondUniprotAc());
                 writer.write(':');
-                writer.write(secondInteractor.getSecondGeneName());
+                writer.write(secondInteractor.getGeneName());
             }
 
             // generated warning message if the two protein are from different organism
-            if (!firstTaxId.equals(secondInteractor.getSecondTaxId())) {
+            if (!firstTaxId.equals(secondInteractor.getTaxId())) {
                 writer.write(' ');
                 writer.write("(xeno)");
             }
@@ -97,16 +96,14 @@ public class OldCCLineWriterImpl implements CCLineWriter  {
             writer.write(';');
             writer.write(' ');
             writer.write("NbExp=");
-            OldInteractionDetails oldDetails = (OldInteractionDetails) secondInteractor.getInteractionDetails().iterator().next();
-
-            writer.write(oldDetails.getNumberOfExperiments());
+            writer.write(secondInteractor.getNumberOfInteractionEvidences());
             writer.write(';');
             writer.write(' ');
             writer.write("IntAct=");
             writer.write(secondInteractor.getFirstIntacAc());
             writer.write(',');
             writer.write(' ');
-            writer.write(secondInteractor.getSecondInteractor());
+            writer.write(secondInteractor.getSecondIntactAc());
             writer.write(';');
 
             writer.write(WriterUtils.NEW_LINE);

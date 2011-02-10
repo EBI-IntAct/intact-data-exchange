@@ -2,10 +2,10 @@ package uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters;
 
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters2;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.DefaultInteractionDetails;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.InteractionDetails;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.InteractionDetailsImpl;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCInteractor;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters2;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import javax.swing.event.EventListenerList;
@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Default writer for CCLines
@@ -22,7 +23,7 @@ import java.util.Set;
  * @since <pre>28/01/11</pre>
  */
 
-public class CCLineWriterImpl implements CCLineWriter {
+public class DefaultCCLineWriter2 implements CCLineWriter2 {
 
     /**
      * The writer
@@ -35,7 +36,7 @@ public class CCLineWriterImpl implements CCLineWriter {
      * @param outputStream : the outputStreamWriter
      * @throws IOException
      */
-    public CCLineWriterImpl(OutputStreamWriter outputStream) throws IOException {
+    public DefaultCCLineWriter2(OutputStreamWriter outputStream) throws IOException {
         if (outputStream == null){
             throw new IllegalArgumentException("You must give a non null OutputStream writer");
         }
@@ -43,13 +44,13 @@ public class CCLineWriterImpl implements CCLineWriter {
     }
 
     @Override
-    public void writeCCLine(CCParameters parameters) throws IOException {
+    public void writeCCLine(CCParameters2 parameters) throws IOException {
 
         // if parameter not null, write it
         if (parameters != null){
 
             // write the title
-            writeCCLineTitle(parameters.getFirstInteractor());
+            writeCCLineTitle(parameters.getMasterUniprotAc());
 
             // write the content
             writeCCLineParameters(parameters);
@@ -59,10 +60,10 @@ public class CCLineWriterImpl implements CCLineWriter {
     }
 
     @Override
-    public void writeCCLines(List<CCParameters> CCLines) throws IOException {
+    public void writeCCLines(List<CCParameters2> CCLines) throws IOException {
 
         // write each CCParameter
-        for (CCParameters parameter : CCLines){
+        for (CCParameters2 parameter : CCLines){
             writeCCLine(parameter);
         }
     }
@@ -71,23 +72,22 @@ public class CCLineWriterImpl implements CCLineWriter {
      * Write the content of the CC line
      * @param parameters : the parameters
      */
-    public void writeCCLineParameters(CCParameters parameters) throws IOException {
+    public void writeCCLineParameters(CCParameters2 parameters) throws IOException {
 
-        String firstUniprotAc = parameters.getFirstInteractor();
-        String firstTaxId = parameters.getFirstTaxId();
+        String firstTaxId = parameters.getTaxId();
 
-        for (SecondCCInteractor secondInteractor : parameters.getSecondCCInteractors()){
+        for (SecondCCParameters2 secondInteractor : parameters.getSecondCCParameters()){
             String firstIntactAc = secondInteractor.getFirstIntacAc();
 
             // write introduction
-            writeInteractionIntroduction(true, firstUniprotAc, firstIntactAc, secondInteractor.getSecondInteractor(), secondInteractor.getSecondIntactAc());
+            writeInteractionIntroduction(true, firstIntactAc, secondInteractor.getSecondIntactAc());
 
             // write first protein
-            writeFirstProtein(secondInteractor.getFirstInteractor(), parameters.getFirstGeneName());
+            writeFirstProtein(secondInteractor.getFirstUniprotAc(), parameters.getGeneName());
 
             // write second protein
-            writeSecondProtein(secondInteractor.getSecondInteractor(), secondInteractor.getSecondGeneName(),
-                    firstTaxId, secondInteractor.getSecondTaxId(), secondInteractor.getSecondOrganismName());
+            writeSecondProtein(secondInteractor.getSecondUniprotAc(), secondInteractor.getGeneName(),
+                    firstTaxId, secondInteractor.getTaxId(), secondInteractor.getOrganismName());
 
             // write the details of the interaction
             writeInteractionDetails(secondInteractor.getInteractionDetails());
@@ -142,12 +142,10 @@ public class CCLineWriterImpl implements CCLineWriter {
     /**
      * Write the introduction of a CC line
      * @param doesInteract
-     * @param uniprot1
      * @param intact1
-     * @param uniprot2
      * @param intact2
      */
-    private void writeInteractionIntroduction(boolean doesInteract, String uniprot1, String intact1, String uniprot2, String intact2) throws IOException {
+    private void writeInteractionIntroduction(boolean doesInteract, String intact1, String intact2) throws IOException {
         writer.write("CC       Interact=");
         writer.write((doesInteract ? "Yes" : "No"));
         writer.write("; ");
@@ -226,11 +224,11 @@ public class CCLineWriterImpl implements CCLineWriter {
      * Write the details of a binary interaction
      * @param interactionDetails
      */
-    private void writeInteractionDetails(Set<InteractionDetails> interactionDetails) throws IOException {
+    private void writeInteractionDetails(SortedSet<InteractionDetails> interactionDetails) throws IOException {
 
         // collect all pubmeds and spoke expanded information
         for (InteractionDetails details : interactionDetails){
-            InteractionDetailsImpl detailsImpl = (InteractionDetailsImpl) details;
+            DefaultInteractionDetails detailsImpl = (DefaultInteractionDetails) details;
 
             String type = detailsImpl.getInteractionType();
             String method = detailsImpl.getDetectionMethod();

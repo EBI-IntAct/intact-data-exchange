@@ -117,13 +117,13 @@ public class EncoreInteractionToCCLineConverter {
 
             // if we have spoke expanded interactions, create an InteractionDetails 'spoke expanded' and add it to the list of InteractionDetails
             if (!pubmedSpokeExpanded.isEmpty()){
-                InteractionDetails details = new InteractionDetailsImpl(type, method, true, pubmedSpokeExpanded);
+                InteractionDetails details = new DefaultInteractionDetails(type, method, true, pubmedSpokeExpanded);
                 sortedInteractionDetails.add(details);
             }
 
             // if we have true binary interactions, create an InteractionDetails 'true binary' and add it to the list of InteractionDetails
             if (!pubmedTrueBinary.isEmpty()){
-                InteractionDetails details = new InteractionDetailsImpl(type, method, false, pubmedTrueBinary);
+                InteractionDetails details = new DefaultInteractionDetails(type, method, false, pubmedTrueBinary);
                 sortedInteractionDetails.add(details);
             }
         }
@@ -182,12 +182,12 @@ public class EncoreInteractionToCCLineConverter {
 
      * @return the converted CCParameter
      */
-    public CCParameters convertInteractionsIntoCCLines(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
+    public CCParameters2 convertInteractionsIntoCCLines(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
         String geneName1 = context.getGeneNames().get(firstInteractor);
         String taxId1 = null;
 
-        List<SecondCCInteractor> secondCCInteractors = new ArrayList<SecondCCInteractor>(interactions.size());
+        List<SecondCCParameters2> secondCCInteractors = new ArrayList<SecondCCParameters2>(interactions.size());
 
         if (!interactions.isEmpty()){
 
@@ -202,7 +202,7 @@ public class EncoreInteractionToCCLineConverter {
                 String intact1 = interactorA[1];
                 String intact2 = interactorB[1];
 
-                // if the uniprot acs are not null, it is possible to convert into a CCParameters
+                // if the uniprot acs are not null, it is possible to convert into a CCParameters2
                 if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
                     // the complete uniprot ac of the first interactor
                     String firstUniprot = null;
@@ -250,23 +250,23 @@ public class EncoreInteractionToCCLineConverter {
                     // collect all pubmeds and spoke expanded information
                     SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
 
-                    SecondCCInteractor secondCCInteractor = new SecondCCInteractorImpl(firstUniprot, secondUniprot, firstIntactAc, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
+                    SecondCCParameters2 secondCCInteractor = new DefaultSecondCCInteractor2(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
                     secondCCInteractors.add(secondCCInteractor);
                 }
             }
 
-            return new CCParametersImpl(firstInteractor, geneName1, taxId1, secondCCInteractors);
+            return new DefaultCCParameters2(firstInteractor, geneName1, taxId1, secondCCInteractors);
         }
 
         return null;
     }
 
-    public CCParameters convertInteractionsIntoOldCCLines(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
+    public CCParameters1 convertInteractionsIntoOldCCLines(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
         String geneName1 = context.getGeneNames().get(firstInteractor);
         String taxId1 = null;
 
-        List<SecondCCInteractor> secondCCInteractors = new ArrayList<SecondCCInteractor>(interactions.size());
+        List<SecondCCParameters1> secondCCInteractors = new ArrayList<SecondCCParameters1>(interactions.size());
 
         if (!interactions.isEmpty()){
 
@@ -281,7 +281,7 @@ public class EncoreInteractionToCCLineConverter {
                 String intact1 = interactorA[1];
                 String intact2 = interactorB[1];
 
-                // if the uniprot acs are not null, it is possible to convert into a CCParameters
+                // if the uniprot acs are not null, it is possible to convert into a CCParameters2
                 if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
                     // the complete uniprot ac of the first interactor
                     String firstUniprot = null;
@@ -300,15 +300,11 @@ public class EncoreInteractionToCCLineConverter {
                     // extract taxIds
                     String taxId2 = null;
 
-                    // extract organism names
-                    String organism2 = null;
-
                     if (uniprot1.startsWith(firstInteractor)){
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
                         taxId2 = organismsB[0];
-                        organism2 = organismsB[1];
                         secondIntactAc = intact2;
 
                         taxId1 = organismsA[0];
@@ -319,25 +315,20 @@ public class EncoreInteractionToCCLineConverter {
                         secondUniprot = uniprot1;
                         geneName2 = context.getGeneNames().get(uniprot1);
                         taxId2 = organismsA[0];
-                        organism2 = organismsA[1];
                         secondIntactAc = intact1;
 
                         taxId1 = organismsB[0];
                         firstIntactAc = intact2;
                     }
 
-                    // collect all pubmeds and spoke expanded information
-                    Set<InteractionDetails> sortedInteractionDetails = new HashSet<InteractionDetails>();
+                    int numberEvidences = interaction.getExperimentToPubmed().size();
 
-                    OldInteractionDetails oldDetail = new OldInteractionDetails(interaction.getExperimentToPubmed().size());
-                    sortedInteractionDetails.add(oldDetail);
-
-                    SecondCCInteractor secondCCInteractor = new SecondCCInteractorImpl(firstUniprot, secondUniprot, firstIntactAc, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
+                    SecondCCParameters1 secondCCInteractor = new DefaultSecondCCParameters1(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
                     secondCCInteractors.add(secondCCInteractor);
                 }
             }
 
-            return new CCParametersImpl(firstInteractor, geneName1, taxId1, secondCCInteractors);
+            return new DefaultCCParameters1(firstInteractor, geneName1, taxId1, secondCCInteractors);
         }
 
         return null;

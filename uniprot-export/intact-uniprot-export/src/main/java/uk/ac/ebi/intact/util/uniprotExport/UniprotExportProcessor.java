@@ -7,13 +7,15 @@ import uk.ac.ebi.intact.util.uniprotExport.converters.InteractorToDRLineConverte
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters2;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
-import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriter;
-import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriterImpl;
-import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.OldCCLineWriterImpl;
+import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriter1;
+import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriter2;
+import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.DefaultCCLineWriter1;
+import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.DefaultCCLineWriter2;
 import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DRLineWriter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DRLineWriterImpl;
 import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.GOLineWriter;
@@ -49,14 +51,14 @@ public class UniprotExportProcessor {
         this.filter = filter;
     }
 
-    public void runUniprotExport(String DRFile, String CCFile, String GOFile, boolean useNewFormat) throws UniprotExportException {
+    public void runUniprotExport(String DRFile, String CCFile, String GOFile, int version) throws UniprotExportException {
 
         logger.info("Export binary interactions from IntAct");
         MiClusterScoreResults results = filter.exportInteractions();
 
         try {
             logger.info("Write DR and CC lines");
-            exportDRAndCCLines(results, DRFile, CCFile, useNewFormat);
+            exportDRAndCCLines(results, DRFile, CCFile, version);
             logger.info("write GO lines");
             exportGOLines(results, GOFile);
 
@@ -71,7 +73,7 @@ public class UniprotExportProcessor {
 
     /*public void exportCCLines(MiClusterScoreResults results, String CCFile) throws IOException {
 
-        CCLineWriter ccWriter = new CCLineWriterImpl(new FileWriter(CCFile));
+        CCLineWriter2 ccWriter = new DefaultCCLineWriter2(new FileWriter(CCFile));
         List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
 
         for (Map.Entry<String, List<Integer>> interactor : results.getCluster().getInteractorMapping().entrySet()){
@@ -85,7 +87,7 @@ public class UniprotExportProcessor {
                 }
             }
 
-            CCParameters ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interactions, results.getExportContext(), interactor.getKey());
+            CCParameters2 ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interactions, results.getExportContext(), interactor.getKey());
 
             ccWriter.writeCCLine(ccParameters);
         }
@@ -154,19 +156,22 @@ public class UniprotExportProcessor {
         drWriter.close();
     }
 
-    public void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile, boolean useNewFormat) throws IOException {
+    public void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile, int version) throws IOException {
         DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
 
         Set<String> interactors = new HashSet(results.getCluster().getInteractorCluster().keySet());
         Set<String> processedInteractors = new HashSet<String>();
 
-        CCLineWriter ccWriter;
-        if(useNewFormat){
-            ccWriter = new CCLineWriterImpl(new FileWriter(CCFile));
+        CCLineWriter1 ccWriter1 = null;
+        CCLineWriter2 ccWriter2 = null;
+
+        if(version == 1){
+            ccWriter1 = new DefaultCCLineWriter1(new FileWriter(CCFile));
         }
         else {
-            ccWriter = new OldCCLineWriterImpl(new FileWriter(CCFile));
+            ccWriter2 = new DefaultCCLineWriter2(new FileWriter(CCFile));
         }
+
         List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
 
         while (!interactors.isEmpty()){
@@ -218,14 +223,14 @@ public class UniprotExportProcessor {
             }
 
             if (numberInteractions > 0){
-                CCParameters ccParameters;
-                if (useNewFormat){
-                    ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interactions, results.getExportContext(), parent);
+                if (version == 1){
+                    CCParameters1 ccParameters = this.ccConverter.convertInteractionsIntoOldCCLines(interactions, results.getExportContext(), parent);
+                    ccWriter1.writeCCLine(ccParameters);
                 }
                 else{
-                    ccParameters = this.ccConverter.convertInteractionsIntoOldCCLines(interactions, results.getExportContext(), parent);
+                    CCParameters2 ccParameters = this.ccConverter.convertInteractionsIntoCCLines(interactions, results.getExportContext(), parent);
+                    ccWriter2.writeCCLine(ccParameters);
                 }
-                ccWriter.writeCCLine(ccParameters);
 
                 DRParameters parameter = this.drConverter.convertInteractorToDRLine(parent, numberInteractions);
                 drWriter.writeDRLine(parameter);
@@ -233,7 +238,7 @@ public class UniprotExportProcessor {
             }
         }
 
-        ccWriter.close();
+        ccWriter2.close();
         drWriter.close();
     }
 

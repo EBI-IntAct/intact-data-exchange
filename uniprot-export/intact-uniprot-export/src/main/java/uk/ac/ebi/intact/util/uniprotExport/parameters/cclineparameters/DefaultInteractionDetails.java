@@ -10,7 +10,7 @@ import java.util.Set;
  * @since <pre>31/01/11</pre>
  */
 
-public class InteractionDetailsImpl implements Comparable<InteractionDetailsImpl>, InteractionDetails{
+public class DefaultInteractionDetails implements InteractionDetails{
 
     private String interactionType;
     private String detectionMethod;
@@ -19,18 +19,18 @@ public class InteractionDetailsImpl implements Comparable<InteractionDetailsImpl
 
     private Set<String> pubmedIds;
 
-    public InteractionDetailsImpl(String interactionType, String detectionMethod, boolean isSpokeExpanded,
-                                  Set<String> pubmedIds){
+    public DefaultInteractionDetails(String interactionType, String detectionMethod, boolean isSpokeExpanded,
+                                     Set<String> pubmedIds){
 
 
         if (detectionMethod == null){
-            throw  new IllegalArgumentException("The InteractionDetailsImpl must contain a non null detection method.");
+            throw  new IllegalArgumentException("The DefaultInteractionDetails must contain a non null detection method.");
         }
         else if (pubmedIds == null){
-            throw  new IllegalArgumentException("The InteractionDetailsImpl must contain a non null set of Pubmed Ids.");
+            throw  new IllegalArgumentException("The DefaultInteractionDetails must contain a non null set of Pubmed Ids.");
         }
         else if (pubmedIds.isEmpty()){
-            throw  new IllegalArgumentException("The InteractionDetailsImpl must contain a non empty set of Pubmed Ids.");
+            throw  new IllegalArgumentException("The DefaultInteractionDetails must contain a non empty set of Pubmed Ids.");
 
         }
 
@@ -40,14 +40,14 @@ public class InteractionDetailsImpl implements Comparable<InteractionDetailsImpl
         this.pubmedIds = pubmedIds;
     }
     @Override
-    public int compareTo(InteractionDetailsImpl o) {
+    public int compareTo(DefaultInteractionDetails o) {
         final int BEFORE = -1;
         final int EQUAL = 0;
         final int AFTER = 1;
 
         if ( this == o ) return EQUAL;
 
-        if (o instanceof InteractionDetailsImpl){
+        if (o instanceof DefaultInteractionDetails){
 
         }
 
@@ -116,7 +116,7 @@ public class InteractionDetailsImpl implements Comparable<InteractionDetailsImpl
             return false;
         }
 
-        InteractionDetailsImpl details2 = (InteractionDetailsImpl) o;
+        DefaultInteractionDetails details2 = (DefaultInteractionDetails) o;
 
         if (!getDetectionMethod().equals(details2.getDetectionMethod()))
         {

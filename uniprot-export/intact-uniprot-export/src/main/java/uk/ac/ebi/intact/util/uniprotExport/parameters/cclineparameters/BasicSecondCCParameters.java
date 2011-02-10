@@ -1,16 +1,15 @@
 package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
 
-import java.util.Set;
-
 /**
- * Interface for the CC parameters attached to the second interactor
+ * BasicCCParameters contains the uniprot AC of the two interactors (can be isoforms of feature chains),
+ * the intact AC of the two interactors, the gene name and taxId of the second interactor
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
- * @since <pre>02/02/11</pre>
+ * @since <pre>10/02/11</pre>
  */
 
-public interface SecondCCInteractor {
+public interface BasicSecondCCParameters {
 
     /**
      * the Intact AC of the first interactor
@@ -21,12 +20,12 @@ public interface SecondCCInteractor {
      * The uniprot ac of the first interactor (can be isoform and feature chain)
      * @return
      */
-    public String getFirstInteractor();
+    public String getFirstUniprotAc();
 
     /**
      * the uniprot AC of the second interactor
      */
-    public String getSecondInteractor();
+    public String getSecondUniprotAc();
 
     /**
      * the Intact AC of the second interactor
@@ -36,23 +35,11 @@ public interface SecondCCInteractor {
     /**
      * The gene name of the second interactor
      */
-    public String getSecondGeneName();
+    public String getGeneName();
 
     /**
      * The taxId of the second interactor
      * @return
      */
-    public String getSecondTaxId();
-
-    /**
-     * the organism name of the second interactor
-     * @return
-     */
-    public String getSecondOrganismName();
-
-    /**
-     * the list of interaction details
-     * @return
-     */
-    public Set<InteractionDetails> getInteractionDetails();
+    public String getTaxId();
 }

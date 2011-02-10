@@ -68,9 +68,9 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return parameters;
     }
 
-    public List<CCParameters> createCCParameters(){
+    public List<CCParameters2> createCCParameters(){
 
-        List<CCParameters> parameters = new ArrayList<CCParameters>(3);
+        List<CCParameters2> parameters = new ArrayList<CCParameters2>(3);
 
         String uniprotAc1 = "P28548";
         String uniprotAc2 = "Q22534";
@@ -117,11 +117,11 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         publications4.add(pmid4);
         publications4.add(pmid2);
 
-        InteractionDetails detail1 = new InteractionDetailsImpl("physical association", "tandem affinity purification", false, publications1);
-        InteractionDetails detail2 = new InteractionDetailsImpl("physical association", "two hybrid pooling", false, publications2);
-        InteractionDetails detail3 = new InteractionDetailsImpl("association", "anti bait coimmunoprecipitation", true, publications3);
-        InteractionDetails detail4 = new InteractionDetailsImpl("physical association", "coimmunoprecipitation", false, publications4);
-        InteractionDetails detail5 = new InteractionDetailsImpl("physical association", "two hybrid pooling", false, publications1);
+        InteractionDetails detail1 = new DefaultInteractionDetails("physical association", "tandem affinity purification", false, publications1);
+        InteractionDetails detail2 = new DefaultInteractionDetails("physical association", "two hybrid pooling", false, publications2);
+        InteractionDetails detail3 = new DefaultInteractionDetails("association", "anti bait coimmunoprecipitation", true, publications3);
+        InteractionDetails detail4 = new DefaultInteractionDetails("physical association", "coimmunoprecipitation", false, publications4);
+        InteractionDetails detail5 = new DefaultInteractionDetails("physical association", "two hybrid pooling", false, publications1);
 
         SortedSet<InteractionDetails> details1 = new TreeSet<InteractionDetails>();
         details1.add(detail1);
@@ -134,37 +134,37 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         details3.add(detail3);
         details3.add(detail4);
 
-        SecondCCInteractor secondParameters1 = new SecondCCInteractorImpl(uniprotAc5, uniprotAc2, intactAc4, intactAc1, geneName2, taxId2, organismName2, details1);
-        SecondCCInteractor secondParameters2 = new SecondCCInteractorImpl(uniprotAc6, uniprotAc3, intactAc5, intactAc2, geneName3, taxId, organismName, details2);
-        SecondCCInteractor secondParameters3 = new SecondCCInteractorImpl(uniprotAc7, uniprotAc4, intactAc6, intactAc3, geneName4, taxId, organismName, details3);
+        SecondCCParameters2 secondParameters1 = new DefaultSecondCCInteractor2(uniprotAc5, intactAc4, uniprotAc2, intactAc1, geneName2, taxId2, organismName2, details1);
+        SecondCCParameters2 secondParameters2 = new DefaultSecondCCInteractor2(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, organismName, details2);
+        SecondCCParameters2 secondParameters3 = new DefaultSecondCCInteractor2(uniprotAc7, intactAc6, uniprotAc4, intactAc3, geneName4, taxId, organismName, details3);
 
-        List<SecondCCInteractor> listOfSecondInteractors1 = new ArrayList<SecondCCInteractor>();
+        List<SecondCCParameters2> listOfSecondInteractors1 = new ArrayList<SecondCCParameters2>();
         listOfSecondInteractors1.add(secondParameters1);
         listOfSecondInteractors1.add(secondParameters2);
         listOfSecondInteractors1.add(secondParameters3);
 
-        CCParameters parameters1 = new CCParametersImpl(uniprotAc1, geneName1, taxId, listOfSecondInteractors1);
+        CCParameters2 parameters1 = new DefaultCCParameters2(uniprotAc1, geneName1, taxId, listOfSecondInteractors1);
         parameters.add(parameters1);
 
-        List<SecondCCInteractor> listOfSecondInteractors2 = new ArrayList<SecondCCInteractor>();
-        SecondCCInteractor secondParameters4 = new SecondCCInteractorImpl(uniprotAc2, uniprotAc5, intactAc1, intactAc4, geneName1, taxId, organismName, details1);
+        List<SecondCCParameters2> listOfSecondInteractors2 = new ArrayList<SecondCCParameters2>();
+        SecondCCParameters2 secondParameters4 = new DefaultSecondCCInteractor2(uniprotAc2, intactAc1, uniprotAc5, intactAc4, geneName1, taxId, organismName, details1);
         listOfSecondInteractors2.add(secondParameters4);
 
-        CCParameters parameters2 = new CCParametersImpl(uniprotAc2, geneName2, taxId2, listOfSecondInteractors2);
+        CCParameters2 parameters2 = new DefaultCCParameters2(uniprotAc2, geneName2, taxId2, listOfSecondInteractors2);
         parameters.add(parameters2);
 
-        List<SecondCCInteractor> listOfSecondInteractors3 = new ArrayList<SecondCCInteractor>();
-        SecondCCInteractor secondParameters5 = new SecondCCInteractorImpl(uniprotAc3, uniprotAc6, intactAc2, intactAc5, geneName1, taxId, organismName, details2);
+        List<SecondCCParameters2> listOfSecondInteractors3 = new ArrayList<SecondCCParameters2>();
+        SecondCCParameters2 secondParameters5 = new DefaultSecondCCInteractor2(uniprotAc3, intactAc2, uniprotAc6, intactAc5, geneName1, taxId, organismName, details2);
         listOfSecondInteractors3.add(secondParameters5);
 
-        CCParameters parameters3 = new CCParametersImpl(uniprotAc3, geneName3, taxId, listOfSecondInteractors3);
+        CCParameters2 parameters3 = new DefaultCCParameters2(uniprotAc3, geneName3, taxId, listOfSecondInteractors3);
         parameters.add(parameters3);
 
-        List<SecondCCInteractor> listOfSecondInteractors4 = new ArrayList<SecondCCInteractor>();
-        SecondCCInteractor secondParameters6 = new SecondCCInteractorImpl(uniprotAc4, uniprotAc7, intactAc3, intactAc6, geneName1, taxId, organismName, details3);
+        List<SecondCCParameters2> listOfSecondInteractors4 = new ArrayList<SecondCCParameters2>();
+        SecondCCParameters2 secondParameters6 = new DefaultSecondCCInteractor2(uniprotAc4, intactAc3, uniprotAc7, intactAc6, geneName1, taxId, organismName, details3);
         listOfSecondInteractors4.add(secondParameters6);
 
-        CCParameters parameters4 = new CCParametersImpl(uniprotAc4, geneName4, taxId, listOfSecondInteractors4);
+        CCParameters2 parameters4 = new DefaultCCParameters2(uniprotAc4, geneName4, taxId, listOfSecondInteractors4);
         parameters.add(parameters4);
 
         return parameters;

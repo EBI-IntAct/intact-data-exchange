@@ -34,7 +34,6 @@ import java.util.List;
 
 public class NonClusteredMitabFilter extends AbstractMitabFilter implements InteractionFilter {
 
-    private InteractionExporter exporter;
     protected IntactPsimiTabReader mitabReader;
 
     public NonClusteredMitabFilter(InteractionExporter exporter, String mitab){

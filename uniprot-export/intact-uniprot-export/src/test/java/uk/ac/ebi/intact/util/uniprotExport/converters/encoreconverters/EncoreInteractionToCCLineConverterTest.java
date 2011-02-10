@@ -4,9 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters2;
 
 import java.util.List;
 
@@ -42,12 +41,12 @@ public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
 
         List<String> ps = map.get(mp2);*/
 
-        CCParameters parameters = converter.convertInteractionsIntoCCLines(interactions, context, firstInteractor);
+        CCParameters2 parameters = converter.convertInteractionsIntoCCLines(interactions, context, firstInteractor);
         Assert.assertNotNull(parameters);
-        Assert.assertEquals("P28548", parameters.getFirstInteractor());
-        Assert.assertEquals("Kin-10", parameters.getFirstGeneName());
-        Assert.assertEquals("6239", parameters.getFirstTaxId());
-        Assert.assertEquals(3, parameters.getSecondCCInteractors().size());
+        Assert.assertEquals("P28548", parameters.getMasterUniprotAc());
+        Assert.assertEquals("Kin-10", parameters.getGeneName());
+        Assert.assertEquals("6239", parameters.getTaxId());
+        Assert.assertEquals(3, parameters.getSecondCCParameters().size());
 
     }
 }
