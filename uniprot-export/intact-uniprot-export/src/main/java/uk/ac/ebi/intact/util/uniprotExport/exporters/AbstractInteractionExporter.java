@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.exporters;
 
+import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
@@ -22,6 +23,9 @@ import java.util.Set;
  */
 
 public abstract class AbstractInteractionExporter implements InteractionExporter {
+
+    private static final Logger logger = Logger.getLogger(AbstractInteractionExporter.class);
+
     @Override
     public void exportInteractionsFrom(UniprotExportResults results) throws UniprotExportException {
         ExportContext context = results.getExportContext();
@@ -35,6 +39,7 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
             for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
                 if (canExportBinaryInteraction(entry.getValue(), context)){
+                    logger.info("Binary Interaction " + entry.getKey() + " has passed the export rules");
                     interactionsPossibleToExport.add(entry.getKey());
                 }
             }
@@ -43,6 +48,7 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
             for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
                 if (canExportEncoreInteraction(entry.getValue(), context)){
+                    logger.info("Binary Interaction " + entry.getKey() + " has passed the export rules");
                     interactionsPossibleToExport.add(entry.getKey());
                 }
             }

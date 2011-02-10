@@ -3,10 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.exporters.rules;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.InteractionDetectionMethod;
-import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Interaction;
@@ -269,7 +266,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         return numberOfExperiment;
     }
 
-    private int computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(String method, ExportContext context, BinaryInteraction interaction){
+    private int computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(String method, ExportContext context, BinaryInteraction interaction, Set<String> validIntactIds){
         Set<String> intactAcs = FilterUtils.extractIntactAcFrom(interaction.getInteractionAcs());
 
         Map<MethodAndTypePair, List<String>> invertedMap = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), intactAcs);
@@ -280,6 +277,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
             if (entry.getKey().getMethod().equals(method)){
                 numberOfExperiment += entry.getValue().size();
+                validIntactIds.addAll(entry.getValue());
             }
         }
 
@@ -356,8 +354,6 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     @Override
     public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context) throws UniprotExportException {
 
-        System.out.println("\t\t Interaction: Id:" + interaction.getId());
-
         //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
         Set<String> detectionMethods = interaction.getMethodToPubmed().keySet();
@@ -371,9 +367,11 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             int numberOfExperimentWithThisMethod = computeNumberOfExperimentsHavingDetectionMethod(method, context, interaction, validIntactIds);
 
             if (hasPassedInteractionDetectionMethodRules(method, numberOfExperimentWithThisMethod)){
+                logger.info("Binary Interaction " + interaction.getId() + " : the method " + method + " has passed the rules");
                 passRules = true;
             }
             else {
+                logger.info("Binary Interaction " + interaction.getId() + " : the method " + method + " doesn't pass the rules and will be removed");
                 removeInteractionEvidencesFrom(interaction, validIntactIds, context);
             }
         }
@@ -402,15 +400,25 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
         Set<InteractionDetectionMethod> detectionMethods = new HashSet(interaction.getDetectionMethods());
 
+        Set<String> validIntactIds = new HashSet<String>();
+        boolean passRules = false;
+
         for (InteractionDetectionMethod method : detectionMethods){
-            int numberOfExperimentWithThisMethod = computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(method.getIdentifier(), context, interaction);
+            validIntactIds.clear();
+            int numberOfExperimentWithThisMethod = computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(method.getIdentifier(), context, interaction, validIntactIds);
 
             if (hasPassedInteractionDetectionMethodRules(method.getIdentifier(), numberOfExperimentWithThisMethod)){
-                return true;
+                logger.info("The method " + method + " has passed the rules");
+
+                passRules = true;
+            }
+            else {
+                logger.info("The method " + method + " doesn't pass the rules and will be removed");
+                removeInteractionEvidencesFrom(interaction, validIntactIds, context);
             }
         }
 
-        return false;
+        return passRules;
     }
 
     protected void removeInteractionEvidencesFrom(EncoreInteraction encore, Set<String> validInteractions, ExportContext context){
@@ -419,7 +427,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         List<String> methodsToRemove = new ArrayList(encore.getMethodToPubmed().keySet());
         List<String> typesToRemove = new ArrayList(encore.getTypeToPubmed().keySet());
 
-        Collection<String> spokeExpandedInteractions = CollectionUtils.subtract(encore.getExperimentToPubmed().keySet(), validInteractions);
+        Collection<String> interactionsToRemove = CollectionUtils.subtract(encore.getExperimentToPubmed().keySet(), validInteractions);
 
         for (String interactionAc : validInteractions){
 
@@ -490,9 +498,49 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             entry.getValue().remove(pubmedsToRemove);
         }
 
-        for (String interactionAc : spokeExpandedInteractions){
+        for (String interactionAc : interactionsToRemove){
             encore.getExperimentToPubmed().remove(interactionAc);
             encore.getExperimentToDatabase().remove(interactionAc);
         }
+    }
+
+    protected void removeInteractionEvidencesFrom(BinaryInteraction<Interactor> binary, Set<String> validInteractions, ExportContext context){
+        List<CrossReference> interactionsToRemove = new ArrayList(binary.getInteractionAcs());
+        List<InteractionDetectionMethod> methodsToRemove = new ArrayList(binary.getDetectionMethods());
+        List<InteractionType> typesToRemove = new ArrayList(binary.getInteractionTypes());
+
+        for (String interaction : validInteractions){
+
+            MethodAndTypePair pair = context.getInteractionToMethod_type().get(interaction);
+
+            String detectionMI = pair.getMethod();
+
+            String typeMi = pair.getType();
+
+            for (InteractionDetectionMethod method : binary.getDetectionMethods()){
+                if (method.getIdentifier().equals(detectionMI)){
+                    methodsToRemove.remove(method);
+                    break;
+                }
+            }
+
+            for (InteractionType type : binary.getInteractionTypes()){
+                if (type.getIdentifier().equals(typeMi)){
+                    typesToRemove.remove(type);
+                    break;
+                }
+            }
+
+            for (CrossReference ref : binary.getInteractionAcs()){
+                if (ref.getIdentifier().equals(interaction)){
+                    interactionsToRemove.remove(ref);
+                    break;
+                }
+            }
+        }
+
+        binary.getDetectionMethods().removeAll(methodsToRemove);
+        binary.getInteractionTypes().removeAll(typesToRemove);
+        binary.getInteractionAcs().removeAll(interactionsToRemove);
     }
 }

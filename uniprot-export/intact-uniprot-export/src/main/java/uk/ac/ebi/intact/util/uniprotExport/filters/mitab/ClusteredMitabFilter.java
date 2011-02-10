@@ -149,14 +149,12 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements Interac
                         }
                         else if (!InteractionUtils.isBinaryInteraction(intact) && excludeSpokeExpanded){
                             context.getSpokeExpandedInteractions().add(intactAc);
-                            interaction.getInteractionAcs().remove(intactAc);
                             interactionsInIntactPassingExport.remove(intact);
                         }
                     }
                 }
             }
             else{
-                interaction.getInteractionAcs().remove(intactAc);
                 interactionsInIntactPassingExport.remove(intact);
             }
         }
@@ -233,7 +231,6 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements Interac
                 }
             }
             else{
-                interaction.getInteractionAcs().remove(intactAc);
                 interactionsInIntactPassingExport.remove(intact);
             }
         }
@@ -274,6 +271,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements Interac
 
     protected void removeNotExportedInteractionEvidencesFrom(BinaryInteraction<Interactor> binary, List<InteractionImpl> exportedInteractionEvidences){
         List<CrossReference> publicationsToRemove = new ArrayList(binary.getPublications());
+        List<CrossReference> interactionsToRemove = new ArrayList(binary.getInteractionAcs());
         List<InteractionDetectionMethod> methodsToRemove = new ArrayList(binary.getDetectionMethods());
         List<InteractionType> typeToRemove = new ArrayList(binary.getInteractionTypes());
 
@@ -296,6 +294,13 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements Interac
                 }
             }
 
+            for (CrossReference ref : binary.getInteractionAcs()){
+                if (ref.getIdentifier().equals(interaction.getAc())){
+                    interactionsToRemove.remove(ref);
+                    break;
+                }
+            }
+
             for (InteractionDetectionMethod method : binary.getDetectionMethods()){
                 if (method.getIdentifier().equals(detectionMI)){
                     methodsToRemove.remove(method);
@@ -314,6 +319,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements Interac
         binary.getPublications().removeAll(publicationsToRemove);
         binary.getDetectionMethods().removeAll(methodsToRemove);
         binary.getInteractionTypes().removeAll(typeToRemove);
+        binary.getInteractionAcs().removeAll(interactionsToRemove);
     }
 
     public MiClusterScoreResults exportInteractionsFrom(String mitab) throws UniprotExportException {

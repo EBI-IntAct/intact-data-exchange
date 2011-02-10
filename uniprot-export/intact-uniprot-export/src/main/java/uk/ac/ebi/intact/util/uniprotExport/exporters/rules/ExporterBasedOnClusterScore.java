@@ -60,7 +60,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
      * @return the computed Mi cluster score for this interaction
      */
     private double getMiClusterScoreFor(BinaryInteraction interaction){
-        List<psidev.psi.mi.tab.model.Confidence> confidenceValues = interaction.getConfidenceValues();
+        List<Confidence> confidenceValues = interaction.getConfidenceValues();
         return extractMiClusterScoreFrom(confidenceValues);
     }
 
@@ -89,7 +89,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
                     String method = context.getInteractionToMethod_type().get(ac).getMethod();
 
                     if (!method.equals(COLOCALIZATION)){
-                        logger.info("The interaction " + encore.getId() + " passed the export rules");
+                        logger.info("The interaction " + encore.getId() + " passed the export rules with score = " + score);
                         return true;
                     }
                 }
@@ -119,7 +119,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
                     String method = context.getInteractionToMethod_type().get(ac).getMethod();
 
                     if (!method.equals(COLOCALIZATION)){
-                        logger.info("The interaction " + ac + " passed the export rules");
+                        logger.info("The interaction " + ac + " passed the export rules with score = " + score);
 
                         return true;
                     }
