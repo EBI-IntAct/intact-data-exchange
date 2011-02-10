@@ -1,12 +1,15 @@
 package uk.ac.ebi.intact.util.uniprotExport.exporters.rules;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.InteractionDetectionMethod;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.util.uniprotExport.CvInteractionStatus;
 import uk.ac.ebi.intact.util.uniprotExport.LineExport;
@@ -14,15 +17,12 @@ import uk.ac.ebi.intact.util.uniprotExport.LineExportConfig;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.AbstractInteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.QueryFactory;
-import uk.ac.ebi.intact.util.uniprotExport.filters.IntactFilter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
-import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
-import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.results.contexts.ExportContext;
-import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
+import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
+import uk.ac.ebi.intact.util.uniprotExport.results.contexts.ExportContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.io.FileWriter;
@@ -43,6 +43,7 @@ import java.util.*;
  * @since <pre>01/02/11</pre>
  */
 public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter {
+    private static final Logger logger = Logger.getLogger(ExporterBasedOnDetectionMethod.class);
 
     private QueryFactory queryProvider;
     protected LineExportConfig config;
@@ -190,9 +191,6 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
                 }
             }
         }
-
-        System.out.println("\t\t CvInteractionExport status: " + status);
-
         return status;
     }
 
@@ -244,16 +242,11 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
             // the interaction exists in IntAct
             if (interaction != null){
-                System.out.println("\t\t Interaction: Shortlabel:" + interaction.getShortLabel() + "  AC: " + interaction.getAc());
+                logger.info("\t\t Interaction: Shortlabel:" + interaction.getShortLabel() + "  AC: " + interaction.getAc());
 
                 if (InteractionUtils.isBinaryInteraction(interaction)){
                     eligibleInteractions.add(interactionAc);
                 }
-            }
-            // the interaction doesn't exist in IntAct
-            else {
-                System.out.println("\t\t\t That interaction "+interactionAc +" is null, skip it.");
-                continue; // skip that interaction
             }
             IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
         } // i
@@ -306,6 +299,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
                 if (canExportBinaryInteraction(entry.getValue(), context)){
+                    logger.info("Binary interaction " + entry.getKey() + "passed the export rules.");
                     eligibleInteractions.add(entry.getKey());
                 }
             }
@@ -314,153 +308,11 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
                 if (canExportEncoreInteraction(entry.getValue(), context)){
+                    logger.info("Binary interaction " + entry.getKey() + "passed the export rules.");
                     eligibleInteractions.add(entry.getKey());
                 }
             }
         }
-    }
-
-    /**
-     * Apply the rules on interaction detection method for all the interactions with two uniprot proteis
-     * @param cluster
-     * @param eligibleInteractions
-     */
-    private void filterNoUniprotProteinsAndProcessEligibleExperiments(IntActInteractionClusterScore cluster, MiClusterContext context, List<Integer> eligibleInteractions) {
-
-        // process each interaction of the list
-        for (Map.Entry<Integer, EncoreInteraction> interactionEntry : cluster.getInteractionMapping().entrySet()) {
-
-            EncoreInteraction interaction = interactionEntry.getValue();
-
-            // get the Encore interaction object
-            if (interaction != null){
-                System.out.println("\t\t Interaction: Id:" + interaction.getId());
-
-                String A = interaction.getInteractorA(IntactFilter.UNIPROT_DATABASE);
-                String B = interaction.getInteractorB(IntactFilter.UNIPROT_DATABASE);
-
-                if (A != null && B!= null){
-                    //Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
-
-                    //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-
-                    Set<String> detectionMethods = interaction.getMethodToPubmed().keySet();
-                    Set<String> validIntactIds = new HashSet<String>();
-
-                    for (String method : detectionMethods){
-                        validIntactIds.clear();
-
-                        int numberOfExperimentWithThisMethod = computeNumberOfExperimentsHavingDetectionMethod(method, context, interaction, validIntactIds);
-
-                        if (hasPassedInteractionDetectionMethodRules(method, numberOfExperimentWithThisMethod)){
-                            eligibleInteractions.add(interactionEntry.getKey());
-                            break;
-                        }
-                    }
-
-                    /*Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
-                    Set<Experiment> experiments = new HashSet<Experiment>();
-
-                    for (Interaction inter : interactions){
-                        experiments.addAll(inter.getExperiments());
-                    }
-
-                    for (Iterator iterator2 = experiments.iterator(); iterator2.hasNext();) {
-                        Experiment experiment = (Experiment) iterator2.next();
-
-                        if (hasPassedInteractionDetectionMethodRules(experiment.getCvInteraction(), experiments)){
-                            eligibleInteractions.add(interactionEntry.getKey());
-                            break;
-                        }
-                    } // i's experiments*/
-                    //IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
-                }
-            }
-        } // i
-    }
-
-    /**
-     * This method will get the interactions from released experiment which can be processed for uniprot export and which passed the
-     * dr export constraints at the level of the experiment. Write the interaction accessions in a file
-     * @param fileForListOfInteractions
-     * @return the list of interaction Acs which are elligible for uniprot export
-     * @throws java.sql.SQLException
-     * @throws java.io.IOException
-     */
-    public List<String> filterOnNonUnprotProteinsAndCollectInteractionsFromReleasedExperiments(String fileForListOfInteractions) throws SQLException, IOException {
-
-        List<String> interactionsToBeProcessedForExport = this.queryProvider.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
-
-        System.out.println(interactionsToBeProcessedForExport.size() + " will be processed for a possible uniprot export.");
-
-        FileWriter writer = new FileWriter(fileForListOfInteractions);
-
-        for (String ac : interactionsToBeProcessedForExport){
-            writer.write(ac + "\n");
-            writer.flush();
-        }
-
-        writer.close();
-        System.out.println(interactionsToBeProcessedForExport.size() + " will be kept for Mi scoring.");
-
-        return interactionsToBeProcessedForExport;
-    }
-
-    /**
-     * Collect all the interactions from released experiments which passed the dr-export filter but can contain non uniprot proteins
-     * @param fileForListOfInteractions
-     * @return
-     * @throws SQLException
-     * @throws IOException
-     */
-    public List<String> collectAllInteractionsFromReleasedExperiments(String fileForListOfInteractions) throws SQLException, IOException {
-
-        List<String> interactionsToBeProcessedForExport = this.queryProvider.getInteractionAcsFromReleasedExperimentsContainingNoUniprotProteinsToBeProcessedForUniprotExport();
-
-        System.out.println(interactionsToBeProcessedForExport.size() + " will be processed for a possible uniprot export.");
-
-        FileWriter writer = new FileWriter(fileForListOfInteractions);
-
-        for (String ac : interactionsToBeProcessedForExport){
-            writer.write(ac + "\n");
-            writer.flush();
-        }
-
-        writer.close();
-
-        return interactionsToBeProcessedForExport;
-    }
-
-    /**
-     *
-     * @param cluster
-     * @param fileForListOfInteractions
-     * @return the list of Encore interaction ids which can be exported in uniprot. The mi score has been computed for the interactions which passed the dr export constraints at the level of the experiment
-     * Write the interaction accessions in a file
-     * @throws SQLException
-     * @throws IOException
-     */
-    public Set<Integer> extractEligibleInteractionsFrom(IntActInteractionClusterScore cluster, MiClusterContext context, String fileForListOfInteractions) throws SQLException, IOException, UniprotExportException {
-
-        System.out.println(cluster.getInteractionMapping().size() + " interactions to process.");
-        Set<Integer> eligibleInteractions = new HashSet<Integer>();
-
-        processEligibleExperiments(cluster, context, eligibleInteractions);
-
-        FileWriter writer = new FileWriter(fileForListOfInteractions);
-
-        for (Integer id : eligibleInteractions){
-            EncoreInteraction interaction = cluster.getInteractionMapping().get(id);
-
-            Map<String, String> refs = interaction.getExperimentToPubmed();
-            for (String ref : refs.keySet()){
-                writer.write(ref + "\n");
-                writer.flush();
-            }
-        }
-
-        writer.close();
-        return eligibleInteractions;
     }
 
     /**

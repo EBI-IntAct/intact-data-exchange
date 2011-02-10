@@ -89,7 +89,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
                     String method = context.getInteractionToMethod_type().get(ac).getMethod();
 
                     if (!method.equals(COLOCALIZATION)){
-                        logger.info("The interaction " + encore.getId() + " passes the export rules");
+                        logger.info("The interaction " + encore.getId() + " passed the export rules");
                         return true;
                     }
                 }
@@ -119,6 +119,8 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
                     String method = context.getInteractionToMethod_type().get(ac).getMethod();
 
                     if (!method.equals(COLOCALIZATION)){
+                        logger.info("The interaction " + ac + " passed the export rules");
+
                         return true;
                     }
                 }
