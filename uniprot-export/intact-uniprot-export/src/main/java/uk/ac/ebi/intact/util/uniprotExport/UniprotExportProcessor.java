@@ -118,7 +118,7 @@ public class UniprotExportProcessor {
 
         Map<Integer, EncoreInteraction> interactionMapping = results.getCluster().getEncoreInteractionCluster();
 
-        for (Integer interactionId : interactionMapping.keySet()){
+        for (Integer interactionId : results.getInteractionsToExport()){
             logger.info("Write GO lines for " + interactionId);
 
             EncoreInteraction interaction = interactionMapping.get(interactionId);
