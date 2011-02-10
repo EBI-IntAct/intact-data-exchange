@@ -259,7 +259,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         } // i
     }
 
-    private int computeNumberOfExperimentsHavingDetectionMethod(String method, ExportContext context, EncoreInteraction interaction){
+    private int computeNumberOfExperimentsHavingDetectionMethod(String method, ExportContext context, EncoreInteraction interaction, Set<String> validIntactIds){
 
         Map<MethodAndTypePair, List<String>> invertedMap = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), interaction.getExperimentToPubmed().keySet());
 
@@ -269,6 +269,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
             if (entry.getKey().getMethod().equals(method)){
                 numberOfExperiment += entry.getValue().size();
+                validIntactIds.addAll(entry.getValue());
             }
         }
 
@@ -344,9 +345,12 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
                     //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
                     Set<String> detectionMethods = interaction.getMethodToPubmed().keySet();
+                    Set<String> validIntactIds = new HashSet<String>();
 
                     for (String method : detectionMethods){
-                        int numberOfExperimentWithThisMethod = computeNumberOfExperimentsHavingDetectionMethod(method, context, interaction);
+                        validIntactIds.clear();
+
+                        int numberOfExperimentWithThisMethod = computeNumberOfExperimentsHavingDetectionMethod(method, context, interaction, validIntactIds);
 
                         if (hasPassedInteractionDetectionMethodRules(method, numberOfExperimentWithThisMethod)){
                             eligibleInteractions.add(interactionEntry.getKey());
@@ -502,28 +506,23 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
         System.out.println("\t\t Interaction: Id:" + interaction.getId());
 
-        Collection<String> interactionsAcs = interaction.getExperimentToPubmed().keySet();
-        Set<String> trueBinaryInteractions = new HashSet<String>();
-
-        for (String intactAc : interactionsAcs){
-            if (!context.getSpokeExpandedInteractions().contains(intactAc)){
-                trueBinaryInteractions.add(intactAc);
-            }
-        }
-
-        if (trueBinaryInteractions.size() < interactionsAcs.size()){
-            removeSpokeExpandedInteractionEvidencesFrom(interaction, trueBinaryInteractions, context);
-        }
-
         //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
         Set<String> detectionMethods = interaction.getMethodToPubmed().keySet();
 
+        boolean passRules = false;
+
+        Set<String> validIntactIds = new HashSet<String>();
+
         for (String method : detectionMethods){
-            int numberOfExperimentWithThisMethod = computeNumberOfExperimentsHavingDetectionMethod(method, context, interaction);
+            validIntactIds.clear();
+            int numberOfExperimentWithThisMethod = computeNumberOfExperimentsHavingDetectionMethod(method, context, interaction, validIntactIds);
 
             if (hasPassedInteractionDetectionMethodRules(method, numberOfExperimentWithThisMethod)){
-                return true;
+                passRules = true;
+            }
+            else {
+                removeInteractionEvidencesFrom(interaction, validIntactIds, context);
             }
         }
         /*Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
@@ -543,7 +542,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
      } // i's experiments*/
         //IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
 
-        return false;
+        return passRules;
     }
 
     @Override
@@ -562,15 +561,15 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         return false;
     }
 
-    protected void removeSpokeExpandedInteractionEvidencesFrom(EncoreInteraction encore, Set<String> trueBinaryInteractions, ExportContext context){
+    protected void removeInteractionEvidencesFrom(EncoreInteraction encore, Set<String> validInteractions, ExportContext context){
         List<CrossReference> publicationsToRemove = new ArrayList(encore.getPublicationIds());
         List<String> publicationIdsToKeep = new ArrayList<String>(encore.getPublicationIds().size());
         List<String> methodsToRemove = new ArrayList(encore.getMethodToPubmed().keySet());
         List<String> typesToRemove = new ArrayList(encore.getTypeToPubmed().keySet());
 
-        Collection<String> spokeExpandedInteractions = CollectionUtils.subtract(encore.getExperimentToPubmed().keySet(), trueBinaryInteractions);
+        Collection<String> spokeExpandedInteractions = CollectionUtils.subtract(encore.getExperimentToPubmed().keySet(), validInteractions);
 
-        for (String interactionAc : trueBinaryInteractions){
+        for (String interactionAc : validInteractions){
 
             MethodAndTypePair pair = context.getInteractionToMethod_type().get(interactionAc);
 
