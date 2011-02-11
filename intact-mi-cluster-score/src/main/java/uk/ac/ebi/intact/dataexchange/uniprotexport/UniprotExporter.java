@@ -9,6 +9,8 @@ import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportProcessor;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
+import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
+import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.filters.mitab.NonClusteredMitabFilter;
 
 import java.io.IOException;
@@ -50,6 +52,20 @@ public class UniprotExporter {
         int version = Integer.parseInt(args[6]);
 
         IntactContext.initContext(new String[]{"/META-INF/" + database + ".spring.xml"});
+        FilterConfig config = FilterContext.getInstance().getConfig();
+
+        //if (version ==1){
+            //config.setExcludeLowConfidenceInteractions(true);
+            //config.setExcludeNegativeInteractions(true);
+            //config.setExcludeNonUniprotInteractors(true);
+            //config.setExcludeSpokeExpandedInteractions(true);
+        //}
+        //else{
+            config.setExcludeLowConfidenceInteractions(true);
+            config.setExcludeNegativeInteractions(false);
+            config.setExcludeNonUniprotInteractors(true);
+            config.setExcludeSpokeExpandedInteractions(true);
+        //}
 
         final ExporterRule rule = InteractionExporterFactory.convertIntoExporterRule(args[0]);
 
