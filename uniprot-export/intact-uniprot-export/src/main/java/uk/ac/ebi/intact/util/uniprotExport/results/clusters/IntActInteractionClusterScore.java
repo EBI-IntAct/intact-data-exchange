@@ -220,12 +220,13 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
                     double score = FilterUtils.getMiClusterScoreFor(eI);
 
                     // write score in a text file
-                    fstream.write(eI.getId());
+                    fstream.write(Integer.toString(eI.getId()));
                     fstream.write("-");
                     fstream.write(eI.getInteractorA());
                     fstream.write("-");
                     fstream.write(eI.getInteractorB());
                     fstream.write(":" + score);
+                    fstream.write("\n");
                     fstream.flush();
 
                     BinaryInteraction bI = iConverter.getBinaryInteraction(eI);

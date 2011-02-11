@@ -86,12 +86,13 @@ public class BinaryClusterScore implements IntactCluster {
                     double score = FilterUtils.getMiClusterScoreFor(eI);
 
                     // write score in a text file
-                    fstream.write(mappingId);
+                    fstream.write(Integer.toString(mappingId));
                     fstream.write("-");
                     fstream.write(eI.getInteractorA().getIdentifiers().iterator().next().getIdentifier());
                     fstream.write("-");
                     fstream.write(eI.getInteractorB().getIdentifiers().iterator().next().getIdentifier());
                     fstream.write(":" + score);
+                    fstream.write("\n");
                     fstream.flush();
 
                     writer.writeOrAppend(eI, file, false);
@@ -132,12 +133,13 @@ public class BinaryClusterScore implements IntactCluster {
                     double score = FilterUtils.getMiClusterScoreFor(eI);
 
                     // write score in a text file
-                    fstream.write(mappingId);
+                    fstream.write(Integer.toString(mappingId));
                     fstream.write("-");
                     fstream.write(eI.getInteractorA().getIdentifiers().iterator().next().getIdentifier());
                     fstream.write("-");
                     fstream.write(eI.getInteractorB().getIdentifiers().iterator().next().getIdentifier());
                     fstream.write(":" + score);
+                    fstream.write("\n");
                     fstream.flush();
 
                     writer.writeOrAppend(eI, file, false);

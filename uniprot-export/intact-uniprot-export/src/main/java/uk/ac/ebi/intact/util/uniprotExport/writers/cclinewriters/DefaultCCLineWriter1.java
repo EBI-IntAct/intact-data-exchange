@@ -96,7 +96,7 @@ public class DefaultCCLineWriter1 implements CCLineWriter1  {
             writer.write(';');
             writer.write(' ');
             writer.write("NbExp=");
-            writer.write(secondInteractor.getNumberOfInteractionEvidences());
+            writer.write(Integer.toString(secondInteractor.getNumberOfInteractionEvidences()));
             writer.write(';');
             writer.write(' ');
             writer.write("IntAct=");

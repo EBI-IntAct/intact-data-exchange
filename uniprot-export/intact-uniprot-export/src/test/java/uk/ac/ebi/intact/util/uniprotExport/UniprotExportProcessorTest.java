@@ -1,12 +1,16 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
 import uk.ac.ebi.intact.util.uniprotExport.filters.IntactFilter;
+import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
+
+import java.io.IOException;
 
 /**
  * Tester of the uniprot export processor
@@ -21,7 +25,8 @@ public class UniprotExportProcessorTest extends UniprotExportBase{
     @Test
     @DirtiesContext
     @Transactional(propagation = Propagation.NEVER)
-    public void test_simulation() throws UniprotExportException {
+    @Ignore
+    public void test_simulation() throws UniprotExportException, IOException {
         createExperimentContext();
 
         Assert.assertEquals(4, getDaoFactory().getInteractionDao().getAll().size());
@@ -30,8 +35,13 @@ public class UniprotExportProcessorTest extends UniprotExportBase{
         IntactFilter filter = new IntactFilter(new ExporterBasedOnDetectionMethod());
 
         UniprotExportProcessor processor = new UniprotExportProcessor(filter);
+        MiClusterScoreResults results = createMiScoreResultsForDetectionMethodExport();
+        results.getInteractionsToExport().add(1);
+        results.getInteractionsToExport().add(2);
+        results.getInteractionsToExport().add(3);
+        processor.exportDRAndCCLines(results, "drFile", "ccFile", 1);
 
-        processor.runUniprotExport("test1", "test2", "test3", 1);
+        results.getCluster().saveClusteredInteractions("interactions", results.getInteractionsToExport());
 
     }
 }

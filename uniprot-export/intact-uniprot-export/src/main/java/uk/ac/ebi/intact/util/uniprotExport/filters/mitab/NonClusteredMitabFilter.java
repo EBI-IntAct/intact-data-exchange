@@ -169,7 +169,10 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
             MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
             context.getInteractionToMethod_type().put(intactAc, entry);
 
-
+            interaction.getInteractorA().getAlternativeIdentifiers().clear();
+            interaction.getInteractorA().getAliases().clear();
+            interaction.getInteractorB().getAlternativeIdentifiers().clear();
+            interaction.getInteractorB().getAliases().clear();
 
             if (!interaction.getExpansionMethods().isEmpty() && !excludedSpokeExpanded){
                 logger.info(intactAc + " passes the filters");
