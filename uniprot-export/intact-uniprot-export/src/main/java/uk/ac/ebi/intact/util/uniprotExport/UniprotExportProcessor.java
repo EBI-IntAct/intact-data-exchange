@@ -7,8 +7,6 @@ import uk.ac.ebi.intact.util.uniprotExport.converters.InteractorToDRLineConverte
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
-import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
-import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters2;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
@@ -54,20 +52,6 @@ public class UniprotExportProcessor {
     }
 
     public void runUniprotExport(String DRFile, String CCFile, String GOFile, int version) throws UniprotExportException {
-        FilterConfig config = FilterContext.getInstance().getConfig();
-
-        if (version ==1){
-            config.setExcludeLowConfidenceInteractions(true);
-            config.setExcludeNegativeInteractions(true);
-            config.setExcludeNonUniprotInteractors(true);
-            config.setExcludeSpokeExpandedInteractions(true);
-        }
-        else{
-            config.setExcludeLowConfidenceInteractions(true);
-            config.setExcludeNegativeInteractions(false);
-            config.setExcludeNonUniprotInteractors(true);
-            config.setExcludeSpokeExpandedInteractions(false);
-        }
 
         logger.info("Export binary interactions from IntAct");
         MiClusterScoreResults results = filter.exportInteractions();

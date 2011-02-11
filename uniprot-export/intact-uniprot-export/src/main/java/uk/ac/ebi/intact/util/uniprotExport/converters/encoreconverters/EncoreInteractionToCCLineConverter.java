@@ -186,7 +186,7 @@ public class EncoreInteractionToCCLineConverter {
      */
     public CCParameters2 convertInteractionsIntoCCLinesVersion2(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
-        String geneName1 = context.getGeneNames().get(firstInteractor);
+        String geneName1 = null;
         String taxId1 = null;
 
         List<SecondCCParameters2> secondCCInteractors = new ArrayList<SecondCCParameters2>(interactions.size());
@@ -230,6 +230,7 @@ public class EncoreInteractionToCCLineConverter {
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
+                        geneName1 = context.getGeneNames().get(uniprot1);
                         taxId2 = organismsB[0];
                         organism2 = organismsB[1];
                         secondIntactAc = intact2;
@@ -241,6 +242,7 @@ public class EncoreInteractionToCCLineConverter {
                         firstUniprot = uniprot2;
                         secondUniprot = uniprot1;
                         geneName2 = context.getGeneNames().get(uniprot1);
+                        geneName1 = context.getGeneNames().get(uniprot2);
                         taxId2 = organismsA[0];
                         organism2 = organismsA[1];
                         secondIntactAc = intact1;
@@ -254,6 +256,7 @@ public class EncoreInteractionToCCLineConverter {
                         SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
 
                         if (!sortedInteractionDetails.isEmpty()){
+                            logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
                             SecondCCParameters2 secondCCInteractor = new DefaultSecondCCInteractor2(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
                             secondCCInteractors.add(secondCCInteractor);
                         }
@@ -283,7 +286,7 @@ public class EncoreInteractionToCCLineConverter {
 
     public CCParameters1 convertInteractionsIntoCCLinesVersion1(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
-        String geneName1 = context.getGeneNames().get(firstInteractor);
+        String geneName1 = null;
         String taxId1 = null;
 
         List<SecondCCParameters1> secondCCInteractors = new ArrayList<SecondCCParameters1>(interactions.size());
@@ -324,6 +327,7 @@ public class EncoreInteractionToCCLineConverter {
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
+                        geneName1 = context.getGeneNames().get(uniprot1);
                         taxId2 = organismsB[0];
                         secondIntactAc = intact2;
 
@@ -334,6 +338,7 @@ public class EncoreInteractionToCCLineConverter {
                         firstUniprot = uniprot2;
                         secondUniprot = uniprot1;
                         geneName2 = context.getGeneNames().get(uniprot1);
+                        geneName1 = context.getGeneNames().get(uniprot2);
                         taxId2 = organismsA[0];
                         secondIntactAc = intact1;
 
@@ -345,6 +350,8 @@ public class EncoreInteractionToCCLineConverter {
                         int numberEvidences = interaction.getExperimentToPubmed().size();
 
                         if (numberEvidences > 0){
+                            logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
+
                             SecondCCParameters1 secondCCInteractor = new DefaultSecondCCParameters1(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
                             secondCCInteractors.add(secondCCInteractor);
                         }
