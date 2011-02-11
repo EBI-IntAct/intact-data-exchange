@@ -94,15 +94,12 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements Interac
 
             if (!intactAcs.isEmpty()){
                 if (excludeSpokeExpanded && excludeNonUniprotInteractors && uniprotA != null && uniprotB != null){
-                    logger.info("processing binary interaction " + binaryIdentifier);
                     processClustering(clusterScore, context, binaryIdentifier, interaction, intactAcs, interactorA, uniprotA, interactorB, uniprotB);
                 }
                 else if (excludeNonUniprotInteractors && uniprotA != null && uniprotB != null){
-                    logger.info("processing binary interaction " + binaryIdentifier);
                     processClustering(clusterScore, context, binaryIdentifier, interaction, intactAcs, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded);
                 }
                 else if (!excludeNonUniprotInteractors){
-                    logger.info("processing binary interaction " + binaryIdentifier);
                     processClustering(clusterScore, context, binaryIdentifier, interaction, intactAcs, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded);
                 }
             }

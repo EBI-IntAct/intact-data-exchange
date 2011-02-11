@@ -174,15 +174,13 @@ public class UniprotExportProcessor {
             ccWriter2 = new DefaultCCLineWriter2(new FileWriter(CCFile));
         }
 
-        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
-
         if (!interactors.isEmpty()){
             String parentAc = null;
             Map<Integer, EncoreInteraction> interactionMapping = results.getCluster().getEncoreInteractionCluster();
+            List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
+            int numberInteractions = 0;
 
             for (String interactor : interactors){
-                interactions.clear();
-                int numberInteractions = 0;
 
                 if (parentAc == null){
                     parentAc = interactor;

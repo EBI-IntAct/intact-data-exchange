@@ -39,7 +39,6 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
             for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
                 if (canExportBinaryInteraction(entry.getValue(), context)){
-                    logger.info("Binary Interaction " + entry.getKey() + " has passed the export rules");
                     interactionsPossibleToExport.add(entry.getKey());
                 }
             }
@@ -48,7 +47,6 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
             for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
                 if (canExportEncoreInteraction(entry.getValue(), context)){
-                    logger.info("Binary Interaction " + entry.getKey() + " has passed the export rules");
                     interactionsPossibleToExport.add(entry.getKey());
                 }
             }
