@@ -297,7 +297,6 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
                 if (canExportBinaryInteraction(entry.getValue(), context)){
-                    logger.info("Binary interaction " + entry.getKey() + "passed the export rules.");
                     eligibleInteractions.add(entry.getKey());
                 }
             }
@@ -306,7 +305,6 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
                 if (canExportEncoreInteraction(entry.getValue(), context)){
-                    logger.info("Binary interaction " + entry.getKey() + "passed the export rules.");
                     eligibleInteractions.add(entry.getKey());
                 }
             }
@@ -356,7 +354,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
         //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
-        Set<String> detectionMethods = interaction.getMethodToPubmed().keySet();
+        Set<String> detectionMethods = new HashSet(interaction.getMethodToPubmed().keySet());
 
         boolean passRules = false;
 

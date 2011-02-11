@@ -144,13 +144,13 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
             context.getInteractionToMethod_type().put(intactAc, entry);
 
             if (!interaction.getExpansionMethods().isEmpty() && !excludedSpokeExpanded){
-                logger.info(intactAc + "passes the filters");
+                logger.info(intactAc + " passes the filters");
                 interactionToProcess.add(interaction);
 
                 context.getSpokeExpandedInteractions().add(intactAc);
             }
             else if (interaction.getExpansionMethods().isEmpty()) {
-                logger.info(intactAc + "passes the filters");
+                logger.info(intactAc + " passes the filters");
                 interactionToProcess.add(interaction);
             }
             else if (!interaction.getExpansionMethods().isEmpty()){
@@ -161,7 +161,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
 
     private void processClustering(MiClusterContext context, List<BinaryInteraction> interactionToProcess, IntactBinaryInteraction interaction, String intactAc, ExtendedInteractor interactorA, String uniprotA, ExtendedInteractor interactorB, String uniprotB) {
         if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
-            logger.info(intactAc + "passes the filters");
+            logger.info(intactAc + " passes the filters");
             interactionToProcess.add(interaction);
 
             FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
