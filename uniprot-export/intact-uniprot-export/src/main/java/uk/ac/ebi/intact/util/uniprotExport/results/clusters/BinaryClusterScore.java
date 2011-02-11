@@ -3,16 +3,17 @@ package uk.ac.ebi.intact.util.uniprotExport.results.clusters;
 import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.Binary2Encore;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Cluster containing binary interactions
@@ -68,17 +69,6 @@ public class BinaryClusterScore implements IntactCluster {
 
     @Override
     public void saveCluster(String fileName) {
-        String scoreListCSV = getScoresPerInteraction();
-        try{
-            // Create file
-            FileWriter fstream = new FileWriter(fileName + ".txt");
-            BufferedWriter out = new BufferedWriter(fstream);
-            out.write(scoreListCSV);
-            //Close the output stream
-            out.close();
-        }catch (Exception e){//Catch exception if any
-            logger.error("Error: " + e.getMessage());
-        }
 
         /* Retrieve results */
 
@@ -86,84 +76,35 @@ public class BinaryClusterScore implements IntactCluster {
 
         try {
             File file = new File(fileName);
+            FileWriter fstream = new FileWriter(fileName + ".txt");
 
             for(Integer mappingId:interactionMapping.keySet()){
-                BinaryInteraction eI = interactionMapping.get(mappingId);
+                BinaryInteraction<Interactor> eI = interactionMapping.get(mappingId);
+
+                // convert and write in mitab
                 if (eI != null){
+                    double score = FilterUtils.getMiClusterScoreFor(eI);
+
+                    // write score in a text file
+                    fstream.write(mappingId);
+                    fstream.write("-");
+                    fstream.write(eI.getInteractorA().getIdentifiers().iterator().next().getIdentifier());
+                    fstream.write("-");
+                    fstream.write(eI.getInteractorB().getIdentifiers().iterator().next().getIdentifier());
+                    fstream.write(":" + score);
+                    fstream.flush();
+
                     writer.writeOrAppend(eI, file, false);
                 }
             }
+
+            //Close the output stream
+            fstream.close();
 
         } catch (Exception e) {
             logger.error("It is not possible to write the results in the mitab file " + fileName);
             e.printStackTrace();
         }
-    }
-
-    /**
-     *
-     * @return a list of formatted scores for each interaction
-     */
-    public String getScorePerInteractions(Collection<Integer> interactionIds, String scoreListCSV, String[] scoreList){
-        if(scoreList == null){
-            int scoreListSize = interactionIds.size();
-            scoreList = new String[scoreListSize];
-            scoreListCSV = "";
-            String delimiter = "\n";
-
-            int i = 0;
-            for (Integer eId : interactionIds){
-                BinaryInteraction bI = this.getBinaryInteractionCluster().get(eId);
-
-                if (bI != null){
-                    List<Confidence> confidenceValues = bI.getConfidenceValues();
-                    Double score = null;
-                    for(Confidence confidenceValue:confidenceValues){
-                        if(confidenceValue.getType().equalsIgnoreCase("intactPsiscore")){
-                            score = Double.parseDouble(confidenceValue.getValue());
-                        }
-                    }
-
-                    scoreList[i] = eId + "-" +bI.getInteractorA().toString() + "-" + bI.getInteractorB().toString() + ":" + score;
-                    scoreListCSV = scoreListCSV + scoreList[i];
-                    i++;
-                    if(scoreListSize > i){
-                        scoreListCSV = scoreListCSV + delimiter;
-                    }
-                }
-            }
-        }
-        return scoreListCSV;
-    }
-
-    /**
-     *
-     * @return a list of formatted scores for each interaction
-     */
-    public String getScoresPerInteraction(){
-
-        int scoreListSize = this.getBinaryInteractionCluster().size();
-        String [] scoreList = new String[scoreListSize];
-        String scoreListCSV = "";
-        String delimiter = "\n";
-        int i = 0;
-        for(Map.Entry<Integer, BinaryInteraction<Interactor>> eI:this.getBinaryInteractionCluster().entrySet()){
-            List<Confidence> confidenceValues = eI.getValue().getConfidenceValues();
-            Double score = null;
-            for(Confidence confidenceValue:confidenceValues){
-                if(confidenceValue.getType().equalsIgnoreCase("intactPsiscore")){
-                    score = Double.parseDouble(confidenceValue.getValue());
-                }
-            }
-
-            scoreList[i] = eI.getKey() + "-" + eI.getValue().getInteractorA().getIdentifiers().iterator().next().getIdentifier() + "-" + eI.getValue().getInteractorB().getIdentifiers().iterator().next().getIdentifier() + ":" + score;
-            scoreListCSV = scoreListCSV + scoreList[i];
-            i++;
-            if(scoreListSize > i){
-                scoreListCSV = scoreListCSV + delimiter;
-            }
-        }
-        return scoreListCSV;
     }
 
     /**
