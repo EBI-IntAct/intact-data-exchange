@@ -106,10 +106,7 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
         Assert.assertEquals( 3, smallMolecule.getAnnotations().size() );
         assertHasAnnotation( smallMolecule, "function", "tyrosine kinase inhibitor" );
         assertHasAnnotation( smallMolecule, "function", "antineoplastic agent" );
-        assertHasAnnotation( smallMolecule, "inchi id", "InChI=1/C29H31N7O/c1-21-5-10-25(18-27(21)34-29-31-13-11-26(33-" +
-                                                        "29)24-4-3-12-30-19-24)32-28(37)23-8-6-22(7-9-23)20-36-16-14-35" +
-                                                        "(2)15-17-36/h3-13,18-19H,14-17,20H2,1-2H3,(H,32,37)(H,31,33,34" +
-                                                        ")/f/h32,34H" );
+        assertHasAnnotation( smallMolecule, "inchi id", "InChI=1S/C29H31N7O/c1-21-5-10-25(18-27(21)34-29-31-13-11-26(33-29)24-4-3-12-30-19-24)32-28(37)23-8-6-22(7-9-23)20-36-16-14-35(2)15-17-36/h3-13,18-19H,14-17,20H2,1-2H3,(H,32,37)(H,31,33,34)" );
         assertHasAlias( smallMolecule, "iupac name", "4-[(4-methylpiperazin-1-yl)methyl]-N-{4-methyl-3-" +
                                                      "[(4-pyridin-3-ylpyrimidin-2-yl)amino]phenyl}benzamide" );
 
@@ -143,20 +140,16 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
         Assert.assertTrue( config.isUpdateSmallMolecules() );
         Assert.assertTrue( config.isUpdateSmallMoleculeChebiXrefs() );
 
-        final SmallMolecule smallMolecule = getMockBuilder().createSmallMolecule( "CHEBI:11930", "imatinib" );
+        final SmallMolecule smallMolecule = getMockBuilder().createSmallMolecule( "CHEBI:45781", "imatinib" );
         Assert.assertEquals(1,smallMolecule.getXrefs().size());
 
         enricher.enrich( smallMolecule );
 
-        Assert.assertEquals( 10, smallMolecule.getXrefs().size() );
-        assertHasXref( smallMolecule, "chebi", "CHEBI:18243",  "identity" );
-        assertHasXref( smallMolecule, "chebi", "CHEBI:11930",  "secondary-ac" );
-        assertHasXref( smallMolecule, "chebi", "CHEBI:23886",  "secondary-ac" );
-        assertHasXref( smallMolecule, "chebi", "CHEBI:43686",  "secondary-ac" );
-        assertHasXref( smallMolecule, "chebi", "CHEBI:104584", "secondary-ac" );
-        assertHasXref( smallMolecule, "chebi", "CHEBI:14203",  "secondary-ac" );
-        assertHasXref( smallMolecule, "chebi", "CHEBI:11695",  "secondary-ac" );
-        assertHasXref( smallMolecule, "chebi", "CHEBI:1764",   "secondary-ac" );
+        Assert.assertEquals( 4, smallMolecule.getXrefs().size() );
+        assertHasXref( smallMolecule, "chebi", "CHEBI:45783",  "identity" );
+        assertHasXref( smallMolecule, "chebi", "CHEBI:45781",  "secondary-ac" );
+        assertHasXref( smallMolecule, "chebi", "CHEBI:305376",  "secondary-ac" );
+        assertHasXref( smallMolecule, "chebi", "CHEBI:38918",  "secondary-ac" );
     }
 
     @Test
