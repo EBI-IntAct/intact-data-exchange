@@ -120,10 +120,10 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
             clusterScore.setBinaryInteractionList(interactionToProcess);
             clusterScore.runService();
         }
-
-        if (!this.eligibleInteractionsNotInMitab.isEmpty()){
-            super.clusterIntactInteractions(this.eligibleInteractionsNotInMitab, context, clusterScore, excludeSpokeExpanded, excludeNonUniprotInteractors);
-        }
+         // TODO - negative interactions and intra molecular are not in mitab!!!
+        //if (!this.eligibleInteractionsNotInMitab.isEmpty()){
+            //super.clusterIntactInteractions(this.eligibleInteractionsNotInMitab, context, clusterScore, excludeSpokeExpanded, excludeNonUniprotInteractors);
+        //}
 
         return new MiClusterScoreResults(clusterScore, context);
     }

@@ -1,16 +1,12 @@
 package uk.ac.ebi.intact.util.uniprotExport.filters;
 
-import psidev.psi.mi.tab.model.Alias;
-import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.*;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * TODO comment this
@@ -22,6 +18,7 @@ import java.util.Set;
 
 public class FilterUtils {
     private static final String UNIPROT = "uniprotkb";
+    private static final String CONFIDENCE_NAME = "intactPsiscore";
 
     public static void processGeneNames(Interactor interactorA, String intactA, Interactor interactorB, String intactB, MiClusterContext context) {
         String geneNameA = retrieveInteractorGeneName(interactorA);
@@ -114,5 +111,36 @@ public class FilterUtils {
         }
 
         return pubmedIds;
+    }
+
+    /**
+     *
+     * @param interaction
+     * @return the computed Mi cluster score for this interaction
+     */
+    public static double getMiClusterScoreFor(EncoreInteraction interaction){
+        List<Confidence> confidenceValues = interaction.getConfidenceValues();
+        return extractMiClusterScoreFrom(confidenceValues);
+    }
+
+    private static double extractMiClusterScoreFrom(List<Confidence> confidenceValues) {
+        double score = 0;
+        for(Confidence confidenceValue:confidenceValues){
+            if(confidenceValue.getType().equalsIgnoreCase(CONFIDENCE_NAME)){
+                score = Double.parseDouble(confidenceValue.getValue());
+            }
+        }
+
+        return score;
+    }
+
+    /**
+     *
+     * @param interaction
+     * @return the computed Mi cluster score for this interaction
+     */
+    public static double getMiClusterScoreFor(BinaryInteraction interaction){
+        List<Confidence> confidenceValues = interaction.getConfidenceValues();
+        return extractMiClusterScoreFrom(confidenceValues);
     }
 }

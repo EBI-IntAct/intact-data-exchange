@@ -1,10 +1,8 @@
 package uk.ac.ebi.intact.util.uniprotExport.filters.mitab;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.InteractionDetectionMethod;
 import psidev.psi.mi.tab.model.InteractionType;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.IntactFilter;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
@@ -66,18 +64,6 @@ public abstract class AbstractMitabFilter extends IntactFilter{
                 miTerms.put(type.getIdentifier(), methodName);
             }
         }
-    }
-
-    protected double getMiClusterScoreFor(EncoreInteraction interaction){
-        List<Confidence> confidenceValues = interaction.getConfidenceValues();
-        double score = 0;
-        for(Confidence confidenceValue:confidenceValues){
-            if(confidenceValue.getType().equalsIgnoreCase(CONFIDENCE_NAME)){
-                score = Double.parseDouble(confidenceValue.getValue());
-            }
-        }
-
-        return score;
     }
 
     public Set<String> getEligibleInteractionsForUniprotExport() {

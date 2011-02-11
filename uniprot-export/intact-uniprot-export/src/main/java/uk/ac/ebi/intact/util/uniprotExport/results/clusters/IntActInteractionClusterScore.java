@@ -8,6 +8,7 @@ import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,6 +33,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
 
     public IntActInteractionClusterScore(){
         super();
+
         setMappingIdDbNames("uniprotkb");
         writer = new PsimiTabWriter();
 
@@ -151,47 +153,6 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
     }
 
     /**
-     *
-     * @return a list of formatted scores for each interaction
-     */
-    public String getScoresPerInteraction(Collection<Integer> interactionIds, String scoreListCSV, String [] scoreList){
-        if(this.getInteractionMapping() == null){
-            runService();
-        }
-        if(scoreList == null){
-            int scoreListSize = interactionIds.size();
-            scoreList = new String[scoreListSize];
-            scoreListCSV = "";
-            String delimiter = "\n";
-
-            int i = 0;
-            for (Integer eId : interactionIds){
-                EncoreInteraction eI = this.getInteractionMapping().get(eId);
-
-                if (eI != null){
-                    List<Confidence> confidenceValues = eI.getConfidenceValues();
-                    Double score = null;
-                    for(Confidence confidenceValue:confidenceValues){
-                        if(confidenceValue.getType().equalsIgnoreCase("intactPsiscore")){
-                            score = Double.parseDouble(confidenceValue.getValue());
-                        }
-                    }
-                    if(score == null){
-                        logger.error("No score for this interaction: " + eI.getId());
-                    }
-                    scoreList[i] = eI.getId() + "-" +eI.getInteractorA() + "-" + eI.getInteractorB() + ":" + score;
-                    scoreListCSV = scoreListCSV + scoreList[i];
-                    i++;
-                    if(scoreListSize > i){
-                        scoreListCSV = scoreListCSV + delimiter;
-                    }
-                }
-            }
-        }
-        return scoreListCSV;
-    }
-
-    /**
      * Saves the score using a formatted String for each interaction
      */
     public void saveScores(){
@@ -204,6 +165,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
         /* Retrieve results */
 
         try {
+            logger.info("Saving MITAB ... " + fileName);
             super.saveScoreInMitab(fileName);
 
         } catch (Exception e) {
@@ -216,10 +178,10 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
         }
         try{
             // Create file
+            logger.info("Saving scores on ... " + fileName + "_log.txt");
             FileWriter fstream = new FileWriter(fileName + "_log.txt");
             BufferedWriter out = new BufferedWriter(fstream);
             out.write(scoreListCSV);
-            logger.info("Saving scores on ... " + fileName + "_log.txt");
             //Close the output stream
             out.close();
         }catch (Exception e){//Catch exception if any
@@ -239,39 +201,43 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
      */
     public void saveClusteredInteractions(String fileName, Set<Integer> interactionIds){
 
-        logger.info("Retrieving scores ...");
-        String scoreListCSV = getScoresPerInteraction(interactionIds, null, null);
-        try{
-            // Create file
-            FileWriter fstream = new FileWriter(fileName + ".txt");
-            BufferedWriter out = new BufferedWriter(fstream);
-            out.write(scoreListCSV);
-            logger.info("Saving scores on ... " + fileName + ".txt");
-            //Close the output stream
-            out.close();
-        }catch (Exception e){//Catch exception if any
-            logger.error("Error: " + e.getMessage());
-        }
-
         /* Retrieve results */
 
         Map<Integer, EncoreInteraction> interactionMapping = getInteractionMapping();
         Encore2Binary iConverter = new Encore2Binary(getMappingIdDbNames());
-        logger.info("Saving in mitab...");
+        logger.info("Saving scores...");
 
         try {
             File file = new File(fileName);
 
+            FileWriter fstream = new FileWriter(fileName + ".txt");
+
             for(Integer mappingId:interactionIds){
                 EncoreInteraction eI = interactionMapping.get(mappingId);
+
+                // convert and write in mitab
                 if (eI != null){
+                    double score = FilterUtils.getMiClusterScoreFor(eI);
+
+                    // write score in a text file
+                    fstream.write(eI.getId());
+                    fstream.write("-");
+                    fstream.write(eI.getInteractorA());
+                    fstream.write("-");
+                    fstream.write(eI.getInteractorB());
+                    fstream.write(":" + score);
+                    fstream.flush();
+
                     BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
                     writer.writeOrAppend(bI, file, false);
                 }
             }
 
+            //Close the output stream
+            fstream.close();
+
         } catch (Exception e) {
-            logger.error("It is not possible to write the results in the mitab file " + fileName);
+            logger.error("It is not possible to write the results in the mitab file " + fileName + " or in the text file " + fileName + ".txt");
             e.printStackTrace();
         }
     }

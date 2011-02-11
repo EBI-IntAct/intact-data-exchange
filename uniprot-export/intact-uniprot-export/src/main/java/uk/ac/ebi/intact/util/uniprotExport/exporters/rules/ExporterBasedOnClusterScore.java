@@ -2,7 +2,6 @@ package uk.ac.ebi.intact.util.uniprotExport.exporters.rules;
 
 import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.Confidence;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.AbstractInteractionExporter;
@@ -10,7 +9,6 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.ExportContext;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,47 +25,15 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     private static final Logger logger = Logger.getLogger(ExporterBasedOnClusterScore.class);
 
     private static final double EXPORT_THRESHOLD = 0.43;
-    private static final String CONFIDENCE_NAME = "intactPsiscore";
     private static final String COLOCALIZATION = "MI:0403";
 
     public ExporterBasedOnClusterScore(){
     }
 
-    /**
-     *
-     * @param interaction
-     * @return the computed Mi cluster score for this interaction
-     */
-    private double getMiClusterScoreFor(EncoreInteraction interaction){
-        List<psidev.psi.mi.tab.model.Confidence> confidenceValues = interaction.getConfidenceValues();
-        return extractMiClusterScoreFrom(confidenceValues);
-    }
-
-    private double extractMiClusterScoreFrom(List<Confidence> confidenceValues) {
-        double score = 0;
-        for(Confidence confidenceValue:confidenceValues){
-            if(confidenceValue.getType().equalsIgnoreCase(CONFIDENCE_NAME)){
-                score = Double.parseDouble(confidenceValue.getValue());
-            }
-        }
-
-        return score;
-    }
-
-    /**
-     *
-     * @param interaction
-     * @return the computed Mi cluster score for this interaction
-     */
-    private double getMiClusterScoreFor(BinaryInteraction interaction){
-        List<Confidence> confidenceValues = interaction.getConfidenceValues();
-        return extractMiClusterScoreFrom(confidenceValues);
-    }
-
     @Override
     public boolean canExportEncoreInteraction(EncoreInteraction encore, ExportContext context) throws UniprotExportException {
 
-        double score = getMiClusterScoreFor(encore);
+        double score = FilterUtils.getMiClusterScoreFor(encore);
 
         if (score >= EXPORT_THRESHOLD){
 
@@ -101,7 +67,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
 
     @Override
     public boolean canExportBinaryInteraction(BinaryInteraction interaction, ExportContext context) throws UniprotExportException {
-        double score = getMiClusterScoreFor(interaction);
+        double score = FilterUtils.getMiClusterScoreFor(interaction);
 
         if (score >= EXPORT_THRESHOLD){
 

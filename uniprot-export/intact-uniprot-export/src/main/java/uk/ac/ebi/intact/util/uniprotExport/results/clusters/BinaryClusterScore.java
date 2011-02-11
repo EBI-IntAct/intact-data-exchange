@@ -7,6 +7,7 @@ import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.Binary2Encore;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -170,37 +171,43 @@ public class BinaryClusterScore implements IntactCluster {
      * @param fileName
      * @param interactionIds
      */
-    @Override
     public void saveClusteredInteractions(String fileName, Set<Integer> interactionIds){
-
-        String scoreListCSV = getScorePerInteractions(interactionIds, null, null);
-        try{
-            // Create file
-            FileWriter fstream = new FileWriter(fileName + ".txt");
-            BufferedWriter out = new BufferedWriter(fstream);
-            out.write(scoreListCSV);
-            //Close the output stream
-            out.close();
-        }catch (Exception e){//Catch exception if any
-            logger.error("Error: " + e.getMessage());
-        }
 
         /* Retrieve results */
 
         Map<Integer, BinaryInteraction<Interactor>> interactionMapping = getBinaryInteractionCluster();
+        logger.info("Saving scores...");
 
         try {
             File file = new File(fileName);
 
+            FileWriter fstream = new FileWriter(fileName + ".txt");
+
             for(Integer mappingId:interactionIds){
-                BinaryInteraction eI = interactionMapping.get(mappingId);
+                BinaryInteraction<Interactor> eI = interactionMapping.get(mappingId);
+
+                // convert and write in mitab
                 if (eI != null){
+                    double score = FilterUtils.getMiClusterScoreFor(eI);
+
+                    // write score in a text file
+                    fstream.write(mappingId);
+                    fstream.write("-");
+                    fstream.write(eI.getInteractorA().getIdentifiers().iterator().next().getIdentifier());
+                    fstream.write("-");
+                    fstream.write(eI.getInteractorB().getIdentifiers().iterator().next().getIdentifier());
+                    fstream.write(":" + score);
+                    fstream.flush();
+
                     writer.writeOrAppend(eI, file, false);
                 }
             }
 
+            //Close the output stream
+            fstream.close();
+
         } catch (Exception e) {
-            logger.error("It is not possible to write the results in the mitab file " + fileName);
+            logger.error("It is not possible to write the results in the mitab file " + fileName + " or in the text file " + fileName + ".txt");
             e.printStackTrace();
         }
     }
