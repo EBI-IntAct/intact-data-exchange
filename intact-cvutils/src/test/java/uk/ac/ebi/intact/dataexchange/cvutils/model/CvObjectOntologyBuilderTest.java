@@ -230,7 +230,7 @@ public class CvObjectOntologyBuilderTest extends IntactBasicTestCase{
         Collection<String> drugablemis = new ArrayList<String>();
         for ( CvDagObject cvDag : allDrugableCvs ) {
             if ( log.isDebugEnabled() ) log.debug( cvDag.getIdentifier() + " -> " + cvDag.getShortLabel() );
-            OBOObject drugable = ( OBOObject ) oboSession.getObject( cvDag.getMiIdentifier() );
+            OBOObject drugable = ( OBOObject ) oboSession.getObject( cvDag.getIdentifier() );
             Assert.assertTrue( ontologyBuilder.checkIfCategorySubset( drugable, oboCatDrug ) );
             drugablemis.add( drugable.getID() );
 
@@ -424,9 +424,7 @@ public class CvObjectOntologyBuilderTest extends IntactBasicTestCase{
 
         Collection<String> miCol = new ArrayList<String>();
         //URL url = CvUpdaterTest.class.getResource( "/psi-mi25.obo" );
-        String revision = "1.48";
-        URL url = new URL( OboUtils.PSI_MI_OBO_LOCATION + "?revision=" + revision );
-        log.debug( "url " + url );
+        URL url = CvObjectOntologyBuilderTest.class.getResource("/ontologies/psi-mi25-1_48.obo" );
 
         BufferedReader in = new BufferedReader( new InputStreamReader( url.openStream() ) );
         String inputLine;
