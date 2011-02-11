@@ -209,6 +209,10 @@ public class IntactFilter implements InteractionFilter {
 
                                 FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
 
+                                binary.getInteractorA().getAlternativeIdentifiers().clear();
+                                binary.getInteractorA().getAliases().clear();
+                                binary.getInteractorB().getAlternativeIdentifiers().clear();
+                                binary.getInteractorB().getAliases().clear();
                             }
 
                             binaryInteractions.addAll(toBinary);

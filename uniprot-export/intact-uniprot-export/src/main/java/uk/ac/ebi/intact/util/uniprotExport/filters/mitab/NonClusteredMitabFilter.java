@@ -80,28 +80,57 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
                 String uniprotB = null;
 
                 if (interactorA != null){
+                    CrossReference uniprot1 = null;
+                    CrossReference intact1 = null;
+
                     for (CrossReference refA : interactorA.getIdentifiers()){
                         if (UNIPROT.equalsIgnoreCase(refA.getDatabase())){
                             uniprotA = refA.getIdentifier();
                             //if (uniprotA.contains(FEATURE_CHAIN)){
                             //uniprotA = refA.getIdentifier().substring(0, uniprotA.indexOf(FEATURE_CHAIN));
                             //}
-
-                            break;
+                            uniprot1 = refA;
                         }
+                        else if (INTACT.equalsIgnoreCase(refA.getDatabase())){
+
+                            intact1 = refA;
+                        }
+                    }
+
+                    interactorA.getIdentifiers().clear();
+
+                    if (uniprot1 != null){
+                        interactorA.getIdentifiers().add(uniprot1);
+                    }
+                    if (intact1 != null){
+                        interactorA.getIdentifiers().add(intact1);
                     }
                 }
                 if (interactorB != null){
+                    CrossReference uniprot2 = null;
+                    CrossReference intact2 = null;
+
                     for (CrossReference refB : interactorB.getIdentifiers()){
                         if (UNIPROT.equalsIgnoreCase(refB.getDatabase())){
                             uniprotB = refB.getIdentifier();
-
-                            //if (uniprotB.contains(FEATURE_CHAIN)){
-                            //uniprotB = refB.getIdentifier().substring(0, uniprotB.indexOf(FEATURE_CHAIN));
+                            //if (uniprotA.contains(FEATURE_CHAIN)){
+                            //uniprotA = refA.getIdentifier().substring(0, uniprotA.indexOf(FEATURE_CHAIN));
                             //}
-
-                            break;
+                            uniprot2 = refB;
                         }
+                        else if (INTACT.equalsIgnoreCase(refB.getDatabase())){
+
+                            intact2 = refB;
+                        }
+                    }
+
+                    interactorB.getIdentifiers().clear();
+
+                    if (uniprot2 != null){
+                        interactorB.getIdentifiers().add(uniprot2);
+                    }
+                    if (intact2 != null){
+                        interactorB.getIdentifiers().add(intact2);
                     }
                 }
 
@@ -143,6 +172,8 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
             MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
             context.getInteractionToMethod_type().put(intactAc, entry);
 
+
+
             if (!interaction.getExpansionMethods().isEmpty() && !excludedSpokeExpanded){
                 logger.info(intactAc + " passes the filters");
                 interactionToProcess.add(interaction);
@@ -175,6 +206,11 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
 
             MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
             context.getInteractionToMethod_type().put(intactAc, entry);
+
+            interaction.getInteractorA().getAlternativeIdentifiers().clear();
+            interaction.getInteractorA().getAliases().clear();
+            interaction.getInteractorB().getAlternativeIdentifiers().clear();
+            interaction.getInteractorB().getAliases().clear();
 
             if (!interaction.getExpansionMethods().isEmpty() ){
 
