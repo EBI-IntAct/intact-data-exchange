@@ -187,35 +187,6 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
         }
     }
 
-    private void processClustering(MiClusterContext context, List<BinaryInteraction> interactionToProcess, IntactBinaryInteraction interaction, String intactAc, ExtendedInteractor interactorA, String uniprotA, ExtendedInteractor interactorB, String uniprotB) {
-        if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
-            logger.info(intactAc + " passes the filters");
-            interactionToProcess.add(interaction);
-
-            FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
-            processMiTerms(interaction, context);
-
-            List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
-            String detectionMI = detectionMethods.iterator().next().getIdentifier();
-
-            List<InteractionType> interactionTypes = interaction.getInteractionTypes();
-            String typeMi = interactionTypes.iterator().next().getIdentifier();
-
-            MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
-            context.getInteractionToMethod_type().put(intactAc, entry);
-
-            interaction.getInteractorA().getAlternativeIdentifiers().clear();
-            interaction.getInteractorA().getAliases().clear();
-            interaction.getInteractorB().getAlternativeIdentifiers().clear();
-            interaction.getInteractorB().getAliases().clear();
-
-            if (!interaction.getExpansionMethods().isEmpty() ){
-
-                context.getSpokeExpandedInteractions().add(intactAc);
-            }
-        }
-    }
-
     public MiClusterScoreResults exportInteractionsFrom(String mitab) throws UniprotExportException {
         try {
             logger.info("Filtering and clustering interactions for uniprot export... \n");

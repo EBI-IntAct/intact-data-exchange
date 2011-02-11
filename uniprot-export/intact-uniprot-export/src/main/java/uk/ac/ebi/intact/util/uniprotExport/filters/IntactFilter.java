@@ -139,13 +139,8 @@ public class IntactFilter implements InteractionFilter {
             // we clear the previous chunk of binary interactions to only keep 200 binary interaction at a time
             binaryInteractions.clear();
 
-            if (excludeSpokeExpanded && excludeNonUniprotInteractors){
-                i = convertIntoBinaryInteractions(interactions, i, binaryInteractions, context);
-            }
-            else {
-                // we convert into binary interactions until we fill up the binary interactions list to MAX_NUMBER_INTERACTION. we get the new incremented i.
-                i = convertIntoBinaryInteractionsExcludeNonUniprotProteins(interactions, i, binaryInteractions, context);
-            }
+            // we convert into binary interactions until we fill up the binary interactions list to MAX_NUMBER_INTERACTION. we get the new incremented i.
+            i = convertIntoBinaryInteractionsExcludeNonUniprotProteins(interactions, i, binaryInteractions, context);
 
             // we compute the mi score for the list of binary interactions
             processMiClustering(binaryInteractions, MAX_NUMBER_INTERACTION, clusterScore);
