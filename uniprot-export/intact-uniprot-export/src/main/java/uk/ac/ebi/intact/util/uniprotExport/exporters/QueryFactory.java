@@ -10,6 +10,7 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 
 import javax.persistence.Query;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -66,6 +67,9 @@ public class QueryFactory {
     private final String methodStatus = "select ci.identifier, a.annotationText from CvInteraction ci join ci.annotations as a join a.cvTopic as ct" +
             " where ct.shortLabel = :export";
 
+    // select components with only one interactor (self interactions)
+    private final String selfInteractions= "select distinct(il.ac) from InteractionImpl il join il.components as ct group by il.ac having count(ct.ac) == 1";
+
     public List<Object[]> getMethodStatusInIntact() {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
@@ -75,7 +79,6 @@ public class QueryFactory {
         query.setParameter("export", CvTopic.UNIPROT_DR_EXPORT);
 
         List<Object []> methods = query.getResultList();
-
         dataContext.commitTransaction(transactionStatus);
 
         return methods;
@@ -446,6 +449,152 @@ public class QueryFactory {
 
         return interactions;
     }
+
+    public List<String> getNegativeInteractionsPassingFilter() {
+        FilterConfig config = FilterContext.getInstance().getConfig();
+        boolean excludeSpokeExpanded = config.excludeSpokeExpandedInteractions();
+        boolean excludeNegativeInteractions = config.excludeNegativeInteractions();
+        boolean excludeLowConfidenceInteractions = config.excludeLowConfidenceInteractions();
+        boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
+
+        if (!excludeNegativeInteractions){
+            DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+            TransactionStatus transactionStatus = dataContext.beginTransaction();
+
+            StringBuffer queryString = new StringBuffer();
+            queryString.append("select distinct(i.ac) from InteractionImpl i ");
+            queryString.append("where i.ac in (");
+            queryString.append(interactionsAccepted);
+            queryString.append(") and i.ac not in (");
+            queryString.append(interactionsOnHold);
+            queryString.append(") ");
+            queryString.append(") and i.ac in (");
+            queryString.append(negativeInteractions);
+            queryString.append(") ");
+
+            if (excludeLowConfidenceInteractions){
+                queryString.append("and i.ac not in (");
+                queryString.append(interactionsDrExportNotPassed);
+                queryString.append(") and i.ac not in (");
+                queryString.append(interactionsFromExperimentNoExport);
+                queryString.append(") ");
+            }
+
+            if (excludeSpokeExpanded && excludeNonUniprotInteractors){
+                queryString.append("and i.ac not in (");
+                queryString.append(interactionsInvolvingInteractorsNoUniprotUpdate);
+                queryString.append(") and i.ac not in (");
+                queryString.append(interactionInvolvingNonUniprotOrNonProtein);
+                queryString.append(") ");
+            }
+
+            Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString.toString());
+
+            query.setParameter("accepted", CvTopic.ACCEPTED);
+            query.setParameter("onhold", CvTopic.ON_HOLD);
+            query.setParameter("negative", CvTopic.NEGATIVE);
+
+            if (excludeLowConfidenceInteractions){
+                query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
+                query.setParameter("no", "NO");
+                query.setParameter("yes", "YES");
+                query.setParameter("confidence", CvTopic.AUTHOR_CONFIDENCE_MI_REF);
+            }
+
+            if (excludeSpokeExpanded && excludeNonUniprotInteractors){
+                query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
+                query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
+                query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
+                query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
+            }
+
+            List<String> interactions = query.getResultList();
+
+            dataContext.commitTransaction(transactionStatus);
+
+            return interactions;
+        }
+        else {
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    public List<String> getReleasedSelfInteractionAcsPassingFilters(){
+        FilterConfig config = FilterContext.getInstance().getConfig();
+        boolean excludeSpokeExpanded = config.excludeSpokeExpandedInteractions();
+        boolean excludeNegativeInteractions = config.excludeNegativeInteractions();
+        boolean excludeLowConfidenceInteractions = config.excludeLowConfidenceInteractions();
+        boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
+
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
+
+        StringBuffer queryString = new StringBuffer();
+        queryString.append("select distinct(i.ac) from InteractionImpl i ");
+        queryString.append("where i.ac in (");
+        queryString.append(interactionsAccepted);
+        queryString.append(") and i.ac not in (");
+        queryString.append(interactionsOnHold);
+        queryString.append(") ");
+        queryString.append(") and i.ac in (");
+        queryString.append(selfInteractions);
+        queryString.append(") ");
+
+        if (excludeLowConfidenceInteractions){
+            queryString.append("and i.ac not in (");
+            queryString.append(interactionsDrExportNotPassed);
+            queryString.append(") and i.ac not in (");
+            queryString.append(interactionsFromExperimentNoExport);
+            queryString.append(") ");
+        }
+
+        if (excludeNegativeInteractions){
+            queryString.append("and i.ac not in (");
+            queryString.append(negativeInteractions);
+            queryString.append(") ");
+        }
+
+        if (excludeSpokeExpanded && excludeNonUniprotInteractors){
+            queryString.append("and i.ac not in (");
+            queryString.append(interactionsInvolvingInteractorsNoUniprotUpdate);
+            queryString.append(") and i.ac not in (");
+            queryString.append(interactionInvolvingNonUniprotOrNonProtein);
+            queryString.append(") ");
+        }
+
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString.toString());
+
+        query.setParameter("accepted", CvTopic.ACCEPTED);
+        query.setParameter("onhold", CvTopic.ON_HOLD);
+
+        if (excludeLowConfidenceInteractions){
+            query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
+            query.setParameter("no", "NO");
+            query.setParameter("yes", "YES");
+            query.setParameter("confidence", CvTopic.AUTHOR_CONFIDENCE_MI_REF);
+        }
+
+        if (excludeNegativeInteractions){
+            query.setParameter("negative", CvTopic.NEGATIVE);
+        }
+
+        if (excludeSpokeExpanded && excludeNonUniprotInteractors){
+            query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
+            query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
+            query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
+            query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
+        }
+
+
+        List<String> interactions = query.getResultList();
+
+        dataContext.commitTransaction(transactionStatus);
+
+        return interactions;
+    }
+
 
     /**
      *

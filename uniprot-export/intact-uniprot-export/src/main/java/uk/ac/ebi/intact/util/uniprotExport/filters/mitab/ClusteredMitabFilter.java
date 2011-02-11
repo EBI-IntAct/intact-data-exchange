@@ -340,14 +340,17 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements Interac
         }
     }
 
+    @Override
     public MiClusterScoreResults exportInteractions() throws UniprotExportException {
         return exportInteractionsFrom(mitab);
     }
 
+    @Override
     public InteractionExporter getInteractionExporter() {
         return this.exporter;
     }
 
+    @Override
     public void setInteractionExporter(InteractionExporter exporter) {
         this.exporter = exporter;
     }

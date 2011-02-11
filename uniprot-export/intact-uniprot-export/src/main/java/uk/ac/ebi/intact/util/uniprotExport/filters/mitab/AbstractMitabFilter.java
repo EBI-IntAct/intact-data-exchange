@@ -6,13 +6,10 @@ import psidev.psi.mi.tab.model.InteractionDetectionMethod;
 import psidev.psi.mi.tab.model.InteractionType;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
-import uk.ac.ebi.intact.util.uniprotExport.exporters.QueryFactory;
+import uk.ac.ebi.intact.util.uniprotExport.filters.IntactFilter;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Abstract filter from a mitab file
@@ -22,33 +19,31 @@ import java.util.Set;
  * @since <pre>08/02/11</pre>
  */
 
-public abstract class AbstractMitabFilter {
-    protected QueryFactory queryProvider;
+public abstract class AbstractMitabFilter extends IntactFilter{
     protected Set<String> eligibleInteractionsForUniprotExport = new HashSet<String>();
+    protected List<String> eligibleInteractionsNotInMitab = new ArrayList<String>();
+
     protected static final String CONFIDENCE_NAME = "intactPsiscore";
     protected static final String INTACT = "intact";
     protected static final String UNIPROT = "uniprotkb";
 
-    protected InteractionExporter exporter;
-
     protected String mitab;
 
     public AbstractMitabFilter(InteractionExporter exporter, String mitab){
-        queryProvider = new QueryFactory();
-        this.exporter = exporter;
-
+        super(exporter);
         this.mitab = mitab;
 
-        eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getReleasedInteractionAcsPassingFilters());
+        eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
+        //eligibleInteractionsNotInMitab.addAll(this.queryFactory.getReleasedSelfInteractionAcsPassingFilters());
+        eligibleInteractionsNotInMitab.addAll(this.queryFactory.getNegativeInteractionsPassingFilter());
     }
 
     public AbstractMitabFilter(InteractionExporter exporter){
-        queryProvider = new QueryFactory();
-        this.exporter = exporter;
+        super(exporter);
 
         this.mitab = null;
 
-        eligibleInteractionsForUniprotExport.addAll(this.queryProvider.getReleasedInteractionAcsPassingFilters());
+        eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
     }
 
     protected void processMiTerms(BinaryInteraction interaction, MiClusterContext context){
@@ -87,10 +82,6 @@ public abstract class AbstractMitabFilter {
 
     public Set<String> getEligibleInteractionsForUniprotExport() {
         return eligibleInteractionsForUniprotExport;
-    }
-
-    public QueryFactory getQueryProvider() {
-        return queryProvider;
     }
 
     public String getMitab() {

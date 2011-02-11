@@ -12,13 +12,12 @@ import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
-import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
+import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +34,7 @@ import java.util.List;
  * @since <pre>22-Oct-2010</pre>
  */
 
-public class NonClusteredMitabFilter extends AbstractMitabFilter implements InteractionFilter {
+public class NonClusteredMitabFilter extends AbstractMitabFilter {
     private static final Logger logger = Logger.getLogger(NonClusteredMitabFilter.class);
     protected IntactPsimiTabReader mitabReader;
 
@@ -125,6 +124,10 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter implements Inte
             clusterScore.runService();
         }
 
+        if (!this.eligibleInteractionsNotInMitab.isEmpty()){
+            super.clusterIntactInteractions(this.eligibleInteractionsNotInMitab, context, clusterScore, excludeSpokeExpanded, excludeNonUniprotInteractors);
+        }
+
         return new MiClusterScoreResults(clusterScore, context);
     }
 
@@ -201,14 +204,17 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter implements Inte
         }
     }
 
+    @Override
     public MiClusterScoreResults exportInteractions() throws UniprotExportException {
         return exportInteractionsFrom(mitab);
     }
 
+    @Override
     public InteractionExporter getInteractionExporter() {
         return this.exporter;
     }
 
+    @Override
     public void setInteractionExporter(InteractionExporter exporter) {
         this.exporter = exporter;
     }

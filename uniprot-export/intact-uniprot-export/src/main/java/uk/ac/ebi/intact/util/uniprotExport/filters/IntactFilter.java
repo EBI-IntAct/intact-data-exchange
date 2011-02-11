@@ -53,8 +53,8 @@ public class IntactFilter implements InteractionFilter {
 
     public static final String UNIPROT_DATABASE = "uniprotkb";
 
-    private InteractionExporter exporter;
-    private QueryFactory queryFactory;
+    protected InteractionExporter exporter;
+    protected QueryFactory queryFactory;
 
     /**
      * we create a new IntactFilter
@@ -122,6 +122,12 @@ public class IntactFilter implements InteractionFilter {
         boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
 
         MiClusterScoreResults results = new MiClusterScoreResults(clusterScore, context);
+        clusterIntactInteractions(interactions, context, clusterScore, excludeSpokeExpanded, excludeNonUniprotInteractors);
+
+        return results;
+    }
+
+    protected void clusterIntactInteractions(List<String> interactions, MiClusterContext context, IntActInteractionClusterScore clusterScore, boolean excludeSpokeExpanded, boolean excludeNonUniprotInteractors) {
         int i = 0;
         // the list of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
@@ -147,8 +153,6 @@ public class IntactFilter implements InteractionFilter {
             int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
             logger.info("Still " + interactionsToProcess + " interactions to process in IntAct.");
         }
-
-        return results;
     }
 
     /**
@@ -218,7 +222,17 @@ public class IntactFilter implements InteractionFilter {
                 }
                 // if the interaction cannot be converted into binary interaction, we ignore the interaction.
                 else {
-                    logger.info("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
+                    logger.info("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions.");
+                    /*if (InteractionUtils.isSelfInteraction(intactInteraction)){
+                        IntactCloner cloner = new IntactCloner(true);
+
+                        try {
+                            Interaction interaction = cloner.cloneInteraction(intactInteraction);
+
+                        } catch (IntactClonerException e) {
+                            logger.info("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " is ignored.");
+                        }
+                    }*/
                 }
             }
             else {
