@@ -398,12 +398,12 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
         Set<InteractionDetectionMethod> detectionMethods = new HashSet(interaction.getDetectionMethods());
 
-        Set<String> validIntactIds = new HashSet<String>();
+        Set<String> intactIds = new HashSet<String>();
         boolean passRules = false;
 
         for (InteractionDetectionMethod method : detectionMethods){
-            validIntactIds.clear();
-            int numberOfExperimentWithThisMethod = computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(method.getIdentifier(), context, interaction, validIntactIds);
+            intactIds.clear();
+            int numberOfExperimentWithThisMethod = computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(method.getIdentifier(), context, interaction, intactIds);
 
             if (hasPassedInteractionDetectionMethodRules(method.getIdentifier(), numberOfExperimentWithThisMethod)){
                 logger.info("The method " + method + " has passed the rules");
@@ -412,20 +412,20 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             }
             else {
                 logger.info("The method " + method + " doesn't pass the rules and will be removed");
-                removeInteractionEvidencesFrom(interaction, validIntactIds, context);
+                removeInteractionEvidencesFrom(interaction, intactIds, context);
             }
         }
 
         return passRules;
     }
 
-    protected void removeInteractionEvidencesFrom(EncoreInteraction encore, Set<String> validInteractions, ExportContext context){
+    protected void removeInteractionEvidencesFrom(EncoreInteraction encore, Set<String> wrongInteractions, ExportContext context){
         List<CrossReference> publicationsToRemove = new ArrayList(encore.getPublicationIds());
         List<String> publicationIdsToKeep = new ArrayList<String>(encore.getPublicationIds().size());
         List<String> methodsToRemove = new ArrayList(encore.getMethodToPubmed().keySet());
         List<String> typesToRemove = new ArrayList(encore.getTypeToPubmed().keySet());
 
-        Collection<String> interactionsToRemove = CollectionUtils.subtract(encore.getExperimentToPubmed().keySet(), validInteractions);
+        Collection<String> validInteractions = CollectionUtils.subtract(encore.getExperimentToPubmed().keySet(), wrongInteractions);
 
         for (String interactionAc : validInteractions){
 
@@ -496,16 +496,24 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             entry.getValue().remove(pubmedsToRemove);
         }
 
-        for (String interactionAc : interactionsToRemove){
+        for (String interactionAc : validInteractions){
             encore.getExperimentToPubmed().remove(interactionAc);
             encore.getExperimentToDatabase().remove(interactionAc);
         }
     }
 
-    protected void removeInteractionEvidencesFrom(BinaryInteraction<Interactor> binary, Set<String> validInteractions, ExportContext context){
+    protected void removeInteractionEvidencesFrom(BinaryInteraction<Interactor> binary, Set<String> invalidInteractions, ExportContext context){
         List<CrossReference> interactionsToRemove = new ArrayList(binary.getInteractionAcs());
         List<InteractionDetectionMethod> methodsToRemove = new ArrayList(binary.getDetectionMethods());
         List<InteractionType> typesToRemove = new ArrayList(binary.getInteractionTypes());
+
+        Collection<String> validInteractions = new ArrayList<String>(binary.getInteractionAcs().size());
+
+        for (CrossReference intact : binary.getInteractionAcs()){
+            if (!invalidInteractions.contains(intact.getIdentifier())){
+                validInteractions.add(intact.getIdentifier());
+            }
+        }
 
         for (String interaction : validInteractions){
 
