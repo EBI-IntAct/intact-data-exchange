@@ -359,6 +359,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         boolean passRules = false;
 
         Set<String> validIntactIds = new HashSet<String>();
+        Set<String> invalidIntactIds = new HashSet<String>();
 
         for (String method : detectionMethods){
             validIntactIds.clear();
@@ -370,9 +371,14 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             }
             else {
                 logger.info("Binary Interaction " + interaction.getId() + " : the method " + method + " doesn't pass the rules and will be removed");
-                removeInteractionEvidencesFrom(interaction, validIntactIds, context);
+                invalidIntactIds.addAll(validIntactIds);
             }
         }
+
+        if (!invalidIntactIds.isEmpty() && invalidIntactIds.size() == interaction.getExperimentToPubmed().keySet().size()){
+            removeInteractionEvidencesFrom(interaction, invalidIntactIds, context);
+        }
+
         /*Collection<InteractionImpl> interactions = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionsAcs);
      Set<Experiment> experiments = new HashSet<Experiment>();
 
@@ -399,6 +405,8 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         Set<InteractionDetectionMethod> detectionMethods = new HashSet(interaction.getDetectionMethods());
 
         Set<String> intactIds = new HashSet<String>();
+        Set<String> invalidIntactIds = new HashSet<String>();
+
         boolean passRules = false;
 
         for (InteractionDetectionMethod method : detectionMethods){
@@ -412,8 +420,12 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             }
             else {
                 logger.info("The method " + method + " doesn't pass the rules and will be removed");
-                removeInteractionEvidencesFrom(interaction, intactIds, context);
+                invalidIntactIds.addAll(intactIds);
             }
+        }
+
+        if (!invalidIntactIds.isEmpty() && invalidIntactIds.size() == FilterUtils.extractIntactAcFrom(interaction.getInteractionAcs()).size()){
+            removeInteractionEvidencesFrom(interaction, invalidIntactIds, context);
         }
 
         return passRules;

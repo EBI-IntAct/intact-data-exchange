@@ -40,12 +40,12 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
 
     public NonClusteredMitabFilter(InteractionExporter exporter, String mitab){
         super(exporter, mitab);
-        this.mitabReader = new IntactPsimiTabReader(true);
+        this.mitabReader = new IntactPsimiTabReader(false);
     }
 
     public NonClusteredMitabFilter(InteractionExporter exporter){
         super(exporter);
-        this.mitabReader = new IntactPsimiTabReader(true);
+        this.mitabReader = new IntactPsimiTabReader(false);
     }
 
     protected MiClusterScoreResults computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {

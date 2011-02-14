@@ -261,15 +261,15 @@ public class EncoreInteractionToCCLineConverter {
                             secondCCInteractors.add(secondCCInteractor);
                         }
                         else{
-                            logger.debug("Interaction " + interaction.getId() + " doesn't have any interaction details.");
+                            logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " doesn't have any interaction details.");
                         }
                     }
                     else{
-                        logger.debug("Interaction " + interaction.getId() + " has one of the gene names or taxIds which is null.");
+                        logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " has one of the gene names or taxIds which is null.");
                     }
                 }
                 else{
-                    logger.debug("Interaction " + interaction.getId() + " has one of the unipprot acs/ intact acs which is null.");
+                    logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " has one of the unipprot acs/ intact acs which is null.");
                 }
             }
 
@@ -356,15 +356,15 @@ public class EncoreInteractionToCCLineConverter {
                             secondCCInteractors.add(secondCCInteractor);
                         }
                         else{
-                            logger.debug("Interaction " + interaction.getId() + " doesn't have valid evidences.");
+                            logger.debug("Interaction " + uniprot1 + " and " + uniprot2 + " doesn't have valid evidences.");
                         }
                     }
                     else{
-                        logger.debug("Interaction " + interaction.getId() + " has one of the gene names or taxIds which is null.");
+                        logger.debug("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the gene names or taxIds which is null.");
                     }
                 }
                 else{
-                    logger.debug("Interaction " + interaction.getId() + " has one of the unipprot acs/ intact acs which is null.");
+                    logger.debug("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the unipprot acs/ intact acs which is null.");
                 }
             }
 
