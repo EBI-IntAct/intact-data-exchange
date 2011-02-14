@@ -195,14 +195,11 @@ public class EncoreInteractionToCCLineConverter {
 
             for (EncoreInteraction interaction : interactions){
                 // get the uniprot acs of the first and second interactors
-                String [] interactorA = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsA());
-                String [] interactorB = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsB());
+                String uniprot1 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsA());
+                String uniprot2 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsB());
 
-                String uniprot1 = interactorA[0];
-                String uniprot2 = interactorB[0];
-
-                String intact1 = interactorA[1];
-                String intact2 = interactorB[1];
+                String intact1 = FilterUtils.extractIntactAcFromAccs(interaction.getOtherInteractorAccsA());
+                String intact2 = FilterUtils.extractIntactAcFromAccs(interaction.getOtherInteractorAccsB());
 
                 // if the uniprot acs are not null, it is possible to convert into a CCParameters2
                 if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
@@ -298,11 +295,11 @@ public class EncoreInteractionToCCLineConverter {
                 String [] interactorA = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsA());
                 String [] interactorB = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsB());
 
-                String uniprot1 = interactorA[0];
-                String uniprot2 = interactorB[0];
+                String uniprot1 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsA());
+                String uniprot2 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsB());
 
-                String intact1 = interactorA[1];
-                String intact2 = interactorB[1];
+                String intact1 = FilterUtils.extractIntactAcFromAccs(interaction.getOtherInteractorAccsA());
+                String intact2 = FilterUtils.extractIntactAcFromAccs(interaction.getOtherInteractorAccsB());
 
                 // if the uniprot acs are not null, it is possible to convert into a CCParameters2
                 if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
