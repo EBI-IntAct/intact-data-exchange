@@ -221,6 +221,7 @@ public class UniprotExportProcessor {
                     // clean the global variables, so we can process the new interactor
                     numberInteractions = 0;
                     interactions.clear();
+                    totalNumberInteraction = 0;
 
                     parentAc = interactor;
                     if (interactor.contains("-")){
