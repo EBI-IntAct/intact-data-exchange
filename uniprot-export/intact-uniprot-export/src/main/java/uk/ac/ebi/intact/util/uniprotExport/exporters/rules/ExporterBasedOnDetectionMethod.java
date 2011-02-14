@@ -496,7 +496,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             entry.getValue().remove(pubmedsToRemove);
         }
 
-        for (String interactionAc : validInteractions){
+        for (String interactionAc : wrongInteractions){
             encore.getExperimentToPubmed().remove(interactionAc);
             encore.getExperimentToDatabase().remove(interactionAc);
         }
