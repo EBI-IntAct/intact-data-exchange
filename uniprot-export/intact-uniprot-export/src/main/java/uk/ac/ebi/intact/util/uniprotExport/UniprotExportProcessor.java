@@ -115,7 +115,7 @@ public class UniprotExportProcessor {
         goWriter.close();
     }
 
-    public void exportDRLines(MiClusterScoreResults results, String DRFile) throws IOException {
+    /*public void exportDRLines(MiClusterScoreResults results, String DRFile) throws IOException {
         DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
 
         SortedSet<String> interactors = new TreeSet(results.getCluster().getInteractorCluster().keySet());
@@ -157,7 +157,7 @@ public class UniprotExportProcessor {
         }
 
         drWriter.close();
-    }
+    }*/
 
     public void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile, int version) throws IOException {
         DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
@@ -179,6 +179,7 @@ public class UniprotExportProcessor {
             Map<Integer, EncoreInteraction> interactionMapping = results.getCluster().getEncoreInteractionCluster();
             List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
             int numberInteractions = 0;
+            int totalNumberInteraction = 0;
 
             for (String interactor : interactors){
 
@@ -191,14 +192,15 @@ public class UniprotExportProcessor {
 
                 // while the interactor starts with the same ac, increments the exported interactions
                 if (interactor.startsWith(parentAc)){
-                    int numberExported = collectInteractions(results, interactions, interactionMapping, interactor);
+                    int numberExported = collectExportedInteractions(results, interactions, interactionMapping, interactor);
                     numberInteractions += numberExported;
+                    totalNumberInteraction += results.getCluster().getInteractorCluster().get(interactor).size();
                 }
                 // flushes the exported interactions of the previous interactor and process the new interactor
                 else{
                     // write if the number of interactions is superior to 0
                     if (numberInteractions > 0){
-                        logger.info("Write DR and CC lines for " + parentAc);
+                        logger.info("Write CC lines for " + parentAc);
                         if (version == 1){
                             CCParameters1 ccParameters = this.ccConverter.convertInteractionsIntoCCLinesVersion1(interactions, results.getExportContext(), parentAc);
                             ccWriter1.writeCCLine(ccParameters);
@@ -208,7 +210,11 @@ public class UniprotExportProcessor {
                             ccWriter2.writeCCLine(ccParameters);
                         }
 
-                        DRParameters parameter = this.drConverter.convertInteractorToDRLine(parentAc, numberInteractions);
+                    }
+
+                    if (totalNumberInteraction > 0){
+                        logger.info("Write DR lines for " + parentAc);
+                        DRParameters parameter = this.drConverter.convertInteractorToDRLine(parentAc, totalNumberInteraction);
                         drWriter.writeDRLine(parameter);
                     }
 
@@ -221,8 +227,9 @@ public class UniprotExportProcessor {
                         parentAc = interactor.substring(0, interactor.indexOf("-"));
                     }
 
-                    int numberExported = collectInteractions(results, interactions, interactionMapping, interactor);
+                    int numberExported = collectExportedInteractions(results, interactions, interactionMapping, interactor);
                     numberInteractions += numberExported;
+                    totalNumberInteraction += results.getCluster().getInteractorCluster().get(interactor).size();
                 }
             }
         }
@@ -236,7 +243,7 @@ public class UniprotExportProcessor {
         drWriter.close();
     }
 
-    private int collectInteractions(MiClusterScoreResults results, List<EncoreInteraction> interactions, Map<Integer, EncoreInteraction> interactionMapping, String interactor) {
+    private int collectExportedInteractions(MiClusterScoreResults results, List<EncoreInteraction> interactions, Map<Integer, EncoreInteraction> interactionMapping, String interactor) {
         Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(interactor));
         int numberInteractions = exportedInteractions.size();
 
