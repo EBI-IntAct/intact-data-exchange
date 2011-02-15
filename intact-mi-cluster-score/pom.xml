@@ -120,6 +120,43 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>export-filter</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2024m</argument>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath/>
+                                <argument>uk.ac.ebi.intact.dataexchange.uniprotexport.ExportFilter</argument>
+                                <!-- The file containing the exported interactions (format per line = 'database:ac   database:ac')-->
+                                <argument>${fileA}</argument>
+                                <!-- The mitab file we want to filter with the elements of the file A -->
+                                <argument>${fileB}</argument>
+                                <!-- The name of the file where we want to write the results-->
+                                <argument>${results}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>

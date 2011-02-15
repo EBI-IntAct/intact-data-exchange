@@ -62,9 +62,9 @@ public class UniprotExporter {
         //}
         //else{
             config.setExcludeLowConfidenceInteractions(true);
-            config.setExcludeNegativeInteractions(false);
+            config.setExcludeNegativeInteractions(true);
             config.setExcludeNonUniprotInteractors(true);
-            config.setExcludeSpokeExpandedInteractions(true);
+            config.setExcludeSpokeExpandedInteractions(false);
         //}
 
         final ExporterRule rule = InteractionExporterFactory.convertIntoExporterRule(args[0]);
