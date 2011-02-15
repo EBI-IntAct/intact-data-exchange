@@ -112,6 +112,8 @@ public class UniprotExportProcessor {
             List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
             int numberInteractions = 0;
             int totalNumberInteraction = 0;
+            int processedInteractors = 0;
+            int numberOfinteractors = interactors.size();
 
             for (String interactor : interactors){
 
@@ -165,10 +167,34 @@ public class UniprotExportProcessor {
                     totalNumberInteraction += results.getCluster().getInteractorCluster().get(interactor).size();
                 }
             }
+
+            processedInteractors ++;
+
+            if (processedInteractors == numberOfinteractors){
+                // write if the number of interactions is superior to 0
+                if (numberInteractions > 0){
+                    logger.info("Write CC lines for " + parentAc);
+                    if (version == 1){
+                        CCParameters1 ccParameters = this.ccConverter.convertInteractionsIntoCCLinesVersion1(interactions, results.getExportContext(), parentAc);
+                        ccWriter1.writeCCLine(ccParameters);
+                    }
+                    else{
+                        CCParameters2 ccParameters = this.ccConverter.convertInteractionsIntoCCLinesVersion2(interactions, results.getExportContext(), parentAc);
+                        ccWriter2.writeCCLine(ccParameters);
+                    }
+
+                }
+
+                if (totalNumberInteraction > 0){
+                    logger.info("Write DR lines for " + parentAc);
+                    DRParameters parameter = this.drConverter.convertInteractorToDRLine(parentAc, totalNumberInteraction);
+                    drWriter.writeDRLine(parameter);
+                }
+            }
         }
 
         if (version == 1){
-           ccWriter1.close();
+            ccWriter1.close();
         }
         else{
             ccWriter2.close();
