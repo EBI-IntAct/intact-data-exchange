@@ -72,30 +72,6 @@ public class UniprotExportProcessor {
         }
     }
 
-    /*public void exportCCLines(MiClusterScoreResults results, String CCFile) throws IOException {
-
-        CCLineWriter2 ccWriter = new DefaultCCLineWriter2(new FileWriter(CCFile));
-        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
-
-        for (Map.Entry<String, List<Integer>> interactor : results.getCluster().getInteractorMapping().entrySet()){
-            interactions.clear();
-
-            for (Integer interactionId : interactor.getValue()){
-                EncoreInteraction interaction = results.getCluster().getInteractionMapping().get(interactionId);
-
-                if (interaction != null){
-                    interactions.add(interaction);
-                }
-            }
-
-            CCParameters2 ccParameters = this.ccConverter.convertInteractionsIntoCCLinesVersion2(interactions, results.getExportContext(), interactor.getKey());
-
-            ccWriter.writeCCLine(ccParameters);
-        }
-
-        ccWriter.close();
-    }*/
-
     public void exportGOLines(MiClusterScoreResults results, String GOFile) throws IOException {
 
         GOLineWriter goWriter = new GOLineWriterImpl(new FileWriter(GOFile));
@@ -114,50 +90,6 @@ public class UniprotExportProcessor {
 
         goWriter.close();
     }
-
-    /*public void exportDRLines(MiClusterScoreResults results, String DRFile) throws IOException {
-        DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
-
-        SortedSet<String> interactors = new TreeSet(results.getCluster().getInteractorCluster().keySet());
-        Set<String> processedInteractors = new HashSet<String>();
-
-        while (!interactors.isEmpty()){
-            processedInteractors.clear();
-            Iterator<String> interactorIterator = interactors.iterator();
-
-            String interactorAc = interactorIterator.next();
-            processedInteractors.add(interactorAc);
-
-            String parent = interactorAc;
-            if (interactorAc.contains("-")){
-                parent = interactorAc.substring(0, interactorAc.indexOf("-"));
-            }
-
-            Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(interactorAc));
-            int numberInteractions = exportedInteractions.size();
-
-            while (interactorIterator.hasNext()){
-                exportedInteractions.clear();
-
-                String nextInteractor = interactorIterator.next();
-
-                if (nextInteractor.startsWith(parent)){
-                    processedInteractors.add(nextInteractor);
-
-                    exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(nextInteractor));
-                    numberInteractions += exportedInteractions.size();
-                }
-            }
-
-            if (numberInteractions > 0){
-                DRParameters parameter = this.drConverter.convertInteractorToDRLine(parent, numberInteractions);
-                drWriter.writeDRLine(parameter);
-                interactors.removeAll(processedInteractors);
-            }
-        }
-
-        drWriter.close();
-    }*/
 
     public void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile, int version) throws IOException {
         DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));

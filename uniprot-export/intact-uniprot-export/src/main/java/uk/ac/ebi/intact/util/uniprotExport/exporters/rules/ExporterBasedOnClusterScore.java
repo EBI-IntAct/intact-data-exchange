@@ -24,7 +24,7 @@ import java.util.Set;
 public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     private static final Logger logger = Logger.getLogger(ExporterBasedOnClusterScore.class);
 
-    private static final double EXPORT_THRESHOLD = 0.43;
+    private static final double EXPORT_THRESHOLD = 0.40;
     private static final String COLOCALIZATION = "MI:0403";
 
     public ExporterBasedOnClusterScore(){

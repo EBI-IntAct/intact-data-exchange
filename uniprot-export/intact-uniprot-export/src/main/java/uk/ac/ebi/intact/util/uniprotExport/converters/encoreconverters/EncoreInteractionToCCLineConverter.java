@@ -292,8 +292,6 @@ public class EncoreInteractionToCCLineConverter {
 
             for (EncoreInteraction interaction : interactions){
                 // get the uniprot acs of the first and second interactors
-                String [] interactorA = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsA());
-                String [] interactorB = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsB());
 
                 String uniprot1 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsA());
                 String uniprot2 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsB());

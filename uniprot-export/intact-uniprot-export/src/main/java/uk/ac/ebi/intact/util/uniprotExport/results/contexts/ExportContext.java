@@ -39,5 +39,8 @@ public interface ExportContext {
      */
     public Set<String> getSpokeExpandedInteractions();
 
+    /**
+     * Clear the context
+     */
     public void clear();
 }
