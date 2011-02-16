@@ -34,7 +34,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
     public IntActInteractionClusterScore(){
         super();
 
-        setMappingIdDbNames("uniprotkb, intact");
+        setMappingIdDbNames("uniprotkb,intact");
         writer = new PsimiTabWriter();
 
         setDirectInteractionWeight_3();
@@ -107,12 +107,12 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
      */
     public void setDirectInteractionWeight_3(){
         Map<String,Float> customOntologyTypeScores = new HashMap<String,Float>();
-        customOntologyTypeScores.put("MI:0208", 0.08f);
+        customOntologyTypeScores.put("MI:0208", 0.08f); // genetic interaction
         customOntologyTypeScores.put("MI:0403", 0.05f); // colocalization
-        customOntologyTypeScores.put("MI:0914", 0.33f);
-        customOntologyTypeScores.put("MI:0915", 0.67f);
-        customOntologyTypeScores.put("MI:0407", 1.00f);
-        customOntologyTypeScores.put("unknown", 0.03f);
+        customOntologyTypeScores.put("MI:0914", 0.33f); // association
+        customOntologyTypeScores.put("MI:0915", 0.67f); // physical association
+        customOntologyTypeScores.put("MI:0407", 1.00f); // direct interaction
+        customOntologyTypeScores.put("unknown", 0.03f); // unknown
         super.setCustomOntologyTypeScores(customOntologyTypeScores);
     }
 

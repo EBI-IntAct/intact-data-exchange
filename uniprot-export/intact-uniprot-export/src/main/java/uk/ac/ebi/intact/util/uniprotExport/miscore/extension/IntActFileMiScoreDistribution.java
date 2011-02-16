@@ -103,8 +103,8 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
     }
 
     public static void main(String args[]){
-        IntActFileMiScoreDistribution scoreDistribution = new IntActFileMiScoreDistribution("/home/marine/Desktop/miCluster_score_results/results_miScore/0.43/uniprotExport_excluded.txt");
-        scoreDistribution.createChart("/home/marine/Desktop/between_0.40_0.43.png", "Distribution of the mi score of interactions having score between 0.40 and 0.43", 100, 0.40, 0.43);
+        IntActFileMiScoreDistribution scoreDistribution = new IntActFileMiScoreDistribution("/home/marine/Desktop/miCluster_score_results/results_miScore/0.41/uniprotExport_excluded.txt");
+        scoreDistribution.createChart("/home/marine/Desktop/excluded.png", "Distribution of the mi score of excluded interactions", 100, 0, 1);
     }
 
 }
