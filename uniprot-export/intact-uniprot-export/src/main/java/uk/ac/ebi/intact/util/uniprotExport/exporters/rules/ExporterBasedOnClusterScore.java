@@ -24,7 +24,7 @@ import java.util.Set;
 public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     private static final Logger logger = Logger.getLogger(ExporterBasedOnClusterScore.class);
 
-    private static final double EXPORT_THRESHOLD = 0.40;
+    private double export_threshold = 0.43;
     private static final String COLOCALIZATION = "MI:0403";
 
     public ExporterBasedOnClusterScore(){
@@ -35,7 +35,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
 
         double score = FilterUtils.getMiClusterScoreFor(encore);
 
-        if (score >= EXPORT_THRESHOLD){
+        if (score >= export_threshold){
 
             if (encore.getExperimentToDatabase() == null){
                 throw new UniprotExportException("The interaction " + encore.getId() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
@@ -69,7 +69,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     public boolean canExportBinaryInteraction(BinaryInteraction interaction, ExportContext context) throws UniprotExportException {
         double score = FilterUtils.getMiClusterScoreFor(interaction);
 
-        if (score >= EXPORT_THRESHOLD){
+        if (score >= export_threshold){
 
             Set<String> intactInteractions = new HashSet<String>();
 
@@ -94,5 +94,13 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
         }
 
         return false;
+    }
+
+    public void setExport_threshold(double export_threshold) {
+        this.export_threshold = export_threshold;
+    }
+
+    public double getExport_threshold() {
+        return export_threshold;
     }
 }
