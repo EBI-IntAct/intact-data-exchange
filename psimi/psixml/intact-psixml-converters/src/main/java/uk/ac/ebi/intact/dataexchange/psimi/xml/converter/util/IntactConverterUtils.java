@@ -282,6 +282,12 @@ public class IntactConverterUtils {
             component.setExpressedIn(bioSource);
         }
 
+        ParticipantConfidenceConverter confConverter= new ParticipantConfidenceConverter( institution);
+        for (psidev.psi.mi.xml.model.Confidence psiConfidence :  participant.getConfidenceList()){
+            ComponentConfidence confidence = confConverter.psiToIntact( psiConfidence );
+            component.addConfidence( confidence);
+        }
+
         ParticipantParameterConverter paramConverter= new ParticipantParameterConverter(institution);
         for (psidev.psi.mi.xml.model.Parameter psiParameter : participant.getParameters()){
             ComponentParameter parameter = paramConverter.psiToIntact( psiParameter );

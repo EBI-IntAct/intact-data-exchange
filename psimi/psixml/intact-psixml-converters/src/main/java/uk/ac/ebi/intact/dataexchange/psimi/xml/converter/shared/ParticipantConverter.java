@@ -19,18 +19,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Feature;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Interactor;
-
-import java.util.Iterator;
-import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * Participant converter.
@@ -118,6 +112,12 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
 
                 participant.getHostOrganisms().add(hostOrganism);
             }
+        }
+
+        ParticipantConfidenceConverter confidenceConverter = new ParticipantConfidenceConverter( getInstitution());
+        for (ComponentConfidence conf : intactObject.getConfidences()){
+            psidev.psi.mi.xml.model.Confidence confidence = confidenceConverter.intactToPsi( conf);
+            participant.getConfidenceList().add( confidence);
         }
 
         ParticipantParameterConverter participantParameterConverter = new ParticipantParameterConverter( getInstitution());

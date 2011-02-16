@@ -15,7 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import uk.ac.ebi.intact.model.Confidence;
+import uk.ac.ebi.intact.model.ComponentConfidence;
 import uk.ac.ebi.intact.model.Institution;
 
 
@@ -29,16 +29,15 @@ import uk.ac.ebi.intact.model.Institution;
  *               06-Dec-2007
  *               </pre>
  */
-public class ConfidenceConverter extends AbstractConfidenceConverter<Confidence> {
+public class ParticipantConfidenceConverter extends AbstractConfidenceConverter<ComponentConfidence> {
 
-    public ConfidenceConverter( Institution institution ) {
+    public ParticipantConfidenceConverter(Institution institution) {
         super( institution );
     }
 
     @Override
-    public Confidence newConfidenceInstance(String value) {
-        return new Confidence(value);
+    public ComponentConfidence newConfidenceInstance(String value) {
+        return new ComponentConfidence(value);
     }
-
 
 }
