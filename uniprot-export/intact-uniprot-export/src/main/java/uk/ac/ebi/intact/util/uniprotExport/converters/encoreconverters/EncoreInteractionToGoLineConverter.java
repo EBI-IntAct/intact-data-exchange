@@ -27,8 +27,21 @@ public class EncoreInteractionToGoLineConverter {
      */
     public GOParameters convertInteractionIntoGOParameters(EncoreInteraction interaction){
         // extract the uniprot acs of the firts and second interactors
-        String uniprot1 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsA());
-        String uniprot2 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsB());
+        String uniprot1;
+        String uniprot2;
+
+        if (interaction.getInteractorAccsA().containsKey(WriterUtils.UNIPROT)){
+            uniprot1 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsA());
+        }
+        else {
+            uniprot1 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsA());
+        }
+        if (interaction.getInteractorAccsB().containsKey(WriterUtils.UNIPROT)){
+            uniprot2 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsB());
+        }
+        else {
+            uniprot2 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsB());
+        }
 
         // if the uniprot acs are not null, it is possible to create a GOParameter
         if (uniprot1 != null && uniprot2 != null){

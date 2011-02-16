@@ -107,7 +107,18 @@ public class FilterUtils {
         return interactorAcc;
     }
 
-    public static String extractIntactAcFromAccs(Map<String, List<String>> interactorAccs){
+    public static String extractIntactAcFromAccs(Map<String, String> interactorAccs){
+        String interactorAcc = null;
+        for(Map.Entry<String, String> entry : interactorAccs.entrySet()){
+            if(WriterUtils.INTACT.equalsIgnoreCase(entry.getKey())){
+                interactorAcc =  entry.getValue();
+            }
+        }
+
+        return interactorAcc;
+    }
+
+    public static String extractIntactAcFromOtherAccs(Map<String, List<String>> interactorAccs){
         String intactAc = null;
         for(Map.Entry<String, List<String>> entry : interactorAccs.entrySet()){
             if(WriterUtils.INTACT.equalsIgnoreCase(entry.getKey()) && !entry.getValue().isEmpty()){
@@ -116,6 +127,17 @@ public class FilterUtils {
         }
 
         return intactAc;
+    }
+
+    public static String extractUniprotAcFromOtherAccs(Map<String, List<String>> interactorAccs){
+        String uniprotAc = null;
+        for(Map.Entry<String, List<String>> entry : interactorAccs.entrySet()){
+            if(WriterUtils.UNIPROT.equalsIgnoreCase(entry.getKey()) && !entry.getValue().isEmpty()){
+                uniprotAc = entry.getValue().iterator().next();
+            }
+        }
+
+        return uniprotAc;
     }
 
     /**
