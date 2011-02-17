@@ -24,17 +24,17 @@ public class ExportFilter {
     public static void main( String[] args ) throws IOException, ConverterException {
 
         // Six possible arguments
-        if( args.length != 3 ) {
+        /*if( args.length != 3 ) {
             System.err.println( "Usage: ExportFilter <fileA> <fileB> <results>" );
             System.err.println( "Usage: <fileA> is the file containing the results we want to filter (interactor A and interactor B separated by tab)" );
             System.err.println( "Usage: <fileB> is the mitab file to filter with the results of the file A" );
             System.err.println( "Usage: <fileB> is the file where to write the results" );
 
             System.exit( 1 );
-        }
-        String fileA = args[0];
-        String fileB = args[1];
-        File results = new File(args[2]);
+        }*/
+        String fileA = "/home/marine/Desktop/miCluster_score_results/rules_comparison/detection_method_miScore_0.40/exported_both_rules.txt";
+        String fileB = "/home/marine/Desktop/miCluster_score_results/results_miScore/0.40/uniprotExport.csv";
+        File results = new File("/home/marine/Desktop/exported_both_rules.csv");
 
         // read the elements to filter and put them in a collection
         Map<CrossReference, List<CrossReference>> elementsToFilter = new HashMap<CrossReference, List<CrossReference>>();
@@ -61,6 +61,7 @@ public class ExportFilter {
                 }
 
                 if (refA != null && refB != null){
+
                     if (elementsToFilter.containsKey(refA)){
                         List<CrossReference> refs = elementsToFilter.get(refA);
                         refs.add(refB);
@@ -69,6 +70,16 @@ public class ExportFilter {
                         List<CrossReference> refs = new ArrayList<CrossReference>();
                         refs.add(refB);
                         elementsToFilter.put(refA, refs);
+                    }
+
+                    if (elementsToFilter.containsKey(refB)){
+                        List<CrossReference> refs = elementsToFilter.get(refB);
+                        refs.add(refA);
+                    }
+                    else{
+                        List<CrossReference> refs = new ArrayList<CrossReference>();
+                        refs.add(refA);
+                        elementsToFilter.put(refB, refs);
                     }
                 }
                 else {
@@ -111,7 +122,7 @@ public class ExportFilter {
 
                     if (!hasFoundInteractorB){
                         for (CrossReference ref : interactorB.getAlternativeIdentifiers()){
-                            if (elementsToFilter.containsKey(ref)){
+                            if (secondInteractors.contains(ref)){
                                 hasFoundInteractorB = true;
                             }
                         }
