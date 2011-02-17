@@ -157,6 +157,47 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>export-comparator</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2024m</argument>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath/>
+                                <argument>uk.ac.ebi.intact.dataexchange.uniprotexport.ExportComparator</argument>
+                                <!-- The file containing the exported interactions from export A (format per line = 'database:ac   database:ac')-->
+                                <argument>${fileA}</argument>
+                                <!-- The file containing the exported interactions from export B (format per line = 'database:ac   database:ac')-->
+                                <argument>${fileB}</argument>
+                                <!-- The name of the file where we want to write the results A not B-->
+                                <argument>${file1}</argument>
+                                <!-- The name of the file where we want to write the results A and B-->
+                                <argument>${file2}</argument>
+                                <!-- The name of the file where we want to write the results B not A-->
+                                <argument>${file3}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>

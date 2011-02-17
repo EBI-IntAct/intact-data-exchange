@@ -72,13 +72,13 @@ public class ExportFilter {
                     }
                 }
                 else {
-                    System.err.print("Skip the line " + lineA);
+                    System.err.print("Skip the line " + lineA + "\n");
                 }
-                lineA = readerA.readLine();
             }
             else {
-                System.err.print("The line doesn't contain any tab and is ignored");
+                System.err.print("The line doesn't contain any tab and is ignored \n");
             }
+            lineA = readerA.readLine();
         }
 
         readerA.close();
