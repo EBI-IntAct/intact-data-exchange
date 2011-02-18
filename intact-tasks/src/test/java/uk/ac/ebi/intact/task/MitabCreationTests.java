@@ -29,8 +29,12 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
@@ -38,7 +42,6 @@ import uk.ac.ebi.intact.model.*;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,13 +50,14 @@ import java.util.Map;
  * @version $Id$
  */
 @ContextConfiguration(locations = {"/META-INF/mitab-creation.spring.xml"})
+@Transactional(propagation = Propagation.NEVER)
 public class MitabCreationTests extends IntactBasicTestCase {
 
     @Resource(name = "intactBatchJobLauncher")
     private JobLauncher jobLauncher;
 
     @Autowired
-    private PersisterHelper persisterHelper;
+    private CorePersister corePersister;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -76,6 +80,7 @@ public class MitabCreationTests extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void writeMitab() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
@@ -90,7 +95,7 @@ public class MitabCreationTests extends IntactBasicTestCase {
         Experiment exp = getMockBuilder().createExperimentRandom(3);
         exp.addAnnotation( new Annotation(exp.getOwner(), internalRemark, "some internal information" ) );
 
-        persisterHelper.save(exp);
+        corePersister.saveOrUpdate(exp);
 
         Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
         Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
@@ -108,7 +113,7 @@ public class MitabCreationTests extends IntactBasicTestCase {
 
         proteinA.getBioSource().setTaxId("9606");
 
-        persisterHelper.save(interaction);
+        corePersister.saveOrUpdate(interaction);
 
         Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
 
@@ -131,12 +136,18 @@ public class MitabCreationTests extends IntactBasicTestCase {
         Assert.assertEquals(0L, solrServer.query(new SolrQuery("\"Could not map sequence\"")).getResults().getNumFound());
 
         // checking that the hidden annotation is still there
-        proteinC = getDaoFactory().getProteinDao().getByShortLabel( "protC" );
+        final TransactionStatus transactionStatus = getDataContext().beginTransaction();
+
+        proteinC = getDaoFactory().getProteinDao().getByShortLabel("protC");
         Assert.assertEquals(1, proteinC.getAnnotations().size());
+
+        getDataContext().commitTransaction(transactionStatus);
     }
 
-     @Test
-    public void writeMitab_lala() throws Exception {
+    @Test
+    @DirtiesContext
+    public void writeMitab_withXrefs() throws Exception {
+        FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
         Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
         Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
@@ -151,7 +162,7 @@ public class MitabCreationTests extends IntactBasicTestCase {
         CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
         interaction.addXref(getMockBuilder().createXref(interaction, "IM-1234-1", imexPrimary, imexDb));
 
-        persisterHelper.save(interaction);
+        corePersister.saveOrUpdate(interaction);
 
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
 
@@ -166,5 +177,38 @@ public class MitabCreationTests extends IntactBasicTestCase {
 
         final SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("IM-1234-1")).getResults().getNumFound());
+    }
+
+    @Test
+    @DirtiesContext
+    public void writeMitab_negative() throws Exception {
+        FileUtils.deleteDirectory(new File("target/lala-lucene"));
+
+        Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
+        Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
+        Protein proteinC = getMockBuilder().createProtein("Q00002", "protC");
+
+        Interaction interaction = getMockBuilder().createInteraction(
+                getMockBuilder().createComponentBait(proteinA),
+                getMockBuilder().createComponentPrey(proteinB),
+                getMockBuilder().createComponentPrey(proteinC));
+
+        interaction.addAnnotation(getMockBuilder().createAnnotation("because of this and that", null, CvTopic.NEGATIVE));
+
+        corePersister.saveOrUpdate(interaction);
+
+        Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
+
+        Job job = (Job) applicationContext.getBean("createMitabJob");
+
+        Map<String, JobParameter> params = new HashMap<String, JobParameter>(1);
+        params.put("date", new JobParameter(System.currentTimeMillis()));
+
+        JobExecution jobExecution = jobLauncher.run(job, new JobParameters(params));
+        Assert.assertTrue( jobExecution.getAllFailureExceptions().isEmpty() );
+        Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
+
+        final SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
+        Assert.assertEquals(0L, solrServer.query(new SolrQuery("*:*")).getResults().getNumFound());
     }
 }

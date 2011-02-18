@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.task.mitab;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
@@ -26,18 +27,12 @@ import uk.ac.ebi.intact.irefindex.seguid.RigidGenerator;
 import uk.ac.ebi.intact.irefindex.seguid.RogidGenerator;
 import uk.ac.ebi.intact.irefindex.seguid.SeguidException;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.clone.IntactCloner;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
-import uk.ac.ebi.intact.model.visitor.BaseIntactVisitor;
-import uk.ac.ebi.intact.model.visitor.DefaultTraverser;
-import uk.ac.ebi.intact.model.visitor.IntactObjectTraverser;
-import uk.ac.ebi.intact.model.visitor.IntactVisitor;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.PsimitabTools;
 import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
-import uk.ac.ebi.intact.psimitab.converters.expansion.NotExpandableInteractionException;
 import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
@@ -63,7 +58,13 @@ public class InteractionExpansionCompositeProcessor implements ItemProcessor<Int
         this.binaryItemProcessors = new ArrayList<ItemProcessor<BinaryInteraction, BinaryInteraction>>();
     }
 
+    @Transactional
     public Collection<? extends BinaryInteraction> process(Interaction item) throws Exception {
+        if (InteractionUtils.isNegative(item)) {
+            if (log.isInfoEnabled()) log.info("Filtered interaction: " + item.getAc() + " (negative)");
+            return null;
+        }
+
         if (!expansionStategy.isExpandable(item)) {
             if (log.isWarnEnabled()) log.warn("Filtered interaction: "+item.getAc()+" (not expandable)");
             return null;
