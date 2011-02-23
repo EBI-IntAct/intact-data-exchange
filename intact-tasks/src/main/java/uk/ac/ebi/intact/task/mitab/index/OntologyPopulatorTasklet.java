@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -46,7 +47,7 @@ public class OntologyPopulatorTasklet implements Tasklet{
         if (ontologiesSolrUrl == null) {
             throw new NullPointerException("ontologiesSolrUrl is null");
         }
-        CommonsHttpSolrServer ontologiesSolrServer = new CommonsHttpSolrServer(ontologiesSolrUrl.getURL());
+        StreamingUpdateSolrServer ontologiesSolrServer = new StreamingUpdateSolrServer(ontologiesSolrUrl.getURL().toString(), 10, 4);
         ontologiesSolrServer.setMaxRetries(1);
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(ontologiesSolrServer);

@@ -143,7 +143,7 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         Assert.assertEquals(31, mitab.split("\t").length);
 
         IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB),
-                                                          getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+                                                          getSolrJettyRunner().getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
         indexer.indexOntologies(new OntologyMapping[] {
                 new OntologyMapping("go", IntactSolrIndexerTest.class.getResource("/META-INF/goslim_generic.obo"))});
 

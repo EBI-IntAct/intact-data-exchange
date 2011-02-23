@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.junit.After;
 import org.junit.Assert;
@@ -54,7 +55,7 @@ public class OntologyIndexerTest  {
 
     @Test
     public void testIndexObo() throws Exception{
-        SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        StreamingUpdateSolrServer solrServer = solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
 
@@ -69,7 +70,7 @@ public class OntologyIndexerTest  {
 
     @Test
     public void testTinyIndexObo() throws Exception{
-        SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        StreamingUpdateSolrServer solrServer = solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
 
@@ -84,7 +85,7 @@ public class OntologyIndexerTest  {
 
     @Test
     public void testSmallIndexObo() throws Exception{
-        SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        StreamingUpdateSolrServer solrServer = solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
 
@@ -107,7 +108,7 @@ public class OntologyIndexerTest  {
 
     @Test
     public void testIndexTaxonomy() throws Exception{
-        SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        StreamingUpdateSolrServer solrServer = solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
 

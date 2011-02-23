@@ -43,7 +43,7 @@ public class OntologyBinaryInteractionEnricherTest {
         solrJettyRunner.start();
 
         indexer = new IntactSolrIndexer(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB),
-                                        solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+                                        solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
 
         enricher = new OntologyBinaryInteractionEnricher(
                 new OntologySearcher(solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB)));

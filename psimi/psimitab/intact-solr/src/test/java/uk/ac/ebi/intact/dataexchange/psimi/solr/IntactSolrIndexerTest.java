@@ -216,7 +216,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
 
         OntologyIterator taxonomyIterator = new UniprotTaxonomyOntologyIterator(IntactSolrSearcherTest.class.getResourceAsStream("/META-INF/hominidae-taxonomy.tsv"));
 
-        IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB), getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB), getSolrJettyRunner().getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
         indexer.indexOntology(taxonomyIterator);
         indexer.indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
 

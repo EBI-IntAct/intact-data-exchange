@@ -16,6 +16,8 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -27,7 +29,9 @@ import uk.ac.ebi.intact.bridges.ontologies.iterator.UniprotTaxonomyOntologyItera
 import uk.ac.ebi.intact.dataexchange.psimi.solr.IntactSolrException;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Iterator;
 
 /**
  * Indexes in a SOLR instance the ontologies passed as URL. The created index is useful
@@ -40,9 +44,9 @@ public class OntologyIndexer {
 
     private static final Log log = LogFactory.getLog( OntologyIndexer.class );
 
-    private SolrServer solrServer;
+    private StreamingUpdateSolrServer solrServer;
 
-    public OntologyIndexer(SolrServer solrServer) {
+    public OntologyIndexer(StreamingUpdateSolrServer solrServer) {
         this.solrServer = solrServer;
 
         SolrLogger.readFromLog4j();
@@ -95,21 +99,30 @@ public class OntologyIndexer {
     public void indexOntology(OntologyIterator ontologyIterator, DocumentFilter documentFilter) {
         int i = 0;
 
-        while (ontologyIterator.hasNext()) {
-            OntologyDocument doc = ontologyIterator.next();
-            index(doc, documentFilter);
+//        while (ontologyIterator.hasNext()) {
+//            OntologyDocument doc = ontologyIterator.next();
+//            index(doc, documentFilter);
 
-            i++;
 
-            if (i % 100 == 0) {
-                commitSolr(false);
-                if ( log.isInfoEnabled() ) log.info( i + " terms processed" );
+            Iterator<SolrInputDocument> iter = new SolrInputDocumentIterator(ontologyIterator, documentFilter);
+
+            try {
+                solrServer.add(iter);
+            } catch (Throwable e) {
+                throw new IntactSolrException("Problem indexing documents using iterator", e);
             }
-        }
+
+//            i++;
+
+//            if (i % 100 == 0) {
+//                commitSolr(false);
+//                if ( log.isInfoEnabled() ) log.info( i + " terms processed" );
+//            }
+//        }
 
         commitSolr(true);
         
-        if ( log.isInfoEnabled() ) log.info( "Completed processing of " + i + " terms." );
+//        if ( log.isInfoEnabled() ) log.info( "Completed processing of " + i + " terms." );
     }
 
     public void index(OntologyDocument ontologyDocument) throws IntactSolrException {
@@ -121,6 +134,16 @@ public class OntologyIndexer {
             return;
         }
 
+        SolrInputDocument doc = createSolrInputDocument(ontologyDocument);
+
+        try {
+            solrServer.add(doc);
+        } catch (Exception e) {
+            throw new IntactSolrException("Problem adding ontology document to SOLR server: "+ontologyDocument, e);
+        }
+    }
+
+    private SolrInputDocument createSolrInputDocument(OntologyDocument ontologyDocument) {
         SolrInputDocument doc = new SolrInputDocument();
 
         String uniqueKey = ontologyDocument.getOntology() + "_" + ontologyDocument.getParentId() + "_" + ontologyDocument.getChildId() + "_" + ontologyDocument.getRelationshipType();
@@ -132,12 +155,7 @@ public class OntologyIndexer {
         addField(doc, OntologyFieldNames.CHILD_NAME, ontologyDocument.getChildName(), true);
         addField(doc, OntologyFieldNames.RELATIONSHIP_TYPE, ontologyDocument.getRelationshipType(), false);
         addField(doc, OntologyFieldNames.CYCLIC, ontologyDocument.isCyclicRelationship(), false);
-
-        try {
-            solrServer.add(doc);
-        } catch (Exception e) {
-            throw new IntactSolrException("Problem adding ontology document to SOLR server: "+ontologyDocument, e);
-        }
+        return doc;
     }
 
     private void addField(SolrInputDocument doc, String fieldName, Object value, boolean addTextCopy) {
@@ -156,6 +174,45 @@ public class OntologyIndexer {
             if (optimize) solrServer.optimize();
         } catch (Exception e) {
             throw new IntactSolrException("Problem during commit", e);
+        }
+    }
+
+    private class SolrInputDocumentIterator implements Iterator<SolrInputDocument> {
+
+        private OntologyIterator ontologyIterator;
+        private DocumentFilter documentFilter;
+
+        private OntologyDocument next;
+
+        public SolrInputDocumentIterator(OntologyIterator ontologyIterator,DocumentFilter documentFilter) {
+            this.ontologyIterator = ontologyIterator;
+            this.documentFilter = documentFilter;
+        }
+
+        @Override
+        public boolean hasNext() {
+            boolean hasNext = ontologyIterator.hasNext();
+
+            if (hasNext) {
+                next = ontologyIterator.next();
+
+                if (documentFilter != null && !documentFilter.accept(next)) {
+                    return hasNext();
+                }
+
+            }
+
+            return hasNext;
+        }
+
+        @Override
+        public SolrInputDocument next() {
+            return createSolrInputDocument(next);
+        }
+
+        @Override
+        public void remove() {
+            ontologyIterator.remove();
         }
     }
 }
