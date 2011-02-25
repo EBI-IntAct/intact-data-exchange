@@ -15,12 +15,13 @@
  */
 package uk.ac.ebi.intact.task.mitab;
 
-import psidev.psi.mi.tab.model.BinaryInteraction;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.transaction.annotation.Transactional;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 
-import java.util.List;
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -30,6 +31,7 @@ public class MitabCollectionCompositeWriter implements ItemWriter<Collection<? e
 
     private List<BinaryInteractionItemWriter> delegates;
 
+    @Transactional
     public void write(List<? extends Collection<? extends BinaryInteraction>> items) throws Exception {
         for (Collection<? extends BinaryInteraction> binaryInteraction : items) {
             for (BinaryInteractionItemWriter delegate : delegates) {

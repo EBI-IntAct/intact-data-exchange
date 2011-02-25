@@ -58,7 +58,7 @@ public class InteractionExpansionCompositeProcessor implements ItemProcessor<Int
         this.binaryItemProcessors = new ArrayList<ItemProcessor<BinaryInteraction, BinaryInteraction>>();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Collection<? extends BinaryInteraction> process(Interaction item) throws Exception {
         if (InteractionUtils.isNegative(item)) {
             if (log.isInfoEnabled()) log.info("Filtered interaction: " + item.getAc() + " (negative)");
