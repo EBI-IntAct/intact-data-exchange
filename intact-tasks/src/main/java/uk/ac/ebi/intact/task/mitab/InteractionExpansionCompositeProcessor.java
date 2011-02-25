@@ -60,11 +60,6 @@ public class InteractionExpansionCompositeProcessor implements ItemProcessor<Int
 
     @Transactional(readOnly = true)
     public Collection<? extends BinaryInteraction> process(Interaction item) throws Exception {
-        if (InteractionUtils.isNegative(item)) {
-            if (log.isInfoEnabled()) log.info("Filtered interaction: " + item.getAc() + " (negative)");
-            return null;
-        }
-
         if (!expansionStategy.isExpandable(item)) {
             if (log.isWarnEnabled()) log.warn("Filtered interaction: "+item.getAc()+" (not expandable)");
             return null;
@@ -73,14 +68,6 @@ public class InteractionExpansionCompositeProcessor implements ItemProcessor<Int
         Collection<Interaction> interactions;
 
         boolean expanded = false;
-
-        // disconnect the interaction from the database, by cloning it
-//        IntactCloner cloner = new IntactCloner();
-//        item = cloner.clone( item );
-
-        // remove all annotations that should not be exported to public views
-//        final IntactObjectTraverser traverser = new DefaultTraverser();
-//        traverser.traverse( item, new HiddenAnnotationCleanerVisitor() );
 
         if (InteractionUtils.isBinaryInteraction(item)) {
             interactions = Collections.singleton(item);

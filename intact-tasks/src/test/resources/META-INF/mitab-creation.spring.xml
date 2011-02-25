@@ -99,11 +99,11 @@
          </batch:step>
         <batch:step id="interactionsToMitabStep" parent="intactBatchStep">
             <batch:tasklet>
-                <batch:chunk reader="interactionReader"
+                <batch:chunk reader="interactionReaderExcludeNegative"
                              processor="interactionExpansionCompositeItemProcessor"
                              writer="compositeMitabWriter">
                     <batch:streams>
-                        <batch:stream ref="interactionReader"/>
+                        <batch:stream ref="interactionReaderExcludeNegative"/>
                         <batch:stream ref="mitabWriter"/>
                         <batch:stream ref="luceneMitabWriter"/>
                         <batch:stream ref="solrMitabWriter"/>
