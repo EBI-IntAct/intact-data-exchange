@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.miscore.extension;
 
 /**
- * TODO comment this
+ * This class contains the number of interactions respecting a condition A and a number of interactions respecting the conditions B
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

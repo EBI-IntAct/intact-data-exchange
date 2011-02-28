@@ -9,7 +9,7 @@ import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 import java.util.*;
 
 /**
- * TODO comment this
+ * This class contains utility methods for filtering binary interactions and manipulating the interactions
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -20,6 +20,14 @@ public class FilterUtils {
     private static final String UNIPROT = "uniprotkb";
     private static final String CONFIDENCE_NAME = "intactPsiscore";
 
+    /**
+     * Add the gene name of these interactors in the cluster context if it is not already present
+     * @param interactorA
+     * @param intactA
+     * @param interactorB
+     * @param intactB
+     * @param context
+     */
     public static void processGeneNames(Interactor interactorA, String intactA, Interactor interactorB, String intactB, MiClusterContext context) {
         String geneNameA = retrieveInteractorGeneName(interactorA);
         String geneNameB = retrieveInteractorGeneName(interactorB);
@@ -34,6 +42,12 @@ public class FilterUtils {
         }
     }
 
+
+    /**
+     *
+     * @param interactor
+     * @returnthe gene name of an interactor. If it doesn't exist, will return the locus name and if it doesn't exist, the ORF name
+     */
     public static String retrieveInteractorGeneName(Interactor interactor){
         Collection<Alias> aliases = interactor.getAliases();
         String geneName = null;
@@ -69,6 +83,11 @@ public class FilterUtils {
         return geneName;
     }
 
+    /**
+     *
+     * @param interactorAccs
+     * @return String [2] with the uniprot ac, intact ac of the interactor
+     */
     public static String [] extractUniprotAndIntactAcFromAccs(Map<String, String> interactorAccs){
         String interactorAcc = null;
         String intactAc = null;
@@ -84,6 +103,11 @@ public class FilterUtils {
         return new String [] {interactorAcc, intactAc};
     }
 
+    /**
+     *
+     * @param references
+     * @return the intact cross references
+     */
     public static Set<String> extractIntactAcFrom(Collection<CrossReference> references){
         Set<String> intactAcs = new HashSet<String>(references.size());
 
@@ -96,6 +120,11 @@ public class FilterUtils {
         return intactAcs;
     }
 
+    /**
+     *
+     * @param interactorAccs
+     * @return uniprot ac of the interactor
+     */
     public static String extractUniprotAcFromAccs(Map<String, String> interactorAccs){
         String interactorAcc = null;
         for(Map.Entry<String, String> entry : interactorAccs.entrySet()){
@@ -107,6 +136,11 @@ public class FilterUtils {
         return interactorAcc;
     }
 
+    /**
+     *
+     * @param interactorAccs
+     * @return The intact ac of the interactor
+     */
     public static String extractIntactAcFromAccs(Map<String, String> interactorAccs){
         String interactorAcc = null;
         for(Map.Entry<String, String> entry : interactorAccs.entrySet()){
@@ -118,6 +152,11 @@ public class FilterUtils {
         return interactorAcc;
     }
 
+    /**
+     *
+     * @param interactorAccs
+     * @return the intact ac of the interactor
+     */
     public static String extractIntactAcFromOtherAccs(Map<String, List<String>> interactorAccs){
         String intactAc = null;
         for(Map.Entry<String, List<String>> entry : interactorAccs.entrySet()){
@@ -129,6 +168,11 @@ public class FilterUtils {
         return intactAc;
     }
 
+    /**
+     *
+     * @param interactorAccs
+     * @returnthe uniprot acs of the interactor
+     */
     public static String extractUniprotAcFromOtherAccs(Map<String, List<String>> interactorAccs){
         String uniprotAc = null;
         for(Map.Entry<String, List<String>> entry : interactorAccs.entrySet()){

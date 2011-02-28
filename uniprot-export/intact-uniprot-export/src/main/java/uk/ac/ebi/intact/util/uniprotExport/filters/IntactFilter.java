@@ -53,7 +53,14 @@ public class IntactFilter implements InteractionFilter {
 
     public static final String UNIPROT_DATABASE = "uniprotkb";
 
+    /**
+     * The exporter having the rules
+     */
     protected InteractionExporter exporter;
+
+    /**
+     * The factory for querying the database
+     */
     protected QueryFactory queryFactory;
 
     /**
