@@ -16,7 +16,9 @@ import java.io.FileWriter;
 import java.util.*;
 
 /**
- * Extension of the InteractionClusterScore : use a different format to export the scores
+ * Extension of the InteractionClusterScore : use a different format to export the scores and added utility methods.
+ *
+ * This class is computing the mi score of each clustered binary interaction while clustering
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

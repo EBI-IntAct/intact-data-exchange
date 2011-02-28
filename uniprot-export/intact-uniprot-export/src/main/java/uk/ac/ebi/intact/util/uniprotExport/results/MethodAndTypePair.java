@@ -10,7 +10,14 @@ package uk.ac.ebi.intact.util.uniprotExport.results;
 
 public class MethodAndTypePair {
 
+    /**
+     * The detection method
+     */
     private String method;
+
+    /**
+     * The interaction type
+     */
     private String type;
 
     public MethodAndTypePair(String method, String type){

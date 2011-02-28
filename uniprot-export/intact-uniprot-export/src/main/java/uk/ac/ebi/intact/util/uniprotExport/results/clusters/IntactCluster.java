@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Interface to implement for classes which contains clustered interactions
+ * Interface to implement for classes which contains clustered interactions.
+ *
+ * The cluster must have a map of binary interactions associated with an identifier which is an Integer and it must have a map
+ * associating the name of each interactor with a list of interaction identifiers.
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

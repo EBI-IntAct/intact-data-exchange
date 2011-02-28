@@ -1,7 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.results.contexts;
 
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
-import uk.ac.ebi.intact.util.uniprotExport.results.contexts.ExportContext;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Context of the cluster
+ * Context of the mi cluster
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

@@ -6,7 +6,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Interface to implement for the context of the export
+ * Interface to implement for the context of the export. Must contain :
+ * - gene names associated with the uniprot ac
+ * - MI terms associated with the full name for both detection methods and interaction types
+ * - The interaction acs of spoke expanded binary interactions
+ * - the detection method/interaction type associated with each interaction ac
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

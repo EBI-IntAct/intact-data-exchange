@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Cluster containing binary interactions
+ * Cluster containing binary interactions. This cluster doesn't compute the mi score
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

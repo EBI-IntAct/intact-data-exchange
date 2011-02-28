@@ -22,6 +22,11 @@ public class WriterUtils {
     public static final String TAXID = "taxId";
     public static final String CHAIN_PREFIX = "-PRO_";
 
+    /**
+     * Invert the map so the value become the key. As the value can have several keys, te new value is a list of previous keys
+     * @param mapToInvert
+     * @return a map of type String -> List<String>
+     */
     public static Map<String, List<String>> invertMapOfTypeStringToString (Map<String, String> mapToInvert){
         Map<String, List<String>> invertedMap = new HashMap<String, List<String>>();
 
@@ -42,6 +47,12 @@ public class WriterUtils {
         return invertedMap;
     }
 
+    /**
+     * Invert the map so the value become the key. As the value can have several keys, te new value is a list of previous keys
+     * @param mapToInvert
+     * @param keySelection : the list of keys we want to invert
+     * @return a map of type MethodAndTypePair -> List<String>
+     */
     public static Map<MethodAndTypePair, List<String>> invertMapFromKeySelection (Map<String, MethodAndTypePair> mapToInvert, Set<String> keySelection){
         Map<MethodAndTypePair, List<String>> invertedMap = new HashMap<MethodAndTypePair, List<String>>();
 

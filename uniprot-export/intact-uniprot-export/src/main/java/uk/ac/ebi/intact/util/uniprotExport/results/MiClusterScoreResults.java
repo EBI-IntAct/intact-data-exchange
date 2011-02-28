@@ -1,8 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.results;
 
-import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
-import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
 import java.util.HashSet;
@@ -18,8 +16,19 @@ import java.util.Set;
 
 public class MiClusterScoreResults implements UniprotExportResults{
 
+    /**
+     * The mi cluster
+     */
     private IntactCluster clusterScore;
+
+    /**
+     * The context for the mi cluster
+     */
     private MiClusterContext clusterContext;
+
+    /**
+     * The interaction identifiers we want to export from the cluster
+     */
     private Set<Integer> interactionsToExport;
 
     public MiClusterScoreResults(IntactCluster clusterScore, MiClusterContext clusterContext, Set<Integer> interactionsToExport){
