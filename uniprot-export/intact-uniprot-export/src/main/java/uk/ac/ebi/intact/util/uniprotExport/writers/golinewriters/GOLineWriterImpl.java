@@ -46,11 +46,11 @@ public class GOLineWriterImpl implements GOLineWriter{
             // generate the line
             writeGOLine(uniprot1, uniprot2, self, parameters.getPubmedIds());
 
-            if (!self) {
+            /*if (!self) {
                 // write the reverse
 
                 writeGOLine(uniprot2, uniprot1, self, parameters.getPubmedIds());
-            }
+            }*/
 
             writer.flush();
         }

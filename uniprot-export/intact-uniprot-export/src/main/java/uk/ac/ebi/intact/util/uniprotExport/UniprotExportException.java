@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
 /**
- * TODO comment this
+ * TException thrown when the uniprot export fails
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

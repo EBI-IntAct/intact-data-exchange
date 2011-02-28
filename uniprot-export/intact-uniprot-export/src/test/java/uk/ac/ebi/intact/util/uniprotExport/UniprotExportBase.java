@@ -58,11 +58,15 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         publications2.add(pmid2);
 
         GOParameters parameter1 = new DefaultGOParameters(uniprotAc1, uniprotAc2, publications1);
+        GOParameters parameter4 = new DefaultGOParameters(uniprotAc2, uniprotAc1, publications1);
         GOParameters parameter2 = new DefaultGOParameters(uniprotAc1, uniprotAc4, publications1);
+        GOParameters parameter5 = new DefaultGOParameters(uniprotAc4, uniprotAc1, publications1);
         GOParameters parameter3 = new DefaultGOParameters(uniprotAc5, uniprotAc5, publications2);
 
         parameters.add(parameter1);
+        parameters.add(parameter4);
         parameters.add(parameter2);
+        parameters.add(parameter5);
         parameters.add(parameter3);
 
         return parameters;
