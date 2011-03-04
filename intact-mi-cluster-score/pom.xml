@@ -114,6 +114,8 @@
                                 <argument>${fileExcluded}</argument>
                                 <!-- The name of the database  -->
                                 <argument>${database}</argument>
+                                <!-- The version of CC export  -->
+                                <argument>${version}</argument>
                             </arguments>
                         </configuration>
                     </plugin>

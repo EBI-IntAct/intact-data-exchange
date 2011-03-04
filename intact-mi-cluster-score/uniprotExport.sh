@@ -5,4 +5,4 @@ export MAVEN_OPTS
 
 echo "MAVEN_OPTS=$MAVEN_OPTS"
 
-mvn clean install -Puniprot-export -Drule=$1 -Dsource=$2 -Ddrfile=$3 -Dccfile=$4 -Dgofile=$5 -Ddatabase=$6 -Dmaven.test.skip
+mvn clean install -Puniprot-export -Drule=$1 -Dsource=$2 -Ddrfile=$3 -Dccfile=$4 -Dgofile=$5 -Ddatabase=$6 -Dversion=$7 -Dmaven.test.skip
