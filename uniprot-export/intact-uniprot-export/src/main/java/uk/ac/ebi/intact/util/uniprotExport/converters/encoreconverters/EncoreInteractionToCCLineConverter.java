@@ -191,13 +191,21 @@ public class EncoreInteractionToCCLineConverter {
     }
 
     private String retrieveOrganismScientificName(String taxId) throws TaxonomyServiceException {
+        if (this.taxIdToScientificName.containsKey(taxId)){
+            return this.taxIdToScientificName.get(taxId);
+        }
+
         TaxonomyTerm term = this.taxonomyService.getTaxonomyTerm(Integer.parseInt(taxId));
 
         if (term == null){
+            this.taxIdToScientificName.put(taxId, null);
             return null;
         }
 
-        return term.getScientificName();
+        String scientificName = term.getScientificName();
+        this.taxIdToScientificName.put(taxId, scientificName);
+
+        return scientificName;
     }
 
     /**
