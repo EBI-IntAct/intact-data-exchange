@@ -4,6 +4,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
+import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
+import uk.ac.ebi.intact.bridges.taxonomy.UniprotTaxonomyService;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
@@ -22,6 +25,14 @@ import java.util.*;
 
 public class EncoreInteractionToCCLineConverter {
     private static final Logger logger = Logger.getLogger(EncoreInteractionToCCLineConverter.class);
+
+    private Map<String, String> taxIdToScientificName = new HashMap<String, String>();
+
+    private UniprotTaxonomyService taxonomyService;
+
+    public EncoreInteractionToCCLineConverter(){
+        taxonomyService = new UniprotTaxonomyService();
+    }
 
     /**
      *
@@ -179,6 +190,16 @@ public class EncoreInteractionToCCLineConverter {
         return distinctLines;
     }
 
+    private String retrieveOrganismScientificName(String taxId) throws TaxonomyServiceException {
+        TaxonomyTerm term = this.taxonomyService.getTaxonomyTerm(Integer.parseInt(taxId));
+
+        if (term == null){
+            return null;
+        }
+
+        return term.getScientificName();
+    }
+
     /**
      * Converts an EncoreInteraction into a CCParameter
 
@@ -257,7 +278,12 @@ public class EncoreInteractionToCCLineConverter {
                         geneName2 = context.getGeneNames().get(uniprot2);
                         geneName1 = context.getGeneNames().get(uniprot1);
                         taxId2 = organismsB[0];
-                        organism2 = organismsB[1];
+                        try {
+                            organism2 = retrieveOrganismScientificName(taxId2);
+                        } catch (TaxonomyServiceException e) {
+                            logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
+                            organism2 = organismsB[1];
+                        }
                         secondIntactAc = intact2;
 
                         taxId1 = organismsA[0];
@@ -269,7 +295,12 @@ public class EncoreInteractionToCCLineConverter {
                         geneName2 = context.getGeneNames().get(uniprot1);
                         geneName1 = context.getGeneNames().get(uniprot2);
                         taxId2 = organismsA[0];
-                        organism2 = organismsA[1];
+                        try {
+                            organism2 = retrieveOrganismScientificName(taxId2);
+                        } catch (TaxonomyServiceException e) {
+                            logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
+                            organism2 = organismsA[1];
+                        }
                         secondIntactAc = intact1;
 
                         taxId1 = organismsB[0];
