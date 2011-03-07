@@ -13,6 +13,7 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParamet
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DefaultDRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
@@ -603,7 +604,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         IntActInteractionClusterScore clsuterScore = createClusterForExportBasedOnMiScore();
         MiClusterContext context = createClusterContext();
 
-        MiClusterScoreResults results = new MiClusterScoreResults(clsuterScore, null, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clsuterScore), null, context);
 
         return results;
     }
@@ -612,7 +613,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         IntActInteractionClusterScore clsuterScore = createClusterForExportBasedOnDetectionMethod();
         MiClusterContext context = createClusterContext();
 
-        MiClusterScoreResults results = new MiClusterScoreResults(clsuterScore, null, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clsuterScore), null, context);
 
         return results;
     }

@@ -14,6 +14,7 @@ import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
@@ -161,7 +162,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
 
         // TODO - negative interactions and intra molecular are not in mitab!!!
 
-        return new MiClusterScoreResults(clusterScore, negativeClusterScore, context);
+        return new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
     }
 
     private void processClustering(MiClusterContext context, List<BinaryInteraction> interactionToProcess, IntactBinaryInteraction interaction, String intactAc, ExtendedInteractor interactorA, String uniprotA, ExtendedInteractor interactorB, String uniprotB, boolean excludedSpokeExpanded) {
@@ -206,9 +207,9 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
             MiClusterScoreResults clusterResults = computeMiScoreInteractionEligibleUniprotExport(mitab);
             logger.info("Exporting interactions... \n");
             exporter.exportInteractionsFrom(clusterResults);
-            logger.info(clusterResults.getInteractionsToExport().size() + " binary interactions to export");
+            logger.info(clusterResults.getPositiveClusteredInteractions().getInteractionsToExport().size() + " positive binary interactions to export");
+            logger.info(clusterResults.getNegativeClusteredInteractions().getInteractionsToExport().size() + " negative binary interactions to export");
 
-            //this.interactionClusterScore.getScorePerInteractions(fileExport, this.interactionsToBeExported);
 
             return clusterResults;
         } catch (IOException e) {

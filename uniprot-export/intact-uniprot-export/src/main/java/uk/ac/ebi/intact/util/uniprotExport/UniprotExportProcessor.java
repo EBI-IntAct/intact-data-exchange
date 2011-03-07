@@ -11,6 +11,7 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParamet
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters2;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriter1;
 import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriter2;
@@ -107,10 +108,18 @@ public class UniprotExportProcessor {
             logger.info("Write DR and CC lines");
             exportDRAndCCLines(results, DRFile, CCFile, version);
 
-            logger.info("Save cluster informations in uniprotExport.log");
-            results.getCluster().saveClusteredInteractions("uniprotExport.log", results.getInteractionsToExport());
-            logger.info("Save cluster informations in uniprotExport_excluded.log");
-            results.getCluster().saveClusteredInteractions("uniprotExport_excluded.log", new HashSet(CollectionUtils.subtract(results.getCluster().getAllInteractionIds(), results.getInteractionsToExport())));
+            ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
+            ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
+
+            logger.info("Save positive cluster informations in uniprotExport.log");
+            positiveInteractions.getCluster().saveClusteredInteractions("uniprotExport.log", positiveInteractions.getInteractionsToExport());
+            logger.info("Save negative cluster informations in uniprotExport_negative.log");
+            negativeInteractions.getCluster().saveClusteredInteractions("uniprotExport_negative.log", negativeInteractions.getInteractionsToExport());
+
+            logger.info("Save positive cluster informations in uniprotExport_excluded.log");
+            positiveInteractions.getCluster().saveClusteredInteractions("uniprotExport_excluded.log", new HashSet(CollectionUtils.subtract(positiveInteractions.getCluster().getAllInteractionIds(), positiveInteractions.getInteractionsToExport())));
+            logger.info("Save positive cluster informations in uniprotExport_excluded.log");
+            negativeInteractions.getCluster().saveClusteredInteractions("uniprotExport_excluded_negative.log", new HashSet(CollectionUtils.subtract(negativeInteractions.getCluster().getAllInteractionIds(), negativeInteractions.getInteractionsToExport())));
         } catch (IOException e) {
             throw new UniprotExportException("Impossible to write the results of uniprot export in " + DRFile + " or " + CCFile + " or " + GOFile, e);
         }
@@ -127,13 +136,15 @@ public class UniprotExportProcessor {
         // create the GO writer
         GOLineWriter goWriter = new GOLineWriterImpl(new FileWriter(GOFile));
 
+        ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
+
         // the interactions
-        Map<Integer, EncoreInteraction> interactionMapping = results.getCluster().getEncoreInteractionCluster();
+        Map<Integer, EncoreInteraction> interactionMapping = positiveInteractions.getCluster().getEncoreInteractionCluster();
 
         /**
          * The list of interactors is sorted so if an interactor is an isoform or feature chain, it will follow the master protein
          */
-        Set<String> interactors = new TreeSet(results.getCluster().getInteractorCluster().keySet());
+        Set<String> interactors = new TreeSet(positiveInteractions.getCluster().getInteractorCluster().keySet());
 
         // the cluster is not empty
         if (!interactors.isEmpty() && !interactionMapping.isEmpty()){
@@ -161,7 +172,7 @@ public class UniprotExportProcessor {
                 while (interactor.startsWith(uniprotAc)){
 
                     // collect number of exported interactions for this interactor
-                    collectExportedInteractions(results, interactions, interactor);
+                    collectExportedInteractions(positiveInteractions, interactions, interactor);
 
                     // get the next interactor if it exists or exit
                     if (interactorIterator.hasNext()){
@@ -192,7 +203,7 @@ public class UniprotExportProcessor {
                 }
 
                 // collect new interactions for the new interactor
-                collectExportedInteractions(results, interactions, interactor);
+                collectExportedInteractions(positiveInteractions, interactions, interactor);
             }
         }
 
@@ -244,22 +255,25 @@ public class UniprotExportProcessor {
             ccWriter2 = new DefaultCCLineWriter2(new FileWriter(CCFile));
         }
 
+        ExportedClusteredInteractions positiveClusteredInteractions = results.getPositiveClusteredInteractions();
+        ExportedClusteredInteractions negativeClusteredInteractions = results.getNegativeClusteredInteractions();
+
         /*
-         * The list of interactors is sorted so if an interactor is an isoform or feature chain, it will follow the master protein
-         * If we have negative interactions, it will be added as well
-         */
-        SortedSet<InteractingProtein> interactors = buildSortedListOfInteractingProteins(results.getCluster().getInteractorCluster().keySet(), true);
-        interactors.addAll(buildSortedListOfInteractingProteins(results.getNegativeCluster().getInteractorCluster().keySet(), false));
+        * The list of interactors is sorted so if an interactor is an isoform or feature chain, it will follow the master protein
+        * If we have negative interactions, it will be added as well
+        */
+        SortedSet<InteractingProtein> interactors = buildSortedListOfInteractingProteins(positiveClusteredInteractions.getCluster().getInteractorCluster().keySet(), true);
+        interactors.addAll(buildSortedListOfInteractingProteins(negativeClusteredInteractions.getCluster().getInteractorCluster().keySet(), false));
 
         /*
          * The clustered interactions
          */
-        Map<Integer, EncoreInteraction> interactionMapping = results.getCluster().getEncoreInteractionCluster();
+        Map<Integer, EncoreInteraction> interactionMapping = positiveClusteredInteractions.getCluster().getEncoreInteractionCluster();
 
         /*
          * The clustered negative interactions
          */
-        Map<Integer, EncoreInteraction> negativeInteractionMapping = results.getNegativeCluster().getEncoreInteractionCluster();
+        Map<Integer, EncoreInteraction> negativeInteractionMapping = negativeClusteredInteractions.getCluster().getEncoreInteractionCluster();
 
         // the cluster is not empty and we don't process negative interactions
         if (!interactors.isEmpty() && (!interactionMapping.isEmpty() || negativeInteractionMapping.isEmpty())){
@@ -282,12 +296,25 @@ public class UniprotExportProcessor {
             List<EncoreInteraction> negativeInteractions = new ArrayList<EncoreInteraction>();
 
             // the number of interactions exported in CC lines
-            int numberInteractions = collectExportedInteractions(results, interactions, interactor);
+            int numberInteractions = 0;
             // the number of negative interactions exported in CC lines
-            int numberNegativeInteractions = collectExportedNegativeInteractions(results, negativeInteractions, interactor);
+            int numberNegativeInteractions = 0;
             // the total number of binary interactions attached to this protein
-            int totalNumberInteraction = results.getCluster().getInteractorCluster().get(interactor).size()
-                    + results.getNegativeCluster().getInteractorCluster().get(interactor).size();
+            int totalNumberInteraction = 0;
+
+            if (interactingprot.doesInteract()){
+                // collect number of exported interactions for this interactor
+                numberInteractions = collectExportedInteractions(positiveClusteredInteractions, interactions, interactor);
+                // increments the total number of interactions for this uniprot entry
+                totalNumberInteraction = positiveClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
+            }
+            else{
+                // collect number of exported negative interactions for this interactor
+                numberNegativeInteractions = collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor);
+                // increments the total number of exported negative interactions for the uniprot entry (master, isoforms and feature chain)
+                // increments the total number of interactions for this uniprot entry
+                totalNumberInteraction = negativeClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
+            }
 
             // Map containing negative and positive interactions for this interactor
             Map<Boolean, List<EncoreInteraction>> interactionsToConvert = new HashMap<Boolean, List<EncoreInteraction>>();
@@ -304,20 +331,16 @@ public class UniprotExportProcessor {
                 while (interactor.startsWith(parentAc)){
                     if (interactingprot.doesInteract()){
                         // collect number of exported interactions for this interactor
-                        int numberExported = collectExportedInteractions(results, interactions, interactor);
-                        // increments the total number of exported interactions for the uniprot entry (master, isoforms and feature chain)
-                        numberInteractions += numberExported;
+                        numberInteractions += collectExportedInteractions(positiveClusteredInteractions, interactions, interactor);
+                        // increments the total number of interactions for this uniprot entry
+                        totalNumberInteraction += positiveClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
                     }
                     else{
                         // collect number of exported negative interactions for this interactor
-                        int numberExported = collectExportedNegativeInteractions(results, negativeInteractions, interactor);
-                        // increments the total number of exported negative interactions for the uniprot entry (master, isoforms and feature chain)
-                        numberNegativeInteractions += numberExported;
+                        numberNegativeInteractions += collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor);
+                        // increments the total number of interactions for this uniprot entry
+                        totalNumberInteraction += negativeClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
                     }
-
-                    // increments the total number of interactions for this uniprot entry
-                    totalNumberInteraction += results.getCluster().getInteractorCluster().get(interactor).size()
-                            + results.getNegativeCluster().getInteractorCluster().get(interactor).size();
 
                     // get the next interactor if it exists or exit
                     if (interactorIterator.hasNext()){
@@ -360,9 +383,21 @@ public class UniprotExportProcessor {
                 }
 
                 // collect new interactions for the new interactor
-                int numberExported = collectExportedInteractions(results, interactions, interactor);
-                numberInteractions = numberExported;
-                totalNumberInteraction = results.getCluster().getInteractorCluster().get(interactor).size();
+                if (interactingprot.doesInteract()){
+                    // collect number of exported interactions for this interactor
+                    numberInteractions = collectExportedInteractions(positiveClusteredInteractions, interactions, interactor);
+                    numberNegativeInteractions = 0;
+                    // increments the total number of interactions for this uniprot entry
+                    totalNumberInteraction = positiveClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
+                }
+                else{
+                    // collect number of exported negative interactions for this interactor
+                    numberNegativeInteractions = collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor);
+                    // increments the total number of exported negative interactions for the uniprot entry (master, isoforms and feature chain)
+                    numberInteractions = 0;
+                    // increments the total number of interactions for this uniprot entry
+                    totalNumberInteraction = negativeClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
+                }
             }
 
             if (version == 1){
@@ -384,44 +419,13 @@ public class UniprotExportProcessor {
      * @param interactor
      * @returnthe number of exported binary interactions for this interactor
      */
-    private int collectExportedInteractions(MiClusterScoreResults results, List<EncoreInteraction> interactions, String interactor) {
+    private int collectExportedInteractions(ExportedClusteredInteractions results, List<EncoreInteraction> interactions, String interactor) {
+
         // the clustered interactions
         Map<Integer, EncoreInteraction> interactionMapping = results.getCluster().getEncoreInteractionCluster();
 
         // the exported interactions for this interactor are the interactions attached to this interactor which are also in the list of exported interactions
         Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(interactor));
-        // collect number of exported interactions
-        int numberInteractions = exportedInteractions.size();
-
-        // add the exported interactions to the list of interactions
-        for (Integer interactionId : exportedInteractions){
-            EncoreInteraction interaction = interactionMapping.get(interactionId);
-
-            if (interaction != null){
-                interactions.add(interaction);
-            }
-        }
-
-        return numberInteractions;
-    }
-
-    /**
-     *
-     * @param results : the results of the clustering of negative interactionsand uniprot export
-     * @param interactions : the negative encore interactions to export
-     * @param interactor
-     * @returnthe number of exported negative binary interactions for this interactor
-     */
-    private int collectExportedNegativeInteractions(MiClusterScoreResults results, List<EncoreInteraction> interactions, String interactor) {
-        if (results.getNegativeCluster() == null){
-            return 0;
-        }
-
-        // the clustered interactions
-        Map<Integer, EncoreInteraction> interactionMapping = results.getNegativeCluster().getEncoreInteractionCluster();
-
-        // the exported interactions for this interactor are the interactions attached to this interactor which are also in the list of exported interactions
-        Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getNegativeInteractionsToExport(), results.getNegativeCluster().getInteractorCluster().get(interactor));
         // collect number of exported interactions
         int numberInteractions = exportedInteractions.size();
 

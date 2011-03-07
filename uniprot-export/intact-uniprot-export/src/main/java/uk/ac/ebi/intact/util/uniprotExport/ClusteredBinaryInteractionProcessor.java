@@ -3,6 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.intact.util.uniprotExport.filters.mitab.ClusteredMitabFilter;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 
 import java.util.HashSet;
@@ -29,10 +30,18 @@ public class ClusteredBinaryInteractionProcessor {
         logger.info("Export binary interactions from a clustered mitab file");
         MiClusterScoreResults results = filter.exportInteractions();
 
-        logger.info("Save results of exported interactions in " + fileExported);
-        results.getCluster().saveClusteredInteractions(fileExported, results.getInteractionsToExport());
-        logger.info("Save results of excluded interactions in " + fileExcluded);
-        results.getCluster().saveClusteredInteractions(fileExcluded, new HashSet(CollectionUtils.subtract(results.getCluster().getAllInteractionIds(), results.getInteractionsToExport())));
+        ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
+        ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
+
+        logger.info("Save results of exported positive interactions in " + fileExported);
+        positiveInteractions.getCluster().saveClusteredInteractions(fileExported, positiveInteractions.getInteractionsToExport());
+        logger.info("Save results of exported negative interactions in " + fileExported);
+        negativeInteractions.getCluster().saveClusteredInteractions(fileExported, negativeInteractions.getInteractionsToExport());
+
+        logger.info("Save results of excluded positive interactions in " + fileExcluded);
+        positiveInteractions.getCluster().saveClusteredInteractions(fileExcluded, new HashSet(CollectionUtils.subtract(positiveInteractions.getCluster().getAllInteractionIds(), positiveInteractions.getInteractionsToExport())));
+        logger.info("Save results of excluded negative interactions in " + fileExcluded);
+        negativeInteractions.getCluster().saveClusteredInteractions(fileExcluded, new HashSet(CollectionUtils.subtract(negativeInteractions.getCluster().getAllInteractionIds(), negativeInteractions.getInteractionsToExport())));
     }
 
     public ClusteredMitabFilter getFilter() {

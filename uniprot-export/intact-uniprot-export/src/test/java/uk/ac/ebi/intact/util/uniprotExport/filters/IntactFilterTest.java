@@ -7,9 +7,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
-import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
-import uk.ac.ebi.intact.util.uniprotExport.filters.IntactFilter;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
+import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
 
@@ -38,7 +37,7 @@ public class IntactFilterTest extends UniprotExportBase{
 
         MiClusterScoreResults results = filter.exportInteractions();
 
-        IntactCluster clusterScore = results.getCluster();
+        IntactCluster clusterScore = results.getPositiveClusteredInteractions().getCluster();
 
         // compute score for interactions with valid dr-export
         Assert.assertNotNull(clusterScore);

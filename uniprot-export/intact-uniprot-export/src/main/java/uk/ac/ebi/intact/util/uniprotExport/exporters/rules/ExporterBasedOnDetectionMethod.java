@@ -15,6 +15,7 @@ import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.AbstractInteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.QueryFactory;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
@@ -344,14 +345,14 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
     @Override
     public void exportInteractionsFrom(UniprotExportResults results) throws UniprotExportException {
-        Set<Integer> eligibleInteractions = new HashSet<Integer>();
-        Set<Integer> negativeEligibleInteractions = new HashSet<Integer>();
+        ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
+        ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
 
-        processEligibleExperiments(results.getCluster(), results.getExportContext(), eligibleInteractions, false);
-        processEligibleExperiments(results.getNegativeCluster(), results.getExportContext(), negativeEligibleInteractions, true);
+        Set<Integer> eligibleInteractions = positiveInteractions.getInteractionsToExport();
+        Set<Integer> negativeEligibleInteractions = negativeInteractions.getInteractionsToExport();
 
-        results.setInteractionsToExport(eligibleInteractions);
-        results.setNegativeInteractionsToExport(negativeEligibleInteractions);
+        processEligibleExperiments(positiveInteractions.getCluster(), results.getExportContext(), eligibleInteractions, false);
+        processEligibleExperiments(negativeInteractions.getCluster(), results.getExportContext(), negativeEligibleInteractions, true);
     }
 
     @Override

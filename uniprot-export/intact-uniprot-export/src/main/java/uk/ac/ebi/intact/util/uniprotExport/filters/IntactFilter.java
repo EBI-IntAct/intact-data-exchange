@@ -17,6 +17,7 @@ import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetect
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActFileMiScoreDistribution;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
@@ -97,12 +98,14 @@ public class IntactFilter implements InteractionFilter {
         IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
         MiClusterContext context = new MiClusterContext();
 
-        MiClusterScoreResults results = new MiClusterScoreResults(clusterScore, negativeClusterScore, context);
         int i = 0;
         // the list of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
         // the list of negative binary interactions to process
         List<BinaryInteraction> negativeBinaryInteractions = new ArrayList<BinaryInteraction>();
+
+        // the total results of the export
+        MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
 
         System.out.println(interactions.size() + " interactions in IntAct will be processed.");
 
@@ -147,7 +150,7 @@ public class IntactFilter implements InteractionFilter {
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
         IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
 
-        MiClusterScoreResults results = new MiClusterScoreResults(clusterScore, negativeClusterScore, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
         clusterIntactInteractions(interactions, context, clusterScore, negativeClusterScore);
 
         return results;
@@ -792,9 +795,16 @@ public class IntactFilter implements InteractionFilter {
         MiClusterScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
         exporter.exportInteractionsFrom(results);
 
-        results.getCluster().saveCluster(fileTotal);
-        System.out.println("export binary interactions from intact");
-        extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getCluster());
+        ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
+        ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
+
+        positiveInteractions.getCluster().saveCluster(fileTotal);
+        negativeInteractions.getCluster().saveCluster(fileTotal);
+
+        System.out.println("export positive binary interactions from intact");
+        extractComputedMiScoresFor(positiveInteractions.getInteractionsToExport(), fileDataExported, fileDataNotExported, positiveInteractions.getCluster());
+        System.out.println("export negative binary interactions from intact");
+        extractComputedMiScoresFor(negativeInteractions.getInteractionsToExport(), fileDataExported, fileDataNotExported, negativeInteractions.getCluster());
 
         return results;
     }
@@ -812,9 +822,16 @@ public class IntactFilter implements InteractionFilter {
             MiClusterScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
             exporter.exportInteractionsFrom(results);
 
-            results.getCluster().saveCluster(fileTotal);
-            System.out.println("export binary interactions from intact");
-            extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getCluster());
+            ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
+            ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
+
+            positiveInteractions.getCluster().saveCluster(fileTotal);
+            negativeInteractions.getCluster().saveCluster(fileTotal);
+
+            System.out.println("export positive binary interactions from intact");
+            extractComputedMiScoresFor(positiveInteractions.getInteractionsToExport(), fileDataExported, fileDataNotExported, positiveInteractions.getCluster());
+            System.out.println("export negative binary interactions from intact");
+            extractComputedMiScoresFor(negativeInteractions.getInteractionsToExport(), fileDataExported, fileDataNotExported, negativeInteractions.getCluster());
 
             return results;
         }
@@ -831,9 +848,16 @@ public class IntactFilter implements InteractionFilter {
         MiClusterScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
         exporter.exportInteractionsFrom(results);
 
-        results.getCluster().saveCluster(fileTotal);
-        System.out.println("export binary interactions from intact");
-        extractComputedMiScoresFor(results.getInteractionsToExport(), fileDataExported, fileDataNotExported, results.getCluster());
+        ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
+        ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
+
+        positiveInteractions.getCluster().saveCluster(fileTotal);
+        negativeInteractions.getCluster().saveCluster(fileTotal);
+
+        System.out.println("export positive binary interactions from intact");
+        extractComputedMiScoresFor(positiveInteractions.getInteractionsToExport(), fileDataExported, fileDataNotExported, positiveInteractions.getCluster());
+        System.out.println("export negative binary interactions from intact");
+        extractComputedMiScoresFor(negativeInteractions.getInteractionsToExport(), fileDataExported, fileDataNotExported, negativeInteractions.getCluster());
 
         return results;
     }
@@ -846,11 +870,17 @@ public class IntactFilter implements InteractionFilter {
 
         logger.info("Clustering interactions... \n");
         MiClusterScoreResults results = processExportWithFilterOnNonUniprot(eligibleBinaryInteractions);
-        logger.info("Clustered " + results.getCluster().getAllInteractionIds().size() + " binary interactions");
+
+        ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
+        ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
+
+        logger.info("Clustered " + positiveInteractions.getCluster().getAllInteractionIds().size() + " positive binary interactions");
+        logger.info("Clustered " + negativeInteractions.getCluster().getAllInteractionIds().size() + " negative binary interactions");
 
         logger.info("Exporting interactions... \n");
         exporter.exportInteractionsFrom(results);
-        logger.info(results.getInteractionsToExport().size() + " binary interactions to export");
+        logger.info(positiveInteractions.getInteractionsToExport().size() + " positive binary interactions to export");
+        logger.info(negativeInteractions.getInteractionsToExport().size() + " negative binary interactions to export");
 
         return results;
     }

@@ -17,6 +17,7 @@ import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
@@ -110,7 +111,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
             super.clusterNegativeIntactInteractions(this.negativeInteractions, context, negativeClusterScore);
         }
 
-        return new MiClusterScoreResults(clusterScore, negativeClusterScore, context);
+        return new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
     }
 
     private void processClustering(BinaryClusterScore clusterScore, MiClusterContext context, Integer binaryIdentifier, BinaryInteraction<Interactor> interaction, Set<String> intactAcs, Interactor interactorA, String uniprotA, Interactor interactorB, String uniprotB, boolean excludeSpokeExpanded) {
@@ -252,9 +253,11 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
             MiClusterScoreResults clusterResults = clusterMiScoreInteractionEligibleUniprotExport(mitab);
             logger.info("Exporting binary interactions...");
             exporter.exportInteractionsFrom(clusterResults);
-            logger.info(clusterResults.getInteractionsToExport().size() + " binary interactions to export");
 
-            //this.interactionClusterScore.getScorePerInteractions(fileExport, this.interactionsToBeExported);
+            ExportedClusteredInteractions positiveInteractions = clusterResults.getPositiveClusteredInteractions();
+            ExportedClusteredInteractions negativeInteractions = clusterResults.getNegativeClusteredInteractions();
+            logger.info(positiveInteractions.getInteractionsToExport().size() + " positive binary interactions to export");
+            logger.info(negativeInteractions.getInteractionsToExport().size() + " negative binary interactions to export");
 
             return clusterResults;
         } catch (IOException e) {

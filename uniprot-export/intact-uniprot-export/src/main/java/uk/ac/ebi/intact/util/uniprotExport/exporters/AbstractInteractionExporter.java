@@ -5,12 +5,12 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.results.contexts.ExportContext;
-import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
+import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
+import uk.ac.ebi.intact.util.uniprotExport.results.contexts.ExportContext;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,11 +29,15 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
     @Override
     public void exportInteractionsFrom(UniprotExportResults results) throws UniprotExportException {
         ExportContext context = results.getExportContext();
-        IntactCluster cluster = results.getCluster();
-        IntactCluster negativeCluster = results.getNegativeCluster();
 
-        Set<Integer> interactionsPossibleToExport = new HashSet<Integer>();
-        Set<Integer> negativeInteractionsPossibleToExport = new HashSet<Integer>();
+        ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
+        ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
+
+        IntactCluster cluster = positiveInteractions.getCluster();
+        IntactCluster negativeCluster = negativeInteractions.getCluster();
+
+        Set<Integer> interactionsPossibleToExport = positiveInteractions.getInteractionsToExport();
+        Set<Integer> negativeInteractionsPossibleToExport = negativeInteractions.getInteractionsToExport();
 
         // process positive interactions
         if (cluster instanceof BinaryClusterScore){
@@ -54,8 +58,6 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
                 }
             }
         }
-
-        results.setInteractionsToExport(interactionsPossibleToExport);
 
         // process negative interactions
         if (negativeCluster != null){
@@ -78,7 +80,5 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
                 }
             }
         }
-
-        results.setNegativeInteractionsToExport(interactionsPossibleToExport);
     }
 }

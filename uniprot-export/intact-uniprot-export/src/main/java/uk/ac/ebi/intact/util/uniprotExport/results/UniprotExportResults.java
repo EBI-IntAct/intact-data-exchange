@@ -1,9 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.results;
 
-import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.ExportContext;
-
-import java.util.Set;
 
 /**
  * Interface for classes containing results of uniprot export
@@ -17,43 +14,19 @@ public interface UniprotExportResults {
 
    /**
      *
-     * @return the clustered interactions
+     * @return the results of the export for positive interactions
      */
-    public IntactCluster getCluster();
+    public ExportedClusteredInteractions getPositiveClusteredInteractions();
 
     /**
      *
-     * @return the negative clustered interactions
+     * @return the results of the export for negative interactions
      */
-    public IntactCluster getNegativeCluster();
+    public ExportedClusteredInteractions getNegativeClusteredInteractions();
 
     /**
      *
      * @return the context of the cluster
      */
     public ExportContext getExportContext();
-
-    /**
-     *
-     * @return the list of interaction identifiers of the interactions which will be exported  (the interaction identifier must be mapped to some interaction in the cluster)
-     */
-    public Set<Integer> getInteractionsToExport();
-
-    /**
-     * Set the list of cluster identifiers which can be exported
-     * @param interactionsToExport
-     */
-    public void setInteractionsToExport(Set<Integer> interactionsToExport);
-
-    /**
-     *
-     * @return the list of negative interaction identifiers of the interactions which will be exported  (the interaction identifier must be mapped to some interaction in the cluster)
-     */
-    public Set<Integer> getNegativeInteractionsToExport();
-
-    /**
-     * Set the list of cluster identifiers for negative interactions which can be exported
-     * @param interactionsToExport
-     */
-    public void setNegativeInteractionsToExport(Set<Integer> interactionsToExport);
 }

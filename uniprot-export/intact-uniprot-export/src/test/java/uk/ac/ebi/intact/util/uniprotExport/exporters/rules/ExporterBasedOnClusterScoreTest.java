@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 
 import java.util.Set;
@@ -27,7 +26,7 @@ public class ExporterBasedOnClusterScoreTest extends UniprotExportBase{
 
         exporter.exportInteractionsFrom(results);
 
-        Set<Integer> interactionsExported = results.getInteractionsToExport();
+        Set<Integer> interactionsExported = results.getPositiveClusteredInteractions().getInteractionsToExport();
 
         Assert.assertNotNull(interactionsExported);
         Assert.assertEquals(3, interactionsExported.size());

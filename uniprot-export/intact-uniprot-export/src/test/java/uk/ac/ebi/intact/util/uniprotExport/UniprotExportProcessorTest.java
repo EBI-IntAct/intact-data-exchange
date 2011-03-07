@@ -36,12 +36,12 @@ public class UniprotExportProcessorTest extends UniprotExportBase{
 
         UniprotExportProcessor processor = new UniprotExportProcessor(filter);
         MiClusterScoreResults results = createMiScoreResultsForDetectionMethodExport();
-        results.getInteractionsToExport().add(1);
-        results.getInteractionsToExport().add(2);
-        results.getInteractionsToExport().add(3);
+        results.getPositiveClusteredInteractions().getInteractionsToExport().add(1);
+        results.getPositiveClusteredInteractions().getInteractionsToExport().add(2);
+        results.getPositiveClusteredInteractions().getInteractionsToExport().add(3);
         processor.exportDRAndCCLines(results, "drFile", "ccFile", 1);
 
-        results.getCluster().saveClusteredInteractions("interactions", results.getInteractionsToExport());
+        results.getPositiveClusteredInteractions().getCluster().saveClusteredInteractions("interactions", results.getPositiveClusteredInteractions().getInteractionsToExport());
 
     }
 }

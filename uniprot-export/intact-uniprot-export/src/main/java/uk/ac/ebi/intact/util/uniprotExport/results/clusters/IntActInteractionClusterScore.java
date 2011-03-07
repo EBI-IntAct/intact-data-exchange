@@ -36,6 +36,9 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
     public IntActInteractionClusterScore(){
         super();
 
+        this.setInteractionMapping(new HashMap<Integer, EncoreInteraction>());
+        this.setInteractorMapping(new HashMap<String, List<Integer>> ());
+
         setMappingIdDbNames("uniprotkb,intact");
         writer = new PsimiTabWriter();
 
