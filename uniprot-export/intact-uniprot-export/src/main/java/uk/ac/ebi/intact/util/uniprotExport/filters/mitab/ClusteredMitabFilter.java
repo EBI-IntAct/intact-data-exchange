@@ -15,12 +15,12 @@ import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
-import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
 import java.io.File;
@@ -36,7 +36,7 @@ import java.util.*;
  * @since <pre>08/02/11</pre>
  */
 
-public class ClusteredMitabFilter extends AbstractMitabFilter implements InteractionFilter {
+public class ClusteredMitabFilter extends AbstractMitabFilter {
     private static final Logger logger = Logger.getLogger(ClusteredMitabFilter.class);
     protected PsimiTabReader mitabReader;
 
@@ -52,6 +52,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements Interac
 
     protected MiClusterScoreResults clusterMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
         BinaryClusterScore clusterScore = new BinaryClusterScore();
+        IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
         MiClusterContext context = new MiClusterContext();
 
         FilterConfig config = FilterContext.getInstance().getConfig();
@@ -104,7 +105,12 @@ public class ClusteredMitabFilter extends AbstractMitabFilter implements Interac
             binaryIdentifier++;
         }
 
-        return new MiClusterScoreResults(clusterScore, context);
+        // process negative interactions not in mitab
+        if (!this.negativeInteractions.isEmpty()){
+            super.clusterNegativeIntactInteractions(this.negativeInteractions, context, negativeClusterScore);
+        }
+
+        return new MiClusterScoreResults(clusterScore, negativeClusterScore, context);
     }
 
     private void processClustering(BinaryClusterScore clusterScore, MiClusterContext context, Integer binaryIdentifier, BinaryInteraction<Interactor> interaction, Set<String> intactAcs, Interactor interactorA, String uniprotA, Interactor interactorB, String uniprotB, boolean excludeSpokeExpanded) {

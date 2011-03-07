@@ -138,9 +138,9 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         details3.add(detail3);
         details3.add(detail4);
 
-        SecondCCParameters2 secondParameters1 = new DefaultSecondCCInteractor2(uniprotAc5, intactAc4, uniprotAc2, intactAc1, geneName2, taxId2, organismName2, details1);
-        SecondCCParameters2 secondParameters2 = new DefaultSecondCCInteractor2(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, organismName, details2);
-        SecondCCParameters2 secondParameters3 = new DefaultSecondCCInteractor2(uniprotAc7, intactAc6, uniprotAc4, intactAc3, geneName4, taxId, organismName, details3);
+        SecondCCParameters2 secondParameters1 = new DefaultSecondCCParameters2(uniprotAc5, intactAc4, uniprotAc2, intactAc1, geneName2, taxId2, organismName2, details1, true);
+        SecondCCParameters2 secondParameters2 = new DefaultSecondCCParameters2(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, organismName, details2, true);
+        SecondCCParameters2 secondParameters3 = new DefaultSecondCCParameters2(uniprotAc7, intactAc6, uniprotAc4, intactAc3, geneName4, taxId, organismName, details3, true);
 
         List<SecondCCParameters2> listOfSecondInteractors1 = new ArrayList<SecondCCParameters2>();
         listOfSecondInteractors1.add(secondParameters1);
@@ -151,21 +151,21 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         parameters.add(parameters1);
 
         List<SecondCCParameters2> listOfSecondInteractors2 = new ArrayList<SecondCCParameters2>();
-        SecondCCParameters2 secondParameters4 = new DefaultSecondCCInteractor2(uniprotAc2, intactAc1, uniprotAc5, intactAc4, geneName1, taxId, organismName, details1);
+        SecondCCParameters2 secondParameters4 = new DefaultSecondCCParameters2(uniprotAc2, intactAc1, uniprotAc5, intactAc4, geneName1, taxId, organismName, details1, true);
         listOfSecondInteractors2.add(secondParameters4);
 
         CCParameters2 parameters2 = new DefaultCCParameters2(uniprotAc2, geneName2, taxId2, listOfSecondInteractors2);
         parameters.add(parameters2);
 
         List<SecondCCParameters2> listOfSecondInteractors3 = new ArrayList<SecondCCParameters2>();
-        SecondCCParameters2 secondParameters5 = new DefaultSecondCCInteractor2(uniprotAc3, intactAc2, uniprotAc6, intactAc5, geneName1, taxId, organismName, details2);
+        SecondCCParameters2 secondParameters5 = new DefaultSecondCCParameters2(uniprotAc3, intactAc2, uniprotAc6, intactAc5, geneName1, taxId, organismName, details2, true);
         listOfSecondInteractors3.add(secondParameters5);
 
         CCParameters2 parameters3 = new DefaultCCParameters2(uniprotAc3, geneName3, taxId, listOfSecondInteractors3);
         parameters.add(parameters3);
 
         List<SecondCCParameters2> listOfSecondInteractors4 = new ArrayList<SecondCCParameters2>();
-        SecondCCParameters2 secondParameters6 = new DefaultSecondCCInteractor2(uniprotAc4, intactAc3, uniprotAc7, intactAc6, geneName1, taxId, organismName, details3);
+        SecondCCParameters2 secondParameters6 = new DefaultSecondCCParameters2(uniprotAc4, intactAc3, uniprotAc7, intactAc6, geneName1, taxId, organismName, details3, true);
         listOfSecondInteractors4.add(secondParameters6);
 
         CCParameters2 parameters4 = new DefaultCCParameters2(uniprotAc4, geneName4, taxId, listOfSecondInteractors4);
@@ -603,7 +603,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         IntActInteractionClusterScore clsuterScore = createClusterForExportBasedOnMiScore();
         MiClusterContext context = createClusterContext();
 
-        MiClusterScoreResults results = new MiClusterScoreResults(clsuterScore, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(clsuterScore, null, context);
 
         return results;
     }
@@ -612,7 +612,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         IntActInteractionClusterScore clsuterScore = createClusterForExportBasedOnDetectionMethod();
         MiClusterContext context = createClusterContext();
 
-        MiClusterScoreResults results = new MiClusterScoreResults(clsuterScore, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(clsuterScore, null, context);
 
         return results;
     }

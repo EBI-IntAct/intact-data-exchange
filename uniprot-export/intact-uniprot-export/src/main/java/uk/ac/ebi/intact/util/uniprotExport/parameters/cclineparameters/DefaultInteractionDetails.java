@@ -47,10 +47,6 @@ public class DefaultInteractionDetails implements InteractionDetails{
 
         if ( this == o ) return EQUAL;
 
-        if (o instanceof DefaultInteractionDetails){
-
-        }
-
         int comparison = this.detectionMethod.compareTo(o.getDetectionMethod());
         if ( comparison != EQUAL ) {
             if (this.isSpokeExpanded == o.isSpokeExpanded()){

@@ -11,7 +11,7 @@ import java.util.TreeSet;
  * @since <pre>02/02/11</pre>
  */
 
-public class DefaultSecondCCInteractor2 implements SecondCCParameters2 {
+public class DefaultSecondCCParameters2 implements SecondCCParameters2 {
 
     // duplicated line because of splice variants and feature chains!!!
     private String firstUniprotAc;
@@ -24,11 +24,13 @@ public class DefaultSecondCCInteractor2 implements SecondCCParameters2 {
     private String taxId;
     private String organismName;
 
+    private boolean doesInteract;
+
     private SortedSet<InteractionDetails> interactionDetails;
 
-    public DefaultSecondCCInteractor2(String firstInteractor, String firstIntactAc, String secondInteractor, String secondIntactAc, String secondGeneName,
+    public DefaultSecondCCParameters2(String firstInteractor, String firstIntactAc, String secondInteractor, String secondIntactAc, String secondGeneName,
                                       String secondTaxId, String secondOrganismName,
-                                      SortedSet<InteractionDetails> interactionDetails){
+                                      SortedSet<InteractionDetails> interactionDetails, boolean doesInteract){
 
         this.firstUniprotAc = firstInteractor;
         this.secondUniprotAc = secondInteractor;
@@ -45,6 +47,8 @@ public class DefaultSecondCCInteractor2 implements SecondCCParameters2 {
         else {
             this.interactionDetails = interactionDetails;
         }
+
+        this.doesInteract = doesInteract;
     }
 
     @Override
@@ -75,6 +79,11 @@ public class DefaultSecondCCInteractor2 implements SecondCCParameters2 {
     @Override
     public SortedSet<InteractionDetails> getInteractionDetails() {
         return this.interactionDetails;
+    }
+
+    @Override
+    public boolean doesInteract() {
+        return this.doesInteract;
     }
 
     @Override

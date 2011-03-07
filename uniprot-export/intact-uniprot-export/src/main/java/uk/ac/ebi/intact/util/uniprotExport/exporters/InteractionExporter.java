@@ -31,17 +31,19 @@ public interface InteractionExporter {
      *
      * @param interaction
      * @param context
+     * @param isNegative
      * @return true if the encore interaction pass the uniprot export rules
      * @throws UniprotExportException
      */
-    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context) throws UniprotExportException;
+    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context, boolean isNegative) throws UniprotExportException;
 
     /**
      *
      * @param interaction
      * @param context
+     * @param isNegative
      * @return true if the binary interaction can be exported
      * @throws UniprotExportException
      */
-    public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context) throws UniprotExportException;
+    public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context, boolean isNegative) throws UniprotExportException;
 }

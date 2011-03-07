@@ -80,7 +80,7 @@ public class DefaultCCLineWriter2 implements CCLineWriter2 {
             String firstIntactAc = secondInteractor.getFirstIntacAc();
 
             // write introduction
-            writeInteractionIntroduction(true, firstIntactAc, secondInteractor.getSecondIntactAc());
+            writeInteractionIntroduction(secondInteractor.doesInteract(), firstIntactAc, secondInteractor.getSecondIntactAc());
 
             // write first protein
             writeFirstProtein(secondInteractor.getFirstUniprotAc(), parameters.getGeneName());

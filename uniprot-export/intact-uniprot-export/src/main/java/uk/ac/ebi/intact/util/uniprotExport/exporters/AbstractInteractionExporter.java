@@ -30,15 +30,18 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
     public void exportInteractionsFrom(UniprotExportResults results) throws UniprotExportException {
         ExportContext context = results.getExportContext();
         IntactCluster cluster = results.getCluster();
+        IntactCluster negativeCluster = results.getNegativeCluster();
 
         Set<Integer> interactionsPossibleToExport = new HashSet<Integer>();
+        Set<Integer> negativeInteractionsPossibleToExport = new HashSet<Integer>();
 
+        // process positive interactions
         if (cluster instanceof BinaryClusterScore){
             BinaryClusterScore clusterScore = (BinaryClusterScore) cluster;
 
             for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
-                if (canExportBinaryInteraction(entry.getValue(), context)){
+                if (canExportBinaryInteraction(entry.getValue(), context, true)){
                     interactionsPossibleToExport.add(entry.getKey());
                 }
             }
@@ -46,12 +49,36 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
         else {
             for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
-                if (canExportEncoreInteraction(entry.getValue(), context)){
+                if (canExportEncoreInteraction(entry.getValue(), context, true)){
                     interactionsPossibleToExport.add(entry.getKey());
                 }
             }
         }
 
         results.setInteractionsToExport(interactionsPossibleToExport);
+
+        // process negative interactions
+        if (negativeCluster != null){
+            if (negativeCluster instanceof BinaryClusterScore){
+                BinaryClusterScore clusterScore = (BinaryClusterScore) negativeCluster;
+
+                for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
+
+                    if (canExportBinaryInteraction(entry.getValue(), context, false)){
+                        negativeInteractionsPossibleToExport.add(entry.getKey());
+                    }
+                }
+            }
+            else {
+                for (Map.Entry<Integer, EncoreInteraction> entry : negativeCluster.getEncoreInteractionCluster().entrySet()){
+
+                    if (canExportEncoreInteraction(entry.getValue(), context, false)){
+                        negativeInteractionsPossibleToExport.add(entry.getKey());
+                    }
+                }
+            }
+        }
+
+        results.setNegativeInteractionsToExport(interactionsPossibleToExport);
     }
 }

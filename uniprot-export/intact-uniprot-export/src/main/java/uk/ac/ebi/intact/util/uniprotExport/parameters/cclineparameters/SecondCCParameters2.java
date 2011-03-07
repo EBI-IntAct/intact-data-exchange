@@ -23,4 +23,10 @@ public interface SecondCCParameters2 extends BasicSecondCCParameters{
      * @return
      */
     public SortedSet<InteractionDetails> getInteractionDetails();
+
+    /**
+     *
+     * @return true if it is a positive interactions, false otherwise
+     */
+    public boolean doesInteract();
 }

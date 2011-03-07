@@ -32,7 +32,6 @@ public abstract class AbstractMitabFilter extends IntactFilter{
 
         eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
         //eligibleInteractionsNotInMitab.addAll(this.queryFactory.getReleasedSelfInteractionAcsPassingFilters());
-        //eligibleInteractionsNotInMitab.addAll(this.queryFactory.getNegativeInteractionsPassingFilter());
     }
 
     public AbstractMitabFilter(InteractionExporter exporter){

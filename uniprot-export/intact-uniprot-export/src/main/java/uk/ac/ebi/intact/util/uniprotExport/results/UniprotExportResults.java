@@ -15,11 +15,17 @@ import java.util.Set;
 
 public interface UniprotExportResults {
 
-        /**
+   /**
      *
      * @return the clustered interactions
      */
     public IntactCluster getCluster();
+
+    /**
+     *
+     * @return the negative clustered interactions
+     */
+    public IntactCluster getNegativeCluster();
 
     /**
      *
@@ -38,4 +44,16 @@ public interface UniprotExportResults {
      * @param interactionsToExport
      */
     public void setInteractionsToExport(Set<Integer> interactionsToExport);
+
+    /**
+     *
+     * @return the list of negative interaction identifiers of the interactions which will be exported  (the interaction identifier must be mapped to some interaction in the cluster)
+     */
+    public Set<Integer> getNegativeInteractionsToExport();
+
+    /**
+     * Set the list of cluster identifiers for negative interactions which can be exported
+     * @param interactionsToExport
+     */
+    public void setNegativeInteractionsToExport(Set<Integer> interactionsToExport);
 }

@@ -289,23 +289,25 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
      * @param cluster : the cluster containing the interactions
      * @param eligibleInteractions : the list of eligible encore interaction ids for uniprot export
      */
-    private void processEligibleExperiments(IntactCluster cluster, ExportContext context, Set<Integer> eligibleInteractions) throws UniprotExportException {
+    private void processEligibleExperiments(IntactCluster cluster, ExportContext context, Set<Integer> eligibleInteractions, boolean isNegative) throws UniprotExportException {
 
-        if (cluster instanceof BinaryClusterScore){
-            BinaryClusterScore clusterScore = (BinaryClusterScore) cluster;
+        if (cluster != null){
+            if (cluster instanceof BinaryClusterScore){
+                BinaryClusterScore clusterScore = (BinaryClusterScore) cluster;
 
-            for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
+                for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
-                if (canExportBinaryInteraction(entry.getValue(), context)){
-                    eligibleInteractions.add(entry.getKey());
+                    if (canExportBinaryInteraction(entry.getValue(), context, isNegative)){
+                        eligibleInteractions.add(entry.getKey());
+                    }
                 }
             }
-        }
-        else {
-            for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
+            else {
+                for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
-                if (canExportEncoreInteraction(entry.getValue(), context)){
-                    eligibleInteractions.add(entry.getKey());
+                    if (canExportEncoreInteraction(entry.getValue(), context, isNegative)){
+                        eligibleInteractions.add(entry.getKey());
+                    }
                 }
             }
         }
@@ -343,14 +345,17 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     @Override
     public void exportInteractionsFrom(UniprotExportResults results) throws UniprotExportException {
         Set<Integer> eligibleInteractions = new HashSet<Integer>();
+        Set<Integer> negativeEligibleInteractions = new HashSet<Integer>();
 
-        processEligibleExperiments(results.getCluster(), results.getExportContext(), eligibleInteractions);
+        processEligibleExperiments(results.getCluster(), results.getExportContext(), eligibleInteractions, false);
+        processEligibleExperiments(results.getNegativeCluster(), results.getExportContext(), negativeEligibleInteractions, true);
 
         results.setInteractionsToExport(eligibleInteractions);
+        results.setNegativeInteractionsToExport(negativeEligibleInteractions);
     }
 
     @Override
-    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context) throws UniprotExportException {
+    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context, boolean isNegative) throws UniprotExportException {
 
         //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
 
@@ -400,7 +405,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     }
 
     @Override
-    public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context) throws UniprotExportException {
+    public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context, boolean isNegative) throws UniprotExportException {
 
         Set<InteractionDetectionMethod> detectionMethods = new HashSet(interaction.getDetectionMethods());
 
@@ -488,9 +493,9 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             pubmedsToRemove.clear();
 
             for (String pubmed : entry.getValue()){
-                 if (!publicationIdsToKeep.contains(pubmed)){
-                     pubmedsToRemove.add(pubmed);
-                 }
+                if (!publicationIdsToKeep.contains(pubmed)){
+                    pubmedsToRemove.add(pubmed);
+                }
             }
 
             entry.getValue().remove(pubmedsToRemove);
@@ -500,9 +505,9 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             pubmedsToRemove.clear();
 
             for (String pubmed : entry.getValue()){
-                 if (!publicationIdsToKeep.contains(pubmed)){
-                     pubmedsToRemove.add(pubmed);
-                 }
+                if (!publicationIdsToKeep.contains(pubmed)){
+                    pubmedsToRemove.add(pubmed);
+                }
             }
 
             entry.getValue().remove(pubmedsToRemove);

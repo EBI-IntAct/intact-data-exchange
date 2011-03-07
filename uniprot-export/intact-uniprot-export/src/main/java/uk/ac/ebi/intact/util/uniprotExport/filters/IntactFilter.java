@@ -64,12 +64,18 @@ public class IntactFilter implements InteractionFilter {
     protected QueryFactory queryFactory;
 
     /**
+     * The list of negative interactions
+     */
+    protected List<String> negativeInteractions = new ArrayList<String>();
+
+    /**
      * we create a new IntactFilter
      */
     public IntactFilter(InteractionExporter exporter){
         this.interactionConverter = new Intact2BinaryInteractionConverter();
         this.exporter = exporter;
         this.queryFactory = new QueryFactory();
+        negativeInteractions.addAll(this.queryFactory.getNegativeInteractionsPassingFilter());
     }
 
     /**
@@ -88,12 +94,15 @@ public class IntactFilter implements InteractionFilter {
      */
     public MiClusterScoreResults computeMiScoresFor(List<String> interactions){
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
+        IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
         MiClusterContext context = new MiClusterContext();
 
-        MiClusterScoreResults results = new MiClusterScoreResults(clusterScore, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(clusterScore, negativeClusterScore, context);
         int i = 0;
         // the list of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
+        // the list of negative binary interactions to process
+        List<BinaryInteraction> negativeBinaryInteractions = new ArrayList<BinaryInteraction>();
 
         System.out.println(interactions.size() + " interactions in IntAct will be processed.");
 
@@ -101,12 +110,25 @@ public class IntactFilter implements InteractionFilter {
         while (i < interactions.size()){
             // we clear the previous chunk of binary interactions to only keep 200 binary interaction at a time
             binaryInteractions.clear();
+            negativeBinaryInteractions.clear();
 
-            // we convert into binary interactions until we fill up the binary interactions list to MAX_NUMBER_INTERACTION. we get the new incremented i.
-            i = convertIntoBinaryInteractions(interactions, i, binaryInteractions, context);
+            String intactAc = interactions.get(i);
+
+            if (this.negativeInteractions.contains(interactions.get(i))){
+                // convert the negative binary interaction
+                convertNegativeIntoBinaryInteractions(intactAc, negativeBinaryInteractions, context);
+                i++;
+            }
+            else {
+                // we convert into binary interactions until we fill up the binary interactions list to MAX_NUMBER_INTERACTION. we get the new incremented i.
+                i = convertIntoBinaryInteractions(interactions, i, binaryInteractions, context);
+            }
 
             // we compute the mi score for the list of binary interactions
             processMiClustering(binaryInteractions, MAX_NUMBER_INTERACTION, clusterScore);
+
+            // we compute the mi score for the list of negative binary interactions
+            processMiClustering(negativeBinaryInteractions, MAX_NUMBER_INTERACTION, negativeClusterScore);
 
             int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
             System.out.println("Still " + interactionsToProcess + " interactions to process in IntAct.");
@@ -123,21 +145,20 @@ public class IntactFilter implements InteractionFilter {
     public MiClusterScoreResults processExportWithFilterOnNonUniprot(List<String> interactions) throws UniprotExportException {
         MiClusterContext context = new MiClusterContext();
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
+        IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
 
-        FilterConfig config = FilterContext.getInstance().getConfig();
-        boolean excludeSpokeExpanded = config.excludeSpokeExpandedInteractions();
-        boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
-
-        MiClusterScoreResults results = new MiClusterScoreResults(clusterScore, context);
-        clusterIntactInteractions(interactions, context, clusterScore, excludeSpokeExpanded, excludeNonUniprotInteractors);
+        MiClusterScoreResults results = new MiClusterScoreResults(clusterScore, negativeClusterScore, context);
+        clusterIntactInteractions(interactions, context, clusterScore, negativeClusterScore);
 
         return results;
     }
 
-    protected void clusterIntactInteractions(List<String> interactions, MiClusterContext context, IntActInteractionClusterScore clusterScore, boolean excludeSpokeExpanded, boolean excludeNonUniprotInteractors) {
+    protected void clusterIntactInteractions(List<String> interactions, MiClusterContext context, IntActInteractionClusterScore clusterScore, IntActInteractionClusterScore negativeClusterScore) {
         int i = 0;
         // the list of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
+        // the list of negative binary interactions to process
+        List<BinaryInteraction> negativeBinaryInteractions = new ArrayList<BinaryInteraction>();
 
         logger.info(interactions.size() + " interactions in IntAct will be processed.");
 
@@ -145,12 +166,53 @@ public class IntactFilter implements InteractionFilter {
         while (i < interactions.size()){
             // we clear the previous chunk of binary interactions to only keep 200 binary interaction at a time
             binaryInteractions.clear();
+            negativeBinaryInteractions.clear();
 
-            // we convert into binary interactions until we fill up the binary interactions list to MAX_NUMBER_INTERACTION. we get the new incremented i.
-            i = convertIntoBinaryInteractionsExcludeNonUniprotProteins(interactions, i, binaryInteractions, context);
+            String intactAc = interactions.get(i);
+
+            if (this.negativeInteractions.contains(intactAc)){
+                // convert the negative binary interaction
+                convertNegativeIntoBinaryInteractions(intactAc, negativeBinaryInteractions, context);
+                i++;
+            }
+            else {
+                // we convert into binary interactions until we fill up the binary interactions list to MAX_NUMBER_INTERACTION. we get the new incremented i.
+                i = convertIntoBinaryInteractionsExcludeNonUniprotProteins(interactions, i, binaryInteractions, context);
+
+            }
 
             // we compute the mi score for the list of binary interactions
             processMiClustering(binaryInteractions, MAX_NUMBER_INTERACTION, clusterScore);
+
+            // we compute the mi score for the list of negative binary interactions
+            processMiClustering(negativeBinaryInteractions, MAX_NUMBER_INTERACTION, negativeClusterScore);
+
+            int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
+            logger.info("Still " + interactionsToProcess + " interactions to process in IntAct.");
+        }
+    }
+
+    protected void clusterNegativeIntactInteractions(List<String> interactions, MiClusterContext context, IntActInteractionClusterScore negativeClusterScore) {
+        int i = 0;
+
+        // the list of negative binary interactions to process
+        List<BinaryInteraction> negativeBinaryInteractions = new ArrayList<BinaryInteraction>();
+
+        logger.info(interactions.size() + " interactions in IntAct will be processed.");
+
+        // we process all the interactions of the list per chunk of 200 interactions
+        while (i < interactions.size()){
+            // we clear the previous chunk of binary interactions to only keep 200 binary interaction at a time
+            negativeBinaryInteractions.clear();
+
+            String intactAc = interactions.get(i);
+
+            // convert the negative binary interaction
+            convertNegativeIntoBinaryInteractions(intactAc, negativeBinaryInteractions, context);
+            i++;
+
+            // we compute the mi score for the list of negative binary interactions
+            processMiClustering(negativeBinaryInteractions, MAX_NUMBER_INTERACTION, negativeClusterScore);
 
             int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
             logger.info("Still " + interactionsToProcess + " interactions to process in IntAct.");
@@ -253,6 +315,74 @@ public class IntactFilter implements InteractionFilter {
         dataContext.commitTransaction(transactionStatus);
 
         return i;
+    }
+
+    private void convertNegativeIntoBinaryInteractions(String interaction, Collection<BinaryInteraction> binaryInteractions, MiClusterContext context) {
+
+        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
+
+        // get the IntAct interaction object
+        Interaction intactInteraction = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interaction);
+
+        // the interaction must exist in Intact
+        if (intactInteraction != null){
+            // the interaction can be converted into binary interaction
+            if (this.interactionConverter.getExpansionStrategy().isExpandable(intactInteraction)){
+                try {
+                    // we convert the interaction in binary interaction
+                    Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
+                    if (toBinary.size() == 1){
+                        logger.info("Processing negative interaction " + interaction);
+                        processClusterContext(context, interaction, toBinary);
+
+                        for (IntactBinaryInteraction binary : toBinary){
+
+                            ExtendedInteractor interactorA = binary.getInteractorA();
+                            String uniprotA = null;
+                            ExtendedInteractor interactorB = binary.getInteractorB();
+                            String uniprotB = null;
+
+                            for (CrossReference refA : interactorA.getIdentifiers()){
+                                if (refA.getDatabase().equalsIgnoreCase("uniprotkb")){
+                                    uniprotA = refA.getIdentifier();
+                                    break;
+                                }
+                            }
+                            for (CrossReference refB : interactorB.getIdentifiers()){
+                                if (refB.getDatabase().equalsIgnoreCase("uniprotkb")){
+                                    uniprotB = refB.getIdentifier();
+                                    break;
+                                }
+                            }
+
+                            FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+
+                            binary.getInteractorA().getAlternativeIdentifiers().clear();
+                            binary.getInteractorA().getAliases().clear();
+                            binary.getInteractorB().getAlternativeIdentifiers().clear();
+                            binary.getInteractorB().getAliases().clear();
+                        }
+
+                        binaryInteractions.addAll(toBinary);
+                    }
+                    else {
+                        logger.info("The interaction " + interaction + ", " + intactInteraction.getShortLabel() + " is not a true binary interaction and is excluded.");
+                    }
+                } catch (Exception e) {
+                    logger.error("The interaction " + interaction + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.", e);
+                }
+            }
+            // if the interaction cannot be converted into binary interaction, we ignore the interaction.
+            else {
+                logger.info("The interaction " + interaction + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions.");
+            }
+        }
+        else {
+            logger.error("The interaction " + interaction + " doesn't exist in the database and is excluded.");
+        }
+
+        dataContext.commitTransaction(transactionStatus);
     }
 
     /**
@@ -493,7 +623,7 @@ public class IntactFilter implements InteractionFilter {
             FileWriter writer1 = new FileWriter(fileContainingData);
 
             int i = 0;
-            Set<BinaryInteraction> binaryInteractions = new HashSet<BinaryInteraction>();
+            Set<InteractingProtein> binaryInteractions = new HashSet<InteractingProtein>();
 
             System.out.println(interactions.size() + " interactions in IntAct will be processed.");
 
@@ -541,7 +671,7 @@ public class IntactFilter implements InteractionFilter {
             Set<String> interactionIdentifiersExported = new HashSet<String>();
 
             int i = 0;
-            Set<BinaryInteraction> binaryInteractions = new HashSet<BinaryInteraction>();
+            Set<InteractingProtein> binaryInteractions = new HashSet<InteractingProtein>();
 
             System.out.println(interactions.size() + " interactions in IntAct will be processed.");
 

@@ -50,6 +50,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
 
     protected MiClusterScoreResults computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
+        IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
         MiClusterContext context = new MiClusterContext();
 
         FilterConfig config = FilterContext.getInstance().getConfig();
@@ -59,7 +60,10 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
         File mitabAsFile = new File(mitabFile);
         Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitabAsFile));
 
+        // the binary interactions to cluster
         List<BinaryInteraction> interactionToProcess = new ArrayList<BinaryInteraction>();
+        // the negative binary interactions to cluster
+        List<BinaryInteraction> negativeInteractionToProcess = new ArrayList<BinaryInteraction>();
 
         while (iterator.hasNext()){
             interactionToProcess.clear();
@@ -143,15 +147,21 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
                     }
                 }
             }
-            clusterScore.setBinaryInteractionList(interactionToProcess);
-            clusterScore.runService();
-        }
-         // TODO - negative interactions and intra molecular are not in mitab!!!
-        //if (!this.eligibleInteractionsNotInMitab.isEmpty()){
-            //super.clusterIntactInteractions(this.eligibleInteractionsNotInMitab, context, clusterScore, excludeSpokeExpanded, excludeNonUniprotInteractors);
-        //}
 
-        return new MiClusterScoreResults(clusterScore, context);
+            if (interactionToProcess.isEmpty()){
+                clusterScore.setBinaryInteractionList(interactionToProcess);
+                clusterScore.runService();
+            }
+        }
+
+        // process negative interactions not in mitab
+        if (!this.negativeInteractions.isEmpty()){
+            super.clusterNegativeIntactInteractions(this.negativeInteractions, context, negativeClusterScore);
+        }
+
+        // TODO - negative interactions and intra molecular are not in mitab!!!
+
+        return new MiClusterScoreResults(clusterScore, negativeClusterScore, context);
     }
 
     private void processClustering(MiClusterContext context, List<BinaryInteraction> interactionToProcess, IntactBinaryInteraction interaction, String intactAc, ExtendedInteractor interactorA, String uniprotA, ExtendedInteractor interactorB, String uniprotB, boolean excludedSpokeExpanded) {

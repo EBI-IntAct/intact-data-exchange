@@ -190,6 +190,12 @@ public class EncoreInteractionToCCLineConverter {
         return distinctLines;
     }
 
+    /**
+     *
+     * @param taxId
+     * @return The scientific organism name associated with this taxId, null if no scientific name is associated with this taxId
+     * @throws TaxonomyServiceException
+     */
     private String retrieveOrganismScientificName(String taxId) throws TaxonomyServiceException {
         if (this.taxIdToScientificName.containsKey(taxId)){
             return this.taxIdToScientificName.get(taxId);
@@ -213,7 +219,7 @@ public class EncoreInteractionToCCLineConverter {
 
      * @return the converted CCParameter
      */
-    public CCParameters2 convertInteractionsIntoCCLinesVersion2(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
+    public CCParameters2 convertInteractionsIntoCCLinesVersion2(Map<Boolean, List<EncoreInteraction>> interactions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
         String geneName1 = null;
         String taxId1 = null;
@@ -221,119 +227,240 @@ public class EncoreInteractionToCCLineConverter {
         List<SecondCCParameters2> secondCCInteractors = new ArrayList<SecondCCParameters2>(interactions.size());
 
         if (!interactions.isEmpty()){
+            List<EncoreInteraction> positiveInteractions = interactions.get(true);
+            List<EncoreInteraction> negativeInteractions = interactions.get(false);
 
-            for (EncoreInteraction interaction : interactions){
-                // get the uniprot acs of the first and second interactors
-                String uniprot1;
-                String uniprot2;
+            if (positiveInteractions != null){
+                for (EncoreInteraction interaction : positiveInteractions){
+                    // get the uniprot acs of the first and second interactors
+                    String uniprot1;
+                    String uniprot2;
 
-                if (interaction.getInteractorAccsA().containsKey(WriterUtils.UNIPROT)){
-                   uniprot1 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsA());
-                }
-                else {
-                   uniprot1 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsA());
-                }
-
-                if (interaction.getInteractorAccsB().containsKey(WriterUtils.UNIPROT)){
-                   uniprot2 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsB());
-                }
-                else {
-                   uniprot2 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsB());
-                }
-
-                String intact1;
-                String intact2;
-
-                if (interaction.getInteractorAccsA().containsKey(WriterUtils.INTACT)){
-                   intact1 = FilterUtils.extractIntactAcFromAccs(interaction.getInteractorAccsA());
-                }
-                else {
-                   intact1 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsA());
-                }
-
-                if (interaction.getInteractorAccsB().containsKey(WriterUtils.INTACT)){
-                   intact2 = FilterUtils.extractIntactAcFromAccs(interaction.getInteractorAccsB());
-                }
-                else {
-                   intact2 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsB());
-                }
-
-                // if the uniprot acs are not null, it is possible to convert into a CCParameters2
-                if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
-                    // the complete uniprot ac of the first interactor
-                    String firstUniprot = null;
-                    // extract second interactor
-                    String secondUniprot = null;
-
-                    String secondIntactAc = null;
-
-                    // extract gene names (present in the context and not in the interaction)
-                    String geneName2 = null;
-                    // extract organisms
-                    String [] organismsA;
-                    String [] organismsB;
-                    organismsA = extractOrganismFrom(interaction.getOrganismsA());
-                    organismsB = extractOrganismFrom(interaction.getOrganismsB());
-                    // extract taxIds
-                    String taxId2 = null;
-
-                    // extract organism names
-                    String organism2 = null;
-
-                    if (uniprot1.startsWith(firstInteractor)){
-                        firstUniprot = uniprot1;
-                        secondUniprot = uniprot2;
-                        geneName2 = context.getGeneNames().get(uniprot2);
-                        geneName1 = context.getGeneNames().get(uniprot1);
-                        taxId2 = organismsB[0];
-                        try {
-                            organism2 = retrieveOrganismScientificName(taxId2);
-                        } catch (TaxonomyServiceException e) {
-                            logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
-                            organism2 = organismsB[1];
-                        }
-                        secondIntactAc = intact2;
-
-                        taxId1 = organismsA[0];
-                        firstIntactAc = intact1;
+                    if (interaction.getInteractorAccsA().containsKey(WriterUtils.UNIPROT)){
+                        uniprot1 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsA());
                     }
-                    else{
-                        firstUniprot = uniprot2;
-                        secondUniprot = uniprot1;
-                        geneName2 = context.getGeneNames().get(uniprot1);
-                        geneName1 = context.getGeneNames().get(uniprot2);
-                        taxId2 = organismsA[0];
-                        try {
-                            organism2 = retrieveOrganismScientificName(taxId2);
-                        } catch (TaxonomyServiceException e) {
-                            logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
-                            organism2 = organismsA[1];
-                        }
-                        secondIntactAc = intact1;
-
-                        taxId1 = organismsB[0];
-                        firstIntactAc = intact2;
+                    else {
+                        uniprot1 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsA());
                     }
 
-                    if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null && organism2 != null){
-                        // collect all pubmeds and spoke expanded information
-                        SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
+                    if (interaction.getInteractorAccsB().containsKey(WriterUtils.UNIPROT)){
+                        uniprot2 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsB());
+                    }
+                    else {
+                        uniprot2 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsB());
+                    }
 
-                        if (!sortedInteractionDetails.isEmpty()){
-                            logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
-                            SecondCCParameters2 secondCCInteractor = new DefaultSecondCCInteractor2(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails);
-                            secondCCInteractors.add(secondCCInteractor);
+                    String intact1;
+                    String intact2;
+
+                    if (interaction.getInteractorAccsA().containsKey(WriterUtils.INTACT)){
+                        intact1 = FilterUtils.extractIntactAcFromAccs(interaction.getInteractorAccsA());
+                    }
+                    else {
+                        intact1 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsA());
+                    }
+
+                    if (interaction.getInteractorAccsB().containsKey(WriterUtils.INTACT)){
+                        intact2 = FilterUtils.extractIntactAcFromAccs(interaction.getInteractorAccsB());
+                    }
+                    else {
+                        intact2 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsB());
+                    }
+
+                    // if the uniprot acs are not null, it is possible to convert into a CCParameters2
+                    if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
+                        // the complete uniprot ac of the first interactor
+                        String firstUniprot = null;
+                        // extract second interactor
+                        String secondUniprot = null;
+
+                        String secondIntactAc = null;
+
+                        // extract gene names (present in the context and not in the interaction)
+                        String geneName2 = null;
+                        // extract organisms
+                        String [] organismsA;
+                        String [] organismsB;
+                        organismsA = extractOrganismFrom(interaction.getOrganismsA());
+                        organismsB = extractOrganismFrom(interaction.getOrganismsB());
+                        // extract taxIds
+                        String taxId2 = null;
+
+                        // extract organism names
+                        String organism2 = null;
+
+                        if (uniprot1.startsWith(firstInteractor)){
+                            firstUniprot = uniprot1;
+                            secondUniprot = uniprot2;
+                            geneName2 = context.getGeneNames().get(uniprot2);
+                            geneName1 = context.getGeneNames().get(uniprot1);
+                            taxId2 = organismsB[0];
+                            try {
+                                organism2 = retrieveOrganismScientificName(taxId2);
+                            } catch (TaxonomyServiceException e) {
+                                logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
+                                organism2 = organismsB[1];
+                            }
+                            secondIntactAc = intact2;
+
+                            taxId1 = organismsA[0];
+                            firstIntactAc = intact1;
                         }
                         else{
-                            logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " doesn't have any interaction details.");
+                            firstUniprot = uniprot2;
+                            secondUniprot = uniprot1;
+                            geneName2 = context.getGeneNames().get(uniprot1);
+                            geneName1 = context.getGeneNames().get(uniprot2);
+                            taxId2 = organismsA[0];
+                            try {
+                                organism2 = retrieveOrganismScientificName(taxId2);
+                            } catch (TaxonomyServiceException e) {
+                                logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
+                                organism2 = organismsA[1];
+                            }
+                            secondIntactAc = intact1;
+
+                            taxId1 = organismsB[0];
+                            firstIntactAc = intact2;
+                        }
+
+                        if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null && organism2 != null){
+                            // collect all pubmeds and spoke expanded information
+                            SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
+
+                            if (!sortedInteractionDetails.isEmpty()){
+                                logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
+                                SecondCCParameters2 secondCCInteractor = new DefaultSecondCCParameters2(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails, true);
+                                secondCCInteractors.add(secondCCInteractor);
+                            }
+                            else{
+                                logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " doesn't have any interaction details.");
+                            }
+                        }
+                        else{
+                            logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " has one of the gene names or taxIds which is null.");
                         }
                     }
                     else{
-                        logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " has one of the gene names or taxIds which is null.");
+                        logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " has one of the unipprot acs/ intact acs which is null.");
                     }
                 }
-                else{
-                    logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " has one of the unipprot acs/ intact acs which is null.");
+            }
+
+            if (negativeInteractions != null){
+                for (EncoreInteraction interaction : negativeInteractions){
+                    // get the uniprot acs of the first and second interactors
+                    String uniprot1;
+                    String uniprot2;
+
+                    if (interaction.getInteractorAccsA().containsKey(WriterUtils.UNIPROT)){
+                        uniprot1 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsA());
+                    }
+                    else {
+                        uniprot1 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsA());
+                    }
+
+                    if (interaction.getInteractorAccsB().containsKey(WriterUtils.UNIPROT)){
+                        uniprot2 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsB());
+                    }
+                    else {
+                        uniprot2 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsB());
+                    }
+
+                    String intact1;
+                    String intact2;
+
+                    if (interaction.getInteractorAccsA().containsKey(WriterUtils.INTACT)){
+                        intact1 = FilterUtils.extractIntactAcFromAccs(interaction.getInteractorAccsA());
+                    }
+                    else {
+                        intact1 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsA());
+                    }
+
+                    if (interaction.getInteractorAccsB().containsKey(WriterUtils.INTACT)){
+                        intact2 = FilterUtils.extractIntactAcFromAccs(interaction.getInteractorAccsB());
+                    }
+                    else {
+                        intact2 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsB());
+                    }
+
+                    // if the uniprot acs are not null, it is possible to convert into a CCParameters2
+                    if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
+                        // the complete uniprot ac of the first interactor
+                        String firstUniprot = null;
+                        // extract second interactor
+                        String secondUniprot = null;
+
+                        String secondIntactAc = null;
+
+                        // extract gene names (present in the context and not in the interaction)
+                        String geneName2 = null;
+                        // extract organisms
+                        String [] organismsA;
+                        String [] organismsB;
+                        organismsA = extractOrganismFrom(interaction.getOrganismsA());
+                        organismsB = extractOrganismFrom(interaction.getOrganismsB());
+                        // extract taxIds
+                        String taxId2 = null;
+
+                        // extract organism names
+                        String organism2 = null;
+
+                        if (uniprot1.startsWith(firstInteractor)){
+                            firstUniprot = uniprot1;
+                            secondUniprot = uniprot2;
+                            geneName2 = context.getGeneNames().get(uniprot2);
+                            geneName1 = context.getGeneNames().get(uniprot1);
+                            taxId2 = organismsB[0];
+                            try {
+                                organism2 = retrieveOrganismScientificName(taxId2);
+                            } catch (TaxonomyServiceException e) {
+                                logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
+                                organism2 = organismsB[1];
+                            }
+                            secondIntactAc = intact2;
+
+                            taxId1 = organismsA[0];
+                            firstIntactAc = intact1;
+                        }
+                        else{
+                            firstUniprot = uniprot2;
+                            secondUniprot = uniprot1;
+                            geneName2 = context.getGeneNames().get(uniprot1);
+                            geneName1 = context.getGeneNames().get(uniprot2);
+                            taxId2 = organismsA[0];
+                            try {
+                                organism2 = retrieveOrganismScientificName(taxId2);
+                            } catch (TaxonomyServiceException e) {
+                                logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
+                                organism2 = organismsA[1];
+                            }
+                            secondIntactAc = intact1;
+
+                            taxId1 = organismsB[0];
+                            firstIntactAc = intact2;
+                        }
+
+                        if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null && organism2 != null){
+                            // collect all pubmeds and spoke expanded information
+                            SortedSet<InteractionDetails> sortedInteractionDetails = sortInteractionDetails(interaction, context);
+
+                            if (!sortedInteractionDetails.isEmpty()){
+                                logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
+                                SecondCCParameters2 secondCCInteractor = new DefaultSecondCCParameters2(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails, false);
+                                secondCCInteractors.add(secondCCInteractor);
+                            }
+                            else{
+                                logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " doesn't have any interaction details.");
+                            }
+                        }
+                        else{
+                            logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " has one of the gene names or taxIds which is null.");
+                        }
+                    }
+                    else{
+                        logger.debug("Interaction "  + uniprot1 + " and " + uniprot2 +  " has one of the unipprot acs/ intact acs which is null.");
+                    }
                 }
             }
 
@@ -364,34 +491,34 @@ public class EncoreInteractionToCCLineConverter {
                 String uniprot2;
 
                 if (interaction.getInteractorAccsA().containsKey(WriterUtils.UNIPROT)){
-                   uniprot1 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsA());
+                    uniprot1 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsA());
                 }
                 else {
-                   uniprot1 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsA());
+                    uniprot1 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsA());
                 }
 
                 if (interaction.getInteractorAccsB().containsKey(WriterUtils.UNIPROT)){
-                   uniprot2 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsB());
+                    uniprot2 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsB());
                 }
                 else {
-                   uniprot2 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsB());
+                    uniprot2 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsB());
                 }
 
                 String intact1;
                 String intact2;
 
                 if (interaction.getInteractorAccsA().containsKey(WriterUtils.INTACT)){
-                   intact1 = FilterUtils.extractIntactAcFromAccs(interaction.getInteractorAccsA());
+                    intact1 = FilterUtils.extractIntactAcFromAccs(interaction.getInteractorAccsA());
                 }
                 else {
-                   intact1 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsA());
+                    intact1 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsA());
                 }
 
                 if (interaction.getInteractorAccsB().containsKey(WriterUtils.INTACT)){
-                   intact2 = FilterUtils.extractIntactAcFromAccs(interaction.getInteractorAccsB());
+                    intact2 = FilterUtils.extractIntactAcFromAccs(interaction.getInteractorAccsB());
                 }
                 else {
-                   intact2 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsB());
+                    intact2 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsB());
                 }
 
                 // if the uniprot acs are not null, it is possible to convert into a CCParameters2

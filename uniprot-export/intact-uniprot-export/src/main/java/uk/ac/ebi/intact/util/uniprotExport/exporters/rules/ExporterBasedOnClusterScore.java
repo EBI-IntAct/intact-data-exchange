@@ -24,18 +24,29 @@ import java.util.Set;
 public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     private static final Logger logger = Logger.getLogger(ExporterBasedOnClusterScore.class);
 
-    private double export_threshold = 0.43;
+    /**
+     * The score threshold for positive interactions
+     */
+    private double positive_export_threshold = 0.43;
+
+    /**
+     * The score threshold for negative interactions
+     */
+    private double negative_export_threshold = 0.43;
+
     private static final String COLOCALIZATION = "MI:0403";
 
     public ExporterBasedOnClusterScore(){
     }
 
     @Override
-    public boolean canExportEncoreInteraction(EncoreInteraction encore, ExportContext context) throws UniprotExportException {
+    public boolean canExportEncoreInteraction(EncoreInteraction encore, ExportContext context, boolean isNegative) throws UniprotExportException {
 
         double score = FilterUtils.getMiClusterScoreFor(encore);
 
-        if (score >= export_threshold){
+        double threshold = isNegative ? negative_export_threshold : positive_export_threshold;
+
+        if (score >= threshold){
 
             if (encore.getExperimentToDatabase() == null){
                 throw new UniprotExportException("The interaction " + encore.getId() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
@@ -66,10 +77,12 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     }
 
     @Override
-    public boolean canExportBinaryInteraction(BinaryInteraction interaction, ExportContext context) throws UniprotExportException {
+    public boolean canExportBinaryInteraction(BinaryInteraction interaction, ExportContext context, boolean isNegative) throws UniprotExportException {
         double score = FilterUtils.getMiClusterScoreFor(interaction);
 
-        if (score >= export_threshold){
+        double threshold = isNegative ? negative_export_threshold : positive_export_threshold;
+
+        if (score >= threshold){
 
             Set<String> intactInteractions = new HashSet<String>();
 
@@ -96,11 +109,19 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
         return false;
     }
 
-    public void setExport_threshold(double export_threshold) {
-        this.export_threshold = export_threshold;
+    public void setPositive_export_threshold(double positive_export_threshold) {
+        this.positive_export_threshold = positive_export_threshold;
     }
 
-    public double getExport_threshold() {
-        return export_threshold;
+    public double getPositive_export_threshold() {
+        return positive_export_threshold;
+    }
+
+    public double getNegative_export_threshold() {
+        return negative_export_threshold;
+    }
+
+    public void setNegative_export_threshold(double negative_export_threshold) {
+        this.negative_export_threshold = negative_export_threshold;
     }
 }
