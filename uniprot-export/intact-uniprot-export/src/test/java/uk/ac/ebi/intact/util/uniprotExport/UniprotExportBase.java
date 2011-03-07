@@ -39,6 +39,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     protected String interaction2 = null;
     protected String interaction3 = null;
     protected String interaction4 = null;
+    protected String interaction5 = null;
 
     public List<GOParameters> createGOParameters(){
 
@@ -141,7 +142,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         SecondCCParameters2 secondParameters1 = new DefaultSecondCCParameters2(uniprotAc5, intactAc4, uniprotAc2, intactAc1, geneName2, taxId2, organismName2, details1, true);
         SecondCCParameters2 secondParameters2 = new DefaultSecondCCParameters2(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, organismName, details2, true);
-        SecondCCParameters2 secondParameters3 = new DefaultSecondCCParameters2(uniprotAc7, intactAc6, uniprotAc4, intactAc3, geneName4, taxId, organismName, details3, true);
+        SecondCCParameters2 secondParameters3 = new DefaultSecondCCParameters2(uniprotAc7, intactAc6, uniprotAc4, intactAc3, geneName4, taxId, organismName, details3, false);
 
         List<SecondCCParameters2> listOfSecondInteractors1 = new ArrayList<SecondCCParameters2>();
         listOfSecondInteractors1.add(secondParameters1);
@@ -166,7 +167,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         parameters.add(parameters3);
 
         List<SecondCCParameters2> listOfSecondInteractors4 = new ArrayList<SecondCCParameters2>();
-        SecondCCParameters2 secondParameters6 = new DefaultSecondCCParameters2(uniprotAc4, intactAc3, uniprotAc7, intactAc6, geneName1, taxId, organismName, details3, true);
+        SecondCCParameters2 secondParameters6 = new DefaultSecondCCParameters2(uniprotAc4, intactAc3, uniprotAc7, intactAc6, geneName1, taxId, organismName, details3, false);
         listOfSecondInteractors4.add(secondParameters6);
 
         CCParameters2 parameters4 = new DefaultCCParameters2(uniprotAc4, geneName4, taxId, listOfSecondInteractors4);
@@ -552,6 +553,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     public IntActInteractionClusterScore createClusterForExportBasedOnMiScore(){
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
+        interactions.remove(2);
         interactions.add(createEncoreInteractionLowScore());
         interactions.add(createEncoreInteractionHighScoreSpokeExpanded());
         interactions.add(createEncoreInteractionHighScoreColocalization());
@@ -559,9 +561,19 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return createCluster(interactions);
     }
 
+    public IntActInteractionClusterScore createNegativeCluster(){
+
+        List<EncoreInteraction> interactions = createEncoreInteractions();
+        interactions.remove(0);
+        interactions.remove(0);
+
+        return createCluster(interactions);
+    }
+
     public IntActInteractionClusterScore createClusterForExportBasedOnDetectionMethod(){
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
+        interactions.remove(2);
         interactions.add(createEncoreInteractionHighScoreSpokeExpanded());  // two hybrid pooling : export = conditional, 2 and doesn't pass
         interactions.add(createEncoreInteractionHighScoreColocalization()); // colocalization has an export no
 
@@ -602,18 +614,20 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
     public MiClusterScoreResults createMiScoreResultsForMiScoreExport(){
         IntActInteractionClusterScore clsuterScore = createClusterForExportBasedOnMiScore();
+        IntActInteractionClusterScore negativeClusterScore = createNegativeCluster();
         MiClusterContext context = createClusterContext();
 
-        MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clsuterScore), null, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clsuterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
 
         return results;
     }
 
     public MiClusterScoreResults createMiScoreResultsForDetectionMethodExport(){
-        IntActInteractionClusterScore clsuterScore = createClusterForExportBasedOnDetectionMethod();
+        IntActInteractionClusterScore clusterScore = createClusterForExportBasedOnDetectionMethod();
+        IntActInteractionClusterScore negativeClusterScore = createNegativeCluster();
         MiClusterContext context = createClusterContext();
 
-        MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clsuterScore), null, context);
+        MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
 
         return results;
     }
@@ -676,6 +690,10 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
                 CvTopic.class, null, CvTopic.ACCEPTED);
         getCorePersister().saveOrUpdate(accepted);
 
+        CvTopic negative = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvTopic.class, null, CvTopic.NEGATIVE);
+        getCorePersister().saveOrUpdate(negative);
+
         // the different methods and their export status
         CvInteraction method = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
                 CvInteraction.class, "MI:0398", "two hybrid pooling");
@@ -710,14 +728,12 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         experiment_yes.addAnnotation(expAnn1);
         Annotation expAnnAcc1 = new Annotation(accepted, null);
         experiment_yes.addAnnotation(expAnnAcc1);
-        interaction1 = experiment_yes.getInteractions().iterator().next().getAc();
 
         Experiment experiment_no = getMockBuilder().createExperimentRandom(1);
         Annotation expAnn2 = new Annotation(dr_export, "no");
         experiment_no.addAnnotation(expAnn2);
         Annotation expAnnAcc2 = new Annotation(accepted, null);
         experiment_no.addAnnotation(expAnnAcc2);
-        interaction2 = experiment_no.getInteractions().iterator().next().getAc();
 
         Experiment experiment_condition = getMockBuilder().createExperimentRandom(2);
         Annotation expAnn3 = new Annotation(dr_export, "high");
@@ -725,6 +741,18 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         Annotation expAnnAcc3 = new Annotation(accepted, null);
         experiment_condition.addAnnotation(expAnnAcc3);
 
+        Experiment experiment_negative = getMockBuilder().createExperimentRandom(1);
+        Annotation expAnn4 = new Annotation(negative, null);
+        experiment_negative.getInteractions().iterator().next().addAnnotation(expAnn4);
+        Annotation expAnn5 = new Annotation(dr_export, "yes");
+        experiment_negative.addAnnotation(expAnn5);
+        Annotation expAnnAcc4 = new Annotation(accepted, null);
+        experiment_negative.addAnnotation(expAnnAcc4);
+
+        getCorePersister().saveOrUpdate(experiment_yes, experiment_condition, experiment_no, experiment_negative);
+
+        interaction1 = experiment_yes.getInteractions().iterator().next().getAc();
+        interaction2 = experiment_no.getInteractions().iterator().next().getAc();
         int index = 3;
         for (Interaction interaction : experiment_condition.getInteractions()){
             if (index == 3){
@@ -737,10 +765,12 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
                 interaction.addAnnotation(confidence2);
                 interaction4 = interaction.getAc();
             }
+            getCorePersister().saveOrUpdate(interaction);
             index++;
         }
 
-        getCorePersister().saveOrUpdate(experiment_yes, experiment_condition, experiment_no);
+        interaction5 = experiment_negative.getInteractions().iterator().next().getAc();
+
     }
 
     public boolean areFilesEqual (File file1, File file2) throws IOException {

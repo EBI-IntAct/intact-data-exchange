@@ -463,12 +463,11 @@ public class QueryFactory {
             TransactionStatus transactionStatus = dataContext.beginTransaction();
 
             StringBuffer queryString = new StringBuffer();
-            queryString.append("select distinct(i.ac) from InteractionImpl i ");
+            queryString.append("select distinct i.ac from InteractionImpl i ");
             queryString.append("where i.ac in (");
             queryString.append(interactionsAccepted);
             queryString.append(") and i.ac not in (");
             queryString.append(interactionsOnHold);
-            queryString.append(") ");
             queryString.append(") and i.ac in (");
             queryString.append(negativeInteractions);
             queryString.append(") ");

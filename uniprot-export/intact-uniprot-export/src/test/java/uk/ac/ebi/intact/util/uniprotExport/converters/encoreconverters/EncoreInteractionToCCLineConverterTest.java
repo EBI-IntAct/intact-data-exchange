@@ -5,9 +5,10 @@ import org.junit.Test;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters2;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters2;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +29,13 @@ public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
 
+        List<EncoreInteraction> negativeInteractions = new ArrayList<EncoreInteraction>();
+        negativeInteractions.add(interactions.get(2));
+        interactions.remove(2);
+
         Map<Boolean, List<EncoreInteraction>> interactionsToConvert = new HashMap<Boolean, List<EncoreInteraction>>();
         interactionsToConvert.put(true, interactions);
-        interactionsToConvert.put(false, Collections.EMPTY_LIST);
+        interactionsToConvert.put(false, negativeInteractions);
 
         MiClusterContext context = createClusterContext();
 
@@ -55,5 +60,37 @@ public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
         Assert.assertEquals("6239", parameters.getTaxId());
         Assert.assertEquals(3, parameters.getSecondCCParameters().size());
 
+        SecondCCParameters2 firstSecondPar = parameters.getSecondCCParameters().get(0);
+        Assert.assertEquals("P28548-1", firstSecondPar.getFirstUniprotAc());
+        Assert.assertEquals("Q22534", firstSecondPar.getSecondUniprotAc());
+        Assert.assertTrue(firstSecondPar.doesInteract());
+        Assert.assertEquals("EBI-317777", firstSecondPar.getFirstIntacAc());
+        Assert.assertEquals("EBI-327642", firstSecondPar.getSecondIntactAc());
+        Assert.assertEquals(1, firstSecondPar.getInteractionDetails().size());
+        Assert.assertEquals("9606", firstSecondPar.getTaxId());
+        Assert.assertEquals("Homo sapiens", firstSecondPar.getOrganismName());
+        Assert.assertEquals("pat-12", firstSecondPar.getGeneName());
+
+        SecondCCParameters2 secondSecondPar = parameters.getSecondCCParameters().get(1);
+        Assert.assertEquals("P28548-2", secondSecondPar.getFirstUniprotAc());
+        Assert.assertEquals("O17670", secondSecondPar.getSecondUniprotAc());
+        Assert.assertTrue(secondSecondPar.doesInteract());
+        Assert.assertEquals("EBI-317778", secondSecondPar.getFirstIntacAc());
+        Assert.assertEquals("EBI-311862", secondSecondPar.getSecondIntactAc());
+        Assert.assertEquals(1, secondSecondPar.getInteractionDetails().size());
+        Assert.assertEquals("6239", secondSecondPar.getTaxId());
+        Assert.assertEquals("Caenorhabditis elegans", secondSecondPar.getOrganismName());
+        Assert.assertEquals("eya-1", secondSecondPar.getGeneName());
+
+        SecondCCParameters2 thirdSecondPar = parameters.getSecondCCParameters().get(2);
+        Assert.assertEquals("P28548-PRO_0000068244", thirdSecondPar.getFirstUniprotAc());
+        Assert.assertEquals("Q21361", thirdSecondPar.getSecondUniprotAc());
+        Assert.assertFalse(thirdSecondPar.doesInteract());
+        Assert.assertEquals("EBI-317779", thirdSecondPar.getFirstIntacAc());
+        Assert.assertEquals("EBI-311862", thirdSecondPar.getSecondIntactAc());
+        Assert.assertEquals(3, thirdSecondPar.getInteractionDetails().size());
+        Assert.assertEquals("9606", thirdSecondPar.getTaxId());
+        Assert.assertEquals("Homo sapiens", thirdSecondPar.getOrganismName());
+        Assert.assertEquals("atf-2", thirdSecondPar.getGeneName());
     }
 }
