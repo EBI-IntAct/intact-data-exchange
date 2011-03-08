@@ -74,9 +74,9 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return parameters;
     }
 
-    public List<CCParameters2> createCCParameters(){
+    public List<BasicCCParameters> createCCParameters(){
 
-        List<CCParameters2> parameters = new ArrayList<CCParameters2>(3);
+        List<BasicCCParameters> parameters = new ArrayList<BasicCCParameters>(3);
 
         String uniprotAc1 = "P28548";
         String uniprotAc2 = "Q22534";

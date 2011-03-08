@@ -262,7 +262,7 @@ public class UniprotExportProcessor {
      * @param CCFile : the file containing CC lines
      * @throws IOException
      */
-    private void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile) throws IOException {
+    public void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile) throws IOException {
 
         // the Dr writer
         DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));

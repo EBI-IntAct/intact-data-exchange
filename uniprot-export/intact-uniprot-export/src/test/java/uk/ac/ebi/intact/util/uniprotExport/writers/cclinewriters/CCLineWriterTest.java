@@ -3,7 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters2;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.BasicCCParameters;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -22,7 +22,7 @@ public class CCLineWriterTest extends UniprotExportBase{
 
     @Test
     public void test_cc_export(){
-        List<CCParameters2> parameters = createCCParameters();
+        List<BasicCCParameters> parameters = createCCParameters();
 
         try {
             File testFile = new File("CcTest.txt");
