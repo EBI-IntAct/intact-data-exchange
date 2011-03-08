@@ -386,7 +386,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             }
         }
 
-        if (!invalidIntactIds.isEmpty() && invalidIntactIds.size() == interaction.getExperimentToPubmed().keySet().size()){
+        if (passRules){
             removeInteractionEvidencesFrom(interaction, invalidIntactIds, context);
         }
 
@@ -435,7 +435,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             }
         }
 
-        if (!invalidIntactIds.isEmpty() && invalidIntactIds.size() == FilterUtils.extractIntactAcFrom(interaction.getInteractionAcs()).size()){
+        if (passRules){
             removeInteractionEvidencesFrom(interaction, invalidIntactIds, context);
         }
 
