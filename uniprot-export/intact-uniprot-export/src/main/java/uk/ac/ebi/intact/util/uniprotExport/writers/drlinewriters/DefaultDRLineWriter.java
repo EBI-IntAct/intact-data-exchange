@@ -15,14 +15,14 @@ import java.util.List;
  * @since <pre>28/01/11</pre>
  */
 
-public class DRLineWriterImpl implements DRLineWriter {
+public class DefaultDRLineWriter implements DRLineWriter {
 
     /**
      * The writer
      */
     private OutputStreamWriter writer;
 
-    public DRLineWriterImpl(OutputStreamWriter outputStream) throws IOException {
+    public DefaultDRLineWriter(OutputStreamWriter outputStream) throws IOException {
         if (outputStream == null){
              throw new IllegalArgumentException("You must give a non null OutputStream writer");
         }

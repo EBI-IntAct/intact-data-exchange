@@ -28,7 +28,7 @@ public class DRLineWriterTest extends UniprotExportBase{
         try {
             File testFile = new File("DrTest.txt");
             FileWriter test = new FileWriter(testFile);
-            DRLineWriter writer = new DRLineWriterImpl(test);
+            DRLineWriter writer = new DefaultDRLineWriter(test);
 
             writer.writeDRLines(parameters);
 

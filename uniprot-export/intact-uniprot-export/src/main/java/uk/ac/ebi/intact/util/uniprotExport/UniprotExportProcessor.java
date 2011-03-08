@@ -16,13 +16,12 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParamet
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.writers.CCWriterFactory;
+import uk.ac.ebi.intact.util.uniprotExport.writers.DRWriterFactory;
+import uk.ac.ebi.intact.util.uniprotExport.writers.GOWriterFactory;
 import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DRLineWriter;
-import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DRLineWriterImpl;
 import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.GOLineWriter;
-import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.GOLineWriterImpl;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -68,6 +67,16 @@ public class UniprotExportProcessor {
     private CCWriterFactory ccWriterFactory;
 
     /**
+     * Factory to create DRWriters
+     */
+    private DRWriterFactory drWriterFactory;
+
+    /**
+     * Factory to create GOWriters
+     */
+    private GOWriterFactory goWriterFactory;
+
+    /**
      *
      * @param filter : the filter to use for uniprot export
      */
@@ -83,6 +92,8 @@ public class UniprotExportProcessor {
         this.filter = filter;
 
         this.ccWriterFactory = new CCWriterFactory();
+        this.drWriterFactory = new DRWriterFactory();
+        this.goWriterFactory = new GOWriterFactory();
     }
 
     /**
@@ -97,6 +108,8 @@ public class UniprotExportProcessor {
 
         this.filter = filter;
         this.ccWriterFactory = new CCWriterFactory();
+        this.drWriterFactory = new DRWriterFactory();
+        this.goWriterFactory = new GOWriterFactory();
     }
 
     /**
@@ -144,106 +157,112 @@ public class UniprotExportProcessor {
     public void exportGOLines(MiClusterScoreResults results, String GOFile) throws IOException {
 
         // create the GO writer
-        GOLineWriter goWriter = new GOLineWriterImpl(new FileWriter(GOFile));
+        GOLineWriter goWriter = goWriterFactory.createGOLineWriterFor(this.goConverter, GOFile);
 
-        ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
+        if (goWriter != null){
+            ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
 
-        // the interactions
-        Map<Integer, EncoreInteraction> interactionMapping = positiveInteractions.getCluster().getEncoreInteractionCluster();
+            // the interactions
+            Map<Integer, EncoreInteraction> interactionMapping = positiveInteractions.getCluster().getEncoreInteractionCluster();
 
-        /**
-         * The list of interactors is sorted so if an interactor is an isoform or feature chain, it will follow the master protein
-         */
-        Set<String> interactors = new TreeSet(positiveInteractions.getCluster().getInteractorCluster().keySet());
+            /**
+             * The list of interactors is sorted so if an interactor is an isoform or feature chain, it will follow the master protein
+             */
+            Set<String> interactors = new TreeSet(positiveInteractions.getCluster().getInteractorCluster().keySet());
 
-        // the cluster is not empty
-        if (!interactors.isEmpty() && !interactionMapping.isEmpty()){
-            // iterator of the interactors
-            Iterator<String> interactorIterator = interactors.iterator();
+            // the cluster is not empty
+            if (!interactors.isEmpty() && !interactionMapping.isEmpty()){
+                // iterator of the interactors
+                Iterator<String> interactorIterator = interactors.iterator();
 
-            // collect the first interactor
-            String interactor = interactorIterator.next();
+                // collect the first interactor
+                String interactor = interactorIterator.next();
 
-            // the uniprot ac of the first interactor
-            String uniprotAc = interactor;
-            if (interactor.contains("-")){
-                uniprotAc = interactor.substring(0, interactor.indexOf("-"));
-            }
-
-            // the encore interactions to export in the GO lines for this uniprot entry
-            List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
-            // collect number of exported interactions for this first interactor
-            collectExportedInteractions(positiveInteractions, interactions, interactor);
-
-            // while the sorted list of interactors is not totally processed
-            while (interactorIterator.hasNext() ){
-                // next interactor
-                interactor =  interactorIterator.next();
-
-                // while the next interactor starts with the master uniprot ac, it means it is the same uniprot entry and the interactions are clustered
-                while (interactor.startsWith(uniprotAc)){
-
-                    // collect number of exported interactions for this interactor
-                    collectExportedInteractions(positiveInteractions, interactions, interactor);
-
-                    // get the next interactor if it exists or exit
-                    if (interactorIterator.hasNext()){
-                        interactor = interactorIterator.next();
-                    }
-                    else {
-                        break;
-                    }
-                }
-
-                // write GO lines if the number of interactions is superior to 0
-                if (!interactions.isEmpty()){
-                    logger.info("Write GO lines for " + uniprotAc);
-
-                    // the isoforms have their own GO line contrary to the feaqture chains which are merged to the master entry
-                    List<GOParameters> goParameters = this.goConverter.convertInteractionsIntoGOParameters(interactions, uniprotAc);
-
-                    goWriter.writeGOLines(goParameters);
-                }
-
-                // clean the list of encore interactions attached to the uniprot entry, so we can process the new interactor
-                interactions.clear();
-
-                // extract new master uniprot ac
-                uniprotAc = interactor;
+                // the uniprot ac of the first interactor
+                String uniprotAc = interactor;
                 if (interactor.contains("-")){
                     uniprotAc = interactor.substring(0, interactor.indexOf("-"));
                 }
 
-                // collect new interactions for the new interactor
+                // the encore interactions to export in the GO lines for this uniprot entry
+                List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
+                // collect number of exported interactions for this first interactor
                 collectExportedInteractions(positiveInteractions, interactions, interactor);
 
-                // don't forget the latest !
-                if (!interactorIterator.hasNext()){
+                // while the sorted list of interactors is not totally processed
+                while (interactorIterator.hasNext() ){
+                    // next interactor
+                    interactor =  interactorIterator.next();
+
+                    // while the next interactor starts with the master uniprot ac, it means it is the same uniprot entry and the interactions are clustered
+                    while (interactor.startsWith(uniprotAc)){
+
+                        // collect number of exported interactions for this interactor
+                        collectExportedInteractions(positiveInteractions, interactions, interactor);
+
+                        // get the next interactor if it exists or exit
+                        if (interactorIterator.hasNext()){
+                            interactor = interactorIterator.next();
+                        }
+                        else {
+                            break;
+                        }
+                    }
+
                     // write GO lines if the number of interactions is superior to 0
-                    if (!interactions.isEmpty()){
-                        logger.info("Write GO lines for " + uniprotAc);
+                    flushGoLinesFor(goWriter, uniprotAc, interactions);
 
-                        // the isoforms have their own GO line contrary to the feaqture chains which are merged to the master entry
-                        List<GOParameters> goParameters = this.goConverter.convertInteractionsIntoGOParameters(interactions, uniprotAc);
+                    // clean the list of encore interactions attached to the uniprot entry, so we can process the new interactor
+                    interactions.clear();
 
-                        goWriter.writeGOLines(goParameters);
+                    // extract new master uniprot ac
+                    uniprotAc = interactor;
+                    if (interactor.contains("-")){
+                        uniprotAc = interactor.substring(0, interactor.indexOf("-"));
+                    }
+
+                    // collect new interactions for the new interactor
+                    collectExportedInteractions(positiveInteractions, interactions, interactor);
+
+                    // don't forget the latest !
+                    if (!interactorIterator.hasNext()){
+                        // write GO lines if the number of interactions is superior to 0
+                        flushGoLinesFor(goWriter, uniprotAc, interactions);
                     }
                 }
             }
+
+            // for each interactions we can export, get it from the cluster and convert it into GO line
+            /*for (Integer interactionId : results.getInteractionsToExport()){
+                EncoreInteraction interaction = interactionMapping.get(interactionId);
+                logger.info("Write GO lines for " + interaction.getInteractorA() + " - " + interaction.getInteractorB());
+
+                GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
+
+                goWriter.writeGOLine(goParameters);
+            }*/
+
+            // close the writer
+            goWriter.close();
         }
+    }
 
-        // for each interactions we can export, get it from the cluster and convert it into GO line
-        /*for (Integer interactionId : results.getInteractionsToExport()){
-            EncoreInteraction interaction = interactionMapping.get(interactionId);
-            logger.info("Write GO lines for " + interaction.getInteractorA() + " - " + interaction.getInteractorB());
+    /**
+     * Write the go lines for a uniprot protein
+     * @param goWriter
+     * @param uniprotAc
+     * @param interactions
+     * @throws IOException
+     */
+    private void flushGoLinesFor(GOLineWriter goWriter, String uniprotAc, List<EncoreInteraction> interactions) throws IOException {
+        if (!interactions.isEmpty()){
+            logger.info("Write GO lines for " + uniprotAc);
 
-            GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
+            // the isoforms have their own GO line contrary to the feaqture chains which are merged to the master entry
+            List<GOParameters> goParameters = this.goConverter.convertInteractionsIntoGOParameters(interactions, uniprotAc);
 
-            goWriter.writeGOLine(goParameters);
-        }*/
-
-        // close the writer
-        goWriter.close();
+            goWriter.writeGOLines(goParameters);
+        }
     }
 
     private SortedSet<InteractingProtein> buildSortedListOfInteractingProteins(Set<String> interactors, boolean doesInteract){
@@ -267,136 +286,62 @@ public class UniprotExportProcessor {
     public void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile) throws IOException {
 
         // the Dr writer
-        DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
+        DRLineWriter drWriter = drWriterFactory.createDRLineWriterFor(this.drConverter, DRFile);
 
         // two CC line writers which will be initialized depending on the version (1 = old CC line format, 2 = new CC line format)
         CCLineWriter ccWriter = ccWriterFactory.createCCLineWriterFor(this.ccConverter, CCFile);
 
-        ExportedClusteredInteractions positiveClusteredInteractions = results.getPositiveClusteredInteractions();
-        ExportedClusteredInteractions negativeClusteredInteractions = results.getNegativeClusteredInteractions();
+        if (drWriter != null || ccWriter != null){
+            ExportedClusteredInteractions positiveClusteredInteractions = results.getPositiveClusteredInteractions();
+            ExportedClusteredInteractions negativeClusteredInteractions = results.getNegativeClusteredInteractions();
 
-        /*
-        * The list of interactors is sorted so if an interactor is an isoform or feature chain, it will follow the master protein
-        * If we have negative interactions, it will be added as well
-        */
-        SortedSet<InteractingProtein> interactors = buildSortedListOfInteractingProteins(positiveClusteredInteractions.getCluster().getInteractorCluster().keySet(), true);
-        interactors.addAll(buildSortedListOfInteractingProteins(negativeClusteredInteractions.getCluster().getInteractorCluster().keySet(), false));
+            /*
+            * The list of interactors is sorted so if an interactor is an isoform or feature chain, it will follow the master protein
+            * If we have negative interactions, it will be added as well
+            */
+            SortedSet<InteractingProtein> interactors = buildSortedListOfInteractingProteins(positiveClusteredInteractions.getCluster().getInteractorCluster().keySet(), true);
+            interactors.addAll(buildSortedListOfInteractingProteins(negativeClusteredInteractions.getCluster().getInteractorCluster().keySet(), false));
 
-        /*
-        * The clustered interactions
-        */
-        Map<Integer, EncoreInteraction> interactionMapping = positiveClusteredInteractions.getCluster().getEncoreInteractionCluster();
+            /*
+            * The clustered interactions
+            */
+            Map<Integer, EncoreInteraction> interactionMapping = positiveClusteredInteractions.getCluster().getEncoreInteractionCluster();
 
-        /*
-        * The clustered negative interactions
-        */
-        Map<Integer, EncoreInteraction> negativeInteractionMapping = negativeClusteredInteractions.getCluster().getEncoreInteractionCluster();
+            /*
+            * The clustered negative interactions
+            */
+            Map<Integer, EncoreInteraction> negativeInteractionMapping = negativeClusteredInteractions.getCluster().getEncoreInteractionCluster();
 
-        // the cluster is not empty and we don't process negative interactions
-        if (!interactors.isEmpty() && (!interactionMapping.isEmpty() || negativeInteractionMapping.isEmpty())){
-            // iterator of the interactors
-            Iterator<InteractingProtein> interactorIterator = interactors.iterator();
+            // the cluster is not empty and we don't process negative interactions
+            if (!interactors.isEmpty() && (!interactionMapping.isEmpty() || negativeInteractionMapping.isEmpty())){
+                // iterator of the interactors
+                Iterator<InteractingProtein> interactorIterator = interactors.iterator();
 
-            // collect the first interactor
-            InteractingProtein interactingprot = interactorIterator.next();
-            String interactor = interactingprot.getInteractor();
+                // collect the first interactor
+                InteractingProtein interactingprot = interactorIterator.next();
+                String interactor = interactingprot.getInteractor();
 
-            // the master uniprot ac of the first interactor
-            String parentAc = interactor;
-            if (interactor.contains("-")){
-                parentAc = interactor.substring(0, interactor.indexOf("-"));
-            }
-
-            // the encore interactions to export in the CC lines for this interactor
-            List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
-            // the negative encore interactions to export in the CC lines for this interactor
-            List<EncoreInteraction> negativeInteractions = new ArrayList<EncoreInteraction>();
-
-            // the number of interactions exported in CC lines
-            int numberInteractions = 0;
-            // the number of negative interactions exported in CC lines
-            int numberNegativeInteractions = 0;
-            // the total number of binary interactions attached to this protein
-            int totalNumberInteraction = 0;
-
-            if (interactingprot.doesInteract()){
-                // collect number of exported interactions for this interactor
-                numberInteractions = collectExportedInteractions(positiveClusteredInteractions, interactions, interactor);
-                // increments the total number of interactions for this uniprot entry
-                totalNumberInteraction = positiveClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
-            }
-            else{
-                // collect number of exported negative interactions for this interactor
-                numberNegativeInteractions = collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor);
-                // increments the total number of exported negative interactions for the uniprot entry (master, isoforms and feature chain)
-                // increments the total number of interactions for this uniprot entry
-                totalNumberInteraction = negativeClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
-            }
-
-            // while the sorted list of interactors is not totally processed
-            while (interactorIterator.hasNext() ){
-                // next interactor
-                interactingprot = interactorIterator.next();
-                interactor =  interactingprot.getInteractor();
-
-                // while the next interactor starts with the master uniprot ac, it means it is the same uniprot entry and the interactions are clustered
-                while (interactor.startsWith(parentAc)){
-                    if (interactingprot.doesInteract()){
-                        // collect number of exported interactions for this interactor
-                        numberInteractions += collectExportedInteractions(positiveClusteredInteractions, interactions, interactor);
-                        // increments the total number of interactions for this uniprot entry
-                        totalNumberInteraction += positiveClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
-                    }
-                    else{
-                        // collect number of exported negative interactions for this interactor
-                        numberNegativeInteractions += collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor);
-                        // increments the total number of interactions for this uniprot entry
-                        totalNumberInteraction += negativeClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
-                    }
-
-                    // get the next interactor if it exists or exit
-                    if (interactorIterator.hasNext()){
-                        interactingprot = interactorIterator.next();
-                        interactor = interactingprot.getInteractor();
-                    }
-                    else {
-                        break;
-                    }
-                }
-
-                // write CC lines if the number of interactions is superior to 0
-                if (numberInteractions > 0 || numberNegativeInteractions > 0){
-                    logger.info("Write CC lines for " + parentAc);
-                    if (ccWriter != null){
-                        CCParameters ccParameters = this.ccConverter.convertPositiveAndNegativeInteractionsIntoCCLines(interactions, negativeInteractions, results.getExportContext(), parentAc);
-                        ccWriter.writeCCLine(ccParameters);
-                    }
-                    else{
-                        logger.error("No CCWriter is compatible with the current ccline converter, the cc lines will not be written");
-                    }
-                }
-
-                // write DR lines if the total number of interactions is superior to 0
-                if (totalNumberInteraction > 0){
-                    logger.info("Write DR lines for " + parentAc);
-                    DRParameters parameter = this.drConverter.convertInteractorIntoDRLine(parentAc, totalNumberInteraction);
-                    drWriter.writeDRLine(parameter);
-                }
-
-                // clean the list of encore interactions attached to the uniprot entry, so we can process the new interactor
-                interactions.clear();
-
-                // extract new master uniprot ac
-                parentAc = interactor;
+                // the master uniprot ac of the first interactor
+                String parentAc = interactor;
                 if (interactor.contains("-")){
                     parentAc = interactor.substring(0, interactor.indexOf("-"));
                 }
 
-                // collect new interactions for the new interactor
+                // the encore interactions to export in the CC lines for this interactor
+                List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
+                // the negative encore interactions to export in the CC lines for this interactor
+                List<EncoreInteraction> negativeInteractions = new ArrayList<EncoreInteraction>();
+
+                // the number of interactions exported in CC lines
+                int numberInteractions = 0;
+                // the number of negative interactions exported in CC lines
+                int numberNegativeInteractions = 0;
+                // the total number of binary interactions attached to this protein
+                int totalNumberInteraction = 0;
+
                 if (interactingprot.doesInteract()){
                     // collect number of exported interactions for this interactor
                     numberInteractions = collectExportedInteractions(positiveClusteredInteractions, interactions, interactor);
-                    numberNegativeInteractions = 0;
                     // increments the total number of interactions for this uniprot entry
                     totalNumberInteraction = positiveClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
                 }
@@ -404,40 +349,122 @@ public class UniprotExportProcessor {
                     // collect number of exported negative interactions for this interactor
                     numberNegativeInteractions = collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor);
                     // increments the total number of exported negative interactions for the uniprot entry (master, isoforms and feature chain)
-                    numberInteractions = 0;
                     // increments the total number of interactions for this uniprot entry
                     totalNumberInteraction = negativeClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
                 }
 
-                // don't forget to write the latest interactor
-                if (!interactorIterator.hasNext()){
-                    // write CC lines if the number of interactions is superior to 0
-                    if (numberInteractions > 0 || numberNegativeInteractions > 0){
-                        logger.info("Write CC lines for " + parentAc);
-                        if (ccWriter != null){
-                            CCParameters ccParameters = this.ccConverter.convertPositiveAndNegativeInteractionsIntoCCLines(interactions, negativeInteractions, results.getExportContext(), parentAc);
-                            ccWriter.writeCCLine(ccParameters);
+                // while the sorted list of interactors is not totally processed
+                while (interactorIterator.hasNext() ){
+                    // next interactor
+                    interactingprot = interactorIterator.next();
+                    interactor =  interactingprot.getInteractor();
+
+                    // while the next interactor starts with the master uniprot ac, it means it is the same uniprot entry and the interactions are clustered
+                    while (interactor.startsWith(parentAc)){
+                        if (interactingprot.doesInteract()){
+                            // collect number of exported interactions for this interactor
+                            numberInteractions += collectExportedInteractions(positiveClusteredInteractions, interactions, interactor);
+                            // increments the total number of interactions for this uniprot entry
+                            totalNumberInteraction += positiveClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
                         }
                         else{
-                            logger.error("No CCWriter is compatible with the current ccline converter, the cc lines will not be written");
+                            // collect number of exported negative interactions for this interactor
+                            numberNegativeInteractions += collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor);
+                            // increments the total number of interactions for this uniprot entry
+                            totalNumberInteraction += negativeClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
+                        }
+
+                        // get the next interactor if it exists or exit
+                        if (interactorIterator.hasNext()){
+                            interactingprot = interactorIterator.next();
+                            interactor = interactingprot.getInteractor();
+                        }
+                        else {
+                            break;
                         }
                     }
 
-                    // write DR lines if the total number of interactions is superior to 0
-                    if (totalNumberInteraction > 0){
-                        logger.info("Write DR lines for " + parentAc);
-                        DRParameters parameter = this.drConverter.convertInteractorIntoDRLine(parentAc, totalNumberInteraction);
-                        drWriter.writeDRLine(parameter);
+                    // write CC lines if the number of interactions is superior to 0
+                    flushDRAndCCLinesFor(results, drWriter, ccWriter, parentAc, interactions, negativeInteractions, numberInteractions, numberNegativeInteractions, totalNumberInteraction);
+
+                    // clean the list of encore interactions attached to the uniprot entry, so we can process the new interactor
+                    interactions.clear();
+
+                    // extract new master uniprot ac
+                    parentAc = interactor;
+                    if (interactor.contains("-")){
+                        parentAc = interactor.substring(0, interactor.indexOf("-"));
+                    }
+
+                    // collect new interactions for the new interactor
+                    if (interactingprot.doesInteract()){
+                        // collect number of exported interactions for this interactor
+                        numberInteractions = collectExportedInteractions(positiveClusteredInteractions, interactions, interactor);
+                        numberNegativeInteractions = 0;
+                        // increments the total number of interactions for this uniprot entry
+                        totalNumberInteraction = positiveClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
+                    }
+                    else{
+                        // collect number of exported negative interactions for this interactor
+                        numberNegativeInteractions = collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor);
+                        // increments the total number of exported negative interactions for the uniprot entry (master, isoforms and feature chain)
+                        numberInteractions = 0;
+                        // increments the total number of interactions for this uniprot entry
+                        totalNumberInteraction = negativeClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
+                    }
+
+                    // don't forget to write the latest interactor
+                    if (!interactorIterator.hasNext()){
+                        // write CC lines if the number of interactions is superior to 0
+                        flushDRAndCCLinesFor(results, drWriter, ccWriter, parentAc, interactions, negativeInteractions, numberInteractions, numberNegativeInteractions, totalNumberInteraction);
                     }
                 }
             }
+
+            // close the writers
+            drWriter.close();
+
+            if (ccWriter != null){
+                ccWriter.close();
+            }
+        }
+    }
+
+    /**
+     * Write DR and CC lines for a specific uniprot ac
+     * @param results
+     * @param drWriter
+     * @param ccWriter
+     * @param parentAc
+     * @param interactions
+     * @param negativeInteractions
+     * @param numberInteractions
+     * @param numberNegativeInteractions
+     * @param totalNumberInteraction
+     * @throws IOException
+     */
+    private void flushDRAndCCLinesFor(MiClusterScoreResults results, DRLineWriter drWriter, CCLineWriter ccWriter, String parentAc, List<EncoreInteraction> interactions, List<EncoreInteraction> negativeInteractions, int numberInteractions, int numberNegativeInteractions, int totalNumberInteraction) throws IOException {
+        if (numberInteractions > 0 || numberNegativeInteractions > 0){
+            logger.info("Write CC lines for " + parentAc);
+            if (ccWriter != null){
+                CCParameters ccParameters = this.ccConverter.convertPositiveAndNegativeInteractionsIntoCCLines(interactions, negativeInteractions, results.getExportContext(), parentAc);
+                ccWriter.writeCCLine(ccParameters);
+            }
+            else{
+                logger.error("No CCWriter is compatible with the current ccline converter, the cc lines will not be written");
+            }
         }
 
-        // close the writers
-        drWriter.close();
-
-        if (ccWriter != null){
-            ccWriter.close();
+        // write DR lines if the total number of interactions is superior to 0
+        if (totalNumberInteraction > 0){
+            logger.info("Write DR lines for " + parentAc);
+            if (drWriter != null){
+                DRParameters parameter = this.drConverter.convertInteractorIntoDRLine(parentAc, totalNumberInteraction);
+                drWriter.writeDRLine(parameter);
+            }
+            else{
+                logger.error("No DRWriter is compatible with the current drline converter, the dr lines will not be written");
+            }
         }
     }
 

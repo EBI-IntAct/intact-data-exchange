@@ -17,14 +17,14 @@ import java.util.Set;
  * @since <pre>28/01/11</pre>
  */
 
-public class GOLineWriterImpl implements GOLineWriter{
+public class DefaultGOLineWriter implements GOLineWriter{
 
     /**
      * The writer
      */
     private OutputStreamWriter writer;
 
-    public GOLineWriterImpl(OutputStreamWriter outputStream) throws IOException {
+    public DefaultGOLineWriter(OutputStreamWriter outputStream) throws IOException {
         if (outputStream == null){
              throw new IllegalArgumentException("You must give a non null OutputStream writer");
         }
