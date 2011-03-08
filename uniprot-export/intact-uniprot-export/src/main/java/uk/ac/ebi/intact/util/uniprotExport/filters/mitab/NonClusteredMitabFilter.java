@@ -63,8 +63,6 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
 
         // the binary interactions to cluster
         List<BinaryInteraction> interactionToProcess = new ArrayList<BinaryInteraction>();
-        // the negative binary interactions to cluster
-        List<BinaryInteraction> negativeInteractionToProcess = new ArrayList<BinaryInteraction>();
 
         while (iterator.hasNext()){
             interactionToProcess.clear();
@@ -149,7 +147,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
                 }
             }
 
-            if (interactionToProcess.isEmpty()){
+            if (!interactionToProcess.isEmpty()){
                 clusterScore.setBinaryInteractionList(interactionToProcess);
                 clusterScore.runService();
             }
