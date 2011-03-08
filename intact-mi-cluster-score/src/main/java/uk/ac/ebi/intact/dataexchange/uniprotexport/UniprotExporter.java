@@ -7,6 +7,8 @@ import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.ExporterRule;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.InteractionSource;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportProcessor;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLine1Converter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLine2Converter;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
@@ -62,7 +64,7 @@ public class UniprotExporter {
         //}
         //else{
             config.setExcludeLowConfidenceInteractions(true);
-            config.setExcludeNegativeInteractions(true);
+            config.setExcludeNegativeInteractions(false);
             config.setExcludeNonUniprotInteractors(true);
             config.setExcludeSpokeExpandedInteractions(false);
         //}
@@ -116,6 +118,12 @@ public class UniprotExporter {
 
         try {
 
+            if (version == 1){
+                processor.setCcConverter(new EncoreInteractionToCCLine1Converter());
+            }
+            else{
+               processor.setCcConverter(new EncoreInteractionToCCLine2Converter());
+            }
             processor.runUniprotExport(drFile, ccFile, goFile, version);
 
         } catch (UniprotExportException e) {

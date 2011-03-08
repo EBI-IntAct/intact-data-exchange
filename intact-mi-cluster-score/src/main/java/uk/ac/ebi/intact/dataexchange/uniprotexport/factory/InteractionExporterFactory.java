@@ -21,7 +21,7 @@ public class InteractionExporterFactory {
                 return new ExporterBasedOnDetectionMethod();
             case mi_score:
                 ExporterBasedOnClusterScore exporter = new ExporterBasedOnClusterScore();
-                exporter.setExport_threshold(0.42);
+                //exporter.setExport_threshold(0.42);
                 return exporter;
             default:
                 return null;
