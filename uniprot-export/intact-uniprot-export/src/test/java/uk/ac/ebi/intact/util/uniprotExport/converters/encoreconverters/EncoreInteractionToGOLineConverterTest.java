@@ -18,7 +18,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_go_convert_ok(){
-        EncoreInteractionToGoLineConverter converter = new EncoreInteractionToGoLineConverter();
+        DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
 
         EncoreInteraction interaction = createEncoreInteraction();
 
@@ -32,7 +32,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_go_convert_no_first_interactor(){
-        EncoreInteractionToGoLineConverter converter = new EncoreInteractionToGoLineConverter();
+        DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
 
         EncoreInteraction interaction = createEncoreInteraction();
         interaction.getInteractorAccsA().clear();
@@ -43,7 +43,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_go_convert_no_second_interactor(){
-        EncoreInteractionToGoLineConverter converter = new EncoreInteractionToGoLineConverter();
+        DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
 
         EncoreInteraction interaction = createEncoreInteraction();
         interaction.getInteractorAccsB().clear();
@@ -55,7 +55,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_go_convert_no_publications(){
-        EncoreInteractionToGoLineConverter converter = new EncoreInteractionToGoLineConverter();
+        DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
 
         EncoreInteraction interaction = createEncoreInteraction();
         interaction.getPublicationIds().clear();
@@ -66,7 +66,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_go_convert_one_publication_no_pubmed(){
-        EncoreInteractionToGoLineConverter converter = new EncoreInteractionToGoLineConverter();
+        DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
 
         EncoreInteraction interaction = createEncoreInteraction();
         interaction.getPublicationIds().iterator().next().setDatabase("DOI");

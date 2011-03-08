@@ -3,7 +3,9 @@ package uk.ac.ebi.intact.util.uniprotExport;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.intact.util.uniprotExport.converters.DefaultInteractorToDRLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.InteractorToDRLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.DefaultEncoreInteractionToGoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLine1Converter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter;
@@ -71,12 +73,12 @@ public class UniprotExportProcessor {
      */
     public UniprotExportProcessor(InteractionFilter filter){
 
-        goConverter = new EncoreInteractionToGoLineConverter();
+        goConverter = new DefaultEncoreInteractionToGoLineConverter();
 
         // by default, initialize a converter of the first CC line format
         ccConverter = new EncoreInteractionToCCLine1Converter();
 
-        drConverter = new InteractorToDRLineConverter();
+        drConverter = new DefaultInteractorToDRLineConverter();
 
         this.filter = filter;
 
@@ -87,10 +89,10 @@ public class UniprotExportProcessor {
      *
      * @param filter : the filter to use for uniprot export
      */
-    public UniprotExportProcessor(InteractionFilter filter, EncoreInteractionToGoLineConverter goConverter, EncoreInteractionToCCLine1Converter ccConverter, InteractorToDRLineConverter drConverter){
+    public UniprotExportProcessor(InteractionFilter filter, DefaultEncoreInteractionToGoLineConverter goConverter, EncoreInteractionToCCLine1Converter ccConverter, DefaultInteractorToDRLineConverter drConverter){
 
-        this.goConverter = goConverter != null ? goConverter : new EncoreInteractionToGoLineConverter();
-        this.drConverter = drConverter != null ? drConverter : new InteractorToDRLineConverter();
+        this.goConverter = goConverter != null ? goConverter : new DefaultEncoreInteractionToGoLineConverter();
+        this.drConverter = drConverter != null ? drConverter : new DefaultInteractorToDRLineConverter();
         this.ccConverter = ccConverter != null ? ccConverter : new EncoreInteractionToCCLine1Converter();
 
         this.filter = filter;
@@ -377,7 +379,7 @@ public class UniprotExportProcessor {
                 // write DR lines if the total number of interactions is superior to 0
                 if (totalNumberInteraction > 0){
                     logger.info("Write DR lines for " + parentAc);
-                    DRParameters parameter = this.drConverter.convertInteractorToDRLine(parentAc, totalNumberInteraction);
+                    DRParameters parameter = this.drConverter.convertInteractorIntoDRLine(parentAc, totalNumberInteraction);
                     drWriter.writeDRLine(parameter);
                 }
 
@@ -424,7 +426,7 @@ public class UniprotExportProcessor {
                     // write DR lines if the total number of interactions is superior to 0
                     if (totalNumberInteraction > 0){
                         logger.info("Write DR lines for " + parentAc);
-                        DRParameters parameter = this.drConverter.convertInteractorToDRLine(parentAc, totalNumberInteraction);
+                        DRParameters parameter = this.drConverter.convertInteractorIntoDRLine(parentAc, totalNumberInteraction);
                         drWriter.writeDRLine(parameter);
                     }
                 }

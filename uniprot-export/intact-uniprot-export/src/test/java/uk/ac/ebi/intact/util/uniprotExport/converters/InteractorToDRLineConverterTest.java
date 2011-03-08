@@ -2,7 +2,6 @@ package uk.ac.ebi.intact.util.uniprotExport.converters;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ebi.intact.util.uniprotExport.converters.InteractorToDRLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 
 /**
@@ -17,9 +16,9 @@ public class InteractorToDRLineConverterTest{
 
     @Test
     public void test_dr_convert_ok(){
-        InteractorToDRLineConverter converter = new InteractorToDRLineConverter();
+        DefaultInteractorToDRLineConverter converter = new DefaultInteractorToDRLineConverter();
 
-        DRParameters parameters = converter.convertInteractorToDRLine("EBI-xxxxx", 3);
+        DRParameters parameters = converter.convertInteractorIntoDRLine("EBI-xxxxx", 3);
         Assert.assertNotNull(parameters);
         Assert.assertEquals("EBI-xxxxx", parameters.getUniprotAc());
         Assert.assertEquals(3, parameters.getNumberOfInteractions());
@@ -27,9 +26,9 @@ public class InteractorToDRLineConverterTest{
 
     @Test
     public void test_dr_convert_null(){
-        InteractorToDRLineConverter converter = new InteractorToDRLineConverter();
+        DefaultInteractorToDRLineConverter converter = new DefaultInteractorToDRLineConverter();
 
-        DRParameters parameters = converter.convertInteractorToDRLine(null, 3);
+        DRParameters parameters = converter.convertInteractorIntoDRLine(null, 3);
         Assert.assertNull(parameters);
     }
 }
