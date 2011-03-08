@@ -16,12 +16,15 @@
     <description>IntAct CC/DR line export for UniProt using the Mi cluster score</description>
 
     <properties>
-        <rule>intact</rule>
-        <source>mi_score</source>
-        <drfile>$INTACT/local/data/released/current/various/uniprotlinks.dat</drfile>
-        <ccfile>$INTACT/local/data/released/current/various/uniprotcomments.dat</ccfile>
-        <gofile>$INTACT/local/data/released/current/various/gene_association.goa_intact.gz</gofile>
-        <version>1</version>
+        <rule>mi_score</rule>
+        <source>intact</source>
+        <drfile>$INTACT/local/data/released/current/various/uniprotlinks.dat:1</drfile>
+        <ccfile>$INTACT/local/data/released/current/various/uniprotcomments.dat:1</ccfile>
+        <gofile>$INTACT/local/data/released/current/various/gene_association.goa_intact.gz:1</gofile>
+        <binaryOnly>false</binaryOnly>
+        <highConfidence>true</highConfidence>
+        <proteinOnly>true</proteinOnly>
+        <positiveOnly>true</positiveOnly>
     </properties>
 
     <build>
@@ -71,8 +74,10 @@
                                 <argument>${gofile}</argument>
                                 <!-- The name of the database  -->
                                 <argument>${database}</argument>
-                                <!-- The version of the CC line writer  -->
-                                <argument>${version}</argument>
+                                <argument>${binaryOnly}</argument>
+                                <argument>${highConfidence}</argument>
+                                <argument>${proteinOnly}</argument>
+                                <argument>${positiveOnly}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
