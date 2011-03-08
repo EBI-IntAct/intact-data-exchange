@@ -3,10 +3,8 @@ package uk.ac.ebi.intact.util.uniprotExport.filters;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
@@ -36,11 +34,6 @@ public class IntactFilterTest extends UniprotExportBase{
 
         createExperimentContext();
 
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        Interaction interaction3 = getDaoFactory().getInteractionDao().getByAc(this.interaction3);
-
-        getDataContext().commitTransaction(status);
         Assert.assertEquals(5, getDaoFactory().getInteractionDao().getAll().size());
         Assert.assertEquals(4, getDaoFactory().getExperimentDao().getAll().size());
 
