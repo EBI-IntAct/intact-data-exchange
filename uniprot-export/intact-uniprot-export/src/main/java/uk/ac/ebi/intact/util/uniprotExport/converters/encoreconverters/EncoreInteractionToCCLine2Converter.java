@@ -77,32 +77,28 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
             for (String pubmedId : pubmedIds){
                 List<String> interactionsAcsAttachedToThisPubmed = pubmedToInteraction.get(pubmedId);
 
-                if (interactionsAcsAttachedToThisPubmed == null){
-                    logger.fatal(pubmedId + " is not associated with any interactions acs but is present with " + method + " and " + type+ ", interaction " + interaction.getInteractorA() + "-" + interaction.getInteractorB());
+                logger.debug("Process pubmed " + pubmedId + ", having " + (interactionsAcsAttachedToThisPubmed != null ? interactionsAcsAttachedToThisPubmed.size() : 0) + " interactions acs.");
+                // get the list of IntAct interaction Ids which are linked to this pubmed ids and also associated with the couple {method, type}
+                List<String> interactionForPubmedAndTypeAndMethod = new ArrayList(CollectionUtils.intersection(interactionsAcsAttachedToThisPubmed, totalInteractions));
+
+                // number of spoke expanded interactions associated with this pubmed id and couple {method, type}
+                int numberSpokeExpanded = 0;
+
+                for (String intAc : interactionForPubmedAndTypeAndMethod){
+                    // the interaction is spoke expanded
+                    if (context.getSpokeExpandedInteractions().contains(intAc)){
+                        numberSpokeExpanded++;
+                    }
                 }
-                else{
-                    // get the list of IntAct interaction Ids which are linked to this pubmed ids and also associated with the couple {method, type}
-                    List<String> interactionForPubmedAndTypeAndMethod = new ArrayList(CollectionUtils.intersection(interactionsAcsAttachedToThisPubmed, totalInteractions));
 
-                    // number of spoke expanded interactions associated with this pubmed id and couple {method, type}
-                    int numberSpokeExpanded = 0;
-
-                    for (String intAc : interactionForPubmedAndTypeAndMethod){
-                        // the interaction is spoke expanded
-                        if (context.getSpokeExpandedInteractions().contains(intAc)){
-                            numberSpokeExpanded++;
-                        }
-                    }
-
-                    // if all interactions associated with this pubmed id and couple {method, type} are spoke expanded, add the pubmed id to the
-                    // list of pubmed Ids 'spoke expanded'
-                    if (numberSpokeExpanded == interactionForPubmedAndTypeAndMethod.size()){
-                        pubmedSpokeExpanded.add(pubmedId);
-                    }
-                    // if at least one interaction is not spoke expanded, the pubmed id goes to the list of pubmed ids 'true binary'
-                    else {
-                        pubmedTrueBinary.add(pubmedId);
-                    }
+                // if all interactions associated with this pubmed id and couple {method, type} are spoke expanded, add the pubmed id to the
+                // list of pubmed Ids 'spoke expanded'
+                if (numberSpokeExpanded == interactionForPubmedAndTypeAndMethod.size()){
+                    pubmedSpokeExpanded.add(pubmedId);
+                }
+                // if at least one interaction is not spoke expanded, the pubmed id goes to the list of pubmed ids 'true binary'
+                else {
+                    pubmedTrueBinary.add(pubmedId);
                 }
             }
 
