@@ -57,13 +57,15 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
         // - pubmed ids associated with both spoke expanded and true binary interactions. In this case, we consider the pubmed id as only associated with true binary interaction
         for (Map.Entry<MethodAndTypePair, Set<String>> ip : distinctInformationDetails.entrySet()){
             // the method is the key of the entry
-            String method = context.getMiTerms().get(ip.getKey().getMethod());
+            String method = context.getMiTerms().containsKey(ip.getKey().getMethod()) ? context.getMiTerms().get(ip.getKey().getMethod()) : ip.getKey().getMethod();
 
             // the type is the value of the entry
-            String type = context.getMiTerms().get(ip.getKey().getType());
+            String type = context.getMiTerms().containsKey(ip.getKey().getType()) ? context.getMiTerms().get(ip.getKey().getType()) : ip.getKey().getType();
 
             // the list of pubmed ids associated with the couple {method, type}
             Set<String> pubmedIds = ip.getValue();
+
+            logger.debug("Process method " + method + ", type " + type + ", " + pubmedIds.size() + " publications");
 
             // the list which will contain the pubmeds Ids ONLY associated with spoke expanded interactions for the couple {method, type}
             Set<String> pubmedSpokeExpanded = new HashSet<String>(pubmedIds.size());
@@ -71,13 +73,14 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
             Set<String> pubmedTrueBinary = new HashSet<String>(pubmedIds.size());
 
             // the list of IntAct interaction acs associated with the couple {method, type}
-            List<String> totalInteractions = method_typeToInteractions.get(ip.getKey());
+            List<String> totalInteractions = method_typeToInteractions.containsKey(ip.getKey()) ? method_typeToInteractions.get(ip.getKey()) : Collections.EMPTY_LIST;
 
             // for each pubmed associated with couple {method, type}
             for (String pubmedId : pubmedIds){
-                List<String> interactionsAcsAttachedToThisPubmed = pubmedToInteraction.get(pubmedId);
+                List<String> interactionsAcsAttachedToThisPubmed = pubmedToInteraction.containsKey(pubmedId) ? pubmedToInteraction.get(pubmedId) : Collections.EMPTY_LIST;
 
-                logger.debug("Process pubmed " + pubmedId + ", having " + (interactionsAcsAttachedToThisPubmed != null ? interactionsAcsAttachedToThisPubmed.size() : 0) + " interactions acs.");
+                logger.debug("Process pubmed " + pubmedId + ", having " + interactionsAcsAttachedToThisPubmed.size() + " interactions acs.");
+
                 // get the list of IntAct interaction Ids which are linked to this pubmed ids and also associated with the couple {method, type}
                 List<String> interactionForPubmedAndTypeAndMethod = new ArrayList(CollectionUtils.intersection(interactionsAcsAttachedToThisPubmed, totalInteractions));
 
