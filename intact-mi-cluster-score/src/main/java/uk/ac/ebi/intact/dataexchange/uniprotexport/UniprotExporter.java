@@ -124,7 +124,7 @@ public class UniprotExporter {
             else{
                processor.setCcConverter(new EncoreInteractionToCCLine2Converter());
             }
-            processor.runUniprotExport(drFile, ccFile, goFile, version);
+            processor.runUniprotExport(drFile, ccFile, goFile);
 
         } catch (UniprotExportException e) {
             e.printStackTrace();
