@@ -6,20 +6,18 @@ import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.clone.IntactCloner;
-import uk.ac.ebi.intact.model.clone.IntactClonerException;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DefaultDRParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
+import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -730,21 +728,6 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         experiment_yes.addAnnotation(expAnn1);
         Annotation expAnnAcc1 = new Annotation(accepted, null);
         experiment_yes.addAnnotation(expAnnAcc1);
-
-        IntactCloner cloner = new IntactCloner(false);
-        try {
-            Interaction clone = cloner.cloneInteraction(experiment_yes.getInteractions().iterator().next());
-            clone.setShortLabel("blabla");
-            clone.setOwner(getIntactContext().getInstitution());
-            clone.getExperiments().clear();
-            clone.getExperiments().add(experiment_yes);
-
-            clone.addAnnotation(getMockBuilder().createAnnotationRandom());
-            experiment_yes.getInteractions().add(clone);
-        } catch (IntactClonerException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        experiment_yes.setCvInteraction(method2);
 
         Experiment experiment_no = getMockBuilder().createExperimentRandom(1);
         Annotation expAnn2 = new Annotation(dr_export, "no");
