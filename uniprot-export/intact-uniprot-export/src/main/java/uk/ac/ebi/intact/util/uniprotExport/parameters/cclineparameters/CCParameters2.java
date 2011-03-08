@@ -10,23 +10,7 @@ import java.util.List;
  * @since <pre>31/01/11</pre>
  */
 
-public interface CCParameters2 {
-
-    /**
-     * the uniprot AC of the first interactor (it is a master uniprot ac)
-     */
-    public String getMasterUniprotAc();
-
-    /**
-     * The gene name of the first interactor
-     */
-    public String getGeneName();
-
-    /**
-     * The taxid of the first interactor
-     * @return
-     */
-    public String getTaxId();
+public interface CCParameters2 extends BasicCCParameters{
 
     /**
      *

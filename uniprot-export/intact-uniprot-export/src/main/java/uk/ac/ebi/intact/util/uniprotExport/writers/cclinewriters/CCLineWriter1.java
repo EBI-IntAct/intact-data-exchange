@@ -13,7 +13,7 @@ import java.util.List;
  * @since <pre>10/02/11</pre>
  */
 
-public interface CCLineWriter1 {
+public interface CCLineWriter1 extends BasicCCLineWriter{
 
     /**
      * append the CCLine to a file (which can be the property of the writer)
@@ -28,10 +28,4 @@ public interface CCLineWriter1 {
      * @throws IOException
      */
     public void writeCCLines(List<CCParameters1> CCLines) throws IOException;
-
-    /**
-     * Close the current writer (version 2)
-     * @throws IOException
-     */
-    public void close() throws IOException;
 }

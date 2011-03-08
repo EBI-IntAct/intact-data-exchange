@@ -9,9 +9,7 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCP
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Tester of the CC line converter
@@ -25,17 +23,13 @@ public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_cc_convert_ok(){
-        EncoreInteractionToCCLineConverter converter = new EncoreInteractionToCCLineConverter();
+        EncoreInteractionToCCLine1Converter converter = new EncoreInteractionToCCLine1Converter();
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
 
         List<EncoreInteraction> negativeInteractions = new ArrayList<EncoreInteraction>();
         negativeInteractions.add(interactions.get(2));
         interactions.remove(2);
-
-        Map<Boolean, List<EncoreInteraction>> interactionsToConvert = new HashMap<Boolean, List<EncoreInteraction>>();
-        interactionsToConvert.put(true, interactions);
-        interactionsToConvert.put(false, negativeInteractions);
 
         MiClusterContext context = createClusterContext();
 
@@ -53,7 +47,7 @@ public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
 
         List<String> ps = map.get(mp2);*/
 
-        CCParameters2 parameters = converter.convertInteractionsIntoCCLinesVersion2(interactionsToConvert, context, firstInteractor);
+        CCParameters2 parameters = (CCParameters2) converter.convertPositiveAndNegativeInteractionsIntoCCLines(interactions, negativeInteractions, context, firstInteractor);
         Assert.assertNotNull(parameters);
         Assert.assertEquals("P28548", parameters.getMasterUniprotAc());
         Assert.assertEquals("Kin-10", parameters.getGeneName());
