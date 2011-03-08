@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters;
 
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.BasicCCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
@@ -55,15 +56,6 @@ public class DefaultCCLineWriter1 implements CCLineWriter1  {
         }
     }
 
-    @Override
-    public void writeCCLines(List<CCParameters1> CCLines) throws IOException {
-
-        // write each CCParameter
-        for (CCParameters1 parameter : CCLines){
-            writeCCLine(parameter);
-        }
-    }
-
     /**
      * Write the content of the CC line
      * @param parameters : the parameters
@@ -111,6 +103,21 @@ public class DefaultCCLineWriter1 implements CCLineWriter1  {
         writer.write("//");
         writer.write(WriterUtils.NEW_LINE);
         writer.flush();
+    }
+
+    @Override
+    public void writeCCLine(BasicCCParameters parameters) throws IOException {
+        if (parameters instanceof CCParameters1){
+            CCParameters1 parameters1 = (CCParameters1) parameters;
+            writeCCLine(parameters1);
+        }
+    }
+
+    @Override
+    public void writeCCLines(List<BasicCCParameters> CCLines) throws IOException {
+        for (BasicCCParameters parameters : CCLines){
+             writeCCLine(parameters);
+        }
     }
 
     @Override

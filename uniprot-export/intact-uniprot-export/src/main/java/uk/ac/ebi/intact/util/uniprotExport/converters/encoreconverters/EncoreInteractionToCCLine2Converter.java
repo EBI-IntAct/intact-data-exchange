@@ -75,12 +75,14 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
 
             // for each pubmed associated with couple {method, type}
             for (String pubmedId : pubmedIds){
-                if (pubmedToInteraction.get(pubmedId) == null){
+                List<String> interactionsAcsAttachedToThisPubmed = pubmedToInteraction.get(pubmedId);
+
+                if (interactionsAcsAttachedToThisPubmed == null){
                     logger.fatal(pubmedId + " is not associated with any interactions acs but is present with " + method + " and " + type+ ", interaction " + interaction.getInteractorA() + "-" + interaction.getInteractorB());
                 }
                 else{
                     // get the list of IntAct interaction Ids which are linked to this pubmed ids and also associated with the couple {method, type}
-                    List<String> interactionForPubmedAndTypeAndMethod = new ArrayList(CollectionUtils.intersection(pubmedToInteraction.get(pubmedId), totalInteractions));
+                    List<String> interactionForPubmedAndTypeAndMethod = new ArrayList(CollectionUtils.intersection(interactionsAcsAttachedToThisPubmed, totalInteractions));
 
                     // number of spoke expanded interactions associated with this pubmed id and couple {method, type}
                     int numberSpokeExpanded = 0;

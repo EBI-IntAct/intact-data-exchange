@@ -3,7 +3,6 @@ package uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters1;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * CCLineWriters1 are able to write CCParameters1
@@ -21,11 +20,4 @@ public interface CCLineWriter1 extends BasicCCLineWriter{
      * @throws java.io.IOException
      */
     public void writeCCLine(CCParameters1 parameters) throws IOException;
-
-    /**
-     * Write a list of CC lines (version 1)
-     * @param CCLines : a list of CC lines
-     * @throws IOException
-     */
-    public void writeCCLines(List<CCParameters1> CCLines) throws IOException;
 }
