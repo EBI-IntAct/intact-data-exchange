@@ -23,7 +23,7 @@ public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_cc_convert_ok(){
-        EncoreInteractionToCCLine1Converter converter = new EncoreInteractionToCCLine1Converter();
+        EncoreInteractionToCCLine2Converter converter = new EncoreInteractionToCCLine2Converter();
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
 
