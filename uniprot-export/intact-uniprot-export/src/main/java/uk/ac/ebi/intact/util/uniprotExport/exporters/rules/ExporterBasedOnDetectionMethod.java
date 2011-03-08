@@ -205,7 +205,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
         CvInteractionStatus methodStatus = getMethodExportStatus(methodMi, "\t\t");
 
-        if (methodStatus.doExport()) {
+        if (methodStatus.doExport() && numberOfExperiments > 0) {
             return true;
         }
         else if (methodStatus.isConditionalExport()) {
@@ -277,8 +277,13 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         for (Map.Entry<MethodAndTypePair, List<String>> entry : invertedMap.entrySet()){
 
             if (entry.getKey().getMethod().equals(method)){
-                numberOfExperiment += entry.getValue().size();
-                validIntactIds.addAll(entry.getValue());
+
+                for (String intactId : entry.getValue()){
+                    if (!context.getSpokeExpandedInteractions().contains(intactId)){
+                        numberOfExperiment ++;
+                        validIntactIds.add(intactId);
+                    }
+                }
             }
         }
 
