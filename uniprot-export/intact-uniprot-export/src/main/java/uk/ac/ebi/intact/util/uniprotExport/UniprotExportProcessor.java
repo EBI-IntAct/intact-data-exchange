@@ -8,13 +8,13 @@ import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInt
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.BasicCCParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.writers.CCWriterFactory;
-import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.BasicCCLineWriter;
+import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DRLineWriter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DRLineWriterImpl;
 import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.GOLineWriter;
@@ -268,7 +268,7 @@ public class UniprotExportProcessor {
         DRLineWriter drWriter = new DRLineWriterImpl(new FileWriter(DRFile));
 
         // two CC line writers which will be initialized depending on the version (1 = old CC line format, 2 = new CC line format)
-        BasicCCLineWriter ccWriter = ccWriterFactory.createCCLineWriterFor(this.ccConverter, CCFile);
+        CCLineWriter ccWriter = ccWriterFactory.createCCLineWriterFor(this.ccConverter, CCFile);
 
         ExportedClusteredInteractions positiveClusteredInteractions = results.getPositiveClusteredInteractions();
         ExportedClusteredInteractions negativeClusteredInteractions = results.getNegativeClusteredInteractions();
@@ -366,7 +366,7 @@ public class UniprotExportProcessor {
                 if (numberInteractions > 0 || numberNegativeInteractions > 0){
                     logger.info("Write CC lines for " + parentAc);
                     if (ccWriter != null){
-                        BasicCCParameters ccParameters = this.ccConverter.convertPositiveAndNegativeInteractionsIntoCCLines(interactions, negativeInteractions, results.getExportContext(), parentAc);
+                        CCParameters ccParameters = this.ccConverter.convertPositiveAndNegativeInteractionsIntoCCLines(interactions, negativeInteractions, results.getExportContext(), parentAc);
                         ccWriter.writeCCLine(ccParameters);
                     }
                     else{
@@ -413,7 +413,7 @@ public class UniprotExportProcessor {
                     if (numberInteractions > 0 || numberNegativeInteractions > 0){
                         logger.info("Write CC lines for " + parentAc);
                         if (ccWriter != null){
-                            BasicCCParameters ccParameters = this.ccConverter.convertPositiveAndNegativeInteractionsIntoCCLines(interactions, negativeInteractions, results.getExportContext(), parentAc);
+                            CCParameters ccParameters = this.ccConverter.convertPositiveAndNegativeInteractionsIntoCCLines(interactions, negativeInteractions, results.getExportContext(), parentAc);
                             ccWriter.writeCCLine(ccParameters);
                         }
                         else{

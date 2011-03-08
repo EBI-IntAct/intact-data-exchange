@@ -10,7 +10,7 @@ import java.util.SortedSet;
  * @since <pre>02/02/11</pre>
  */
 
-public interface SecondCCParameters2 extends BasicSecondCCParameters{
+public interface SecondCCParameters2 extends SecondCCParameters {
 
     /**
      * the organism name of the second interactor

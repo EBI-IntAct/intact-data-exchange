@@ -26,13 +26,13 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
     }
 
     @Override
-    public BasicCCParameters convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, List<EncoreInteraction> negativeInteractions, MiClusterContext context, String firstInteractor) {
+    public CCParameters convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, List<EncoreInteraction> negativeInteractions, MiClusterContext context, String firstInteractor) {
         logger.warn("The CCline format version 1 doesn't accept negative interactions so they will be ignored.");
         return convertInteractionsIntoCCLines(positiveInteractions, context, firstInteractor);
     }
 
     @Override
-    public CCParameters1 convertInteractionsIntoCCLines(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
+    public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
         String geneName1 = null;
         String taxId1 = null;

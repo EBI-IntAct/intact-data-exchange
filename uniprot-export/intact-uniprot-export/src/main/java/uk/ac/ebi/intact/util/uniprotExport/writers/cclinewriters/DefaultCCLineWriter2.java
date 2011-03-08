@@ -20,7 +20,7 @@ import java.util.SortedSet;
  * @since <pre>28/01/11</pre>
  */
 
-public class DefaultCCLineWriter2 implements CCLineWriter2 {
+public class DefaultCCLineWriter2 implements CCLineWriter<CCParameters<SecondCCParameters2>> {
 
     /**
      * The writer
@@ -41,7 +41,7 @@ public class DefaultCCLineWriter2 implements CCLineWriter2 {
     }
 
     @Override
-    public void writeCCLine(CCParameters2 parameters) throws IOException {
+    public void writeCCLine(CCParameters<SecondCCParameters2> parameters) throws IOException {
 
         // if parameter not null, write it
         if (parameters != null){
@@ -60,7 +60,7 @@ public class DefaultCCLineWriter2 implements CCLineWriter2 {
      * Write the content of the CC line
      * @param parameters : the parameters
      */
-    public void writeCCLineParameters(CCParameters2 parameters) throws IOException {
+    public void writeCCLineParameters(CCParameters<SecondCCParameters2> parameters) throws IOException {
 
         String firstTaxId = parameters.getTaxId();
 
@@ -85,16 +85,8 @@ public class DefaultCCLineWriter2 implements CCLineWriter2 {
     }
 
     @Override
-    public void writeCCLine(BasicCCParameters parameters) throws IOException {
-        if (parameters instanceof CCParameters2){
-            CCParameters2 parameters2 = (CCParameters2) parameters;
-            writeCCLine(parameters2);
-        }
-    }
-
-    @Override
-    public void writeCCLines(List<BasicCCParameters> CCLines) throws IOException {
-        for (BasicCCParameters parameters : CCLines){
+    public void writeCCLines(List<CCParameters<SecondCCParameters2>> CCLines) throws IOException {
+        for (CCParameters<SecondCCParameters2> parameters : CCLines){
             writeCCLine(parameters);
         }
     }

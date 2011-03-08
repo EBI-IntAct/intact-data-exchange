@@ -8,7 +8,7 @@ package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
  * @since <pre>10/02/11</pre>
  */
 
-public interface SecondCCParameters1 extends BasicSecondCCParameters{
+public interface SecondCCParameters1 extends SecondCCParameters {
 
     /**
      * the number of interaction evidences

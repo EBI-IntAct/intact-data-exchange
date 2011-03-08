@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
 
 /**
- * BasicCCParameters contains the uniprot AC of the two interactors (can be isoforms of feature chains),
+ * CCParameters contains the uniprot AC of the two interactors (can be isoforms of feature chains),
  * the intact AC of the two interactors, the gene name and taxId of the second interactor
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
@@ -9,7 +9,7 @@ package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
  * @since <pre>10/02/11</pre>
  */
 
-public interface BasicSecondCCParameters {
+public abstract interface SecondCCParameters {
 
     /**
      * the Intact AC of the first interactor

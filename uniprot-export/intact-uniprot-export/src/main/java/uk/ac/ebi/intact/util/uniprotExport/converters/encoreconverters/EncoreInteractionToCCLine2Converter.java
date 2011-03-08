@@ -75,46 +75,48 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
             // the list of IntAct interaction acs associated with the couple {method, type}
             List<String> totalInteractions = method_typeToInteractions.containsKey(ip.getKey()) ? method_typeToInteractions.get(ip.getKey()) : Collections.EMPTY_LIST;
 
-            // for each pubmed associated with couple {method, type}
-            for (String pubmedId : pubmedIds){
-                List<String> interactionsAcsAttachedToThisPubmed = pubmedToInteraction.containsKey(pubmedId) ? pubmedToInteraction.get(pubmedId) : Collections.EMPTY_LIST;
+            if (!totalInteractions.isEmpty()){
+                // for each pubmed associated with couple {method, type}
+                for (String pubmedId : pubmedIds){
+                    List<String> interactionsAcsAttachedToThisPubmed = pubmedToInteraction.containsKey(pubmedId) ? pubmedToInteraction.get(pubmedId) : Collections.EMPTY_LIST;
 
-                logger.debug("Process pubmed " + pubmedId + ", having " + interactionsAcsAttachedToThisPubmed.size() + " interactions acs.");
+                    logger.debug("Process pubmed " + pubmedId + ", having " + interactionsAcsAttachedToThisPubmed.size() + " interactions acs.");
 
-                // get the list of IntAct interaction Ids which are linked to this pubmed ids and also associated with the couple {method, type}
-                List<String> interactionForPubmedAndTypeAndMethod = new ArrayList(CollectionUtils.intersection(interactionsAcsAttachedToThisPubmed, totalInteractions));
+                    // get the list of IntAct interaction Ids which are linked to this pubmed ids and also associated with the couple {method, type}
+                    List<String> interactionForPubmedAndTypeAndMethod = new ArrayList(CollectionUtils.intersection(interactionsAcsAttachedToThisPubmed, totalInteractions));
 
-                // number of spoke expanded interactions associated with this pubmed id and couple {method, type}
-                int numberSpokeExpanded = 0;
+                    // number of spoke expanded interactions associated with this pubmed id and couple {method, type}
+                    int numberSpokeExpanded = 0;
 
-                for (String intAc : interactionForPubmedAndTypeAndMethod){
-                    // the interaction is spoke expanded
-                    if (context.getSpokeExpandedInteractions().contains(intAc)){
-                        numberSpokeExpanded++;
+                    for (String intAc : interactionForPubmedAndTypeAndMethod){
+                        // the interaction is spoke expanded
+                        if (context.getSpokeExpandedInteractions().contains(intAc)){
+                            numberSpokeExpanded++;
+                        }
+                    }
+
+                    // if all interactions associated with this pubmed id and couple {method, type} are spoke expanded, add the pubmed id to the
+                    // list of pubmed Ids 'spoke expanded'
+                    if (numberSpokeExpanded == interactionForPubmedAndTypeAndMethod.size() && numberSpokeExpanded > 0){
+                        pubmedSpokeExpanded.add(pubmedId);
+                    }
+                    // if at least one interaction is not spoke expanded, the pubmed id goes to the list of pubmed ids 'true binary'
+                    else {
+                        pubmedTrueBinary.add(pubmedId);
                     }
                 }
 
-                // if all interactions associated with this pubmed id and couple {method, type} are spoke expanded, add the pubmed id to the
-                // list of pubmed Ids 'spoke expanded'
-                if (numberSpokeExpanded == interactionForPubmedAndTypeAndMethod.size()){
-                    pubmedSpokeExpanded.add(pubmedId);
+                // if we have spoke expanded interactions, create an InteractionDetails 'spoke expanded' and add it to the list of InteractionDetails
+                if (!pubmedSpokeExpanded.isEmpty()){
+                    InteractionDetails details = new DefaultInteractionDetails(type, method, true, pubmedSpokeExpanded);
+                    sortedInteractionDetails.add(details);
                 }
-                // if at least one interaction is not spoke expanded, the pubmed id goes to the list of pubmed ids 'true binary'
-                else {
-                    pubmedTrueBinary.add(pubmedId);
+
+                // if we have true binary interactions, create an InteractionDetails 'true binary' and add it to the list of InteractionDetails
+                if (!pubmedTrueBinary.isEmpty()){
+                    InteractionDetails details = new DefaultInteractionDetails(type, method, false, pubmedTrueBinary);
+                    sortedInteractionDetails.add(details);
                 }
-            }
-
-            // if we have spoke expanded interactions, create an InteractionDetails 'spoke expanded' and add it to the list of InteractionDetails
-            if (!pubmedSpokeExpanded.isEmpty()){
-                InteractionDetails details = new DefaultInteractionDetails(type, method, true, pubmedSpokeExpanded);
-                sortedInteractionDetails.add(details);
-            }
-
-            // if we have true binary interactions, create an InteractionDetails 'true binary' and add it to the list of InteractionDetails
-            if (!pubmedTrueBinary.isEmpty()){
-                InteractionDetails details = new DefaultInteractionDetails(type, method, false, pubmedTrueBinary);
-                sortedInteractionDetails.add(details);
             }
         }
 
@@ -172,7 +174,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
 
      * @return the converted CCParameter
      */
-    public CCParameters2 convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, List<EncoreInteraction> negativeInteractions, MiClusterContext context, String firstInteractor){
+    public CCParameters<SecondCCParameters2> convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, List<EncoreInteraction> negativeInteractions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
         String geneName1 = null;
         String taxId1 = null;
@@ -423,7 +425,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
     }
 
     @Override
-    public BasicCCParameters convertInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, MiClusterContext context, String firstInteractor) {
+    public CCParameters convertInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, MiClusterContext context, String firstInteractor) {
         return convertPositiveAndNegativeInteractionsIntoCCLines(positiveInteractions, Collections.EMPTY_LIST, context, firstInteractor);
     }
 }

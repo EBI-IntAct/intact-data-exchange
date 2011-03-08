@@ -11,7 +11,7 @@ import java.util.List;
  * @since <pre>10/02/11</pre>
  */
 
-public class DefaultCCParameters1 implements CCParameters1{
+public class DefaultCCParameters1 implements CCParameters<SecondCCParameters1>{
 
     private String masterAc;
 

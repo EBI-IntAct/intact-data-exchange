@@ -1,11 +1,10 @@
 package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.BasicCCParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Interface for Encore interaction to CC line converters
@@ -25,7 +24,7 @@ public interface EncoreInteractionToCCLineConverter {
      * @param firstInteractor : the first interactor which should be in all the encore interactions
      * @return a CCParameter containing the information of all interactions attached to a same interactor
      */
-    public BasicCCParameters convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, List<EncoreInteraction> negativeInteractions, MiClusterContext context, String firstInteractor);
+    public CCParameters convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, List<EncoreInteraction> negativeInteractions, MiClusterContext context, String firstInteractor);
 
     /**
      * Convert the list of positive encore interactions into a single CCParameter
@@ -34,5 +33,5 @@ public interface EncoreInteractionToCCLineConverter {
      * @param firstInteractor : the first interactor which should be in all the encore interactions
      * @return a CCParameter containing the information of all positove interactions attached to a same interactor
      */
-    public BasicCCParameters convertInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, MiClusterContext context, String firstInteractor);
+    public CCParameters convertInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, MiClusterContext context, String firstInteractor);
 }

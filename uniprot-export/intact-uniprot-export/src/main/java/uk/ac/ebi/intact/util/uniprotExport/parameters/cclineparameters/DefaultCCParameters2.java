@@ -10,7 +10,7 @@ import java.util.*;
  * @since <pre>31/01/11</pre>
  */
 
-public class DefaultCCParameters2 implements CCParameters2 {
+public class DefaultCCParameters2 implements CCParameters<SecondCCParameters2> {
 
     private String masterAc;
 

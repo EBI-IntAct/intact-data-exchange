@@ -2,8 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters;
 
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.BasicCCParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -20,7 +19,7 @@ import java.util.List;
  * @since <pre>09/02/11</pre>
  */
 
-public class DefaultCCLineWriter1 implements CCLineWriter1  {
+public class DefaultCCLineWriter1 implements CCLineWriter<CCParameters<SecondCCParameters1>> {
 
     /**
      * The writer
@@ -41,7 +40,7 @@ public class DefaultCCLineWriter1 implements CCLineWriter1  {
     }
 
     @Override
-    public void writeCCLine(CCParameters1 parameters) throws IOException {
+    public void writeCCLine(CCParameters<SecondCCParameters1> parameters) throws IOException {
 
         // if parameter not null, write it
         if (parameters != null){
@@ -60,7 +59,7 @@ public class DefaultCCLineWriter1 implements CCLineWriter1  {
      * Write the content of the CC line
      * @param parameters : the parameters
      */
-    public void writeCCLineParameters(CCParameters1 parameters) throws IOException {
+    public void writeCCLineParameters(CCParameters<SecondCCParameters1> parameters) throws IOException {
 
         String firstUniprotAc = parameters.getMasterUniprotAc();
         String firstTaxId = parameters.getTaxId();
@@ -106,16 +105,8 @@ public class DefaultCCLineWriter1 implements CCLineWriter1  {
     }
 
     @Override
-    public void writeCCLine(BasicCCParameters parameters) throws IOException {
-        if (parameters instanceof CCParameters1){
-            CCParameters1 parameters1 = (CCParameters1) parameters;
-            writeCCLine(parameters1);
-        }
-    }
-
-    @Override
-    public void writeCCLines(List<BasicCCParameters> CCLines) throws IOException {
-        for (BasicCCParameters parameters : CCLines){
+    public void writeCCLines(List<CCParameters<SecondCCParameters1>> CCLines) throws IOException {
+        for (CCParameters<SecondCCParameters1> parameters : CCLines){
              writeCCLine(parameters);
         }
     }
