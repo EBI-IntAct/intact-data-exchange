@@ -100,7 +100,7 @@ public class UniprotExportProcessor {
      *
      * @param filter : the filter to use for uniprot export
      */
-    public UniprotExportProcessor(InteractionFilter filter, DefaultEncoreInteractionToGoLineConverter goConverter, EncoreInteractionToCCLine1Converter ccConverter, DefaultInteractorToDRLineConverter drConverter){
+    public UniprotExportProcessor(InteractionFilter filter, EncoreInteractionToGoLineConverter goConverter, EncoreInteractionToCCLineConverter ccConverter, InteractorToDRLineConverter drConverter){
 
         this.goConverter = goConverter != null ? goConverter : new DefaultEncoreInteractionToGoLineConverter();
         this.drConverter = drConverter != null ? drConverter : new DefaultInteractorToDRLineConverter();
