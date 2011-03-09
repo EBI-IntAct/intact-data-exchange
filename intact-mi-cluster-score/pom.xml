@@ -85,6 +85,41 @@
             </build>
         </profile>
         <profile>
+            <id>mitab-indexer</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2024m</argument>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath/>
+                                <argument>uk.ac.ebi.intact.dataexchange.uniprotexport.MitabIndexer</argument>
+                                <!-- The mitab file to cluster-->
+                                <argument>${mitab}</argument>
+                                <!-- The clustered-mitab file -->
+                                <argument>${clustered}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>binary-export</id>
 
             <build>
