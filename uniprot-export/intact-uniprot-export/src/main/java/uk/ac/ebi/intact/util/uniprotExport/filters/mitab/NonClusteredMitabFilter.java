@@ -237,7 +237,6 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
      */
     public void clusterAndComputeMiScoreInteraction(String mitabFile, String clusteredMitabFile) throws IOException, ConverterException {
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
-        clusterScore.setMappingIdDbNames("uniprotkb,intact");
 
         File mitabAsFile = new File(mitabFile);
         Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitabAsFile));
