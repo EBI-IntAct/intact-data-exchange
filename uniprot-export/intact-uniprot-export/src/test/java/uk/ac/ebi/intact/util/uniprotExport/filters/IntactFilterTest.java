@@ -56,7 +56,7 @@ public class IntactFilterTest extends UniprotExportBase{
         boolean isValid = true;
 
         for (EncoreInteraction interaction : clusterScore.getEncoreInteractionCluster().values()){
-             Set<String> interactionAcs = interaction.getExperimentToPubmed().keySet();
+            Set<String> interactionAcs = interaction.getExperimentToPubmed().keySet();
 
             if (interactionAcs.contains(interaction2) || interactionAcs.contains(interaction4) || interactionAcs.contains(interaction5)){
                 isValid = false;
@@ -65,7 +65,7 @@ public class IntactFilterTest extends UniprotExportBase{
         }
 
         for (EncoreInteraction interaction : negativeClusterScore.getEncoreInteractionCluster().values()){
-             Set<String> interactionAcs = interaction.getExperimentToPubmed().keySet();
+            Set<String> interactionAcs = interaction.getExperimentToPubmed().keySet();
 
             if (!interactionAcs.contains(interaction5)){
                 isValid = false;

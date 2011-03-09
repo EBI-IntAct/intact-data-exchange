@@ -363,7 +363,10 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     @Override
     public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context, boolean isNegative) throws UniprotExportException {
 
-        //TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+        // don't export negative interactions
+        if (isNegative){
+            return false;
+        }
 
         Set<String> detectionMethods = new HashSet(interaction.getMethodToPubmed().keySet());
 
@@ -412,6 +415,11 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
     @Override
     public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context, boolean isNegative) throws UniprotExportException {
+
+        // don't export negative interactions
+        if (isNegative){
+            return false;
+        }
 
         Set<InteractionDetectionMethod> detectionMethods = new HashSet(interaction.getDetectionMethods());
 

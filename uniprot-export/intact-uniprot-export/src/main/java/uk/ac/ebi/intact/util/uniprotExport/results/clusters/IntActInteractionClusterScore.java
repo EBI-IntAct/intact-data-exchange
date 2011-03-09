@@ -13,7 +13,10 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Extension of the InteractionClusterScore : use a different format to export the scores and added utility methods.
@@ -36,8 +39,17 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
     public IntActInteractionClusterScore(){
         super();
 
-        this.setInteractionMapping(new HashMap<Integer, EncoreInteraction>());
-        this.setInteractorMapping(new HashMap<String, List<Integer>> ());
+        if (this.getInteractionMapping() == null){
+            this.setInteractionMapping(new HashMap<Integer, EncoreInteraction>());
+        }
+
+        if (this.getInteractorMapping() == null){
+            this.setInteractorMapping(new HashMap<String, List<Integer>> ());
+        }
+
+        if (this.getSynonymMapping() == null){
+            this.setSynonymMapping(new HashMap<String, String> ());
+        }
 
         setMappingIdDbNames("uniprotkb,intact");
         writer = new PsimiTabWriter();
