@@ -155,7 +155,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
 
         // process negative interactions not in mitab
         if (!this.negativeInteractions.isEmpty()){
-            super.clusterNegativeIntactInteractions(this.negativeInteractions, context, negativeClusterScore);
+            super.clusterNegativeIntactInteractions(context, negativeClusterScore);
         }
 
         // TODO - negative interactions and intra molecular are not in mitab!!!

@@ -397,17 +397,16 @@ public class QueryFactory {
         queryString.append(interactionsOnHold);
         queryString.append(") ");
 
+        // negative interactions will be processed differently and are not in the same list
+        queryString.append("and i.ac not in (");
+        queryString.append(negativeInteractions);
+        queryString.append(") ");
+
         if (excludeLowConfidenceInteractions){
             queryString.append("and i.ac not in (");
             queryString.append(interactionsDrExportNotPassed);
             queryString.append(") and i.ac not in (");
             queryString.append(interactionsFromExperimentNoExport);
-            queryString.append(") ");
-        }
-
-        if (excludeNegativeInteractions){
-            queryString.append("and i.ac not in (");
-            queryString.append(negativeInteractions);
             queryString.append(") ");
         }
 
@@ -423,16 +422,13 @@ public class QueryFactory {
 
         query.setParameter("accepted", CvTopic.ACCEPTED);
         query.setParameter("onhold", CvTopic.ON_HOLD);
+        query.setParameter("negative", CvTopic.NEGATIVE);
 
         if (excludeLowConfidenceInteractions){
             query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
             query.setParameter("no", "NO");
             query.setParameter("yes", "YES");
             query.setParameter("confidence", CvTopic.AUTHOR_CONFIDENCE_MI_REF);
-        }
-
-        if (excludeNegativeInteractions){
-            query.setParameter("negative", CvTopic.NEGATIVE);
         }
 
         if (excludeSpokeExpanded && excludeNonUniprotInteractors){

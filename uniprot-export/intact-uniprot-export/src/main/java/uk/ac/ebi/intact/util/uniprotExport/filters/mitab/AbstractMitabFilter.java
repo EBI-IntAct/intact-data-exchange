@@ -18,7 +18,6 @@ import java.util.*;
  */
 
 public abstract class AbstractMitabFilter extends IntactFilter{
-    protected Set<String> eligibleInteractionsForUniprotExport = new HashSet<String>();
     //protected List<String> eligibleInteractionsNotInMitab = new ArrayList<String>();
 
     protected static final String INTACT = "intact";
@@ -30,7 +29,6 @@ public abstract class AbstractMitabFilter extends IntactFilter{
         super(exporter);
         this.mitab = mitab;
 
-        eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
         //eligibleInteractionsNotInMitab.addAll(this.queryFactory.getReleasedSelfInteractionAcsPassingFilters());
     }
 

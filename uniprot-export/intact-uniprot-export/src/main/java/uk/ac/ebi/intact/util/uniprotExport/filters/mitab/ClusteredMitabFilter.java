@@ -108,7 +108,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
 
         // process negative interactions not in mitab
         if (!this.negativeInteractions.isEmpty()){
-            super.clusterNegativeIntactInteractions(this.negativeInteractions, context, negativeClusterScore);
+            super.clusterNegativeIntactInteractions(context, negativeClusterScore);
         }
 
         return new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
