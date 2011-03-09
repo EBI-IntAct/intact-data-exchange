@@ -169,7 +169,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
 
         for (CrossReference pub : publications){
             if (!WriterUtils.PUBMED.equalsIgnoreCase(pub.getDatabase())){
-                 interaction.getPublications().remove(pub);
+                interaction.getPublications().remove(pub);
             }
         }
     }
@@ -226,6 +226,38 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
         } catch (ConverterException e) {
             throw new UniprotExportException("It was not possible to iterate the binary interactions in the mitab file " + mitab, e);
         }
+    }
+
+    /**
+     * Cluster all the binary interactions in the mitab file and save in clustered mitab file
+     * @param mitabFile
+     * @param clusteredMitabFile
+     * @throws IOException
+     * @throws ConverterException
+     */
+    public void clusterAndComputeMiScoreInteraction(String mitabFile, String clusteredMitabFile) throws IOException, ConverterException {
+        IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
+        clusterScore.setMappingIdDbNames("uniprotkb,intact");
+
+        File mitabAsFile = new File(mitabFile);
+        Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitabAsFile));
+
+        // the binary interactions to cluster
+        List<BinaryInteraction> interactionToProcess = new ArrayList<BinaryInteraction>();
+
+        while (iterator.hasNext()){
+            interactionToProcess.clear();
+            while (interactionToProcess.size() < 200 && iterator.hasNext()){
+                IntactBinaryInteraction interaction = (IntactBinaryInteraction) iterator.next();
+
+                interactionToProcess.add(interaction);
+            }
+
+            clusterScore.setBinaryInteractionList(interactionToProcess);
+            clusterScore.runService();
+        }
+
+        clusterScore.saveCluster(clusteredMitabFile);
     }
 
     @Override
