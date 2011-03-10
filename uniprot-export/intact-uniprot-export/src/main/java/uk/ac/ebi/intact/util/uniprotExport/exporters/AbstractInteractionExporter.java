@@ -45,7 +45,7 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
 
             for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
-                if (canExportBinaryInteraction(entry.getValue(), context, true)){
+                if (canExportBinaryInteraction(entry.getValue(), context)){
                     interactionsPossibleToExport.add(entry.getKey());
                 }
             }
@@ -53,7 +53,7 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
         else {
             for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
-                if (canExportEncoreInteraction(entry.getValue(), context, true)){
+                if (canExportEncoreInteraction(entry.getValue(), context)){
                     interactionsPossibleToExport.add(entry.getKey());
                 }
             }
@@ -66,7 +66,7 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
 
                 for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
-                    if (canExportBinaryInteraction(entry.getValue(), context, false)){
+                    if (canExportNegativeBinaryInteraction(entry.getValue(), context, positiveInteractions)){
                         negativeInteractionsPossibleToExport.add(entry.getKey());
                     }
                 }
@@ -74,7 +74,7 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
             else {
                 for (Map.Entry<Integer, EncoreInteraction> entry : negativeCluster.getEncoreInteractionCluster().entrySet()){
 
-                    if (canExportEncoreInteraction(entry.getValue(), context, false)){
+                    if (canExportNegativeEncoreInteraction(entry.getValue(), context, positiveInteractions)){
                         negativeInteractionsPossibleToExport.add(entry.getKey());
                     }
                 }

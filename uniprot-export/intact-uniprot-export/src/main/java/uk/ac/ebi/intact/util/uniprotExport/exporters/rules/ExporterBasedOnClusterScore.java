@@ -2,10 +2,13 @@ package uk.ac.ebi.intact.util.uniprotExport.exporters.rules;
 
 import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.AbstractInteractionExporter;
+import uk.ac.ebi.intact.util.uniprotExport.exporters.ExporterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.ExportContext;
 
 import java.util.HashSet;
@@ -40,13 +43,11 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     }
 
     @Override
-    public boolean canExportEncoreInteraction(EncoreInteraction encore, ExportContext context, boolean isNegative) throws UniprotExportException {
+    public boolean canExportEncoreInteraction(EncoreInteraction encore, ExportContext context) throws UniprotExportException {
 
         double score = FilterUtils.getMiClusterScoreFor(encore);
 
-        double threshold = isNegative ? negative_export_threshold : positive_export_threshold;
-
-        if (score >= threshold){
+        if (score >= positive_export_threshold){
 
             if (encore.getExperimentToDatabase() == null){
                 throw new UniprotExportException("The interaction " + encore.getId() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
@@ -77,12 +78,10 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     }
 
     @Override
-    public boolean canExportBinaryInteraction(BinaryInteraction interaction, ExportContext context, boolean isNegative) throws UniprotExportException {
+    public boolean canExportBinaryInteraction(BinaryInteraction interaction, ExportContext context) throws UniprotExportException {
         double score = FilterUtils.getMiClusterScoreFor(interaction);
 
-        double threshold = isNegative ? negative_export_threshold : positive_export_threshold;
-
-        if (score >= threshold){
+        if (score >= positive_export_threshold){
 
             Set<String> intactInteractions = new HashSet<String>();
 
@@ -98,7 +97,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
                     String method = context.getInteractionToMethod_type().get(ac).getMethod();
 
                     if (!method.equals(COLOCALIZATION)){
-                        logger.info("The interaction " + ac + " passed the export rules with score = " + score);
+                        logger.info("The negative interaction " + ac + " passed the export rules with score = " + score);
 
                         return true;
                     }
@@ -123,5 +122,79 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
 
     public void setNegative_export_threshold(double negative_export_threshold) {
         this.negative_export_threshold = negative_export_threshold;
+    }
+
+    @Override
+    public boolean canExportNegativeEncoreInteraction(EncoreInteraction encore, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException {
+        boolean isElgibleForExport = ExporterUtils.isNegativeInteractionEligibleForUniprotExport(encore, positiveInteractions);
+
+        if (isElgibleForExport){
+            double score = FilterUtils.getMiClusterScoreFor(encore);
+
+            if (score >= negative_export_threshold){
+
+                if (encore.getExperimentToDatabase() == null){
+                    throw new UniprotExportException("The interaction " + encore.getId() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
+                }
+
+                Set<String> intactInteractions = new HashSet<String>();
+
+                intactInteractions.addAll(encore.getExperimentToPubmed().keySet());
+
+                if (intactInteractions.isEmpty()){
+                    throw new UniprotExportException("The interaction " + encore.getId() + ":" + encore.getInteractorA() + "-" + encore.getInteractorB() +" doesn't have any references to IntAct.");
+                }
+
+                for (String ac : intactInteractions){
+                    if (!context.getSpokeExpandedInteractions().contains(ac)){
+
+                        String method = context.getInteractionToMethod_type().get(ac).getMethod();
+
+                        if (!method.equals(COLOCALIZATION)){
+                            logger.info("The negative interaction " + encore.getId() + " passed the export rules with score = " + score);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean canExportNegativeBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException {
+        boolean isElgibleForExport = ExporterUtils.isNegativeInteractionEligibleForUniprotExport(interaction, positiveInteractions);
+
+        if (isElgibleForExport){
+            double score = FilterUtils.getMiClusterScoreFor(interaction);
+
+            if (score >= positive_export_threshold){
+
+                Set<String> intactInteractions = new HashSet<String>();
+
+                intactInteractions.addAll(FilterUtils.extractIntactAcFrom(interaction.getInteractionAcs()));
+
+                if (intactInteractions.isEmpty()){
+                    throw new UniprotExportException("The interaction :" + interaction.getInteractorA().toString() + "-" + interaction.getInteractorB().toString() +" doesn't have any references to IntAct.");
+                }
+
+                for (String ac : intactInteractions){
+                    if (!context.getSpokeExpandedInteractions().contains(ac)){
+
+                        String method = context.getInteractionToMethod_type().get(ac).getMethod();
+
+                        if (!method.equals(COLOCALIZATION)){
+                            logger.info("The interaction " + ac + " passed the export rules with score = " + score);
+
+                            return true;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        return false;
     }
 }

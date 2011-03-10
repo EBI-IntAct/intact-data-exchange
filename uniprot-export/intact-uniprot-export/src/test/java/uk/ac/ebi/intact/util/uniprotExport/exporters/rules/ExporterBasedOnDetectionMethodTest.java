@@ -40,20 +40,13 @@ public class ExporterBasedOnDetectionMethodTest extends UniprotExportBase {
 
         Assert.assertNotNull(interactionsExported);
         Assert.assertNotNull(negativeInteractionsExported);
-        Assert.assertEquals(2, interactionsExported.size());
-        Assert.assertEquals(1, negativeInteractionsExported.size());
+        Assert.assertEquals(3, interactionsExported.size());
+        Assert.assertEquals(0, negativeInteractionsExported.size());
 
         boolean isValid = true;
 
         for (Integer interactionId : interactionsExported){
-             if ( interactionId == 3 | interactionId == 5 || interactionId == 6){
-                  isValid = false;
-                 break;
-             }
-        }
-
-        for (Integer interactionId : negativeInteractionsExported){
-             if ( interactionId != 3){
+             if ( interactionId == 5 || interactionId == 6){
                   isValid = false;
                  break;
              }

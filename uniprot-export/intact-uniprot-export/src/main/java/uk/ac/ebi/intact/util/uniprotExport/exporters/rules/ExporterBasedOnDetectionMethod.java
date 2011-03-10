@@ -295,7 +295,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
      * @param cluster : the cluster containing the interactions
      * @param eligibleInteractions : the list of eligible encore interaction ids for uniprot export
      */
-    private void processEligibleExperiments(IntactCluster cluster, ExportContext context, Set<Integer> eligibleInteractions, boolean isNegative) throws UniprotExportException {
+    private void processEligibleExperiments(IntactCluster cluster, ExportContext context, Set<Integer> eligibleInteractions) throws UniprotExportException {
 
         if (cluster != null){
             if (cluster instanceof BinaryClusterScore){
@@ -303,7 +303,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
                 for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
 
-                    if (canExportBinaryInteraction(entry.getValue(), context, isNegative)){
+                    if (canExportBinaryInteraction(entry.getValue(), context)){
                         eligibleInteractions.add(entry.getKey());
                     }
                 }
@@ -311,7 +311,37 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
             else {
                 for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
-                    if (canExportEncoreInteraction(entry.getValue(), context, isNegative)){
+                    if (canExportEncoreInteraction(entry.getValue(), context)){
+                        eligibleInteractions.add(entry.getKey());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Apply the rules on the interaction detection method for all the negative interactions in the cluster
+     * @param cluster : the cluster containing the negative interactions
+     * @param eligibleInteractions : the list of eligible negative encore interaction ids for uniprot export
+     * @param positiveInteractions : result of uniprot export for positive interactions
+     */
+    private void processEligibleExperimentsForNegativeInteraction(IntactCluster cluster, ExportContext context, Set<Integer> eligibleInteractions, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException {
+
+        if (cluster != null){
+            if (cluster instanceof BinaryClusterScore){
+                BinaryClusterScore clusterScore = (BinaryClusterScore) cluster;
+
+                for (Map.Entry<Integer, BinaryInteraction<Interactor>> entry : clusterScore.getBinaryInteractionCluster().entrySet()){
+
+                    if (canExportNegativeBinaryInteraction(entry.getValue(), context, positiveInteractions)){
+                        eligibleInteractions.add(entry.getKey());
+                    }
+                }
+            }
+            else {
+                for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
+
+                    if (canExportNegativeEncoreInteraction(entry.getValue(), context, positiveInteractions)){
                         eligibleInteractions.add(entry.getKey());
                     }
                 }
@@ -356,17 +386,12 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         Set<Integer> eligibleInteractions = positiveInteractions.getInteractionsToExport();
         Set<Integer> negativeEligibleInteractions = negativeInteractions.getInteractionsToExport();
 
-        processEligibleExperiments(positiveInteractions.getCluster(), results.getExportContext(), eligibleInteractions, false);
-        processEligibleExperiments(negativeInteractions.getCluster(), results.getExportContext(), negativeEligibleInteractions, true);
+        processEligibleExperiments(positiveInteractions.getCluster(), results.getExportContext(), eligibleInteractions);
+        processEligibleExperimentsForNegativeInteraction(negativeInteractions.getCluster(), results.getExportContext(), negativeEligibleInteractions, positiveInteractions);
     }
 
     @Override
-    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context, boolean isNegative) throws UniprotExportException {
-
-        // don't export negative interactions
-        if (isNegative){
-            return false;
-        }
+    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context) throws UniprotExportException {
 
         Set<String> detectionMethods = new HashSet(interaction.getMethodToPubmed().keySet());
 
@@ -414,12 +439,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     }
 
     @Override
-    public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context, boolean isNegative) throws UniprotExportException {
-
-        // don't export negative interactions
-        if (isNegative){
-            return false;
-        }
+    public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context) throws UniprotExportException {
 
         Set<InteractionDetectionMethod> detectionMethods = new HashSet(interaction.getDetectionMethods());
 
@@ -448,6 +468,18 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         }
 
         return passRules;
+    }
+
+    @Override
+    public boolean canExportNegativeEncoreInteraction(EncoreInteraction interaction, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException {
+        // no negative interaction can be exported
+        return false;
+    }
+
+    @Override
+    public boolean canExportNegativeBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException {
+        // no negative interaction can be exported
+        return false;
     }
 
     protected void removeInteractionEvidencesFrom(EncoreInteraction encore, Set<String> wrongInteractions, ExportContext context){

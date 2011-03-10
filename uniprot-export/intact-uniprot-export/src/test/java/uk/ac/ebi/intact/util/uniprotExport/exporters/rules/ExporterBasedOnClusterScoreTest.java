@@ -37,14 +37,14 @@ public class ExporterBasedOnClusterScoreTest extends UniprotExportBase{
         boolean isValid = true;
 
         for (Integer interactionId : interactionsExported){
-             if ( interactionId == 3 || interactionId == 4 || interactionId == 5 || interactionId == 6){
+             if ( interactionId == 4 || interactionId == 5 || interactionId == 6){
                   isValid = false;
                  break;
              }
         }
 
         for (Integer interactionId : negativeInteractionsExported){
-             if ( interactionId != 3){
+             if ( interactionId != 2){
                   isValid = false;
                  break;
              }

@@ -565,7 +565,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
         interactions.remove(0);
-        interactions.remove(0);
+        interactions.remove(1);
 
         return createCluster(interactions);
     }
@@ -573,7 +573,6 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     public IntActInteractionClusterScore createClusterForExportBasedOnDetectionMethod(){
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
-        interactions.remove(2);
         interactions.add(createEncoreInteractionHighScoreSpokeExpanded());  // two hybrid pooling : export = conditional, 2 and doesn't pass
         interactions.add(createEncoreInteractionHighScoreColocalization()); // colocalization has an export no
 

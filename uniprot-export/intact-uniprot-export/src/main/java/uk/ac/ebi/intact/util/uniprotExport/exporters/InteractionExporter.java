@@ -4,6 +4,7 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
+import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.ExportContext;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 
@@ -35,7 +36,7 @@ public interface InteractionExporter {
      * @return true if the encore interaction pass the uniprot export rules
      * @throws UniprotExportException
      */
-    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context, boolean isNegative) throws UniprotExportException;
+    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context) throws UniprotExportException;
 
     /**
      *
@@ -45,5 +46,25 @@ public interface InteractionExporter {
      * @return true if the binary interaction can be exported
      * @throws UniprotExportException
      */
-    public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context, boolean isNegative) throws UniprotExportException;
+    public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context) throws UniprotExportException;
+
+     /**
+     *
+     * @param interaction
+     * @param context
+     * @param positiveInteractions : the results of the clustering and uniprot export for positive interactions
+     * @return true if the negative encore interaction pass the uniprot export rules
+     * @throws UniprotExportException
+     */
+    public boolean canExportNegativeEncoreInteraction(EncoreInteraction interaction, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException;
+
+    /**
+     *
+     * @param interaction
+     * @param context
+     * @param positiveInteractions : the results of the clustering and uniprot export for positive interactions
+     * @return true if the negative binary interaction can be exported
+     * @throws UniprotExportException
+     */
+    public boolean canExportNegativeBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException;
 }
