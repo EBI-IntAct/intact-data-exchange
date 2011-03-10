@@ -137,20 +137,20 @@ public class ExporterUtils {
     public static boolean isNegativeInteractionEligibleForUniprotExport(BinaryInteraction<Interactor> interaction, ExportedClusteredInteractions positiveInteractions){
 
         // the negative interaction must be not null and the results of exported positive interactions must be non null
-        /*if (interaction != null && positiveInteractions != null){
+        if (interaction != null && positiveInteractions != null){
 
             // collect first uniprot ac
-            String uniprot1 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorA().getIdentifiers());
+            String uniprot1 = FilterUtils.extractUniprotAcFromCrossReferences(interaction.getInteractorA().getIdentifiers());
 
             if (uniprot1 == null){
-                uniprot1 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsA());
+                uniprot1 = FilterUtils.extractUniprotAcFromCrossReferences(interaction.getInteractorA().getAlternativeIdentifiers());
             }
 
             // collect second uniprot ac
-            String uniprot2 = FilterUtils.extractUniprotAcFromAccs(interaction.getInteractorAccsB());
+            String uniprot2 = FilterUtils.extractUniprotAcFromCrossReferences(interaction.getInteractorB().getIdentifiers());
 
             if (uniprot2 == null){
-                uniprot2 = FilterUtils.extractUniprotAcFromOtherAccs(interaction.getOtherInteractorAccsB());
+                uniprot2 = FilterUtils.extractUniprotAcFromCrossReferences(interaction.getInteractorB().getAlternativeIdentifiers());
             }
 
             // both uniprot ac must be non null
@@ -210,15 +210,15 @@ public class ExporterUtils {
                     if (!intersectionExported.isEmpty()){
 
                         // list of pubmed ids for the negative interaction
-                        Set<String> pubmedIdsNegative = FilterUtils.extractPubmedIdsFrom(interaction.getPublicationIds());
+                        Set<String> pubmedIdsNegative = FilterUtils.extractPubmedIdsFrom(interaction.getPublications());
 
                         // for each exported positive interaction
                         for (Integer positiveId : intersectionExported){
                             // the positive interaction
-                            EncoreInteraction positiveInteraction = cluster.getEncoreInteractionCluster().get(positiveId);
+                            BinaryInteraction<Interactor> positiveInteraction = cluster.getBinaryInteractionCluster().get(positiveId);
 
                             // the list of pubmed ids for the positive interaction
-                            Set<String> pubmedIdsPositive = FilterUtils.extractPubmedIdsFrom(positiveInteraction.getPublicationIds());
+                            Set<String> pubmedIdsPositive = FilterUtils.extractPubmedIdsFrom(positiveInteraction.getPublications());
 
                             // the common list of pubmed ids for the negative and positive interaction
                             Collection<String> pubmedIntersection = CollectionUtils.intersection(pubmedIdsNegative, pubmedIdsPositive);
@@ -231,7 +231,7 @@ public class ExporterUtils {
                     }
                 }
             }
-        }*/
+        }
 
         return false;
     }

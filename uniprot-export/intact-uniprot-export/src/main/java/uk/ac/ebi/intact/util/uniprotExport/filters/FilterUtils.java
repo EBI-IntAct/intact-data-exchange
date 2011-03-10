@@ -139,6 +139,23 @@ public class FilterUtils {
     /**
      *
      * @param interactorAccs
+     * @return uniprot ac of the interactor
+     */
+    public static String extractUniprotAcFromCrossReferences(Collection<CrossReference> interactorAccs){
+        String interactorAcc = null;
+
+        for(CrossReference entry : interactorAccs){
+            if(WriterUtils.UNIPROT.equalsIgnoreCase(entry.getDatabase())){
+                interactorAcc =  entry.getIdentifier();
+            }
+        }
+
+        return interactorAcc;
+    }
+
+    /**
+     *
+     * @param interactorAccs
      * @return The intact ac of the interactor
      */
     public static String extractIntactAcFromAccs(Map<String, String> interactorAccs){
