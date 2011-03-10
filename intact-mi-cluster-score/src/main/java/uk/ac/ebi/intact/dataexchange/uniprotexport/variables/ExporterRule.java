@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport.variables;
 
 /**
- * TODO comment this
+ * Possible exporter rules
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

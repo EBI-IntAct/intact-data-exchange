@@ -12,7 +12,12 @@ import java.io.*;
 import java.util.*;
 
 /**
- * This script allows to filter in a file B the elements which are in the file A (line starting)
+ * This script allows to filter in a file B the elements which are in the file A (line starting).
+ *
+ * The possible arguments are :
+ * - fileA : name of the file A containing the results we want to filter (each line contain an interactor A and interactor B separated by a tab)
+ * - fileB : name of the mitab file to filter
+ * - results : name of the mitab file which contain the mitab lines having the same interactors as in the file A (independently of the order of the interactors in each line)
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -28,7 +33,7 @@ public class ExportFilter {
             System.err.println( "Usage: ExportFilter <fileA> <fileB> <results>" );
             System.err.println( "Usage: <fileA> is the file containing the results we want to filter (interactor A and interactor B separated by tab)" );
             System.err.println( "Usage: <fileB> is the mitab file to filter with the results of the file A" );
-            System.err.println( "Usage: <fileB> is the file where to write the results" );
+            System.err.println( "Usage: <results> is the file where to write the results" );
 
             System.exit( 1 );
         }

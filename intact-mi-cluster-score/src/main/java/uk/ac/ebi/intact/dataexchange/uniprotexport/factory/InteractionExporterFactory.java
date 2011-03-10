@@ -6,7 +6,7 @@ import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetect
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 
 /**
- * TODO comment this
+ * Factory for the exporter rules
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

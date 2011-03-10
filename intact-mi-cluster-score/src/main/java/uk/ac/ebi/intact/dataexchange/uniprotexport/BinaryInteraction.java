@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport;
 
 /**
- * TODO comment this
+ * Contains an interactor A and B. The order of A and B is not important.
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

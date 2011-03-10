@@ -16,7 +16,11 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * This class generates a clustered mitab file using the mi cluster
+ * This class generates a clustered mitab file using the mi cluster.
+ *
+ * The possible arguments are :
+ * - mitab : the mitab file to read and cluster
+ * - clustered : the name of the clustered mitab file to generate
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

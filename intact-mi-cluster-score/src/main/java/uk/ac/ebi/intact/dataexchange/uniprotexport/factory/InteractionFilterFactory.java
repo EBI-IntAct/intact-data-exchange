@@ -7,7 +7,7 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.mitab.NonClusteredMitabFilter;
 
 /**
- * TODO comment this
+ * Factory for the filters
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

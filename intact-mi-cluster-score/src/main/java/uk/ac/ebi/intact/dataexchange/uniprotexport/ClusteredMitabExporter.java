@@ -11,8 +11,8 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.mitab.ClusteredMitabFilter;
 import java.io.IOException;
 
 /**
- * TODO comment this
- *
+ * This script will use the clustered binary interactions in a mitab file and run a uniprot export simulation
+ * @deprecated not used
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>08/02/11</pre>

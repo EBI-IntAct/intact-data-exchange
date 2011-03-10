@@ -7,7 +7,14 @@ import java.io.*;
 import java.util.*;
 
 /**
- * TODO comment this
+ * Compares two mitab files based on the interactor identifiers. (only compare the binary interactions present using interactor A identifier and interactor B identifier, independently of the order)
+ *
+ * The possible arguments are :
+ * - fileA : first mitab file
+ * - fileB : second mitab file
+ * - file1 : the mitab lines which correspond to the binary interactions present in the file A but not in the file B
+ * - file2 : the mitab lines which correspond to the binary interactions present in both files A and B
+ * - file3 : the mitab lines which correspond to the binary interactions present in the file B but not in the file A
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

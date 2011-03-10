@@ -18,13 +18,28 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.mitab.NonClusteredMitabFilter
 import java.io.IOException;
 
 /**
- * The main class for uniprot export
+ * The main class for running uniprot export.
+ *
+ * The possible arguments are :
+ * - rule : can be 'mi_score' or 'detection_method'. It defines the rules we want to apply to the binary interactions
+ * - source : can be 'mitab' or 'intact' depending if we export interactions from a mitab file or directly from intact.
+ * we can specify the name of the mitab file like that : -Dsource=mitab:filename
+ * - drFile : name of the file containing the DR lines which will be generated. If we want to specify the version of the DR format to use we can write :
+ * -DdrFile:1. The current versions for DR formats are : 1.
+ * - ccFile : name of the file containing the CC lines which will be generated. If we want to specify the version of the CC format to use we can write :
+ * -DccFile:1. The current versions for CC formats are : 1 or 2.
+ * - goFile : name of the file containing the GO lines which will be generated. If we want to specify the version of the GO format to use we can write :
+ * -DgoFile:1. The current versions for GO formats are : 1.
+ * - database : name of the database instance to use for reading private annotations (such as no-uniprot-update, uniprot-dr-export, etc.)
+ * - binaryOnly : can be 'false' or 'true'. It tells if we want to work with only true binary interactions or if we accept spoke expanded binary interactions
+ * - highConfidence : can be 'false' or 'true'. It tells if we want to work with only high confidence interactions (exclude uniprot-dr-export = no or author-confidence = low)
+ * - proteinOnly : can be 'false' or 'true'. It tells if we want binary interactions only involving uniprot proteins
+ * - positiveOnly : can be 'false' or 'true'. It tells if we want only positive binary interactions (exclude negative binary interactions)
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>01/02/11</pre>
  */
-
 public class UniprotExporter {
 
     public static void main( String[] args ) throws IOException {
