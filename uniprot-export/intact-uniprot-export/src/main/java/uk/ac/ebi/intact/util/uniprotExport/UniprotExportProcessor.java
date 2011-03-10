@@ -389,6 +389,7 @@ public class UniprotExportProcessor {
 
                     // clean the list of encore interactions attached to the uniprot entry, so we can process the new interactor
                     interactions.clear();
+                    negativeInteractions.clear();
 
                     // extract new master uniprot ac
                     parentAc = interactor;

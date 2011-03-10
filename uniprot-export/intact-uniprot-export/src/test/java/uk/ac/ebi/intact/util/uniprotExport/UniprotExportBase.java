@@ -7,6 +7,7 @@ import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.ProteinUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
@@ -40,6 +41,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     protected String interaction3 = null;
     protected String interaction4 = null;
     protected String interaction5 = null;
+    protected String interaction6 = null;
 
     public List<GOParameters> createGOParameters(){
 
@@ -238,6 +240,53 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         interaction.setPublicationIds(publications);
         interaction.setOrganismsA(organismA);
         interaction.setOrganismsB(organismB);
+        interaction.setExperimentToPubmed(experimentToPubmed);
+        interaction.setTypeToPubmed(type2Pubmed);
+        interaction.setMethodToPubmed(method2Pubmed);
+
+        return interaction;
+    }
+
+    public EncoreInteraction createNegativeEncoreInteraction(){
+        EncoreInteraction interaction = new EncoreInteraction();
+
+        Map<String, String> interactorA = new HashMap<String, String>();
+        interactorA.put("uniprotkb", "P28548-2");
+        interactorA.put("intact", "EBI-317778");
+        Map<String, String> interactorB = new HashMap<String, String>();
+        interactorB.put("uniprotkb", "O17670");
+        interactorB.put("intact", "EBI-311862");
+
+        List<String> pubmeds = new ArrayList<String>();
+        pubmeds.add("14704431");
+        pubmeds.add("15199141");
+
+        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
+        type2Pubmed.put("MI:0915", pubmeds);
+        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
+        method2Pubmed.put("MI:0398", pubmeds);
+
+        Map<String, String> experimentToPubmed = new HashMap<String, String>();
+        experimentToPubmed.put("EBI-xxxxxx2", "14704431");
+        experimentToPubmed.put("EBI-xxxxxx3", "15199141");
+
+        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
+        organismA.add(orgA);
+
+        List<CrossReference> publications = new ArrayList<CrossReference>(1);
+        CrossReference ref = new CrossReferenceImpl("pubmed", "14704431");
+        CrossReference ref2 = new CrossReferenceImpl("pubmed", "15199141");
+        publications.add(ref);
+        publications.add(ref2);
+
+        interaction.setId(2);
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.7"));
+        interaction.setInteractorAccsA(interactorA);
+        interaction.setInteractorAccsB(interactorB);
+        interaction.setPublicationIds(publications);
+        interaction.setOrganismsA(organismA);
+        interaction.setOrganismsB(organismA);
         interaction.setExperimentToPubmed(experimentToPubmed);
         interaction.setTypeToPubmed(type2Pubmed);
         interaction.setMethodToPubmed(method2Pubmed);
@@ -509,6 +558,23 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interactions;
     }
 
+    public List<EncoreInteraction> createPositiveEncoreInteractions(){
+        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
+
+        interactions.add(createEncoreInteraction());
+        interactions.add(createThirdEncoreInteraction());
+
+        return interactions;
+    }
+
+    public List<EncoreInteraction> createNegativeEncoreInteractions(){
+        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
+
+        interactions.add(createNegativeEncoreInteraction());
+
+        return interactions;
+    }
+
     public MiClusterContext createClusterContext(){
         MiClusterContext context = new MiClusterContext();
 
@@ -553,7 +619,6 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     public IntActInteractionClusterScore createClusterForExportBasedOnMiScore(){
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
-        interactions.remove(2);
         interactions.add(createEncoreInteractionLowScore());
         interactions.add(createEncoreInteractionHighScoreSpokeExpanded());
         interactions.add(createEncoreInteractionHighScoreColocalization());
@@ -563,9 +628,14 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
     public IntActInteractionClusterScore createNegativeCluster(){
 
-        List<EncoreInteraction> interactions = createEncoreInteractions();
-        interactions.remove(0);
-        interactions.remove(1);
+        List<EncoreInteraction> interactions = createNegativeEncoreInteractions();
+
+        return createCluster(interactions);
+    }
+
+    public IntActInteractionClusterScore createPositiveCluster(){
+
+        List<EncoreInteraction> interactions = createPositiveEncoreInteractions();
 
         return createCluster(interactions);
     }
@@ -623,6 +693,16 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
     public MiClusterScoreResults createMiScoreResultsForDetectionMethodExport(){
         IntActInteractionClusterScore clusterScore = createClusterForExportBasedOnDetectionMethod();
+        IntActInteractionClusterScore negativeClusterScore = createNegativeCluster();
+        MiClusterContext context = createClusterContext();
+
+        MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
+
+        return results;
+    }
+
+    public MiClusterScoreResults createMiScoreResultsForSimulation(){
+        IntActInteractionClusterScore clusterScore = createPositiveCluster();
         IntActInteractionClusterScore negativeClusterScore = createNegativeCluster();
         MiClusterContext context = createClusterContext();
 
@@ -727,6 +807,21 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         experiment_yes.addAnnotation(expAnn1);
         Annotation expAnnAcc1 = new Annotation(accepted, null);
         experiment_yes.addAnnotation(expAnnAcc1);
+        experiment_yes.setCvInteraction(method2);
+
+        Interaction inter = getMockBuilder().createDeterministicInteraction();
+        inter.getComponents().clear();
+        Iterator<Component> iteratorComponent = experiment_yes.getInteractions().iterator().next().getComponents().iterator();
+        inter.addComponent(iteratorComponent.next());
+        Component isoform = iteratorComponent.next();
+        InteractorXref uniprotIdentity = ProteinUtils.getUniprotXref(isoform.getInteractor());
+        uniprotIdentity.setPrimaryId(uniprotIdentity.getPrimaryId() + "-4");
+        inter.addComponent(isoform);
+        Annotation negativeAnn = new Annotation(negative, null);
+        inter.addAnnotation(negativeAnn);
+        experiment_yes.addInteraction(inter);
+        inter.getExperiments().clear();
+        inter.addExperiment(experiment_yes);
 
         Experiment experiment_no = getMockBuilder().createExperimentRandom(1);
         Annotation expAnn2 = new Annotation(dr_export, "no");
@@ -750,7 +845,15 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         getCorePersister().saveOrUpdate(experiment_yes, experiment_condition, experiment_no, experiment_negative);
 
-        interaction1 = experiment_yes.getInteractions().iterator().next().getAc();
+        for (Interaction interaction : experiment_yes.getInteractions()){
+            if (interaction.getAnnotations().isEmpty()){
+                interaction1 = interaction.getAc();
+            }
+            else {
+                interaction6 = interaction.getAc();
+            }
+        }
+
         interaction2 = experiment_no.getInteractions().iterator().next().getAc();
         int index = 3;
         for (Interaction interaction : experiment_condition.getInteractions()){

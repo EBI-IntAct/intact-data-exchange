@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLine2Converter;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
 import uk.ac.ebi.intact.util.uniprotExport.filters.IntactFilter;
+import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 
 import java.io.IOException;
 
@@ -37,13 +38,14 @@ public class UniprotExportProcessorTest extends UniprotExportBase{
         UniprotExportProcessor processor = new UniprotExportProcessor(filter);
         processor.setCcConverter(new EncoreInteractionToCCLine2Converter());
 
-        /*MiClusterScoreResults results = createMiScoreResultsForDetectionMethodExport();
+        MiClusterScoreResults results = createMiScoreResultsForSimulation();
         results.getPositiveClusteredInteractions().getInteractionsToExport().add(1);
-        results.getPositiveClusteredInteractions().getInteractionsToExport().add(2);
         results.getPositiveClusteredInteractions().getInteractionsToExport().add(3);
-        processor.exportDRAndCCLines(results, "drFile", "ccFile");*/
+        results.getNegativeClusteredInteractions().getInteractionsToExport().add(2);
 
-        processor.runUniprotExport("drFile", "ccFile", "goFile");
+        processor.exportDRAndCCLines(results, "drFile", "ccFile");
+
+        //processor.runUniprotExport("drFile", "ccFile", "goFile");
 
         //results.getPositiveClusteredInteractions().getCluster().saveClusteredInteractions("interactions", results.getPositiveClusteredInteractions().getInteractionsToExport());
 

@@ -31,7 +31,7 @@ public class ExporterBasedOnClusterScoreTest extends UniprotExportBase{
 
         Assert.assertNotNull(interactionsExported);
         Assert.assertNotNull(negativeInteractionsExported);
-        Assert.assertEquals(2, interactionsExported.size());
+        Assert.assertEquals(3, interactionsExported.size());
         Assert.assertEquals(1, negativeInteractionsExported.size());
 
         boolean isValid = true;
