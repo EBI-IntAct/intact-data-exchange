@@ -73,10 +73,10 @@ public class UniprotExporter {
         String goFile = args[4];
         int version_goFile;
         String database = args[5];
-        boolean excludeSpokeExpanded = Boolean.getBoolean(args[6]);
-        boolean excludeLowConfidence = Boolean.getBoolean(args[7]);
-        boolean excludeNonProtein = Boolean.getBoolean(args[8]);
-        boolean excludeNegative = Boolean.getBoolean(args[9]);
+        boolean excludeSpokeExpanded = Boolean.parseBoolean(args[6]);
+        boolean excludeLowConfidence = Boolean.parseBoolean(args[7]);
+        boolean excludeNonProtein = Boolean.parseBoolean(args[8]);
+        boolean excludeNegative = Boolean.parseBoolean(args[9]);
 
         IntactContext.initContext(new String[]{"/META-INF/" + database + ".spring.xml"});
         FilterConfig config = FilterContext.getInstance().getConfig();
