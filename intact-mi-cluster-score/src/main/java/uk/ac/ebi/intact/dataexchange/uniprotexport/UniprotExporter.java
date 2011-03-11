@@ -154,6 +154,11 @@ public class UniprotExporter {
 
         System.out.println( "database = " + database );
 
+        System.out.println("Filter spoke expanded interactions : " + excludeSpokeExpanded );
+        System.out.println("Filter low confidence interactions : " + excludeLowConfidence);
+        System.out.println("Filter non uniprot proteins : " + excludeNonProtein);
+        System.out.println("Filter negative interactions : " + excludeNegative) ;
+
         InteractionExporter exporter = InteractionExporterFactory.createInteractionExporter(rule);
         InteractionFilter filter = InteractionFilterFactory.createInteractionFilter(source, exporter);
 
