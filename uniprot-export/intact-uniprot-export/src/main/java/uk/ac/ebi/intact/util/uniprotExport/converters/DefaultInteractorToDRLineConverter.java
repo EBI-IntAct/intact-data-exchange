@@ -32,7 +32,7 @@ public class DefaultInteractorToDRLineConverter implements InteractorToDRLineCon
             return new DefaultDRParameters(interactorAc, numberInteractions);
         }
 
-        logger.debug("interactor Ac is null, cannot convert into DRLines");
+        logger.warn("interactor Ac is null, cannot convert into DRLines");
         return null;
     }
 }

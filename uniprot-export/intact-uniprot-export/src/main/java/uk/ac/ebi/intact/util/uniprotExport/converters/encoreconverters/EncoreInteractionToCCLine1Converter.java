@@ -130,15 +130,15 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             secondCCInteractors.add(secondCCInteractor);
                         }
                         else{
-                            logger.debug("Interaction " + uniprot1 + " and " + uniprot2 + " doesn't have valid evidences.");
+                            logger.warn("Interaction " + uniprot1 + " and " + uniprot2 + " doesn't have valid evidences.");
                         }
                     }
                     else{
-                        logger.debug("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the gene names or taxIds which is null.");
+                        logger.warn("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the gene names or taxIds which is null.");
                     }
                 }
                 else{
-                    logger.debug("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the unipprot acs/ intact acs which is null.");
+                    logger.warn("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the unipprot acs/ intact acs which is null.");
                 }
             }
 

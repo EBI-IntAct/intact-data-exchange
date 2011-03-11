@@ -69,10 +69,10 @@ public class DefaultEncoreInteractionToGoLineConverter implements EncoreInteract
 
                 return parameters;
             }
-            logger.debug("No pubmed ids for "+uniprot1+" and "+uniprot2+", cannot convert into GOLines");
+            logger.warn("No pubmed ids for "+uniprot1+" and "+uniprot2+", cannot convert into GOLines");
         }
 
-        logger.debug("one of the uniprot ac is null, cannot convert into GOLines");
+        logger.warn("one of the uniprot ac is null, cannot convert into GOLines");
         return null;
     }
 
