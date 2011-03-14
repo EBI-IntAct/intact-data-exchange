@@ -301,6 +301,10 @@ public class ImexAssigner {
 
             System.out.println( "About to process publication: " + publication.getShortLabel()+"..." );
 
+            if( ! publication.getShortLabel().equals( "21245844" ) ) {
+                continue;
+            }
+
             fireOnProcessPublication( new ImexUpdateEvent( this, publication ) );
 
             try {
@@ -318,10 +322,12 @@ public class ImexAssigner {
 
                 fireOnProcessImexPublication( new ImexUpdateEvent( this, publication ) );
 
-                // TODO do we want to assign IMEx id to publication if no interactions are exportable (no PPI)
+                // TODO do we want to assign IMEx id to publication if no interactions are exportable (e.g. no PPI)
 
                 final String publicationId = publication.getPublicationId();
                 edu.ucla.mbi.imex.central.ws.Publication imexPublication = imexCentral.getPublicationById( publicationId );
+                boolean foundByPmid = false;
+                boolean foundByImexId = false;
 
                 if( imexPublication == null ) {
                     // attempt a search by IMEx id as the publication could have gone from 'unassigned' to a real PMID
@@ -331,6 +337,7 @@ public class ImexAssigner {
                         imexPublication = imexCentral.getPublicationById( imexId );
 
                         if( imexPublication != null ) {
+                            foundByImexId = true;
                             System.out.println( "Could not find this publication by PMID ("+ publicationId +") but did by IMEx id ("+ imexId +"). " +
                                                 "It may be that the PMID was changes in IntAct since the record was registered." );
 
@@ -340,6 +347,8 @@ public class ImexAssigner {
                             System.err.println( "WARNING - This publication has an IMEx id that isn't registered in IMEx Central ("+imexCentral.getEndpoint()+")" );
                         }
                     }
+                } else {
+                    foundByPmid = true;
                 }
 
                 if( imexPublication != null ) {
@@ -389,7 +398,11 @@ public class ImexAssigner {
                     System.out.println( "\tAttempting to update IMEx publication status from '" +
                                         imexPublication.getStatus() + "' to '" + intactStatus + "' ..." );
 
-                    imexCentral.updatePublicationStatus( publicationId, intactStatus, null );
+                    if( foundByPmid ) {
+                        imexCentral.updatePublicationStatus( publicationId, intactStatus, null );
+                    } else {
+                        System.err.println( "This publication cannot be found by PMID, so we cannot update it's status yet." );
+                    }
                 }
 
                 // TODO only update adminGroup/adminUser when the value is different
@@ -398,7 +411,8 @@ public class ImexAssigner {
                 imexCentral.updatePublicationAdminGroup( publicationId, Operation.ADD, institution );
                 System.out.println( "Updated publication admin group to: " + institution );
 
-                // Note: we assume the curators' login in intact are the same in IMExCentral. Also they must be all lowercase in IMExCentral.
+                // Note: we assume the curators' login in intact are the same as in IMExCentral.
+                //       Also they must be all lowercase in IMExCentral.
                 String curator = getPublicationCreator( publication ).toLowerCase();
                 try {
                     imexCentral.updatePublicationAdminUser( publicationId, Operation.ADD, curator );
@@ -406,7 +420,7 @@ public class ImexAssigner {
                 } catch ( ImexCentralException e ) {
                     IcentralFault f = (IcentralFault) e.getCause();
                     if( f.getFaultInfo().getFaultCode() == 10 ) {
-                        // unknown user, we automaticaly reassigne this record to user phantom
+                        // unknown user, we automaticaly re-assign this record to user 'phantom'
                         curator = "phantom";  // this will apply to all curators that have left the group
                         imexCentral.updatePublicationAdminUser( publicationId, Operation.ADD, curator );
                         System.out.println( "Updated publication admin user to: " + curator );
@@ -848,9 +862,13 @@ public class ImexAssigner {
                                                                        Arrays.asList( "Mol. Cancer" ),
                                                                        2010 );
 
+            final boolean innateDbJournalMatch = matchesJournalsAndYear( experiment,
+                                                                         Arrays.asList( "Nat. Immunol. (1529-2908)" ),
+                                                                         2011 );
+
             final boolean datasetMatch = hasDataset(experiment, Arrays.asList("BioCreative - Critical Assessment of Information Extraction systems in Biology"));
 
-            if ( ! ( intactJournalMatch || i2dJournalMatch || molconJournalMatch || datasetMatch ) ) {
+            if ( ! ( intactJournalMatch || i2dJournalMatch || molconJournalMatch || datasetMatch || innateDbJournalMatch ) ) {
                 return false;
             }
 
