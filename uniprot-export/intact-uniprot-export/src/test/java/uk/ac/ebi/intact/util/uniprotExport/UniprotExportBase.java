@@ -6,8 +6,8 @@ import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.clone.IntactClonerException;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.ProteinUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
@@ -755,7 +755,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
     }
 
-    public void createExperimentContext(){
+    public void createExperimentContext() throws IntactClonerException {
         // dr export and confidence annotation topic
         CvTopic dr_export = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
                 CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT);
@@ -808,20 +808,6 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         Annotation expAnnAcc1 = new Annotation(accepted, null);
         experiment_yes.addAnnotation(expAnnAcc1);
         experiment_yes.setCvInteraction(method2);
-
-        Interaction inter = getMockBuilder().createDeterministicInteraction();
-        inter.getComponents().clear();
-        Iterator<Component> iteratorComponent = experiment_yes.getInteractions().iterator().next().getComponents().iterator();
-        inter.addComponent(iteratorComponent.next());
-        Component isoform = iteratorComponent.next();
-        InteractorXref uniprotIdentity = ProteinUtils.getUniprotXref(isoform.getInteractor());
-        uniprotIdentity.setPrimaryId(uniprotIdentity.getPrimaryId() + "-4");
-        inter.addComponent(isoform);
-        Annotation negativeAnn = new Annotation(negative, null);
-        inter.addAnnotation(negativeAnn);
-        experiment_yes.addInteraction(inter);
-        inter.getExperiments().clear();
-        inter.addExperiment(experiment_yes);
 
         Experiment experiment_no = getMockBuilder().createExperimentRandom(1);
         Annotation expAnn2 = new Annotation(dr_export, "no");

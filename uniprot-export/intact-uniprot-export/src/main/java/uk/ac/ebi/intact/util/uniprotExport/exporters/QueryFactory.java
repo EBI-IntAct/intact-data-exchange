@@ -381,7 +381,6 @@ public class QueryFactory {
     public List<String> getReleasedInteractionAcsPassingFilters(){
         FilterConfig config = FilterContext.getInstance().getConfig();
         boolean excludeSpokeExpanded = config.excludeSpokeExpandedInteractions();
-        boolean excludeNegativeInteractions = config.excludeNegativeInteractions();
         boolean excludeLowConfidenceInteractions = config.excludeLowConfidenceInteractions();
         boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
 

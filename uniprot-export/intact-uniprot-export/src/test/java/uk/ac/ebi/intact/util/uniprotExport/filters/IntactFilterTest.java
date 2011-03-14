@@ -6,6 +6,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.intact.model.clone.IntactClonerException;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
@@ -29,7 +30,7 @@ public class IntactFilterTest extends UniprotExportBase{
     @Test
     @DirtiesContext
     @Transactional(propagation = Propagation.NEVER)
-    public void test_simulation() throws UniprotExportException {
+    public void test_simulation() throws UniprotExportException, IntactClonerException {
         FilterConfig config = FilterContext.getInstance().getConfig();
         // accept negative interactions
         config.setExcludeNegativeInteractions(false);

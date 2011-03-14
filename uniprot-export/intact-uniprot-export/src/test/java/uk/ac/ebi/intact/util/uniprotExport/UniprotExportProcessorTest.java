@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.ebi.intact.model.clone.IntactClonerException;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLine2Converter;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
 import uk.ac.ebi.intact.util.uniprotExport.filters.IntactFilter;
@@ -27,7 +28,7 @@ public class UniprotExportProcessorTest extends UniprotExportBase{
     @DirtiesContext
     @Transactional(propagation = Propagation.NEVER)
     @Ignore
-    public void test_simulation() throws UniprotExportException, IOException {
+    public void test_simulation() throws UniprotExportException, IOException, IntactClonerException {
         createExperimentContext();
 
         Assert.assertEquals(6, getDaoFactory().getInteractionDao().getAll().size());
