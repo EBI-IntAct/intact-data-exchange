@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
+import org.hibernate.annotations.CascadeType;
 import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.builder.Row;
@@ -188,28 +189,27 @@ public class DatabaseMitabExporter {
                     }
                 }
 
-                if (log.isTraceEnabled()) log.trace("Starting conversion and property enrichment: "+interactor.getShortLabel());
 
                 if (!interactions.isEmpty()) {
-                    Collection<IntactBinaryInteraction> binaryInteractions = null;
-                    try {
-                        binaryInteractions = converter.convert(interactions);
-                    } catch (NotExpandableInteractionException e) {
-                        e.printStackTrace();
-                    }
-                    enrich(binaryInteractions);
-    
+                    if (log.isTraceEnabled()) log.trace("Starting conversion and property enrichment: "+interactor.getShortLabel());
 
-                    if ( log.isTraceEnabled() ) log.trace( "Storing " + binaryInteractions.size() + " interactions..." );
+                    Collection<IntactBinaryInteraction> binaryInteractions = converter.convert(interactions);
 
-                    int count = 0;
-                    for (IntactBinaryInteraction bi : binaryInteractions) {
-                        count++;
-                        if ( log.isTraceEnabled() ) {
-                            log.trace( "Processing interaction #" + count );
+                    if( binaryInteractions != null ) {
+
+                        enrich(binaryInteractions);
+
+                        if ( log.isTraceEnabled() ) log.trace( "Storing " + binaryInteractions.size() + " interactions..." );
+
+                        int count = 0;
+                        for (IntactBinaryInteraction bi : binaryInteractions) {
+                            count++;
+                            if ( log.isTraceEnabled() ) {
+                                log.trace( "Processing interaction #" + count );
+                            }
+
+                            clusterBuilder.addBinaryInteraction( bi );
                         }
-
-                        clusterBuilder.addBinaryInteraction( bi );
                     }
 
                     interactorCount++;
