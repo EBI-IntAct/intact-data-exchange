@@ -231,6 +231,12 @@ public class DatabaseMitabExporter {
 
 
         // TODO close database
+        try {
+            IntactContext.getCurrentInstance().destroy();
+        } catch ( Exception e ) {
+            log.warn( "Failed to close the database access", e );
+        }
+
 
         // Now that we have the clusters built, let's browse then and generate the index
 
@@ -281,19 +287,25 @@ public class DatabaseMitabExporter {
 
                 interactionCount++;
 
-                if (pairProcessed % 500 == 0) {
-                    if (log.isDebugEnabled()) log.debug("Processed "+interactionCount+" interactions ("+interactorCount+" interactors)");
-                    mitabWriter.flush();
+            } // interactions of the pair
 
-                    if (interactionIndexWriter != null) {
-                        interactionIndexWriter.optimize();
-                        interactionIndexWriter.flush();
-                    }
 
-                    if (interactorIndexWriter != null) {
-                        interactorIndexWriter.optimize();
-                        interactorIndexWriter.flush();
-                    }
+            if (pairProcessed % 500 == 0) {
+                if (log.isDebugEnabled()) log.debug("Processed "+interactionCount+" interactions ("+interactorCount+" interactors)");
+                mitabWriter.flush();
+
+                if (interactionIndexWriter != null) {
+                    log.info( "Starting to optimize interaction index" );
+                    interactionIndexWriter.optimize();
+                    interactionIndexWriter.flush();
+                    log.info( "Completed" );
+                }
+
+                if (interactorIndexWriter != null) {
+                    log.info( "Starting to optimize interactor index" );
+                    interactorIndexWriter.optimize();
+                    interactorIndexWriter.flush();
+                    log.info( "Completed" );
                 }
             }
 
