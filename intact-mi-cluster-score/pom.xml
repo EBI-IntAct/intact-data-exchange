@@ -85,6 +85,47 @@
             </build>
         </profile>
         <profile>
+            <id>uniprot-export-filter</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2024m</argument>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath/>
+                                <argument>uk.ac.ebi.intact.dataexchange.uniprotexport.UniprotExportFilter</argument>
+                                <!-- The source of the binary interactions (intact or mitab:fileName) -->
+                                <argument>${source}</argument>
+                                <!-- The name of the resulting file -->
+                                <argument>${results}</argument>
+                                <!-- The name of the database  -->
+                                <argument>${database}</argument>
+                                <argument>${binaryOnly}</argument>
+                                <argument>${highConfidence}</argument>
+                                <argument>${proteinOnly}</argument>
+                                <argument>${positiveOnly}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>mitab-indexer</id>
 
             <build>
