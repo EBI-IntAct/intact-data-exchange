@@ -7,7 +7,7 @@ import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
+import uk.ac.ebi.enfin.mi.cluster.score.UnNormalizedInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 
 import java.io.BufferedWriter;
@@ -28,7 +28,7 @@ import java.util.Set;
  * @since <pre>16-Sep-2010</pre>
  */
 
-public class IntActInteractionClusterScore extends InteractionClusterScore implements IntactCluster {
+public class IntActInteractionClusterScore extends UnNormalizedInteractionClusterScore implements IntactCluster {
 
     private static final Logger logger = Logger.getLogger(IntActInteractionClusterScore.class);
     private String[] scoreList = null;

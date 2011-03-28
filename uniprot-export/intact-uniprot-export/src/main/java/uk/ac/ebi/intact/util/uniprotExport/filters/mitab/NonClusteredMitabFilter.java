@@ -18,6 +18,7 @@ import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions
 import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -221,6 +222,31 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
 
 
             return clusterResults;
+        } catch (IOException e) {
+            throw new UniprotExportException("It was not possible to convert the data in the mitab file " + mitab + " in an InputStream", e);
+        } catch (ConverterException e) {
+            throw new UniprotExportException("It was not possible to iterate the binary interactions in the mitab file " + mitab, e);
+        }
+    }
+
+    /**
+     * Save the results of cluster and filtering without export rules
+     * @param mitab
+     * @param mitabResults
+     * @throws UniprotExportException
+     */
+    public void saveClusterAndFilterResultsFrom(String mitab, String mitabResults) throws UniprotExportException {
+        try {
+            logger.info("Filtering and clustering interactions for uniprot export... \n");
+            MiClusterScoreResults clusterResults = computeMiScoreInteractionEligibleUniprotExport(mitab);
+            logger.info("Saving interactions... \n");
+
+            IntactCluster positiveCluster = clusterResults.getPositiveClusteredInteractions().getCluster();
+            IntactCluster negativeCluster = clusterResults.getNegativeClusteredInteractions().getCluster();
+
+            positiveCluster.saveClusteredInteractions(mitabResults, positiveCluster.getEncoreInteractionCluster().keySet());
+            negativeCluster.saveClusteredInteractions(mitabResults+"_negative.txt", negativeCluster.getEncoreInteractionCluster().keySet());
+
         } catch (IOException e) {
             throw new UniprotExportException("It was not possible to convert the data in the mitab file " + mitab + " in an InputStream", e);
         } catch (ConverterException e) {
