@@ -897,4 +897,28 @@ public class IntactFilter implements InteractionFilter {
     public void setInteractionExporter(InteractionExporter exporter) {
         this.exporter = exporter;
     }
+
+    @Override
+    public void saveClusterAndFilterResultsFrom(String mitab, String mitabResults) throws UniprotExportException {
+        logger.info("Filtering interactions for uniprot export... \n");
+        logger.info(this.eligibleInteractionsForUniprotExport.size() + " positive intact interactions passed the filters \n");
+        logger.info(this.negativeInteractions.size() + " negative intact interactions passed the filters \n");
+
+        logger.info("Clustering interactions... \n");
+        MiClusterScoreResults results = processExportWithFilterOnNonUniprot();
+
+        ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
+        ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
+
+        logger.info("Clustered " + positiveInteractions.getCluster().getAllInteractionIds().size() + " positive binary interactions");
+        logger.info("Clustered " + negativeInteractions.getCluster().getAllInteractionIds().size() + " negative binary interactions");
+
+        logger.info("Saving interactions... \n");
+        IntactCluster positiveCluster = positiveInteractions.getCluster();
+        IntactCluster negativeCluster = negativeInteractions.getCluster();
+
+        positiveCluster.saveClusteredInteractions(mitabResults, positiveCluster.getEncoreInteractionCluster().keySet());
+        negativeCluster.saveClusteredInteractions(mitabResults+"_negative.txt", negativeCluster.getEncoreInteractionCluster().keySet());
+
+    }
 }

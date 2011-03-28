@@ -34,4 +34,12 @@ public interface InteractionFilter {
      * @param exporter
      */
     public void setInteractionExporter(InteractionExporter exporter);
+
+    /**
+     * Save the results of cluster and filtering without export rules
+     * @param mitab
+     * @param mitabResults
+     * @throws UniprotExportException
+     */
+    public void saveClusterAndFilterResultsFrom(String mitab, String mitabResults) throws UniprotExportException;
 }
