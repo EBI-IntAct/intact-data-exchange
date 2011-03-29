@@ -145,10 +145,11 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
 
         enricher.enrich( smallMolecule );
 
-        Assert.assertEquals( 4, smallMolecule.getXrefs().size() );
+        Assert.assertEquals( 5, smallMolecule.getXrefs().size() );
         assertHasXref( smallMolecule, "chebi", "CHEBI:45783",  "identity" );
         assertHasXref( smallMolecule, "chebi", "CHEBI:45781",  "secondary-ac" );
         assertHasXref( smallMolecule, "chebi", "CHEBI:305376",  "secondary-ac" );
+        assertHasXref( smallMolecule, "chebi", "CHEBI:188797",  "secondary-ac" );
         assertHasXref( smallMolecule, "chebi", "CHEBI:38918",  "secondary-ac" );
     }
 
