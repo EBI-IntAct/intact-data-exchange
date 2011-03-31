@@ -30,8 +30,6 @@ import psidev.psi.mi.xml.model.Participant;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.core.persister.Finder;
-import uk.ac.ebi.intact.core.persister.finder.DefaultFinder;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.core.util.DebugUtil;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
@@ -211,7 +209,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         Assert.assertEquals(2, getDaoFactory().getComponentDao().countAll());
         Assert.assertEquals(2, getDaoFactory().getProteinDao().countAll());
 
-        Assert.assertEquals(4, getDaoFactory().getBioSourceDao().countAll());
+        Assert.assertEquals(5, getDaoFactory().getBioSourceDao().countAll());
         Assert.assertEquals(1, getDaoFactory().getCvObjectDao(CvCellType.class).countAll());
     }
 
