@@ -234,7 +234,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         publications.add(ref);
 
         interaction.setId(1);
-        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.6"));
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "11"));
         interaction.setInteractorAccsA(interactorA);
         interaction.setInteractorAccsB(interactorB);
         interaction.setPublicationIds(publications);
@@ -281,7 +281,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         publications.add(ref2);
 
         interaction.setId(2);
-        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.7"));
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "10"));
         interaction.setInteractorAccsA(interactorA);
         interaction.setInteractorAccsB(interactorB);
         interaction.setPublicationIds(publications);
@@ -328,7 +328,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         publications.add(ref2);
 
         interaction.setId(2);
-        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.7"));
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "10"));
         interaction.setInteractorAccsA(interactorA);
         interaction.setInteractorAccsB(interactorB);
         interaction.setPublicationIds(publications);
@@ -394,7 +394,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         publications.add(ref);
 
         interaction.setId(3);
-        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.8"));
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "9"));
         interaction.setInteractorAccsA(interactorA);
         interaction.setInteractorAccsB(interactorB);
         interaction.setPublicationIds(publications);
@@ -488,7 +488,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         publications.add(ref);
 
         interaction.setId(5);
-        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.5"));
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "10"));
         interaction.setInteractorAccsA(interactorA);
         interaction.setInteractorAccsB(interactorB);
         interaction.setPublicationIds(publications);
@@ -535,7 +535,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         publications.add(ref);
 
         interaction.setId(6);
-        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "0.7"));
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "10"));
         interaction.setInteractorAccsA(interactorA);
         interaction.setInteractorAccsB(interactorB);
         interaction.setPublicationIds(publications);

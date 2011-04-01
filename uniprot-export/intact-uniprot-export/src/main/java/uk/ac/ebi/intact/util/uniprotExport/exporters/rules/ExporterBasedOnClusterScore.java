@@ -30,12 +30,12 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     /**
      * The score threshold for positive interactions
      */
-    private double positive_export_threshold = 0.43;
+    private double positive_export_threshold = 8;
 
     /**
      * The score threshold for negative interactions
      */
-    private double negative_export_threshold = 0.43;
+    private double negative_export_threshold = 8;
 
     private static final String COLOCALIZATION = "MI:0403";
 
@@ -64,9 +64,9 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
             for (String ac : intactInteractions){
                 if (!context.getSpokeExpandedInteractions().contains(ac)){
 
-                    String method = context.getInteractionToMethod_type().get(ac).getMethod();
+                    String type = context.getInteractionToMethod_type().get(ac).getType();
 
-                    if (!method.equals(COLOCALIZATION)){
+                    if (!type.equals(COLOCALIZATION)){
                         logger.info("The interaction " + encore.getId() + " passed the export rules with score = " + score);
                         return true;
                     }
@@ -94,9 +94,9 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
             for (String ac : intactInteractions){
                 if (!context.getSpokeExpandedInteractions().contains(ac)){
 
-                    String method = context.getInteractionToMethod_type().get(ac).getMethod();
+                    String type = context.getInteractionToMethod_type().get(ac).getType();
 
-                    if (!method.equals(COLOCALIZATION)){
+                    if (!type.equals(COLOCALIZATION)){
                         logger.info("The negative interaction " + ac + " passed the export rules with score = " + score);
 
                         return true;
@@ -148,9 +148,9 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
                 for (String ac : intactInteractions){
                     if (!context.getSpokeExpandedInteractions().contains(ac)){
 
-                        String method = context.getInteractionToMethod_type().get(ac).getMethod();
+                        String type = context.getInteractionToMethod_type().get(ac).getType();
 
-                        if (!method.equals(COLOCALIZATION)){
+                        if (!type.equals(COLOCALIZATION)){
                             logger.info("The negative interaction " + encore.getId() + " passed the export rules with score = " + score);
                             return true;
                         }
