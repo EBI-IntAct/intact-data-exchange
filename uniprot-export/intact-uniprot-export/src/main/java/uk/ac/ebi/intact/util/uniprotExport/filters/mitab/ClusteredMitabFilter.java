@@ -5,6 +5,7 @@ import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.converter.ConverterException;
+import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.InteractionDao;
 import uk.ac.ebi.intact.model.CvInteraction;
@@ -18,7 +19,6 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
-import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
@@ -141,7 +141,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
 
                         String typeMi = interactionType.getIdentifier();
 
-                        MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
+                        MethodTypePair entry = new MethodTypePair(detectionMI, typeMi);
                         context.getInteractionToMethod_type().put(intactAc, entry);
 
                         if (!InteractionUtils.isBinaryInteraction(intact) && !excludeSpokeExpanded){

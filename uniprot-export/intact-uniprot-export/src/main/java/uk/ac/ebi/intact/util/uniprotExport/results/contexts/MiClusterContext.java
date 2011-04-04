@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.results.contexts;
 
-import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
+import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,7 +19,7 @@ public class MiClusterContext implements ExportContext {
 
     private Map<String, String> geneNames = new HashMap<String, String>();
     private Map<String, String> miTerms = new HashMap<String, String>();
-    private Map<String, MethodAndTypePair> interactionToType_Method = new HashMap<String, MethodAndTypePair>();
+    private Map<String, MethodTypePair> interactionToType_Method = new HashMap<String, MethodTypePair>();
     private Set<String> spokeExpandedInteractions = new HashSet<String>();
 
     /**
@@ -42,7 +42,7 @@ public class MiClusterContext implements ExportContext {
      *
      * @return Map associating an Intact interaction AC to a couple {method, interaction type}
      */
-    public Map<String, MethodAndTypePair> getInteractionToMethod_type() {
+    public Map<String, MethodTypePair> getInteractionToMethod_type() {
         return interactionToType_Method;
     }
 

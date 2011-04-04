@@ -4,7 +4,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.model.*;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
@@ -16,7 +17,6 @@ import uk.ac.ebi.intact.util.uniprotExport.exporters.AbstractInteractionExporter
 import uk.ac.ebi.intact.util.uniprotExport.exporters.QueryFactory;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
-import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
@@ -250,13 +250,13 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         } // i
     }
 
-    private int computeNumberOfExperimentsHavingDetectionMethod(String method, ExportContext context, EncoreInteraction interaction, Set<String> validIntactIds){
+    private int computeNumberOfExperimentsHavingDetectionMethod(String method, ExportContext context, EncoreInteractionForScoring interaction, Set<String> validIntactIds){
 
-        Map<MethodAndTypePair, List<String>> invertedMap = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), interaction.getExperimentToPubmed().keySet());
+        Map<MethodTypePair, List<String>> invertedMap = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), interaction.getExperimentToPubmed().keySet());
 
         int numberOfExperiment = 0;
 
-        for (Map.Entry<MethodAndTypePair, List<String>> entry : invertedMap.entrySet()){
+        for (Map.Entry<MethodTypePair, List<String>> entry : invertedMap.entrySet()){
 
             if (entry.getKey().getMethod().equals(method)){
                 numberOfExperiment += entry.getValue().size();
@@ -270,11 +270,11 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     private int computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(String method, ExportContext context, BinaryInteraction interaction, Set<String> validIntactIds){
         Set<String> intactAcs = FilterUtils.extractIntactAcFrom(interaction.getInteractionAcs());
 
-        Map<MethodAndTypePair, List<String>> invertedMap = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), intactAcs);
+        Map<MethodTypePair, List<String>> invertedMap = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), intactAcs);
 
         int numberOfExperiment = 0;
 
-        for (Map.Entry<MethodAndTypePair, List<String>> entry : invertedMap.entrySet()){
+        for (Map.Entry<MethodTypePair, List<String>> entry : invertedMap.entrySet()){
 
             if (entry.getKey().getMethod().equals(method)){
 
@@ -309,7 +309,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
                 }
             }
             else {
-                for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
+                for (Map.Entry<Integer, EncoreInteractionForScoring> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
                     if (canExportEncoreInteraction(entry.getValue(), context)){
                         eligibleInteractions.add(entry.getKey());
@@ -339,7 +339,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
                 }
             }
             else {
-                for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
+                for (Map.Entry<Integer, EncoreInteractionForScoring> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
                     if (canExportNegativeEncoreInteraction(entry.getValue(), context, positiveInteractions)){
                         eligibleInteractions.add(entry.getKey());
@@ -391,7 +391,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     }
 
     @Override
-    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context) throws UniprotExportException {
+    public boolean canExportEncoreInteraction(EncoreInteractionForScoring interaction, ExportContext context) throws UniprotExportException {
 
         Set<String> detectionMethods = new HashSet(interaction.getMethodToPubmed().keySet());
 
@@ -471,7 +471,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     }
 
     @Override
-    public boolean canExportNegativeEncoreInteraction(EncoreInteraction interaction, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException {
+    public boolean canExportNegativeEncoreInteraction(EncoreInteractionForScoring interaction, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException {
         // no negative interaction can be exported
         return false;
     }
@@ -482,7 +482,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         return false;
     }
 
-    protected void removeInteractionEvidencesFrom(EncoreInteraction encore, Set<String> wrongInteractions, ExportContext context){
+    protected void removeInteractionEvidencesFrom(EncoreInteractionForScoring encore, Set<String> wrongInteractions, ExportContext context){
         List<CrossReference> publicationsToRemove = new ArrayList(encore.getPublicationIds());
         List<String> publicationIdsToKeep = new ArrayList<String>(encore.getPublicationIds().size());
         List<String> methodsToRemove = new ArrayList(encore.getMethodToPubmed().keySet());
@@ -492,7 +492,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
         for (String interactionAc : validInteractions){
 
-            MethodAndTypePair pair = context.getInteractionToMethod_type().get(interactionAc);
+            MethodTypePair pair = context.getInteractionToMethod_type().get(interactionAc);
 
             String detectionMI = pair.getMethod();
 
@@ -580,7 +580,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
         for (String interaction : validInteractions){
 
-            MethodAndTypePair pair = context.getInteractionToMethod_type().get(interaction);
+            MethodTypePair pair = context.getInteractionToMethod_type().get(interaction);
 
             String detectionMI = pair.getMethod();
 

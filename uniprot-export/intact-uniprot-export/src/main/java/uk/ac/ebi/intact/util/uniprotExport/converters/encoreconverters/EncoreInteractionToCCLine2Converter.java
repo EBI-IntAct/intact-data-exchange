@@ -2,11 +2,11 @@ package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
-import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -34,7 +34,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
      * @param context : the context of the export
      * @return a sorted list of InteractionDetails extracted from the interaction
      */
-    private SortedSet<InteractionDetails> sortInteractionDetails(EncoreInteraction interaction, MiClusterContext context){
+    private SortedSet<InteractionDetails> sortInteractionDetails(EncoreInteractionForScoring interaction, MiClusterContext context){
 
         // map which associates IntAct interaction Ac to pubmed id
         Map<String, String> interactionToPubmed = interaction.getExperimentToPubmed();
@@ -43,10 +43,10 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
         Map<String, List<String>> pubmedToInteraction = WriterUtils.invertMapOfTypeStringToString(interactionToPubmed);
 
         // map which associates a couple {interaction detection method, interaction type} to a set of Pubmed ids
-        Map<MethodAndTypePair, Set<String>> distinctInformationDetails = collectDistinctInteractionDetails(interaction, context);
+        Map<MethodTypePair, List<String>> distinctInformationDetails = interaction.getMethodTypePairListMap();
 
         // map which associates a couple {interaction detection method, interaction type} to a set of IntAct interaction Acs
-        Map<MethodAndTypePair, List<String>> method_typeToInteractions = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), interactionToPubmed.keySet());
+        Map<MethodTypePair, List<String>> method_typeToInteractions = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), interactionToPubmed.keySet());
 
         // the list with the interaction details
         SortedSet<InteractionDetails> sortedInteractionDetails = new TreeSet<InteractionDetails>();
@@ -55,7 +55,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
         // - pubmed ids only associated with spoke expanded interactions
         // - pubmed ids only associated with true binary interactions
         // - pubmed ids associated with both spoke expanded and true binary interactions. In this case, we consider the pubmed id as only associated with true binary interaction
-        for (Map.Entry<MethodAndTypePair, Set<String>> ip : distinctInformationDetails.entrySet()){
+        for (Map.Entry<MethodTypePair, List<String>> ip : distinctInformationDetails.entrySet()){
             // the method is the key of the entry
             String method = context.getMiTerms().containsKey(ip.getKey().getMethod()) ? context.getMiTerms().get(ip.getKey().getMethod()) : ip.getKey().getMethod();
 
@@ -63,7 +63,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
             String type = context.getMiTerms().containsKey(ip.getKey().getType()) ? context.getMiTerms().get(ip.getKey().getType()) : ip.getKey().getType();
 
             // the list of pubmed ids associated with the couple {method, type}
-            Set<String> pubmedIds = ip.getValue();
+            Set<String> pubmedIds = new HashSet(ip.getValue());
 
             logger.debug("Process method " + method + ", type " + type + ", " + pubmedIds.size() + " publications");
 
@@ -124,57 +124,11 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
     }
 
     /**
-     * Merge the map interaction type -> list of pubmed ids with the map detection method -> list of pubmed ids which are in the interaction.
-     * @param interaction : the interaction
-     * @param context
-     * @return a map composed with :
-     * - key = couple {method, type}
-     * - value = set of pubmed ids
-     */
-    private Map<MethodAndTypePair, Set<String>> collectDistinctInteractionDetails(EncoreInteraction interaction, MiClusterContext context){
-        // map which associates the interaction type to the pubmed id
-        Map<String, List<String>> typeToPubmed = interaction.getTypeToPubmed();
-
-        // map which associates the detection method with the pubmed id
-        Map<String, List<String>> methodToPubmed = interaction.getMethodToPubmed();
-
-        // the map which is a merge of the two previous maps
-        Map<MethodAndTypePair, Set<String>> distinctLines = new HashMap<MethodAndTypePair, Set<String>>();
-
-        // for each method of this interaction
-        for (Map.Entry<String, List<String>> methodEntry : methodToPubmed.entrySet()){
-            // list of pubmeds associated with this method
-            List<String> pubmeds1 = methodEntry.getValue();
-            // the name of the method
-            String method = methodEntry.getKey();
-
-            // for each interaction type of this interaction
-            for (Map.Entry<String, List<String>> typeEntry : typeToPubmed.entrySet()){
-                // list of pubmeds associated with this interaction type
-                List<String> pubmeds2 = typeEntry.getValue();
-                // the name of the interaction type
-                String type = typeEntry.getKey();
-
-                // the list of pubmed ids associated with the couple {method, type}
-                Set<String> associatedPubmeds = new HashSet(CollectionUtils.intersection(pubmeds1, pubmeds2));
-
-                // if it is not empty, we can add a new entry in the map
-                if (!associatedPubmeds.isEmpty()){
-
-                    distinctLines.put(new MethodAndTypePair(method, type), associatedPubmeds);
-                }
-            }
-        }
-
-        return distinctLines;
-    }
-
-    /**
      * Converts an EncoreInteraction into a CCParameter
 
      * @return the converted CCParameter
      */
-    public CCParameters<SecondCCParameters2> convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, List<EncoreInteraction> negativeInteractions, MiClusterContext context, String firstInteractor){
+    public CCParameters<SecondCCParameters2> convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteractionForScoring> positiveInteractions, List<EncoreInteractionForScoring> negativeInteractions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
         String geneName1 = null;
         String taxId1 = null;
@@ -182,7 +136,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
         List<SecondCCParameters2> secondCCInteractors = new ArrayList<SecondCCParameters2>(positiveInteractions.size() + negativeInteractions.size());
 
         if (positiveInteractions != null && !positiveInteractions.isEmpty()){
-            for (EncoreInteraction interaction : positiveInteractions){
+            for (EncoreInteractionForScoring interaction : positiveInteractions){
                 // get the uniprot acs of the first and second interactors
                 String uniprot1;
                 String uniprot2;
@@ -299,7 +253,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
         }
 
         if (negativeInteractions != null && !negativeInteractions.isEmpty()){
-            for (EncoreInteraction interaction : negativeInteractions){
+            for (EncoreInteractionForScoring interaction : negativeInteractions){
                 // get the uniprot acs of the first and second interactors
                 String uniprot1;
                 String uniprot2;
@@ -425,7 +379,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
     }
 
     @Override
-    public CCParameters convertInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, MiClusterContext context, String firstInteractor) {
+    public CCParameters convertInteractionsIntoCCLines(List<EncoreInteractionForScoring> positiveInteractions, MiClusterContext context, String firstInteractor) {
         return convertPositiveAndNegativeInteractionsIntoCCLines(positiveInteractions, Collections.EMPTY_LIST, context, firstInteractor);
     }
 }

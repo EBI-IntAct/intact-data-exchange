@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.model.*;
+import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Interaction;
@@ -18,7 +19,6 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActFileMiScoreDistribution;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
-import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
@@ -508,7 +508,7 @@ public class IntactFilter implements InteractionFilter {
             context.getMiTerms().put(typeMi, interactionTypes.iterator().next().getText());
         }
 
-        context.getInteractionToMethod_type().put(interactionAc, new MethodAndTypePair(detectionMI, typeMi));
+        context.getInteractionToMethod_type().put(interactionAc, new MethodTypePair(detectionMI, typeMi));
 
         if (toBinary.size() > 1){
 
@@ -532,7 +532,7 @@ public class IntactFilter implements InteractionFilter {
             while (numberOfBinaryInteractions < binaryInteractions.size()){
                 try {
                     // we compute the MI cluster score
-                    clusterScore.setBinaryInteractionList(binaryInteractions.subList(numberOfBinaryInteractions, numberOfBinaryInteractions + Math.min(range, binaryInteractions.size() - numberOfBinaryInteractions)));
+                    clusterScore.setBinaryInteractionIterator(binaryInteractions.subList(numberOfBinaryInteractions, numberOfBinaryInteractions + Math.min(range, binaryInteractions.size() - numberOfBinaryInteractions)).iterator());
                     clusterScore.runService();
                 } catch (Exception e){
                     e.printStackTrace();

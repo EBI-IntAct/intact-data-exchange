@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters2;
@@ -25,9 +25,9 @@ public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
     public void test_cc_convert_ok(){
         EncoreInteractionToCCLine2Converter converter = new EncoreInteractionToCCLine2Converter();
 
-        List<EncoreInteraction> interactions = createEncoreInteractions();
+        List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
 
-        List<EncoreInteraction> negativeInteractions = new ArrayList<EncoreInteraction>();
+        List<EncoreInteractionForScoring> negativeInteractions = new ArrayList<EncoreInteractionForScoring>();
         negativeInteractions.add(interactions.get(2));
         interactions.remove(2);
 

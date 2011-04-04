@@ -3,7 +3,8 @@ package uk.ac.ebi.intact.util.uniprotExport;
 import psidev.psi.mi.tab.model.ConfidenceImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.clone.IntactClonerException;
@@ -15,7 +16,6 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DefaultDR
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
-import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
@@ -200,8 +200,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return parameters;
     }
 
-    public EncoreInteraction createEncoreInteraction(){
-        EncoreInteraction interaction = new EncoreInteraction();
+    public EncoreInteractionForScoring createEncoreInteraction(){
+        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P28548-1");
@@ -213,10 +213,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         List<String> pubmeds = new ArrayList<String>();
         pubmeds.add("14704431");
 
-        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
-        type2Pubmed.put("MI:0915", pubmeds);
-        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
-        method2Pubmed.put("MI:0676", pubmeds);
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0676", "MI:0915"), pubmeds);
 
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx1", "14704431");
@@ -241,14 +238,12 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         interaction.setOrganismsA(organismA);
         interaction.setOrganismsB(organismB);
         interaction.setExperimentToPubmed(experimentToPubmed);
-        interaction.setTypeToPubmed(type2Pubmed);
-        interaction.setMethodToPubmed(method2Pubmed);
 
         return interaction;
     }
 
-    public EncoreInteraction createNegativeEncoreInteraction(){
-        EncoreInteraction interaction = new EncoreInteraction();
+    public EncoreInteractionForScoring createNegativeEncoreInteraction(){
+        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P28548-2");
@@ -261,10 +256,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         pubmeds.add("14704431");
         pubmeds.add("15199141");
 
-        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
-        type2Pubmed.put("MI:0915", pubmeds);
-        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
-        method2Pubmed.put("MI:0398", pubmeds);
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0398", "MI:0915"), pubmeds);
 
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx2", "14704431");
@@ -288,14 +280,12 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         interaction.setOrganismsA(organismA);
         interaction.setOrganismsB(organismA);
         interaction.setExperimentToPubmed(experimentToPubmed);
-        interaction.setTypeToPubmed(type2Pubmed);
-        interaction.setMethodToPubmed(method2Pubmed);
 
         return interaction;
     }
 
-    public EncoreInteraction createSecondEncoreInteraction(){
-        EncoreInteraction interaction = new EncoreInteraction();
+    public EncoreInteractionForScoring createSecondEncoreInteraction(){
+        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P28548-2");
@@ -308,10 +298,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         pubmeds.add("14704431");
         pubmeds.add("15199141");
 
-        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
-        type2Pubmed.put("MI:0915", pubmeds);
-        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
-        method2Pubmed.put("MI:0398", pubmeds);
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0398", "MI:0915"), pubmeds);
 
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx2", "14704431");
@@ -335,14 +322,12 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         interaction.setOrganismsA(organismA);
         interaction.setOrganismsB(organismA);
         interaction.setExperimentToPubmed(experimentToPubmed);
-        interaction.setTypeToPubmed(type2Pubmed);
-        interaction.setMethodToPubmed(method2Pubmed);
 
         return interaction;
     }
 
-    public EncoreInteraction createThirdEncoreInteraction(){
-        EncoreInteraction interaction = new EncoreInteraction();
+    public EncoreInteractionForScoring createThirdEncoreInteraction(){
+        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P28548-PRO_0000068244");
@@ -353,26 +338,15 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         List<String> pubmeds1 = new ArrayList<String>();
         pubmeds1.add("14704431");
-        pubmeds1.add("15199141");
-        List<String> pubmeds2 = new ArrayList<String>();
-        pubmeds2.add("18212739");
-        List<String> pubmeds3 = new ArrayList<String>();
-        pubmeds3.add("14704431");
-        pubmeds3.add("15199141");
-        pubmeds3.add("15115758");
         List<String> pubmeds4 = new ArrayList<String>();
         pubmeds4.add("18212739");
         List<String> pubmeds5 = new ArrayList<String>();
         pubmeds5.add("15199141");
         pubmeds5.add("15115758");
 
-        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
-        type2Pubmed.put("MI:0914", pubmeds2);
-        type2Pubmed.put("MI:0915", pubmeds3);
-        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
-        method2Pubmed.put("MI:0398", pubmeds1);
-        method2Pubmed.put("MI:0006", pubmeds4);
-        method2Pubmed.put("MI:0019", pubmeds5);
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0006", "MI:0914"), pubmeds4);
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0019", "MI:0915"), pubmeds5);
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0398", "MI:0915"), pubmeds1);
 
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx4", "14704431");
@@ -401,14 +375,12 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         interaction.setOrganismsA(organismA);
         interaction.setOrganismsB(organismB);
         interaction.setExperimentToPubmed(experimentToPubmed);
-        interaction.setTypeToPubmed(type2Pubmed);
-        interaction.setMethodToPubmed(method2Pubmed);
 
         return interaction;
     }
 
-    public EncoreInteraction createEncoreInteractionLowScore(){
-        EncoreInteraction interaction = new EncoreInteraction();
+    public EncoreInteractionForScoring createEncoreInteractionLowScore(){
+        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P12345");
@@ -420,10 +392,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         List<String> pubmeds1 = new ArrayList<String>();
         pubmeds1.add("19705531");
 
-        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
-        type2Pubmed.put("MI:0914", pubmeds1);
-        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
-        method2Pubmed.put("MI:0019", pubmeds1);
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0019", "MI:0914"), pubmeds1);
 
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx10", "19705531");
@@ -448,14 +417,12 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         interaction.setOrganismsA(organismA);
         interaction.setOrganismsB(organismB);
         interaction.setExperimentToPubmed(experimentToPubmed);
-        interaction.setTypeToPubmed(type2Pubmed);
-        interaction.setMethodToPubmed(method2Pubmed);
 
         return interaction;
     }
 
-    public EncoreInteraction createEncoreInteractionHighScoreSpokeExpanded(){
-        EncoreInteraction interaction = new EncoreInteraction();
+    public EncoreInteractionForScoring createEncoreInteractionHighScoreSpokeExpanded(){
+        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P12346");
@@ -467,10 +434,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         List<String> pubmeds1 = new ArrayList<String>();
         pubmeds1.add("19705532");
 
-        Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
-        type2Pubmed.put("MI:0914", pubmeds1);
-        Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
-        method2Pubmed.put("MI:0398", pubmeds1);
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0398", "MI:0914"), pubmeds1);
 
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx11", "19705532");
@@ -495,14 +459,12 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         interaction.setOrganismsA(organismA);
         interaction.setOrganismsB(organismB);
         interaction.setExperimentToPubmed(experimentToPubmed);
-        interaction.setTypeToPubmed(type2Pubmed);
-        interaction.setMethodToPubmed(method2Pubmed);
 
         return interaction;
     }
 
-    public EncoreInteraction createEncoreInteractionHighScoreColocalization(){
-        EncoreInteraction interaction = new EncoreInteraction();
+    public EncoreInteractionForScoring createEncoreInteractionHighScoreColocalization(){
+        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P12347");
@@ -514,6 +476,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         List<String> pubmeds1 = new ArrayList<String>();
         pubmeds1.add("19705533");
 
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0403", "MI:0403"), pubmeds1);
         Map<String, List<String>> type2Pubmed = new HashMap<String, List<String>>();
         type2Pubmed.put("MI:0403", pubmeds1);
         Map<String, List<String>> method2Pubmed = new HashMap<String, List<String>>();
@@ -542,14 +505,12 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         interaction.setOrganismsA(organismA);
         interaction.setOrganismsB(organismB);
         interaction.setExperimentToPubmed(experimentToPubmed);
-        interaction.setTypeToPubmed(type2Pubmed);
-        interaction.setMethodToPubmed(method2Pubmed);
 
         return interaction;
     }
 
-    public List<EncoreInteraction> createEncoreInteractions(){
-        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
+    public List<EncoreInteractionForScoring> createEncoreInteractions(){
+        List<EncoreInteractionForScoring> interactions = new ArrayList<EncoreInteractionForScoring>();
 
         interactions.add(createEncoreInteraction());
         interactions.add(createSecondEncoreInteraction());
@@ -558,8 +519,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interactions;
     }
 
-    public List<EncoreInteraction> createPositiveEncoreInteractions(){
-        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
+    public List<EncoreInteractionForScoring> createPositiveEncoreInteractions(){
+        List<EncoreInteractionForScoring> interactions = new ArrayList<EncoreInteractionForScoring>();
 
         interactions.add(createEncoreInteraction());
         interactions.add(createThirdEncoreInteraction());
@@ -567,8 +528,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interactions;
     }
 
-    public List<EncoreInteraction> createNegativeEncoreInteractions(){
-        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
+    public List<EncoreInteractionForScoring> createNegativeEncoreInteractions(){
+        List<EncoreInteractionForScoring> interactions = new ArrayList<EncoreInteractionForScoring>();
 
         interactions.add(createNegativeEncoreInteraction());
 
@@ -601,24 +562,24 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         context.getSpokeExpandedInteractions().add("EBI-xxxxxx8");
         context.getSpokeExpandedInteractions().add("EBI-xxxxxx11");
 
-        context.getInteractionToMethod_type().put("EBI-xxxxxx1", new MethodAndTypePair("MI:0676", "MI:0915"));
-        context.getInteractionToMethod_type().put("EBI-xxxxxx2", new MethodAndTypePair("MI:0398", "MI:0915"));
-        context.getInteractionToMethod_type().put("EBI-xxxxxx3", new MethodAndTypePair("MI:0398", "MI:0915"));
-        context.getInteractionToMethod_type().put("EBI-xxxxxx4", new MethodAndTypePair("MI:0398", "MI:0915"));
-        context.getInteractionToMethod_type().put("EBI-xxxxxx6", new MethodAndTypePair("MI:0398", "MI:0915"));
-        context.getInteractionToMethod_type().put("EBI-xxxxxx7", new MethodAndTypePair("MI:0019", "MI:0915"));
-        context.getInteractionToMethod_type().put("EBI-xxxxxx8", new MethodAndTypePair("MI:0006", "MI:0914"));
-        context.getInteractionToMethod_type().put("EBI-xxxxxx9", new MethodAndTypePair("MI:0019", "MI:0915"));
-        context.getInteractionToMethod_type().put("EBI-xxxxxx10", new MethodAndTypePair("MI:0019", "MI:0914"));
-        context.getInteractionToMethod_type().put("EBI-xxxxxx11", new MethodAndTypePair("MI:0019", "MI:0914"));
-        context.getInteractionToMethod_type().put("EBI-xxxxxx12", new MethodAndTypePair("MI:0403", "MI:0403"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx1", new MethodTypePair("MI:0676", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx2", new MethodTypePair("MI:0398", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx3", new MethodTypePair("MI:0398", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx4", new MethodTypePair("MI:0398", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx6", new MethodTypePair("MI:0398", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx7", new MethodTypePair("MI:0019", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx8", new MethodTypePair("MI:0006", "MI:0914"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx9", new MethodTypePair("MI:0019", "MI:0915"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx10", new MethodTypePair("MI:0019", "MI:0914"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx11", new MethodTypePair("MI:0019", "MI:0914"));
+        context.getInteractionToMethod_type().put("EBI-xxxxxx12", new MethodTypePair("MI:0403", "MI:0403"));
 
         return context;
     }
 
     public IntActInteractionClusterScore createClusterForExportBasedOnMiScore(){
 
-        List<EncoreInteraction> interactions = createEncoreInteractions();
+        List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
         interactions.add(createEncoreInteractionLowScore());
         interactions.add(createEncoreInteractionHighScoreSpokeExpanded());
         interactions.add(createEncoreInteractionHighScoreColocalization());
@@ -628,33 +589,33 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
     public IntActInteractionClusterScore createNegativeCluster(){
 
-        List<EncoreInteraction> interactions = createNegativeEncoreInteractions();
+        List<EncoreInteractionForScoring> interactions = createNegativeEncoreInteractions();
 
         return createCluster(interactions);
     }
 
     public IntActInteractionClusterScore createPositiveCluster(){
 
-        List<EncoreInteraction> interactions = createPositiveEncoreInteractions();
+        List<EncoreInteractionForScoring> interactions = createPositiveEncoreInteractions();
 
         return createCluster(interactions);
     }
 
     public IntActInteractionClusterScore createClusterForExportBasedOnDetectionMethod(){
 
-        List<EncoreInteraction> interactions = createEncoreInteractions();
+        List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
         interactions.add(createEncoreInteractionHighScoreSpokeExpanded());  // two hybrid pooling : export = conditional, 2 and doesn't pass
         interactions.add(createEncoreInteractionHighScoreColocalization()); // colocalization has an export no
 
         return createCluster(interactions);
     }
 
-    private IntActInteractionClusterScore createCluster(List<EncoreInteraction> interactions){
+    private IntActInteractionClusterScore createCluster(List<EncoreInteractionForScoring> interactions){
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
-        clusterScore.setInteractionMapping(new HashMap<Integer, EncoreInteraction>());
+        clusterScore.setInteractionMapping(new HashMap<Integer, EncoreInteractionForScoring>());
         clusterScore.setInteractorMapping(new HashMap<String, List<Integer>>());
 
-        for (EncoreInteraction interaction : interactions){
+        for (EncoreInteractionForScoring interaction : interactions){
             clusterScore.getInteractionMapping().put(interaction.getId(), interaction);
 
             String interactorA = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsA())[0];

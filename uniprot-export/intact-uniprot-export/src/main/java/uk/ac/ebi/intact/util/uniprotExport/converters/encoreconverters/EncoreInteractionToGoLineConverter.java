@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public interface EncoreInteractionToGoLineConverter {
      * @param firstInteractor : the first interactor of the interaction
      * @return a GOParameters with the information provided by the interaction
      */
-    public GOParameters convertInteractionIntoGOParameters(EncoreInteraction interaction, String firstInteractor);
+    public GOParameters convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor);
 
     /**
      *
@@ -30,6 +30,6 @@ public interface EncoreInteractionToGoLineConverter {
      * @return a clustered list of GOParameters with the information provided by all the interactions. Must merge feature chains with the master protein
      * and demerge the isoforms (one go parameter per master protein/feature chains and one go parameter for each isoforms)
      */
-    public List<GOParameters> convertInteractionsIntoGOParameters(List<EncoreInteraction> interactions, String parentAc);
+    public List<GOParameters> convertInteractionsIntoGOParameters(List<EncoreInteractionForScoring> interactions, String parentAc);
 
 }

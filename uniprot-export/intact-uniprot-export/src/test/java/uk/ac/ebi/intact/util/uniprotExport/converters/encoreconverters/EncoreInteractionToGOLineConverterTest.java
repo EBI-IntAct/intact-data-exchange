@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 
@@ -20,7 +20,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
     public void test_go_convert_ok(){
         DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
 
-        EncoreInteraction interaction = createEncoreInteraction();
+        EncoreInteractionForScoring interaction = createEncoreInteraction();
 
         GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1");
         Assert.assertNotNull(parameters);
@@ -34,7 +34,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
     public void test_go_convert_no_first_interactor(){
         DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
 
-        EncoreInteraction interaction = createEncoreInteraction();
+        EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getInteractorAccsA().clear();
 
         GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1");
@@ -45,7 +45,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
     public void test_go_convert_no_second_interactor(){
         DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
 
-        EncoreInteraction interaction = createEncoreInteraction();
+        EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getInteractorAccsB().clear();
 
         GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1");
@@ -57,7 +57,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
     public void test_go_convert_no_publications(){
         DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
 
-        EncoreInteraction interaction = createEncoreInteraction();
+        EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getPublicationIds().clear();
 
         GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1");
@@ -68,7 +68,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
     public void test_go_convert_one_publication_no_pubmed(){
         DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
 
-        EncoreInteraction interaction = createEncoreInteraction();
+        EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getPublicationIds().iterator().next().setDatabase("DOI");
 
         GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1");

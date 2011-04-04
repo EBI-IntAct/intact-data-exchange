@@ -3,7 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.exporters;
 import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
@@ -51,7 +51,7 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
             }
         }
         else {
-            for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
+            for (Map.Entry<Integer, EncoreInteractionForScoring> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
                 if (canExportEncoreInteraction(entry.getValue(), context)){
                     interactionsPossibleToExport.add(entry.getKey());
@@ -72,7 +72,7 @@ public abstract class AbstractInteractionExporter implements InteractionExporter
                 }
             }
             else {
-                for (Map.Entry<Integer, EncoreInteraction> entry : negativeCluster.getEncoreInteractionCluster().entrySet()){
+                for (Map.Entry<Integer, EncoreInteractionForScoring> entry : negativeCluster.getEncoreInteractionCluster().entrySet()){
 
                     if (canExportNegativeEncoreInteraction(entry.getValue(), context, positiveInteractions)){
                         negativeInteractionsPossibleToExport.add(entry.getKey());

@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.model.clone.IntactClonerException;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
@@ -56,7 +56,7 @@ public class IntactFilterTest extends UniprotExportBase{
 
         boolean isValid = true;
 
-        for (EncoreInteraction interaction : clusterScore.getEncoreInteractionCluster().values()){
+        for (EncoreInteractionForScoring interaction : clusterScore.getEncoreInteractionCluster().values()){
             Set<String> interactionAcs = interaction.getExperimentToPubmed().keySet();
 
             if (interactionAcs.contains(interaction2) || interactionAcs.contains(interaction4) || interactionAcs.contains(interaction5)){
@@ -65,7 +65,7 @@ public class IntactFilterTest extends UniprotExportBase{
             }
         }
 
-        for (EncoreInteraction interaction : negativeClusterScore.getEncoreInteractionCluster().values()){
+        for (EncoreInteractionForScoring interaction : negativeClusterScore.getEncoreInteractionCluster().values()){
             Set<String> interactionAcs = interaction.getExperimentToPubmed().keySet();
 
             if (!interactionAcs.contains(interaction5)){

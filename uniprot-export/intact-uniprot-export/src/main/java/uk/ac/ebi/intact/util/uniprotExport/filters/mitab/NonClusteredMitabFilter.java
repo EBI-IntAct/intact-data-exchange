@@ -6,6 +6,7 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.InteractionDetectionMethod;
 import psidev.psi.mi.tab.model.InteractionType;
 import psidev.psi.mi.xml.converter.ConverterException;
+import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
@@ -15,7 +16,6 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
-import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
@@ -150,7 +150,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
             }
 
             if (!interactionToProcess.isEmpty()){
-                clusterScore.setBinaryInteractionList(interactionToProcess);
+                clusterScore.setBinaryInteractionIterator(interactionToProcess.iterator());
                 clusterScore.runService();
             }
         }
@@ -187,7 +187,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
             List<InteractionType> interactionTypes = interaction.getInteractionTypes();
             String typeMi = interactionTypes.iterator().next().getIdentifier();
 
-            MethodAndTypePair entry = new MethodAndTypePair(detectionMI, typeMi);
+            MethodTypePair entry = new MethodTypePair(detectionMI, typeMi);
             context.getInteractionToMethod_type().put(intactAc, entry);
 
             interaction.getInteractorA().getAlternativeIdentifiers().clear();
@@ -278,7 +278,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
                 interactionToProcess.add(interaction);
             }
 
-            clusterScore.setBinaryInteractionList(interactionToProcess);
+            clusterScore.setBinaryInteractionIterator(interactionToProcess.iterator());
             clusterScore.runService();
         }
 

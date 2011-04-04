@@ -5,7 +5,7 @@ import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.Binary2Encore;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 
 import java.io.File;
@@ -41,15 +41,15 @@ public class BinaryClusterScore implements IntactCluster {
     }
 
     @Override
-    public Map<Integer, EncoreInteraction> getEncoreInteractionCluster() {
+    public Map<Integer, EncoreInteractionForScoring> getEncoreInteractionCluster() {
         Binary2Encore iConverter = new Binary2Encore();
 
-        Map<Integer, EncoreInteraction> encoreInteractionCluster = new HashMap<Integer, EncoreInteraction>();
+        Map<Integer, EncoreInteractionForScoring> encoreInteractionCluster = new HashMap<Integer, EncoreInteractionForScoring>();
 
         for(Integer mappingId:getBinaryInteractionCluster().keySet()){
             BinaryInteraction bI = getBinaryInteractionCluster().get(mappingId);
             if (bI != null){
-                EncoreInteraction eI = iConverter.getEncoreInteraction(bI);
+                EncoreInteractionForScoring eI = iConverter.getEncoreInteractionForScoring(bI);
                 encoreInteractionCluster.put(mappingId, eI);
             }
         }

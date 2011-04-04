@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
-import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
+import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 
 import java.util.*;
 
@@ -53,13 +53,13 @@ public class WriterUtils {
      * @param keySelection : the list of keys we want to invert
      * @return a map of type MethodAndTypePair -> List<String>
      */
-    public static Map<MethodAndTypePair, List<String>> invertMapFromKeySelection (Map<String, MethodAndTypePair> mapToInvert, Set<String> keySelection){
-        Map<MethodAndTypePair, List<String>> invertedMap = new HashMap<MethodAndTypePair, List<String>>();
+    public static Map<MethodTypePair, List<String>> invertMapFromKeySelection (Map<String, MethodTypePair> mapToInvert, Set<String> keySelection){
+        Map<MethodTypePair, List<String>> invertedMap = new HashMap<MethodTypePair, List<String>>();
 
         for (String selectedKey : keySelection){
 
             if (mapToInvert.containsKey(selectedKey)){
-                MethodAndTypePair value = mapToInvert.get(selectedKey);
+                MethodTypePair value = mapToInvert.get(selectedKey);
 
                 if (invertedMap.containsKey(value)){
                     List<String> values = invertedMap.get(value);

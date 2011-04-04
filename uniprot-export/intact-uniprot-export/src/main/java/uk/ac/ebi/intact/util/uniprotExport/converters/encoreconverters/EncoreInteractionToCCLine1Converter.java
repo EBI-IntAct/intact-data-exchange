@@ -1,9 +1,12 @@
 package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.apache.log4j.Logger;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.DefaultCCParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.DefaultSecondCCParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -26,13 +29,13 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
     }
 
     @Override
-    public CCParameters convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteraction> positiveInteractions, List<EncoreInteraction> negativeInteractions, MiClusterContext context, String firstInteractor) {
+    public CCParameters convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteractionForScoring> positiveInteractions, List<EncoreInteractionForScoring> negativeInteractions, MiClusterContext context, String firstInteractor) {
         logger.warn("The CCline format version 1 doesn't accept negative interactions so they will be ignored.");
         return convertInteractionsIntoCCLines(positiveInteractions, context, firstInteractor);
     }
 
     @Override
-    public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(List<EncoreInteraction> interactions, MiClusterContext context, String firstInteractor){
+    public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(List<EncoreInteractionForScoring> interactions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
         String geneName1 = null;
         String taxId1 = null;
@@ -41,7 +44,7 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
 
         if (!interactions.isEmpty()){
 
-            for (EncoreInteraction interaction : interactions){
+            for (EncoreInteractionForScoring interaction : interactions){
                 // get the uniprot acs of the first and second interactors
 
                 String uniprot1;

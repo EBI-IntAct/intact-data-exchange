@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.results.contexts;
 
-import uk.ac.ebi.intact.util.uniprotExport.results.MethodAndTypePair;
+import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +35,7 @@ public interface ExportContext {
      *
      * @return Map associating an Intact interaction AC to a couple {method, interaction type}
      */
-    public Map<String, MethodAndTypePair> getInteractionToMethod_type();
+    public Map<String, MethodTypePair> getInteractionToMethod_type();
 
     /**
      *

@@ -2,21 +2,18 @@ package uk.ac.ebi.intact.util.uniprotExport.results.clusters;
 
 import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.PsimiTabWriter;
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.Confidence;
-import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.enfin.mi.cluster.score.UnNormalizedInteractionClusterScore;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
+import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
+import uk.ac.ebi.enfin.mi.score.scores.UnNormalizedMIScore;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Extension of the InteractionClusterScore : use a different format to export the scores and added utility methods.
@@ -28,7 +25,7 @@ import java.util.Set;
  * @since <pre>16-Sep-2010</pre>
  */
 
-public class IntActInteractionClusterScore extends UnNormalizedInteractionClusterScore implements IntactCluster {
+public class IntActInteractionClusterScore extends InteractionClusterScore implements IntactCluster {
 
     private static final Logger logger = Logger.getLogger(IntActInteractionClusterScore.class);
     private String[] scoreList = null;
@@ -39,54 +36,33 @@ public class IntActInteractionClusterScore extends UnNormalizedInteractionCluste
     public IntActInteractionClusterScore(){
         super();
 
-        if (this.getInteractionMapping() == null){
-            this.setInteractionMapping(new HashMap<Integer, EncoreInteraction>());
-        }
-
-        if (this.getInteractorMapping() == null){
-            this.setInteractorMapping(new HashMap<String, List<Integer>> ());
-        }
-
-        if (this.getSynonymMapping() == null){
-            this.setSynonymMapping(new HashMap<String, String> ());
-        }
-
         setMappingIdDbNames("uniprotkb,intact");
         writer = new PsimiTabWriter();
 
         setDirectInteractionWeight_5();
         initializeMethodWeights();
         setPublicationWeight(0.0f);
+
+        this.miscore = new UnNormalizedMIScore();
     }
 
     @Override
-    public void runService() {
-        logger.debug("runService");
-        super.runService();
-    }
+    protected void processMethodAndType(EncoreInteractionForScoring encoreInteraction, EncoreInteractionForScoring mappingEncoreInteraction) {
+        Map<MethodTypePair, List<String>> existingMethodTypeToPubmed = mappingEncoreInteraction.getMethodTypePairListMap();
 
-    /**
-     * Set the weight of the publication
-     * @param weight
-     */
-    public void setPublicationWeight(float weight){
-        super.setPublicationWeight(weight);
-    }
+        for (Map.Entry<MethodTypePair, List<String>> entry : encoreInteraction.getMethodTypePairListMap().entrySet()){
+            if (existingMethodTypeToPubmed.containsKey(entry.getKey())){
+                List<String> existingPubmeds = existingMethodTypeToPubmed.get(entry.getKey());
+                List<String> newPubmeds = encoreInteraction.getMethodTypePairListMap().get(entry.getKey());
 
-    /**
-     * Set the weight of the method
-     * @param weight
-     */
-    public void setMethodWeight(float weight){
-        super.setMethodWeight(weight);
-    }
-
-    /**
-     * Set the weight of the interaction type
-     * @param weight
-     */
-    public void setTypeWeight(float weight){
-        super.setTypeWeight(weight);
+                for (String pub : newPubmeds){
+                    existingPubmeds.add(pub);
+                }
+            }
+            else{
+                existingMethodTypeToPubmed.put(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     /**
@@ -147,7 +123,7 @@ public class IntActInteractionClusterScore extends UnNormalizedInteractionCluste
             scoreListCSV = "";
             String delimiter = "\n";
             int i = 0;
-            for(EncoreInteraction eI:this.getInteractionMapping().values()){
+            for(EncoreInteractionForScoring eI:this.getInteractionMapping().values()){
                 List<Confidence> confidenceValues = eI.getConfidenceValues();
                 Double score = null;
                 for(Confidence confidenceValue:confidenceValues){
@@ -167,14 +143,6 @@ public class IntActInteractionClusterScore extends UnNormalizedInteractionCluste
             }
         }
         return scoreList;
-    }
-
-    /**
-     * Saves the score using a formatted String for each interaction
-     */
-    public void saveScores(){
-        fileName = "scores.txt";
-        saveScores(fileName);
     }
 
     @Override
@@ -220,7 +188,7 @@ public class IntActInteractionClusterScore extends UnNormalizedInteractionCluste
 
         /* Retrieve results */
 
-        Map<Integer, EncoreInteraction> interactionMapping = getInteractionMapping();
+        Map<Integer, EncoreInteractionForScoring> interactionMapping = getInteractionMapping();
         Encore2Binary iConverter = new Encore2Binary(getMappingIdDbNames());
         logger.info("Saving scores...");
 
@@ -230,7 +198,7 @@ public class IntActInteractionClusterScore extends UnNormalizedInteractionCluste
             FileWriter fstream = new FileWriter(fileName + ".txt");
 
             for(Integer mappingId:interactionIds){
-                EncoreInteraction eI = interactionMapping.get(mappingId);
+                EncoreInteractionForScoring eI = interactionMapping.get(mappingId);
 
                 // convert and write in mitab
                 if (eI != null){
@@ -266,7 +234,7 @@ public class IntActInteractionClusterScore extends UnNormalizedInteractionCluste
     }
 
     @Override
-    public Map<Integer, EncoreInteraction> getEncoreInteractionCluster() {
+    public Map<Integer, EncoreInteractionForScoring> getEncoreInteractionCluster() {
         return getInteractionMapping();
     }
 
@@ -277,7 +245,7 @@ public class IntActInteractionClusterScore extends UnNormalizedInteractionCluste
         Map<Integer, BinaryInteraction<Interactor>> binaryInteractionCluster = new HashMap<Integer, BinaryInteraction<Interactor>>();
 
         for(Integer mappingId:getInteractionMapping().keySet()){
-            EncoreInteraction eI = getInteractionMapping().get(mappingId);
+            EncoreInteractionForScoring eI = getInteractionMapping().get(mappingId);
             if (eI != null){
                 BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
                 binaryInteractionCluster.put(mappingId, bI);

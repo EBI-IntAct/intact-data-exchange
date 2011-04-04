@@ -3,7 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.exporters;
 import org.apache.commons.collections.CollectionUtils;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
@@ -26,7 +26,7 @@ public class ExporterUtils {
      * @param positiveInteractions : the clustered positive interactions with the list of exported positive interactions
      * @return true if the negative interaction is matching a positive interaction having the same pubmed id
      */
-    public static boolean isNegativeInteractionEligibleForUniprotExport(EncoreInteraction interaction, ExportedClusteredInteractions positiveInteractions){
+    public static boolean isNegativeInteractionEligibleForUniprotExport(EncoreInteractionForScoring interaction, ExportedClusteredInteractions positiveInteractions){
 
         // the negative interaction must be not null and the results of exported positive interactions must be non null
         if (interaction != null && positiveInteractions != null){
@@ -107,7 +107,7 @@ public class ExporterUtils {
                         // for each exported positive interaction
                         for (Integer positiveId : intersectionExported){
                             // the positive interaction
-                            EncoreInteraction positiveInteraction = cluster.getEncoreInteractionCluster().get(positiveId);
+                            EncoreInteractionForScoring positiveInteraction = cluster.getEncoreInteractionCluster().get(positiveId);
 
                             // the list of pubmed ids for the positive interaction
                             Set<String> pubmedIdsPositive = FilterUtils.extractPubmedIdsFrom(positiveInteraction.getPublicationIds());

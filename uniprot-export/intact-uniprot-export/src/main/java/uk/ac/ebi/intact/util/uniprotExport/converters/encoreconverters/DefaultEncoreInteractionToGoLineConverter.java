@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.apache.log4j.Logger;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
@@ -25,7 +25,7 @@ public class DefaultEncoreInteractionToGoLineConverter implements EncoreInteract
      * @param interaction
      * @return The converted GOParameters
      */
-    public GOParameters convertInteractionIntoGOParameters(EncoreInteraction interaction, String firstInteractor){
+    public GOParameters convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor){
         // extract the uniprot acs of the firts and second interactors
         String uniprot1;
         String uniprot2;
@@ -81,12 +81,12 @@ public class DefaultEncoreInteractionToGoLineConverter implements EncoreInteract
      * @param interactions : list of encore interactions involving the same interactors or feature chains of a same entry
      * @return The converted GOParameters
      */
-    public List<GOParameters> convertInteractionsIntoGOParameters(List<EncoreInteraction> interactions, String parentAc){
+    public List<GOParameters> convertInteractionsIntoGOParameters(List<EncoreInteractionForScoring> interactions, String parentAc){
         List<GOParameters> goParameters = new ArrayList<GOParameters>(interactions.size());
 
         Map<String, Set<String>> clusteredInteractionWithFeatureChains = new HashMap<String, Set<String>>();
 
-        for (EncoreInteraction interaction : interactions){
+        for (EncoreInteractionForScoring interaction : interactions){
             // extract the uniprot acs of the first and second interactors for the first interaction
             String uniprot1;
             String uniprot2;

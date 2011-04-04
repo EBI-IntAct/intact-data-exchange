@@ -3,7 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.exporters.rules;
 import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.AbstractInteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.ExporterUtils;
@@ -43,7 +43,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     }
 
     @Override
-    public boolean canExportEncoreInteraction(EncoreInteraction encore, ExportContext context) throws UniprotExportException {
+    public boolean canExportEncoreInteraction(EncoreInteractionForScoring encore, ExportContext context) throws UniprotExportException {
 
         double score = FilterUtils.getMiClusterScoreFor(encore);
 
@@ -125,7 +125,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     }
 
     @Override
-    public boolean canExportNegativeEncoreInteraction(EncoreInteraction encore, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException {
+    public boolean canExportNegativeEncoreInteraction(EncoreInteractionForScoring encore, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException {
         boolean isElgibleForExport = ExporterUtils.isNegativeInteractionEligibleForUniprotExport(encore, positiveInteractions);
 
         if (isElgibleForExport){
