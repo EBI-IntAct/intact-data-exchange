@@ -87,9 +87,45 @@ public class CreateMissingPublications {
             System.out.println( "Batch ["+currentIndex+","+ (maxResults) +"] contained " + experiments.size() + " experiment(s)." );
 
             for (Experiment exp : experiments) {
-                String pubmed = ExperimentUtils.getPubmedId(exp);
+                ExperimentXref primaryRef = null;
 
-                if (pubmed != null) {
+                ExperimentXref firstPubmed = null;
+                ExperimentXref lastDOI = null;
+                ExperimentXref other = null;
+                for (ExperimentXref xref : exp.getXrefs()) {
+                    String qualMi = null;
+
+                    if (xref.getCvXrefQualifier() != null) {
+                        qualMi = xref.getCvXrefQualifier().getIdentifier();
+                    }
+
+                    if (CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(qualMi)) {
+                        if (CvDatabase.PUBMED_MI_REF.equalsIgnoreCase(xref.getCvDatabase().getIdentifier())){
+                            firstPubmed = xref;
+                            break;
+                        }
+                        else if (CvDatabase.DOI_MI_REF.equalsIgnoreCase(xref.getCvDatabase().getIdentifier())){
+                            lastDOI = xref;
+                        }
+                        else{
+                            other = xref;
+                        }
+                    }
+                }
+
+                if (firstPubmed != null){
+                    primaryRef = firstPubmed;
+                }
+                else if (lastDOI != null){
+                    primaryRef = lastDOI;
+                }
+                else{
+                    primaryRef = other;
+                }
+
+                if (primaryRef != null) {
+                    String pubmed = primaryRef.getPrimaryId();
+
                     Publication publication = daoFactory.getPublicationDao().getByPubmedId(pubmed);
 
                     String oldLabel = null;
