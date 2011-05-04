@@ -55,8 +55,8 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         for ( CvExperimentalRole experimentalRole : intactObject.getExperimentalRoles() ) {
             ExperimentalRole expRole = ( ExperimentalRole )
                     PsiConverterUtils.toCvType( experimentalRole,
-                                                new ExperimentalRoleConverter( getInstitution() ),
-                                                this );
+                            new ExperimentalRoleConverter( getInstitution() ),
+                            this );
             participant.getExperimentalRoles().add( expRole );
         }
 
@@ -65,9 +65,9 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         }
 
         BiologicalRole bioRole = (BiologicalRole)
-                PsiConverterUtils.toCvType(intactObject.getCvBiologicalRole(), 
-                                           new BiologicalRoleConverter(getInstitution()),
-                                           this);
+                PsiConverterUtils.toCvType(intactObject.getCvBiologicalRole(),
+                        new BiologicalRoleConverter(getInstitution()),
+                        this);
         participant.setBiologicalRole(bioRole);
 
         psidev.psi.mi.xml.model.Interactor interactor = new InteractorConverter(getInstitution()).intactToPsi(intactObject.getInteractor());
@@ -124,6 +124,12 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         for (uk.ac.ebi.intact.model.ComponentParameter param : intactObject.getParameters()){
             psidev.psi.mi.xml.model.Parameter parameter = participantParameterConverter.intactToPsi(param);
             participant.getParameters().add(parameter);
+        }
+
+        Attribute attribute = new Attribute(CvTopic.COMMENT_MI_REF, CvTopic.COMMENT, "Stoichiometry: " + intactObject.getStoichiometry());
+
+        if (!participant.getAttributes().contains( attribute )) {
+            participant.getAttributes().add( attribute );
         }
 
         return participant;
