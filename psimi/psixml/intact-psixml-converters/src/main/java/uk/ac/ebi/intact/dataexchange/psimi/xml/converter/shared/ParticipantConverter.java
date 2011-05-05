@@ -126,10 +126,12 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             participant.getParameters().add(parameter);
         }
 
-        Attribute attribute = new Attribute(CvTopic.COMMENT_MI_REF, CvTopic.COMMENT, "Stoichiometry: " + intactObject.getStoichiometry());
+        if (intactObject.getStoichiometry() > 0.0f){
+            Attribute attribute = new Attribute(CvTopic.COMMENT_MI_REF, CvTopic.COMMENT, "Stoichiometry: " + intactObject.getStoichiometry());
 
-        if (!participant.getAttributes().contains( attribute )) {
-            participant.getAttributes().add( attribute );
+            if (!participant.getAttributes().contains( attribute )) {
+                participant.getAttributes().add( attribute );
+            }
         }
 
         return participant;
