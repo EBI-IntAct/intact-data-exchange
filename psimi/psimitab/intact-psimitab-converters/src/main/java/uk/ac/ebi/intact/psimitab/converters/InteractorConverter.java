@@ -88,8 +88,8 @@ public class InteractorConverter {
                 String db = null;
                 String mi = null;
                 if ( alias.getCvAliasType() != null ) {
-                    CvObjectXref idxref = CvObjectUtils.getPsiMiIdentityXref( alias.getCvAliasType() );
-                    mi = idxref.getPrimaryId();
+                    mi = alias.getCvAliasType().getIdentifier();
+
                     if ( uniprotKeys.contains( mi ) ) {
                         db = CvDatabase.UNIPROT;
                     } else {
@@ -101,6 +101,7 @@ public class InteractorConverter {
                         String text = alias.getCvAliasType().getShortLabel();
                         if ( mi.equals( GENE_NAME_MI_REF ) ) {
                             Alias tabAlias = new AliasImpl( db, id );
+                            tabAlias.setAliasType(GENE_NAME);
                             tabAliases.add( tabAlias );
                         } else {
                             if ( text != null ) {

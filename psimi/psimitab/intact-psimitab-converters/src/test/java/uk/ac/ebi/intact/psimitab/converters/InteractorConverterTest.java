@@ -1,25 +1,21 @@
 package uk.ac.ebi.intact.psimitab.converters;
 
-import static org.junit.Assert.assertNotNull;
-import org.junit.Test;
 import org.junit.Assert;
-import org.junit.Ignore;
-import psidev.psi.mi.tab.model.Interactor;
-import psidev.psi.mi.tab.model.BinaryInteraction;
+import org.junit.Test;
 import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.XrefUtils;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
-import uk.ac.ebi.intact.core.context.IntactContext;
 
-import java.util.List;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * InteractorConverter Tester.
@@ -82,6 +78,11 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         Assert.assertEquals(1,XrefUtils.getIdentityXrefs(interactorA).size());
         Assert.assertEquals(1,XrefUtils.getIdentityXrefs(interactorB).size());
 
+        InteractorAlias geneNameSynonymAlias = getMockBuilder().createAlias(interactorA, "lala-gene-name-synonym", CvAliasType.GENE_NAME_SYNONYM_MI_REF, CvAliasType.GENE_NAME_SYNONYM);
+
+        interactorA.addAlias(geneNameSynonymAlias);
+
+
         //Database to Mitab
         InteractionConverter interactionConverter = new InteractionConverter();
         IntactBinaryInteraction intactBi = interactionConverter.toBinaryInteraction( binaryInteraction );
@@ -97,9 +98,9 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         List<CrossReference> propertiesB = intactBi.getInteractorB().getProperties();
         Assert.assertEquals(2,propertiesB.size());
 
-        /*final IntactDocumentDefinition docDef = new IntactDocumentDefinition();
+        final IntactDocumentDefinition docDef = new IntactDocumentDefinition();
         final String line = docDef.interactionToString(intactBi);
-        System.out.println(line);*/
+        System.out.println(line);
     }
 
     private boolean checkIfPropertiesHasIdentity(Collection<CrossReference> crossReferences) {
