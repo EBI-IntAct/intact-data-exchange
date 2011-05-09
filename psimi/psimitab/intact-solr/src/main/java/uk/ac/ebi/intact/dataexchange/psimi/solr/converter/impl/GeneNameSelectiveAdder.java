@@ -32,16 +32,16 @@ import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 public class GeneNameSelectiveAdder implements RowDataSelectiveAdder {
 
     public void addToDoc(SolrInputDocument doc, Row row) {
-        Column colAltidA = row.getColumnByIndex(IntactDocumentDefinition.ALTID_INTERACTOR_A);
-        Column colAltidB = row.getColumnByIndex(IntactDocumentDefinition.ALTID_INTERACTOR_B);
+        Column aliasA = row.getColumnByIndex(IntactDocumentDefinition.ALIAS_INTERACTOR_A);
+        Column aliasB = row.getColumnByIndex(IntactDocumentDefinition.ALIAS_INTERACTOR_B);
 
-        addGeneNames(doc, colAltidA);
-        addGeneNames(doc, colAltidB);
+        addGeneNames(doc, aliasA);
+        addGeneNames(doc, aliasB);
     }
 
     private void addGeneNames(SolrInputDocument doc, Column column) {
         for (Field field : column.getFields()) {
-            if ("uniprotkb".equals(field.getType()) && "gene name synonym".equals(field.getDescription())) {
+            if ("gene name".equals(field.getDescription())) {
                 doc.addField(FieldNames.GENE_NAME, field.getValue());
             }
         }

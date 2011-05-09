@@ -115,7 +115,7 @@ public class SolrDocumentConverterTest {
      @Test
     public void geneName() throws Exception {
         String psiMiTabLine = "intact:EBI-12345\tintact:EBI-54321|uniprotkb:P12345\tuniprotkb:Nefh(gene name synonym)\tuniprotkb:Dst(gene name synonym)" +
-                              "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
+                              "\tintact:Nfh(gene name)\tintact:Bpag1(gene name)\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
                               "\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)" +
                               "\tintact:EBI-446356|irefindex:arigidblabla(" + FieldNames.RIGID + ")\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
                               "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tgo:\"GO:0030246\"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
@@ -125,8 +125,8 @@ public class SolrDocumentConverterTest {
 
         final SolrInputField field = doc.getField("geneName");
         Assert.assertEquals(2, field.getValueCount());
-        Assert.assertTrue(field.getValues().contains("Nefh"));
-        Assert.assertTrue(field.getValues().contains("Dst"));
+        Assert.assertTrue(field.getValues().contains("Nfh"));
+        Assert.assertTrue(field.getValues().contains("Bpag1"));
 
     }
 }
