@@ -91,6 +91,8 @@ public class InteractionExpansionCompositeProcessor implements ItemProcessor<Int
 
         InteractionConverter interactionConverter = new InteractionConverter();
 
+        log.info("Processing interaction : " + item.getAc());
+
         for (Interaction interaction : interactions) {
 
             IntactBinaryInteraction binaryInteraction = interactionConverter.toBinaryInteraction(interaction);
