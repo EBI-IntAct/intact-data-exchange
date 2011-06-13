@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Xref;
+import uk.ac.ebi.intact.core.persister.IntactCore;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.AnnotationConverterConfig;
@@ -86,7 +87,7 @@ public class PsiConverterUtils {
         if ( !ConverterContext.getInstance().getInteractorConfig().isExcludeInteractorAliases() ) {
             AliasConverter aliasConverter = new AliasConverter( annotatedObject.getOwner(),
                                                                 AnnotatedObjectUtils.getAliasClassType( annotatedObject.getClass() ) );
-            for ( Alias alias : annotatedObject.getAliases() ) {
+            for ( Alias alias : IntactCore.ensureInitializedAliases(annotatedObject)) {
                 names.getAliases().add( aliasConverter.intactToPsi( alias ) );
             }
         }
@@ -102,7 +103,7 @@ public class PsiConverterUtils {
         DbReference acRef = null;
 
         if (ac != null)  {
-            for ( uk.ac.ebi.intact.model.Xref xref : (Collection<uk.ac.ebi.intact.model.Xref>) annotatedObject.getXrefs()) {
+            for ( uk.ac.ebi.intact.model.Xref xref : IntactCore.ensureInitializedXrefs(annotatedObject)) {
                 if (annotatedObject.getAc().equals(xref.getPrimaryId())) {
                     containsAcXref = true;
                     break;
@@ -147,7 +148,7 @@ public class PsiConverterUtils {
             xref = new Xref();
         }
 
-        Collection<DbReference> dbRefs = toDbReferences( annotatedObject, annotatedObject.getXrefs() );
+        Collection<DbReference> dbRefs = toDbReferences( annotatedObject, IntactCore.ensureInitializedXrefs(annotatedObject));
 
         if(acRef != null) {
             dbRefs.add( acRef );
@@ -230,8 +231,8 @@ public class PsiConverterUtils {
 
         AnnotationConverterConfig configAnnotation = ConverterContext.getInstance().getAnnotationConfig();
         
-        for ( Annotation annotation : annotatedObject.getAnnotations() ) {
-        	if (false == configAnnotation.isExcluded(annotation.getCvTopic())) {
+        for ( Annotation annotation : IntactCore.ensureInitializedAnnotations(annotatedObject) ) {
+        	if (!configAnnotation.isExcluded(annotation.getCvTopic())) {
         		Attribute attribute = annotationConverter.intactToPsi( annotation );
                 if (!attributeContainer.getAttributes().contains( attribute )) {
                     attributeContainer.getAttributes().add( attribute );

@@ -88,10 +88,8 @@ public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<
         if (cvAliasType != null) {
             String aliasType = cvAliasType.getShortLabel();
 
-            final CvObjectXref xref = CvObjectUtils.getPsiMiIdentityXref( cvAliasType );
-            if( xref != null ) {
-                String aliasTypeAc = xref.getPrimaryId();
-                psiAlias.setTypeAc(aliasTypeAc);
+            if (cvAliasType.getIdentifier() != null) {
+                psiAlias.setTypeAc(cvAliasType.getIdentifier());
             }
 
             psiAlias.setType(aliasType);

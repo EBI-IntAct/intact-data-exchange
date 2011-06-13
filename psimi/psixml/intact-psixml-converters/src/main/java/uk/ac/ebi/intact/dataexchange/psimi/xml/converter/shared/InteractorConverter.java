@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.InteractorType;
 import psidev.psi.mi.xml.model.Organism;
+import uk.ac.ebi.intact.core.persister.IntactCore;
 import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
@@ -117,7 +118,7 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
 
         if ( !ConverterContext.getInstance().getInteractorConfig().isExcludePolymerSequence() ) {
             if ( intactObject instanceof Polymer ) {
-                String sequence = ( ( Polymer ) intactObject ).getSequence();
+                String sequence = IntactCore.ensureInitializedSequence((Polymer) intactObject);
                 interactor.setSequence( sequence );
             }
         }

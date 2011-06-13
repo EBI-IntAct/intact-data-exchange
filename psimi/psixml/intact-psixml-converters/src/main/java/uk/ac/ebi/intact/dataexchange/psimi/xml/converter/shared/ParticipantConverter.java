@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
+import uk.ac.ebi.intact.core.persister.IntactCore;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
@@ -25,6 +26,8 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Feature;
 import uk.ac.ebi.intact.model.Interaction;
+
+import java.util.Collection;
 
 /**
  * Participant converter.
@@ -52,7 +55,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         PsiConverterUtils.populate(intactObject, participant, this );
         participant.getNames().setShortLabel(intactObject.getInteractor().getShortLabel());
 
-        for ( CvExperimentalRole experimentalRole : intactObject.getExperimentalRoles() ) {
+        for ( CvExperimentalRole experimentalRole : IntactCore.ensureInitializedExperimentalRoles(intactObject)) {
             ExperimentalRole expRole = ( ExperimentalRole )
                     PsiConverterUtils.toCvType( experimentalRole,
                             new ExperimentalRoleConverter( getInstitution() ),
@@ -77,14 +80,14 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             participant.setInteractorRef(new InteractorRef(interactor.getId()));
         }
 
-        for (CvIdentification participantDetectionMethod : intactObject.getParticipantDetectionMethods()) {
+        for (CvIdentification participantDetectionMethod : IntactCore.ensureInitializedParticipantIdentificationMethods(intactObject)) {
             ParticipantIdentificationMethodConverter pimConverter = new ParticipantIdentificationMethodConverter(getInstitution());
             ParticipantIdentificationMethod participantIdentificationMethod = pimConverter.intactToPsi(participantDetectionMethod);
 
             participant.getParticipantIdentificationMethods().add(participantIdentificationMethod);
         }
 
-        for (CvExperimentalPreparation experimentalPreparation : intactObject.getExperimentalPreparations()) {
+        for (CvExperimentalPreparation experimentalPreparation : IntactCore.ensureInitializedExperimentalPreparations(intactObject)) {
             CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation> epConverter =
                     new CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation>(getInstitution(), CvExperimentalPreparation.class, ExperimentalPreparation.class);
             ExperimentalPreparation expPrep = epConverter.intactToPsi(experimentalPreparation);
@@ -92,10 +95,12 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             participant.getExperimentalPreparations().add(expPrep);
         }
 
-        if (!intactObject.getBindingDomains().isEmpty()) {
+        Collection<Feature> features = IntactCore.ensureInitializedFeatures(intactObject);
+
+        if (!features.isEmpty()) {
             FeatureConverter featureConverter = new FeatureConverter(getInstitution());
 
-            for (Feature feature : intactObject.getBindingDomains()) {
+            for (Feature feature : features) {
                 participant.getFeatures().add(featureConverter.intactToPsi(feature));
             }
         }
@@ -115,13 +120,13 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         }
 
         ParticipantConfidenceConverter confidenceConverter = new ParticipantConfidenceConverter( getInstitution());
-        for (ComponentConfidence conf : intactObject.getConfidences()){
+        for (ComponentConfidence conf : IntactCore.ensureInitializedComponentConfidences(intactObject)){
             psidev.psi.mi.xml.model.Confidence confidence = confidenceConverter.intactToPsi( conf);
             participant.getConfidenceList().add( confidence);
         }
 
         ParticipantParameterConverter participantParameterConverter = new ParticipantParameterConverter( getInstitution());
-        for (uk.ac.ebi.intact.model.ComponentParameter param : intactObject.getParameters()){
+        for (uk.ac.ebi.intact.model.ComponentParameter param : IntactCore.ensureInitializedComponentParameters(intactObject)){
             psidev.psi.mi.xml.model.Parameter parameter = participantParameterConverter.intactToPsi(param);
             participant.getParameters().add(parameter);
         }

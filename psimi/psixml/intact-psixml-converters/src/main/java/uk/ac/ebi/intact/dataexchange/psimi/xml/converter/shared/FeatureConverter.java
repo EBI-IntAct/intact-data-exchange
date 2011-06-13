@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.FeatureDetectionMethod;
 import psidev.psi.mi.xml.model.FeatureType;
+import uk.ac.ebi.intact.core.persister.IntactCore;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -85,7 +86,7 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
 
         RangeConverter rangeConverter = new RangeConverter(getInstitution());
 
-        for (Range intactRange : intactObject.getRanges()) {
+        for (Range intactRange : IntactCore.ensureInitializedRanges(intactObject)) {
             psidev.psi.mi.xml.model.Range psiRange = rangeConverter.intactToPsi(intactRange);
             psiFeature.getRanges().add(psiRange);
         }
