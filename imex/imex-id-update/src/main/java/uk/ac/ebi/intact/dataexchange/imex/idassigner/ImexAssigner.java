@@ -26,6 +26,7 @@ import org.springframework.transaction.TransactionStatus;
 import uk.ac.ebi.intact.bridges.imexcentral.*;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.LoggingImexUpdateListener;
@@ -292,6 +293,7 @@ public class ImexAssigner {
 
         final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        final CorePersister persister = IntactContext.getCurrentInstance().getCorePersister();
 
         // TODO browse publication by smaller chunk to minimize memory usage.
         List<Publication> publications = daoFactory.getPublicationDao().getAll();
@@ -300,10 +302,6 @@ public class ImexAssigner {
         for ( Publication publication : publications ) {
 
             System.out.println( "About to process publication: " + publication.getShortLabel()+"..." );
-
-            if( ! publication.getShortLabel().equals( "21245844" ) ) {
-                continue;
-            }
 
             fireOnProcessPublication( new ImexUpdateEvent( this, publication ) );
 
@@ -505,7 +503,7 @@ public class ImexAssigner {
                         // Add imex-primary to the exp
                         ExperimentXref expXref = new ExperimentXref( publication.getOwner(), imex, imexId, imexPrimary );
                         experiment.addXref( expXref );
-                        if ( !dryRun ) daoFactory.getXrefDao().persist( expXref );
+//                        if ( !dryRun ) daoFactory.getXrefDao().persist( expXref );
 
                         System.out.println( "\tAdded missing Experiment's IMEx primary: " + imexId );
                     }
@@ -524,6 +522,7 @@ public class ImexAssigner {
 
                             if ( AnnotatedObjectUtils.searchXrefs( interaction, imexSource ).isEmpty() ) {
                                 // Add xref imex-source pointing to intact in each interaction
+
                                 final InteractorXref sourceXref = new InteractorXref( interaction.getOwner(), psimi, intact.getIdentifier(), imexSource );
                                 interaction.addXref( sourceXref );
 
@@ -571,6 +570,8 @@ public class ImexAssigner {
                                 }
                             }
                         } // is PPI
+
+//                        persister.saveOrUpdate( interaction );
 
                     } // interactions
 
@@ -807,7 +808,10 @@ public class ImexAssigner {
         final InteractorXref sourceXref = new InteractorXref( interaction.getOwner(), imex, newImexId, imexSecondary );
         interaction.addXref( sourceXref );
 
-        if ( !dryRun ) daoFactory.getXrefDao().persist( sourceXref );
+        if ( !dryRun ) {
+            daoFactory.getXrefDao().persist( sourceXref );
+            daoFactory.getInteractionDao().update( (InteractionImpl) interaction );
+        }
 
         fireOnNewImexIdAssignedToInteraction(
                 new ImexUpdateEvent( this,

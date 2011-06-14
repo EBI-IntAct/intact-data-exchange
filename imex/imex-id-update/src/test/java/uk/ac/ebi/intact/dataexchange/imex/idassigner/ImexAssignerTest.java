@@ -5,6 +5,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.bridges.imexcentral.mock.MockImexCentralClient;
 import uk.ac.ebi.intact.core.config.CvPrimer;
 import uk.ac.ebi.intact.core.context.IntactContext;
@@ -32,6 +34,7 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         CvPrimer cvPrimer = new ImexCvPrimer( getDaoFactory() );
         cvPrimer.createCVs();
     }
+
 
     @Test
     public void update() throws Exception {
@@ -61,9 +64,15 @@ public class ImexAssignerTest extends IntactBasicTestCase {
 
         // check in the database
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
-        Assert.assertEquals( experiment.getShortLabel(), daoFactory.getExperimentDao().getByXref( "IM-1" ).getShortLabel() );
-        Assert.assertEquals( "123456789", daoFactory.getPublicationDao().getByXref( "IM-1" ).getShortLabel() );
-        Assert.assertEquals( 2, daoFactory.getInteractionDao().getByXrefLike( "IM-1-%" ).size() );
+        final Experiment reloadedExperiment = daoFactory.getExperimentDao().getByXref( "IM-1" );
+        Assert.assertNotNull( reloadedExperiment );
+        Assert.assertEquals( experiment.getShortLabel(), reloadedExperiment.getShortLabel() );
+        final Publication reloadedPublication = daoFactory.getPublicationDao().getByXref( "IM-1" );
+        Assert.assertNotNull( reloadedPublication );
+        Assert.assertEquals( "123456789", reloadedPublication.getShortLabel() );
+        Assert.assertEquals( 2, daoFactory.getInteractionDao().getAll().size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-1" ).size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-2" ).size() );
 
         // check log files
         Assert.assertEquals( 1, countLines( "target/123456789/processed.csv" ) );
@@ -102,7 +111,11 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
         Assert.assertEquals( experiment.getShortLabel(), daoFactory.getExperimentDao().getByXref( "IM-1" ).getShortLabel() );
         Assert.assertEquals( "123456789", daoFactory.getPublicationDao().getByXref( "IM-1" ).getShortLabel() );
-        Assert.assertEquals( 4, daoFactory.getInteractionDao().getByXrefLike( "IM-1-%" ).size() );
+        Assert.assertEquals( 4, daoFactory.getInteractionDao().getAll().size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-1" ).size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-2" ).size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-3" ).size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-4" ).size() );
 
         // check log files
         Assert.assertEquals( 1, countLines( "target/123456789_2/processed.csv" ) );
@@ -146,7 +159,10 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
         Assert.assertEquals( experiment.getShortLabel(), daoFactory.getExperimentDao().getByXref( "IM-1" ).getShortLabel() );
         Assert.assertEquals( "123456789", daoFactory.getPublicationDao().getByXref( "IM-1" ).getShortLabel() );
-        Assert.assertEquals( 3, daoFactory.getInteractionDao().getByXrefLike( "IM-1-%" ).size() );
+        Assert.assertEquals( 3, daoFactory.getInteractionDao().getAll().size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-1" ).size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-2" ).size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-3" ).size() );
 
         // check log files
         Assert.assertEquals( 1, countLines( "target/123456789_3/processed.csv" ) );
@@ -189,7 +205,9 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
         Assert.assertEquals( experiment.getShortLabel(), daoFactory.getExperimentDao().getByXref( "IM-1" ).getShortLabel() );
         Assert.assertEquals( "123456789", daoFactory.getPublicationDao().getByXref( "IM-1" ).getShortLabel() );
-        Assert.assertEquals( 2, daoFactory.getInteractionDao().getByXrefLike( "IM-1-%" ).size() );
+        Assert.assertEquals( 2, daoFactory.getInteractionDao().getAll().size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-1" ).size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-2" ).size() );
 
         // check log files
         Assert.assertEquals( 1, countLines( "target/123456789_4/processed.csv" ) );
@@ -237,7 +255,9 @@ public class ImexAssignerTest extends IntactBasicTestCase {
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
         Assert.assertEquals( experiment.getShortLabel(), daoFactory.getExperimentDao().getByXref( "IM-1" ).getShortLabel() );
         Assert.assertEquals( "123456789", daoFactory.getPublicationDao().getByXref( "IM-1" ).getShortLabel() );
-        Assert.assertEquals( 2, daoFactory.getInteractionDao().getByXrefLike( "IM-1-%" ).size() );
+        Assert.assertEquals( 2, daoFactory.getInteractionDao().getAll().size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-1" ).size() );
+        Assert.assertEquals( 1, daoFactory.getInteractionDao().getByXrefLike( "IM-1-2" ).size() );
 
         // check log files
         Assert.assertEquals( 1, countLines( "target/123456789_5/processed.csv" ) );
