@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.dataexchange.imex;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Publication;
 import uk.ac.ebi.intact.model.Experiment;
@@ -21,6 +22,7 @@ public class ImexExporterTest extends IntactBasicTestCase {
     private ImexExporter exporter;
 
     @Test
+    @DirtiesContext
     public void exportPublication() throws Exception {
         final String pmid = "12345678";
         final Publication publication = getMockBuilder().createPublication( pmid );
@@ -40,6 +42,7 @@ public class ImexExporterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void exportPublications() {
 
     }
