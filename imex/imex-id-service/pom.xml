@@ -74,21 +74,4 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-              <id>intact.nexus</id>
-              <name>IntAct Nexus</name>
-              <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <site>
-            <id>intact-site</id>
-            <name>Intact site</name>
-            <url>${site.remote.basedir}/intact-imex-id-assigner</url>
-
-        </site>
-    </distributionManagement>
-
 </project>
