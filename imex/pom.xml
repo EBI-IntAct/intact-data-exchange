@@ -17,27 +17,24 @@
     <name>IntAct Data Exchange :: IMEx</name>
 
     <modules>
-<!--        
         <module>imex-exchange</module>
         <module>imex-id-service</module>
--->
         <module>imex-id-update</module>
     </modules>
 
     <repositories>
         <repository>
-              <id>intact.nexus</id>
-              <name>IntAct Nexus</name>
-              <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
+            <id>intact.nexus</id>
+            <name>IntAct Nexus</name>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
         </repository>
     </repositories>
 
-    <distributionManagement>
-        <site>
-            <id>intact-site</id>
-            <name>Intact site</name>
-            <url>${site.remote.basedir}/dataexchange</url>
-        </site>
-    </distributionManagement>
-
+    <pluginRepositories>
+      <pluginRepository>
+            <id>intact.nexus</id>
+            <name>IntAct Nexus</name>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
+       </pluginRepository>
+   </pluginRepositories>
 </project>
