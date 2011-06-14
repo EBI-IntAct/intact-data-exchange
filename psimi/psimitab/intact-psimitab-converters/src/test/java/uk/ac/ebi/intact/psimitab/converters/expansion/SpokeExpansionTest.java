@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * SpokeExpansion Tester.
@@ -22,6 +24,7 @@ import java.util.List;
 public class SpokeExpansionTest extends IntactBasicTestCase {
 
     @Test
+    @DirtiesContext
     public void expandTest_1() throws Exception{
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
@@ -49,6 +52,7 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void expandTest_2() throws Exception{
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
@@ -62,6 +66,7 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
     }
 
     @Test (expected = NotExpandableInteractionException.class)
+    @DirtiesContext
     public void expandTest_3() throws Exception{
 
         // relies on the fact that the created component have role: neutral
@@ -72,6 +77,7 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void expandTest_4() throws Exception{
 
         Component selfComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
@@ -99,6 +105,7 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
 
 
     @Test
+    @DirtiesContext
     public void getNameTest() throws Exception {
         SpokeExpansion spokeExpansion = new SpokeExpansion();
         assertEquals( "Spoke", spokeExpansion.getName() );

@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
@@ -9,6 +9,8 @@ import uk.ac.ebi.intact.model.Interaction;
 
 import java.util.Collection;
 import java.util.Iterator;
+
+import static org.junit.Assert.*;
 
 /**
  * SpokeWithoutBaitExpansion Tester.
@@ -21,6 +23,7 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
 
 
     @Test
+    @DirtiesContext
     public void expandTest_1() throws Exception{
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
@@ -48,6 +51,7 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void expandTest_2() throws Exception{
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
@@ -61,6 +65,7 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void expandTest_3() throws Exception {
 
         // relies on the fact that the created component have role: neutral
@@ -72,6 +77,7 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void expandTest_4() throws Exception{
 
         // generate a interaction with only one Component
@@ -89,6 +95,7 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void getNameTest() throws Exception {
         SpokeWithoutBaitExpansion spokeWithoutBaitExpansion = new SpokeWithoutBaitExpansion();
         assertEquals( "Spoke", spokeWithoutBaitExpansion.getName() );

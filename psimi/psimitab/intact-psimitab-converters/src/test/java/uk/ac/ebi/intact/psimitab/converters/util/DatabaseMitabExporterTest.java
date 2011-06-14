@@ -18,32 +18,27 @@ package uk.ac.ebi.intact.psimitab.converters.util;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.store.FSDirectory;
 import org.junit.*;
 import org.obo.dataadapter.OBOParseException;
-import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
+import org.springframework.test.annotation.DirtiesContext;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexWriter;
-import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
-import uk.ac.ebi.intact.bridges.ontologies.iterator.OntologyIterator;
+import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.OboOntologyIterator;
+import uk.ac.ebi.intact.bridges.ontologies.iterator.OntologyIterator;
 import uk.ac.ebi.intact.bridges.ontologies.util.OntologyUtils;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.psimitab.search.IntactSearchEngine;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
+import uk.ac.ebi.intact.psimitab.search.IntactSearchEngine;
 
-import java.io.StringWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
-
-import psidev.psi.mi.search.SearchResult;
+import java.util.List;
 
 /**
  * DatabaseMitabExporter Tester.
@@ -102,6 +97,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void exportAll() throws Exception {
         Interaction interaction = getMockBuilder().createInteraction("a1", "a2", "a3");
 
@@ -136,6 +132,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void exportCvExpansion() throws Exception {
         // then build a single binary interaction with 2 interactor having 1 distinct GO term (! overlapping parents)
         final CvDatabase go = getMockBuilder().createCvObject( CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO );
@@ -195,6 +192,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void checkInteractionMerge() throws Exception {
 
         final Protein p1 = getMockBuilder().createProtein( "P12345", "foo" );
@@ -267,6 +265,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void checkNaryInteractionMerge() throws Exception {
 
         final Protein p1 = getMockBuilder().createProtein( "P12345", "foo" );
@@ -353,7 +352,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
     private void updateInteractorRole( Interaction i, Protein p, CvExperimentalRole role ) {
         for ( Component component : i.getComponents() ) {
             if( component.getInteractor().equals(p) ) {
-                component.setExperimentalRoles( Arrays.asList( role ) );
+                component.setExperimentalRoles( new ArrayList(Arrays.asList( role )) );
             }
         }
     }
@@ -383,6 +382,7 @@ public class DatabaseMitabExporterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void exportAll_noInteractorIndex() throws Exception {
         Interaction interaction = getMockBuilder().createInteraction("a1", "a2", "a3");
 

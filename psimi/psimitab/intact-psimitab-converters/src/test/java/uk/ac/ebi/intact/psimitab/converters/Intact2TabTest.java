@@ -1,8 +1,7 @@
 package uk.ac.ebi.intact.psimitab.converters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
@@ -14,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * Intact2Tab Tester.
  *
@@ -24,6 +26,7 @@ import java.util.Iterator;
 public class Intact2TabTest extends IntactBasicTestCase {
 
     @Test
+    @DirtiesContext
     public void convertIntact2TabTest_BinaryInteractionImpl() throws Exception {
 
         Intact2BinaryInteractionConverter i2t = new Intact2BinaryInteractionConverter();
@@ -50,6 +53,7 @@ public class Intact2TabTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void convertIntact2TabTest_IntactBinaryInteraction() throws Exception {
 
         Intact2BinaryInteractionConverter i2t = new Intact2BinaryInteractionConverter();
@@ -75,6 +79,7 @@ public class Intact2TabTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void convertIntact2TabTest_PostProcessorStrategy() throws Exception {
 
         Intact2BinaryInteractionConverter i2t = new Intact2BinaryInteractionConverter();

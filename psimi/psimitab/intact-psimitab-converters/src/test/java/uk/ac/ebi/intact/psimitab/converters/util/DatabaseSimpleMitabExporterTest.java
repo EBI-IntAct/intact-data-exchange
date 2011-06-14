@@ -19,10 +19,11 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.core.util.SchemaUtils;
 import uk.ac.ebi.intact.model.*;
 
 import java.io.StringWriter;
@@ -50,7 +51,10 @@ public class DatabaseSimpleMitabExporterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void exportInteractions() throws Exception {
+        TransactionStatus status1 = getDataContext().beginTransaction();
 
         // this interaction is going to generate 2 binary i1 via the spoke expansion
         Interaction i1 = getMockBuilder().createInteraction("a1", "a2", "a3");
@@ -70,11 +74,16 @@ public class DatabaseSimpleMitabExporterTest extends IntactBasicTestCase {
         Assert.assertEquals(3, getDaoFactory().getInteractionDao().countAll());
         Assert.assertEquals(4, getDaoFactory().getInteractorDao( ProteinImpl.class ).countAll());
 
+        getDataContext().commitTransaction(status1);
+
         StringWriter mitabWriter = new StringWriter();
 
-        exporter.exportAllInteractions(mitabWriter);
+        TransactionStatus status = getDataContext().beginTransaction();
 
+        exporter.exportAllInteractions(mitabWriter);
         mitabWriter.close();
+
+        getDataContext().commitTransaction(status);
 
         final String mitab = mitabWriter.toString();
         final String[] lines = mitab.split( "\n" );
@@ -88,6 +97,7 @@ public class DatabaseSimpleMitabExporterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void exportInteractionsWithSameRoles() throws Exception {
 
         Assert.assertEquals( 0, getDaoFactory().getInteractorDao( InteractorImpl.class ).countAll() );

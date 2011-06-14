@@ -1,13 +1,15 @@
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Interaction;
 
 import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * MatrixExpansion Tester.
@@ -19,6 +21,7 @@ import java.util.Collection;
 public class MatrixExpansionTest extends IntactBasicTestCase {
 
     @Test
+    @DirtiesContext
     public void expandTest_1() {
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
@@ -38,6 +41,7 @@ public class MatrixExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void expandTest_2() {
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
@@ -51,6 +55,7 @@ public class MatrixExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void expandTest_3() {
         
         // relies on the fact that the created component have role: neutral
@@ -63,6 +68,7 @@ public class MatrixExpansionTest extends IntactBasicTestCase {
 
 
     @Test
+    @DirtiesContext
     public void getNameTest() throws Exception {
         MatrixExpansion matrixExpansion = new MatrixExpansion();
         assertEquals( "Matrix", matrixExpansion.getName() );

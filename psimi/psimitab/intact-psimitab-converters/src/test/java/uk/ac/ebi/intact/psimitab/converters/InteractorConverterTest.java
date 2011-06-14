@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.psimitab.converters;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
@@ -28,6 +29,7 @@ public class InteractorConverterTest extends IntactBasicTestCase {
 
 
     @Test
+    @DirtiesContext
     public void toMitabTest() {
         InteractorConverter converter = new InteractorConverter();
 
@@ -41,6 +43,7 @@ public class InteractorConverterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void toMitabWithAllPropertiesTest(){
 
         Interaction binaryInteraction = getMockBuilder().createInteractionRandomBinary();
@@ -124,6 +127,7 @@ public class InteractorConverterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void intactIdentity_1() throws Exception {
         final Interaction bi = getMockBuilder().createInteractionRandomBinary();
         final Protein protein = getMockBuilder().createProtein( "P12345", "ABC_HUMAN" );
@@ -147,6 +151,7 @@ public class InteractorConverterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void intactIdentity_2() throws Exception {
         final Interaction bi = getMockBuilder().createInteractionRandomBinary();
         final Protein protein = getMockBuilder().createProtein( "P12345", "ABC_HUMAN" );
@@ -173,6 +178,7 @@ public class InteractorConverterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @DirtiesContext
     public void addShortLabelToAlternativeId() {
 
         final uk.ac.ebi.intact.model.Interactor interactorA_dna = getMockBuilder().createNucleicAcidRandom();
