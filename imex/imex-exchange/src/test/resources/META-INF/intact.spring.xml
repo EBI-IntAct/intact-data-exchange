@@ -9,7 +9,7 @@
            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
 
     <bean class="uk.ac.ebi.intact.core.context.IntactInitializer" init-method="init">
-        <property name="autoPersist" value="false"/>
+        <property name="autoPersist" value="true"/>
     </bean>
 
     <bean name="intactConfig" class="uk.ac.ebi.intact.core.config.IntactConfiguration">
