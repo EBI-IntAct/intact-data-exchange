@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.model.CvTopic;
@@ -37,6 +38,7 @@ public class PsiExchange_BasicTest extends IntactBasicTestCase {
     private PsiExchange psiExchange;
 
     @Test
+    @DirtiesContext
     public void importIntoIntact_default() throws Exception {
         Institution institution = getMockBuilder().createInstitution("IA:0000", "lalaInstitution");
         institution.getAnnotations().add(getMockBuilder().createAnnotation("nowhere", CvTopic.CONTACT_EMAIL_MI_REF, CvTopic.CONTACT_EMAIL));
