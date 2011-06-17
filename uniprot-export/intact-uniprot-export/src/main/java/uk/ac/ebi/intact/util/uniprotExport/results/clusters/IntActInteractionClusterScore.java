@@ -39,8 +39,10 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
         setMappingIdDbNames("uniprotkb,intact");
         writer = new PsimiTabWriter();
 
+        // we want direct interaction = 5
         setDirectInteractionWeight_5();
-        initializeMethodWeights();
+        // we want method weights with PCA = 1.5
+        initializeMethodWeights_PCA_1_5();
         setPublicationWeight(0.0f);
 
         this.miscore = new UnNormalizedMIScore();
@@ -73,6 +75,23 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
         HashMap<String,Float> customOntologyMethodScores = new HashMap<String,Float>();
         customOntologyMethodScores.put("MI:0013", 3f); // cv1 // biophysical
         customOntologyMethodScores.put("MI:0090", 2f); // cv2 // protein complementation assay
+        customOntologyMethodScores.put("MI:0254", 0.3f); // cv3 // genetic interference
+        customOntologyMethodScores.put("MI:0255", 0.3f); // cv4 // post transcriptional interference
+        customOntologyMethodScores.put("MI:0401", 3f); // cv5 // biochemical
+        customOntologyMethodScores.put("MI:0428", 0.6f); // cv6 // imagining technique
+        customOntologyMethodScores.put("unknown", 0.1f); // cv7 // unknown
+        super.setCustomOntologyMethodScores(customOntologyMethodScores);
+    }
+
+    /**
+     * Initialises the weight of each method and decrease the weight of imaging techniques.
+     * PCA has a weight of 1.5 instead of 2
+     */
+    private void initializeMethodWeights_PCA_1_5(){
+
+        HashMap<String,Float> customOntologyMethodScores = new HashMap<String,Float>();
+        customOntologyMethodScores.put("MI:0013", 3f); // cv1 // biophysical
+        customOntologyMethodScores.put("MI:0090", 1.5f); // cv2 // protein complementation assay
         customOntologyMethodScores.put("MI:0254", 0.3f); // cv3 // genetic interference
         customOntologyMethodScores.put("MI:0255", 0.3f); // cv4 // post transcriptional interference
         customOntologyMethodScores.put("MI:0401", 3f); // cv5 // biochemical
@@ -214,7 +233,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
                     fstream.write("\n");
                     fstream.flush();
 
-                    BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
+                    BinaryInteraction bI = iConverter.getBinaryInteractionForScoring(eI);
                     writer.writeOrAppend(bI, file, false);
                 }
             }
@@ -247,7 +266,7 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
         for(Integer mappingId:getInteractionMapping().keySet()){
             EncoreInteractionForScoring eI = getInteractionMapping().get(mappingId);
             if (eI != null){
-                BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
+                BinaryInteraction bI = iConverter.getBinaryInteractionForScoring(eI);
                 binaryInteractionCluster.put(mappingId, bI);
             }
         }

@@ -103,8 +103,8 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
     }
 
     public static void main(String args[]){
-        IntActFileMiScoreDistribution scoreDistribution = new IntActFileMiScoreDistribution("/home/marine/Desktop/results.txt.txt");
-        scoreDistribution.createChart("/home/marine/Desktop/results.png", "Distribution of the mi score without normalization", 100, 0, 34);
+        IntActFileMiScoreDistribution scoreDistribution = new IntActFileMiScoreDistribution("/home/marine/Desktop/uniprot-export/unNormalized/rules_comparison/8/detection_method_and_mi_score.txt");
+        scoreDistribution.createChart("/home/marine/Desktop/uniprot-export/unNormalized/rules_comparison/8/detection_method_and_mi_score_2.png", "Distribution of the mi score without normalization for exported interactions using both rules", 100, 8, 100);
     }
 
 }
