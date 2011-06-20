@@ -3,8 +3,6 @@ package uk.ac.ebi.intact.util.uniprotExport.filters;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.model.clone.IntactClonerException;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
@@ -29,7 +27,6 @@ public class IntactFilterTest extends UniprotExportBase{
 
     @Test
     @DirtiesContext
-    @Transactional(propagation = Propagation.NEVER)
     public void test_simulation() throws UniprotExportException, IntactClonerException {
         FilterConfig config = FilterContext.getInstance().getConfig();
         // accept negative interactions
@@ -38,6 +35,7 @@ public class IntactFilterTest extends UniprotExportBase{
 
         createExperimentContext();
 
+        Assert.assertEquals(2, getDaoFactory().getConfidenceDao().getAll().size());
         Assert.assertEquals(5, getDaoFactory().getInteractionDao().getAll().size());
         Assert.assertEquals(4, getDaoFactory().getExperimentDao().getAll().size());
 

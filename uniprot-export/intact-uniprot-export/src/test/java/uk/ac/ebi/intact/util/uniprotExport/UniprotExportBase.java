@@ -1,5 +1,9 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
+import org.junit.Assert;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.tab.model.ConfidenceImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
@@ -678,8 +682,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
                 CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT);
         getCorePersister().saveOrUpdate(dr_export);
 
-        CvTopic confidence = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
-                CvTopic.class, CvTopic.AUTHOR_CONFIDENCE_MI_REF, CvTopic.AUTHOR_CONFIDENCE_MI_REF);
+        CvConfidenceType confidence = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvConfidenceType.class, null, "author-score");
         getCorePersister().saveOrUpdate(confidence);
 
         CvTopic accepted = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
@@ -716,14 +720,17 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
     }
 
+    @Transactional (propagation = Propagation.NEVER)
     public void createExperimentContext() throws IntactClonerException {
+        TransactionStatus status = getDataContext().beginTransaction();
+
         // dr export and confidence annotation topic
         CvTopic dr_export = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
                 CvTopic.class, null, CvTopic.UNIPROT_DR_EXPORT);
         getCorePersister().saveOrUpdate(dr_export);
 
-        CvTopic confidence = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
-                CvTopic.class, CvTopic.AUTHOR_CONFIDENCE_MI_REF, CvTopic.AUTHOR_CONFIDENCE_MI_REF);
+        CvConfidenceType confidence = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
+                CvConfidenceType.class, null, "author-score");
         getCorePersister().saveOrUpdate(confidence);
 
         CvTopic accepted = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
@@ -803,15 +810,17 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         interaction2 = experiment_no.getInteractions().iterator().next().getAc();
         int index = 3;
-        for (Interaction interaction : experiment_condition.getInteractions()){
+
+        List<Interaction> interactions = new ArrayList(experiment_condition.getInteractions());
+        for (Interaction interaction : interactions){
             if (index == 3){
-                Annotation confidence1 = new Annotation(confidence, "high");
-                interaction.addAnnotation(confidence1);
+                Confidence confidence1 = new Confidence(confidence, "high");
+                interaction.addConfidence(confidence1);
                 interaction3 = interaction.getAc();
             }
             else {
-                Annotation confidence2 = new Annotation(confidence, "low");
-                interaction.addAnnotation(confidence2);
+                Confidence confidence2 = new Confidence(confidence, "low");
+                interaction.addConfidence(confidence2);
                 interaction4 = interaction.getAc();
             }
             getCorePersister().saveOrUpdate(interaction);
@@ -819,6 +828,10 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         }
 
         interaction5 = experiment_negative.getInteractions().iterator().next().getAc();
+
+        getDataContext().commitTransaction(status);
+
+        Assert.assertEquals(2, getDaoFactory().getConfidenceDao().getAll().size());
 
     }
 
