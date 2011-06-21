@@ -2,7 +2,6 @@ package uk.ac.ebi.intact.psimitab.converters;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.test.annotation.DirtiesContext;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
@@ -27,7 +26,6 @@ import static org.junit.Assert.assertNotNull;
 public class InteractionConverterTest extends IntactBasicTestCase {
 
     @Test
-    @DirtiesContext
     public void convertToMitab() throws Exception {
         InteractionConverter interactionConverter = new InteractionConverter();
 
@@ -53,7 +51,6 @@ public class InteractionConverterTest extends IntactBasicTestCase {
     }
 
     @Test
-    @DirtiesContext
     public void convertToMitab_imexInPub() throws Exception {
         InteractionConverter interactionConverter = new InteractionConverter();
 
@@ -76,7 +73,6 @@ public class InteractionConverterTest extends IntactBasicTestCase {
     }
 
     @Test
-    @DirtiesContext
     public void convertToIntactMitab() throws Exception {
         InteractionConverter interactionConverter = new InteractionConverter();
 
@@ -92,7 +88,6 @@ public class InteractionConverterTest extends IntactBasicTestCase {
     }
 
     @Test
-    @DirtiesContext
     public void convertToIntactMitab_imex() throws Exception {
         InteractionConverter interactionConverter = new InteractionConverter();
 
@@ -112,7 +107,6 @@ public class InteractionConverterTest extends IntactBasicTestCase {
     }
 
     @Test
-    @DirtiesContext
     public void parameterTest() throws Exception {
         InteractionConverter interactionConverter = new InteractionConverter();
 
@@ -176,7 +170,6 @@ public class InteractionConverterTest extends IntactBasicTestCase {
 
 
     @Test
-    @DirtiesContext
     public void convertToIntactMitabWithDatabaseSourceFilter() throws Exception {
         InteractionConverter interactionConverter = new InteractionConverter();
 

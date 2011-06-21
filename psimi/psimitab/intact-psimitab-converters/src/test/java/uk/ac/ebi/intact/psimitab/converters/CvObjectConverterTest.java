@@ -1,7 +1,6 @@
 package uk.ac.ebi.intact.psimitab.converters;
 
 import org.junit.Test;
-import org.springframework.test.annotation.DirtiesContext;
 import psidev.psi.mi.tab.model.InteractionDetectionMethod;
 import psidev.psi.mi.tab.model.InteractionDetectionMethodImpl;
 import psidev.psi.mi.tab.model.InteractionType;
@@ -23,7 +22,6 @@ import static org.junit.Assert.assertNotNull;
 public class CvObjectConverterTest extends IntactBasicTestCase {
 
     @Test
-    @DirtiesContext
     public void convertToMitab_InteractionType() throws Exception {
         CvObjectConverter converter = new CvObjectConverter();
 
@@ -36,7 +34,6 @@ public class CvObjectConverterTest extends IntactBasicTestCase {
     }
 
     @Test
-    @DirtiesContext
     public void convertToMitab_InteractionDetectionMethod() throws Exception {
         CvObjectConverter converter = new CvObjectConverter();
 

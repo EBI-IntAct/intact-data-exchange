@@ -1,7 +1,6 @@
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
 import org.junit.Test;
-import org.springframework.test.annotation.DirtiesContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Interaction;
@@ -21,7 +20,6 @@ import static org.junit.Assert.assertNotNull;
 public class MatrixExpansionTest extends IntactBasicTestCase {
 
     @Test
-    @DirtiesContext
     public void expandTest_1() {
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
@@ -41,7 +39,6 @@ public class MatrixExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
-    @DirtiesContext
     public void expandTest_2() {
 
         Component baitComponent = getMockBuilder().createComponentBait( getMockBuilder().createProteinRandom() );
@@ -55,7 +52,6 @@ public class MatrixExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
-    @DirtiesContext
     public void expandTest_3() {
         
         // relies on the fact that the created component have role: neutral
@@ -68,7 +64,6 @@ public class MatrixExpansionTest extends IntactBasicTestCase {
 
 
     @Test
-    @DirtiesContext
     public void getNameTest() throws Exception {
         MatrixExpansion matrixExpansion = new MatrixExpansion();
         assertEquals( "Matrix", matrixExpansion.getName() );
