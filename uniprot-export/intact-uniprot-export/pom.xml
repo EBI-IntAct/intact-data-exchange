@@ -75,7 +75,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psimitab-converters</artifactId>
-            <version>${pom.parent}</version>
+            <version>${pom.version}</version>
         </dependency>
     </dependencies>
 
