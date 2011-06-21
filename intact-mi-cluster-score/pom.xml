@@ -287,13 +287,12 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.uniprotexport</groupId>
             <artifactId>intact-uniprot-export</artifactId>
-            <version>2.1.3-SNAPSHOT</version>
+            <version>${pom.version}</version>
         </dependency>
 
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>
-            <version>2.4.0-SNAPSHOT</version>
         </dependency>
 
         <!-- PostgreSQL -->
