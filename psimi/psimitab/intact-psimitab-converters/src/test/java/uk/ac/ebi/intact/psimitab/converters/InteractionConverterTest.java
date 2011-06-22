@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
@@ -30,6 +31,8 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         InteractionConverter interactionConverter = new InteractionConverter();
 
         final Interaction interaction = getMockBuilder().createInteractionRandomBinary();
+        interaction.setOwner((Institution) IntactContext.getCurrentInstance().getSpringContext().getBean("institutionIntact"));
+
         interaction.setAc( "EBI-zzzzzzz" );
         Iterator<Component> i = interaction.getComponents().iterator();
         i.next().getInteractor().setAc( "EBI-xxxxxxx" );
@@ -48,6 +51,11 @@ public class InteractionConverterTest extends IntactBasicTestCase {
 
         Assert.assertEquals(2, bi.getPublications().size());  // imex and pubmed
         Assert.assertEquals(2, bi.getInteractionAcs().size());
+
+        CrossReference sourceXref = (CrossReference) bi.getSourceDatabases().iterator().next();
+        System.out.println(sourceXref);
+        Assert.assertEquals("MI:0469", sourceXref.getIdentifier());
+        Assert.assertEquals("intact", sourceXref.getText());
     }
 
     @Test
@@ -92,7 +100,7 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         InteractionConverter interactionConverter = new InteractionConverter();
 
         final Interaction interaction = getMockBuilder().createInteractionRandomBinary();
-        
+
         CvDatabase imexDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
         CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
         interaction.addXref(getMockBuilder().createXref(interaction, "IM-1234-1", imexPrimary, imexDb));
@@ -162,7 +170,9 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         Assert.assertEquals(4d, ip.getFactor(), 0d);
         Assert.assertEquals("kilodalton", ip.getUnit());
 
-
+        CrossReference sourceXred = bi.getSourceDatabases().iterator().next();
+        Assert.assertEquals("unknown", sourceXred.getIdentifier());
+        Assert.assertEquals("unknown", sourceXred.getText());
 
 
 

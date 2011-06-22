@@ -70,14 +70,14 @@ public class InteractionConverter {
         final Component componentB = iterator.next();
 
         InteractorConverter interactorConverter = new InteractorConverter();
-        
+
         ExtendedInteractor interactorA = interactorConverter.toMitab( componentA, interaction );
         ExtendedInteractor interactorB = interactorConverter.toMitab( componentB, interaction );
 
         IntactBinaryInteraction bi = new IntactBinaryInteraction( interactorA, interactorB );
 
         final Collection<Experiment> experiments = interaction.getExperiments();
-        
+
         List<Author> authors = new ArrayList<Author>();
         List<InteractionDetectionMethod> detectionMethods = new ArrayList<InteractionDetectionMethod>();
         Set<CrossReference> publications = new HashSet<CrossReference>();
@@ -189,17 +189,29 @@ public class InteractionConverter {
         }
 
         // set source database list
-        if ( interaction.getOwner() != null && interaction.getOwner().getXrefs() != null ) {
+        if ( interaction.getOwner() != null) {
             List<CrossReference> sourceDatabases = xConverter.toCrossReferences( interaction.getOwner().getXrefs(), true, false,CvDatabase.PSI_MI_MI_REF );
+
             if ( !sourceDatabases.isEmpty() ){
                 for (CrossReference sourceXref : sourceDatabases) {
                     sourceXref.setText(interaction.getOwner().getShortLabel());
                 }
-                bi.setSourceDatabases( sourceDatabases );
+
             } else {
-                defaultSourceDatabase.setText(interaction.getOwner().getShortLabel());
-                bi.getSourceDatabases().add( defaultSourceDatabase );
+                String label = interaction.getOwner().getShortLabel();
+
+                if (label == null || label.isEmpty()) {
+                    label = "not specified";
+                }
+
+                label = label.toLowerCase();
+
+                CrossReference sourceXref = new CrossReferenceImpl("unknown", label, label);
+                sourceDatabases.add(sourceXref);
+
             }
+
+            bi.setSourceDatabases( sourceDatabases );
         }
 
         // process extended
