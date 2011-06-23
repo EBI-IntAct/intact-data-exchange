@@ -31,7 +31,7 @@ public class ScoreComparator {
 
     public static void main( String[] args ) throws IOException {
         // Five possible arguments
-        if( args.length != 5 ) {
+        /*if( args.length != 5 ) {
             System.err.println( "Usage: ExportFilter <exportedA> <exportedB> <excludedA> <excludedB> <results>" );
             System.err.println( "Usage: <exportedA> is the file containing the exported interactions of a first export (list of id-uniprot1-uniprot2-score)" );
             System.err.println( "Usage: <exportedB> is the file containing the exported interactions of a second export (list of id-uniprot1-uniprot2-score)" );
@@ -40,13 +40,13 @@ public class ScoreComparator {
             System.err.println( "Usage: <results> is the file where to write the scores of both exports for the binary interaction exported in first export and/or second export" );
 
             System.exit( 1 );
-        }
+        }*/
         System.out.println("Reading arguments...");
-        File exportedA = new File(args[0]);
-        File exportedB = new File(args[1]);
-        File excludedA = new File(args[2]);
-        File excludedB = new File(args[3]);
-        File results = new File(args[4]);
+        File exportedA = new File("/home/marine/Desktop/uniprot-export/unNormalized/simulation_mi_score/8/exported_positive.txt");
+        File exportedB = new File("/home/marine/Desktop/uniprot-export/unNormalized/simulation_mi_score/8_PCA_1.5_fixed/exported_positive.txt");
+        File excludedA = new File("/home/marine/Desktop/uniprot-export/unNormalized/simulation_mi_score/8/excluded_positive.txt");
+        File excludedB = new File("/home/marine/Desktop/uniprot-export/unNormalized/simulation_mi_score/8_PCA_1.5_fixed/excluded_positive.txt");
+        File results = new File("/home/marine/Desktop/results.csv");
 
         System.out.println("Extracting exported interactions in "+exportedA.getName()+"...");
         Map<String, String> exportResultsA = extractScoreResultsFor(exportedA);
@@ -112,25 +112,20 @@ public class ScoreComparator {
 
         while (line != null){
 
-            if (line.contains("\t")){
-                if (line.contains(INTERACTOR_SEPARATOR)){
-                    String[] values = line.split(INTERACTOR_SEPARATOR);
+            if (line.contains(INTERACTOR_SEPARATOR)){
+                String[] values = line.split(INTERACTOR_SEPARATOR);
 
-                    if (values.length == 3){
-                        String firstInteractor = values[1];
-                        String secondValue = values[2];
+                if (values.length == 3){
+                    String firstInteractor = values[1];
+                    String secondValue = values[2];
 
-                        if (secondValue.contains(SCORE_SEPARATOR)){
-                            String [] scores = secondValue.split(SCORE_SEPARATOR);
-                            String secondInteractor = scores[0];
-                            String score = scores[1];
+                    if (secondValue.contains(SCORE_SEPARATOR)){
+                        String [] scores = secondValue.split(SCORE_SEPARATOR);
+                        String secondInteractor = scores[0];
+                        String score = scores[1];
 
-                            exportScores.put(firstInteractor+"-"+secondInteractor, score);
-                            exportScores.put(secondInteractor+"-"+firstInteractor, score);
-                        }
-                        else {
-                            System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
-                        }
+                        System.out.println("Extracting" + line + "...'");
+                        exportScores.put(firstInteractor+"-"+secondInteractor, score);
                     }
                     else {
                         System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
@@ -139,11 +134,14 @@ public class ScoreComparator {
                 else {
                     System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
                 }
-                line = reader.readLine();
             }
-
-            reader.close();
+            else {
+                System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
+            }
+            line = reader.readLine();
         }
+
+        reader.close();
 
         return exportScores;
     }
