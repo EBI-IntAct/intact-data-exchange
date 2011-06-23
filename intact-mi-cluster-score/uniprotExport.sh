@@ -16,4 +16,4 @@ echo $8
 echo $9
 echo $10
 
-mvn -U clean install -Puniprot-export -Drule=$1 -Dsource=$2 -Ddrfile=$3 -Dccfile=$4 -Dgofile=$5 -Ddatabase=$6 -DbinaryOnly=$7 -DhighConfidence=$8 -DproteinOnly=$9 -DpositiveOnly=${10} -Dmaven.test.skip -Dmaven.repo.local=repository
+mvn -U clean install -Puniprot-export -Drule=$1 -Dsource=$2 -Ddrfile=$3 -Dccfile=$4 -Dgofile=$5 -Ddatabase=$6 -DbinaryOnly=$7 -DhighConfidence=$8 -DproteinOnly=$9 -DpositiveOnly=${10} -Dmaven.test.skip

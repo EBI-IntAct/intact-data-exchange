@@ -41,17 +41,23 @@ public class ScoreComparator {
 
             System.exit( 1 );
         }
+        System.out.println("Reading arguments...");
         File exportedA = new File(args[0]);
         File exportedB = new File(args[1]);
         File excludedA = new File(args[2]);
         File excludedB = new File(args[3]);
         File results = new File(args[4]);
 
+        System.out.println("Extracting exported interactions in "+exportedA.getName()+"...");
         Map<String, String> exportResultsA = extractScoreResultsFor(exportedA);
+        System.out.println("Extracting exported interactions in "+exportedB.getName()+"...");
         Map<String, String> exportResultsB = extractScoreResultsFor(exportedB);
+        System.out.println("Extracting excluded interactions in "+excludedA.getName()+"...");
         Map<String, String> excludedResultsA = extractScoreResultsFor(excludedA);
+        System.out.println("Extracting excluded interactions in "+excludedB.getName()+"...");
         Map<String, String> excludedResultsB = extractScoreResultsFor(excludedB);
 
+        System.out.println("Collect exported interactions and scores ...");
         Collection<String> exportedBothAAndB = CollectionUtils.intersection(exportResultsA.keySet(), exportResultsB.keySet());
         Collection<String> exportedANotB = CollectionUtils.intersection(exportResultsA.keySet(), excludedResultsB.keySet());
         Collection<String> exportedBNotA = CollectionUtils.intersection(exportResultsB.keySet(), excludedResultsA.keySet());
@@ -64,6 +70,7 @@ public class ScoreComparator {
         resultsWriter.write("Score for export B");
         resultsWriter.write("\n");
 
+        System.out.println("Write scores of exported interactions in both exports...");
         for (String interaction : exportedBothAAndB){
             resultsWriter.write(interaction);
             resultsWriter.write("\t");
@@ -73,6 +80,7 @@ public class ScoreComparator {
             resultsWriter.write("\n");
         }
 
+        System.out.println("Write scores of exported interactions in first export but not second...");
         for (String interaction : exportedANotB){
             resultsWriter.write(interaction);
             resultsWriter.write("\t");
@@ -82,6 +90,7 @@ public class ScoreComparator {
             resultsWriter.write("\n");
         }
 
+        System.out.println("Write scores of exported interactions in second export but not first...");
         for (String interaction : exportedBNotA){
             resultsWriter.write(interaction);
             resultsWriter.write("\t");
