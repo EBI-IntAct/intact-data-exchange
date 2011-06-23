@@ -59,8 +59,12 @@ public class ScoreComparator {
 
         System.out.println("Collect exported interactions and scores ...");
         Collection<String> exportedBothAAndB = CollectionUtils.intersection(exportResultsA.keySet(), exportResultsB.keySet());
+        System.out.println(exportedBothAAndB.size() + " interactions exported in both exports");
         Collection<String> exportedANotB = CollectionUtils.intersection(exportResultsA.keySet(), excludedResultsB.keySet());
+        System.out.println(exportedANotB.size() + " interactions exported in first export but not second");
         Collection<String> exportedBNotA = CollectionUtils.intersection(exportResultsB.keySet(), excludedResultsA.keySet());
+        System.out.println(exportedANotB.size() + " interactions exported in second export but not first");
+
 
         FileWriter resultsWriter = new FileWriter(results);
         resultsWriter.write("Interaction");
