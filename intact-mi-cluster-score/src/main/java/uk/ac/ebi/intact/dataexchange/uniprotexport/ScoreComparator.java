@@ -139,9 +139,9 @@ public class ScoreComparator {
                 System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
             }
             line = reader.readLine();
-
-            reader.close();
         }
+
+        reader.close();
 
         return exportScores;
     }
