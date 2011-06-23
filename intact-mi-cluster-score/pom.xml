@@ -281,6 +281,47 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>score-comparator</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2024m</argument>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath />
+                                <argument>uk.ac.ebi.intact.dataexchange.uniprotexport.ScoreComparator</argument>
+                                <!-- The file containing the exported interactions of a first export (list of id-uniprot1-uniprot2-score)-->
+                                <argument>${exportedA}</argument>
+                                <!-- The file containing the exported interactions of a second export (list of id-uniprot1-uniprot2-score)-->
+                                <argument>${exportedB}</argument>
+                                <!-- The name of the file containing the excluded interactions of the first export (list of id-uniprot1-uniprot2-score)-->
+                                <argument>${excludedA}</argument>
+                                <!-- The name of the file containing the excluded interactions of the second export (list of id-uniprot1-uniprot2-score)-->
+                                <argument>${excludedB}</argument>
+                                <!-- The name of the file where to write the scores of both exports for the binary interaction exported in first export and/or second export-->
+                                <argument>${results}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>
