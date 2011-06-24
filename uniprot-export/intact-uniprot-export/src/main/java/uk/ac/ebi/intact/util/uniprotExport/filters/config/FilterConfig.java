@@ -14,6 +14,7 @@ public class FilterConfig {
     private boolean excludeLowConfidenceInteractions = true;
     private boolean excludeNegativeInteractions = true;
     private boolean excludeNonUniprotInteractors = true;
+    private boolean excludeInferredInteractions = true;
 
     public boolean excludeSpokeExpandedInteractions() {
         return excludeSpokeExpandedInteractions;
@@ -45,5 +46,13 @@ public class FilterConfig {
 
     public void setExcludeNonUniprotInteractors(boolean excludeNonUniprotInteractors) {
         this.excludeNonUniprotInteractors = excludeNonUniprotInteractors;
+    }
+
+    public boolean isExcludeInferredInteractions() {
+        return excludeInferredInteractions;
+    }
+
+    public void setExcludeInferredInteractions(boolean excludeInferredInteractions) {
+        this.excludeInferredInteractions = excludeInferredInteractions;
     }
 }

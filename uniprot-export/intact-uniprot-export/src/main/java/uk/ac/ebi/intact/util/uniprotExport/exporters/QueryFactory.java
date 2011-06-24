@@ -4,6 +4,7 @@ import org.springframework.transaction.TransactionStatus;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.CvInteraction;
 import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
@@ -24,6 +25,8 @@ import java.util.List;
 public class QueryFactory {
 
     private final static String AUTHOR_SCORE = "author-score";
+    private final static String INFERRED_AUTHOR = "MI:0363";
+
     private final String interactionInvolvedInComponents = "select distinct(c1.interaction.ac) from Component c1";
 
     private final String interactionsInvolvingInteractorsNoUniprotUpdate = "select distinct(i2.ac) from Component c2 join " +
@@ -74,6 +77,10 @@ public class QueryFactory {
     // select components with only one interactor (self interactions)
     private final String selfInteractions= "select distinct(il.ac) from InteractionImpl il join il.components as ct group by il.ac having count(ct.ac) == 1";
 
+    // negative interactions
+    private final String inferredInteractions = "select distinct(infer.ac) from InteractionImpl as infer join " +
+            "infer.experiments as exp join exp.cvInteraction as det where det.identifier = :inferred_author or det.identifier = :inferred_curator";
+
     public List<Object[]> getMethodStatusInIntact() {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
@@ -86,6 +93,22 @@ public class QueryFactory {
         dataContext.commitTransaction(transactionStatus);
 
         return methods;
+    }
+
+    public List<String> getInferredInteractions() {
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
+
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(inferredInteractions);
+        query.setParameter("inferred_author", INFERRED_AUTHOR);
+        query.setParameter("inferred_curator", CvInteraction.INFERRED_BY_CURATOR_MI_REF);
+
+        List<String> interactions = query.getResultList();
+
+        dataContext.commitTransaction(transactionStatus);
+
+        return interactions;
     }
 
     public List<String> getInteractionInvolvedInComponents() {
@@ -306,7 +329,8 @@ public class QueryFactory {
                 "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") and i.ac not in ("+negativeInteractions+") " +
                 "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+") " +
                 "and i.ac not in (" + interactionsDrExportNotPassed + ") " +
-                "and i.ac not in (" + interactionsFromExperimentNoExport + ")";
+                "and i.ac not in (" + interactionsFromExperimentNoExport + ")" +
+                "and i.ac not in (" + inferredInteractions + ")";
         // we want all the interactions which :
         // no participant has a 'no-uniprot-update' annotation
         // the interaction doesn't have any 'negative' annotation
@@ -323,6 +347,8 @@ public class QueryFactory {
         query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
         query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
         query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
+        query.setParameter("inferred_author", INFERRED_AUTHOR);
+        query.setParameter("inferred_curator", CvInteraction.INFERRED_BY_CURATOR_MI_REF);
 
         List<String> interactions = query.getResultList();
 
@@ -348,7 +374,8 @@ public class QueryFactory {
                 "and i.ac not in (" + interactionsFromExperimentNoExport + ") " +
                 "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") " +
                 "and i.ac not in ("+negativeInteractions+") " +
-                "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+")";
+                "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+")" +
+                "and i.ac not in ("+inferredInteractions+")";
 
         // we want all the interactions which :
         // no participant has a 'no-uniprot-update' annotation
@@ -370,6 +397,8 @@ public class QueryFactory {
         query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
         query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
         query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
+        query.setParameter("inferred_author", INFERRED_AUTHOR);
+        query.setParameter("inferred_curator", CvInteraction.INFERRED_BY_CURATOR_MI_REF);
 
         List<String> interactions = query.getResultList();
 
@@ -387,6 +416,7 @@ public class QueryFactory {
         boolean excludeSpokeExpanded = config.excludeSpokeExpandedInteractions();
         boolean excludeLowConfidenceInteractions = config.excludeLowConfidenceInteractions();
         boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
+        boolean excludeInferredInteractions = config.isExcludeInferredInteractions();
 
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
@@ -421,6 +451,12 @@ public class QueryFactory {
             queryString.append(") ");
         }
 
+        if (excludeInferredInteractions){
+            queryString.append("and i.ac not in (");
+            queryString.append(inferredInteractions);
+            queryString.append(")");
+        }
+
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString.toString());
 
         query.setParameter("accepted", CvTopic.ACCEPTED);
@@ -441,6 +477,10 @@ public class QueryFactory {
             query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
         }
 
+        if (excludeInferredInteractions){
+            query.setParameter("inferred_author", INFERRED_AUTHOR);
+            query.setParameter("inferred_curator", CvInteraction.INFERRED_BY_CURATOR_MI_REF);
+        }
 
         List<String> interactions = query.getResultList();
 
@@ -455,6 +495,7 @@ public class QueryFactory {
         boolean excludeNegativeInteractions = config.excludeNegativeInteractions();
         boolean excludeLowConfidenceInteractions = config.excludeLowConfidenceInteractions();
         boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
+        boolean excludeInferredInteractions = config.isExcludeInferredInteractions();
 
         if (!excludeNegativeInteractions){
             DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
@@ -487,6 +528,12 @@ public class QueryFactory {
                 queryString.append(") ");
             }
 
+            if (excludeInferredInteractions){
+                queryString.append("and i.ac not in (");
+                queryString.append(inferredInteractions);
+                queryString.append(")");
+            }
+
             Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString.toString());
 
             query.setParameter("accepted", CvTopic.ACCEPTED);
@@ -507,6 +554,11 @@ public class QueryFactory {
                 query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
             }
 
+            if (excludeInferredInteractions){
+                query.setParameter("inferred_author", INFERRED_AUTHOR);
+                query.setParameter("inferred_curator", CvInteraction.INFERRED_BY_CURATOR_MI_REF);
+            }
+
             List<String> interactions = query.getResultList();
 
             dataContext.commitTransaction(transactionStatus);
@@ -524,6 +576,7 @@ public class QueryFactory {
         boolean excludeNegativeInteractions = config.excludeNegativeInteractions();
         boolean excludeLowConfidenceInteractions = config.excludeLowConfidenceInteractions();
         boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
+        boolean excludeInferredInteractions = config.isExcludeInferredInteractions();
 
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
@@ -562,6 +615,12 @@ public class QueryFactory {
             queryString.append(") ");
         }
 
+        if (excludeInferredInteractions){
+            queryString.append("and i.ac not in (");
+            queryString.append(inferredInteractions);
+            queryString.append(")");
+        }
+
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString.toString());
 
         query.setParameter("accepted", CvTopic.ACCEPTED);
@@ -585,6 +644,10 @@ public class QueryFactory {
             query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
         }
 
+        if (excludeInferredInteractions){
+            query.setParameter("inferred_author", INFERRED_AUTHOR);
+            query.setParameter("inferred_curator", CvInteraction.INFERRED_BY_CURATOR_MI_REF);
+        }
 
         List<String> interactions = query.getResultList();
 
@@ -609,7 +672,8 @@ public class QueryFactory {
                 "and i.ac not in ("+interactionsOnHold+") " +
                 "and i.ac not in (" + interactionsDrExportNotPassed + ") " +
                 "and i.ac not in (" + interactionsFromExperimentNoExport + ") " +
-                "and i.ac not in ("+negativeInteractions+") ";
+                "and i.ac not in ("+negativeInteractions+") " +
+                "and i.ac not in ("+inferredInteractions+")";
 
         // we want all the interactions which :
         // no participant has a 'no-uniprot-update' annotation
@@ -627,6 +691,8 @@ public class QueryFactory {
         query.setParameter("yes", "YES");
         query.setParameter("confidence", AUTHOR_SCORE);
         query.setParameter("negative", CvTopic.NEGATIVE);
+        query.setParameter("inferred_author", INFERRED_AUTHOR);
+        query.setParameter("inferred_curator", CvInteraction.INFERRED_BY_CURATOR_MI_REF);
 
         List<String> interactions = query.getResultList();
 
@@ -650,7 +716,8 @@ public class QueryFactory {
                 "and i.ac not in ("+interactionsOnHold+") " +
                 "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") " +
                 "and i.ac not in ("+negativeInteractions+") " +
-                "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+")";
+                "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+")" +
+                "and i.ac not in ("+inferredInteractions+")";
 
         // we want all the interactions which :
         // no participant has a 'no-uniprot-update' annotation
@@ -668,6 +735,8 @@ public class QueryFactory {
         query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
         query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
         query.setParameter("protein", "uk.ac.ebi.intact.model.ProteinImpl");
+        query.setParameter("inferred_author", INFERRED_AUTHOR);
+        query.setParameter("inferred_curator", CvInteraction.INFERRED_BY_CURATOR_MI_REF);
 
         List<String> interactions = query.getResultList();
 
