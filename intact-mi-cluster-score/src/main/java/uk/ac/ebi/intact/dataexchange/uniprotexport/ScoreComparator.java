@@ -63,7 +63,7 @@ public class ScoreComparator {
         Collection<String> exportedANotB = CollectionUtils.subtract(exportResultsA.keySet(), exportedBothAAndB);
         System.out.println(exportedANotB.size() + " interactions exported in first export but not second");
         Collection<String> exportedBNotA = CollectionUtils.subtract(exportResultsB.keySet(), exportedBothAAndB);
-        System.out.println(exportedANotB.size() + " interactions exported in second export but not first");
+        System.out.println(exportedBNotA.size() + " interactions exported in second export but not first");
 
 
         FileWriter resultsWriter = new FileWriter(results);
