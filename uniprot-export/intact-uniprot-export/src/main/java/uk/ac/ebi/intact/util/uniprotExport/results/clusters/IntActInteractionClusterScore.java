@@ -42,7 +42,8 @@ public class IntActInteractionClusterScore extends InteractionClusterScore imple
         // we want direct interaction = 5
         setDirectInteractionWeight_5();
         // we want method weights with PCA = 1.5
-        initializeMethodWeights_PCA_1_5();
+        //initializeMethodWeights_PCA_1_5();
+        initializeMethodWeights();
         setPublicationWeight(0.0f);
 
         this.miscore = new UnNormalizedMIScore();

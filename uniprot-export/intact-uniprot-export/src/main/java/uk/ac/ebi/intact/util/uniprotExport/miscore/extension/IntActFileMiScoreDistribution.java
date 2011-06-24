@@ -102,9 +102,23 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
         miH.createChart(diagrammName);
     }
 
+        /**
+     * Create a chart with the results of mi cluster score
+     * @param diagrammName
+     */
+    public void createRelativeChart(String diagrammName, String title, int numberOfBars, double min, double max) {
+        IntActMiScoreHistogram miH = new IntActMiScoreHistogram();
+        miH.setTitle(title);
+        miH.setNumberOfBars(numberOfBars);
+        miH.setMaxScore(max);
+        miH.setMinScore(min);
+        miH.setValues(getScores());
+        miH.createRelativeChart(diagrammName);
+    }
+
     public static void main(String args[]){
-        IntActFileMiScoreDistribution scoreDistribution = new IntActFileMiScoreDistribution("/home/marine/Desktop/uniprot-export/unNormalized/rules_comparison/8/detection_method_and_mi_score.txt");
-        scoreDistribution.createChart("/home/marine/Desktop/uniprot-export/unNormalized/rules_comparison/8/detection_method_and_mi_score_2.png", "Distribution of the mi score without normalization for exported interactions using both rules", 100, 8, 100);
+        IntActFileMiScoreDistribution scoreDistribution = new IntActFileMiScoreDistribution("/home/marine/Desktop/uniprot-export/unNormalized/simulation2/9_PCA_2/exported_negative.txt");
+        scoreDistribution.createRelativeChart("/home/marine/Desktop/uniprot-export/unNormalized/simulation2/9_PCA_2/exported_negative.png", "Distribution of the scores of negative interactions exported with PCA 2, cut-off 9. Total negative : 51", 100, 9, 17);
     }
 
 }

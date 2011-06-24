@@ -89,6 +89,33 @@ public class IntActMiScoreHistogram extends MiscoreHistogram{
         }
     }
 
+    public void createRelativeChart(String pngFileName){
+        HistogramDataset dataset = new HistogramDataset();
+        dataset.setType(HistogramType.RELATIVE_FREQUENCY);
+
+        double [] values = getValuesBetween(getMinScore(), getMaxScore());
+        dataset.addSeries(getTitle(), values,getNumberOfBars(),getMinScore(),getMaxScore());
+        String plotTitle = getTitle();
+        String xaxis = "Score";
+        String yaxis = "% of interactions";
+        PlotOrientation orientation = PlotOrientation.VERTICAL;
+        boolean show = false;
+        boolean toolTips = false;
+        boolean urls = false;
+        JFreeChart chart = ChartFactory.createHistogram( plotTitle, xaxis, yaxis,
+                dataset, orientation, show, toolTips, urls);
+
+        // get a reference to the plot for further customisation...
+        final XYPlot plot = chart.getXYPlot();
+        plot.getRangeAxis().setAutoRange(true);
+
+        try {
+            ChartUtilities.saveChartAsPNG(new File(pngFileName), chart, getWidth(), getHeight());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public double getMinScore() {
         return minScore;
     }
