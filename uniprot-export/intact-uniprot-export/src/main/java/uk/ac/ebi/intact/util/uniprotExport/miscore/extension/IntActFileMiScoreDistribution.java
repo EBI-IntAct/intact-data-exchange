@@ -117,8 +117,8 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
     }
 
     public static void main(String args[]){
-        IntActFileMiScoreDistribution scoreDistribution = new IntActFileMiScoreDistribution("/home/marine/Desktop/uniprot-export/unNormalized/simulation2/9_PCA_2/exported_negative.txt");
-        scoreDistribution.createRelativeChart("/home/marine/Desktop/uniprot-export/unNormalized/simulation2/9_PCA_2/exported_negative.png", "Distribution of the scores of negative interactions exported with PCA 2, cut-off 9. Total negative : 51", 100, 9, 17);
+        IntActFileMiScoreDistribution scoreDistribution = new IntActFileMiScoreDistribution("/home/marine/Desktop/uniprot-export/unNormalized/simulation2/9_PCA_2/original_files/exported_positive.txt");
+        scoreDistribution.createRelativeChart("/home/marine/Desktop/uniprot-export/unNormalized/simulation2/9_PCA_2/exported_positive.png", "Distribution of the scores of positive interactions exported with PCA 2, cut-off 9. Total positive : 155306", 100, 7, 249);
     }
 
 }

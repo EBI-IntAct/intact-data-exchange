@@ -134,15 +134,15 @@ public class UniprotExportProcessor {
             ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
             ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
 
-            logger.info("Save positive cluster informations in uniprotExport.log");
-            positiveInteractions.getCluster().saveClusteredInteractions("uniprotExport.log", positiveInteractions.getInteractionsToExport());
-            logger.info("Save negative cluster informations in uniprotExport_negative.log");
-            negativeInteractions.getCluster().saveClusteredInteractions("uniprotExport_negative.log", negativeInteractions.getInteractionsToExport());
+            logger.info("Save positive cluster informations in exported_positive.csv");
+            positiveInteractions.getCluster().saveClusteredInteractions("exported_positive.csv", positiveInteractions.getInteractionsToExport());
+            logger.info("Save negative cluster informations in exported_negative.csv");
+            negativeInteractions.getCluster().saveClusteredInteractions("exported_negative.csv", negativeInteractions.getInteractionsToExport());
 
             logger.info("Save positive cluster informations in uniprotExport_excluded.log");
-            positiveInteractions.getCluster().saveClusteredInteractions("uniprotExport_excluded.log", new HashSet(CollectionUtils.subtract(positiveInteractions.getCluster().getAllInteractionIds(), positiveInteractions.getInteractionsToExport())));
-            logger.info("Save positive cluster informations in uniprotExport_excluded.log");
-            negativeInteractions.getCluster().saveClusteredInteractions("uniprotExport_excluded_negative.log", new HashSet(CollectionUtils.subtract(negativeInteractions.getCluster().getAllInteractionIds(), negativeInteractions.getInteractionsToExport())));
+            positiveInteractions.getCluster().saveClusteredInteractions("excluded_positive.csv", new HashSet(CollectionUtils.subtract(positiveInteractions.getCluster().getAllInteractionIds(), positiveInteractions.getInteractionsToExport())));
+            logger.info("Save positive cluster informations in excluded_negative.csv");
+            negativeInteractions.getCluster().saveClusteredInteractions("excluded_negative.csv", new HashSet(CollectionUtils.subtract(negativeInteractions.getCluster().getAllInteractionIds(), negativeInteractions.getInteractionsToExport())));
         } catch (IOException e) {
             throw new UniprotExportException("Impossible to write the results of uniprot export in " + DRFile + " or " + CCFile + " or " + GOFile, e);
         }
