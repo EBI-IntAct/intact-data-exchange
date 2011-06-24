@@ -119,9 +119,54 @@ public class ScoreComparator {
             if (line.contains(INTERACTOR_SEPARATOR)){
                 String[] values = line.split(INTERACTOR_SEPARATOR);
 
+                // we have two master proteins
                 if (values.length == 3){
                     String firstInteractor = values[1];
                     String secondValue = values[2];
+
+                    if (secondValue.contains(SCORE_SEPARATOR)){
+                        String [] scores = secondValue.split(SCORE_SEPARATOR);
+                        String secondInteractor = scores[0];
+                        String score = scores[1];
+
+                        System.out.println("Extracting" + line + "...'");
+                        exportScores.put(firstInteractor+"-"+secondInteractor, score);
+                    }
+                    else {
+                        System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
+                    }
+                }
+                // we have one master protein and one isoform/feature chain
+                else if (values.length == 4){
+                    String firstInteractor = values[1];
+                    String secondValue = values[2];
+
+                    // the first uniprot ac was isoform or feature chain
+                    if (secondValue.length() == 1 || secondValue.startsWith("PRO")){
+                        firstInteractor = values[1] + "-" + values[2];
+                        secondValue = values[3];
+                    }
+                    // the second uniprot ac was isoform or feature chain
+                    else {
+                        secondValue = values[2] + "-" + values[3];
+                    }
+
+                    if (secondValue.contains(SCORE_SEPARATOR)){
+                        String [] scores = secondValue.split(SCORE_SEPARATOR);
+                        String secondInteractor = scores[0];
+                        String score = scores[1];
+
+                        System.out.println("Extracting" + line + "...'");
+                        exportScores.put(firstInteractor+"-"+secondInteractor, score);
+                    }
+                    else {
+                        System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
+                    }
+                }
+                // we have two isoforms/feature chains
+                else if (values.length == 5){
+                    String firstInteractor = values[1] + "-" + values[2];
+                    String secondValue = values[3] + "-" + values[4];
 
                     if (secondValue.contains(SCORE_SEPARATOR)){
                         String [] scores = secondValue.split(SCORE_SEPARATOR);
