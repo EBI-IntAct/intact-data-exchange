@@ -45,8 +45,8 @@ public class UniprotExporter {
     public static void main( String[] args ) throws IOException {
 
         // Six possible arguments
-        if( args.length != 10 ) {
-            System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <goFile> <database> <binaryOnly> <highConfidence> <proteinOnly> <positiveOnly>" );
+        if( args.length != 11 ) {
+            System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <goFile> <database> <binaryOnly> <highConfidence> <proteinOnly> <positiveOnly> <excludeInferred>" );
             System.err.println( "Usage: <rule> is the type of rule we want to use to export the interaction to uniprot. " +
                     "Can be 'detection_method' if we want the rules based on detection method or 'mi_score' if we want the rules based on mi score" );
             System.err.println( "Usage: <source> is the source of the binary interactions we want to export." +
@@ -60,6 +60,7 @@ public class UniprotExporter {
             System.err.println( "Usage: <highConfidence> true : exclude low confidence interactions (dr-export = no or condition is not respected) from the cluster or false : accept low confidence interactions in the cluster. By default, is true.");
             System.err.println( "Usage: <proteinOnly> true : exclude interactions with a non protein interactor from the cluster or false : accept interactions having a non protein interactor in the cluster. By default, is true.");
             System.err.println( "Usage: <positiveOnly> true : exclude negative interactions from the cluster or false : accept negative interactions in the cluster. By default, is true.");
+            System.err.println( "Usage: <excludeInferred> true : exclude inferred interactions from the cluster or false : accept interactions inferred by the author and/or curator in the cluster. By default, is true.");
             System.exit( 1 );
         }
 
@@ -77,6 +78,7 @@ public class UniprotExporter {
         boolean excludeLowConfidence = Boolean.parseBoolean(args[7]);
         boolean excludeNonProtein = Boolean.parseBoolean(args[8]);
         boolean excludeNegative = Boolean.parseBoolean(args[9]);
+        boolean excludeInferred = Boolean.parseBoolean(args[10]);
 
         IntactContext.initContext(new String[]{"/META-INF/" + database + ".spring.xml"});
         FilterConfig config = FilterContext.getInstance().getConfig();
@@ -85,6 +87,7 @@ public class UniprotExporter {
         config.setExcludeNegativeInteractions(excludeNegative);
         config.setExcludeNonUniprotInteractors(excludeNonProtein);
         config.setExcludeSpokeExpandedInteractions(excludeSpokeExpanded);
+        config.setExcludeInferredInteractions(excludeInferred);
 
         final ExporterRule rule = InteractionExporterFactory.convertIntoExporterRule(ruleArg);
 
@@ -158,6 +161,7 @@ public class UniprotExporter {
         System.out.println("Filter low confidence interactions : " + excludeLowConfidence);
         System.out.println("Filter non uniprot proteins : " + excludeNonProtein);
         System.out.println("Filter negative interactions : " + excludeNegative) ;
+        System.out.println("Filter inferred interactions : " + excludeInferred) ;
 
         InteractionExporter exporter = InteractionExporterFactory.createInteractionExporter(rule);
         InteractionFilter filter = InteractionFilterFactory.createInteractionFilter(source, exporter);

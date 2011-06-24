@@ -78,6 +78,7 @@
                                 <argument>${highConfidence}</argument>
                                 <argument>${proteinOnly}</argument>
                                 <argument>${positiveOnly}</argument>
+                                <argument>${excludeInferred}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
