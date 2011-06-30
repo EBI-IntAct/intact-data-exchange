@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +27,6 @@ import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Interaction;
 import psidev.psi.mi.xml.model.Parameter;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.persister.IntactCore;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterMessage;
@@ -40,13 +39,10 @@ import uk.ac.ebi.intact.model.Range;
 import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.clone.IntactCloner;
 import uk.ac.ebi.intact.model.util.XrefUtils;
-import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
-import uk.ac.ebi.intact.util.psivalidator.PsiValidatorReport;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -402,6 +398,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void intactTopsi_linkedFeatures() throws Exception {
         TransactionStatus status = getDataContext().beginTransaction();
 
@@ -486,6 +483,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
     }
 
     @Test
+    @DirtiesContext
     public void roundtrip_baitPraySameInteractor() throws Exception {
         Protein prot = getMockBuilder().createProteinRandom();
         Protein protCopy = new IntactCloner().clone(prot);
