@@ -28,6 +28,8 @@ import uk.ac.ebi.intact.model.Feature;
 import uk.ac.ebi.intact.model.Interaction;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Participant converter.
@@ -38,6 +40,8 @@ import java.util.Collection;
 public class ParticipantConverter extends AbstractIntactPsiConverter<Component, Participant> {
 
     private static final Log log = LogFactory.getLog(ParticipantConverter.class);
+    // TODO: fix ConversionCache or lazy initialization (featureMap is only necessary because of this)
+    Map<String, psidev.psi.mi.xml.model.Feature> featureMap = new HashMap<String, psidev.psi.mi.xml.model.Feature>();
 
     public ParticipantConverter(Institution institution) {
         super(institution);
@@ -101,7 +105,11 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             FeatureConverter featureConverter = new FeatureConverter(getInstitution());
 
             for (Feature feature : features) {
-                participant.getFeatures().add(featureConverter.intactToPsi(feature));
+                psidev.psi.mi.xml.model.Feature psiFeature = featureConverter.intactToPsi(feature);
+                if(feature.getAc() != null){
+                    featureMap.put(feature.getAc(), psiFeature);
+                }
+                participant.getFeatures().add(psiFeature);
             }
         }
 
@@ -140,5 +148,9 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         }
 
         return participant;
+    }
+
+    public Map<String, psidev.psi.mi.xml.model.Feature> getFeatureMap() {
+        return featureMap;
     }
 }

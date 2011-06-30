@@ -15,12 +15,14 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import psidev.psi.mi.xml.model.FeatureDetectionMethod;
-import psidev.psi.mi.xml.model.FeatureType;
+import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.core.persister.IntactCore;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Feature;
+import uk.ac.ebi.intact.model.Range;
 
 /**
  * TODO comment this
@@ -39,7 +41,7 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
 
         // using the empty constructor because we don't have a Component instance to pass
         // to the standard parametrized constructor
-        Feature feature = new Feature();
+        Feature feature = super.psiToIntact(psiObject);
         feature.setOwner(getInstitution());
         IntactConverterUtils.populateNames(psiObject.getNames(), feature);
         IntactConverterUtils.populateXref(psiObject.getXref(), feature, new XrefConverter<FeatureXref>(getInstitution(), FeatureXref.class));
@@ -73,8 +75,7 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
     }
 
     public psidev.psi.mi.xml.model.Feature intactToPsi(Feature intactObject) {
-        psidev.psi.mi.xml.model.Feature psiFeature = new psidev.psi.mi.xml.model.Feature();
-        PsiConverterUtils.populate(intactObject, psiFeature, this );
+        psidev.psi.mi.xml.model.Feature psiFeature = super.intactToPsi(intactObject);
 
         CvObjectConverter<CvFeatureType,FeatureType> featureTypeConverter =
                 new CvObjectConverter<CvFeatureType,FeatureType>(getInstitution(), CvFeatureType.class, FeatureType.class);

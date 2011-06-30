@@ -17,21 +17,37 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.xml.PsimiXmlReader;
+import psidev.psi.mi.xml.PsimiXmlVersion;
+import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Interaction;
 import psidev.psi.mi.xml.model.Parameter;
+import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.core.persister.IntactCore;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterMessage;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Confidence;
+import uk.ac.ebi.intact.model.Feature;
+import uk.ac.ebi.intact.model.Range;
 import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.clone.IntactCloner;
 import uk.ac.ebi.intact.model.util.XrefUtils;
+import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
+import uk.ac.ebi.intact.util.psivalidator.PsiValidatorReport;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * InteractionConverter Tester.
@@ -266,6 +282,76 @@ public class InteractionConverterTest extends AbstractConverterTest {
         Assert.assertEquals(2, ConverterContext.getInstance().getReport().getMessages().size());
     }
 
+
+
+    @Test
+    public void psiToIntact_linkedFeatures() throws Exception {
+        Interaction psiInteraction = PsiMockFactory.createMockInteraction(2);
+
+        Iterator<Participant> iterator = psiInteraction.getParticipants().iterator();
+        Participant participantFirst = iterator.next();
+        Participant participantSec = iterator.next();
+
+        participantFirst.getFeatures().clear();
+        participantSec.getFeatures().clear();
+
+        psidev.psi.mi.xml.model.Feature featureFirst = PsiMockFactory.createFeature();
+        psidev.psi.mi.xml.model.Feature featureSec = PsiMockFactory.createFeature();
+
+        participantFirst.getFeatures().add(featureFirst);
+        participantSec.getFeatures().add(featureSec);
+
+        InferredInteraction inferredInteraction = new InferredInteraction();
+        inferredInteraction.getParticipant().add(new InferredInteractionParticipant(featureFirst));
+        inferredInteraction.getParticipant().add(new InferredInteractionParticipant(featureSec));
+
+        psiInteraction.getInferredInteractions().add(inferredInteraction);
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        uk.ac.ebi.intact.model.Interaction intactInteraction = converter.psiToIntact(psiInteraction);
+
+        Assert.assertEquals(2, intactInteraction.getComponents().size());
+
+        Iterator<Component> iterator1 = intactInteraction.getComponents().iterator();
+        Component compFirst = iterator1.next();
+        Component compSec = iterator1.next();
+
+        Assert.assertEquals(1, compFirst.getFeatures().size());
+        Assert.assertEquals(1, compSec.getFeatures().size());
+
+        Feature intactFeatureFirst = compFirst.getFeatures().iterator().next();
+        Feature intactFeatureSec = compSec.getFeatures().iterator().next();
+
+        Assert.assertTrue(intactFeatureFirst.getBoundDomain().equals(intactFeatureSec));
+        Assert.assertTrue(intactFeatureSec.getBoundDomain().equals(intactFeatureFirst));
+    }
+
+    @Test
+    public void psiToIntact_linkedFeatures_readFromFile() throws Exception {
+        PsimiXmlReader reader = new PsimiXmlReader( PsimiXmlVersion.VERSION_253 );
+        URL url = this.getClass().getResource("/xml/14729917_simplified.xml");
+        EntrySet entrySet = reader.read(new File(url.getFile()));
+
+        EntryConverter entryConverter = new EntryConverter();
+        IntactEntry intactEntry = entryConverter.psiToIntact(entrySet.getEntries().iterator().next());
+
+        uk.ac.ebi.intact.model.Interaction intactInteraction = intactEntry.getInteractions().iterator().next();
+        Assert.assertEquals(2, intactInteraction.getComponents().size());
+
+        Iterator<Component> iterator1 = intactInteraction.getComponents().iterator();
+        Component compFirst = iterator1.next();
+        Component compSec = iterator1.next();
+
+        Assert.assertEquals(1, compFirst.getFeatures().size());
+        Assert.assertEquals(1, compSec.getFeatures().size());
+
+        Feature intactFeatureFirst = compFirst.getFeatures().iterator().next();
+        Feature intactFeatureSec = compSec.getFeatures().iterator().next();
+
+        Assert.assertTrue(intactFeatureFirst.getBoundDomain().equals(intactFeatureSec));
+        Assert.assertTrue(intactFeatureSec.getBoundDomain().equals(intactFeatureFirst));
+    }
+
     @Test
     public void intactTopsi_default() throws Exception {
         uk.ac.ebi.intact.model.Interaction intactInteraction = new IntactMockBuilder().createDeterministicInteraction();
@@ -312,6 +398,91 @@ public class InteractionConverterTest extends AbstractConverterTest {
 
         Assert.assertNotNull(psiInteraction.getXref());
         Assert.assertEquals("intact", psiInteraction.getXref().getPrimaryRef().getDb());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    public void intactTopsi_linkedFeatures() throws Exception {
+        TransactionStatus status = getDataContext().beginTransaction();
+
+        IntactMockBuilder intactMockBuilder = new IntactMockBuilder();
+
+        uk.ac.ebi.intact.model.Interaction intactInteraction = intactMockBuilder.createDeterministicInteraction();
+
+        Iterator<Component> componentIterator = intactInteraction.getComponents().iterator();
+        Component firstComponent = componentIterator.next();
+        Component secComponent = componentIterator.next();
+
+        firstComponent.getFeatures().clear();
+        secComponent.getFeatures().clear();
+
+        Feature feature = createFeature("feature1", firstComponent, 1, 1,5, 5, intactMockBuilder);
+        Feature feature2 = createFeature("feature2", secComponent, 1, 3,5, 5, intactMockBuilder);
+        Feature feature3 = createFeature("feature3", firstComponent, 1, 1,4, 5, intactMockBuilder);
+        Feature feature4 = createFeature("feature4", secComponent, 1, 1,5, 10, intactMockBuilder);
+
+
+        feature.setBoundDomain(feature2);
+        feature2.setBoundDomain(feature);
+
+        feature3.setBoundDomain(feature4);
+        feature4.setBoundDomain(feature3);
+
+
+        firstComponent.getFeatures().add(feature);
+        firstComponent.getFeatures().add(feature3);
+        secComponent.getFeatures().add(feature2);
+        secComponent.getFeatures().add(feature4);
+
+        getCorePersister().saveOrUpdate(intactInteraction);
+        getDataContext().commitTransaction(status);
+
+        InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));
+        Interaction psiInteraction = converter.intactToPsi( intactInteraction);
+
+        Assert.assertEquals(2, psiInteraction.getInferredInteractions().size());
+
+        InferredInteractionParticipant iParticipant = new InferredInteractionParticipant((psidev.psi.mi.xml.model.Feature) ConversionCache.getElement(feature));
+        InferredInteractionParticipant iParticipant2 = new InferredInteractionParticipant((psidev.psi.mi.xml.model.Feature) ConversionCache.getElement(feature2));
+
+        InferredInteractionParticipant iParticipant3 = new InferredInteractionParticipant((psidev.psi.mi.xml.model.Feature) ConversionCache.getElement(feature3));
+        InferredInteractionParticipant iParticipant4 = new InferredInteractionParticipant((psidev.psi.mi.xml.model.Feature) ConversionCache.getElement(feature4));
+
+        for(InferredInteraction interaction : psiInteraction.getInferredInteractions()){
+
+            Assert.assertEquals(2, interaction.getParticipant().size());
+
+            // test if feature is linked with feature2 and feature3 is linked with feature4
+            Assert.assertTrue((interaction.getParticipant().contains(iParticipant) && interaction.getParticipant().contains(iParticipant2)) ||
+                              (interaction.getParticipant().contains(iParticipant3) && interaction.getParticipant().contains(iParticipant4)));
+        }
+    }
+
+    @Test
+    public void intactTopsi_linkedFeatures_writeFile() throws Exception {
+        PsimiXmlReader reader = new PsimiXmlReader( PsimiXmlVersion.VERSION_253 );
+        URL url = this.getClass().getResource("/xml/14729917_simplified.xml");
+        EntrySet entrySet = reader.read(new File(url.getFile()));
+
+        EntryConverter entryConverter = new EntryConverter();
+        IntactEntry intactEntry = entryConverter.psiToIntact(entrySet.getEntries().iterator().next());
+
+        Entry psiEntry = entryConverter.intactToPsi(intactEntry);
+
+        EntrySet psiEntrySet = new EntrySet(Arrays.asList(psiEntry), 2, 5, 3);
+        PsimiXmlWriter writer = new PsimiXmlWriter(PsimiXmlVersion.VERSION_254);
+
+        String xml = writer.getAsString(psiEntrySet);
+    }
+
+    private Feature createFeature(String name, Component component, int fromIntervalStart, int fromIntervalEnd,
+                                  int toIntervalStart, int toIntervalEnd, IntactMockBuilder intactMockBuilder){
+        CvFeatureType featureType = intactMockBuilder.createCvObject(CvFeatureType.class, CvFeatureType.EXPERIMENTAL_FEATURE_MI_REF, CvFeatureType.EXPERIMENTAL_FEATURE);
+        Feature feature = new Feature(name, component, featureType);
+
+        Range range = intactMockBuilder.createRange(fromIntervalStart, fromIntervalEnd, toIntervalStart, toIntervalEnd);
+        feature.addRange(range);
+        return feature;
     }
 
     @Test

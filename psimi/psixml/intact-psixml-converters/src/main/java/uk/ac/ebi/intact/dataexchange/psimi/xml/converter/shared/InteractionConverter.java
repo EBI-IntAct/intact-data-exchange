@@ -15,10 +15,13 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
+import org.apache.axis.encoding.ser.ArrayDeserializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obo.datamodel.OBOSession;
+import org.springframework.util.Assert;
 import psidev.psi.mi.xml.model.*;
+import psidev.psi.mi.xml.model.Feature;
 import uk.ac.ebi.intact.core.persister.IntactCore;
 import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
 import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
@@ -26,6 +29,7 @@ import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.MessageLevel;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
@@ -255,11 +259,51 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
 
         ParticipantConverter participantConverter = new ParticipantConverter(getInstitution());
-        for (Component comp : IntactCore.ensureInitializedParticipants(intactObject)) {
+
+        Collection<Component> components = IntactCore.ensureInitializedParticipants(intactObject);
+
+        for (Component comp : components) {
             Participant participant = participantConverter.intactToPsi(comp);
             participant.setInteraction(interaction);
             participant.setInteractionRef(new InteractionRef(interaction.getId()));
             interaction.getParticipants().add(participant);
+        }
+
+        for (Component comp : components){
+            for(uk.ac.ebi.intact.model.Feature feature : IntactCore.ensureInitializedFeatures(comp)){
+                if(feature.getBoundDomain() != null){
+
+                    uk.ac.ebi.intact.model.Feature boundFeature = feature.getBoundDomain();
+
+                    Feature psiFeature;
+                    Feature boundPsiFeature;
+
+                    if(feature.getAc() != null){
+                        psiFeature = participantConverter.getFeatureMap().get(feature.getAc());
+                    }else{
+                        psiFeature = (Feature) ConversionCache.getElement(feature);
+                    }
+
+                    if(boundFeature.getAc() != null){
+                        boundPsiFeature = participantConverter.getFeatureMap().get(boundFeature.getAc());
+                    }else{
+                        boundPsiFeature = (Feature) ConversionCache.getElement(boundFeature);
+                    }
+
+                    if(psiFeature != null && boundPsiFeature != null){
+                        InferredInteractionParticipant iParticipantFirst = new InferredInteractionParticipant(psiFeature);
+                        InferredInteractionParticipant iParticipantSecond = new InferredInteractionParticipant(boundPsiFeature);
+
+                        InferredInteraction iInteraction = new InferredInteraction(Arrays.asList(iParticipantFirst, iParticipantSecond));
+                        InferredInteraction iTestInteraction = new InferredInteraction(Arrays.asList(iParticipantSecond, iParticipantFirst));
+
+                        if(!(interaction.getInferredInteractions().contains(iInteraction) ||
+                             interaction.getInferredInteractions().contains(iTestInteraction))){
+                            interaction.getInferredInteractions().add(iInteraction);
+                        }
+                    }
+                }
+            }
         }
 
         InteractionType interactionType = (InteractionType)
@@ -401,6 +445,39 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
             Component component = IntactConverterUtils.newComponent(interaction.getOwner(), participant, interaction);
             components.add(component);
+        }
+
+        for( InferredInteraction inferredInteraction : psiInteraction.getInferredInteractions()){
+            if(inferredInteraction.getParticipant().size() == 2){
+                Iterator<InferredInteractionParticipant> iterator = inferredInteraction.getParticipant().iterator();
+                InferredInteractionParticipant firstParticipant = iterator.next();
+                InferredInteractionParticipant secParticipant = iterator.next();
+
+                uk.ac.ebi.intact.model.Feature firstFeature = null;
+                uk.ac.ebi.intact.model.Feature secFeature = null;
+
+                if(firstParticipant.hasFeature()){
+                    firstFeature = (uk.ac.ebi.intact.model.Feature) ConversionCache.getElement(firstParticipant.getFeature());
+                }else if (firstParticipant.hasFeatureRef()){
+                    // TODO featureRef?
+                }
+
+                if(secParticipant.hasFeature()){
+                    secFeature = (uk.ac.ebi.intact.model.Feature) ConversionCache.getElement(secParticipant.getFeature());
+                }else if(secParticipant.hasFeatureRef()){
+
+                }
+
+                if(firstFeature != null && secFeature != null){
+                    firstFeature.setBoundDomain(secFeature);
+                    secFeature.setBoundDomain(firstFeature);
+                }else{
+                    // TODO think about cases where features are linked with participants
+                }
+
+            }else{
+               // TODO think about cases with more than two participant
+            }
         }
 
         return components;
