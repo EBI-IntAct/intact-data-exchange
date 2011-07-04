@@ -15,11 +15,9 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import org.apache.axis.encoding.ser.ArrayDeserializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obo.datamodel.OBOSession;
-import org.springframework.util.Assert;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Feature;
 import uk.ac.ebi.intact.core.persister.IntactCore;
@@ -36,7 +34,6 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Confidence;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Xref;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
@@ -56,9 +53,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     private static final Log log = LogFactory.getLog(InteractionConverter.class);
 
     private static ThreadLocal<List<CvDagObject>> ontology = new ThreadLocal<List<CvDagObject>>();
-    private static final String MODELLED = "modelled";
-    private static final String INTRA_MOLECULAR = "intra-molecular";
-    private static final String NEGATIVE = "negative";
+    public static final String MODELLED = "modelled";
+    public static final String INTRA_MOLECULAR = "intra-molecular";
+    public static final String NEGATIVE = "negative";
 
     private static final String TRUE = "true";
 
@@ -133,7 +130,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
             ConfidenceConverter confConverter= new ConfidenceConverter( getInstitution());
             for (psidev.psi.mi.xml.model.Confidence psiConfidence :  psiObject.getConfidences()){
-               Confidence confidence = confConverter.psiToIntact( psiConfidence );
+                Confidence confidence = confConverter.psiToIntact( psiConfidence );
                 interaction.addConfidence( confidence);
             }
 
@@ -150,20 +147,20 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             // negative
             if( psiObject.isNegative() ) {
                 interaction.addAnnotation( new Annotation( getInstitution(),
-                                                           new CvTopic( getInstitution(), NEGATIVE ),
-                                                           TRUE ) );
+                        new CvTopic( getInstitution(), NEGATIVE ),
+                        TRUE ) );
             }
 
             if( psiObject.isIntraMolecular() ) {
                 interaction.addAnnotation( new Annotation( getInstitution(),
-                                                           new CvTopic( getInstitution(), INTRA_MOLECULAR ),
-                                                           TRUE ) );
+                        new CvTopic( getInstitution(), INTRA_MOLECULAR ),
+                        TRUE ) );
             }
 
             if( psiObject.isModelled() ) {
                 interaction.addAnnotation( new Annotation( getInstitution(),
-                                                           new CvTopic( getInstitution(), MODELLED ),
-                                                           TRUE ) );
+                        new CvTopic( getInstitution(), MODELLED ),
+                        TRUE ) );
             }
         } catch (Throwable t) {
             throw new PsiConversionException("Problem converting PSI interaction to Intact: "+psiObject.getNames(), t);
@@ -229,9 +226,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
     public psidev.psi.mi.xml.model.Interaction intactToPsi(Interaction intactObject) {
 
-        final boolean isNegative = removeAnnotation( intactObject, NEGATIVE, TRUE );
-        final boolean isIntraMolecular = removeAnnotation( intactObject, INTRA_MOLECULAR, TRUE );
-        final boolean isModelled = removeAnnotation( intactObject, MODELLED, TRUE );
+        final boolean isNegative = containsAnnotation( intactObject, NEGATIVE, TRUE );
+        final boolean isIntraMolecular = containsAnnotation( intactObject, INTRA_MOLECULAR, TRUE );
+        final boolean isModelled = containsAnnotation( intactObject, MODELLED, TRUE );
 
         psidev.psi.mi.xml.model.Interaction interaction = super.intactToPsi(intactObject);
 
@@ -298,7 +295,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                         InferredInteraction iTestInteraction = new InferredInteraction(Arrays.asList(iParticipantSecond, iParticipantFirst));
 
                         if(!(interaction.getInferredInteractions().contains(iInteraction) ||
-                             interaction.getInferredInteractions().contains(iTestInteraction))){
+                                interaction.getInferredInteractions().contains(iTestInteraction))){
                             interaction.getInferredInteractions().add(iInteraction);
                         }
                     }
@@ -308,8 +305,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         InteractionType interactionType = (InteractionType)
                 PsiConverterUtils.toCvType(intactObject.getCvInteractionType(),
-                                           new InteractionTypeConverter(getInstitution()),
-                                           this );
+                        new InteractionTypeConverter(getInstitution()),
+                        this );
         interaction.getInteractionTypes().add(interactionType);
 
         ConfidenceConverter confidenceConverter = new ConfidenceConverter( getInstitution());
@@ -323,7 +320,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             psidev.psi.mi.xml.model.Parameter parameter = interactionParameterConverter.intactToPsi(param);
             interaction.getParameters().add(parameter);
         }
-        
+
         interaction.setNegative( isNegative );
         interaction.setIntraMolecular( isIntraMolecular );
         interaction.setModelled( isModelled );
@@ -335,14 +332,27 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         return interaction;
     }
 
-    private boolean removeAnnotation( Interaction interaction, String topicShortlabel, String text ) {
+    /*private boolean removeAnnotation( Interaction interaction, String topicShortlabel, String text ) {
         boolean found = false;
         final Iterator<Annotation> it = IntactCore.ensureInitializedAnnotations(interaction).iterator();
         while ( it.hasNext() ) {
             Annotation annotation = it.next();
             if ( annotation.getCvTopic().getShortLabel().equals( topicShortlabel )
-                 && ( text != null && text.equals( annotation.getAnnotationText() ) ) ) {
+                    && ( text != null && text.equals( annotation.getAnnotationText() ) ) ) {
                 it.remove();
+                found = true;
+            }
+        }
+        return found;
+    }*/
+
+    private boolean containsAnnotation( Interaction interaction, String topicShortlabel, String text ) {
+        boolean found = false;
+        final Iterator<Annotation> it = IntactCore.ensureInitializedAnnotations(interaction).iterator();
+        while ( it.hasNext() ) {
+            Annotation annotation = it.next();
+            if ( annotation.getCvTopic().getShortLabel().equals( topicShortlabel )
+                    && ( text != null && text.equals( annotation.getAnnotationText() ) ) ) {
                 found = true;
             }
         }
@@ -373,7 +383,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                     addMessageToContext(MessageLevel.WARN, message, true);
 
                     CvIdentification detMethod = CvObjectUtils.createCvObject(experiment.getOwner(), CvIdentification.class, "MI:0661", "experimental particp");
-                    experiment.setCvIdentification(detMethod);  
+                    experiment.setCvIdentification(detMethod);
                 }
             }
         }
@@ -382,13 +392,13 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     private String calculateParticipantDetMethod(Collection<Component> components) {
         Set<String> detMethodMis = new HashSet<String>();
 
-         for (Component component : components) {
-             for (CvIdentification partDetMethod : component.getParticipantDetectionMethods()) {
-                 if (partDetMethod.getIdentifier() != null) {
-                     detMethodMis.add(partDetMethod.getIdentifier());
-                 }
-             }
-         }
+        for (Component component : components) {
+            for (CvIdentification partDetMethod : component.getParticipantDetectionMethods()) {
+                if (partDetMethod.getIdentifier() != null) {
+                    detMethodMis.add(partDetMethod.getIdentifier());
+                }
+            }
+        }
 
         if (detMethodMis.size() == 1) {
             return detMethodMis.iterator().next();
@@ -421,7 +431,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
      */
     protected CvInteractionType getInteractionType(psidev.psi.mi.xml.model.Interaction psiInteraction) {
         final Collection<InteractionType> interactionTypes = psiInteraction.getInteractionTypes();
-        
+
         if (interactionTypes == null || interactionTypes.isEmpty()) {
             throw new PsiConversionException("Interaction without Interaction Type: "+psiInteraction);
         }
@@ -476,13 +486,13 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                 }
 
             }else{
-               // TODO think about cases with more than two participant
+                // TODO think about cases with more than two participant
             }
         }
 
         return components;
     }
-    
+
     protected void failIfInconsistentConversion(Interaction intact, psidev.psi.mi.xml.model.Interaction psi) {
         failIfInconsistentCollectionSize("experiment", IntactCore.ensureInitializedExperiments(intact), psi.getExperiments());
         failIfInconsistentCollectionSize("participant", IntactCore.ensureInitializedParticipants(intact), psi.getParticipants());

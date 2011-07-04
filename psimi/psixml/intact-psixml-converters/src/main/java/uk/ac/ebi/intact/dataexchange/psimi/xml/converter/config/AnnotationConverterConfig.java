@@ -1,9 +1,10 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config;
 
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
+import uk.ac.ebi.intact.model.CvTopic;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import uk.ac.ebi.intact.model.CvTopic;
 
 /**
  * Holds the configuration of the converter.
@@ -20,6 +21,11 @@ public class AnnotationConverterConfig {
     private Set<CvTopic> excludeAnnotationTopic = new HashSet<CvTopic>( );
 
     public AnnotationConverterConfig() {
+
+        // always exclude negative, Intra-molecular and modelled
+        addExcludeAnnotationTopic(new CvTopic(InteractionConverter.NEGATIVE));
+        addExcludeAnnotationTopic(new CvTopic(InteractionConverter.INTRA_MOLECULAR));
+        addExcludeAnnotationTopic(new CvTopic(InteractionConverter.MODELLED));
     }
 
     ///////////////////////////////
