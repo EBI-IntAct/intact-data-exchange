@@ -34,7 +34,7 @@ public class AnnotationConverter extends AbstractIntactPsiConverter<Annotation, 
     }
 
     public Annotation psiToIntact(Attribute psiObject) {
-        psiEndConversion(psiObject);
+        psiStartConversion(psiObject);
 
         CvTopic cvTopic = new CvTopic(getInstitution(), psiObject.getName());
 
@@ -58,7 +58,7 @@ public class AnnotationConverter extends AbstractIntactPsiConverter<Annotation, 
             attribute.setNameAc(intactObject.getCvTopic().getIdentifier());
         }
 
-        psiEndConversion(intactObject);
+        intactEndConversion(intactObject);
 
         return attribute;
     }

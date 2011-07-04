@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvFuzzyType;
 import uk.ac.ebi.intact.model.Institution;
@@ -133,6 +132,8 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         Range range = new Range(fromFuzzyType, beginIntervalFrom, beginIntervalTo, toFuzzyType, endIntervalFrom, endIntervalTo, seq);
         range.setOwner(getInstitution());
 
+        psiStartConversion(psiObject);
+
         // check possible errors
         if ((fromFuzzyType.isUndetermined() || fromFuzzyType.isCTerminalRegion() || fromFuzzyType.isNTerminalRegion()) && (beginIntervalFrom > 0 || beginIntervalTo > 0 || beginIntervalFrom != beginIntervalTo)){
             throw new PsiConversionException( "Cannot convert the range " + range.toString() + ". The start position is undetermined and we should have a position null" +
@@ -163,6 +164,7 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         // correct positions for undetermined, n-terminal or c-terminal
         FeatureUtils.correctRangePositionsAccordingToType(range, seq);
 
+        psiEndConversion(psiObject);
         return range;
     }
 
@@ -274,6 +276,7 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
     public psidev.psi.mi.xml.model.Range intactToPsi(Range intactObject) {
         psidev.psi.mi.xml.model.Range psiRange = new psidev.psi.mi.xml.model.Range();
 
+        intactStartConversation(intactObject);
         // set the range status
         CvObjectConverter<CvFuzzyType,RangeStatus> fuzzyTypeConverter =
                 new CvObjectConverter<CvFuzzyType,RangeStatus>( getInstitution(),
@@ -330,6 +333,7 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
             psiRange.setEnd(new Position(endIntervalTo));
         }
 
+        intactEndConversion(intactObject);
         return psiRange;
     }
 }

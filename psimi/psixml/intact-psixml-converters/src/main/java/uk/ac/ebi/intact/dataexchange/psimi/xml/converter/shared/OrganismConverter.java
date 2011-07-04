@@ -32,6 +32,8 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         int taxId = psiObject.getNcbiTaxId();
 
         BioSource bioSource = new BioSource(getInstitution(), shortLabel, String.valueOf(taxId));
+        psiStartConversion(psiObject);
+
         IntactConverterUtils.populateNames(psiObject.getNames(), bioSource);
 
         // cell type
@@ -57,11 +59,13 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
             bioSource.setCvTissue(intactTissue);
         }
 
+        psiEndConversion(psiObject);
         return bioSource;
     }
 
     public Organism intactToPsi(BioSource intactObject) {
         Organism organism = new Organism();
+        intactStartConversation(intactObject);
         PsiConverterUtils.populate(intactObject, organism, this);
 
         organism.setNcbiTaxId(Integer.valueOf(intactObject.getTaxId()));
@@ -86,7 +90,7 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
             organism.setTissue(psiTissue);
         }
 
-
+        intactEndConversion(intactObject);
         return organism;
     }
 }

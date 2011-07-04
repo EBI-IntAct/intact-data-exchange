@@ -50,12 +50,17 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
     public Component psiToIntact(Participant psiObject) {
         Interaction interaction = new InteractionConverter(getInstitution()).psiToIntact(psiObject.getInteraction());
 
+        psiStartConversion(psiObject);
         Component component = IntactConverterUtils.newComponent(getInstitution(), psiObject, interaction);
+
+        psiEndConversion(psiObject);
         return component;
     }
 
     public Participant intactToPsi(Component intactObject) {
         Participant participant = new Participant();
+
+        intactStartConversation(intactObject);
         PsiConverterUtils.populate(intactObject, participant, this );
         participant.getNames().setShortLabel(intactObject.getInteractor().getShortLabel());
 
@@ -147,6 +152,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             }
         }
 
+        intactEndConversion(intactObject);
         return participant;
     }
 

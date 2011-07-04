@@ -77,7 +77,9 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
         }
 
         X xref = newXrefInstance(xrefClass, cvDb, primaryId, secondaryId, dbRelease, xrefQual);
+        psiStartConversion(psiObject);
         xref.setOwner(getInstitution());
+        psiEndConversion(psiObject);
 
         return xref;
     }
@@ -86,6 +88,8 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
         fixPubmedReferenceAsIdentityToPrimaryRef(intactObject);
 
         DbReference dbRef = new DbReference();
+
+        intactStartConversation(intactObject);
         dbRef.setDb(intactObject.getCvDatabase().getShortLabel());
         dbRef.setId(intactObject.getPrimaryId());
         dbRef.setSecondary(intactObject.getSecondaryId());
@@ -101,6 +105,7 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
             dbRef.setDb(intactObject.getCvDatabase().getShortLabel());
         }
 
+        intactEndConversion(intactObject);
         return dbRef;
     }
 

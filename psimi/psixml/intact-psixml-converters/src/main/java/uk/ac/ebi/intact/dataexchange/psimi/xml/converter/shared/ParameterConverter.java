@@ -40,6 +40,8 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
         cvParameterType.setIdentifier(psiObject.getTermAc());
 
         T parameter = newParameterInstance();
+
+        psiStartConversion(psiObject);
         parameter.setOwner(getInstitution());
         parameter.setCvParameterType(cvParameterType);
         parameter.setFactor(factor);
@@ -67,12 +69,17 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
             Experiment experiment = experimentConverter.psiToIntact(psiObject.getExperiment());
             parameter.setExperiment(experiment);
         }
+
+        psiEndConversion(psiObject);
         return parameter;
     }
 
     public psidev.psi.mi.xml.model.Parameter intactToPsi( T intactObject ) {
 
         psidev.psi.mi.xml.model.Parameter parameter = new psidev.psi.mi.xml.model.Parameter(intactObject.getCvParameterType().getShortLabel(), intactObject.getFactor());
+
+        intactStartConversation(parameter);
+
         parameter.setTermAc(intactObject.getCvParameterType().getIdentifier());
         if (intactObject.getBase() != null) {
             parameter.setBase(intactObject.getBase());
@@ -94,6 +101,8 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
             ExperimentConverter experimentConverter = new ExperimentConverter(getInstitution());
             parameter.setExperiment(experimentConverter.intactToPsi(intactObject.getExperiment()));
         }
+
+        intactEndConversion(intactObject);
         return parameter;
     }
 

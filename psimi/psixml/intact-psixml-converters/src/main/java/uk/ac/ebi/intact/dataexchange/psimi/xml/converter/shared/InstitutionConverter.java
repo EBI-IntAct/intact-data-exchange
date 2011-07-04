@@ -32,6 +32,8 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
             return institution;
         }
 
+        psiStartConversion(psiObject);
+
         IntactConverterUtils.populateNames(psiObject.getNames(), institution);
 
         if (psiObject.getXref() != null) {
@@ -55,6 +57,8 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
 
         setInstitution(institution);
 
+        psiEndConversion(psiObject);
+
         return institution;
     }
 
@@ -66,11 +70,14 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
             return source;
         }
 
+        intactStartConversation(intactObject);
+
         source = new Source();
         PsiConverterUtils.populate(intactObject, source, this);
 
         source.setReleaseDate(new Date());
 
+        intactEndConversion(intactObject);
         return source;
     }
 
