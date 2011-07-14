@@ -30,12 +30,12 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     /**
      * The score threshold for positive interactions
      */
-    private double positive_export_threshold = 8;
+    private double positive_export_threshold = 9;
 
     /**
      * The score threshold for negative interactions
      */
-    private double negative_export_threshold = 8;
+    private double negative_export_threshold = 9;
 
     private static final String COLOCALIZATION = "MI:0403";
 
