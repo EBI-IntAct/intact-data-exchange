@@ -319,7 +319,7 @@ public class IntactFilter implements InteractionFilter {
             // we increments the index in the interaction list
             i++;
         }
-        dataContext.commitTransaction(transactionStatus);
+        dataContext.rollbackTransaction(transactionStatus);
 
         return i;
     }
@@ -389,7 +389,7 @@ public class IntactFilter implements InteractionFilter {
             logger.error("The interaction " + interaction + " doesn't exist in the database and is excluded.");
         }
 
-        dataContext.commitTransaction(transactionStatus);
+        dataContext.rollbackTransaction(transactionStatus);
     }
 
     /**
@@ -452,7 +452,7 @@ public class IntactFilter implements InteractionFilter {
             // we increments the index in the interaction list
             i++;
         }
-        dataContext.commitTransaction(transactionStatus);
+        dataContext.rollbackTransaction(transactionStatus);
 
         return i;
     }
