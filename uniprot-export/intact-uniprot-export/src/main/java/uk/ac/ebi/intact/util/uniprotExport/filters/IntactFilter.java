@@ -271,6 +271,7 @@ public class IntactFilter implements InteractionFilter {
                                 }
 
                                 FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+                                removeNonPubmedPublicationsFrom(binary);
 
                                 binary.getInteractorA().getAlternativeIdentifiers().clear();
                                 binary.getInteractorA().getAliases().clear();
