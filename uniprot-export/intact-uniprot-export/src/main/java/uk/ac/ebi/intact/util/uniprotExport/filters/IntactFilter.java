@@ -50,7 +50,7 @@ public class IntactFilter implements InteractionFilter {
     /**
      * Threshold value for the maximum number of binary interactions we want to process at the same time.
      */
-    private static final int MAX_NUMBER_INTERACTION = 200;
+    private static final int MAX_NUMBER_INTERACTION = 300;
 
     public static final String UNIPROT_DATABASE = "uniprotkb";
 
