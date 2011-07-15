@@ -246,7 +246,7 @@ public class IntactFilter implements InteractionFilter {
                         // we convert the interaction in binary interaction
                         Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
                         if (toBinary.size() == 1){
-                            logger.info("Processing interaction " + interactionAc);
+                            //logger.info("Processing interaction " + interactionAc);
                             processClusterContext(context, interactionAc, toBinary);
 
                             for (IntactBinaryInteraction binary : toBinary){
@@ -331,7 +331,7 @@ public class IntactFilter implements InteractionFilter {
                     // we convert the interaction in binary interaction
                     Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
                     if (toBinary.size() == 1){
-                        logger.info("Processing interaction " + interaction);
+                        //logger.info("Processing interaction " + interaction);
                         processClusterContext(context, interaction, toBinary);
 
                         for (IntactBinaryInteraction binary : toBinary){
@@ -418,11 +418,11 @@ public class IntactFilter implements InteractionFilter {
                         Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
 
                         if (excludeSpokeExpanded && toBinary.size() == 1){
-                            logger.info("Processing interaction " + interactionAc);
+                            //logger.info("Processing interaction " + interactionAc);
                             processClustering(binaryInteractions, context, interactionAc, toBinary, excludeNonUniprotInteractors);
                         }
                         else if (!excludeSpokeExpanded){
-                            logger.info("Processing interaction " + interactionAc);
+                            //logger.info("Processing interaction " + interactionAc);
                             processClustering(binaryInteractions, context, interactionAc, toBinary, excludeNonUniprotInteractors);
                         }
                     } catch (Exception e) {
