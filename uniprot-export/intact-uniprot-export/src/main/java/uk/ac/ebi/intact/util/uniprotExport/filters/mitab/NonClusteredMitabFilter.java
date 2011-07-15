@@ -20,7 +20,6 @@ import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -165,15 +164,6 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
         return new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
     }
 
-    private void removeNonPubmedPublicationsFrom(IntactBinaryInteraction interaction){
-        List<CrossReference> publications = new ArrayList(interaction.getPublications());
-
-        for (CrossReference pub : publications){
-            if (!WriterUtils.PUBMED.equalsIgnoreCase(pub.getDatabase())){
-                interaction.getPublications().remove(pub);
-            }
-        }
-    }
     private void processClustering(MiClusterContext context, List<BinaryInteraction> interactionToProcess, IntactBinaryInteraction interaction, String intactAc, ExtendedInteractor interactorA, String uniprotA, ExtendedInteractor interactorB, String uniprotB, boolean excludedSpokeExpanded) {
         if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
 

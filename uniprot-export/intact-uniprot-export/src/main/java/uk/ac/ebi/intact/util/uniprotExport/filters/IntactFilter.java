@@ -24,6 +24,7 @@ import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
+import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -478,7 +479,18 @@ public class IntactFilter implements InteractionFilter {
             if ((uniprotA != null && uniprotB != null && excludeNonUniprot) || !excludeNonUniprot){
 
                 FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+                removeNonPubmedPublicationsFrom(binary);
                 binaryInteractions.add(binary);
+            }
+        }
+    }
+
+    protected void removeNonPubmedPublicationsFrom(IntactBinaryInteraction interaction){
+        List<CrossReference> publications = new ArrayList(interaction.getPublications());
+
+        for (CrossReference pub : publications){
+            if (!WriterUtils.PUBMED.equalsIgnoreCase(pub.getDatabase())){
+                interaction.getPublications().remove(pub);
             }
         }
     }
