@@ -409,7 +409,7 @@ public class QueryFactory {
 
     /**
      *
-     * @return the list of interaction accessions which are publicly released and pass the filtering options set in the FilterConfig
+     * @return the list of positive interaction accessions which are publicly released and pass the filtering options set in the FilterConfig
      */
     public List<String> getReleasedInteractionAcsPassingFilters(){
         FilterConfig config = FilterContext.getInstance().getConfig();

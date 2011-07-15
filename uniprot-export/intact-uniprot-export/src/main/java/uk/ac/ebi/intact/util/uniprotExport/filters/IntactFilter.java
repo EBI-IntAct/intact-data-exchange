@@ -135,10 +135,10 @@ public class IntactFilter implements InteractionFilter {
             }
 
             // we compute the mi score for the list of binary interactions
-            processMiClustering(binaryInteractions, MAX_NUMBER_INTERACTION, clusterScore);
+            processMiClustering(binaryInteractions, clusterScore);
 
             // we compute the mi score for the list of negative binary interactions
-            processMiClustering(negativeBinaryInteractions, MAX_NUMBER_INTERACTION, negativeClusterScore);
+            processMiClustering(negativeBinaryInteractions, negativeClusterScore);
 
             int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
             System.out.println("Still " + interactionsToProcess + " interactions to process in IntAct.");
@@ -166,30 +166,24 @@ public class IntactFilter implements InteractionFilter {
         int i = 0;
         // the list of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
-        // the list of negative binary interactions to process
-        List<BinaryInteraction> negativeBinaryInteractions = new ArrayList<BinaryInteraction>();
 
         logger.info(this.eligibleInteractionsForUniprotExport.size() + " interactions in IntAct will be processed.");
 
-        Iterator<String> interactionIterator = this.eligibleInteractionsForUniprotExport.iterator();
+        List<String> positiveInteractions = new ArrayList(this.eligibleInteractionsForUniprotExport);
 
         // we process all the interactions of the list per chunk of 200 interactions
-        while (i < this.eligibleInteractionsForUniprotExport.size()){
+        while (i < positiveInteractions.size()){
             // we clear the previous chunk of binary interactions to only keep 200 binary interaction at a time
             binaryInteractions.clear();
-            negativeBinaryInteractions.clear();
-
-            String intactAc = interactionIterator.next();
 
             // we convert into binary interactions until we fill up the binary interactions list to MAX_NUMBER_INTERACTION. we get the new incremented i.
-            convertIntoBinaryInteractions(intactAc, binaryInteractions, context);
-            i++;
+            i = convertIntoBinaryInteractions(positiveInteractions, i, binaryInteractions, context);
 
             // we compute the mi score for the list of binary interactions
-            processMiClustering(binaryInteractions, MAX_NUMBER_INTERACTION, clusterScore);
+            processMiClustering(binaryInteractions, clusterScore);
 
             int interactionsToProcess = this.eligibleInteractionsForUniprotExport.size() - Math.min(i, this.eligibleInteractionsForUniprotExport.size());
-            logger.info("Still " + interactionsToProcess + " psoitive interactions to process in IntAct.");
+            logger.info("Still " + interactionsToProcess + " positive interactions to process in IntAct.");
         }
 
         if (!this.negativeInteractions.isEmpty()){
@@ -205,24 +199,21 @@ public class IntactFilter implements InteractionFilter {
 
         logger.info(this.negativeInteractions.size() + " negative interactions in IntAct will be processed.");
 
-        Iterator<String> interactionIterator = this.negativeInteractions.iterator();
+        List<String> negativeInteractions = new ArrayList(this.negativeInteractions);
 
         // we process all the interactions of the list per chunk of 200 interactions
-        while (i < this.negativeInteractions.size()){
+        while (i < negativeInteractions.size()){
             // we clear the previous chunk of binary interactions to only keep 200 binary interaction at a time
             negativeBinaryInteractions.clear();
 
-            String intactAc = interactionIterator.next();
-
-            // convert the negative binary interaction
-            convertIntoBinaryInteractions(intactAc, negativeBinaryInteractions, context);
-            i++;
+            // we convert into binary interactions until we fill up the binary interactions list to MAX_NUMBER_INTERACTION. we get the new incremented i.
+            i = convertIntoBinaryInteractions(negativeInteractions, i, negativeBinaryInteractions, context);
 
             // we compute the mi score for the list of negative binary interactions
-            processMiClustering(negativeBinaryInteractions, MAX_NUMBER_INTERACTION, negativeClusterScore);
+            processMiClustering(negativeBinaryInteractions, negativeClusterScore);
 
             int interactionsToProcess = this.negativeInteractions.size() - Math.min(i, this.negativeInteractions.size());
-            logger.info("Still " + interactionsToProcess + " negainteractions to process in IntAct.");
+            logger.info("Still " + interactionsToProcess + " negative interactions to process in IntAct.");
         }
     }
 
@@ -519,32 +510,16 @@ public class IntactFilter implements InteractionFilter {
     /**
      *
      * @param binaryInteractions : the list of binary interactions to process
-     * @param range : the maximum number of binary interactions we want to process at the same time
      */
-    private void processMiClustering(List<BinaryInteraction> binaryInteractions, int range, IntActInteractionClusterScore clusterScore) {
-        // the range must be positive
-        if (range > 0){
+    private void processMiClustering(List<BinaryInteraction> binaryInteractions, IntActInteractionClusterScore clusterScore) {
 
-            // number of binary interactions which have been processed
-            int numberOfBinaryInteractions = 0;
-
-            // process all the binary interactions
-            while (numberOfBinaryInteractions < binaryInteractions.size()){
-                try {
-                    // we compute the MI cluster score
-                    clusterScore.setBinaryInteractionIterator(binaryInteractions.subList(numberOfBinaryInteractions, numberOfBinaryInteractions + Math.min(range, binaryInteractions.size() - numberOfBinaryInteractions)).iterator());
-                    clusterScore.runService();
-                } catch (Exception e){
-                    e.printStackTrace();
-                    System.out.println("The score cannot be computed for the list of binary interactions of size " + binaryInteractions.size());
-                }
-
-                // increments the number of binary interactions which have been processed
-                numberOfBinaryInteractions+= Math.min(range, binaryInteractions.size() - numberOfBinaryInteractions);
-            }
-        }
-        else {
-            throw new IllegalArgumentException("we cannot process the miClustering of a list of binary interactions if the range of interactions we can process at the same time is 0.");
+        try {
+            // we compute the MI cluster score
+            clusterScore.setBinaryInteractionIterator(binaryInteractions.iterator());
+            clusterScore.runService();
+        } catch (Exception e){
+            e.printStackTrace();
+            System.out.println("The score cannot be computed for the list of binary interactions of size " + binaryInteractions.size());
         }
     }
 
