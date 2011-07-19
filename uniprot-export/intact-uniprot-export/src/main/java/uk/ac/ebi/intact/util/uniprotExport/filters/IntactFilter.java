@@ -178,7 +178,7 @@ public class IntactFilter implements InteractionFilter {
             binaryInteractions.clear();
 
             // we convert into binary interactions until we fill up the binary interactions list to MAX_NUMBER_INTERACTION. we get the new incremented i.
-            i = convertIntoBinaryInteractions(positiveInteractions, i, binaryInteractions, context);
+            i = convertIntoBinaryInteractionsExcludeNonUniprotProteins(positiveInteractions, i, binaryInteractions, context);
 
             // we compute the mi score for the list of binary interactions
             processMiClustering(binaryInteractions, clusterScore);
@@ -208,7 +208,7 @@ public class IntactFilter implements InteractionFilter {
             negativeBinaryInteractions.clear();
 
             // we convert into binary interactions until we fill up the binary interactions list to MAX_NUMBER_INTERACTION. we get the new incremented i.
-            i = convertIntoBinaryInteractions(negativeInteractions, i, negativeBinaryInteractions, context);
+            i = convertIntoBinaryInteractionsExcludeNonUniprotProteins(negativeInteractions, i, negativeBinaryInteractions, context);
 
             // we compute the mi score for the list of negative binary interactions
             processMiClustering(negativeBinaryInteractions, negativeClusterScore);
