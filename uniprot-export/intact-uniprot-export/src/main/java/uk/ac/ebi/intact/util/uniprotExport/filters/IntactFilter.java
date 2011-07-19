@@ -225,6 +225,7 @@ public class IntactFilter implements InteractionFilter {
      * @param binaryInteractions : the list which will contain the binary interactions
      * @return the index where we stopped in the list of interactions
      */
+    @Deprecated
     private int convertIntoBinaryInteractions(List<String> interactions, int i, Collection<BinaryInteraction> binaryInteractions, MiClusterContext context) {
         // number of converted binary interactions
         int k = 0;
@@ -314,6 +315,14 @@ public class IntactFilter implements InteractionFilter {
         return i;
     }
 
+    /**
+     *
+     * @param interaction
+     * @param binaryInteractions
+     * @param context
+     *
+     */
+    @Deprecated
     private void convertIntoBinaryInteractions(String interaction, Collection<BinaryInteraction> binaryInteractions, MiClusterContext context) {
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
