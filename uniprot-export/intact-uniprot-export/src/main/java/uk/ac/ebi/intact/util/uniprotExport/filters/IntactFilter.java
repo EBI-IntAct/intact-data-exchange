@@ -246,44 +246,41 @@ public class IntactFilter implements InteractionFilter {
                     try {
                         // we convert the interaction in binary interaction
                         Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
-                        if (toBinary.size() == 1){
-                            //logger.info("Processing interaction " + interactionAc);
-                            processClusterContext(context, interactionAc, toBinary);
 
-                            for (IntactBinaryInteraction binary : toBinary){
+                        //logger.info("Processing interaction " + interactionAc);
+                        processClusterContext(context, interactionAc, toBinary);
 
-                                ExtendedInteractor interactorA = binary.getInteractorA();
-                                String uniprotA = null;
-                                ExtendedInteractor interactorB = binary.getInteractorB();
-                                String uniprotB = null;
+                        for (IntactBinaryInteraction binary : toBinary){
 
-                                for (CrossReference refA : interactorA.getIdentifiers()){
-                                    if (refA.getDatabase().equalsIgnoreCase("uniprotkb")){
-                                        uniprotA = refA.getIdentifier();
-                                        break;
-                                    }
+                            ExtendedInteractor interactorA = binary.getInteractorA();
+                            String uniprotA = null;
+                            ExtendedInteractor interactorB = binary.getInteractorB();
+                            String uniprotB = null;
+
+                            for (CrossReference refA : interactorA.getIdentifiers()){
+                                if (refA.getDatabase().equalsIgnoreCase("uniprotkb")){
+                                    uniprotA = refA.getIdentifier();
+                                    break;
                                 }
-                                for (CrossReference refB : interactorB.getIdentifiers()){
-                                    if (refB.getDatabase().equalsIgnoreCase("uniprotkb")){
-                                        uniprotB = refB.getIdentifier();
-                                        break;
-                                    }
+                            }
+                            for (CrossReference refB : interactorB.getIdentifiers()){
+                                if (refB.getDatabase().equalsIgnoreCase("uniprotkb")){
+                                    uniprotB = refB.getIdentifier();
+                                    break;
                                 }
-
-                                FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
-                                removeNonPubmedPublicationsFrom(binary);
-
-                                binary.getInteractorA().getAlternativeIdentifiers().clear();
-                                binary.getInteractorA().getAliases().clear();
-                                binary.getInteractorB().getAlternativeIdentifiers().clear();
-                                binary.getInteractorB().getAliases().clear();
                             }
 
-                            binaryInteractions.addAll(toBinary);
+                            FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+                            removeNonPubmedPublicationsFrom(binary);
+
+                            binary.getInteractorA().getAlternativeIdentifiers().clear();
+                            binary.getInteractorA().getAliases().clear();
+                            binary.getInteractorB().getAlternativeIdentifiers().clear();
+                            binary.getInteractorB().getAliases().clear();
                         }
-                        else {
-                            logger.info("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " is not a true binary interaction and is excluded.");
-                        }
+
+                        binaryInteractions.addAll(toBinary);
+
                     } catch (Exception e) {
                         logger.error("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.", e);
                     }
