@@ -100,6 +100,7 @@ public class IntactFilter implements InteractionFilter {
      * Computes the MI cluster score for the list of interactions
      * @param interactions : the list of interactions for what we want to compute the MI cluster score
      */
+    @Deprecated
     public MiClusterScoreResults computeMiScoresFor(List<String> interactions){
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
         IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
