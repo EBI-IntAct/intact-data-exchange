@@ -488,13 +488,13 @@ public class IntactFilter implements InteractionFilter {
 
             if ((uniprotA != null && uniprotB != null && excludeNonUniprot) || !excludeNonUniprot){
 
+                FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+                removeNonPubmedPublicationsFrom(binary);
+
                 binary.getInteractorA().getAlternativeIdentifiers().clear();
                 binary.getInteractorA().getAliases().clear();
                 binary.getInteractorB().getAlternativeIdentifiers().clear();
                 binary.getInteractorB().getAliases().clear();
-
-                FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
-                removeNonPubmedPublicationsFrom(binary);
                 binaryInteractions.add(binary);
             }
         }
