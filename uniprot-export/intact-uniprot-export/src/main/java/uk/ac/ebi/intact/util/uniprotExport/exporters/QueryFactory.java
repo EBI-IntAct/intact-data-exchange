@@ -65,10 +65,19 @@ public class QueryFactory {
             "and i11.ac not in ("+interactionsFromExperimentExportConditional+")";
 
     private final String interactionsAccepted = "select distinct(i2.ac) from Component c1 join c1.interaction as i2 join i2.experiments as e " +
-            "join e.annotations as an where an.cvTopic.shortLabel = :accepted";
+            "join e.annotations as an join e.publication as pn3 where an.cvTopic.shortLabel = :accepted or pn3.ac in (select distinct(pn.ac) " +
+            "from Publication pn join pn.annotations as pnAnn where pnAnn.cvTopic.shortLabel = :accepted)";
     // interactions with at least one experiment 'on-hold'
-    private final String interactionsOnHold = "select distinct(i3.ac) from Component c2 join c2.interaction as i3 join i3.experiments" +
-            " as e2 join e2.annotations as an2 where an2.cvTopic.shortLabel = :onhold";
+    private final String interactionsOnHoldOrToBeReviewed = "select distinct(i3.ac) from Component c2 join c2.interaction as i3 join i3.experiments" +
+            " as e2 join e2.annotations as an2 join e2.publication as pn4 where an2.cvTopic.shortLabel = :onhold or an2.cvTopic.shortLabel = :to_be_reviewed" +
+            " or pn4.ac in (select distinct(pn2.ac) from Publication pn2 join pn2.annotations as pnAnn2 " +
+            "where pnAnn2.cvTopic.shortLabel = :onhold or pnAnn2.cvTopic.shortLabel = :to_be_reviewed)";
+
+    private final String publicationsAccepted = "select distinct(pn.ac) from Publication pn join pn.annotations as pnAnn " +
+            "where pnAnn.cvTopic.shortLabel = :accepted";
+    // interactions with at least one experiment 'on-hold'
+    private final String publicationsOnHoldOrToBeReviewed = "select distinct(pn2.ac) from Publication pn2 join pn2.annotations as pnAnn2 " +
+            "where pnAnn2.cvTopic.shortLabel = :onhold or pnAnn2.cvTopic.shortLabel = :to_be_reviewed";
 
     // select status of the different methods in IntAct
     private final String methodStatus = "select ci.identifier, a.annotationText from CvInteraction ci join ci.annotations as a join a.cvTopic as ct" +
@@ -300,13 +309,14 @@ public class QueryFactory {
         return interactions;
     }
 
-    public List<String> getInteractionsOnHold() {
+    public List<String> getInteractionsOnHoldOrToBeReviewed() {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
         TransactionStatus transactionStatus = dataContext.beginTransaction();
 
-        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(interactionsOnHold);
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(interactionsOnHoldOrToBeReviewed);
         query.setParameter("onhold", CvTopic.ON_HOLD);
+        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
 
         List<String> interactions = query.getResultList();
 
@@ -369,7 +379,7 @@ public class QueryFactory {
 
         String queryString = "select distinct(i.ac) from InteractionImpl i " +
                 "where i.ac in ("+interactionsAccepted + ") " +
-                "and i.ac not in ("+interactionsOnHold+") " +
+                "and i.ac not in ("+ interactionsOnHoldOrToBeReviewed +") " +
                 "and i.ac not in (" + interactionsDrExportNotPassed + ") " +
                 "and i.ac not in (" + interactionsFromExperimentNoExport + ") " +
                 "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") " +
@@ -388,6 +398,7 @@ public class QueryFactory {
         //query.setParameter("september2005", "01/09/2005");
         //query.setParameter("dateFormat", "dd/mm/yyyy");
         query.setParameter("onhold", CvTopic.ON_HOLD);
+        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
         query.setParameter("no", "NO");
         query.setParameter("yes", "YES");
@@ -427,7 +438,7 @@ public class QueryFactory {
         queryString.append("where i.ac in (");
         queryString.append(interactionsAccepted);
         queryString.append(") and i.ac not in (");
-        queryString.append(interactionsOnHold);
+        queryString.append(interactionsOnHoldOrToBeReviewed);
         queryString.append(") ");
 
         // negative interactions will be processed differently and are not in the same list
@@ -461,6 +472,7 @@ public class QueryFactory {
 
         query.setParameter("accepted", CvTopic.ACCEPTED);
         query.setParameter("onhold", CvTopic.ON_HOLD);
+        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
         query.setParameter("negative", CvTopic.NEGATIVE);
 
         if (excludeLowConfidenceInteractions){
@@ -507,7 +519,7 @@ public class QueryFactory {
             queryString.append("where i.ac in (");
             queryString.append(interactionsAccepted);
             queryString.append(") and i.ac not in (");
-            queryString.append(interactionsOnHold);
+            queryString.append(interactionsOnHoldOrToBeReviewed);
             queryString.append(") and i.ac in (");
             queryString.append(negativeInteractions);
             queryString.append(") ");
@@ -538,6 +550,7 @@ public class QueryFactory {
 
             query.setParameter("accepted", CvTopic.ACCEPTED);
             query.setParameter("onhold", CvTopic.ON_HOLD);
+            query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
             query.setParameter("negative", CvTopic.NEGATIVE);
 
             if (excludeLowConfidenceInteractions){
@@ -587,7 +600,7 @@ public class QueryFactory {
         queryString.append("where i.ac in (");
         queryString.append(interactionsAccepted);
         queryString.append(") and i.ac not in (");
-        queryString.append(interactionsOnHold);
+        queryString.append(interactionsOnHoldOrToBeReviewed);
         queryString.append(") ");
         queryString.append(") and i.ac in (");
         queryString.append(selfInteractions);
@@ -625,6 +638,7 @@ public class QueryFactory {
 
         query.setParameter("accepted", CvTopic.ACCEPTED);
         query.setParameter("onhold", CvTopic.ON_HOLD);
+        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
 
         if (excludeLowConfidenceInteractions){
             query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
@@ -669,7 +683,7 @@ public class QueryFactory {
 
         String queryString = "select distinct(i.ac) from InteractionImpl i " +
                 "where i.ac in ("+interactionsAccepted + ") " +
-                "and i.ac not in ("+interactionsOnHold+") " +
+                "and i.ac not in ("+ interactionsOnHoldOrToBeReviewed +") " +
                 "and i.ac not in (" + interactionsDrExportNotPassed + ") " +
                 "and i.ac not in (" + interactionsFromExperimentNoExport + ") " +
                 "and i.ac not in ("+negativeInteractions+") " +
@@ -686,6 +700,7 @@ public class QueryFactory {
         //query.setParameter("september2005", "01/09/2005");
         //query.setParameter("dateFormat", "dd/mm/yyyy");
         query.setParameter("onhold", CvTopic.ON_HOLD);
+        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
         query.setParameter("no", "NO");
         query.setParameter("yes", "YES");
@@ -713,7 +728,7 @@ public class QueryFactory {
 
         String queryString = "select distinct(i.ac) from InteractionImpl i " +
                 "where i.ac in ("+interactionsAccepted + ") " +
-                "and i.ac not in ("+interactionsOnHold+") " +
+                "and i.ac not in ("+ interactionsOnHoldOrToBeReviewed +") " +
                 "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") " +
                 "and i.ac not in ("+negativeInteractions+") " +
                 "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+")" +
@@ -730,6 +745,7 @@ public class QueryFactory {
         //query.setParameter("september2005", "01/09/2005");
         //query.setParameter("dateFormat", "dd/mm/yyyy");
         query.setParameter("onhold", CvTopic.ON_HOLD);
+        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
         query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
         query.setParameter("negative", CvTopic.NEGATIVE);
         query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
