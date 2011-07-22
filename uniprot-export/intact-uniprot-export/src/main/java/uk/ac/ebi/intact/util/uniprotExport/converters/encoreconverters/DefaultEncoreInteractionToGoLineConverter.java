@@ -85,7 +85,7 @@ public class DefaultEncoreInteractionToGoLineConverter implements EncoreInteract
         List<GOParameters> goParameters = new ArrayList<GOParameters>(interactions.size());
 
         Map<String, Set<String>> clusteredInteractionWithFeatureChains = new HashMap<String, Set<String>>();
-
+        Map<String, String> mapOfFirstInteractors = new HashMap<String, String>();
         for (EncoreInteractionForScoring interaction : interactions){
             // extract the uniprot acs of the first and second interactors for the first interaction
             String uniprot1;
@@ -113,10 +113,15 @@ public class DefaultEncoreInteractionToGoLineConverter implements EncoreInteract
                 // if the list of pubmed ids is not empty, the GOParameter is created
                 if (!pubmedIds.isEmpty()){
                     logger.debug("convert GO parameters for " + uniprot1 + ", " + uniprot2 + ", " + pubmedIds.size() + " pubmed ids");
-                    GOParameters parameters;
 
+                    // we have a master protein as first interactor or a feature chain. keep the list of pubmed ids for later
                     if (uniprot1.equalsIgnoreCase(parentAc) || (uniprot1.startsWith(parentAc) && uniprot1.contains(WriterUtils.CHAIN_PREFIX))){
+                        if (uniprot2.contains(WriterUtils.CHAIN_PREFIX)){
+                            uniprot2 = uniprot2.substring(0, uniprot2.indexOf(WriterUtils.CHAIN_PREFIX));
+                        }
+
                         if (clusteredInteractionWithFeatureChains.containsKey(uniprot2)){
+
                             Set<String> interactionList = clusteredInteractionWithFeatureChains.get(uniprot2);
                             interactionList.addAll(pubmedIds);
                         }
@@ -125,7 +130,12 @@ public class DefaultEncoreInteractionToGoLineConverter implements EncoreInteract
                             clusteredInteractionWithFeatureChains.put(uniprot2, pubmedIds);
                         }
                     }
+                    // we have a master protein as first interactor or a feature chain. keep the list of pubmed ids for later
                     else if (uniprot2.equalsIgnoreCase(parentAc) || (uniprot2.startsWith(parentAc) && uniprot2.contains(WriterUtils.CHAIN_PREFIX))) {
+                        if (uniprot1.contains(WriterUtils.CHAIN_PREFIX)){
+                            uniprot1 = uniprot1.substring(0, uniprot1.indexOf(WriterUtils.CHAIN_PREFIX));
+                        }
+
                         if (clusteredInteractionWithFeatureChains.containsKey(uniprot1)){
                             Set<String> interactionList = clusteredInteractionWithFeatureChains.get(uniprot1);
                             interactionList.addAll(pubmedIds);
@@ -135,19 +145,53 @@ public class DefaultEncoreInteractionToGoLineConverter implements EncoreInteract
                             clusteredInteractionWithFeatureChains.put(uniprot1, pubmedIds);
                         }
                     }
+                    // the first interactor is an isoform and the second interactor is a feature chain
+                    else if (uniprot1.startsWith(parentAc) && !uniprot1.startsWith(parentAc) && uniprot2.contains(WriterUtils.CHAIN_PREFIX)){
+                        uniprot2 = uniprot2.substring(0, uniprot2.indexOf(WriterUtils.CHAIN_PREFIX));
+
+                        if (clusteredInteractionWithFeatureChains.containsKey(uniprot2)){
+
+                            Set<String> interactionList = clusteredInteractionWithFeatureChains.get(uniprot2);
+                            interactionList.addAll(pubmedIds);
+                        }
+                        else{
+
+                            clusteredInteractionWithFeatureChains.put(uniprot2, pubmedIds);
+                        }
+
+                        if (!mapOfFirstInteractors.containsKey(uniprot2)){
+
+                            mapOfFirstInteractors.put(uniprot2, uniprot1);
+                        }
+                    }
+                    // the first interactor is an isoform and the second interactor is a feature chain
+                    else if (uniprot2.startsWith(parentAc) && !uniprot2.startsWith(parentAc) && uniprot1.contains(WriterUtils.CHAIN_PREFIX)){
+                        uniprot1 = uniprot1.substring(0, uniprot1.indexOf(WriterUtils.CHAIN_PREFIX));
+
+                        if (clusteredInteractionWithFeatureChains.containsKey(uniprot1)){
+
+                            Set<String> interactionList = clusteredInteractionWithFeatureChains.get(uniprot1);
+                            interactionList.addAll(pubmedIds);
+                        }
+                        else{
+
+                            clusteredInteractionWithFeatureChains.put(uniprot1, pubmedIds);
+                        }
+
+                        if (!mapOfFirstInteractors.containsKey(uniprot1)){
+
+                            mapOfFirstInteractors.put(uniprot1, uniprot2);
+                        }
+                    }
+                    // the first interactor is an isoform and the second interactor is isoform or master protein
                     else{
-                        if (uniprot1.contains(WriterUtils.CHAIN_PREFIX)){
-                            uniprot1 = uniprot1.substring(0, uniprot1.indexOf(WriterUtils.CHAIN_PREFIX));
-                        }
 
-                        if (uniprot2.contains(WriterUtils.CHAIN_PREFIX)){
-                            uniprot2 = uniprot2.substring(0, uniprot2.indexOf(WriterUtils.CHAIN_PREFIX));
-                        }
-
-                        logger.debug("convert GO parameters for " + uniprot1 + ", " + uniprot2 + ", " + pubmedIds.size() + " pubmed ids");
                         GOParameters parameter;
 
                         if (uniprot1.equalsIgnoreCase(parentAc)){
+                            parameter = new DefaultGOParameters(uniprot1, uniprot2, pubmedIds);
+                        }
+                        else if (uniprot1.startsWith(parentAc) && !uniprot2.startsWith(parentAc)){
                             parameter = new DefaultGOParameters(uniprot1, uniprot2, pubmedIds);
                         }
                         else{
@@ -166,15 +210,17 @@ public class DefaultEncoreInteractionToGoLineConverter implements EncoreInteract
             }
         }
 
+        // we need to build go parameters when we have master proteins and/or feature chains
         if (!clusteredInteractionWithFeatureChains.isEmpty()){
             for (Map.Entry<String, Set<String>> entry : clusteredInteractionWithFeatureChains.entrySet()){
                 String secondInteractor = entry.getKey();
+                String firstInteractor = parentAc;
 
-                if (secondInteractor.contains(WriterUtils.CHAIN_PREFIX)){
-                    secondInteractor = entry.getKey().substring(0, entry.getKey().indexOf(WriterUtils.CHAIN_PREFIX));
+                if (mapOfFirstInteractors.containsKey(secondInteractor)){
+
+                    firstInteractor = mapOfFirstInteractors.get(secondInteractor);
                 }
-
-                GOParameters parameter = new DefaultGOParameters(parentAc, secondInteractor, entry.getValue());
+                GOParameters parameter = new DefaultGOParameters(firstInteractor, secondInteractor, entry.getValue());
 
                 goParameters.add(parameter);
             }
