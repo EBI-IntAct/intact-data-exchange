@@ -2,7 +2,10 @@ package uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters;
 
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.DefaultInteractionDetails;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.InteractionDetails;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters2;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import javax.swing.event.EventListenerList;
@@ -11,7 +14,6 @@ import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * Default writer for CCLines
@@ -65,7 +67,7 @@ public class DefaultCCLineWriter2 implements CCLineWriter<CCParameters<SecondCCP
 
         String firstTaxId = parameters.getTaxId();
 
-        TreeSet<SecondCCParameters2> secondParameters = new TreeSet(parameters.getSecondCCParameters());
+        SortedSet<SecondCCParameters2> secondParameters = parameters.getSecondCCParameters();
 
         for (SecondCCParameters2 secondInteractor : secondParameters){
             String firstIntactAc = secondInteractor.getFirstIntacAc();

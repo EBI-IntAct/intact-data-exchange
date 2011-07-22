@@ -82,16 +82,12 @@ public class DefaultSecondCCParameters1 implements SecondCCParameters1{
 
         // the current string comes first if it's before in the alphabetical order
 
-        if( gene1 == null ) {
-            System.out.println( this );
-        }
-
-        if( firstUniprotAc1.equals(secondUniprotAc) ) {
+        if( firstUniprotAc1.equals(secondUniprotAc) && !firstUniprotAc2.equals(cc2.getSecondUniprotAc())) {
 
             // we put first the Self interaction
             return -1;
 
-        } else if( firstUniprotAc2.equals(cc2.getSecondUniprotAc()) ) {
+        } else if( firstUniprotAc2.equals(cc2.getSecondUniprotAc()) && !firstUniprotAc1.equals(secondUniprotAc)) {
 
             return 1;
 

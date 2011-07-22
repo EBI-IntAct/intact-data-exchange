@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
 
-import java.util.List;
+import java.util.SortedSet;
 
 /**
  * Basic CC parameters contains the master uniprot ac, gene name and taxId of the first interactor and a list of basic SecondCCparameters
@@ -32,5 +32,5 @@ public interface CCParameters<T extends SecondCCParameters> {
      *
      * @return The list of second CC parameters
      */
-    public List<T> getSecondCCParameters();
+    public SortedSet<T> getSecondCCParameters();
 }

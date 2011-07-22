@@ -10,8 +10,9 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCP
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Converter of an EncoreInteraction into a CCParameter1
@@ -40,7 +41,7 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
         String geneName1 = null;
         String taxId1 = null;
 
-        List<SecondCCParameters1> secondCCInteractors = new ArrayList<SecondCCParameters1>(interactions.size());
+        SortedSet<SecondCCParameters1> secondCCInteractors = new TreeSet<SecondCCParameters1>();
 
         if (!interactions.isEmpty()){
 

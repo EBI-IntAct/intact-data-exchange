@@ -150,7 +150,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         SecondCCParameters2 secondParameters2 = new DefaultSecondCCParameters2(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, organismName, details2, true);
         SecondCCParameters2 secondParameters3 = new DefaultSecondCCParameters2(uniprotAc7, intactAc6, uniprotAc4, intactAc3, geneName4, taxId, organismName, details3, false);
 
-        List<SecondCCParameters2> listOfSecondInteractors1 = new ArrayList<SecondCCParameters2>();
+        SortedSet<SecondCCParameters2> listOfSecondInteractors1 = new TreeSet<SecondCCParameters2>();
         listOfSecondInteractors1.add(secondParameters1);
         listOfSecondInteractors1.add(secondParameters2);
         listOfSecondInteractors1.add(secondParameters3);
@@ -158,21 +158,21 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         CCParameters<SecondCCParameters2> parameters1 = new DefaultCCParameters2(uniprotAc1, geneName1, taxId, listOfSecondInteractors1);
         parameters.add(parameters1);
 
-        List<SecondCCParameters2> listOfSecondInteractors2 = new ArrayList<SecondCCParameters2>();
+        SortedSet<SecondCCParameters2> listOfSecondInteractors2 = new TreeSet<SecondCCParameters2>();
         SecondCCParameters2 secondParameters4 = new DefaultSecondCCParameters2(uniprotAc2, intactAc1, uniprotAc5, intactAc4, geneName1, taxId, organismName, details1, true);
         listOfSecondInteractors2.add(secondParameters4);
 
         CCParameters<SecondCCParameters2> parameters2 = new DefaultCCParameters2(uniprotAc2, geneName2, taxId2, listOfSecondInteractors2);
         parameters.add(parameters2);
 
-        List<SecondCCParameters2> listOfSecondInteractors3 = new ArrayList<SecondCCParameters2>();
+        SortedSet<SecondCCParameters2> listOfSecondInteractors3 = new TreeSet<SecondCCParameters2>();
         SecondCCParameters2 secondParameters5 = new DefaultSecondCCParameters2(uniprotAc3, intactAc2, uniprotAc6, intactAc5, geneName1, taxId, organismName, details2, true);
         listOfSecondInteractors3.add(secondParameters5);
 
         CCParameters<SecondCCParameters2> parameters3 = new DefaultCCParameters2(uniprotAc3, geneName3, taxId, listOfSecondInteractors3);
         parameters.add(parameters3);
 
-        List<SecondCCParameters2> listOfSecondInteractors4 = new ArrayList<SecondCCParameters2>();
+        SortedSet<SecondCCParameters2> listOfSecondInteractors4 = new TreeSet<SecondCCParameters2>();
         SecondCCParameters2 secondParameters6 = new DefaultSecondCCParameters2(uniprotAc4, intactAc3, uniprotAc7, intactAc6, geneName1, taxId, organismName, details3, false);
         listOfSecondInteractors4.add(secondParameters6);
 

@@ -54,37 +54,45 @@ public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
         Assert.assertEquals("6239", parameters.getTaxId());
         Assert.assertEquals(3, parameters.getSecondCCParameters().size());
 
-        SecondCCParameters2 firstSecondPar = parameters.getSecondCCParameters().get(0);
-        Assert.assertEquals("P28548-1", firstSecondPar.getFirstUniprotAc());
-        Assert.assertEquals("Q22534", firstSecondPar.getSecondUniprotAc());
-        Assert.assertTrue(firstSecondPar.doesInteract());
-        Assert.assertEquals("EBI-317777", firstSecondPar.getFirstIntacAc());
-        Assert.assertEquals("EBI-327642", firstSecondPar.getSecondIntactAc());
-        Assert.assertEquals(1, firstSecondPar.getInteractionDetails().size());
-        Assert.assertEquals("9606", firstSecondPar.getTaxId());
-        Assert.assertEquals("Homo sapiens", firstSecondPar.getOrganismName());
-        Assert.assertEquals("pat-12", firstSecondPar.getGeneName());
+        int i = 0;
 
-        SecondCCParameters2 secondSecondPar = parameters.getSecondCCParameters().get(1);
-        Assert.assertEquals("P28548-2", secondSecondPar.getFirstUniprotAc());
-        Assert.assertEquals("O17670", secondSecondPar.getSecondUniprotAc());
-        Assert.assertTrue(secondSecondPar.doesInteract());
-        Assert.assertEquals("EBI-317778", secondSecondPar.getFirstIntacAc());
-        Assert.assertEquals("EBI-311862", secondSecondPar.getSecondIntactAc());
-        Assert.assertEquals(1, secondSecondPar.getInteractionDetails().size());
-        Assert.assertEquals("6239", secondSecondPar.getTaxId());
-        Assert.assertEquals("Caenorhabditis elegans", secondSecondPar.getOrganismName());
-        Assert.assertEquals("eya-1", secondSecondPar.getGeneName());
+        for (SecondCCParameters2 secondPar : parameters.getSecondCCParameters()){
+            i++;
 
-        SecondCCParameters2 thirdSecondPar = parameters.getSecondCCParameters().get(2);
-        Assert.assertEquals("P28548-PRO_0000068244", thirdSecondPar.getFirstUniprotAc());
-        Assert.assertEquals("Q21361", thirdSecondPar.getSecondUniprotAc());
-        Assert.assertFalse(thirdSecondPar.doesInteract());
-        Assert.assertEquals("EBI-317779", thirdSecondPar.getFirstIntacAc());
-        Assert.assertEquals("EBI-311862", thirdSecondPar.getSecondIntactAc());
-        Assert.assertEquals(3, thirdSecondPar.getInteractionDetails().size());
-        Assert.assertEquals("9606", thirdSecondPar.getTaxId());
-        Assert.assertEquals("Homo sapiens", thirdSecondPar.getOrganismName());
-        Assert.assertEquals("atf-2", thirdSecondPar.getGeneName());
+            if (i == 2){
+                Assert.assertEquals("P28548-1", secondPar.getFirstUniprotAc());
+                Assert.assertEquals("Q22534", secondPar.getSecondUniprotAc());
+                Assert.assertTrue(secondPar.doesInteract());
+                Assert.assertEquals("EBI-317777", secondPar.getFirstIntacAc());
+                Assert.assertEquals("EBI-327642", secondPar.getSecondIntactAc());
+                Assert.assertEquals(1, secondPar.getInteractionDetails().size());
+                Assert.assertEquals("9606", secondPar.getTaxId());
+                Assert.assertEquals("Homo sapiens", secondPar.getOrganismName());
+                Assert.assertEquals("pat-12", secondPar.getGeneName());
+            }
+
+            else if (i == 1){
+                Assert.assertEquals("P28548-2", secondPar.getFirstUniprotAc());
+                Assert.assertEquals("O17670", secondPar.getSecondUniprotAc());
+                Assert.assertTrue(secondPar.doesInteract());
+                Assert.assertEquals("EBI-317778", secondPar.getFirstIntacAc());
+                Assert.assertEquals("EBI-311862", secondPar.getSecondIntactAc());
+                Assert.assertEquals(1, secondPar.getInteractionDetails().size());
+                Assert.assertEquals("6239", secondPar.getTaxId());
+                Assert.assertEquals("Caenorhabditis elegans", secondPar.getOrganismName());
+                Assert.assertEquals("eya-1", secondPar.getGeneName());
+            }
+            else if (i == 3){
+                Assert.assertEquals("P28548-PRO_0000068244", secondPar.getFirstUniprotAc());
+                Assert.assertEquals("Q21361", secondPar.getSecondUniprotAc());
+                Assert.assertFalse(secondPar.doesInteract());
+                Assert.assertEquals("EBI-317779", secondPar.getFirstIntacAc());
+                Assert.assertEquals("EBI-311862", secondPar.getSecondIntactAc());
+                Assert.assertEquals(3, secondPar.getInteractionDetails().size());
+                Assert.assertEquals("9606", secondPar.getTaxId());
+                Assert.assertEquals("Homo sapiens", secondPar.getOrganismName());
+                Assert.assertEquals("atf-2", secondPar.getGeneName());
+            }
+        }
     }
 }

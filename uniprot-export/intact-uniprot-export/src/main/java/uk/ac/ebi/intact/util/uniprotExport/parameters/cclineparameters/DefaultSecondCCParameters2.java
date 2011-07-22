@@ -97,6 +97,10 @@ public class DefaultSecondCCParameters2 implements SecondCCParameters2 {
     }
 
     public int compareTo( Object o ) {
+        final int BEFORE = -1;
+        final int EQUAL = 0;
+        final int AFTER = 1;
+
         DefaultSecondCCParameters2 cc2 = null;
         cc2 = (DefaultSecondCCParameters2) o;
 
@@ -107,18 +111,21 @@ public class DefaultSecondCCParameters2 implements SecondCCParameters2 {
         final String firstUniprotAc2 = cc2.getFirstUniprotAc();
         // the current string comes first if it's before in the alphabetical order
 
-        if( gene1 == null ) {
-            System.out.println( this );
+        if (doesInteract() && !cc2.doesInteract()){
+            return BEFORE;
         }
-
-        if( firstUniprotAc1.equals(secondUniprotAc) ) {
+        else if (cc2.doesInteract() && !doesInteract()){
+            return AFTER;
+        }
+        else if( firstUniprotAc1.equals(secondUniprotAc) && !firstUniprotAc2.equals(cc2.getSecondUniprotAc())) {
 
             // we put first the Self interaction
-            return -1;
+            return BEFORE;
 
-        } else if( firstUniprotAc2.equals(cc2.getSecondUniprotAc()) ) {
+        }
+        else if( firstUniprotAc2.equals(cc2.getSecondUniprotAc()) && !firstUniprotAc1.equals(secondUniprotAc)) {
 
-            return 1;
+            return AFTER;
 
         } else {
 

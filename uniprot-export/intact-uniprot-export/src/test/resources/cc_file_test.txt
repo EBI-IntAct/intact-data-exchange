@@ -1,11 +1,5 @@
 AC   P28548
 CC   -!- INTERACTION:
-CC       Interact=No; Xref=IntAct:EBI-317779,EBI-311862;
-CC         Protein1=kin-10 [P28548:PRO_0000068244];
-CC         Protein2=atf-2 [Q21361];
-CC         InteractionType=association; Method=anti bait coimmunoprecipitation; Expansion=Spoke; Source=PubMed:18212739;
-CC         InteractionType=physical association; Method=coimmunoprecipitation; Source=PubMed:15115758, PubMed:15199141;
-CC         InteractionType=physical association; Method=two hybrid pooling; Source=PubMed:14704431;
 CC       Interact=Yes; Xref=IntAct:EBI-317778,EBI-311862;
 CC         Protein1=kin-10 [P28548-2];
 CC         Protein2=eya-1 [O17670];
@@ -14,6 +8,12 @@ CC       Interact=Yes; Xref=IntAct:EBI-317777,EBI-327642;
 CC         Protein1=kin-10 [P28548-1];
 CC         Protein2=pat-12 [Q22534]; Organism=Homo sapiens [NCBI_TaxID:9606];
 CC         InteractionType=physical association; Method=tandem affinity purification; Source=PubMed:14704431;
+CC       Interact=No; Xref=IntAct:EBI-317779,EBI-311862;
+CC         Protein1=kin-10 [P28548:PRO_0000068244];
+CC         Protein2=atf-2 [Q21361];
+CC         InteractionType=association; Method=anti bait coimmunoprecipitation; Expansion=Spoke; Source=PubMed:18212739;
+CC         InteractionType=physical association; Method=coimmunoprecipitation; Source=PubMed:15115758, PubMed:15199141;
+CC         InteractionType=physical association; Method=two hybrid pooling; Source=PubMed:14704431;
 //
 AC   Q22534
 CC   -!- INTERACTION:

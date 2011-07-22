@@ -133,7 +133,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
         String geneName1 = null;
         String taxId1 = null;
 
-        List<SecondCCParameters2> secondCCInteractors = new ArrayList<SecondCCParameters2>(positiveInteractions.size() + negativeInteractions.size());
+        SortedSet<SecondCCParameters2> secondCCInteractors = new TreeSet<SecondCCParameters2>();
 
         if (positiveInteractions != null && !positiveInteractions.isEmpty()){
             for (EncoreInteractionForScoring interaction : positiveInteractions){

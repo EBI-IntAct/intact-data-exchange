@@ -18,10 +18,10 @@ public class DefaultCCParameters2 implements CCParameters<SecondCCParameters2> {
 
     private String taxId;
 
-    private List<SecondCCParameters2> secondCCParameters;
+    private SortedSet<SecondCCParameters2> secondCCParameters;
 
     public DefaultCCParameters2(String firstInteractor, String firstGeneName,
-                                String firstTaxId, List<SecondCCParameters2> secondInteractors){
+                                String firstTaxId, SortedSet<SecondCCParameters2> secondInteractors){
 
         this.masterAc = firstInteractor;
 
@@ -29,7 +29,7 @@ public class DefaultCCParameters2 implements CCParameters<SecondCCParameters2> {
         this.taxId = firstTaxId;
 
         if (secondInteractors == null){
-            this.secondCCParameters = new ArrayList<SecondCCParameters2>();
+            this.secondCCParameters = new TreeSet<SecondCCParameters2>();
         }
         else{
             this.secondCCParameters = secondInteractors;
@@ -52,7 +52,7 @@ public class DefaultCCParameters2 implements CCParameters<SecondCCParameters2> {
     }
 
     @Override
-    public List<SecondCCParameters2> getSecondCCParameters() {
+    public SortedSet<SecondCCParameters2> getSecondCCParameters() {
         return this.secondCCParameters;
     }
 }

@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Default implementation of CCParameters1
@@ -19,10 +19,10 @@ public class DefaultCCParameters1 implements CCParameters<SecondCCParameters1>{
 
     private String taxId;
 
-    private List<SecondCCParameters1> secondCCParameters;
+    private SortedSet<SecondCCParameters1> secondCCParameters;
 
     public DefaultCCParameters1(String firstInteractor, String firstGeneName,
-                               String firstTaxId, List<SecondCCParameters1> secondInteractors){
+                               String firstTaxId, SortedSet<SecondCCParameters1> secondInteractors){
 
         this.masterAc = firstInteractor;
 
@@ -30,7 +30,7 @@ public class DefaultCCParameters1 implements CCParameters<SecondCCParameters1>{
         this.taxId = firstTaxId;
 
         if (secondInteractors == null){
-            this.secondCCParameters = new ArrayList<SecondCCParameters1>();
+            this.secondCCParameters = new TreeSet<SecondCCParameters1>();
         }
         else{
             this.secondCCParameters = secondInteractors;
@@ -53,7 +53,7 @@ public class DefaultCCParameters1 implements CCParameters<SecondCCParameters1>{
     }
 
     @Override
-    public List<SecondCCParameters1> getSecondCCParameters() {
+    public SortedSet<SecondCCParameters1> getSecondCCParameters() {
         return this.secondCCParameters;
     }
 }
