@@ -132,27 +132,7 @@ public class DefaultSecondCCParameters1 implements SecondCCParameters1{
 
         DefaultSecondCCParameters1 ccLine1 = (DefaultSecondCCParameters1) o;
 
-        if (firstUniprotAc != null ? !firstUniprotAc.equals(ccLine1.firstUniprotAc) : ccLine1.firstUniprotAc != null)
-        {
-            return false;
-        }
         if (geneName != null ? !geneName.equals(ccLine1.geneName) : ccLine1.geneName != null)
-        {
-            return false;
-        }
-        if (secondUniprotAc != null ? !secondUniprotAc.equals(ccLine1.secondUniprotAc) : ccLine1.secondUniprotAc != null)
-        {
-            return false;
-        }
-        if (firstIntact != null ? !firstIntact.equals(ccLine1.firstIntact) : ccLine1.firstIntact != null)
-        {
-            return false;
-        }
-        if (secondIntact != null ? !secondIntact.equals(ccLine1.secondIntact) : ccLine1.secondIntact != null)
-        {
-            return false;
-        }
-        if (taxId != null ? !taxId.equals(ccLine1.taxId) : ccLine1.taxId != null)
         {
             return false;
         }
@@ -163,12 +143,7 @@ public class DefaultSecondCCParameters1 implements SecondCCParameters1{
     public int hashCode()
     {
         int result;
-        result = (firstUniprotAc != null ? firstUniprotAc.hashCode() : 0);
-        result = 31 * result + (geneName != null ? geneName.hashCode() : 0);
-        result = 31 * result + (secondUniprotAc != null ? secondUniprotAc.hashCode() : 0);
-        result = 31 * result + (firstIntact != null ? firstIntact.hashCode() : 0);
-        result = 31 * result + (secondIntact != null ? secondIntact.hashCode() : 0);
-        result = 31 * result + (taxId != null ? taxId.hashCode() : 0);
+        result = (geneName != null ? geneName.hashCode() : 0);
         return result;
     }
 }
