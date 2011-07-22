@@ -101,6 +101,13 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                     // extract taxIds
                     String taxId2 = null;
 
+                    if (uniprot1.contains(WriterUtils.CHAIN_PREFIX)){
+                        uniprot1 = uniprot1.substring(0, uniprot1.indexOf(WriterUtils.CHAIN_PREFIX));
+                    }
+                    if (uniprot2.contains(WriterUtils.CHAIN_PREFIX)){
+                        uniprot2 = uniprot2.substring(0, uniprot2.indexOf(WriterUtils.CHAIN_PREFIX));
+                    }
+
                     if (uniprot1.startsWith(firstInteractor)){
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
