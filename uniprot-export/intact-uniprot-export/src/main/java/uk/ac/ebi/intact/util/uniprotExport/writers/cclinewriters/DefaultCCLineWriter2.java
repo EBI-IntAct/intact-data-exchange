@@ -11,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Default writer for CCLines
@@ -64,7 +65,9 @@ public class DefaultCCLineWriter2 implements CCLineWriter<CCParameters<SecondCCP
 
         String firstTaxId = parameters.getTaxId();
 
-        for (SecondCCParameters2 secondInteractor : parameters.getSecondCCParameters()){
+        TreeSet<SecondCCParameters2> secondParameters = new TreeSet(parameters.getSecondCCParameters());
+
+        for (SecondCCParameters2 secondInteractor : secondParameters){
             String firstIntactAc = secondInteractor.getFirstIntacAc();
 
             // write introduction

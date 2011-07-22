@@ -10,6 +10,7 @@ import javax.swing.event.EventListenerList;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
+import java.util.TreeSet;
 
 /**
  * Default Writer of the CC line format (version 1)
@@ -64,7 +65,9 @@ public class DefaultCCLineWriter1 implements CCLineWriter<CCParameters<SecondCCP
         String firstUniprotAc = parameters.getMasterUniprotAc();
         String firstTaxId = parameters.getTaxId();
 
-        for (SecondCCParameters1 secondInteractor : parameters.getSecondCCParameters()){
+        TreeSet<SecondCCParameters1> secondParameters = new TreeSet(parameters.getSecondCCParameters());
+
+        for (SecondCCParameters1 secondInteractor : secondParameters){
             writer.write("CC       ");
 
             if (firstUniprotAc.equals(secondInteractor.getSecondUniprotAc())) {

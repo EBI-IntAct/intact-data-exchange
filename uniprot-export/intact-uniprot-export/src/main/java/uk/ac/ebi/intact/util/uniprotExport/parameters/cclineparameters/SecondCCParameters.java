@@ -9,7 +9,7 @@ package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
  * @since <pre>10/02/11</pre>
  */
 
-public abstract interface SecondCCParameters {
+public abstract interface SecondCCParameters extends Comparable{
 
     /**
      * the Intact AC of the first interactor
