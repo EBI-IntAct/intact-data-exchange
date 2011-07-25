@@ -23,6 +23,7 @@ import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
+import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedProteins;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -76,6 +77,11 @@ public class IntactFilter implements InteractionFilter {
     protected Set<String> eligibleInteractionsForUniprotExport = new HashSet<String>();
 
     /**
+     * The map of intact isoform proteins pointing to a parent with a different uniprot entry
+     */
+    protected Map<String, Set<IntactTransSplicedProteins>> transcriptsWithDifferentParentAcs = new HashMap<String, Set<IntactTransSplicedProteins>>();
+
+    /**
      * we create a new IntactFilter
      */
     public IntactFilter(InteractionExporter exporter){
@@ -84,6 +90,34 @@ public class IntactFilter implements InteractionFilter {
         this.queryFactory = new QueryFactory();
         negativeInteractions.addAll(this.queryFactory.getNegativeInteractionsPassingFilter());
         eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
+
+        buildTranscriptsWithDifferentParents();
+    }
+
+    private void buildTranscriptsWithDifferentParents(){
+        List<Object []> proteinsAndParents = this.queryFactory.getTranscriptsWithDifferentParents();
+
+        for (Object [] proteinAndParent : proteinsAndParents){
+            if (proteinAndParent.length == 3){
+                String proteinAc = (String) proteinAndParent[0];
+                String parentAc = (String) proteinAndParent[1];
+                String isoformAc = (String) proteinAndParent[2];
+
+                if (proteinAc != null && parentAc != null && isoformAc != null) {
+
+                    IntactTransSplicedProteins spliceProtein = new IntactTransSplicedProteins(proteinAc, isoformAc);
+
+                    if (transcriptsWithDifferentParentAcs.containsKey(parentAc)){
+                        transcriptsWithDifferentParentAcs.get(parentAc).add(spliceProtein);
+                    }
+                    else{
+                        Set<IntactTransSplicedProteins> intactAcs = new HashSet<IntactTransSplicedProteins>();
+                        intactAcs.add(spliceProtein);
+                        transcriptsWithDifferentParentAcs.put(parentAc, intactAcs);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -155,6 +189,8 @@ public class IntactFilter implements InteractionFilter {
      */
     public MiClusterScoreResults processExportWithFilterOnNonUniprot() throws UniprotExportException {
         MiClusterContext context = new MiClusterContext();
+        context.setTranscriptsWithDifferentMasterAcs(this.transcriptsWithDifferentParentAcs);
+
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
         IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
 

@@ -207,6 +207,40 @@ public class FilterUtils {
         return intactAc;
     }
 
+        /**
+     *
+     * @param interactorAccs
+     * @return The intact ac of the interactor
+     */
+    public static List<String> extractAllIntactAcFromAccs(Map<String, String> interactorAccs){
+        List<String> intactAcs = new ArrayList<String>(interactorAccs.size());
+
+        for(Map.Entry<String, String> entry : interactorAccs.entrySet()){
+            if(WriterUtils.INTACT.equalsIgnoreCase(entry.getKey())){
+                intactAcs.add(entry.getValue());
+            }
+        }
+
+        return intactAcs;
+    }
+
+    /**
+     *
+     * @param interactorAccs
+     * @return the intact ac of the interactor
+     */
+    public static List<String> extractAllIntactAcFromOtherAccs(Map<String, List<String>> interactorAccs){
+        List<String> intactAcs = Collections.EMPTY_LIST;
+
+        for(Map.Entry<String, List<String>> entry : interactorAccs.entrySet()){
+            if(WriterUtils.INTACT.equalsIgnoreCase(entry.getKey()) && !entry.getValue().isEmpty()){
+                intactAcs = entry.getValue();
+            }
+        }
+
+        return intactAcs;
+    }
+
     /**
      *
      * @param interactorAccs

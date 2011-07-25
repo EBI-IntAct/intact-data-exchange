@@ -83,8 +83,6 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                     intact2 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsB());
                 }
 
-                boolean toMergeLater = false;
-
                 // if the uniprot acs are not null, it is possible to convert into a CCParameters2
                 if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
                     // the complete uniprot ac of the first interactor

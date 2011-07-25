@@ -2,10 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.results.contexts;
 
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Context of the mi cluster
@@ -21,6 +18,10 @@ public class MiClusterContext implements ExportContext {
     private Map<String, String> miTerms = new HashMap<String, String>();
     private Map<String, MethodTypePair> interactionToType_Method = new HashMap<String, MethodTypePair>();
     private Set<String> spokeExpandedInteractions = new HashSet<String>();
+    /**
+     * The map of intact isoform proteins pointing to a parent with a different uniprot entry
+     */
+    private Map<String, Set<IntactTransSplicedProteins>> transcriptsWithDifferentParentAcs;
 
     /**
      *
@@ -52,6 +53,19 @@ public class MiClusterContext implements ExportContext {
      */
     public Set<String> getSpokeExpandedInteractions() {
         return spokeExpandedInteractions;
+    }
+
+    @Override
+    public Map<String, Set<IntactTransSplicedProteins>> getTranscriptsWithDifferentMasterAcs() {
+        if (this.transcriptsWithDifferentParentAcs == null){
+            this.transcriptsWithDifferentParentAcs = new HashMap<String, Set<IntactTransSplicedProteins>>();
+        }
+
+        return this.transcriptsWithDifferentParentAcs;
+    }
+
+    public void setTranscriptsWithDifferentMasterAcs(Map<String, Set<IntactTransSplicedProteins>> mapOfIsoformsWithDifferentParents){
+        this.transcriptsWithDifferentParentAcs = mapOfIsoformsWithDifferentParents;
     }
 
     public void clear(){

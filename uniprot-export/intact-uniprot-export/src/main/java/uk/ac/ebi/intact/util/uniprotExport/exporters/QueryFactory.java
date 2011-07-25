@@ -90,6 +90,21 @@ public class QueryFactory {
     private final String inferredInteractions = "select distinct(infer.ac) from InteractionImpl as infer join " +
             "infer.experiments as exp join exp.cvInteraction as det where det.identifier = :inferred_author or det.identifier = :inferred_curator";
 
+    private final String isoformsWithDifferentParents = "select iso.ac, x2.primaryid, x1.primaryid from ia_interactor iso, ia_interactor parent, ia_interactor_xref x1, ia_interactor_xref x1_1, ia_interactor_xref x2 " +
+            "where iso.ac = x1.parent_ac " +
+            "and x1_1.parent_ac = iso.ac " +
+            "and parent.ac = x2.parent_ac " +
+            "and iso.objclass like '%ProteinImpl' " +
+            "and parent.objclass like '%ProteinImpl' " +
+            "and x1.database_ac = (select ac from ia_controlledvocab where shortlabel = 'uniprotkb') " +
+            "and x1.database_ac = x2.database_ac " +
+            "and x1_1.database_ac = (select ac from ia_controlledvocab where shortlabel = 'intact') " +
+            "and x1.qualifier_ac = (select ac from ia_controlledvocab where shortlabel = 'identity') " +
+            "and x1.qualifier_ac = x2.qualifier_ac " +
+            "and x1_1.qualifier_ac in (select ac from ia_controlledvocab where shortlabel = 'chain-parent' or shortlabel = 'isoform-parent') " +
+            "and x2.primaryid <> SUBSTR(x1.primaryid, 1, length(x2.primaryid)) " +
+            "and parent.ac = x1_1.primaryid;";
+
     public List<Object[]> getMethodStatusInIntact() {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
@@ -97,6 +112,19 @@ public class QueryFactory {
 
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(methodStatus);
         query.setParameter("export", CvTopic.UNIPROT_DR_EXPORT);
+
+        List<Object []> methods = query.getResultList();
+        dataContext.commitTransaction(transactionStatus);
+
+        return methods;
+    }
+
+    public List<Object[]> getTranscriptsWithDifferentParents() {
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
+
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createNativeQuery(isoformsWithDifferentParents);
 
         List<Object []> methods = query.getResultList();
         dataContext.commitTransaction(transactionStatus);
