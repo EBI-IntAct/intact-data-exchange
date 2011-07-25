@@ -51,17 +51,33 @@ public class FilterUtils {
     public static String retrieveInteractorGeneName(Interactor interactor){
         Collection<Alias> aliases = interactor.getAliases();
         String geneName = null;
+        String locusName = null;
+        String orf = null;
 
-        if (aliases.isEmpty()) {
+        // collect gene, locaus and orf names in aliases and other identifiers
+        if (!aliases.isEmpty()){
+            for (Alias alias : interactor.getAliases()){
+                if (UNIPROT.equalsIgnoreCase(alias.getDbSource())){
+                    if (CvAliasType.GENE_NAME.equalsIgnoreCase(alias.getAliasType())){
+                        geneName = alias.getName();
+                    }
+                    else if (CvAliasType.LOCUS_NAME.equalsIgnoreCase(alias.getAliasType())){
+                        locusName = alias.getName();
+                    }
+                    else if (CvAliasType.ORF_NAME.equalsIgnoreCase(alias.getAliasType())){
+                        orf = alias.getName();
+                    }
+                }
+            }
+        }
 
-            Collection<CrossReference> otherIdentifiers = interactor.getAlternativeIdentifiers();
-            // then look for locus
-            String locusName = null;
-            String orf = null;
-
-            for (CrossReference ref : otherIdentifiers){
+        if (geneName == null && !interactor.getAlternativeIdentifiers().isEmpty()){
+            for (CrossReference ref : interactor.getAlternativeIdentifiers()){
                 if (UNIPROT.equalsIgnoreCase(ref.getDatabase())){
-                    if (CvAliasType.LOCUS_NAME.equalsIgnoreCase(ref.getText())){
+                    if (CvAliasType.GENE_NAME.equalsIgnoreCase(ref.getText())){
+                        geneName = ref.getIdentifier();
+                    }
+                    else if (CvAliasType.LOCUS_NAME.equalsIgnoreCase(ref.getText())){
                         locusName = ref.getIdentifier();
                     }
                     else if (CvAliasType.ORF_NAME.equalsIgnoreCase(ref.getText())){
@@ -69,15 +85,21 @@ public class FilterUtils {
                     }
                 }
             }
-
-            geneName = locusName != null ? locusName : orf;
-
-        } else {
-            geneName = aliases.iterator().next().getName();
         }
 
+        // if gene name is null, get locus name. If locus name is null, get orf name. If orf name is null return "-"
         if( geneName == null ) {
-            geneName = "-";
+            if (locusName == null){
+                if (orf == null){
+                    geneName = "-";
+                }
+                else {
+                    geneName = orf;
+                }
+            }
+            else {
+                geneName = locusName;
+            }
         }
 
         return geneName;
