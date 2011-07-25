@@ -60,6 +60,10 @@ public class DefaultSecondCCParameters1 implements SecondCCParameters1{
         return this.geneName;
     }
 
+    public void setGeneName(String name){
+        this.geneName = name;
+    }
+
     @Override
     public String getTaxId() {
         return this.taxId;
@@ -68,6 +72,10 @@ public class DefaultSecondCCParameters1 implements SecondCCParameters1{
     @Override
     public int getNumberOfInteractionEvidences() {
         return this.numberOfInteractionEvidences;
+    }
+
+    public void setNumberOfInteractionEvidences(int number) {
+        this.numberOfInteractionEvidences = number;
     }
 
     public int compareTo( Object o ) {

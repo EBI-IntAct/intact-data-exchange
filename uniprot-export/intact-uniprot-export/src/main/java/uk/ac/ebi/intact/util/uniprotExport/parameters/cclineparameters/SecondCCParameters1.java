@@ -15,4 +15,8 @@ public interface SecondCCParameters1 extends SecondCCParameters {
      * @return
      */
     public int getNumberOfInteractionEvidences();
+
+    public void setGeneName(String name);
+
+    public void setNumberOfInteractionEvidences(int number);
 }

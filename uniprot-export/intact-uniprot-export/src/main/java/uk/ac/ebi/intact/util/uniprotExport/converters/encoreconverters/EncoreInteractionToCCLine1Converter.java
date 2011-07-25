@@ -10,9 +10,7 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCP
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Converter of an EncoreInteraction into a CCParameter1
@@ -40,6 +38,9 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
         String firstIntactAc = null;
         String geneName1 = null;
         String taxId1 = null;
+
+        // set containing the SecondCCParameters in case of feature chains
+        Set<SecondCCParameters1> processedCCParametersForFeatureChains = new HashSet<SecondCCParameters1>();
 
         SortedSet<SecondCCParameters1> secondCCInteractors = new TreeSet<SecondCCParameters1>();
 
@@ -82,6 +83,8 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                     intact2 = FilterUtils.extractIntactAcFromOtherAccs(interaction.getOtherInteractorAccsB());
                 }
 
+                boolean toMergeLater = false;
+
                 // if the uniprot acs are not null, it is possible to convert into a CCParameters2
                 if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
                     // the complete uniprot ac of the first interactor
@@ -101,11 +104,16 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                     // extract taxIds
                     String taxId2 = null;
 
+                    boolean containsFeatureChain = false;
+
+                    // remap to parent in case of feature chain
                     if (uniprot1.contains(WriterUtils.CHAIN_PREFIX)){
                         uniprot1 = uniprot1.substring(0, uniprot1.indexOf(WriterUtils.CHAIN_PREFIX));
+                        containsFeatureChain = true;
                     }
                     if (uniprot2.contains(WriterUtils.CHAIN_PREFIX)){
                         uniprot2 = uniprot2.substring(0, uniprot2.indexOf(WriterUtils.CHAIN_PREFIX));
+                        containsFeatureChain = true;
                     }
 
                     if (uniprot1.startsWith(firstInteractor)){
@@ -138,18 +146,55 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
 
                             SecondCCParameters1 secondCCInteractor = new DefaultSecondCCParameters1(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
-                            secondCCInteractors.add(secondCCInteractor);
+
+                            if (!containsFeatureChain){
+                                secondCCInteractors.add(secondCCInteractor);
+                            }
+                            else {
+                                processedCCParametersForFeatureChains.add(secondCCInteractor);
+                            }
                         }
                         else{
-                            logger.warn("Interaction " + uniprot1 + " and " + uniprot2 + " doesn't have valid evidences.");
+                            logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " doesn't have valid evidences.");
                         }
                     }
                     else{
-                        logger.warn("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the gene names or taxIds which is null.");
+                        logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the gene names or taxIds which is null.");
                     }
                 }
                 else{
-                    logger.warn("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the unipprot acs/ intact acs which is null.");
+                    logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the unipprot acs/ intact acs which is null.");
+                }
+            }
+
+            // update existing secondCCParameters if we had feature chains to merge information
+            if (!processedCCParametersForFeatureChains.isEmpty()){
+                for (SecondCCParameters1 secondParameter : processedCCParametersForFeatureChains){
+                    String firstUniprot = secondParameter.getFirstUniprotAc();
+                    String secondUniprotAc = secondParameter.getSecondUniprotAc();
+
+                    boolean hasFoundExistingSecondCC = false;
+
+                    for (SecondCCParameters1 existingParameters : secondCCInteractors){
+                        if (firstUniprot.equals(existingParameters.getFirstUniprotAc())){
+                            if (secondUniprotAc.equals(existingParameters.getSecondUniprotAc())){
+                                hasFoundExistingSecondCC = true;
+
+                                int newNumberOfExp = existingParameters.getNumberOfInteractionEvidences() + secondParameter.getNumberOfInteractionEvidences();
+                                existingParameters.setNumberOfInteractionEvidences(newNumberOfExp);
+
+                                if (existingParameters.getGeneName().equals("-") && !secondParameter.getGeneName().equals("-")){
+                                    existingParameters.setGeneName(secondParameter.getGeneName());
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    // if this information could not be merged, add it to the list of secondCCParameters
+                    if (!hasFoundExistingSecondCC){
+                        secondCCInteractors.add(secondParameter);
+                    }
                 }
             }
 
