@@ -7,6 +7,7 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParamet
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.DefaultCCParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.DefaultSecondCCParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedProteins;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -34,7 +35,7 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
     }
 
     @Override
-    public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(List<EncoreInteractionForScoring> interactions, MiClusterContext context, String firstInteractor){
+    public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(List<EncoreInteractionForScoring> interactions, MiClusterContext context, String masterUniprot){
         String firstIntactAc = null;
         String geneName1 = null;
         String taxId1 = null;
@@ -43,6 +44,8 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
         Set<SecondCCParameters1> processedCCParametersForFeatureChains = new HashSet<SecondCCParameters1>();
 
         SortedSet<SecondCCParameters1> secondCCInteractors = new TreeSet<SecondCCParameters1>();
+
+        Map<String, Set<IntactTransSplicedProteins>> transSplicedVariants = context.getTranscriptsWithDifferentMasterAcs();
 
         if (!interactions.isEmpty()){
 
@@ -114,7 +117,7 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                         containsFeatureChain = true;
                     }
 
-                    if (uniprot1.startsWith(firstInteractor)){
+                    if (uniprot1.startsWith(masterUniprot)){
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
@@ -125,7 +128,7 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                         taxId1 = organismsA[0];
                         firstIntactAc = intact1;
                     }
-                    else{
+                    else if (uniprot2.startsWith(masterUniprot)) {
                         firstUniprot = uniprot2;
                         secondUniprot = uniprot1;
                         geneName2 = context.getGeneNames().get(uniprot1);
@@ -135,6 +138,45 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
 
                         taxId1 = organismsB[0];
                         firstIntactAc = intact2;
+                    }
+                    else {
+                        Set<IntactTransSplicedProteins> transSplicedProteins = transSplicedVariants.get(masterUniprot);
+                        boolean startsWithUniprot1 = false;
+
+                        if (transSplicedProteins != null){
+                            for (IntactTransSplicedProteins prot : transSplicedProteins){
+                                if (uniprot1.equalsIgnoreCase(prot.getUniprotAc())){
+                                    startsWithUniprot1 = true;
+                                    break;
+                                }
+                                else if (uniprot2.equalsIgnoreCase(prot.getUniprotAc())){
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (startsWithUniprot1){
+                            firstUniprot = uniprot1;
+                            secondUniprot = uniprot2;
+                            geneName2 = context.getGeneNames().get(uniprot2);
+                            geneName1 = context.getGeneNames().get(uniprot1);
+                            taxId2 = organismsB[0];
+                            secondIntactAc = intact2;
+
+                            taxId1 = organismsA[0];
+                            firstIntactAc = intact1;
+                        }
+                        else {
+                            firstUniprot = uniprot2;
+                            secondUniprot = uniprot1;
+                            geneName2 = context.getGeneNames().get(uniprot1);
+                            geneName1 = context.getGeneNames().get(uniprot2);
+                            taxId2 = organismsA[0];
+                            secondIntactAc = intact1;
+
+                            taxId1 = organismsB[0];
+                            firstIntactAc = intact2;
+                        }
                     }
 
                     if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null){
@@ -197,11 +239,11 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
             }
 
             if (!secondCCInteractors.isEmpty()){
-                return new DefaultCCParameters1(firstInteractor, geneName1, taxId1, secondCCInteractors);
+                return new DefaultCCParameters1(masterUniprot, geneName1, taxId1, secondCCInteractors);
             }
         }
 
-        logger.debug("Interactor " + firstInteractor + " doesn't have any valid second CC parameters and will be skipped.");
+        logger.debug("Interactor " + masterUniprot + " doesn't have any valid second CC parameters and will be skipped.");
 
         return null;
     }

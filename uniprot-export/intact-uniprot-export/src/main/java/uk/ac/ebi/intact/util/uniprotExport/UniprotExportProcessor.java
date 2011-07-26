@@ -281,6 +281,13 @@ public class UniprotExportProcessor {
         return interactingProteins;
     }
 
+    /**
+     * Collect all encore interactions which could be associated with this uniprot master but are trans-spliced variants with uniprot ac coming from another uniprot entry
+     * @param master
+     * @param results
+     * @param context
+     * @return
+     */
     private List<EncoreInteractionForScoring> collectSupplementaryInteractionsForMaster(String master, ExportedClusteredInteractions results, MiClusterContext context){
         Map<String, Set<IntactTransSplicedProteins>> transSplicing = context.getTranscriptsWithDifferentMasterAcs();
 
@@ -395,6 +402,7 @@ public class UniprotExportProcessor {
                 // the total number of binary interactions attached to this protein
                 int totalNumberInteraction = 0;
 
+                // collect all encore interactions from trans-splicing (isoforms with uniprot ac coming from another entry but which are also present in this uniprot entry)
                 List<EncoreInteractionForScoring> supplementaryPositiveInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(parentAc, positiveClusteredInteractions, clusterContext);
                 List<EncoreInteractionForScoring> supplementaryNegativeInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(parentAc, negativeClusteredInteractions, clusterContext);
 
