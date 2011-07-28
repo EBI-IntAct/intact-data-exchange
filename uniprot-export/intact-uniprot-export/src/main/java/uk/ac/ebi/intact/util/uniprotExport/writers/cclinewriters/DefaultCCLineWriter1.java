@@ -70,7 +70,7 @@ public class DefaultCCLineWriter1 implements CCLineWriter<CCParameters<SecondCCP
         for (SecondCCParameters1 secondInteractor : secondParameters){
             writer.write("CC       ");
 
-            if (secondInteractor.getSecondUniprotAc().startsWith(firstUniprotAc)) {
+            if (secondInteractor.getSecondUniprotAc().equals(firstUniprotAc)) {
 
                 writer.write("Self");
 
