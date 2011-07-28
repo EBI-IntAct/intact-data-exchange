@@ -88,74 +88,40 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
 
                 // if the uniprot acs are not null, it is possible to convert into a CCParameters2
                 if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
-                    // the complete uniprot ac of the first interactor
-                    String firstUniprot = null;
-                    // extract second interactor
-                    String secondUniprot = null;
-
-                    String secondIntactAc = null;
-
-                    // extract gene names (present in the context and not in the interaction)
-                    String geneName2 = null;
-                    // extract organisms
-                    String [] organismsA;
-                    String [] organismsB;
-                    organismsA = extractOrganismFrom(interaction.getOrganismsA());
-                    organismsB = extractOrganismFrom(interaction.getOrganismsB());
-                    // extract taxIds
-                    String taxId2 = null;
-
-                    boolean containsFeatureChain = false;
-
-                    // remap to parent in case of feature chain
-                    if (uniprot1.contains(WriterUtils.CHAIN_PREFIX)){
-                        uniprot1 = uniprot1.substring(0, uniprot1.indexOf(WriterUtils.CHAIN_PREFIX));
-                        containsFeatureChain = true;
-                    }
-                    if (uniprot2.contains(WriterUtils.CHAIN_PREFIX)){
-                        uniprot2 = uniprot2.substring(0, uniprot2.indexOf(WriterUtils.CHAIN_PREFIX));
-                        containsFeatureChain = true;
-                    }
-
-                    if (uniprot1.startsWith(masterUniprot)){
-                        firstUniprot = uniprot1;
-                        secondUniprot = uniprot2;
-                        geneName2 = context.getGeneNames().get(uniprot2);
-                        geneName1 = context.getGeneNames().get(uniprot1);
-                        taxId2 = organismsB[0];
-                        secondIntactAc = intact2;
-
-                        taxId1 = organismsA[0];
-                        firstIntactAc = intact1;
-                    }
-                    else if (uniprot2.startsWith(masterUniprot)) {
-                        firstUniprot = uniprot2;
-                        secondUniprot = uniprot1;
-                        geneName2 = context.getGeneNames().get(uniprot1);
-                        geneName1 = context.getGeneNames().get(uniprot2);
-                        taxId2 = organismsA[0];
-                        secondIntactAc = intact1;
-
-                        taxId1 = organismsB[0];
-                        firstIntactAc = intact2;
+                    if (uniprot1.startsWith(masterUniprot) && !uniprot1.equals(masterUniprot) && uniprot2.startsWith(masterUniprot) && !uniprot2.equals(masterUniprot)){
+                        logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because is a self interaction with two isoforms of same protein");
                     }
                     else {
-                        Set<IntactTransSplicedProteins> transSplicedProteins = transSplicedVariants.get(masterUniprot);
-                        boolean startsWithUniprot1 = false;
+                        // the complete uniprot ac of the first interactor
+                        String firstUniprot = null;
+                        // extract second interactor
+                        String secondUniprot = null;
 
-                        if (transSplicedProteins != null){
-                            for (IntactTransSplicedProteins prot : transSplicedProteins){
-                                if (uniprot1.equalsIgnoreCase(prot.getUniprotAc())){
-                                    startsWithUniprot1 = true;
-                                    break;
-                                }
-                                else if (uniprot2.equalsIgnoreCase(prot.getUniprotAc())){
-                                    break;
-                                }
-                            }
+                        String secondIntactAc = null;
+
+                        // extract gene names (present in the context and not in the interaction)
+                        String geneName2 = null;
+                        // extract organisms
+                        String [] organismsA;
+                        String [] organismsB;
+                        organismsA = extractOrganismFrom(interaction.getOrganismsA());
+                        organismsB = extractOrganismFrom(interaction.getOrganismsB());
+                        // extract taxIds
+                        String taxId2 = null;
+
+                        boolean containsFeatureChain = false;
+
+                        // remap to parent in case of feature chain
+                        if (uniprot1.contains(WriterUtils.CHAIN_PREFIX)){
+                            uniprot1 = uniprot1.substring(0, uniprot1.indexOf(WriterUtils.CHAIN_PREFIX));
+                            containsFeatureChain = true;
+                        }
+                        if (uniprot2.contains(WriterUtils.CHAIN_PREFIX)){
+                            uniprot2 = uniprot2.substring(0, uniprot2.indexOf(WriterUtils.CHAIN_PREFIX));
+                            containsFeatureChain = true;
                         }
 
-                        if (startsWithUniprot1){
+                        if (uniprot1.startsWith(masterUniprot)){
                             firstUniprot = uniprot1;
                             secondUniprot = uniprot2;
                             geneName2 = context.getGeneNames().get(uniprot2);
@@ -166,7 +132,7 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             taxId1 = organismsA[0];
                             firstIntactAc = intact1;
                         }
-                        else {
+                        else if (uniprot2.startsWith(masterUniprot)) {
                             firstUniprot = uniprot2;
                             secondUniprot = uniprot1;
                             geneName2 = context.getGeneNames().get(uniprot1);
@@ -177,29 +143,77 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             taxId1 = organismsB[0];
                             firstIntactAc = intact2;
                         }
-                    }
+                        else {
+                            Set<IntactTransSplicedProteins> transSplicedProteins = transSplicedVariants.get(masterUniprot);
+                            boolean startsWithUniprot1 = false;
+                            boolean startsWithUniprot2 = false;
 
-                    if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null){
-                        int numberEvidences = interaction.getExperimentToPubmed().size();
+                            if (transSplicedProteins != null){
+                                for (IntactTransSplicedProteins prot : transSplicedProteins){
+                                    if (uniprot1.equalsIgnoreCase(prot.getUniprotAc())){
+                                        startsWithUniprot1 = true;
+                                    }
+                                    else if (uniprot2.equalsIgnoreCase(prot.getUniprotAc())){
+                                        startsWithUniprot2 = true;
+                                    }
+                                }
+                            }
 
-                        if (numberEvidences > 0){
-                            logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
-
-                            SecondCCParameters1 secondCCInteractor = new DefaultSecondCCParameters1(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
-
-                            if (!containsFeatureChain){
-                                secondCCInteractors.add(secondCCInteractor);
+                            if (startsWithUniprot1 && startsWithUniprot2){
+                                logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because is a self interaction with two isoforms of same protein");
+                                geneName1 = null;
+                                geneName2 = null;
+                                taxId1 = null;
+                                taxId2 = null;
                             }
                             else {
-                                processedCCParametersForFeatureChains.add(secondCCInteractor);
+                                if (startsWithUniprot1){
+                                    firstUniprot = uniprot1;
+                                    secondUniprot = uniprot2;
+                                    geneName2 = context.getGeneNames().get(uniprot2);
+                                    geneName1 = context.getGeneNames().get(uniprot1);
+                                    taxId2 = organismsB[0];
+                                    secondIntactAc = intact2;
+
+                                    taxId1 = organismsA[0];
+                                    firstIntactAc = intact1;
+                                }
+                                else {
+                                    firstUniprot = uniprot2;
+                                    secondUniprot = uniprot1;
+                                    geneName2 = context.getGeneNames().get(uniprot1);
+                                    geneName1 = context.getGeneNames().get(uniprot2);
+                                    taxId2 = organismsA[0];
+                                    secondIntactAc = intact1;
+
+                                    taxId1 = organismsB[0];
+                                    firstIntactAc = intact2;
+                                }
+                            }
+                        }
+
+                        if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null){
+                            int numberEvidences = interaction.getExperimentToPubmed().size();
+
+                            if (numberEvidences > 0){
+                                logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
+
+                                SecondCCParameters1 secondCCInteractor = new DefaultSecondCCParameters1(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
+
+                                if (!containsFeatureChain){
+                                    secondCCInteractors.add(secondCCInteractor);
+                                }
+                                else {
+                                    processedCCParametersForFeatureChains.add(secondCCInteractor);
+                                }
+                            }
+                            else{
+                                logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " doesn't have valid evidences.");
                             }
                         }
                         else{
-                            logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " doesn't have valid evidences.");
+                            logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the gene names or taxIds which is null.");
                         }
-                    }
-                    else{
-                        logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the gene names or taxIds which is null.");
                     }
                 }
                 else{
