@@ -34,6 +34,16 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
         return convertInteractionsIntoCCLines(positiveInteractions, context, firstInteractor);
     }
 
+    private boolean containsIsoformSelfInteraction(String uniprot1, String uniprot2, String master){
+
+        if (uniprot1.startsWith(master) && uniprot2.startsWith(master)){
+            if (!uniprot1.equals(master) || !uniprot2.equals(master)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(List<EncoreInteractionForScoring> interactions, MiClusterContext context, String masterUniprot){
         String firstIntactAc = null;
@@ -88,7 +98,7 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
 
                 // if the uniprot acs are not null, it is possible to convert into a CCParameters2
                 if (uniprot1 != null && uniprot2 != null && intact1 != null && intact2 != null){
-                    if (uniprot1.startsWith(masterUniprot) && !uniprot1.equals(masterUniprot) && uniprot2.startsWith(masterUniprot) && !uniprot2.equals(masterUniprot)){
+                    if (containsIsoformSelfInteraction(uniprot1, uniprot2, masterUniprot)){
                         logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because is a self interaction with two isoforms of same protein");
                     }
                     else {
@@ -122,44 +132,26 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                         }
 
                         if (uniprot1.startsWith(masterUniprot)){
-                            if (uniprot2.startsWith(masterUniprot) && !uniprot2.equals(masterUniprot)){
-                                logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because is a self interaction with two isoforms of same protein");
-                                geneName1 = null;
-                                geneName2 = null;
-                                taxId1 = null;
-                                taxId2 = null;
-                            }
-                            else{
-                                firstUniprot = uniprot1;
-                                secondUniprot = uniprot2;
-                                geneName2 = context.getGeneNames().get(uniprot2);
-                                geneName1 = context.getGeneNames().get(uniprot1);
-                                taxId2 = organismsB[0];
-                                secondIntactAc = intact2;
+                            firstUniprot = uniprot1;
+                            secondUniprot = uniprot2;
+                            geneName2 = context.getGeneNames().get(uniprot2);
+                            geneName1 = context.getGeneNames().get(uniprot1);
+                            taxId2 = organismsB[0];
+                            secondIntactAc = intact2;
 
-                                taxId1 = organismsA[0];
-                                firstIntactAc = intact1;
-                            }
+                            taxId1 = organismsA[0];
+                            firstIntactAc = intact1;
                         }
                         else if (uniprot2.startsWith(masterUniprot)) {
-                            if (uniprot1.startsWith(masterUniprot) && !uniprot1.equals(masterUniprot)){
-                                logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because is a self interaction with two isoforms of same protein");
-                                geneName1 = null;
-                                geneName2 = null;
-                                taxId1 = null;
-                                taxId2 = null;
-                            }
-                            else{
-                                firstUniprot = uniprot2;
-                                secondUniprot = uniprot1;
-                                geneName2 = context.getGeneNames().get(uniprot1);
-                                geneName1 = context.getGeneNames().get(uniprot2);
-                                taxId2 = organismsA[0];
-                                secondIntactAc = intact1;
+                            firstUniprot = uniprot2;
+                            secondUniprot = uniprot1;
+                            geneName2 = context.getGeneNames().get(uniprot1);
+                            geneName1 = context.getGeneNames().get(uniprot2);
+                            taxId2 = organismsA[0];
+                            secondIntactAc = intact1;
 
-                                taxId1 = organismsB[0];
-                                firstIntactAc = intact2;
-                            }
+                            taxId1 = organismsB[0];
+                            firstIntactAc = intact2;
                         }
                         else {
                             Set<IntactTransSplicedProteins> transSplicedProteins = transSplicedVariants.get(masterUniprot);
@@ -177,7 +169,7 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                                 }
                             }
 
-                            if ((startsWithUniprot1 && startsWithUniprot2) || (startsWithUniprot1 && !uniprot2.equals(masterUniprot) && uniprot2.startsWith(masterUniprot)) || (startsWithUniprot2 && !uniprot1.equals(masterUniprot) && uniprot1.startsWith(masterUniprot))){
+                            if ((startsWithUniprot1 && startsWithUniprot2) || (startsWithUniprot1 && uniprot2.startsWith(masterUniprot)) || (startsWithUniprot2 && uniprot1.startsWith(masterUniprot))){
                                 logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because is a self interaction with two isoforms of same protein");
                                 geneName1 = null;
                                 geneName2 = null;
@@ -186,44 +178,26 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             }
                             else {
                                 if (startsWithUniprot1){
-                                    if (uniprot2.startsWith(masterUniprot) && !uniprot2.equals(masterUniprot)){
-                                        logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because is a self interaction with two isoforms of same protein");
-                                        geneName1 = null;
-                                        geneName2 = null;
-                                        taxId1 = null;
-                                        taxId2 = null;
-                                    }
-                                    else{
-                                        firstUniprot = uniprot1;
-                                        secondUniprot = uniprot2;
-                                        geneName2 = context.getGeneNames().get(uniprot2);
-                                        geneName1 = context.getGeneNames().get(uniprot1);
-                                        taxId2 = organismsB[0];
-                                        secondIntactAc = intact2;
+                                    firstUniprot = uniprot1;
+                                    secondUniprot = uniprot2;
+                                    geneName2 = context.getGeneNames().get(uniprot2);
+                                    geneName1 = context.getGeneNames().get(uniprot1);
+                                    taxId2 = organismsB[0];
+                                    secondIntactAc = intact2;
 
-                                        taxId1 = organismsA[0];
-                                        firstIntactAc = intact1;
-                                    }
+                                    taxId1 = organismsA[0];
+                                    firstIntactAc = intact1;
                                 }
                                 else {
-                                    if (uniprot1.startsWith(masterUniprot) && !uniprot1.equals(masterUniprot)){
-                                        logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because is a self interaction with two isoforms of same protein");
-                                        geneName1 = null;
-                                        geneName2 = null;
-                                        taxId1 = null;
-                                        taxId2 = null;
-                                    }
-                                    else{
-                                        firstUniprot = uniprot2;
-                                        secondUniprot = uniprot1;
-                                        geneName2 = context.getGeneNames().get(uniprot1);
-                                        geneName1 = context.getGeneNames().get(uniprot2);
-                                        taxId2 = organismsA[0];
-                                        secondIntactAc = intact1;
+                                    firstUniprot = uniprot2;
+                                    secondUniprot = uniprot1;
+                                    geneName2 = context.getGeneNames().get(uniprot1);
+                                    geneName1 = context.getGeneNames().get(uniprot2);
+                                    taxId2 = organismsA[0];
+                                    secondIntactAc = intact1;
 
-                                        taxId1 = organismsB[0];
-                                        firstIntactAc = intact2;
-                                    }
+                                    taxId1 = organismsB[0];
+                                    firstIntactAc = intact2;
                                 }
                             }
                         }
