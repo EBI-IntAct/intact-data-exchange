@@ -30,6 +30,7 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.*;
 import uk.ac.ebi.intact.uniprot.model.Organism;
 import uk.ac.ebi.intact.uniprot.model.UniprotProtein;
+import uk.ac.ebi.intact.uniprot.model.UniprotProteinTranscript;
 
 import java.util.Collection;
 import java.util.List;
@@ -102,6 +103,7 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                 Protein proteinToEnrich = (Protein) objectToEnrich;
 
                 UniprotProtein uniprotProt = null;
+                UniprotProteinTranscript uniprotTrans = null;
 
                 int taxId;
 
@@ -116,16 +118,23 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                 if (uniprotXref != null) {
                     String uniprotId = uniprotXref.getPrimaryId();
 
-                    if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein: " + uniprotId + " (taxid:"+taxId+")");
+                    if (uniprotId.contains("-") || uniprotId.contains("PRO_")){
+                        if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein isoform/chain: " + uniprotId + " (taxid:"+taxId+")");
 
-                    uniprotProt = interactorFetcher.fetchInteractorFromUniprot(uniprotId, taxId);
+                        uniprotTrans = interactorFetcher.fetchProteinTranscriptFromUniprot(uniprotId, taxId);
+                    }
+                    else{
+                        if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein: " + uniprotId + " (taxid:"+taxId+")");
+
+                        uniprotProt = interactorFetcher.fetchInteractorFromUniprot(uniprotId, taxId);
+                    }
 
                 } //else  {
-                    //if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein by shortLabel: "+proteinToEnrich.getShortLabel()+" (taxid:"+taxId+")");
+                //if (log.isDebugEnabled()) log.debug("\tEnriching Uniprot protein by shortLabel: "+proteinToEnrich.getShortLabel()+" (taxid:"+taxId+")");
 
-                    //if (proteinToEnrich.getShortLabel() != null) {
-                        //uniprotProt = interactorFetcher.fetchInteractorFromUniprot(proteinToEnrich.getShortLabel(), taxId);
-                    //}
+                //if (proteinToEnrich.getShortLabel() != null) {
+                //uniprotProt = interactorFetcher.fetchInteractorFromUniprot(proteinToEnrich.getShortLabel(), taxId);
+                //}
                 //}
 
                 if (uniprotProt != null) {
@@ -140,15 +149,27 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                     BioSource bioSource = new BioSource(objectToEnrich.getOwner(), organism.getName(), String.valueOf(organism.getTaxid()));
                     proteinToEnrich.setBioSource(bioSource);
                 }
+                else if (uniprotTrans != null){
+                    updateIsoformXrefs(proteinToEnrich, uniprotTrans);
+                    updateAliases(proteinToEnrich, uniprotTrans.getMasterProtein());
+                    updateSequence(proteinToEnrich, uniprotTrans);
+
+                    proteinToEnrich.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(uniprotTrans.getPrimaryAc().toLowerCase()));
+                    proteinToEnrich.setFullName(uniprotTrans.getDescription());
+
+                    Organism organism = uniprotTrans.getOrganism();
+                    BioSource bioSource = new BioSource(objectToEnrich.getOwner(), organism.getName(), String.valueOf(organism.getTaxid()));
+                    proteinToEnrich.setBioSource(bioSource);
+                }
                 else {
                     String shortlabel = proteinToEnrich.getShortLabel();
 
                     if (shortlabel != null){
-                        proteinToEnrich.setShortLabel(proteinToEnrich.getShortLabel().toLowerCase());                        
+                        proteinToEnrich.setShortLabel(proteinToEnrich.getShortLabel().toLowerCase());
                     }
                 }
 
-                if (objectToEnrich.getBioSource() != null) {
+                if (proteinToEnrich.getBioSource() != null) {
                     bioSourceEnricher.enrich(objectToEnrich.getBioSource());
                 }
 
@@ -229,7 +250,7 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                     if( functionTopic != null ) {
                         for ( OntologyDataItem parent : chebiEntity.getOntologyParents() ) {
                             if( "has role".equals( parent.getType() ) ) {
-                                 updateAnnotations( smallMoleculeToEnrich, functionTopic, parent.getChebiName() );
+                                updateAnnotations( smallMoleculeToEnrich, functionTopic, parent.getChebiName() );
                             }
                         }
                     }
@@ -256,8 +277,8 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                 chebiSecondaries.remove( chebiRef.getPrimaryId() );
             } else {
                 log.warn( "Small molecule (ac:"+ objectToEnrich.getAc() +
-                          ", shortlabel:"+ objectToEnrich.getShortLabel() +") has a chebi ID ("+
-                          chebiRef.getPrimaryId() +") that isn't found in the corresponding ChEBI entity" );
+                        ", shortlabel:"+ objectToEnrich.getShortLabel() +") has a chebi ID ("+
+                        chebiRef.getPrimaryId() +") that isn't found in the corresponding ChEBI entity" );
             }
         }
 
@@ -265,9 +286,9 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         if( chebiPrimary != null ) {
             InteractorXref xref =
                     new InteractorXref( objectToEnrich.getOwner(),
-                                        cvObjectFetcher.fetchByTermId( CvDatabase.class, CvDatabase.CHEBI_MI_REF ),
-                                        chebiPrimary,
-                                        identity );
+                            cvObjectFetcher.fetchByTermId( CvDatabase.class, CvDatabase.CHEBI_MI_REF ),
+                            chebiPrimary,
+                            identity );
             objectToEnrich.addXref( xref );
         }
 
@@ -275,9 +296,9 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         for ( String chebiSecondary : chebiSecondaries ) {
             InteractorXref xref =
                     new InteractorXref( objectToEnrich.getOwner(),
-                                        cvObjectFetcher.fetchByTermId( CvDatabase.class, CvDatabase.CHEBI_MI_REF ),
-                                        chebiSecondary,
-                                        secondary );
+                            cvObjectFetcher.fetchByTermId( CvDatabase.class, CvDatabase.CHEBI_MI_REF ),
+                            chebiSecondary,
+                            secondary );
             objectToEnrich.addXref( xref );
         }
     }
@@ -296,10 +317,16 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         }
     }
 
-     private void updateSequence(Protein proteinToEnrich, UniprotProtein uniprotProt) {
-         if (uniprotProt.getSequence() != null && !uniprotProt.getSequence().equals(proteinToEnrich.getSequence())) {
+    private void updateSequence(Protein proteinToEnrich, UniprotProtein uniprotProt) {
+        if (uniprotProt.getSequence() != null && !uniprotProt.getSequence().equals(proteinToEnrich.getSequence())) {
             proteinToEnrich.setSequence(uniprotProt.getSequence());
-         }
+        }
+    }
+
+    private void updateSequence(Protein proteinToEnrich, UniprotProteinTranscript uniprotProt) {
+        if (uniprotProt.getSequence() != null && !uniprotProt.getSequence().equals(proteinToEnrich.getSequence())) {
+            proteinToEnrich.setSequence(uniprotProt.getSequence());
+        }
     }
 
     /**
@@ -314,7 +341,7 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         if(name.length()>255){
             return name.substring( 0,255 );
         }
-       return name.trim().toLowerCase();
+        return name.trim().toLowerCase();
     }
 
     private void updateAliases(Interactor interactor, UniprotProtein uniprotProt) {
@@ -355,6 +382,26 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
     }
 
     private void updateXrefs(Protein protein, UniprotProtein uniprotProt) {
+        InteractorXref uniprotXref = ProteinUtils.getUniprotXref(protein);
+
+        CvObjectBuilder cvObjectBuilder = new CvObjectBuilder();
+        CvXrefQualifier identityQual = cvObjectBuilder.createIdentityCvXrefQualifier(protein.getOwner());
+        CvDatabase uniprotDb = CvObjectUtils.createCvObject(protein.getOwner(), CvDatabase.class, CvDatabase.UNIPROT_MI_REF, CvDatabase.UNIPROT);
+
+        if (uniprotXref == null) {
+            InteractorXref xref = XrefUtils.createIdentityXref(protein, uniprotProt.getPrimaryAc(), identityQual, uniprotDb);
+            protein.addXref(xref);
+        }
+
+        CvXrefQualifier secondaryAcQual = CvObjectUtils.createCvObject(protein.getOwner(), CvXrefQualifier.class, CvXrefQualifier.SECONDARY_AC_MI_REF, CvXrefQualifier.SECONDARY_AC);
+
+        for (String secondaryAc : uniprotProt.getSecondaryAcs()) {
+            InteractorXref xref = XrefUtils.createIdentityXref(protein, secondaryAc, secondaryAcQual, uniprotDb);
+            protein.addXref(xref);
+        }
+    }
+
+    private void updateIsoformXrefs(Protein protein, UniprotProteinTranscript uniprotProt) {
         InteractorXref uniprotXref = ProteinUtils.getUniprotXref(protein);
 
         CvObjectBuilder cvObjectBuilder = new CvObjectBuilder();

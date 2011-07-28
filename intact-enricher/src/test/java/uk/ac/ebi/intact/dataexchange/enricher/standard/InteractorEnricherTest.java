@@ -223,7 +223,7 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
 
     @Test
     public void enrich_alias() {
-        BioSource ecoli = getMockBuilder().createBioSource(561, "ecoli");
+        BioSource ecoli = getMockBuilder().createBioSource(83333, "ecoli");
         Protein protein = getMockBuilder().createProtein("P45530", "tusb_ecoli", ecoli);
         protein.getAliases().clear();
 
@@ -248,7 +248,7 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
 
     @Test
     public void enrich_uniprot_biosource() {
-        BioSource lalaOrganism = getMockBuilder().createBioSource(50, "lala");
+        BioSource lalaOrganism = getMockBuilder().createBioSource(9606, "human");
         Protein protein = getMockBuilder().createProtein("P18850", "unknownName", lalaOrganism);
 
         enricher.enrich(protein);
