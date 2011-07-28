@@ -159,7 +159,7 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                                 }
                             }
 
-                            if (startsWithUniprot1 && startsWithUniprot2){
+                            if ((startsWithUniprot1 && startsWithUniprot2) || (startsWithUniprot1 && !uniprot2.equals(masterUniprot) && uniprot2.startsWith(masterUniprot)) || (startsWithUniprot2 && !uniprot1.equals(masterUniprot) && uniprot1.startsWith(masterUniprot))){
                                 logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because is a self interaction with two isoforms of same protein");
                                 geneName1 = null;
                                 geneName2 = null;
