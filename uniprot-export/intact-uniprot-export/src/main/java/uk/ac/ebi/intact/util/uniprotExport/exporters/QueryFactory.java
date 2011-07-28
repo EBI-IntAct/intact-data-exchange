@@ -11,6 +11,7 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 
 import javax.persistence.Query;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -122,12 +123,12 @@ public class QueryFactory {
     public List<Object[]> getTranscriptsWithDifferentParents() {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
-        TransactionStatus transactionStatus = dataContext.beginTransaction();
+        //TransactionStatus transactionStatus = dataContext.beginTransaction();
 
-        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createNativeQuery(isoformsWithDifferentParents);
+        //Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createNativeQuery(isoformsWithDifferentParents);
 
-        List<Object []> methods = query.getResultList();
-        dataContext.commitTransaction(transactionStatus);
+        List<Object []> methods = new ArrayList<Object[]>();//query.getResultList();
+        //dataContext.commitTransaction(transactionStatus);
 
         return methods;
     }
