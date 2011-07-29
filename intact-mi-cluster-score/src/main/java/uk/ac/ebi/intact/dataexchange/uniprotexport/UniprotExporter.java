@@ -1,6 +1,5 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport;
 
-import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.factory.*;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.ExporterRule;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.InteractionSource;
@@ -45,8 +44,8 @@ public class UniprotExporter {
     public static void main( String[] args ) throws IOException {
 
         // Six possible arguments
-        if( args.length != 11 ) {
-            System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <goFile> <database> <binaryOnly> <highConfidence> <proteinOnly> <positiveOnly> <excludeInferred>" );
+        if( args.length != 10 ) {
+            System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <goFile> <binaryOnly> <highConfidence> <proteinOnly> <positiveOnly> <excludeInferred>" );
             System.err.println( "Usage: <rule> is the type of rule we want to use to export the interaction to uniprot. " +
                     "Can be 'detection_method' if we want the rules based on detection method or 'mi_score' if we want the rules based on mi score" );
             System.err.println( "Usage: <source> is the source of the binary interactions we want to export." +
@@ -55,7 +54,6 @@ public class UniprotExporter {
             System.err.println( "Usage: <drFile:version> the name of the file which will contain the DR lines. The version is optional and by default is 1");
             System.err.println( "Usage: <ccFile:version> the name of the file which will contain the CC lines. The version is optional and by default is 1");
             System.err.println( "Usage: <goFile:version> the name of the file which will contain the GO lines. The version is optional and by default is 1");
-            System.err.println( "Usage: <database> the database instance which will be used to extract supplementary information");
             System.err.println( "Usage: <binaryOnly> true : exclude spoke expanded interactions from the cluster or false : accept spoke expanded interactions in the cluster. By default, is false.");
             System.err.println( "Usage: <highConfidence> true : exclude low confidence interactions (dr-export = no or condition is not respected) from the cluster or false : accept low confidence interactions in the cluster. By default, is true.");
             System.err.println( "Usage: <proteinOnly> true : exclude interactions with a non protein interactor from the cluster or false : accept interactions having a non protein interactor in the cluster. By default, is true.");
@@ -73,14 +71,12 @@ public class UniprotExporter {
         int version_ccFile;
         String goFile = args[4];
         int version_goFile;
-        String database = args[5];
-        boolean excludeSpokeExpanded = Boolean.parseBoolean(args[6]);
-        boolean excludeLowConfidence = Boolean.parseBoolean(args[7]);
-        boolean excludeNonProtein = Boolean.parseBoolean(args[8]);
-        boolean excludeNegative = Boolean.parseBoolean(args[9]);
-        boolean excludeInferred = Boolean.parseBoolean(args[10]);
+        boolean excludeSpokeExpanded = Boolean.parseBoolean(args[5]);
+        boolean excludeLowConfidence = Boolean.parseBoolean(args[6]);
+        boolean excludeNonProtein = Boolean.parseBoolean(args[7]);
+        boolean excludeNegative = Boolean.parseBoolean(args[8]);
+        boolean excludeInferred = Boolean.parseBoolean(args[9]);
 
-        IntactContext.initContext(new String[]{"/META-INF/" + database + ".spring.xml"});
         FilterConfig config = FilterContext.getInstance().getConfig();
 
         config.setExcludeLowConfidenceInteractions(excludeLowConfidence);
@@ -154,8 +150,6 @@ public class UniprotExporter {
         System.out.println( "Version of the CC writer = " + version_ccFile );
         System.out.println( "GO file = " + goFile );
         System.out.println( "Version of the GO writer = " + version_goFile );
-
-        System.out.println( "database = " + database );
 
         System.out.println("Filter spoke expanded interactions : " + excludeSpokeExpanded );
         System.out.println("Filter low confidence interactions : " + excludeLowConfidence);

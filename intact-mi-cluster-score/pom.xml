@@ -25,6 +25,9 @@
         <highConfidence>true</highConfidence>
         <proteinOnly>true</proteinOnly>
         <positiveOnly>true</positiveOnly>
+        <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
+        <db.hbm2ddl>none</db.hbm2ddl>
+        <spring.version>3.0.2.RELEASE</spring.version>
     </properties>
 
     <build>
@@ -72,8 +75,6 @@
                                 <argument>${ccfile}</argument>
                                 <!-- The name of the GO file  -->
                                 <argument>${gofile}</argument>
-                                <!-- The name of the database  -->
-                                <argument>${database}</argument>
                                 <argument>${binaryOnly}</argument>
                                 <argument>${highConfidence}</argument>
                                 <argument>${proteinOnly}</argument>
@@ -114,8 +115,6 @@
                                 <argument>${source}</argument>
                                 <!-- The name of the resulting file -->
                                 <argument>${results}</argument>
-                                <!-- The name of the database  -->
-                                <argument>${database}</argument>
                                 <argument>${binaryOnly}</argument>
                                 <argument>${highConfidence}</argument>
                                 <argument>${proteinOnly}</argument>
@@ -194,8 +193,6 @@
                                 <argument>${fileExported}</argument>
                                 <!-- The name of the log file containing excluded interactions-->
                                 <argument>${fileExcluded}</argument>
-                                <!-- The name of the database  -->
-                                <argument>${database}</argument>
                                 <!-- The version of CC export  -->
                                 <argument>${version}</argument>
                             </arguments>
@@ -365,13 +362,35 @@
             <artifactId>commons-collections</artifactId>
             <version>3.2</version>
         </dependency>
+
+        <!--Spring-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
     </dependencies>
 
     <repositories>
         <repository>
-              <id>intact.nexus</id>
-              <name>IntAct Nexus</name>
-              <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
+            <id>intact.nexus</id>
+            <name>IntAct Nexus</name>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
         </repository>
     </repositories>
 

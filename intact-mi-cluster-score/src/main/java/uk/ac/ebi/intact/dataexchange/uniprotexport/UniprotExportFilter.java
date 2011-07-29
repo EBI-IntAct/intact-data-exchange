@@ -1,6 +1,5 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport;
 
-import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.factory.InteractionFilterFactory;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.InteractionSource;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
@@ -27,12 +26,11 @@ public class UniprotExportFilter {
 
         // Six possible arguments
         if( args.length != 7 ) {
-            System.err.println( "Usage: UniprotExportFilter <source> <result> <database> <binaryOnly> <highConfidence> <proteinOnly> <positiveOnly>" );
+            System.err.println( "Usage: UniprotExportFilter <source> <result> <binaryOnly> <highConfidence> <proteinOnly> <positiveOnly>" );
             System.err.println( "Usage: <source> is the source of the binary interactions we want to export." +
                     " Can be 'intact' if we want to export the interactions directly from intact (no file name is necessary) or 'mitab:fileName' if we want to export from mitab. In the last case" +
                     "the file name must be given in the source option preceded by ':'" );
             System.err.println( "Usage: <result> the name of the mitab file which will contain the results. Four files will be generated : two files for positive interactions, two for negative interactions. One mitab file and one text file");
-            System.err.println( "Usage: <database> the database instance which will be used to extract supplementary information");
             System.err.println( "Usage: <binaryOnly> true : exclude spoke expanded interactions from the cluster or false : accept spoke expanded interactions in the cluster. By default, is false.");
             System.err.println( "Usage: <highConfidence> true : exclude low confidence interactions (dr-export = no or condition is not respected) from the cluster or false : accept low confidence interactions in the cluster. By default, is true.");
             System.err.println( "Usage: <proteinOnly> true : exclude interactions with a non protein interactor from the cluster or false : accept interactions having a non protein interactor in the cluster. By default, is true.");
@@ -43,13 +41,11 @@ public class UniprotExportFilter {
         String sourceType = args[0];
         String mitabFile = null;
         String results = args[1];
-        String database = args[2];
-        boolean excludeSpokeExpanded = Boolean.parseBoolean(args[3]);
-        boolean excludeLowConfidence = Boolean.parseBoolean(args[4]);
-        boolean excludeNonProtein = Boolean.parseBoolean(args[5]);
-        boolean excludeNegative = Boolean.parseBoolean(args[6]);
+        boolean excludeSpokeExpanded = Boolean.parseBoolean(args[2]);
+        boolean excludeLowConfidence = Boolean.parseBoolean(args[3]);
+        boolean excludeNonProtein = Boolean.parseBoolean(args[4]);
+        boolean excludeNegative = Boolean.parseBoolean(args[5]);
 
-        IntactContext.initContext(new String[]{"/META-INF/" + database + ".spring.xml"});
         FilterConfig config = FilterContext.getInstance().getConfig();
 
         config.setExcludeLowConfidenceInteractions(excludeLowConfidence);
@@ -78,8 +74,6 @@ public class UniprotExportFilter {
             System.out.println( "MITAB file = " + mitabFile );
         }
         System.out.println( "Results file = " + results );
-
-        System.out.println( "database = " + database );
 
         System.out.println("Filter spoke expanded interactions : " + excludeSpokeExpanded );
         System.out.println("Filter low confidence interactions : " + excludeLowConfidence);
