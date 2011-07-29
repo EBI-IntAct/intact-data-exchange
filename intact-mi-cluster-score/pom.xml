@@ -348,8 +348,8 @@
         <!-- Oracle -->
         <dependency>
             <groupId>com.oracle</groupId>
-            <artifactId>oracle-thin</artifactId>
-            <version>10.2.0.4</version>
+            <artifactId>ojdbc14</artifactId>
+            <version>10.2.0.3.0</version>
         </dependency>
 
         <!-- H2 -->
