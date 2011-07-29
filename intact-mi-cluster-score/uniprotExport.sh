@@ -19,4 +19,6 @@ echo $11
 
 MAVEN_PROFILE=$6
 
+echo "use profile ${MAVEN_PROFILE}"
+
 mvn -U clean install -Puniprot-export,${MAVEN_PROFILE} -Drule=$1 -Dsource=$2 -Ddrfile=$3 -Dccfile=$4 -Dgofile=$5 -DbinaryOnly=$7 -DhighConfidence=$8 -DproteinOnly=$9 -DpositiveOnly=${10} -DexcludeInferred=${11} -Dmaven.test.skip -Dmaven.repo.local=repository -Ddb=oracle
