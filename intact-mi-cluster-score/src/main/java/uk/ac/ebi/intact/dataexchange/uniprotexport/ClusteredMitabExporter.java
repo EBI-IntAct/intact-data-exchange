@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport;
 
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.factory.InteractionExporterFactory;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.ExporterRule;
 import uk.ac.ebi.intact.util.uniprotExport.ClusteredBinaryInteractionProcessor;
@@ -35,6 +36,8 @@ public class ClusteredMitabExporter {
         String clusteredMitab = args[1];
         String fileExported = args[2];
         String fileExcluded = args[3];
+
+        IntactContext.initContext(new String[]{"/META-INF/jpa.spring.xml", "/META-INF/uniprotExport.spring.xml"});
 
         final ExporterRule rule = InteractionExporterFactory.convertIntoExporterRule(args[0]);
 

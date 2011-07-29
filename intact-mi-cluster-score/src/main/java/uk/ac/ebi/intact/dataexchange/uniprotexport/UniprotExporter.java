@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport;
 
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.factory.*;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.ExporterRule;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.InteractionSource;
@@ -76,6 +77,8 @@ public class UniprotExporter {
         boolean excludeNonProtein = Boolean.parseBoolean(args[7]);
         boolean excludeNegative = Boolean.parseBoolean(args[8]);
         boolean excludeInferred = Boolean.parseBoolean(args[9]);
+
+        IntactContext.initContext(new String[]{"/META-INF/jpa.spring.xml", "/META-INF/uniprotExport.spring.xml"});
 
         FilterConfig config = FilterContext.getInstance().getConfig();
 
