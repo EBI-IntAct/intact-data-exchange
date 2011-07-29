@@ -103,8 +103,8 @@ public class QueryFactory {
             "and x1.qualifier_ac = (select ac from ia_controlledvocab where shortlabel = 'identity') " +
             "and x1.qualifier_ac = x2.qualifier_ac " +
             "and x1_1.qualifier_ac in (select ac from ia_controlledvocab where shortlabel = 'chain-parent' or shortlabel = 'isoform-parent') " +
-            "and x2.primaryid <> SUBSTR(x1.primaryid, 1, length(x2.primaryid)) " +
-            "and parent.ac = x1_1.primaryid;";
+            "and x2.primaryid <> substr(x1.primaryid, 1, 6) " +
+            "and parent.ac = x1_1.primaryid";
 
     public List<Object[]> getMethodStatusInIntact() {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
@@ -123,12 +123,12 @@ public class QueryFactory {
     public List<Object[]> getTranscriptsWithDifferentParents() {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
-        //TransactionStatus transactionStatus = dataContext.beginTransaction();
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
 
-        //Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createNativeQuery(isoformsWithDifferentParents);
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createNativeQuery(isoformsWithDifferentParents);
 
-        List<Object []> methods = new ArrayList<Object[]>();//query.getResultList();
-        //dataContext.commitTransaction(transactionStatus);
+        List<Object []> methods = query.getResultList();
+        dataContext.commitTransaction(transactionStatus);
 
         return methods;
     }
