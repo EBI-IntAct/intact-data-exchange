@@ -122,7 +122,8 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             containsFeatureChain = true;
                         }
 
-                        if (uniprot1.startsWith(masterUniprot)){
+                        // case of uniprot1 = master uniprot interacting with one of its isoforms uniprot 2
+                        if (uniprot1.equals(masterUniprot) && !uniprot2.equals(masterUniprot) && uniprot2.startsWith(masterUniprot)){
                             firstUniprot = uniprot1;
                             secondUniprot = uniprot2;
                             geneName2 = context.getGeneNames().get(uniprot2);
@@ -133,7 +134,8 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             taxId1 = organismsA[0];
                             firstIntactAc = intact1;
                         }
-                        else if (uniprot2.startsWith(masterUniprot)) {
+                         // case of uniprot2 = master uniprot interacting with one of its isoforms uniprot 1
+                        else if (uniprot2.equals(masterUniprot) && !uniprot1.equals(masterUniprot) && uniprot1.startsWith(masterUniprot)){
                             firstUniprot = uniprot2;
                             secondUniprot = uniprot1;
                             geneName2 = context.getGeneNames().get(uniprot1);
@@ -144,44 +146,29 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             taxId1 = organismsB[0];
                             firstIntactAc = intact2;
                         }
-                        else {
-                            Set<IntactTransSplicedProteins> transSplicedProteins = transSplicedVariants.get(masterUniprot);
-                            boolean startsWithUniprot1 = false;
+                        // case of uniprot1 = master uniprot or isoform or feature chain interacting with a different uniprot entry uniprot1
+                        else if (uniprot1.startsWith(masterUniprot) && !uniprot2.startsWith(masterUniprot)){
+                            firstUniprot = uniprot1;
+                            secondUniprot = uniprot2;
+                            geneName2 = context.getGeneNames().get(uniprot2);
+                            geneName1 = context.getGeneNames().get(uniprot1);
+                            taxId2 = organismsB[0];
+                            secondIntactAc = intact2;
 
-                            if (transSplicedProteins != null){
-                                for (IntactTransSplicedProteins prot : transSplicedProteins){
-                                    if (uniprot1.equalsIgnoreCase(prot.getUniprotAc())){
-                                        startsWithUniprot1 = true;
-                                        break;
-                                    }
-                                    else if (uniprot2.equalsIgnoreCase(prot.getUniprotAc())){
-                                        break;
-                                    }
-                                }
-                            }
+                            taxId1 = organismsA[0];
+                            firstIntactAc = intact1;
+                        }
+                        // case of uniprot2 = master uniprot or isoform or feature chain interacting with a different uniprot entry uniprot2
+                        else if (uniprot2.startsWith(masterUniprot) && !uniprot1.startsWith(masterUniprot)) {
+                            firstUniprot = uniprot2;
+                            secondUniprot = uniprot1;
+                            geneName2 = context.getGeneNames().get(uniprot1);
+                            geneName1 = context.getGeneNames().get(uniprot2);
+                            taxId2 = organismsA[0];
+                            secondIntactAc = intact1;
 
-                            if (startsWithUniprot1){
-                                firstUniprot = uniprot1;
-                                secondUniprot = uniprot2;
-                                geneName2 = context.getGeneNames().get(uniprot2);
-                                geneName1 = context.getGeneNames().get(uniprot1);
-                                taxId2 = organismsB[0];
-                                secondIntactAc = intact2;
-
-                                taxId1 = organismsA[0];
-                                firstIntactAc = intact1;
-                            }
-                            else {
-                                firstUniprot = uniprot2;
-                                secondUniprot = uniprot1;
-                                geneName2 = context.getGeneNames().get(uniprot1);
-                                geneName1 = context.getGeneNames().get(uniprot2);
-                                taxId2 = organismsA[0];
-                                secondIntactAc = intact1;
-
-                                taxId1 = organismsB[0];
-                                firstIntactAc = intact2;
-                            }
+                            taxId1 = organismsB[0];
+                            firstIntactAc = intact2;
                         }
 
                         if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null){
