@@ -368,6 +368,7 @@ public class ImexAssigner {
                         System.out.println( "\tSkipping registration in IMEx Central until it supports pre-publication with internal ID: " + publicationId );
                     } else {
                         imexPublication = imexCentral.createPublicationById( publicationId );
+                        foundByPmid = true;
                         System.out.println( "\tCreating a new record in IMExCentral" );
                         System.out.println( "\t\t" + printImexPublication( imexPublication ) );
                     }
