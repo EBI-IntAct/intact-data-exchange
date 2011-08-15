@@ -122,8 +122,8 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             containsFeatureChain = true;
                         }
 
-                        // case of uniprot1 = master uniprot interacting with one of its isoforms uniprot 2
-                        if (uniprot1.equals(masterUniprot) && !uniprot2.equals(masterUniprot) && uniprot2.startsWith(masterUniprot)){
+                        // case of uniprot1 = master uniprot interacting with one of its isoforms uniprot 2 or self interaction
+                        if (uniprot1.equals(masterUniprot) && ((!uniprot2.equals(masterUniprot) && uniprot2.startsWith(masterUniprot)) || uniprot2.equals(masterUniprot))){
                             firstUniprot = uniprot1;
                             secondUniprot = uniprot2;
                             geneName2 = context.getGeneNames().get(uniprot2);
@@ -134,8 +134,8 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             taxId1 = organismsA[0];
                             firstIntactAc = intact1;
                         }
-                         // case of uniprot2 = master uniprot interacting with one of its isoforms uniprot 1
-                        else if (uniprot2.equals(masterUniprot) && !uniprot1.equals(masterUniprot) && uniprot1.startsWith(masterUniprot)){
+                         // case of uniprot2 = master uniprot interacting with one of its isoforms uniprot 1 or self interaction
+                        else if (uniprot2.equals(masterUniprot) && ((!uniprot1.equals(masterUniprot) && uniprot1.startsWith(masterUniprot)) || uniprot1.equals(masterUniprot))){
                             firstUniprot = uniprot2;
                             secondUniprot = uniprot1;
                             geneName2 = context.getGeneNames().get(uniprot1);
