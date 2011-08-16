@@ -74,7 +74,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
     public void after() throws Exception {
 
         // uncommenting this will cause the test to hang - which might be used to perform extra solr query.
-       // solrJettyRunner.join();
+        // solrJettyRunner.join();
 
         solrJettyRunner.stop();
     }
@@ -142,6 +142,47 @@ public class MitabCreationTest extends IntactBasicTestCase {
         Assert.assertEquals(1, proteinC.getAnnotations().size());
 
         getDataContext().commitTransaction(transactionStatus);
+    }
+
+    @Test
+    @DirtiesContext
+    public void writeMitabSelf() throws Exception {
+        FileUtils.deleteDirectory(new File("target/lala-lucene"));
+
+        Experiment exp = getMockBuilder().createExperimentRandom(3);
+
+        corePersister.saveOrUpdate(exp);
+
+        Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
+
+        Interaction interaction = getMockBuilder().createInteraction(
+                getMockBuilder().createComponentNeutral(proteinA));
+        Assert.assertEquals(1, interaction.getComponents().size());
+
+        // set stoichiometry
+        interaction.getComponents().iterator().next().setStoichiometry(2);
+
+        CvDatabase goDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO);
+        proteinA.addXref(getMockBuilder().createXref(proteinA, "GO:0030246", null, goDb));
+
+        proteinA.getBioSource().setTaxId("9606");
+
+        corePersister.saveOrUpdate(interaction);
+
+        Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
+
+        Job job = (Job) applicationContext.getBean("createMitabJob");
+
+        Map<String, JobParameter> params = new HashMap<String, JobParameter>(1);
+        params.put("date", new JobParameter(System.currentTimeMillis()));
+
+        JobExecution jobExecution = jobLauncher.run(job, new JobParameters(params));
+        Assert.assertTrue( jobExecution.getAllFailureExceptions().isEmpty() );
+        Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
+
+        final SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
+
+        Assert.assertEquals(1L, solrServer.query(new SolrQuery("P12345")).getResults().getNumFound());
     }
 
     @Test

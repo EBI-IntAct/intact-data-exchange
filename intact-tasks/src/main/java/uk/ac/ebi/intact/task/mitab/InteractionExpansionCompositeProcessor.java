@@ -28,7 +28,6 @@ import uk.ac.ebi.intact.irefindex.seguid.RogidGenerator;
 import uk.ac.ebi.intact.irefindex.seguid.SeguidException;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.PsimitabTools;
 import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
@@ -69,15 +68,19 @@ public class InteractionExpansionCompositeProcessor implements ItemProcessor<Int
 
         boolean expanded = false;
 
-        if (InteractionUtils.isBinaryInteraction(item)) {
-            interactions = Collections.singleton(item);
-        } else {
-            try {
-                interactions = expansionStategy.expand(item);
-            } catch (Throwable e) {
-                throw new InteractionExpansionException("Problem expanding interaction: "+item, e);
-            }
+        try {
+            interactions = expansionStategy.expand(item);
+        } catch (Throwable e) {
+            throw new InteractionExpansionException("Problem expanding interaction: "+item, e);
+        }
+
+        // if we have more than one interaction, it means that we have spoke expanded interactions
+        if (interactions != null && interactions.size() > 1) {
+
             expanded = true;
+        }
+        else if (interactions == null){
+            interactions = Collections.EMPTY_LIST;
         }
 
         if (interactions.isEmpty()) {
