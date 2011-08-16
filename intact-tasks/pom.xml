@@ -38,12 +38,12 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psimitab-converters</artifactId>
-            <version>${pom.version}</version>
+            <version>${pom.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-solr</artifactId>
-            <version>${pom.version}</version>
+            <version>${pom.parent.version}</version>
         </dependency>
 
         <!-- Logging -->
