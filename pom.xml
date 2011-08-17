@@ -19,7 +19,7 @@
     <url>http://www.ebi.ac.uk/~intact/devsite/dataexchange</url>
 
     <properties>
-        <version.core>2.4.0</version.core>
+        <version.core>2.4.1</version.core>
     </properties>
 
     <scm>

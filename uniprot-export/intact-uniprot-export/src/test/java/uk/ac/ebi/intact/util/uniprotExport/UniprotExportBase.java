@@ -9,6 +9,7 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.clone.IntactClonerException;
@@ -690,6 +691,10 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
                 CvTopic.class, null, CvTopic.ACCEPTED);
         getCorePersister().saveOrUpdate(accepted);
 
+        CvPublicationStatus released = new CvPublicationStatus(IntactContext.getCurrentInstance().getInstitution(), "released");
+        CvPublicationStatus readyForRelease = new CvPublicationStatus(IntactContext.getCurrentInstance().getInstitution(), "ready for release");
+        getCorePersister().saveOrUpdate(released, readyForRelease);
+
         // the different methods and their export status
         CvInteraction method = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
                 CvInteraction.class, "MI:0398", "two hybrid pooling");
@@ -741,6 +746,10 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
                 CvTopic.class, null, CvTopic.NEGATIVE);
         getCorePersister().saveOrUpdate(negative);
 
+        CvPublicationStatus released = new CvPublicationStatus(IntactContext.getCurrentInstance().getInstitution(), "released");
+        CvPublicationStatus readyForRelease = new CvPublicationStatus(IntactContext.getCurrentInstance().getInstitution(), "ready for release");
+        getCorePersister().saveOrUpdate(released, readyForRelease);
+
         // the different methods and their export status
         CvInteraction method = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
                 CvInteraction.class, "MI:0398", "two hybrid pooling");
@@ -771,31 +780,27 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         // several experiments and their export status
         Experiment experiment_yes = getMockBuilder().createExperimentRandom(1);
+        experiment_yes.getPublication().setStatus(released);
         Annotation expAnn1 = new Annotation(dr_export, "yes");
         experiment_yes.addAnnotation(expAnn1);
-        Annotation expAnnAcc1 = new Annotation(accepted, null);
-        experiment_yes.addAnnotation(expAnnAcc1);
         experiment_yes.setCvInteraction(method2);
 
         Experiment experiment_no = getMockBuilder().createExperimentRandom(1);
+        experiment_no.getPublication().setStatus(released);
         Annotation expAnn2 = new Annotation(dr_export, "no");
         experiment_no.addAnnotation(expAnn2);
-        Annotation expAnnAcc2 = new Annotation(accepted, null);
-        experiment_no.addAnnotation(expAnnAcc2);
 
         Experiment experiment_condition = getMockBuilder().createExperimentRandom(2);
+        experiment_condition.getPublication().setStatus(readyForRelease);
         Annotation expAnn3 = new Annotation(dr_export, "high");
         experiment_condition.addAnnotation(expAnn3);
-        Annotation expAnnAcc3 = new Annotation(accepted, null);
-        experiment_condition.addAnnotation(expAnnAcc3);
 
         Experiment experiment_negative = getMockBuilder().createExperimentRandom(1);
+        experiment_negative.getPublication().setStatus(released);
         Annotation expAnn4 = new Annotation(negative, null);
         experiment_negative.getInteractions().iterator().next().addAnnotation(expAnn4);
         Annotation expAnn5 = new Annotation(dr_export, "yes");
         experiment_negative.addAnnotation(expAnn5);
-        Annotation expAnnAcc4 = new Annotation(accepted, null);
-        experiment_negative.addAnnotation(expAnnAcc4);
 
         getCorePersister().saveOrUpdate(experiment_yes, experiment_condition, experiment_no, experiment_negative);
 

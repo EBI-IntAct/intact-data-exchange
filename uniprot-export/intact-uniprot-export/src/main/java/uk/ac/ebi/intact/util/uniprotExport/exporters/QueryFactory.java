@@ -27,6 +27,8 @@ public class QueryFactory {
 
     private final static String AUTHOR_SCORE = "author-score";
     private final static String INFERRED_AUTHOR = "MI:0363";
+    private final static String RELEASED = "released";
+    private static final String READY_FOR_RELEASE = "ready for release";
 
     private final String interactionInvolvedInComponents = "select distinct(c1.interaction.ac) from Component c1";
 
@@ -65,20 +67,9 @@ public class QueryFactory {
             "and i11.ac not in (" + interactionsFromExperimentExportYes + ") " +
             "and i11.ac not in ("+interactionsFromExperimentExportConditional+")";
 
-    private final String interactionsAccepted = "select distinct(i2.ac) from Component c1 join c1.interaction as i2 join i2.experiments as e " +
-            "join e.annotations as an join e.publication as pn3 where an.cvTopic.shortLabel = :accepted or pn3.ac in (select distinct(pn.ac) " +
-            "from Publication pn join pn.annotations as pnAnn where pnAnn.cvTopic.shortLabel = :accepted)";
-    // interactions with at least one experiment 'on-hold'
-    private final String interactionsOnHoldOrToBeReviewed = "select distinct(i3.ac) from Component c2 join c2.interaction as i3 join i3.experiments" +
-            " as e2 join e2.annotations as an2 join e2.publication as pn4 where an2.cvTopic.shortLabel = :onhold or an2.cvTopic.shortLabel = :to_be_reviewed" +
-            " or pn4.ac in (select distinct(pn2.ac) from Publication pn2 join pn2.annotations as pnAnn2 " +
-            "where pnAnn2.cvTopic.shortLabel = :onhold or pnAnn2.cvTopic.shortLabel = :to_be_reviewed)";
-
-    private final String publicationsAccepted = "select distinct(pn.ac) from Publication pn join pn.annotations as pnAnn " +
-            "where pnAnn.cvTopic.shortLabel = :accepted";
-    // interactions with at least one experiment 'on-hold'
-    private final String publicationsOnHoldOrToBeReviewed = "select distinct(pn2.ac) from Publication pn2 join pn2.annotations as pnAnn2 " +
-            "where pnAnn2.cvTopic.shortLabel = :onhold or pnAnn2.cvTopic.shortLabel = :to_be_reviewed";
+    // interactions attached to a publication released or ready-to-be-released
+    private final String releasedInteractions = "select distinct(rel.ac) from Component relComp join relComp.interaction as rel join rel.experiments" +
+            " as relexp join relexp.publication as relpub where relpub.status.shortLabel = :released or relpub.status.shortLabel = :ready_for_release";
 
     // select status of the different methods in IntAct
     private final String methodStatus = "select ci.identifier, a.annotationText from CvInteraction ci join ci.annotations as a join a.cvTopic as ct" +
@@ -321,31 +312,14 @@ public class QueryFactory {
         return interactions;
     }
 
-    public List<String> getInteractionsAccepted() {
+    public List<String> getReleasedInteractions() {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
         TransactionStatus transactionStatus = dataContext.beginTransaction();
 
-        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(interactionsAccepted);
-        query.setParameter("accepted", CvTopic.ACCEPTED);
-        //query.setParameter("september2005", "01/09/2005");
-        //query.setParameter("dateFormat", "dd/mm/yyyy");
-
-        List<String> interactions = query.getResultList();
-
-        dataContext.commitTransaction(transactionStatus);
-
-        return interactions;
-    }
-
-    public List<String> getInteractionsOnHoldOrToBeReviewed() {
-        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
-
-        TransactionStatus transactionStatus = dataContext.beginTransaction();
-
-        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(interactionsOnHoldOrToBeReviewed);
-        query.setParameter("onhold", CvTopic.ON_HOLD);
-        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(releasedInteractions);
+        query.setParameter("released", RELEASED);
+        query.setParameter("ready_for_release", READY_FOR_RELEASE);
 
         List<String> interactions = query.getResultList();
 
@@ -407,8 +381,7 @@ public class QueryFactory {
         TransactionStatus transactionStatus = dataContext.beginTransaction();
 
         String queryString = "select distinct(i.ac) from InteractionImpl i " +
-                "where i.ac in ("+interactionsAccepted + ") " +
-                "and i.ac not in ("+ interactionsOnHoldOrToBeReviewed +") " +
+                "where i.ac in ("+releasedInteractions + ") " +
                 "and i.ac not in (" + interactionsDrExportNotPassed + ") " +
                 "and i.ac not in (" + interactionsFromExperimentNoExport + ") " +
                 "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") " +
@@ -423,11 +396,10 @@ public class QueryFactory {
         // the participants are proteins
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
 
-        query.setParameter("accepted", CvTopic.ACCEPTED);
+        query.setParameter("released", RELEASED);
         //query.setParameter("september2005", "01/09/2005");
         //query.setParameter("dateFormat", "dd/mm/yyyy");
-        query.setParameter("onhold", CvTopic.ON_HOLD);
-        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
+        query.setParameter("ready_for_release", READY_FOR_RELEASE);
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
         query.setParameter("no", "NO");
         query.setParameter("yes", "YES");
@@ -465,9 +437,7 @@ public class QueryFactory {
         StringBuffer queryString = new StringBuffer();
         queryString.append("select distinct(i.ac) from InteractionImpl i ");
         queryString.append("where i.ac in (");
-        queryString.append(interactionsAccepted);
-        queryString.append(") and i.ac not in (");
-        queryString.append(interactionsOnHoldOrToBeReviewed);
+        queryString.append(releasedInteractions);
         queryString.append(") ");
 
         // negative interactions will be processed differently and are not in the same list
@@ -499,9 +469,8 @@ public class QueryFactory {
 
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString.toString());
 
-        query.setParameter("accepted", CvTopic.ACCEPTED);
-        query.setParameter("onhold", CvTopic.ON_HOLD);
-        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
+        query.setParameter("released", RELEASED);
+        query.setParameter("ready_for_release", READY_FOR_RELEASE);
         query.setParameter("negative", CvTopic.NEGATIVE);
 
         if (excludeLowConfidenceInteractions){
@@ -546,9 +515,7 @@ public class QueryFactory {
             StringBuffer queryString = new StringBuffer();
             queryString.append("select distinct i.ac from InteractionImpl i ");
             queryString.append("where i.ac in (");
-            queryString.append(interactionsAccepted);
-            queryString.append(") and i.ac not in (");
-            queryString.append(interactionsOnHoldOrToBeReviewed);
+            queryString.append(releasedInteractions);
             queryString.append(") and i.ac in (");
             queryString.append(negativeInteractions);
             queryString.append(") ");
@@ -577,9 +544,8 @@ public class QueryFactory {
 
             Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString.toString());
 
-            query.setParameter("accepted", CvTopic.ACCEPTED);
-            query.setParameter("onhold", CvTopic.ON_HOLD);
-            query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
+            query.setParameter("released", RELEASED);
+            query.setParameter("ready_for_release", READY_FOR_RELEASE);
             query.setParameter("negative", CvTopic.NEGATIVE);
 
             if (excludeLowConfidenceInteractions){
@@ -627,10 +593,7 @@ public class QueryFactory {
         StringBuffer queryString = new StringBuffer();
         queryString.append("select distinct(i.ac) from InteractionImpl i ");
         queryString.append("where i.ac in (");
-        queryString.append(interactionsAccepted);
-        queryString.append(") and i.ac not in (");
-        queryString.append(interactionsOnHoldOrToBeReviewed);
-        queryString.append(") ");
+        queryString.append(releasedInteractions);
         queryString.append(") and i.ac in (");
         queryString.append(selfInteractions);
         queryString.append(") ");
@@ -665,9 +628,8 @@ public class QueryFactory {
 
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString.toString());
 
-        query.setParameter("accepted", CvTopic.ACCEPTED);
-        query.setParameter("onhold", CvTopic.ON_HOLD);
-        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
+        query.setParameter("released", RELEASED);
+        query.setParameter("ready_for_release", READY_FOR_RELEASE);
 
         if (excludeLowConfidenceInteractions){
             query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
@@ -711,8 +673,7 @@ public class QueryFactory {
         TransactionStatus transactionStatus = dataContext.beginTransaction();
 
         String queryString = "select distinct(i.ac) from InteractionImpl i " +
-                "where i.ac in ("+interactionsAccepted + ") " +
-                "and i.ac not in ("+ interactionsOnHoldOrToBeReviewed +") " +
+                "where i.ac in ("+releasedInteractions + ") " +
                 "and i.ac not in (" + interactionsDrExportNotPassed + ") " +
                 "and i.ac not in (" + interactionsFromExperimentNoExport + ") " +
                 "and i.ac not in ("+negativeInteractions+") " +
@@ -725,11 +686,8 @@ public class QueryFactory {
         // the participants are proteins
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
 
-        query.setParameter("accepted", CvTopic.ACCEPTED);
-        //query.setParameter("september2005", "01/09/2005");
-        //query.setParameter("dateFormat", "dd/mm/yyyy");
-        query.setParameter("onhold", CvTopic.ON_HOLD);
-        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
+        query.setParameter("released", RELEASED);
+        query.setParameter("ready_for_release", READY_FOR_RELEASE);
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
         query.setParameter("no", "NO");
         query.setParameter("yes", "YES");
@@ -756,8 +714,7 @@ public class QueryFactory {
         TransactionStatus transactionStatus = dataContext.beginTransaction();
 
         String queryString = "select distinct(i.ac) from InteractionImpl i " +
-                "where i.ac in ("+interactionsAccepted + ") " +
-                "and i.ac not in ("+ interactionsOnHoldOrToBeReviewed +") " +
+                "where i.ac in ("+releasedInteractions + ") " +
                 "and i.ac not in ("+interactionsInvolvingInteractorsNoUniprotUpdate+") " +
                 "and i.ac not in ("+negativeInteractions+") " +
                 "and i.ac not in ("+interactionInvolvingNonUniprotOrNonProtein+")" +
@@ -770,11 +727,10 @@ public class QueryFactory {
         // the participants are proteins
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
 
-        query.setParameter("accepted", CvTopic.ACCEPTED);
+        query.setParameter("released", RELEASED);
         //query.setParameter("september2005", "01/09/2005");
         //query.setParameter("dateFormat", "dd/mm/yyyy");
-        query.setParameter("onhold", CvTopic.ON_HOLD);
-        query.setParameter("to_be_reviewed", CvTopic.TO_BE_REVIEWED);
+        query.setParameter("ready_for_release", READY_FOR_RELEASE);
         query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
         query.setParameter("negative", CvTopic.NEGATIVE);
         query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
