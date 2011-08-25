@@ -33,6 +33,7 @@ import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -45,6 +46,8 @@ public class IntactConverterUtils {
 
     private static final Log log = LogFactory.getLog(IntactConverterUtils.class);
     private static final String AUTHOR_SCORE = "author-score";
+    private static final String AUTH_CONF_MI = "MI:0621";
+    private static final String AUTH_CONF = "author-confidence";
 
     private IntactConverterUtils() {
     }
@@ -248,7 +251,8 @@ public class IntactConverterUtils {
         Component component = new Component(institution, interaction, interactor, intactExpRoles.iterator().next(), biologicalRole);
 
         // author confidence annotations to migrate to componentConfidences later
-        Collection<Attribute> annotationConfidencesToMigrate = new ArrayList<Attribute>(participant.getAttributes().size());
+        Collection<Attribute> annotationConfidencesToMigrate = extractAuthorConfidencesFrom(participant.getAttributes());
+
         // all other attributes will be converted into annotations
         Collection<Attribute> attributesToConvert = CollectionUtils.subtract(participant.getAttributes(), annotationConfidencesToMigrate);
 
@@ -335,5 +339,27 @@ public class IntactConverterUtils {
 //        }
 
         return component;
+    }
+
+    private static Collection<Attribute> extractAuthorConfidencesFrom(Collection<Attribute> attributes){
+        if (attributes != null && !attributes.isEmpty()){
+            Collection<Attribute> attributesConf = new ArrayList<Attribute>(attributes);
+            for (Attribute att : attributes){
+                if (att.getNameAc() != null){
+                    if (att.getNameAc().equals(AUTH_CONF_MI)){
+                        attributesConf.add(att);
+                    }
+                }
+                else if (att.getName() != null){
+                    if (att.getName().equals(AUTH_CONF)){
+                        attributesConf.add(att);
+                    }
+                }
+            }
+
+            return attributesConf;
+        }
+
+        return Collections.EMPTY_LIST;
     }
 }
