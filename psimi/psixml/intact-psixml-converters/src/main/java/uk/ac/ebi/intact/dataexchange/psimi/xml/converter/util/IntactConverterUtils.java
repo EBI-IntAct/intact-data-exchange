@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
@@ -43,6 +44,7 @@ import java.util.Random;
 public class IntactConverterUtils {
 
     private static final Log log = LogFactory.getLog(IntactConverterUtils.class);
+    private static final String AUTHOR_SCORE = "author-score";
 
     private IntactConverterUtils() {
     }
@@ -121,6 +123,21 @@ public class IntactConverterUtils {
 
         if (attributeContainer.hasAttributes()) {
             for (Attribute attribute : attributeContainer.getAttributes()) {
+                Annotation annotation = annotationConverter.psiToIntact(attribute);
+                annotation.setOwner(institution);
+
+                if (!annotated.getAnnotations().contains(annotation)) {
+                    annotated.getAnnotations().add(annotation);
+                }
+            }
+        }
+    }
+
+    public static void populateAnnotations(Collection<Attribute> attributesToConvert, Annotated annotated, Institution institution) {
+        AnnotationConverter annotationConverter = new AnnotationConverter(institution);
+
+        if (!attributesToConvert.isEmpty()) {
+            for (Attribute attribute : attributesToConvert) {
                 Annotation annotation = annotationConverter.psiToIntact(attribute);
                 annotation.setOwner(institution);
 
@@ -230,9 +247,14 @@ public class IntactConverterUtils {
 
         Component component = new Component(institution, interaction, interactor, intactExpRoles.iterator().next(), biologicalRole);
 
+        // author confidence annotations to migrate to componentConfidences later
+        Collection<Attribute> annotationConfidencesToMigrate = new ArrayList<Attribute>(participant.getAttributes().size());
+        // all other attributes will be converted into annotations
+        Collection<Attribute> attributesToConvert = CollectionUtils.subtract(participant.getAttributes(), annotationConfidencesToMigrate);
+
         IntactConverterUtils.populateNames(participant.getNames(), component);
         IntactConverterUtils.populateXref(participant.getXref(), component, new XrefConverter<ComponentXref>(institution, ComponentXref.class));
-        IntactConverterUtils.populateAnnotations(participant, component, institution);
+        IntactConverterUtils.populateAnnotations(attributesToConvert, component, institution);
 
         component.setExperimentalRoles(intactExpRoles);
 
@@ -285,6 +307,18 @@ public class IntactConverterUtils {
         ParticipantConfidenceConverter confConverter= new ParticipantConfidenceConverter( institution);
         for (psidev.psi.mi.xml.model.Confidence psiConfidence :  participant.getConfidenceList()){
             ComponentConfidence confidence = confConverter.psiToIntact( psiConfidence );
+            component.addConfidence( confidence);
+        }
+        for (Attribute authorConf : annotationConfidencesToMigrate){
+
+            String value = authorConf.getValue();
+            ComponentConfidence confidence = confConverter.newConfidenceInstance(value);
+
+            CvConfidenceType cvConfType = new CvConfidenceType();
+            cvConfType.setOwner(confConverter.getInstitution());
+            cvConfType.setShortLabel(AUTHOR_SCORE);
+            confidence.setCvConfidenceType( cvConfType);
+
             component.addConfidence( confidence);
         }
 
