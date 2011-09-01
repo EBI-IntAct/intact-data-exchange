@@ -56,11 +56,16 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
         Component fakeBait = sortedComponents.get(0);
 
         // Build interactions
-        for (int i = 1; i < sortedComponents.size(); i++) {
-            Component fakePrey = sortedComponents.get(i);
-
-            Interaction spokeInteraction = buildInteraction(interaction, fakeBait, fakePrey);
+        if( sortedComponents.size() == 1 && fakeBait.getStoichiometry() >= 2 ) {
+            Interaction spokeInteraction = buildInteraction(interaction, fakeBait, fakeBait);
             interactions.add(spokeInteraction);
+        } else {
+            for (int i = 1; i < sortedComponents.size(); i++) {
+                Component fakePrey = sortedComponents.get(i);
+
+                Interaction spokeInteraction = buildInteraction(interaction, fakeBait, fakePrey);
+                interactions.add(spokeInteraction);
+            }
         }
 
         return interactions;

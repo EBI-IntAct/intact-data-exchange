@@ -90,6 +90,23 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
     }
 
     @Test
+    public void expandTest_5() throws Exception{
+
+        // generate a interaction with only one Component
+        Component selfComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
+        selfComponent.getCvExperimentalRole().setShortLabel(CvExperimentalRole.NEUTRAL);
+        selfComponent.getCvExperimentalRole().setIdentifier(CvExperimentalRole.NEUTRAL_PSI_REF);
+        selfComponent.setStoichiometry( 3 );
+
+        Interaction interaction = getMockBuilder().createInteraction( selfComponent );
+
+        SpokeWithoutBaitExpansion spokeWithoutBaitExpansion = new SpokeWithoutBaitExpansion();
+        Collection<Interaction> interactions = spokeWithoutBaitExpansion.expand( interaction );
+        assertNotNull( interactions );
+        assertEquals( 1, interactions.size() );
+    }
+
+    @Test
     public void getNameTest() throws Exception {
         SpokeWithoutBaitExpansion spokeWithoutBaitExpansion = new SpokeWithoutBaitExpansion();
         assertEquals( "Spoke", spokeWithoutBaitExpansion.getName() );
