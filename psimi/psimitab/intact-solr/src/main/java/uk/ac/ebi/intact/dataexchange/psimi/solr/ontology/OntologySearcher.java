@@ -15,18 +15,19 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
+import org.apache.commons.collections.map.LRUMap;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
-import org.apache.commons.collections.map.LRUMap;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Map;
+import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Searches the ontology, using a SolrServer pointing to an ontology core.
@@ -34,7 +35,7 @@ import java.util.Collections;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class OntologySearcher {
+public class OntologySearcher implements Serializable {
 
     private static final int CHILDREN_CACHE_SIZE = 10000;
     private static final int PARENTS_CACHE_SIZE = 10000;
