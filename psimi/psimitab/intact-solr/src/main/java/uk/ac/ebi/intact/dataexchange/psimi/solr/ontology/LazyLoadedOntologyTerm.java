@@ -25,6 +25,7 @@ import org.apache.solr.common.SolrDocumentList;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -34,7 +35,7 @@ import java.util.*;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class LazyLoadedOntologyTerm implements OntologyTerm {
+public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
 
     private final OntologySearcher searcher;
 
