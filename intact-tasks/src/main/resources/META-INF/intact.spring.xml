@@ -32,6 +32,17 @@
         </property>
     </bean>
 
+    <bean id="publicationCompact25XmlProcessor" class="uk.ac.ebi.intact.task.xml.PublicationCompactXml25Processor">
+        <property name="largeScale" value="2000"/>
+        <property name="smallScale" value="1000"/>
+        <property name="separator" value="_"/>
+        <property name="negativeTag" value="negative"/>
+    </bean>
+
+    <bean id="publicationCompact25XmlWriter" class="uk.ac.ebi.intact.task.xml.PublicationCompactXml25Writer">
+        <property name="parentFolderPaths" value="${xml.pmid.folder}"/>
+    </bean>
+
     <bean id="baseOntologyPopulatorTasklet" class="uk.ac.ebi.intact.task.mitab.index.OntologyPopulatorTasklet"
           abstract="true" scope="prototype">
         <property name="indexUniprotTaxonomy" value="true"/>

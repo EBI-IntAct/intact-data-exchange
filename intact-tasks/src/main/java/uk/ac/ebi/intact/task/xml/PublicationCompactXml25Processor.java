@@ -322,4 +322,36 @@ public class PublicationCompactXml25Processor implements ItemProcessor<Publicati
         intactEntry.setInstitution(null);
         intactEntry.setReleasedDate(null);
     }
+
+    public int getLargeScale() {
+        return largeScale;
+    }
+
+    public void setLargeScale(int largeScale) {
+        this.largeScale = largeScale;
+    }
+
+    public int getSmallScale() {
+        return smallScale;
+    }
+
+    public void setSmallScale(int smallScale) {
+        this.smallScale = smallScale;
+    }
+
+    public String getSeparator() {
+        return separator;
+    }
+
+    public void setSeparator(String separator) {
+        this.separator = separator;
+    }
+
+    public String getNegativeTag() {
+        return negativeTag;
+    }
+
+    public void setNegativeTag(String negativeTag) {
+        this.negativeTag = negativeTag;
+    }
 }

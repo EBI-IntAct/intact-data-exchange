@@ -100,4 +100,12 @@ public class PublicationCompactXml25Writer implements ItemWriter<Collection<Publ
             }
         }
     }
+
+    public String getParentFolderPaths() {
+        return parentFolderPaths;
+    }
+
+    public void setParentFolderPaths(String parentFolderPaths) {
+        this.parentFolderPaths = parentFolderPaths;
+    }
 }
