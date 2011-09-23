@@ -127,6 +127,7 @@
                     <batch:streams>
                         <batch:stream ref="orderedByCreatedPublicationReader"/>
                         <batch:stream ref="publicationCompact25XmlWriter"/>
+                        <batch:stream ref="publicationCompact25XmlProcessor"/>
                     </batch:streams>
                 </batch:chunk>
             </batch:tasklet>
