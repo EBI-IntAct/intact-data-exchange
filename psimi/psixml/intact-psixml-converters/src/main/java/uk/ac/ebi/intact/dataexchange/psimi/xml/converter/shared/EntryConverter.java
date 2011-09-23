@@ -15,17 +15,18 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import psidev.psi.mi.xml.model.*;
+import psidev.psi.mi.xml.model.Entry;
+import psidev.psi.mi.xml.model.ExperimentDescription;
+import psidev.psi.mi.xml.model.HasId;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationItem;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
+import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -117,15 +118,6 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
                     }
                 }
 
-//                for (Participant participant : interaction.getParticipants()) {
-//                    if (!contains(entry.getInteractors(), participant.getInteractor())) {
-//                        entry.getInteractors().add(participant.getInteractor());
-//                    }
-//                }
-            }
-
-            if( ConverterContext.getInstance().isGenerateCompactXml() ) {
-
                 for ( uk.ac.ebi.intact.model.Experiment e : intactInteracton.getExperiments() ) {
                     ExperimentConverter experimentConverter = new ExperimentConverter(getInstitution());
                     final ExperimentDescription experimentDesc = experimentConverter.intactToPsi( e );
@@ -134,9 +126,9 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
                     }
                 }
 
-//                for (ExperimentDescription experimentDesc : interaction.getExperiments()) {
-//                    if (!contains(entry.getExperiments(), experimentDesc)) {
-//                        entry.getExperiments().add(experimentDesc);
+//                for (Participant participant : interaction.getParticipants()) {
+//                    if (!contains(entry.getInteractors(), participant.getInteractor())) {
+//                        entry.getInteractors().add(participant.getInteractor());
 //                    }
 //                }
             }
