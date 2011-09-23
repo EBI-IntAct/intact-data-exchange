@@ -37,18 +37,13 @@ public class PublicationCompactXml25Processor implements ItemProcessor<Publicati
      */
     private int smallScale;
 
-    // collection of large scale experiments : each experiment can be splitted
-    private Collection<Experiment> largeScaleExperiments = new ArrayList<Experiment>();
-    // collection of small scale experiments : each experiment will be one entry
-    private Collection<Experiment> smallScaleExperiments = new ArrayList<Experiment>();
-    // collection of mixed experiments : the experiments will be in a single entry
-    private Collection<Experiment> mixedExperiments = new ArrayList<Experiment>();
+    // an currentIntactEntry for generating xml
+    private IntactEntry currentIntactEntry;
 
-    // collection of negativeInteractions. In IntAct, one negative interaction is in a separate experiment
-    private Collection<Experiment> negativeExperiments = new ArrayList<Experiment>();
-
-    // an intactEntry for generating xml
-    private IntactEntry intactEntry;
+    /**
+     * The intactEntry object to use and flush at once
+     */
+    private IntactEntry independentIntactEntry;
 
     /**
      * separator for the entry name
@@ -62,7 +57,8 @@ public class PublicationCompactXml25Processor implements ItemProcessor<Publicati
 
     public PublicationCompactXml25Processor(){
         this.entryConverter = new EntryConverter();
-        intactEntry = new IntactEntry();
+        currentIntactEntry = new IntactEntry();
+        independentIntactEntry = new IntactEntry();
     }
 
     @Override
@@ -72,51 +68,79 @@ public class PublicationCompactXml25Processor implements ItemProcessor<Publicati
         uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext.getInstance().setGenerateExpandedXml(false);
         ConverterContext.getInstance().getConverterConfig().setXmlForm(PsimiXmlForm.FORM_COMPACT);
 
+        // we count the number of processed interactions for the current intact entry
         int sumOfInteractions = 0;
+        // we count the number of intact entries we are processing
+        int numberEntries = 1;
 
-        // filter the experiments and interactions of this publication
-        for (Experiment exp : item.getExperiments()){
+        // iterator of experiments
+        Iterator<Experiment> iterator = item.getExperiments().iterator();
+
+        // the generated publication entries
+        SortedSet<PublicationEntry> publicationEntries = new TreeSet<PublicationEntry>();
+
+        // the current date of release
+        Date releasedDate = new Date(System.currentTimeMillis());
+
+        // convert experiments in one to several publication entry(ies)
+        while (iterator.hasNext()){
+            // the processed experiment
+            Experiment exp = iterator.next();
+
+            // number of interactions attached to the processed experiment
             int interactionSize = exp.getInteractions().size();
 
             // the experiments does contain negative interactions. Normally in intact, one experiment containing one negative should only contain negative
             if (interactionSize > 0 && InteractionUtils.isNegative(exp.getInteractions().iterator().next())){
-                negativeExperiments.add(exp);
+                // create a publication entry and reinitialize the independent intact entry
+                processNegativeExperiments(publicationEntries, item.getOwner(), item.getShortLabel(), item.getCreated(), releasedDate, exp);
             }
-            // one large scale experiment will be splitted and need to be processed separately
+            // one large scale experiment will be splitted and need to be processed separately in the independent intact entry
             else if (interactionSize >= largeScale){
-                largeScaleExperiments.add(exp);
+                processLargeScaleExperiments(publicationEntries, item.getOwner(), item.getShortLabel(), item.getCreated(), releasedDate, exp);
             }
-            // the experiment is quite big and will form a small scale chunk
+            // the next experiment cannot be added to the current intact entry so the current intact entry will be flushed and the processed experiment
+            // will be in the next intact entry
             else if (interactionSize >= smallScale){
-                smallScaleExperiments.add(exp);
+                // we append an index number to the entry name if we have several experiments. This experiment will be alone in a file so the other expiments
+                // will go in another file
+                boolean appendChunkIndex = item.getExperiments().size() > 1;
+
+                // we create a publication entry for this experiment and flush it using the independent intact entry
+                processSmallScaleExperiments(publicationEntries, item.getOwner(), item.getShortLabel(), item.getCreated(), releasedDate, appendChunkIndex, exp, numberEntries);
+
+                // we processed one 'small scale' entry
+                numberEntries ++;
+            }
+            // we cannot append a new experiment otherwise the number of interactions will be too big
+            else if (sumOfInteractions + interactionSize > largeScale){
+                // the current experiment will be in the next intact entry so an index is necessary
+                boolean appendChunkIndex = true;
+
+                // we flush the previous currentIntactEntry
+                flushCurrentIntactEntry(publicationEntries, item.getShortLabel(), item.getCreated(), numberEntries, appendChunkIndex);
+                // we processed one 'small scale entry'
+                numberEntries ++;
+                sumOfInteractions = 0;
+
+                // we prepare a new currentIntactEntry
+                startNewIntactEntry(item.getOwner(), item.getCreated(), exp);
+                sumOfInteractions = interactionSize;
             }
             // we can mix this experiment with others
             else {
-                mixedExperiments.add(exp);
+                sumOfInteractions += interactionSize;
+                appendExperimentsToIntactEntry(exp);
+            }
+
+            // we can flush the current intact entry as the last experiment has been processed
+            if (!iterator.hasNext() && !currentIntactEntry.getInteractions().isEmpty()){
+                boolean appendChunkIndex = numberEntries > 1;
+
+                // we flush the previous currentIntactEntry
+                flushCurrentIntactEntry(publicationEntries, item.getShortLabel(), item.getCreated(), numberEntries, appendChunkIndex);
             }
         }
-
-        SortedSet<PublicationEntry> publicationEntries = new TreeSet<PublicationEntry>();
-
-        if (!largeScaleExperiments.isEmpty()){
-            processLargeScaleExperiments(publicationEntries, item.getOwner(), item.getShortLabel(), item.getCreated());
-        }
-        if (!smallScaleExperiments.isEmpty()){
-            boolean appendChunkIndex = smallScaleExperiments.size() + mixedExperiments.size() > 1;
-           processSmallScaleExperiments(publicationEntries, item.getOwner(), item.getShortLabel(), item.getCreated(), appendChunkIndex);
-        }
-        if (!negativeExperiments.isEmpty()){
-           processNegativeExperiments(publicationEntries, item.getOwner(), item.getShortLabel(), item.getCreated());
-        }
-        if (!mixedExperiments.isEmpty()){
-           processMixedExperiments(publicationEntries, item.getOwner(), item.getShortLabel(), item.getCreated(), smallScaleExperiments.size());
-        }
-
-        // clean the context before returning the result
-        negativeExperiments.clear();
-        largeScaleExperiments.clear();
-        smallScaleExperiments.clear();
-        mixedExperiments.clear();
 
         return publicationEntries;
     }
@@ -126,48 +150,45 @@ public class PublicationCompactXml25Processor implements ItemProcessor<Publicati
      * @param publicationEntries
      * @param institution
      * @param publicationId
-     * @param date
      */
-    private void processLargeScaleExperiments(Collection<PublicationEntry> publicationEntries, Institution institution, String publicationId, Date date){
+    private void processLargeScaleExperiments(Collection<PublicationEntry> publicationEntries, Institution institution, String publicationId, Date created, Date released, Experiment exp){
 
-        for (Experiment exp : largeScaleExperiments){
-            // number of interactions already processed
-            int interactionProcessed = 0;
-            // total number of interactions for this experiment
-            int totalSize = exp.getInteractions().size();
-            // number of interaction chunks (and so interaction files)
-            int numberOfChunk = 0;
+        // number of interactions already processed
+        int interactionProcessed = 0;
+        // total number of interactions for this experiment
+        int totalSize = exp.getInteractions().size();
+        // number of interaction chunks (and so interaction files)
+        int numberOfChunk = 0;
 
-            // iterator of the interactions
-            Iterator<Interaction> iterator = exp.getInteractions().iterator();
+        // iterator of the interactions
+        Iterator<Interaction> iterator = exp.getInteractions().iterator();
 
-            while (interactionProcessed < totalSize){
-                // number of interactions processed for a specific chunk
-                int interactionChunk = 0;
+        while (interactionProcessed < totalSize){
+            // number of interactions processed for a specific chunk
+            int interactionChunk = 0;
 
-                // each chunk = a new xml entry
-                // set institution
-                intactEntry.setInstitution(institution);
-                // set release date
-                intactEntry.setReleasedDate(date);
+            // each chunk = a new xml entry
+            // set institution
+            independentIntactEntry.setInstitution(institution);
+            // set release date
+            independentIntactEntry.setReleasedDate(released);
 
-                while (interactionChunk < largeScale && interactionChunk < totalSize){
+            while (interactionChunk < largeScale && interactionChunk < totalSize){
 
-                    Interaction interaction = iterator.next();
-                    intactEntry.getInteractions().add(interaction);
+                Interaction interaction = iterator.next();
+                independentIntactEntry.getInteractions().add(interaction);
 
-                    interactionChunk++;
-                }
-
-                numberOfChunk++;
-
-                // name of the entry = publicationId_experimentLabel_chunkNumber
-                String publicationName = publicationId + separator + exp.getShortLabel() + separator + numberOfChunk;
-                // flush the current intact entry and start a new one
-                createChunkPublicationEntry(publicationEntries, date, publicationName);
-
-                interactionProcessed += interactionChunk;
+                interactionChunk++;
             }
+
+            numberOfChunk++;
+
+            // name of the entry = publicationId_experimentLabel_chunkNumber
+            String publicationName = publicationId + separator + exp.getShortLabel() + separator + numberOfChunk;
+            // flush the current intact entry and start a new one
+            createChunkPublicationEntry(publicationEntries, created, publicationName, independentIntactEntry);
+
+            interactionProcessed += interactionChunk;
         }
     }
 
@@ -176,31 +197,25 @@ public class PublicationCompactXml25Processor implements ItemProcessor<Publicati
      * @param publicationEntries
      * @param institution
      * @param publicationId
-     * @param date
      */
-    private void processSmallScaleExperiments(Collection<PublicationEntry> publicationEntries, Institution institution, String publicationId, Date date, boolean appendSmallChunk){
-        int numberOfSmallChunk = 0;
+    private void processSmallScaleExperiments(Collection<PublicationEntry> publicationEntries, Institution institution, String publicationId, Date created, Date released, boolean appendSmallChunk, Experiment exp, int index){
 
-        for (Experiment exp : smallScaleExperiments){
-            numberOfSmallChunk++;
+        // set institution
+        independentIntactEntry.setInstitution(institution);
+        // set release date
+        independentIntactEntry.setReleasedDate(released);
+        // add all the interactions to the currentIntactEntry
+        independentIntactEntry.getInteractions().addAll(exp.getInteractions());
 
-            // set institution
-            intactEntry.setInstitution(institution);
-            // set release date
-            intactEntry.setReleasedDate(date);
-            // add all the interactions to the intactEntry
-            intactEntry.getInteractions().addAll(exp.getInteractions());
+        // name of the entry = publicationId_smallChunkNumber
+        String publicationName = publicationId;
 
-            // name of the entry = publicationId_smallChunkNumber
-            String publicationName = publicationId;
-
-            if (appendSmallChunk || smallScaleExperiments.size() > 1){
-                 publicationName = publicationId + separator + numberOfSmallChunk;
-            }
-
-            // flush the current intact entry and start a new one
-            createChunkPublicationEntry(publicationEntries, date, publicationName);
+        if (appendSmallChunk || index > 1){
+            publicationName = publicationId + separator + index;
         }
+
+        // flush the current intact entry and start a new one
+        createChunkPublicationEntry(publicationEntries, created, publicationName, independentIntactEntry);
     }
 
     /**
@@ -208,89 +223,65 @@ public class PublicationCompactXml25Processor implements ItemProcessor<Publicati
      * @param publicationEntries
      * @param institution
      * @param publicationId
-     * @param date
      */
-    private void processNegativeExperiments(Collection<PublicationEntry> publicationEntries, Institution institution, String publicationId, Date date){
+    private void processNegativeExperiments(Collection<PublicationEntry> publicationEntries, Institution institution, String publicationId, Date created, Date released, Experiment exp){
 
         // set institution
-        intactEntry.setInstitution(institution);
+        independentIntactEntry.setInstitution(institution);
         // set release date
-        intactEntry.setReleasedDate(date);
+        independentIntactEntry.setReleasedDate(released);
 
-        for (Experiment exp : negativeExperiments){
-
-            // add all the interactions to the intactEntry
-            intactEntry.getInteractions().addAll(exp.getInteractions());
-        }
+        // add all the interactions to the currentIntactEntry
+        independentIntactEntry.getInteractions().addAll(exp.getInteractions());
 
         // name of the entry = publicationId_smallChunkNumber
         String publicationName = publicationId + separator + negativeTag;
         // flush the current intact entry and start a new one
-        createChunkPublicationEntry(publicationEntries, date, publicationName);
+        createChunkPublicationEntry(publicationEntries, created, publicationName, independentIntactEntry);
     }
 
     /**
      * Append all the experiments up to a large scale threshold value of interactions
-     * @param publicationEntries
-     * @param institution
-     * @param publicationId
-     * @param date
      */
-    private void processMixedExperiments(Collection<PublicationEntry> publicationEntries, Institution institution, String publicationId, Date date, int start){
+    private void appendExperimentsToIntactEntry(Experiment exp){
 
-        int numberOfSmallChunk = start;
-        int numberInteractions = 0;
-        int numberExperiment = 0;
+        // add all the interactions to the currentIntactEntry
+        currentIntactEntry.getInteractions().addAll(exp.getInteractions());
 
-        Iterator<Experiment> iterator = mixedExperiments.iterator();
-        // set institution
-        intactEntry.setInstitution(institution);
-        // set release date
-        intactEntry.setReleasedDate(date);
-
-        while (numberExperiment < mixedExperiments.size()){
-            Experiment exp = iterator.next();
-            int sizeInteractions = exp.getInteractions().size();
-
-            // the number of interactions is still inferior to largescale so we can append this experiment to the current entry
-            if (numberInteractions + sizeInteractions <= largeScale){
-                numberInteractions += sizeInteractions;
-
-                // add all the interactions to the intactEntry
-                intactEntry.getInteractions().addAll(exp.getInteractions());
-            }
-            // the number of interactions is too big for this entry so the experiment will be appended to a new entry after processing the current one
-            else {
-                // we have a new chunk
-                numberOfSmallChunk++;
-                // name of the entry = publicationId_smallChunkNumber
-                String publicationName = publicationId + separator + numberOfSmallChunk;
-                // flush the current intact entry and start a new one
-                createChunkPublicationEntry(publicationEntries, date, publicationName);
-
-                // start a new intact entry
-                // set institution
-                intactEntry.setInstitution(institution);
-                // set release date
-                intactEntry.setReleasedDate(date);
-                // add all the interactions to the intactEntry
-                intactEntry.getInteractions().addAll(exp.getInteractions());
-
-                numberInteractions = sizeInteractions;
-            }
-
-            // process the last or only one intactEntry
-            // name of the entry = publicationId_smallChunkNumber
-            String publicationName = publicationId;
-            if (numberOfSmallChunk > 1){
-                publicationName = publicationId + separator + numberOfSmallChunk;
-            }
-            // flush the current intact entry and start a new one
-            createChunkPublicationEntry(publicationEntries, date, publicationName);
-        }
     }
 
-    private void createChunkPublicationEntry(Collection<PublicationEntry> publicationEntries, Date date, String publicationName) {
+    /**
+     * Flush the current intact entry
+     * @param publicationEntries
+     * @param publicationId
+     * @param index
+     * @param appendChunkIndex
+     */
+    private void flushCurrentIntactEntry(Collection<PublicationEntry> publicationEntries, String publicationId, Date created, int index, boolean appendChunkIndex){
+
+        // name of the entry = publicationId_smallChunkNumber
+        String publicationName = publicationId;
+
+        if (appendChunkIndex || index > 1){
+            publicationName = publicationId + separator + index;
+        }
+
+        // flush the current intact entry and start a new one
+        createChunkPublicationEntry(publicationEntries, created, publicationName, currentIntactEntry);
+
+    }
+
+    private void startNewIntactEntry(Institution institution, Date date, Experiment exp){
+
+        // set institution
+        currentIntactEntry.setInstitution(institution);
+        // set release date
+        currentIntactEntry.setReleasedDate(date);
+        // add all the interactions to the currentIntactEntry
+        currentIntactEntry.getInteractions().addAll(exp.getInteractions());
+    }
+
+    private void createChunkPublicationEntry(Collection<PublicationEntry> publicationEntries, Date date, String publicationName, IntactEntry intactEntry) {
         // generate the xml entry for this chunk of interactions
         Entry xmlEntry = entryConverter.intactToPsi(intactEntry);
 
@@ -301,11 +292,11 @@ public class PublicationCompactXml25Processor implements ItemProcessor<Publicati
         // add the publication entry to the list of publication entries
         publicationEntries.add(publicationEntry);
         // clear the intact entry
-        clearIntactEntry();
+        clearIntactEntry(intactEntry);
     }
 
-    private void clearIntactEntry() {
-        // clear the intactEntry
+    private void clearIntactEntry(IntactEntry intactEntry) {
+        // clear the currentIntactEntry
         intactEntry.getInteractions().clear();
 
         if(intactEntry.getExperiments() != null){

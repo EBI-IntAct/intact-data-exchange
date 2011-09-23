@@ -261,6 +261,40 @@ public class MitabCreationTest extends IntactBasicTestCase {
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("IM-1234-1")).getResults().getNumFound());
     }
 
+    /*@Test
+    @DirtiesContext
+    public void writeCompactXML_test() throws Exception {
+
+        Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
+        Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
+        Protein proteinC = getMockBuilder().createProtein("Q00002", "protC");
+
+        Interaction interaction = getMockBuilder().createInteraction(
+                getMockBuilder().createComponentBait(proteinA),
+                getMockBuilder().createComponentPrey(proteinB),
+                getMockBuilder().createComponentPrey(proteinC));
+
+        CvDatabase imexDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
+        CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
+        interaction.addXref(getMockBuilder().createXref(interaction, "IM-1234-1", imexPrimary, imexDb));
+
+        corePersister.saveOrUpdate(interaction);
+
+        Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
+
+        Job job = (Job) applicationContext.getBean("createMitabJob");
+
+        Map<String, JobParameter> params = new HashMap<String, JobParameter>(1);
+        params.put("date", new JobParameter(System.currentTimeMillis()));
+
+        JobExecution jobExecution = jobLauncher.run(job, new JobParameters(params));
+        Assert.assertTrue( jobExecution.getAllFailureExceptions().isEmpty() );
+        Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
+
+        final SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
+        Assert.assertEquals(2L, solrServer.query(new SolrQuery("IM-1234-1")).getResults().getNumFound());
+    } */
+
     @Test
     @DirtiesContext
     public void writeMitab_negative() throws Exception {
