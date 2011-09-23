@@ -52,4 +52,8 @@ public class IdSequenceGenerator {
     public void reset() {
         this.currentId = 0;
     }
+
+    public void resetIdTo(int newStart){
+        this.currentId = newStart;
+    }
 }
