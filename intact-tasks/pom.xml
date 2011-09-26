@@ -47,16 +47,7 @@
             <artifactId>intact-psimitab-converters</artifactId>
             <version>${pom.version}</version>
         </dependency>
-        <dependency>
-            <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-            <artifactId>intact-psixml-converters</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>psidev.psi.mi</groupId>
-            <artifactId>psi25-xml</artifactId>
-            <version>1.7.10-SNAPSHOT</version>
-        </dependency>
+
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-solr</artifactId>
