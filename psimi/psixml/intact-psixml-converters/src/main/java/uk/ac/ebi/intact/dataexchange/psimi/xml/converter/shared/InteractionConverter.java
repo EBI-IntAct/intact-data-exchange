@@ -226,9 +226,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
     public psidev.psi.mi.xml.model.Interaction intactToPsi(Interaction intactObject) {
 
-        final boolean isNegative = containsAnnotation( intactObject, NEGATIVE, TRUE );
-        final boolean isIntraMolecular = containsAnnotation( intactObject, INTRA_MOLECULAR, TRUE );
-        final boolean isModelled = containsAnnotation( intactObject, MODELLED, TRUE );
+        final boolean isNegative = containsAnnotation( intactObject, NEGATIVE);
+        final boolean isIntraMolecular = containsAnnotation( intactObject, INTRA_MOLECULAR );
+        final boolean isModelled = containsAnnotation( intactObject, MODELLED );
 
         psidev.psi.mi.xml.model.Interaction interaction = super.intactToPsi(intactObject);
 
@@ -352,7 +352,19 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         while ( it.hasNext() ) {
             Annotation annotation = it.next();
             if ( annotation.getCvTopic().getShortLabel().equals( topicShortlabel )
-                    && ( text != null && text.equals( annotation.getAnnotationText() ) ) ) {
+                    && ( (text != null && text.equals( annotation.getAnnotationText() ) )) || (text == null && annotation.getAnnotationText() == null) ) {
+                found = true;
+            }
+        }
+        return found;
+    }
+
+    private boolean containsAnnotation( Interaction interaction, String topicShortlabel) {
+        boolean found = false;
+        final Iterator<Annotation> it = IntactCore.ensureInitializedAnnotations(interaction).iterator();
+        while ( it.hasNext() ) {
+            Annotation annotation = it.next();
+            if ( annotation.getCvTopic().getShortLabel().equals( topicShortlabel ) ) {
                 found = true;
             }
         }
