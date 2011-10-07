@@ -84,12 +84,12 @@ public class MitabCreationTest extends IntactBasicTestCase {
     public void writeMitab() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
-        CvTopic hidden = getMockBuilder().createCvObject( CvTopic.class, "MI:xxxx", "hidden" );
+        CvTopic hidden = getMockBuilder().createCvObject( CvTopic.class, null, "hidden" );
 
-        CvTopic internalRemark = getMockBuilder().createCvObject( CvTopic.class, "MI:yyyy", "internal-remark" );
+        CvTopic internalRemark = getMockBuilder().createCvObject( CvTopic.class, null, "internal-remark" );
         internalRemark.addAnnotation( new Annotation(getIntactContext().getInstitution(), hidden, "" ) );
 
-        CvTopic noUniprotUpdate = getMockBuilder().createCvObject( CvTopic.class, "MI:zzzz", "no-uniprot-update" );
+        CvTopic noUniprotUpdate = getMockBuilder().createCvObject( CvTopic.class, null, "no-uniprot-update" );
         noUniprotUpdate.addAnnotation( new Annotation(getIntactContext().getInstitution(), hidden, "" ) );
 
         Experiment exp = getMockBuilder().createExperimentRandom(3);
