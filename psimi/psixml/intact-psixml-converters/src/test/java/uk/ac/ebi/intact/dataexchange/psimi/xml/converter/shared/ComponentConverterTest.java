@@ -45,7 +45,7 @@ public class ComponentConverterTest extends IntactBasicTestCase {
 
         Assert.assertNotNull(component);
         Assert.assertNotNull(component.getInteractor());
-        Assert.assertNotNull(component.getInteraction());
+        Assert.assertNull(component.getInteraction());
         Assert.assertEquals(1, component.getExperimentalRoles().size());
         Assert.assertNull(component.getExpressedIn());
 

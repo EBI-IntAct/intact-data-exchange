@@ -45,13 +45,12 @@ import java.util.Random;
 public class IntactConverterUtils {
 
     private static final Log log = LogFactory.getLog(IntactConverterUtils.class);
-    private static final String AUTHOR_SCORE = "author-score";
-    private static final String AUTH_CONF_MI = "MI:0621";
-    private static final String AUTH_CONF = "author-confidence";
+    public static final String AUTHOR_SCORE = "author-score";
+    public static final String AUTH_CONF_MI = "MI:0621";
+    public static final String AUTH_CONF = "author-confidence";
 
     private IntactConverterUtils() {
     }
-
     public static void populateNames(Names names, AnnotatedObject<?, ?> annotatedObject) {
         String shortLabel = getShortLabelFromNames(names);
 
@@ -72,6 +71,33 @@ public class IntactConverterUtils {
 
             Class<?> aliasClass = AnnotatedObjectUtils.getAliasClassType(annotatedObject.getClass());
             AliasConverter aliasConverter = new AliasConverter(getInstitution(annotatedObject), aliasClass);
+
+            populateAliases(names.getAliases(), annotatedObject, aliasConverter);
+        }
+    }
+
+    public static void populateNames(Names names, AnnotatedObject<?, ?> annotatedObject, AliasConverter aliasConverter) {
+        String shortLabel = getShortLabelFromNames(names);
+
+        if (names == null && (annotatedObject instanceof Experiment) ) {
+            shortLabel = createExperimentTempShortLabel();
+        }
+
+        if ( ! ( annotatedObject instanceof Institution ) ) {
+            if ( shortLabel != null ) {
+                shortLabel = shortLabel.toLowerCase();
+            }
+        }
+
+        annotatedObject.setShortLabel(shortLabel);
+
+        if (names != null) {
+            annotatedObject.setFullName(names.getFullName());
+
+            if (aliasConverter == null){
+                Class<?> aliasClass = AnnotatedObjectUtils.getAliasClassType(annotatedObject.getClass());
+                aliasConverter = new AliasConverter(getInstitution(annotatedObject), aliasClass);
+            }
 
             populateAliases(names.getAliases(), annotatedObject, aliasConverter);
         }
@@ -121,7 +147,42 @@ public class IntactConverterUtils {
         }
     }
 
-    public static void populateAnnotations(AttributeContainer attributeContainer, Annotated annotated, Institution institution) {
+    public static void populateAnnotations(AttributeContainer attributeContainer, Annotated annotated, Institution institution, AnnotationConverter annotationConverter) {
+
+        if (annotationConverter == null){
+            annotationConverter = new AnnotationConverter(institution);
+        }
+
+        if (attributeContainer.hasAttributes()) {
+            for (Attribute attribute : attributeContainer.getAttributes()) {
+                Annotation annotation = annotationConverter.psiToIntact(attribute);
+                annotation.setOwner(institution);
+
+                if (!annotated.getAnnotations().contains(annotation)) {
+                    annotated.getAnnotations().add(annotation);
+                }
+            }
+        }
+    }
+
+    public static void populateAnnotations(Collection<Attribute> attributesToConvert, Annotated annotated, Institution institution, AnnotationConverter annotationConverter) {
+        if (annotationConverter == null){
+            annotationConverter = new AnnotationConverter(institution);
+        }
+
+        if (!attributesToConvert.isEmpty()) {
+            for (Attribute attribute : attributesToConvert) {
+                Annotation annotation = annotationConverter.psiToIntact(attribute);
+                annotation.setOwner(institution);
+
+                if (!annotated.getAnnotations().contains(annotation)) {
+                    annotated.getAnnotations().add(annotation);
+                }
+            }
+        }
+    }
+
+        public static void populateAnnotations(AttributeContainer attributeContainer, Annotated annotated, Institution institution) {
         AnnotationConverter annotationConverter = new AnnotationConverter(institution);
 
         if (attributeContainer.hasAttributes()) {
@@ -218,6 +279,7 @@ public class IntactConverterUtils {
     }
 
     public static Component newComponent(Institution institution, Participant participant, uk.ac.ebi.intact.model.Interaction interaction) {
+
         Interactor interactor = new InteractorConverter(institution).psiToIntact(participant.getInteractor());
 
         BiologicalRole psiBioRole = participant.getBiologicalRole();
@@ -341,7 +403,7 @@ public class IntactConverterUtils {
         return component;
     }
 
-    private static Collection<Attribute> extractAuthorConfidencesFrom(Collection<Attribute> attributes){
+    public static Collection<Attribute> extractAuthorConfidencesFrom(Collection<Attribute> attributes){
         if (attributes != null && !attributes.isEmpty()){
             Collection<Attribute> attributesConf = new ArrayList<Attribute>(attributes);
             for (Attribute att : attributes){

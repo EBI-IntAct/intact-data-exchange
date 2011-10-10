@@ -184,7 +184,10 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
             // components, created after the interaction, as we need the interaction to create them
             Collection<Component> components = getComponents(interaction, psiObject);
-            interaction.setComponents(components);
+            interaction.getComponents().clear();
+            for (Component comp : components){
+                interaction.addComponent(comp);
+            }
 
             for (psidev.psi.mi.xml.model.Confidence psiConfidence :  psiObject.getConfidences()){
                 Confidence confidence = confConverter.psiToIntact( psiConfidence );
@@ -513,7 +516,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                 throw new PsiConversionException("Participant without interactor found: "+participant+" in interaction: "+interaction);
             }
 
-            Component component = IntactConverterUtils.newComponent(interaction.getOwner(), participant, interaction);
+            Component component = participantConverter.psiToIntact(participant);
+            component.setInteraction(interaction);
+
             components.add(component);
         }
 
