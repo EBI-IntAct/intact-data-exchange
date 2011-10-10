@@ -15,6 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.FeatureDetectionMethod;
 import psidev.psi.mi.xml.model.FeatureType;
 import uk.ac.ebi.intact.core.persister.IntactCore;
@@ -32,6 +34,7 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
     private CvObjectConverter<CvFeatureType,FeatureType> featureTypeConverter;
     private CvObjectConverter<CvFeatureIdentification,FeatureDetectionMethod> featureDetMethodConverter;
     private RangeConverter rangeConverter;
+    private static final Log log = LogFactory.getLog(FeatureConverter.class);
 
     public FeatureConverter(Institution institution) {
         super(institution, Feature.class, psidev.psi.mi.xml.model.Feature.class);
@@ -53,8 +56,12 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
         psiStartConversion(psiObject);
 
         feature.setOwner(getInstitution());
+
+        // export xrefs, names and annotations
         IntactConverterUtils.populateNames(psiObject.getNames(), feature, aliasConverter);
         IntactConverterUtils.populateXref(psiObject.getXref(), feature, xrefConverter);
+        IntactConverterUtils.populateAnnotations(psiObject, feature, getInstitution(), annotationConverter);
+
         //feature.setShortLabel(shortLabel);
 
         if (psiObject.getFeatureType() != null) {
@@ -62,12 +69,19 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
             CvFeatureType featureType = featureTypeConverter.psiToIntact(psiObject.getFeatureType());
             feature.setCvFeatureType(featureType);
         }
+        else {
+            log.error("Feature without feature type : " + feature.getShortLabel());
+        }
 
         FeatureDetectionMethod featureDetMethod = psiObject.getFeatureDetectionMethod();
         if (featureDetMethod != null) {
 
             CvFeatureIdentification cvFeatureDetMethod = featureDetMethodConverter.psiToIntact(featureDetMethod);
             feature.setCvFeatureIdentification(cvFeatureDetMethod);
+        }
+
+        if (psiObject.getRanges().isEmpty()){
+            log.error("Feature without any ranges : " + feature.getShortLabel());
         }
 
         for (psidev.psi.mi.xml.model.Range psiRange : psiObject.getRanges()) {
@@ -97,6 +111,13 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
         if (intactObject.getCvFeatureType() != null){
             FeatureType featureType = featureTypeConverter.intactToPsi(intactObject.getCvFeatureType());
             psiFeature.setFeatureType(featureType);
+        }
+        else {
+            log.error("Feature without feature type " + intactObject.getShortLabel());
+        }
+
+        if (intactObject.getRanges().isEmpty()){
+            log.error("Feature without any ranges : " + intactObject.getShortLabel());
         }
 
         for (Range intactRange : IntactCore.ensureInitializedRanges(intactObject)) {

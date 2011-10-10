@@ -308,7 +308,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         }
 
         // create bibref if possible
-        if (bibref.getXref().getPrimaryRef() != null){
+        if (bibref.getXref() != null && bibref.getXref().getPrimaryRef() != null){
             expDesc.setBibref(bibref);
         }
         else {
