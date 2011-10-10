@@ -62,9 +62,9 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             interactor.setBioSource(bioSource);
         }
 
-        IntactConverterUtils.populateNames( psiObject.getNames(), interactor );
-        IntactConverterUtils.populateXref( psiObject.getXref(), interactor, new XrefConverter<InteractorXref>( getInstitution(), InteractorXref.class ) );
-        IntactConverterUtils.populateAnnotations( psiObject, interactor, getInstitution() );
+        IntactConverterUtils.populateNames( psiObject.getNames(), interactor, aliasConverter );
+        IntactConverterUtils.populateXref( psiObject.getXref(), interactor, xrefConverter );
+        IntactConverterUtils.populateAnnotations( psiObject, interactor, getInstitution(), annotationConverter );
 
         String sequence = psiObject.getSequence();
 

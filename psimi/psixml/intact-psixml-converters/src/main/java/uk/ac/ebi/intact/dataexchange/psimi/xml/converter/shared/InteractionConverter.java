@@ -165,9 +165,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             CvInteractorType interactorType = CvObjectUtils.createCvObject(getInstitution(), CvInteractorType.class, CvInteractorType.INTERACTION_MI_REF, CvInteractorType.INTERACTION);
             interaction.setCvInteractorType(interactorType);
 
-            IntactConverterUtils.populateNames(psiObject.getNames(), interaction);
-            IntactConverterUtils.populateXref(psiObject.getXref(), interaction, new XrefConverter<InteractorXref>(getInstitution(), InteractorXref.class));
-            IntactConverterUtils.populateAnnotations(psiObject, interaction, getInstitution());
+            IntactConverterUtils.populateNames(psiObject.getNames(), interaction, aliasConverter);
+            IntactConverterUtils.populateXref(psiObject.getXref(), interaction, xrefConverter);
+            IntactConverterUtils.populateAnnotations(psiObject, interaction, getInstitution(), annotationConverter);
 
             // imexId
             String imexId = psiObject.getImexId();

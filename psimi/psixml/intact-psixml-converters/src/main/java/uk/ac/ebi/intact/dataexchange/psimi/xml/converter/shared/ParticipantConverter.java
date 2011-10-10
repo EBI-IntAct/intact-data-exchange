@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.core.persister.IntactCore;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
@@ -41,7 +40,7 @@ import java.util.Map;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class ParticipantConverter extends AbstractIntactPsiConverter<Component, Participant> {
+public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Component, psidev.psi.mi.xml.model.Participant>{
 
     private static final Log log = LogFactory.getLog(ParticipantConverter.class);
     // TODO: fix ConversionCache or lazy initialization (featureMap is only necessary because of this)
@@ -59,7 +58,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
     private ParticipantParameterConverter participantParameterConverter;
 
     public ParticipantConverter(Institution institution) {
-        super(institution);
+        super(institution, Component.class, psidev.psi.mi.xml.model.Participant.class);
         ExperimentConverter expConverter = new ExperimentConverter(institution);
 
         interactionConverter = new InteractionConverter(institution, expConverter, this);
@@ -75,7 +74,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
     }
 
     public ParticipantConverter(Institution institution, InteractionConverter interactionConverter) {
-        super(institution);
+        super(institution, Component.class, psidev.psi.mi.xml.model.Participant.class);
         ExperimentConverter expConverter = new ExperimentConverter(institution);
 
         if (interactionConverter != null){
@@ -97,7 +96,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
     }
 
     public ParticipantConverter(Institution institution, InteractionConverter interactionConverter, ExperimentConverter expConverter) {
-        super(institution);
+        super(institution, Component.class, psidev.psi.mi.xml.model.Participant.class);
 
         if (interactionConverter != null){
             this.interactionConverter = interactionConverter;
@@ -131,10 +130,9 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
     }
 
     public Participant intactToPsi(Component intactObject) {
-        Participant participant = new Participant();
+        Participant participant = super.intactToPsi(intactObject);
 
         intactStartConversation(intactObject);
-        PsiConverterUtils.populate(intactObject, participant, this );
         participant.getNames().setShortLabel(intactObject.getInteractor().getShortLabel());
 
         for ( CvExperimentalRole experimentalRole : IntactCore.ensureInitializedExperimentalRoles(intactObject)) {

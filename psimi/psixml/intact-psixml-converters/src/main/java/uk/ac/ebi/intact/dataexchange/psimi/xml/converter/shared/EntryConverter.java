@@ -42,6 +42,7 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
     private InteractionConverter interactionConverter;
     private InteractorConverter interactorConverter;
     private ExperimentConverter experimentConverter;
+    protected AnnotationConverter annotationConverter;
 
     public EntryConverter() {
         super(null);
@@ -49,6 +50,7 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         experimentConverter = new ExperimentConverter(null);
         interactionConverter = new InteractionConverter(null, experimentConverter);
         interactorConverter = new InteractorConverter(null);
+        this.annotationConverter = new AnnotationConverter(null);
     }
 
     @Deprecated
@@ -73,7 +75,7 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         IntactEntry ientry = new IntactEntry(interactions);
         ientry.setInstitution(getInstitution());
 
-        IntactConverterUtils.populateAnnotations(psiObject, ientry, institution);
+        IntactConverterUtils.populateAnnotations(psiObject, ientry, institution, this.annotationConverter);
 
         if (psiObject.getSource().getReleaseDate() != null) {
             ientry.setReleasedDate(psiObject.getSource().getReleaseDate());
@@ -163,5 +165,6 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         experimentConverter.setInstitution(institution);
         interactionConverter.setInstitution(institution, false, true);
         interactorConverter.setInstitution(institution);
+        this.annotationConverter.setInstitution(institution);
     }
 }

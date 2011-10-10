@@ -49,7 +49,7 @@ public class PsiConverterUtils {
 
     private static final Log log = LogFactory.getLog(PsiConverterUtils.class);
 
-	
+
     private PsiConverterUtils() {
     }
 
@@ -71,6 +71,24 @@ public class PsiConverterUtils {
         }
     }
 
+    public static void populate( AnnotatedObject<?, ?> annotatedObject, Object objectToPopulate, AliasConverter aliasConverter, AnnotationConverter annotationConverter, XrefConverter xrefConverter ) {
+        if ( objectToPopulate instanceof HasId ) {
+            populateId( ( HasId ) objectToPopulate );
+        }
+
+        if ( objectToPopulate instanceof NamesContainer ) {
+            populateNames( annotatedObject, ( NamesContainer ) objectToPopulate, aliasConverter );
+        }
+
+        if ( objectToPopulate instanceof XrefContainer ) {
+            populateXref( annotatedObject, ( XrefContainer ) objectToPopulate, xrefConverter );
+        }
+
+        if ( objectToPopulate instanceof AttributeContainer ) {
+            populateAttributes( annotatedObject, ( AttributeContainer ) objectToPopulate, annotationConverter );
+        }
+    }
+
     protected static void populateNames( AnnotatedObject<?, ?> annotatedObject, NamesContainer namesContainer ) {
         Names names = namesContainer.getNames();
 
@@ -86,7 +104,7 @@ public class PsiConverterUtils {
 
         if ( !ConverterContext.getInstance().getInteractorConfig().isExcludeInteractorAliases() ) {
             AliasConverter aliasConverter = new AliasConverter( annotatedObject.getOwner(),
-                                                                AnnotatedObjectUtils.getAliasClassType( annotatedObject.getClass() ) );
+                    AnnotatedObjectUtils.getAliasClassType( annotatedObject.getClass() ) );
             for ( Alias alias : IntactCore.ensureInitializedAliases(annotatedObject)) {
                 names.getAliases().add( aliasConverter.intactToPsi( alias ) );
             }
@@ -94,6 +112,30 @@ public class PsiConverterUtils {
 
         namesContainer.setNames( names );
     }
+
+    protected static void populateNames( AnnotatedObject<?, ?> annotatedObject, NamesContainer namesContainer, AliasConverter aliasConverter ) {
+        Names names = namesContainer.getNames();
+
+        if ( names == null ) {
+            names = new Names();
+        }
+
+        String shortLabel = annotatedObject.getShortLabel();
+        String fullName = annotatedObject.getFullName();
+
+        names.setShortLabel( shortLabel );
+        names.setFullName( fullName );
+
+        if ( !ConverterContext.getInstance().getInteractorConfig().isExcludeInteractorAliases() ) {
+
+            for ( Alias alias : IntactCore.ensureInitializedAliases(annotatedObject)) {
+                names.getAliases().add( aliasConverter.intactToPsi( alias ) );
+            }
+        }
+
+        namesContainer.setNames( names );
+    }
+
 
     private static void populateXref( AnnotatedObject<?, ?> annotatedObject, XrefContainer xrefContainer, AbstractIntactPsiConverter converter ) {
 
@@ -133,8 +175,8 @@ public class PsiConverterUtils {
                 }
 
                 acRef = new DbReference( db, dbMi, ac,
-                                         CvXrefQualifier.SOURCE_REFERENCE,
-                                         CvXrefQualifier.SOURCE_REFERENCE_MI_REF );
+                        CvXrefQualifier.SOURCE_REFERENCE,
+                        CvXrefQualifier.SOURCE_REFERENCE_MI_REF );
             }
         }
 
@@ -162,28 +204,148 @@ public class PsiConverterUtils {
             if (primaryPubmedRef != null) {
                 xref.setPrimaryRef( primaryPubmedRef );
             } else {
-            	final DbReference primaryDoiRef = getPrimaryReference( dbRefs , CvDatabase.DOI_MI_REF );
-            	
-            	if (primaryDoiRef != null) {
-            		xref.setPrimaryRef(primaryDoiRef);
-            		
-                   	if (log.isWarnEnabled()) log.warn("Primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
+                final DbReference primaryDoiRef = getPrimaryReference( dbRefs , CvDatabase.DOI_MI_REF );
+
+                if (primaryDoiRef != null) {
+                    xref.setPrimaryRef(primaryDoiRef);
+
+                    if (log.isWarnEnabled()) log.warn("Primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
                             " found in "+xrefContainer.getClass().getSimpleName()+
                             ": "+xrefContainer+", located at: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString()+
                             " is neither a reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") nor a DOI (dbAc=" + CvDatabase.DOI_MI_REF + ")");
 
-            		
-            	} else {
+
+                } else {
                     final DbReference primaryRef = getPrimaryReference( dbRefs );
 
                     if (primaryRef != null) {
-                    	xref.setPrimaryRef(primaryRef);
+                        xref.setPrimaryRef(primaryRef);
                     } else  {
-                    	if (log.isWarnEnabled()) log.warn("No primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
-                                                         " could be found in "+xrefContainer.getClass().getSimpleName()+
-                                                         ": "+xrefContainer+", located at: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString());
+                        if (log.isWarnEnabled()) log.warn("No primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
+                                " could be found in "+xrefContainer.getClass().getSimpleName()+
+                                ": "+xrefContainer+", located at: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString());
                     }
-            	}
+                }
+            }
+        } else {
+            // remove the primary ref from the collection if it is a experiment
+            // so we don't have the same ref in the bibref and the xref sections
+            if ( annotatedObject instanceof Experiment ) {
+                final DbReference bibref = getPrimaryReference(dbRefs, CvDatabase.PUBMED_MI_REF);
+
+                if (bibref != null) {
+                    dbRefs.remove(bibref);
+                }
+            }
+
+            DbReference primaryRef = getIdentity( dbRefs );
+            xref.setPrimaryRef( primaryRef );
+
+            // remove the primary ref
+            // from the collection and add the rest as secondary refs
+            dbRefs.remove( primaryRef );
+
+            for ( DbReference secDbRef : dbRefs ) {
+                if ( !xref.getSecondaryRef().contains( secDbRef ) ) {
+                    xref.getSecondaryRef().add( secDbRef );
+                }
+            }
+        }
+
+        if (xref.getPrimaryRef() != null) {
+            xrefContainer.setXref( xref );
+        }
+    }
+
+    private static void populateXref( AnnotatedObject<?, ?> annotatedObject, XrefContainer xrefContainer, XrefConverter converter ) {
+
+        // ac - create a xref to the institution db
+        String ac = annotatedObject.getAc();
+        boolean containsAcXref = false;
+        DbReference acRef = null;
+
+        if (ac != null)  {
+            for ( uk.ac.ebi.intact.model.Xref xref : IntactCore.ensureInitializedXrefs(annotatedObject)) {
+                if (annotatedObject.getAc().equals(xref.getPrimaryId())) {
+                    containsAcXref = true;
+                    break;
+                }
+            }
+
+            if (!containsAcXref) {
+                String dbMi = null;
+                String db = null;
+
+                // calculate the owner of the interaction, based on the AC prefix first,
+                // then in the defaultInstitutionForACs if passed to the ConverterContext or,
+                // finally to the Institution in the source section of the PSI-XML
+                if (ac.startsWith("EBI")) {
+                    dbMi = Institution.INTACT_REF;
+                    db = Institution.INTACT.toLowerCase();
+                } else if (ac.startsWith("MINT")) {
+                    dbMi = Institution.MINT_REF;
+                    db = Institution.MINT.toLowerCase();
+                } else if (ConverterContext.getInstance().getDefaultInstitutionForAcs() != null){
+                    Institution defaultInstitution = ConverterContext.getInstance().getDefaultInstitutionForAcs();
+                    dbMi = converter.calculateInstitutionPrimaryId(defaultInstitution);
+                    db = defaultInstitution.getShortLabel().toLowerCase();
+                } else {
+                    dbMi = converter.getInstitutionPrimaryId();
+                    db = converter.getInstitution().getShortLabel().toLowerCase();
+                }
+
+                acRef = new DbReference( db, dbMi, ac,
+                        CvXrefQualifier.SOURCE_REFERENCE,
+                        CvXrefQualifier.SOURCE_REFERENCE_MI_REF );
+            }
+        }
+
+        if ( acRef == null && annotatedObject.getXrefs().isEmpty() ) {
+            return;
+        }
+
+        Xref xref = xrefContainer.getXref();
+
+        if ( xref == null ) {
+            xref = new Xref();
+        }
+
+        Collection<DbReference> dbRefs = toDbReferences( annotatedObject, IntactCore.ensureInitializedXrefs(annotatedObject), converter);
+
+        if(acRef != null) {
+            dbRefs.add( acRef );
+        }
+
+        // normally the primary reference is the identity reference, but for bibliographic references
+        // it is the primary-reference and it does not contain secondary refs
+        if ( xrefContainer instanceof Bibref ) {
+            final DbReference primaryPubmedRef = getPrimaryReference( dbRefs , CvDatabase.PUBMED_MI_REF );
+
+            if (primaryPubmedRef != null) {
+                xref.setPrimaryRef( primaryPubmedRef );
+            } else {
+                final DbReference primaryDoiRef = getPrimaryReference( dbRefs , CvDatabase.DOI_MI_REF );
+
+                if (primaryDoiRef != null) {
+                    xref.setPrimaryRef(primaryDoiRef);
+
+                    if (log.isWarnEnabled()) log.warn("Primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
+                            " found in "+xrefContainer.getClass().getSimpleName()+
+                            ": "+xrefContainer+", located at: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString()+
+                            " is neither a reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") nor a DOI (dbAc=" + CvDatabase.DOI_MI_REF + ")");
+
+
+                } else {
+                    final DbReference primaryRef = getPrimaryReference( dbRefs );
+
+                    if (primaryRef != null) {
+                        xref.setPrimaryRef(primaryRef);
+                    } else  {
+                        if (log.isWarnEnabled()) log.warn("No primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
+                                " could be found in "+xrefContainer.getClass().getSimpleName()+
+                                ": "+xrefContainer+", located at: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString());
+                    }
+                }
             }
         } else {
             // remove the primary ref from the collection if it is a experiment
@@ -230,10 +392,24 @@ public class PsiConverterUtils {
         AnnotationConverter annotationConverter = new AnnotationConverter( annotatedObject.getOwner() );
 
         AnnotationConverterConfig configAnnotation = ConverterContext.getInstance().getAnnotationConfig();
-        
+
         for ( Annotation annotation : IntactCore.ensureInitializedAnnotations(annotatedObject) ) {
-        	if (!configAnnotation.isExcluded(annotation.getCvTopic())) {
-        		Attribute attribute = annotationConverter.intactToPsi( annotation );
+            if (!configAnnotation.isExcluded(annotation.getCvTopic())) {
+                Attribute attribute = annotationConverter.intactToPsi( annotation );
+                if (!attributeContainer.getAttributes().contains( attribute )) {
+                    attributeContainer.getAttributes().add( attribute );
+                }
+            }
+        }
+    }
+
+     private static void populateAttributes( AnnotatedObject<?, ?> annotatedObject, AttributeContainer attributeContainer, AnnotationConverter annotationConverter ) {
+
+        AnnotationConverterConfig configAnnotation = ConverterContext.getInstance().getAnnotationConfig();
+
+        for ( Annotation annotation : IntactCore.ensureInitializedAnnotations(annotatedObject) ) {
+            if (!configAnnotation.isExcluded(annotation.getCvTopic())) {
+                Attribute attribute = annotationConverter.intactToPsi( annotation );
                 if (!attributeContainer.getAttributes().contains( attribute )) {
                     attributeContainer.getAttributes().add( attribute );
                 }
@@ -343,6 +519,28 @@ public class PsiConverterUtils {
                 }
             } else {
                 XrefConverter xrefConverter = new XrefConverter( annotatedObject.getOwner(), intactXref.getClass() );
+                DbReference dbRef = xrefConverter.intactToPsi( intactXref );
+                dbRefs.add( dbRef );
+            }
+        }
+
+        return dbRefs;
+    }
+
+    private static Collection<DbReference> toDbReferences( AnnotatedObject<?, ?> annotatedObject,
+                                                           Collection<? extends uk.ac.ebi.intact.model.Xref> intactXrefs, XrefConverter xrefConverter ) {
+
+        Collection<DbReference> dbRefs = new HashSet<DbReference>( intactXrefs.size() );
+
+        for ( uk.ac.ebi.intact.model.Xref intactXref : intactXrefs ) {
+
+            if ( annotatedObject instanceof Interactor && !( annotatedObject instanceof Interaction ) ) {
+                // We have an interactor that is not an interaction.
+                if ( includeInteractorXref( intactXref ) ) {
+                    DbReference dbRef = xrefConverter.intactToPsi( intactXref );
+                    dbRefs.add( dbRef );
+                }
+            } else {
                 DbReference dbRef = xrefConverter.intactToPsi( intactXref );
                 dbRefs.add( dbRef );
             }

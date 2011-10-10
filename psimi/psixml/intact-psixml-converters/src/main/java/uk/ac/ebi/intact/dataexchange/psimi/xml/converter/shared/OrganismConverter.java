@@ -7,10 +7,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConver
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.annotation.PsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
-import uk.ac.ebi.intact.model.BioSource;
-import uk.ac.ebi.intact.model.CvCellType;
-import uk.ac.ebi.intact.model.CvTissue;
-import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.*;
 
 /**
  * TODO comment this
@@ -23,11 +20,13 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
 
     private CvObjectConverter<CvCellType,CellType> cellTypeConverter;
     private CvObjectConverter<CvTissue, Tissue> tissueConverter;
+    protected AliasConverter aliasConverter;
 
     public OrganismConverter(Institution institution) {
         super(institution);
         cellTypeConverter = new CvObjectConverter<CvCellType,CellType>(institution, CvCellType.class, CellType.class);
         tissueConverter = new CvObjectConverter<CvTissue,Tissue>(institution, CvTissue.class, Tissue.class);
+        this.aliasConverter = new AliasConverter(institution, BioSourceAlias.class);
     }
 
     public BioSource psiToIntact(Organism psiObject) {
@@ -39,7 +38,7 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         BioSource bioSource = new BioSource(getInstitution(), shortLabel, String.valueOf(taxId));
         psiStartConversion(psiObject);
 
-        IntactConverterUtils.populateNames(psiObject.getNames(), bioSource);
+        IntactConverterUtils.populateNames(psiObject.getNames(), bioSource, aliasConverter);
 
         // cell type
         final CellType cellType = psiObject.getCellType();
@@ -65,7 +64,7 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
     public Organism intactToPsi(BioSource intactObject) {
         Organism organism = new Organism();
         intactStartConversation(intactObject);
-        PsiConverterUtils.populate(intactObject, organism, this);
+        PsiConverterUtils.populate(intactObject, organism, aliasConverter, null, null);
 
         organism.setNcbiTaxId(Integer.valueOf(intactObject.getTaxId()));
 
@@ -96,5 +95,6 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         super.setInstitution(institution);
         cellTypeConverter.setInstitution(institution);
         tissueConverter.setInstitution(institution);
+        this.aliasConverter.setInstitution(institution);
     }
 }

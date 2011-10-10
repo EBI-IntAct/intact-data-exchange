@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.*;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 
 /**
  * FeatureConverter Tester.
@@ -59,6 +60,7 @@ public class FeatureConverterTest extends AbstractConverterTest {
 
     @Test
     public void psiToIntact_feature() throws Exception {
+        ConversionCache.clear();
         Feature psiFeature = PsiMockFactory.createFeature();
 
         FeatureConverter featureConverter = new FeatureConverter(getMockInstitution());

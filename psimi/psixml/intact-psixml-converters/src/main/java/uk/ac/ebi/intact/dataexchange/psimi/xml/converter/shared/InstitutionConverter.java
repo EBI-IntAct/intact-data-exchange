@@ -4,9 +4,7 @@ import psidev.psi.mi.xml.model.Attribute;
 import psidev.psi.mi.xml.model.Source;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.InstitutionXref;
 
 import java.util.Date;
 
@@ -34,16 +32,16 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
 
         psiStartConversion(psiObject);
 
-        IntactConverterUtils.populateNames(psiObject.getNames(), institution);
+        IntactConverterUtils.populateNames(psiObject.getNames(), institution, aliasConverter);
 
         if (psiObject.getXref() != null) {
-            IntactConverterUtils.populateXref(psiObject.getXref(), institution, new XrefConverter<InstitutionXref>(institution, InstitutionXref.class));
+            IntactConverterUtils.populateXref(psiObject.getXref(), institution, xrefConverter);
         }
 
         if (psiObject.getBibref() != null) {
-            IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), institution, new XrefConverter<InstitutionXref>(getInstitution(), InstitutionXref.class));
+            IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), institution, xrefConverter);
         }
-        IntactConverterUtils.populateAnnotations(psiObject, institution, institution);
+        IntactConverterUtils.populateAnnotations(psiObject, institution, institution, annotationConverter);
   
         for (Attribute attribute : psiObject.getAttributes()) {
             String attributeName = attribute.getName();
@@ -71,9 +69,6 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
         }
 
         intactStartConversation(intactObject);
-
-        source = new Source();
-        PsiConverterUtils.populate(intactObject, source, this);
 
         source.setReleaseDate(new Date());
 

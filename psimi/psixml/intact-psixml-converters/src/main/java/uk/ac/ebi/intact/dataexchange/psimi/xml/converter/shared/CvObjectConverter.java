@@ -21,8 +21,8 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.CvObject;
-import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
 /**
  * TODO comment this
@@ -34,11 +34,20 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
 
     private Class<C> intactCvClass;
     private Class<T> psiCvClass;
+    protected AliasConverter aliasConverter;
+    protected XrefConverter xrefConverter;
+    protected AnnotationConverter annotationConverter;
 
     public CvObjectConverter(Institution institution, Class<C> intactCvClass, Class<T> psiCvClass) {
         super(institution);
         this.intactCvClass = intactCvClass;
         this.psiCvClass = psiCvClass;
+        Class<?> aliasClass = AnnotatedObjectUtils.getAliasClassType(intactCvClass);
+        Class<?> xrefClass = AnnotatedObjectUtils.getXrefClassType(intactCvClass);
+
+        this.annotationConverter = new AnnotationConverter(institution);
+        this.aliasConverter = new AliasConverter(institution, aliasClass);
+        this.xrefConverter = new XrefConverter(institution, xrefClass);
     }
 
     public C psiToIntact(T psiObject) {
@@ -46,8 +55,8 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
 
         C cv = newCvInstance(intactCvClass);
         cv.setOwner(getInstitution());
-        IntactConverterUtils.populateNames(psiObject.getNames(), cv);
-        IntactConverterUtils.populateXref(psiObject.getXref(), cv, new XrefConverter<CvObjectXref>(getInstitution(), CvObjectXref.class));
+        IntactConverterUtils.populateNames(psiObject.getNames(), cv, aliasConverter);
+        IntactConverterUtils.populateXref(psiObject.getXref(), cv, xrefConverter);
 
         psiEndConversion(psiObject);
 
@@ -64,7 +73,7 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
         }
 
         cvType = newCvInstance(psiCvClass);
-        PsiConverterUtils.populate(intactObject, cvType, this);
+        PsiConverterUtils.populate(intactObject, cvType, aliasConverter, annotationConverter, xrefConverter);
 
         ConversionCache.putElement(elementKey(intactObject), cvType);
 
@@ -87,5 +96,13 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
 
     private String elementKey(C intactObject) {
         return intactObject.getIdentifier() + "_" + intactObject.getClass();
+    }
+
+    @Override
+    public void setInstitution(Institution institution){
+        super.setInstitution(institution);
+        this.annotationConverter.setInstitution(institution);
+        this.aliasConverter.setInstitution(institution);
+        this.xrefConverter.setInstitution(institution);
     }
 }

@@ -84,8 +84,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         if (bioSource != null) {
             experiment.setBioSource(bioSource);
         }
-        IntactConverterUtils.populateNames(psiObject.getNames(), experiment);
-        IntactConverterUtils.populateXref(psiObject.getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
+        IntactConverterUtils.populateNames(psiObject.getNames(), experiment, this.aliasConverter);
+        IntactConverterUtils.populateXref(psiObject.getXref(), experiment, this.xrefConverter);
 
         // fail if the primary reference does not point to Pubmed and primary-reference
         boolean hasValidPrimaryRef = true;
@@ -112,9 +112,9 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         }
 
         if( psiObject.getBibref() != null && psiObject.getBibref().getXref() != null ) {
-            IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
+            IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, this.xrefConverter);
         }
-        IntactConverterUtils.populateAnnotations(psiObject, experiment, getInstitution());
+        IntactConverterUtils.populateAnnotations(psiObject, experiment, getInstitution(), this.annotationConverter);
 
         experiment.setCvInteraction(cvInteractionDetectionMethod);
 
@@ -146,7 +146,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         Bibref bibref = new Bibref();
 
         try {
-            PsiConverterUtils.populate(intactObject, bibref, this);
+            PsiConverterUtils.populate(intactObject, bibref, aliasConverter, annotationConverter, xrefConverter);
         } catch (UnsupportedConversionException e) {
             throw new UnsupportedConversionException("No Bibref could be found for Experiment with Xrefs: "+intactObject.getXrefs(), e);
         }
@@ -155,8 +155,6 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         expDesc.setBibref(bibref);
         expDesc.setInteractionDetectionMethod(detMethod);
-
-        PsiConverterUtils.populate(intactObject, expDesc, this);
 
         if (intactObject.getCvIdentification() != null) {
             ParticipantIdentificationMethod identMethod = (ParticipantIdentificationMethod)

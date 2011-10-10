@@ -16,14 +16,11 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.XrefUtils;
-
-import java.util.Collection;
+import uk.ac.ebi.intact.model.AnnotatedObject;
+import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
 /**
  * Abstract Annotated Object Converter.
@@ -38,10 +35,21 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
     private boolean newIntactObjectCreated;
     private boolean newPsiObjectCreated;
 
+    protected AliasConverter aliasConverter;
+    protected XrefConverter xrefConverter;
+    protected AnnotationConverter annotationConverter;
+
     public AbstractAnnotatedObjectConverter(Institution institution, Class<? extends A> intactClass, Class<T> psiClass) {
         super(institution);
         this.intactClass = intactClass;
         this.psiClass = psiClass;
+
+        Class<?> aliasClass = AnnotatedObjectUtils.getAliasClassType(intactClass);
+        Class<?> xrefClass = AnnotatedObjectUtils.getXrefClassType(intactClass);
+
+        this.annotationConverter = new AnnotationConverter(institution);
+        this.aliasConverter = new AliasConverter(institution, aliasClass);
+        this.xrefConverter = new XrefConverter(institution, xrefClass);
     }
 
     public A psiToIntact(T psiObject) {
@@ -74,7 +82,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         }
 
         psiObject = newInstance(psiClass);
-        PsiConverterUtils.populate(intactObject, psiObject, this);
+        PsiConverterUtils.populate(intactObject, psiObject, aliasConverter, annotationConverter, xrefConverter);
 
         ConversionCache.putElement(intactObject, psiObject);
 
@@ -104,5 +112,13 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
 
     protected boolean isNewPsiObjectCreated() {
         return newPsiObjectCreated;
+    }
+
+    @Override
+    public void setInstitution(Institution institution){
+        super.setInstitution(institution);
+        this.annotationConverter.setInstitution(institution);
+        this.aliasConverter.setInstitution(institution);
+        this.xrefConverter.setInstitution(institution);
     }
 }
