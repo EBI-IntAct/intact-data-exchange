@@ -43,7 +43,7 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
     public InteractorConverter( Institution institution ) {
         super( institution, InteractorImpl.class, psidev.psi.mi.xml.model.Interactor.class );
         organismConverter = new OrganismConverter(institution);
-        interactorTypeConverter = new InteractorTypeConverter( getInstitution() );
+        interactorTypeConverter = new InteractorTypeConverter(institution );
     }
 
     public Interactor psiToIntact( psidev.psi.mi.xml.model.Interactor psiObject ) {
@@ -58,7 +58,6 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         Organism organism = psiObject.getOrganism();
 
         if (organism != null) {
-            organismConverter.setInstitution(getInstitution());
             BioSource bioSource = organismConverter.psiToIntact(organism);
             interactor.setBioSource(bioSource);
         }
@@ -128,7 +127,6 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             }
         }
 
-        this.interactorTypeConverter.setInstitution(getInstitution());
         InteractorType interactorType = ( InteractorType )
                 PsiConverterUtils.toCvType( intactObject.getCvInteractorType(),
                         this.interactorTypeConverter,
@@ -136,7 +134,6 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         interactor.setInteractorType( interactorType );
 
         if (intactObject.getBioSource() != null) {
-            this.organismConverter.setInstitution(getInstitution());
             Organism organism = this.organismConverter.intactToPsi(intactObject.getBioSource());
             interactor.setOrganism(organism);
         }
@@ -147,8 +144,6 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
     }
 
     protected Interactor newInteractorAccordingToType( Organism psiOrganism, String shortLabel, InteractorType psiInteractorType ) {
-        organismConverter.setInstitution(getInstitution());
-        interactorTypeConverter.setInstitution(getInstitution());
 
         BioSource organism = organismConverter.psiToIntact( psiOrganism );
         CvInteractorType interactorType = interactorTypeConverter.psiToIntact( psiInteractorType );
@@ -227,5 +222,13 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         }
 
         return interactor;
+    }
+
+    @Override
+    public void setInstitution(Institution institution)
+    {
+        super.setInstitution(institution);
+        organismConverter.setInstitution(institution);
+        interactorTypeConverter.setInstitution( getInstitution() );
     }
 }

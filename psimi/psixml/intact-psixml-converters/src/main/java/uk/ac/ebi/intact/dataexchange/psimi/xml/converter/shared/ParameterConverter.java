@@ -39,7 +39,6 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
         super( institution );
         if (expConverter != null){
             experimentConverter = expConverter;
-            experimentConverter.setInstitution(institution);
         }
         else {
             experimentConverter = new ExperimentConverter(institution);
@@ -79,7 +78,6 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
             parameter.setUncertainty(uncertainty);
         }
         if (psiObject.hasExperiment()){
-            experimentConverter.setInstitution(getInstitution());
             Experiment experiment = experimentConverter.psiToIntact(psiObject.getExperiment());
             parameter.setExperiment(experiment);
         }
@@ -112,7 +110,6 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
             parameter.setUnitAc(intactObject.getCvParameterUnit().getIdentifier());
         }
         if(intactObject.getExperiment() != null) {
-            experimentConverter.setInstitution(getInstitution());
             parameter.setExperiment(experimentConverter.intactToPsi(intactObject.getExperiment()));
         }
 
@@ -122,4 +119,11 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
 
     protected abstract T newParameterInstance();
 
+    public void setInstitution(Institution institution, boolean setExperimentInstitution)
+    {
+        super.setInstitution(institution);
+        if (setExperimentInstitution){
+            experimentConverter.setInstitution(institution);
+        }
+    }
 }

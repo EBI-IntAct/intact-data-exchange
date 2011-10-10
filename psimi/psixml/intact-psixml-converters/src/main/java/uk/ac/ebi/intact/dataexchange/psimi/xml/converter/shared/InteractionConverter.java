@@ -94,7 +94,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         confConverter= new ConfidenceConverter( institution);
         if (expConverter != null){
             experimentConverter = expConverter;
-            experimentConverter.setInstitution(institution);
         }
         else {
             experimentConverter = new ExperimentConverter(institution);
@@ -111,7 +110,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         paramConverter= new InteractionParameterConverter( institution, experimentConverter);
         if (partConveter != null){
             participantConverter = partConveter;
-            participantConverter.setInstitution(institution);
         }
         else {
             participantConverter = new ParticipantConverter(institution, this, experimentConverter);
@@ -124,7 +122,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         confConverter= new ConfidenceConverter( institution);
         if (expConverter != null){
             experimentConverter = expConverter;
-            experimentConverter.setInstitution(institution);
         }
         else {
             experimentConverter = new ExperimentConverter(institution);
@@ -132,7 +129,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         paramConverter= new InteractionParameterConverter( institution, experimentConverter);
         if (partConveter != null){
             participantConverter = partConveter;
-            participantConverter.setInstitution(institution);
         }
         else {
             participantConverter = new ParticipantConverter(institution, this, experimentConverter);
@@ -190,14 +186,12 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             Collection<Component> components = getComponents(interaction, psiObject);
             interaction.setComponents(components);
 
-            confConverter.setInstitution(getInstitution());
             for (psidev.psi.mi.xml.model.Confidence psiConfidence :  psiObject.getConfidences()){
                 Confidence confidence = confConverter.psiToIntact( psiConfidence );
                 interaction.addConfidence( confidence);
             }
 
             // parameter conversion
-            paramConverter.setInstitution(getInstitution());
             for (psidev.psi.mi.xml.model.Parameter psiParameter :  psiObject.getParameters()){
                 InteractionParameter parameter = paramConverter.psiToIntact( psiParameter );
                 interaction.addParameter(parameter);
@@ -307,7 +301,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             interaction.setImexId(imexXref.getPrimaryId());
         }
 
-        experimentConverter.setInstitution(getInstitution());
         for (Experiment exp : IntactCore.ensureInitializedExperiments(intactObject)) {
             ExperimentDescription expDescription = experimentConverter.intactToPsi(exp);
             if( ConverterContext.getInstance().isGenerateExpandedXml() ) {
@@ -318,7 +311,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
 
         Collection<Component> components = IntactCore.ensureInitializedParticipants(intactObject);
-        participantConverter.setInstitution(getInstitution());
         participantConverter.getFeatureMap().clear();
         for (Component comp : components) {
             Participant participant = participantConverter.intactToPsi(comp);
@@ -364,20 +356,17 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             }
         }
 
-        interactionTypeConverter.setInstitution(getInstitution());
         InteractionType interactionType = (InteractionType)
                 PsiConverterUtils.toCvType(intactObject.getCvInteractionType(),
                         this.interactionTypeConverter,
                         this );
         interaction.getInteractionTypes().add(interactionType);
 
-        confConverter.setInstitution(getInstitution());
         for (Confidence conf : IntactCore.ensureInitializedConfidences(intactObject)) {
             psidev.psi.mi.xml.model.Confidence confidence = confConverter.intactToPsi(conf);
             interaction.getConfidences().add( confidence);
         }
 
-        paramConverter.setInstitution(getInstitution());
         for (uk.ac.ebi.intact.model.InteractionParameter param : IntactCore.ensureInitializedInteractionParameters(intactObject)){
             psidev.psi.mi.xml.model.Parameter parameter = paramConverter.intactToPsi(param);
             interaction.getParameters().add(parameter);
@@ -490,7 +479,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         List<Experiment> experiments = new ArrayList<Experiment>(expDescriptions.size());
 
-        experimentConverter.setInstitution(getInstitution());
         for (ExperimentDescription expDesc : expDescriptions) {
             Experiment experiment = experimentConverter.psiToIntact(expDesc);
             experiments.add(experiment);
@@ -514,7 +502,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
 
         InteractionType psiInteractionType = interactionTypes.iterator().next();
-        this.interactionTypeConverter.setInstitution(getInstitution());
         return this.interactionTypeConverter.psiToIntact(psiInteractionType);
     }
 
@@ -570,5 +557,31 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         failIfInconsistentCollectionSize("experiment", IntactCore.ensureInitializedExperiments(intact), psi.getExperiments());
         failIfInconsistentCollectionSize("participant", IntactCore.ensureInitializedParticipants(intact), psi.getParticipants());
         failIfInconsistentCollectionSize( "confidence", IntactCore.ensureInitializedConfidences(intact), psi.getConfidences());
+    }
+
+    @Override
+    public void setInstitution(Institution institution)
+    {
+        super.setInstitution(institution);
+        confConverter.setInstitution( institution);
+        experimentConverter.setInstitution(institution);
+        paramConverter.setInstitution( institution);
+        participantConverter.setInstitution(institution, true, false);
+        interactionTypeConverter.setInstitution(institution);
+    }
+
+    public void setInstitution(Institution institution, boolean setExperimentInstitution, boolean setParticipantInstitution)
+    {
+        super.setInstitution(institution);
+        confConverter.setInstitution( institution);
+        if (setExperimentInstitution){
+            experimentConverter.setInstitution(institution);
+        }
+        paramConverter.setInstitution( institution, false);
+
+        if (setParticipantInstitution){
+            participantConverter.setInstitution(institution, false, false);
+        }
+        interactionTypeConverter.setInstitution(institution);
     }
 }

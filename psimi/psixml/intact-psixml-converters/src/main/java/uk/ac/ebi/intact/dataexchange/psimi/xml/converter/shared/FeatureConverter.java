@@ -59,7 +59,6 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
 
         if (psiObject.getFeatureType() != null) {
 
-            featureTypeConverter.setInstitution(getInstitution());
             CvFeatureType featureType = featureTypeConverter.psiToIntact(psiObject.getFeatureType());
             feature.setCvFeatureType(featureType);
         }
@@ -67,12 +66,9 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
         FeatureDetectionMethod featureDetMethod = psiObject.getFeatureDetectionMethod();
         if (featureDetMethod != null) {
 
-            featureDetMethodConverter.setInstitution(getInstitution());
             CvFeatureIdentification cvFeatureDetMethod = featureDetMethodConverter.psiToIntact(featureDetMethod);
             feature.setCvFeatureIdentification(cvFeatureDetMethod);
         }
-
-        rangeConverter.setInstitution(getInstitution());
 
         for (psidev.psi.mi.xml.model.Range psiRange : psiObject.getRanges()) {
             Range range = rangeConverter.psiToIntact(psiRange);
@@ -94,18 +90,14 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
         intactStartConversation(intactObject);
 
         if (intactObject.getCvFeatureIdentification()!= null) {
-            featureDetMethodConverter.setInstitution(getInstitution());
             FeatureDetectionMethod featureMethod = featureDetMethodConverter.intactToPsi(intactObject.getCvFeatureIdentification());
             psiFeature.setFeatureDetectionMethod(featureMethod);
         }
 
         if (intactObject.getCvFeatureType() != null){
-            featureTypeConverter.setInstitution(getInstitution());
             FeatureType featureType = featureTypeConverter.intactToPsi(intactObject.getCvFeatureType());
             psiFeature.setFeatureType(featureType);
         }
-
-        rangeConverter.setInstitution(getInstitution());
 
         for (Range intactRange : IntactCore.ensureInitializedRanges(intactObject)) {
             psidev.psi.mi.xml.model.Range psiRange = rangeConverter.intactToPsi(intactRange);
@@ -121,5 +113,12 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
         throw new UnsupportedOperationException();
     }
 
-
+    @Override
+    public void setInstitution(Institution institution)
+    {
+        super.setInstitution(institution);
+        featureTypeConverter.setInstitution(institution);
+        featureDetMethodConverter.setInstitution(institution);
+        rangeConverter.setInstitution(institution);
+    }
 }

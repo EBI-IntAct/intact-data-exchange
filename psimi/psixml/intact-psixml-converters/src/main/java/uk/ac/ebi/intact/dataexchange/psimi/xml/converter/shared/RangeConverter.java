@@ -103,7 +103,6 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
             throw new PsiConversionException("We couldn't find a end status for the position (" + endIntervalFrom + "-" + endIntervalTo + ")");
         }
 
-        fuzzyTypeConverter.setInstitution(getInstitution());
         CvFuzzyType fromFuzzyType = fuzzyTypeConverter.psiToIntact(startStatus);
         CvFuzzyType toFuzzyType = fuzzyTypeConverter.psiToIntact(endStatus);
 
@@ -279,7 +278,6 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
 
         intactStartConversation(intactObject);
         // set the range status
-        fuzzyTypeConverter.setInstitution(getInstitution());
 
         final CvFuzzyType fromFuzzyType = intactObject.getFromCvFuzzyType();
 
@@ -333,5 +331,13 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
 
         intactEndConversion(intactObject);
         return psiRange;
+    }
+
+        @Override
+    public void setInstitution(Institution institution)
+    {
+        super.setInstitution(institution);
+
+        this.fuzzyTypeConverter.setInstitution(institution);
     }
 }

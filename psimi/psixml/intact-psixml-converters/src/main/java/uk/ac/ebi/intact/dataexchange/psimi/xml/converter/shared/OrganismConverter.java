@@ -45,7 +45,6 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         final CellType cellType = psiObject.getCellType();
 
         if (cellType != null) {
-            cellTypeConverter.setInstitution(getInstitution());
             CvCellType intactCellType = cellTypeConverter.psiToIntact(cellType);
 
             bioSource.setCvCellType(intactCellType);
@@ -55,7 +54,6 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         final Tissue tissue = psiObject.getTissue();
 
         if (tissue != null) {
-            tissueConverter.setInstitution(getInstitution());
             CvTissue intactTissue = tissueConverter.psiToIntact(tissue);
             bioSource.setCvTissue(intactTissue);
         }
@@ -75,7 +73,6 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         final CvCellType intactCellType = intactObject.getCvCellType();
 
         if (intactCellType != null) {
-             cellTypeConverter.setInstitution(getInstitution());
 
             CellType psiCellType = cellTypeConverter.intactToPsi(intactCellType);
             organism.setCellType(psiCellType);
@@ -85,12 +82,19 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         final CvTissue intactTissue = intactObject.getCvTissue();
 
         if (intactTissue != null) {
-             tissueConverter.setInstitution(getInstitution());
             Tissue psiTissue = tissueConverter.intactToPsi(intactTissue);
             organism.setTissue(psiTissue);
         }
 
         intactEndConversion(intactObject);
         return organism;
+    }
+
+        @Override
+    public void setInstitution(Institution institution)
+    {
+        super.setInstitution(institution);
+        cellTypeConverter.setInstitution(institution);
+        tissueConverter.setInstitution(institution);
     }
 }

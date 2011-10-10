@@ -28,7 +28,15 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
     private String institutionPrimaryId;
 
     public AbstractIntactPsiConverter(Institution institution) {
-        setInstitution(institution);
+        this.institution = institution;
+
+        if (institution != null){
+            try {
+                this.institutionPrimaryId = calculateInstitutionPrimaryId(institution);
+            } catch (Throwable e) {
+                log.error("Problem calculating primaryId for institution: "+institution.getShortLabel());
+            }
+        }
     }
 
     public String calculateInstitutionPrimaryId(Institution institution) {

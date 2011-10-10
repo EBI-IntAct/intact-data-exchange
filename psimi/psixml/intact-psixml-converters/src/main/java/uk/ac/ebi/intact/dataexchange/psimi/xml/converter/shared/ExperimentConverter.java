@@ -61,9 +61,9 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         String shortLabel;
 
         if (psiObject.getNames() != null) {
-           shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
+            shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
         } else {
-           shortLabel = IntactConverterUtils.createExperimentTempShortLabel(); 
+            shortLabel = IntactConverterUtils.createExperimentTempShortLabel();
         }
 
         BioSource bioSource = null;
@@ -71,13 +71,11 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         if (psiObject.getHostOrganisms() != null && !psiObject.getHostOrganisms().isEmpty()) {
             Organism hostOrganism = psiObject.getHostOrganisms().iterator().next();
 
-            organismConverter.setInstitution(experiment.getOwner());
             bioSource = organismConverter.psiToIntact(hostOrganism);
         }
 
 
         InteractionDetectionMethod idm = psiObject.getInteractionDetectionMethod();
-        interactionDetectionMethodConverter.setInstitution(getInstitution());
         CvInteraction cvInteractionDetectionMethod = this.interactionDetectionMethodConverter.psiToIntact(idm);
 
         experiment.setOwner(getInstitution());
@@ -96,8 +94,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             final DbReference primaryRef = bibref.getXref().getPrimaryRef();
             if ( ! hasValidPrimaryRef( primaryRef ) ) {
                 final String message = "Bibref in ExperimentDescription [PSI Id=" + psiObject.getId() + "] " +
-                                       "should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
-                                       "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + "): " + primaryRef;
+                        "should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
+                        "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + "): " + primaryRef;
                 log.warn(message);
                 addMessageToContext(MessageLevel.WARN, message, true);
 
@@ -105,10 +103,10 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             }
         } else {
             final String message = "No bibref defined in ExperimentDescription [PSI Id=" + psiObject.getId() + "]. " +
-                                   "It should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
-                                   "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + ")";
+                    "It should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
+                    "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + ")";
             log.warn(message);
-                addMessageToContext(MessageLevel.WARN, message, true);
+            addMessageToContext(MessageLevel.WARN, message, true);
 
             hasValidPrimaryRef = false;
         }
@@ -117,12 +115,11 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, new XrefConverter<ExperimentXref>(getInstitution(), ExperimentXref.class));
         }
         IntactConverterUtils.populateAnnotations(psiObject, experiment, getInstitution());
-        
+
         experiment.setCvInteraction(cvInteractionDetectionMethod);
 
         ParticipantIdentificationMethod pim = psiObject.getParticipantIdentificationMethod();
         if (pim != null) {
-            this.participantIdentificationMethodConverter.setInstitution(getInstitution());
             CvIdentification cvParticipantIdentification = this.participantIdentificationMethodConverter.psiToIntact(pim);
             experiment.setCvIdentification(cvParticipantIdentification);
         }
@@ -154,7 +151,6 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             throw new UnsupportedConversionException("No Bibref could be found for Experiment with Xrefs: "+intactObject.getXrefs(), e);
         }
 
-        this.interactionDetectionMethodConverter.setInstitution(getInstitution());
         InteractionDetectionMethod detMethod = (InteractionDetectionMethod) PsiConverterUtils.toCvType(intactObject.getCvInteraction(), this.interactionDetectionMethodConverter, this);
 
         expDesc.setBibref(bibref);
@@ -163,16 +159,14 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         PsiConverterUtils.populate(intactObject, expDesc, this);
 
         if (intactObject.getCvIdentification() != null) {
-            this.participantIdentificationMethodConverter.setInstitution(getInstitution());
             ParticipantIdentificationMethod identMethod = (ParticipantIdentificationMethod)
                     PsiConverterUtils.toCvType(intactObject.getCvIdentification(),
-                                               this.participantIdentificationMethodConverter,
-                                               this );
+                            this.participantIdentificationMethodConverter,
+                            this );
             expDesc.setParticipantIdentificationMethod(identMethod);
         }
 
         if (intactObject.getBioSource() != null) {
-            this.organismConverter.setInstitution(getInstitution());
             Organism organism = this.organismConverter.intactToPsi(intactObject.getBioSource());
             expDesc.getHostOrganisms().add(organism);
         }
@@ -199,8 +193,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         if (! hasValidPrimaryRef(primaryRef) ) {
             final String message = "Could not build a Publication from ExperimentDescription [PSI Id=" + experiment.getId() + "] " +
-                                   "as it should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
-                                   "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + "): " + primaryRef;
+                    "as it should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
+                    "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + "): " + primaryRef;
             log.warn(message);
             addMessageToContext(MessageLevel.WARN, message, true);
         }
@@ -218,5 +212,14 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         ConversionCache.putElement("pub:"+pubId, publication);
 
         return publication;
+    }
+
+    @Override
+    public void setInstitution(Institution institution)
+    {
+        super.setInstitution(institution);
+        organismConverter.setInstitution(institution);
+        interactionDetectionMethodConverter.setInstitution(institution);
+        participantIdentificationMethodConverter.setInstitution(institution);
     }
 }

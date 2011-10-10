@@ -43,7 +43,6 @@ public abstract class AbstractConfidenceConverter<T extends AbstractConfidence> 
         String value = psiObject.getValue();
         T confidence = newConfidenceInstance(value);
 
-        confidenceTyeConverter.setInstitution(getInstitution());
         CvConfidenceType cvConfType = confidenceTyeConverter.psiToIntact( psiObject.getUnit());
         confidence.setCvConfidenceType( cvConfType);
         return confidence;
@@ -61,4 +60,10 @@ public abstract class AbstractConfidenceConverter<T extends AbstractConfidence> 
         return confidence;
     }
 
+    @Override
+    public void setInstitution(Institution institution)
+    {
+        super.setInstitution(institution);
+        this.confidenceTyeConverter.setInstitution(institution);
+    }
 }

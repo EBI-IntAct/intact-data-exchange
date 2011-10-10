@@ -76,7 +76,6 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
 
         if (interactionConverter != null){
             this.interactionConverter = interactionConverter;
-            this.interactionConverter.setInstitution(institution);
         }
         else {
             this.interactionConverter = new InteractionConverter(institution, expConverter, this);
@@ -98,7 +97,6 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
 
         if (interactionConverter != null){
             this.interactionConverter = interactionConverter;
-            this.interactionConverter.setInstitution(institution);
         }
         else {
             this.interactionConverter = new InteractionConverter(institution, expConverter, this);
@@ -116,7 +114,6 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
     }
 
     public Component psiToIntact(Participant psiObject) {
-        interactionConverter.setInstitution(getInstitution());
 
         Interaction interaction = interactionConverter.psiToIntact(psiObject.getInteraction());
 
@@ -134,7 +131,6 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         PsiConverterUtils.populate(intactObject, participant, this );
         participant.getNames().setShortLabel(intactObject.getInteractor().getShortLabel());
 
-        experimentalRoleConverter.setInstitution(getInstitution());
         for ( CvExperimentalRole experimentalRole : IntactCore.ensureInitializedExperimentalRoles(intactObject)) {
             ExperimentalRole expRole = ( ExperimentalRole )
                     PsiConverterUtils.toCvType( experimentalRole,
@@ -147,14 +143,12 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             throw new IllegalStateException("Found component without biological role: "+intactObject.getAc());
         }
 
-        biologicalRoleConverter.setInstitution(getInstitution());
         BiologicalRole bioRole = (BiologicalRole)
                 PsiConverterUtils.toCvType(intactObject.getCvBiologicalRole(),
                         this.biologicalRoleConverter,
                         this);
         participant.setBiologicalRole(bioRole);
 
-        interactorConverter.setInstitution(getInstitution());
         psidev.psi.mi.xml.model.Interactor interactor = interactorConverter.intactToPsi(intactObject.getInteractor());
         if( ConverterContext.getInstance().isGenerateExpandedXml() ) {
             participant.setInteractor(interactor);
@@ -162,7 +156,6 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             participant.setInteractorRef(new InteractorRef(interactor.getId()));
         }
 
-        pimConverter.setInstitution(getInstitution());
         for (CvIdentification participantDetectionMethod : IntactCore.ensureInitializedParticipantIdentificationMethods(intactObject)) {
 
             ParticipantIdentificationMethod participantIdentificationMethod = pimConverter.intactToPsi(participantDetectionMethod);
@@ -170,7 +163,6 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             participant.getParticipantIdentificationMethods().add(participantIdentificationMethod);
         }
 
-        epConverter.setInstitution(getInstitution());
         for (CvExperimentalPreparation experimentalPreparation : IntactCore.ensureInitializedExperimentalPreparations(intactObject)) {
             ExperimentalPreparation expPrep = epConverter.intactToPsi(experimentalPreparation);
 
@@ -180,7 +172,6 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         Collection<Feature> features = IntactCore.ensureInitializedFeatures(intactObject);
 
         if (!features.isEmpty()) {
-            featureConverter.setInstitution(getInstitution());
             for (Feature feature : features) {
                 psidev.psi.mi.xml.model.Feature psiFeature = featureConverter.intactToPsi(feature);
                 if(feature.getAc() != null){
@@ -191,7 +182,6 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         }
 
         if (intactObject.getExpressedIn() != null) {
-            organismConverter.setInstitution(getInstitution());
             Organism organism = organismConverter.intactToPsi(intactObject.getExpressedIn());
             if (organism != null) {
                 HostOrganism hostOrganism = new HostOrganism();
@@ -205,13 +195,11 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             }
         }
 
-        confidenceConverter.setInstitution(getInstitution());
         for (ComponentConfidence conf : IntactCore.ensureInitializedComponentConfidences(intactObject)){
             psidev.psi.mi.xml.model.Confidence confidence = confidenceConverter.intactToPsi( conf);
             participant.getConfidenceList().add( confidence);
         }
 
-        participantParameterConverter.setInstitution(getInstitution());
         for (uk.ac.ebi.intact.model.ComponentParameter param : IntactCore.ensureInitializedComponentParameters(intactObject)){
             psidev.psi.mi.xml.model.Parameter parameter = participantParameterConverter.intactToPsi(param);
             participant.getParameters().add(parameter);
@@ -231,5 +219,42 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
 
     public Map<String, psidev.psi.mi.xml.model.Feature> getFeatureMap() {
         return featureMap;
+    }
+
+    @Override
+    public void setInstitution(Institution institution)
+    {
+        super.setInstitution(institution);
+
+        this.interactionConverter.setInstitution(institution, true, false);
+
+        this.experimentalRoleConverter.setInstitution(institution);
+        this.biologicalRoleConverter.setInstitution(institution);
+        this.interactorConverter.setInstitution(institution);
+        pimConverter.setInstitution(institution);
+        epConverter.setInstitution(institution);
+        featureConverter.setInstitution(institution);
+        organismConverter.setInstitution(institution);
+        confidenceConverter.setInstitution(institution);
+        participantParameterConverter.setInstitution(institution);
+    }
+
+    public void setInstitution(Institution institution, boolean setExperimentInstitution, boolean setInteractionInstitution)
+    {
+        super.setInstitution(institution);
+
+        if (setInteractionInstitution){
+            this.interactionConverter.setInstitution(institution, true, false);
+        }
+
+        this.experimentalRoleConverter.setInstitution(institution);
+        this.biologicalRoleConverter.setInstitution(institution);
+        this.interactorConverter.setInstitution(institution);
+        pimConverter.setInstitution(institution);
+        epConverter.setInstitution(institution);
+        featureConverter.setInstitution(institution);
+        organismConverter.setInstitution(institution);
+        confidenceConverter.setInstitution(institution);
+        participantParameterConverter.setInstitution(institution, setExperimentInstitution);
     }
 }

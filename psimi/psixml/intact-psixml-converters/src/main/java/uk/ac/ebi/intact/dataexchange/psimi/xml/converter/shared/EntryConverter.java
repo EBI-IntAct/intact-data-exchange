@@ -61,11 +61,9 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
 
         Institution institution = institutionConverter.psiToIntact(psiObject.getSource());
 
-        super.setInstitution(institution);
+        setInstitution(institution);
 
         Collection<Interaction> interactions = new ArrayList<Interaction>();
-
-        interactionConverter.setInstitution(institution);
 
         for (psidev.psi.mi.xml.model.Interaction psiInteraction : psiObject.getInteractions()) {
             Interaction interaction = interactionConverter.psiToIntact(psiInteraction);
@@ -103,12 +101,9 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         Interaction firstInteraction = intactObject.getInteractions().iterator().next();
         Institution institution = firstInteraction.getOwner();
 
-        super.setInstitution(firstInteraction.getOwner());
+        setInstitution(firstInteraction.getOwner());
 
         entry.setSource(institutionConverter.intactToPsi(institution));
-
-        interactionConverter.setInstitution(institution);
-        interactorConverter.setInstitution(institution);
 
         // converts all experiments first
         if (ConverterContext.getInstance().isGenerateCompactXml()){
@@ -160,4 +155,13 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         failIfInconsistentCollectionSize("interactor", intactEntry.getInteractors(), PsiConverterUtils.nonRedundantInteractorsFromPsiEntry(psiEntry));
     }
 
+    @Override
+    public void setInstitution(Institution institution)
+    {
+        super.setInstitution(institution);
+        institutionConverter.setInstitution(institution);
+        experimentConverter.setInstitution(institution);
+        interactionConverter.setInstitution(institution, false, true);
+        interactorConverter.setInstitution(institution);
+    }
 }
