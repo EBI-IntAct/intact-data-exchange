@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
@@ -34,10 +35,7 @@ import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * PSI converter utilities.
@@ -257,7 +255,7 @@ public class PsiConverterUtils {
         }
     }
 
-    private static void populateXref( AnnotatedObject<?, ?> annotatedObject, XrefContainer xrefContainer, XrefConverter converter ) {
+    public static void populateXref( AnnotatedObject<?, ?> annotatedObject, XrefContainer xrefContainer, XrefConverter converter ) {
 
         // ac - create a xref to the institution db
         String ac = annotatedObject.getAc();
@@ -319,15 +317,15 @@ public class PsiConverterUtils {
         // normally the primary reference is the identity reference, but for bibliographic references
         // it is the primary-reference and it does not contain secondary refs
         if ( xrefContainer instanceof Bibref ) {
-            final DbReference primaryPubmedRef = getPrimaryReference( dbRefs , CvDatabase.PUBMED_MI_REF );
+            DbReference primaryRef = getPrimaryReference( dbRefs , CvDatabase.PUBMED_MI_REF );
 
-            if (primaryPubmedRef != null) {
-                xref.setPrimaryRef( primaryPubmedRef );
+            if (primaryRef != null) {
+                xref.setPrimaryRef( primaryRef );
             } else {
-                final DbReference primaryDoiRef = getPrimaryReference( dbRefs , CvDatabase.DOI_MI_REF );
+                primaryRef = getPrimaryReference( dbRefs , CvDatabase.DOI_MI_REF );
 
-                if (primaryDoiRef != null) {
-                    xref.setPrimaryRef(primaryDoiRef);
+                if (primaryRef != null) {
+                    xref.setPrimaryRef(primaryRef);
 
                     if (log.isWarnEnabled()) log.warn("Primary-reference (refTypeAc="+ CvXrefQualifier.PRIMARY_REFERENCE_MI_REF+") " +
                             " found in "+xrefContainer.getClass().getSimpleName()+
@@ -336,7 +334,7 @@ public class PsiConverterUtils {
 
 
                 } else {
-                    final DbReference primaryRef = getPrimaryReference( dbRefs );
+                    primaryRef = getPrimaryReference( dbRefs );
 
                     if (primaryRef != null) {
                         xref.setPrimaryRef(primaryRef);
@@ -346,12 +344,19 @@ public class PsiConverterUtils {
                                 ": "+xrefContainer+", located at: "+ ConverterContext.getInstance().getLocation().getCurrentLocation().pathFromRootAsString());
                     }
                 }
+
+                // add the secondary xrefs
+                xref.getSecondaryRef().addAll(CollectionUtils.subtract(dbRefs, Arrays.asList(primaryRef)));
             }
         } else {
             // remove the primary ref from the collection if it is a experiment
             // so we don't have the same ref in the bibref and the xref sections
             if ( annotatedObject instanceof Experiment ) {
-                final DbReference bibref = getPrimaryReference(dbRefs, CvDatabase.PUBMED_MI_REF);
+                DbReference bibref = getPrimaryReference(dbRefs, CvDatabase.PUBMED_MI_REF);
+
+                if (bibref == null){
+                    bibref = getPrimaryReference(dbRefs, CvDatabase.DOI_MI_REF);
+                }
 
                 if (bibref != null) {
                     dbRefs.remove(bibref);
@@ -359,6 +364,11 @@ public class PsiConverterUtils {
             }
 
             DbReference primaryRef = getIdentity( dbRefs );
+
+            if (primaryRef == null){
+                primaryRef = getPrimaryReference(dbRefs);
+            }
+
             xref.setPrimaryRef( primaryRef );
 
             // remove the primary ref
@@ -403,7 +413,7 @@ public class PsiConverterUtils {
         }
     }
 
-     private static void populateAttributes( AnnotatedObject<?, ?> annotatedObject, AttributeContainer attributeContainer, AnnotationConverter annotationConverter ) {
+     public static void populateAttributes( AnnotatedObject<?, ?> annotatedObject, AttributeContainer attributeContainer, AnnotationConverter annotationConverter ) {
 
         AnnotationConverterConfig configAnnotation = ConverterContext.getInstance().getAnnotationConfig();
 

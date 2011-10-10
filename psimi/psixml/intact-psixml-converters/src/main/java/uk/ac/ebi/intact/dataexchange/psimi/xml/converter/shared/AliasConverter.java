@@ -22,9 +22,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiMiPopulator;
 import uk.ac.ebi.intact.model.Alias;
 import uk.ac.ebi.intact.model.CvAliasType;
-import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
  * Alias converter.
@@ -37,10 +35,12 @@ public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<
     private static final Log log = LogFactory.getLog( AliasConverter.class );
 
     private Class<A> aliasClass;
+    private PsiMiPopulator psiMiPopulator;
 
     public AliasConverter(Institution institution, Class<A> aliasType) {
         super(institution);
         this.aliasClass = aliasType;
+        psiMiPopulator = new PsiMiPopulator(institution);
     }
 
     public A psiToIntact(psidev.psi.mi.xml.model.Alias psiObject) {
@@ -56,15 +56,16 @@ public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<
 
         CvAliasType cvAliasType = null;
 
+        // a type ac must always be a mi term
         if (aliasType != null) {
             cvAliasType = new CvAliasType(getInstitution(), aliasType);
 
-            PsiMiPopulator psiMiPopulator = new PsiMiPopulator(getInstitution());
             if( aliasTypeAc != null ) {
-            psiMiPopulator.populateWithPsiMi(cvAliasType, aliasTypeAc);
+                cvAliasType.setIdentifier(aliasTypeAc);
+                psiMiPopulator.populateWithPsiMi(cvAliasType, aliasTypeAc);
             } else {
                 if ( log.isWarnEnabled() ) log.warn( "Attempting to build an Alias ("+ aliasType +
-                                                     ") without nameAc, this will result in a CvTopic without Xref" );
+                        ") without nameAc, this will result in a CvTopic without Xref" );
             }
         }
 

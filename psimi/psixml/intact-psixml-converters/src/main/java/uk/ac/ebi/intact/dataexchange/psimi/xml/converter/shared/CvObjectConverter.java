@@ -36,7 +36,6 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
     private Class<T> psiCvClass;
     protected AliasConverter aliasConverter;
     protected XrefConverter xrefConverter;
-    protected AnnotationConverter annotationConverter;
 
     public CvObjectConverter(Institution institution, Class<C> intactCvClass, Class<T> psiCvClass) {
         super(institution);
@@ -45,7 +44,6 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
         Class<?> aliasClass = AnnotatedObjectUtils.getAliasClassType(intactCvClass);
         Class<?> xrefClass = AnnotatedObjectUtils.getXrefClassType(intactCvClass);
 
-        this.annotationConverter = new AnnotationConverter(institution);
         this.aliasConverter = new AliasConverter(institution, aliasClass);
         this.xrefConverter = new XrefConverter(institution, xrefClass);
     }
@@ -73,7 +71,7 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
         }
 
         cvType = newCvInstance(psiCvClass);
-        PsiConverterUtils.populate(intactObject, cvType, aliasConverter, annotationConverter, xrefConverter);
+        PsiConverterUtils.populate(intactObject, cvType, aliasConverter, null, xrefConverter);
 
         ConversionCache.putElement(elementKey(intactObject), cvType);
 
@@ -101,7 +99,6 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
     @Override
     public void setInstitution(Institution institution){
         super.setInstitution(institution);
-        this.annotationConverter.setInstitution(institution);
         this.aliasConverter.setInstitution(institution);
         this.xrefConverter.setInstitution(institution);
     }

@@ -80,5 +80,4 @@ public class PsiMiPopulator {
     private CvXrefQualifier createIdentityCvXrefQualifier() {
         return cvObjectBuilder.createIdentityCvXrefQualifier(institution);
     }
-
 }

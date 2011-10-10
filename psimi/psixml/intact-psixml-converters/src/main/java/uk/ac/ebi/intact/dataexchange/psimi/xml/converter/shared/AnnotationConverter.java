@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.Attribute;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiMiPopulator;
 import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.Institution;
@@ -28,9 +29,11 @@ import uk.ac.ebi.intact.model.Institution;
  * @version $Id$
  */
 public class AnnotationConverter extends AbstractIntactPsiConverter<Annotation, Attribute> {
+    private PsiMiPopulator psiMiPopulator;
 
     public AnnotationConverter(Institution institution) {
         super(institution);
+        psiMiPopulator = new PsiMiPopulator(institution);
     }
 
     public Annotation psiToIntact(Attribute psiObject) {
@@ -38,8 +41,10 @@ public class AnnotationConverter extends AbstractIntactPsiConverter<Annotation, 
 
         CvTopic cvTopic = new CvTopic(getInstitution(), psiObject.getName());
 
+        // all name Acs should be from psi mi controlled vocabularies
         if (psiObject.getNameAc() != null) {
             cvTopic.setIdentifier(psiObject.getNameAc());
+            psiMiPopulator.populateWithPsiMi(cvTopic, psiObject.getNameAc());
         }
 
         Annotation annotation = new Annotation(getInstitution(), cvTopic, psiObject.getValue());

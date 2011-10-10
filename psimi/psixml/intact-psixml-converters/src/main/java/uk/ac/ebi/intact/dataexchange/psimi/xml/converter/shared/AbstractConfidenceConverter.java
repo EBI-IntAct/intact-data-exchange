@@ -23,7 +23,8 @@ import uk.ac.ebi.intact.model.Institution;
 
 
 /**
- * TODO comment that class header
+ * TODO a confidence can have a list of experiment refs but it does not need to be converted because in intact, one interaction has only one experiment
+ * TODO if the interaction can have several experiments, the confidence converter must also be able to convert experiment refs
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
@@ -53,7 +54,6 @@ public abstract class AbstractConfidenceConverter<T extends AbstractConfidence> 
 
         confidence.setValue( intactObject.getValue());
 
-        confidenceTyeConverter.setInstitution(getInstitution());
         Unit unit = confidenceTyeConverter.intactToPsi(intactObject.getCvConfidenceType());
         confidence.setUnit(unit);
 

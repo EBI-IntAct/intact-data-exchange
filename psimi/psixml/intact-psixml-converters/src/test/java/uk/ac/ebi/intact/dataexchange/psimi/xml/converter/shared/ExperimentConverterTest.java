@@ -17,14 +17,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.xml.model.ExperimentDescription;
 import psidev.psi.mi.xml.model.DbReference;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import psidev.psi.mi.xml.model.ExperimentDescription;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 
 /**
  * TODO comment this
@@ -76,6 +74,7 @@ public class ExperimentConverterTest extends AbstractConverterTest {
         Experiment exp = getMockBuilder().createExperimentRandom(1);
         exp.getXrefs().clear();
         exp.addXref(getMockBuilder().createPrimaryReferenceXref(exp, "1234567"));
+        exp.getPublication().setShortLabel("1234567");
 
         ExperimentConverter converter = new ExperimentConverter(new Institution("testInst"));
         ExperimentDescription expDesc = converter.intactToPsi(exp);
@@ -90,6 +89,7 @@ public class ExperimentConverterTest extends AbstractConverterTest {
         exp.setShortLabel(null);
         exp.getXrefs().clear();
         exp.addXref(getMockBuilder().createPrimaryReferenceXref(exp, "1234567"));
+        exp.getPublication().setShortLabel("1234567");
 
         ExperimentConverter converter = new ExperimentConverter(new Institution("testInst"));
         ExperimentDescription expDesc = converter.intactToPsi(exp);
