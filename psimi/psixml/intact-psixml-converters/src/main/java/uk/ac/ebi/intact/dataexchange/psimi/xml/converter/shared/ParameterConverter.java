@@ -28,8 +28,22 @@ import uk.ac.ebi.intact.model.*;
  */
 public abstract class ParameterConverter<T extends Parameter> extends AbstractIntactPsiConverter<T, psidev.psi.mi.xml.model.Parameter> {
 
+    private ExperimentConverter experimentConverter;
+
     public ParameterConverter( Institution institution ) {
         super( institution );
+        experimentConverter = new ExperimentConverter(institution);
+    }
+
+    public ParameterConverter( Institution institution, ExperimentConverter expConverter ) {
+        super( institution );
+        if (expConverter != null){
+            experimentConverter = expConverter;
+            experimentConverter.setInstitution(institution);
+        }
+        else {
+            experimentConverter = new ExperimentConverter(institution);
+        }
     }
 
     public T psiToIntact( psidev.psi.mi.xml.model.Parameter psiObject ) {
@@ -65,7 +79,7 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
             parameter.setUncertainty(uncertainty);
         }
         if (psiObject.hasExperiment()){
-            ExperimentConverter experimentConverter = new ExperimentConverter(getInstitution());
+            experimentConverter.setInstitution(getInstitution());
             Experiment experiment = experimentConverter.psiToIntact(psiObject.getExperiment());
             parameter.setExperiment(experiment);
         }
@@ -98,7 +112,7 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
             parameter.setUnitAc(intactObject.getCvParameterUnit().getIdentifier());
         }
         if(intactObject.getExperiment() != null) {
-            ExperimentConverter experimentConverter = new ExperimentConverter(getInstitution());
+            experimentConverter.setInstitution(getInstitution());
             parameter.setExperiment(experimentConverter.intactToPsi(intactObject.getExperiment()));
         }
 

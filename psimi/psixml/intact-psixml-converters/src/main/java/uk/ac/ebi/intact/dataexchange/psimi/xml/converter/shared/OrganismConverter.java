@@ -21,8 +21,13 @@ import uk.ac.ebi.intact.model.Institution;
 @PsiConverter(intactObjectType = BioSource.class, psiObjectType = Organism.class)
 public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Organism> {
 
+    private CvObjectConverter<CvCellType,CellType> cellTypeConverter;
+    private CvObjectConverter<CvTissue, Tissue> tissueConverter;
+
     public OrganismConverter(Institution institution) {
         super(institution);
+        cellTypeConverter = new CvObjectConverter<CvCellType,CellType>(institution, CvCellType.class, CellType.class);
+        tissueConverter = new CvObjectConverter<CvTissue,Tissue>(institution, CvTissue.class, Tissue.class);
     }
 
     public BioSource psiToIntact(Organism psiObject) {
@@ -40,9 +45,7 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         final CellType cellType = psiObject.getCellType();
 
         if (cellType != null) {
-            CvObjectConverter<CvCellType,CellType> cellTypeConverter =
-                    new CvObjectConverter<CvCellType,CellType>(getInstitution(), CvCellType.class, CellType.class);
-
+            cellTypeConverter.setInstitution(getInstitution());
             CvCellType intactCellType = cellTypeConverter.psiToIntact(cellType);
 
             bioSource.setCvCellType(intactCellType);
@@ -52,9 +55,7 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         final Tissue tissue = psiObject.getTissue();
 
         if (tissue != null) {
-            CvObjectConverter<CvTissue, Tissue> tissueConverter =
-                    new CvObjectConverter<CvTissue,Tissue>(getInstitution(), CvTissue.class, Tissue.class);
-
+            tissueConverter.setInstitution(getInstitution());
             CvTissue intactTissue = tissueConverter.psiToIntact(tissue);
             bioSource.setCvTissue(intactTissue);
         }
@@ -74,8 +75,8 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         final CvCellType intactCellType = intactObject.getCvCellType();
 
         if (intactCellType != null) {
-             CvObjectConverter<CvCellType,CellType> cellTypeConverter =
-                    new CvObjectConverter<CvCellType,CellType>(getInstitution(), CvCellType.class, CellType.class);
+             cellTypeConverter.setInstitution(getInstitution());
+
             CellType psiCellType = cellTypeConverter.intactToPsi(intactCellType);
             organism.setCellType(psiCellType);
         }
@@ -84,8 +85,7 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         final CvTissue intactTissue = intactObject.getCvTissue();
 
         if (intactTissue != null) {
-             CvObjectConverter<CvTissue, Tissue> tissueConverter =
-                    new CvObjectConverter<CvTissue,Tissue>(getInstitution(), CvTissue.class, Tissue.class);
+             tissueConverter.setInstitution(getInstitution());
             Tissue psiTissue = tissueConverter.intactToPsi(intactTissue);
             organism.setTissue(psiTissue);
         }

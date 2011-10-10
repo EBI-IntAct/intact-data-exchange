@@ -43,12 +43,82 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
     // TODO: fix ConversionCache or lazy initialization (featureMap is only necessary because of this)
     Map<String, psidev.psi.mi.xml.model.Feature> featureMap = new HashMap<String, psidev.psi.mi.xml.model.Feature>();
 
+    private InteractionConverter interactionConverter;
+    private ExperimentalRoleConverter experimentalRoleConverter;
+    private BiologicalRoleConverter biologicalRoleConverter;
+    private InteractorConverter interactorConverter;
+    private ParticipantIdentificationMethodConverter pimConverter;
+    private CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation> epConverter;
+    private FeatureConverter featureConverter;
+    private OrganismConverter organismConverter;
+    private ParticipantConfidenceConverter confidenceConverter;
+    private ParticipantParameterConverter participantParameterConverter;
+
     public ParticipantConverter(Institution institution) {
         super(institution);
+        ExperimentConverter expConverter = new ExperimentConverter(institution);
+
+        interactionConverter = new InteractionConverter(institution, expConverter, this);
+        this.experimentalRoleConverter = new ExperimentalRoleConverter( institution );
+        this.biologicalRoleConverter = new BiologicalRoleConverter(institution);
+        this.interactorConverter = new InteractorConverter(institution);
+        pimConverter = new ParticipantIdentificationMethodConverter(institution);
+        epConverter = new CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation>(institution, CvExperimentalPreparation.class, ExperimentalPreparation.class);
+        featureConverter = new FeatureConverter(institution);
+        organismConverter = new OrganismConverter(institution);
+        confidenceConverter = new ParticipantConfidenceConverter( institution);
+        participantParameterConverter = new ParticipantParameterConverter( institution, expConverter);
+    }
+
+    public ParticipantConverter(Institution institution, InteractionConverter interactionConverter) {
+        super(institution);
+        ExperimentConverter expConverter = new ExperimentConverter(institution);
+
+        if (interactionConverter != null){
+            this.interactionConverter = interactionConverter;
+            this.interactionConverter.setInstitution(institution);
+        }
+        else {
+            this.interactionConverter = new InteractionConverter(institution, expConverter, this);
+        }
+
+        this.participantParameterConverter = new ParticipantParameterConverter(institution, expConverter);
+        this.experimentalRoleConverter = new ExperimentalRoleConverter( institution );
+        this.biologicalRoleConverter = new BiologicalRoleConverter(institution);
+        this.interactorConverter = new InteractorConverter(institution);
+        pimConverter = new ParticipantIdentificationMethodConverter(institution);
+        epConverter = new CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation>(institution, CvExperimentalPreparation.class, ExperimentalPreparation.class);
+        featureConverter = new FeatureConverter(institution);
+        organismConverter = new OrganismConverter(institution);
+        confidenceConverter = new ParticipantConfidenceConverter( institution);
+    }
+
+    public ParticipantConverter(Institution institution, InteractionConverter interactionConverter, ExperimentConverter expConverter) {
+        super(institution);
+
+        if (interactionConverter != null){
+            this.interactionConverter = interactionConverter;
+            this.interactionConverter.setInstitution(institution);
+        }
+        else {
+            this.interactionConverter = new InteractionConverter(institution, expConverter, this);
+        }
+
+        this.participantParameterConverter = new ParticipantParameterConverter(institution, expConverter);
+        this.experimentalRoleConverter = new ExperimentalRoleConverter( institution );
+        this.biologicalRoleConverter = new BiologicalRoleConverter(institution);
+        this.interactorConverter = new InteractorConverter(institution);
+        pimConverter = new ParticipantIdentificationMethodConverter(institution);
+        epConverter = new CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation>(institution, CvExperimentalPreparation.class, ExperimentalPreparation.class);
+        featureConverter = new FeatureConverter(institution);
+        organismConverter = new OrganismConverter(institution);
+        confidenceConverter = new ParticipantConfidenceConverter( institution);
     }
 
     public Component psiToIntact(Participant psiObject) {
-        Interaction interaction = new InteractionConverter(getInstitution()).psiToIntact(psiObject.getInteraction());
+        interactionConverter.setInstitution(getInstitution());
+
+        Interaction interaction = interactionConverter.psiToIntact(psiObject.getInteraction());
 
         psiStartConversion(psiObject);
         Component component = IntactConverterUtils.newComponent(getInstitution(), psiObject, interaction);
@@ -64,10 +134,11 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         PsiConverterUtils.populate(intactObject, participant, this );
         participant.getNames().setShortLabel(intactObject.getInteractor().getShortLabel());
 
+        experimentalRoleConverter.setInstitution(getInstitution());
         for ( CvExperimentalRole experimentalRole : IntactCore.ensureInitializedExperimentalRoles(intactObject)) {
             ExperimentalRole expRole = ( ExperimentalRole )
                     PsiConverterUtils.toCvType( experimentalRole,
-                            new ExperimentalRoleConverter( getInstitution() ),
+                            this.experimentalRoleConverter,
                             this );
             participant.getExperimentalRoles().add( expRole );
         }
@@ -76,29 +147,31 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             throw new IllegalStateException("Found component without biological role: "+intactObject.getAc());
         }
 
+        biologicalRoleConverter.setInstitution(getInstitution());
         BiologicalRole bioRole = (BiologicalRole)
                 PsiConverterUtils.toCvType(intactObject.getCvBiologicalRole(),
-                        new BiologicalRoleConverter(getInstitution()),
+                        this.biologicalRoleConverter,
                         this);
         participant.setBiologicalRole(bioRole);
 
-        psidev.psi.mi.xml.model.Interactor interactor = new InteractorConverter(getInstitution()).intactToPsi(intactObject.getInteractor());
+        interactorConverter.setInstitution(getInstitution());
+        psidev.psi.mi.xml.model.Interactor interactor = interactorConverter.intactToPsi(intactObject.getInteractor());
         if( ConverterContext.getInstance().isGenerateExpandedXml() ) {
             participant.setInteractor(interactor);
         } else {
             participant.setInteractorRef(new InteractorRef(interactor.getId()));
         }
 
+        pimConverter.setInstitution(getInstitution());
         for (CvIdentification participantDetectionMethod : IntactCore.ensureInitializedParticipantIdentificationMethods(intactObject)) {
-            ParticipantIdentificationMethodConverter pimConverter = new ParticipantIdentificationMethodConverter(getInstitution());
+
             ParticipantIdentificationMethod participantIdentificationMethod = pimConverter.intactToPsi(participantDetectionMethod);
 
             participant.getParticipantIdentificationMethods().add(participantIdentificationMethod);
         }
 
+        epConverter.setInstitution(getInstitution());
         for (CvExperimentalPreparation experimentalPreparation : IntactCore.ensureInitializedExperimentalPreparations(intactObject)) {
-            CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation> epConverter =
-                    new CvObjectConverter<CvExperimentalPreparation, ExperimentalPreparation>(getInstitution(), CvExperimentalPreparation.class, ExperimentalPreparation.class);
             ExperimentalPreparation expPrep = epConverter.intactToPsi(experimentalPreparation);
 
             participant.getExperimentalPreparations().add(expPrep);
@@ -107,8 +180,7 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         Collection<Feature> features = IntactCore.ensureInitializedFeatures(intactObject);
 
         if (!features.isEmpty()) {
-            FeatureConverter featureConverter = new FeatureConverter(getInstitution());
-
+            featureConverter.setInstitution(getInstitution());
             for (Feature feature : features) {
                 psidev.psi.mi.xml.model.Feature psiFeature = featureConverter.intactToPsi(feature);
                 if(feature.getAc() != null){
@@ -119,7 +191,8 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
         }
 
         if (intactObject.getExpressedIn() != null) {
-            Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getExpressedIn());
+            organismConverter.setInstitution(getInstitution());
+            Organism organism = organismConverter.intactToPsi(intactObject.getExpressedIn());
             if (organism != null) {
                 HostOrganism hostOrganism = new HostOrganism();
                 hostOrganism.setNcbiTaxId(organism.getNcbiTaxId());
@@ -132,13 +205,13 @@ public class ParticipantConverter extends AbstractIntactPsiConverter<Component, 
             }
         }
 
-        ParticipantConfidenceConverter confidenceConverter = new ParticipantConfidenceConverter( getInstitution());
+        confidenceConverter.setInstitution(getInstitution());
         for (ComponentConfidence conf : IntactCore.ensureInitializedComponentConfidences(intactObject)){
             psidev.psi.mi.xml.model.Confidence confidence = confidenceConverter.intactToPsi( conf);
             participant.getConfidenceList().add( confidence);
         }
 
-        ParticipantParameterConverter participantParameterConverter = new ParticipantParameterConverter( getInstitution());
+        participantParameterConverter.setInstitution(getInstitution());
         for (uk.ac.ebi.intact.model.ComponentParameter param : IntactCore.ensureInitializedComponentParameters(intactObject)){
             psidev.psi.mi.xml.model.Parameter parameter = participantParameterConverter.intactToPsi(param);
             participant.getParameters().add(parameter);

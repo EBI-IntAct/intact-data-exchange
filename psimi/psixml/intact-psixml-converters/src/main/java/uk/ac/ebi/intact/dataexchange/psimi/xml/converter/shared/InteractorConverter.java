@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import psidev.psi.mi.xml.model.InteractorType;
 import psidev.psi.mi.xml.model.Organism;
 import uk.ac.ebi.intact.core.persister.IntactCore;
-import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
@@ -38,8 +37,13 @@ import java.util.Set;
  */
 public class InteractorConverter extends AbstractAnnotatedObjectConverter<Interactor, psidev.psi.mi.xml.model.Interactor> {
 
+    private OrganismConverter organismConverter;
+    private InteractorTypeConverter interactorTypeConverter;
+
     public InteractorConverter( Institution institution ) {
         super( institution, InteractorImpl.class, psidev.psi.mi.xml.model.Interactor.class );
+        organismConverter = new OrganismConverter(institution);
+        interactorTypeConverter = new InteractorTypeConverter( getInstitution() );
     }
 
     public Interactor psiToIntact( psidev.psi.mi.xml.model.Interactor psiObject ) {
@@ -54,7 +58,8 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         Organism organism = psiObject.getOrganism();
 
         if (organism != null) {
-            BioSource bioSource = new OrganismConverter(interactor.getOwner()).psiToIntact(organism);
+            organismConverter.setInstitution(getInstitution());
+            BioSource bioSource = organismConverter.psiToIntact(organism);
             interactor.setBioSource(bioSource);
         }
 
@@ -123,14 +128,16 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             }
         }
 
+        this.interactorTypeConverter.setInstitution(getInstitution());
         InteractorType interactorType = ( InteractorType )
                 PsiConverterUtils.toCvType( intactObject.getCvInteractorType(),
-                        new InteractorTypeConverter( getInstitution() ),
+                        this.interactorTypeConverter,
                         this );
         interactor.setInteractorType( interactorType );
 
         if (intactObject.getBioSource() != null) {
-            Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getBioSource());
+            this.organismConverter.setInstitution(getInstitution());
+            Organism organism = this.organismConverter.intactToPsi(intactObject.getBioSource());
             interactor.setOrganism(organism);
         }
 
@@ -140,8 +147,11 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
     }
 
     protected Interactor newInteractorAccordingToType( Organism psiOrganism, String shortLabel, InteractorType psiInteractorType ) {
-        BioSource organism = new OrganismConverter( getInstitution() ).psiToIntact( psiOrganism );
-        CvInteractorType interactorType = new InteractorTypeConverter( getInstitution() ).psiToIntact( psiInteractorType );
+        organismConverter.setInstitution(getInstitution());
+        interactorTypeConverter.setInstitution(getInstitution());
+
+        BioSource organism = organismConverter.psiToIntact( psiOrganism );
+        CvInteractorType interactorType = interactorTypeConverter.psiToIntact( psiInteractorType );
 
         // MI identifier
         String typeId = null;
@@ -199,8 +209,8 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             } else if ( interactorTypeLabel.equals( CvInteractorType.SMALL_MOLECULE ) ) {
                 interactor = new SmallMoleculeImpl( shortLabel, getInstitution(), interactorType );
                 interactor.setBioSource( organism );
-            } else if (CvInteractorType.NUCLEIC_ACID.equals(typeId) || dnaLabels.contains(typeId) ||
-                    rnaLabels.contains(typeId) ) {
+            } else if (CvInteractorType.NUCLEIC_ACID.equals(interactorTypeLabel) || dnaLabels.contains(interactorTypeLabel) ||
+                    rnaLabels.contains(interactorTypeLabel) ) {
                 interactor = new NucleicAcidImpl( getInstitution(), organism, shortLabel, interactorType );
             } else if ( interactorTypeLabel.equals( CvInteractorType.BIOPOLYMER ) ) {
                 interactor = new BioPolymerImpl( shortLabel, getInstitution(), interactorType );

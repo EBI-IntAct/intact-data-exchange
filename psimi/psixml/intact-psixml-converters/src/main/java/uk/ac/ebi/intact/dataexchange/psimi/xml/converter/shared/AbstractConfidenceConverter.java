@@ -30,8 +30,11 @@ import uk.ac.ebi.intact.model.Institution;
  */
 public abstract class AbstractConfidenceConverter<T extends AbstractConfidence> extends AbstractIntactPsiConverter<T, psidev.psi.mi.xml.model.Confidence> {
 
+    private CvObjectConverter<CvConfidenceType,Unit> confidenceTyeConverter;
+
     public AbstractConfidenceConverter(Institution institution) {
         super( institution );
+        confidenceTyeConverter = new CvObjectConverter<CvConfidenceType,Unit>(institution, CvConfidenceType.class, Unit.class);
     }
 
     public abstract T newConfidenceInstance(String value);
@@ -39,8 +42,8 @@ public abstract class AbstractConfidenceConverter<T extends AbstractConfidence> 
     public T psiToIntact( psidev.psi.mi.xml.model.Confidence psiObject ) {
         String value = psiObject.getValue();
         T confidence = newConfidenceInstance(value);
-        CvObjectConverter<CvConfidenceType,Unit> confidenceTyeConverter =
-                        new CvObjectConverter<CvConfidenceType,Unit>(getInstitution(), CvConfidenceType.class, Unit.class);
+
+        confidenceTyeConverter.setInstitution(getInstitution());
         CvConfidenceType cvConfType = confidenceTyeConverter.psiToIntact( psiObject.getUnit());
         confidence.setCvConfidenceType( cvConfType);
         return confidence;
@@ -51,9 +54,7 @@ public abstract class AbstractConfidenceConverter<T extends AbstractConfidence> 
 
         confidence.setValue( intactObject.getValue());
 
-        CvObjectConverter<CvConfidenceType,Unit> confidenceTyeConverter =
-                        new CvObjectConverter<CvConfidenceType,Unit>(getInstitution(), CvConfidenceType.class, Unit.class);
-
+        confidenceTyeConverter.setInstitution(getInstitution());
         Unit unit = confidenceTyeConverter.intactToPsi(intactObject.getCvConfidenceType());
         confidence.setUnit(unit);
 

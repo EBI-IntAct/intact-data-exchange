@@ -30,6 +30,10 @@ public class InteractionParameterConverter extends ParameterConverter<Interactio
         super(institution);
     }
 
+    public InteractionParameterConverter(Institution institution, ExperimentConverter expConverter) {
+        super(institution, expConverter);
+    }
+
     protected InteractionParameter newParameterInstance() {
         return new InteractionParameter();
     }

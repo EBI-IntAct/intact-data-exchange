@@ -53,9 +53,11 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
     public static final String CTERMINAL_REGION = "c-terminal region";
     public static final String NTERMINAL_REGION = "n-terminal region";
     public static final String RAGGED_NTERMINUS = "ragged n-terminus";
+    private CvObjectConverter<CvFuzzyType,RangeStatus> fuzzyTypeConverter;
 
     public RangeConverter(Institution institution) {
         super(institution);
+        fuzzyTypeConverter = new CvObjectConverter<CvFuzzyType,RangeStatus>(institution, CvFuzzyType.class, RangeStatus.class);
     }
 
     public Range psiToIntact(psidev.psi.mi.xml.model.Range psiObject) {
@@ -90,8 +92,6 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         }
 
         // collect the range CvFuzzyTypes
-        CvObjectConverter<CvFuzzyType,RangeStatus> fuzzyTypeConverter =
-                new CvObjectConverter<CvFuzzyType,RangeStatus>(getInstitution(), CvFuzzyType.class, RangeStatus.class);
 
         final RangeStatus startStatus = psiObject.getStartStatus();
         final RangeStatus endStatus = psiObject.getEndStatus();
@@ -103,6 +103,7 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
             throw new PsiConversionException("We couldn't find a end status for the position (" + endIntervalFrom + "-" + endIntervalTo + ")");
         }
 
+        fuzzyTypeConverter.setInstitution(getInstitution());
         CvFuzzyType fromFuzzyType = fuzzyTypeConverter.psiToIntact(startStatus);
         CvFuzzyType toFuzzyType = fuzzyTypeConverter.psiToIntact(endStatus);
 
@@ -278,10 +279,7 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
 
         intactStartConversation(intactObject);
         // set the range status
-        CvObjectConverter<CvFuzzyType,RangeStatus> fuzzyTypeConverter =
-                new CvObjectConverter<CvFuzzyType,RangeStatus>( getInstitution(),
-                        CvFuzzyType.class,
-                        RangeStatus.class );
+        fuzzyTypeConverter.setInstitution(getInstitution());
 
         final CvFuzzyType fromFuzzyType = intactObject.getFromCvFuzzyType();
 

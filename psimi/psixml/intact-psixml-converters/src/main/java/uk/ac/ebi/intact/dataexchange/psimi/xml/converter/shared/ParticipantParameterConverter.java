@@ -30,6 +30,10 @@ public class ParticipantParameterConverter extends ParameterConverter<ComponentP
         super(institution);
     }
 
+    public ParticipantParameterConverter(Institution institution, ExperimentConverter expConverter) {
+        super(institution, expConverter);
+    }
+
     protected ComponentParameter newParameterInstance() {
         return new ComponentParameter();
     }

@@ -29,8 +29,15 @@ import uk.ac.ebi.intact.model.*;
  */
 public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, psidev.psi.mi.xml.model.Feature> {
 
+    private CvObjectConverter<CvFeatureType,FeatureType> featureTypeConverter;
+    private CvObjectConverter<CvFeatureIdentification,FeatureDetectionMethod> featureDetMethodConverter;
+    private RangeConverter rangeConverter;
+
     public FeatureConverter(Institution institution) {
         super(institution, Feature.class, psidev.psi.mi.xml.model.Feature.class);
+        featureTypeConverter = new CvObjectConverter<CvFeatureType,FeatureType>(institution, CvFeatureType.class, FeatureType.class);
+        featureDetMethodConverter = new CvObjectConverter<CvFeatureIdentification,FeatureDetectionMethod>(institution, CvFeatureIdentification.class, FeatureDetectionMethod.class);
+        rangeConverter = new RangeConverter(institution);
     }
 
     public Feature psiToIntact(psidev.psi.mi.xml.model.Feature psiObject) {
@@ -51,23 +58,21 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
         //feature.setShortLabel(shortLabel);
 
         if (psiObject.getFeatureType() != null) {
-            CvObjectConverter<CvFeatureType,FeatureType> featureTypeConverter =
-                    new CvObjectConverter<CvFeatureType,FeatureType>(getInstitution(), CvFeatureType.class, FeatureType.class);
 
+            featureTypeConverter.setInstitution(getInstitution());
             CvFeatureType featureType = featureTypeConverter.psiToIntact(psiObject.getFeatureType());
             feature.setCvFeatureType(featureType);
         }
 
         FeatureDetectionMethod featureDetMethod = psiObject.getFeatureDetectionMethod();
         if (featureDetMethod != null) {
-            CvObjectConverter<CvFeatureIdentification,FeatureDetectionMethod> featureDetMethodConverter =
-                    new CvObjectConverter<CvFeatureIdentification,FeatureDetectionMethod>(getInstitution(), CvFeatureIdentification.class, FeatureDetectionMethod.class);
 
+            featureDetMethodConverter.setInstitution(getInstitution());
             CvFeatureIdentification cvFeatureDetMethod = featureDetMethodConverter.psiToIntact(featureDetMethod);
             feature.setCvFeatureIdentification(cvFeatureDetMethod);
         }
 
-        RangeConverter rangeConverter = new RangeConverter(getInstitution());
+        rangeConverter.setInstitution(getInstitution());
 
         for (psidev.psi.mi.xml.model.Range psiRange : psiObject.getRanges()) {
             Range range = rangeConverter.psiToIntact(psiRange);
@@ -88,15 +93,19 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
 
         intactStartConversation(intactObject);
 
-        CvObjectConverter<CvFeatureType,FeatureType> featureTypeConverter =
-                new CvObjectConverter<CvFeatureType,FeatureType>(getInstitution(), CvFeatureType.class, FeatureType.class);
+        if (intactObject.getCvFeatureIdentification()!= null) {
+            featureDetMethodConverter.setInstitution(getInstitution());
+            FeatureDetectionMethod featureMethod = featureDetMethodConverter.intactToPsi(intactObject.getCvFeatureIdentification());
+            psiFeature.setFeatureDetectionMethod(featureMethod);
+        }
 
-        if (intactObject.getCvFeatureType() != null) {
+        if (intactObject.getCvFeatureType() != null){
+            featureTypeConverter.setInstitution(getInstitution());
             FeatureType featureType = featureTypeConverter.intactToPsi(intactObject.getCvFeatureType());
             psiFeature.setFeatureType(featureType);
         }
 
-        RangeConverter rangeConverter = new RangeConverter(getInstitution());
+        rangeConverter.setInstitution(getInstitution());
 
         for (Range intactRange : IntactCore.ensureInitializedRanges(intactObject)) {
             psidev.psi.mi.xml.model.Range psiRange = rangeConverter.intactToPsi(intactRange);

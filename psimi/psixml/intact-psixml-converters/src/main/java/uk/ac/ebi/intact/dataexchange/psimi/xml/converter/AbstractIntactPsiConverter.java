@@ -47,13 +47,15 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
         return institution;
     }
 
-    protected void setInstitution(Institution institution)
+    public void setInstitution(Institution institution)
     {
         this.institution = institution;
-        try {
-            this.institutionPrimaryId = calculateInstitutionPrimaryId(institution);
-        } catch (Throwable e) {
-            log.error("Problem calculating primaryId for institution: "+institution.getShortLabel());
+        if (institution != null){
+            try {
+                this.institutionPrimaryId = calculateInstitutionPrimaryId(institution);
+            } catch (Throwable e) {
+                log.error("Problem calculating primaryId for institution: "+institution.getShortLabel());
+            }
         }
     }
 
@@ -90,7 +92,7 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
     }
 
     protected void intactStartConversation(Object intactObject) {
-         String id = null;
+        String id = null;
         if (intactObject instanceof IntactObject) {
             final String ac = ((IntactObject) intactObject).getAc();
             if (ac != null) {

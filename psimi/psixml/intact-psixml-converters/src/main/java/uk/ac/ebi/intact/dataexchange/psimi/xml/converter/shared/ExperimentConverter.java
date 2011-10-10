@@ -37,9 +37,16 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
      * Sets up a logger for that class.
      */
     private static final Log log = LogFactory.getLog(ExperimentConverter.class);
+    private OrganismConverter organismConverter;
+    private InteractionDetectionMethodConverter interactionDetectionMethodConverter;
+    private ParticipantIdentificationMethodConverter participantIdentificationMethodConverter;
 
     public ExperimentConverter(Institution institution) {
+
         super(institution, Experiment.class, ExperimentDescription.class);
+        organismConverter = new OrganismConverter(institution);
+        interactionDetectionMethodConverter = new InteractionDetectionMethodConverter(institution);
+        participantIdentificationMethodConverter = new ParticipantIdentificationMethodConverter(institution);
     }
 
     public Experiment psiToIntact(ExperimentDescription psiObject) {
@@ -63,12 +70,15 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         if (psiObject.getHostOrganisms() != null && !psiObject.getHostOrganisms().isEmpty()) {
             Organism hostOrganism = psiObject.getHostOrganisms().iterator().next();
-            bioSource = new OrganismConverter(experiment.getOwner()).psiToIntact(hostOrganism);
+
+            organismConverter.setInstitution(experiment.getOwner());
+            bioSource = organismConverter.psiToIntact(hostOrganism);
         }
 
 
         InteractionDetectionMethod idm = psiObject.getInteractionDetectionMethod();
-        CvInteraction cvInteractionDetectionMethod = new InteractionDetectionMethodConverter(getInstitution()).psiToIntact(idm);
+        interactionDetectionMethodConverter.setInstitution(getInstitution());
+        CvInteraction cvInteractionDetectionMethod = this.interactionDetectionMethodConverter.psiToIntact(idm);
 
         experiment.setOwner(getInstitution());
         experiment.setShortLabel(shortLabel);
@@ -112,7 +122,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         ParticipantIdentificationMethod pim = psiObject.getParticipantIdentificationMethod();
         if (pim != null) {
-            CvIdentification cvParticipantIdentification = new ParticipantIdentificationMethodConverter(getInstitution()).psiToIntact(pim);
+            this.participantIdentificationMethodConverter.setInstitution(getInstitution());
+            CvIdentification cvParticipantIdentification = this.participantIdentificationMethodConverter.psiToIntact(pim);
             experiment.setCvIdentification(cvParticipantIdentification);
         }
 
@@ -143,8 +154,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             throw new UnsupportedConversionException("No Bibref could be found for Experiment with Xrefs: "+intactObject.getXrefs(), e);
         }
 
-        InteractionDetectionMethodConverter detMethodConverter = new InteractionDetectionMethodConverter(getInstitution());
-        InteractionDetectionMethod detMethod = (InteractionDetectionMethod) PsiConverterUtils.toCvType(intactObject.getCvInteraction(), detMethodConverter, this);
+        this.interactionDetectionMethodConverter.setInstitution(getInstitution());
+        InteractionDetectionMethod detMethod = (InteractionDetectionMethod) PsiConverterUtils.toCvType(intactObject.getCvInteraction(), this.interactionDetectionMethodConverter, this);
 
         expDesc.setBibref(bibref);
         expDesc.setInteractionDetectionMethod(detMethod);
@@ -152,15 +163,17 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         PsiConverterUtils.populate(intactObject, expDesc, this);
 
         if (intactObject.getCvIdentification() != null) {
+            this.participantIdentificationMethodConverter.setInstitution(getInstitution());
             ParticipantIdentificationMethod identMethod = (ParticipantIdentificationMethod)
                     PsiConverterUtils.toCvType(intactObject.getCvIdentification(),
-                                               new ParticipantIdentificationMethodConverter(getInstitution()),
+                                               this.participantIdentificationMethodConverter,
                                                this );
             expDesc.setParticipantIdentificationMethod(identMethod);
         }
 
         if (intactObject.getBioSource() != null) {
-            Organism organism = new OrganismConverter(getInstitution()).intactToPsi(intactObject.getBioSource());
+            this.organismConverter.setInstitution(getInstitution());
+            Organism organism = this.organismConverter.intactToPsi(intactObject.getBioSource());
             expDesc.getHostOrganisms().add(organism);
         }
 
