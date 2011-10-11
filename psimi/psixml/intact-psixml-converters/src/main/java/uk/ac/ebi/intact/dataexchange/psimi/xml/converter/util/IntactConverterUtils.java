@@ -405,7 +405,7 @@ public class IntactConverterUtils {
 
     public static Collection<Attribute> extractAuthorConfidencesFrom(Collection<Attribute> attributes){
         if (attributes != null && !attributes.isEmpty()){
-            Collection<Attribute> attributesConf = new ArrayList<Attribute>(attributes);
+            Collection<Attribute> attributesConf = new ArrayList<Attribute>(attributes.size());
             for (Attribute att : attributes){
                 if (att.getNameAc() != null){
                     if (att.getNameAc().equals(AUTH_CONF_MI)){
@@ -414,6 +414,23 @@ public class IntactConverterUtils {
                 }
                 else if (att.getName() != null){
                     if (att.getName().equals(AUTH_CONF)){
+                        attributesConf.add(att);
+                    }
+                }
+            }
+
+            return attributesConf;
+        }
+
+        return Collections.EMPTY_LIST;
+    }
+
+    public static Collection<Annotation> extractAuthorConfidencesAnnotationsFrom(Collection<Annotation> annotations){
+        if (annotations != null && !annotations.isEmpty()){
+            Collection<Annotation> attributesConf = new ArrayList<Annotation>(annotations.size());
+            for (Annotation att : annotations){
+                if (att.getCvTopic() != null){
+                    if (AUTH_CONF_MI.equals(att.getCvTopic().getIdentifier())){
                         attributesConf.add(att);
                     }
                 }
