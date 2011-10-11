@@ -1,5 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.CellType;
 import psidev.psi.mi.xml.model.Organism;
 import psidev.psi.mi.xml.model.Tissue;
@@ -17,6 +19,7 @@ import uk.ac.ebi.intact.model.*;
  */
 @PsiConverter(intactObjectType = BioSource.class, psiObjectType = Organism.class)
 public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Organism> {
+    private static final Log log = LogFactory.getLog(OrganismConverter.class);
 
     private CvObjectConverter<CvCellType,CellType> cellTypeConverter;
     private CvObjectConverter<CvTissue, Tissue> tissueConverter;
@@ -32,11 +35,13 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
     public BioSource psiToIntact(Organism psiObject) {
         if (psiObject == null) return null;
 
-        String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
+        psiStartConversion(psiObject);
+
         int taxId = psiObject.getNcbiTaxId();
 
-        BioSource bioSource = new BioSource(getInstitution(), shortLabel, String.valueOf(taxId));
-        psiStartConversion(psiObject);
+        BioSource bioSource = new BioSource();
+        bioSource.setTaxId(String.valueOf(taxId));
+        bioSource.setOwner(getInstitution());
 
         IntactConverterUtils.populateNames(psiObject.getNames(), bioSource, aliasConverter);
 
@@ -57,16 +62,28 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
             bioSource.setCvTissue(intactTissue);
         }
 
+        if (psiObject.getCompartment() != null){
+            log.warn("Organism having a compartment : "+psiObject.getNcbiTaxId()+". Compartment is not converted in IntAct and is ignored.");
+        }
+
         psiEndConversion(psiObject);
         return bioSource;
     }
 
     public Organism intactToPsi(BioSource intactObject) {
-        Organism organism = new Organism();
         intactStartConversation(intactObject);
+        Organism organism = new Organism();
+
+        // populates names
         PsiConverterUtils.populate(intactObject, organism, aliasConverter, null, null);
 
-        organism.setNcbiTaxId(Integer.valueOf(intactObject.getTaxId()));
+        // taxId
+        if (intactObject.getTaxId() != null){
+            organism.setNcbiTaxId(Integer.valueOf(intactObject.getTaxId()));
+        }
+        else {
+            log.error("BioSource without taxId : " + intactObject.getShortLabel());
+        }
 
         // cell type
         final CvCellType intactCellType = intactObject.getCvCellType();

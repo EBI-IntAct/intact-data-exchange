@@ -285,12 +285,18 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
             RangeStatus startStatus = fuzzyTypeConverter.intactToPsi(fromFuzzyType);
             psiRange.setStartStatus(startStatus);
         }
+        else {
+            throw new PsiConversionException("Ranges must have a start status");
+        }
 
         final CvFuzzyType toFuzzyType = intactObject.getToCvFuzzyType();
 
         if (toFuzzyType != null) {
             RangeStatus endStatus = fuzzyTypeConverter.intactToPsi(toFuzzyType);
             psiRange.setEndStatus(endStatus);
+        }
+        else {
+            throw new PsiConversionException("Ranges must have a start status");
         }
 
         // get the positions

@@ -56,6 +56,7 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
     private OrganismConverter organismConverter;
     private ParticipantConfidenceConverter confidenceConverter;
     private ParticipantParameterConverter participantParameterConverter;
+    private static final String STOICHIOMETRY_PREFIX = "Stoichiometry: ";
 
     public ParticipantConverter(Institution institution) {
         super(institution, Component.class, psidev.psi.mi.xml.model.Participant.class);
@@ -121,9 +122,8 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         // the interaction in the participant is a complex interactor, not an 'interaction'...
         // TODO being able to convert interactions as participants
         //Interaction interaction = interactionConverter.psiToIntact(psiObject.getInteraction());
-
         psiStartConversion(psiObject);
-        Component component = newComponent(psiObject, null);
+        Component component = newComponent(psiObject);
 
         psiEndConversion(psiObject);
         return component;
@@ -133,9 +133,16 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         Participant participant = super.intactToPsi(intactObject);
 
         intactStartConversation(intactObject);
-        participant.getNames().setShortLabel(intactObject.getInteractor().getShortLabel());
 
-        for ( CvExperimentalRole experimentalRole : IntactCore.ensureInitializedExperimentalRoles(intactObject)) {
+        // experimental roles
+        Collection<CvExperimentalRole> experimentalRoles = IntactCore.ensureInitializedExperimentalRoles(intactObject);
+        if (experimentalRoles.isEmpty()){
+            log.error("Component without experimental roles : " + intactObject.getShortLabel());
+        }
+        else if (experimentalRoles.size() > 1){
+            log.error("Component with "+experimentalRoles.size()+" experimental roles : " + intactObject.getShortLabel());
+        }
+        for ( CvExperimentalRole experimentalRole : experimentalRoles) {
             ExperimentalRole expRole = ( ExperimentalRole )
                     PsiConverterUtils.toCvType( experimentalRole,
                             this.experimentalRoleConverter,
@@ -143,6 +150,7 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             participant.getExperimentalRoles().add( expRole );
         }
 
+        // biological role
         if (intactObject.getCvBiologicalRole() == null) {
             throw new IllegalStateException("Found component without biological role: "+intactObject.getAc());
         }
@@ -153,13 +161,31 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
                         this);
         participant.setBiologicalRole(bioRole);
 
-        psidev.psi.mi.xml.model.Interactor interactor = interactorConverter.intactToPsi(intactObject.getInteractor());
-        if( ConverterContext.getInstance().isGenerateExpandedXml() ) {
-            participant.setInteractor(interactor);
-        } else {
-            participant.setInteractorRef(new InteractorRef(interactor.getId()));
+        // interactor converter
+
+        // interactor is interaction
+        if (intactObject.getInteractor() != null && intactObject.getInteractor() instanceof InteractionImpl){
+            psidev.psi.mi.xml.model.Interaction interactor = interactionConverter.intactToPsi((InteractionImpl) intactObject.getInteractor());
+            if( ConverterContext.getInstance().isGenerateExpandedXml() ) {
+                participant.setInteraction(interactor);
+            } else {
+                participant.setInteractionRef(new InteractionRef(interactor.getId()));
+            }
+        }
+        // normal interactor
+        else if (intactObject.getInteractor() != null){
+            psidev.psi.mi.xml.model.Interactor interactor = interactorConverter.intactToPsi(intactObject.getInteractor());
+            if( ConverterContext.getInstance().isGenerateExpandedXml() ) {
+                participant.setInteractor(interactor);
+            } else {
+                participant.setInteractorRef(new InteractorRef(interactor.getId()));
+            }
+        }
+        else {
+            log.error("Component without interactor " + intactObject.getShortLabel());
         }
 
+        // participant identification methods
         for (CvIdentification participantDetectionMethod : IntactCore.ensureInitializedParticipantIdentificationMethods(intactObject)) {
 
             ParticipantIdentificationMethod participantIdentificationMethod = pimConverter.intactToPsi(participantDetectionMethod);
@@ -167,12 +193,14 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             participant.getParticipantIdentificationMethods().add(participantIdentificationMethod);
         }
 
+        // experimental preparations
         for (CvExperimentalPreparation experimentalPreparation : IntactCore.ensureInitializedExperimentalPreparations(intactObject)) {
             ExperimentalPreparation expPrep = epConverter.intactToPsi(experimentalPreparation);
 
             participant.getExperimentalPreparations().add(expPrep);
         }
 
+        // features
         Collection<Feature> features = IntactCore.ensureInitializedFeatures(intactObject);
 
         if (!features.isEmpty()) {
@@ -185,6 +213,7 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             }
         }
 
+        // expressed in
         if (intactObject.getExpressedIn() != null) {
             Organism organism = organismConverter.intactToPsi(intactObject.getExpressedIn());
             if (organism != null) {
@@ -199,18 +228,55 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             }
         }
 
+        // confidences
         for (ComponentConfidence conf : IntactCore.ensureInitializedComponentConfidences(intactObject)){
             psidev.psi.mi.xml.model.Confidence confidence = confidenceConverter.intactToPsi( conf);
             participant.getConfidenceList().add( confidence);
+
+            // in case of author-score and for retro-compatibility, we add an author-confidence annotation
+            if (conf.getCvConfidenceType() != null && IntactConverterUtils.AUTHOR_SCORE.equalsIgnoreCase(conf.getCvConfidenceType().getShortLabel())){
+                Attribute authConf = new Attribute(IntactConverterUtils.AUTH_CONF_MI, IntactConverterUtils.AUTH_CONF, conf.getValue());
+
+                if (!participant.getAttributes().contains(authConf)){
+                    participant.getAttributes().add(authConf);
+                }
+            }
         }
 
+        // if we had author-conf annotations, we convert them in confidences also
+        Collection<Annotation> annotationsToConvertInConfidence = IntactConverterUtils.extractAuthorConfidencesAnnotationsFrom(intactObject.getAnnotations());
+        for (Annotation ann : annotationsToConvertInConfidence){
+            if (ann.getAnnotationText() != null){
+                psidev.psi.mi.xml.model.Confidence confidence = new psidev.psi.mi.xml.model.Confidence();
+                confidence.setValue(ann.getAnnotationText());
+
+                Names names = new Names();
+                names.setFullName(IntactConverterUtils.AUTH_CONF);
+                names.setShortLabel(IntactConverterUtils.AUTH_CONF_MI);
+
+                psidev.psi.mi.xml.model.Xref xref = new psidev.psi.mi.xml.model.Xref();
+                xref.setPrimaryRef(new DbReference(CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF, IntactConverterUtils.AUTH_CONF_MI, CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF));
+                Unit unit = new Unit();
+                unit.setNames(names);
+                unit.setXref(xref);
+
+                confidence.setUnit(unit);
+
+                if (!participant.getConfidenceList().contains(confidence)){
+                    participant.getConfidenceList().add( confidence);
+                }
+            }
+        }
+
+        // component parameters
         for (uk.ac.ebi.intact.model.ComponentParameter param : IntactCore.ensureInitializedComponentParameters(intactObject)){
             psidev.psi.mi.xml.model.Parameter parameter = participantParameterConverter.intactToPsi(param);
             participant.getParameters().add(parameter);
         }
 
+        // stoichiometry
         if (intactObject.getStoichiometry() > 0.0f){
-            Attribute attribute = new Attribute(CvTopic.COMMENT_MI_REF, CvTopic.COMMENT, "Stoichiometry: " + intactObject.getStoichiometry());
+            Attribute attribute = new Attribute(CvTopic.COMMENT_MI_REF, CvTopic.COMMENT, STOICHIOMETRY_PREFIX + intactObject.getStoichiometry());
 
             if (!participant.getAttributes().contains( attribute )) {
                 participant.getAttributes().add( attribute );
@@ -221,16 +287,46 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         return participant;
     }
 
-    private Component newComponent(Participant participant, uk.ac.ebi.intact.model.Interaction interaction) {
+    private Component newComponent(Participant participant) {
 
-        Interactor interactor = this.interactorConverter.psiToIntact(participant.getInteractor());
+        Component component = new Component();
 
+        // author confidence annotations to migrate to componentConfidences later
+        Collection<Attribute> annotationConfidencesToMigrate = IntactConverterUtils.extractAuthorConfidencesFrom(participant.getAttributes());
+
+        // all other attributes will be converted into annotations
+        Collection<Attribute> attributesToConvert = CollectionUtils.subtract(participant.getAttributes(), annotationConfidencesToMigrate);
+
+        // populates names, xrefs and attributes
+        IntactConverterUtils.populateNames(participant.getNames(), component);
+        IntactConverterUtils.populateXref(participant.getXref(), component, new XrefConverter<ComponentXref>(getInstitution(), ComponentXref.class));
+        IntactConverterUtils.populateAnnotations(attributesToConvert, component, getInstitution());
+
+        component.setOwner(getInstitution());
+
+        Interactor interactor = null;
+        // interactor is participant
+        if (participant.getInteractor() != null){
+            interactor = this.interactorConverter.psiToIntact(participant.getInteractor());
+        }
+        // interaction is participant
+        else if (participant.getInteraction() != null){
+            interactor = this.interactionConverter.psiToIntact(participant.getInteraction());
+        }
+        else {
+            log.error("Participant without interactor : " + component.getShortLabel());
+        }
+        component.setInteractor(interactor);
+
+        // biological role
         BiologicalRole psiBioRole = participant.getBiologicalRole();
         if (psiBioRole == null) {
             psiBioRole = PsiConverterUtils.createUnspecifiedBiologicalRole();
         }
         CvBiologicalRole biologicalRole = this.biologicalRoleConverter.psiToIntact(psiBioRole);
+        component.setCvBiologicalRole(biologicalRole);
 
+        // we have more than one experimental role
         if (participant.getExperimentalRoles().size() > 1) {
             throw new UnsupportedConversionException("Cannot convert participants with more than one experimental role: "+participant);
         }
@@ -246,35 +342,15 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             roles = participant.getExperimentalRoles();
         }
 
-        Collection<CvExperimentalRole> intactExpRoles = new ArrayList<CvExperimentalRole>(roles.size());
-
         for (ExperimentalRole role : roles) {
             CvExperimentalRole experimentalRole = this.experimentalRoleConverter.psiToIntact(role);
-            intactExpRoles.add(experimentalRole);
+            component.getExperimentalRoles().add(experimentalRole);
         }
 
-        Component component = new Component();
-        component.setOwner(getInstitution());
-        component.setInteractor(interactor);
-        component.getExperimentalRoles().addAll(intactExpRoles);
-        component.setCvBiologicalRole(biologicalRole);
-
-        // author confidence annotations to migrate to componentConfidences later
-        Collection<Attribute> annotationConfidencesToMigrate = IntactConverterUtils.extractAuthorConfidencesFrom(participant.getAttributes());
-
-        // all other attributes will be converted into annotations
-        Collection<Attribute> attributesToConvert = CollectionUtils.subtract(participant.getAttributes(), annotationConfidencesToMigrate);
-
-        IntactConverterUtils.populateNames(participant.getNames(), component);
-        IntactConverterUtils.populateXref(participant.getXref(), component, new XrefConverter<ComponentXref>(getInstitution(), ComponentXref.class));
-        IntactConverterUtils.populateAnnotations(attributesToConvert, component, getInstitution());
-
-        component.setExperimentalRoles(intactExpRoles);
-
+        // converts features
         for (psidev.psi.mi.xml.model.Feature psiFeature : participant.getFeatures()) {
             Feature feature = featureConverter.psiToIntact(psiFeature);
-            component.getBindingDomains().add(feature);
-            feature.setComponent(component);
+            component.addFeature(feature);
 
             if (interactor instanceof Polymer){
                 Polymer polymer = (Polymer) interactor;
@@ -289,16 +365,19 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             }
         }
 
+        // converts participant identification methods
         for (ParticipantIdentificationMethod pim : participant.getParticipantIdentificationMethods()) {
             CvIdentification cvIdentification = pimConverter.psiToIntact(pim);
             component.getParticipantDetectionMethods().add(cvIdentification);
         }
 
+        // converts experimental preparations
         for (ExperimentalPreparation expPrep : participant.getExperimentalPreparations()) {
             CvExperimentalPreparation cvExpPrep = epConverter.psiToIntact(expPrep);
             component.getExperimentalPreparations().add(cvExpPrep);
         }
 
+        // converts host organism
         if (!participant.getHostOrganisms().isEmpty()) {
             HostOrganism hostOrganism = participant.getHostOrganisms().iterator().next();
             Organism organism = new Organism();
@@ -312,10 +391,12 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             component.setExpressedIn(bioSource);
         }
 
+        // converts confidences
         for (psidev.psi.mi.xml.model.Confidence psiConfidence :  participant.getConfidenceList()){
             ComponentConfidence confidence = confidenceConverter.psiToIntact( psiConfidence );
             component.addConfidence( confidence);
         }
+        // converts author-confidences
         for (Attribute authorConf : annotationConfidencesToMigrate){
 
             String value = authorConf.getValue();
@@ -326,12 +407,38 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             cvConfType.setShortLabel(IntactConverterUtils.AUTHOR_SCORE);
             confidence.setCvConfidenceType( cvConfType);
 
-            component.addConfidence( confidence);
+            if (!component.getConfidences().contains(confidence)){
+                component.addConfidence( confidence);
+            }
         }
 
+        // converts parameters
         for (psidev.psi.mi.xml.model.Parameter psiParameter : participant.getParameters()){
             ComponentParameter parameter = participantParameterConverter.psiToIntact( psiParameter );
             component.addParameter(parameter);
+        }
+
+        if (!participant.getExperimentalInteractors().isEmpty()){
+            log.warn("Participant with " + participant.getExperimentalInteractors().size() + " experimental interactors : " + component.getShortLabel() + ". We do not export them in Intact");
+        }
+
+        // stoichiometry
+        if (participant.hasAttributes()){
+            for (Attribute a : participant.getAttributes()){
+                if (a.getNameAc() != null){
+                    if (a.getNameAc().equals(CvTopic.COMMENT_MI_REF) && a.getValue() != null){
+                        if (a.getValue().startsWith(STOICHIOMETRY_PREFIX)){
+                            try {
+                                float stoichio = Float.parseFloat(a.getValue().substring(a.getValue().indexOf(STOICHIOMETRY_PREFIX) + STOICHIOMETRY_PREFIX.length()));
+                                component.setStoichiometry(stoichio);
+                            }
+                            catch (NumberFormatException e) {
+                                log.error(e);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
 //        ConfidenceConverter confConverter= new ConfidenceConverter( institution );

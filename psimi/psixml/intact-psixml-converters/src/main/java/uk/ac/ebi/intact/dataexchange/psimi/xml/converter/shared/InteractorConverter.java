@@ -15,6 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.InteractorType;
 import psidev.psi.mi.xml.model.Organism;
 import uk.ac.ebi.intact.core.persister.IntactCore;
@@ -39,6 +41,8 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
 
     private OrganismConverter organismConverter;
     private InteractorTypeConverter interactorTypeConverter;
+    private static final Log log = LogFactory.getLog(InteractorConverter.class);
+
 
     public InteractorConverter( Institution institution ) {
         super( institution, InteractorImpl.class, psidev.psi.mi.xml.model.Interactor.class );
@@ -55,6 +59,12 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
 
         psiStartConversion(psiObject);
 
+        // converts names, xrefs and annotations
+        IntactConverterUtils.populateNames(psiObject.getNames(), interactor, aliasConverter);
+        IntactConverterUtils.populateXref( psiObject.getXref(), interactor, xrefConverter );
+        IntactConverterUtils.populateAnnotations( psiObject, interactor, getInstitution(), annotationConverter );
+
+        // converts organism
         Organism organism = psiObject.getOrganism();
 
         if (organism != null) {
@@ -62,10 +72,7 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             interactor.setBioSource(bioSource);
         }
 
-        IntactConverterUtils.populateNames( psiObject.getNames(), interactor, aliasConverter );
-        IntactConverterUtils.populateXref( psiObject.getXref(), interactor, xrefConverter );
-        IntactConverterUtils.populateAnnotations( psiObject, interactor, getInstitution(), annotationConverter );
-
+        // converts sequence
         String sequence = psiObject.getSequence();
 
         // sequence
@@ -74,6 +81,9 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             polymer.setSequence( sequence );
             polymer.setCrc64( Crc64.getCrc64( sequence ) );
 
+        }
+        else if (sequence != null){
+            log.error("Interactor not considered as polymer but which contains a sequence : " + interactor.getShortLabel() + ". The sequence will be ignored.");
         }
 
         // no uniprot update?
@@ -120,19 +130,31 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
 
         intactStartConversation(intactObject);
 
+        // converts sequence
         if ( !ConverterContext.getInstance().getInteractorConfig().isExcludePolymerSequence() ) {
-            if ( intactObject instanceof Polymer ) {
-                String sequence = IntactCore.ensureInitializedSequence((Polymer) intactObject);
-                interactor.setSequence( sequence );
+            if ( intactObject instanceof Polymer) {
+                Polymer polymer = (Polymer) intactObject;
+
+                if (polymer.getSequence() != null){
+                    String sequence = IntactCore.ensureInitializedSequence(polymer);
+                    interactor.setSequence( sequence );
+                }
             }
         }
 
-        InteractorType interactorType = ( InteractorType )
-                PsiConverterUtils.toCvType( intactObject.getCvInteractorType(),
-                        this.interactorTypeConverter,
-                        this );
-        interactor.setInteractorType( interactorType );
+        // converts interactor type
+        if (intactObject.getCvInteractorType() != null){
+            InteractorType interactorType = ( InteractorType )
+                    PsiConverterUtils.toCvType(intactObject.getCvInteractorType(),
+                            this.interactorTypeConverter,
+                            this);
+            interactor.setInteractorType( interactorType );
+        }
+        else {
+            log.error("Interactor without interactor type : " + intactObject.getShortLabel());
+        }
 
+        // converts biosource
         if (intactObject.getBioSource() != null) {
             Organism organism = this.organismConverter.intactToPsi(intactObject.getBioSource());
             interactor.setOrganism(organism);

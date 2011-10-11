@@ -611,9 +611,12 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             components.add(component);
         }
 
+        // does not look at the experimentRef of inferredInteraction because we suppose in IntAct that one interaction has only one experiment
         for( InferredInteraction inferredInteraction : psiInteraction.getInferredInteractions()){
             if(inferredInteraction.getParticipant().size() == 2){
                 Iterator<InferredInteractionParticipant> iterator = inferredInteraction.getParticipant().iterator();
+
+                // we suspect that one inferredInteraction contains only two participants
                 InferredInteractionParticipant firstParticipant = iterator.next();
                 InferredInteractionParticipant secParticipant = iterator.next();
 
@@ -625,11 +628,17 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                 }else if (firstParticipant.hasFeatureRef()){
                     // TODO featureRef?
                 }
+                else if (firstParticipant.hasParticipant() || firstParticipant.hasParticipantRef()){
+                    log.warn("Inferred interaction with a participant or participant ref cannot be converted in IntAct yet.");
+                }
 
                 if(secParticipant.hasFeature()){
                     secFeature = (uk.ac.ebi.intact.model.Feature) ConversionCache.getElement(secParticipant.getFeature());
                 }else if(secParticipant.hasFeatureRef()){
-
+                    // TODO featureRef?
+                }
+                else if (secParticipant.hasParticipant() || secParticipant.hasParticipantRef()){
+                    log.warn("Inferred interaction with a participant or participant ref cannot be converted in IntAct yet.");
                 }
 
                 if(firstFeature != null && secFeature != null){
@@ -641,6 +650,12 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
             }else{
                 // TODO think about cases with more than two participant
+                if (inferredInteraction.getParticipant().isEmpty()){
+                    log.error("Inferred interaction without any participants which is not valid.");
+                }
+                else {
+                    log.warn("Inferred interaction with " + inferredInteraction.getParticipant().size() + " participants. In IntAct, we cannot convert such inferred interactions.");
+                }
             }
         }
 
