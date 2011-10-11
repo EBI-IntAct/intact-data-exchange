@@ -107,6 +107,10 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
 
         entry.setSource(institutionConverter.intactToPsi(institution));
 
+        if (intactObject.getReleasedDate() != null){
+            entry.getSource().setReleaseDate(intactObject.getReleasedDate());
+        }
+
         // converts all experiments first
         if (ConverterContext.getInstance().isGenerateCompactXml()){
             for ( uk.ac.ebi.intact.model.Experiment e : intactObject.getExperiments() ) {
