@@ -20,6 +20,8 @@ public class AnnotationConverterConfig {
      */
     private Set<CvTopic> excludeAnnotationTopic = new HashSet<CvTopic>( );
 
+    private boolean excludeHiddenTopics = false;
+
     public AnnotationConverterConfig() {
 
         // always exclude negative, Intra-molecular and modelled
@@ -49,6 +51,15 @@ public class AnnotationConverterConfig {
     }
 
     public boolean isExcluded( CvTopic topic  ) {
+
+        if (topic != null && !topic.getAnnotations().isEmpty() && excludeHiddenTopics){
+
+            for (uk.ac.ebi.intact.model.Annotation ann : topic.getAnnotations()){
+                if (ann.getCvTopic() != null && ann.getCvTopic().getShortLabel().equalsIgnoreCase(CvTopic.HIDDEN)){
+                    return true;
+                }
+            }
+        }
         return excludeAnnotationTopic.contains( topic );
     }
 
