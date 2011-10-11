@@ -264,17 +264,17 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         if (intactObject.getPublication() != null){
             Publication publication = intactObject.getPublication();
 
-            if (publication.getXrefs().isEmpty() && !publication.getAnnotations().isEmpty()){
+            // the shortlabel of the publication is the pubmed id by default
+            if (publication.getXrefs().isEmpty() && publication.getShortLabel() != null){
+                Xref xref = new Xref();
+                xref.setPrimaryRef(new DbReference(CvDatabase.PUBMED, CvDatabase.PUBMED_MI_REF, publication.getShortLabel(), CvXrefQualifier.PRIMARY_REFERENCE, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF));
+                bibref.setXref(xref);
+            }
+            else if (publication.getXrefs().isEmpty() && !publication.getAnnotations().isEmpty()){
                 PsiConverterUtils.populateAttributes( publication, bibref, annotationConverter );
             }
             else if (!publication.getXrefs().isEmpty()){
                 PsiConverterUtils.populateXref( publication, bibref, publicationXrefConverter );
-            }
-            // the shortlabel of the publication is the pubmed id by default
-            else {
-                Xref xref = new Xref();
-                xref.setPrimaryRef(new DbReference(CvDatabase.PUBMED, CvDatabase.PUBMED_MI_REF, publication.getShortLabel(), CvXrefQualifier.PRIMARY_REFERENCE, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF));
-                bibref.setXref(xref);
             }
 
             // add annotation from publication not present in experiment
@@ -309,6 +309,9 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         // create bibref if possible
         if (bibref.getXref() != null && bibref.getXref().getPrimaryRef() != null){
+            expDesc.setBibref(bibref);
+        }
+        else if (bibref.hasAttributes()){
             expDesc.setBibref(bibref);
         }
         else {
