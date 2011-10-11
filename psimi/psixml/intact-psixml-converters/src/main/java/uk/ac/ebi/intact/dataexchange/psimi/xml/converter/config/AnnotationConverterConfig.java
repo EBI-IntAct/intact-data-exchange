@@ -66,4 +66,12 @@ public class AnnotationConverterConfig {
     public boolean hasExcludedCvTopic() {
         return !excludeAnnotationTopic.isEmpty();
     }
+
+    public boolean isExcludeHiddenTopics() {
+        return excludeHiddenTopics;
+    }
+
+    public void setExcludeHiddenTopics(boolean excludeHiddenTopics) {
+        this.excludeHiddenTopics = excludeHiddenTopics;
+    }
 }
