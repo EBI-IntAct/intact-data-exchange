@@ -160,7 +160,7 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
             throw new PsiConversionException( "Cannot convert the range " + range.toString() + ". The start position is c-terminal and we should have a position equal to the sequence length" +
                     " (or 0 if we don't know the sequence length) instead of "+endIntervalFrom+"-"+endIntervalTo+". A position interval is not allowed for this status.");
         }
-        
+
         // correct positions for undetermined, n-terminal or c-terminal
         FeatureUtils.correctRangePositionsAccordingToType(range, seq);
 
@@ -339,11 +339,19 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         return psiRange;
     }
 
-        @Override
+    @Override
     public void setInstitution(Institution institution)
     {
         super.setInstitution(institution);
 
-        this.fuzzyTypeConverter.setInstitution(institution);
+        this.fuzzyTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setInstitution(Institution institution, String institId){
+        super.setInstitution(institution, institId);
+
+        this.fuzzyTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
+
     }
 }

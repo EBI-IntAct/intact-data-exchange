@@ -138,8 +138,16 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
     public void setInstitution(Institution institution)
     {
         super.setInstitution(institution);
-        featureTypeConverter.setInstitution(institution);
-        featureDetMethodConverter.setInstitution(institution);
-        rangeConverter.setInstitution(institution);
+        featureTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
+        featureDetMethodConverter.setInstitution(institution, getInstitutionPrimaryId());
+        rangeConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setInstitution(Institution institution, String institId){
+        super.setInstitution(institution, institId);
+        featureTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
+        featureDetMethodConverter.setInstitution(institution, getInstitutionPrimaryId());
+        rangeConverter.setInstitution(institution, getInstitutionPrimaryId());
     }
 }

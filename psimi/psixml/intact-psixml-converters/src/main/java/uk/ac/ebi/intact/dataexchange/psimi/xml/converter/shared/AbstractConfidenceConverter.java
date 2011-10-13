@@ -64,6 +64,13 @@ public abstract class AbstractConfidenceConverter<T extends AbstractConfidence> 
     public void setInstitution(Institution institution)
     {
         super.setInstitution(institution);
-        this.confidenceTyeConverter.setInstitution(institution);
+        this.confidenceTyeConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setInstitution(Institution institution, String institId){
+        super.setInstitution(institution, institId);
+        this.confidenceTyeConverter.setInstitution(institution, institId);
+
     }
 }

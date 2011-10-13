@@ -169,10 +169,20 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
     public void setInstitution(Institution institution)
     {
         super.setInstitution(institution);
-        institutionConverter.setInstitution(institution);
-        experimentConverter.setInstitution(institution);
-        interactionConverter.setInstitution(institution, false, true);
-        interactorConverter.setInstitution(institution);
-        this.annotationConverter.setInstitution(institution);
+        institutionConverter.setInstitution(institution, getInstitutionPrimaryId());
+        experimentConverter.setInstitution(institution, getInstitutionPrimaryId());
+        interactionConverter.setInstitution(institution, false, true, getInstitutionPrimaryId());
+        interactorConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.annotationConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setInstitution(Institution institution, String institId){
+        super.setInstitution(institution, institId);
+        institutionConverter.setInstitution(institution, getInstitutionPrimaryId());
+        experimentConverter.setInstitution(institution, getInstitutionPrimaryId());
+        interactionConverter.setInstitution(institution, false, true, getInstitutionPrimaryId());
+        interactorConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.annotationConverter.setInstitution(institution, getInstitutionPrimaryId());
     }
 }

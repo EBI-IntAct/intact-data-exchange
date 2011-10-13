@@ -124,4 +124,13 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
     public String getInstitutionPrimaryId() {
         return institutionPrimaryId;
     }
+
+    public void setInstitutionPrimaryId(String institutionPrimaryId) {
+        this.institutionPrimaryId = institutionPrimaryId;
+    }
+
+    public void setInstitution(Institution institution, String institutionPrimaryId) {
+        this.institution = institution;
+        this.institutionPrimaryId = institutionPrimaryId;
+    }
 }

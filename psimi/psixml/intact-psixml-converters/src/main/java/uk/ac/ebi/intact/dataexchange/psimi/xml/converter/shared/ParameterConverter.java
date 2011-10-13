@@ -123,7 +123,15 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
     {
         super.setInstitution(institution);
         if (setExperimentInstitution){
-            experimentConverter.setInstitution(institution);
+            experimentConverter.setInstitution(institution, getInstitutionPrimaryId());
+        }
+    }
+
+    public void setInstitution(Institution institution, boolean setExperimentInstitution, String institutionPrimaryId)
+    {
+        super.setInstitution(institution, institutionPrimaryId);
+        if (setExperimentInstitution){
+            experimentConverter.setInstitution(institution, getInstitutionPrimaryId());
         }
     }
 }

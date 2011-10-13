@@ -110,8 +110,16 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
     public void setInstitution(Institution institution)
     {
         super.setInstitution(institution);
-        cellTypeConverter.setInstitution(institution);
-        tissueConverter.setInstitution(institution);
-        this.aliasConverter.setInstitution(institution);
+        cellTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
+        tissueConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.aliasConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+            @Override
+    public void setInstitution(Institution institution, String institId){
+        super.setInstitution(institution, institId);
+        cellTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
+        tissueConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.aliasConverter.setInstitution(institution, getInstitutionPrimaryId());
     }
 }

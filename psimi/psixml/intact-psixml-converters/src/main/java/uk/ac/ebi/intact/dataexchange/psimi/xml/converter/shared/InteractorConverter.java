@@ -250,7 +250,14 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
     public void setInstitution(Institution institution)
     {
         super.setInstitution(institution);
-        organismConverter.setInstitution(institution);
-        interactorTypeConverter.setInstitution( getInstitution() );
+        organismConverter.setInstitution(institution, getInstitutionPrimaryId());
+        interactorTypeConverter.setInstitution( getInstitution(), getInstitutionPrimaryId() );
+    }
+
+        @Override
+    public void setInstitution(Institution institution, String institId){
+        super.setInstitution(institution, institId);
+        organismConverter.setInstitution(institution, getInstitutionPrimaryId());
+        interactorTypeConverter.setInstitution( getInstitution(), getInstitutionPrimaryId() );
     }
 }

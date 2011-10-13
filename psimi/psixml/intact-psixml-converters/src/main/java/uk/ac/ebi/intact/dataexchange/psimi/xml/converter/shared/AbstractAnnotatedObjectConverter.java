@@ -54,7 +54,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
 
     public A psiToIntact(T psiObject) {
         A intactObject = (A) ConversionCache.getElement(psiObject);
-        
+
         if (intactObject != null) {
             newIntactObjectCreated = false;
             return intactObject;
@@ -117,8 +117,16 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
     @Override
     public void setInstitution(Institution institution){
         super.setInstitution(institution);
-        this.annotationConverter.setInstitution(institution);
-        this.aliasConverter.setInstitution(institution);
-        this.xrefConverter.setInstitution(institution);
+        this.annotationConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.aliasConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.xrefConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setInstitution(Institution institution, String institId){
+        super.setInstitution(institution, institId);
+        this.annotationConverter.setInstitution(institution, institId);
+        this.aliasConverter.setInstitution(institution, institId);
+        this.xrefConverter.setInstitution(institution, institId);
     }
 }

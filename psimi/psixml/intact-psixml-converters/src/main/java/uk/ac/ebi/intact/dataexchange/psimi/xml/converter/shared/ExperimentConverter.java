@@ -425,9 +425,18 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
     public void setInstitution(Institution institution)
     {
         super.setInstitution(institution);
-        organismConverter.setInstitution(institution);
-        interactionDetectionMethodConverter.setInstitution(institution);
-        participantIdentificationMethodConverter.setInstitution(institution);
-        publicationXrefConverter.setInstitution(institution);
+        organismConverter.setInstitution(institution, getInstitutionPrimaryId());
+        interactionDetectionMethodConverter.setInstitution(institution, getInstitutionPrimaryId());
+        participantIdentificationMethodConverter.setInstitution(institution, getInstitutionPrimaryId());
+        publicationXrefConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setInstitution(Institution institution, String institId){
+        super.setInstitution(institution, institId);
+        organismConverter.setInstitution(institution, getInstitutionPrimaryId());
+        interactionDetectionMethodConverter.setInstitution(institution, getInstitutionPrimaryId());
+        participantIdentificationMethodConverter.setInstitution(institution, getInstitutionPrimaryId());
+        publicationXrefConverter.setInstitution(institution, getInstitutionPrimaryId());
     }
 }

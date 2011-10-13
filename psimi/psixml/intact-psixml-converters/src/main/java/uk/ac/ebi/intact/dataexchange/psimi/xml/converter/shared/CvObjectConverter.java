@@ -99,7 +99,15 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
     @Override
     public void setInstitution(Institution institution){
         super.setInstitution(institution);
-        this.aliasConverter.setInstitution(institution);
-        this.xrefConverter.setInstitution(institution);
+        this.aliasConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.xrefConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setInstitution(Institution institution, String institId){
+        super.setInstitution(institution, institId);
+        this.aliasConverter.setInstitution(institution, institId);
+        this.xrefConverter.setInstitution(institution, institId);
+
     }
 }

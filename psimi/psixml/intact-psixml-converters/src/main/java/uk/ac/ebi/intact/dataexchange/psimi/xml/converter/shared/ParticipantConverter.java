@@ -459,17 +459,17 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
     {
         super.setInstitution(institution);
 
-        this.interactionConverter.setInstitution(institution, true, false);
+        this.interactionConverter.setInstitution(institution, true, false, getInstitutionPrimaryId());
 
-        this.experimentalRoleConverter.setInstitution(institution);
-        this.biologicalRoleConverter.setInstitution(institution);
-        this.interactorConverter.setInstitution(institution);
-        pimConverter.setInstitution(institution);
-        epConverter.setInstitution(institution);
-        featureConverter.setInstitution(institution);
-        organismConverter.setInstitution(institution);
-        confidenceConverter.setInstitution(institution);
-        participantParameterConverter.setInstitution(institution);
+        this.experimentalRoleConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.biologicalRoleConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.interactorConverter.setInstitution(institution, getInstitutionPrimaryId());
+        pimConverter.setInstitution(institution, getInstitutionPrimaryId());
+        epConverter.setInstitution(institution, getInstitutionPrimaryId());
+        featureConverter.setInstitution(institution, getInstitutionPrimaryId());
+        organismConverter.setInstitution(institution, getInstitutionPrimaryId());
+        confidenceConverter.setInstitution(institution, getInstitutionPrimaryId());
+        participantParameterConverter.setInstitution(institution, getInstitutionPrimaryId());
     }
 
     public void setInstitution(Institution institution, boolean setExperimentInstitution, boolean setInteractionInstitution)
@@ -477,17 +477,54 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         super.setInstitution(institution);
 
         if (setInteractionInstitution){
-            this.interactionConverter.setInstitution(institution, true, false);
+            this.interactionConverter.setInstitution(institution, true, false, getInstitutionPrimaryId());
         }
 
-        this.experimentalRoleConverter.setInstitution(institution);
-        this.biologicalRoleConverter.setInstitution(institution);
-        this.interactorConverter.setInstitution(institution);
-        pimConverter.setInstitution(institution);
-        epConverter.setInstitution(institution);
-        featureConverter.setInstitution(institution);
-        organismConverter.setInstitution(institution);
-        confidenceConverter.setInstitution(institution);
-        participantParameterConverter.setInstitution(institution, setExperimentInstitution);
+        this.experimentalRoleConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.biologicalRoleConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.interactorConverter.setInstitution(institution, getInstitutionPrimaryId());
+        pimConverter.setInstitution(institution, getInstitutionPrimaryId());
+        epConverter.setInstitution(institution, getInstitutionPrimaryId());
+        featureConverter.setInstitution(institution, getInstitutionPrimaryId());
+        organismConverter.setInstitution(institution, getInstitutionPrimaryId());
+        confidenceConverter.setInstitution(institution, getInstitutionPrimaryId());
+        participantParameterConverter.setInstitution(institution, setExperimentInstitution, getInstitutionPrimaryId());
+    }
+
+    public void setInstitution(Institution institution, boolean setExperimentInstitution, boolean setInteractionInstitution, String institutionPrimaryId)
+    {
+        super.setInstitution(institution, institutionPrimaryId);
+
+        if (setInteractionInstitution){
+            this.interactionConverter.setInstitution(institution, true, false, getInstitutionPrimaryId());
+        }
+
+        this.experimentalRoleConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.biologicalRoleConverter.setInstitution(institution, getInstitutionPrimaryId());
+        this.interactorConverter.setInstitution(institution, getInstitutionPrimaryId());
+        pimConverter.setInstitution(institution, getInstitutionPrimaryId());
+        epConverter.setInstitution(institution, getInstitutionPrimaryId());
+        featureConverter.setInstitution(institution, getInstitutionPrimaryId());
+        organismConverter.setInstitution(institution, getInstitutionPrimaryId());
+        confidenceConverter.setInstitution(institution, getInstitutionPrimaryId());
+        participantParameterConverter.setInstitution(institution, setExperimentInstitution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setInstitution(Institution institution, String institId){
+        super.setInstitution(institution, institId);
+
+        this.interactionConverter.setInstitution(institution, true, false, institId);
+
+        this.experimentalRoleConverter.setInstitution(institution, institId);
+        this.biologicalRoleConverter.setInstitution(institution, institId);
+        this.interactorConverter.setInstitution(institution, institId);
+        pimConverter.setInstitution(institution, institId);
+        epConverter.setInstitution(institution, institId);
+        featureConverter.setInstitution(institution, institId);
+        organismConverter.setInstitution(institution, institId);
+        confidenceConverter.setInstitution(institution, institId);
+        participantParameterConverter.setInstitution(institution, institId);
+
     }
 }

@@ -676,7 +676,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
     }
 
-        protected void failIfInconsistentPsiConversion(Interaction intact, psidev.psi.mi.xml.model.Interaction psi, int numberOfAuthorConfAttributes) {
+    protected void failIfInconsistentPsiConversion(Interaction intact, psidev.psi.mi.xml.model.Interaction psi, int numberOfAuthorConfAttributes) {
         failIfInconsistentCollectionSize("experiment", IntactCore.ensureInitializedExperiments(intact), psi.getExperiments());
         failIfInconsistentCollectionSize("participant", IntactCore.ensureInitializedParticipants(intact), psi.getParticipants());
 
@@ -690,25 +690,50 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     public void setInstitution(Institution institution)
     {
         super.setInstitution(institution);
-        confConverter.setInstitution( institution);
-        experimentConverter.setInstitution(institution);
-        paramConverter.setInstitution( institution);
-        participantConverter.setInstitution(institution, true, false);
-        interactionTypeConverter.setInstitution(institution);
+        confConverter.setInstitution( institution, getInstitutionPrimaryId());
+        experimentConverter.setInstitution(institution, getInstitutionPrimaryId());
+        paramConverter.setInstitution( institution, getInstitutionPrimaryId());
+        participantConverter.setInstitution(institution, true, false, getInstitutionPrimaryId());
+        interactionTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
     }
 
     public void setInstitution(Institution institution, boolean setExperimentInstitution, boolean setParticipantInstitution)
     {
         super.setInstitution(institution);
-        confConverter.setInstitution( institution);
+        confConverter.setInstitution( institution, getInstitutionPrimaryId());
         if (setExperimentInstitution){
-            experimentConverter.setInstitution(institution);
+            experimentConverter.setInstitution(institution, getInstitutionPrimaryId());
         }
-        paramConverter.setInstitution( institution, false);
+        paramConverter.setInstitution( institution, false, getInstitutionPrimaryId());
 
         if (setParticipantInstitution){
-            participantConverter.setInstitution(institution, false, false);
+            participantConverter.setInstitution(institution, false, false, getInstitutionPrimaryId());
         }
-        interactionTypeConverter.setInstitution(institution);
+        interactionTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    public void setInstitution(Institution institution, boolean setExperimentInstitution, boolean setParticipantInstitution, String institutionPrimaryId)
+    {
+        super.setInstitution(institution, institutionPrimaryId);
+        confConverter.setInstitution( institution, getInstitutionPrimaryId());
+        if (setExperimentInstitution){
+            experimentConverter.setInstitution(institution, getInstitutionPrimaryId());
+        }
+        paramConverter.setInstitution( institution, false, getInstitutionPrimaryId());
+
+        if (setParticipantInstitution){
+            participantConverter.setInstitution(institution, false, false, getInstitutionPrimaryId());
+        }
+        interactionTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setInstitution(Institution institution, String institId){
+        super.setInstitution(institution, institId);
+        confConverter.setInstitution( institution, getInstitutionPrimaryId());
+        experimentConverter.setInstitution(institution, getInstitutionPrimaryId());
+        paramConverter.setInstitution( institution, getInstitutionPrimaryId());
+        participantConverter.setInstitution(institution, true, false, getInstitutionPrimaryId());
+        interactionTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
     }
 }
