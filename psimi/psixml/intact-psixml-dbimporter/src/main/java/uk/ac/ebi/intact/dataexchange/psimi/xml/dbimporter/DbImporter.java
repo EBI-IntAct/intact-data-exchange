@@ -10,11 +10,11 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.PsiExchange;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher.PsiEnricher;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.user.User;
 
 import java.io.*;
-import java.util.*;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -55,7 +55,16 @@ public class DbImporter {
         IntactContext.initContext(new String[] { "classpath*:/META-INF/intact.spring.xml",
                                                  "/META-INF/intact.spring.xml"});
 
+        User user = IntactContext.getCurrentInstance().getDaoFactory().getUserDao().getByLogin(curatorName.toLowerCase());
+
         IntactContext.getCurrentInstance().getUserContext().setUserId(curatorName);
+
+        if (user == null){
+            throw new IllegalArgumentException("User with login " + curatorName + " does not exist in the database and so the db import is aborted.");
+        }
+        else {
+            IntactContext.getCurrentInstance().getUserContext().setUser(user);
+        }
 
         for (File fileToImport : filesToImport) {
 
