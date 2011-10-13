@@ -188,9 +188,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             if (components.isEmpty()){
                 log.error("Interaction without any participants : " + interaction.getShortLabel());
             }
-            for (Component comp : components){
-                interaction.addComponent(comp);
-            }
+            interaction.getComponents().addAll(components);
 
             // convert confidences
             for (psidev.psi.mi.xml.model.Confidence psiConfidence :  psiObject.getConfidences()){
