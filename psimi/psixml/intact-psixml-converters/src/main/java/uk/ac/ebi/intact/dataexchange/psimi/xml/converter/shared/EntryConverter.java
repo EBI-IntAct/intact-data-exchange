@@ -100,12 +100,16 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
             throw new IllegalArgumentException( "You must give an IntactEntry with at least one interaction." );
         }
 
-        Interaction firstInteraction = intactObject.getInteractions().iterator().next();
-        Institution institution = firstInteraction.getOwner();
+        if (intactObject.getInstitution() != null){
+            setInstitution(intactObject.getInstitution());
+        }
+        else {
+            Interaction firstInteraction = intactObject.getInteractions().iterator().next();
 
-        setInstitution(firstInteraction.getOwner());
+            setInstitution(firstInteraction.getOwner());
+        }
 
-        entry.setSource(institutionConverter.intactToPsi(institution));
+        entry.setSource(institutionConverter.intactToPsi(getInstitution()));
 
         if (intactObject.getReleasedDate() != null){
             entry.getSource().setReleaseDate(intactObject.getReleasedDate());
