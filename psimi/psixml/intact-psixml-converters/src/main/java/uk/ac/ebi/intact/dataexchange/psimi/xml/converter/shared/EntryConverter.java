@@ -119,9 +119,7 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         if (ConverterContext.getInstance().isGenerateCompactXml()){
             for ( uk.ac.ebi.intact.model.Experiment e : intactObject.getExperiments() ) {
                 final ExperimentDescription experimentDesc = experimentConverter.intactToPsi( e );
-                if (!contains(entry.getExperiments(), experimentDesc)) {
-                    entry.getExperiments().add( experimentDesc );
-                }
+                entry.getExperiments().add( experimentDesc );
             }
         }
 
@@ -129,9 +127,7 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         if (ConverterContext.getInstance().isGenerateCompactXml()){
             for ( uk.ac.ebi.intact.model.Interactor i : intactObject.getInteractors() ) {
                 final psidev.psi.mi.xml.model.Interactor interactor = interactorConverter.intactToPsi( i );
-                if ( ! contains( entry.getInteractors(), interactor ) ) {
-                    entry.getInteractors().add( interactor );
-                }
+                entry.getInteractors().add( interactor );
             }
         }
 
