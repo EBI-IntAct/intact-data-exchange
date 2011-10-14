@@ -7,9 +7,7 @@ import psidev.psi.mi.xml.model.HasId;
 import psidev.psi.mi.xml.model.Interaction;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.InteractionLocationItem;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationItem;
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.InstitutionXref;
-import uk.ac.ebi.intact.model.IntactObject;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.util.Collection;
@@ -27,8 +25,23 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
     private Institution institution;
     private String institutionPrimaryId;
 
+    private boolean checkInitializedCollections = true;
+
     public AbstractIntactPsiConverter(Institution institution) {
         this.institution = institution;
+
+        if (institution != null){
+            try {
+                this.institutionPrimaryId = calculateInstitutionPrimaryId(institution);
+            } catch (Throwable e) {
+                log.error("Problem calculating primaryId for institution: "+institution.getShortLabel());
+            }
+        }
+    }
+
+    public AbstractIntactPsiConverter(Institution institution, boolean checkInitializedCollections) {
+        this.institution = institution;
+        this.checkInitializedCollections = checkInitializedCollections;
 
         if (institution != null){
             try {
@@ -132,5 +145,13 @@ public abstract class AbstractIntactPsiConverter<I, P> implements IntactPsiConve
     public void setInstitution(Institution institution, String institutionPrimaryId) {
         this.institution = institution;
         this.institutionPrimaryId = institutionPrimaryId;
+    }
+
+    public boolean isCheckInitializedCollections() {
+        return checkInitializedCollections;
+    }
+
+    public void setCheckInitializedCollections(boolean checkInitializedCollections) {
+        this.checkInitializedCollections = checkInitializedCollections;
     }
 }

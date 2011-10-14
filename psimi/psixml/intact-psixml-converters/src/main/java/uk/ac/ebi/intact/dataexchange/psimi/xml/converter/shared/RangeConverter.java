@@ -354,4 +354,10 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         this.fuzzyTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
 
     }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.fuzzyTypeConverter.setCheckInitializedCollections(check);
+    }
 }

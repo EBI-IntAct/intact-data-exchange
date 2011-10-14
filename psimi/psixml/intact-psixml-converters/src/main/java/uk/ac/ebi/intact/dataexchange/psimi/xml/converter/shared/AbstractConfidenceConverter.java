@@ -73,4 +73,10 @@ public abstract class AbstractConfidenceConverter<T extends AbstractConfidence> 
         this.confidenceTyeConverter.setInstitution(institution, institId);
 
     }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.confidenceTyeConverter.setCheckInitializedCollections(check);
+    }
 }

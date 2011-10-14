@@ -15,12 +15,18 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
+import uk.ac.ebi.intact.core.persister.IntactCore;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.AnnotatedObject;
 import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Abstract Annotated Object Converter.
@@ -82,7 +88,7 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         }
 
         psiObject = newInstance(psiClass);
-        PsiConverterUtils.populate(intactObject, psiObject, aliasConverter, annotationConverter, xrefConverter);
+        PsiConverterUtils.populate(intactObject, psiObject, aliasConverter, annotationConverter, xrefConverter, isCheckInitializedCollections());
 
         ConversionCache.putElement(intactObject, psiObject);
 
@@ -128,5 +134,43 @@ public abstract class AbstractAnnotatedObjectConverter<A extends AnnotatedObject
         this.annotationConverter.setInstitution(institution, institId);
         this.aliasConverter.setInstitution(institution, institId);
         this.xrefConverter.setInstitution(institution, institId);
+    }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.annotationConverter.setCheckInitializedCollections(check);
+        this.aliasConverter.setCheckInitializedCollections(check);
+        this.xrefConverter.setCheckInitializedCollections(check);
+    }
+
+    protected Collection<Xref> searchXrefs(AnnotatedObject intactObject, String databaseMiRef, String qualifierMiRef, boolean checkInitializedXrefs){
+        Collection<Xref> xrefs;
+        if (checkInitializedXrefs){
+            xrefs = new ArrayList<Xref>(IntactCore.ensureInitializedXrefs(intactObject));
+        }
+        else {
+            xrefs = intactObject.getXrefs();
+        }
+
+        if (xrefs.isEmpty()){
+             return Collections.EMPTY_LIST;
+        }
+
+        Collection<Xref> results = new ArrayList<Xref>(xrefs.size());
+
+        for (Xref xref : xrefs){
+            if (xref.getCvDatabase() != null && xref.getCvDatabase().getIdentifier() != null){
+                 if (xref.getCvDatabase().getIdentifier().equals(databaseMiRef)){
+                      if (xref.getCvXrefQualifier() != null && xref.getCvXrefQualifier().getIdentifier() != null){
+                          if (xref.getCvXrefQualifier().getIdentifier().equals(qualifierMiRef)){
+                               results.add(xref);
+                          }
+                      }
+                 }
+            }
+        }
+
+        return results;
     }
 }

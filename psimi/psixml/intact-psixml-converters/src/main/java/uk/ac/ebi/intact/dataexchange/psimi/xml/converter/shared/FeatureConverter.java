@@ -23,6 +23,8 @@ import uk.ac.ebi.intact.core.persister.IntactCore;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.model.*;
 
+import java.util.Collection;
+
 /**
  * TODO comment this
  *
@@ -120,7 +122,15 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
             log.error("Feature without any ranges : " + intactObject.getShortLabel());
         }
 
-        for (Range intactRange : IntactCore.ensureInitializedRanges(intactObject)) {
+        Collection<Range> ranges;
+        if (isCheckInitializedCollections()){
+            ranges = IntactCore.ensureInitializedRanges(intactObject);
+        }
+        else {
+            ranges = intactObject.getRanges();
+        }
+
+        for (Range intactRange : ranges) {
             psidev.psi.mi.xml.model.Range psiRange = rangeConverter.intactToPsi(intactRange);
             psiFeature.getRanges().add(psiRange);
         }
@@ -149,5 +159,13 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
         featureTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
         featureDetMethodConverter.setInstitution(institution, getInstitutionPrimaryId());
         rangeConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.featureTypeConverter.setCheckInitializedCollections(check);
+        this.featureDetMethodConverter.setCheckInitializedCollections(check);
+        this.rangeConverter.setCheckInitializedCollections(check);
     }
 }

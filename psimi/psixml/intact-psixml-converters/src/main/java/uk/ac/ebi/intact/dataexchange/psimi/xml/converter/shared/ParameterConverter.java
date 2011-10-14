@@ -134,4 +134,17 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
             experimentConverter.setInstitution(institution, getInstitutionPrimaryId());
         }
     }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.experimentConverter.setCheckInitializedCollections(check);
+    }
+
+    public void setCheckInitializedCollections(boolean check, boolean initializeExperiment){
+        super.setCheckInitializedCollections(check);
+        if (initializeExperiment){
+            this.experimentConverter.setCheckInitializedCollections(check);
+        }
+    }
 }

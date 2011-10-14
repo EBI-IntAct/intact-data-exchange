@@ -71,7 +71,7 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
         }
 
         cvType = newCvInstance(psiCvClass);
-        PsiConverterUtils.populate(intactObject, cvType, aliasConverter, null, xrefConverter);
+        PsiConverterUtils.populate(intactObject, cvType, aliasConverter, null, xrefConverter, isCheckInitializedCollections());
 
         ConversionCache.putElement(elementKey(intactObject), cvType);
 
@@ -109,5 +109,12 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
         this.aliasConverter.setInstitution(institution, institId);
         this.xrefConverter.setInstitution(institution, institId);
 
+    }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.aliasConverter.setCheckInitializedCollections(check);
+        this.xrefConverter.setCheckInitializedCollections(check);
     }
 }

@@ -69,7 +69,7 @@ public class PsiConverterUtils {
         }
     }
 
-    public static void populate( AnnotatedObject<?, ?> annotatedObject, Object objectToPopulate, AliasConverter aliasConverter, AnnotationConverter annotationConverter, XrefConverter xrefConverter ) {
+    public static void populate( AnnotatedObject<?, ?> annotatedObject, Object objectToPopulate, AliasConverter aliasConverter, AnnotationConverter annotationConverter, XrefConverter xrefConverter, boolean checkInitializedCollections ) {
         if ( objectToPopulate instanceof HasId ) {
             populateId( ( HasId ) objectToPopulate );
         }
@@ -103,6 +103,7 @@ public class PsiConverterUtils {
         if ( !ConverterContext.getInstance().getInteractorConfig().isExcludeInteractorAliases() ) {
             AliasConverter aliasConverter = new AliasConverter( annotatedObject.getOwner(),
                     AnnotatedObjectUtils.getAliasClassType( annotatedObject.getClass() ) );
+
             for ( Alias alias : IntactCore.ensureInitializedAliases(annotatedObject)) {
                 names.getAliases().add( aliasConverter.intactToPsi( alias ) );
             }
@@ -126,7 +127,15 @@ public class PsiConverterUtils {
 
         if ( !ConverterContext.getInstance().getInteractorConfig().isExcludeInteractorAliases() ) {
 
-            for ( Alias alias : IntactCore.ensureInitializedAliases(annotatedObject)) {
+            Collection<? extends Alias> aliases;
+            if (aliasConverter.isCheckInitializedCollections()){
+                aliases = IntactCore.ensureInitializedAliases(annotatedObject);
+            }
+            else {
+                aliases = annotatedObject.getAliases();
+            }
+
+            for ( Alias alias : aliases) {
                 names.getAliases().add( aliasConverter.intactToPsi( alias ) );
             }
         }
@@ -262,8 +271,16 @@ public class PsiConverterUtils {
         boolean containsAcXref = false;
         DbReference acRef = null;
 
+        Collection<? extends uk.ac.ebi.intact.model.Xref> xrefs;
+        if (converter.isCheckInitializedCollections()){
+            xrefs = IntactCore.ensureInitializedXrefs(annotatedObject);
+        }
+        else {
+            xrefs = annotatedObject.getXrefs();
+        }
+
         if (ac != null)  {
-            for ( uk.ac.ebi.intact.model.Xref xref : IntactCore.ensureInitializedXrefs(annotatedObject)) {
+            for ( uk.ac.ebi.intact.model.Xref xref : xrefs) {
                 if (annotatedObject.getAc().equals(xref.getPrimaryId())) {
                     containsAcXref = true;
                     break;
@@ -287,7 +304,8 @@ public class PsiConverterUtils {
                     Institution defaultInstitution = ConverterContext.getInstance().getDefaultInstitutionForAcs();
                     dbMi = converter.calculateInstitutionPrimaryId(defaultInstitution);
                     db = defaultInstitution.getShortLabel().toLowerCase();
-                } else {
+                }
+                else{
                     dbMi = converter.getInstitutionPrimaryId();
                     db = converter.getInstitution().getShortLabel().toLowerCase();
                 }
@@ -298,7 +316,7 @@ public class PsiConverterUtils {
             }
         }
 
-        if ( acRef == null && annotatedObject.getXrefs().isEmpty() ) {
+        if ( acRef == null && xrefs.isEmpty() ) {
             return;
         }
 
@@ -308,7 +326,7 @@ public class PsiConverterUtils {
             xref = new Xref();
         }
 
-        Collection<DbReference> dbRefs = toDbReferences( annotatedObject, IntactCore.ensureInitializedXrefs(annotatedObject), converter);
+        Collection<DbReference> dbRefs = toDbReferences( annotatedObject, xrefs, converter);
 
         if(acRef != null) {
             dbRefs.add( acRef );
@@ -413,11 +431,18 @@ public class PsiConverterUtils {
         }
     }
 
-     public static void populateAttributes( AnnotatedObject<?, ?> annotatedObject, AttributeContainer attributeContainer, AnnotationConverter annotationConverter ) {
+    public static void populateAttributes( AnnotatedObject<?, ?> annotatedObject, AttributeContainer attributeContainer, AnnotationConverter annotationConverter ) {
 
         AnnotationConverterConfig configAnnotation = ConverterContext.getInstance().getAnnotationConfig();
 
-        for ( Annotation annotation : IntactCore.ensureInitializedAnnotations(annotatedObject) ) {
+        Collection<Annotation> annotations;
+        if (annotationConverter.isCheckInitializedCollections()){
+            annotations = IntactCore.ensureInitializedAnnotations(annotatedObject);
+        }
+        else {
+            annotations = annotatedObject.getAnnotations();
+        }
+        for ( Annotation annotation : annotations ) {
             if (!configAnnotation.isExcluded(annotation.getCvTopic())) {
                 Attribute attribute = annotationConverter.intactToPsi( annotation );
                 if (!attributeContainer.getAttributes().contains( attribute )) {
@@ -434,6 +459,17 @@ public class PsiConverterUtils {
 
         CvType cvType = cvConverter.intactToPsi( cvObject );
         populate( cvObject, cvType, converter );
+
+        return cvType;
+    }
+
+    public static CvType toCvType( CvObject cvObject, CvObjectConverter cvConverter, AliasConverter aliasConverter, XrefConverter xrefConverter, boolean checkInitializedCollections ) {
+        if ( cvObject == null ) {
+            throw new NullPointerException( "cvObject" );
+        }
+
+        CvType cvType = cvConverter.intactToPsi( cvObject );
+        populate( cvObject, cvType, aliasConverter, null, xrefConverter, checkInitializedCollections );
 
         return cvType;
     }

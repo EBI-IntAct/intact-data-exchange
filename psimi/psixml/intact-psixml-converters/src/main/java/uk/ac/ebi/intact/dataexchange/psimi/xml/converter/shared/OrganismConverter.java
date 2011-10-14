@@ -75,7 +75,7 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         Organism organism = new Organism();
 
         // populates names
-        PsiConverterUtils.populate(intactObject, organism, aliasConverter, null, null);
+        PsiConverterUtils.populate(intactObject, organism, aliasConverter, null, null, isCheckInitializedCollections());
 
         // taxId
         if (intactObject.getTaxId() != null){
@@ -106,7 +106,7 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         return organism;
     }
 
-        @Override
+    @Override
     public void setInstitution(Institution institution)
     {
         super.setInstitution(institution);
@@ -115,11 +115,19 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         this.aliasConverter.setInstitution(institution, getInstitutionPrimaryId());
     }
 
-            @Override
+    @Override
     public void setInstitution(Institution institution, String institId){
         super.setInstitution(institution, institId);
         cellTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
         tissueConverter.setInstitution(institution, getInstitutionPrimaryId());
         this.aliasConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.cellTypeConverter.setCheckInitializedCollections(check);
+        this.tissueConverter.setCheckInitializedCollections(check);
+        this.aliasConverter.setCheckInitializedCollections(check);
     }
 }

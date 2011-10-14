@@ -135,7 +135,14 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         intactStartConversation(intactObject);
 
         // experimental roles
-        Collection<CvExperimentalRole> experimentalRoles = IntactCore.ensureInitializedExperimentalRoles(intactObject);
+        Collection<CvExperimentalRole> experimentalRoles;
+        if (isCheckInitializedCollections()){
+            experimentalRoles = IntactCore.ensureInitializedExperimentalRoles(intactObject);
+        }
+        else {
+            experimentalRoles = intactObject.getExperimentalRoles();
+        }
+
         if (experimentalRoles.isEmpty()){
             log.error("Component without experimental roles : " + intactObject.getShortLabel());
         }
@@ -146,7 +153,9 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             ExperimentalRole expRole = ( ExperimentalRole )
                     PsiConverterUtils.toCvType( experimentalRole,
                             this.experimentalRoleConverter,
-                            this );
+                            aliasConverter,
+                            xrefConverter,
+                            isCheckInitializedCollections());
             participant.getExperimentalRoles().add( expRole );
         }
 
@@ -158,7 +167,9 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         BiologicalRole bioRole = (BiologicalRole)
                 PsiConverterUtils.toCvType(intactObject.getCvBiologicalRole(),
                         this.biologicalRoleConverter,
-                        this);
+                        aliasConverter,
+                        xrefConverter,
+                        isCheckInitializedCollections());
         participant.setBiologicalRole(bioRole);
 
         // interactor converter
@@ -186,7 +197,15 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         }
 
         // participant identification methods
-        for (CvIdentification participantDetectionMethod : IntactCore.ensureInitializedParticipantIdentificationMethods(intactObject)) {
+        Collection<CvIdentification> partIdentMethods;
+        if (isCheckInitializedCollections()){
+            partIdentMethods = IntactCore.ensureInitializedParticipantIdentificationMethods(intactObject);
+        }
+        else {
+            partIdentMethods = intactObject.getParticipantDetectionMethods();
+        }
+
+        for (CvIdentification participantDetectionMethod : partIdentMethods) {
 
             ParticipantIdentificationMethod participantIdentificationMethod = pimConverter.intactToPsi(participantDetectionMethod);
 
@@ -194,14 +213,28 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         }
 
         // experimental preparations
-        for (CvExperimentalPreparation experimentalPreparation : IntactCore.ensureInitializedExperimentalPreparations(intactObject)) {
+        Collection<CvExperimentalPreparation> expPreparations;
+        if (isCheckInitializedCollections()){
+            expPreparations = IntactCore.ensureInitializedExperimentalPreparations(intactObject);
+        }
+        else {
+            expPreparations = intactObject.getExperimentalPreparations();
+        }
+
+        for (CvExperimentalPreparation experimentalPreparation : expPreparations) {
             ExperimentalPreparation expPrep = epConverter.intactToPsi(experimentalPreparation);
 
             participant.getExperimentalPreparations().add(expPrep);
         }
 
         // features
-        Collection<Feature> features = IntactCore.ensureInitializedFeatures(intactObject);
+        Collection<Feature> features;
+        if (isCheckInitializedCollections()){
+            features = IntactCore.ensureInitializedFeatures(intactObject);
+        }
+        else {
+            features = intactObject.getFeatures();
+        }
 
         if (!features.isEmpty()) {
             for (Feature feature : features) {
@@ -229,7 +262,14 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         }
 
         // confidences
-        for (ComponentConfidence conf : IntactCore.ensureInitializedComponentConfidences(intactObject)){
+        Collection<ComponentConfidence> confs;
+        if (isCheckInitializedCollections()){
+            confs = IntactCore.ensureInitializedComponentConfidences(intactObject);
+        }
+        else {
+            confs = intactObject.getConfidences();
+        }
+        for (ComponentConfidence conf : confs){
             psidev.psi.mi.xml.model.Confidence confidence = confidenceConverter.intactToPsi( conf);
             participant.getConfidenceList().add( confidence);
 
@@ -269,7 +309,15 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         }
 
         // component parameters
-        for (uk.ac.ebi.intact.model.ComponentParameter param : IntactCore.ensureInitializedComponentParameters(intactObject)){
+        Collection<uk.ac.ebi.intact.model.ComponentParameter> params;
+        if (isCheckInitializedCollections()){
+            params = IntactCore.ensureInitializedComponentParameters(intactObject);
+        }
+        else {
+            params = intactObject.getParameters();
+        }
+
+        for (uk.ac.ebi.intact.model.ComponentParameter param : params){
             psidev.psi.mi.xml.model.Parameter parameter = participantParameterConverter.intactToPsi(param);
             participant.getParameters().add(parameter);
         }
@@ -496,7 +544,7 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         super.setInstitution(institution, institutionPrimaryId);
 
         if (setInteractionInstitution){
-            this.interactionConverter.setInstitution(institution, true, false, getInstitutionPrimaryId());
+            this.interactionConverter.setInstitution(institution, setExperimentInstitution, false, getInstitutionPrimaryId());
         }
 
         this.experimentalRoleConverter.setInstitution(institution, getInstitutionPrimaryId());
@@ -526,5 +574,36 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         confidenceConverter.setInstitution(institution, institId);
         participantParameterConverter.setInstitution(institution, institId);
 
+    }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.interactionConverter.setCheckInitializedCollections(check);
+        this.experimentalRoleConverter.setCheckInitializedCollections(check);
+        this.interactorConverter.setCheckInitializedCollections(check);
+        this.pimConverter.setCheckInitializedCollections(check);
+        this.epConverter.setCheckInitializedCollections(check);
+        this.featureConverter.setCheckInitializedCollections(check);
+        this.organismConverter.setCheckInitializedCollections(check);
+        this.confidenceConverter.setCheckInitializedCollections(check);
+        this.biologicalRoleConverter.setCheckInitializedCollections(check);
+        this.participantParameterConverter.setCheckInitializedCollections(check);
+    }
+
+    public void setCheckInitializedCollections(boolean check, boolean initializeExperiment, boolean initialiseInteraction){
+        super.setCheckInitializedCollections(check);
+        if (initialiseInteraction){
+            this.interactionConverter.setCheckInitializedCollections(check, initializeExperiment, false);
+        }
+        this.experimentalRoleConverter.setCheckInitializedCollections(check);
+        this.interactorConverter.setCheckInitializedCollections(check);
+        this.pimConverter.setCheckInitializedCollections(check);
+        this.epConverter.setCheckInitializedCollections(check);
+        this.featureConverter.setCheckInitializedCollections(check);
+        this.organismConverter.setCheckInitializedCollections(check);
+        this.confidenceConverter.setCheckInitializedCollections(check);
+        this.biologicalRoleConverter.setCheckInitializedCollections(check);
+        this.participantParameterConverter.setCheckInitializedCollections(check, initializeExperiment);
     }
 }

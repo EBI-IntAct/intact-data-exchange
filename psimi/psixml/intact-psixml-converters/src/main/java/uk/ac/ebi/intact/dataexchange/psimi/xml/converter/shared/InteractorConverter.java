@@ -136,7 +136,13 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
                 Polymer polymer = (Polymer) intactObject;
 
                 if (polymer.getSequence() != null){
-                    String sequence = IntactCore.ensureInitializedSequence(polymer);
+                    String sequence;
+                    if (isCheckInitializedCollections()){
+                        sequence = IntactCore.ensureInitializedSequence(polymer);
+                    }
+                    else {
+                        sequence = interactor.getSequence();
+                    }
                     interactor.setSequence( sequence );
                 }
             }
@@ -147,7 +153,9 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
             InteractorType interactorType = ( InteractorType )
                     PsiConverterUtils.toCvType(intactObject.getCvInteractorType(),
                             this.interactorTypeConverter,
-                            this);
+                            aliasConverter,
+                            xrefConverter,
+                            isCheckInitializedCollections());
             interactor.setInteractorType( interactorType );
         }
         else {
@@ -254,10 +262,17 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
         interactorTypeConverter.setInstitution( getInstitution(), getInstitutionPrimaryId() );
     }
 
-        @Override
+    @Override
     public void setInstitution(Institution institution, String institId){
         super.setInstitution(institution, institId);
         organismConverter.setInstitution(institution, getInstitutionPrimaryId());
         interactorTypeConverter.setInstitution( getInstitution(), getInstitutionPrimaryId() );
+    }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.organismConverter.setCheckInitializedCollections(check);
+        this.interactorTypeConverter.setCheckInitializedCollections(check);
     }
 }

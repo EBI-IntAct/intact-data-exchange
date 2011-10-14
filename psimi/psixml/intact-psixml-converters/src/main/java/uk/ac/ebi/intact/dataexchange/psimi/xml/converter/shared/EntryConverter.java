@@ -185,4 +185,14 @@ public class EntryConverter extends AbstractIntactPsiConverter<IntactEntry, Entr
         interactorConverter.setInstitution(institution, getInstitutionPrimaryId());
         this.annotationConverter.setInstitution(institution, getInstitutionPrimaryId());
     }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.institutionConverter.setCheckInitializedCollections(check);
+        this.experimentConverter.setCheckInitializedCollections(check);
+        this.interactionConverter.setCheckInitializedCollections(check, false, true);
+        this.interactorConverter.setCheckInitializedCollections(check);
+        this.annotationConverter.setCheckInitializedCollections(check);
+    }
 }

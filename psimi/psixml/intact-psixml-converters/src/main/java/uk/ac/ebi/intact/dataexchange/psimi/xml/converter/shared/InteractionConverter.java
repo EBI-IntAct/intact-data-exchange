@@ -265,7 +265,14 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     }
 
     protected Xref getImexXref(Interaction interaction) {
-        for (Xref xref : IntactCore.ensureInitializedXrefs(interaction)) {
+        Collection<? extends Xref> refs;
+        if (isCheckInitializedCollections()){
+            refs = IntactCore.ensureInitializedXrefs(interaction);
+        }
+        else {
+            refs = interaction.getXrefs();
+        }
+        for (Xref xref : refs) {
             if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getIdentifier())) {
                 return xref;
             }
@@ -330,7 +337,15 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
 
         // converts experiments
-        Collection<Experiment> experiments = IntactCore.ensureInitializedExperiments(intactObject);
+        Collection<Experiment> experiments;
+
+        if (isCheckInitializedCollections()){
+            experiments = IntactCore.ensureInitializedExperiments(intactObject);
+        }
+        else {
+            experiments = intactObject.getExperiments();
+        }
+
         if (experiments.size() == 0){
             log.error("Interaction without any experiments : " + intactObject.getShortLabel());
         }
@@ -348,7 +363,15 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
 
         // converts participants
-        Collection<Component> components = IntactCore.ensureInitializedParticipants(intactObject);
+        Collection<Component> components;
+
+        if (isCheckInitializedCollections()){
+            components = IntactCore.ensureInitializedParticipants(intactObject);
+        }
+        else {
+            components = intactObject.getComponents();
+        }
+
         if (components.isEmpty()){
             log.error("Interaction without any participants : " + intactObject.getShortLabel());
         }
@@ -359,7 +382,14 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         // converts inferred interactions
         for (Component comp : components){
-            for(uk.ac.ebi.intact.model.Feature feature : IntactCore.ensureInitializedFeatures(comp)){
+            Collection<uk.ac.ebi.intact.model.Feature> features;
+            if (isCheckInitializedCollections()){
+                features = IntactCore.ensureInitializedFeatures(comp);
+            }
+            else {
+                features = comp.getFeatures();
+            }
+            for(uk.ac.ebi.intact.model.Feature feature : features){
                 if(feature.getBoundDomain() != null){
 
                     uk.ac.ebi.intact.model.Feature boundFeature = feature.getBoundDomain();
@@ -401,15 +431,25 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             InteractionType interactionType = (InteractionType)
                     PsiConverterUtils.toCvType(intactObject.getCvInteractionType(),
                             this.interactionTypeConverter,
-                            this);
+                            aliasConverter,
+                            xrefConverter,
+                            isCheckInitializedCollections());
             interaction.getInteractionTypes().add(interactionType);
         }
         else {
             log.error("Interaction without interaction type : " + intactObject.getShortLabel());
         }
 
+        Collection<Confidence> confidences;
+        if (isCheckInitializedCollections()){
+            confidences = IntactCore.ensureInitializedConfidences(intactObject);
+        }
+        else {
+            confidences = intactObject.getConfidences();
+        }
+
         // converts confidences (and add author-confidence when necessary for retrocompatibility)
-        for (Confidence conf : IntactCore.ensureInitializedConfidences(intactObject)) {
+        for (Confidence conf : confidences) {
             psidev.psi.mi.xml.model.Confidence confidence = confConverter.intactToPsi(conf);
             interaction.getConfidences().add( confidence);
 
@@ -449,7 +489,16 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
 
         // converts interaction parameters
-        for (uk.ac.ebi.intact.model.InteractionParameter param : IntactCore.ensureInitializedInteractionParameters(intactObject)){
+
+        Collection<uk.ac.ebi.intact.model.InteractionParameter> parameters;
+        if (isCheckInitializedCollections()){
+            parameters = IntactCore.ensureInitializedInteractionParameters(intactObject);
+        }
+        else {
+            parameters = intactObject.getParameters();
+        }
+
+        for (uk.ac.ebi.intact.model.InteractionParameter param : parameters){
             psidev.psi.mi.xml.model.Parameter parameter = paramConverter.intactToPsi(param);
             interaction.getParameters().add(parameter);
         }
@@ -495,7 +544,16 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
     private boolean containsAnnotation( Interaction interaction, String topicShortlabel) {
         boolean found = false;
-        final Iterator<Annotation> it = IntactCore.ensureInitializedAnnotations(interaction).iterator();
+
+        Collection<Annotation> annotations;
+        if (isCheckInitializedCollections()){
+            annotations = IntactCore.ensureInitializedAnnotations(interaction);
+        }
+        else {
+            annotations = interaction.getAnnotations();
+        }
+
+        final Iterator<Annotation> it = annotations.iterator();
         while ( it.hasNext() ) {
             Annotation annotation = it.next();
             if ( annotation.getCvTopic().getShortLabel().equals( topicShortlabel ) ) {
@@ -661,26 +719,68 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     }
 
     protected void failIfInconsistentConversion(Interaction intact, psidev.psi.mi.xml.model.Interaction psi) {
-        failIfInconsistentCollectionSize("experiment", IntactCore.ensureInitializedExperiments(intact), psi.getExperiments());
-        failIfInconsistentCollectionSize("participant", IntactCore.ensureInitializedParticipants(intact), psi.getParticipants());
-        failIfInconsistentCollectionSize( "confidence", IntactCore.ensureInitializedConfidences(intact), psi.getConfidences());
+        Collection<Experiment> experiments;
+        Collection<Component> participants;
+        Collection<Confidence> confidences;
+        if (isCheckInitializedCollections()){
+            experiments = IntactCore.ensureInitializedExperiments(intact);
+            participants = IntactCore.ensureInitializedParticipants(intact);
+            confidences = IntactCore.ensureInitializedConfidences(intact);
+        }
+        else {
+            experiments = intact.getExperiments();
+            participants = intact.getComponents();
+            confidences = intact.getConfidences();
+        }
+
+        failIfInconsistentCollectionSize("experiment", experiments, psi.getExperiments());
+        failIfInconsistentCollectionSize("participant", participants, psi.getParticipants());
+        failIfInconsistentCollectionSize( "confidence", confidences, psi.getConfidences());
     }
 
     protected void failIfInconsistentConversion(Interaction intact, psidev.psi.mi.xml.model.Interaction psi, int numberOfAuthorConfAttributes) {
-        failIfInconsistentCollectionSize("experiment", IntactCore.ensureInitializedExperiments(intact), psi.getExperiments());
-        failIfInconsistentCollectionSize("participant", IntactCore.ensureInitializedParticipants(intact), psi.getParticipants());
+        Collection<Experiment> experiments;
+        Collection<Component> participants;
+        Collection<Confidence> confidences;
+        if (isCheckInitializedCollections()){
+            experiments = IntactCore.ensureInitializedExperiments(intact);
+            participants = IntactCore.ensureInitializedParticipants(intact);
+            confidences = IntactCore.ensureInitializedConfidences(intact);
+        }
+        else {
+            experiments = intact.getExperiments();
+            participants = intact.getComponents();
+            confidences = intact.getConfidences();
+        }
 
-        Collection<Confidence> confs = IntactCore.ensureInitializedConfidences(intact);
+        failIfInconsistentCollectionSize("experiment", experiments, psi.getExperiments());
+        failIfInconsistentCollectionSize("participant", participants, psi.getParticipants());
+
+        Collection<Confidence> confs = confidences;
         if (confs.size() > 0 && psi.getConfidences().size() + numberOfAuthorConfAttributes > 0 && confs.size() != (psi.getConfidences().size() + numberOfAuthorConfAttributes)) {
             throw new InconsistentConversionException("Confidence", confs.size(), psi.getConfidences().size() + numberOfAuthorConfAttributes);
         }
     }
 
     protected void failIfInconsistentPsiConversion(Interaction intact, psidev.psi.mi.xml.model.Interaction psi, int numberOfAuthorConfAttributes) {
-        failIfInconsistentCollectionSize("experiment", IntactCore.ensureInitializedExperiments(intact), psi.getExperiments());
-        failIfInconsistentCollectionSize("participant", IntactCore.ensureInitializedParticipants(intact), psi.getParticipants());
+        Collection<Experiment> experiments;
+        Collection<Component> participants;
+        Collection<Confidence> confidences;
+        if (isCheckInitializedCollections()){
+            experiments = IntactCore.ensureInitializedExperiments(intact);
+            participants = IntactCore.ensureInitializedParticipants(intact);
+            confidences = IntactCore.ensureInitializedConfidences(intact);
+        }
+        else {
+            experiments = intact.getExperiments();
+            participants = intact.getComponents();
+            confidences = intact.getConfidences();
+        }
 
-        Collection<Confidence> confs = IntactCore.ensureInitializedConfidences(intact);
+        failIfInconsistentCollectionSize("experiment", experiments, psi.getExperiments());
+        failIfInconsistentCollectionSize("participant", participants, psi.getParticipants());
+
+        Collection<Confidence> confs = confidences;
         if (confs.size() + numberOfAuthorConfAttributes > 0 && psi.getConfidences().size() > 0 && (confs.size() + numberOfAuthorConfAttributes) != psi.getConfidences().size()) {
             throw new InconsistentConversionException("Confidence", confs.size(), psi.getConfidences().size() + numberOfAuthorConfAttributes);
         }
@@ -735,5 +835,28 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         paramConverter.setInstitution( institution, getInstitutionPrimaryId());
         participantConverter.setInstitution(institution, true, false, getInstitutionPrimaryId());
         interactionTypeConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.confConverter.setCheckInitializedCollections(check);
+        this.experimentConverter.setCheckInitializedCollections(check);
+        this.paramConverter.setCheckInitializedCollections(check);
+        this.participantConverter.setCheckInitializedCollections(check);
+        this.interactionTypeConverter.setCheckInitializedCollections(check);
+    }
+
+    public void setCheckInitializedCollections(boolean check, boolean initializeExperiment, boolean initializeParticipant){
+        super.setCheckInitializedCollections(check);
+        this.confConverter.setCheckInitializedCollections(check);
+        if (initializeExperiment){
+            this.experimentConverter.setCheckInitializedCollections(check);
+        }
+        this.paramConverter.setCheckInitializedCollections(check, false);
+        if (initializeParticipant){
+            this.participantConverter.setCheckInitializedCollections(check, false, false);
+        }
+        this.interactionTypeConverter.setCheckInitializedCollections(check);
     }
 }

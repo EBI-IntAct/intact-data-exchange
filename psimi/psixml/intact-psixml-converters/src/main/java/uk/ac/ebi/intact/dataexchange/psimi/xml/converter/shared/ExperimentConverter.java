@@ -25,7 +25,6 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.PublicationUtils;
 
 import java.util.ArrayList;
@@ -231,7 +230,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         // converts detection method
         if (intactObject.getCvInteraction() != null){
-            InteractionDetectionMethod detMethod = (InteractionDetectionMethod) PsiConverterUtils.toCvType(intactObject.getCvInteraction(), this.interactionDetectionMethodConverter, this);
+            InteractionDetectionMethod detMethod = (InteractionDetectionMethod) PsiConverterUtils.toCvType(intactObject.getCvInteraction(), this.interactionDetectionMethodConverter, aliasConverter, xrefConverter, isCheckInitializedCollections());
             expDesc.setInteractionDetectionMethod(detMethod);
         }
         else {
@@ -243,7 +242,9 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             ParticipantIdentificationMethod identMethod = (ParticipantIdentificationMethod)
                     PsiConverterUtils.toCvType(intactObject.getCvIdentification(),
                             this.participantIdentificationMethodConverter,
-                            this );
+                            aliasConverter,
+                            xrefConverter,
+                            isCheckInitializedCollections());
             expDesc.setParticipantIdentificationMethod(identMethod);
         }
         else {
@@ -285,15 +286,15 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
             // we extract the primary ref from the experiment if possible
             if (!intactObject.getXrefs().isEmpty()){
-                Collection<ExperimentXref> primaryRefs = AnnotatedObjectUtils.searchXrefs(intactObject, CvDatabase.PUBMED_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF);
+                Collection<uk.ac.ebi.intact.model.Xref> primaryRefs = searchXrefs(intactObject, CvDatabase.PUBMED_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, isCheckInitializedCollections());
 
                 if (primaryRefs.isEmpty()){
-                    primaryRefs = AnnotatedObjectUtils.searchXrefs(intactObject, CvDatabase.DOI_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF);
+                    primaryRefs = searchXrefs(intactObject, CvDatabase.DOI_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, isCheckInitializedCollections());
                 }
 
                 if (!primaryRefs.isEmpty()){
-                    Iterator<ExperimentXref> iterator = primaryRefs.iterator();
-                    ExperimentXref primaryRef = iterator.next();
+                    Iterator<uk.ac.ebi.intact.model.Xref> iterator = primaryRefs.iterator();
+                    uk.ac.ebi.intact.model.Xref primaryRef = iterator.next();
 
                     Xref xref = new Xref();
                     xref.setPrimaryRef(new DbReference(primaryRef.getCvDatabase().getShortLabel(), primaryRef.getCvDatabase().getIdentifier(), primaryRef.getPrimaryId(), primaryRef.getCvXrefQualifier().getShortLabel(), primaryRef.getCvXrefQualifier().getIdentifier()));
@@ -438,5 +439,14 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         interactionDetectionMethodConverter.setInstitution(institution, getInstitutionPrimaryId());
         participantIdentificationMethodConverter.setInstitution(institution, getInstitutionPrimaryId());
         publicationXrefConverter.setInstitution(institution, getInstitutionPrimaryId());
+    }
+
+    @Override
+    public void setCheckInitializedCollections(boolean check){
+        super.setCheckInitializedCollections(check);
+        this.organismConverter.setCheckInitializedCollections(check);
+        this.interactionDetectionMethodConverter.setCheckInitializedCollections(check);
+        this.participantIdentificationMethodConverter.setCheckInitializedCollections(check);
+        this.publicationXrefConverter.setCheckInitializedCollections(check);
     }
 }

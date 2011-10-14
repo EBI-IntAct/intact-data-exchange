@@ -3,11 +3,11 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
-import psidev.psi.mi.xml.model.Xref;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.model.Institution;
 
 import java.util.Collection;
 import java.util.Date;
@@ -77,15 +77,15 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
         Bibref bibref = new Bibref();
         // we extract the primary ref if possible
         if (!intactObject.getXrefs().isEmpty()){
-            Collection<InstitutionXref> primaryRefs = AnnotatedObjectUtils.searchXrefs(intactObject, CvDatabase.PUBMED_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF);
+            Collection<uk.ac.ebi.intact.model.Xref> primaryRefs = searchXrefs(intactObject, CvDatabase.PUBMED_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, isCheckInitializedCollections());
 
             if (primaryRefs.isEmpty()){
-                primaryRefs = AnnotatedObjectUtils.searchXrefs(intactObject, CvDatabase.DOI_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF);
+                primaryRefs = searchXrefs(intactObject, CvDatabase.DOI_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, isCheckInitializedCollections());
             }
 
             if (!primaryRefs.isEmpty()){
-                Iterator<InstitutionXref> iterator = primaryRefs.iterator();
-                InstitutionXref primaryRef = iterator.next();
+                Iterator<uk.ac.ebi.intact.model.Xref> iterator = primaryRefs.iterator();
+                uk.ac.ebi.intact.model.Xref primaryRef = iterator.next();
 
                 Xref xref = new Xref();
                 xref.setPrimaryRef(new DbReference(primaryRef.getCvDatabase().getShortLabel(), primaryRef.getCvDatabase().getIdentifier(), primaryRef.getPrimaryId(), primaryRef.getCvXrefQualifier().getShortLabel(), primaryRef.getCvXrefQualifier().getIdentifier()));

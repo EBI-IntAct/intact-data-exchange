@@ -9,6 +9,8 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.InteractorConver
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.DisabledLocationTree;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.location.LocationTree;
 import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.InstitutionXref;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -28,7 +30,7 @@ public class ConverterContext {
     private boolean generateExpandedXml;
 
     private InteractorConverterConfig configInteractor;
-    
+
     private AnnotationConverterConfig configAnnotation;
 
     private InteractionConverterConfig configInteraction;
@@ -38,6 +40,7 @@ public class ConverterContext {
     private LocationTree location;
 
     private Institution defaultInstitutionForAcs;
+    private String defaultInstitutionPrimaryIdForAcs;
 
     private boolean locationInfoDisabled;
 
@@ -48,7 +51,7 @@ public class ConverterContext {
 
     private Set<String> dnaTypeLabels;
     private Set<String> rnaTypeLabels;
-    
+
     private static ThreadLocal<ConverterContext> instance = new ThreadLocal<ConverterContext>() {
         @Override
         protected ConverterContext initialValue() {
@@ -78,15 +81,15 @@ public class ConverterContext {
 
         // in order to avoid connection to the database, we list here all the MIs of DNA and RNA related terms
         rnaTypeMis = new HashSet( Arrays.asList( "MI:0320", "MI:0321", "MI:0322", "MI:0323", "MI:0324",
-                                                 "MI:0325", "MI:0607", "MI:0608", "MI:0609", "MI:0610",
-                                                 "MI:0611", "MI:0679", "MI:0679" ) );
+                "MI:0325", "MI:0607", "MI:0608", "MI:0609", "MI:0610",
+                "MI:0611", "MI:0679", "MI:0679" ) );
 
         rnaTypeLabels = new HashSet( Arrays.asList( "ribonucleic acid", "catalytic rna", "guide rna", "heterogeneous nuclear rna", "messenger rna", "poly adenine", "transfer rna",
                 "small nuclear rna", "ribosomal rna", "small nucleolar rna", "small interfering rna", "signal recognition particle rna",
                 "poly adenine") );
-        
+
         dnaTypeMis = new HashSet( Arrays.asList( "MI:0319", "MI:0680", "MI:0681", "MI:0250" ) );
-        
+
         dnaTypeLabels = new HashSet( Arrays.asList( "deoxyribonucleic acid", "single stranded deoxyribonucleic acid", "double stranded deoxyribonucleic acid", "gene" ) );
 
     }
@@ -118,7 +121,7 @@ public class ConverterContext {
     public void setInteractorConfig( InteractorConverterConfig configInteractor ) {
         this.configInteractor = configInteractor;
     }
-    
+
     public void setAnnotationConfig( AnnotationConverterConfig configAnnotation ) {
         this.configAnnotation = configAnnotation;
     }
@@ -156,6 +159,13 @@ public class ConverterContext {
     public Institution getDefaultInstitutionForAcs() {
         if (defaultInstitutionForAcs == null && IntactContext.currentInstanceExists()) {
             defaultInstitutionForAcs = IntactContext.getCurrentInstance().getInstitution();
+            if (defaultInstitutionForAcs != null) {
+                InstitutionXref xref = XrefUtils.getPsiMiIdentityXref(defaultInstitutionForAcs);
+
+                if (xref != null) {
+                    defaultInstitutionPrimaryIdForAcs = xref.getPrimaryId();
+                }
+            }
         }
         return defaultInstitutionForAcs;
     }
@@ -180,7 +190,7 @@ public class ConverterContext {
     public Set<String> getRnaTypeLabels() {
         return rnaTypeLabels;
     }
-    
+
 
     public Set<String> getDnaTypeMis() {
         return dnaTypeMis;
@@ -196,5 +206,13 @@ public class ConverterContext {
 
     public void setAutoFixInteractionSourceReference(boolean autoFixInteractionSourceReference) {
         this.autoFixInteractionSourceReference = autoFixInteractionSourceReference;
+    }
+
+    public String getDefaultInstitutionPrimaryIdForAcs() {
+        return defaultInstitutionPrimaryIdForAcs;
+    }
+
+    public void setDefaultInstitutionPrimaryIdForAcs(String defaultInstitutionPrimaryIdForAcs) {
+        this.defaultInstitutionPrimaryIdForAcs = defaultInstitutionPrimaryIdForAcs;
     }
 }
