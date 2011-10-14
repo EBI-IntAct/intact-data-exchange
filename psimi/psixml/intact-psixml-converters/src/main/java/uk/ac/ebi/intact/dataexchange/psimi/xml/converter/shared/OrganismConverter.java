@@ -21,14 +21,14 @@ import uk.ac.ebi.intact.model.*;
 public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Organism> {
     private static final Log log = LogFactory.getLog(OrganismConverter.class);
 
-    private CvObjectConverter<CvCellType,CellType> cellTypeConverter;
-    private CvObjectConverter<CvTissue, Tissue> tissueConverter;
+    private CvObjectConverterWithAttributes<CvCellType,CellType> cellTypeConverter;
+    private CvObjectConverterWithAttributes<CvTissue, Tissue> tissueConverter;
     protected AliasConverter aliasConverter;
 
     public OrganismConverter(Institution institution) {
         super(institution);
-        cellTypeConverter = new CvObjectConverter<CvCellType,CellType>(institution, CvCellType.class, CellType.class);
-        tissueConverter = new CvObjectConverter<CvTissue,Tissue>(institution, CvTissue.class, Tissue.class);
+        cellTypeConverter = new CvObjectConverterWithAttributes<CvCellType,CellType>(institution, CvCellType.class, CellType.class);
+        tissueConverter = new CvObjectConverterWithAttributes<CvTissue,Tissue>(institution, CvTissue.class, Tissue.class);
         this.aliasConverter = new AliasConverter(institution, BioSourceAlias.class);
     }
 
@@ -75,7 +75,8 @@ public class OrganismConverter extends AbstractIntactPsiConverter<BioSource, Org
         Organism organism = new Organism();
 
         // populates names
-        PsiConverterUtils.populate(intactObject, organism, aliasConverter, null, null, isCheckInitializedCollections());
+        // Set id, annotations, xrefs and aliases
+        PsiConverterUtils.populateNames(intactObject, organism, aliasConverter);
 
         // taxId
         if (intactObject.getTaxId() != null){

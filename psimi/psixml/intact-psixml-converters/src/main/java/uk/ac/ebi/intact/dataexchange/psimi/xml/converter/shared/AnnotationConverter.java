@@ -57,11 +57,17 @@ public class AnnotationConverter extends AbstractIntactPsiConverter<Annotation, 
     public Attribute intactToPsi(Annotation intactObject) {
         intactStartConversation(intactObject);
 
-        Attribute attribute = new Attribute(intactObject.getCvTopic().getShortLabel(), intactObject.getAnnotationText());
-
-        if (intactObject.getCvTopic().getIdentifier() != null) {
-            attribute.setNameAc(intactObject.getCvTopic().getIdentifier());
+        String name=null;
+        String nameAc= null;
+        if (intactObject.getCvTopic() == null){
+            name=CvTopic.COMMENT;
+            nameAc=CvTopic.CAUTION_MI_REF;
         }
+        else {
+            name = intactObject.getCvTopic().getShortLabel() != null ? intactObject.getCvTopic().getShortLabel() : CvTopic.COMMENT;
+            nameAc = intactObject.getCvTopic().getIdentifier() != null ? intactObject.getCvTopic().getIdentifier() : CvTopic.COMMENT_MI_REF;
+        }
+        Attribute attribute = new Attribute(nameAc, name, intactObject.getAnnotationText());
 
         intactEndConversion(intactObject);
 

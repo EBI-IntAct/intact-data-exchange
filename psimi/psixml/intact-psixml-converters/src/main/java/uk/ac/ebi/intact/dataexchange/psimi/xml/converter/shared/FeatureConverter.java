@@ -21,6 +21,7 @@ import psidev.psi.mi.xml.model.FeatureDetectionMethod;
 import psidev.psi.mi.xml.model.FeatureType;
 import uk.ac.ebi.intact.core.persister.IntactCore;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 
 import java.util.Collection;
@@ -105,6 +106,12 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
 
         intactStartConversation(intactObject);
 
+        // Set id, annotations, xrefs and aliases
+        PsiConverterUtils.populateId(psiFeature);
+        PsiConverterUtils.populateNames(intactObject, psiFeature, aliasConverter);
+        PsiConverterUtils.populateXref(intactObject, psiFeature, xrefConverter);
+        PsiConverterUtils.populateAttributes(intactObject, psiFeature, annotationConverter);
+
         if (intactObject.getCvFeatureIdentification()!= null) {
             FeatureDetectionMethod featureMethod = featureDetMethodConverter.intactToPsi(intactObject.getCvFeatureIdentification());
             psiFeature.setFeatureDetectionMethod(featureMethod);
@@ -118,10 +125,6 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
             log.error("Feature without feature type " + intactObject.getShortLabel());
         }
 
-        if (intactObject.getRanges().isEmpty()){
-            log.error("Feature without any ranges : " + intactObject.getShortLabel());
-        }
-
         Collection<Range> ranges;
         if (isCheckInitializedCollections()){
             ranges = IntactCore.ensureInitializedRanges(intactObject);
@@ -133,6 +136,10 @@ public class FeatureConverter extends AbstractAnnotatedObjectConverter<Feature, 
         for (Range intactRange : ranges) {
             psidev.psi.mi.xml.model.Range psiRange = rangeConverter.intactToPsi(intactRange);
             psiFeature.getRanges().add(psiRange);
+        }
+
+        if (ranges.isEmpty()){
+            log.error("Feature without any ranges : " + intactObject.getShortLabel());
         }
 
         intactEndConversion(intactObject);

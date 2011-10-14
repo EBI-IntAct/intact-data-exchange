@@ -315,11 +315,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
     public psidev.psi.mi.xml.model.Interaction intactToPsi(Interaction intactObject) {
 
-        final boolean isNegative = containsAnnotation( intactObject, NEGATIVE);
-        final boolean isIntraMolecular = containsAnnotation( intactObject, INTRA_MOLECULAR );
-        final boolean isModelled = containsAnnotation( intactObject, MODELLED );
-        participantConverter.getFeatureMap().clear();
-
         psidev.psi.mi.xml.model.Interaction interaction = super.intactToPsi(intactObject);
         int numberOfAuthorConf = 0;
 
@@ -329,6 +324,38 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         intactStartConversation(intactObject);
 
+        // Set id, annotations, xrefs and aliases
+        PsiConverterUtils.populateId(interaction);
+        PsiConverterUtils.populateNames(intactObject, interaction, aliasConverter);
+        PsiConverterUtils.populateXref(intactObject, interaction, xrefConverter);
+        PsiConverterUtils.populateAttributes(intactObject, interaction, annotationConverter);
+
+        Collection<Experiment> experiments;
+        Collection<Component> components;
+        Collection<Confidence> confidences;
+        Collection<uk.ac.ebi.intact.model.InteractionParameter> parameters;
+        Collection<Annotation> annotations;
+
+        if (isCheckInitializedCollections()){
+            experiments = IntactCore.ensureInitializedExperiments(intactObject);
+            components = IntactCore.ensureInitializedParticipants(intactObject);
+            confidences = IntactCore.ensureInitializedConfidences(intactObject);
+            parameters = IntactCore.ensureInitializedInteractionParameters(intactObject);
+            annotations = IntactCore.ensureInitializedAnnotations(intactObject);
+        }
+        else {
+            experiments = intactObject.getExperiments();
+            components = intactObject.getComponents();
+            confidences = intactObject.getConfidences();
+            parameters = intactObject.getParameters();
+            annotations = intactObject.getAnnotations();
+        }
+
+        participantConverter.getFeatureMap().clear();
+
+        // collect annotations which have a spcial meaning for psi xml
+        numberOfAuthorConf += processSpecializedAnnotations(annotations, interaction);
+
         // imexId
         Xref imexXref = getImexXref(intactObject);
 
@@ -337,14 +364,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
 
         // converts experiments
-        Collection<Experiment> experiments;
-
-        if (isCheckInitializedCollections()){
-            experiments = IntactCore.ensureInitializedExperiments(intactObject);
-        }
-        else {
-            experiments = intactObject.getExperiments();
-        }
 
         if (experiments.size() == 0){
             log.error("Interaction without any experiments : " + intactObject.getShortLabel());
@@ -362,15 +381,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             }
         }
 
-        // converts participants
-        Collection<Component> components;
-
-        if (isCheckInitializedCollections()){
-            components = IntactCore.ensureInitializedParticipants(intactObject);
-        }
-        else {
-            components = intactObject.getComponents();
-        }
+        // converts participants and inferred interactions
 
         if (components.isEmpty()){
             log.error("Interaction without any participants : " + intactObject.getShortLabel());
@@ -378,10 +389,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         for (Component comp : components) {
             Participant participant = participantConverter.intactToPsi(comp);
             interaction.getParticipants().add(participant);
-        }
 
-        // converts inferred interactions
-        for (Component comp : components){
+            // process features
             Collection<uk.ac.ebi.intact.model.Feature> features;
             if (isCheckInitializedCollections()){
                 features = IntactCore.ensureInitializedFeatures(comp);
@@ -389,6 +398,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             else {
                 features = comp.getFeatures();
             }
+
             for(uk.ac.ebi.intact.model.Feature feature : features){
                 if(feature.getBoundDomain() != null){
 
@@ -428,24 +438,11 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         // converts interaction type
         if (intactObject.getCvInteractionType() != null){
-            InteractionType interactionType = (InteractionType)
-                    PsiConverterUtils.toCvType(intactObject.getCvInteractionType(),
-                            this.interactionTypeConverter,
-                            aliasConverter,
-                            xrefConverter,
-                            isCheckInitializedCollections());
+            InteractionType interactionType = this.interactionTypeConverter.intactToPsi(intactObject.getCvInteractionType());
             interaction.getInteractionTypes().add(interactionType);
         }
         else {
             log.error("Interaction without interaction type : " + intactObject.getShortLabel());
-        }
-
-        Collection<Confidence> confidences;
-        if (isCheckInitializedCollections()){
-            confidences = IntactCore.ensureInitializedConfidences(intactObject);
-        }
-        else {
-            confidences = intactObject.getConfidences();
         }
 
         // converts confidences (and add author-confidence when necessary for retrocompatibility)
@@ -462,51 +459,13 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                 }
             }
         }
-        // if we had author-conf annotations, we convert them in confidences also
-        Collection<Annotation> annotationsToConvertInConfidence = IntactConverterUtils.extractAuthorConfidencesAnnotationsFrom(intactObject.getAnnotations());
-        for (Annotation ann : annotationsToConvertInConfidence){
-            if (ann.getAnnotationText() != null){
-                psidev.psi.mi.xml.model.Confidence confidence = new psidev.psi.mi.xml.model.Confidence();
-                confidence.setValue(ann.getAnnotationText());
-
-                Names names = new Names();
-                names.setFullName(IntactConverterUtils.AUTH_CONF);
-                names.setShortLabel(IntactConverterUtils.AUTH_CONF_MI);
-
-                psidev.psi.mi.xml.model.Xref xref = new psidev.psi.mi.xml.model.Xref();
-                xref.setPrimaryRef(new DbReference(CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF, IntactConverterUtils.AUTH_CONF_MI, CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF));
-                Unit unit = new Unit();
-                unit.setNames(names);
-                unit.setXref(xref);
-
-                confidence.setUnit(unit);
-
-                if (!interaction.getConfidences().contains(confidence)){
-                    interaction.getConfidences().add( confidence);
-                    numberOfAuthorConf ++;
-                }
-            }
-        }
 
         // converts interaction parameters
-
-        Collection<uk.ac.ebi.intact.model.InteractionParameter> parameters;
-        if (isCheckInitializedCollections()){
-            parameters = IntactCore.ensureInitializedInteractionParameters(intactObject);
-        }
-        else {
-            parameters = intactObject.getParameters();
-        }
 
         for (uk.ac.ebi.intact.model.InteractionParameter param : parameters){
             psidev.psi.mi.xml.model.Parameter parameter = paramConverter.intactToPsi(param);
             interaction.getParameters().add(parameter);
         }
-
-        // set boolean values
-        interaction.setNegative( isNegative );
-        interaction.setIntraMolecular( isIntraMolecular );
-        interaction.setModelled( isModelled );
 
         intactEndConversion(intactObject);
 
@@ -515,52 +474,54 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         return interaction;
     }
 
-    /*private boolean removeAnnotation( Interaction interaction, String topicShortlabel, String text ) {
-        boolean found = false;
-        final Iterator<Annotation> it = IntactCore.ensureInitializedAnnotations(interaction).iterator();
-        while ( it.hasNext() ) {
-            Annotation annotation = it.next();
-            if ( annotation.getCvTopic().getShortLabel().equals( topicShortlabel )
-                    && ( text != null && text.equals( annotation.getAnnotationText() ) ) ) {
-                it.remove();
-                found = true;
-            }
-        }
-        return found;
-    }*/
-
-    private boolean containsAnnotation( Interaction interaction, String topicShortlabel, String text ) {
-        boolean found = false;
-        final Iterator<Annotation> it = IntactCore.ensureInitializedAnnotations(interaction).iterator();
-        while ( it.hasNext() ) {
-            Annotation annotation = it.next();
-            if ( annotation.getCvTopic().getShortLabel().equals( topicShortlabel )
-                    && ( (text != null && text.equals( annotation.getAnnotationText() ) )) || (text == null && annotation.getAnnotationText() == null) ) {
-                found = true;
-            }
-        }
-        return found;
-    }
-
-    private boolean containsAnnotation( Interaction interaction, String topicShortlabel) {
-        boolean found = false;
-
-        Collection<Annotation> annotations;
-        if (isCheckInitializedCollections()){
-            annotations = IntactCore.ensureInitializedAnnotations(interaction);
-        }
-        else {
-            annotations = interaction.getAnnotations();
-        }
+    private int processSpecializedAnnotations( Collection<Annotation> annotations, psidev.psi.mi.xml.model.Interaction interaction) {
+        // set boolean values
 
         final Iterator<Annotation> it = annotations.iterator();
+
+        if (!it.hasNext()){
+            return 0;
+        }
+
+        int numberOfAuthConf = 0;
+
         while ( it.hasNext() ) {
             Annotation annotation = it.next();
-            if ( annotation.getCvTopic().getShortLabel().equals( topicShortlabel ) ) {
-                found = true;
+            if ( annotation.getCvTopic().getShortLabel().equals( NEGATIVE ) ) {
+                interaction.setNegative( true );
+            }
+            else if (annotation.getCvTopic().getShortLabel().equals( MODELLED )){
+                interaction.setModelled( true );
+            }
+            else if (annotation.getCvTopic().getShortLabel().equals( INTRA_MOLECULAR )){
+                interaction.setIntraMolecular( true );
+            }
+            else if (IntactConverterUtils.AUTH_CONF_MI.equals(annotation.getCvTopic().getIdentifier())){
+                if (annotation.getAnnotationText() != null){
+                    psidev.psi.mi.xml.model.Confidence confidence = new psidev.psi.mi.xml.model.Confidence();
+                    confidence.setValue(annotation.getAnnotationText());
+
+                    Names names = new Names();
+                    names.setFullName(IntactConverterUtils.AUTH_CONF);
+                    names.setShortLabel(IntactConverterUtils.AUTH_CONF_MI);
+
+                    psidev.psi.mi.xml.model.Xref xref = new psidev.psi.mi.xml.model.Xref();
+                    xref.setPrimaryRef(new DbReference(CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF, IntactConverterUtils.AUTH_CONF_MI, CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF));
+                    Unit unit = new Unit();
+                    unit.setNames(names);
+                    unit.setXref(xref);
+
+                    confidence.setUnit(unit);
+
+                    if (!interaction.getConfidences().contains(confidence)){
+                        interaction.getConfidences().add( confidence);
+                        numberOfAuthConf ++;
+                    }
+                }
             }
         }
-        return found;
+
+        return numberOfAuthConf;
     }
 
     private void updateExperimentParticipantDetectionMethod(Interaction interaction) {

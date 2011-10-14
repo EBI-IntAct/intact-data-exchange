@@ -130,6 +130,12 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
 
         intactStartConversation(intactObject);
 
+        // Set id, annotations, xrefs and aliases
+        PsiConverterUtils.populateId(interactor);
+        PsiConverterUtils.populateNames(intactObject, interactor, aliasConverter);
+        PsiConverterUtils.populateXref(intactObject, interactor, xrefConverter);
+        PsiConverterUtils.populateAttributes(intactObject, interactor, annotationConverter);
+
         // converts sequence
         if ( !ConverterContext.getInstance().getInteractorConfig().isExcludePolymerSequence() ) {
             if ( intactObject instanceof Polymer) {
@@ -150,12 +156,7 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
 
         // converts interactor type
         if (intactObject.getCvInteractorType() != null){
-            InteractorType interactorType = ( InteractorType )
-                    PsiConverterUtils.toCvType(intactObject.getCvInteractorType(),
-                            this.interactorTypeConverter,
-                            aliasConverter,
-                            xrefConverter,
-                            isCheckInitializedCollections());
+            InteractorType interactorType = this.interactorTypeConverter.intactToPsi(intactObject.getCvInteractorType());
             interactor.setInteractorType( interactorType );
         }
         else {

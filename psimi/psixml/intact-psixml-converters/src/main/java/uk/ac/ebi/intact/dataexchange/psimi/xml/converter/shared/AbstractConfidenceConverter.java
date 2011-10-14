@@ -31,11 +31,11 @@ import uk.ac.ebi.intact.model.Institution;
  */
 public abstract class AbstractConfidenceConverter<T extends AbstractConfidence> extends AbstractIntactPsiConverter<T, psidev.psi.mi.xml.model.Confidence> {
 
-    private CvObjectConverter<CvConfidenceType,Unit> confidenceTyeConverter;
+    private CvObjectConverterWithAttributes<CvConfidenceType,Unit> confidenceTyeConverter;
 
     public AbstractConfidenceConverter(Institution institution) {
         super( institution );
-        confidenceTyeConverter = new CvObjectConverter<CvConfidenceType,Unit>(institution, CvConfidenceType.class, Unit.class);
+        confidenceTyeConverter = new CvObjectConverterWithAttributes<CvConfidenceType,Unit>(institution, CvConfidenceType.class, Unit.class);
     }
 
     public abstract T newConfidenceInstance(String value);

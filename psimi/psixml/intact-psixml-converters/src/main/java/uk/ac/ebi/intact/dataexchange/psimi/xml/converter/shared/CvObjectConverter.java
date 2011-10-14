@@ -32,8 +32,8 @@ import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
  */
 public class CvObjectConverter<C extends CvObject, T extends CvType> extends AbstractIntactPsiConverter<C, T> {
 
-    private Class<C> intactCvClass;
-    private Class<T> psiCvClass;
+    protected Class<C> intactCvClass;
+    protected Class<T> psiCvClass;
     protected AliasConverter aliasConverter;
     protected XrefConverter xrefConverter;
 
@@ -71,7 +71,10 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
         }
 
         cvType = newCvInstance(psiCvClass);
-        PsiConverterUtils.populate(intactObject, cvType, aliasConverter, null, xrefConverter, isCheckInitializedCollections());
+
+        // Set id, annotations, xrefs and aliases
+        PsiConverterUtils.populateNames(intactObject, cvType, aliasConverter);
+        PsiConverterUtils.populateXref(intactObject, cvType, xrefConverter);
 
         ConversionCache.putElement(elementKey(intactObject), cvType);
 
@@ -81,7 +84,7 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
     }
 
 
-    private static <C> C newCvInstance(Class<C> cvClass) {
+    protected static <C> C newCvInstance(Class<C> cvClass) {
         C cv = null;
         try {
             cv = cvClass.newInstance();
@@ -92,7 +95,7 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
         return cv;
     }
 
-    private String elementKey(C intactObject) {
+    protected String elementKey(C intactObject) {
         return intactObject.getIdentifier() + "_" + intactObject.getClass();
     }
 

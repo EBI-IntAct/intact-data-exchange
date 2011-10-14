@@ -112,7 +112,7 @@ public class PsiConverterUtils {
         namesContainer.setNames( names );
     }
 
-    protected static void populateNames( AnnotatedObject<?, ?> annotatedObject, NamesContainer namesContainer, AliasConverter aliasConverter ) {
+    public static void populateNames( AnnotatedObject<?, ?> annotatedObject, NamesContainer namesContainer, AliasConverter aliasConverter ) {
         Names names = namesContainer.getNames();
 
         if ( names == null ) {
@@ -405,7 +405,7 @@ public class PsiConverterUtils {
         }
     }
 
-    private static int populateId( HasId hasIdElement ) {
+    public static int populateId( HasId hasIdElement ) {
         if ( hasIdElement.getId() > 0 ) {
             return hasIdElement.getId();
         }

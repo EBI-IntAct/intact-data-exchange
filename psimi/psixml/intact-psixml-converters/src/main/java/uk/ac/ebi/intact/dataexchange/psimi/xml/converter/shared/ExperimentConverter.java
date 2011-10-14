@@ -105,16 +105,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         psiStartConversion(psiObject);
 
-        String shortLabel;
-
-        if (psiObject.getNames() != null) {
-            shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
-        } else {
-            shortLabel = IntactConverterUtils.createExperimentTempShortLabel();
-        }
-
         experiment.setOwner(getInstitution());
-        experiment.setShortLabel(shortLabel);
 
         IntactConverterUtils.populateNames(psiObject.getNames(), experiment, this.aliasConverter);
         IntactConverterUtils.populateXref(psiObject.getXref(), experiment, this.xrefConverter);
@@ -130,12 +121,12 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             experiment.setBioSource(bioSource);
         }
         else {
-            log.error("Experiment without host organism : " + shortLabel);
+            log.error("Experiment without host organism : " + experiment.getShortLabel());
         }
 
         // if more tan one host organism, we just convert the first organism and ignore the others
         if (psiObject.getHostOrganisms().size() > 1){
-            log.error("Experiment with "+psiObject.getHostOrganisms().size()+" host organisms : " + shortLabel + ". Only the first host organism will be converted in Intact.");
+            log.error("Experiment with "+psiObject.getHostOrganisms().size()+" host organisms : " + experiment.getShortLabel() + ". Only the first host organism will be converted in Intact.");
         }
 
         // convert the interaction detection method
@@ -145,7 +136,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             experiment.setCvInteraction(cvInteractionDetectionMethod);
         }
         else {
-            log.error("Experiment without interaction detection method : " + shortLabel);
+            log.error("Experiment without interaction detection method : " + experiment.getShortLabel());
         }
 
         // convert detection method
@@ -155,7 +146,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             experiment.setCvIdentification(cvParticipantIdentification);
         }
         else {
-            log.error("Experiment without participant identification method : " + shortLabel);
+            log.error("Experiment without participant identification method : " + experiment.getShortLabel());
         }
 
         // fail if the primary reference does not point to Pubmed and primary-reference
@@ -228,9 +219,15 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         intactStartConversation(intactObject);
 
+        // Set id, annotations, xrefs and aliases
+        PsiConverterUtils.populateId(expDesc);
+        PsiConverterUtils.populateNames(intactObject, expDesc, aliasConverter);
+        PsiConverterUtils.populateXref(intactObject, expDesc, xrefConverter);
+        PsiConverterUtils.populateAttributes(intactObject, expDesc, annotationConverter);
+
         // converts detection method
         if (intactObject.getCvInteraction() != null){
-            InteractionDetectionMethod detMethod = (InteractionDetectionMethod) PsiConverterUtils.toCvType(intactObject.getCvInteraction(), this.interactionDetectionMethodConverter, aliasConverter, xrefConverter, isCheckInitializedCollections());
+            InteractionDetectionMethod detMethod = this.interactionDetectionMethodConverter.intactToPsi(intactObject.getCvInteraction());
             expDesc.setInteractionDetectionMethod(detMethod);
         }
         else {
@@ -239,12 +236,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         // converts participant identification method
         if (intactObject.getCvIdentification() != null) {
-            ParticipantIdentificationMethod identMethod = (ParticipantIdentificationMethod)
-                    PsiConverterUtils.toCvType(intactObject.getCvIdentification(),
-                            this.participantIdentificationMethodConverter,
-                            aliasConverter,
-                            xrefConverter,
-                            isCheckInitializedCollections());
+            ParticipantIdentificationMethod identMethod = participantIdentificationMethodConverter.intactToPsi(intactObject.getCvIdentification());
             expDesc.setParticipantIdentificationMethod(identMethod);
         }
         else {

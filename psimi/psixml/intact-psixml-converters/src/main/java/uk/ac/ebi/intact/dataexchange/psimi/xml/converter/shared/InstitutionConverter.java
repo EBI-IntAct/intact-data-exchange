@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.Institution;
@@ -73,6 +74,11 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
         }
 
         intactStartConversation(intactObject);
+
+        // Set id, annotations, xrefs and aliases
+        PsiConverterUtils.populateNames(intactObject, source, aliasConverter);
+        PsiConverterUtils.populateXref(intactObject, source, xrefConverter);
+        PsiConverterUtils.populateAttributes(intactObject, source, annotationConverter);
 
         Bibref bibref = new Bibref();
         // we extract the primary ref if possible
