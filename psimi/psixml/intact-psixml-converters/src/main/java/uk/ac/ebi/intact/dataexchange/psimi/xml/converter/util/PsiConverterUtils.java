@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.util.XMLChar;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Xref;
 import uk.ac.ebi.intact.core.persister.IntactCore;
@@ -715,7 +716,7 @@ public class PsiConverterUtils {
             else if (character == '&') {
                 result.append("&amp;");
             }
-            else {
+            else if (!XMLChar.isInvalid(character)){
                 //the char is not a special one
                 //add it to the result as is
                 result.append(character);
