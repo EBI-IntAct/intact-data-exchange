@@ -35,6 +35,8 @@ import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.*;
 
 /**
@@ -688,4 +690,39 @@ public class PsiConverterUtils {
 
         return null;
     }
+
+    public static String forXML(String aText){
+        if (aText == null){
+            return null;
+        }
+
+        final StringBuilder result = new StringBuilder();
+        final StringCharacterIterator iterator = new StringCharacterIterator(aText);
+        char character =  iterator.current();
+        while (character != CharacterIterator.DONE ){
+            if (character == '<') {
+                result.append("&lt;");
+            }
+            else if (character == '>') {
+                result.append("&gt;");
+            }
+            else if (character == '\"') {
+                result.append("&quot;");
+            }
+            else if (character == '\'') {
+                result.append("&#039;");
+            }
+            else if (character == '&') {
+                result.append("&amp;");
+            }
+            else {
+                //the char is not a special one
+                //add it to the result as is
+                result.append(character);
+            }
+            character = iterator.next();
+        }
+        return result.toString();
+    }
+
 }

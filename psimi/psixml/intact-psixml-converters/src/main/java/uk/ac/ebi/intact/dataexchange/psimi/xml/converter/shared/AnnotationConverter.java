@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.Attribute;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiMiPopulator;
 import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.CvTopic;
@@ -67,7 +68,8 @@ public class AnnotationConverter extends AbstractIntactPsiConverter<Annotation, 
             name = intactObject.getCvTopic().getShortLabel() != null ? intactObject.getCvTopic().getShortLabel() : CvTopic.COMMENT;
             nameAc = intactObject.getCvTopic().getIdentifier() != null ? intactObject.getCvTopic().getIdentifier() : CvTopic.COMMENT_MI_REF;
         }
-        Attribute attribute = new Attribute(nameAc, name, intactObject.getAnnotationText());
+
+        Attribute attribute = new Attribute(nameAc, name, PsiConverterUtils.forXML(intactObject.getAnnotationText()));
 
         intactEndConversion(intactObject);
 

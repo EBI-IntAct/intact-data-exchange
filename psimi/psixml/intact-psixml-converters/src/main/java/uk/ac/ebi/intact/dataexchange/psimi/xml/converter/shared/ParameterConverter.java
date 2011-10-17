@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
+import psidev.psi.mi.xml.model.ExperimentRef;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
 import uk.ac.ebi.intact.model.*;
 
@@ -110,7 +111,7 @@ public abstract class ParameterConverter<T extends Parameter> extends AbstractIn
             parameter.setUnitAc(intactObject.getCvParameterUnit().getIdentifier());
         }
         if(intactObject.getExperiment() != null) {
-            parameter.setExperiment(experimentConverter.intactToPsi(intactObject.getExperiment()));
+            parameter.setExperimentRef(new ExperimentRef(experimentConverter.intactToPsi(intactObject.getExperiment()).getId()));
         }
 
         intactEndConversion(intactObject);
