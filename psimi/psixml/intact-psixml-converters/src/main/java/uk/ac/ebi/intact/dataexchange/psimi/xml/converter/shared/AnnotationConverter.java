@@ -69,7 +69,7 @@ public class AnnotationConverter extends AbstractIntactPsiConverter<Annotation, 
             nameAc = intactObject.getCvTopic().getIdentifier() != null ? intactObject.getCvTopic().getIdentifier() : CvTopic.COMMENT_MI_REF;
         }
 
-        Attribute attribute = new Attribute(nameAc, name, PsiConverterUtils.forXML(intactObject.getAnnotationText()));
+        Attribute attribute = new Attribute(nameAc, name, intactObject.getAnnotationText());
 
         intactEndConversion(intactObject);
 
