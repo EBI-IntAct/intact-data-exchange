@@ -55,7 +55,7 @@ public class AnnotationConverterConfig {
         if (topic != null && !topic.getAnnotations().isEmpty() && excludeHiddenTopics){
 
             for (uk.ac.ebi.intact.model.Annotation ann : topic.getAnnotations()){
-                if (ann.getCvTopic() != null && ann.getCvTopic().getShortLabel().equalsIgnoreCase(CvTopic.HIDDEN)){
+                if (ann.getCvTopic() != null && (ann.getCvTopic().getShortLabel().equalsIgnoreCase(CvTopic.HIDDEN) || ann.getCvTopic().getShortLabel().equalsIgnoreCase(CvTopic.NO_EXPORT))){
                     return true;
                 }
             }
