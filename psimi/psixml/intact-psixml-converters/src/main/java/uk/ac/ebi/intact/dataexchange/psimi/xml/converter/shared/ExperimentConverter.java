@@ -20,7 +20,9 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Xref;
 import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.MessageLevel;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.AnnotationConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
@@ -399,16 +401,19 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
     }
 
     public void extractPublicationAnnotationsAbsentFromExperiment(Publication pub, ExperimentDescription expDesc){
+        AnnotationConverterConfig configAnnotation = ConverterContext.getInstance().getAnnotationConfig();
 
         if (pub.getAnnotations().isEmpty()){
             return;
         }
 
         for (Annotation attr : pub.getAnnotations()){
-            Attribute attribute = annotationConverter.intactToPsi(attr);
+            if (!configAnnotation.isExcluded(attr.getCvTopic())) {
+                Attribute attribute = annotationConverter.intactToPsi(attr);
 
-            if (!expDesc.getAttributes().contains(attribute)){
-                expDesc.getAttributes().add(attribute);
+                if (!expDesc.getAttributes().contains(attribute)){
+                    expDesc.getAttributes().add(attribute);
+                }
             }
         }
     }
