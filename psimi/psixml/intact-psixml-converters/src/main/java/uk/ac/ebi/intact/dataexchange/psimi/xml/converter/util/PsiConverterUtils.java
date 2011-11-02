@@ -663,12 +663,18 @@ public class PsiConverterUtils {
 
         // primaryRef is the ac by default, otherwise the first xref
         if (primary != null){
+            if (acRef != null){
+                dbRefs.add(acRef);
+            }
            return primary;
         }
         else if (acRef != null){
             return acRef;
         }
         else if ( !dbRefs.isEmpty() ) {
+            if (acRef != null){
+                dbRefs.add(acRef);
+            }
             return dbRefs.iterator().next();
         }
 
