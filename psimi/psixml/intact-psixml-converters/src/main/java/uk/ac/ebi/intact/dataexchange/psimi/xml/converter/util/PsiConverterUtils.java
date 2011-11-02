@@ -184,9 +184,10 @@ public class PsiConverterUtils {
                     db = converter.getInstitution().getShortLabel().toLowerCase();
                 }
 
+                // the ref is identity!!!!
                 acRef = new DbReference( db, dbMi, ac,
-                        CvXrefQualifier.SOURCE_REFERENCE,
-                        CvXrefQualifier.SOURCE_REFERENCE_MI_REF );
+                        CvXrefQualifier.IDENTITY,
+                        CvXrefQualifier.IDENTITY_MI_REF );
             }
         }
 
@@ -201,10 +202,6 @@ public class PsiConverterUtils {
         }
 
         Collection<DbReference> dbRefs = toDbReferences( annotatedObject, IntactCore.ensureInitializedXrefs(annotatedObject));
-
-        if(acRef != null) {
-            dbRefs.add( acRef );
-        }
 
         // normally the primary reference is the identity reference, but for bibliographic references
         // it is the primary-reference and it does not contain secondary refs
@@ -238,6 +235,7 @@ public class PsiConverterUtils {
                 }
             }
         } else {
+
             // remove the primary ref from the collection if it is a experiment
             // so we don't have the same ref in the bibref and the xref sections
             if ( annotatedObject instanceof Experiment ) {
@@ -248,7 +246,7 @@ public class PsiConverterUtils {
                 }
             }
 
-            DbReference primaryRef = getIdentity( dbRefs );
+            DbReference primaryRef = getIdentity( dbRefs, acRef );
             xref.setPrimaryRef( primaryRef );
 
             // remove the primary ref
@@ -314,8 +312,8 @@ public class PsiConverterUtils {
                 }
 
                 acRef = new DbReference( db, dbMi, ac,
-                        CvXrefQualifier.SOURCE_REFERENCE,
-                        CvXrefQualifier.SOURCE_REFERENCE_MI_REF );
+                        CvXrefQualifier.IDENTITY,
+                        CvXrefQualifier.IDENTITY_MI_REF );
             }
         }
 
@@ -330,10 +328,6 @@ public class PsiConverterUtils {
         }
 
         Collection<DbReference> dbRefs = toDbReferences( annotatedObject, xrefs, converter);
-
-        if(acRef != null) {
-            dbRefs.add( acRef );
-        }
 
         // normally the primary reference is the identity reference, but for bibliographic references
         // it is the primary-reference and it does not contain secondary refs
@@ -384,7 +378,7 @@ public class PsiConverterUtils {
                 }
             }
 
-            DbReference primaryRef = getIdentity( dbRefs );
+            DbReference primaryRef = getIdentity( dbRefs, acRef );
 
             if (primaryRef == null){
                 primaryRef = getPrimaryReference(dbRefs);
@@ -635,33 +629,46 @@ public class PsiConverterUtils {
      * @param dbRefs
      * @return
      */
-    protected static DbReference getIdentity( Collection<DbReference> dbRefs ) {
+    protected static DbReference getIdentity( Collection<DbReference> dbRefs, DbReference acRef ) {
         Collection<DbReference> identityRefs = new HashSet<DbReference>();
+
+        DbReference primary = null;
 
         for ( DbReference dbRef : dbRefs ) {
             if ( dbRef.getRefTypeAc() != null && dbRef.getRefTypeAc().equals( CvXrefQualifier.IDENTITY_MI_REF ) ) {
 
                 if ( dbRef.getDbAc() != null && dbRef.getDbAc().equals( CvDatabase.PSI_MI_MI_REF ) ) {
-                    return dbRef;
+                    primary = dbRef;
+                    break;
                 }
 
                 identityRefs.add( dbRef );
             }
         }
 
-        if ( !identityRefs.isEmpty() ) {
+        if ( !identityRefs.isEmpty() && primary == null ) {
             // return the one for uniprot, if present. Otherwise return a random one.
             for ( DbReference dbRef : identityRefs ) {
                 if ( dbRef.getDbAc().equals( CvDatabase.UNIPROT_MI_REF ) ) {
 
-                    return dbRef;
+                    primary = dbRef;
+                    break;
                 }
             }
 
-            return identityRefs.iterator().next();
+            if (primary == null){
+                primary = identityRefs.iterator().next();
+            }
         }
 
-        if ( !dbRefs.isEmpty() ) {
+        // primaryRef is the ac by default, otherwise the first xref
+        if (primary != null){
+           return primary;
+        }
+        else if (acRef != null){
+            return acRef;
+        }
+        else if ( !dbRefs.isEmpty() ) {
             return dbRefs.iterator().next();
         }
 

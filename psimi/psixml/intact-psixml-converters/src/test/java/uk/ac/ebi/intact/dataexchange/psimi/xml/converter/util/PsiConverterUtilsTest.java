@@ -16,8 +16,6 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import psidev.psi.mi.xml.model.DbReference;
 import psidev.psi.mi.xml.model.Interactor;
@@ -31,6 +29,9 @@ import uk.ac.ebi.intact.model.Protein;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * TODO comment this
@@ -50,7 +51,7 @@ public class PsiConverterUtilsTest {
 
         List<DbReference> dbRefs = Arrays.asList(dbRefUniprot, dbRefRefSeq, dbRefRandom);
 
-        DbReference identityRef = PsiConverterUtils.getIdentity(dbRefs);
+        DbReference identityRef = PsiConverterUtils.getIdentity(dbRefs, null);
 
         assertNotNull(identityRef);
         assertEquals(dbRefUniprot.getDb(), identityRef.getDb());
@@ -66,7 +67,7 @@ public class PsiConverterUtilsTest {
 
         List<DbReference> dbRefs = Arrays.asList(dbRefRefSeq, dbRefUniprot, dbRefRandom);
 
-        DbReference identityRef = PsiConverterUtils.getIdentity(dbRefs);
+        DbReference identityRef = PsiConverterUtils.getIdentity(dbRefs, null);
 
         assertNotNull(identityRef);
         assertEquals(dbRefUniprot.getDb(), identityRef.getDb());
