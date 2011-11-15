@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.psimitab.converters;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.tab.model.Confidence;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
@@ -87,20 +88,20 @@ public class InteractionConverter {
         if ( experiments != null ) {
             for (Experiment experiment : experiments) {
                 if (authors.isEmpty()) {
-                Annotation authorAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.AUTHOR_LIST_MI_REF);
-                Annotation yearAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.PUBLICATION_YEAR_MI_REF);
+                    Annotation authorAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.AUTHOR_LIST_MI_REF);
+                    Annotation yearAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.PUBLICATION_YEAR_MI_REF);
 
-                String authorText = "-";
+                    String authorText = "-";
 
-                if (authorAnnot != null) {
-                    authorText = authorAnnot.getAnnotationText().split(" ")[0] + " et al.";
-                }
+                    if (authorAnnot != null) {
+                        authorText = authorAnnot.getAnnotationText().split(" ")[0] + " et al.";
+                    }
 
-                if (yearAnnot != null) {
-                    authorText = authorText+" ("+yearAnnot.getAnnotationText()+")";
-                }
+                    if (yearAnnot != null) {
+                        authorText = authorText+" ("+yearAnnot.getAnnotationText()+")";
+                    }
 
-                authors.add(new AuthorImpl(authorText));
+                    authors.add(new AuthorImpl(authorText));
                 }
 
                 // det methods
@@ -142,7 +143,7 @@ public class InteractionConverter {
                 }
 
                 // datasets
-                 for ( Annotation annotation : experiment.getAnnotations() ) {
+                for ( Annotation annotation : experiment.getAnnotations() ) {
                     if ( CvTopic.DATASET_MI_REF.equals(annotation.getCvTopic().getIdentifier()) ) {
                         datasets.add( annotation.getAnnotationText() );
                     }
@@ -172,7 +173,7 @@ public class InteractionConverter {
         for (InteractorXref xref : interaction.getXrefs()) {
             if (xref.getCvXrefQualifier() != null) {
                 if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier()) ||
-                    CvXrefQualifier.IMEX_EVIDENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                        CvXrefQualifier.IMEX_EVIDENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
                     interactionAcs.add(CrossReferenceFactory.getInstance().build( CvDatabase.IMEX, xref.getPrimaryId() ));
                 }
             }
@@ -184,7 +185,7 @@ public class InteractionConverter {
         if ( interaction.getCvInteractionType() != null ) {
             List<InteractionType> interactionTypes = new ArrayList<InteractionType>();
             interactionTypes.add( ( InteractionType ) cvObjectConverter.toCrossReference( InteractionTypeImpl.class,
-                                                                                 interaction.getCvInteractionType() ) );
+                    interaction.getCvInteractionType() ) );
             bi.setInteractionTypes( interactionTypes );
         }
 
@@ -214,6 +215,26 @@ public class InteractionConverter {
             bi.setSourceDatabases( sourceDatabases );
         }
 
+        // set interaction confidences
+        if (!interaction.getConfidences().isEmpty()){
+            List<Confidence> confidences = new ArrayList<Confidence>();
+
+            for (uk.ac.ebi.intact.model.Confidence conf : interaction.getConfidences()){
+                if (conf.getValue() != null){
+                    String type = "unknown";
+
+                    if (conf.getCvConfidenceType() != null){
+                        type = conf.getCvConfidenceType().getShortLabel();
+                    }
+
+                    Confidence mitabConf = new ConfidenceImpl(type, conf.getValue());
+                    confidences.add(mitabConf);
+                }
+            }
+
+            bi.setConfidenceValues(confidences);
+        }
+
         // process extended
 
         // expansion
@@ -225,10 +246,10 @@ public class InteractionConverter {
         for ( InteractionParameter interactionParameter : interaction.getParameters() ) {
             uk.ac.ebi.intact.psimitab.model.Parameter parameterInteraction =
                     new uk.ac.ebi.intact.psimitab.model.Parameter(interactionParameter.getCvParameterType().getShortLabel(),
-                                                                  interactionParameter.getFactor(),
-                                                                  interactionParameter.getBase(),
-                                                                  interactionParameter.getExponent(),
-                                                                  (interactionParameter.getCvParameterUnit() != null? interactionParameter.getCvParameterUnit().getShortLabel() : null));
+                            interactionParameter.getFactor(),
+                            interactionParameter.getBase(),
+                            interactionParameter.getExponent(),
+                            (interactionParameter.getCvParameterUnit() != null? interactionParameter.getCvParameterUnit().getShortLabel() : null));
             bi.getParameters().add( parameterInteraction );
         }
 

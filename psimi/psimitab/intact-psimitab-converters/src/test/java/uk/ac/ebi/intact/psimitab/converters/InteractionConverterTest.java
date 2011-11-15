@@ -3,10 +3,12 @@ package uk.ac.ebi.intact.psimitab.converters;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.model.Parameter;
 
@@ -15,6 +17,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -93,6 +96,27 @@ public class InteractionConverterTest extends IntactBasicTestCase {
 
         assertNotNull( bi );
 
+    }
+
+    @Test
+    public void convertToIntactMitabConfidences() throws Exception {
+        InteractionConverter interactionConverter = new InteractionConverter();
+
+        final Interaction interaction = getMockBuilder().createInteractionRandomBinary();
+        interaction.getConfidences().add(getMockBuilder().createConfidence(CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvConfidenceType.class, null, "intact-score"), "0.8"));
+        Iterator<Component> i = interaction.getComponents().iterator();
+        i.next().getInteractor().setAc( "EBI-xxxxxxx" );
+        i.next().getInteractor().setAc( "EBI-yyyyyyy" );
+
+        Assert.assertEquals(1, interaction.getConfidences().size());
+
+        BinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
+
+        assertNotNull( bi );
+        assertEquals(1, bi.getConfidenceValues().size());
+        psidev.psi.mi.tab.model.Confidence conf = (Confidence) bi.getConfidenceValues().iterator().next();
+        assertEquals("intact-score", conf.getType());
+        assertEquals("0.8", conf.getValue());
     }
 
     @Test
