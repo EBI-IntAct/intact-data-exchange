@@ -402,6 +402,7 @@ public class PsiConverterUtils {
         }
     }
 
+
     public static int populateId( HasId hasIdElement ) {
         if ( hasIdElement.getId() > 0 ) {
             return hasIdElement.getId();
@@ -592,6 +593,19 @@ public class PsiConverterUtils {
         return dbRefs;
     }
 
+    public static Set<DbReference> toDbReferences( Collection<? extends uk.ac.ebi.intact.model.Xref> intactXrefs, XrefConverter xrefConverter ) {
+
+        Set<DbReference> dbRefs = new HashSet<DbReference>( intactXrefs.size() );
+
+        for ( uk.ac.ebi.intact.model.Xref intactXref : intactXrefs ) {
+
+            DbReference dbRef = xrefConverter.intactToPsi( intactXref );
+            dbRefs.add( dbRef );
+        }
+
+        return dbRefs;
+    }
+
     /**
      * Figures out if the given Xref has to be exported given the InteractorConverterConfig available.
      *
@@ -666,7 +680,7 @@ public class PsiConverterUtils {
             if (acRef != null){
                 dbRefs.add(acRef);
             }
-           return primary;
+            return primary;
         }
         else if (acRef != null){
             return acRef;

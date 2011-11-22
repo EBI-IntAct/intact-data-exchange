@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
@@ -29,10 +30,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.PublicationUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * Experiment converter.
@@ -255,25 +253,26 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         }
 
         Bibref bibref = new Bibref();
+        PsiConverterUtils.populateXref(intactObject, bibref, xrefConverter);
 
         if (intactObject.getPublication() != null){
             Publication publication = intactObject.getPublication();
 
             // the shortlabel of the publication is the pubmed id by default
-            if (publication.getXrefs().isEmpty() && publication.getShortLabel() != null){
+            if (bibref.getXref() == null && publication.getXrefs().isEmpty() && publication.getShortLabel() != null){
                 Xref xref = new Xref();
                 xref.setPrimaryRef(new DbReference(CvDatabase.PUBMED, CvDatabase.PUBMED_MI_REF, publication.getShortLabel(), CvXrefQualifier.PRIMARY_REFERENCE, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF));
                 bibref.setXref(xref);
             }
-            else if (publication.getXrefs().isEmpty() && !publication.getAnnotations().isEmpty()){
+            else if (bibref.getXref() == null && publication.getXrefs().isEmpty() && !publication.getAnnotations().isEmpty()){
                 PsiConverterUtils.populateAttributes( publication, bibref, annotationConverter );
             }
-            else if (!publication.getXrefs().isEmpty()){
-                PsiConverterUtils.populateXref( publication, bibref, publicationXrefConverter );
+            else if (bibref.getXref() == null && !publication.getXrefs().isEmpty()){
+                PsiConverterUtils.populateXref(publication, bibref, publicationXrefConverter);
             }
 
-            // add annotation from publication not present in experiment
-            extractPublicationAnnotationsAbsentFromExperiment(publication, expDesc);
+            // add annotation/xrefs from publication not present in experiment
+            extractPublicationAnnotationsAndXrefsAbsentFromExperiment(publication, expDesc, intactObject);
         }
         else {
             log.error("Experiment without publication : " + intactObject.getShortLabel());
@@ -400,10 +399,10 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         return attributes;
     }
 
-    public void extractPublicationAnnotationsAbsentFromExperiment(Publication pub, ExperimentDescription expDesc){
+    public void extractPublicationAnnotationsAndXrefsAbsentFromExperiment(Publication pub, ExperimentDescription expDesc, Experiment exp){
         AnnotationConverterConfig configAnnotation = ConverterContext.getInstance().getAnnotationConfig();
 
-        if (pub.getAnnotations().isEmpty()){
+        if (pub.getAnnotations().isEmpty() && pub.getXrefs().isEmpty()){
             return;
         }
 
@@ -413,6 +412,55 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
                 if (!expDesc.getAttributes().contains(attribute)){
                     expDesc.getAttributes().add(attribute);
+                }
+            }
+        }
+
+        if (!pub.getXrefs().isEmpty()){
+            Set<DbReference> convertedRefs = PsiConverterUtils.toDbReferences(pub.getXrefs(), publicationXrefConverter);
+
+            if (expDesc.getXref() == null){
+                Set<DbReference> existingDbRefs = new HashSet();
+
+                if (expDesc.getBibref() != null && expDesc.getBibref().getXref() != null){
+                    existingDbRefs.addAll(expDesc.getBibref().getXref().getAllDbReferences());
+                }
+                Collection<DbReference> disjunction = CollectionUtils.subtract(convertedRefs, existingDbRefs);
+                if (!disjunction.isEmpty()){
+                    Iterator<DbReference> iteratorDb = disjunction.iterator();
+
+                    Xref expRef = new Xref(iteratorDb.next());
+
+                    while(iteratorDb.hasNext()){
+                        expRef.getSecondaryRef().add(iteratorDb.next());
+                    }
+
+                    expDesc.setXref(expRef);
+                }
+            }
+            else {
+                Xref expRef = expDesc.getXref();
+
+                Set<DbReference> existingDbRefs = new HashSet(expRef.getAllDbReferences());
+
+                if (expDesc.getBibref() != null && expDesc.getBibref().getXref() != null){
+                    existingDbRefs.addAll(expDesc.getBibref().getXref().getAllDbReferences());
+                }
+
+                Collection<DbReference> disjunction = CollectionUtils.subtract(convertedRefs, existingDbRefs);
+
+                if (!disjunction.isEmpty()){
+                    if (expRef.getPrimaryRef() == null){
+                        Iterator<DbReference> iteratorDb = disjunction.iterator();
+                        expRef.setPrimaryRef(iteratorDb.next());
+
+                        while(iteratorDb.hasNext()){
+                            expRef.getSecondaryRef().add(iteratorDb.next());
+                        }
+                    }
+                    else {
+                        expRef.getSecondaryRef().addAll(disjunction);
+                    }
                 }
             }
         }
