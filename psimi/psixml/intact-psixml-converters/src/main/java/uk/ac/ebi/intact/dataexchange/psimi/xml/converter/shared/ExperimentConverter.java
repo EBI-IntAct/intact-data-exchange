@@ -253,7 +253,13 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         }
 
         Bibref bibref = new Bibref();
+        boolean isBibRefSet = false;
+
         PsiConverterUtils.populateXref(intactObject, bibref, xrefConverter);
+        if (bibref.getXref() != null && bibref.getXref().getPrimaryRef() != null){
+            expDesc.setBibref(bibref);
+            isBibRefSet = true;
+        }
 
         if (intactObject.getPublication() != null){
             Publication publication = intactObject.getPublication();
@@ -302,7 +308,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         }
 
         // create bibref if possible
-        if (bibref.getXref() != null && bibref.getXref().getPrimaryRef() != null){
+        if (!isBibRefSet && bibref.getXref() != null && bibref.getXref().getPrimaryRef() != null){
             expDesc.setBibref(bibref);
         }
         else if (bibref.hasAttributes()){
