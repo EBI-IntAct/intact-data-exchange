@@ -255,13 +255,13 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         Bibref bibref = new Bibref();
         boolean isBibRefSet = false;
 
-        PsiConverterUtils.populateXref(intactObject, bibref, xrefConverter);
-        if (bibref.getXref() != null && bibref.getXref().getPrimaryRef() != null){
-            expDesc.setBibref(bibref);
-            isBibRefSet = true;
-        }
-
         if (intactObject.getPublication() != null){
+            PsiConverterUtils.populateXref(intactObject, bibref, xrefConverter);
+            if (bibref.getXref() != null && bibref.getXref().getPrimaryRef() != null){
+                expDesc.setBibref(bibref);
+                isBibRefSet = true;
+            }
+
             Publication publication = intactObject.getPublication();
 
             // the shortlabel of the publication is the pubmed id by default
