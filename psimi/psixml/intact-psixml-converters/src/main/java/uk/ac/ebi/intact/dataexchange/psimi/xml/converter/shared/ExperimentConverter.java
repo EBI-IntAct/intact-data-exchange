@@ -308,14 +308,16 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         }
 
         // create bibref if possible
-        if (!isBibRefSet && bibref.getXref() != null && bibref.getXref().getPrimaryRef() != null){
-            expDesc.setBibref(bibref);
-        }
-        else if (bibref.hasAttributes()){
-            expDesc.setBibref(bibref);
-        }
-        else {
-            log.error("Experiment without primary reference or publicaton " + intactObject.getShortLabel());
+        if (!isBibRefSet){
+            if (bibref.getXref() != null && bibref.getXref().getPrimaryRef() != null){
+                expDesc.setBibref(bibref);
+            }
+            else if (bibref.hasAttributes()){
+                expDesc.setBibref(bibref);
+            }
+            else {
+                log.error("Experiment without primary reference or publicaton " + intactObject.getShortLabel());
+            }
         }
 
         intactEndConversion(intactObject);
