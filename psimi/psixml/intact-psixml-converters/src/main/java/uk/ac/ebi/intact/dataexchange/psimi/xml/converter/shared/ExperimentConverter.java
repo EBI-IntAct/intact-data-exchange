@@ -256,24 +256,26 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         boolean isBibRefSet = false;
 
         if (intactObject.getPublication() != null){
+            expDesc.setBibref(bibref);
             PsiConverterUtils.populateXref(intactObject, bibref, xrefConverter);
             if (bibref.getXref() != null && bibref.getXref().getPrimaryRef() != null){
-                expDesc.setBibref(bibref);
                 isBibRefSet = true;
             }
 
             Publication publication = intactObject.getPublication();
 
             // the shortlabel of the publication is the pubmed id by default
-            if (bibref.getXref() == null && publication.getXrefs().isEmpty() && publication.getShortLabel() != null){
+            if ((bibref.getXref() == null || bibref.getXref().getPrimaryRef() == null) && publication.getXrefs().isEmpty() && publication.getShortLabel() != null){
                 Xref xref = new Xref();
                 xref.setPrimaryRef(new DbReference(CvDatabase.PUBMED, CvDatabase.PUBMED_MI_REF, publication.getShortLabel(), CvXrefQualifier.PRIMARY_REFERENCE, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF));
                 bibref.setXref(xref);
+
+                isBibRefSet = true;
             }
-            else if (bibref.getXref() == null && publication.getXrefs().isEmpty() && !publication.getAnnotations().isEmpty()){
+            else if ((bibref.getXref() == null || bibref.getXref().getPrimaryRef() == null) && publication.getXrefs().isEmpty() && !publication.getAnnotations().isEmpty()){
                 PsiConverterUtils.populateAttributes( publication, bibref, annotationConverter );
             }
-            else if (bibref.getXref() == null && !publication.getXrefs().isEmpty()){
+            else if ((bibref.getXref() == null || bibref.getXref().getPrimaryRef() == null) && !publication.getXrefs().isEmpty()){
                 PsiConverterUtils.populateXref(publication, bibref, publicationXrefConverter);
             }
 
