@@ -124,7 +124,7 @@ public class UniprotExportProcessor {
      * @param GOFile : name of the GO file
      * @throws UniprotExportException
      */
-    public void runUniprotExport(String DRFile, String CCFile, String GOFile) throws UniprotExportException {
+    public void runUniprotExport(String DRFile, String CCFile, String GOFile, String silverCCFile) throws UniprotExportException {
 
         logger.info("Export binary interactions from IntAct");
         MiClusterScoreResults results = filter.exportInteractions();
@@ -134,7 +134,7 @@ public class UniprotExportProcessor {
             exportGOLines(results, GOFile);
 
             logger.info("Write DR and CC lines");
-            exportDRAndCCLines(results, DRFile, CCFile);
+            exportDRAndCCLines(results, DRFile, CCFile, silverCCFile);
 
             ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
             ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
@@ -345,7 +345,7 @@ public class UniprotExportProcessor {
      * @param CCFile : the file containing CC lines
      * @throws IOException
      */
-    public void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile) throws IOException {
+    public void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile, String silverCCFile) throws IOException {
         MiClusterContext clusterContext = results.getExportContext();
 
         // the Dr writer
@@ -353,6 +353,7 @@ public class UniprotExportProcessor {
 
         // two CC line writers which will be initialized depending on the version (1 = old CC line format, 2 = new CC line format)
         CCLineWriter ccWriter = ccWriterFactory.createCCLineWriterFor(this.ccConverter, CCFile);
+        CCLineWriter ccWriterForSilver = ccWriterFactory.createCCLineWriterFor(this.ccConverter, silverCCFile);
 
         if (drWriter != null || ccWriter != null){
             ExportedClusteredInteractions positiveClusteredInteractions = results.getPositiveClusteredInteractions();
@@ -395,12 +396,10 @@ public class UniprotExportProcessor {
                 // the negative encore interactions to export in the CC lines for this interactor
                 List<EncoreInteractionForScoring> negativeInteractions = new ArrayList<EncoreInteractionForScoring>();
 
-                // the number of interactions exported in CC lines
-                int numberInteractions = 0;
-                // the number of negative interactions exported in CC lines
-                int numberNegativeInteractions = 0;
-                // the total number of binary interactions attached to this protein
-                int totalNumberInteraction = 0;
+                // the encore interactions excluded from the CC lines for this interactor
+                List<EncoreInteractionForScoring> excludedInteractions = new ArrayList<EncoreInteractionForScoring>();
+                // the negative encore interactions excluded from the CC lines for this interactor
+                List<EncoreInteractionForScoring> excludedNegativeInteractions = new ArrayList<EncoreInteractionForScoring>();
 
                 // collect all encore interactions from trans-splicing (isoforms with uniprot ac coming from another entry but which are also present in this uniprot entry)
                 List<EncoreInteractionForScoring> supplementaryPositiveInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(parentAc, positiveClusteredInteractions, clusterContext);
@@ -408,16 +407,13 @@ public class UniprotExportProcessor {
 
                 if (interactingprot.doesInteract()){
                     // collect number of exported interactions for this interactor
-                    numberInteractions = collectExportedInteractions(positiveClusteredInteractions, interactions, interactor, supplementaryPositiveInteractionFromTransSplicedIsoforms);
-                    // increments the total number of interactions for this uniprot entry
-                    totalNumberInteraction = positiveClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size() + supplementaryPositiveInteractionFromTransSplicedIsoforms.size() + supplementaryNegativeInteractionFromTransSplicedIsoforms.size();
+                    // numberInteractions = collectExportedInteractions(positiveClusteredInteractions, interactions, interactor, supplementaryPositiveInteractionFromTransSplicedIsoforms);
+                    collectExportedAndExcludedInteractions(positiveClusteredInteractions, interactions, excludedInteractions, interactor, supplementaryPositiveInteractionFromTransSplicedIsoforms);
                 }
                 else{
                     // collect number of exported negative interactions for this interactor
-                    numberNegativeInteractions = collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor, supplementaryNegativeInteractionFromTransSplicedIsoforms);
-                    // increments the total number of exported negative interactions for the uniprot entry (master, isoforms and feature chain)
-                    // increments the total number of interactions for this uniprot entry
-                    totalNumberInteraction = negativeClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size()  + supplementaryPositiveInteractionFromTransSplicedIsoforms.size() + supplementaryNegativeInteractionFromTransSplicedIsoforms.size();
+                    // numberNegativeInteractions = collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor, supplementaryNegativeInteractionFromTransSplicedIsoforms);
+                    collectExportedAndExcludedInteractions(negativeClusteredInteractions, negativeInteractions, excludedNegativeInteractions, interactor, supplementaryNegativeInteractionFromTransSplicedIsoforms);
                 }
 
                 // while the sorted list of interactors is not totally processed
@@ -430,15 +426,11 @@ public class UniprotExportProcessor {
                     while (interactor.startsWith(parentAc)){
                         if (interactingprot.doesInteract()){
                             // collect number of exported interactions for this interactor
-                            numberInteractions += collectExportedInteractions(positiveClusteredInteractions, interactions, interactor, Collections.EMPTY_LIST);
-                            // increments the total number of interactions for this uniprot entry
-                            totalNumberInteraction += positiveClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
+                            collectExportedAndExcludedInteractions(positiveClusteredInteractions, interactions, excludedInteractions, interactor, Collections.EMPTY_LIST);
                         }
                         else{
                             // collect number of exported negative interactions for this interactor
-                            numberNegativeInteractions += collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor, Collections.EMPTY_LIST);
-                            // increments the total number of interactions for this uniprot entry
-                            totalNumberInteraction += negativeClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size();
+                            collectExportedAndExcludedInteractions(negativeClusteredInteractions, negativeInteractions, excludedNegativeInteractions, interactor, Collections.EMPTY_LIST);
                         }
 
                         // get the next interactor if it exists or exit
@@ -447,47 +439,45 @@ public class UniprotExportProcessor {
                             interactor = interactingprot.getInteractor();
                         }
                         else {
+                            interactor = null;
                             break;
                         }
                     }
 
                     // write CC lines if the number of interactions is superior to 0
-                    flushDRAndCCLinesFor(results, drWriter, ccWriter, parentAc, interactions, negativeInteractions, numberInteractions, numberNegativeInteractions, totalNumberInteraction);
+                    flushDRAndCCLinesFor(results, drWriter, ccWriter, ccWriterForSilver, parentAc, interactions, excludedInteractions, negativeInteractions, excludedNegativeInteractions);
 
                     // clean the list of encore interactions attached to the uniprot entry, so we can process the new interactor
                     interactions.clear();
+                    excludedInteractions.clear();
                     negativeInteractions.clear();
+                    excludedNegativeInteractions.clear();
 
                     // extract new master uniprot ac
-                    parentAc = interactor;
-                    if (interactor.contains("-")){
-                        parentAc = interactor.substring(0, interactor.indexOf("-"));
-                    }
+                    if (interactor != null){
+                        parentAc = interactor;
+                        if (interactor.contains("-")){
+                            parentAc = interactor.substring(0, interactor.indexOf("-"));
+                        }
 
-                    supplementaryPositiveInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(parentAc, positiveClusteredInteractions, clusterContext);
-                    supplementaryNegativeInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(parentAc, negativeClusteredInteractions, clusterContext);
+                        supplementaryPositiveInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(parentAc, positiveClusteredInteractions, clusterContext);
+                        supplementaryNegativeInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(parentAc, negativeClusteredInteractions, clusterContext);
 
-                    // collect new interactions for the new interactor
-                    if (interactingprot.doesInteract()){
-                        // collect number of exported interactions for this interactor
-                        numberInteractions = collectExportedInteractions(positiveClusteredInteractions, interactions, interactor, supplementaryPositiveInteractionFromTransSplicedIsoforms);
-                        numberNegativeInteractions = 0;
-                        // increments the total number of interactions for this uniprot entry
-                        totalNumberInteraction = positiveClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size() + supplementaryPositiveInteractionFromTransSplicedIsoforms.size() + supplementaryNegativeInteractionFromTransSplicedIsoforms.size();
-                    }
-                    else{
-                        // collect number of exported negative interactions for this interactor
-                        numberNegativeInteractions = collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor, supplementaryNegativeInteractionFromTransSplicedIsoforms);
-                        // increments the total number of exported negative interactions for the uniprot entry (master, isoforms and feature chain)
-                        numberInteractions = 0;
-                        // increments the total number of interactions for this uniprot entry
-                        totalNumberInteraction = negativeClusteredInteractions.getCluster().getInteractorCluster().get(interactor).size()  + supplementaryPositiveInteractionFromTransSplicedIsoforms.size() + supplementaryNegativeInteractionFromTransSplicedIsoforms.size();
-                    }
+                        // collect new interactions for the new interactor
+                        if (interactingprot.doesInteract()){
+                            // collect number of exported interactions for this interactor
+                            collectExportedAndExcludedInteractions(positiveClusteredInteractions, interactions, excludedInteractions, interactor, supplementaryPositiveInteractionFromTransSplicedIsoforms);
+                        }
+                        else{
+                            // collect number of exported negative interactions for this interactor
+                            collectExportedAndExcludedInteractions(negativeClusteredInteractions, negativeInteractions, excludedNegativeInteractions, interactor, supplementaryNegativeInteractionFromTransSplicedIsoforms);
+                        }
 
-                    // don't forget to write the latest interactor
-                    if (!interactorIterator.hasNext()){
-                        // write CC lines if the number of interactions is superior to 0
-                        flushDRAndCCLinesFor(results, drWriter, ccWriter, parentAc, interactions, negativeInteractions, numberInteractions, numberNegativeInteractions, totalNumberInteraction);
+                        // don't forget to write the latest interactor
+                        if (!interactorIterator.hasNext()){
+                            // write CC lines if the number of interactions is superior to 0
+                            flushDRAndCCLinesFor(results, drWriter, ccWriter, ccWriterForSilver, parentAc, interactions, excludedInteractions, negativeInteractions, excludedNegativeInteractions);
+                        }
                     }
                 }
             }
@@ -497,6 +487,10 @@ public class UniprotExportProcessor {
 
             if (ccWriter != null){
                 ccWriter.close();
+            }
+
+            if (ccWriterForSilver != null){
+                ccWriterForSilver.close();
             }
         }
     }
@@ -509,20 +503,34 @@ public class UniprotExportProcessor {
      * @param parentAc
      * @param interactions
      * @param negativeInteractions
-     * @param numberInteractions
-     * @param numberNegativeInteractions
-     * @param totalNumberInteraction
      * @throws IOException
      */
-    private void flushDRAndCCLinesFor(MiClusterScoreResults results, DRLineWriter drWriter, CCLineWriter ccWriter, String parentAc, List<EncoreInteractionForScoring> interactions, List<EncoreInteractionForScoring> negativeInteractions, int numberInteractions, int numberNegativeInteractions, int totalNumberInteraction) throws IOException {
+    private void flushDRAndCCLinesFor(MiClusterScoreResults results, DRLineWriter drWriter, CCLineWriter ccWriter, CCLineWriter silverCcWriter, String parentAc, List<EncoreInteractionForScoring> interactions, List<EncoreInteractionForScoring> excludedInteractions, List<EncoreInteractionForScoring> negativeInteractions, List<EncoreInteractionForScoring> excludedNegativeInteractions) throws IOException {
+        int numberInteractions = interactions.size();
+        int numberNegativeInteractions = negativeInteractions.size();
+        int numberExcludedInteractions = excludedInteractions.size();
+        int numberExcludedNegativeInteractions = excludedNegativeInteractions.size();
+        int totalNumberInteraction = numberNegativeInteractions + numberInteractions + numberExcludedInteractions + numberExcludedNegativeInteractions;
+
         if (numberInteractions > 0 || numberNegativeInteractions > 0){
-            logger.info("Write CC lines for " + parentAc);
+            logger.info("Write gold CC lines for " + parentAc);
             if (ccWriter != null){
                 CCParameters ccParameters = this.ccConverter.convertPositiveAndNegativeInteractionsIntoCCLines(interactions, negativeInteractions, results.getExportContext(), parentAc);
                 ccWriter.writeCCLine(ccParameters);
             }
             else{
-                logger.error("No CCWriter is compatible with the current ccline converter, the cc lines will not be written");
+                logger.error("No CCWriter is compatible with the current ccline converter, the gold cc lines will not be written");
+            }
+        }
+
+        if (numberExcludedInteractions > 0 || numberExcludedNegativeInteractions > 0){
+            logger.info("Write silver CC lines for " + parentAc);
+            if (silverCcWriter != null){
+                CCParameters ccParameters = this.ccConverter.convertPositiveAndNegativeInteractionsIntoCCLines(excludedInteractions, excludedNegativeInteractions, results.getExportContext(), parentAc);
+                silverCcWriter.writeCCLine(ccParameters);
+            }
+            else{
+                logger.error("No CCWriter is compatible with the current ccline converter, the silver cc lines will not be written");
             }
         }
 
@@ -567,6 +575,54 @@ public class UniprotExportProcessor {
 
             if (interaction != null){
                 interactions.add(interaction);
+            }
+        }
+
+        return numberInteractions;
+    }
+
+    /**
+     *
+     * @param results : the results of the clustering and uniprot export
+     * @param interactions : the encore interactions to export
+     * @param excludedInteractions : the encore interactions to exclude (silver)
+     * @param interactor
+     * @returnthe number of exported binary interactions for this interactor
+     */
+    private int collectExportedAndExcludedInteractions(ExportedClusteredInteractions results, List<EncoreInteractionForScoring> interactions, List<EncoreInteractionForScoring> excludedInteractions, String interactor, List<EncoreInteractionForScoring> supplementaryInteractionsFromTransSplicing) {
+
+        // the clustered interactions
+        Map<Integer, EncoreInteractionForScoring> interactionMapping = results.getCluster().getEncoreInteractionCluster();
+        List<Integer> allInteractions = results.getCluster().getInteractorCluster().get(interactor);
+
+        // the exported interactions for this interactor are the interactions attached to this interactor which are also in the list of exported interactions
+        Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), allInteractions);
+        Collection<Integer> excludedInteractionIds = CollectionUtils.subtract(allInteractions, exportedInteractions);
+
+        if (!supplementaryInteractionsFromTransSplicing.isEmpty()){
+            Collection<Integer> intersection = CollectionUtils.intersection(results.getInteractionsToExport(), supplementaryInteractionsFromTransSplicing);
+            exportedInteractions.addAll(intersection);
+            excludedInteractions.addAll(CollectionUtils.subtract(supplementaryInteractionsFromTransSplicing, intersection));
+        }
+
+        // collect number of exported interactions
+        int numberInteractions = exportedInteractions.size();
+        int numberExcluded = excludedInteractionIds.size();
+
+        // add the exported interactions to the list of interactions
+        for (Integer interactionId : exportedInteractions){
+            EncoreInteractionForScoring interaction = interactionMapping.get(interactionId);
+
+            if (interaction != null){
+                interactions.add(interaction);
+            }
+        }
+
+        for (Integer interactionId : excludedInteractionIds){
+            EncoreInteractionForScoring interaction = interactionMapping.get(interactionId);
+
+            if (interaction != null){
+                excludedInteractions.add(interaction);
             }
         }
 

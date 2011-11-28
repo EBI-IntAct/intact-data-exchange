@@ -1,7 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
@@ -27,7 +26,6 @@ public class UniprotExportProcessorTest extends UniprotExportBase{
     @Test
     @DirtiesContext
     @Transactional(propagation = Propagation.NEVER)
-    @Ignore
     public void test_simulation() throws UniprotExportException, IOException, IntactClonerException {
         createExperimentContext();
 
@@ -41,10 +39,10 @@ public class UniprotExportProcessorTest extends UniprotExportBase{
 
         MiClusterScoreResults results = createMiScoreResultsForSimulation();
         results.getPositiveClusteredInteractions().getInteractionsToExport().add(1);
-        results.getPositiveClusteredInteractions().getInteractionsToExport().add(3);
-        results.getNegativeClusteredInteractions().getInteractionsToExport().add(2);
+        //results.getPositiveClusteredInteractions().getInteractionsToExport().add(3);
+        //results.getNegativeClusteredInteractions().getInteractionsToExport().add(2);
 
-        processor.exportDRAndCCLines(results, "drFile", "ccFile");
+        processor.exportDRAndCCLines(results, "drFile", "ccFile", "ccFileSilver");
 
         //processor.runUniprotExport("drFile", "ccFile", "goFile");
 
