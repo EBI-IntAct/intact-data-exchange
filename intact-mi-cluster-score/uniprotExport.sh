@@ -16,9 +16,10 @@ echo $8
 echo $9
 echo $10
 echo $11
+echo $12
 
-MAVEN_PROFILE=$6
+MAVEN_PROFILE=$7
 
 echo "use profile ${MAVEN_PROFILE}"
 
-mvn -U clean install -Puniprot-export,${MAVEN_PROFILE} -Drule=$1 -Dsource=$2 -Ddrfile=$3 -Dccfile=$4 -Dgofile=$5 -DbinaryOnly=$7 -DhighConfidence=$8 -DproteinOnly=$9 -DpositiveOnly=${10} -DexcludeInferred=${11} -Dmaven.test.skip -Dmaven.repo.local=repository -Ddb=oracle
+mvn -U clean install -Puniprot-export,${MAVEN_PROFILE} -Drule=$1 -Dsource=$2 -Ddrfile=$3 -Dccfile=$4 -Dgofile=$5 -DccSilver=$6 -DbinaryOnly=$8 -DhighConfidence=$9 -DproteinOnly=$10 -DpositiveOnly=${11} -DexcludeInferred=${12} -Dmaven.test.skip -Dmaven.repo.local=repository -Ddb=oracle

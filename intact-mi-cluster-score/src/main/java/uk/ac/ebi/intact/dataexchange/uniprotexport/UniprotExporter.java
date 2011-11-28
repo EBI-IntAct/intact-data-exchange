@@ -45,8 +45,8 @@ public class UniprotExporter {
     public static void main( String[] args ) throws IOException {
 
         // Six possible arguments
-        if( args.length != 10 ) {
-            System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <goFile> <binaryOnly> <highConfidence> <proteinOnly> <positiveOnly> <excludeInferred>" );
+        if( args.length != 11 ) {
+            System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <silverCCFile> <goFile> <binaryOnly> <highConfidence> <proteinOnly> <positiveOnly> <excludeInferred>" );
             System.err.println( "Usage: <rule> is the type of rule we want to use to export the interaction to uniprot. " +
                     "Can be 'detection_method' if we want the rules based on detection method or 'mi_score' if we want the rules based on mi score" );
             System.err.println( "Usage: <source> is the source of the binary interactions we want to export." +
@@ -54,6 +54,7 @@ public class UniprotExporter {
                     "the file name must be given in the source option preceded by ':'" );
             System.err.println( "Usage: <drFile:version> the name of the file which will contain the DR lines. The version is optional and by default is 1");
             System.err.println( "Usage: <ccFile:version> the name of the file which will contain the CC lines. The version is optional and by default is 1");
+            System.err.println( "Usage: <silverCCFile:version> the name of the file which will contain the silver CC lines. The version is optional and by default is 1");
             System.err.println( "Usage: <goFile:version> the name of the file which will contain the GO lines. The version is optional and by default is 1");
             System.err.println( "Usage: <binaryOnly> true : exclude spoke expanded interactions from the cluster or false : accept spoke expanded interactions in the cluster. By default, is false.");
             System.err.println( "Usage: <highConfidence> true : exclude low confidence interactions (dr-export = no or condition is not respected) from the cluster or false : accept low confidence interactions in the cluster. By default, is true.");
@@ -72,11 +73,13 @@ public class UniprotExporter {
         int version_ccFile;
         String goFile = args[4];
         int version_goFile;
-        boolean excludeSpokeExpanded = Boolean.parseBoolean(args[5]);
-        boolean excludeLowConfidence = Boolean.parseBoolean(args[6]);
-        boolean excludeNonProtein = Boolean.parseBoolean(args[7]);
-        boolean excludeNegative = Boolean.parseBoolean(args[8]);
-        boolean excludeInferred = Boolean.parseBoolean(args[9]);
+        String silverCcFile = args[5];
+        int version_silverCcFile;
+        boolean excludeSpokeExpanded = Boolean.parseBoolean(args[6]);
+        boolean excludeLowConfidence = Boolean.parseBoolean(args[7]);
+        boolean excludeNonProtein = Boolean.parseBoolean(args[8]);
+        boolean excludeNegative = Boolean.parseBoolean(args[9]);
+        boolean excludeInferred = Boolean.parseBoolean(args[10]);
 
         IntactContext.initContext(new String[]{"/META-INF/jpa.spring.xml", "/META-INF/uniprotExport.spring.xml"});
 
@@ -133,6 +136,16 @@ public class UniprotExporter {
             version_goFile = 1;
         }
 
+        if (silverCcFile.contains(":")){
+            int index = args[3].indexOf(":");
+            silverCcFile = args[3].substring(0, index);
+
+            version_silverCcFile =  Integer.parseInt(args[3].substring(index + 1));
+        }
+        else{
+            version_silverCcFile = 1;
+        }
+
         final InteractionSource source = InteractionFilterFactory.convertIntoInteractionSourceName(sourceType);
 
         if (source.equals(InteractionSource.none) || (mitabFile == null && source.equals(InteractionSource.mitab)) || (mitabFile != null && !source.equals(InteractionSource.mitab))){
@@ -153,6 +166,8 @@ public class UniprotExporter {
         System.out.println( "Version of the CC writer = " + version_ccFile );
         System.out.println( "GO file = " + goFile );
         System.out.println( "Version of the GO writer = " + version_goFile );
+        System.out.println( "Silver CC file = " + silverCcFile );
+        System.out.println( "Version of the silver CC writer = " + version_silverCcFile );
 
         System.out.println("Filter spoke expanded interactions : " + excludeSpokeExpanded );
         System.out.println("Filter low confidence interactions : " + excludeLowConfidence);
@@ -175,7 +190,7 @@ public class UniprotExporter {
         UniprotExportProcessor processor = new UniprotExportProcessor(filter, goConverter, ccConverter, drConverter);
 
         try {
-            processor.runUniprotExport(drFile, ccFile, goFile);
+            processor.runUniprotExport(drFile, ccFile, goFile, silverCcFile);
 
         } catch (UniprotExportException e) {
             e.printStackTrace();
