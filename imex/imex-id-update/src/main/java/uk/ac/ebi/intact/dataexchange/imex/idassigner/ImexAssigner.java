@@ -293,7 +293,7 @@ public class ImexAssigner {
 
         final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
-        final CorePersister persister = IntactContext.getCurrentInstance().getCorePersister();
+//        final CorePersister persister = IntactContext.getCurrentInstance().getCorePersister();
 
         // TODO browse publication by smaller chunk to minimize memory usage.
         List<Publication> publications = daoFactory.getPublicationDao().getAll();
@@ -397,6 +397,7 @@ public class ImexAssigner {
                     System.out.println( "\tAttempting to update IMEx publication status from '" +
                                         imexPublication.getStatus() + "' to '" + intactStatus + "' ..." );
 
+                    // TODO Check if
                     if( foundByPmid ) {
                         imexCentral.updatePublicationStatus( publicationId, intactStatus, null );
                     } else {
@@ -406,6 +407,8 @@ public class ImexAssigner {
 
                 // TODO only update adminGroup/adminUser when the value is different
 
+
+                // TODO Here we are not taking into account MolCon, I2D, InnateDB... Use the publication's institution.shortlabel
                 final String institution = "INTACT";
                 imexCentral.updatePublicationAdminGroup( publicationId, Operation.ADD, institution );
                 System.out.println( "Updated publication admin group to: " + institution );
@@ -513,7 +516,7 @@ public class ImexAssigner {
 
                         System.out.println( "\t\tInteraction: " + interaction.getShortLabel() + " (AC: " + interaction.getAc() + ")" );
 
-                        if ( !involvesOnlyProteins( interaction ) ) {
+                        if ( ! involvesOnlyProteins( interaction ) ) {
 
                             System.out.println( "\t\tThis interaction doesn't only involve proteins ... skip it." );
 
@@ -541,8 +544,9 @@ public class ImexAssigner {
 
                             } else {
 
+                                final String interactionImexId = primaryXref.getPrimaryId();
                                 // check and update if necessary
-                                if ( !IMEX_INTERACTION_ID.matcher( primaryXref.getPrimaryId() ).matches() ) {
+                                if ( ! IMEX_INTERACTION_ID.matcher( primaryXref.getPrimaryId() ).matches() ) {
                                     // We have an old IMEx id, change qualifier from primary to secondary
                                     primaryXref.setCvXrefQualifier( imexSecondary );
                                     if ( !dryRun ) daoFactory.getXrefDao().update( primaryXref );
@@ -554,13 +558,15 @@ public class ImexAssigner {
                                     lastImexId = addImexPrimary( daoFactory, interaction, imex, imexPrimary, imexId, lastImexId );
                                 } else {
 
-                                    if ( !hasAssignedIdYet ) {
+                                    if ( !hasAssignedIdYet && ! interactionImexId.startsWith( imexId ) ) {
 
                                         System.err.println( "Despite the fact that publication didn't have an " +
                                                             "annotation 'last-imex-assigned' some interaction do " +
                                                             "have IMEx ids assigned (e.g. " + primaryXref.getPrimaryId()
                                                             + "). There is a chance we are assigning the same IDs to " +
                                                             "different interactions." );
+                                        System.err.println( "Interaction IMEx id ("+ interactionImexId +
+                                                            ") mismatch the publication IMEx id ("+ imexId +")." );
 
                                         badLastImexAssigned++;
 
@@ -571,8 +577,6 @@ public class ImexAssigner {
                                 }
                             }
                         } // is PPI
-
-//                        persister.saveOrUpdate( interaction );
 
                     } // interactions
 
@@ -864,7 +868,8 @@ public class ImexAssigner {
                                                                     2006 );
 
             final boolean molconJournalMatch = matchesJournalsAndYear( experiment,
-                                                                       Arrays.asList( "Mol. Cancer" ),
+                                                                       Arrays.asList( "Mol. Cancer",
+                                                                                      "J Mol Signal."),
                                                                        2010 );
 
             final boolean innateDbJournalMatch = matchesJournalsAndYear( experiment,
@@ -897,6 +902,8 @@ public class ImexAssigner {
         final Collection<Experiment> experiments = publication.getExperiments();
 
         boolean isCuratorTriggered = false;
+
+        // TODO check if there are more than one distinct IMEx ID.
 
         // Irrespectively of the journal, if at least one experiment has an xref(db=imex, qualifier=imex-primary)
         // we will assign IMEx ids to it.
