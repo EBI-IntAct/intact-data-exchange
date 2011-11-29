@@ -5,11 +5,13 @@ import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
 import uk.ac.ebi.intact.bridges.taxonomy.UniprotTaxonomyService;
+import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedProteins;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Abstract encore interaction to CC line converter
@@ -76,5 +78,20 @@ public abstract class AbstractEncoreInteractionToCCLineConverter implements Enco
         this.taxIdToScientificName.put(taxId, scientificName);
 
         return scientificName;
+    }
+
+    protected boolean isFirstInteractor(String firstInteractor, String interactor,Set<IntactTransSplicedProteins> transSplicedProteins){
+
+        if (interactor.startsWith(firstInteractor)){
+           return true;
+        }
+        else if (transSplicedProteins != null){
+            for (IntactTransSplicedProteins prot : transSplicedProteins){
+                if (interactor.equalsIgnoreCase(prot.getUniprotAc())){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

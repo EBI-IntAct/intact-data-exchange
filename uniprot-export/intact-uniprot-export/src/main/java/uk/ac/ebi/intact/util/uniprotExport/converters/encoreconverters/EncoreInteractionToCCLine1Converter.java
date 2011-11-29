@@ -122,6 +122,8 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             containsFeatureChain = true;
                         }
 
+                        // we don't allow self interactions with isoforms or isoforms interacting with isoforms
+
                         // case of uniprot1 = master uniprot interacting with one of its isoforms uniprot 2 or self interaction
                         if (uniprot1.equals(masterUniprot) && ((!uniprot2.equals(masterUniprot) && uniprot2.startsWith(masterUniprot)) || uniprot2.equals(masterUniprot))){
                             firstUniprot = uniprot1;
@@ -169,6 +171,9 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
 
                             taxId1 = organismsB[0];
                             firstIntactAc = intact2;
+                        }
+                        else {
+                            logger.info("We don't convert an interaction composed of two isoforms of the same master protein because the format is not supporting that.");
                         }
 
                         if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null){

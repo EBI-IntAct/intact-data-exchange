@@ -52,9 +52,14 @@ public class UniprotExportProcessor {
     private EncoreInteractionToGoLineConverter goConverter;
 
     /**
-     * The converter of Encore interactions into CC line
+     * The converter of Encore interactions into gold CC line
      */
     private EncoreInteractionToCCLineConverter ccConverter;
+
+    /**
+     * The converter of Encore interactions into silver CC line
+     */
+    private EncoreInteractionToCCLineConverter silverCcConverter;
 
     /**
      * The converter of an interactor into DR line
@@ -92,6 +97,9 @@ public class UniprotExportProcessor {
         // by default, initialize a converter of the first CC line format
         ccConverter = new EncoreInteractionToCCLine1Converter();
 
+        // by default, we use the same cc converter for silver and gold cc lines
+        silverCcConverter = ccConverter;
+
         drConverter = new DefaultInteractorToDRLineConverter();
 
         this.filter = filter;
@@ -105,11 +113,12 @@ public class UniprotExportProcessor {
      *
      * @param filter : the filter to use for uniprot export
      */
-    public UniprotExportProcessor(InteractionFilter filter, EncoreInteractionToGoLineConverter goConverter, EncoreInteractionToCCLineConverter ccConverter, InteractorToDRLineConverter drConverter){
+    public UniprotExportProcessor(InteractionFilter filter, EncoreInteractionToGoLineConverter goConverter, EncoreInteractionToCCLineConverter ccConverter, EncoreInteractionToCCLineConverter silverCcConverter, InteractorToDRLineConverter drConverter){
 
         this.goConverter = goConverter != null ? goConverter : new DefaultEncoreInteractionToGoLineConverter();
         this.drConverter = drConverter != null ? drConverter : new DefaultInteractorToDRLineConverter();
         this.ccConverter = ccConverter != null ? ccConverter : new EncoreInteractionToCCLine1Converter();
+        this.silverCcConverter = silverCcConverter != null ? silverCcConverter : this.ccConverter;
 
         this.filter = filter;
         this.ccWriterFactory = new CCWriterFactory();
@@ -237,16 +246,6 @@ public class UniprotExportProcessor {
                 }
             }
 
-            // for each interactions we can export, get it from the cluster and convert it into GO line
-            /*for (Integer interactionId : results.getInteractionsToExport()){
-                EncoreInteraction interaction = interactionMapping.get(interactionId);
-                logger.info("Write GO lines for " + interaction.getInteractorA() + " - " + interaction.getInteractorB());
-
-                GOParameters goParameters = this.goConverter.convertInteractionIntoGOParameters(interaction);
-
-                goWriter.writeGOLine(goParameters);
-            }*/
-
             // close the writer
             goWriter.close();
         }
@@ -353,7 +352,7 @@ public class UniprotExportProcessor {
 
         // two CC line writers which will be initialized depending on the version (1 = old CC line format, 2 = new CC line format)
         CCLineWriter ccWriter = ccWriterFactory.createCCLineWriterFor(this.ccConverter, CCFile);
-        CCLineWriter ccWriterForSilver = ccWriterFactory.createCCLineWriterFor(this.ccConverter, silverCCFile);
+        CCLineWriter ccWriterForSilver = ccWriterFactory.createCCLineWriterFor(this.silverCcConverter, silverCCFile);
 
         if (drWriter != null || ccWriter != null){
             ExportedClusteredInteractions positiveClusteredInteractions = results.getPositiveClusteredInteractions();
@@ -526,7 +525,7 @@ public class UniprotExportProcessor {
         if (numberExcludedInteractions > 0 || numberExcludedNegativeInteractions > 0){
             logger.info("Write silver CC lines for " + parentAc);
             if (silverCcWriter != null){
-                CCParameters ccParameters = this.ccConverter.convertPositiveAndNegativeInteractionsIntoCCLines(excludedInteractions, excludedNegativeInteractions, results.getExportContext(), parentAc);
+                CCParameters ccParameters = this.silverCcConverter.convertPositiveAndNegativeInteractionsIntoCCLines(excludedInteractions, excludedNegativeInteractions, results.getExportContext(), parentAc);
                 silverCcWriter.writeCCLine(ccParameters);
             }
             else{
@@ -643,6 +642,14 @@ public class UniprotExportProcessor {
 
     public void setCcConverter(EncoreInteractionToCCLineConverter ccConverter) {
         this.ccConverter = ccConverter;
+    }
+
+    public EncoreInteractionToCCLineConverter getSilverCcConverter() {
+        return silverCcConverter;
+    }
+
+    public void setSilverCcConverter(EncoreInteractionToCCLineConverter silverCcConverter) {
+        this.silverCcConverter = silverCcConverter;
     }
 
     public InteractorToDRLineConverter getDrConverter() {

@@ -196,7 +196,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
                     // extract organism names
                     String organism2 = null;
 
-                    if (uniprot1.startsWith(firstInteractor)){
+                    if (isFirstInteractor(firstInteractor, uniprot1, transSplicedVariants.get(firstInteractor))){
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
@@ -213,7 +213,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
                         taxId1 = organismsA[0];
                         firstIntactAc = intact1;
                     }
-                    else if (uniprot2.startsWith(firstInteractor)) {
+                    else {
                         firstUniprot = uniprot2;
                         secondUniprot = uniprot1;
                         geneName2 = context.getGeneNames().get(uniprot1);
@@ -229,57 +229,6 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
 
                         taxId1 = organismsB[0];
                         firstIntactAc = intact2;
-                    }
-                    else {
-                        Set<IntactTransSplicedProteins> transSplicedProteins = transSplicedVariants.get(firstInteractor);
-                        boolean startsWithUniprot1 = false;
-
-                        if (transSplicedProteins != null){
-                            for (IntactTransSplicedProteins prot : transSplicedProteins){
-                                if (uniprot1.equalsIgnoreCase(prot.getUniprotAc())){
-                                    startsWithUniprot1 = true;
-                                    break;
-                                }
-                                else if (uniprot2.equalsIgnoreCase(prot.getUniprotAc())){
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (startsWithUniprot1){
-                            firstUniprot = uniprot1;
-                            secondUniprot = uniprot2;
-                            geneName2 = context.getGeneNames().get(uniprot2);
-                            geneName1 = context.getGeneNames().get(uniprot1);
-                            taxId2 = organismsB[0];
-                            try {
-                                organism2 = retrieveOrganismScientificName(taxId2);
-                            } catch (TaxonomyServiceException e) {
-                                logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
-                                organism2 = organismsB[1];
-                            }
-                            secondIntactAc = intact2;
-
-                            taxId1 = organismsA[0];
-                            firstIntactAc = intact1;
-                        }
-                        else {
-                            firstUniprot = uniprot2;
-                            secondUniprot = uniprot1;
-                            geneName2 = context.getGeneNames().get(uniprot1);
-                            geneName1 = context.getGeneNames().get(uniprot2);
-                            taxId2 = organismsA[0];
-                            try {
-                                organism2 = retrieveOrganismScientificName(taxId2);
-                            } catch (TaxonomyServiceException e) {
-                                logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
-                                organism2 = organismsA[1];
-                            }
-                            secondIntactAc = intact1;
-
-                            taxId1 = organismsB[0];
-                            firstIntactAc = intact2;
-                        }
                     }
 
                     if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null && organism2 != null){
@@ -364,7 +313,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
                     // extract organism names
                     String organism2 = null;
 
-                    if (uniprot1.startsWith(firstInteractor)){
+                    if (isFirstInteractor(firstInteractor, uniprot1, transSplicedVariants.get(firstInteractor))){
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
@@ -381,7 +330,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
                         taxId1 = organismsA[0];
                         firstIntactAc = intact1;
                     }
-                    else if (uniprot2.startsWith(firstInteractor)){
+                    else {
                         firstUniprot = uniprot2;
                         secondUniprot = uniprot1;
                         geneName2 = context.getGeneNames().get(uniprot1);
@@ -397,57 +346,6 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
 
                         taxId1 = organismsB[0];
                         firstIntactAc = intact2;
-                    }
-                    else {
-                        Set<IntactTransSplicedProteins> transSplicedProteins = transSplicedVariants.get(firstInteractor);
-                        boolean startsWithUniprot1 = false;
-
-                        if (transSplicedProteins != null){
-                            for (IntactTransSplicedProteins prot : transSplicedProteins){
-                                if (uniprot1.equalsIgnoreCase(prot.getUniprotAc())){
-                                    startsWithUniprot1 = true;
-                                    break;
-                                }
-                                else if (uniprot2.equalsIgnoreCase(prot.getUniprotAc())){
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (startsWithUniprot1){
-                            firstUniprot = uniprot1;
-                            secondUniprot = uniprot2;
-                            geneName2 = context.getGeneNames().get(uniprot2);
-                            geneName1 = context.getGeneNames().get(uniprot1);
-                            taxId2 = organismsB[0];
-                            try {
-                                organism2 = retrieveOrganismScientificName(taxId2);
-                            } catch (TaxonomyServiceException e) {
-                                logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
-                                organism2 = organismsB[1];
-                            }
-                            secondIntactAc = intact2;
-
-                            taxId1 = organismsA[0];
-                            firstIntactAc = intact1;
-                        }
-                        else {
-                            firstUniprot = uniprot2;
-                            secondUniprot = uniprot1;
-                            geneName2 = context.getGeneNames().get(uniprot1);
-                            geneName1 = context.getGeneNames().get(uniprot2);
-                            taxId2 = organismsA[0];
-                            try {
-                                organism2 = retrieveOrganismScientificName(taxId2);
-                            } catch (TaxonomyServiceException e) {
-                                logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
-                                organism2 = organismsA[1];
-                            }
-                            secondIntactAc = intact1;
-
-                            taxId1 = organismsB[0];
-                            firstIntactAc = intact2;
-                        }
                     }
 
                     if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null && organism2 != null){
