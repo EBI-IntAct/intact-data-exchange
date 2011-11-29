@@ -374,7 +374,7 @@ public class ImexAssigner {
                     }
                 }
 
-                // update publications status
+                // Update publications status
 
                 PublicationStatus intactStatus = getPublicationStatus( publication );
                 switch( intactStatus ) {
@@ -499,18 +499,6 @@ public class ImexAssigner {
                     System.out.println( "\tProcessing experiment: " + experiment.getShortLabel() );
 
                     imexExperimentCount++;
-
-                    updateImexAnnotations( daoFactory, imexCuration, fullCoverage, experiment, "\t" );
-
-                    // Add imex id so that PSI-MI XML export run smoothly without requiring code update
-                    if ( !containsPrimaryImexId( experiment ) ) {
-                        // Add imex-primary to the exp
-                        ExperimentXref expXref = new ExperimentXref( publication.getOwner(), imex, imexId, imexPrimary );
-                        experiment.addXref( expXref );
-//                        if ( !dryRun ) daoFactory.getXrefDao().persist( expXref );
-
-                        System.out.println( "\tAdded missing Experiment's IMEx primary: " + imexId );
-                    }
 
                     for ( Interaction interaction : experiment.getInteractions() ) {
 
@@ -899,49 +887,35 @@ public class ImexAssigner {
     }
 
     private boolean isCuratorTriggered( Publication publication, DaoFactory daoFactory ) {
-        final Collection<Experiment> experiments = publication.getExperiments();
-
         boolean isCuratorTriggered = false;
 
         // TODO check if there are more than one distinct IMEx ID.
 
-        // Irrespectively of the journal, if at least one experiment has an xref(db=imex, qualifier=imex-primary)
+        // Irrespectively of the journal, if the publication has an xref(db=imex, qualifier=imex-primary)
         // we will assign IMEx ids to it.
 
-        // search for an experiment with IMEx id
+        // Search for IMEx id on Publication
         Xref imexIdXref = null;
-        for ( Experiment experiment : experiments ) {
-            if( containsPrimaryImexId( experiment ) ) {
-                imexIdXref = ImexUtils.getPrimaryImexId( experiment );
-                System.out.println( "Experiment '"+ experiment.getShortLabel() +"' has an IMEx id assigned ("+
-                                    imexIdXref.getPrimaryId() +"), enable export of the whole publication." );
-                isCuratorTriggered = true;
-                break;
-            }
+        if( containsPrimaryImexId( publication ) ) {
+            imexIdXref = ImexUtils.getPrimaryImexId( publication );
+            System.out.println( "Publication '"+ publication.getShortLabel() +"' has an IMEx id assigned ("+
+                                imexIdXref.getPrimaryId() +"), enable processing of the whole publication." );
+            isCuratorTriggered = true;
         }
 
-        if( imexIdXref != null ) {
-            // check that we have the same id on the publication, if not, add it.
-            final Xref pubImexIdXref = ImexUtils.getPrimaryImexId( publication );
-            if( pubImexIdXref != null ) {
-                if( imexIdXref.getPrimaryId().equals( pubImexIdXref.getPrimaryId() ) ) {
-                    System.out.println( "Publication and experiment have the same IMEx id." );
-                } else {
-                    throw new IllegalStateException( "WARNING: Publication '"+ publication.getShortLabel()+"' and experiment '"+
-                                                     imexIdXref.getParentAc() +"' different IMEx ID, respectively: " +
-                                                     pubImexIdXref.getPrimaryId() + " and " + imexIdXref.getPrimaryId() );
-                }
-            } else {
-                // assign that IMEx id to the publication
-                PublicationXref pubXref = new PublicationXref( publication.getOwner(), imex, imexIdXref.getPrimaryId(), imexPrimary );
-                publication.addXref( pubXref );
-                if ( !dryRun ) daoFactory.getXrefDao().persist( pubXref );
-
-                fireOnNewImexIdAssignedToPublication( new ImexUpdateEvent( this, publication, "Based on IMEx ID assigned to experiment by curator" ) );
-
-                System.out.println( "\tCreated publication's IMEx primary: " + imexIdXref.getPrimaryId() + " based on experiment's IMEx ID." );
-            }
-        }
+//        if( imexIdXref != null ) {
+//            // check that we have the same id on the publication, if not, add it.
+//            final Xref pubImexIdXref = ImexUtils.getPrimaryImexId( publication );
+//            if( pubImexIdXref != null ) {
+//                if( imexIdXref.getPrimaryId().equals( pubImexIdXref.getPrimaryId() ) ) {
+//                    System.out.println( "Publication and experiment have the same IMEx id." );
+//                } else {
+//                    throw new IllegalStateException( "WARNING: Publication '"+ publication.getShortLabel()+"' and experiment '"+
+//                                                     imexIdXref.getParentAc() +"' different IMEx ID, respectively: " +
+//                                                     pubImexIdXref.getPrimaryId() + " and " + imexIdXref.getPrimaryId() );
+//                }
+//            }
+//        }
 
         return isCuratorTriggered;
     }
