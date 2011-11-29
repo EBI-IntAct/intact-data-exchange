@@ -75,10 +75,10 @@
                                 <argument>${drfile}</argument>
                                 <!-- The name of the CC file-->
                                 <argument>${ccfile}</argument>
-                                <!-- The name of the silver CC file-->
-                                <argument>${silverccfile}</argument>
                                 <!-- The name of the GO file  -->
                                 <argument>${gofile}</argument>
+                                <!-- The name of the silver CC file-->
+                                <argument>${silverccfile}</argument>
                                 <argument>${binaryOnly}</argument>
                                 <argument>${highConfidence}</argument>
                                 <argument>${proteinOnly}</argument>

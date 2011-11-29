@@ -137,10 +137,10 @@ public class UniprotExporter {
         }
 
         if (silverCcFile.contains(":")){
-            int index = args[3].indexOf(":");
-            silverCcFile = args[3].substring(0, index);
+            int index = args[5].indexOf(":");
+            silverCcFile = args[5].substring(0, index);
 
-            version_silverCcFile =  Integer.parseInt(args[3].substring(index + 1));
+            version_silverCcFile =  Integer.parseInt(args[5].substring(index + 1));
         }
         else{
             version_silverCcFile = 1;
