@@ -20,6 +20,7 @@
         <source>intact</source>
         <drfile>/ebi/sp/pro6/intact/local/data/released/current/various/uniprotlinks.dat:1</drfile>
         <ccfile>/ebi/sp/pro6/intact/local/data/released/current/various/uniprotcomments.dat:1</ccfile>
+        <silverccfile>/ebi/sp/pro6/intact/local/data/released/current/various/silver_nexprot.txt:1</silverccfile>
         <gofile>/ebi/sp/pro6/intact/local/data/released/current/various/gene_association.goa_intact.gz:1</gofile>
         <binaryOnly>false</binaryOnly>
         <highConfidence>true</highConfidence>
@@ -74,6 +75,8 @@
                                 <argument>${drfile}</argument>
                                 <!-- The name of the CC file-->
                                 <argument>${ccfile}</argument>
+                                <!-- The name of the silver CC file-->
+                                <argument>${silverccfile}</argument>
                                 <!-- The name of the GO file  -->
                                 <argument>${gofile}</argument>
                                 <argument>${binaryOnly}</argument>
