@@ -186,8 +186,13 @@ public class UniprotExporter {
         InteractorToDRLineConverter drConverter = DRConverterFactory.createDRLineConverter(version_drFile);
         EncoreInteractionToGoLineConverter goConverter = GOConverterFactory.createGOConverter(version_goFile);
         EncoreInteractionToCCLineConverter ccConverter = CCConverterFactory.createCCConverter(version_ccFile);
+        EncoreInteractionToCCLineConverter silverCcConverter = ccConverter;
 
-        UniprotExportProcessor processor = new UniprotExportProcessor(filter, goConverter, ccConverter, drConverter);
+        if (version_ccFile != version_silverCcFile){
+            silverCcConverter = CCConverterFactory.createCCConverter(version_silverCcFile);
+        }
+
+        UniprotExportProcessor processor = new UniprotExportProcessor(filter, goConverter, ccConverter, silverCcConverter, drConverter);
 
         try {
             processor.runUniprotExport(drFile, ccFile, goFile, silverCcFile);
