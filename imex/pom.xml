@@ -15,8 +15,7 @@
     <name>IntAct Data Exchange :: IMEx</name>
 
     <modules>
-        <!--<module>imex-exchange</module>
-        <module>imex-id-service</module>-->
+        <!--<module>imex-id-service</module>-->
         <module>imex-id-update</module>
     </modules>
 
