@@ -1,4 +1,0 @@
-IntAct SOLR Home
-================
-
-Version: ${version} 
