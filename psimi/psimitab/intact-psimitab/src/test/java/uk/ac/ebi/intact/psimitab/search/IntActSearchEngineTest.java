@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.psimitab.search;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.store.Directory;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,6 +27,8 @@ import psidev.psi.mi.tab.model.builder.DocumentDefinition;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * IntActSearchEngine Tester.
@@ -300,17 +301,17 @@ public class IntActSearchEngineTest {
         assertEquals(1, result.getData().size());
 
         //search with parent term
-        searchQuery = ("properties:\"plasma membrane part\"");
+        searchQuery = ("properties:\"cell-substrate junction\"");
         result = searchEngine.search(searchQuery, null, null);
         assertEquals(1, result.getData().size());
 
-        //search with parent term GO:0044459(plasma membrane part)
-        searchQuery = ("properties:\"GO:0044459\"");
+        //search with parent term GO:0030055(cell-substrate junction)
+        searchQuery = ("properties:\"GO:0030055\"");
         result = searchEngine.search(searchQuery, null, null);
         assertEquals(1, result.getData().size());
 
         //search with parent term in exact field-should be 0
-        searchQuery = ("properties_exact:\"plasma membrane part\"");
+        searchQuery = ("properties_exact:\"cell-substrate junction\"");
         result = searchEngine.search(searchQuery, null, null);
         assertEquals(0, result.getData().size());
 
