@@ -88,6 +88,15 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
      * @return list of cv terms with parents and itself
      */
     public Collection<Field> getAllParents(psidev.psi.mi.tab.model.builder.Field field, boolean includeItself) throws SolrServerException {
+         return getAllParents(field, includeItself, true);
+    }
+
+    /**
+     * @param field         the field for which we want to get the parents
+     * @param includeItself if true, the passed field will be part of the collection (its description updated from the index)
+     * @return list of cv terms with parents and itself
+     */
+    public Collection<Field> getAllParents(psidev.psi.mi.tab.model.builder.Field field, boolean includeItself, boolean includeSynonyms) throws SolrServerException {
         if (ontologySearcher == null) {
             return Collections.EMPTY_LIST;
         }
@@ -104,13 +113,13 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
 
         // fetch parents and fill the field list
         final OntologyTerm ontologyTerm = findOntologyTerm(field);
-        final Set<OntologyTerm> parents = ontologyTerm.getAllParentsToRoot();
+        final Set<OntologyTerm> parents = ontologyTerm.getAllParentsToRoot(includeSynonyms);
 
         allParents = convertTermsToFields(type, parents);
 
         if (includeItself) {
-            Field updatedItself = convertTermToField(type, ontologyTerm);
-            allParents.add(updatedItself);
+            Collection<Field> itselfAndSynonyms = convertTermToFieldIncludingSynonyms(type, ontologyTerm);
+            allParents.addAll(itselfAndSynonyms);
         }
 
         cvCache.put(identifier, allParents);
@@ -152,5 +161,17 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
 
     private Field convertTermToField(String type, OntologyTerm term) {
         return new Field( type, term.getId(), term.getName() );
+    }
+
+    private Collection<Field> convertTermToFieldIncludingSynonyms(String type, OntologyTerm term) {
+        Collection<Field> fields = new ArrayList<Field>();
+
+        fields.add(convertTermToField(type, term));
+        
+        for (OntologyTerm synonymField : term.getSynonyms()) {
+            fields.add(convertTermToField(type, synonymField));
+        }
+
+        return fields;
     }
 }

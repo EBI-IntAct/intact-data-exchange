@@ -97,32 +97,15 @@ public class OntologyIndexer {
     }
 
     public void indexOntology(OntologyIterator ontologyIterator, DocumentFilter documentFilter) {
-        int i = 0;
+        Iterator<SolrInputDocument> iter = new SolrInputDocumentIterator(ontologyIterator, documentFilter);
 
-//        while (ontologyIterator.hasNext()) {
-//            OntologyDocument doc = ontologyIterator.next();
-//            index(doc, documentFilter);
-
-
-            Iterator<SolrInputDocument> iter = new SolrInputDocumentIterator(ontologyIterator, documentFilter);
-
-            try {
-                solrServer.add(iter);
-            } catch (Throwable e) {
-                throw new IntactSolrException("Problem indexing documents using iterator", e);
-            }
-
-//            i++;
-
-//            if (i % 100 == 0) {
-//                commitSolr(false);
-//                if ( log.isInfoEnabled() ) log.info( i + " terms processed" );
-//            }
-//        }
+        try {
+            solrServer.add(iter);
+        } catch (Throwable e) {
+            throw new IntactSolrException("Problem indexing documents using iterator", e);
+        }
 
         commitSolr(true);
-        
-//        if ( log.isInfoEnabled() ) log.info( "Completed processing of " + i + " terms." );
     }
 
     public void index(OntologyDocument ontologyDocument) throws IntactSolrException {
@@ -155,6 +138,15 @@ public class OntologyIndexer {
         addField(doc, OntologyFieldNames.CHILD_NAME, ontologyDocument.getChildName(), true);
         addField(doc, OntologyFieldNames.RELATIONSHIP_TYPE, ontologyDocument.getRelationshipType(), false);
         addField(doc, OntologyFieldNames.CYCLIC, ontologyDocument.isCyclicRelationship(), false);
+        
+        for (String synonym : ontologyDocument.getParentSynonyms()) {
+            addField(doc, OntologyFieldNames.PARENT_SYNONYMS, synonym, false);
+        }
+
+        for (String synonym : ontologyDocument.getChildSynonyms()) {
+            addField(doc, OntologyFieldNames.CHILDREN_SYNONYMS, synonym, false);
+        }
+
         return doc;
     }
 

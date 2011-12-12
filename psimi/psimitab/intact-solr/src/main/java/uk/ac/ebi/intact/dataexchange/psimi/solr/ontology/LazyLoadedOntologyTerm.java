@@ -44,6 +44,7 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
 
     private List<OntologyTerm> parents;
     private List<OntologyTerm> children;
+    private Set<OntologyTerm> synonyms;
 
     public LazyLoadedOntologyTerm(OntologySearcher searcher, String id) throws SolrServerException {
         this( searcher, id, null );
@@ -52,18 +53,39 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
     public LazyLoadedOntologyTerm(OntologySearcher searcher, String id, String name) throws SolrServerException {
         this.searcher = searcher;
         this.id = id;
-        this.name = findName(searcher, id, name);
+        this.name = findNameAndSynonyms(searcher, id, name);
+        
+        
+        
     }
 
-    private String findName(OntologySearcher searcher, String id, String defaultValue) throws SolrServerException {
+    public LazyLoadedOntologyTerm(OntologySearcher searcher, String id, String name, Set<OntologyTerm> synonyms) throws SolrServerException {
+        this.searcher = searcher;
+        this.id = id;
+        this.name = name;
+        this.synonyms = synonyms;
+    }
+
+    private String findNameAndSynonyms(OntologySearcher searcher, String id, String defaultValue) throws SolrServerException {
         QueryResponse queryResponse = searcher.searchByChildId(id, 0, 1);
 
-        String parentName = null;
+        String childName = null;
         if (queryResponse.getResults().getNumFound() > 0) {
-            parentName = (String) queryResponse.getResults().iterator().next().getFieldValue( OntologyFieldNames.CHILD_NAME);
+            final SolrDocument solrDocument = queryResponse.getResults().iterator().next();
+            childName = (String) solrDocument.getFieldValue(OntologyFieldNames.CHILD_NAME);
+
+            Collection<Object> fieldValues = solrDocument.getFieldValues(OntologyFieldNames.CHILDREN_SYNONYMS);
+
+            synonyms = new HashSet<OntologyTerm>(fieldValues.size());
+
+
+            // TODO use a Factory to instantiate stuff, so we can create the synonyms outside the constructor
+            for (Object fieldValue : fieldValues) {
+                synonyms.add(fieldValue.toString());
+            }
         }
 
-        return parentName == null ? defaultValue : parentName;
+        return childName == null ? defaultValue : childName;
     }
 
     public String getId() {
@@ -115,6 +137,11 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
         return children;
     }
 
+    @Override
+    public Set<OntologyTerm> getSynonyms() {
+        return synonyms;
+    }
+
     private QueryResponse searchQuery(String idFieldName, boolean includeCyclic) throws SolrServerException {
 
         SolrQuery query = new SolrQuery(idFieldName+":\""+id+"\"");
@@ -135,6 +162,11 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
         return getAllParentsToRoot(this);
     }
 
+    @Override
+    public Set<OntologyTerm> getAllParentsToRoot(boolean includeSynonyms) {
+        return null;
+    }
+
     protected Set<OntologyTerm> getAllParentsToRoot(OntologyTerm ontologyTerm) {
         Set<OntologyTerm> parents = new HashSet<OntologyTerm>();
 
@@ -145,19 +177,6 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
 
         return parents;
     }
-
-//    private Set<OntologyTerm> getAllParentsToRoot(OntologyTerm ontologyTerm, String prefix ) {
-//        Set<OntologyTerm> parents = new HashSet<OntologyTerm>();
-//
-//        System.out.println( prefix + ontologyTerm.getName() + " ("+ ontologyTerm.getId() +")" );
-//
-//        for (OntologyTerm parent : ontologyTerm.getParents()) {
-//            parents.add(parent);
-//            parents.addAll(getAllParentsToRoot(parent, prefix + "  "));
-//        }
-//
-//        return parents;
-//    }
 
     public Collection<OntologyTerm> getChildrenAtDepth(int depth) {
         return getChildren(this, 0, depth).get(depth);
@@ -181,7 +200,8 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
     private List<OntologyTerm> processOntologyTermHits( final QueryResponse queryResponse,
                                                         final String id,
                                                         final String termIdKey,
-                                                        final String termNameKey ) throws SolrServerException {
+                                                        final String termNameKey,
+                                                        final String termSynonymsKey) throws SolrServerException {
         
         final SolrDocumentList results = queryResponse.getResults();
         List<OntologyTerm> terms = new ArrayList<OntologyTerm>( results.size() );
@@ -194,8 +214,15 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
             String parentId = (String) solrDocument.getFieldValue( termIdKey );
             String parentName = (String) solrDocument.getFieldValue( termNameKey );
 
+            Collection<Object> fieldValues = solrDocument.getFieldValues(termSynonymsKey);
+            Set<OntologyTerm> synonyms = new HashSet<OntologyTerm>(fieldValues.size());
+
+            for (Object fieldValue : fieldValues) {
+                synonyms.add(new LazyLoadedOntologyTerm(searcher, parentId, fieldValue.toString()));
+            }
+            
             if (parentId != null && !processedIds.contains(parentId)) {
-                terms.add(newInternalOntologyTerm(searcher, parentId, parentName));
+                terms.add(newInternalOntologyTerm(searcher, parentId, parentName, synonyms));
                 processedIds.add(parentId);
             }
         }
@@ -208,7 +235,8 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
         return processOntologyTermHits( queryResponse,
                                         id,
                                         OntologyFieldNames.PARENT_ID,
-                                        OntologyFieldNames.PARENT_NAME );
+                                        OntologyFieldNames.PARENT_NAME,
+                                        OntologyFieldNames.PARENT_SYNONYMS);
     }
 
     private List<OntologyTerm> processChildrenHits(QueryResponse queryResponse, String id) throws IOException,
@@ -216,13 +244,14 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
         return processOntologyTermHits( queryResponse,
                                         id,
                                         OntologyFieldNames.CHILD_ID,
-                                        OntologyFieldNames.CHILD_NAME );
+                                        OntologyFieldNames.CHILD_NAME,
+                                        OntologyFieldNames.CHILDREN_SYNONYMS);
     }
 
     protected OntologyTerm newInternalOntologyTerm(OntologySearcher searcher,
                                                    String id,
-                                                   String name) throws SolrServerException {
-        return new LazyLoadedOntologyTerm( searcher, id, name );
+                                                   String name, Set<OntologyTerm> synonyms) throws SolrServerException {
+        return new LazyLoadedOntologyTerm( searcher, id, name, synonyms );
     }
 
     @Override
