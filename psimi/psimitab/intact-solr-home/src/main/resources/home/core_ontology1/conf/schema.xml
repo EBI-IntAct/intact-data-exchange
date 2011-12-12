@@ -315,6 +315,8 @@
      <field name="cname" type="string" indexed="true" stored="true" />
      <field name="reltype" type="string" indexed="true" stored="true" />
      <field name="cyclic" type="boolean" indexed="true" default="false" stored="true" />
+     <field name="csynonyms" type="string" indexed="false" default="false" stored="true" multiValued="true"/>
+     <field name="psynonyms" type="string" indexed="false" default="false" stored="true" multiValued="true"/>
 
      <!--<field name="label" type="string" required="true" indexed="true" stored="true" multiValued="false"/>-->
      <!--<field name="databaseLabel" type="string" required="true" indexed="true" stored="true" multiValued="false"/>-->
