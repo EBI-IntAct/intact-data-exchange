@@ -1,9 +1,10 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Abstract Solr test case and convenience assertion.

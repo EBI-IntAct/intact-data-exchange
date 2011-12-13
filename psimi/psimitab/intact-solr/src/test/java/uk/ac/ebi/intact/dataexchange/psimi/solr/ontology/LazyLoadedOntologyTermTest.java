@@ -15,7 +15,6 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
 import org.junit.*;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
@@ -117,8 +116,8 @@ public class LazyLoadedOntologyTermTest {
         Assert.assertEquals(2, parents.size());
 
         final Iterator<OntologyTerm> iterator = parents.iterator();
-        Assert.assertEquals("GO:0008150", iterator.next().getId());
         Assert.assertEquals("GO:0008152", iterator.next().getId());
+        Assert.assertEquals("GO:0008150", iterator.next().getId());
     }
 
     @Test

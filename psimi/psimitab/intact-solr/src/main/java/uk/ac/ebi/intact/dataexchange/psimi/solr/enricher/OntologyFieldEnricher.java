@@ -115,7 +115,7 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
         final OntologyTerm ontologyTerm = findOntologyTerm(field);
         final Set<OntologyTerm> parents = ontologyTerm.getAllParentsToRoot(includeSynonyms);
 
-        allParents = convertTermsToFields(type, parents);
+        allParents = convertTermsToFieldsIncludingSynonyms(type, parents);
 
         if (includeItself) {
             Collection<Field> itselfAndSynonyms = convertTermToFieldIncludingSynonyms(type, ontologyTerm);
@@ -135,25 +135,28 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
         if (ontologySearcher == null) {
             return null;
         }
+        
+        String cacheKey = id+"_"+name;
 
-        if (ontologyTermCache.containsKey(id)) {
-            return ontologyTermCache.get(id);
+        if (ontologyTermCache.containsKey(cacheKey)) {
+            return ontologyTermCache.get(cacheKey);
         }
 
         final LazyLoadedOntologyTerm term = new LazyLoadedOntologyTerm(ontologySearcher, id, name);
 
-        ontologyTermCache.put( id, term );
+        ontologyTermCache.put( cacheKey, term );
 
         return term;
     }
 
-    private List<psidev.psi.mi.tab.model.builder.Field> convertTermsToFields( String type, Set<OntologyTerm> terms ) {
-        List<psidev.psi.mi.tab.model.builder.Field> fields =
-                new ArrayList<psidev.psi.mi.tab.model.builder.Field>( terms.size());
+    private List<psidev.psi.mi.tab.model.builder.Field> convertTermsToFieldsIncludingSynonyms(String type, Set<OntologyTerm> terms) {
+        List<psidev.psi.mi.tab.model.builder.Field> fields = new ArrayList<psidev.psi.mi.tab.model.builder.Field>();
 
-        for ( OntologyTerm term : terms ) {
-            Field field = convertTermToField(type, term);
-            fields.add( field );
+        if (terms != null) {
+            for ( OntologyTerm term : terms ) {
+                Collection<Field> fieldsWithSynonyms = convertTermToFieldIncludingSynonyms(type, term);
+                fields.addAll( fieldsWithSynonyms );
+            }
         }
 
         return fields;

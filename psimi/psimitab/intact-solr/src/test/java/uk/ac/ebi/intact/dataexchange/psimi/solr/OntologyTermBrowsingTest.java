@@ -2,11 +2,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.junit.Test;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BinaryInteractionEnricher;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.FieldEnricher;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.OntologyBinaryInteractionEnricher;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.OntologyFieldEnricher;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
 
 import java.net.URL;
 
@@ -27,12 +22,6 @@ public class OntologyTermBrowsingTest extends AbstractSolrTestCase {
         final URL goURL = OntologyTermBrowsingTest.class.getResource( "/META-INF/GO_protein_domain_binding.obo" );
         getIndexer().indexOntologies( new OntologyMapping[]{new OntologyMapping( "go", goURL )} );
         assertCountOntologyTerm( 74, "*:*" );
-
-        // enrich interactions based on ontology indexed
-        final OntologySearcher ontologySearcher = new OntologySearcher( getSolrJettyRunner().getSolrServer( CoreNames.CORE_ONTOLOGY_PUB ) );
-        BinaryInteractionEnricher enricher = new OntologyBinaryInteractionEnricher( ontologySearcher );
-
-        FieldEnricher fe = new OntologyFieldEnricher( ontologySearcher );
 
         getIndexer().indexMitabFromClasspath( "/mitab_samples/intact5_go_binding.txt", true );
         assertCountInteraction( 5, "*:*" );

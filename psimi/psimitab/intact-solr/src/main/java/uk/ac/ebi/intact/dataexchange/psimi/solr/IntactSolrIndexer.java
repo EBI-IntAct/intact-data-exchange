@@ -34,6 +34,7 @@ import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
 import java.io.*;
 import java.net.MalformedURLException;
+import java.util.Arrays;
 
 /**
  * Indexes information into a SOLR server.
@@ -96,7 +97,7 @@ public class IntactSolrIndexer {
             throw new IllegalStateException("To index an ontology, an ontology SolrServer must be passed to the constructor");
         }
         
-        if (log.isInfoEnabled()) log.info("Indexing ontologies: "+ontologyMappings);
+        if (log.isInfoEnabled()) log.info("Indexing ontologies: "+ Arrays.asList(ontologyMappings));
         
         OntologyIndexer ontologyIndexer = new OntologyIndexer(ontologySolrServer);
         ontologyIndexer.indexObo(ontologyMappings);

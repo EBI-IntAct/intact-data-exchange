@@ -143,8 +143,9 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
 
         Collection<Object> expandedGoIds = doc.getFieldValues("go_expanded");
-        Assert.assertEquals(3, expandedGoIds.size());
+        Assert.assertEquals(6, expandedGoIds.size());
         Assert.assertTrue(expandedGoIds.contains("go:\"GO:0030246\"(carbohydrate binding)"));
+        Assert.assertTrue(expandedGoIds.contains("go:\"GO:0030246\"(selectin)"));
 
         IntactBinaryInteraction binaryInteraction = (IntactBinaryInteraction) converter.toBinaryInteraction(doc);
         Assert.assertEquals("carbohydrate binding", binaryInteraction.getInteractorB().getProperties().iterator().next().getText());
@@ -174,7 +175,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
 
         Collection<Object> expandedTaxidA = doc.getFieldValues("taxidA_expanded");
         Assert.assertTrue(expandedTaxidA.contains("taxid:314295(Catarrhini)"));
-        Assert.assertTrue(expandedTaxidA.contains("taxid:207598(Homininae)"));
+        Assert.assertTrue(expandedTaxidA.contains("taxid:207598(Hominidae)"));
         Assert.assertTrue(expandedTaxidA.contains("taxid:9605(Homo)"));
         Assert.assertTrue(expandedTaxidA.contains("taxid:9604(Hominidae)"));
         Assert.assertTrue(expandedTaxidA.contains("taxid:9606(Human)"));
@@ -225,7 +226,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
 
         SolrDocument doc = queryResponse.getResults().get(0);
 
-        Assert.assertEquals(12, doc.getFieldValues("species").size());
+        Assert.assertEquals(26, doc.getFieldValues("species").size());
         Assert.assertEquals(12, doc.getFieldValues("species_id").size());
     }
 

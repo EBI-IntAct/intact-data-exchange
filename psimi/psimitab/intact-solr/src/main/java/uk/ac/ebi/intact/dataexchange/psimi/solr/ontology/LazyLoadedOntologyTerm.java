@@ -41,6 +41,7 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
 
     private final String id;
     private final String name;
+    private Set<String> synonymsStr;
 
     private List<OntologyTerm> parents;
     private List<OntologyTerm> children;
@@ -54,9 +55,6 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
         this.searcher = searcher;
         this.id = id;
         this.name = findNameAndSynonyms(searcher, id, name);
-        
-        
-        
     }
 
     public LazyLoadedOntologyTerm(OntologySearcher searcher, String id, String name, Set<OntologyTerm> synonyms) throws SolrServerException {
@@ -76,12 +74,10 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
 
             Collection<Object> fieldValues = solrDocument.getFieldValues(OntologyFieldNames.CHILDREN_SYNONYMS);
 
-            synonyms = new HashSet<OntologyTerm>(fieldValues.size());
+            synonymsStr = new HashSet<String>(fieldValues.size());
 
-
-            // TODO use a Factory to instantiate stuff, so we can create the synonyms outside the constructor
             for (Object fieldValue : fieldValues) {
-                synonyms.add(fieldValue.toString());
+                synonymsStr.add(fieldValue.toString());
             }
         }
 
@@ -139,6 +135,22 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
 
     @Override
     public Set<OntologyTerm> getSynonyms() {
+        if (synonyms != null) {
+            return synonyms;
+        }
+        
+        synonyms = new HashSet<OntologyTerm>();
+
+        if (synonymsStr != null) {
+            for (String syn : synonymsStr) {
+                try {
+                    synonyms.add(new LazyLoadedOntologyTerm(searcher, id, syn, Collections.EMPTY_SET));
+                } catch (SolrServerException e) {
+                    throw new IllegalStateException("Problem loading synonym: "+syn);
+                }
+            }
+        }
+        
         return synonyms;
     }
 
@@ -159,20 +171,26 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
     }
 
     public Set<OntologyTerm> getAllParentsToRoot() {
-        return getAllParentsToRoot(this);
+        return getAllParentsToRoot(this, false);
     }
 
     @Override
     public Set<OntologyTerm> getAllParentsToRoot(boolean includeSynonyms) {
-        return null;
+        return getAllParentsToRoot(this, includeSynonyms);
     }
 
-    protected Set<OntologyTerm> getAllParentsToRoot(OntologyTerm ontologyTerm) {
+    protected Set<OntologyTerm> getAllParentsToRoot(OntologyTerm ontologyTerm, boolean includeSynonyms) {
         Set<OntologyTerm> parents = new HashSet<OntologyTerm>();
 
         for (OntologyTerm parent : ontologyTerm.getParents()) {
             parents.add(parent);
-            parents.addAll(getAllParentsToRoot(parent));
+
+            if (includeSynonyms) {
+                Set<OntologyTerm> synonyms = parent.getSynonyms();
+                parents.addAll(synonyms);
+            }
+
+            parents.addAll(getAllParentsToRoot(parent, includeSynonyms));
         }
 
         return parents;
@@ -217,8 +235,10 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
             Collection<Object> fieldValues = solrDocument.getFieldValues(termSynonymsKey);
             Set<OntologyTerm> synonyms = new HashSet<OntologyTerm>(fieldValues.size());
 
-            for (Object fieldValue : fieldValues) {
-                synonyms.add(new LazyLoadedOntologyTerm(searcher, parentId, fieldValue.toString()));
+            if (parentId != null) {
+                for (Object fieldValue : fieldValues) {
+                    synonyms.add(new LazyLoadedOntologyTerm(searcher, parentId, fieldValue.toString(), Collections.EMPTY_SET));
+                }
             }
             
             if (parentId != null && !processedIds.contains(parentId)) {
@@ -261,14 +281,17 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
 
         LazyLoadedOntologyTerm that = (LazyLoadedOntologyTerm) o;
 
-        if (!id.equals(that.id)) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
     }
 
     @Override

@@ -20,7 +20,6 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.OntologyIterator;
@@ -32,6 +31,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * IntactSolrSearcher Tester.

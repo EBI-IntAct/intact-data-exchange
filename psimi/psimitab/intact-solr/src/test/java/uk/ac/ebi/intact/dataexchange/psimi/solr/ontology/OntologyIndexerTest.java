@@ -16,7 +16,6 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.junit.After;
@@ -26,8 +25,6 @@ import org.junit.Test;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.UniprotTaxonomyOntologyIterator;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
-
-import java.net.URL;
 
 
 /**
@@ -59,13 +56,12 @@ public class OntologyIndexerTest  {
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
 
-        ontologyIndexer.indexObo("psi-mi", new URL("http://psidev.cvs.sourceforge.net/viewvc/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo?revision=1.52"));
+        ontologyIndexer.indexObo("psi-mi", OntologyIndexerTest.class.getResource("/META-INF/psi-mi.obo"));
 
         SolrQuery query = new SolrQuery("*:*");
         QueryResponse queryResponse = solrServer.query(query);
 
-        // 990 is_a relationship, and likely 793 leaf terms (I didn't count them by hand ;))
-        Assert.assertEquals(1799, queryResponse.getResults().getNumFound());
+        Assert.assertEquals(1745, queryResponse.getResults().getNumFound());
     }
 
     @Test
