@@ -74,10 +74,11 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
 
             Collection<Object> fieldValues = solrDocument.getFieldValues(OntologyFieldNames.CHILDREN_SYNONYMS);
 
-            synonymsStr = new HashSet<String>(fieldValues.size());
-
-            for (Object fieldValue : fieldValues) {
-                synonymsStr.add(fieldValue.toString());
+            synonymsStr = new HashSet<String>();
+            if(fieldValues != null){
+                for (Object fieldValue : fieldValues) {
+                    synonymsStr.add(fieldValue.toString());
+                }
             }
         }
 
