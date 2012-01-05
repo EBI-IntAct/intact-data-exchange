@@ -5,6 +5,7 @@ import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters2;
+import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedProteins;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -24,7 +25,7 @@ public class EncoreInteractionToGoLineConverter2 implements EncoreInteractionToG
     /**
      * Converts an EncoreInteraction into GOParameters
      * @param interaction
-     * @param firstInteractor master uniprot of first interactor
+     * @param firstInteractor uniprot ac of first interactor
      * @return The converted GOParameters
      */
     public DefaultGOParameters2 convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor, MiClusterContext context){
@@ -138,16 +139,45 @@ public class EncoreInteractionToGoLineConverter2 implements EncoreInteractionToG
 
                 // if the list of pubmed ids is not empty, the GOParameter is created
                 if (!pubmedIds.isEmpty()){
+                    Map<String, Set<IntactTransSplicedProteins>> transSplicedVariants = context.getTranscriptsWithDifferentMasterAcs();
+                    boolean isUniprot1Isoform = isIsoformOfAnotherUniprotEntry(uniprot1, transSplicedVariants.get(uniprot1));
+                    boolean isUniprot2Isoform = isIsoformOfAnotherUniprotEntry(uniprot1, transSplicedVariants.get(uniprot2));
 
                     // the first interactor is uniprot1 and the second uniprot is a different uniprot entry
-                    if (uniprot1.startsWith(parentAc) && !uniprot2.startsWith(parentAc)){
+                    if ((uniprot1.startsWith(parentAc) || isUniprot1Isoform) && !uniprot2.startsWith(parentAc) && !isUniprot2Isoform){
                         DefaultGOParameters2 parameter = new DefaultGOParameters2(uniprot1, uniprot2, pubmedIds, parentAc, goRefs);
                         goParameters.add(parameter);
                     }
                     // the first interactor is uniprot2 and the uniprot 1 is a different uniprot entry
-                    else if (uniprot2.startsWith(parentAc) && !uniprot1.startsWith(parentAc)) {
+                    else if ((uniprot2.startsWith(parentAc) || isUniprot2Isoform) && !uniprot1.startsWith(parentAc) && !isUniprot1Isoform) {
                         DefaultGOParameters2 parameter = new DefaultGOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
                         goParameters.add(parameter);
+                    }
+                    // the two interactors are identical, we have a self interaction
+                    else if (uniprot1.equalsIgnoreCase(uniprot2)){
+                        DefaultGOParameters2 parameter = new DefaultGOParameters2(uniprot1, uniprot2, pubmedIds, parentAc, goRefs);
+
+                        goParameters.add(parameter);
+                    }
+                    // the two interactors are from the same uniprot entry but are different isoforms/feature chains : we have a single interaction but two lines
+                    else if (uniprot2.startsWith(parentAc) && uniprot1.startsWith(parentAc)) {
+                        DefaultGOParameters2 parameter1 = new DefaultGOParameters2(uniprot1, uniprot2, pubmedIds, parentAc, goRefs);
+                        goParameters.add(parameter1);
+                        DefaultGOParameters2 parameter2 = new DefaultGOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
+                        goParameters.add(parameter2);
+                    }
+                    // the two interactors are from the same uniprot entry but are different isoforms/feature chains : one of the isoform does not match the master uniprot entry so it may come back later, we do not need to write it twice
+                    else if (uniprot1.startsWith(parentAc) && isUniprot2Isoform) {
+                        DefaultGOParameters2 parameter = new DefaultGOParameters2(uniprot1, uniprot2, pubmedIds, parentAc, goRefs);
+                        goParameters.add(parameter);
+                    }
+                    // the two interactors are from the same uniprot entry but are different isoforms/feature chains : one of the isoform does not match the master uniprot entry so it may come back later, we do not need to write it twice
+                    else if (uniprot2.startsWith(parentAc) && isUniprot1Isoform) {
+                        DefaultGOParameters2 parameter = new DefaultGOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
+                        goParameters.add(parameter);
+                    }
+                    else {
+                        logger.info("The interaction "+uniprot1+" and "+uniprot2+" is ignored because both interactors are not matching the master uniprot ac");
                     }
                 }
                 else{
@@ -160,5 +190,17 @@ public class EncoreInteractionToGoLineConverter2 implements EncoreInteractionToG
         }
 
         return goParameters;
+    }
+
+    protected boolean isIsoformOfAnotherUniprotEntry(String interactor, Set<IntactTransSplicedProteins> transSplicedProteins){
+
+        if (transSplicedProteins != null){
+            for (IntactTransSplicedProteins prot : transSplicedProteins){
+                if (interactor.equalsIgnoreCase(prot.getUniprotAc())){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

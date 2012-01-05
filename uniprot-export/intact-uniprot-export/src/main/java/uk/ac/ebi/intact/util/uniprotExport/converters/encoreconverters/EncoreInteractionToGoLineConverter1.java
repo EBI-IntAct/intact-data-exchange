@@ -23,6 +23,7 @@ public class EncoreInteractionToGoLineConverter1 implements EncoreInteractionToG
     /**
      * Converts an EncoreInteraction into GOParameters
      * @param interaction
+     * @param firstInteractor
      * @return The converted GOParameters
      */
     public DefaultGOParameters1 convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor, MiClusterContext context){
@@ -125,11 +126,24 @@ public class EncoreInteractionToGoLineConverter1 implements EncoreInteractionToG
                     // the first interactor is uniprot1 and the second uniprot is a different uniprot entry
                     if (uniprot1.startsWith(parentAc) && !uniprot2.startsWith(parentAc)){
                         processGoParameters(parentAc, goParameters, clusteredInteractionWithFeatureChains, isoformClusteredInteractionWithFeatureChains, mapOfFirstInteractors, uniprot1, uniprot2, pubmedIds);
-
                     }
                     // the first interactor is uniprot2 and the uniprot 1 is a different uniprot entry
                     else if (uniprot2.startsWith(parentAc) && !uniprot1.startsWith(parentAc)) {
                         processGoParameters(parentAc, goParameters, clusteredInteractionWithFeatureChains, isoformClusteredInteractionWithFeatureChains, mapOfFirstInteractors, uniprot2, uniprot1, pubmedIds);
+                    }
+                    // the two interactors are identical, we have a self interaction
+                    else if (uniprot1.equalsIgnoreCase(uniprot2)){
+                        DefaultGOParameters1 parameter = new DefaultGOParameters1(uniprot1, uniprot2, pubmedIds);
+
+                        goParameters.add(parameter);
+                    }
+                    // the two interactors are from the same uniprot entry but are different isoforms/feature chains : we have a single interaction but two lines
+                    else if (uniprot2.startsWith(parentAc) && uniprot1.startsWith(parentAc)) {
+                        processGoParameters(parentAc, goParameters, clusteredInteractionWithFeatureChains, isoformClusteredInteractionWithFeatureChains, mapOfFirstInteractors, uniprot1, uniprot2, pubmedIds);
+                        processGoParameters(parentAc, goParameters, clusteredInteractionWithFeatureChains, isoformClusteredInteractionWithFeatureChains, mapOfFirstInteractors, uniprot2, uniprot1, pubmedIds);
+                    }
+                    else {
+                        logger.info("The interaction "+uniprot1+" and "+uniprot2+" is ignored because both interactors are not matching the master uniprot ac");
                     }
                 }
                 else{
