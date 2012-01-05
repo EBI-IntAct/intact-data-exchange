@@ -10,13 +10,13 @@ import java.util.Set;
  * @since <pre>31/01/11</pre>
  */
 
-public class DefaultGOParameters implements GOParameters{
+public class DefaultGOParameters1 implements GOParameters{
 
     private String firstProtein;
     private String secondProtein;
     private Set<String> pubmedIds;
 
-    public DefaultGOParameters(String firstProtein, String secondProtein, Set<String> pubmedIds){
+    public DefaultGOParameters1(String firstProtein, String secondProtein, Set<String> pubmedIds){
 
         this.firstProtein = firstProtein;
         this.secondProtein = secondProtein;

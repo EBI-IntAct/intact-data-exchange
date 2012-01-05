@@ -18,10 +18,16 @@ public class MiClusterContext implements ExportContext {
     private Map<String, String> miTerms = new HashMap<String, String>();
     private Map<String, MethodTypePair> interactionToType_Method = new HashMap<String, MethodTypePair>();
     private Set<String> spokeExpandedInteractions = new HashSet<String>();
+
     /**
      * The map of intact isoform proteins pointing to a parent with a different uniprot entry
      */
     private Map<String, Set<IntactTransSplicedProteins>> transcriptsWithDifferentParentAcs;
+
+    /**
+     * The map of interaction acs to GO component xrefs
+     */
+    private Map<String, Set<String>> interactionComponentXrefs;
 
     /**
      *
@@ -56,6 +62,19 @@ public class MiClusterContext implements ExportContext {
     }
 
     @Override
+    public Map<String, Set<String>> getInteractionComponentXrefs() {
+        if (this.interactionComponentXrefs == null){
+            this.interactionComponentXrefs = new HashMap<String, Set<String>>();
+        }
+
+        return interactionComponentXrefs;
+    }
+
+    public void setInteractionComponentXrefs(Map<String, Set<String>> interactionComponentXrefs) {
+        this.interactionComponentXrefs = interactionComponentXrefs;
+    }
+
+    @Override
     public Map<String, Set<IntactTransSplicedProteins>> getTranscriptsWithDifferentMasterAcs() {
         if (this.transcriptsWithDifferentParentAcs == null){
             this.transcriptsWithDifferentParentAcs = new HashMap<String, Set<IntactTransSplicedProteins>>();
@@ -68,10 +87,13 @@ public class MiClusterContext implements ExportContext {
         this.transcriptsWithDifferentParentAcs = mapOfIsoformsWithDifferentParents;
     }
 
+
+
     public void clear(){
         this.getGeneNames().clear();
         this.getInteractionToMethod_type().clear();
         this.spokeExpandedInteractions.clear();
         this.getMiTerms().clear();
+        this.interactionComponentXrefs.clear();
     }
 }

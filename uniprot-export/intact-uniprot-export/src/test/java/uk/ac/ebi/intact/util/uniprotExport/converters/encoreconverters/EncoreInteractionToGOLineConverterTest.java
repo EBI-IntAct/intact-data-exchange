@@ -18,11 +18,11 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_go_convert_ok(){
-        DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
+        EncoreInteractionToGoLineConverter1 converter = new EncoreInteractionToGoLineConverter1();
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1");
+        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
         Assert.assertNotNull(parameters);
         Assert.assertEquals("P28548-1", parameters.getFirstProtein());
         Assert.assertEquals("Q22534", parameters.getSecondProtein());
@@ -32,46 +32,46 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_go_convert_no_first_interactor(){
-        DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
+        EncoreInteractionToGoLineConverter1 converter = new EncoreInteractionToGoLineConverter1();
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getInteractorAccsA().clear();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1");
+        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
         Assert.assertNull(parameters);
     }
 
     @Test
     public void test_go_convert_no_second_interactor(){
-        DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
+        EncoreInteractionToGoLineConverter1 converter = new EncoreInteractionToGoLineConverter1();
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getInteractorAccsB().clear();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1");
+        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
         Assert.assertNull(parameters);
 
     }
 
     @Test
     public void test_go_convert_no_publications(){
-        DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
+        EncoreInteractionToGoLineConverter1 converter = new EncoreInteractionToGoLineConverter1();
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getPublicationIds().clear();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1");
+        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
         Assert.assertNull(parameters);
     }
 
     @Test
     public void test_go_convert_one_publication_no_pubmed(){
-        DefaultEncoreInteractionToGoLineConverter converter = new DefaultEncoreInteractionToGoLineConverter();
+        EncoreInteractionToGoLineConverter1 converter = new EncoreInteractionToGoLineConverter1();
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getPublicationIds().iterator().next().setDatabase("DOI");
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1");
+        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
         Assert.assertNull(parameters);
     }
 }

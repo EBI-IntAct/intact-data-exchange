@@ -18,7 +18,7 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DefaultDRParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
@@ -66,11 +66,11 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         Set<String> publications2 = new HashSet<String>(1);
         publications2.add(pmid2);
 
-        GOParameters parameter1 = new DefaultGOParameters(uniprotAc1, uniprotAc2, publications1);
-        GOParameters parameter4 = new DefaultGOParameters(uniprotAc2, uniprotAc1, publications1);
-        GOParameters parameter2 = new DefaultGOParameters(uniprotAc1, uniprotAc4, publications1);
-        GOParameters parameter5 = new DefaultGOParameters(uniprotAc4, uniprotAc1, publications1);
-        GOParameters parameter3 = new DefaultGOParameters(uniprotAc5, uniprotAc5, publications2);
+        GOParameters parameter1 = new DefaultGOParameters1(uniprotAc1, uniprotAc2, publications1);
+        GOParameters parameter4 = new DefaultGOParameters1(uniprotAc2, uniprotAc1, publications1);
+        GOParameters parameter2 = new DefaultGOParameters1(uniprotAc1, uniprotAc4, publications1);
+        GOParameters parameter5 = new DefaultGOParameters1(uniprotAc4, uniprotAc1, publications1);
+        GOParameters parameter3 = new DefaultGOParameters1(uniprotAc5, uniprotAc5, publications2);
 
         parameters.add(parameter1);
         parameters.add(parameter4);

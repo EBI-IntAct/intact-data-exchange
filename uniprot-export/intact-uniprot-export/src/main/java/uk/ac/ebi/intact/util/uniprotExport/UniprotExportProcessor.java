@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.converters.DefaultInteractorToDRLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.InteractorToDRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.DefaultEncoreInteractionToGoLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter1;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLine1Converter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter;
@@ -92,7 +92,7 @@ public class UniprotExportProcessor {
      */
     public UniprotExportProcessor(InteractionFilter filter){
 
-        goConverter = new DefaultEncoreInteractionToGoLineConverter();
+        goConverter = new EncoreInteractionToGoLineConverter1();
 
         // by default, initialize a converter of the first CC line format
         ccConverter = new EncoreInteractionToCCLine1Converter();
@@ -115,7 +115,7 @@ public class UniprotExportProcessor {
      */
     public UniprotExportProcessor(InteractionFilter filter, EncoreInteractionToGoLineConverter goConverter, EncoreInteractionToCCLineConverter ccConverter, EncoreInteractionToCCLineConverter silverCcConverter, InteractorToDRLineConverter drConverter){
 
-        this.goConverter = goConverter != null ? goConverter : new DefaultEncoreInteractionToGoLineConverter();
+        this.goConverter = goConverter != null ? goConverter : new EncoreInteractionToGoLineConverter1();
         this.drConverter = drConverter != null ? drConverter : new DefaultInteractorToDRLineConverter();
         this.ccConverter = ccConverter != null ? ccConverter : new EncoreInteractionToCCLine1Converter();
         this.silverCcConverter = silverCcConverter != null ? silverCcConverter : this.ccConverter;
@@ -199,9 +199,12 @@ public class UniprotExportProcessor {
                 }
 
                 // the encore interactions to export in the GO lines for this uniprot entry
-                List<EncoreInteractionForScoring> interactions = new ArrayList<EncoreInteractionForScoring>();
+                Set<EncoreInteractionForScoring> interactions = new HashSet<EncoreInteractionForScoring>();
+                // collect all encore interactions from trans-splicing (isoforms with uniprot ac coming from another entry but which are also present in this uniprot entry)
+                List<EncoreInteractionForScoring> supplementaryPositiveInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(uniprotAc, positiveInteractions, results.getExportContext());
+
                 // collect number of exported interactions for this first interactor
-                collectExportedInteractions(positiveInteractions, interactions, interactor, Collections.EMPTY_LIST);
+                collectExportedInteractions(positiveInteractions, interactions, interactor, supplementaryPositiveInteractionFromTransSplicedIsoforms);
 
                 // while the sorted list of interactors is not totally processed
                 while (interactorIterator.hasNext() ){
@@ -224,7 +227,7 @@ public class UniprotExportProcessor {
                     }
 
                     // write GO lines if the number of interactions is superior to 0
-                    flushGoLinesFor(goWriter, uniprotAc, interactions);
+                    flushGoLinesFor(goWriter, uniprotAc, interactions, results.getExportContext());
 
                     // clean the list of encore interactions attached to the uniprot entry, so we can process the new interactor
                     interactions.clear();
@@ -241,7 +244,7 @@ public class UniprotExportProcessor {
                     // don't forget the latest !
                     if (!interactorIterator.hasNext()){
                         // write GO lines if the number of interactions is superior to 0
-                        flushGoLinesFor(goWriter, uniprotAc, interactions);
+                        flushGoLinesFor(goWriter, uniprotAc, interactions, results.getExportContext());
                     }
                 }
             }
@@ -254,16 +257,16 @@ public class UniprotExportProcessor {
     /**
      * Write the go lines for a uniprot protein
      * @param goWriter
-     * @param uniprotAc
+     * @param master
      * @param interactions
      * @throws IOException
      */
-    private void flushGoLinesFor(GOLineWriter goWriter, String uniprotAc, List<EncoreInteractionForScoring> interactions) throws IOException {
+    private void flushGoLinesFor(GOLineWriter goWriter, String master, Set<EncoreInteractionForScoring> interactions, MiClusterContext context) throws IOException {
         if (!interactions.isEmpty()){
-            logger.info("Write GO lines for " + uniprotAc);
+            logger.info("Write GO lines for " + master);
 
             // the isoforms have their own GO line contrary to the feaqture chains which are merged to the master entry
-            List<GOParameters> goParameters = this.goConverter.convertInteractionsIntoGOParameters(interactions, uniprotAc);
+            List<GOParameters> goParameters = this.goConverter.convertInteractionsIntoGOParameters(interactions, master, context);
 
             goWriter.writeGOLines(goParameters);
         }
@@ -553,7 +556,7 @@ public class UniprotExportProcessor {
      * @param interactor
      * @returnthe number of exported binary interactions for this interactor
      */
-    private int collectExportedInteractions(ExportedClusteredInteractions results, List<EncoreInteractionForScoring> interactions, String interactor, List<EncoreInteractionForScoring> supplementaryInteractionsFromTransSplicing) {
+    private int collectExportedInteractions(ExportedClusteredInteractions results, Set<EncoreInteractionForScoring> interactions, String interactor, List<EncoreInteractionForScoring> supplementaryInteractionsFromTransSplicing) {
 
         // the clustered interactions
         Map<Integer, EncoreInteractionForScoring> interactionMapping = results.getCluster().getEncoreInteractionCluster();

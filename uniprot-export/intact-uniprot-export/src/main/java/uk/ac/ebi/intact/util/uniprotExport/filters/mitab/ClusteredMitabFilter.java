@@ -56,6 +56,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
         IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
         MiClusterContext context = new MiClusterContext();
         context.setTranscriptsWithDifferentMasterAcs(this.transcriptsWithDifferentParentAcs);
+        context.setInteractionComponentXrefs(this.interactionComponentXrefs);
 
         FilterConfig config = FilterContext.getInstance().getConfig();
         boolean excludeSpokeExpanded = config.excludeSpokeExpandedInteractions();

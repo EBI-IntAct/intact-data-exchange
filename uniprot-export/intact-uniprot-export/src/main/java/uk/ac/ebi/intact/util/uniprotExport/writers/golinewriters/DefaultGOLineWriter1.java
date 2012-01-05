@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters;
 
-import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.io.IOException;
@@ -17,14 +17,14 @@ import java.util.Set;
  * @since <pre>28/01/11</pre>
  */
 
-public class DefaultGOLineWriter implements GOLineWriter{
+public class DefaultGOLineWriter1 implements GOLineWriter<DefaultGOParameters1>{
 
     /**
      * The writer
      */
     private OutputStreamWriter writer;
 
-    public DefaultGOLineWriter(OutputStreamWriter outputStream) throws IOException {
+    public DefaultGOLineWriter1(OutputStreamWriter outputStream) throws IOException {
         if (outputStream == null){
              throw new IllegalArgumentException("You must give a non null OutputStream writer");
         }
@@ -32,7 +32,7 @@ public class DefaultGOLineWriter implements GOLineWriter{
     }
 
     @Override
-    public void writeGOLine(GOParameters parameters) throws IOException {
+    public void writeGOLine(DefaultGOParameters1 parameters) throws IOException {
         // if the parameter is not null, we can write the go line
         if (parameters != null){
             String uniprot1 = parameters.getFirstProtein();
@@ -57,8 +57,8 @@ public class DefaultGOLineWriter implements GOLineWriter{
     }
 
     @Override
-    public void writeGOLines(List<GOParameters> GOLines) throws IOException {
-        for (GOParameters parameter : GOLines){
+    public void writeGOLines(List<DefaultGOParameters1> GOLines) throws IOException {
+        for (DefaultGOParameters1 parameter : GOLines){
             writeGOLine(parameter);
         }
     }

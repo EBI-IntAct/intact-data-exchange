@@ -44,6 +44,12 @@ public interface ExportContext {
     public Set<String> getSpokeExpandedInteractions();
 
     /**
+     *
+     * @return list of intact ACs with one to several component xrefs
+     */
+    public Map<String, Set<String>> getInteractionComponentXrefs();
+
+    /**
      * @return map of intact isoform ac which is associated with a different master uniprot ac
      */
     public Map<String, Set<IntactTransSplicedProteins>> getTranscriptsWithDifferentMasterAcs();

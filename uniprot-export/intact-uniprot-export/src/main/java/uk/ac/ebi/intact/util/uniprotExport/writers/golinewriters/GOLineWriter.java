@@ -13,21 +13,21 @@ import java.util.List;
  * @since <pre>28/01/11</pre>
  */
 
-public interface GOLineWriter {
+public interface GOLineWriter<T extends GOParameters> {
 
     /**
      * Write a GO line
      * @param parameters : the parameters of a GO line
      * @throws IOException
      */
-    public void writeGOLine(GOParameters parameters) throws IOException;
+    public void writeGOLine(T parameters) throws IOException;
 
     /**
      * Write a list GO lines
      * @param GOLines : a list of GO lines
      * @throws IOException
      */
-    public void writeGOLines(List<GOParameters> GOLines) throws IOException;
+    public void writeGOLines(List<T> GOLines) throws IOException;
 
     /**
      * Close the current writer

@@ -96,6 +96,9 @@ public class QueryFactory {
             "and x1_1.qualifier_ac in (select ac from ia_controlledvocab where shortlabel = 'chain-parent' or shortlabel = 'isoform-parent') " +
             "and x2.primaryid <> substr(x1.primaryid, 1, 6) " +
             "and parent.ac = x1_1.primaryid";
+    
+    private final String interactionsWithGoComponentXrefs = "select interact.ac, goRefs.primaryId from InteractionImpl interact join interact.xrefs as goRefs " +
+            "where goRefs.cvDatabase.identifier = :go and goRefs.cvXrefQualifier.identifier = :component";
 
     public List<Object[]> getMethodStatusInIntact() {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
@@ -109,6 +112,21 @@ public class QueryFactory {
         dataContext.commitTransaction(transactionStatus);
 
         return methods;
+    }
+
+    public List<Object[]> getGoComponentXrefsInIntact() {
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
+
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(interactionsWithGoComponentXrefs);
+        query.setParameter("go", CvDatabase.GO_MI_REF);
+        query.setParameter("component", CvXrefQualifier.COMPONENT_MI_REF);
+
+        List<Object []> xrefs = query.getResultList();
+        dataContext.commitTransaction(transactionStatus);
+
+        return xrefs;
     }
 
     public List<Object[]> getTranscriptsWithDifferentParents() {

@@ -82,6 +82,11 @@ public class IntactFilter implements InteractionFilter {
     protected Map<String, Set<IntactTransSplicedProteins>> transcriptsWithDifferentParentAcs = new HashMap<String, Set<IntactTransSplicedProteins>>();
 
     /**
+     * The map associating interaction ac with a set of GO component xrefs
+     */
+    protected Map<String, Set<String>> interactionComponentXrefs = new HashMap<String, Set<String>>();
+
+    /**
      * we create a new IntactFilter
      */
     public IntactFilter(InteractionExporter exporter){
@@ -92,6 +97,7 @@ public class IntactFilter implements InteractionFilter {
         eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
 
         buildTranscriptsWithDifferentParents();
+        buildInteractionGoComponentXrefs();
     }
 
     private void buildTranscriptsWithDifferentParents(){
@@ -114,6 +120,29 @@ public class IntactFilter implements InteractionFilter {
                         Set<IntactTransSplicedProteins> intactAcs = new HashSet<IntactTransSplicedProteins>();
                         intactAcs.add(spliceProtein);
                         transcriptsWithDifferentParentAcs.put(parentAc, intactAcs);
+                    }
+                }
+            }
+        }
+    }
+
+    private void buildInteractionGoComponentXrefs(){
+        List<Object []> goXrefs = this.queryFactory.getGoComponentXrefsInIntact();
+
+        for (Object [] goXref : goXrefs){
+            if (goXref.length == 2){
+                String interactionAc = (String) goXref[0];
+                String componentRef = (String) goXref[1];
+
+                if (interactionAc != null && componentRef != null) {
+
+                    if (interactionComponentXrefs.containsKey(interactionAc)){
+                        interactionComponentXrefs.get(interactionAc).add(componentRef);
+                    }
+                    else{
+                        Set<String> componentRefs = new HashSet<String>();
+                        componentRefs.add(componentRef);
+                        interactionComponentXrefs.put(interactionAc, componentRefs);
                     }
                 }
             }
@@ -190,6 +219,7 @@ public class IntactFilter implements InteractionFilter {
     public MiClusterScoreResults processExportWithFilterOnNonUniprot() throws UniprotExportException {
         MiClusterContext context = new MiClusterContext();
         context.setTranscriptsWithDifferentMasterAcs(this.transcriptsWithDifferentParentAcs);
+        context.setInteractionComponentXrefs(this.interactionComponentXrefs);
 
         IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
         IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();

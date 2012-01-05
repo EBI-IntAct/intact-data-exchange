@@ -1,8 +1,10 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.DefaultEncoreInteractionToGoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.DefaultGOLineWriter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter2;
+import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.DefaultGOLineWriter1;
+import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.DefaultGOLineWriter2;
 import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.GOLineWriter;
 
 import java.io.FileWriter;
@@ -32,8 +34,8 @@ public class GOWriterFactory {
             return null;
         }
 
-        if (goConverter instanceof DefaultEncoreInteractionToGoLineConverter){
-            return new DefaultGOLineWriter(outputStream);
+        if (goConverter instanceof EncoreInteractionToGoLineConverter1){
+            return new DefaultGOLineWriter1(outputStream);
         }
         else {
             return null;
@@ -53,8 +55,11 @@ public class GOWriterFactory {
             return null;
         }
 
-        if (goConverter instanceof DefaultEncoreInteractionToGoLineConverter){
-            return new DefaultGOLineWriter(new FileWriter(outputStream));
+        if (goConverter instanceof EncoreInteractionToGoLineConverter1){
+            return new DefaultGOLineWriter1(new FileWriter(outputStream));
+        }
+        else if (goConverter instanceof EncoreInteractionToGoLineConverter2){
+            return new DefaultGOLineWriter2(new FileWriter(outputStream));
         }
         else {
             return null;
@@ -71,7 +76,10 @@ public class GOWriterFactory {
     public GOLineWriter createGOLineWriterFor(int version, OutputStreamWriter outputStream) throws IOException {
 
         if (version == 1){
-            return new DefaultGOLineWriter(outputStream);
+            return new DefaultGOLineWriter1(outputStream);
+        }
+        else if (version == 2){
+            return new DefaultGOLineWriter2(outputStream);
         }
         else {
             return null;
@@ -88,7 +96,10 @@ public class GOWriterFactory {
     public GOLineWriter createGOLineWriterFor(int version, String outputStream) throws IOException {
 
         if (version == 1){
-            return new DefaultGOLineWriter(new FileWriter(outputStream));
+            return new DefaultGOLineWriter1(new FileWriter(outputStream));
+        }
+        else if (version == 2){
+            return new DefaultGOLineWriter2(new FileWriter(outputStream));
         }
         else {
             return null;
