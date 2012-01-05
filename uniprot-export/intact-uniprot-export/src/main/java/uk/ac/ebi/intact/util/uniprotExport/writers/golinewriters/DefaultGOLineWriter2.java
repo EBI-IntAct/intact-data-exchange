@@ -172,8 +172,9 @@ public class DefaultGOLineWriter2 implements GOLineWriter<DefaultGOParameters2> 
         writer.write(WriterUtils.TABULATION); // Annotation extension
 
         if (isoform != null){
+            String fixedIsoform = isoform.replace("-PRO_", ":PRO_");
             writer.write("UniProtKB:"); // Gene product form id
-            writer.write(isoform);
+            writer.write(fixedIsoform);
         }
         else {
             writer.write(WriterUtils.TABULATION); //No Gene product form id
