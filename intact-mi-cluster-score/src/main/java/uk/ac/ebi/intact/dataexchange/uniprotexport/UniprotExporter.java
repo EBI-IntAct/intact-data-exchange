@@ -6,14 +6,15 @@ import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.ExporterRule;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.InteractionSource;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportProcessor;
-import uk.ac.ebi.intact.util.uniprotExport.converters.InteractorToDRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.filters.mitab.NonClusteredMitabFilter;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 
 import java.io.IOException;
 
@@ -183,10 +184,10 @@ public class UniprotExporter {
             mitabFilter.setMitab(mitabFile);
         }
 
-        InteractorToDRLineConverter drConverter = DRConverterFactory.createDRLineConverter(version_drFile);
-        EncoreInteractionToGoLineConverter goConverter = GOConverterFactory.createGOConverter(version_goFile);
-        EncoreInteractionToCCLineConverter ccConverter = CCConverterFactory.createCCConverter(version_ccFile);
-        EncoreInteractionToCCLineConverter silverCcConverter = ccConverter;
+        DRLineConverter drConverter = DRConverterFactory.createDRLineConverter(version_drFile);
+        GoLineConverter<? extends GOParameters> goConverter = GOConverterFactory.createGOConverter(version_goFile);
+        CCLineConverter ccConverter = CCConverterFactory.createCCConverter(version_ccFile);
+        CCLineConverter silverCcConverter = ccConverter;
 
         if (version_ccFile != version_silverCcFile){
             silverCcConverter = CCConverterFactory.createCCConverter(version_silverCcFile);

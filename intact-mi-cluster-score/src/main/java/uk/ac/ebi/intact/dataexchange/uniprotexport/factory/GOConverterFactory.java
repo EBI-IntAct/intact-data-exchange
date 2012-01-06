@@ -1,8 +1,9 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport.factory;
 
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter1;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter2;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter2;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 
 /**
  * Factory for the GO line converters
@@ -14,12 +15,12 @@ import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInt
 
 public class GOConverterFactory {
 
-    public static EncoreInteractionToGoLineConverter createGOConverter(int version){
+    public static GoLineConverter<? extends GOParameters> createGOConverter(int version){
          switch (version) {
             case 1:
-                return new EncoreInteractionToGoLineConverter1();
+                return new GoLineConverter1();
              case 2:
-                 return new EncoreInteractionToGoLineConverter2();
+                 return new GoLineConverter2();
             default:
                 return null;
         }

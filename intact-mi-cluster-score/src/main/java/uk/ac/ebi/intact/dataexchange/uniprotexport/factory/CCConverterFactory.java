@@ -1,8 +1,8 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport.factory;
 
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLine1Converter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLine2Converter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter2;
 
 /**
  * Factory for the CC line converters
@@ -14,12 +14,12 @@ import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInt
 
 public class CCConverterFactory {
 
-    public static EncoreInteractionToCCLineConverter createCCConverter(int version){
+    public static CCLineConverter createCCConverter(int version){
          switch (version) {
             case 1:
-                return new EncoreInteractionToCCLine1Converter();
+                return new CCLineConverter1();
             case 2:
-                return new EncoreInteractionToCCLine2Converter();
+                return new CCLineConverter2();
             default:
                 return null;
         }
