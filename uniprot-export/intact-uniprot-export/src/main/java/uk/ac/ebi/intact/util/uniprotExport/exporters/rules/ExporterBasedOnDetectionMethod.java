@@ -14,7 +14,7 @@ import uk.ac.ebi.intact.util.uniprotExport.LineExport;
 import uk.ac.ebi.intact.util.uniprotExport.LineExportConfig;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.AbstractInteractionExporter;
-import uk.ac.ebi.intact.util.uniprotExport.exporters.QueryFactory;
+import uk.ac.ebi.intact.util.uniprotExport.exporters.QueryBuilder;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
@@ -43,7 +43,7 @@ import java.util.*;
 public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter {
     private static final Logger logger = Logger.getLogger(ExporterBasedOnDetectionMethod.class);
 
-    private QueryFactory queryProvider;
+    private QueryBuilder queryProvider;
     protected LineExportConfig config;
 
     /**
@@ -52,7 +52,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     protected Map<String, CvInteractionStatus> cvInteractionExportStatusCache = new HashMap<String, CvInteractionStatus>();
 
     public ExporterBasedOnDetectionMethod(){
-        this.queryProvider = new QueryFactory();
+        this.queryProvider = new QueryBuilder();
         buildCvInteractionStatusCache();
         config = new LineExportConfig();
     }

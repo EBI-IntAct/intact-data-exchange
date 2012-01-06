@@ -4,38 +4,42 @@ import org.apache.log4j.Logger;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.DefaultCCParameters1;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.DefaultSecondCCParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters1Impl;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters1;
-import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedProteins;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
- * Converter of an EncoreInteraction into a CCParameter1
+ * The CCLineConverter1 can only convert positive encore interactions to CC parameters for the CC line format, version 1.
+ * Self intercations involving two isoforms cannot be converted.
+ * Feature chains are remapped to the master uniprot entry
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>31/01/11</pre>
  */
 
-public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteractionToCCLineConverter {
-    private static final Logger logger = Logger.getLogger(EncoreInteractionToCCLine1Converter.class);
+public class CCLineConverter1 extends AbstractCCLineConverter {
+    private static final Logger logger = Logger.getLogger(CCLineConverter1.class);
 
-    public EncoreInteractionToCCLine1Converter(){
+    public CCLineConverter1(){
         super();
     }
 
     @Override
-    public CCParameters convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteractionForScoring> positiveInteractions, List<EncoreInteractionForScoring> negativeInteractions, MiClusterContext context, String firstInteractor) {
+    public CCParameters convertPositiveAndNegativeInteractionsIntoCCLines(Set<EncoreInteractionForScoring> positiveInteractions, Set<EncoreInteractionForScoring> negativeInteractions, MiClusterContext context, String firstInteractor) {
         logger.warn("The CCline format version 1 doesn't accept negative interactions so they will be ignored.");
         return convertInteractionsIntoCCLines(positiveInteractions, context, firstInteractor);
     }
 
     @Override
-    public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(List<EncoreInteractionForScoring> interactions, MiClusterContext context, String masterUniprot){
+    public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(Set<EncoreInteractionForScoring> interactions, MiClusterContext context, String masterUniprot){
         String firstIntactAc = null;
         String geneName1 = null;
         String taxId1 = null;
@@ -44,8 +48,6 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
         Set<SecondCCParameters1> processedCCParametersForFeatureChains = new HashSet<SecondCCParameters1>();
 
         SortedSet<SecondCCParameters1> secondCCInteractors = new TreeSet<SecondCCParameters1>();
-
-        Map<String, Set<IntactTransSplicedProteins>> transSplicedVariants = context.getTranscriptsWithDifferentMasterAcs();
 
         if (!interactions.isEmpty()){
 
@@ -182,7 +184,7 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
                             if (numberEvidences > 0){
                                 logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
 
-                                SecondCCParameters1 secondCCInteractor = new DefaultSecondCCParameters1(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
+                                SecondCCParameters1 secondCCInteractor = new SecondCCParameters1Impl(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
 
                                 if (!containsFeatureChain){
                                     secondCCInteractors.add(secondCCInteractor);
@@ -237,7 +239,7 @@ public class EncoreInteractionToCCLine1Converter extends AbstractEncoreInteracti
             }
 
             if (!secondCCInteractors.isEmpty()){
-                return new DefaultCCParameters1(masterUniprot, geneName1, taxId1, secondCCInteractors);
+                return new CCParameters1(masterUniprot, geneName1, taxId1, secondCCInteractors);
             }
         }
 

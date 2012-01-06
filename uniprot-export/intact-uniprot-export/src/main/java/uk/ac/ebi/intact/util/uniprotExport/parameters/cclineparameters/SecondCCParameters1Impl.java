@@ -8,7 +8,7 @@ package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
  * @since <pre>10/02/11</pre>
  */
 
-public class DefaultSecondCCParameters1 implements SecondCCParameters1{
+public class SecondCCParameters1Impl implements SecondCCParameters1{
 
     private String firstUniprotAc;
     private String secondUniprotAc;
@@ -21,8 +21,8 @@ public class DefaultSecondCCParameters1 implements SecondCCParameters1{
 
     private int numberOfInteractionEvidences;
 
-    public DefaultSecondCCParameters1(String firstUniprotAc, String firstIntactAc, String secondUniprotAc,
-                                      String secondIntactAc, String geneName, String taxId, int numberInteractions){
+    public SecondCCParameters1Impl(String firstUniprotAc, String firstIntactAc, String secondUniprotAc,
+                                   String secondIntactAc, String geneName, String taxId, int numberInteractions){
 
         this.firstUniprotAc = firstUniprotAc;
         this.secondUniprotAc = secondUniprotAc;
@@ -79,8 +79,8 @@ public class DefaultSecondCCParameters1 implements SecondCCParameters1{
     }
 
     public int compareTo( Object o ) {
-        DefaultSecondCCParameters1 cc2 = null;
-        cc2 = (DefaultSecondCCParameters1) o;
+        SecondCCParameters1Impl cc2 = null;
+        cc2 = (SecondCCParameters1Impl) o;
 
         final String gene1 = getGeneName();
         final String gene2 = cc2.getGeneName();
@@ -138,7 +138,7 @@ public class DefaultSecondCCParameters1 implements SecondCCParameters1{
             return false;
         }
 
-        DefaultSecondCCParameters1 ccLine1 = (DefaultSecondCCParameters1) o;
+        SecondCCParameters1Impl ccLine1 = (SecondCCParameters1Impl) o;
 
         if (geneName != null ? !geneName.equals(ccLine1.geneName) : ccLine1.geneName != null)
         {

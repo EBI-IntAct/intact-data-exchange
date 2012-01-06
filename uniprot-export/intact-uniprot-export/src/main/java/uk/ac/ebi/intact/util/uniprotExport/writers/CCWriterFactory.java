@@ -1,11 +1,11 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLine1Converter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLine2Converter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter2;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriter;
-import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.DefaultCCLineWriter1;
-import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.DefaultCCLineWriter2;
+import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriter1;
+import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriter2;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,17 +28,17 @@ public class CCWriterFactory {
      * @return a CCLine writer which is compatible with this converter, null otherwise
      * @throws IOException
      */
-    public CCLineWriter createCCLineWriterFor(EncoreInteractionToCCLineConverter ccConverter, OutputStreamWriter outputStream) throws IOException {
+    public CCLineWriter createCCLineWriterFor(CCLineConverter ccConverter, OutputStreamWriter outputStream) throws IOException {
 
         if (ccConverter == null){
             return null;
         }
 
-        if (ccConverter instanceof EncoreInteractionToCCLine1Converter){
-            return new DefaultCCLineWriter1(outputStream);
+        if (ccConverter instanceof CCLineConverter1){
+            return new CCLineWriter1(outputStream);
         }
-        else if (ccConverter instanceof EncoreInteractionToCCLine2Converter){
-            return new DefaultCCLineWriter2(outputStream);
+        else if (ccConverter instanceof CCLineConverter2){
+            return new CCLineWriter2(outputStream);
         }
         else {
             return null;
@@ -52,17 +52,17 @@ public class CCWriterFactory {
      * @return a CCLine writer which is compatible with this converter, null otherwise
      * @throws IOException
      */
-    public CCLineWriter createCCLineWriterFor(EncoreInteractionToCCLineConverter ccConverter, String outputStream) throws IOException {
+    public CCLineWriter createCCLineWriterFor(CCLineConverter ccConverter, String outputStream) throws IOException {
 
         if (ccConverter == null){
             return null;
         }
 
-        if (ccConverter instanceof EncoreInteractionToCCLine1Converter){
-            return new DefaultCCLineWriter1(new FileWriter(outputStream));
+        if (ccConverter instanceof CCLineConverter1){
+            return new CCLineWriter1(new FileWriter(outputStream));
         }
-        else if (ccConverter instanceof EncoreInteractionToCCLine2Converter){
-            return new DefaultCCLineWriter2(new FileWriter(outputStream));
+        else if (ccConverter instanceof CCLineConverter2){
+            return new CCLineWriter2(new FileWriter(outputStream));
         }
         else {
             return null;
@@ -79,10 +79,10 @@ public class CCWriterFactory {
     public CCLineWriter createCCLineWriterFor(int version, OutputStreamWriter outputStream) throws IOException {
 
         if (version == 1){
-            return new DefaultCCLineWriter1(outputStream);
+            return new CCLineWriter1(outputStream);
         }
         else if (version == 2){
-            return new DefaultCCLineWriter2(outputStream);
+            return new CCLineWriter2(outputStream);
         }
         else {
             return null;
@@ -99,10 +99,10 @@ public class CCWriterFactory {
     public CCLineWriter createCCLineWriterFor(int version, String outputStream) throws IOException {
 
         if (version == 1){
-            return new DefaultCCLineWriter1(new FileWriter(outputStream));
+            return new CCLineWriter1(new FileWriter(outputStream));
         }
         else if (version == 2){
-            return new DefaultCCLineWriter2(new FileWriter(outputStream));
+            return new CCLineWriter2(new FileWriter(outputStream));
         }
         else {
             return null;

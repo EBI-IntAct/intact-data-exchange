@@ -14,27 +14,40 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Abstract encore interaction to CC line converter
+ * Abstract class for CC line converters. A CC line converter can convert an Encore interaction to a CC parameter representing
+ * the CC line.
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>08/03/11</pre>
  */
 
-public abstract class AbstractEncoreInteractionToCCLineConverter implements EncoreInteractionToCCLineConverter{
+public abstract class AbstractCCLineConverter implements CCLineConverter {
 
-    private static final Logger logger = Logger.getLogger(AbstractEncoreInteractionToCCLineConverter.class);
+    private static final Logger logger = Logger.getLogger(AbstractCCLineConverter.class);
 
-    private Map<String, String> taxIdToScientificName = new HashMap<String, String>();
+    /**
+     * This map allows to cache information about organisms. The key is the taxId and the value is the scientific name
+     */
+    private Map<String, String> taxIdToScientificName;
 
+    /**
+     * The uniprot taxonomy service to retrieve scientific names using taxIds
+     */
     private UniprotTaxonomyService taxonomyService;
 
-    public AbstractEncoreInteractionToCCLineConverter(){
+    public AbstractCCLineConverter(){
         taxonomyService = new UniprotTaxonomyService();
+        taxIdToScientificName = new HashMap<String, String>();
     }
 
     /**
+     * This methods can extract taxIds and organism names from a CrossReference.
+     * It returns a String [] of length 2 with :
+     * - taxId found in the cross reference
+     * - organism name found in cross reference
      *
+     * If no taxId/organism name can be found, the taxId/organism name which is returned is '-'
      * @param references : the organism cross references
      * @return a String [2] with the taxId of the organism and the organism name
      */
@@ -57,7 +70,7 @@ public abstract class AbstractEncoreInteractionToCCLineConverter implements Enco
     }
 
     /**
-     *
+     * This method will retrieve a scientific name given the taxId using the uniprot taxonomy service
      * @param taxId
      * @return The scientific organism name associated with this taxId, null if no scientific name is associated with this taxId
      * @throws uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException
@@ -80,13 +93,23 @@ public abstract class AbstractEncoreInteractionToCCLineConverter implements Enco
         return scientificName;
     }
 
-    protected boolean isFirstInteractor(String firstInteractor, String interactor,Set<IntactTransSplicedProteins> transSplicedProteins){
+    /**
+     *
+     * @param firstInteractor : uniprot ac of the master uniprot
+     * @param interactor : uniprot ac of the interactor
+     * @param transSplicedProteins : set of trans spliced proteins which can be associated with the master uniprot entry
+     * @return true if this interactor is from the same uniprot entry as the master uniprot ac, false otherwise
+     */
+    protected boolean isFromSameUniprotEntry(String firstInteractor, String interactor, Set<IntactTransSplicedProteins> transSplicedProteins){
 
+        // the interactor starts with master uniprot so we consider it as the first interactor
         if (interactor.startsWith(firstInteractor)){
            return true;
         }
+        // if proteins from this uniprot entry are trans spliced variants
         else if (transSplicedProteins != null){
             for (IntactTransSplicedProteins prot : transSplicedProteins){
+                // the interactor is a transpliced variant of this uniprot entry so we consider it as the first interactor
                 if (interactor.equalsIgnoreCase(prot.getUniprotAc())){
                     return true;
                 }

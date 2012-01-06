@@ -11,7 +11,7 @@ import java.util.TreeSet;
  * @since <pre>10/02/11</pre>
  */
 
-public class DefaultCCParameters1 implements CCParameters<SecondCCParameters1>{
+public class CCParameters1 implements CCParameters<SecondCCParameters1>{
 
     private String masterAc;
 
@@ -21,8 +21,8 @@ public class DefaultCCParameters1 implements CCParameters<SecondCCParameters1>{
 
     private SortedSet<SecondCCParameters1> secondCCParameters;
 
-    public DefaultCCParameters1(String firstInteractor, String firstGeneName,
-                               String firstTaxId, SortedSet<SecondCCParameters1> secondInteractors){
+    public CCParameters1(String firstInteractor, String firstGeneName,
+                         String firstTaxId, SortedSet<SecondCCParameters1> secondInteractors){
 
         this.masterAc = firstInteractor;
 

@@ -20,7 +20,7 @@ import java.util.SortedSet;
  * @since <pre>09/02/11</pre>
  */
 
-public class DefaultCCLineWriter1 implements CCLineWriter<CCParameters<SecondCCParameters1>> {
+public class CCLineWriter1 implements CCLineWriter<CCParameters<SecondCCParameters1>> {
 
     /**
      * The writer
@@ -33,7 +33,7 @@ public class DefaultCCLineWriter1 implements CCLineWriter<CCParameters<SecondCCP
      * @param outputStream : the outputStreamWriter
      * @throws IOException
      */
-    public DefaultCCLineWriter1(OutputStreamWriter outputStream) throws IOException {
+    public CCLineWriter1(OutputStreamWriter outputStream) throws IOException {
         if (outputStream == null){
             throw new IllegalArgumentException("You must give a non null OutputStream writer");
         }

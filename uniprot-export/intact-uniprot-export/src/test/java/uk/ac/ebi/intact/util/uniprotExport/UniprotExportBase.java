@@ -17,12 +17,12 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DefaultDRParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParametersImpl;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
-import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
 import java.io.BufferedReader;
@@ -66,11 +66,11 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         Set<String> publications2 = new HashSet<String>(1);
         publications2.add(pmid2);
 
-        GOParameters parameter1 = new DefaultGOParameters1(uniprotAc1, uniprotAc2, publications1);
-        GOParameters parameter4 = new DefaultGOParameters1(uniprotAc2, uniprotAc1, publications1);
-        GOParameters parameter2 = new DefaultGOParameters1(uniprotAc1, uniprotAc4, publications1);
-        GOParameters parameter5 = new DefaultGOParameters1(uniprotAc4, uniprotAc1, publications1);
-        GOParameters parameter3 = new DefaultGOParameters1(uniprotAc5, uniprotAc5, publications2);
+        GOParameters parameter1 = new GOParameters1(uniprotAc1, uniprotAc2, publications1);
+        GOParameters parameter4 = new GOParameters1(uniprotAc2, uniprotAc1, publications1);
+        GOParameters parameter2 = new GOParameters1(uniprotAc1, uniprotAc4, publications1);
+        GOParameters parameter5 = new GOParameters1(uniprotAc4, uniprotAc1, publications1);
+        GOParameters parameter3 = new GOParameters1(uniprotAc5, uniprotAc5, publications2);
 
         parameters.add(parameter1);
         parameters.add(parameter4);
@@ -130,11 +130,11 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         publications4.add(pmid4);
         publications4.add(pmid2);
 
-        InteractionDetails detail1 = new DefaultInteractionDetails("physical association", "tandem affinity purification", false, publications1);
-        InteractionDetails detail2 = new DefaultInteractionDetails("physical association", "two hybrid pooling", false, publications2);
-        InteractionDetails detail3 = new DefaultInteractionDetails("association", "anti bait coimmunoprecipitation", true, publications3);
-        InteractionDetails detail4 = new DefaultInteractionDetails("physical association", "coimmunoprecipitation", false, publications4);
-        InteractionDetails detail5 = new DefaultInteractionDetails("physical association", "two hybrid pooling", false, publications1);
+        InteractionDetails detail1 = new InteractionDetailsImpl("physical association", "tandem affinity purification", false, publications1);
+        InteractionDetails detail2 = new InteractionDetailsImpl("physical association", "two hybrid pooling", false, publications2);
+        InteractionDetails detail3 = new InteractionDetailsImpl("association", "anti bait coimmunoprecipitation", true, publications3);
+        InteractionDetails detail4 = new InteractionDetailsImpl("physical association", "coimmunoprecipitation", false, publications4);
+        InteractionDetails detail5 = new InteractionDetailsImpl("physical association", "two hybrid pooling", false, publications1);
 
         SortedSet<InteractionDetails> details1 = new TreeSet<InteractionDetails>();
         details1.add(detail1);
@@ -147,37 +147,37 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         details3.add(detail3);
         details3.add(detail4);
 
-        SecondCCParameters2 secondParameters1 = new DefaultSecondCCParameters2(uniprotAc5, intactAc4, uniprotAc2, intactAc1, geneName2, taxId2, organismName2, details1, true);
-        SecondCCParameters2 secondParameters2 = new DefaultSecondCCParameters2(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, organismName, details2, true);
-        SecondCCParameters2 secondParameters3 = new DefaultSecondCCParameters2(uniprotAc7, intactAc6, uniprotAc4, intactAc3, geneName4, taxId, organismName, details3, false);
+        SecondCCParameters2 secondParameters1 = new SecondCCParameters2Impl(uniprotAc5, intactAc4, uniprotAc2, intactAc1, geneName2, taxId2, organismName2, details1, true);
+        SecondCCParameters2 secondParameters2 = new SecondCCParameters2Impl(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, organismName, details2, true);
+        SecondCCParameters2 secondParameters3 = new SecondCCParameters2Impl(uniprotAc7, intactAc6, uniprotAc4, intactAc3, geneName4, taxId, organismName, details3, false);
 
         SortedSet<SecondCCParameters2> listOfSecondInteractors1 = new TreeSet<SecondCCParameters2>();
         listOfSecondInteractors1.add(secondParameters1);
         listOfSecondInteractors1.add(secondParameters2);
         listOfSecondInteractors1.add(secondParameters3);
 
-        CCParameters<SecondCCParameters2> parameters1 = new DefaultCCParameters2(uniprotAc1, geneName1, taxId, listOfSecondInteractors1);
+        CCParameters<SecondCCParameters2> parameters1 = new CCParameters2(uniprotAc1, geneName1, taxId, listOfSecondInteractors1);
         parameters.add(parameters1);
 
         SortedSet<SecondCCParameters2> listOfSecondInteractors2 = new TreeSet<SecondCCParameters2>();
-        SecondCCParameters2 secondParameters4 = new DefaultSecondCCParameters2(uniprotAc2, intactAc1, uniprotAc5, intactAc4, geneName1, taxId, organismName, details1, true);
+        SecondCCParameters2 secondParameters4 = new SecondCCParameters2Impl(uniprotAc2, intactAc1, uniprotAc5, intactAc4, geneName1, taxId, organismName, details1, true);
         listOfSecondInteractors2.add(secondParameters4);
 
-        CCParameters<SecondCCParameters2> parameters2 = new DefaultCCParameters2(uniprotAc2, geneName2, taxId2, listOfSecondInteractors2);
+        CCParameters<SecondCCParameters2> parameters2 = new CCParameters2(uniprotAc2, geneName2, taxId2, listOfSecondInteractors2);
         parameters.add(parameters2);
 
         SortedSet<SecondCCParameters2> listOfSecondInteractors3 = new TreeSet<SecondCCParameters2>();
-        SecondCCParameters2 secondParameters5 = new DefaultSecondCCParameters2(uniprotAc3, intactAc2, uniprotAc6, intactAc5, geneName1, taxId, organismName, details2, true);
+        SecondCCParameters2 secondParameters5 = new SecondCCParameters2Impl(uniprotAc3, intactAc2, uniprotAc6, intactAc5, geneName1, taxId, organismName, details2, true);
         listOfSecondInteractors3.add(secondParameters5);
 
-        CCParameters<SecondCCParameters2> parameters3 = new DefaultCCParameters2(uniprotAc3, geneName3, taxId, listOfSecondInteractors3);
+        CCParameters<SecondCCParameters2> parameters3 = new CCParameters2(uniprotAc3, geneName3, taxId, listOfSecondInteractors3);
         parameters.add(parameters3);
 
         SortedSet<SecondCCParameters2> listOfSecondInteractors4 = new TreeSet<SecondCCParameters2>();
-        SecondCCParameters2 secondParameters6 = new DefaultSecondCCParameters2(uniprotAc4, intactAc3, uniprotAc7, intactAc6, geneName1, taxId, organismName, details3, false);
+        SecondCCParameters2 secondParameters6 = new SecondCCParameters2Impl(uniprotAc4, intactAc3, uniprotAc7, intactAc6, geneName1, taxId, organismName, details3, false);
         listOfSecondInteractors4.add(secondParameters6);
 
-        CCParameters<SecondCCParameters2> parameters4 = new DefaultCCParameters2(uniprotAc4, geneName4, taxId, listOfSecondInteractors4);
+        CCParameters<SecondCCParameters2> parameters4 = new CCParameters2(uniprotAc4, geneName4, taxId, listOfSecondInteractors4);
         parameters.add(parameters4);
 
         return parameters;
@@ -192,10 +192,10 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         String uniprotAc4 = "Q17862";
         String uniprotAc5 = "P33327";
 
-        DRParameters parameter1 = new DefaultDRParameters(uniprotAc1, 2);
-        DRParameters parameter2 = new DefaultDRParameters(uniprotAc2, 1);
-        DRParameters parameter3 = new DefaultDRParameters(uniprotAc4, 1);
-        DRParameters parameter4 = new DefaultDRParameters(uniprotAc5, 1);
+        DRParameters parameter1 = new DRParametersImpl(uniprotAc1, 2);
+        DRParameters parameter2 = new DRParametersImpl(uniprotAc2, 1);
+        DRParameters parameter3 = new DRParametersImpl(uniprotAc4, 1);
+        DRParameters parameter4 = new DRParametersImpl(uniprotAc5, 1);
 
         parameters.add(parameter1);
         parameters.add(parameter2);
@@ -582,7 +582,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return context;
     }
 
-    public IntActInteractionClusterScore createClusterForExportBasedOnMiScore(){
+    public IntActClusterScore createClusterForExportBasedOnMiScore(){
 
         List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
         interactions.add(createEncoreInteractionLowScore());
@@ -592,21 +592,21 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return createCluster(interactions);
     }
 
-    public IntActInteractionClusterScore createNegativeCluster(){
+    public IntActClusterScore createNegativeCluster(){
 
         List<EncoreInteractionForScoring> interactions = createNegativeEncoreInteractions();
 
         return createCluster(interactions);
     }
 
-    public IntActInteractionClusterScore createPositiveCluster(){
+    public IntActClusterScore createPositiveCluster(){
 
         List<EncoreInteractionForScoring> interactions = createPositiveEncoreInteractions();
 
         return createCluster(interactions);
     }
 
-    public IntActInteractionClusterScore createClusterForExportBasedOnDetectionMethod(){
+    public IntActClusterScore createClusterForExportBasedOnDetectionMethod(){
 
         List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
         interactions.add(createEncoreInteractionHighScoreSpokeExpanded());  // two hybrid pooling : export = conditional, 2 and doesn't pass
@@ -615,8 +615,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return createCluster(interactions);
     }
 
-    private IntActInteractionClusterScore createCluster(List<EncoreInteractionForScoring> interactions){
-        IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
+    private IntActClusterScore createCluster(List<EncoreInteractionForScoring> interactions){
+        IntActClusterScore clusterScore = new IntActClusterScore();
         clusterScore.setInteractionMapping(new HashMap<Integer, EncoreInteractionForScoring>());
         clusterScore.setInteractorMapping(new HashMap<String, List<Integer>>());
 
@@ -648,8 +648,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     }
 
     public MiClusterScoreResults createMiScoreResultsForMiScoreExport(){
-        IntActInteractionClusterScore clsuterScore = createClusterForExportBasedOnMiScore();
-        IntActInteractionClusterScore negativeClusterScore = createNegativeCluster();
+        IntActClusterScore clsuterScore = createClusterForExportBasedOnMiScore();
+        IntActClusterScore negativeClusterScore = createNegativeCluster();
         MiClusterContext context = createClusterContext();
 
         MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clsuterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
@@ -658,8 +658,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     }
 
     public MiClusterScoreResults createMiScoreResultsForDetectionMethodExport(){
-        IntActInteractionClusterScore clusterScore = createClusterForExportBasedOnDetectionMethod();
-        IntActInteractionClusterScore negativeClusterScore = createNegativeCluster();
+        IntActClusterScore clusterScore = createClusterForExportBasedOnDetectionMethod();
+        IntActClusterScore negativeClusterScore = createNegativeCluster();
         MiClusterContext context = createClusterContext();
 
         MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
@@ -668,8 +668,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     }
 
     public MiClusterScoreResults createMiScoreResultsForSimulation(){
-        IntActInteractionClusterScore clusterScore = createPositiveCluster();
-        IntActInteractionClusterScore negativeClusterScore = createNegativeCluster();
+        IntActClusterScore clusterScore = createPositiveCluster();
+        IntActClusterScore negativeClusterScore = createNegativeCluster();
         MiClusterContext context = createClusterContext();
 
         MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);

@@ -21,7 +21,7 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
 import java.io.File;
@@ -53,7 +53,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
 
     protected MiClusterScoreResults clusterMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
         BinaryClusterScore clusterScore = new BinaryClusterScore();
-        IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
+        IntActClusterScore negativeClusterScore = new IntActClusterScore();
         MiClusterContext context = new MiClusterContext();
         context.setTranscriptsWithDifferentMasterAcs(this.transcriptsWithDifferentParentAcs);
         context.setInteractionComponentXrefs(this.interactionComponentXrefs);

@@ -16,7 +16,7 @@ public class InteractorToDRLineConverterTest{
 
     @Test
     public void test_dr_convert_ok(){
-        DefaultInteractorToDRLineConverter converter = new DefaultInteractorToDRLineConverter();
+        DRLineConverter1 converter = new DRLineConverter1();
 
         DRParameters parameters = converter.convertInteractorIntoDRLine("EBI-xxxxx", 3);
         Assert.assertNotNull(parameters);
@@ -26,7 +26,7 @@ public class InteractorToDRLineConverterTest{
 
     @Test
     public void test_dr_convert_null(){
-        DefaultInteractorToDRLineConverter converter = new DefaultInteractorToDRLineConverter();
+        DRLineConverter1 converter = new DRLineConverter1();
 
         DRParameters parameters = converter.convertInteractorIntoDRLine(null, 3);
         Assert.assertNull(parameters);

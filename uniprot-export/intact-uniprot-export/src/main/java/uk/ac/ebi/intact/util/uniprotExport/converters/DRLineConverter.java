@@ -10,7 +10,7 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParamet
  * @since <pre>08/03/11</pre>
  */
 
-public interface InteractorToDRLineConverter {
+public interface DRLineConverter {
 
     /**
      * Converts an interactor into a DR line

@@ -27,7 +27,7 @@ public class GOLineWriterTest extends UniprotExportBase{
         try {
             File testFile = new File("GoTest.txt");
             FileWriter test = new FileWriter(testFile);
-            GOLineWriter writer = new DefaultGOLineWriter1(test);
+            GOLineWriter writer = new GOLineWriter1(test);
 
             writer.writeGOLines(parameters);
 

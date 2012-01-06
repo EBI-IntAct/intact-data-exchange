@@ -1,9 +1,9 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
-import uk.ac.ebi.intact.util.uniprotExport.converters.DefaultInteractorToDRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.InteractorToDRLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DRLineWriter;
-import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DefaultDRLineWriter;
+import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DRLineWriter1;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -26,14 +26,14 @@ public class DRWriterFactory {
      * @return a DRLine writer which is compatible with this converter, null otherwise
      * @throws IOException
      */
-    public DRLineWriter createDRLineWriterFor(InteractorToDRLineConverter drConverter, OutputStreamWriter outputStream) throws IOException {
+    public DRLineWriter createDRLineWriterFor(DRLineConverter drConverter, OutputStreamWriter outputStream) throws IOException {
 
         if (drConverter == null){
             return null;
         }
 
-        if (drConverter instanceof DefaultInteractorToDRLineConverter){
-            return new DefaultDRLineWriter(outputStream);
+        if (drConverter instanceof DRLineConverter1){
+            return new DRLineWriter1(outputStream);
         }
         else {
             return null;
@@ -47,14 +47,14 @@ public class DRWriterFactory {
      * @return a DRLine writer which is compatible with this converter, null otherwise
      * @throws IOException
      */
-    public DRLineWriter createDRLineWriterFor(InteractorToDRLineConverter drConverter, String outputStream) throws IOException {
+    public DRLineWriter createDRLineWriterFor(DRLineConverter drConverter, String outputStream) throws IOException {
 
         if (drConverter == null){
             return null;
         }
 
-        if (drConverter instanceof DefaultInteractorToDRLineConverter){
-            return new DefaultDRLineWriter(new FileWriter(outputStream));
+        if (drConverter instanceof DRLineConverter1){
+            return new DRLineWriter1(new FileWriter(outputStream));
         }
         else {
             return null;
@@ -71,7 +71,7 @@ public class DRWriterFactory {
     public DRLineWriter createDRLineWriterFor(int version, OutputStreamWriter outputStream) throws IOException {
 
         if (version == 1){
-            return new DefaultDRLineWriter(outputStream);
+            return new DRLineWriter1(outputStream);
         }
         else {
             return null;
@@ -88,7 +88,7 @@ public class DRWriterFactory {
     public DRLineWriter createDRLineWriterFor(int version, String outputStream) throws IOException {
 
         if (version == 1){
-            return new DefaultDRLineWriter(new FileWriter(outputStream));
+            return new DRLineWriter1(new FileWriter(outputStream));
         }
         else {
             return null;

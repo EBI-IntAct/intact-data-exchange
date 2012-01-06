@@ -27,7 +27,7 @@ public class CCLineWriterTest extends UniprotExportBase{
         try {
             File testFile = new File("CcTest.txt");
             FileWriter test = new FileWriter(testFile);
-            CCLineWriter writer = new DefaultCCLineWriter2(test);
+            CCLineWriter writer = new CCLineWriter2(test);
 
             writer.writeCCLines(parameters);
 

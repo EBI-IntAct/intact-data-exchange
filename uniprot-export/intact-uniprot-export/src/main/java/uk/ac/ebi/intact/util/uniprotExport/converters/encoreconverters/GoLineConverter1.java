@@ -3,7 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.DefaultGOParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -17,8 +17,8 @@ import java.util.*;
  * @since <pre>31/01/11</pre>
  */
 
-public class EncoreInteractionToGoLineConverter1 implements EncoreInteractionToGoLineConverter<DefaultGOParameters1>{
-    private static final Logger logger = Logger.getLogger(EncoreInteractionToGoLineConverter1.class);
+public class GoLineConverter1 implements GoLineConverter<GOParameters1> {
+    private static final Logger logger = Logger.getLogger(GoLineConverter1.class);
 
     /**
      * Converts an EncoreInteraction into GOParameters
@@ -26,7 +26,7 @@ public class EncoreInteractionToGoLineConverter1 implements EncoreInteractionToG
      * @param firstInteractor
      * @return The converted GOParameters
      */
-    public DefaultGOParameters1 convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor, MiClusterContext context){
+    public GOParameters1 convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor, MiClusterContext context){
         // extract the uniprot acs of the firts and second interactors
         String uniprot1;
         String uniprot2;
@@ -62,13 +62,13 @@ public class EncoreInteractionToGoLineConverter1 implements EncoreInteractionToG
             // if the list of pubmed ids is not empty, the GOParameter is created
             if (!pubmedIds.isEmpty()){
                 logger.debug("convert GO parameters for " + uniprot1 + ", " + uniprot2 + ", " + pubmedIds.size() + " pubmed ids");
-                DefaultGOParameters1 parameters;
+                GOParameters1 parameters;
 
                 if (uniprot1.equalsIgnoreCase(firstInteractor)){
-                    parameters = new DefaultGOParameters1(fixedUniprot1, fixedUniprot2, pubmedIds);
+                    parameters = new GOParameters1(fixedUniprot1, fixedUniprot2, pubmedIds);
                 }
                 else{
-                    parameters = new DefaultGOParameters1(fixedUniprot2, fixedUniprot1, pubmedIds);
+                    parameters = new GOParameters1(fixedUniprot2, fixedUniprot1, pubmedIds);
                 }
 
                 return parameters;
@@ -85,8 +85,8 @@ public class EncoreInteractionToGoLineConverter1 implements EncoreInteractionToG
      * @param interactions : list of encore interactions involving the same interactors or feature chains of a same entry
      * @return The converted GOParameters
      */
-    public List<DefaultGOParameters1> convertInteractionsIntoGOParameters(Set<EncoreInteractionForScoring> interactions, String parentAc, MiClusterContext context){
-        List<DefaultGOParameters1> goParameters = new ArrayList<DefaultGOParameters1>(interactions.size());
+    public List<GOParameters1> convertInteractionsIntoGOParameters(Set<EncoreInteractionForScoring> interactions, String parentAc, MiClusterContext context){
+        List<GOParameters1> goParameters = new ArrayList<GOParameters1>(interactions.size());
 
         // map containing the second interactor as a key and the list of pubmed ids associated with this second interactor
         Map<String, Set<String>> clusteredInteractionWithFeatureChains = new HashMap<String, Set<String>>();
@@ -133,7 +133,7 @@ public class EncoreInteractionToGoLineConverter1 implements EncoreInteractionToG
                     }
                     // the two interactors are identical, we have a self interaction
                     else if (uniprot1.equalsIgnoreCase(uniprot2)){
-                        DefaultGOParameters1 parameter = new DefaultGOParameters1(uniprot1, uniprot2, pubmedIds);
+                        GOParameters1 parameter = new GOParameters1(uniprot1, uniprot2, pubmedIds);
 
                         goParameters.add(parameter);
                     }
@@ -162,7 +162,7 @@ public class EncoreInteractionToGoLineConverter1 implements EncoreInteractionToG
                 // by default the first interactor of merged entries is the master protein
                 String master = parentAc;
 
-                DefaultGOParameters1 parameter = new DefaultGOParameters1(master, secondInteractor, entry.getValue());
+                GOParameters1 parameter = new GOParameters1(master, secondInteractor, entry.getValue());
                 goParameters.add(parameter);
             }
         }
@@ -179,7 +179,7 @@ public class EncoreInteractionToGoLineConverter1 implements EncoreInteractionToG
 
                     isoform = mapOfFirstInteractors.get(secondInteractor);
                 }
-                DefaultGOParameters1 parameter = new DefaultGOParameters1(isoform, secondInteractor, entry.getValue());
+                GOParameters1 parameter = new GOParameters1(isoform, secondInteractor, entry.getValue());
                 goParameters.add(parameter);
             }
         }
@@ -187,7 +187,7 @@ public class EncoreInteractionToGoLineConverter1 implements EncoreInteractionToG
         return goParameters;
     }
 
-    private void processGoParameters(String parentAc, List<DefaultGOParameters1> goParameters, Map<String, Set<String>> clusteredInteractionWithFeatureChains, Map<String, Set<String>> isoformClusteredInteractionWithFeatureChains, Map<String, String> mapOfFirstInteractors, String uniprot1, String uniprot2, Set<String> pubmedIds) {
+    private void processGoParameters(String parentAc, List<GOParameters1> goParameters, Map<String, Set<String>> clusteredInteractionWithFeatureChains, Map<String, Set<String>> isoformClusteredInteractionWithFeatureChains, Map<String, String> mapOfFirstInteractors, String uniprot1, String uniprot2, Set<String> pubmedIds) {
         // the first uniprotAc is the master protein or is a feature chain of the master protein
         if (uniprot1.equalsIgnoreCase(parentAc) || (uniprot1.startsWith(parentAc) && uniprot1.contains(WriterUtils.CHAIN_PREFIX))){
             // if the second interactor is a feature chain, we must remap to its parent
@@ -231,7 +231,7 @@ public class EncoreInteractionToGoLineConverter1 implements EncoreInteractionToG
         // the first interactor is an isoform and the second interactor is isoform or master protein
         else{
 
-            DefaultGOParameters1 parameter = new DefaultGOParameters1(uniprot1, uniprot2, pubmedIds);
+            GOParameters1 parameter = new GOParameters1(uniprot1, uniprot2, pubmedIds);
 
             goParameters.add(parameter);
         }

@@ -15,7 +15,7 @@ import java.util.Set;
  * @since <pre>08/03/11</pre>
  */
 
-public interface EncoreInteractionToGoLineConverter<T extends GOParameters> {
+public interface GoLineConverter<T extends GOParameters> {
 
     /**
      *

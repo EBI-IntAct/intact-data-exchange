@@ -11,7 +11,7 @@ import java.util.TreeSet;
  * @since <pre>02/02/11</pre>
  */
 
-public class DefaultSecondCCParameters2 implements SecondCCParameters2 {
+public class SecondCCParameters2Impl implements SecondCCParameters2 {
 
     // duplicated line because of splice variants and feature chains!!!
     private String firstUniprotAc;
@@ -28,9 +28,9 @@ public class DefaultSecondCCParameters2 implements SecondCCParameters2 {
 
     private SortedSet<InteractionDetails> interactionDetails;
 
-    public DefaultSecondCCParameters2(String firstInteractor, String firstIntactAc, String secondInteractor, String secondIntactAc, String secondGeneName,
-                                      String secondTaxId, String secondOrganismName,
-                                      SortedSet<InteractionDetails> interactionDetails, boolean doesInteract){
+    public SecondCCParameters2Impl(String firstInteractor, String firstIntactAc, String secondInteractor, String secondIntactAc, String secondGeneName,
+                                   String secondTaxId, String secondOrganismName,
+                                   SortedSet<InteractionDetails> interactionDetails, boolean doesInteract){
 
         this.firstUniprotAc = firstInteractor;
         this.secondUniprotAc = secondInteractor;
@@ -101,8 +101,8 @@ public class DefaultSecondCCParameters2 implements SecondCCParameters2 {
         final int EQUAL = 0;
         final int AFTER = 1;
 
-        DefaultSecondCCParameters2 cc2 = null;
-        cc2 = (DefaultSecondCCParameters2) o;
+        SecondCCParameters2Impl cc2 = null;
+        cc2 = (SecondCCParameters2Impl) o;
 
         final String gene1 = getGeneName();
         final String gene2 = cc2.getGeneName();
@@ -166,7 +166,7 @@ public class DefaultSecondCCParameters2 implements SecondCCParameters2 {
             return false;
         }
 
-        DefaultSecondCCParameters1 ccLine1 = (DefaultSecondCCParameters1) o;
+        SecondCCParameters1Impl ccLine1 = (SecondCCParameters1Impl) o;
 
         if (geneName != null ? !geneName.equals(ccLine1.getGeneName()) : ccLine1.getGeneName() != null)
         {

@@ -23,7 +23,7 @@ import java.util.List;
  * @since <pre>22-Oct-2010</pre>
  */
 
-public class QueryFactory {
+public class QueryBuilder {
 
     private final static String AUTHOR_SCORE = "author-score";
     private final static String INFERRED_AUTHOR = "MI:0363";

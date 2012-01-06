@@ -11,13 +11,13 @@ import java.util.Set;
  * @since <pre>04/01/12</pre>
  */
 
-public class DefaultGOParameters2 extends DefaultGOParameters1{
+public class GOParameters2 extends GOParameters1 {
     
     private String masterProtein;
     
     private Set<String> componentXrefs;
     
-    public DefaultGOParameters2(String firstProtein, String secondProtein, Set<String> pubmedIds, String masterProtein, Set<String> componentXrefs) {
+    public GOParameters2(String firstProtein, String secondProtein, Set<String> pubmedIds, String masterProtein, Set<String> componentXrefs) {
         super(firstProtein, secondProtein, pubmedIds);
 
         this.masterProtein = masterProtein;

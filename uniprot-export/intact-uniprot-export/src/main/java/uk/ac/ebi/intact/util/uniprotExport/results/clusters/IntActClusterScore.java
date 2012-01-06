@@ -25,15 +25,15 @@ import java.util.*;
  * @since <pre>16-Sep-2010</pre>
  */
 
-public class IntActInteractionClusterScore extends InteractionClusterScore implements IntactCluster {
+public class IntActClusterScore extends InteractionClusterScore implements IntactCluster {
 
-    private static final Logger logger = Logger.getLogger(IntActInteractionClusterScore.class);
+    private static final Logger logger = Logger.getLogger(IntActClusterScore.class);
     private String[] scoreList = null;
     private String scoreListCSV;
 
     private PsimiTabWriter writer;
 
-    public IntActInteractionClusterScore(){
+    public IntActClusterScore(){
         super();
 
         setMappingIdDbNames("uniprotkb,intact");

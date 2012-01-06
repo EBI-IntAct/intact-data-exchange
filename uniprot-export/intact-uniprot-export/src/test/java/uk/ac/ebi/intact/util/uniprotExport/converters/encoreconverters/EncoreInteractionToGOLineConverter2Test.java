@@ -7,18 +7,18 @@ import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 
 /**
- * Tester of the GO line converter
+ * Unit tester for GO line converter 2
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
- * @since <pre>04/02/11</pre>
+ * @since <pre>06/01/12</pre>
  */
 
-public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
+public class EncoreInteractionToGOLineConverter2Test extends UniprotExportBase {
 
     @Test
     public void test_go_convert_ok(){
-        EncoreInteractionToGoLineConverter1 converter = new EncoreInteractionToGoLineConverter1();
+        GoLineConverter2 converter = new GoLineConverter2();
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
 
@@ -32,7 +32,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_go_convert_no_first_interactor(){
-        EncoreInteractionToGoLineConverter1 converter = new EncoreInteractionToGoLineConverter1();
+        GoLineConverter2 converter = new GoLineConverter2();
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getInteractorAccsA().clear();
@@ -43,7 +43,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_go_convert_no_second_interactor(){
-        EncoreInteractionToGoLineConverter1 converter = new EncoreInteractionToGoLineConverter1();
+        GoLineConverter2 converter = new GoLineConverter2();
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getInteractorAccsB().clear();
@@ -55,7 +55,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_go_convert_no_publications(){
-        EncoreInteractionToGoLineConverter1 converter = new EncoreInteractionToGoLineConverter1();
+        GoLineConverter2 converter = new GoLineConverter2();
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getPublicationIds().clear();
@@ -66,7 +66,7 @@ public class EncoreInteractionToGOLineConverterTest extends UniprotExportBase{
 
     @Test
     public void test_go_convert_one_publication_no_pubmed(){
-        EncoreInteractionToGoLineConverter1 converter = new EncoreInteractionToGoLineConverter1();
+        GoLineConverter2 converter = new GoLineConverter2();
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getPublicationIds().iterator().next().setDatabase("DOI");

@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.results;
 
-import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
 /**
@@ -38,7 +38,7 @@ public class MiClusterScoreResults implements UniprotExportResults{
 
         this.clusterContext = clusterContext;
         this.positiveClusteredInteractions = positiveInteractions;
-        this.negativeClusteredInteractions = negativeInteractions != null ? negativeInteractions : new ExportedClusteredInteractions(new IntActInteractionClusterScore());
+        this.negativeClusteredInteractions = negativeInteractions != null ? negativeInteractions : new ExportedClusteredInteractions(new IntActClusterScore());
     }
 
     public MiClusterScoreResults(ExportedClusteredInteractions positiveInteractions, MiClusterContext clusterContext){
@@ -51,7 +51,7 @@ public class MiClusterScoreResults implements UniprotExportResults{
 
         this.clusterContext = clusterContext;
         this.positiveClusteredInteractions = positiveInteractions;
-        this.negativeClusteredInteractions = new ExportedClusteredInteractions(new IntActInteractionClusterScore());
+        this.negativeClusteredInteractions = new ExportedClusteredInteractions(new IntActClusterScore());
     }
 
     @Override

@@ -13,7 +13,7 @@ import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
-import uk.ac.ebi.intact.util.uniprotExport.exporters.QueryFactory;
+import uk.ac.ebi.intact.util.uniprotExport.exporters.QueryBuilder;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
@@ -21,7 +21,7 @@ import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActFileMiScoreDi
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
-import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActInteractionClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedProteins;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
@@ -64,7 +64,7 @@ public class IntactFilter implements InteractionFilter {
     /**
      * The factory for querying the database
      */
-    protected QueryFactory queryFactory;
+    protected QueryBuilder queryFactory;
 
     /**
      * The list of negative interactions
@@ -92,7 +92,7 @@ public class IntactFilter implements InteractionFilter {
     public IntactFilter(InteractionExporter exporter){
         this.interactionConverter = new Intact2BinaryInteractionConverter();
         this.exporter = exporter;
-        this.queryFactory = new QueryFactory();
+        this.queryFactory = new QueryBuilder();
         negativeInteractions.addAll(this.queryFactory.getNegativeInteractionsPassingFilter());
         eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
 
@@ -165,8 +165,8 @@ public class IntactFilter implements InteractionFilter {
      */
     @Deprecated
     public MiClusterScoreResults computeMiScoresFor(List<String> interactions){
-        IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
-        IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
+        IntActClusterScore clusterScore = new IntActClusterScore();
+        IntActClusterScore negativeClusterScore = new IntActClusterScore();
         MiClusterContext context = new MiClusterContext();
 
         int i = 0;
@@ -221,8 +221,8 @@ public class IntactFilter implements InteractionFilter {
         context.setTranscriptsWithDifferentMasterAcs(this.transcriptsWithDifferentParentAcs);
         context.setInteractionComponentXrefs(this.interactionComponentXrefs);
 
-        IntActInteractionClusterScore clusterScore = new IntActInteractionClusterScore();
-        IntActInteractionClusterScore negativeClusterScore = new IntActInteractionClusterScore();
+        IntActClusterScore clusterScore = new IntActClusterScore();
+        IntActClusterScore negativeClusterScore = new IntActClusterScore();
 
         MiClusterScoreResults results = new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
         clusterIntactInteractions(context, clusterScore, negativeClusterScore);
@@ -230,7 +230,7 @@ public class IntactFilter implements InteractionFilter {
         return results;
     }
 
-    protected void clusterIntactInteractions(MiClusterContext context, IntActInteractionClusterScore clusterScore, IntActInteractionClusterScore negativeClusterScore) {
+    protected void clusterIntactInteractions(MiClusterContext context, IntActClusterScore clusterScore, IntActClusterScore negativeClusterScore) {
         int i = 0;
         // the list of binary interactions to process
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
@@ -259,7 +259,7 @@ public class IntactFilter implements InteractionFilter {
         }
     }
 
-    protected void clusterNegativeIntactInteractions(MiClusterContext context, IntActInteractionClusterScore negativeClusterScore) {
+    protected void clusterNegativeIntactInteractions(MiClusterContext context, IntActClusterScore negativeClusterScore) {
         int i = 0;
 
         // the list of negative binary interactions to process
@@ -604,7 +604,7 @@ public class IntactFilter implements InteractionFilter {
      *
      * @param binaryInteractions : the list of binary interactions to process
      */
-    private void processMiClustering(List<BinaryInteraction> binaryInteractions, IntActInteractionClusterScore clusterScore) {
+    private void processMiClustering(List<BinaryInteraction> binaryInteractions, IntActClusterScore clusterScore) {
 
         try {
             // we compute the MI cluster score
@@ -615,161 +615,6 @@ public class IntactFilter implements InteractionFilter {
             System.out.println("The score cannot be computed for the list of binary interactions of size " + binaryInteractions.size());
         }
     }
-
-    /**
-     * Create a Map containing for each interaction as String interactorA-interactorB a MI score extracted from a file
-     * @param fileName : the file containing the mi scores
-     * @return Map containing for each interaction as String interactorA-interactorB a MI score
-     * @throws IOException
-     */
-    /*private Map<String,Double> buildMapOfMiScoreFromFile(String fileName) throws IOException {
-
-        // the buffer reader
-        BufferedReader reader = new BufferedReader(new FileReader(fileName));
-
-        // new Map to fill
-        Map<String,Double> totalMiScore = new HashMap<String, Double>();
-
-        // read the file
-        String line = reader.readLine();
-        while (line != null){
-
-            // we can only read a line containing a score
-            if (line.contains(SCORE_SEPARATOR)){
-                String [] miScore = line.split(SCORE_SEPARATOR);
-
-                // we normally have only 2 columns : one for the interaction String one for the score
-                if (miScore.length == 2){
-                    // the interaction description is the first column
-                    String interaction = miScore[0];
-
-                    // the score is the second column
-                    Double score = Double.parseDouble(miScore[1]);
-
-                    // we want to extract the interactors names from the interaction String containing the interaction id at the beginning
-                    if (interaction.contains(INTERACTOR_SEPARATOR)){
-                        // the first index of the interactor separator is the befinning of interactorA-interactorB
-                        int index = interaction.indexOf(INTERACTOR_SEPARATOR);
-
-                        // this index must be inferior to the interaction String length
-                        if (index + 1 < interaction.length()){
-                            // extract the interactor names
-                            interaction = interaction.substring(index + 1);
-
-                            // put them as a key in the map with the score value
-                            totalMiScore.put(interaction, score);
-                        }
-                        else {
-                            System.out.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
-                        }
-                    }
-                    else {
-                        System.out.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
-                    }
-                }
-                else {
-                    System.out.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
-                }
-            }
-            else {
-                System.out.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
-            }
-
-            line = reader.readLine();
-        }
-
-        reader.close();
-
-        return totalMiScore;
-    }*/
-
-    /*public void extractMiScoresFromFile(List<String> interactions, String fileContainingTotalScore, String fileContainingData){
-        try {
-
-            // we extract the score results from the file
-            Map<String, Double> totalNiScore = buildMapOfMiScoreFromFile(fileContainingTotalScore);
-
-            // list of interactions ids exported in uniprot
-            Set<String> interactionIdentifiersExported = new HashSet<String>();
-            // list of interactions ids not exported in uniprot
-            Set<String> interactionIdentifiersAlreadyProcessed = new HashSet<String>();
-
-            // file converters for interactions exported in uniprot
-            FileWriter writer1 = new FileWriter(fileContainingData);
-
-            int i = 0;
-            Set<InteractingProtein> binaryInteractions = new HashSet<InteractingProtein>();
-
-            System.out.println(interactions.size() + " interactions in IntAct will be processed.");
-
-            // each interaction will be processed
-            while (i < interactions.size()){
-                // we clear the previous binary interactions to keep only 200 binary interaction at the same time
-                binaryInteractions.clear();
-
-                // converts the interactions into binary interactions and increments the index in the list of interactions
-                i = convertIntoBinaryInteractions(interactions, i, binaryInteractions);
-
-                // filter the computed scores
-                extractMiScoreForBinaryInteractionsFromFile(binaryInteractions, interactionIdentifiersExported, totalNiScore);
-                //i += 200;
-                int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
-                System.out.println("Still " + interactionsToProcess + " interactions to process in IntAct.");
-            }
-
-            // close the writers
-            writer1.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("We cannot write the results in " + fileContainingData);
-        }
-    }*/
-
-
-    /**
-     * Extracts the MI cluster score for each interaction exported in uniprot and write the results in a file. the results for the interactions not exported in uniprot
-     * is also written in a file. This supposes that the MI score has been computed for all the interactions in IntAct before.
-     * The computed scores of all the interactions is extracted from a file.
-     *  @param interactions : the list of interactions currently exported in uniprot
-     * @param fileContainingTotalScore : the file containing the mi score results
-     * @param fileContainingDataExported : the files for the score results of the interactions exported in uniprot
-     * @param fileContainingDataNotExported : the files for the score results of the interactions not exported in uniprot
-     */
-    /*public void extractMiScoresFromFile(List<String> interactions, String fileContainingTotalScore, String fileContainingDataExported, String fileContainingDataNotExported){
-        try {
-
-            // we extract the score results from the file
-            Map<String, Double> totalNiScore = buildMapOfMiScoreFromFile(fileContainingTotalScore);
-
-            // list of interactions ids exported in uniprot
-            Set<String> interactionIdentifiersExported = new HashSet<String>();
-
-            int i = 0;
-            Set<InteractingProtein> binaryInteractions = new HashSet<InteractingProtein>();
-
-            System.out.println(interactions.size() + " interactions in IntAct will be processed.");
-
-            // each interaction will be processed
-            while (i < interactions.size()){
-                // we clear the previous binary interactions to keep only 200 binary interaction at the same time
-                binaryInteractions.clear();
-
-                // converts the interactions into binary interactions and increments the index in the list of interactions
-                i = convertIntoBinaryInteractions(interactions, i, binaryInteractions);
-
-                // filter the computed scores
-                extractMiScoreForBinaryInteractionsFromFile(binaryInteractions, interactionIdentifiersExported, totalNiScore);
-                //i += 200;
-                int interactionsToProcess = interactions.size() - Math.min(i, interactions.size());
-                System.out.println("Still " + interactionsToProcess + " interactions to process in IntAct.");
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("We cannot write the results in " + fileContainingDataExported + " or " + fileContainingDataNotExported);
-        }
-    }*/
 
     /**
      * Extracts the MI cluster score for each interaction exported in uniprot and write the results in a file. the results for the interactions not exported in uniprot
@@ -819,7 +664,7 @@ public class IntactFilter implements InteractionFilter {
      * @param binaryInteractions : binary interactions exported in uniprot
      * @param interactionIdentifiersExported : the list of interaction ids exported in uniprot
      */
-    private void extractEncoreInteractionIdForBinaryInteractions(Set<BinaryInteraction> binaryInteractions, Set<Integer> interactionIdentifiersExported, IntActInteractionClusterScore clusterScore){
+    private void extractEncoreInteractionIdForBinaryInteractions(Set<BinaryInteraction> binaryInteractions, Set<Integer> interactionIdentifiersExported, IntActClusterScore clusterScore){
 
         // for each binary interaction exported in uniprot, add the Encore interaction Id to the list of exported interactions
         for (BinaryInteraction binary : binaryInteractions){

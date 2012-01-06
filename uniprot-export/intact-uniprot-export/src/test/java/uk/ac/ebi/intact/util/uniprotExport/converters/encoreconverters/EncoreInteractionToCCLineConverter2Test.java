@@ -9,6 +9,7 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCP
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -19,11 +20,11 @@ import java.util.List;
  * @since <pre>04/02/11</pre>
  */
 
-public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
+public class EncoreInteractionToCCLineConverter2Test extends UniprotExportBase{
 
     @Test
     public void test_cc_convert_ok(){
-        EncoreInteractionToCCLine2Converter converter = new EncoreInteractionToCCLine2Converter();
+        CCLineConverter2 converter = new CCLineConverter2();
 
         List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
 
@@ -35,19 +36,7 @@ public class EncoreInteractionToCCLineConverterTest extends UniprotExportBase{
 
         String firstInteractor = "P28548";
 
-        /*MethodAndTypePair mp1 = new MethodAndTypePair("MI:0398", "MI:0915");
-        List<String> pubmeds = new ArrayList<String>();
-        pubmeds.add("123456789");
-
-        Map<MethodAndTypePair, List<String>> map = new HashMap<MethodAndTypePair, List<String>> ();
-        map.put(mp1, pubmeds);
-
-        MethodAndTypePair mp2 = new MethodAndTypePair("MI:0398", "MI:0915");
-        boolean contain = map.containsKey(mp2);
-
-        List<String> ps = map.get(mp2);*/
-
-        CCParameters<SecondCCParameters2> parameters = converter.convertPositiveAndNegativeInteractionsIntoCCLines(interactions, negativeInteractions, context, firstInteractor);
+        CCParameters<SecondCCParameters2> parameters = converter.convertPositiveAndNegativeInteractionsIntoCCLines(new HashSet<EncoreInteractionForScoring>(interactions), new HashSet<EncoreInteractionForScoring>(negativeInteractions), context, firstInteractor);
         Assert.assertNotNull(parameters);
         Assert.assertEquals("P28548", parameters.getMasterUniprotAc());
         Assert.assertEquals("Kin-10", parameters.getGeneName());

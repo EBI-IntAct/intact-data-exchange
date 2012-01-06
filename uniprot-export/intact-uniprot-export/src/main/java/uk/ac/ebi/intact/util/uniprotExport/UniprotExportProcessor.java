@@ -3,14 +3,16 @@ package uk.ac.ebi.intact.util.uniprotExport;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
-import uk.ac.ebi.intact.util.uniprotExport.converters.DefaultInteractorToDRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.InteractorToDRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter1;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLine1Converter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToCCLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.EncoreInteractionToGoLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter1;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
+import uk.ac.ebi.intact.util.uniprotExport.iterator.UniprotEntryIterator;
+import uk.ac.ebi.intact.util.uniprotExport.iterator.UniprotEntry;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
@@ -49,22 +51,22 @@ public class UniprotExportProcessor {
     /**
      * The converter of Encore interactions into GO line
      */
-    private EncoreInteractionToGoLineConverter goConverter;
+    private GoLineConverter goConverter;
 
     /**
      * The converter of Encore interactions into gold CC line
      */
-    private EncoreInteractionToCCLineConverter ccConverter;
+    private CCLineConverter ccConverter;
 
     /**
      * The converter of Encore interactions into silver CC line
      */
-    private EncoreInteractionToCCLineConverter silverCcConverter;
+    private CCLineConverter silverCcConverter;
 
     /**
      * The converter of an interactor into DR line
      */
-    private InteractorToDRLineConverter drConverter;
+    private DRLineConverter drConverter;
 
     /**
      * The filter of binary interactions
@@ -86,44 +88,53 @@ public class UniprotExportProcessor {
      */
     private GOWriterFactory goWriterFactory;
 
+    private Set<EncoreInteractionForScoring> positiveInteractionsToExport;
+    private Set<EncoreInteractionForScoring> negativeInteractionsToExport;
+    private Set<EncoreInteractionForScoring> positiveInteractionsToExclude;
+    private Set<EncoreInteractionForScoring> negativeInteractionsToExclude;
+
     /**
      *
      * @param filter : the filter to use for uniprot export
      */
     public UniprotExportProcessor(InteractionFilter filter){
 
-        goConverter = new EncoreInteractionToGoLineConverter1();
+        goConverter = new GoLineConverter1();
 
         // by default, initialize a converter of the first CC line format
-        ccConverter = new EncoreInteractionToCCLine1Converter();
+        ccConverter = new CCLineConverter1();
 
         // by default, we use the same cc converter for silver and gold cc lines
         silverCcConverter = ccConverter;
 
-        drConverter = new DefaultInteractorToDRLineConverter();
+        drConverter = new DRLineConverter1();
 
         this.filter = filter;
 
         this.ccWriterFactory = new CCWriterFactory();
         this.drWriterFactory = new DRWriterFactory();
         this.goWriterFactory = new GOWriterFactory();
+
+        positiveInteractionsToExport = new HashSet<EncoreInteractionForScoring>();
     }
 
     /**
      *
      * @param filter : the filter to use for uniprot export
      */
-    public UniprotExportProcessor(InteractionFilter filter, EncoreInteractionToGoLineConverter goConverter, EncoreInteractionToCCLineConverter ccConverter, EncoreInteractionToCCLineConverter silverCcConverter, InteractorToDRLineConverter drConverter){
+    public UniprotExportProcessor(InteractionFilter filter, GoLineConverter goConverter, CCLineConverter ccConverter, CCLineConverter silverCcConverter, DRLineConverter drConverter){
 
-        this.goConverter = goConverter != null ? goConverter : new EncoreInteractionToGoLineConverter1();
-        this.drConverter = drConverter != null ? drConverter : new DefaultInteractorToDRLineConverter();
-        this.ccConverter = ccConverter != null ? ccConverter : new EncoreInteractionToCCLine1Converter();
+        this.goConverter = goConverter != null ? goConverter : new GoLineConverter1();
+        this.drConverter = drConverter != null ? drConverter : new DRLineConverter1();
+        this.ccConverter = ccConverter != null ? ccConverter : new CCLineConverter1();
         this.silverCcConverter = silverCcConverter != null ? silverCcConverter : this.ccConverter;
 
         this.filter = filter;
         this.ccWriterFactory = new CCWriterFactory();
         this.drWriterFactory = new DRWriterFactory();
         this.goWriterFactory = new GOWriterFactory();
+
+        positiveInteractionsToExport = new HashSet<EncoreInteractionForScoring>();
     }
 
     /**
@@ -179,73 +190,35 @@ public class UniprotExportProcessor {
             // the interactions
             Map<Integer, EncoreInteractionForScoring> interactionMapping = positiveInteractions.getCluster().getEncoreInteractionCluster();
 
-            /**
-             * The list of interactors is sorted so if an interactor is an isoform or feature chain, it will follow the master protein
-             */
-            Set<String> interactors = new TreeSet(positiveInteractions.getCluster().getInteractorCluster().keySet());
+            //Sorted set of uniprot acs, ordered by uniprot acs. If an interactor is an isoform or feature chain, it will follow the master protein (at least
+            // the master protein of the same entry. However it can happen that we have an isoform with a uniprot ac not matching the main uniprot entry.
+            // These isoforms are rare and are treated separately)
+            UniprotEntryIterator simpleInteractorIterator = new UniprotEntryIterator(new TreeSet(positiveInteractions.getCluster().getInteractorCluster().keySet()), null);
 
             // the cluster is not empty
-            if (!interactors.isEmpty() && !interactionMapping.isEmpty()){
-                // iterator of the interactors
-                Iterator<String> interactorIterator = interactors.iterator();
+            if (!interactionMapping.isEmpty()){
 
-                // collect the first interactor
-                String interactor = interactorIterator.next();
+                while (simpleInteractorIterator.hasNext()){
+                    // collect all the uniprot acs of a same uniprot entry (master uniprot plus isoforms and feature chains)
+                    UniprotEntry uniprotEntry = simpleInteractorIterator.next();
 
-                // the uniprot ac of the first interactor
-                String uniprotAc = interactor;
-                if (!UniprotExportUtils.isMasterProtein(interactor)){
-                    uniprotAc = UniprotExportUtils.extractMasterProteinFrom(interactor);
-                }
+                    // clear the encore interactions to export in the GO lines for this uniprot entry
+                    positiveInteractionsToExport.clear();
 
-                // the encore interactions to export in the GO lines for this uniprot entry
-                Set<EncoreInteractionForScoring> interactions = new HashSet<EncoreInteractionForScoring>();
-                // collect all encore interactions from trans-splicing (isoforms with uniprot ac coming from another entry but which are also present in this uniprot entry)
-                List<EncoreInteractionForScoring> supplementaryPositiveInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(uniprotAc, positiveInteractions, results.getExportContext());
+                    // collect all encore interactions from trans-splicing (isoforms with uniprot ac coming from another entry but which are also present in this uniprot entry)
+                    List<EncoreInteractionForScoring> supplementaryPositiveInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(uniprotEntry.getMasterUniprot(), positiveInteractions, results.getExportContext());
 
-                // collect number of exported interactions for this first interactor
-                collectExportedInteractions(positiveInteractions, interactions, interactor, supplementaryPositiveInteractionFromTransSplicedIsoforms);
+                    // collect number of exported interactions for the master uniprot and the isoforms of this uniprot entry starting with a different master
+                    collectExportedInteractions(positiveInteractions, positiveInteractionsToExport, uniprotEntry.getMasterUniprot(), supplementaryPositiveInteractionFromTransSplicedIsoforms);
 
-                // while the sorted list of interactors is not totally processed
-                while (interactorIterator.hasNext() ){
-                    // next interactor
-                    interactor =  interactorIterator.next();
-
-                    // while the next interactor starts with the master uniprot ac, it means it is the same uniprot entry and the interactions are clustered
-                    while (interactor.startsWith(uniprotAc)){
-
+                    // collect the interactions for all the interactors which are not the master uniprot
+                    for (String interactor : uniprotEntry.getPositiveInteractors()){
                         // collect number of exported interactions for this interactor
-                        collectExportedInteractions(positiveInteractions, interactions, interactor, Collections.EMPTY_LIST);
-
-                        // get the next interactor if it exists or exit
-                        if (interactorIterator.hasNext()){
-                            interactor = interactorIterator.next();
-                        }
-                        else {
-                            break;
-                        }
+                        collectExportedInteractions(positiveInteractions, positiveInteractionsToExport, interactor, Collections.EMPTY_LIST);
                     }
 
                     // write GO lines if the number of interactions is superior to 0
-                    flushGoLinesFor(goWriter, uniprotAc, interactions, results.getExportContext());
-
-                    // clean the list of encore interactions attached to the uniprot entry, so we can process the new interactor
-                    interactions.clear();
-
-                    // extract new master uniprot ac
-                    uniprotAc = interactor;
-                    if (interactor.contains("-")){
-                        uniprotAc = interactor.substring(0, interactor.indexOf("-"));
-                    }
-
-                    // collect new interactions for the new interactor
-                    collectExportedInteractions(positiveInteractions, interactions, interactor, Collections.EMPTY_LIST);
-
-                    // don't forget the latest !
-                    if (!interactorIterator.hasNext()){
-                        // write GO lines if the number of interactions is superior to 0
-                        flushGoLinesFor(goWriter, uniprotAc, interactions, results.getExportContext());
-                    }
+                    flushGoLinesFor(goWriter, uniprotEntry.getMasterUniprot(), positiveInteractionsToExport, results.getExportContext());
                 }
             }
 
@@ -265,22 +238,10 @@ public class UniprotExportProcessor {
         if (!interactions.isEmpty()){
             logger.info("Write GO lines for " + master);
 
-            // the isoforms have their own GO line contrary to the feaqture chains which are merged to the master entry
             List<GOParameters> goParameters = this.goConverter.convertInteractionsIntoGOParameters(interactions, master, context);
 
             goWriter.writeGOLines(goParameters);
         }
-    }
-
-    private SortedSet<InteractingProtein> buildSortedListOfInteractingProteins(Set<String> interactors, boolean doesInteract){
-
-        SortedSet<InteractingProtein> interactingProteins = new TreeSet();
-
-        for (String interactor : interactors){
-            interactingProteins.add(new InteractingProtein(interactor, doesInteract));
-        }
-
-        return interactingProteins;
     }
 
     /**
@@ -361,12 +322,10 @@ public class UniprotExportProcessor {
             ExportedClusteredInteractions positiveClusteredInteractions = results.getPositiveClusteredInteractions();
             ExportedClusteredInteractions negativeClusteredInteractions = results.getNegativeClusteredInteractions();
 
-            /*
-            * The list of interactors is sorted so if an interactor is an isoform or feature chain, it will follow the master protein
-            * If we have negative interactions, it will be added as well
-            */
-            SortedSet<InteractingProtein> interactors = buildSortedListOfInteractingProteins(positiveClusteredInteractions.getCluster().getInteractorCluster().keySet(), true);
-            interactors.addAll(buildSortedListOfInteractingProteins(negativeClusteredInteractions.getCluster().getInteractorCluster().keySet(), false));
+            // an iterator of all the interactors of this cluster
+            // The list of interactors is sorted so if an interactor is an isoform or feature chain, it will follow the master protein
+            // If we have negative interactions, it will be added as well
+            UniprotEntryIterator uniprotEntryIterator = new UniprotEntryIterator(new TreeSet(positiveClusteredInteractions.getCluster().getInteractorCluster().keySet()), new TreeSet(negativeClusteredInteractions.getCluster().getInteractorCluster().keySet()));
 
             /*
             * The clustered interactions
@@ -379,108 +338,46 @@ public class UniprotExportProcessor {
             Map<Integer, EncoreInteractionForScoring> negativeInteractionMapping = negativeClusteredInteractions.getCluster().getEncoreInteractionCluster();
 
             // the cluster is not empty and we don't process negative interactions
-            if (!interactors.isEmpty() && (!interactionMapping.isEmpty() || negativeInteractionMapping.isEmpty())){
-                // iterator of the interactors
-                Iterator<InteractingProtein> interactorIterator = interactors.iterator();
+            if (!interactionMapping.isEmpty() || negativeInteractionMapping.isEmpty()){
 
-                // collect the first interactor
-                InteractingProtein interactingprot = interactorIterator.next();
-                String interactor = interactingprot.getInteractor();
+                while (uniprotEntryIterator.hasNext()){
+                    // collect all the uniprot acs of a same uniprot entry (master uniprot plus isoforms and feature chains)
+                    UniprotEntry uniprotEntry = uniprotEntryIterator.next();
 
-                // the master uniprot ac of the first interactor
-                String parentAc = interactor;
-                if (!UniprotExportUtils.isMasterProtein(interactor)){
-                    parentAc = UniprotExportUtils.extractMasterProteinFrom(interactor);
-                }
+                    // clear the positive encore interactions to export in the DR and CC lines for this uniprot entry
+                    positiveInteractionsToExport.clear();
+                    // clear the negative encore interactions to export in the DR and CC lines for this uniprot entry
+                    negativeInteractionsToExport.clear();
+                    // clear the positive encore interactions to exclude in the DR and CC lines for this uniprot entry
+                    positiveInteractionsToExclude.clear();
+                    // clear the negative encore interactions to exclude in the DR and CC lines for this uniprot entry
+                    negativeInteractionsToExclude.clear();
 
-                // the encore interactions to export in the CC lines for this interactor
-                List<EncoreInteractionForScoring> interactions = new ArrayList<EncoreInteractionForScoring>();
-                // the negative encore interactions to export in the CC lines for this interactor
-                List<EncoreInteractionForScoring> negativeInteractions = new ArrayList<EncoreInteractionForScoring>();
+                    // collect all encore interactions (negative and positive)of master protein or from trans-splicing (isoforms with uniprot ac coming from another entry but which are also present in this uniprot entry)
+                    List<EncoreInteractionForScoring> supplementaryPositiveInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(uniprotEntry.getMasterUniprot(), positiveClusteredInteractions, clusterContext);
+                    List<EncoreInteractionForScoring> supplementaryNegativeInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(uniprotEntry.getMasterUniprot(), negativeClusteredInteractions, clusterContext);
 
-                // the encore interactions excluded from the CC lines for this interactor
-                List<EncoreInteractionForScoring> excludedInteractions = new ArrayList<EncoreInteractionForScoring>();
-                // the negative encore interactions excluded from the CC lines for this interactor
-                List<EncoreInteractionForScoring> excludedNegativeInteractions = new ArrayList<EncoreInteractionForScoring>();
-
-                // collect all encore interactions from trans-splicing (isoforms with uniprot ac coming from another entry but which are also present in this uniprot entry)
-                List<EncoreInteractionForScoring> supplementaryPositiveInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(parentAc, positiveClusteredInteractions, clusterContext);
-                List<EncoreInteractionForScoring> supplementaryNegativeInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(parentAc, negativeClusteredInteractions, clusterContext);
-
-                if (interactingprot.doesInteract()){
                     // collect number of exported interactions for this interactor
                     // numberInteractions = collectExportedInteractions(positiveClusteredInteractions, interactions, interactor, supplementaryPositiveInteractionFromTransSplicedIsoforms);
-                    collectExportedAndExcludedInteractions(positiveClusteredInteractions, interactions, excludedInteractions, interactor, supplementaryPositiveInteractionFromTransSplicedIsoforms);
-                }
-                else{
+                    collectExportedAndExcludedInteractions(positiveClusteredInteractions, positiveInteractionsToExport, positiveInteractionsToExclude, uniprotEntry.getMasterUniprot(), supplementaryPositiveInteractionFromTransSplicedIsoforms);
                     // collect number of exported negative interactions for this interactor
                     // numberNegativeInteractions = collectExportedInteractions(negativeClusteredInteractions, negativeInteractions, interactor, supplementaryNegativeInteractionFromTransSplicedIsoforms);
-                    collectExportedAndExcludedInteractions(negativeClusteredInteractions, negativeInteractions, excludedNegativeInteractions, interactor, supplementaryNegativeInteractionFromTransSplicedIsoforms);
-                }
+                    collectExportedAndExcludedInteractions(negativeClusteredInteractions, negativeInteractionsToExport, negativeInteractionsToExclude, uniprotEntry.getMasterUniprot(), supplementaryNegativeInteractionFromTransSplicedIsoforms);
 
-                // while the sorted list of interactors is not totally processed
-                while (interactorIterator.hasNext() ){
-                    // next interactor
-                    interactingprot = interactorIterator.next();
-                    interactor =  interactingprot.getInteractor();
+                    // collect positive interactions involving isoforms and feature chains
+                    for (String pos : uniprotEntry.getPositiveInteractors()){
+                        // collect number of exported interactions for this interactor
+                        collectExportedAndExcludedInteractions(positiveClusteredInteractions, positiveInteractionsToExport, positiveInteractionsToExclude, pos, Collections.EMPTY_LIST);
+                    }
 
-                    // while the next interactor starts with the master uniprot ac, it means it is the same uniprot entry and the interactions are clustered
-                    while (interactor.startsWith(parentAc)){
-                        if (interactingprot.doesInteract()){
-                            // collect number of exported interactions for this interactor
-                            collectExportedAndExcludedInteractions(positiveClusteredInteractions, interactions, excludedInteractions, interactor, Collections.EMPTY_LIST);
-                        }
-                        else{
-                            // collect number of exported negative interactions for this interactor
-                            collectExportedAndExcludedInteractions(negativeClusteredInteractions, negativeInteractions, excludedNegativeInteractions, interactor, Collections.EMPTY_LIST);
-                        }
-
-                        // get the next interactor if it exists or exit
-                        if (interactorIterator.hasNext()){
-                            interactingprot = interactorIterator.next();
-                            interactor = interactingprot.getInteractor();
-                        }
-                        else {
-                            interactor = null;
-                            break;
-                        }
+                    // collect negative interactions involving isoforms and feature chains
+                    for (String neg : uniprotEntry.getNegativeInteractors()){
+                        // collect number of exported interactions for this interactor
+                        collectExportedAndExcludedInteractions(positiveClusteredInteractions, negativeInteractionsToExport, negativeInteractionsToExclude, neg, Collections.EMPTY_LIST);
                     }
 
                     // write CC lines if the number of interactions is superior to 0
-                    flushDRAndCCLinesFor(results, drWriter, ccWriter, ccWriterForSilver, parentAc, interactions, excludedInteractions, negativeInteractions, excludedNegativeInteractions);
-
-                    // clean the list of encore interactions attached to the uniprot entry, so we can process the new interactor
-                    interactions.clear();
-                    excludedInteractions.clear();
-                    negativeInteractions.clear();
-                    excludedNegativeInteractions.clear();
-
-                    // extract new master uniprot ac
-                    if (interactor != null){
-                        parentAc = interactor;
-                        if (interactor.contains("-")){
-                            parentAc = interactor.substring(0, interactor.indexOf("-"));
-                        }
-
-                        supplementaryPositiveInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(parentAc, positiveClusteredInteractions, clusterContext);
-                        supplementaryNegativeInteractionFromTransSplicedIsoforms = collectSupplementaryInteractionsForMaster(parentAc, negativeClusteredInteractions, clusterContext);
-
-                        // collect new interactions for the new interactor
-                        if (interactingprot.doesInteract()){
-                            // collect number of exported interactions for this interactor
-                            collectExportedAndExcludedInteractions(positiveClusteredInteractions, interactions, excludedInteractions, interactor, supplementaryPositiveInteractionFromTransSplicedIsoforms);
-                        }
-                        else{
-                            // collect number of exported negative interactions for this interactor
-                            collectExportedAndExcludedInteractions(negativeClusteredInteractions, negativeInteractions, excludedNegativeInteractions, interactor, supplementaryNegativeInteractionFromTransSplicedIsoforms);
-                        }
-
-                        // don't forget to write the latest interactor
-                        if (!interactorIterator.hasNext()){
-                            // write CC lines if the number of interactions is superior to 0
-                            flushDRAndCCLinesFor(results, drWriter, ccWriter, ccWriterForSilver, parentAc, interactions, excludedInteractions, negativeInteractions, excludedNegativeInteractions);
-                        }
-                    }
+                    flushDRAndCCLinesFor(results, drWriter, ccWriter, ccWriterForSilver, uniprotEntry.getMasterUniprot(), positiveInteractionsToExport, positiveInteractionsToExclude, negativeInteractionsToExport, negativeInteractionsToExclude);
                 }
             }
 
@@ -507,7 +404,7 @@ public class UniprotExportProcessor {
      * @param negativeInteractions
      * @throws IOException
      */
-    private void flushDRAndCCLinesFor(MiClusterScoreResults results, DRLineWriter drWriter, CCLineWriter ccWriter, CCLineWriter silverCcWriter, String parentAc, List<EncoreInteractionForScoring> interactions, List<EncoreInteractionForScoring> excludedInteractions, List<EncoreInteractionForScoring> negativeInteractions, List<EncoreInteractionForScoring> excludedNegativeInteractions) throws IOException {
+    private void flushDRAndCCLinesFor(MiClusterScoreResults results, DRLineWriter drWriter, CCLineWriter ccWriter, CCLineWriter silverCcWriter, String parentAc, Set<EncoreInteractionForScoring> interactions, Set<EncoreInteractionForScoring> excludedInteractions, Set<EncoreInteractionForScoring> negativeInteractions, Set<EncoreInteractionForScoring> excludedNegativeInteractions) throws IOException {
         int numberInteractions = interactions.size();
         int numberNegativeInteractions = negativeInteractions.size();
         int numberExcludedInteractions = excludedInteractions.size();
@@ -591,7 +488,7 @@ public class UniprotExportProcessor {
      * @param interactor
      * @returnthe number of exported binary interactions for this interactor
      */
-    private int collectExportedAndExcludedInteractions(ExportedClusteredInteractions results, List<EncoreInteractionForScoring> interactions, List<EncoreInteractionForScoring> excludedInteractions, String interactor, List<EncoreInteractionForScoring> supplementaryInteractionsFromTransSplicing) {
+    private int collectExportedAndExcludedInteractions(ExportedClusteredInteractions results, Set<EncoreInteractionForScoring> interactions, Set<EncoreInteractionForScoring> excludedInteractions, String interactor, List<EncoreInteractionForScoring> supplementaryInteractionsFromTransSplicing) {
 
         // the clustered interactions
         Map<Integer, EncoreInteractionForScoring> interactionMapping = results.getCluster().getEncoreInteractionCluster();
@@ -631,35 +528,35 @@ public class UniprotExportProcessor {
         return numberInteractions;
     }
 
-    public EncoreInteractionToGoLineConverter getGoConverter() {
+    public GoLineConverter getGoConverter() {
         return goConverter;
     }
 
-    public void setGoConverter(EncoreInteractionToGoLineConverter goConverter) {
+    public void setGoConverter(GoLineConverter goConverter) {
         this.goConverter = goConverter;
     }
 
-    public EncoreInteractionToCCLineConverter getCcConverter() {
+    public CCLineConverter getCcConverter() {
         return ccConverter;
     }
 
-    public void setCcConverter(EncoreInteractionToCCLineConverter ccConverter) {
+    public void setCcConverter(CCLineConverter ccConverter) {
         this.ccConverter = ccConverter;
     }
 
-    public EncoreInteractionToCCLineConverter getSilverCcConverter() {
+    public CCLineConverter getSilverCcConverter() {
         return silverCcConverter;
     }
 
-    public void setSilverCcConverter(EncoreInteractionToCCLineConverter silverCcConverter) {
+    public void setSilverCcConverter(CCLineConverter silverCcConverter) {
         this.silverCcConverter = silverCcConverter;
     }
 
-    public InteractorToDRLineConverter getDrConverter() {
+    public DRLineConverter getDrConverter() {
         return drConverter;
     }
 
-    public void setDrConverter(InteractorToDRLineConverter drConverter) {
+    public void setDrConverter(DRLineConverter drConverter) {
         this.drConverter = drConverter;
     }
 

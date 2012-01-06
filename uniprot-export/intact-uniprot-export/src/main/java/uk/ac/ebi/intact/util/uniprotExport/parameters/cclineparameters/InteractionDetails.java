@@ -10,7 +10,7 @@ import java.util.Set;
  * @since <pre>31/01/11</pre>
  */
 
-public interface InteractionDetails extends Comparable<DefaultInteractionDetails>{
+public interface InteractionDetails extends Comparable<InteractionDetailsImpl>{
 
     /**
      * The interaction type

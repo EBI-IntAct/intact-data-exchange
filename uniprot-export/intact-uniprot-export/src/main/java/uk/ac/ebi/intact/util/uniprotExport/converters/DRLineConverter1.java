@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.converters;
 
 import org.apache.log4j.Logger;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DefaultDRParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParametersImpl;
 
 import java.io.IOException;
 
@@ -14,8 +14,8 @@ import java.io.IOException;
  * @since <pre>31/01/11</pre>
  */
 
-public class DefaultInteractorToDRLineConverter implements InteractorToDRLineConverter {
-    private static final Logger logger = Logger.getLogger(DefaultInteractorToDRLineConverter.class);
+public class DRLineConverter1 implements DRLineConverter {
+    private static final Logger logger = Logger.getLogger(DRLineConverter1.class);
 
     /**
      * Converts an interactor into a DR line
@@ -29,7 +29,7 @@ public class DefaultInteractorToDRLineConverter implements InteractorToDRLineCon
         // if the interactor ac is not null, we can create a DRParameter
         if (interactorAc != null){
             logger.debug("Convert DR parameters for " + interactorAc + ", " + numberInteractions);
-            return new DefaultDRParameters(interactorAc, numberInteractions);
+            return new DRParametersImpl(interactorAc, numberInteractions);
         }
 
         logger.warn("interactor Ac is null, cannot convert into DRLines");

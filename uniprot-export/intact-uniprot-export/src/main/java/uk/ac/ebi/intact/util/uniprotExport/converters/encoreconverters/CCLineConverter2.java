@@ -21,11 +21,11 @@ import java.util.*;
  * @since <pre>08/03/11</pre>
  */
 
-public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteractionToCCLineConverter {
+public class CCLineConverter2 extends AbstractCCLineConverter {
 
-    private static final Logger logger = Logger.getLogger(EncoreInteractionToCCLine1Converter.class);
+    private static final Logger logger = Logger.getLogger(CCLineConverter1.class);
 
-    public EncoreInteractionToCCLine2Converter(){
+    public CCLineConverter2(){
         super();
     }
 
@@ -109,13 +109,13 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
 
                 // if we have spoke expanded interactions, create an InteractionDetails 'spoke expanded' and add it to the list of InteractionDetails
                 if (!pubmedSpokeExpanded.isEmpty()){
-                    InteractionDetails details = new DefaultInteractionDetails(type, method, true, pubmedSpokeExpanded);
+                    InteractionDetails details = new InteractionDetailsImpl(type, method, true, pubmedSpokeExpanded);
                     sortedInteractionDetails.add(details);
                 }
 
                 // if we have true binary interactions, create an InteractionDetails 'true binary' and add it to the list of InteractionDetails
                 if (!pubmedTrueBinary.isEmpty()){
-                    InteractionDetails details = new DefaultInteractionDetails(type, method, false, pubmedTrueBinary);
+                    InteractionDetails details = new InteractionDetailsImpl(type, method, false, pubmedTrueBinary);
                     sortedInteractionDetails.add(details);
                 }
             }
@@ -129,7 +129,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
 
      * @return the converted CCParameter
      */
-    public CCParameters<SecondCCParameters2> convertPositiveAndNegativeInteractionsIntoCCLines(List<EncoreInteractionForScoring> positiveInteractions, List<EncoreInteractionForScoring> negativeInteractions, MiClusterContext context, String firstInteractor){
+    public CCParameters<SecondCCParameters2> convertPositiveAndNegativeInteractionsIntoCCLines(Set<EncoreInteractionForScoring> positiveInteractions, Set<EncoreInteractionForScoring> negativeInteractions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
         String geneName1 = null;
         String taxId1 = null;
@@ -196,7 +196,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
                     // extract organism names
                     String organism2 = null;
 
-                    if (isFirstInteractor(firstInteractor, uniprot1, transSplicedVariants.get(firstInteractor))){
+                    if (isFromSameUniprotEntry(firstInteractor, uniprot1, transSplicedVariants.get(firstInteractor))){
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
@@ -237,7 +237,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
 
                         if (!sortedInteractionDetails.isEmpty()){
                             logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
-                            SecondCCParameters2 secondCCInteractor = new DefaultSecondCCParameters2(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails, true);
+                            SecondCCParameters2 secondCCInteractor = new SecondCCParameters2Impl(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails, true);
                             secondCCInteractors.add(secondCCInteractor);
                         }
                         else{
@@ -313,7 +313,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
                     // extract organism names
                     String organism2 = null;
 
-                    if (isFirstInteractor(firstInteractor, uniprot1, transSplicedVariants.get(firstInteractor))){
+                    if (isFromSameUniprotEntry(firstInteractor, uniprot1, transSplicedVariants.get(firstInteractor))){
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
@@ -354,7 +354,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
 
                         if (!sortedInteractionDetails.isEmpty()){
                             logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
-                            SecondCCParameters2 secondCCInteractor = new DefaultSecondCCParameters2(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails, false);
+                            SecondCCParameters2 secondCCInteractor = new SecondCCParameters2Impl(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, organism2, sortedInteractionDetails, false);
                             secondCCInteractors.add(secondCCInteractor);
                         }
                         else{
@@ -372,7 +372,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
         }
 
         if (!secondCCInteractors.isEmpty()){
-            return new DefaultCCParameters2(firstInteractor, geneName1, taxId1, secondCCInteractors);
+            return new CCParameters2(firstInteractor, geneName1, taxId1, secondCCInteractors);
         }
 
         logger.debug("Interactor " + firstInteractor + " doesn't have any valid second CC parameters and will be skipped.");
@@ -381,7 +381,7 @@ public class EncoreInteractionToCCLine2Converter extends AbstractEncoreInteracti
     }
 
     @Override
-    public CCParameters convertInteractionsIntoCCLines(List<EncoreInteractionForScoring> positiveInteractions, MiClusterContext context, String masterUniprot) {
-        return convertPositiveAndNegativeInteractionsIntoCCLines(positiveInteractions, Collections.EMPTY_LIST, context, masterUniprot);
+    public CCParameters convertInteractionsIntoCCLines(Set<EncoreInteractionForScoring> positiveInteractions, MiClusterContext context, String masterUniprot) {
+        return convertPositiveAndNegativeInteractionsIntoCCLines(positiveInteractions, Collections.EMPTY_SET, context, masterUniprot);
     }
 }

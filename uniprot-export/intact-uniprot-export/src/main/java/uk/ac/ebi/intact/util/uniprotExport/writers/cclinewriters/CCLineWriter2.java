@@ -3,7 +3,7 @@ package uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineCreatedEvent;
 import uk.ac.ebi.intact.util.uniprotExport.event.CcLineEventListener;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.DefaultInteractionDetails;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.InteractionDetailsImpl;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.InteractionDetails;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters2;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
@@ -23,7 +23,7 @@ import java.util.SortedSet;
  * @since <pre>28/01/11</pre>
  */
 
-public class DefaultCCLineWriter2 implements CCLineWriter<CCParameters<SecondCCParameters2>> {
+public class CCLineWriter2 implements CCLineWriter<CCParameters<SecondCCParameters2>> {
 
     /**
      * The writer
@@ -36,7 +36,7 @@ public class DefaultCCLineWriter2 implements CCLineWriter<CCParameters<SecondCCP
      * @param outputStream : the outputStreamWriter
      * @throws IOException
      */
-    public DefaultCCLineWriter2(OutputStreamWriter outputStream) throws IOException {
+    public CCLineWriter2(OutputStreamWriter outputStream) throws IOException {
         if (outputStream == null){
             throw new IllegalArgumentException("You must give a non null OutputStream writer");
         }
@@ -228,7 +228,7 @@ public class DefaultCCLineWriter2 implements CCLineWriter<CCParameters<SecondCCP
 
         // collect all pubmeds and spoke expanded information
         for (InteractionDetails details : interactionDetails){
-            DefaultInteractionDetails detailsImpl = (DefaultInteractionDetails) details;
+            InteractionDetailsImpl detailsImpl = (InteractionDetailsImpl) details;
 
             String type = detailsImpl.getInteractionType();
             String method = detailsImpl.getDetectionMethod();

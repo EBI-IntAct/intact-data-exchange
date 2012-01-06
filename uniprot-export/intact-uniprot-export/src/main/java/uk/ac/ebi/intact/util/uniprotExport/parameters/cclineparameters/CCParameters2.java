@@ -10,7 +10,7 @@ import java.util.*;
  * @since <pre>31/01/11</pre>
  */
 
-public class DefaultCCParameters2 implements CCParameters<SecondCCParameters2> {
+public class CCParameters2 implements CCParameters<SecondCCParameters2> {
 
     private String masterAc;
 
@@ -20,8 +20,8 @@ public class DefaultCCParameters2 implements CCParameters<SecondCCParameters2> {
 
     private SortedSet<SecondCCParameters2> secondCCParameters;
 
-    public DefaultCCParameters2(String firstInteractor, String firstGeneName,
-                                String firstTaxId, SortedSet<SecondCCParameters2> secondInteractors){
+    public CCParameters2(String firstInteractor, String firstGeneName,
+                         String firstTaxId, SortedSet<SecondCCParameters2> secondInteractors){
 
         this.masterAc = firstInteractor;
 
