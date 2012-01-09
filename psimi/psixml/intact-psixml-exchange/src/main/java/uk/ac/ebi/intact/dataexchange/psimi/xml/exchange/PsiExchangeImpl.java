@@ -172,7 +172,13 @@ public class PsiExchangeImpl implements PsiExchange {
         while (iterator.hasNext()) {
             psidev.psi.mi.xml.model.Interaction psiInteraction = iterator.next();
 
-            Interaction interaction = interactionConverter.psiToIntact(psiInteraction);
+            Interaction interaction = null;
+
+            try {
+                interaction = interactionConverter.psiToIntact(psiInteraction);
+            } catch (Throwable e) {
+                throw new ImportException("Problem converting interaction: "+psiInteraction, e);
+            }
 
             checkValidFeatures(interaction);
             ConversionCache.clear();
