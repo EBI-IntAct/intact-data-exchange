@@ -14,7 +14,7 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParamet
  * @since <pre>06/01/12</pre>
  */
 
-public class EncoreInteractionToGOLineConverter2Test extends UniprotExportBase {
+public class GOLineConverter2Test extends UniprotExportBase {
 
     @Test
     public void test_go_convert_ok(){

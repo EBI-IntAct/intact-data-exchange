@@ -12,7 +12,7 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParamet
  * @since <pre>04/02/11</pre>
  */
 
-public class InteractorToDRLineConverterTest{
+public class DRLineConverter1Test {
 
     @Test
     public void test_dr_convert_ok(){

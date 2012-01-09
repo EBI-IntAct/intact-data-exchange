@@ -10,7 +10,9 @@ import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 import java.util.*;
 
 /**
- * Converts an EncoreInteraction into a GOParameter, format 1. It is the default converter
+ * Converts an EncoreInteraction into a GOParameter, format 1.
+ *
+ * Cannot convert feature chains, need to remap to the parent.
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
