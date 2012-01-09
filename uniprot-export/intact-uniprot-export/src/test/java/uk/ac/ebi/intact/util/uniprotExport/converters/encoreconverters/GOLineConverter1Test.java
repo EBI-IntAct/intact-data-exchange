@@ -5,6 +5,11 @@ import org.junit.Test;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
+
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Tester of the GO line converter
@@ -73,5 +78,23 @@ public class GOLineConverter1Test extends UniprotExportBase{
 
         GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
         Assert.assertNull(parameters);
+    }
+
+    @Test
+    public void test_go_convert_simulation(){
+        GoLineConverter1 converter = new GoLineConverter1();
+
+        List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
+        interactions.add(3, createIsoformIsoformInteraction()); // can be converted because isoform-isoform
+        interactions.add(4, createEncoreInteractionWithTransIsoform()); // can be converted
+        interactions.add(5, createEncoreInteractionWithTransIsoformAndMaster()); // can be converted because isoform and other uniprot entry, even if this isoform is not matching the master
+
+        MiClusterContext context = createClusterContext();
+
+        String firstInteractor = "P28548";
+
+        List<GOParameters1> parameters = converter.convertInteractionsIntoGOParameters(new HashSet<EncoreInteractionForScoring>(interactions), firstInteractor, context);
+        Assert.assertNotNull(parameters);
+        //Assert.assertEquals(12, parameters.size());
     }
 }

@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.apache.log4j.Logger;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.intact.util.uniprotExport.UniprotExportUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
@@ -208,10 +209,12 @@ public class GoLineConverter1 implements GoLineConverter<GOParameters1> {
                 clusteredInteractionWithFeatureChains.put(uniprot2, pubmedIds);
             }
         }
-        // the first uniprotAc is an isoform of the master uniprot entry and the second uniprot ac is a feature chain
-        else if (uniprot1.startsWith(parentAc) && uniprot2.contains(WriterUtils.CHAIN_PREFIX)){
+        // the first uniprotAc is an isoform of the master uniprot entry and the second uniprot ac is a feature chain or master uniprot
+        else if (uniprot1.startsWith(parentAc) && (uniprot2.contains(WriterUtils.CHAIN_PREFIX) || UniprotExportUtils.isMasterProtein(uniprot2))){
             // we must remap the feature chain to its parent
-            uniprot2 = uniprot2.substring(0, uniprot2.indexOf(WriterUtils.CHAIN_PREFIX));
+            if (uniprot2.contains(WriterUtils.CHAIN_PREFIX)){
+                uniprot2 = uniprot2.substring(0, uniprot2.indexOf(WriterUtils.CHAIN_PREFIX));
+            }
 
             // we must merge the information of this interaction with the one of the master protein if it exists
             if (isoformClusteredInteractionWithFeatureChains.containsKey(uniprot2)){
