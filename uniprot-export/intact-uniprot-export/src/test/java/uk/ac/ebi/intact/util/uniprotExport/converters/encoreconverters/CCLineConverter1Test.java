@@ -28,7 +28,7 @@ public class CCLineConverter1Test extends UniprotExportBase {
 
         List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
         interactions.add(3, createIsoformIsoformInteraction()); // cannot be converted because isoform-isoform
-        interactions.add(4, createEncoreInteractionWithTransIsoform()); // cannot be converted because isoform isoform
+        interactions.add(4, createEncoreInteractionWithTransIsoform()); // can be converted but is not written twice because another isoform of the entry already interacts with same protein
         interactions.add(5, createEncoreInteractionWithTransIsoformAndMaster()); // can be converted because isoform and other uniprot entry, even if this isoform is not matching the master
 
         List<EncoreInteractionForScoring> negativeInteractions = new ArrayList<EncoreInteractionForScoring>();

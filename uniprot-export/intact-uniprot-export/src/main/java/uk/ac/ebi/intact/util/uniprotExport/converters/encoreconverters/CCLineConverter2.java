@@ -14,7 +14,9 @@ import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 import java.util.*;
 
 /**
- * Converter of an EncoreInteraction into a CCParameter2
+ * Converter of an EncoreInteraction into a CCParameter2.
+ *
+ * The format 2 of CC lines can deal with isoform/isoform interactions, negative interactions and feature chains
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -131,7 +133,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
      */
     public CCParameters<SecondCCParameters2> convertPositiveAndNegativeInteractionsIntoCCLines(Set<EncoreInteractionForScoring> positiveInteractions, Set<EncoreInteractionForScoring> negativeInteractions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
-        String geneName1 = null;
+        String geneName1 = context.getGeneNames().get(firstInteractor);
         String taxId1 = null;
 
         SortedSet<SecondCCParameters2> secondCCInteractors = new TreeSet<SecondCCParameters2>();
@@ -200,7 +202,9 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
-                        geneName1 = context.getGeneNames().get(uniprot1);
+                        if (geneName1 == null){
+                            geneName1 = context.getGeneNames().get(uniprot1);
+                        }
                         taxId2 = organismsB[0];
                         try {
                             organism2 = retrieveOrganismScientificName(taxId2);
@@ -217,7 +221,6 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
                         firstUniprot = uniprot2;
                         secondUniprot = uniprot1;
                         geneName2 = context.getGeneNames().get(uniprot1);
-                        geneName1 = context.getGeneNames().get(uniprot2);
                         taxId2 = organismsA[0];
                         try {
                             organism2 = retrieveOrganismScientificName(taxId2);
@@ -229,6 +232,10 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
 
                         taxId1 = organismsB[0];
                         firstIntactAc = intact2;
+
+                        if (geneName1 == null){
+                            geneName1 = context.getGeneNames().get(uniprot2);
+                        }
                     }
 
                     if (geneName1 != null && geneName2 != null && taxId1 != null && taxId2 != null && organism2 != null){

@@ -189,7 +189,7 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                         }
                         // we don't allow self interactions with isoforms or isoforms interacting with isoforms
                         else {
-                            logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because the two interactors are isoforms of the same uniprot entry " + masterUniprot);
+                            logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because the two interactors are isoforms of the same uniprot entry " + masterUniprot);
                         }
                     }
                     else {
@@ -216,7 +216,7 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                         }
                     }
                     else{
-                        logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the gene names or taxIds which is null.");
+                        logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the gene names or taxIds which is null.");
                     }
                 }
                 else{

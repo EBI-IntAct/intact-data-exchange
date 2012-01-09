@@ -146,6 +146,11 @@ public class SecondCCParameters2Impl implements SecondCCParameters2 {
 
                     if( uniprotID1 != null && uniprotID2 != null ) {
                         score = uniprotID1.compareTo( uniprotID2 );
+
+                        // if same second uniprot, we can compare the first uniprot
+                        if (score == 0){
+                            score = getFirstUniprotAc().compareTo(cc2.getFirstUniprotAc());
+                        }
                     }
                 }
             }
@@ -172,6 +177,14 @@ public class SecondCCParameters2Impl implements SecondCCParameters2 {
         {
             return false;
         }
+        else if (secondUniprotAc != null ? !secondUniprotAc.equalsIgnoreCase(ccLine1.getSecondUniprotAc()) : ccLine1.getSecondUniprotAc() != null){
+
+            return false;
+        }
+        else if (firstUniprotAc != null ? !firstUniprotAc.equalsIgnoreCase(ccLine1.getFirstUniprotAc()) : ccLine1.getFirstUniprotAc() != null){
+
+            return false;
+        }
 
         return true;
     }
@@ -180,6 +193,9 @@ public class SecondCCParameters2Impl implements SecondCCParameters2 {
     {
         int result;
         result = (geneName != null ? geneName.hashCode() : 0);
+        result = 31 * result + (secondUniprotAc != null ? secondUniprotAc.hashCode() : 0);
+        result = 31 * result + (firstUniprotAc != null ? firstUniprotAc.hashCode() : 0);
+
         return result;
     }
 }

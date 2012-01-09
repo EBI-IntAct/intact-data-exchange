@@ -144,6 +144,10 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
         {
             return false;
         }
+        else if (secondUniprotAc != null ? !secondUniprotAc.equalsIgnoreCase(ccLine1.getSecondUniprotAc()) : ccLine1.secondUniprotAc != null){
+
+            return false;
+        }
 
         return true;
     }
@@ -152,6 +156,7 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
     {
         int result;
         result = (geneName != null ? geneName.hashCode() : 0);
+        result = 31 * result + (secondUniprotAc != null ? secondUniprotAc.hashCode() : 0);
         return result;
     }
 }
