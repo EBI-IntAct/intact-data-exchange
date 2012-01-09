@@ -20,7 +20,7 @@ import java.util.List;
  * @since <pre>04/02/11</pre>
  */
 
-public class EncoreInteractionToCCLineConverter2Test extends UniprotExportBase{
+public class CCLineConverter2Test extends UniprotExportBase{
 
     @Test
     public void test_cc_convert_ok(){

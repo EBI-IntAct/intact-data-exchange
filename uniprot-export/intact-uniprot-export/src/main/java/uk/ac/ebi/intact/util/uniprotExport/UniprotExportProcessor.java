@@ -116,6 +116,9 @@ public class UniprotExportProcessor {
         this.goWriterFactory = new GOWriterFactory();
 
         positiveInteractionsToExport = new HashSet<EncoreInteractionForScoring>();
+        negativeInteractionsToExport = new HashSet<EncoreInteractionForScoring>();
+        positiveInteractionsToExclude = new HashSet<EncoreInteractionForScoring>();
+        negativeInteractionsToExclude = new HashSet<EncoreInteractionForScoring>();
     }
 
     /**
@@ -135,6 +138,9 @@ public class UniprotExportProcessor {
         this.goWriterFactory = new GOWriterFactory();
 
         positiveInteractionsToExport = new HashSet<EncoreInteractionForScoring>();
+        negativeInteractionsToExport = new HashSet<EncoreInteractionForScoring>();
+        positiveInteractionsToExclude = new HashSet<EncoreInteractionForScoring>();
+        negativeInteractionsToExclude = new HashSet<EncoreInteractionForScoring>();
     }
 
     /**
@@ -493,6 +499,11 @@ public class UniprotExportProcessor {
         // the clustered interactions
         Map<Integer, EncoreInteractionForScoring> interactionMapping = results.getCluster().getEncoreInteractionCluster();
         List<Integer> allInteractions = results.getCluster().getInteractorCluster().get(interactor);
+
+        // no interactions involving this participant
+        if (allInteractions == null){
+            return 0;
+        }
 
         // the exported interactions for this interactor are the interactions attached to this interactor which are also in the list of exported interactions
         Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), allInteractions);

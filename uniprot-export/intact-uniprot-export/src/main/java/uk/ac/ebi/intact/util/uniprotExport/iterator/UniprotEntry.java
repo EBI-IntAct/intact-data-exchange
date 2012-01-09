@@ -19,6 +19,8 @@ public class UniprotEntry {
 
     public UniprotEntry(String masterUniprot){
         positiveInteractors = new HashSet<String>();
+        negativeInteractors = new HashSet<String>();
+        this.masterUniprot = masterUniprot;
     }
 
     public String getMasterUniprot() {

@@ -6,7 +6,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.model.clone.IntactClonerException;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter2;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter1;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
 import uk.ac.ebi.intact.util.uniprotExport.filters.IntactFilter;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
@@ -36,7 +36,7 @@ public class UniprotExportProcessorTest extends UniprotExportBase{
         IntactFilter filter = new IntactFilter(new ExporterBasedOnDetectionMethod());
 
         UniprotExportProcessor processor = new UniprotExportProcessor(filter);
-        processor.setCcConverter(new CCLineConverter2());
+        processor.setCcConverter(new CCLineConverter1());
         processor.setSilverCcConverter(processor.getCcConverter());
 
         MiClusterScoreResults results = createMiScoreResultsForSimulation();

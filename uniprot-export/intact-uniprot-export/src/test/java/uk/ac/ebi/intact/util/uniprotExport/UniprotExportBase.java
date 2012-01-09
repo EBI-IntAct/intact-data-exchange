@@ -23,6 +23,7 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParamet
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActClusterScore;
+import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedProteins;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
 import java.io.BufferedReader;
@@ -330,6 +331,129 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         return interaction;
     }
+    public EncoreInteractionForScoring createIsoformIsoformInteraction(){
+        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+
+        Map<String, String> interactorA = new HashMap<String, String>();
+        interactorA.put("uniprotkb", "P28548-2");
+        interactorA.put("intact", "EBI-317778");
+        Map<String, String> interactorB = new HashMap<String, String>();
+        interactorB.put("uniprotkb", "P28548-1");
+        interactorB.put("intact", "EBI-317777");
+
+        List<String> pubmeds = new ArrayList<String>();
+        pubmeds.add("14704431");
+        pubmeds.add("15199141");
+
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0398", "MI:0915"), pubmeds);
+
+        Map<String, String> experimentToPubmed = new HashMap<String, String>();
+        experimentToPubmed.put("EBI-xxxxxx2", "14704431");
+        experimentToPubmed.put("EBI-xxxxxx3", "15199141");
+
+        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
+        organismA.add(orgA);
+
+        List<CrossReference> publications = new ArrayList<CrossReference>(1);
+        CrossReference ref = new CrossReferenceImpl("pubmed", "14704431");
+        CrossReference ref2 = new CrossReferenceImpl("pubmed", "15199141");
+        publications.add(ref);
+        publications.add(ref2);
+
+        interaction.setId(2);
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "10"));
+        interaction.setInteractorAccsA(interactorA);
+        interaction.setInteractorAccsB(interactorB);
+        interaction.setPublicationIds(publications);
+        interaction.setOrganismsA(organismA);
+        interaction.setOrganismsB(organismA);
+        interaction.setExperimentToPubmed(experimentToPubmed);
+
+        return interaction;
+    }
+    public EncoreInteractionForScoring createEncoreInteractionWithTransIsoformAndMaster(){
+        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+
+        Map<String, String> interactorA = new HashMap<String, String>();
+        interactorA.put("uniprotkb", "P28548");
+        interactorA.put("intact", "EBI-317888");
+        Map<String, String> interactorB = new HashMap<String, String>();
+        interactorB.put("uniprotkb", "P12347-4");
+        interactorB.put("intact", "EBI-99999999");
+
+        List<String> pubmeds = new ArrayList<String>();
+        pubmeds.add("14704431");
+        pubmeds.add("15199141");
+
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0398", "MI:0915"), pubmeds);
+
+        Map<String, String> experimentToPubmed = new HashMap<String, String>();
+        experimentToPubmed.put("EBI-xxxxxx2", "14704431");
+        experimentToPubmed.put("EBI-xxxxxx3", "15199141");
+
+        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
+        organismA.add(orgA);
+
+        List<CrossReference> publications = new ArrayList<CrossReference>(1);
+        CrossReference ref = new CrossReferenceImpl("pubmed", "14704431");
+        CrossReference ref2 = new CrossReferenceImpl("pubmed", "15199141");
+        publications.add(ref);
+        publications.add(ref2);
+
+        interaction.setId(2);
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "10"));
+        interaction.setInteractorAccsA(interactorA);
+        interaction.setInteractorAccsB(interactorB);
+        interaction.setPublicationIds(publications);
+        interaction.setOrganismsA(organismA);
+        interaction.setOrganismsB(organismA);
+        interaction.setExperimentToPubmed(experimentToPubmed);
+
+        return interaction;
+    }
+    public EncoreInteractionForScoring createEncoreInteractionWithTransIsoform(){
+        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+
+        Map<String, String> interactorA = new HashMap<String, String>();
+        interactorA.put("uniprotkb", "O17670");
+        interactorA.put("intact", "EBI-311862");
+        Map<String, String> interactorB = new HashMap<String, String>();
+        interactorB.put("uniprotkb", "P12347-4");
+        interactorB.put("intact", "EBI-99999999");
+
+        List<String> pubmeds = new ArrayList<String>();
+        pubmeds.add("14704431");
+        pubmeds.add("15199141");
+
+        interaction.getMethodTypePairListMap().put(new MethodTypePair("MI:0398", "MI:0915"), pubmeds);
+
+        Map<String, String> experimentToPubmed = new HashMap<String, String>();
+        experimentToPubmed.put("EBI-xxxxxx2", "14704431");
+        experimentToPubmed.put("EBI-xxxxxx3", "15199141");
+
+        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
+        organismA.add(orgA);
+
+        List<CrossReference> publications = new ArrayList<CrossReference>(1);
+        CrossReference ref = new CrossReferenceImpl("pubmed", "14704431");
+        CrossReference ref2 = new CrossReferenceImpl("pubmed", "15199141");
+        publications.add(ref);
+        publications.add(ref2);
+
+        interaction.setId(2);
+        interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "10"));
+        interaction.setInteractorAccsA(interactorA);
+        interaction.setInteractorAccsB(interactorB);
+        interaction.setPublicationIds(publications);
+        interaction.setOrganismsA(organismA);
+        interaction.setOrganismsB(organismA);
+        interaction.setExperimentToPubmed(experimentToPubmed);
+
+        return interaction;
+    }
 
     public EncoreInteractionForScoring createThirdEncoreInteraction(){
         EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
@@ -555,6 +679,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         context.getGeneNames().put("P12346","name-2");
         context.getGeneNames().put("P12347","name-3");
         context.getGeneNames().put("P12348","name-4");
+        context.getGeneNames().put("P12347-4","name-5");
 
         context.getMiTerms().put("MI:0398", "two hybrid pooling"); // condition export = 2
         context.getMiTerms().put("MI:0915", "physical association");
@@ -578,6 +703,10 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         context.getInteractionToMethod_type().put("EBI-xxxxxx10", new MethodTypePair("MI:0019", "MI:0914"));
         context.getInteractionToMethod_type().put("EBI-xxxxxx11", new MethodTypePair("MI:0019", "MI:0914"));
         context.getInteractionToMethod_type().put("EBI-xxxxxx12", new MethodTypePair("MI:0403", "MI:0403"));
+        
+        Set<IntactTransSplicedProteins> isoforms = new HashSet<IntactTransSplicedProteins>();
+        isoforms.add(new IntactTransSplicedProteins("EBI-99999999", "P12347-4"));
+        context.getTranscriptsWithDifferentMasterAcs().put("P28548", isoforms);
 
         return context;
     }

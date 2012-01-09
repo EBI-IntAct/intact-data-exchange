@@ -7,7 +7,7 @@ import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import java.util.Set;
 
 /**
- * Interface for Encore interaction to CC line converters
+ * Interface for CC line converters
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

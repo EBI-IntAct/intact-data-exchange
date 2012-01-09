@@ -136,7 +136,7 @@ public class UniprotEntryIterator extends UnmodifiableIterator<UniprotEntry> {
     @Override
     public UniprotEntry next() {
         
-        if (lastPositiveInteractor == null){
+        if (lastPositiveInteractor == null && lastNegativeInteractor == null){
             throw new NoSuchElementException("This Simple interactor iterator does not have any elements to process");
         }
 
