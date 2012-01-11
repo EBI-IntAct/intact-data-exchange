@@ -23,6 +23,31 @@ import java.util.*;
 public class GoLineConverter1 implements GoLineConverter<GOParameters1> {
     private static final Logger logger = Logger.getLogger(GoLineConverter1.class);
 
+    /*
+     *map containing the second interactor as a key and the list of pubmed ids associated with this second interactor
+      */
+    private Map<String, Set<String>> clusteredInteractionWithFeatureChains = new HashMap<String, Set<String>>();
+    /*
+     * map containing the second interactor as a key and the list of pubmed ids associated with this second interactor. The first interactor is an isoform
+      */
+    private Map<String, Set<String>> isoformClusteredInteractionWithFeatureChains = new HashMap<String, Set<String>>();
+    /*
+     *map associating for each second interactor what is the first interactor (can be master protein or isoform)
+      */
+    private Map<String, String> mapOfFirstInteractors = new HashMap<String, String>();
+
+    public GoLineConverter1(){
+        clusteredInteractionWithFeatureChains = new HashMap<String, Set<String>>();
+        isoformClusteredInteractionWithFeatureChains = new HashMap<String, Set<String>>();
+        mapOfFirstInteractors = new HashMap<String, String>();
+    }
+
+    private void clear(){
+        clusteredInteractionWithFeatureChains.clear();
+        isoformClusteredInteractionWithFeatureChains.clear();
+        mapOfFirstInteractors.clear();
+    }
+
     /**
      * Converts an EncoreInteraction into GOParameters
      * @param interaction
@@ -91,12 +116,7 @@ public class GoLineConverter1 implements GoLineConverter<GOParameters1> {
     public List<GOParameters1> convertInteractionsIntoGOParameters(Set<EncoreInteractionForScoring> interactions, String parentAc, MiClusterContext context){
         List<GOParameters1> goParameters = new ArrayList<GOParameters1>(interactions.size());
 
-        // map containing the second interactor as a key and the list of pubmed ids associated with this second interactor
-        Map<String, Set<String>> clusteredInteractionWithFeatureChains = new HashMap<String, Set<String>>();
-        // map containing the second interactor as a key and the list of pubmed ids associated with this second interactor. The first interactor is an isoform
-        Map<String, Set<String>> isoformClusteredInteractionWithFeatureChains = new HashMap<String, Set<String>>();
-        // map associating for each second interactor what is the first interactor (can be master protein or isoform)
-        Map<String, String> mapOfFirstInteractors = new HashMap<String, String>();
+        clear();
 
         // for each binary interaction associated with the same uniprot entry given with parentAc
         for (EncoreInteractionForScoring interaction : interactions){
@@ -186,6 +206,8 @@ public class GoLineConverter1 implements GoLineConverter<GOParameters1> {
                 goParameters.add(parameter);
             }
         }
+
+        clear();
 
         return goParameters;
     }

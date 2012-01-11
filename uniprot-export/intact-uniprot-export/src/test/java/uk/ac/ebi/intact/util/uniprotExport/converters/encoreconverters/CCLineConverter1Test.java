@@ -62,9 +62,13 @@ public class CCLineConverter1Test extends UniprotExportBase {
             }
 
             else if (i == 1){
-                Assert.assertEquals("P28548-2", secondPar.getFirstUniprotAc());
+                if (!"P28548-2".equalsIgnoreCase(secondPar.getFirstUniprotAc()) && !"P12347-4".equalsIgnoreCase(secondPar.getFirstUniprotAc())){
+                    Assert.assertFalse(true);
+                }
                 Assert.assertEquals("O17670", secondPar.getSecondUniprotAc());
-                Assert.assertEquals("EBI-317778", secondPar.getFirstIntacAc());
+                if (!"EBI-317778".equalsIgnoreCase(secondPar.getFirstIntacAc()) && !"EBI-99999999".equalsIgnoreCase(secondPar.getFirstIntacAc())){
+                    Assert.assertFalse(true);
+                }
                 Assert.assertEquals("EBI-311862", secondPar.getSecondIntactAc());
                 Assert.assertEquals(2, secondPar.getNumberOfInteractionEvidences());
                 Assert.assertEquals("6239", secondPar.getTaxId());

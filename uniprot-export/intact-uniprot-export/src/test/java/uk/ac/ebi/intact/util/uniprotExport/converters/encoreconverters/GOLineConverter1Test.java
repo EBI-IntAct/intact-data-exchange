@@ -95,6 +95,46 @@ public class GOLineConverter1Test extends UniprotExportBase{
 
         List<GOParameters1> parameters = converter.convertInteractionsIntoGOParameters(new HashSet<EncoreInteractionForScoring>(interactions), firstInteractor, context);
         Assert.assertNotNull(parameters);
-        //Assert.assertEquals(12, parameters.size());
+        Assert.assertEquals(6, parameters.size());
+
+        int index = 0;
+        for (GOParameters1 par : parameters){
+            index ++;
+
+            // isoform isoform first
+            if (index == 1 || index == 2){
+                if ("P28548-2".equalsIgnoreCase(par.getFirstProtein())){
+                    Assert.assertEquals("P28548-1", par.getSecondProtein());
+                }
+                else if ("P28548-1".equalsIgnoreCase(par.getFirstProtein())){
+                    Assert.assertEquals("P28548-2", par.getSecondProtein());
+                }
+                else {
+                    Assert.assertFalse(true);
+                }
+
+
+            }
+            // feature chain
+            else if (index == 4){
+                Assert.assertEquals("P28548", par.getFirstProtein());
+                Assert.assertEquals("Q21361", par.getSecondProtein());
+            }
+            // master protein and trans variant
+            else if (index == 3){
+                Assert.assertEquals("P28548", par.getFirstProtein());
+                Assert.assertEquals("P12347-4", par.getSecondProtein());
+            }
+            // first interaction with isoform
+            else if (index == 5){
+                Assert.assertEquals("P28548-1", par.getFirstProtein());
+                Assert.assertEquals("Q22534", par.getSecondProtein());
+            }
+            // second interaction with isoform
+            else if (index == 6){
+                Assert.assertEquals("P28548-2", par.getFirstProtein());
+                Assert.assertEquals("O17670", par.getSecondProtein());
+            }
+        }
     }
 }
