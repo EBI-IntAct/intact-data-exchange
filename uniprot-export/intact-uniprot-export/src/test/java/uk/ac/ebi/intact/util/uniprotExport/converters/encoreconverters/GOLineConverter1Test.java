@@ -102,15 +102,6 @@ public class GOLineConverter1Test extends UniprotExportBase{
 
             // isoform isoform first
             if (("P28548-1".equalsIgnoreCase(par.getFirstProtein()) && "P28548-2".equalsIgnoreCase(par.getSecondProtein())) || ("P28548-2".equalsIgnoreCase(par.getFirstProtein()) && "P28548-1".equalsIgnoreCase(par.getSecondProtein())) ){
-                if ("P28548-2".equalsIgnoreCase(par.getFirstProtein())){
-                    Assert.assertEquals("P28548-1", par.getSecondProtein());
-                }
-                else if ("P28548-1".equalsIgnoreCase(par.getFirstProtein())){
-                    Assert.assertEquals("P28548-2", par.getSecondProtein());
-                }
-                else {
-                    Assert.assertFalse(true);
-                }
 
                 Assert.assertEquals(2, par.getPubmedIds().size());
                 Iterator<String> pubIterator = par.getPubmedIds().iterator();

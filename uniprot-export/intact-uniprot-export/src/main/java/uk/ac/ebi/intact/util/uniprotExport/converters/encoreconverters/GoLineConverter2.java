@@ -140,8 +140,8 @@ public class GoLineConverter2 implements GoLineConverter<GOParameters2> {
                 // if the list of pubmed ids is not empty, the GOParameter is created
                 if (!pubmedIds.isEmpty()){
                     Map<String, Set<IntactTransSplicedProteins>> transSplicedVariants = context.getTranscriptsWithDifferentMasterAcs();
-                    boolean isUniprot1Isoform = isIsoformOfAnotherUniprotEntry(uniprot1, transSplicedVariants.get(uniprot1));
-                    boolean isUniprot2Isoform = isIsoformOfAnotherUniprotEntry(uniprot1, transSplicedVariants.get(uniprot2));
+                    boolean isUniprot1Isoform = isIsoformOfAnotherUniprotEntry(uniprot1, transSplicedVariants.get(parentAc));
+                    boolean isUniprot2Isoform = isIsoformOfAnotherUniprotEntry(uniprot2, transSplicedVariants.get(parentAc));
 
                     // the first interactor is uniprot1 and the second uniprot is a different uniprot entry
                     if ((uniprot1.startsWith(parentAc) || isUniprot1Isoform) && !uniprot2.startsWith(parentAc) && !isUniprot2Isoform){
@@ -166,15 +166,26 @@ public class GoLineConverter2 implements GoLineConverter<GOParameters2> {
                         GOParameters2 parameter2 = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
                         goParameters.add(parameter2);
                     }
-                    // the two interactors are from the same uniprot entry but are different isoforms/feature chains : one of the isoform does not match the master uniprot entry so it may come back later, we do not need to write it twice
+                    // the two interactors are from the same uniprot entry but are different isoforms/feature chains : one of the isoform does not match the master uniprot entry so we need to write it twice with the current parent ac
                     else if (uniprot1.startsWith(parentAc) && isUniprot2Isoform) {
                         GOParameters2 parameter = new GOParameters2(uniprot1, uniprot2, pubmedIds, parentAc, goRefs);
                         goParameters.add(parameter);
+                        GOParameters2 parameter2 = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
+                        goParameters.add(parameter2);
                     }
-                    // the two interactors are from the same uniprot entry but are different isoforms/feature chains : one of the isoform does not match the master uniprot entry so it may come back later, we do not need to write it twice
+                    // the two interactors are from the same uniprot entry but are different isoforms/feature chains : one of the isoform does not match the master uniprot entry so we need to write it twice with the current parent ac
                     else if (uniprot2.startsWith(parentAc) && isUniprot1Isoform) {
                         GOParameters2 parameter = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
                         goParameters.add(parameter);
+                        GOParameters2 parameter2 = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
+                        goParameters.add(parameter2);
+                    }
+                    // the two interactors are from the same uniprot entry but are different isoforms/feature chains : both isoforms do not match the master uniprot entry so we need to write it twice with the current parent ac
+                    else if (isUniprot1Isoform && isUniprot2Isoform){
+                        GOParameters2 parameter = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
+                        goParameters.add(parameter);
+                        GOParameters2 parameter2 = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
+                        goParameters.add(parameter2);
                     }
                     else {
                         logger.info("The interaction "+uniprot1+" and "+uniprot2+" is ignored because both interactors are not matching the master uniprot ac");
