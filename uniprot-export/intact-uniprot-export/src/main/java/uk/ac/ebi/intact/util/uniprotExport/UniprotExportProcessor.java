@@ -463,23 +463,27 @@ public class UniprotExportProcessor {
 
         // the clustered interactions
         Map<Integer, EncoreInteractionForScoring> interactionMapping = results.getCluster().getEncoreInteractionCluster();
+        List<Integer> allInteractions = results.getCluster().getInteractorCluster().get(interactor);
+        int numberInteractions = 0;
 
-        // the exported interactions for this interactor are the interactions attached to this interactor which are also in the list of exported interactions
-        Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(interactor));
+        if (allInteractions != null){
+            // the exported interactions for this interactor are the interactions attached to this interactor which are also in the list of exported interactions
+            Collection<Integer> exportedInteractions = CollectionUtils.intersection(results.getInteractionsToExport(), results.getCluster().getInteractorCluster().get(interactor));
 
-        if (!supplementaryInteractionsFromTransSplicing.isEmpty()){
-            exportedInteractions.addAll(CollectionUtils.intersection(results.getInteractionsToExport(), supplementaryInteractionsFromTransSplicing));
-        }
+            if (!supplementaryInteractionsFromTransSplicing.isEmpty()){
+                exportedInteractions.addAll(CollectionUtils.intersection(results.getInteractionsToExport(), supplementaryInteractionsFromTransSplicing));
+            }
 
-        // collect number of exported interactions
-        int numberInteractions = exportedInteractions.size();
+            // collect number of exported interactions
+            numberInteractions = exportedInteractions.size();
 
-        // add the exported interactions to the list of interactions
-        for (Integer interactionId : exportedInteractions){
-            EncoreInteractionForScoring interaction = interactionMapping.get(interactionId);
+            // add the exported interactions to the list of interactions
+            for (Integer interactionId : exportedInteractions){
+                EncoreInteractionForScoring interaction = interactionMapping.get(interactionId);
 
-            if (interaction != null){
-                interactions.add(interaction);
+                if (interaction != null){
+                    interactions.add(interaction);
+                }
             }
         }
 
