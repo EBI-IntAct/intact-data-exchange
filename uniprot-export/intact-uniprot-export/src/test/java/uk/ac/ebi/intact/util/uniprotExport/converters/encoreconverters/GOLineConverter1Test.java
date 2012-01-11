@@ -9,6 +9,7 @@ import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParamet
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -97,12 +98,10 @@ public class GOLineConverter1Test extends UniprotExportBase{
         Assert.assertNotNull(parameters);
         Assert.assertEquals(6, parameters.size());
 
-        int index = 0;
         for (GOParameters1 par : parameters){
-            index ++;
 
             // isoform isoform first
-            if (index == 1 || index == 2){
+            if (("P28548-1".equalsIgnoreCase(par.getFirstProtein()) && "P28548-2".equalsIgnoreCase(par.getSecondProtein())) || ("P28548-2".equalsIgnoreCase(par.getFirstProtein()) && "P28548-1".equalsIgnoreCase(par.getSecondProtein())) ){
                 if ("P28548-2".equalsIgnoreCase(par.getFirstProtein())){
                     Assert.assertEquals("P28548-1", par.getSecondProtein());
                 }
@@ -113,27 +112,43 @@ public class GOLineConverter1Test extends UniprotExportBase{
                     Assert.assertFalse(true);
                 }
 
-
+                Assert.assertEquals(2, par.getPubmedIds().size());
+                Iterator<String> pubIterator = par.getPubmedIds().iterator();
+                Assert.assertEquals("15199141", pubIterator.next());
+                Assert.assertEquals("14704431", pubIterator.next());
             }
             // feature chain
-            else if (index == 4){
-                Assert.assertEquals("P28548", par.getFirstProtein());
-                Assert.assertEquals("Q21361", par.getSecondProtein());
+            else if ("P28548".equals(par.getFirstProtein()) && "Q21361".equals(par.getSecondProtein())){
+                Assert.assertEquals(4, par.getPubmedIds().size());
+                Iterator<String> pubIterator = par.getPubmedIds().iterator();
+                Assert.assertEquals("15199141", pubIterator.next());
+                Assert.assertEquals("18212739", pubIterator.next());
+                Assert.assertEquals("15115758", pubIterator.next());
+                Assert.assertEquals("14704431", pubIterator.next());
             }
             // master protein and trans variant
-            else if (index == 3){
-                Assert.assertEquals("P28548", par.getFirstProtein());
-                Assert.assertEquals("P12347-4", par.getSecondProtein());
+            else if ("P28548".equals(par.getFirstProtein()) && "P12347-4".equals(par.getSecondProtein())){
+                Assert.assertEquals(2, par.getPubmedIds().size());
+                Iterator<String> pubIterator = par.getPubmedIds().iterator();
+                Assert.assertEquals("15199141", pubIterator.next());
+                Assert.assertEquals("14704431", pubIterator.next());
             }
             // first interaction with isoform
-            else if (index == 5){
-                Assert.assertEquals("P28548-1", par.getFirstProtein());
+            else if ("P28548-1".equals(par.getFirstProtein())){
                 Assert.assertEquals("Q22534", par.getSecondProtein());
+                Assert.assertEquals(1, par.getPubmedIds().size());
+                Assert.assertEquals("14704431", par.getPubmedIds().iterator().next());
             }
             // second interaction with isoform
-            else if (index == 6){
-                Assert.assertEquals("P28548-2", par.getFirstProtein());
+            else if ("P28548-2".equals(par.getFirstProtein())){
                 Assert.assertEquals("O17670", par.getSecondProtein());
+                Assert.assertEquals(2, par.getPubmedIds().size());
+                Iterator<String> pubIterator = par.getPubmedIds().iterator();
+                Assert.assertEquals("15199141", pubIterator.next());
+                Assert.assertEquals("14704431", pubIterator.next());
+            }
+            else {
+                Assert.assertFalse(true);
             }
         }
     }

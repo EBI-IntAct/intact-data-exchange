@@ -494,7 +494,13 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         List<CrossReference> publications = new ArrayList<CrossReference>(1);
         CrossReference ref = new CrossReferenceImpl("pubmed", "14704431");
+        CrossReference ref2 = new CrossReferenceImpl("pubmed", "18212739");
+        CrossReference ref3 = new CrossReferenceImpl("pubmed", "15199141");
+        CrossReference ref4 = new CrossReferenceImpl("pubmed", "15115758");
         publications.add(ref);
+        publications.add(ref2);
+        publications.add(ref3);
+        publications.add(ref4);
 
         interaction.setId(3);
         interaction.getConfidenceValues().add(new ConfidenceImpl("intactPsiscore", "9"));
