@@ -22,10 +22,10 @@ public class GOLineWriter1Test extends UniprotExportBase{
 
     @Test
     public void test_go_export(){
-        List<GOParameters> parameters = createGOParameters();
+        List<GOParameters> parameters = createGOParameters1();
 
         try {
-            File testFile = new File("GoTest.txt");
+            File testFile = new File("GoTest1.txt");
             FileWriter test = new FileWriter(testFile);
             GOLineWriter writer = new GOLineWriter1(test);
 

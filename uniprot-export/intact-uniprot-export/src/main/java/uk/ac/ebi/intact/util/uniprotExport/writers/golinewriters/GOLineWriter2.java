@@ -175,6 +175,7 @@ public class GOLineWriter2 implements GOLineWriter<GOParameters2> {
             String fixedIsoform = isoform.replace("-PRO_", ":PRO_");
             writer.write("UniProtKB:"); // Gene product form id
             writer.write(fixedIsoform);
+            writer.write(WriterUtils.TABULATION);
         }
         else {
             writer.write(WriterUtils.TABULATION); //No Gene product form id

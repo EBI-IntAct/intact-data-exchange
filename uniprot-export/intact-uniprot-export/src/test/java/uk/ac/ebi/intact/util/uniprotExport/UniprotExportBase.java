@@ -18,8 +18,9 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParametersImpl;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters2;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActClusterScore;
@@ -49,7 +50,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     protected String interaction5 = null;
     protected String interaction6 = null;
 
-    public List<GOParameters> createGOParameters(){
+    public List<GOParameters> createGOParameters1(){
 
         List<GOParameters> parameters = new ArrayList<GOParameters>(3);
 
@@ -72,6 +73,43 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         GOParameters parameter2 = new GOParameters1(uniprotAc1, uniprotAc4, publications1);
         GOParameters parameter5 = new GOParameters1(uniprotAc4, uniprotAc1, publications1);
         GOParameters parameter3 = new GOParameters1(uniprotAc5, uniprotAc5, publications2);
+
+        parameters.add(parameter1);
+        parameters.add(parameter4);
+        parameters.add(parameter2);
+        parameters.add(parameter5);
+        parameters.add(parameter3);
+
+        return parameters;
+    }
+
+    public List<GOParameters> createGOParameters2(){
+
+        List<GOParameters> parameters = new ArrayList<GOParameters>(3);
+
+        String uniprotAc1 = "Q9NET8";
+        String uniprotAc2 = "Q22534-2";
+        String uniprotAc4 = "Q17862-PRO_xxxxxxx";
+        String uniprotAc5 = "P33327-3";
+
+        String pmid1 = "14704431";
+        String pmid2 = "18467557";
+
+        Set<String> publications1 = new HashSet<String>(1);
+        publications1.add(pmid1);
+
+        Set<String> publications2 = new HashSet<String>(1);
+        publications2.add(pmid2);
+        
+        Set<String> componentsXrefs = new HashSet<String>(2);
+        componentsXrefs.add("GO:xxxxxx1");
+        componentsXrefs.add("GO:xxxxxx2");
+
+        GOParameters parameter1 = new GOParameters2(uniprotAc1, uniprotAc2, publications1, uniprotAc1, Collections.EMPTY_SET);
+        GOParameters parameter4 = new GOParameters2(uniprotAc2, uniprotAc1, publications1, "Q22534", componentsXrefs);
+        GOParameters parameter2 = new GOParameters2(uniprotAc1, uniprotAc4, publications1, uniprotAc1, Collections.EMPTY_SET);
+        GOParameters parameter5 = new GOParameters2(uniprotAc4, uniprotAc1, publications1, "Q17862", Collections.EMPTY_SET);
+        GOParameters parameter3 = new GOParameters2(uniprotAc5, uniprotAc5, publications2, "P33327", Collections.EMPTY_SET);
 
         parameters.add(parameter1);
         parameters.add(parameter4);
