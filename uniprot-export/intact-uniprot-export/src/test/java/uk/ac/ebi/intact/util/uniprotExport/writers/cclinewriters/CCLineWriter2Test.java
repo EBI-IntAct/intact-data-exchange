@@ -18,14 +18,14 @@ import java.util.List;
  * @since <pre>02/02/11</pre>
  */
 
-public class CCLineWriterTest extends UniprotExportBase{
+public class CCLineWriter2Test extends UniprotExportBase{
 
     @Test
     public void test_cc_export(){
-        List<CCParameters> parameters = createCCParameters();
+        List<CCParameters> parameters = createCCParameters2();
 
         try {
-            File testFile = new File("CcTest.txt");
+            File testFile = new File("CcTest2.txt");
             FileWriter test = new FileWriter(testFile);
             CCLineWriter writer = new CCLineWriter2(test);
 
@@ -33,7 +33,7 @@ public class CCLineWriterTest extends UniprotExportBase{
 
             writer.close();
 
-            File template = new File(CCLineWriterTest.class.getResource("/cc_file_test.txt").getFile());
+            File template = new File(CCLineWriter2Test.class.getResource("/cc_file_test2.txt").getFile());
 
             Assert.assertTrue(areFilesEqual(testFile, template));
 

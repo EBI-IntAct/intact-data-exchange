@@ -82,7 +82,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return parameters;
     }
 
-    public List<CCParameters> createCCParameters(){
+    public List<CCParameters> createCCParameters2(){
 
         List<CCParameters> parameters = new ArrayList<CCParameters>(3);
 
@@ -180,6 +180,60 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         CCParameters<SecondCCParameters2> parameters4 = new CCParameters2(uniprotAc4, geneName4, taxId, listOfSecondInteractors4);
         parameters.add(parameters4);
+
+        return parameters;
+    }
+
+    public List<CCParameters> createCCParameters1(){
+
+        List<CCParameters> parameters = new ArrayList<CCParameters>(3);
+
+        String uniprotAc1 = "P28548";
+        String uniprotAc2 = "Q22534";
+        String uniprotAc3 = "O17670";
+        String uniprotAc4 = "Q21361";
+        String uniprotAc5 = "P28548-1";
+        String uniprotAc6 = "P28548-2";
+
+        String intactAc1 = "EBI-327642";
+        String intactAc2 = "EBI-311862";
+        String intactAc3 = "EBI-311862";
+        String intactAc4 = "EBI-317777";
+        String intactAc5 = "EBI-317778";
+        String intactAc6 = "EBI-317779";
+
+        String geneName1 = "kin-10";
+        String geneName2 = "pat-12";
+        String geneName3 = "eya-1";
+        String geneName4 = "atf-2";
+
+        String taxId = "6239";
+
+        String taxId2 = "9606";
+
+        SecondCCParameters1 secondParameters1 = new SecondCCParameters1Impl(uniprotAc5, intactAc4, uniprotAc2, intactAc1, geneName2, taxId2, 1);
+        SecondCCParameters1 secondParameters2 = new SecondCCParameters1Impl(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, 2);
+
+        SortedSet<SecondCCParameters1> listOfSecondInteractors1 = new TreeSet<SecondCCParameters1>();
+        listOfSecondInteractors1.add(secondParameters1);
+        listOfSecondInteractors1.add(secondParameters2);
+
+        CCParameters<SecondCCParameters1> parameters1 = new CCParameters1(uniprotAc1, geneName1, taxId, listOfSecondInteractors1);
+        parameters.add(parameters1);
+
+        SortedSet<SecondCCParameters1> listOfSecondInteractors2 = new TreeSet<SecondCCParameters1>();
+        SecondCCParameters1 secondParameters4 = new SecondCCParameters1Impl(uniprotAc2, intactAc1, uniprotAc5, intactAc4, geneName1, taxId, 1);
+        listOfSecondInteractors2.add(secondParameters4);
+
+        CCParameters<SecondCCParameters1> parameters2 = new CCParameters1(uniprotAc2, geneName2, taxId2, listOfSecondInteractors2);
+        parameters.add(parameters2);
+
+        SortedSet<SecondCCParameters1> listOfSecondInteractors3 = new TreeSet<SecondCCParameters1>();
+        SecondCCParameters1 secondParameters5 = new SecondCCParameters1Impl(uniprotAc3, intactAc2, uniprotAc6, intactAc5, geneName1, taxId, 2);
+        listOfSecondInteractors3.add(secondParameters5);
+
+        CCParameters<SecondCCParameters1> parameters3 = new CCParameters1(uniprotAc3, geneName3, taxId, listOfSecondInteractors3);
+        parameters.add(parameters3);
 
         return parameters;
     }
@@ -713,6 +767,11 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         Set<IntactTransSplicedProteins> isoforms = new HashSet<IntactTransSplicedProteins>();
         isoforms.add(new IntactTransSplicedProteins("EBI-99999999", "P12347-4"));
         context.getTranscriptsWithDifferentMasterAcs().put("P28548", isoforms);
+
+        Set<String> goRefs = new HashSet<String>();
+        goRefs.add("GO:00xxxxxxxxx1");
+        goRefs.add("GO:00xxxxxxxxx2");
+        context.getInteractionComponentXrefs().put("EBI-xxxxxx4", goRefs);
 
         return context;
     }

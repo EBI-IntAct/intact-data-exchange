@@ -18,7 +18,7 @@ import java.util.List;
  * @since <pre>02/02/11</pre>
  */
 
-public class GOLineWriterTest extends UniprotExportBase{
+public class GOLineWriter1Test extends UniprotExportBase{
 
     @Test
     public void test_go_export(){
@@ -33,7 +33,7 @@ public class GOLineWriterTest extends UniprotExportBase{
 
             writer.close();
 
-            File template = new File(GOLineWriterTest.class.getResource("/go_file_test.txt").getFile());
+            File template = new File(GOLineWriter1Test.class.getResource("/go_file_test1.txt").getFile());
 
             Assert.assertTrue(areFilesEqual(testFile, template));
 
