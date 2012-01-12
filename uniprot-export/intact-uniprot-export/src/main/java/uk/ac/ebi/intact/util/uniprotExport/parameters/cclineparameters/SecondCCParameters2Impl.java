@@ -166,12 +166,12 @@ public class SecondCCParameters2Impl implements SecondCCParameters2 {
         {
             return true;
         }
-        if (o == null || getClass() != o.getClass())
+        if (o == null || !(o instanceof SecondCCParameters2Impl))
         {
             return false;
         }
 
-        SecondCCParameters1Impl ccLine1 = (SecondCCParameters1Impl) o;
+        SecondCCParameters2Impl ccLine1 = (SecondCCParameters2Impl) o;
 
         if (geneName != null ? !geneName.equals(ccLine1.getGeneName()) : ccLine1.getGeneName() != null)
         {

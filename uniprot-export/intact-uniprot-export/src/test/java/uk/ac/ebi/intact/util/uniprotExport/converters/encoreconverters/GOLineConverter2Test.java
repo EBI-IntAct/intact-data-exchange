@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters2;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
@@ -28,12 +27,13 @@ public class GOLineConverter2Test extends UniprotExportBase {
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
-        Assert.assertNotNull(parameters);
+        List<GOParameters2> parameters1 = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
+        Assert.assertEquals(1, parameters1.size());
+
+        GOParameters2 parameters = parameters1.iterator().next();
         Assert.assertEquals("P28548-1", parameters.getFirstProtein());
         Assert.assertEquals("Q22534", parameters.getSecondProtein());
-        Assert.assertEquals(1, parameters.getPubmedIds().size());
-        Assert.assertEquals("14704431", parameters.getPubmedIds().iterator().next());
+        Assert.assertEquals("14704431", parameters.getPubmedId());
     }
 
     @Test
@@ -43,8 +43,8 @@ public class GOLineConverter2Test extends UniprotExportBase {
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getInteractorAccsA().clear();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
-        Assert.assertNull(parameters);
+        List<GOParameters2> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
+        Assert.assertTrue(parameters.isEmpty());
     }
 
     @Test
@@ -54,8 +54,8 @@ public class GOLineConverter2Test extends UniprotExportBase {
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getInteractorAccsB().clear();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
-        Assert.assertNull(parameters);
+        List<GOParameters2> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
+        Assert.assertTrue(parameters.isEmpty());
 
     }
 
@@ -66,8 +66,8 @@ public class GOLineConverter2Test extends UniprotExportBase {
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getPublicationIds().clear();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
-        Assert.assertNull(parameters);
+        List<GOParameters2> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
+        Assert.assertTrue(parameters.isEmpty());
     }
 
     @Test
@@ -77,8 +77,8 @@ public class GOLineConverter2Test extends UniprotExportBase {
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getPublicationIds().iterator().next().setDatabase("DOI");
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
-        Assert.assertNull(parameters);
+        List<GOParameters2> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
+        Assert.assertTrue(parameters.isEmpty());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
 
         List<GOParameters2> parameters = converter.convertInteractionsIntoGOParameters(new HashSet<EncoreInteractionForScoring>(interactions), firstInteractor, context);
         Assert.assertNotNull(parameters);
-        Assert.assertEquals(8, parameters.size());
+        Assert.assertEquals(17, parameters.size());
 
         for (GOParameters2 par : parameters){
 
@@ -104,22 +104,18 @@ public class GOLineConverter2Test extends UniprotExportBase {
             if (("P28548-1".equalsIgnoreCase(par.getFirstProtein()) && "P28548-2".equalsIgnoreCase(par.getSecondProtein())) || ("P28548-2".equalsIgnoreCase(par.getFirstProtein()) && "P28548-1".equalsIgnoreCase(par.getSecondProtein())) ){
 
                 Assert.assertEquals("P28548", par.getMasterProtein());
-                Assert.assertEquals(2, par.getPubmedIds().size());
-                Iterator<String> pubIterator = par.getPubmedIds().iterator();
-                Assert.assertEquals("15199141", pubIterator.next());
-                Assert.assertEquals("14704431", pubIterator.next());
+                if (!"14704431".equals(par.getPubmedId()) && !"15199141".equals(par.getPubmedId())){
+                    Assert.assertTrue(false);
+                }
             }
             // feature chain
             else if ("P28548-PRO_0000068244".equals(par.getFirstProtein())){
 
                 Assert.assertEquals("Q21361", par.getSecondProtein());
                 Assert.assertEquals("P28548", par.getMasterProtein());
-                Assert.assertEquals(4, par.getPubmedIds().size());
-                Iterator<String> pubIterator = par.getPubmedIds().iterator();
-                Assert.assertEquals("15199141", pubIterator.next());
-                Assert.assertEquals("18212739", pubIterator.next());
-                Assert.assertEquals("15115758", pubIterator.next());
-                Assert.assertEquals("14704431", pubIterator.next());
+                if (!"15199141".equals(par.getPubmedId()) && !"18212739".equals(par.getPubmedId()) && !"15115758".equals(par.getPubmedId()) && !"14704431".equals(par.getPubmedId())){
+                    Assert.assertTrue(false);
+                }
 
                 Assert.assertEquals(2, par.getComponentXrefs().size());
                 Iterator<String> compIterator = par.getComponentXrefs().iterator();
@@ -131,46 +127,41 @@ public class GOLineConverter2Test extends UniprotExportBase {
 
                 Assert.assertEquals("P28548", par.getMasterProtein());
                 Assert.assertEquals("P12347-4", par.getSecondProtein());
-                Assert.assertEquals(2, par.getPubmedIds().size());
-                Iterator<String> pubIterator = par.getPubmedIds().iterator();
-                Assert.assertEquals("15199141", pubIterator.next());
-                Assert.assertEquals("14704431", pubIterator.next());
+                if (!"15199141".equals(par.getPubmedId()) && !"14704431".equals(par.getPubmedId())){
+                    Assert.assertTrue(false);
+                }
             }
             // trans variant and master protein
             else if ("P12347-4".equals(par.getFirstProtein()) && "P28548".equals(par.getSecondProtein())){
 
                 Assert.assertEquals("P28548", par.getMasterProtein());
-                Assert.assertEquals(2, par.getPubmedIds().size());
-                Iterator<String> pubIterator = par.getPubmedIds().iterator();
-                Assert.assertEquals("15199141", pubIterator.next());
-                Assert.assertEquals("14704431", pubIterator.next());
+                if (!"15199141".equals(par.getPubmedId()) && !"14704431".equals(par.getPubmedId())){
+                    Assert.assertTrue(false);
+                }
             }
             // trans variant and another uniprot entry
             else if ("P12347-4".equals(par.getFirstProtein()) && "O17670".equals(par.getSecondProtein())){
 
                 Assert.assertEquals("P28548", par.getMasterProtein());
-                Assert.assertEquals(2, par.getPubmedIds().size());
-                Iterator<String> pubIterator = par.getPubmedIds().iterator();
-                Assert.assertEquals("15199141", pubIterator.next());
-                Assert.assertEquals("14704431", pubIterator.next());
+                if (!"15199141".equals(par.getPubmedId()) && !"14704431".equals(par.getPubmedId())){
+                    Assert.assertTrue(false);
+                }
             }
             // first interaction with isoform
             else if ("P28548-1".equals(par.getFirstProtein())){
 
                 Assert.assertEquals("P28548", par.getMasterProtein());
                 Assert.assertEquals("Q22534", par.getSecondProtein());
-                Assert.assertEquals(1, par.getPubmedIds().size());
-                Assert.assertEquals("14704431", par.getPubmedIds().iterator().next());
+                Assert.assertEquals("14704431", par.getPubmedId());
             }
             // second interaction with isoform
             else if ("P28548-2".equals(par.getFirstProtein())){
 
                 Assert.assertEquals("P28548", par.getMasterProtein());
                 Assert.assertEquals("O17670", par.getSecondProtein());
-                Assert.assertEquals(2, par.getPubmedIds().size());
-                Iterator<String> pubIterator = par.getPubmedIds().iterator();
-                Assert.assertEquals("15199141", pubIterator.next());
-                Assert.assertEquals("14704431", pubIterator.next());
+                if (!"15199141".equals(par.getPubmedId()) && !"14704431".equals(par.getPubmedId())){
+                    Assert.assertTrue(false);
+                }
             }
             else {
                 Assert.assertFalse(true);

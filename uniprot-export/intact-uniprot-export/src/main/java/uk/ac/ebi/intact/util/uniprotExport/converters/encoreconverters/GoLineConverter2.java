@@ -28,7 +28,7 @@ public class GoLineConverter2 implements GoLineConverter<GOParameters2> {
      * @param firstInteractor uniprot ac of first interactor
      * @return The converted GOParameters
      */
-    public GOParameters2 convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor, MiClusterContext context){
+    public List<GOParameters2> convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor, MiClusterContext context){
         // extract the uniprot acs of the firts and second interactors
         String uniprot1;
         String uniprot2;
@@ -59,22 +59,31 @@ public class GoLineConverter2 implements GoLineConverter<GOParameters2> {
             // if the list of pubmed ids is not empty, the GOParameter is created
             if (!pubmedIds.isEmpty()){
                 logger.debug("convert GO parameters for " + uniprot1 + ", " + uniprot2 + ", " + pubmedIds.size() + " pubmed ids");
-                GOParameters2 parameters;
+                List<GOParameters2> parameters = new ArrayList<GOParameters2>();
 
                 if (uniprot1.equalsIgnoreCase(firstInteractor)){
                     if (!UniprotExportUtils.isMasterProtein(uniprot1)){
-                        parameters = new GOParameters2(uniprot1, uniprot2, pubmedIds, UniprotExportUtils.extractMasterProteinFrom(uniprot1), goRefs);
+                        
+                        for (String pub : pubmedIds){
+                            parameters.add(new GOParameters2(uniprot1, uniprot2, pub, UniprotExportUtils.extractMasterProteinFrom(uniprot1), goRefs));
+                        }
                     }
                     else {
-                        parameters = new GOParameters2(uniprot1, uniprot2, pubmedIds, uniprot1, goRefs);
+                        for (String pub : pubmedIds){
+                            parameters.add(new GOParameters2(uniprot1, uniprot2, pub, uniprot1, goRefs));
+                        }
                     }
                 }
                 else{
                     if (!UniprotExportUtils.isMasterProtein(uniprot2)){
-                        parameters = new GOParameters2(uniprot2, uniprot1, pubmedIds, UniprotExportUtils.extractMasterProteinFrom(uniprot1), goRefs);
+                        for (String pub : pubmedIds){
+                            parameters.add(new GOParameters2(uniprot2, uniprot1, pub, UniprotExportUtils.extractMasterProteinFrom(uniprot2), goRefs));
+                        }
                     }
                     else {
-                        parameters = new GOParameters2(uniprot2, uniprot1, pubmedIds, uniprot2, goRefs);
+                        for (String pub : pubmedIds){
+                            parameters.add(new GOParameters2(uniprot2, uniprot2, pub, uniprot2, goRefs));
+                        }
                     }
                 }
 
@@ -84,7 +93,7 @@ public class GoLineConverter2 implements GoLineConverter<GOParameters2> {
         }
 
         logger.warn("one of the uniprot ac is null, cannot convert into GOLines");
-        return null;
+        return Collections.EMPTY_LIST;
     }
     
     private Set<String> collectGoComponentRefsFrom(Set<String> interactionAcs, MiClusterContext context){
@@ -145,47 +154,49 @@ public class GoLineConverter2 implements GoLineConverter<GOParameters2> {
 
                     // the first interactor is uniprot1 and the second uniprot is a different uniprot entry
                     if ((uniprot1.startsWith(parentAc) || isUniprot1Isoform) && !uniprot2.startsWith(parentAc) && !isUniprot2Isoform){
-                        GOParameters2 parameter = new GOParameters2(uniprot1, uniprot2, pubmedIds, parentAc, goRefs);
-                        goParameters.add(parameter);
+                        for (String pub : pubmedIds){
+                            goParameters.add(new GOParameters2(uniprot1, uniprot2, pub, parentAc, goRefs));
+                        }
                     }
                     // the first interactor is uniprot2 and the uniprot 1 is a different uniprot entry
                     else if ((uniprot2.startsWith(parentAc) || isUniprot2Isoform) && !uniprot1.startsWith(parentAc) && !isUniprot1Isoform) {
-                        GOParameters2 parameter = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
-                        goParameters.add(parameter);
+                        for (String pub : pubmedIds){
+                            goParameters.add(new GOParameters2(uniprot2, uniprot1, pub, parentAc, goRefs));
+                        }
                     }
                     // the two interactors are identical, we have a self interaction
                     else if (uniprot1.equalsIgnoreCase(uniprot2)){
-                        GOParameters2 parameter = new GOParameters2(uniprot1, uniprot2, pubmedIds, parentAc, goRefs);
-
-                        goParameters.add(parameter);
+                        for (String pub : pubmedIds){
+                            goParameters.add(new GOParameters2(uniprot1, uniprot2, pub, parentAc, goRefs));
+                        }
                     }
                     // the two interactors are from the same uniprot entry but are different isoforms/feature chains : we have a single interaction but two lines
                     else if (uniprot2.startsWith(parentAc) && uniprot1.startsWith(parentAc)) {
-                        GOParameters2 parameter1 = new GOParameters2(uniprot1, uniprot2, pubmedIds, parentAc, goRefs);
-                        goParameters.add(parameter1);
-                        GOParameters2 parameter2 = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
-                        goParameters.add(parameter2);
+                        for (String pub : pubmedIds){
+                            goParameters.add(new GOParameters2(uniprot1, uniprot2, pub, parentAc, goRefs));
+                            goParameters.add(new GOParameters2(uniprot2, uniprot1, pub, parentAc, goRefs));
+                        }
                     }
                     // the two interactors are from the same uniprot entry but are different isoforms/feature chains : one of the isoform does not match the master uniprot entry so we need to write it twice with the current parent ac
                     else if (uniprot1.startsWith(parentAc) && isUniprot2Isoform) {
-                        GOParameters2 parameter = new GOParameters2(uniprot1, uniprot2, pubmedIds, parentAc, goRefs);
-                        goParameters.add(parameter);
-                        GOParameters2 parameter2 = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
-                        goParameters.add(parameter2);
+                        for (String pub : pubmedIds){
+                            goParameters.add(new GOParameters2(uniprot1, uniprot2, pub, parentAc, goRefs));
+                            goParameters.add(new GOParameters2(uniprot2, uniprot1, pub, parentAc, goRefs));
+                        }
                     }
                     // the two interactors are from the same uniprot entry but are different isoforms/feature chains : one of the isoform does not match the master uniprot entry so we need to write it twice with the current parent ac
                     else if (uniprot2.startsWith(parentAc) && isUniprot1Isoform) {
-                        GOParameters2 parameter = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
-                        goParameters.add(parameter);
-                        GOParameters2 parameter2 = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
-                        goParameters.add(parameter2);
+                        for (String pub : pubmedIds){
+                            goParameters.add(new GOParameters2(uniprot2, uniprot1, pub, parentAc, goRefs));
+                            goParameters.add(new GOParameters2(uniprot2, uniprot1, pub, parentAc, goRefs));
+                        }
                     }
                     // the two interactors are from the same uniprot entry but are different isoforms/feature chains : both isoforms do not match the master uniprot entry so we need to write it twice with the current parent ac
                     else if (isUniprot1Isoform && isUniprot2Isoform){
-                        GOParameters2 parameter = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
-                        goParameters.add(parameter);
-                        GOParameters2 parameter2 = new GOParameters2(uniprot2, uniprot1, pubmedIds, parentAc, goRefs);
-                        goParameters.add(parameter2);
+                        for (String pub : pubmedIds){
+                            goParameters.add(new GOParameters2(uniprot2, uniprot1, pub, parentAc, goRefs));
+                            goParameters.add(new GOParameters2(uniprot2, uniprot1, pub, parentAc, goRefs));
+                        }
                     }
                     else {
                         logger.info("The interaction "+uniprot1+" and "+uniprot2+" is ignored because both interactors are not matching the master uniprot ac");

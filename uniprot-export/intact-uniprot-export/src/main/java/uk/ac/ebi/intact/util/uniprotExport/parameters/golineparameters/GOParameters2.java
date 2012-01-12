@@ -11,14 +11,18 @@ import java.util.Set;
  * @since <pre>04/01/12</pre>
  */
 
-public class GOParameters2 extends GOParameters1 {
+public class GOParameters2 implements GOParameters {
     
     private String masterProtein;
+    private String firstProtein;
+    private String secondProtein;
+    private String pubmedId;
     
     private Set<String> componentXrefs;
     
-    public GOParameters2(String firstProtein, String secondProtein, Set<String> pubmedIds, String masterProtein, Set<String> componentXrefs) {
-        super(firstProtein, secondProtein, pubmedIds);
+    public GOParameters2(String firstProtein, String secondProtein, String pubmedIds, String masterProtein, Set<String> componentXrefs) {
+        this.firstProtein = firstProtein;
+        this.secondProtein = secondProtein;
 
         this.masterProtein = masterProtein;
 
@@ -28,6 +32,8 @@ public class GOParameters2 extends GOParameters1 {
         else {
             this.componentXrefs = componentXrefs;
         }
+
+        this.pubmedId = pubmedIds;
     }
 
     public String getMasterProtein() {
@@ -36,5 +42,19 @@ public class GOParameters2 extends GOParameters1 {
 
     public Set<String> getComponentXrefs() {
         return componentXrefs;
+    }
+
+    @Override
+    public String getFirstProtein() {
+        return this.firstProtein;
+    }
+
+    @Override
+    public String getSecondProtein() {
+        return this.secondProtein;
+    }
+
+    public String getPubmedId() {
+        return this.pubmedId;
     }
 }

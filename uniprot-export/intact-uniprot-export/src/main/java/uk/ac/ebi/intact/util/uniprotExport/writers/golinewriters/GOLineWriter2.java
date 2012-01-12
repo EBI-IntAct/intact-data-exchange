@@ -53,7 +53,7 @@ public class GOLineWriter2 implements GOLineWriter<GOParameters2> {
             }
 
             // generate the line
-            writeGOLine(master, uniprot1, uniprot2, self, parameters.getPubmedIds(), parameters.getComponentXrefs());
+            writeGOLine(master, uniprot1, uniprot2, self, parameters.getPubmedId(), parameters.getComponentXrefs());
 
             writer.flush();
         }
@@ -67,26 +67,19 @@ public class GOLineWriter2 implements GOLineWriter<GOParameters2> {
     }
 
     /**
-     * Write a list of pubmed ids
+     * Write a pubmed id
      * @param pubmedIds
      * @throws IOException
      */
-    private void writePubmedLine(Set<String> pubmedIds) throws IOException {
+    private void writePubmedLine(String pubmedIds) throws IOException {
 
-        if (pubmedIds.isEmpty()) {
+        if (pubmedIds == null) {
             System.out.println("ERROR: No PubMed ID found in that set of experiments. ");
             return;
         }
 
-        // build a pipe separated list of pubmed IDs
-        for (Iterator iterator = pubmedIds.iterator(); iterator.hasNext();) {
-            String pubmed = (String) iterator.next();
-            writer.write("PMID:");
-            writer.write(pubmed);
-            if (iterator.hasNext()) {
-                writer.write('|');
-            }
-        }
+        writer.write("PMID:");
+        writer.write(pubmedIds);
 
         writer.write(WriterUtils.TABULATION);
     }
@@ -122,7 +115,7 @@ public class GOLineWriter2 implements GOLineWriter<GOParameters2> {
      * @param pubmedBuffer
      * @throws IOException
      */
-    private void writeGOLine(String master1, String uniprot1, String uniprot2, boolean self, Set<String> pubmedBuffer, Set<String> goRefs) throws IOException {
+    private void writeGOLine(String master1, String uniprot1, String uniprot2, boolean self, String pubmedBuffer, Set<String> goRefs) throws IOException {
         // first interactor is an isoform
         if (master1 != null && !master1.equalsIgnoreCase(uniprot1)){
             writeFirstInteractor(master1);
@@ -154,13 +147,14 @@ public class GOLineWriter2 implements GOLineWriter<GOParameters2> {
      * @param pubmedBuffer
      * @throws IOException
      */
-    private void writeGeneralLine(String uniprot2, Set<String> pubmedBuffer, String isoform, Set<String> goRefs) throws IOException {
+    private void writeGeneralLine(String uniprot2, String pubmedBuffer, String isoform, Set<String> goRefs) throws IOException {
         writePubmedLine(pubmedBuffer);
+        String fixedSecondInteractor = uniprot2.replace("-PRO_", ":PRO_");
 
         writer.write("IPI");
         writer.write(WriterUtils.TABULATION); // Evidence
         writer.write("UniProtKB:");
-        writer.write(uniprot2);
+        writer.write(fixedSecondInteractor);
         writer.write(WriterUtils.TABULATION); // with
         writer.write(WriterUtils.TABULATION); // Aspect
         writer.write(WriterUtils.TABULATION); // DB_Object_name
@@ -170,18 +164,16 @@ public class GOLineWriter2 implements GOLineWriter<GOParameters2> {
         writer.write(WriterUtils.TABULATION); // Date
         writer.write("IntAct");   // Assigned By
         writer.write(WriterUtils.TABULATION); // Annotation extension
+        writeGOAnnotationLine(goRefs);
+        writer.write(WriterUtils.TABULATION);
 
         if (isoform != null){
             String fixedIsoform = isoform.replace("-PRO_", ":PRO_");
             writer.write("UniProtKB:"); // Gene product form id
             writer.write(fixedIsoform);
-            writer.write(WriterUtils.TABULATION);
-        }
-        else {
-            writer.write(WriterUtils.TABULATION); //No Gene product form id
         }
 
-        writeGOAnnotationLine(goRefs);
+
         writer.write(WriterUtils.NEW_LINE);
     }
 

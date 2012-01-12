@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters1;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
@@ -28,8 +27,10 @@ public class GOLineConverter1Test extends UniprotExportBase{
 
         EncoreInteractionForScoring interaction = createEncoreInteraction();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
-        Assert.assertNotNull(parameters);
+        List<GOParameters1> parameters1 = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
+        Assert.assertEquals(1, parameters1.size());
+
+        GOParameters1 parameters = parameters1.iterator().next();
         Assert.assertEquals("P28548-1", parameters.getFirstProtein());
         Assert.assertEquals("Q22534", parameters.getSecondProtein());
         Assert.assertEquals(1, parameters.getPubmedIds().size());
@@ -43,8 +44,8 @@ public class GOLineConverter1Test extends UniprotExportBase{
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getInteractorAccsA().clear();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
-        Assert.assertNull(parameters);
+        List<GOParameters1> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
+        Assert.assertTrue(parameters.isEmpty());
     }
 
     @Test
@@ -54,8 +55,8 @@ public class GOLineConverter1Test extends UniprotExportBase{
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getInteractorAccsB().clear();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
-        Assert.assertNull(parameters);
+        List<GOParameters1> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
+        Assert.assertTrue(parameters.isEmpty());
 
     }
 
@@ -66,8 +67,8 @@ public class GOLineConverter1Test extends UniprotExportBase{
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getPublicationIds().clear();
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
-        Assert.assertNull(parameters);
+        List<GOParameters1> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
+        Assert.assertTrue(parameters.isEmpty());
     }
 
     @Test
@@ -77,8 +78,8 @@ public class GOLineConverter1Test extends UniprotExportBase{
         EncoreInteractionForScoring interaction = createEncoreInteraction();
         interaction.getPublicationIds().iterator().next().setDatabase("DOI");
 
-        GOParameters parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
-        Assert.assertNull(parameters);
+        List<GOParameters1> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
+        Assert.assertTrue(parameters.isEmpty());
     }
 
     @Test

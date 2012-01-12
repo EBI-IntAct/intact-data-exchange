@@ -94,22 +94,16 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         String pmid1 = "14704431";
         String pmid2 = "18467557";
-
-        Set<String> publications1 = new HashSet<String>(1);
-        publications1.add(pmid1);
-
-        Set<String> publications2 = new HashSet<String>(1);
-        publications2.add(pmid2);
         
         Set<String> componentsXrefs = new HashSet<String>(2);
         componentsXrefs.add("GO:xxxxxx1");
         componentsXrefs.add("GO:xxxxxx2");
 
-        GOParameters parameter1 = new GOParameters2(uniprotAc1, uniprotAc2, publications1, uniprotAc1, Collections.EMPTY_SET);
-        GOParameters parameter4 = new GOParameters2(uniprotAc2, uniprotAc1, publications1, "Q22534", componentsXrefs);
-        GOParameters parameter2 = new GOParameters2(uniprotAc1, uniprotAc4, publications1, uniprotAc1, Collections.EMPTY_SET);
-        GOParameters parameter5 = new GOParameters2(uniprotAc4, uniprotAc1, publications1, "Q17862", Collections.EMPTY_SET);
-        GOParameters parameter3 = new GOParameters2(uniprotAc5, uniprotAc5, publications2, "P33327", Collections.EMPTY_SET);
+        GOParameters parameter1 = new GOParameters2(uniprotAc1, uniprotAc2, pmid1, uniprotAc1, Collections.EMPTY_SET);
+        GOParameters parameter4 = new GOParameters2(uniprotAc2, uniprotAc1, pmid1, "Q22534", componentsXrefs);
+        GOParameters parameter2 = new GOParameters2(uniprotAc1, uniprotAc4, pmid1, uniprotAc1, Collections.EMPTY_SET);
+        GOParameters parameter5 = new GOParameters2(uniprotAc4, uniprotAc1, pmid1, "Q17862", Collections.EMPTY_SET);
+        GOParameters parameter3 = new GOParameters2(uniprotAc5, uniprotAc5, pmid2, "P33327", Collections.EMPTY_SET);
 
         parameters.add(parameter1);
         parameters.add(parameter4);

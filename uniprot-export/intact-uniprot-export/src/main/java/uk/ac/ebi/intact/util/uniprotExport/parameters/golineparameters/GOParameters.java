@@ -1,7 +1,5 @@
 package uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters;
 
-import java.util.Set;
-
 /**
  * GO parameters must provide uniprot acs of the first and second protein and a list of pubmed Ids
  *
@@ -23,10 +21,4 @@ public interface GOParameters {
      * @return
      */
     public String getSecondProtein();
-
-    /**
-     * The list of publication ids
-     * @return
-     */
-    public Set<String> getPubmedIds();
 }

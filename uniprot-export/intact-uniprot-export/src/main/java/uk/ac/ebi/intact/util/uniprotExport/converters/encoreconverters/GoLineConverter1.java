@@ -54,7 +54,7 @@ public class GoLineConverter1 implements GoLineConverter<GOParameters1> {
      * @param firstInteractor
      * @return The converted GOParameters
      */
-    public GOParameters1 convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor, MiClusterContext context){
+    public List<GOParameters1> convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor, MiClusterContext context){
         // extract the uniprot acs of the firts and second interactors
         String uniprot1;
         String uniprot2;
@@ -99,13 +99,13 @@ public class GoLineConverter1 implements GoLineConverter<GOParameters1> {
                     parameters = new GOParameters1(fixedUniprot2, fixedUniprot1, pubmedIds);
                 }
 
-                return parameters;
+                return Arrays.asList(parameters);
             }
             logger.warn("No pubmed ids for "+uniprot1+" and "+uniprot2+", cannot convert into GOLines");
         }
 
         logger.warn("one of the uniprot ac is null, cannot convert into GOLines");
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     /**

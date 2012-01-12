@@ -143,7 +143,7 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
         {
             return true;
         }
-        if (o == null || getClass() != o.getClass())
+        if (o == null || !(o instanceof SecondCCParameters1Impl))
         {
             return false;
         }

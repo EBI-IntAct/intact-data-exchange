@@ -24,7 +24,7 @@ public interface GoLineConverter<T extends GOParameters> {
      * @param context : the context of the cluster
      * @return a GOParameters with the information provided by the interaction
      */
-    public T convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor, MiClusterContext context);
+    public List<T> convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor, MiClusterContext context);
 
     /**
      *
