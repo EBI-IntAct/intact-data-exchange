@@ -44,14 +44,14 @@ public class CCLineConverter1Test extends UniprotExportBase {
         Assert.assertEquals("P28548", parameters.getMasterUniprotAc());
         Assert.assertEquals("Kin-10", parameters.getGeneName());
         Assert.assertEquals("6239", parameters.getTaxId());
-        Assert.assertEquals(4, parameters.getSecondCCParameters().size());
+        Assert.assertEquals(3, parameters.getSecondCCParameters().size());
 
         int i = 0;
 
         for (SecondCCParameters1 secondPar : parameters.getSecondCCParameters()){
             i++;
 
-            if (i == 4){
+            if (i == 3){
                 Assert.assertEquals("P28548-1", secondPar.getFirstUniprotAc());
                 Assert.assertEquals("Q22534", secondPar.getSecondUniprotAc());
                 Assert.assertEquals("EBI-317777", secondPar.getFirstIntacAc());
@@ -61,7 +61,7 @@ public class CCLineConverter1Test extends UniprotExportBase {
                 Assert.assertEquals("pat-12", secondPar.getGeneName());
             }
 
-            else if (i == 1 || i==2){
+            else if (i == 1){
                 if (!"P28548-2".equalsIgnoreCase(secondPar.getFirstUniprotAc()) && !"P12347-4".equalsIgnoreCase(secondPar.getFirstUniprotAc())){
                     Assert.assertFalse(true);
                 }
@@ -74,7 +74,7 @@ public class CCLineConverter1Test extends UniprotExportBase {
                 Assert.assertEquals("6239", secondPar.getTaxId());
                 Assert.assertEquals("eya-1", secondPar.getGeneName());
             }
-            else if (i == 3){
+            else if (i == 2){
                 Assert.assertEquals("P28548", secondPar.getFirstUniprotAc());
                 Assert.assertEquals("P12347-4", secondPar.getSecondUniprotAc());
                 Assert.assertEquals("EBI-317888", secondPar.getFirstIntacAc());

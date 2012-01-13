@@ -119,16 +119,6 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
                     if( uniprotID1 != null && uniprotID2 != null ) {
                         score = uniprotID1.compareTo( uniprotID2 );
                     }
-                    
-                    // in case we have same interactors, we compare first interactors
-                    if (score == 0){
-                        String firstID1 = getFirstUniprotAc();
-                        String firstID2 = cc2.getFirstUniprotAc();
-
-                        if (firstID1 != null && firstID2 != null){
-                            return firstID1.compareTo(firstID2);
-                        }
-                    }
                 }
             }
 
@@ -158,10 +148,6 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
 
             return false;
         }
-        else if (firstUniprotAc != null ? !firstUniprotAc.equalsIgnoreCase(ccLine1.getFirstUniprotAc()) : ccLine1.getFirstUniprotAc() != null){
-
-            return false;
-        }
 
         return true;
     }
@@ -171,7 +157,6 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
         int result;
         result = (geneName != null ? geneName.hashCode() : 0);
         result = 31 * result + (secondUniprotAc != null ? secondUniprotAc.hashCode() : 0);
-        result = 31 * result + (firstUniprotAc != null ? firstUniprotAc.hashCode() : 0);
         return result;
     }
 }
