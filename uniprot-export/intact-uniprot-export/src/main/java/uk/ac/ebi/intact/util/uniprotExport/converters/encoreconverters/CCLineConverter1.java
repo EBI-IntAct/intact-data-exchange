@@ -28,8 +28,12 @@ import java.util.*;
 public class CCLineConverter1 extends AbstractCCLineConverter {
     private static final Logger logger = Logger.getLogger(CCLineConverter1.class);
 
+    // set containing the SecondCCParameters in case of feature chains
+    private Set<SecondCCParameters1> processedCCParametersForFeatureChains;
+
     public CCLineConverter1(){
         super();
+        processedCCParametersForFeatureChains = new HashSet<SecondCCParameters1>();
     }
 
     @Override
@@ -40,12 +44,11 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
 
     @Override
     public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(Set<EncoreInteractionForScoring> interactions, MiClusterContext context, String masterUniprot){
+        processedCCParametersForFeatureChains.clear();
+
         String firstIntactAc = null;
         String geneName1 = context.getGeneNames().get(masterUniprot);
         String taxId1 = null;
-
-        // set containing the SecondCCParameters in case of feature chains
-        Set<SecondCCParameters1> processedCCParametersForFeatureChains = new HashSet<SecondCCParameters1>();
 
         SortedSet<SecondCCParameters1> secondCCInteractors = new TreeSet<SecondCCParameters1>();
 
@@ -136,7 +139,7 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
 
                         taxId1 = organismsA[0];
                         firstIntactAc = intact1;
-                        
+
                         if (geneName1 == null){
                             geneName1 = context.getGeneNames().get(uniprot1);
                         }
@@ -263,6 +266,7 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
 
         logger.debug("Interactor " + masterUniprot + " doesn't have any valid second CC parameters and will be skipped.");
 
+        processedCCParametersForFeatureChains.clear();
         return null;
     }
 }
