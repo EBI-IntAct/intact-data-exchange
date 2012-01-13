@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
+import uk.ac.ebi.intact.util.uniprotExport.UniprotExportUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedProteins;
@@ -198,7 +199,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
                     // extract organism names
                     String organism2 = null;
 
-                    if (isFromSameUniprotEntry(firstInteractor, uniprot1, transSplicedVariants.get(firstInteractor))){
+                    if (UniprotExportUtils.isFromSameUniprotEntry(firstInteractor, uniprot1, transSplicedVariants.get(firstInteractor))){
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
@@ -320,7 +321,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
                     // extract organism names
                     String organism2 = null;
 
-                    if (isFromSameUniprotEntry(firstInteractor, uniprot1, transSplicedVariants.get(firstInteractor))){
+                    if (UniprotExportUtils.isFromSameUniprotEntry(firstInteractor, uniprot1, transSplicedVariants.get(firstInteractor))){
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);

@@ -92,6 +92,8 @@ public class UniprotExportProcessor {
     private Set<EncoreInteractionForScoring> negativeInteractionsToExport;
     private Set<EncoreInteractionForScoring> positiveInteractionsToExclude;
     private Set<EncoreInteractionForScoring> negativeInteractionsToExclude;
+    
+    private Set<EncoreInteractionForScoring> encoreInteractionsForDRLine;
 
     /**
      *
@@ -119,6 +121,7 @@ public class UniprotExportProcessor {
         negativeInteractionsToExport = new HashSet<EncoreInteractionForScoring>();
         positiveInteractionsToExclude = new HashSet<EncoreInteractionForScoring>();
         negativeInteractionsToExclude = new HashSet<EncoreInteractionForScoring>();
+        encoreInteractionsForDRLine = new HashSet<EncoreInteractionForScoring>();
     }
 
     /**
@@ -141,6 +144,7 @@ public class UniprotExportProcessor {
         negativeInteractionsToExport = new HashSet<EncoreInteractionForScoring>();
         positiveInteractionsToExclude = new HashSet<EncoreInteractionForScoring>();
         negativeInteractionsToExclude = new HashSet<EncoreInteractionForScoring>();
+        encoreInteractionsForDRLine = new HashSet<EncoreInteractionForScoring>();
     }
 
     /**
@@ -411,6 +415,8 @@ public class UniprotExportProcessor {
      * @throws IOException
      */
     private void flushDRAndCCLinesFor(MiClusterScoreResults results, DRLineWriter drWriter, CCLineWriter ccWriter, CCLineWriter silverCcWriter, String parentAc, Set<EncoreInteractionForScoring> interactions, Set<EncoreInteractionForScoring> excludedInteractions, Set<EncoreInteractionForScoring> negativeInteractions, Set<EncoreInteractionForScoring> excludedNegativeInteractions) throws IOException {
+        encoreInteractionsForDRLine.clear();
+
         int numberInteractions = interactions.size();
         int numberNegativeInteractions = negativeInteractions.size();
         int numberExcludedInteractions = excludedInteractions.size();
@@ -443,13 +449,22 @@ public class UniprotExportProcessor {
         if (totalNumberInteraction > 0){
             logger.info("Write DR lines for " + parentAc);
             if (drWriter != null){
-                DRParameters parameter = this.drConverter.convertInteractorIntoDRLine(parentAc, totalNumberInteraction);
-                drWriter.writeDRLine(parameter);
+                encoreInteractionsForDRLine.addAll(positiveInteractionsToExport);
+                encoreInteractionsForDRLine.addAll(positiveInteractionsToExclude);
+                encoreInteractionsForDRLine.addAll(negativeInteractionsToExport);
+                encoreInteractionsForDRLine.addAll(negativeInteractionsToExclude);
+                DRParameters parameter = this.drConverter.convertInteractorIntoDRLine(parentAc, encoreInteractionsForDRLine, results.getExportContext());
+
+                if (parameter != null){
+                    drWriter.writeDRLine(parameter);
+                }
             }
             else{
                 logger.error("No DRWriter is compatible with the current drline converter, the dr lines will not be written");
             }
         }
+
+        encoreInteractionsForDRLine.clear();
     }
 
     /**

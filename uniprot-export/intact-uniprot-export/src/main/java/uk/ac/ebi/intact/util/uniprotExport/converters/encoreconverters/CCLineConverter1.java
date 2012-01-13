@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.apache.log4j.Logger;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.intact.util.uniprotExport.UniprotExportUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters1;
@@ -121,9 +122,9 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                     }
 
                     // boolean to know if uniprot 1 is from same uniprot entry than uniprot master
-                    boolean isUniprot1FromSameUniprotEntry = isFromSameUniprotEntry(masterUniprot, uniprot1, transSplicedVariants.get(masterUniprot));
+                    boolean isUniprot1FromSameUniprotEntry = UniprotExportUtils.isFromSameUniprotEntry(masterUniprot, uniprot1, transSplicedVariants.get(masterUniprot));
                     // boolean to know if uniprot 2 is from same uniprot entry than uniprot master
-                    boolean isUniprot2FromSameUniprotEntry = isFromSameUniprotEntry(masterUniprot, uniprot2, transSplicedVariants.get(masterUniprot));
+                    boolean isUniprot2FromSameUniprotEntry = UniprotExportUtils.isFromSameUniprotEntry(masterUniprot, uniprot2, transSplicedVariants.get(masterUniprot));
 
                     // the first uniprot is from the same uniprot entry as the master uniprot but the uniprot 2 is from another uniprot entry
                     if (isUniprot1FromSameUniprotEntry && !isUniprot2FromSameUniprotEntry){

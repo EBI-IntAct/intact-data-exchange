@@ -5,13 +5,11 @@ import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
 import uk.ac.ebi.intact.bridges.taxonomy.UniprotTaxonomyService;
-import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedProteins;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Abstract class for CC line converters. A CC line converter can convert an Encore interaction to a CC parameter representing
@@ -91,30 +89,5 @@ public abstract class AbstractCCLineConverter implements CCLineConverter {
         this.taxIdToScientificName.put(taxId, scientificName);
 
         return scientificName;
-    }
-
-    /**
-     *
-     * @param firstInteractor : uniprot ac of the master uniprot
-     * @param interactor : uniprot ac of the interactor
-     * @param transSplicedProteins : set of trans spliced proteins which can be associated with the master uniprot entry
-     * @return true if this interactor is from the same uniprot entry as the master uniprot ac, false otherwise
-     */
-    protected boolean isFromSameUniprotEntry(String firstInteractor, String interactor, Set<IntactTransSplicedProteins> transSplicedProteins){
-
-        // the interactor starts with master uniprot so we consider it as the first interactor
-        if (interactor.startsWith(firstInteractor)){
-           return true;
-        }
-        // if proteins from this uniprot entry are trans spliced variants
-        else if (transSplicedProteins != null){
-            for (IntactTransSplicedProteins prot : transSplicedProteins){
-                // the interactor is a transpliced variant of this uniprot entry so we consider it as the first interactor
-                if (interactor.equalsIgnoreCase(prot.getUniprotAc())){
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

@@ -17,7 +17,7 @@ public interface DRParameters {
     public String getUniprotAc();
 
     /**
-     * The number of interactions
+     * The number of distinct interactors (isoforms/feature chains are merged with uniprot master)and self interaction are not counted
      * @return
      */
     public int getNumberOfInteractions();
