@@ -24,6 +24,8 @@ import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
+import java.util.regex.Matcher;
+
 /**
  * TODO comment this
  *
@@ -96,7 +98,16 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
 
         if (intactObject.getCvDatabase() != null) {
             isPubmed = CvDatabase.PUBMED_MI_REF.equals(intactObject.getCvDatabase().getIdentifier());
-            dbRef.setDbAc(intactObject.getCvDatabase().getIdentifier());
+
+            if (intactObject.getCvDatabase().getIdentifier() != null){
+                String upperId = intactObject.getCvDatabase().getIdentifier().toUpperCase();
+                Matcher databaseMatcher = CvObjectConverter.MI_REGEXP.matcher(upperId);
+
+                if (databaseMatcher.find() && databaseMatcher.group().equalsIgnoreCase(upperId)){
+                    dbRef.setDbAc(intactObject.getCvDatabase().getIdentifier());
+                }
+            }
+
             dbRef.setDb(intactObject.getCvDatabase().getShortLabel());
         }
 
@@ -111,7 +122,15 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
             }
             else{
                 dbRef.setRefType(intactObject.getCvXrefQualifier().getShortLabel());
-                dbRef.setRefTypeAc(intactObject.getCvXrefQualifier().getIdentifier());
+
+                if (intactObject.getCvXrefQualifier().getIdentifier() != null){
+                    String upperId = intactObject.getCvXrefQualifier().getIdentifier().toUpperCase();
+                    Matcher qualifierMatcher = CvObjectConverter.MI_REGEXP.matcher(upperId);
+
+                    if (qualifierMatcher.find() && qualifierMatcher.group().equalsIgnoreCase(upperId)){
+                        dbRef.setRefTypeAc(intactObject.getCvXrefQualifier().getIdentifier());
+                    }
+                }
             }
         }
 
@@ -150,8 +169,10 @@ public class XrefConverter<X extends Xref> extends AbstractIntactPsiConverter<X,
     }
 
     protected void fixPubmedReferenceAsIdentityToPrimaryRef(DbReference dbRef) {
-        if (CvDatabase.PUBMED_MI_REF.equals(dbRef.getDbAc())
-                && CvXrefQualifier.IDENTITY_MI_REF.equals(dbRef.getRefTypeAc())) {
+        if (((dbRef.getDbAc() != null && CvDatabase.PUBMED_MI_REF.equals(dbRef.getDbAc()))
+                || (dbRef.getDbAc() == null && CvDatabase.PUBMED.equals(dbRef.getDb().toLowerCase())))
+                && (( dbRef.getRefTypeAc() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(dbRef.getRefTypeAc()))
+        || ( dbRef.getRefTypeAc() == null && CvXrefQualifier.IDENTITY.equals(dbRef.getRefType().toLowerCase())))) {
             dbRef.setRefTypeAc(CvXrefQualifier.PRIMARY_REFERENCE_MI_REF);
             dbRef.setRefType(CvXrefQualifier.PRIMARY_REFERENCE);
 

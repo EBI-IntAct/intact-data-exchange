@@ -17,11 +17,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import psidev.psi.mi.xml.model.Attribute;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiMiPopulator;
 import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.Institution;
+
+import java.util.regex.Matcher;
 
 /**
  * TODO comment this
@@ -62,11 +63,25 @@ public class AnnotationConverter extends AbstractIntactPsiConverter<Annotation, 
         String nameAc= null;
         if (intactObject.getCvTopic() == null){
             name=CvTopic.COMMENT;
-            nameAc=CvTopic.CAUTION_MI_REF;
+            nameAc=CvTopic.COMMENT_MI_REF;
         }
         else {
-            name = intactObject.getCvTopic().getShortLabel() != null ? intactObject.getCvTopic().getShortLabel() : CvTopic.COMMENT;
-            nameAc = intactObject.getCvTopic().getIdentifier() != null ? intactObject.getCvTopic().getIdentifier() : CvTopic.COMMENT_MI_REF;
+            name = intactObject.getCvTopic().getShortLabel();
+
+            if (intactObject.getCvTopic().getIdentifier() != null) {
+
+                String upperId = intactObject.getCvTopic().getIdentifier().toUpperCase();
+                Matcher topicMatcher = CvObjectConverter.MI_REGEXP.matcher(upperId);
+
+                if (topicMatcher.find() && topicMatcher.group().equalsIgnoreCase(upperId)){
+                    nameAc = intactObject.getCvTopic().getIdentifier();
+                }
+            }
+
+            if (name == null && nameAc == null){
+                name=CvTopic.COMMENT;
+                nameAc=CvTopic.COMMENT_MI_REF;
+            }
         }
 
         Attribute attribute = new Attribute(nameAc, name, intactObject.getAnnotationText());

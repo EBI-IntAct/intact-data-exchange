@@ -651,7 +651,7 @@ public class PsiConverterUtils {
         for ( DbReference dbRef : dbRefs ) {
             if ( dbRef.getRefTypeAc() != null && dbRef.getRefTypeAc().equals( CvXrefQualifier.IDENTITY_MI_REF ) ) {
 
-                if ( dbRef.getDbAc() != null && dbRef.getDbAc().equals( CvDatabase.PSI_MI_MI_REF ) ) {
+                if ( (dbRef.getDbAc() != null && dbRef.getDbAc().equals( CvDatabase.PSI_MI_MI_REF )) || (dbRef.getDbAc() == null && dbRef.getDb().equalsIgnoreCase( CvDatabase.PSI_MI)) ) {
                     primary = dbRef;
                     break;
                 }
@@ -663,7 +663,7 @@ public class PsiConverterUtils {
         if ( !identityRefs.isEmpty() && primary == null ) {
             // return the one for uniprot, if present. Otherwise return a random one.
             for ( DbReference dbRef : identityRefs ) {
-                if ( dbRef.getDbAc().equals( CvDatabase.UNIPROT_MI_REF ) ) {
+                if ( (dbRef.getDbAc() != null && dbRef.getDbAc().equals( CvDatabase.UNIPROT_MI_REF )) || (dbRef.getDbAc() == null && dbRef.getDb().equalsIgnoreCase( CvDatabase.UNIPROT )) ) {
 
                     primary = dbRef;
                     break;

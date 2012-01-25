@@ -24,6 +24,8 @@ import uk.ac.ebi.intact.model.Alias;
 import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.model.Institution;
 
+import java.util.regex.Matcher;
+
 /**
  * Alias converter.
  *
@@ -90,7 +92,13 @@ public class AliasConverter<A extends Alias> extends AbstractIntactPsiConverter<
             String aliasType = cvAliasType.getShortLabel();
 
             if (cvAliasType.getIdentifier() != null) {
-                psiAlias.setTypeAc(cvAliasType.getIdentifier());
+
+                String upperId = cvAliasType.getIdentifier().toUpperCase();
+                Matcher typeMatcher = CvObjectConverter.MI_REGEXP.matcher(upperId);
+
+                if (typeMatcher.find() && typeMatcher.group().equalsIgnoreCase(upperId)){
+                    psiAlias.setTypeAc(cvAliasType.getIdentifier());
+                }
             }
 
             psiAlias.setType(aliasType);

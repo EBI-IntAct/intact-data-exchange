@@ -328,9 +328,12 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
     }
 
     private boolean hasValidPrimaryRef( DbReference primaryRef ) {
-        if (!CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(primaryRef.getRefTypeAc()) ||
-                (!CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())
-                        && !CvDatabase.DOI_MI_REF.equals(primaryRef.getDbAc()))
+        if ( (primaryRef.getRefTypeAc() != null && !CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(primaryRef.getRefTypeAc())) ||
+        (primaryRef.getRefTypeAc() == null && !CvXrefQualifier.PRIMARY_REFERENCE.equals(primaryRef.getRefType().toLowerCase())) ||
+                (primaryRef.getDbAc() != null && !CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())
+                        && !CvDatabase.DOI_MI_REF.equals(primaryRef.getDbAc())) ||
+                (primaryRef.getDbAc() == null && !CvDatabase.PUBMED.equals(primaryRef.getDb().toLowerCase())
+                        && !CvDatabase.DOI.equals(primaryRef.getDb().toLowerCase()))
                 ) {
             return false;
         }

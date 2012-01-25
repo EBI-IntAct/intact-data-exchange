@@ -462,6 +462,19 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
                         }
                     }
                 }
+                else if (a.getName() != null){
+                    if (a.getName().equalsIgnoreCase(CvTopic.COMMENT) && a.getValue() != null){
+                        if (a.getValue().startsWith(STOICHIOMETRY_PREFIX)){
+                            try {
+                                float stoichio = Float.parseFloat(a.getValue().substring(a.getValue().indexOf(STOICHIOMETRY_PREFIX) + STOICHIOMETRY_PREFIX.length()));
+                                component.setStoichiometry(stoichio);
+                            }
+                            catch (NumberFormatException e) {
+                                log.error(e);
+                            }
+                        }
+                    }
+                }
             }
         }
 

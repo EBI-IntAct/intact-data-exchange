@@ -24,6 +24,8 @@ import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
+import java.util.regex.Pattern;
+
 /**
  * TODO comment this
  *
@@ -36,6 +38,8 @@ public class CvObjectConverter<C extends CvObject, T extends CvType> extends Abs
     protected Class<T> psiCvClass;
     protected AliasConverter aliasConverter;
     protected XrefConverter xrefConverter;
+
+    public final static Pattern MI_REGEXP = Pattern.compile("MI:[0-9]{4}+");
 
     public CvObjectConverter(Institution institution, Class<C> intactCvClass, Class<T> psiCvClass) {
         super(institution);
