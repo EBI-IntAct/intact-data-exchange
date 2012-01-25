@@ -19,12 +19,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.intact.model.CvObject;
-import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvObjectXref;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.XrefUtils;
+import uk.ac.ebi.intact.model.CvXrefQualifier;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * CvObject Converter.
@@ -53,7 +53,7 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
             throw new NullPointerException( cvObject.getClass().getSimpleName() + "("+ text +") didn't have an identity" );
         }
 
-        final CvObjectXref idXref = XrefUtils.getIdentityXref(cvObject, CvDatabase.PSI_MI_MI_REF);
+        final CvObjectXref idXref = findMatchingIdentityXref(cvObject.getXrefs(), identity); //XrefUtils.getIdentityXref(cvObject, CvDatabase.PSI_MI_MI_REF);
         String db = (idXref != null)? idXref.getCvDatabase().getShortLabel() : "notspecified";
 
         try {
@@ -62,6 +62,32 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
         } catch ( Exception e ) {
             throw new RuntimeException( "An exception occured while building a " + clazz.getSimpleName() + ": " + text, e );
         }
+    } 
+    
+    private CvObjectXref findMatchingIdentityXref(Collection<CvObjectXref> xrefs, String identity){
+
+        CvObjectXref identityRef = null;
+        
+        Collection<CvObjectXref> identities = new ArrayList<CvObjectXref>(xrefs.size());
+        
+        for (CvObjectXref xref : xrefs){
+             if (xref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equalsIgnoreCase(xref.getCvXrefQualifier().getIdentifier())){
+                 if (identity.equalsIgnoreCase(xref.getPrimaryId())){
+                     identityRef = xref;
+                     break;
+                 }
+             }
+            else {
+                identities.add(xref);
+            }
+        }
+
+        // in case the identity ref is null but we have xrefs matching the identifier, we take the first identity xref
+        if (identityRef == null && !identities.isEmpty()){
+            identityRef = identities.iterator().next();
+        }
+        
+        return identityRef;
     }
 
     public T toCrossReference( O cvObject ) {

@@ -6,8 +6,10 @@ import psidev.psi.mi.tab.model.InteractionDetectionMethodImpl;
 import psidev.psi.mi.tab.model.InteractionType;
 import psidev.psi.mi.tab.model.InteractionTypeImpl;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvInteraction;
 import uk.ac.ebi.intact.model.CvInteractionType;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -44,6 +46,20 @@ public class CvObjectConverterTest extends IntactBasicTestCase {
         assertEquals( "psi-mi", detectionMethod.getDatabase() );
         assertEquals( "MI:0027", detectionMethod.getIdentifier() );
         assertEquals( "cosedimentation", detectionMethod.getText() );
+    }
+
+    @Test
+    public void convertToMitab_non_mi_detectionMethod() throws Exception {
+        CvObjectConverter converter = new CvObjectConverter();
+
+        CvInteraction t = CvObjectUtils.createCvObject(getMockBuilder().getInstitution(), CvInteraction.class, "MOD:00001", "test-mod");
+        t.getXrefs().iterator().next().setCvDatabase(getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.PSI_MOD_MI_REF, CvDatabase.PSI_MOD));
+
+        InteractionDetectionMethod detectionMethod = ( InteractionDetectionMethod ) converter.toCrossReference( InteractionDetectionMethodImpl.class, t );
+        assertNotNull( detectionMethod );
+        assertEquals( "psi-mod", detectionMethod.getDatabase() );
+        assertEquals( "MOD:00001", detectionMethod.getIdentifier() );
+        assertEquals( "test-mod", detectionMethod.getText() );
     }
 
 }
