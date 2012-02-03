@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import org.apache.log4j.Logger;
 import org.bbop.dataadapter.DataAdapterException;
-import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.*;
 import org.obo.datamodel.impl.*;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
@@ -27,6 +26,7 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.io.*;
 import java.util.*;
+
 import static java.util.Collections.sort;
 
 
@@ -44,8 +44,8 @@ public class CvExporter {
     //initialize logger
     protected final static Logger log = Logger.getLogger( CvExporter.class );
 
-    private static final String ALIAS_IDENTIFIER = "PSI-MI-alternate";
-    private static final String SHORTLABEL_IDENTIFIER = "PSI-MI-short";
+    private static final String ALIAS_IDENTIFIER = "INTACT-alternate";
+    private static final String SHORTLABEL_IDENTIFIER = "INTACT-short";
 
     private Map<CvClassIdentifier, OBOClass> cvToOboCache;
 
@@ -77,8 +77,21 @@ public class CvExporter {
         sort( allUniqCvs, new Comparator<CvObject>() {
             public int compare( CvObject o1, CvObject o2 ) {
 
-                String id1 = CvObjectUtils.getIdentity( o1 );
-                String id2 = CvObjectUtils.getIdentity( o2 );
+                String id1;
+                if (o1.getIdentifier() != null){
+                   id1 = o1.getIdentifier(); 
+                }
+                else {
+                    id1 = CvObjectUtils.getIdentity( o1 );
+                }
+
+                String id2;
+                if (o2.getIdentifier() != null){
+                    id2 = o2.getIdentifier();
+                }
+                else {
+                    id2 = CvObjectUtils.getIdentity( o2 );
+                }
 
                 return id1.compareTo( id2 );
             }
@@ -91,7 +104,7 @@ public class CvExporter {
         int counter = 1;
         for ( CvDagObject cvDagObj : allUniqCvs ) {
 
-            if ( CvObjectUtils.getIdentity( cvDagObj ) == null ) {
+            if ( CvObjectUtils.getIdentity( cvDagObj ) == null && cvDagObj.getIdentifier() == null ) {
                 throw new NullPointerException( "No Identifier for the cvObject " + cvDagObj );
             }
             if ( log.isTraceEnabled() ) log.trace( counter + "  " + CvObjectUtils.getIdentity( cvDagObj ) );
@@ -123,14 +136,22 @@ public class CvExporter {
 
         Map<String, HashSet<CvDagObject>> cvMapWithParents = new HashMap<String, HashSet<CvDagObject>>();
         for ( CvDagObject cvdag : allCvs ) {
+            String id;
 
-            if ( cvMapWithParents.get( CvObjectUtils.getIdentity( cvdag ) ) == null ) {
-                cvMapWithParents.put( CvObjectUtils.getIdentity( cvdag ), new HashSet<CvDagObject>( cvdag.getParents() ) );
+            if (cvdag.getIdentifier() != null){
+                id = cvdag.getIdentifier();
+            }
+            else {
+                id = CvObjectUtils.getIdentity( cvdag );
+            }
+
+            if ( cvMapWithParents.get( id ) == null ) {
+                cvMapWithParents.put( id, new HashSet<CvDagObject>( cvdag.getParents() ) );
             } else {
 
-                HashSet<CvDagObject> alreadyExisting = cvMapWithParents.get( CvObjectUtils.getIdentity( cvdag ) );
+                HashSet<CvDagObject> alreadyExisting = cvMapWithParents.get( id );
                 alreadyExisting.addAll( cvdag.getParents() );
-                cvMapWithParents.put( CvObjectUtils.getIdentity( cvdag ), alreadyExisting );
+                cvMapWithParents.put( id, alreadyExisting );
             }
 
 
@@ -177,12 +198,12 @@ public class CvExporter {
     }
 
     private void addHeaderInfo() {
-        oboSession.setDefaultNamespace( new Namespace( "PSI-MI" ) );
+        oboSession.setDefaultNamespace( new Namespace( "INTACT" ) );
         oboSession.addPropertyValue(new PropertyValueImpl("auto-generated-by", "IntAct CvExporter"));
-        oboSession.addSynonymCategory(new SynonymCategoryImpl("PSI-MI-alternate", "Alternate label curated by PSI-MI"));
-        oboSession.addSynonymCategory(new SynonymCategoryImpl("PSI-MI-short", "Unique short label curated by PSI-MI"));
+        oboSession.addSynonymCategory(new SynonymCategoryImpl("INTACT-alternate", "Alternate label curated by INTACT"));
+        oboSession.addSynonymCategory(new SynonymCategoryImpl("INTACT-short", "Unique short label curated by INTACT"));
     }
-            
+
     private void addFooterInfo() {
         OBOPropertyImpl partOf = new OBOPropertyImpl("part_of");
         partOf.setName("part of");
@@ -204,7 +225,15 @@ public class CvExporter {
         HashMap<String, CvDagObject> cvHash = new HashMap<String, CvDagObject>();
         List<CvDagObject> allUniqCvs = new ArrayList<CvDagObject>();
         for ( CvDagObject cvObj : allCvs ) {
-            cvHash.put( CvObjectUtils.getIdentity( cvObj ), cvObj );
+            String id;
+
+            if (cvObj.getIdentifier() != null){
+                id = cvObj.getIdentifier();
+            }
+            else {
+                id = CvObjectUtils.getIdentity( cvObj );
+            }
+            cvHash.put( id, cvObj );
         }
 
 
@@ -224,7 +253,14 @@ public class CvExporter {
      * @return a OBOClass instance
      */
     protected OBOClass convertCv2OBO( CvDagObject dagObj, Map<String, HashSet<CvDagObject>> cvMapWithParents ) {
-        final String cvId = CvObjectUtils.getIdentity(dagObj);
+        final String cvId;
+
+        if (dagObj.getIdentifier() != null){
+            cvId = dagObj.getIdentifier();
+        }
+        else {
+           cvId = CvObjectUtils.getIdentity(dagObj);
+        }
 
         if ( cvId == null ) {
             throw new NullPointerException( "Identifier is null" );
@@ -239,7 +275,7 @@ public class CvExporter {
         OBOClass oboObj = new OBOClassImpl( dagObj.getFullName(), cvId);
 
         cvToOboCache.put(cvClassId, oboObj);
-        
+
         //assign short label
 
         if ( dagObj.getShortLabel() != null ) {
@@ -255,14 +291,11 @@ public class CvExporter {
             boolean isIdentity = false;
             CvXrefQualifier qualifier = xref.getCvXrefQualifier();
             CvDatabase database = xref.getCvDatabase();
-            String qualMi;
-            String dbMi;
 
-            if ( qualifier != null && database != null &&
-                 ( qualMi = CvObjectUtils.getIdentity( qualifier ) ) != null &&
-                 ( dbMi = CvObjectUtils.getIdentity( database ) ) != null &&
-                 qualMi.equals( CvXrefQualifier.IDENTITY_MI_REF ) &&
-                 dbMi.equals( CvDatabase.PSI_MI_MI_REF ) ) {
+            if ( qualifier != null &&
+                 qualifier.getIdentifier() != null &&
+                 qualifier.getIdentifier().equals( CvXrefQualifier.IDENTITY_MI_REF ) &&
+                 xref.getPrimaryId() != null && xref.getPrimaryId().equals(cvId)) {
                 isIdentity = true;
             }//end if
 

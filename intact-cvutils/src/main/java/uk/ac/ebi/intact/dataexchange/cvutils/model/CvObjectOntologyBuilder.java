@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.cvutils.model;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obo.datamodel.*;
@@ -33,8 +34,6 @@ import uk.ac.ebi.intact.model.visitor.IntactVisitor;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.collect.Maps;
 
 
 /**
@@ -282,6 +281,7 @@ public class CvObjectOntologyBuilder {
 
             //Identity xref is added to all the cvs
             cvObject.addXref( createIdentityXref( cvObject, oboObj.getID() ) );
+            cvObject.setIdentifier(oboObj.getID());
             cvObject.setFullName( oboObj.getName() );
 
             /********************************
