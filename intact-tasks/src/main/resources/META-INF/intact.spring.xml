@@ -25,6 +25,10 @@
         </property>
     </bean>
 
+    <bean id="clusterScoreProcessor" class="uk.ac.ebi.intact.task.mitab.MitabClusterScoreItemProcessor">
+         <property name="miScoreLabel" value="miScore"/>
+    </bean>
+
     <bean id="intactMitabReader" class="uk.ac.ebi.intact.task.mitab.MitabItemReader"
           abstract="true" scope="prototype">
         <property name="documentDefinition">
