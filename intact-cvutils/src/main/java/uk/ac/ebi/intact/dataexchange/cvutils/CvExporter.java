@@ -44,8 +44,14 @@ public class CvExporter {
     //initialize logger
     protected final static Logger log = Logger.getLogger( CvExporter.class );
 
-    private static final String ALIAS_IDENTIFIER = "INTACT-alternate";
-    private static final String SHORTLABEL_IDENTIFIER = "INTACT-short";
+    private static final String INTACT_ALIAS_IDENTIFIER = "INTACT-alternate";
+    private static final String INTACT_SHORTLABEL_IDENTIFIER = "INTACT-short";
+
+    private static final String MI_ALIAS_IDENTIFIER = "PSI-MI-alternate";
+    private static final String MI_SHORTLABEL_IDENTIFIER = "PSI-MI-short";
+
+    private static final String MOD_ALIAS_IDENTIFIER = "PSI-MOD-alternate";
+    private static final String MOD_SHORTLABEL_IDENTIFIER = "PSI-MOD-label";
 
     private Map<CvClassIdentifier, OBOClass> cvToOboCache;
 
@@ -289,6 +295,7 @@ public class CvExporter {
 
         for ( CvObjectXref xref : xrefs ) {
             boolean isIdentity = false;
+            boolean isSecondary = false;
             CvXrefQualifier qualifier = xref.getCvXrefQualifier();
             CvDatabase database = xref.getCvDatabase();
 
@@ -297,9 +304,15 @@ public class CvExporter {
                  qualifier.getIdentifier().equals( CvXrefQualifier.IDENTITY_MI_REF ) &&
                  xref.getPrimaryId() != null && xref.getPrimaryId().equals(cvId)) {
                 isIdentity = true;
-            }//end if
+            }
+            else if(qualifier != null &&
+                    qualifier.getIdentifier() != null &&
+                    qualifier.getIdentifier().equals( CvXrefQualifier.SECONDARY_AC_MI_REF )){
+                isSecondary = true;
+            }
+            //end if
 
-            if ( !isIdentity ) {
+            if ( !isIdentity && !isSecondary) {
 
                 String dbx = "";
 
@@ -436,7 +449,7 @@ public class CvExporter {
         Synonym syn = new SynonymImpl();
         syn.setText( synonym );
         SynonymCategory synCat = new SynonymCategoryImpl();
-        synCat.setID( SHORTLABEL_IDENTIFIER );
+        synCat.setID(INTACT_SHORTLABEL_IDENTIFIER);
         syn.setSynonymCategory( synCat );
         syn.setScope( 1 );
         oboObj.addSynonym( syn );
@@ -485,7 +498,7 @@ public class CvExporter {
         Synonym syn = new SynonymImpl();
         syn.setText( cvAlias.getName() );
         SynonymCategory synCat = new SynonymCategoryImpl();
-        synCat.setID( ALIAS_IDENTIFIER );
+        synCat.setID(INTACT_ALIAS_IDENTIFIER);
         syn.setSynonymCategory( synCat );
         syn.setScope( 1 );
         return syn;
@@ -495,7 +508,7 @@ public class CvExporter {
         Synonym syn = new SynonymImpl();
         syn.setText( shortLabel );
         SynonymCategory synCat = new SynonymCategoryImpl();
-        synCat.setID( SHORTLABEL_IDENTIFIER );
+        synCat.setID(INTACT_SHORTLABEL_IDENTIFIER);
         syn.setSynonymCategory( synCat );
         syn.setScope( 1 );
         return syn;
