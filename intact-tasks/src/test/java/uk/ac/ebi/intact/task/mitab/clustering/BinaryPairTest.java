@@ -14,6 +14,15 @@ import org.junit.Test;
 public class BinaryPairTest {
 
     @Test
+    public void compare_two_interactors_same_orders(){
+        BinaryPair pair1 = new BinaryPair("test1", "test2");
+        BinaryPair pair2 = new BinaryPair("test1", "test2");
+
+        Assert.assertEquals(pair1, pair2);
+        Assert.assertEquals(0, pair1.compareTo(pair2));
+    }
+
+    @Test
     public void compare_two_interactors_different_orders(){
         BinaryPair pair1 = new BinaryPair("test1", "test2");
         BinaryPair pair2 = new BinaryPair("test2", "test1");
