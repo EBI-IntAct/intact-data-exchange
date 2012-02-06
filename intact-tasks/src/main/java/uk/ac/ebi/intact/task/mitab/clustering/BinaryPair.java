@@ -174,8 +174,8 @@ public class BinaryPair implements Comparable<BinaryPair>{
         String [] interactors2 = orderInteractors(binaryPair.getInteractorA(), binaryPair.getInteractorB());
         
         String firstInteractor1 = interactors1[0];
-        String firstInteractor2 = interactors1[1];
-        String secondInteractor1 = interactors2[0];
+        String firstInteractor2 = interactors2[0];
+        String secondInteractor1 = interactors1[1];
         String secondInteractor2 = interactors2[1];
         
         int comp1 = compareInteractors(firstInteractor1, firstInteractor2);
