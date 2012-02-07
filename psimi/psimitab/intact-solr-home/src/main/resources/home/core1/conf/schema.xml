@@ -384,6 +384,7 @@
      <field name="interpro" type="string" indexed="true" stored="false" multiValued="true"/>
      <field name="psi-mi" type="string" indexed="true" stored="false" multiValued="true"/>
      <field name="chebi" type="string" indexed="true" stored="false" multiValued="true"/>
+     <field name="uniprotkb" type="string" indexed="true" stored="false" multiValued="true"/>
 
      <field name="rigid" type="string" indexed="true" stored="true" multiValued="false"/>
 
@@ -394,7 +395,7 @@
 
      <field name="spell" type="textSpell" indexed="true" stored="true" multiValued="true"/>
 
-     <field name="intact-mi-score" type="sdouble" indexed="true" stored="false" multiValued="true"/>
+     <field name="intact-miscore" type="sdouble" indexed="true" stored="false" multiValued="true"/>
 
      <!-- EXAMPLE -->
    <!--<field name="id" type="string" indexed="true" stored="true" required="false" />-->
