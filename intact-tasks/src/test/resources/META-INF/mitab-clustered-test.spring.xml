@@ -14,6 +14,19 @@
            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
            http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
 
+    <!-- Initialize the datasource -->
+    <bean id="intactDataSourceInitializer" class="uk.ac.ebi.intact.core.batch.BatchDatasourceInitializer">
+        <property name="dataSource" ref="intactBatchDataSource"/>
+        <property name="initScripts" value="classpath*:/org/springframework/batch/core/schema-h2.sql"/>
+    </bean>
+
+    <bean id="intactBatchDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="org.h2.Driver"/>
+        <property name="url" value="jdbc:h2:mem:intactbatch"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+    </bean>
+
     <bean id="mitabClusteredProcessor" class="uk.ac.ebi.intact.task.mitab.clustering.MitabClusterScoreItemProcessor">
         <property name="miScoreLabel" value="miScore"/>
         <property name="hasHeader" value="true"/>
