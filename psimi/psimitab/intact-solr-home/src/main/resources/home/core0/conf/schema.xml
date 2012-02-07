@@ -394,7 +394,7 @@
 
      <field name="spell" type="textSpell" indexed="true" stored="true" multiValued="true"/>
 
-     <field name="mi-score" type="sdouble" indexed="true" stored="false" multiValued="true"/>
+     <field name="intact-mi-score" type="sdouble" indexed="true" stored="false" multiValued="true"/>
 
      <!-- EXAMPLE -->
    <!--<field name="id" type="string" indexed="true" stored="true" required="false" />-->
