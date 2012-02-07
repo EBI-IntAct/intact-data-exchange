@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.converter;
 
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -29,8 +30,11 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BaseFieldEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.FieldEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.OntologyFieldEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.util.IntactSolrUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.util.SchemaInfo;
 import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -44,29 +48,37 @@ import java.util.List;
 public class SolrDocumentConverter {
 
     private DocumentDefinition documentDefintion;
+    private SchemaInfo schemaInfo;
 
     /**
      * Access to the Ontology index.
      */
     private FieldEnricher fieldEnricher;
 
-    public SolrDocumentConverter() {
-        this(new IntactDocumentDefinition());
-    }
-
-    public SolrDocumentConverter(DocumentDefinition documentDefintion) {
-        this.documentDefintion = documentDefintion;
+    public SolrDocumentConverter(SolrServer solrServer) {
+        this.documentDefintion = new IntactDocumentDefinition();
         this.fieldEnricher = new BaseFieldEnricher();
+
+        try {
+            this.schemaInfo = IntactSolrUtils.retrieveSchemaInfo(solrServer);
+        } catch (IOException e) {
+            throw new RuntimeException("Problem fetching schema info from solr server: "+solrServer);
+        }
     }
 
-    public SolrDocumentConverter(DocumentDefinition documentDefintion,
+    public SolrDocumentConverter(SolrServer solrServer, DocumentDefinition documentDefintion) {
+        this(solrServer);
+        this.documentDefintion = documentDefintion;
+    }
+
+    public SolrDocumentConverter(SolrServer solrServer, DocumentDefinition documentDefintion,
                                  FieldEnricher fieldEnricher) {
-        this(documentDefintion);
+        this(solrServer, documentDefintion);
         this.fieldEnricher = fieldEnricher;
     }
 
-    public SolrDocumentConverter(DocumentDefinition documentDefintion, OntologySearcher ontologySearcher) {
-        this(documentDefintion, new OntologyFieldEnricher(ontologySearcher));
+    public SolrDocumentConverter(SolrServer solrServer, DocumentDefinition documentDefintion, OntologySearcher ontologySearcher) {
+        this(solrServer, documentDefintion, new OntologyFieldEnricher(ontologySearcher));
     }
 
     public SolrInputDocument toSolrDocument(String mitabLine) throws SolrServerException {
@@ -156,11 +168,11 @@ public class SolrDocumentConverter {
     public Row toRow(SolrDocument doc) {
         return toRow((Object)doc);
     }
-    
+
     public Row toRow(SolrInputDocument doc) {
         return toRow((Object)doc);
     }
-    
+
     protected Row toRow(Object doc) {
         int i = 0;
 
@@ -210,7 +222,7 @@ public class SolrDocumentConverter {
         } else if (doc instanceof SolrInputDocument) {
             return ((SolrInputDocument)doc).getFieldValues(fieldName);
         }
-       
+
         throw new IllegalArgumentException("Unexpected object type: "+doc.getClass().getName());
     }
 
@@ -250,7 +262,7 @@ public class SolrDocumentConverter {
     }
 
     private void addColumnToDoc(SolrInputDocument doc, Row row, String fieldName, int columnIndex,  boolean expandableColumn) throws SolrServerException {
-        addColumnToDoc(doc, row, fieldName, columnIndex, 1f, expandableColumn); 
+        addColumnToDoc(doc, row, fieldName, columnIndex, 1f, expandableColumn);
     }
 
     private void addColumnToDoc(SolrInputDocument doc, Row row, String fieldName, int columnIndex, float boost, boolean expandableColumn) throws SolrServerException {
@@ -290,9 +302,12 @@ public class SolrDocumentConverter {
             }
             addDescriptionField(doc, field.getType(), field);
             addField(doc, fieldName, field.toString(), boost);
-            addField(doc, fieldName+"_ms", field.toString(), boost);
+            addField(doc, fieldName + "_ms", field.toString(), boost);
 
             if (field.getType() != null) {
+                if (schemaInfo.hasFieldName(field.getType())) {
+                    addField(doc, field.getType(), field.getValue(), boost);
+                }
                 addField(doc, field.getType()+"_xref", field.getValue(), boost);
                 addField(doc, fieldName+"_"+field.getType()+"_xref", field.getValue(), boost);
                 addField(doc, fieldName+"_"+field.getType()+"_xref_ms", field.toString(), boost);

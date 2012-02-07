@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import psidev.psi.mi.tab.model.builder.Row;
@@ -33,13 +34,15 @@ import java.util.Collection;
  */
 public class SolrSearchResult {
 
+    private SolrServer solrServer;
     private QueryResponse queryResponse;
 
     private Collection<String> lineList;
     private Collection<Row> rowList;
     private Collection<IntactBinaryInteraction> binaryInteractionList;
 
-    public SolrSearchResult(QueryResponse queryResponse) {
+    public SolrSearchResult(SolrServer solrServer, QueryResponse queryResponse) {
+        this.solrServer = solrServer;
         this.queryResponse = queryResponse;
     }
 
@@ -53,7 +56,7 @@ public class SolrSearchResult {
         }
 
         lineList = new ArrayList<String>(Long.valueOf(getTotalCount()).intValue());
-        SolrDocumentConverter converter = new SolrDocumentConverter(new IntactDocumentDefinition());
+        SolrDocumentConverter converter = new SolrDocumentConverter(solrServer, new IntactDocumentDefinition());
 
         for (SolrDocument doc : queryResponse.getResults()) {
             lineList.add(converter.toMitabLine(doc));
@@ -68,7 +71,7 @@ public class SolrSearchResult {
         }
 
         rowList = new ArrayList<Row>(Long.valueOf(getTotalCount()).intValue());
-        SolrDocumentConverter converter = new SolrDocumentConverter(new IntactDocumentDefinition());
+        SolrDocumentConverter converter = new SolrDocumentConverter(solrServer, new IntactDocumentDefinition());
 
         for (SolrDocument doc : queryResponse.getResults()) {
             rowList.add(converter.toRow(doc));
@@ -83,7 +86,7 @@ public class SolrSearchResult {
         }
 
         binaryInteractionList = new ArrayList<IntactBinaryInteraction>(Long.valueOf(getTotalCount()).intValue());
-        SolrDocumentConverter converter = new SolrDocumentConverter(new IntactDocumentDefinition());
+        SolrDocumentConverter converter = new SolrDocumentConverter(solrServer, new IntactDocumentDefinition());
 
         for (SolrDocument doc : queryResponse.getResults()) {
             binaryInteractionList.add((IntactBinaryInteraction) converter.toBinaryInteraction(doc));

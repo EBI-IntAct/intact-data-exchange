@@ -112,7 +112,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         Assert.assertEquals(1, ontologyNames.size());
         Assert.assertEquals("go", ontologyNames.iterator().next());
 
-        SolrDocumentConverter converter = new SolrDocumentConverter(new IntactDocumentDefinition(), ontologySearcher);
+        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer(), new IntactDocumentDefinition(), ontologySearcher);
 
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
 
@@ -138,7 +138,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
                               "\tMI:0499(unspecified role)\tinterpro:IPR004829|\t"+goTermToExpand+"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
 
         OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
-        SolrDocumentConverter converter = new SolrDocumentConverter(new IntactDocumentDefinition(), ontologySearcher);
+        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer(), new IntactDocumentDefinition(), ontologySearcher);
 
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
 
@@ -169,7 +169,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         getIndexer().indexOntology(taxonomyIterator);
 
         OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
-        SolrDocumentConverter converter = new SolrDocumentConverter(new IntactDocumentDefinition(), ontologySearcher);
+        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer(), new IntactDocumentDefinition(), ontologySearcher);
 
         SolrInputDocument doc = converter.toSolrDocument(mitab);
 

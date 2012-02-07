@@ -63,7 +63,7 @@ public class IntactSolrIndexer {
 
     public IntactSolrIndexer(SolrServer solrServer) {
         this.solrServer = solrServer;
-        this.converter = new SolrDocumentConverter(new IntactDocumentDefinition());
+        this.converter = new SolrDocumentConverter(solrServer, new IntactDocumentDefinition());
 
         SolrLogger.readFromLog4j();
     }
@@ -75,7 +75,7 @@ public class IntactSolrIndexer {
     public IntactSolrIndexer(SolrServer solrServer, StreamingUpdateSolrServer ontologySolrServer) {
         this(solrServer);
         this.ontologySolrServer = ontologySolrServer;
-        this.converter = new SolrDocumentConverter(new IntactDocumentDefinition(), new OntologySearcher(ontologySolrServer));
+        this.converter = new SolrDocumentConverter(solrServer, new IntactDocumentDefinition(), new OntologySearcher(ontologySolrServer));
     }
 
     ///////////////////////////

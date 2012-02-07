@@ -1,8 +1,12 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrServer;
 import org.junit.After;
 import org.junit.Before;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
+
+import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,7 +24,7 @@ public class AbstractSolrTestCase {
 
     @Before
     public void before() throws Exception {
-        solrJettyRunner = new SolrJettyRunner();
+        solrJettyRunner = new SolrJettyRunner(new File(System.getProperty("basedir"), "solr-home-test"));
         solrJettyRunner.start();
 
         indexer = new IntactSolrIndexer( solrJettyRunner.getSolrServer( CoreNames.CORE_PUB ),
@@ -31,8 +35,10 @@ public class AbstractSolrTestCase {
     public void after() throws Exception {
 //        solrJettyRunner.join();
         solrJettyRunner.stop();
-        solrJettyRunner = null;
 
+        FileUtils.deleteQuietly(solrJettyRunner.getSolrHome());
+
+        solrJettyRunner = null;
         indexer = null;
     }
 
@@ -54,5 +60,9 @@ public class AbstractSolrTestCase {
         IntactSolrSearcher searcher = new IntactSolrSearcher( solrJettyRunner.getSolrServer( CoreNames.CORE_PUB ) );
         SolrSearchResult result = searcher.search( searchQuery, null, null );
         assertEquals( expectedCount.longValue(), result.getTotalCount() );
+    }
+
+    protected SolrServer getSolrServer() {
+        return solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
     }
 }

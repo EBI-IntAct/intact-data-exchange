@@ -93,7 +93,7 @@ public class IntactSolrSearcher {
         }
 
         QueryResponse queryResponse = executeQuery(query);
-        return new SolrSearchResult(queryResponse);
+        return new SolrSearchResult(solrServer, queryResponse);
     }
 
     public Collection<InteractorIdCount> searchInteractors(SolrQuery query, String interactorMi) throws IntactSolrException {

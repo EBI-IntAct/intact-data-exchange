@@ -19,6 +19,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.junit.Assert;
 import org.junit.Test;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.AbstractSolrTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.FieldNames;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
@@ -28,7 +29,7 @@ import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class SolrDocumentConverterTest {
+public class SolrDocumentConverterTest extends AbstractSolrTestCase {
 
     @Test
     public void testToSolrDocument() throws Exception {
@@ -39,7 +40,7 @@ public class SolrDocumentConverterTest {
                               "\tintact:EBI-446356|irefindex:"+ rigid +"("+ FieldNames.RIGID+")\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
                               "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tgo:\"GO:0030246\"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
 
-        SolrDocumentConverter converter = new SolrDocumentConverter();
+        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer());
 
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
 
@@ -56,7 +57,7 @@ public class SolrDocumentConverterTest {
                               "\tintact:EBI-446356|irefindex:arigidblabla("+ FieldNames.RIGID+")\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
                               "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tgo:\"GO:0030246\"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
 
-        SolrDocumentConverter converter = new SolrDocumentConverter();
+        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer());
          //mitab to solrinputdoc
         SolrInputDocument inputDoc1 = converter.toSolrDocument(psiMiTabLine);
         //solrinputdoc to binaryinteraction 
@@ -80,7 +81,7 @@ public class SolrDocumentConverterTest {
                               "\tintact:EBI-446356|irefindex:arigidblabla(" + FieldNames.RIGID + ")\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
                               "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tgo:\"GO:0030246\"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
 
-        SolrDocumentConverter converter = new SolrDocumentConverter();
+        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer());
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
 
         final SolrInputField field = doc.getField("intact_byInteractorType_mi0326");
@@ -98,7 +99,7 @@ public class SolrDocumentConverterTest {
                               "\tintact:EBI-446356|irefindex:arigidblabla(" + FieldNames.RIGID + ")\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
                               "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tgo:\"GO:0030246\"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
 
-        SolrDocumentConverter converter = new SolrDocumentConverter();
+        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer());
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
 
         final SolrInputField intactIdField = doc.getField("intact_id");
@@ -120,7 +121,7 @@ public class SolrDocumentConverterTest {
                               "\tintact:EBI-446356|irefindex:arigidblabla(" + FieldNames.RIGID + ")\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
                               "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tgo:\"GO:0030246\"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
 
-        SolrDocumentConverter converter = new SolrDocumentConverter();
+        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer());
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
 
         final SolrInputField field = doc.getField("geneName");

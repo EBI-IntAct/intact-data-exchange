@@ -15,7 +15,6 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.server;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
@@ -27,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -44,29 +42,22 @@ public class SolrJettyRunner {
     private int port = 18080;
 
     private Server server;
+    private SolrServer solrServer;
 
     private File workingDir;
     private File solrHome;
 
     private URL solrHomeJar;
 
-    private boolean deleteSolrHomeOnServerStop = false;
 
     public SolrJettyRunner() {
-        workingDir = new File(System.getProperty("java.io.tmpdir"), "solr-home-"+System.currentTimeMillis());
-
-        try {
-            deleteSolrHomeOnServerStop = true;
-            FileUtils.forceDeleteOnExit(workingDir);
-        } catch (IOException e) {
-            throw new IllegalStateException("Problem forcing delete on exit for: "+workingDir, e);
-        }
-
-        if (log.isInfoEnabled()) log.info("Jetty working dir: "+workingDir);
+        this(new File(System.getProperty("java.io.tmpdir"), "solr-home-"+System.currentTimeMillis()));
     }
 
     public SolrJettyRunner(File workingDir) {
         this.workingDir = workingDir;
+
+        if (log.isInfoEnabled()) log.info("Jetty working dir: "+workingDir);
 
     }
 
@@ -79,8 +70,9 @@ public class SolrJettyRunner {
     public void start() throws Exception {
         File solrWar;
 
-        if (workingDir.exists()) {
-            solrHome = new File(workingDir, "home");
+        solrHome = new File(workingDir, "home");
+
+        if (solrHome.exists()) {
             solrWar = new File(workingDir, "solr.war");
 
             if (!solrHome.exists()) {
@@ -132,13 +124,6 @@ public class SolrJettyRunner {
 
     public void stop() throws Exception {
         if (server != null) server.stop();
-        if( deleteSolrHomeOnServerStop ) {
-            try {
-                FileUtils.forceDeleteOnExit(workingDir);
-            } catch (IOException e) {
-                throw new IllegalStateException("Problem forcing delete on exit for: "+workingDir, e);
-            }
-        }
     }
 
     public File getSolrHome() {
@@ -151,10 +136,12 @@ public class SolrJettyRunner {
 
     public SolrServer getSolrServer(String coreName) {
         try {
-            return new CommonsHttpSolrServer(getSolrUrl(coreName));
+            solrServer = new CommonsHttpSolrServer(getSolrUrl(coreName));
         } catch (MalformedURLException e) {
             throw new IllegalStateException("URL should be well formed", e);
         }
+
+        return solrServer;
     }
 
     public StreamingUpdateSolrServer getStreamingSolrServer(String coreName) {

@@ -18,7 +18,7 @@
 
     <properties>
         <!-- Used to populate the properties file, to define the repository where the solr home template will be found -->
-        <intact.solr.home.repositoryBase>http://www.ebi.ac.uk/~maven/m2repo</intact.solr.home.repositoryBase>
+        <intact.solr.home.repositoryBase>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</intact.solr.home.repositoryBase>
     </properties>
 
     <build>

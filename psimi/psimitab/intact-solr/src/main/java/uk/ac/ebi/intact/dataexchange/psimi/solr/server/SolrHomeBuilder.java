@@ -15,19 +15,26 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.server;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
 
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.net.*;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
-import sun.net.www.protocol.file.FileURLConnection;
 
 /**
  * Creates a filesystem to host a solr home with IntAct configuration.
@@ -43,8 +50,11 @@ public class SolrHomeBuilder {
 
     private File solrHomeDir;
     private File solrWar;
+    private HttpClient httpClient;
 
     public SolrHomeBuilder() {
+        this.httpClient = new HttpClient();
+
        Properties props = new Properties();
 
         try {
@@ -62,15 +72,81 @@ public class SolrHomeBuilder {
         String artifactId = "intact-solr-home";
         String version = props.getProperty("intact.solr.home.version");
 
-        if (exists(repo, groupId, artifactId, version)) {
-            solrHomeJar = createJarUrl(repo, groupId, artifactId, version);
-        } else if (exists(localRepo, groupId, artifactId, version)) {
-            solrHomeJar = createJarUrl(localRepo, groupId, artifactId, version);
-        } else if (!version.endsWith("-SNAPSHOT") && exists(repo, groupId, artifactId, version+"-SNAPSHOT")){
-            solrHomeJar = createJarUrl(repo, groupId, artifactId, version+"-SNAPSHOT");
-        } else {
-            throw new IllegalStateException("SolrHomeJar not found");
+        URL artifactUrl = null;
+        try {
+            artifactUrl = findArtifactUrl(repo, groupId, artifactId, version);
+        } catch (IOException e) {
+            throw new IllegalStateException("Problem finding artifact url: "+artifactUrl);
         }
+        
+        if (exists(artifactUrl)) {
+            solrHomeJar = createJarUrl(artifactUrl);
+        } else {
+            URL localArtifactUrl = null;
+            try {
+                localArtifactUrl = findArtifactUrl(localRepo, groupId, artifactId, version);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Problem creating local artifact url");
+            }
+
+            if (exists(localArtifactUrl)) {
+                solrHomeJar = createJarUrl(localArtifactUrl);
+            } else {
+                throw new IllegalStateException("SolrHomeJar not found");
+            }
+        }
+    }
+
+    private URL findArtifactUrl(String repo, String groupId, String artifactId, String version) throws IOException {
+        if (version.endsWith("-SNAPSHOT") && repo.startsWith("http://")) {
+            repo = repo +"-snapshots";
+        } else {
+            return new URL(getBaseUrl(repo, groupId, artifactId, version)+artifactId+"-"+version+".jar");
+        }
+
+        String baseUrl = getBaseUrl(repo, groupId, artifactId, version);
+
+        URL url = null;
+
+        try {
+            url = new URL(baseUrl + "maven-metadata.xml");
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Problem fetching metadata in Maven repository: " + url, e);
+        }
+
+        GetMethod method = new GetMethod(url.toString());
+        int code = httpClient.executeMethod(method);
+
+        if (code != 200) {
+            throw new IOException("Cannot fetch metadata: "+url);
+        }
+
+        XPath xpath = XPathFactory.newInstance().newXPath();
+
+        InputSource inputSource = new InputSource(method.getResponseBodyAsStream());
+
+        try {
+            NodeList snapshotsNodes = (NodeList) xpath.evaluate("/metadata/versioning/snapshot", inputSource, XPathConstants.NODESET);
+
+            Node node = snapshotsNodes.item(0);
+
+            NodeList snapshotChildNodes = node.getChildNodes();
+
+            String timestamp = snapshotChildNodes.item(1).getTextContent();
+            String buildNumber = snapshotChildNodes.item(3).getTextContent();
+
+            return new URL(baseUrl+artifactId+"-"+version.replaceAll("-SNAPSHOT", "")+"-"+timestamp+"-"+buildNumber+".jar");
+
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+    private String getBaseUrl(String repo, String groupId, String artifactId, String version) {
+        return repo + "/" + groupId.replaceAll("\\.", "/") + "/" + artifactId + "/" + version + "/";
     }
 
     public SolrHomeBuilder(URL solrHomeJar) {
@@ -89,16 +165,15 @@ public class SolrHomeBuilder {
         SolrLogger.readFromLog4j();
     }
 
-    private URL createJarUrl(String repo, String groupId, String artifactId, String version) {
-        return createUrl(repo, groupId, artifactId, version, "jar:", "!/");
+    private URL createJarUrl(URL artifactUrl) {
+        return createUrl(artifactUrl, "jar:", "!/");
     }
 
-    private URL createHttpUrl(String repo, String groupId, String artifactId, String version) {
-        return createUrl(repo, groupId, artifactId, version, "", "");
+    private URL createHttpUrl(URL artifactUrl) {
+        return createUrl(artifactUrl, "", "");
     }
 
-    private boolean exists(String repo, String groupId, String artifactId, String version) {
-        URL url = createHttpUrl(repo, groupId, artifactId, version);
+    private boolean exists(URL url) {
         try {
             URLConnection urlConnection = url.openConnection();
             if (urlConnection instanceof HttpURLConnection) {
@@ -113,26 +188,11 @@ public class SolrHomeBuilder {
         }
     }
 
-    private URL createUrl(String repo, String groupId, String artifactId, String version, String prefix, String suffix) {
-        StringBuilder sb = new StringBuilder(256);
-        sb.append(prefix);
-        sb.append(repo);
-
-        if (version.endsWith("-SNAPSHOT") && repo.startsWith("http://")) {
-            sb.append("_snapshots");
-        }
-
-        sb.append("/");
-        sb.append(groupId.replaceAll("\\.", "/")).append("/");
-        sb.append(artifactId).append("/");
-        sb.append(version).append("/");
-        sb.append("intact-solr-home-").append(version).append(".jar");
-        sb.append(suffix);
-
+    private URL createUrl(URL artifactUrl, String prefix, String suffix) {
         try {
-            return new URL(sb.toString());
+            return new URL(prefix+artifactUrl.toString()+suffix);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Problem creating url: "+ sb, e);
+            throw new RuntimeException("Problem creating url: "+ artifactUrl, e);
         }
     }
 
