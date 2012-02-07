@@ -28,6 +28,12 @@
     <bean id="clusterScoreProcessor" class="uk.ac.ebi.intact.task.mitab.clustering.MitabClusterScoreItemProcessor">
         <property name="miScoreLabel" value="miScore"/>
         <property name="hasHeader" value="true"/>
+        <property name="databasesForUniqIdentifier">
+            <list>
+                <value>uniprotkb</value>
+                <value>intact</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="intactMitabReader" class="uk.ac.ebi.intact.task.mitab.MitabItemReader"

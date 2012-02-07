@@ -7,18 +7,12 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import psidev.psi.mi.tab.PsimiTabReader;
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.Confidence;
-import psidev.psi.mi.tab.model.ConfidenceImpl;
-import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.converter.ConverterException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * This processor retrieves cluster score for a binary interactions.
@@ -38,6 +32,8 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
     private Map<BinaryPair, Double> scores;
     private String miScoreLabel;
     private boolean hasHeader = false;
+    
+    private String[] databasesForUniqIdentifier;
 
     public MitabClusterScoreItemProcessor(){
         scores = new TreeMap<BinaryPair, Double>();
@@ -103,10 +99,25 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
             return null;
         }
 
-        if (!interactor.getIdentifiers().isEmpty()){
+        if (!interactor.getIdentifiers().isEmpty() && databasesForUniqIdentifier == null){
             if (interactor.getIdentifiers().size() > 1){
                 log.warn("Interactor with more than one identifiers : " + interactor.toString() + ". Only the first identifier is taken into account");
             }
+
+            return interactor.getIdentifiers().iterator().next().getIdentifier();
+        }
+        else if (!interactor.getIdentifiers().isEmpty()){
+            
+            for (String db : databasesForUniqIdentifier){
+
+                for (CrossReference ref : interactor.getIdentifiers()){
+                    if (ref.getDatabase() != null && ref.getDatabase().equalsIgnoreCase(db)){
+                        return ref.getIdentifier();
+                    }
+                }
+            }
+
+            log.warn("The identifiers of interactor " + interactor.toString() + " are not recognized so only the first identifier will be taken into account");
 
             return interactor.getIdentifiers().iterator().next().getIdentifier();
         }
@@ -179,5 +190,14 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
     public void close() throws ItemStreamException {
 
         scores.clear();
+    }
+
+    public String[] getDatabasesForUniqIdentifier() {
+        
+        return databasesForUniqIdentifier;
+    }
+
+    public void setDatabasesForUniqIdentifier(String[] databasesForUniqIdentifier) {
+        this.databasesForUniqIdentifier = databasesForUniqIdentifier;
     }
 }
