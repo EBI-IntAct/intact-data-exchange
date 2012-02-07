@@ -35,7 +35,7 @@ import java.util.Map;
  */
 @ContextConfiguration(locations = {"/META-INF/mitab-creation.spring.xml", "/META-INF/job-tests.spring.xml"})
 @Transactional(propagation = Propagation.NEVER)
-public class DatabaseToMitabExportTest extends IntactBasicTestCase{
+public class DatabaseToMitabExportJobTest extends IntactBasicTestCase{
 
     @Resource(name = "intactBatchJobLauncher")
     private JobLauncher jobLauncher;
