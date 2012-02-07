@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.task.mitab;
+package uk.ac.ebi.intact.task.mitab.clustering;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,7 +12,6 @@ import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.ConfidenceImpl;
 import psidev.psi.mi.tab.model.Interactor;
 import psidev.psi.mi.xml.converter.ConverterException;
-import uk.ac.ebi.intact.task.mitab.clustering.BinaryPair;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,6 +82,14 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
 
     public void setMiScoreLabel(String miScoreLabel) {
         this.miScoreLabel = miScoreLabel;
+    }
+
+    public boolean isHasHeader() {
+        return hasHeader;
+    }
+
+    public void setHasHeader(boolean hasHeader) {
+        this.hasHeader = hasHeader;
     }
 
     /**

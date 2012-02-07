@@ -25,8 +25,9 @@
         </property>
     </bean>
 
-    <bean id="clusterScoreProcessor" class="uk.ac.ebi.intact.task.mitab.MitabClusterScoreItemProcessor">
-         <property name="miScoreLabel" value="miScore"/>
+    <bean id="clusterScoreProcessor" class="uk.ac.ebi.intact.task.mitab.clustering.MitabClusterScoreItemProcessor">
+        <property name="miScoreLabel" value="miScore"/>
+        <property name="hasHeader" value="true"/>
     </bean>
 
     <bean id="intactMitabReader" class="uk.ac.ebi.intact.task.mitab.MitabItemReader"
@@ -60,5 +61,5 @@
             </list>
         </property>
     </bean>
-    
+
 </beans>

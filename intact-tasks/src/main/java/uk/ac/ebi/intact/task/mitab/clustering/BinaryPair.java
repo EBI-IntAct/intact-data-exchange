@@ -14,8 +14,10 @@ public class BinaryPair implements Comparable<BinaryPair>{
     private String interactorB;
     
     public BinaryPair(String interactorA, String interactorB){
-        this.interactorA = interactorA;
-        this.interactorB = interactorB;
+        String [] orderedInteractors = orderInteractors(interactorA, interactorB);
+        
+        this.interactorA = orderedInteractors[0];
+        this.interactorB = orderedInteractors[1];
     }
 
     public String getInteractorA() {
@@ -40,22 +42,8 @@ public class BinaryPair implements Comparable<BinaryPair>{
             result = interactorA.hashCode();
         }
         else {
-            int compare = interactorA.compareTo(interactorB);
-
-            if (compare == 0){
-                result = interactorA.hashCode();
-                result = 31 * interactorB.hashCode();
-            }
-            // interactor A is before interactor B
-            else if (compare < 0){
-                result = interactorA.hashCode();
-                result = 31 * interactorB.hashCode();
-            }
-            // interactor B is before interactor A
-            else {
-                result = interactorB.hashCode();
-                result = 31 * interactorA.hashCode(); 
-            }
+            result = interactorA.hashCode();
+            result = 31 * interactorB.hashCode();
         }
 
         return result;
@@ -78,60 +66,20 @@ public class BinaryPair implements Comparable<BinaryPair>{
             if (pair2.getInteractorA() == null || pair2.getInteractorB() == null){
                 return false;
             }
-            else if (interactorA.equals(pair2.getInteractorA())){
-                return interactorB.equals(pair2.getInteractorB());
-            }
-            else if (interactorA.equals(pair2.getInteractorB())){
-                return interactorB.equals(pair2.getInteractorA());
-            }
-            else {
+            else if (!interactorA.equals(pair2.getInteractorA()) || !interactorB.equals(pair2.getInteractorB())){
                 return false;
             }
         }
-        else if (interactorA == null && interactorB == null){
-             if (pair2.getInteractorA() != null || pair2.getInteractorB() != null){
-                 return false;
-             }
+        else if (interactorA == null && interactorB == null && (pair2.getInteractorA() != null || pair2.getInteractorB() != null)){
+             return false;
         }
         else if (interactorA == null && interactorB != null){
-            if (pair2.getInteractorA() == null){
-                if (pair2.getInteractorB() == null){
-                    return false;
-                }
-                else {
-                    return pair2.getInteractorB().equals(interactorB);
-                }
-            }
-            else if (pair2.getInteractorB() == null){
-                if (pair2.getInteractorA() == null){
-                    return false;
-                }
-                else {
-                    return pair2.getInteractorA().equals(interactorB);
-                }
-            }
-            else {
+            if (pair2.getInteractorA() != null || pair2.getInteractorB() == null || (pair2.getInteractorB() != null && interactorB.equals(pair2.getInteractorB()))){
                 return false;
             }
         }
-        else {
-            if (pair2.getInteractorA() == null){
-                if (pair2.getInteractorB() == null){
-                    return false;
-                }
-                else {
-                    return pair2.getInteractorB().equals(interactorA);
-                }
-            }
-            else if (pair2.getInteractorB() == null){
-                if (pair2.getInteractorA() == null){
-                    return false;
-                }
-                else {
-                    return pair2.getInteractorA().equals(interactorA);
-                }
-            }
-            else {
+        else if (interactorB == null && interactorA != null){
+            if (pair2.getInteractorB() != null || pair2.getInteractorA() == null || (pair2.getInteractorA() != null && interactorA.equals(pair2.getInteractorA()))){
                 return false;
             }
         }
@@ -170,18 +118,10 @@ public class BinaryPair implements Comparable<BinaryPair>{
         final int BEFORE = -1;
         final int AFTER = 1;
         
-        String [] interactors1 = orderInteractors(interactorA, interactorB);
-        String [] interactors2 = orderInteractors(binaryPair.getInteractorA(), binaryPair.getInteractorB());
-        
-        String firstInteractor1 = interactors1[0];
-        String firstInteractor2 = interactors2[0];
-        String secondInteractor1 = interactors1[1];
-        String secondInteractor2 = interactors2[1];
-        
-        int comp1 = compareInteractors(firstInteractor1, firstInteractor2);
+        int comp1 = compareInteractors(interactorA, binaryPair.getInteractorA());
 
         if (comp1 == 0){
-            return compareInteractors(secondInteractor1, secondInteractor2);
+            return compareInteractors(interactorB, binaryPair.getInteractorB());
         }
         else if (comp1 < 0){
             return BEFORE;
