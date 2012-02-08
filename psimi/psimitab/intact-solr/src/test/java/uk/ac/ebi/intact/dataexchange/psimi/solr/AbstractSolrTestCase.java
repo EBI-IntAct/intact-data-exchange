@@ -6,8 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
 
-import java.io.File;
-
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -24,7 +22,7 @@ public class AbstractSolrTestCase {
 
     @Before
     public void before() throws Exception {
-        solrJettyRunner = new SolrJettyRunner(new File(System.getProperty("basedir"), "solr-home-test"));
+        solrJettyRunner = new SolrJettyRunner();
         solrJettyRunner.start();
 
         indexer = new IntactSolrIndexer( solrJettyRunner.getSolrServer( CoreNames.CORE_PUB ),

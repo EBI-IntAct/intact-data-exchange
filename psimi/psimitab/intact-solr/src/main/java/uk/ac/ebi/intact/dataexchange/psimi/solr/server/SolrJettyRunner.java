@@ -70,9 +70,8 @@ public class SolrJettyRunner {
     public void start() throws Exception {
         File solrWar;
 
-        solrHome = new File(workingDir, "home");
-
-        if (solrHome.exists()) {
+        if (workingDir.exists()) {
+            solrHome = new File(workingDir, "home");
             solrWar = new File(workingDir, "solr.war");
 
             if (!solrHome.exists()) {
