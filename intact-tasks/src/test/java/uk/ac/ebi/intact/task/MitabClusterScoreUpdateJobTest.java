@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.task;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,5 +63,8 @@ public class MitabClusterScoreUpdateJobTest extends IntactBasicTestCase {
         
         File generatedMitab = new File("target/lala.txt");
         Assert.assertTrue(generatedMitab.exists());
+        
+        File expectedMitab = new File(MitabClusterScoreUpdateJobTest.class.getResource("/resulting_mitab_score.txt").getFile());
+        Assert.assertEquals(FileUtils.checksumCRC32(generatedMitab), FileUtils.checksumCRC32(expectedMitab));
     }
 }
