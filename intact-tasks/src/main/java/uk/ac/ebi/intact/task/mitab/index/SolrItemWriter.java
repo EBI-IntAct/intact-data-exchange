@@ -58,7 +58,7 @@ public class SolrItemWriter implements BinaryInteractionItemWriter, ItemStream{
 
         SolrServer interactionsSolrServer = getInteractionsSolrServer();
 
-        SolrDocumentConverter solrDocumentConverter = new SolrDocumentConverter(interactionsSolrServer, documentDefinition);
+        SolrDocumentConverter solrDocumentConverter = new SolrDocumentConverter(interactionsSolrServer, documentDefinition, ontologySearcher);
 
         for (BinaryInteraction binaryInteraction : items) {
             SolrInputDocument solrInputDoc = solrDocumentConverter.toSolrDocument(binaryInteraction);

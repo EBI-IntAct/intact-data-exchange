@@ -42,7 +42,6 @@ import java.util.*;
  * @version $Id$
  */
 public class InteractionExpansionCompositeProcessor implements ItemProcessor<Interaction, Collection<? extends BinaryInteraction>> {
-
     private static final Log log = LogFactory.getLog( InteractionExpansionCompositeProcessor.class );
 
     private static final String SMALLMOLECULE_MI_REF = "MI:0328";
