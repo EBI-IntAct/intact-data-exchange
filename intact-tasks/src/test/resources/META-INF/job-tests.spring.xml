@@ -38,11 +38,11 @@
         <property name="documentDefinition">
             <bean class="uk.ac.ebi.intact.psimitab.IntactDocumentDefinition"/>
         </property>
-        <property name="resource" value="classpath:/mitab.txt"/>
+        <property name="resource" value="classpath:/resulting_mitab_score.txt"/>
     </bean>
 
     <bean id="mitabClusteredProcessor" class="uk.ac.ebi.intact.task.mitab.clustering.MitabClusterScoreItemProcessor">
-        <property name="miScoreLabel" value="miScore"/>
+        <property name="miScoreLabel" value="intact-miscore"/>
         <property name="hasHeader" value="true"/>
         <property name="clusteredMitabFile" value="classpath:/mitab-clustered.txt"/>
         <property name="databasesForUniqIdentifier">
@@ -87,10 +87,27 @@
         </batch:tasklet>
     </batch:step>
 
+    <!-- Read the MITAB file and index in SOLR-->
+    <batch:step id="indexSolr" parent="intactBatchStep">
+        <batch:tasklet>
+            <batch:chunk reader="solrMitabReader"
+                         writer="solrMitabWriter">
+                <batch:streams>
+                    <batch:stream ref="solrMitabReader"/>
+                    <batch:stream ref="solrMitabWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+
+    <!-- job tests -->
     <batch:job id="mitabExportJob" job-repository="intactJobRepository">
         <batch:step id="exportMitabStep" parent="databaseMitabExport"/>
     </batch:job>
     <batch:job id="mitabScoreUpdateJob" job-repository="intactJobRepository">
         <batch:step id="updateScoreStep" parent="updateMitabWithClusterScore"/>
+    </batch:job>
+    <batch:job id="mitabSolrIndexJob" job-repository="intactJobRepository">
+        <batch:step id="indexSolrStep" parent="indexSolr"/>
     </batch:job>
 </beans>

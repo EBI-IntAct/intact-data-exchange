@@ -26,7 +26,7 @@
     </bean>
 
     <bean id="clusterScoreProcessor" class="uk.ac.ebi.intact.task.mitab.clustering.MitabClusterScoreItemProcessor">
-        <property name="miScoreLabel" value="miScore"/>
+        <property name="miScoreLabel" value="intact-miscore"/>
         <property name="hasHeader" value="true"/>
         <property name="databasesForUniqIdentifier">
             <list>

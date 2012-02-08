@@ -17,7 +17,6 @@ package uk.ac.ebi.intact.task.mitab.index;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
@@ -59,7 +58,7 @@ public class SolrItemWriter implements BinaryInteractionItemWriter, ItemStream{
 
         SolrServer interactionsSolrServer = getInteractionsSolrServer();
 
-        SolrDocumentConverter solrDocumentConverter = new SolrDocumentConverter(documentDefinition, ontologySearcher);
+        SolrDocumentConverter solrDocumentConverter = new SolrDocumentConverter(interactionsSolrServer, documentDefinition);
 
         for (BinaryInteraction binaryInteraction : items) {
             SolrInputDocument solrInputDoc = solrDocumentConverter.toSolrDocument(binaryInteraction);

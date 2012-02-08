@@ -21,7 +21,7 @@ import java.util.Iterator;
  * @version $Id$
  * @since <pre>06/02/12</pre>
  */
-@ContextConfiguration(locations = {"/META-INF/mitab-clustered-test.spring.xml"})
+@ContextConfiguration(locations = {"/META-INF/mitab-creation.spring.xml", "/META-INF/job-tests.spring.xml"})
 public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
 
     @Autowired
@@ -54,7 +54,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
         BinaryInteraction processedBinary1 = mitabClusteredProcessor.process(binary1);
         Assert.assertEquals(1, processedBinary1.getConfidenceValues().size());
         Confidence conf = (Confidence) processedBinary1.getConfidenceValues().iterator().next();
-        Assert.assertEquals("miScore", conf.getType());
+        Assert.assertEquals("intact-miscore", conf.getType());
         Assert.assertEquals("0.7", conf.getValue());
 
         BinaryInteraction binary2 = binaryInteractionIterator.next();
@@ -63,7 +63,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
         BinaryInteraction processedBinary2 = mitabClusteredProcessor.process(binary2);
         Assert.assertEquals(1, processedBinary2.getConfidenceValues().size());
         conf = (Confidence) processedBinary2.getConfidenceValues().iterator().next();
-        Assert.assertEquals("miScore", conf.getType());
+        Assert.assertEquals("intact-miscore", conf.getType());
         Assert.assertEquals("0.7", conf.getValue());
     }
 
@@ -80,7 +80,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
         BinaryInteraction processedBinary1 = mitabClusteredProcessor.process(binary1);
         Assert.assertEquals(1, processedBinary1.getConfidenceValues().size());
         Confidence conf = (Confidence) processedBinary1.getConfidenceValues().iterator().next();
-        Assert.assertEquals("miScore", conf.getType());
+        Assert.assertEquals("intact-miscore", conf.getType());
         Assert.assertEquals("0.5", conf.getValue());
 
         BinaryInteraction binary2 = binaryInteractionIterator.next();
@@ -89,7 +89,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
         BinaryInteraction processedBinary2 = mitabClusteredProcessor.process(binary2);
         Assert.assertEquals(1, processedBinary2.getConfidenceValues().size());
         conf = (Confidence) processedBinary2.getConfidenceValues().iterator().next();
-        Assert.assertEquals("miScore", conf.getType());
+        Assert.assertEquals("intact-miscore", conf.getType());
         Assert.assertEquals("0.5", conf.getValue());
     }
 
