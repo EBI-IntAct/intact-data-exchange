@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 import org.bbop.dataadapter.DataAdapterException;
 import org.obo.datamodel.*;
 import org.obo.datamodel.impl.*;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
+import uk.ac.ebi.intact.dataexchange.cvutils.model.*;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
@@ -55,6 +55,12 @@ public class CvExporter {
 
     private Map<CvClassIdentifier, OBOClass> cvToOboCache;
 
+    /**
+     * Map containing database MI identifier and the ExternalOntologyConfig object which should be use for this database
+     */
+    private Map<String, ExternalOntologyConfig> cvToOboMapExternalConfig;
+    private ExternalOntologyConfig defaultOntologyConfig;
+
     private OBOClass rootObj;
     private OBOClass tissueObj;
     private OBOClass cellTypeObj;
@@ -67,6 +73,16 @@ public class CvExporter {
         oboSession = new OBOSessionImpl( objFactory );
 
         cvToOboCache = new HashMap<CvClassIdentifier,OBOClass>();
+        
+        defaultOntologyConfig = new IntactOntologyConfig();
+        cvToOboMapExternalConfig = new HashMap<String, ExternalOntologyConfig>();
+        initializeExternalOntologyConfig();
+    }
+    
+    private void initializeExternalOntologyConfig() {
+
+        cvToOboMapExternalConfig.put(CvDatabase.PSI_MI_MI_REF, new MiOntologyConfig());
+        cvToOboMapExternalConfig.put(CvDatabase.PSI_MOD_MI_REF, new ModOntologyConfig());
     }
 
     /**
@@ -204,10 +220,22 @@ public class CvExporter {
     }
 
     private void addHeaderInfo() {
-        oboSession.setDefaultNamespace( new Namespace( "INTACT" ) );
+        
+        Collection<ExternalOntologyConfig> ontoConfigs = cvToOboMapExternalConfig.values();
+
+        oboSession.setDefaultNamespace( new Namespace( defaultOntologyConfig.getDefaultNamespace() ) );
+
         oboSession.addPropertyValue(new PropertyValueImpl("auto-generated-by", "IntAct CvExporter"));
-        oboSession.addSynonymCategory(new SynonymCategoryImpl("INTACT-alternate", "Alternate label curated by INTACT"));
-        oboSession.addSynonymCategory(new SynonymCategoryImpl("INTACT-short", "Unique short label curated by INTACT"));
+
+        oboSession.addSynonymCategory(new SynonymCategoryImpl(defaultOntologyConfig.getAliasSynonymCategory(), defaultOntologyConfig.getAliasSynonymDefinition()));
+        oboSession.addSynonymCategory(new SynonymCategoryImpl(defaultOntologyConfig.getShortLabelSynonymCategory(), defaultOntologyConfig.getShortLabelSynonymDefinition()));
+
+        for (ExternalOntologyConfig conf : ontoConfigs){
+            oboSession.addNamespace( new Namespace( conf.getDefaultNamespace() ) );
+
+            oboSession.addSynonymCategory(new SynonymCategoryImpl(conf.getAliasSynonymCategory(), conf.getAliasSynonymDefinition()));
+            oboSession.addSynonymCategory(new SynonymCategoryImpl(conf.getShortLabelSynonymCategory(), conf.getShortLabelSynonymDefinition()));
+        }    
     }
 
     private void addFooterInfo() {
@@ -282,13 +310,8 @@ public class CvExporter {
 
         cvToOboCache.put(cvClassId, oboObj);
 
-        //assign short label
-
-        if ( dagObj.getShortLabel() != null ) {
-            Synonym syn = createSynonym( dagObj.getShortLabel() );
-            oboObj.addSynonym( syn );
-        }
-
+        CvObjectXref identityRef = null;
+        
         //assign Xrefs
         Collection<CvObjectXref> xrefs = dagObj.getXrefs();
 
@@ -304,6 +327,7 @@ public class CvExporter {
                  qualifier.getIdentifier().equals( CvXrefQualifier.IDENTITY_MI_REF ) &&
                  xref.getPrimaryId() != null && xref.getPrimaryId().equals(cvId)) {
                 isIdentity = true;
+                identityRef = xref;
             }
             else if(qualifier != null &&
                     qualifier.getIdentifier() != null &&
@@ -336,6 +360,24 @@ public class CvExporter {
 
         } //end for
 
+        ExternalOntologyConfig currentOntologyConfig = defaultOntologyConfig;
+        
+        
+        if (identityRef != null && identityRef.getCvDatabase() != null && identityRef.getCvDatabase().getIdentifier() != null){
+            if (cvToOboMapExternalConfig.containsKey(identityRef.getCvDatabase().getIdentifier())){
+                currentOntologyConfig = cvToOboMapExternalConfig.get(identityRef.getCvDatabase().getIdentifier());
+            }
+        }
+
+        oboObj.setNamespace(new Namespace(currentOntologyConfig.getDefaultNamespace()));
+
+        //assign short label
+
+        if ( dagObj.getShortLabel() != null ) {
+            Synonym syn = createSynonym( dagObj.getShortLabel(), defaultOntologyConfig.getShortLabelSynonymCategory() );
+            oboObj.addSynonym( syn );
+        }
+        
         //assign def   from Annotations
         Collection<Annotation> annotations = dagObj.getAnnotations();
 
@@ -368,7 +410,7 @@ public class CvExporter {
         //assign alias
 
         for ( CvObjectAlias cvAlias : dagObj.getAliases() ) {
-            Synonym altSyn = createAlias( cvAlias );
+            Synonym altSyn = createAlias( cvAlias, currentOntologyConfig.getAliasSynonymCategory() );
             oboObj.addSynonym( altSyn );
 
         }
@@ -494,21 +536,21 @@ public class CvExporter {
         return false;
     }
 
-    private Synonym createAlias( CvObjectAlias cvAlias ) {
+    private Synonym createAlias( CvObjectAlias cvAlias, String aliasId ) {
         Synonym syn = new SynonymImpl();
         syn.setText( cvAlias.getName() );
         SynonymCategory synCat = new SynonymCategoryImpl();
-        synCat.setID(INTACT_ALIAS_IDENTIFIER);
+        synCat.setID(aliasId);
         syn.setSynonymCategory( synCat );
         syn.setScope( 1 );
         return syn;
     }
 
-    private Synonym createSynonym( String shortLabel ) {
+    private Synonym createSynonym( String shortLabel, String shortLabelId ) {
         Synonym syn = new SynonymImpl();
         syn.setText( shortLabel );
         SynonymCategory synCat = new SynonymCategoryImpl();
-        synCat.setID(INTACT_SHORTLABEL_IDENTIFIER);
+        synCat.setID(shortLabelId);
         syn.setSynonymCategory( synCat );
         syn.setScope( 1 );
         return syn;
