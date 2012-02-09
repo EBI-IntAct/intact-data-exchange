@@ -62,7 +62,7 @@
                 </bean>
                 <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyMappingFactoryBean">
                     <property name="name" value="psi-mi"/>
-                    <property name="resource" value="http://psidev.cvs.sourceforge.net/viewvc/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo?revision=HEAD"/>
+                    <property name="resource" value="http://psidev.sourceforge.net/mi/rel25/data/psi-mi25.obo"/>
                 </bean>
                 <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyMappingFactoryBean">
                     <property name="name" value="psi-mod"/>
