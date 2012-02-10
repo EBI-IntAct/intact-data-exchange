@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.task.mitab.clustering;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -13,10 +14,10 @@ import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -105,9 +106,9 @@ public class ClusterScoreTasklet implements Tasklet {
      * Get mitab files from a resource location
      * @return
      */
-    private File[] getListOfMitabFiles(){
+    private Collection<File> getListOfMitabFiles(){
         /* Get a list of files */
-        File[] files = mitabInputFolder.listFiles();
+        Collection<File> files = FileUtils.listFiles(mitabInputFolder, new String[] {"txt"}, false);
 
         /* Make sure there are files in the provided location */
         if (files == null) {
@@ -174,13 +175,13 @@ public class ClusterScoreTasklet implements Tasklet {
      */
     public RepeatStatus execute(StepContribution arg0, ChunkContext arg1) throws Exception {
         /* Get mitab files */
-        File[] files = getListOfMitabFiles();
+        Collection<File> files = getListOfMitabFiles();
         PsimiTabReader mitabReader = new PsimiTabReader(false);
         InteractionClusterScore interactionClusterScore = new InteractionClusterScore();
-        for (int i = 0; i < files.length; i++) {
+        for (File file : files) {
             /* Get binaryInteractions from mitab file */
             List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
-            binaryInteractions.addAll(mitabReader.read(files[i]));
+            binaryInteractions.addAll(mitabReader.read(file));
             /* Run cluster using list of binary interactions as input */
             interactionClusterScore.setBinaryInteractionIterator(binaryInteractions.iterator());
             interactionClusterScore.setMappingIdDbNames("uniprotkb,irefindex,ddbj/embl/genbank,refseq,chebi");
