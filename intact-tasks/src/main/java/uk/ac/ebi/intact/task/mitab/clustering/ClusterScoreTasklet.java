@@ -78,7 +78,7 @@ public class ClusterScoreTasklet implements Tasklet {
      * Save clustered results including scores in mitab files
      * @param interactionClusterScore
      */
-    private void saveMitabOutputFile(InteractionClusterScore interactionClusterScore){
+    private void saveMitabOutputFile(InteractionClusterScore interactionClusterScore) throws IOException {
         /* Retrieve results */
         Map<Integer, EncoreInteractionForScoring> interactionMapping = interactionClusterScore.getInteractionMapping();
 
@@ -89,11 +89,7 @@ public class ClusterScoreTasklet implements Tasklet {
         for(Integer mappingId:interactionMapping.keySet()){
             EncoreInteractionForScoring eI = interactionMapping.get(mappingId);
             BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
-            try {
-                writer.writeOrAppend(bI, file, false);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            writer.writeOrAppend(bI, file, false);
         }
     }
 
