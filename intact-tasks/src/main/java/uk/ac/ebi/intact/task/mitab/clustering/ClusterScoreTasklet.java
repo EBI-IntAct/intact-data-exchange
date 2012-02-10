@@ -1,8 +1,6 @@
 package uk.ac.ebi.intact.task.mitab.clustering;
 
-import org.apache.commons.io.FileUtils;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemStreamException;
@@ -17,7 +15,6 @@ import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +30,7 @@ public class ClusterScoreTasklet implements Tasklet {
     private String mitabInputFileName;
     private File mitabInputFile;
     private String mitabOutputFileName;
-    private File mitabOutputFile;
+    private boolean header = true;
 
     public ClusterScoreTasklet(String mitabInputFolderName, String mitabOutputFolderName) {
         this.mitabInputFileName = mitabInputFolderName;
@@ -75,22 +72,6 @@ public class ClusterScoreTasklet implements Tasklet {
         if (mitabOutputFileName == null){
             throw new ItemStreamException("A mitab output file name is needed");
         }
-        this.mitabOutputFile = new File (mitabOutputFileName);
-    }
-
-    /**
-     * Get mitab files from a resource location
-     * @return
-     */
-    private Collection<File> getListOfMitabFiles(){
-        /* Get a list of files */
-        Collection<File> files = FileUtils.listFiles(mitabInputFile, new String[] {"txt"}, false);
-
-        /* Make sure there are files in the provided location */
-        if (files == null) {
-            throw new UnexpectedJobExecutionException("Could not find mitab files in " + mitabInputFileName);
-        }
-        return files;
     }
 
     /**
@@ -101,7 +82,7 @@ public class ClusterScoreTasklet implements Tasklet {
         /* Retrieve results */
         Map<Integer, EncoreInteractionForScoring> interactionMapping = interactionClusterScore.getInteractionMapping();
 
-        PsimiTabWriter writer = new PsimiTabWriter();
+        PsimiTabWriter writer = new PsimiTabWriter(header);
         Encore2Binary iConverter = new Encore2Binary(interactionClusterScore.getMappingIdDbNames());
 
         File file = new File(this.mitabOutputFileName);
@@ -114,19 +95,6 @@ public class ClusterScoreTasklet implements Tasklet {
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Get clustered results including scores
-     * @param binaryInteractions
-     * @return
-     */
-    private InteractionClusterScore getInteractionClusterScore(List<BinaryInteraction> binaryInteractions) {
-        InteractionClusterScore iC = new InteractionClusterScore();
-        iC.setBinaryInteractionIterator(binaryInteractions.iterator());
-        iC.setMappingIdDbNames("uniprotkb,irefindex,ddbj/embl/genbank,refseq,chebi");
-        iC.runService();
-        return iC;
     }
 
 
@@ -143,7 +111,7 @@ public class ClusterScoreTasklet implements Tasklet {
         this.checkInputMitabFile();
 
         /* Get mitab file */
-        PsimiTabReader mitabReader = new PsimiTabReader(false);
+        PsimiTabReader mitabReader = new PsimiTabReader(header);
         InteractionClusterScore interactionClusterScore = new InteractionClusterScore();
 
         /* Get binaryInteractions from mitab file */
@@ -161,6 +129,11 @@ public class ClusterScoreTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
+    public boolean isHeader() {
+        return header;
+    }
 
-
+    public void setHeader(boolean header) {
+        this.header = header;
+    }
 }
