@@ -79,7 +79,7 @@ public class ClusterScoreTasklet implements Tasklet {
         if (mitabOutputFile.exists() && !mitabOutputFile.canWrite()) throw new IllegalArgumentException("Cannot write to file: "+mitabOutputFileName);
 
         if (!mitabOutputFile.getParentFile().exists()){
-            mitabOutputFile.getParentFile().mkdir();
+            mitabOutputFile.getParentFile().mkdirs();
         }
     }
 

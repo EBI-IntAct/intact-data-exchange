@@ -76,9 +76,8 @@ public class MitabItemWriter implements BinaryInteractionItemWriter, ItemStream 
            }
 
             try {
-               outputFile.getParentFile().mkdirs();
                 if (!outputFile.getParentFile().exists()){
-                    outputFile.getParentFile().mkdir();
+                    outputFile.getParentFile().mkdirs();
                 }
 
                outputWriter = new FileWriter(outputFile, true);
