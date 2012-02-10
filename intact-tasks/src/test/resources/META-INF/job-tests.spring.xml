@@ -54,9 +54,8 @@
     </bean>
 
     <bean name="clusterScoreTasklet" class="uk.ac.ebi.intact.task.mitab.clustering.ClusterScoreTasklet">
-        <constructor-arg value="src/test/resources/mitab"/>
-        <constructor-arg value="src/test/resources/mitabClustered"/>
-        <property name="fileLineLimit" value="3" />
+        <constructor-arg value="src/test/resources/mitab/mitab.txt"/>
+        <constructor-arg value="target/mitab-clustered.txt"/>
     </bean>
 
 

@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.task.mitab.clustering;
 
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.Job;
@@ -39,15 +39,11 @@ public class ClusterScoreTaskletTest{
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Before
+
+    @After
     public void deleteGeneratedMitab(){
-        File directory = new File("src/test/resources/mitabClustered");
-        File[] files = directory.listFiles();
-        for (File file : files){
-           if (!file.delete()){
-               System.out.println("Failed to delete "+file);
-           }
-        }
+        File file = new File("target/mitab-clustered");
+        file.delete();
     }
 
 	@Test
@@ -61,5 +57,8 @@ public class ClusterScoreTaskletTest{
         Assert.assertTrue(jobExecution.getAllFailureExceptions().isEmpty());
         Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
 
+        File file = new File("target/mitab-clustered.txt");
+        
+        Assert.assertTrue(file.exists());
 	}
 }

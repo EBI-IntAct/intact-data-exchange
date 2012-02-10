@@ -23,83 +23,59 @@ import java.util.Map;
 
 
 /**
- * Tasklet to cluster and score mitab files
+ * Tasklet to cluster and score mitab file
  *
  * @author Rafael Jimenez (rafael@ebi.ac.uk)
  * @version $Id$
  * @since TODO add POM version
  */
 public class ClusterScoreTasklet implements Tasklet {
-    private String mitabInputFolderName;
-    private File mitabInputFolder;
-    private String mitabOutputFolderName;
-    private File mitabOutputFolder;
-    private int fileLineLimit = 500;
+    private String mitabInputFileName;
+    private File mitabInputFile;
+    private String mitabOutputFileName;
+    private File mitabOutputFile;
 
     public ClusterScoreTasklet(String mitabInputFolderName, String mitabOutputFolderName) {
-        this.mitabInputFolderName = mitabInputFolderName;
-        this.mitabOutputFolderName = mitabOutputFolderName;
-        this.setMitabOutputFolder();
-        this.setMitabInputFolder();
+        this.mitabInputFileName = mitabInputFolderName;
+        this.mitabOutputFileName = mitabOutputFolderName;
     }
 
-    public String getMitabInputFolderName() {
-        return mitabInputFolderName;
+    public String getMitabInputFileName() {
+        return mitabInputFileName;
     }
 
-    public String getMitabOutputFolderName() {
-        return mitabOutputFolderName;
+    public String getMitabOutputFileName() {
+        return mitabOutputFileName;
     }
 
-    public int getFileLineLimit() {
-        return fileLineLimit;
+    public void setMitabInputFileName(String mitabInputFileName) {
+        this.mitabInputFileName = mitabInputFileName;
     }
 
-    public void setFileLineLimit(int fileLineLimit) {
-        this.fileLineLimit = fileLineLimit;
+    public void setMitabOutputFileName(String mitabOutputFileName) {
+        this.mitabOutputFileName = mitabOutputFileName;
     }
 
-    public File getMitabInputFolder() {
-        return mitabInputFolder;
-    }
-
-    private void setMitabInputFolder() {
-        if (mitabInputFolderName == null){
-            throw new ItemStreamException("A mitab parent folder is needed");
+    private void checkInputMitabFile() {
+        if (mitabInputFileName == null){
+            throw new ItemStreamException("A mitab parent file is needed");
         }
 
-        mitabInputFolder = new File (mitabInputFolderName);
+        mitabInputFile = new File (mitabInputFileName);
 
-        if ( !mitabInputFolder.exists() ) {
-            throw new ItemStreamException( "The mitab parent folder : " + mitabInputFolder.getAbsolutePath() + " does not exist and is necessary for this task." );
+        if ( !mitabInputFile.exists() ) {
+            throw new ItemStreamException( "The mitab file : " + mitabInputFile.getAbsolutePath() + " does not exist and is necessary for this task." );
         }
-        else if (!mitabInputFolder.isDirectory()){
-            throw new ItemStreamException( mitabInputFolderName + " is not a directory." );
-        }
-        else if (!mitabInputFolder.canRead()){
-            throw new ItemStreamException( "Impossible to read files : " + mitabInputFolderName );
+        else if (!mitabInputFile.canRead()){
+            throw new ItemStreamException( "Impossible to read file : " + mitabInputFileName);
         }
     }
 
-    public File getMitabOutputFolder() {
-        return mitabOutputFolder;
-    }
-
-    private void setMitabOutputFolder() {
-        if (mitabOutputFolderName == null){
-            throw new ItemStreamException("A mitab parent folder is needed");
+    private void checkOutputMitabFile() {
+        if (mitabOutputFileName == null){
+            throw new ItemStreamException("A mitab output file name is needed");
         }
-        this.mitabOutputFolder = new File (mitabOutputFolderName);
-
-        if ( !mitabOutputFolder.exists() ) {
-            throw new ItemStreamException( "The mitab parent folder : " + mitabOutputFolder.getAbsolutePath() + " does not exist and is necessary for this task." );
-        }
-        else if (!mitabOutputFolder.isDirectory()){
-            throw new ItemStreamException( mitabOutputFolderName + " is not a directory." );
-        }
-        else if (!mitabOutputFolder.canRead()){
-            throw new ItemStreamException( "Impossible to read files : " + mitabOutputFolderName );
-        }
+        this.mitabOutputFile = new File (mitabOutputFileName);
     }
 
     /**
@@ -108,11 +84,11 @@ public class ClusterScoreTasklet implements Tasklet {
      */
     private Collection<File> getListOfMitabFiles(){
         /* Get a list of files */
-        Collection<File> files = FileUtils.listFiles(mitabInputFolder, new String[] {"txt"}, false);
+        Collection<File> files = FileUtils.listFiles(mitabInputFile, new String[] {"txt"}, false);
 
         /* Make sure there are files in the provided location */
         if (files == null) {
-            throw new UnexpectedJobExecutionException("Could not find mitab files in " + mitabInputFolderName);
+            throw new UnexpectedJobExecutionException("Could not find mitab files in " + mitabInputFileName);
         }
         return files;
     }
@@ -121,16 +97,14 @@ public class ClusterScoreTasklet implements Tasklet {
      * Save clustered results including scores in mitab files
      * @param interactionClusterScore
      */
-    private void saveMitabOutputFiles(InteractionClusterScore interactionClusterScore){
+    private void saveMitabOutputFile(InteractionClusterScore interactionClusterScore){
         /* Retrieve results */
         Map<Integer, EncoreInteractionForScoring> interactionMapping = interactionClusterScore.getInteractionMapping();
 
         PsimiTabWriter writer = new PsimiTabWriter();
         Encore2Binary iConverter = new Encore2Binary(interactionClusterScore.getMappingIdDbNames());
 
-        int fileCount=1;
-        int lineCount=1;
-        File file = new File(this.mitabOutputFolderName, "test-" + fileCount + ".txt");
+        File file = new File(this.mitabOutputFileName);
         for(Integer mappingId:interactionMapping.keySet()){
             EncoreInteractionForScoring eI = interactionMapping.get(mappingId);
             BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
@@ -139,16 +113,6 @@ public class ClusterScoreTasklet implements Tasklet {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if(lineCount == fileLineLimit){
-                lineCount = 0;
-                fileCount++;
-                file = new File(this.mitabOutputFolderName, "test-" + fileCount + ".txt");
-                if(file.exists()){
-                    file.delete();
-                    file = new File(this.mitabOutputFolderName, "test-" + fileCount + ".txt");
-                }
-            }
-            lineCount++;
         }
     }
 
@@ -174,21 +138,24 @@ public class ClusterScoreTasklet implements Tasklet {
      * @throws Exception
      */
     public RepeatStatus execute(StepContribution arg0, ChunkContext arg1) throws Exception {
-        /* Get mitab files */
-        Collection<File> files = getListOfMitabFiles();
+        // do some checking there
+        this.checkOutputMitabFile();
+        this.checkInputMitabFile();
+
+        /* Get mitab file */
         PsimiTabReader mitabReader = new PsimiTabReader(false);
         InteractionClusterScore interactionClusterScore = new InteractionClusterScore();
-        for (File file : files) {
-            /* Get binaryInteractions from mitab file */
-            List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
-            binaryInteractions.addAll(mitabReader.read(file));
-            /* Run cluster using list of binary interactions as input */
-            interactionClusterScore.setBinaryInteractionIterator(binaryInteractions.iterator());
-            interactionClusterScore.setMappingIdDbNames("uniprotkb,irefindex,ddbj/embl/genbank,refseq,chebi");
-            interactionClusterScore.runService();
-        }
+
+        /* Get binaryInteractions from mitab file */
+        List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
+        binaryInteractions.addAll(mitabReader.read(mitabInputFile));
+        /* Run cluster using list of binary interactions as input */
+        interactionClusterScore.setBinaryInteractionIterator(binaryInteractions.iterator());
+        interactionClusterScore.setMappingIdDbNames("uniprotkb,irefindex,ddbj/embl/genbank,refseq,chebi");
+        interactionClusterScore.runService();
+
         /* Save mitab clustered data in files */
-        saveMitabOutputFiles(interactionClusterScore);
+        saveMitabOutputFile(interactionClusterScore);
 
         /* task finsihed */
         return RepeatStatus.FINISHED;
