@@ -8,6 +8,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
@@ -88,17 +89,27 @@ public class ClusterScoreTasklet implements Tasklet {
      * Save clustered results including scores in mitab files
      * @param interactionClusterScore
      */
-    private void saveMitabOutputFile(InteractionClusterScore interactionClusterScore) throws IOException {
+    private void saveMitabOutputFile(InteractionClusterScore interactionClusterScore) throws IOException, ConverterException {
         /* Retrieve results */
         Map<Integer, EncoreInteractionForScoring> interactionMapping = interactionClusterScore.getInteractionMapping();
 
         PsimiTabWriter writer = new PsimiTabWriter(header);
+        
+        boolean isFirstInteraction = true;
+
         Encore2Binary iConverter = new Encore2Binary(interactionClusterScore.getMappingIdDbNames());
 
         for(Integer mappingId:interactionMapping.keySet()){
             EncoreInteractionForScoring eI = interactionMapping.get(mappingId);
             BinaryInteraction bI = iConverter.getBinaryInteractionForScoring(eI);
-            writer.writeOrAppend(bI, mitabOutputFile, false);
+            
+            if (isFirstInteraction){
+                isFirstInteraction = false;
+                writer.writeOrAppend(bI, mitabOutputFile, true);
+            }
+            else {
+                writer.writeOrAppend(bI, mitabOutputFile, false);
+            }
         }
     }
 
