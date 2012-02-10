@@ -30,6 +30,7 @@ public class ClusterScoreTasklet implements Tasklet {
     private String mitabInputFileName;
     private File mitabInputFile;
     private String mitabOutputFileName;
+    private File mitabOutputFile;
     private boolean header = true;
 
     public ClusterScoreTasklet(String mitabInputFolderName, String mitabOutputFolderName) {
@@ -72,6 +73,14 @@ public class ClusterScoreTasklet implements Tasklet {
         if (mitabOutputFileName == null){
             throw new ItemStreamException("A mitab output file name is needed");
         }
+
+        mitabOutputFile = new File(mitabOutputFileName);
+
+        if (mitabOutputFile.exists() && !mitabOutputFile.canWrite()) throw new IllegalArgumentException("Cannot write to file: "+mitabOutputFileName);
+
+        if (!mitabOutputFile.getParentFile().exists()){
+            mitabOutputFile.getParentFile().mkdir();
+        }
     }
 
     /**
@@ -85,11 +94,10 @@ public class ClusterScoreTasklet implements Tasklet {
         PsimiTabWriter writer = new PsimiTabWriter(header);
         Encore2Binary iConverter = new Encore2Binary(interactionClusterScore.getMappingIdDbNames());
 
-        File file = new File(this.mitabOutputFileName);
         for(Integer mappingId:interactionMapping.keySet()){
             EncoreInteractionForScoring eI = interactionMapping.get(mappingId);
             BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
-            writer.writeOrAppend(bI, file, false);
+            writer.writeOrAppend(bI, mitabOutputFile, false);
         }
     }
 
