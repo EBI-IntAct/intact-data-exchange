@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -12,10 +13,8 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.intact.core.persister.CorePersister;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -30,9 +29,10 @@ import java.util.Map;
  * @version $Id$
  * @since <pre>07/02/12</pre>
  */
-@ContextConfiguration(locations = {"/META-INF/mitab-creation.spring.xml", "/META-INF/job-tests.spring.xml"})
-@Transactional(propagation = Propagation.NEVER)
-public class MitabClusterScoreUpdateJobTest extends IntactBasicTestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"/META-INF/mitab-creation.spring.xml", "/META-INF/job-tests.spring.xml"
+        , "classpath*:/META-INF/intact.spring.xml", "classpath*:/META-INF/standalone/*-standalone.spring.xml"})
+public class MitabClusterScoreUpdateJobTest {
 
     @Resource(name = "intactBatchJobLauncher")
     private JobLauncher jobLauncher;
