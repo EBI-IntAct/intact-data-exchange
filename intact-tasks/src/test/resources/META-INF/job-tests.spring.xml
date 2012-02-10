@@ -57,6 +57,7 @@
         <constructor-arg value="src/test/resources/mitab/mitab.txt"/>
         <constructor-arg value="target/mitab-clustered.txt"/>
         <property name="header" value="false"/>
+        <property name="scoreName" value="intact-miscore"/>
     </bean>
 
 

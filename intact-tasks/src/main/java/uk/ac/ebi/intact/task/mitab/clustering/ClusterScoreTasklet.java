@@ -32,6 +32,7 @@ public class ClusterScoreTasklet implements Tasklet {
     private String mitabOutputFileName;
     private File mitabOutputFile;
     private boolean header = true;
+    private String scoreName;
 
     public ClusterScoreTasklet(String mitabInputFolderName, String mitabOutputFolderName) {
         this.mitabInputFileName = mitabInputFolderName;
@@ -96,7 +97,7 @@ public class ClusterScoreTasklet implements Tasklet {
 
         for(Integer mappingId:interactionMapping.keySet()){
             EncoreInteractionForScoring eI = interactionMapping.get(mappingId);
-            BinaryInteraction bI = iConverter.getBinaryInteraction(eI);
+            BinaryInteraction bI = iConverter.getBinaryInteractionForScoring(eI);
             writer.writeOrAppend(bI, mitabOutputFile, false);
         }
     }
@@ -116,7 +117,9 @@ public class ClusterScoreTasklet implements Tasklet {
 
         /* Get mitab file */
         PsimiTabReader mitabReader = new PsimiTabReader(header);
+
         InteractionClusterScore interactionClusterScore = new InteractionClusterScore();
+        interactionClusterScore.setScoreName(scoreName);
 
         /* Get binaryInteractions from mitab file */
         List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
@@ -139,5 +142,13 @@ public class ClusterScoreTasklet implements Tasklet {
 
     public void setHeader(boolean header) {
         this.header = header;
+    }
+
+    public String getScoreName() {
+        return scoreName;
+    }
+
+    public void setScoreName(String scoreName) {
+        this.scoreName = scoreName;
     }
 }
