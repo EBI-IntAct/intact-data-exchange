@@ -44,15 +44,6 @@ public class CvExporter {
     //initialize logger
     protected final static Logger log = Logger.getLogger( CvExporter.class );
 
-    private static final String INTACT_ALIAS_IDENTIFIER = "INTACT-alternate";
-    private static final String INTACT_SHORTLABEL_IDENTIFIER = "INTACT-short";
-
-    private static final String MI_ALIAS_IDENTIFIER = "PSI-MI-alternate";
-    private static final String MI_SHORTLABEL_IDENTIFIER = "PSI-MI-short";
-
-    private static final String MOD_ALIAS_IDENTIFIER = "PSI-MOD-alternate";
-    private static final String MOD_SHORTLABEL_IDENTIFIER = "PSI-MOD-label";
-
     private Map<CvClassIdentifier, OBOClass> cvToOboCache;
 
     /**
@@ -491,7 +482,7 @@ public class CvExporter {
         Synonym syn = new SynonymImpl();
         syn.setText( synonym );
         SynonymCategory synCat = new SynonymCategoryImpl();
-        synCat.setID(INTACT_SHORTLABEL_IDENTIFIER);
+        synCat.setID(synonym);
         syn.setSynonymCategory( synCat );
         syn.setScope( 1 );
         oboObj.addSynonym( syn );
