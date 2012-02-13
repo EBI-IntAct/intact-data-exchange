@@ -365,7 +365,7 @@ public class CvExporter {
         //assign short label
 
         if ( dagObj.getShortLabel() != null ) {
-            Synonym syn = createSynonym( dagObj.getShortLabel(), defaultOntologyConfig.getShortLabelSynonymCategory() );
+            Synonym syn = createSynonym( dagObj.getShortLabel(), currentOntologyConfig.getShortLabelSynonymCategory() );
             oboObj.addSynonym( syn );
         }
         
