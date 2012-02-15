@@ -12,7 +12,7 @@ public class ModOntologyConfig implements ExternalOntologyConfig{
 
     private static final String MOD_ALIAS_IDENTIFIER = "PSI-MOD-alternate";
     private static final String MOD_SHORTLABEL_IDENTIFIER = "PSI-MOD-label";
-    private static final String MOD_NAMESPACE = "PSI-MOD-alternate";
+    private static final String MOD_NAMESPACE = "PSI-MOD";
     private static final String MOD_ALIAS_DEF = "Short label curated by PSI-MOD";
     private static final String MOD_SHORTLABEL_DEF = "Alternate name curated by PSI-MOD";
 
