@@ -12,6 +12,7 @@ import psidev.psi.mi.xml.converter.ConverterException;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -32,11 +33,13 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
     private Map<BinaryPair, Double> scores;
     private String miScoreLabel;
     private boolean hasHeader = false;
+    private DecimalFormat scoreFormatter;
     
     private String[] databasesForUniqIdentifier;
 
     public MitabClusterScoreItemProcessor(){
         scores = new TreeMap<BinaryPair, Double>();
+        scoreFormatter = new DecimalFormat("#.##");
     }
 
     @Override
@@ -45,7 +48,8 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
         if (item == null){
             return null; 
         }
-        
+
+
         Interactor interactorA = item.getInteractorA();
         Interactor interactorB = item.getInteractorB();
         
@@ -57,7 +61,7 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
         if (scores.containsKey(currentPair)){
             Double score = scores.get(currentPair);
 
-            Confidence conf = new ConfidenceImpl(miScoreLabel, Double.toString(score));
+            Confidence conf = new ConfidenceImpl(miScoreLabel, scoreFormatter.format(score));
             item.getConfidenceValues().add(conf);
         }
         
@@ -82,6 +86,16 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
 
     public boolean isHasHeader() {
         return hasHeader;
+    }
+
+    public DecimalFormat getScoreFormatter() {
+        return scoreFormatter;
+    }
+
+    public void setScoreFormatter(DecimalFormat scoreFormatter) {
+        if (scoreFormatter != null){
+            this.scoreFormatter = scoreFormatter;
+        }
     }
 
     public void setHasHeader(boolean hasHeader) {
