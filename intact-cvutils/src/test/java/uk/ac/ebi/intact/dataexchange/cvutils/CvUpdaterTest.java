@@ -59,7 +59,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
     @Autowired
     private CvUpdater cvUpdater;
-    
+
     @Autowired
     private PersisterHelper persisterHelper;
 
@@ -118,8 +118,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    @DirtiesContext
     public void obsoleteTest() throws Exception {
 
         List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
@@ -137,8 +135,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    @DirtiesContext
     public void obsoleteTest2() throws Exception {
 
         Institution owner = IntactContext.getCurrentInstance().getInstitution();
@@ -164,8 +160,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    @DirtiesContext
     public void updatingWithNewAnnotations() throws Exception {
 
         CvObjectDao<CvObject> cvObjectDao;
@@ -182,7 +176,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         persisterHelper.save( alias, topicsParent, cvTopic1, cvTopic2 );
 
-        
+
 
         cvObjectDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao();
 
@@ -218,13 +212,14 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         Assert.assertEquals( "hidden", topic.getAnnotations().iterator().next().getCvTopic().getShortLabel() );
 
         final int cvCountAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
-        Assert.assertEquals( "3 CvObjects expected to be created during update: hidden, used-in-class and obsolete",
-                             cvsBeforeUpdate + 3, cvCountAfterUpdate );
+        //Assert.assertEquals( "3 CvObjects expected to be created during update: hidden, used-in-class and obsolete",
+        //        cvsBeforeUpdate + 3, cvCountAfterUpdate );
+        Assert.assertEquals( "1 CvObject expected to be created during update: obsolete. hidden and used-in-class are now created by intact initializer",
+                cvsBeforeUpdate + 1, cvCountAfterUpdate );
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    @DirtiesContext
+    //@DirtiesContext
     public void updatingExistingAnnotations() throws Exception {
 
         CvObjectDao<CvObject> cvObjectDao;
@@ -255,7 +250,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         }
 
         int cvsBeforeUpdate = list.size();
-        Assert.assertEquals( existingCvsCount + 4, cvsBeforeUpdate );
+        Assert.assertEquals( existingCvsCount + 3, cvsBeforeUpdate );
 
         final InputStream is = CvUpdaterTest.class.getResourceAsStream( "/annotations_test.csv" );
         AnnotationInfoDataset annotationDataset = OboUtils.createAnnotationInfoDatasetFromResource( is );
@@ -282,18 +277,16 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         final int cvCountAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
 
-        Assert.assertEquals( cvsBeforeUpdate + 2, cvCountAfterUpdate );
+        Assert.assertEquals( cvsBeforeUpdate + 1, cvCountAfterUpdate );
 
         //again call cvupdate and this time it should ignore the annotations
-        
+
         cvUpdater.createOrUpdateCVs( list, annotationDataset );
-        
-        Assert.assertEquals( cvsBeforeUpdate + 2, cvCountAfterUpdate );
+
+        Assert.assertEquals( cvsBeforeUpdate + 1, cvCountAfterUpdate );
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    @DirtiesContext
     public void updateShortLabel() throws Exception {
         // in this test, we have "laladb" in the database. In the OBO file, the shortlabel is "msd pdb"
         Institution owner = IntactContext.getCurrentInstance().getInstitution();
@@ -308,14 +301,12 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         final CvObjectDao<CvDatabase> cvDao = IntactContext.getCurrentInstance().getDataContext().getDaoFactory().getCvObjectDao(CvDatabase.class);
         CvDatabase msdpdb = cvDao.getByPsiMiRef("MI:0472");
-        
+
         Assert.assertEquals("MI:0472", msdpdb.getIdentifier());
         Assert.assertEquals("msd pdb", msdpdb.getShortLabel());
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    @DirtiesContext
     public void obsoleteAggregationTest() throws Exception {
 
         List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
@@ -360,7 +351,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         cvUpdater.createOrUpdateCVs( allCvs, annotationDataset );
 
-        
+
         //check if aggregation has obsolote annotation  after createOrUpdateCvs call
         String id = CvObjectUtils.getIdentity( aggregation );
         Collection<CvObject> existingCvs = cvObjectDao.getByPsiMiRefCollection( Collections.singleton( id ) );
@@ -415,8 +406,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         final TransactionStatus transactionStatus2 = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         int totalCvsAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
 
-        Assert.assertEquals(938, totalCvsAfterUpdate);
-        Assert.assertEquals(932, stats.getCreatedCvs().size());
+        Assert.assertEquals(968, totalCvsAfterUpdate);
+        Assert.assertEquals(930, stats.getCreatedCvs().size());
 
         //54-1 obsolete term
         Assert.assertEquals(53, stats.getOrphanCvs().size());
@@ -447,7 +438,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         cvUpdater.createOrUpdateCVs( cvs );
 
         DaoFactory daoFactory = getDaoFactory();
-        
+
         final Collection<CvObject> notPersistedCvs = new ArrayList<CvObject>();
         final Collection<CvObject> updatedCvs = new ArrayList<CvObject>();
         for ( CvDagObject cv : copyOfCvs ) {
@@ -463,7 +454,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
             }
         }
 
-        Assert.assertEquals( 0, updatedCvs.size() );   
+        Assert.assertEquals( 0, updatedCvs.size() );
     }
 
     private boolean isSizeOfCollectionTheSame( CvObject cv1, CvObject cv2 ) {
@@ -501,8 +492,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    @DirtiesContext
     public void institutionWithNonMiAnnotations() throws Exception {
 
         Institution institution = IntactContext.getCurrentInstance().getInstitution();
@@ -518,7 +507,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         List<CvDagObject> allCvs = ontologyBuilder.getAllCvs();
         Assert.assertEquals( 987, allCvs.size() );
 
-        
+
         cvUpdater.createOrUpdateCVs(allCvs);
     }
 
@@ -526,6 +515,6 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     public void executeUpdateWithLatestCVs() throws Exception {
         cvUpdater.executeUpdateWithLatestCVs();
         Assert.assertTrue(getDaoFactory().getCvObjectDao( CvInteraction.class ).getByPsiMiRef( "MI:0001" ) != null);
-            
+
     }
 }
