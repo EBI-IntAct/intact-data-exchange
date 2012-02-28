@@ -118,6 +118,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void obsoleteTest() throws Exception {
 
         List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
@@ -135,6 +137,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void obsoleteTest2() throws Exception {
 
         Institution owner = IntactContext.getCurrentInstance().getInstitution();
@@ -160,6 +164,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void updatingWithNewAnnotations() throws Exception {
 
         CvObjectDao<CvObject> cvObjectDao;
@@ -217,7 +223,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
-    //@DirtiesContext
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void updatingExistingAnnotations() throws Exception {
 
         CvObjectDao<CvObject> cvObjectDao;
@@ -285,6 +292,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void updateShortLabel() throws Exception {
         // in this test, we have "laladb" in the database. In the OBO file, the shortlabel is "msd pdb"
         Institution owner = IntactContext.getCurrentInstance().getInstitution();
@@ -305,6 +314,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void obsoleteAggregationTest() throws Exception {
 
         List<CvObject> allCvsCommittedBefore = getDaoFactory().getCvObjectDao().getAll();
@@ -490,6 +501,8 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void institutionWithNonMiAnnotations() throws Exception {
 
         Institution institution = IntactContext.getCurrentInstance().getInstitution();
