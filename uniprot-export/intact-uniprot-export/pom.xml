@@ -61,6 +61,19 @@
         </dependency>
 
         <!-- MI score cluster dependency-->
+
+        <dependency>
+            <groupId>uk.ac.ebi.enfin.mi.cluster.score</groupId>
+            <artifactId>miClusterScore</artifactId>
+            <version>1.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>uk.ac.ebi.enfin.mi.cluster.score</groupId>
             <artifactId>miClusterScore</artifactId>
