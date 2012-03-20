@@ -21,6 +21,8 @@ import org.apache.lucene.store.RAMDirectory;
 import org.junit.*;
 import org.obo.dataadapter.OBOParseException;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexSearcher;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyIndexWriter;
@@ -46,6 +48,7 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
+@Transactional(propagation = Propagation.NEVER)
 public class DatabaseMitabExporterTest extends IntactBasicTestCase {
 
     private static OntologyIndexSearcher ontologyIndexSearcher;
