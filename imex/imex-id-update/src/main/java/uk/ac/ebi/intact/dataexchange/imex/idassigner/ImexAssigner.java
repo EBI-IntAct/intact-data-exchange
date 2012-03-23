@@ -17,7 +17,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
 import com.google.common.collect.Lists;
-import edu.ucla.mbi.imex.central.ws.*;
+import edu.ucla.mbi.imex.central.ws.v10.IcentralFault;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,18 +26,17 @@ import org.springframework.transaction.TransactionStatus;
 import uk.ac.ebi.intact.bridges.imexcentral.*;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.LoggingImexUpdateListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ReportWriterListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.FileImexUpdateReportHandler;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Publication;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.ExperimentUtils;
 import uk.ac.ebi.intact.model.util.PublicationUtils;
 
+import javax.persistence.Query;
 import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.io.IOException;
@@ -120,11 +119,11 @@ public class ImexAssigner {
     }
 
     public void addListener( ImexUpdateListener listener) {
-        listenerList.add( ImexUpdateListener.class, listener);
+        listenerList.add(ImexUpdateListener.class, listener);
     }
 
     public void removeListener( ImexUpdateListener listener) {
-        listenerList.remove( ImexUpdateListener.class, listener);
+        listenerList.remove(ImexUpdateListener.class, listener);
     }
 
     protected <T> List<T> getListeners(Class<T> listenerClass) {
@@ -296,10 +295,20 @@ public class ImexAssigner {
 //        final CorePersister persister = IntactContext.getCurrentInstance().getCorePersister();
 
         // TODO browse publication by smaller chunk to minimize memory usage.
-        List<Publication> publications = daoFactory.getPublicationDao().getAll();
+        String queryString = "select distinct p.ac from Publication p";
+
+        Query query = daoFactory.getEntityManager().createQuery(queryString);
+        List<String> publications = query.getResultList();
         final int overallPublicationCount = publications.size();
         System.out.println("Starting to process " + totalPublicationCount +" publication(s).");
-        for ( Publication publication : publications ) {
+
+        IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus );
+
+        for ( String publicationAc : publications ) {
+
+            TransactionStatus transactionStatus2 = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+
+            Publication publication = daoFactory.getPublicationDao().getByAc(publicationAc);
 
             System.out.println( "About to process publication: " + publication.getShortLabel()+"..." );
 
@@ -357,7 +366,7 @@ public class ImexAssigner {
                     System.out.println( "\t\t" + printImexPublication( imexPublication ) );
 
                 } else {
-            
+
                     // TODO fire register new publication in IMExCentral
 
                     System.out.println( "\tPublication not yet registered in the IMExCentral." );
@@ -595,11 +604,11 @@ public class ImexAssigner {
                 t.printStackTrace();
             }
 
+            IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus2 );
+
         } // all publications
 
         // Note: this is going to blow up potentially if we load too much data !
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus );
-
         System.out.println( "Total Publications processed: " + totalPublicationCount );
 
         System.out.println( "IMEx Publications processed:  " + imexPublicationCount );
@@ -678,7 +687,7 @@ public class ImexAssigner {
         return status;
     }
 
-    private String printImexPublication( edu.ucla.mbi.imex.central.ws.Publication imexPublications ) {
+    private String printImexPublication( edu.ucla.mbi.imex.central.ws.v10.Publication imexPublications ) {
         return "[IMEx ID: " + imexPublications.getImexAccession() +
                " | Created: " + imexPublications.getCreationDate() +
                " | Owner: " + imexPublications.getOwner() +
@@ -724,7 +733,7 @@ public class ImexAssigner {
 
                 ao.removeAnnotation( annotation );
                 update(ao);
-                daoFactory.getAnnotationDao().delete( annotation );                
+                daoFactory.getAnnotationDao().delete( annotation );
 
                 System.out.println( "WARNING - Removed duplicated annotation '"+ annot.getCvTopic().getShortLabel() +"' on " +
                                     ao.getClass().getSimpleName() + ": " + ao.getAc());
