@@ -17,7 +17,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
 import com.google.common.collect.Lists;
-import edu.ucla.mbi.imex.central.ws.v10.IcentralFault;
+import edu.ucla.mbi.imex.central.ws.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +32,7 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.LoggingImexUpdateL
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ReportWriterListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.FileImexUpdateReportHandler;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Publication;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.ExperimentUtils;
 import uk.ac.ebi.intact.model.util.PublicationUtils;
@@ -687,7 +688,7 @@ public class ImexAssigner {
         return status;
     }
 
-    private String printImexPublication( edu.ucla.mbi.imex.central.ws.v10.Publication imexPublications ) {
+    private String printImexPublication( edu.ucla.mbi.imex.central.ws.Publication imexPublications ) {
         return "[IMEx ID: " + imexPublications.getImexAccession() +
                " | Created: " + imexPublications.getCreationDate() +
                " | Owner: " + imexPublications.getOwner() +
