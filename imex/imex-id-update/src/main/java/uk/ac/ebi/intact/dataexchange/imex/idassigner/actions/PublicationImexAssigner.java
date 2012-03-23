@@ -1,18 +1,13 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
-import edu.ucla.mbi.imex.central.ws.v20.IcentralFault;
+//import edu.ucla.mbi.imex.central.ws.v20.IcentralFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
-import uk.ac.ebi.intact.bridges.imexcentral.Operation;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexUtils;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.model.Publication;
 
 /**
  * This class will assign an IMEx id to a publication
@@ -50,7 +45,7 @@ public class PublicationImexAssigner {
         }
     }
 
-    public edu.ucla.mbi.imex.central.ws.v20.Publication getExistingPublication(String publicationId) throws ImexCentralException {
+    /*public edu.ucla.mbi.imex.central.ws.v20.Publication getExistingPublication(String publicationId) throws ImexCentralException {
 
         if (publicationId != null){
             return imexCentral.getPublicationById(publicationId);
@@ -145,5 +140,5 @@ public class PublicationImexAssigner {
         }
 
         return false;
-    }
+    }*/
 }
