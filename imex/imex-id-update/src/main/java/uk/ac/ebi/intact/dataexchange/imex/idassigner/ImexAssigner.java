@@ -16,36 +16,6 @@
 
 package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
-import com.google.common.collect.Lists;
-import edu.ucla.mbi.imex.central.ws.*;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hupo.psi.mi.psicquic.wsclient.PsicquicSimpleClient;
-import org.springframework.transaction.TransactionStatus;
-import uk.ac.ebi.intact.bridges.imexcentral.*;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateEvent;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateListener;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.LoggingImexUpdateListener;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ReportWriterListener;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.FileImexUpdateReportHandler;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Publication;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.ExperimentUtils;
-import uk.ac.ebi.intact.model.util.PublicationUtils;
-
-import javax.persistence.Query;
-import javax.swing.event.EventListenerList;
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Pattern;
-
 /**
  * Assigns IMEx IDs to IntAct publications, synchronizing with IMExCentral if necessary.
  *
@@ -53,7 +23,7 @@ import java.util.regex.Pattern;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class ImexAssigner {
+/*public class ImexAssigner {
 
     private static final Log log = LogFactory.getLog( ImexAssigner.class );
 
@@ -1061,5 +1031,5 @@ public class ImexAssigner {
 
         assigner.update();
     }
-}
+}*/
 
