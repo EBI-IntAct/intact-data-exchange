@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <!-- Needed by Spring to find the annotations in the code -->
+    <context:component-scan base-package="uk.ac.ebi.intact.dataexchange.imex.idassigner"/>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations" value="classpath*:intact.properties"/>
+    </bean>
+
+    <!-- updaters -->
+    <bean id="aliasUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvAliasUpdaterImpl"/>
+    <bean id="annotationUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvAnnotationUpdaterImpl"/>
+    <bean id="parentUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvParentUpdaterImpl"/>
+    <bean id="xrefUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvXrefUpdaterImpl"/>
+    <bean id="usedInClassUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.UsedInClassAnnotationUpdaterImpl">
+        <property name="classSeparator" value=","/>
+    </bean>
+
+    <bean id="aliasInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvAliasUpdaterImpl"/>
+    <bean id="annotationInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvAnnotationUpdaterImpl"/>
+    <bean id="parentInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvParentUpdaterImpl"/>
+    <bean id="xrefInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvXrefUpdaterImpl"/>
+    <bean id="usedInClassInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.UsedInClassAnnotationUpdaterImpl">
+        <property name="classSeparator" value=","/>
+    </bean>
+
+    <bean id="cvUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvUpdaterImpl">
+        <property name="cvAliasUpdater" ref="aliasUpdater"/>
+        <property name="cvParentUpdater" ref="parentUpdater"/>
+        <property name="cvXrefUpdater" ref="xrefUpdater"/>
+        <property name="cvAnnotationUpdater" ref="annotationUpdater"/>
+        <property name="usedInClassAnnotationUpdater" ref="usedInClassUpdater"/>
+    </bean>
+
+    <bean id="cvInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvInitializer">
+        <property name="cvAliasUpdater" ref="aliasInitializer"/>
+        <property name="cvParentUpdater" ref="parentInitializer"/>
+        <property name="cvXrefUpdater" ref="xrefInitializer"/>
+        <property name="cvAnnotationUpdater" ref="annotationInitializer"/>
+        <property name="usedInClassAnnotationUpdater" ref="usedInClassInitializer"/>
+    </bean>
+
+    <!-- obsolete remapper -->
+    <bean id="obsoleteRemapper" class="uk.ac.ebi.intact.dbupdate.cv.remapper.ObsoleteCvRemapperImpl">
+        <property name="ontologyIdToDatabase">
+            <map>
+                <entry key="MI" value="MI:0488"/>
+                <entry key="MOD" value="MI:0897"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- Cv importer -->
+    <bean id="cvImporter" class="uk.ac.ebi.intact.dbupdate.cv.importer.CvImporterImpl">
+        <property name="cvUpdater" ref="cvInitializer"/>
+    </bean>
+
+    <!-- error factory-->
+    <bean id="errorFactory" class="uk.ac.ebi.intact.dbupdate.cv.errors.DefaultCvUpdateErrorFactory"/>
+
+</beans>

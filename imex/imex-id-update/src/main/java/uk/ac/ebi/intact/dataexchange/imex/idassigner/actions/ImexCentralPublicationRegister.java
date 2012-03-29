@@ -1,77 +1,30 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
-import edu.ucla.mbi.imex.central.ws.v20.IcentralFault;
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 
 /**
- * This class can register a publication in IMEx central and collect a publication record in IMEx central
+ * Interface for registering a publication in IMEx central and collect a publication record in IMEx central
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
- * @since <pre>28/03/12</pre>
+ * @since <pre>29/03/12</pre>
  */
 
-public class ImexCentralPublicationRegister extends ImexCentralUpdater{
-
-    private static final Log log = LogFactory.getLog(ImexCentralPublicationRegister.class);
-
-    private static int UNKNOWN_IDENTIFIER = 5;
-    private static int RECORD_NOT_CREATED = 7;
-    private static int NO_RECORD_FOUND = 6;
+public interface ImexCentralPublicationRegister {
 
     /**
-     *
+     * Retrieve an existing record in IMEx central matching the publication identifier (pubmed, doi or imex)
      * @param publicationId
-     * @return the registered publication in IMEx central matching the publication id of the publication. Null if the publication has not been registered
-     * @throws ImexCentralException
+     * @return
+     * @throws PublicationImexUpdaterException if it is not possible to retrieve any publications with this identifier
      */
-    public Publication getExistingPublicationInImexCentral(String publicationId) throws PublicationImexUpdaterException {
+    public Publication getExistingPublicationInImexCentral(String publicationId) throws PublicationImexUpdaterException;
 
-        if (publicationId != null){
-            try {
-                return imexCentral.getPublicationById(publicationId);
-            } catch (ImexCentralException e) {
-                IcentralFault f = (IcentralFault) e.getCause();
-                if( f.getFaultInfo().getFaultCode() == UNKNOWN_IDENTIFIER ) {
-                    throw new PublicationImexUpdaterException("The identifier "+publicationId+"is not recognized in IMEx central", e);
-                }
-                else if( f.getFaultInfo().getFaultCode() == NO_RECORD_FOUND ) {
-                    throw new PublicationImexUpdaterException("Cannot find publication " + publicationId + " in IMEx central.", e);
-                }
-                else {
-                    throw new PublicationImexUpdaterException("Cannot retrieve Publication " + publicationId + "in IMEx central.", e);
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public Publication registerPublicationInImexCentral(uk.ac.ebi.intact.model.Publication intactPublication) throws PublicationImexUpdaterException{
-        // create a new publication record in IMEx central
-        Publication newPublication = null;
-        String pubId = extractPubIdFromIntactPublication(intactPublication);
-
-        try {
-
-            newPublication = imexCentral.createPublicationById(pubId);
-            System.out.println("Registered publication : " + pubId + " in IMEx central.");
-
-            return newPublication;
-        } catch (ImexCentralException e) {
-            IcentralFault f = (IcentralFault) e.getCause();
-            if( f.getFaultInfo().getFaultCode() == UNKNOWN_IDENTIFIER ) {
-                throw new PublicationImexUpdaterException("Cannot create a new record because the identifier " + pubId + "is not recognized in IMEx central", e);
-            }
-            else if( f.getFaultInfo().getFaultCode() == RECORD_NOT_CREATED ) {
-                throw new PublicationImexUpdaterException("Cannot create a new record in IMEx central for publication " + intactPublication.getShortLabel(), e);
-            }
-            else {
-                throw new PublicationImexUpdaterException("Cannot register publication " + intactPublication.getShortLabel()+" in IMEx central.", e);
-            }
-        }
-    }
+    /**
+     * Register a publication in IMEx central which is not existing in IMEx central
+     * @param intactPublication
+     * @return  the record in IMEx central which have been created
+     * @throws PublicationImexUpdaterException if it is not possible to create a new record for this publication (may already exists, publication identifier not recognized, etc.)
+     */
+    public Publication registerPublicationInImexCentral(uk.ac.ebi.intact.model.Publication intactPublication) throws PublicationImexUpdaterException;
 }
