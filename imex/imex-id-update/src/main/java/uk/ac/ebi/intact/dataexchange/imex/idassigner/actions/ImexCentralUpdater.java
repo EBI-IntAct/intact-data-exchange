@@ -14,7 +14,7 @@ import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
 public abstract class ImexCentralUpdater {
 
     protected ImexCentralClient imexCentral;
-    protected static String UNASSIGNED_PREFIX = "unassigned";
+    public static String UNASSIGNED_PREFIX = "unassigned";
 
     public void ImexCentralUpdater(ImexCentralClient imexCentral){
 

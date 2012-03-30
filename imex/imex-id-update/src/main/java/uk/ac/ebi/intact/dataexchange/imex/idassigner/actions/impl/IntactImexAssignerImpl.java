@@ -33,44 +33,137 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     private Pattern interaction_imex_regexp = Pattern.compile("(IM-[1-9][0-9]*)-([1-9][0-9]*])");
     private static String IMEX_SECONDARY_MI = "MI:0952";
     private static String IMEX_SECONDARY = "imex secondary";
+    private static String FULL_COVERAGE_MI = "MI:0957";
+    private static String FULL_COVERAGE = "full coverage";
+    private static String IMEX_CURATION_MI = "MI:0959";
+    private static String IMEX_CURATION = "imex curation";
+    private static String FULL_COVERAGE_TEXT = "Only protein-protein interactions";
 
     private Collection<ExperimentXref> experimentXrefs = new ArrayList<ExperimentXref>();
     private Collection<InteractorXref> interactionXrefs = new ArrayList<InteractorXref>();
+    private Collection<Annotation> publicationAnnot = new ArrayList<Annotation>();
     private Set<String> processedImexIds = new HashSet<String> ();
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public void assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException {
-
-        DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
-        XrefDao<PublicationXref> xrefDao = daoFactory.getXrefDao(PublicationXref.class);
-        PublicationDao pubDao = daoFactory.getPublicationDao();
 
         String pubId = extractIdentifierFromPublication(intactPublication, imexPublication);
 
         imexPublication = imexCentral.getPublicationImexAccession( pubId, true );
 
         if (imexPublication.getImexAccession() != null){
-            CvDatabase imex = daoFactory.getCvObjectDao( CvDatabase.class ).getByPsiMiRef( CvDatabase.IMEX_MI_REF );
-            if (imex == null){
-                imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-                IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate(imex);
-            }
-
-            CvXrefQualifier imexPrimary = daoFactory.getCvObjectDao( CvXrefQualifier.class ).getByPsiMiRef( CvXrefQualifier.IMEX_PRIMARY_MI_REF );
-            if (imexPrimary == null){
-                imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-                IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate(imexPrimary);
-            }
-
-            PublicationXref pubXref = new PublicationXref( intactPublication.getOwner(), imex, imexPublication.getImexAccession(), imexPrimary );
-            intactPublication.addXref( pubXref );
-
-            xrefDao.persist(pubXref);
-            pubDao.update(intactPublication);
+            updateImexPrimaryRef(intactPublication, imexPublication);
+            
+            updatePublicationAnnotations(intactPublication);
         }
         else {
             throw new PublicationImexUpdaterException("Impossible to assign an IMEx identifier to publication " + intactPublication.getShortLabel());
         }
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void updateImexPrimaryRef(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) {
+        DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        XrefDao<PublicationXref> xrefDao = daoFactory.getXrefDao(PublicationXref.class);
+        PublicationDao pubDao = daoFactory.getPublicationDao();
+
+        CvDatabase imex = daoFactory.getCvObjectDao( CvDatabase.class ).getByPsiMiRef( CvDatabase.IMEX_MI_REF );
+        if (imex == null){
+            imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
+            IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate(imex);
+        }
+
+        CvXrefQualifier imexPrimary = daoFactory.getCvObjectDao( CvXrefQualifier.class ).getByPsiMiRef( CvXrefQualifier.IMEX_PRIMARY_MI_REF );
+        if (imexPrimary == null){
+            imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
+            IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate(imexPrimary);
+        }
+
+        PublicationXref pubXref = new PublicationXref( intactPublication.getOwner(), imex, imexPublication.getImexAccession(), imexPrimary );
+        intactPublication.addXref( pubXref );
+
+        xrefDao.persist(pubXref);
+        pubDao.update(intactPublication);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void updatePublicationAnnotations(uk.ac.ebi.intact.model.Publication intactPublication){
+        publicationAnnot.clear();
+        publicationAnnot.addAll(intactPublication.getAnnotations());
+        
+        DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        AnnotationDao annotationDao = daoFactory.getAnnotationDao();
+        PublicationDao publicationDao = daoFactory.getPublicationDao();
+
+        boolean hasImexCuration = false;
+        boolean hasFullCoverage = false;
+        
+        for (Annotation ann : publicationAnnot){
+
+            // full coverage annot
+            if (ann.getCvTopic() != null && ann.getCvTopic().getIdentifier() != null && ann.getCvTopic().getIdentifier().equals(FULL_COVERAGE_MI)){
+
+                // annotation is a duplicate, we delete it
+                if (hasFullCoverage){
+                    intactPublication.removeAnnotation(ann);
+                    annotationDao.delete(ann);
+                }
+                // first time we see a full coverage, if not the same text, we update it
+                else if (ann.getAnnotationText() == null || (ann.getAnnotationText() != null && !ann.getAnnotationText().equals(FULL_COVERAGE_TEXT))){
+                    hasFullCoverage = true;
+
+                    ann.setAnnotationText(FULL_COVERAGE_TEXT);
+                    annotationDao.update(ann);
+                }
+                // we found full coverage with same annotation text
+                else {
+                    hasFullCoverage = true;
+                }
+            }
+            // imex curation annot
+            else if (ann.getCvTopic() != null && ann.getCvTopic().getIdentifier() != null && ann.getCvTopic().getIdentifier().equals(IMEX_CURATION_MI)){
+
+                // annotation is a duplicate, we delete it
+                if (hasImexCuration){
+                    intactPublication.removeAnnotation(ann);
+                    annotationDao.delete(ann);
+                }
+                // we found imex curation
+                else {
+                    hasImexCuration = true;
+                }
+            }
+        }
+
+        if (!hasFullCoverage){
+            CvTopic fullCoverage = daoFactory.getCvObjectDao( CvTopic.class ).getByPsiMiRef( FULL_COVERAGE_MI );
+            if (fullCoverage == null){
+                fullCoverage = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, FULL_COVERAGE_MI, FULL_COVERAGE);
+                IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate(fullCoverage);
+            }
+
+            Annotation fullCoverageAnnot = new Annotation( fullCoverage, FULL_COVERAGE_TEXT );
+            annotationDao.persist(fullCoverageAnnot);
+        }
+
+        if (!hasImexCuration){
+            CvTopic imexCuration = daoFactory.getCvObjectDao( CvTopic.class ).getByPsiMiRef( IMEX_CURATION_MI );
+            if (imexCuration == null){
+                imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, IMEX_CURATION_MI, IMEX_CURATION);
+                IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate(imexCuration);
+            }
+
+            Annotation imexCurationAnnot = new Annotation( imexCuration, null );
+            annotationDao.persist(imexCurationAnnot);
+
+            intactPublication.addAnnotation(imexCurationAnnot);
+        }
+
+        if (!hasFullCoverage || !hasImexCuration){
+            publicationDao.update(intactPublication);
+        }
+        
+        publicationAnnot.clear();
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -185,6 +278,8 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     public void assignImexIdentifiersForAllInteractions(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException {
 
         if (imexId != null){
+            processedImexIds.clear();
+
             List<String> existingImexIds = collectExistingInteractionImexIdsForPublication(intactPublication);
             int nextInteractionIndex = getNextImexChunkNumberAndFilterValidImexIdsFrom(existingImexIds, imexId);
             DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
@@ -289,8 +384,9 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         else {
             throw new PublicationImexUpdaterException("Impossible to update IMEx identifiers to interactions of publication " + intactPublication.getShortLabel());
         }
-        
+
         interactionXrefs.clear();
+        processedImexIds.clear();
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)

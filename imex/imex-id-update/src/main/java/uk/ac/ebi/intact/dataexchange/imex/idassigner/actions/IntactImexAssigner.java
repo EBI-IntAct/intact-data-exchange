@@ -5,6 +5,8 @@ import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
 
+import java.util.List;
+
 /**
  * Interface for assigning IMEx id to a publication and updating intact publications, experiments and interactions
  *
@@ -40,4 +42,39 @@ public interface IntactImexAssigner {
      */
     public void updateImexIdentifierForInteraction(Interaction intactInteraction, String imexId) throws PublicationImexUpdaterException;
 
+    /**
+     * Copy the IMEx id to all experiments of a publication and checks if any conflicts in IntAct
+     * @param intactPublication
+     * @param imexId
+     * @throws PublicationImexUpdaterException
+     */
+    public void updateImexIdentifiersForAllExperiments(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException;
+
+    /**
+     *
+     * @param intactPublication
+     * @return a list of interaction IMEx ids associated with the publication
+     */
+    public List<String> collectExistingInteractionImexIdsForPublication(uk.ac.ebi.intact.model.Publication intactPublication);
+
+    /**
+     * Assign an IMEx id for all the interactions of a publication if not already done. Checks if any conflicts in Intact
+     * @param intactPublication
+     * @param imexId
+     * @throws PublicationImexUpdaterException
+     */
+    public void assignImexIdentifiersForAllInteractions(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException;
+
+    /**
+     * Add imex curation and full coverage annotations if not alrteady there
+     * @param intactPublication
+     */
+    public void updatePublicationAnnotations(uk.ac.ebi.intact.model.Publication intactPublication);
+
+    /**
+     * Add or update imex primary ref in Intact
+     * @param intactPublication
+     * @param imexPublication
+     */
+    public void updateImexPrimaryRef(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication);
 }
