@@ -1,13 +1,16 @@
-package uk.ac.ebi.intact.dataexchange.imex.idassigner;
+package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.transaction.TransactionStatus;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.IntactPublicationCollector;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 
 import javax.persistence.Query;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -18,7 +21,7 @@ import java.util.List;
  * @since <pre>02/03/12</pre>
  */
 
-public class PublicationsCollector {
+public class IntactPublicationsCollectorImpl implements IntactPublicationCollector{
 
     private List<String> publicationsHavingImexId;
     private List<String> publicationsWithInteractionsHavingImexId;
@@ -28,7 +31,7 @@ public class PublicationsCollector {
     private List<String> publicationsHavingDataset;
     private List<String> publicationsHavingImexCurationLevel;
 
-    public PublicationsCollector(){
+    public IntactPublicationsCollectorImpl(){
         publicationsHavingImexId = collectPublicationsHavingImexIds();
         publicationsWithInteractionsHavingImexId = collectPublicationHavingInteractionImexIds();
         publicationsWithExperimentsHavingImexId = collectPublicationHavingExperimentImexIds();
@@ -98,7 +101,7 @@ public class PublicationsCollector {
 
         Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
         query.setParameter("curation", "MI:0955");
-        query.setParameter("imex", "IMEx");
+        query.setParameter("imex", "imex curation");
 
         List<String> publications = query.getResultList();
         IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus );
@@ -175,5 +178,65 @@ public class PublicationsCollector {
 
     public List<String> getPublicationsHavingImexCurationLevel() {
         return publicationsHavingImexCurationLevel;
+    }
+    
+    public Collection<String> getPublicationsNeedingAnImexId(){
+
+        // publications having specific journal and specific dataset can be IMEx publications
+        Collection<String> potentialPublicationsForImex = CollectionUtils.union(publicationsHavingDataset, publicationsHavingJournalAndYear);
+
+        // potentialPublications needing an IMEx id to be assigned = potential publications for imex - publications already having IMEx ids
+        Collection<String> potentialPublicationsToBeAssigned = CollectionUtils.subtract(potentialPublicationsForImex, publicationsHavingImexId);
+
+        // publications for which we can assign a new IMEx id = potentialPublications needing an IMEx id to be assigned AND publications having IMEx curation level
+        Collection<String> publicationsToBeAssigned = CollectionUtils.intersection(potentialPublicationsForImex, publicationsHavingImexCurationLevel);
+
+        return publicationsToBeAssigned;
+    }
+
+    public Collection<String> getPublicationsHavingIMExIdToUpdate() {
+
+        // publications having imex id plus imex curation level
+        Collection<String> publicationsWithIMExIdToUpdate = CollectionUtils.intersection(publicationsHavingImexId, publicationsHavingImexCurationLevel);
+
+        return publicationsWithIMExIdToUpdate;
+    }
+
+    public Collection<String> getPublicationsHavingIMExIdAndNotImexCurationLevel() {
+
+        // publications having imex id but not imex curation level
+        Collection<String> publicationsWithImexAndNotImexCurationLevel = CollectionUtils.subtract(publicationsHavingImexId, publicationsHavingImexCurationLevel);
+
+        return publicationsWithImexAndNotImexCurationLevel;
+    }
+
+    public Collection<String> getPublicationsHavingImexCurationLevelButAreNotEligibleImex() {
+
+        // publications having imex curation level but no IMEx id
+        Collection<String> publicationsWithImexCurationLevelAndNotImexId = CollectionUtils.subtract(publicationsHavingImexCurationLevel, publicationsHavingImexId);
+
+        // publications having specific journal and specific dataset can be IMEx publications
+        Collection<String> potentialPublicationsForImex = CollectionUtils.union(publicationsHavingDataset, publicationsHavingJournalAndYear);
+
+        // publications having imex curation level but are not eligible for automatic IMEx assignment
+        Collection<String> publicationsNotEligibleForImexWithImexCurationLevel = CollectionUtils.subtract(publicationsWithImexCurationLevelAndNotImexId, potentialPublicationsForImex);
+
+        return publicationsNotEligibleForImexWithImexCurationLevel;
+    }
+
+    public Collection<String> getPublicationsWithoutImexButWithExperimentImex() {
+
+        // publications without IMEx id but with experiment having IMEx id
+        Collection<String> publicationsWithExperimentImexButNoImexId = CollectionUtils.subtract(publicationsWithExperimentsHavingImexId, publicationsHavingImexId);
+
+        return publicationsWithExperimentImexButNoImexId;
+    }
+
+    public Collection<String> getPublicationsWithoutImexButWithInteractionImex() {
+
+        // publications without IMEx id but with interaction having IMEx id
+        Collection<String> publicationsWithInteractionImexButNoImexId = CollectionUtils.subtract(publicationsWithInteractionsHavingImexId, publicationsHavingImexId);
+
+        return publicationsWithInteractionImexButNoImexId;
     }
 }

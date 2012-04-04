@@ -47,11 +47,11 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     @Transactional(propagation = Propagation.SUPPORTS)
     public void assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException {
 
-        String pubId = extractIdentifierFromPublication(intactPublication, imexPublication);
+        String pubId = extractPubIdFromIntactPublication(intactPublication);
 
         imexPublication = imexCentral.getPublicationImexAccession( pubId, true );
 
-        if (imexPublication.getImexAccession() != null){
+        if (imexPublication.getImexAccession() != null && !imexPublication.getImexAccession().equals(PublicationIdentifierSynchronizerImpl.NO_IMEX_ID)){
             updateImexPrimaryRef(intactPublication, imexPublication);
             
             updatePublicationAnnotations(intactPublication);

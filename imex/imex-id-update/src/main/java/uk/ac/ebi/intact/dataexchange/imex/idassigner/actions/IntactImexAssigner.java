@@ -18,10 +18,11 @@ import java.util.List;
 public interface IntactImexAssigner {
 
     /**
-     * Assign a new IMEx id to a publication and update the intact publication
-     * @param intactPublication
-     * @param imexPublication
-     * @throws PublicationImexUpdaterException
+     * Assign a new IMEx id to a publication and update the annotations of the publication (full coverage and imex curation).
+     * It is only possible to assign a new IMEx id to publications having valid pubmed ids (no unassigned and no DOI number)
+     * @param intactPublication : the publication in IntAct
+     * @param imexPublication : the publication in IMEx
+     * @throws PublicationImexUpdaterException if IMEx central could not generate a valid IMEx id
      * @throws ImexCentralException
      */
     public void assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException;
