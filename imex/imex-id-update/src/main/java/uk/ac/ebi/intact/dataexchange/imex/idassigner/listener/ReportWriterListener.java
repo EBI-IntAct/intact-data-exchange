@@ -1,13 +1,14 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.listener;
 
-import org.joda.time.DateTime;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexUtils;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.IntactUpdateEvent;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.NewAssignedImexEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.ImexUpdateReportHandler;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.ReportWriter;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.AnnotatedObject;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Write to disk on event fired.
@@ -33,41 +34,77 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
     // AbstractImexUpdateListener
 
     @Override
-    public void onProcessPublication( ImexUpdateEvent evt ) throws ProcessorException {
+    public void onNewImexAssigned( NewAssignedImexEvent evt ) throws ProcessorException{
         try {
-            writeDefaultLine( reportHandler.getProcessedWriter(), evt.getPublication(), evt.getMessage() );
+            ReportWriter writer = reportHandler.getNewImexAssignedWriter();
+            writer.writeHeaderIfNecessary("Publication id",
+                    "Imex id",
+                    "Interaction ac",
+                    "Interaction imex id");
+
+            String pubId = dashIfNull(evt.getPublicationId());
+            String imex = dashIfNull(evt.getImexId());
+            String intAc = dashIfNull(evt.getInteractionAc());
+            String intImex = dashIfNull(evt.getInteractionImexId());
+
+            writer.writeColumnValues(pubId,
+                    imex,
+                    intAc,
+                    intImex);
+            writer.flush();
+
         } catch ( IOException e ) {
-            throw new ProcessorException("Error while processing publication " + evt.getPublication().getShortLabel(), e );
+            throw new ProcessorException( "Error while flushing intact update event ", e );
         }
     }
 
     @Override
-    public void onProcessImexPublication( ImexUpdateEvent evt ) throws ProcessorException {
+    public void onIntactUpdate( IntactUpdateEvent evt ) throws ProcessorException{
         try {
-            writeDefaultLine( reportHandler.getProcessImexPublicationWriter(), evt.getPublication(), evt.getMessage() );
-        } catch ( IOException e ) {
-            throw new ProcessorException( "Error while processing publication " + evt.getPublication().getShortLabel(), e );
-        }
-    }
+            ReportWriter writer = reportHandler.getIntactUpdateWriter();
+            writer.writeHeaderIfNecessary("Publication id",
+                    "Imex id",
+                    "Number updated experiments",
+                    "Number updated interactions",
+                    "Updated experiments",
+                    "Updated interactions");
 
-    @Override
-    public void onPublicationUpToDate( ImexUpdateEvent evt ) throws ProcessorException {
-        try {
-            writeDefaultLine( reportHandler.getPublicationUpToDateWriter(), evt.getPublication(), evt.getMessage() );
-        } catch ( IOException e ) {
-            throw new ProcessorException( "Error while processing publication " + evt.getPublication().getShortLabel(), e );
-        }
-    }
+            String pubId = dashIfNull(evt.getPublicationId());
+            String imex = dashIfNull(evt.getImexId());
+            int numberExperiments = evt.getUpdatedExp().size();
+            int numberInteractions = evt.getUpdatedInteraction().size();
+            String experimentAc = writeObjectAcsFor(evt.getUpdatedExp());
+            String interactionAc = writeObjectAcsFor(evt.getUpdatedInteraction());
 
-    @Override
-    public void onImexIdAssignedToPublication( ImexUpdateEvent evt ) throws ProcessorException {
-        try {
-            writeDefaultLine( reportHandler.getImexIdAssignedToPublicationWriter(), evt.getPublication(), evt.getMessage() );
+            writer.writeColumnValues(pubId,
+                    imex,
+                    Integer.toString(numberExperiments),
+                    Integer.toString(numberInteractions),
+                    experimentAc.equals("") ? "-": experimentAc,
+                    interactionAc.equals("") ? "-": interactionAc);
+            writer.flush();
+
         } catch ( IOException e ) {
-            throw new ProcessorException( "Error while processing publication " + evt.getPublication().getShortLabel(), e );
+            throw new ProcessorException( "Error while flushing intact update event ", e );
         }
     }
     
+    private String writeObjectAcsFor(List<? extends AnnotatedObject> intactobjects){
+        StringBuffer buffer = new StringBuffer();
+        
+        for (AnnotatedObject obj : intactobjects){
+            if (obj.getAc() != null){
+                buffer.append(obj.getAc());
+                buffer.append(", ");
+            }
+            else{
+                buffer.append(obj.getShortLabel());
+                buffer.append(", ");
+            }
+        }
+        return buffer.toString();
+    }
+
     @Override
     public void onImexError( ImexErrorEvent evt ) throws ProcessorException{
         try {
@@ -99,100 +136,8 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
         }
     }
 
-    @Override
-    public void onImexIdAssignedToInteraction( ImexUpdateEvent evt ) throws ProcessorException {
-        try {
-            ReportWriter writer = reportHandler.getImexIdAssignedToInteractionWriter();
-            writer.writeHeaderIfNecessary("Interaction AC",
-                                          "shortlabel",
-                                          "Interaction IMEx ID",
-                                          "Publication AC",
-                                          "Publication ID",
-                                          "Publication IMEx ID");
-
-            Publication publication = evt.getPublication();
-            Interaction interaction = evt.getInteraction();
-
-            writer.writeColumnValues(interaction.getAc(),
-                                     interaction.getShortLabel(),
-                                     dashIfNull( getImexId( interaction ) ),
-                                     publication.getAc(),
-                                     publication.getPublicationId(),
-                                     dashIfNull( getImexId( publication ) ) );
-            writer.flush();
-
-        } catch ( IOException e ) {
-            throw new ProcessorException( "Error while processing publication " + evt.getPublication().getShortLabel(), e );
-        }
-    }
-
-    @Override
-    public void onImexIdMismatchFound( ImexUpdateEvent evt ) throws ProcessorException {
-        try {
-            writeDefaultLine( reportHandler.getImexIdMismatchFoundWriter(), evt.getPublication(), evt.getMessage() );
-        } catch ( IOException e ) {
-            throw new ProcessorException( "Error while processing publication " + evt.getPublication().getShortLabel(), e );
-        }
-    }
-
     //////////////////
     // Utilities
-
-    private void writeDefaultHeaderIfNecessary(ReportWriter writer) throws IOException {
-        if (writer != null) {
-            writer.writeHeaderIfNecessary("datetime", "Publication AC", "Publication Identifier", "IMEx ID", "Curator", "Message");
-
-            writer.flush();
-        }
-    }
-
-    private void writeDefaultLine( ReportWriter writer, Publication publication ) throws IOException {
-        writeDefaultLine( writer, publication, null );
-    }
-
-    private void writeDefaultLine( ReportWriter writer, Publication publication, String message ) throws IOException {
-        writeDefaultHeaderIfNecessary( writer );
-        if ( writer != null ) {
-            String imexId = dashIfNull( getImexId( publication ) );
-            String curator = dashIfNull( getCurator( publication ) );
-            message = dashIfNull( message );
-
-            writer.writeColumnValues( new DateTime().toString(),
-                                      publication.getAc(),
-                                      publication.getShortLabel(),
-                                      imexId,
-                                      curator,
-                                      message );
-            writer.flush();
-        }
-    }
-
-    private String getCurator( Publication publication ) {
-        Experiment first = null;
-        for ( Experiment e : publication.getExperiments() ) {
-            if( first == null ) {
-                first = e;
-            } else {
-                if( e.getCreated().before( first.getCreated() ) ) {
-                    first = e;
-                }
-            }
-        }
-
-        if( first != null ) {
-            return first.getCreator();
-        }
-        
-        return null;
-    }
-
-    private String getImexId( AnnotatedObject ao ) {
-        final Xref xref = ImexUtils.getPrimaryImexId( ao );
-        if( xref == null ) {
-            return null;
-        }
-        return xref.getPrimaryId();
-    }
 
     private String dashIfNull( String str ) {
         str = ( str != null ) ? str : EMPTY_VALUE;

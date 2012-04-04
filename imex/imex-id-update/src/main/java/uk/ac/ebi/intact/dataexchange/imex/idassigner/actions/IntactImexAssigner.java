@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexCentralManager;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
 
@@ -22,35 +23,37 @@ public interface IntactImexAssigner {
      * to the intact publication. It is only possible to assign a new IMEx id to publications having valid pubmed ids (no unassigned and no DOI number)
      * @param intactPublication : the publication in IntAct
      * @param imexPublication : the publication in IMEx
-     * @throws PublicationImexUpdaterException if IMEx central could not generate a valid IMEx id
+     * @return true if the IMEx assigner was successful, false otherwise
      * @throws ImexCentralException if no record found or no IMEx id
      */
-    public void assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException;
+    public boolean assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException;
 
     /**
      * Add a IMEx primary reference to the experiment
      * @param intactExperiment
      * @param imexId
-     * @throws PublicationImexUpdaterException if the imexId is null
+     * @return true if the IMEx assigner did an update of the experiment, false otherwise
      */
-    public void updateImexIdentifierForExperiment(Experiment intactExperiment, String imexId) throws PublicationImexUpdaterException;
+    public boolean updateImexIdentifierForExperiment(Experiment intactExperiment, String imexId);
 
     /**
      * Add a IMEx primary reference to the interaction
      * @param intactInteraction
      * @param imexId
-     * @throws PublicationImexUpdaterException if the IMEx id is null
+     * @return true if the IMEx assigner did an update of the interaction, false otherwise
      */
-    public void updateImexIdentifierForInteraction(Interaction intactInteraction, String imexId) throws PublicationImexUpdaterException;
+    public boolean updateImexIdentifierForInteraction(Interaction intactInteraction, String imexId) ;
 
     /**
      * Copy the IMEx id to all experiments of a publication if they don't have the IMEx primary reference. It will not add the IMEx primary reference if
      * there is already an IMEx primary reference to another IMEx id. It will clean up duplicated IMEx ids
      * @param intactPublication
      * @param imexId
-     * @throws PublicationImexUpdaterException if IMEx id is null
+     * @param imexCentralManager ; to fire events if provided.
+     * @return a list of experiments which have been updated
+     * @throws PublicationImexUpdaterException if IMEx id is null or imex conflict and no imexCentralManager was provided to fire an error event
      */
-    public void updateImexIdentifiersForAllExperiments(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException;
+    public List<Experiment> updateImexIdentifiersForAllExperiments(uk.ac.ebi.intact.model.Publication intactPublication, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException;
 
     /**
      * Collect all the interaction IMEx ids associated with this publication
@@ -64,20 +67,24 @@ public interface IntactImexAssigner {
      * IMEx id or interactions which are not PPI. It will clean up duplicated IMEx id and a IMEx primary reference which is invalid will become imex secondary.
      * @param intactPublication
      * @param imexId
-     * @throws PublicationImexUpdaterException when IMEx id is null
+     * @param imexCentralManager ; to fire events if provided.
+     * @return a list of experiments which have been updated
+     * @throws PublicationImexUpdaterException when IMEx id is null or imex conflict and no imexCentralManager was provided to fire an error event
      */
-    public void assignImexIdentifiersForAllInteractions(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException;
+    public List<Interaction> assignImexIdentifiersForAllInteractions(uk.ac.ebi.intact.model.Publication intactPublication, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException;
 
     /**
      * Add imex curation and full coverage annotations if not already present
      * @param intactPublication
+     * @return true if annotations have been updated, false otherwise
      */
-    public void updatePublicationAnnotations(uk.ac.ebi.intact.model.Publication intactPublication);
+    public boolean updatePublicationAnnotations(uk.ac.ebi.intact.model.Publication intactPublication);
 
     /**
      * Add or update imex primary ref in Intact publication
      * @param intactPublication
      * @param imexPublication
+     * @return true if imex primary ref have been updated, false otherwise
      */
-    public void updateImexPrimaryRef(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication);
+    public boolean updateImexPrimaryRef(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication);
 }

@@ -13,13 +13,9 @@ import java.io.IOException;
  */
 public class FileImexUpdateReportHandler implements ImexUpdateReportHandler {
 
-    private ReportWriter processedWriter;
-    private ReportWriter imexPublicationWriter;
-    private ReportWriter publicationUpToDateWriter;
-    private ReportWriter imexIdAssignedToPublicationWriter;
-    private ReportWriter imexIdAssignedToInteractionWriter;
-    private ReportWriter imexIdMismatchWriter;
+    private ReportWriter newImexAssignedWriter;
     private ReportWriter imexErrorWriter;
+    private ReportWriter intactUpdateWriter;
 
     public FileImexUpdateReportHandler( File rootDirectory ) throws IOException {
         if ( !rootDirectory.exists() ) {
@@ -30,53 +26,31 @@ public class FileImexUpdateReportHandler implements ImexUpdateReportHandler {
         }
 
         // Initialize all writers
-        this.processedWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "processed.csv" ) ) );
-        this.imexPublicationWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "processed-imex.csv" ) ) );
-        this.publicationUpToDateWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "up-to-date.csv" ) ) );
-        this.imexIdAssignedToPublicationWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "publication-assigned.csv" ) ) );
-        this.imexIdAssignedToInteractionWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "interaction-assigned.csv" ) ) );
-        this.imexIdMismatchWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "id-mismatch.csv" ) ) );
+        this.newImexAssignedWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "new-imex-assigned.csv" ) ) );
         this.imexErrorWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "imex-errors.csv" ) ) );
-    }
-
-    public ReportWriter getProcessedWriter() throws IOException {
-        return processedWriter;
-    }
-
-    public ReportWriter getProcessImexPublicationWriter() {
-        return imexPublicationWriter;
-    }
-
-    public ReportWriter getPublicationUpToDateWriter() {
-        return publicationUpToDateWriter;
-    }
-
-    public ReportWriter getImexIdAssignedToPublicationWriter() {
-        return imexIdAssignedToPublicationWriter;
-    }
-
-    public ReportWriter getImexIdAssignedToInteractionWriter() {
-        return imexIdAssignedToInteractionWriter;
-    }
-
-    public ReportWriter getImexIdMismatchFoundWriter() {
-        return imexIdMismatchWriter;
+        this.intactUpdateWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "intact-update.csv" ) ) );
     }
 
     public ReportWriter getImexErrorWriter() {
         return imexErrorWriter;
     }
 
+    @Override
+    public ReportWriter getIntactUpdateWriter() {
+        return intactUpdateWriter;
+    }
+
+    @Override
+    public ReportWriter getNewImexAssignedWriter(){
+        return newImexAssignedWriter;
+    }
+
     //////////////////
     // Closeable
 
     public void close() throws IOException {
-        processedWriter.close();
-        imexPublicationWriter.close();
-        publicationUpToDateWriter.close();
-        imexIdAssignedToPublicationWriter.close();
-        imexIdMismatchWriter.close();
-        imexIdAssignedToInteractionWriter.close();
+        newImexAssignedWriter.close();
         imexErrorWriter.close();
+        intactUpdateWriter.close();
     }
 }

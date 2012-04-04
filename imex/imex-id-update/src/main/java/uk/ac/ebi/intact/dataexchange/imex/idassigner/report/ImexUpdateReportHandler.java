@@ -1,7 +1,6 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.report;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 /**
  * Report handler interface.
@@ -12,18 +11,9 @@ import java.io.IOException;
  */
 public interface ImexUpdateReportHandler extends Closeable {
 
-    public ReportWriter getProcessedWriter() throws IOException;
-
-    public ReportWriter getProcessImexPublicationWriter();
-
-    public ReportWriter getPublicationUpToDateWriter();
-
-    public ReportWriter getImexIdAssignedToPublicationWriter();
-
-    public ReportWriter getImexIdAssignedToInteractionWriter();
-
-    public ReportWriter getImexIdMismatchFoundWriter();
-
     public ReportWriter getImexErrorWriter();
 
+    public ReportWriter getIntactUpdateWriter();
+
+    public ReportWriter getNewImexAssignedWriter();
 }

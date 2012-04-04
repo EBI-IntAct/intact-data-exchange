@@ -12,6 +12,9 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexCentralManager;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.ImexCentralUpdater;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.IntactImexAssigner;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationImexUpdaterException;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorType;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.NewAssignedImexEvent;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
@@ -46,7 +49,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     private Set<String> processedImexIds = new HashSet<String> ();
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException {
+    public boolean assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
 
         String pubId = extractPubIdFromIntactPublication(intactPublication);
 
@@ -56,14 +59,16 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
             updateImexPrimaryRef(intactPublication, imexPublication);
 
             updatePublicationAnnotations(intactPublication);
+
+            return true;
         }
         else {
-            throw new PublicationImexUpdaterException("Impossible to assign an IMEx identifier to publication " + intactPublication.getShortLabel());
+            return false;
         }
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void updateImexPrimaryRef(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) {
+    public boolean updateImexPrimaryRef(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) {
         DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
         XrefDao<PublicationXref> xrefDao = daoFactory.getXrefDao(PublicationXref.class);
         PublicationDao pubDao = daoFactory.getPublicationDao();
@@ -85,10 +90,12 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
         xrefDao.persist(pubXref);
         pubDao.update(intactPublication);
+
+        return true;
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void updatePublicationAnnotations(uk.ac.ebi.intact.model.Publication intactPublication){
+    public boolean updatePublicationAnnotations(uk.ac.ebi.intact.model.Publication intactPublication){
         publicationAnnot.clear();
         publicationAnnot.addAll(intactPublication.getAnnotations());
 
@@ -160,28 +167,36 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
             intactPublication.addAnnotation(imexCurationAnnot);
         }
 
+        publicationAnnot.clear();
+
         if (!hasFullCoverage || !hasImexCuration){
             publicationDao.update(intactPublication);
+            return true;
         }
 
-        publicationAnnot.clear();
+        return false;
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void updateImexIdentifiersForAllExperiments(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException {
+    public List<Experiment> updateImexIdentifiersForAllExperiments(uk.ac.ebi.intact.model.Publication intactPublication, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
 
         DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
         XrefDao<ExperimentXref> xrefDao = daoFactory.getXrefDao(ExperimentXref.class);
 
-        if (imexId != null){
+        // imex id is not null and is not default value for missing imex id
+        if (imexId != null && !imexId.equals(ImexCentralManager.NO_IMEX_ID)){
+            List<Experiment> updatedExp = new ArrayList<Experiment>(intactPublication.getExperiments().size());
+
             for (Experiment exp : intactPublication.getExperiments()){
                 experimentXrefs.clear();
                 experimentXrefs.addAll(exp.getXrefs());
 
                 boolean hasImexId = false;
                 boolean hasConflictingImexId = false;
+                boolean isUpdated = false;
 
                 for (ExperimentXref ref : experimentXrefs){
+
                     // imex xref
                     if (ref.getCvDatabase() != null && ref.getCvDatabase().getIdentifier() != null && ref.getCvDatabase().getIdentifier().equals(CvDatabase.IMEX_MI_REF)){
                         // imex primary xref
@@ -201,6 +216,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                 else {
                                     exp.removeXref(ref);
                                     xrefDao.delete(ref);
+                                    isUpdated = true;
                                 }
                             }
                             // null primary identifier but imex id not found, just update the imex id of the ref
@@ -209,29 +225,56 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
                                 ref.setPrimaryId(imexId);
                                 xrefDao.update(ref);
+                                isUpdated = true;
                             }
                             // null primary identifier but imex id was found, just delete the ref 
                             else {
                                 exp.removeXref(ref);
                                 xrefDao.delete(ref);
+                                isUpdated = true;
                             }
                         }
                     }
                 }
 
                 if (!hasImexId && !hasConflictingImexId){
-                    updateImexIdentifierForExperiment(exp, imexId);
+                    boolean isExpUpdated = updateImexIdentifierForExperiment(exp, imexId);
+
+                    if (isExpUpdated){
+                        isUpdated = true;
+                    }
                 }
                 else if (!hasImexId && hasConflictingImexId){
-                    log.error("Experiment " + exp.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+")");
+                    if (imexCentralManager != null){
+                        ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.experiment_imex_conflict, intactPublication.getPublicationId(), imexId, exp.getAc(), null, "Experiment " + exp.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+")");
+                        imexCentralManager.fireOnImexError(errorEvent);
+                    }
+                    else {
+                        throw new PublicationImexUpdaterException("Experiment " + exp.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+")");
+                    }
+                }
+
+                // exp updated
+                if (isUpdated){
+                    updatedExp.add(exp);
                 }
             }
+            experimentXrefs.clear();
+
+            return updatedExp;
         }
         else {
-            throw new PublicationImexUpdaterException("Impossible to update IMEx identifiers to experiments of publication " + intactPublication.getShortLabel());
-        }
+            if (imexCentralManager != null){
+                ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, intactPublication.getPublicationId(), imexId, null, null, "Impossible to update IMEx identifiers to experiments of publication " + intactPublication.getShortLabel());
+                imexCentralManager.fireOnImexError(errorEvent);
+            }
+            else {
+                throw new PublicationImexUpdaterException("Impossible to update IMEx identifiers to experiments of publication " + intactPublication.getShortLabel());
+            }
+            experimentXrefs.clear();
 
-        experimentXrefs.clear();
+            return Collections.EMPTY_LIST;
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -290,10 +333,12 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void assignImexIdentifiersForAllInteractions(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException {
+    public List<Interaction> assignImexIdentifiersForAllInteractions(uk.ac.ebi.intact.model.Publication intactPublication, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
 
-        if (imexId != null){
+        // imex id is not null and is not default value for missing imex id
+        if (imexId != null && !imexId.equals(ImexCentralManager.NO_IMEX_ID)){
             processedImexIds.clear();
+            List<Interaction> updatedInteractions = new ArrayList<Interaction>();
 
             List<String> existingImexIds = collectExistingInteractionImexIdsForPublication(intactPublication);
             int nextInteractionIndex = getNextImexChunkNumberAndFilterValidImexIdsFrom(existingImexIds, imexId);
@@ -324,6 +369,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                     if (involvesOnlyProteins(interaction)){
                         String interactionImexId = null;
                         boolean hasConflictingImexId = false;
+                        boolean isUpdated = false;
 
                         for (InteractorXref ref : interactionXrefs){
                             // imex xref
@@ -339,16 +385,19 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                             if (ref.getPrimaryId().equalsIgnoreCase(interactionImexId)){
                                                 interaction.removeXref(ref);
                                                 xrefDao.delete(ref);
+                                                isUpdated = true;
                                             }
                                             // different imex id which have already been processed in other interactions, just delete it
                                             else if (processedImexIds.contains(ref.getPrimaryId())){
                                                 interaction.removeXref(ref);
                                                 xrefDao.delete(ref);
+                                                isUpdated = true;
                                             }
                                             // different IMEx id but the IMEx id is not a valid interaction imex id. Keep it as imex secondary
                                             else if (!existingImexIds.contains(ref.getPrimaryId())){
                                                 ref.setCvXrefQualifier(imexSecondary);
                                                 xrefDao.update(ref);
+                                                isUpdated = true;
                                             }
                                             // different IMEx id which is valid and not already processed
                                             else {
@@ -361,6 +410,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                             if (processedImexIds.contains(ref.getPrimaryId())){
                                                 interaction.removeXref(ref);
                                                 xrefDao.delete(ref);
+                                                isUpdated = true;
                                             }
                                             // IMEx id not yet processed
                                             else {
@@ -373,6 +423,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                                 else {
                                                     ref.setCvXrefQualifier(imexSecondary);
                                                     xrefDao.update(ref);
+                                                    isUpdated = true;
                                                 }
                                             }
                                         }
@@ -381,6 +432,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                     else {
                                         interaction.removeXref(ref);
                                         xrefDao.delete(ref);
+                                        isUpdated = true;
                                     }
                                 }
                             }
@@ -388,27 +440,59 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
                         // need to create a new IMEx id
                         if (interactionImexId != null && !hasConflictingImexId){
-                            updateImexIdentifierForInteraction(interaction, imexId + "-" + nextInteractionIndex);
-                            // increments the next interaction index
-                            nextInteractionIndex ++;
+                            boolean updatedInteraction = updateImexIdentifierForInteraction(interaction, imexId + "-" + nextInteractionIndex);
+
+                            if (updatedInteraction){
+                                isUpdated = true;
+
+                                if (imexCentralManager != null){
+                                    NewAssignedImexEvent evt = new NewAssignedImexEvent(this, intactPublication.getPublicationId(), imexId, interaction.getAc(), imexId + "-" + nextInteractionIndex);
+                                    imexCentralManager.fireOnNewImexAssigned(evt);
+                                }
+
+                                // increments the next interaction index
+                                nextInteractionIndex ++;
+                            }
                         }
                         else if (interactionImexId != null && hasConflictingImexId){
-                            log.error("Interaction " + interaction.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+"-"+nextInteractionIndex+")");
+                            if (imexCentralManager != null){
+                                ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.interaction_imex_conflict, intactPublication.getPublicationId(), imexId, exp.getAc(), interaction.getAc(), "Interaction " + interaction.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+"-"+nextInteractionIndex+")");
+                                imexCentralManager.fireOnImexError(errorEvent);
+                            }
+                            else {
+                                throw new PublicationImexUpdaterException("Interaction " + interaction.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+"-"+nextInteractionIndex+")");
+                            }
+                        }
+
+                        if (isUpdated){
+                            updatedInteractions.add(interaction);
                         }
                     }
                 }
             }
+
+            interactionXrefs.clear();
+            processedImexIds.clear();
+            
+            return updatedInteractions;
         }
         else {
-            throw new PublicationImexUpdaterException("Impossible to update IMEx identifiers to interactions of publication " + intactPublication.getShortLabel());
-        }
-
-        interactionXrefs.clear();
-        processedImexIds.clear();
+            if (imexCentralManager != null){
+                ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, intactPublication.getPublicationId(), imexId, null, null, "Impossible to update IMEx identifiers to interactions of publication " + intactPublication.getShortLabel());
+                imexCentralManager.fireOnImexError(errorEvent);
+            }
+            else {
+                throw new PublicationImexUpdaterException("Impossible to update IMEx identifiers to interactions of publication " + intactPublication.getShortLabel());
+            }
+            interactionXrefs.clear();
+            processedImexIds.clear();
+            
+            return Collections.EMPTY_LIST;
+        }        
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void updateImexIdentifierForExperiment(Experiment intactExperiment, String imexId) throws PublicationImexUpdaterException{
+    public boolean updateImexIdentifierForExperiment(Experiment intactExperiment, String imexId) {
         DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
         XrefDao<ExperimentXref> xrefDao = daoFactory.getXrefDao(ExperimentXref.class);
         ExperimentDao expDao = daoFactory.getExperimentDao();
@@ -431,14 +515,15 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
             xrefDao.persist(expXref);
             expDao.update(intactExperiment);
+            return true;
         }
         else {
-            throw new PublicationImexUpdaterException("Impossible to assign an IMEx identifier to experiment " + intactExperiment.getShortLabel());
+            return false;
         }
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void updateImexIdentifierForInteraction(Interaction intactInteraction, String imexId) throws PublicationImexUpdaterException{
+    public boolean updateImexIdentifierForInteraction(Interaction intactInteraction, String imexId){
         DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
         XrefDao<InteractorXref> xrefDao = daoFactory.getXrefDao(InteractorXref.class);
         InteractionDao intDao = daoFactory.getInteractionDao();
@@ -461,9 +546,10 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
             xrefDao.persist(intXref);
             intDao.update((InteractionImpl) intactInteraction);
+            return true;
         }
         else {
-            throw new PublicationImexUpdaterException("Impossible to assign an IMEx identifier to experiment " + intactInteraction.getShortLabel());
+            return false;
         }
     }
 }

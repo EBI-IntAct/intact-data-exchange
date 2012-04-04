@@ -11,6 +11,8 @@ import uk.ac.ebi.intact.core.persistence.dao.PublicationDao;
 import uk.ac.ebi.intact.core.persistence.dao.XrefDao;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.*;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.IntactUpdateEvent;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.NewAssignedImexEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.LoggingImexUpdateListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ReportWriterListener;
@@ -56,7 +58,11 @@ public class ImexCentralManager {
     public static String NO_IMEX_ID="N/A";
     public static Pattern PUBMED_REGEXP = Pattern.compile("\\d+");
 
-    private Collection<PublicationXref> pubXrefs = new ArrayList<PublicationXref>();
+    private Collection<PublicationXref> pubXrefs;
+
+    public ImexCentralManager(){
+        pubXrefs = new ArrayList<PublicationXref>();
+    }
 
     /**
      * Updates a publication having IMEx id and assign IMEx ids to experiments and interactions in INTAct. Returns the IMEx record if valid.
@@ -87,9 +93,6 @@ public class ImexCentralManager {
                 // the IMExid is recognized in IMEx central
                 if (imexPublication != null){
 
-                    // extract publication id in IntAct
-                    String pubId = intactPublication.getPublicationId() != null ? intactPublication.getPublicationId() : intactPublication.getShortLabel();
-
                     // if the intact publication identifier is not in sync with IMEx central, try to synchronize it first but does not update the intact publication
                     publicationIdentifierSynchronizer.synchronizePublicationIdentifier(intactPublication, imexPublication);
 
@@ -97,10 +100,10 @@ public class ImexCentralManager {
                     intactImexAssigner.updatePublicationAnnotations(intactPublication);
 
                     // update experiments if necessary
-                    intactImexAssigner.updateImexIdentifiersForAllExperiments(intactPublication, imexId);
+                    intactImexAssigner.updateImexIdentifiersForAllExperiments(intactPublication, imexId, this);
 
                     // update and/or assign interactions if necessary
-                    intactImexAssigner.assignImexIdentifiersForAllInteractions(intactPublication, imexId);
+                    intactImexAssigner.assignImexIdentifiersForAllInteractions(intactPublication, imexId, this);
 
                     synchronizePublicationWithImexCentral(intactPublication, imexPublication);
                 }
@@ -125,15 +128,11 @@ public class ImexCentralManager {
         return null;
     }
 
-    public void synchronizePublicationWithImexCentral(Publication intactPublication, edu.ucla.mbi.imex.central.ws.v20.Publication imexPublication) throws PublicationImexUpdaterException {
+    public void synchronizePublicationWithImexCentral(Publication intactPublication, edu.ucla.mbi.imex.central.ws.v20.Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException {
 
-        try {
-            imexAdminGroupSynchronizer.synchronizePublicationAdminGroup(intactPublication, imexPublication);
-            imexAdminUserSynchronizer.synchronizePublicationAdminUser(intactPublication, imexPublication);
-            imexStatusSynchronizer.synchronizePublicationStatusWithImexCentral(intactPublication, imexPublication);
-        } catch (ImexCentralException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        imexAdminGroupSynchronizer.synchronizePublicationAdminGroup(intactPublication, imexPublication);
+        imexAdminUserSynchronizer.synchronizePublicationAdminUser(intactPublication, imexPublication);
+        imexStatusSynchronizer.synchronizePublicationStatusWithImexCentral(intactPublication, imexPublication);
     }
 
     /**
@@ -214,15 +213,20 @@ public class ImexCentralManager {
      */
     private void assignAndUpdateIntactPublication(Publication intactPublication, edu.ucla.mbi.imex.central.ws.v20.Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException {
         // assign IMEx id to publication and update publication annotations
-        intactImexAssigner.assignImexIdentifier(intactPublication, imexPublication);
+        boolean hasAssigned = intactImexAssigner.assignImexIdentifier(intactPublication, imexPublication);
+
+        if (hasAssigned){
+            NewAssignedImexEvent evt = new NewAssignedImexEvent(this, intactPublication.getPublicationId(), imexPublication.getImexAccession(), null, null);
+            fireOnNewImexAssigned(evt);
+        }
 
         // the IMEx id has been generated and is valid
         if (imexPublication.getImexAccession() != null && !imexPublication.getImexAccession().equals(NO_IMEX_ID)){
             // update experiments
-            intactImexAssigner.updateImexIdentifiersForAllExperiments(intactPublication, imexPublication.getImexAccession());
+            intactImexAssigner.updateImexIdentifiersForAllExperiments(intactPublication, imexPublication.getImexAccession(), this);
 
             // update interactions
-            intactImexAssigner.assignImexIdentifiersForAllInteractions(intactPublication, imexPublication.getImexAccession());
+            intactImexAssigner.assignImexIdentifiersForAllInteractions(intactPublication, imexPublication.getImexAccession(), this);
         }
         else {
             throw new PublicationImexUpdaterException("It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " in IMEx central.");
@@ -392,7 +396,7 @@ public class ImexCentralManager {
         return list;
     }
 
-    private void registerListenersIfNotDoneYet() {
+    public void registerListenersIfNotDoneYet() {
         if (listenerList.getListenerCount() == 0) {
             registerListeners();
         }
@@ -405,6 +409,18 @@ public class ImexCentralManager {
     public void fireOnImexError( ImexErrorEvent evt) {
         for (ImexUpdateListener listener : getListeners(ImexUpdateListener.class)) {
             listener.onImexError(evt);
+        }
+    }
+
+    public void fireOnIntactUpdate( IntactUpdateEvent evt) {
+        for (ImexUpdateListener listener : getListeners(ImexUpdateListener.class)) {
+            listener.onIntactUpdate(evt);
+        }
+    }
+
+    public void fireOnNewImexAssigned( NewAssignedImexEvent evt) {
+        for (ImexUpdateListener listener : getListeners(ImexUpdateListener.class)) {
+            listener.onNewImexAssigned(evt);
         }
     }
 }

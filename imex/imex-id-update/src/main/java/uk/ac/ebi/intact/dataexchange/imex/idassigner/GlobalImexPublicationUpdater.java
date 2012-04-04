@@ -45,6 +45,8 @@ public class GlobalImexPublicationUpdater {
     }
 
     public void updateExistingImexPublications(){
+        imexCentralManager.registerListenersIfNotDoneYet();
+
         Collection<String> publicationsToUpdate = intactPublicationCollector.getPublicationsHavingIMExIdToUpdate();
 
         for (String publication : publicationsToUpdate){
