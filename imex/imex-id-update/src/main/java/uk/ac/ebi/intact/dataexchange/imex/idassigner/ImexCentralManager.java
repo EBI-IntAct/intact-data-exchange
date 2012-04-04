@@ -11,22 +11,21 @@ import uk.ac.ebi.intact.core.persistence.dao.PublicationDao;
 import uk.ac.ebi.intact.core.persistence.dao.XrefDao;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.*;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorType;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.IntactUpdateEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.NewAssignedImexEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.LoggingImexUpdateListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ReportWriterListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.FileImexUpdateReportHandler;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.Publication;
-import uk.ac.ebi.intact.model.PublicationXref;
+import uk.ac.ebi.intact.model.*;
 
 import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -85,7 +84,7 @@ public class ImexCentralManager {
             String imexId = collectAndCleanUpImexPrimaryReferenceFrom(intactPublication);
 
             // the publication does have a single valid IMEx id in IntAct
-            if (imexId != null){
+            if (imexId != null && !imexId.equals(NO_IMEX_ID)){
 
                 // collect publication record using IMEx id
                 edu.ucla.mbi.imex.central.ws.v20.Publication imexPublication = imexCentralRegister.getExistingPublicationInImexCentral(imexId);
@@ -93,30 +92,43 @@ public class ImexCentralManager {
                 // the IMExid is recognized in IMEx central
                 if (imexPublication != null){
 
+                    String pubId = intactPublication.getPublicationId() != null ? intactPublication.getPublicationId() : intactPublication.getShortLabel();
+
                     // if the intact publication identifier is not in sync with IMEx central, try to synchronize it first but does not update the intact publication
                     publicationIdentifierSynchronizer.synchronizePublicationIdentifier(intactPublication, imexPublication);
 
                     // update publication annotations if necessary
-                    intactImexAssigner.updatePublicationAnnotations(intactPublication);
+                    boolean hasUpdated = intactImexAssigner.updatePublicationAnnotations(intactPublication);
 
                     // update experiments if necessary
-                    intactImexAssigner.updateImexIdentifiersForAllExperiments(intactPublication, imexId, this);
+                    List<Experiment> updatedExperiments = intactImexAssigner.updateImexIdentifiersForAllExperiments(intactPublication, imexId, this);
 
                     // update and/or assign interactions if necessary
-                    intactImexAssigner.assignImexIdentifiersForAllInteractions(intactPublication, imexId, this);
+                    List<Interaction> updatedInteractions = intactImexAssigner.assignImexIdentifiersForAllInteractions(intactPublication, imexId, this);
 
-                    synchronizePublicationWithImexCentral(intactPublication, imexPublication);
+                    // if something has been updated, fire an update evt
+                    if (!updatedExperiments.isEmpty() || !updatedInteractions.isEmpty() || hasUpdated){
+                        IntactUpdateEvent evt = new IntactUpdateEvent(this, intactPublication.getPublicationId(), imexId, updatedExperiments, updatedInteractions);
+                        fireOnIntactUpdate(evt);
+                    }
+
+                    // can synchronize admin group, uswer and status only if valid pubmed id
+                    if (Pattern.matches(ImexCentralManager.PUBMED_REGEXP.toString(), pubId)){
+                        synchronizePublicationWithImexCentral(intactPublication, imexPublication);
+                    }
                 }
                 // the IMEx id is not recognized in IMEx central, publication needs to be updated manually
                 else {
-                    throw new PublicationImexUpdaterException("Publication " + publicationAc + " is not matching any record in IMEx central with id " + imexId);
+                    ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.imex_not_recognized, intactPublication.getPublicationId(), imexId, null, null, "Publication " + publicationAc + " is not matching any record in IMEx central with id " + imexId);
+                    fireOnImexError(errorEvt);
                 }
 
                 return imexPublication;
             }
             // impossible to update this publication because does not have a single IMEx id or valid IMEx id
             else {
-                throw new PublicationImexUpdaterException("Publication " + publicationAc + " does not have a valid IMEx id and is ignored.");
+                ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, intactPublication.getPublicationId(), imexId, null, null, "Publication " + publicationAc + " does not have a valid IMEx id and is ignored.");
+                fireOnImexError(errorEvt);
             }
         }
         // publication does not exist in IntAct
@@ -166,7 +178,8 @@ public class ImexCentralManager {
 
                     // we already have an IMEx id in IMEx central, it is not possible to update the intact publication because we have a conflict
                     if (imexPublication.getImexAccession() != null && !imexPublication.getImexAccession().equals(NO_IMEX_ID)){
-                        throw new PublicationImexUpdaterException("It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " because it already has a valid IMEx id in IMEx central.");
+                        ImexErrorEvent evt = new ImexErrorEvent(this, ImexErrorType.imex_in_imexCentral_not_in_intact, intactPublication.getPublicationId(), imexPublication.getImexAccession(), null, null, "It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " because it already has a valid IMEx id in IMEx central.");
+                        fireOnImexError(evt);
                     }
                     // the publication has been registered in IMex central but does not have an IMEx id
                     else {
@@ -184,7 +197,8 @@ public class ImexCentralManager {
                         synchronizePublicationWithImexCentral(intactPublication, imexPublication);
                     }
                     else {
-                        throw new PublicationImexUpdaterException("It is not possible to register the publication " + intactPublication.getShortLabel() + " in IMEx central.");
+                        ImexErrorEvent evt = new ImexErrorEvent(this, ImexErrorType.no_record_created, intactPublication.getPublicationId(), null, null, null, "It is not possible to register the publication " + intactPublication.getShortLabel() + " in IMEx central.");
+                        fireOnImexError(evt);
                     }
                 }
 
@@ -223,14 +237,18 @@ public class ImexCentralManager {
         // the IMEx id has been generated and is valid
         if (imexPublication.getImexAccession() != null && !imexPublication.getImexAccession().equals(NO_IMEX_ID)){
             // update experiments
-            intactImexAssigner.updateImexIdentifiersForAllExperiments(intactPublication, imexPublication.getImexAccession(), this);
+            List<Experiment> updatedExperiments = intactImexAssigner.updateImexIdentifiersForAllExperiments(intactPublication, imexPublication.getImexAccession(), this);
 
             // update interactions
-            intactImexAssigner.assignImexIdentifiersForAllInteractions(intactPublication, imexPublication.getImexAccession(), this);
+            List<Interaction> updatedInteractions = intactImexAssigner.assignImexIdentifiersForAllInteractions(intactPublication, imexPublication.getImexAccession(), this);
+
+            IntactUpdateEvent evt = new IntactUpdateEvent(this, intactPublication.getPublicationId(), imexPublication.getImexAccession(), updatedExperiments, updatedInteractions);
+            fireOnIntactUpdate(evt);
         }
         else {
-            throw new PublicationImexUpdaterException("It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " in IMEx central.");
-        }
+            ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, intactPublication.getPublicationId(), imexPublication.getImexAccession(), null, null, "It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " in IMEx central.");
+            fireOnImexError(errorEvt);
+                    }
     }
 
     /**
@@ -249,6 +267,7 @@ public class ImexCentralManager {
         PublicationXref imexPrimaryRef = null;
 
         boolean hasConflictingImexId = false;
+        boolean hasUpdated = false;
 
         for (PublicationXref ref : pubXrefs){
             // imex xref
@@ -266,6 +285,7 @@ public class ImexCentralManager {
                         else if (imexPrimaryRef != null && imexPrimaryRef.getPrimaryId().equals(ref.getPrimaryId())) {
                             intactPublication.removeXref(ref);
                             xrefDao.delete(ref);
+                            hasUpdated = true;
                         }
                         // we found the imex primary ref
                         else {
@@ -276,17 +296,30 @@ public class ImexCentralManager {
                     else {
                         intactPublication.removeXref(ref);
                         xrefDao.delete(ref);
+                        hasUpdated = true;
                     }
                 }
             }
-        }
-
+        }        
+        
         // we found a unique imex identifier
         if (imexPrimaryRef != null && !hasConflictingImexId){
+
+            if (hasUpdated){
+                IntactUpdateEvent evt = new IntactUpdateEvent(this, intactPublication.getPublicationId(), imexPrimaryRef.getPrimaryId(), Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+                fireOnIntactUpdate(evt);
+            }
+            
             return imexPrimaryRef.getPrimaryId();
         }
         else {
-            log.error("Publication " + intactPublication.getShortLabel() + " cannot be updated because of IMEx identifier conflicts.");
+            if (hasUpdated){
+                IntactUpdateEvent evt = new IntactUpdateEvent(this, intactPublication.getPublicationId(), null, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+                fireOnIntactUpdate(evt);
+            }
+            
+            ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_imex_conflict, intactPublication.getPublicationId(), null, null, null, "Publication " + intactPublication.getShortLabel() + " cannot be updated because of IMEx identifier conflicts.");
+            fireOnImexError(errorEvt);
         }
 
         return null;
