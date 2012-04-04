@@ -1,5 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.listener;
 
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
+
 import java.util.EventListener;
 
 /**
@@ -11,15 +13,17 @@ import java.util.EventListener;
  */
 public interface ImexUpdateListener extends EventListener {
 
-    void onProcessPublication( ImexUpdateEvent evt ) throws ProcessorException;
+    public void onProcessPublication( ImexUpdateEvent evt ) throws ProcessorException;
     
-    void onProcessImexPublication( ImexUpdateEvent evt ) throws ProcessorException;
+    public void onProcessImexPublication( ImexUpdateEvent evt ) throws ProcessorException;
 
-    void onPublicationUpToDate( ImexUpdateEvent evt ) throws ProcessorException;
+    public void onPublicationUpToDate( ImexUpdateEvent evt ) throws ProcessorException;
 
-    void onImexIdAssignedToPublication( ImexUpdateEvent evt ) throws ProcessorException;
+    public void onImexIdAssignedToPublication( ImexUpdateEvent evt ) throws ProcessorException;
 
-    void onImexIdAssignedToInteraction( ImexUpdateEvent evt ) throws ProcessorException;
+    public void onImexIdAssignedToInteraction( ImexUpdateEvent evt ) throws ProcessorException;
 
-    void onImexIdMismatchFound( ImexUpdateEvent evt ) throws ProcessorException;
+    public void onImexIdMismatchFound( ImexUpdateEvent evt ) throws ProcessorException;
+
+    public void onImexError( ImexErrorEvent evt ) throws ProcessorException;
 }

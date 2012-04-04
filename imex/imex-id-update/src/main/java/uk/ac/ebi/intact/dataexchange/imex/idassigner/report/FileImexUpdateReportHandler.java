@@ -19,6 +19,7 @@ public class FileImexUpdateReportHandler implements ImexUpdateReportHandler {
     private ReportWriter imexIdAssignedToPublicationWriter;
     private ReportWriter imexIdAssignedToInteractionWriter;
     private ReportWriter imexIdMismatchWriter;
+    private ReportWriter imexErrorWriter;
 
     public FileImexUpdateReportHandler( File rootDirectory ) throws IOException {
         if ( !rootDirectory.exists() ) {
@@ -35,6 +36,7 @@ public class FileImexUpdateReportHandler implements ImexUpdateReportHandler {
         this.imexIdAssignedToPublicationWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "publication-assigned.csv" ) ) );
         this.imexIdAssignedToInteractionWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "interaction-assigned.csv" ) ) );
         this.imexIdMismatchWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "id-mismatch.csv" ) ) );
+        this.imexErrorWriter = new ReportWriterImpl( new FileWriter( new File( rootDirectory, "imex-errors.csv" ) ) );
     }
 
     public ReportWriter getProcessedWriter() throws IOException {
@@ -61,6 +63,10 @@ public class FileImexUpdateReportHandler implements ImexUpdateReportHandler {
         return imexIdMismatchWriter;
     }
 
+    public ReportWriter getImexErrorWriter() {
+        return imexErrorWriter;
+    }
+
     //////////////////
     // Closeable
 
@@ -71,5 +77,6 @@ public class FileImexUpdateReportHandler implements ImexUpdateReportHandler {
         imexIdAssignedToPublicationWriter.close();
         imexIdMismatchWriter.close();
         imexIdAssignedToInteractionWriter.close();
+        imexErrorWriter.close();
     }
 }

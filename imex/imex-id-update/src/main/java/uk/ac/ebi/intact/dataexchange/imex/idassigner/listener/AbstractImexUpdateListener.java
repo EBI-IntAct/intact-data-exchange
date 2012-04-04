@@ -1,5 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.listener;
 
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
+
 /**
  * Empty implementation to allow writing less code when only implementing part of it.
  *
@@ -20,4 +22,6 @@ public class AbstractImexUpdateListener implements ImexUpdateListener {
     public void onImexIdAssignedToInteraction( ImexUpdateEvent evt )  throws ProcessorException { }
 
     public void onImexIdMismatchFound( ImexUpdateEvent evt ) throws ProcessorException { }
+
+    public void onImexError( ImexErrorEvent evt ) throws ProcessorException { }
 }

@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.dataexchange.imex.idassigner.listener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
 
 /**
  * Outputs event using a simple logger.
@@ -42,5 +43,10 @@ public class LoggingImexUpdateListener extends AbstractImexUpdateListener {
     @Override
     public void onImexIdMismatchFound( ImexUpdateEvent iue ) {
         log.info( "IMEx id mismatch " + iue.getPublication().getShortLabel() + ": " + iue.getMessage() );
+    }
+
+    @Override
+    public void onImexError( ImexErrorEvent evt ) throws ProcessorException{
+        log.info( "IMEx Error " + evt.getErrorType() + ": " + evt.getErrorMessage() );
     }
 }

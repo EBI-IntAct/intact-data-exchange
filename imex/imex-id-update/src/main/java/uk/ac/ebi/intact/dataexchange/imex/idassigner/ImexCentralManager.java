@@ -4,22 +4,28 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.bridges.imexcentral.DefaultImexCentralClient;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.core.persistence.dao.PublicationDao;
 import uk.ac.ebi.intact.core.persistence.dao.XrefDao;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.*;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateListener;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.LoggingImexUpdateListener;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ReportWriterListener;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.FileImexUpdateReportHandler;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.Publication;
 import uk.ac.ebi.intact.model.PublicationXref;
 
 import javax.swing.event.EventListenerList;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -38,8 +44,6 @@ public class ImexCentralManager {
     private EventListenerList listenerList = new EventListenerList();
     private static final Log log = LogFactory.getLog(ImexCentralManager.class);
 
-    private ImexCentralClient imexCentral;
-
     private ImexCentralPublicationRegister imexCentralRegister;
     private PublicationAdminGroupSynchronizer imexAdminGroupSynchronizer;
     private PublicationAdminUserSynchronizer imexAdminUserSynchronizer;
@@ -47,18 +51,12 @@ public class ImexCentralManager {
     private PublicationIdentifierSynchronizer publicationIdentifierSynchronizer;
     private IntactImexAssigner intactImexAssigner;
 
+    private ImexAssignerConfig imexUpdateConfig;
+
     public static String NO_IMEX_ID="N/A";
     public static Pattern PUBMED_REGEXP = Pattern.compile("\\d+");
 
     private Collection<PublicationXref> pubXrefs = new ArrayList<PublicationXref>();
-
-    public ImexCentralManager( String icUsername, String icPassword, String icEndpoint ) throws ImexCentralException {
-        this.imexCentral = new DefaultImexCentralClient( icUsername, icPassword, icEndpoint );
-    }
-
-    public ImexCentralManager( ImexCentralClient client ) {
-        this.imexCentral = client;
-    }
 
     /**
      * Updates a publication having IMEx id and assign IMEx ids to experiments and interactions in INTAct. Returns the IMEx record if valid.
@@ -336,5 +334,77 @@ public class ImexCentralManager {
 
     public void setPublicationIdentifierSynchronizer(PublicationIdentifierSynchronizer publicationIdentifierSynchronizer) {
         this.publicationIdentifierSynchronizer = publicationIdentifierSynchronizer;
+    }
+
+    public EventListenerList getListenerList() {
+        return listenerList;
+    }
+
+    public void setListenerList(EventListenerList listenerList) {
+        this.listenerList = listenerList;
+    }
+
+    public ImexAssignerConfig getImexUpdateConfig() {
+        return imexUpdateConfig;
+    }
+
+    public void setImexUpdateConfig(ImexAssignerConfig imexUpdateConfig) {
+        this.imexUpdateConfig = imexUpdateConfig;
+    }
+
+    // listeners
+
+    protected void registerListeners() {
+        addListener( new LoggingImexUpdateListener() );
+
+        final File directory = imexUpdateConfig.getUpdateLogsDirectory();
+        if( directory != null ) {
+            final FileImexUpdateReportHandler handler;
+            try {
+                handler = new FileImexUpdateReportHandler( directory );
+            } catch ( IOException e ) {
+                throw new RuntimeException( "Filed to initialize ReportWriterListener: " + directory );
+            }
+            addListener( new ReportWriterListener( handler ) );
+        }
+    }
+
+    public void addListener( ImexUpdateListener listener) {
+        listenerList.add(ImexUpdateListener.class, listener);
+    }
+
+    public void removeListener( ImexUpdateListener listener) {
+        listenerList.remove(ImexUpdateListener.class, listener);
+    }
+
+    protected <T> List<T> getListeners(Class<T> listenerClass) {
+        List list = new ArrayList();
+
+        Object[] listeners = listenerList.getListenerList();
+
+        for (int i = 0; i < listeners.length; i += 2) {
+            if (listeners[i] == ImexUpdateListener.class) {
+                if (listenerClass.isAssignableFrom(listeners[i+1].getClass())) {
+                    list.add(listeners[i+1]);
+                }
+            }
+        }
+        return list;
+    }
+
+    private void registerListenersIfNotDoneYet() {
+        if (listenerList.getListenerCount() == 0) {
+            registerListeners();
+        }
+
+        if (listenerList.getListenerCount() == 0) {
+            throw new IllegalStateException("No listener registered for ProteinProcessor");
+        }
+    }
+
+    public void fireOnImexError( ImexErrorEvent evt) {
+        for (ImexUpdateListener listener : getListeners(ImexUpdateListener.class)) {
+            listener.onImexError(evt);
+        }
     }
 }

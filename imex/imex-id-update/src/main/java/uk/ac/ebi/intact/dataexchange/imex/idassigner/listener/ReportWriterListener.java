@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.dataexchange.imex.idassigner.listener;
 
 import org.joda.time.DateTime;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexUtils;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.ImexUpdateReportHandler;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.ReportWriter;
 import uk.ac.ebi.intact.model.*;
@@ -64,6 +65,37 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
             writeDefaultLine( reportHandler.getImexIdAssignedToPublicationWriter(), evt.getPublication(), evt.getMessage() );
         } catch ( IOException e ) {
             throw new ProcessorException( "Error while processing publication " + evt.getPublication().getShortLabel(), e );
+        }
+    }
+    
+    @Override
+    public void onImexError( ImexErrorEvent evt ) throws ProcessorException{
+        try {
+            ReportWriter writer = reportHandler.getImexErrorWriter();
+            writer.writeHeaderIfNecessary("Publication id",
+                    "Imex id",
+                    "Interaction ac",
+                    "Experiment ac",
+                    "Error type",
+                    "Error message");
+
+            String pubId = dashIfNull(evt.getPublicationId());
+            String imex = dashIfNull(evt.getImexId());
+            String interactionAc = dashIfNull(evt.getInteractionAc());
+            String experimentAc = dashIfNull(evt.getExperimentAc());
+            String errorType = evt.getErrorType() != null ? evt.getErrorType().toString() : "-";
+            String errorMessage = dashIfNull(evt.getErrorMessage());
+
+            writer.writeColumnValues(pubId,
+                    imex,
+                    interactionAc,
+                    experimentAc,
+                    errorType,
+                    errorMessage);
+            writer.flush();
+
+        } catch ( IOException e ) {
+            throw new ProcessorException( "Error while flushing error event ", e );
         }
     }
 
