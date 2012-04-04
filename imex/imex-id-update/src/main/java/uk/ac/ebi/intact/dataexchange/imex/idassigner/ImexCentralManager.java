@@ -103,6 +103,8 @@ public class ImexCentralManager {
 
                     // update and/or assign interactions if necessary
                     intactImexAssigner.assignImexIdentifiersForAllInteractions(intactPublication, imexId);
+
+                    synchronizePublicationWithImexCentral(intactPublication, imexPublication);
                 }
                 // the IMEx id is not recognized in IMEx central, publication needs to be updated manually
                 else {
@@ -172,6 +174,7 @@ public class ImexCentralManager {
                     // the publication has been registered in IMex central but does not have an IMEx id
                     else {
                         assignAndUpdateIntactPublication(intactPublication, imexPublication);
+                        synchronizePublicationWithImexCentral(intactPublication, imexPublication);
                     }
                 }
                 // needs to register first the publication in IMEx central
@@ -181,6 +184,7 @@ public class ImexCentralManager {
                     if (imexPublication != null){
                         // assign IMEx id to publication and update publication annotations
                         assignAndUpdateIntactPublication(intactPublication, imexPublication);
+                        synchronizePublicationWithImexCentral(intactPublication, imexPublication);
                     }
                     else {
                         throw new PublicationImexUpdaterException("It is not possible to register the publication " + intactPublication.getShortLabel() + " in IMEx central.");

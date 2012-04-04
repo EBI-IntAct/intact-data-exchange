@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
+import edu.ucla.mbi.imex.central.ws.v20.Publication;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.IntactPublicationCollector;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationImexUpdaterException;
@@ -33,7 +34,8 @@ public class GlobalImexPublicationUpdater {
 
         for (String publication : publicationsNeedingNewImexId){
             try {
-                imexCentralManager.assignImexAndUpdatePublication(publication);
+                Publication imexRecord = imexCentralManager.assignImexAndUpdatePublication(publication);
+
             } catch (PublicationImexUpdaterException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             } catch (ImexCentralException e) {
