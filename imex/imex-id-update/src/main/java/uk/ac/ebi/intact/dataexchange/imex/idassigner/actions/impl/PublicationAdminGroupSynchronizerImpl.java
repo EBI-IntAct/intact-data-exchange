@@ -8,7 +8,6 @@ import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.bridges.imexcentral.Operation;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.ImexCentralUpdater;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationAdminGroupSynchronizer;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationImexUpdaterException;
 
 /**
  * This class is for synchronizing the admin group of a publication in imex central
@@ -25,25 +24,15 @@ public class PublicationAdminGroupSynchronizerImpl extends ImexCentralUpdater im
     private static String INTACT_ADMIN = "INTACT";
     private static int UNKNOWN_GROUP = 11;
 
-    public void synchronizePublicationAdminGroup(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException {
+    public void synchronizePublicationAdminGroup(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
 
         Publication.AdminGroupList adminGroupList = imexPublication.getAdminGroupList();
-        String pubId = extractIdentifierFromPublication(intactPublication, imexPublication);
+        String pubId = extractPubIdFromIntactPublication(intactPublication);
 
         if (!containsAdminGroup(adminGroupList, INTACT_ADMIN)){
             // add first INTACT admin
-            try {
-                imexCentral.updatePublicationAdminGroup(pubId, Operation.ADD, INTACT_ADMIN);
-                log.info("Updated publication admin group to: " + INTACT_ADMIN);
-            } catch ( ImexCentralException e ) {
-                IcentralFault f = (IcentralFault) e.getCause();
-                if( f.getFaultInfo().getFaultCode() == UNKNOWN_GROUP ) {
-                    throw new PublicationImexUpdaterException("The institution INTACT is not recognized in IMEx central so is ignored and needs to be registered in IMEx central.", e);
-                }
-                else {
-                    throw new PublicationImexUpdaterException("Cannot add INTACT admin group to publication " + intactPublication.getShortLabel(), e);
-                }
-            }
+            imexCentral.updatePublicationAdminGroup(pubId, Operation.ADD, INTACT_ADMIN);
+            log.info("Updated publication admin group to: " + INTACT_ADMIN);
         }
 
         // add other database admin group if it exists
@@ -60,7 +49,7 @@ public class PublicationAdminGroupSynchronizerImpl extends ImexCentralUpdater im
                     log.warn("The institution " + institution + " is not recognized in IMEx central so is ignored.");
                 }
                 else {
-                    throw new PublicationImexUpdaterException("Cannot add "+institution+" admin group to publication " + intactPublication.getShortLabel(), e);
+                    throw e;
                 }
             }
         }

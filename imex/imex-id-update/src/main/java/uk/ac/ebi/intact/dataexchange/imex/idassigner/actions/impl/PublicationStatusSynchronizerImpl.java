@@ -1,13 +1,11 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl;
 
-import edu.ucla.mbi.imex.central.ws.v20.IcentralFault;
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.bridges.imexcentral.PublicationStatus;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.ImexCentralUpdater;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationImexUpdaterException;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationStatusSynchronizer;
 import uk.ac.ebi.intact.model.CvPublicationStatus;
 import uk.ac.ebi.intact.model.CvPublicationStatusType;
@@ -26,28 +24,15 @@ public class PublicationStatusSynchronizerImpl extends ImexCentralUpdater implem
 
     private static int UNKNOWN_STATUS = 8;
 
-    public void synchronizePublicationStatusWithImexCentral(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException {
+    public void synchronizePublicationStatusWithImexCentral(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
         String imexStatus = imexPublication.getStatus();
 
         PublicationStatus intactStatus = getPublicationStatus(intactPublication);
 
         if (imexStatus == null || (imexStatus != null && !intactStatus.toString().equalsIgnoreCase(imexStatus))){
-            String pubId = extractIdentifierFromPublication(intactPublication, imexPublication);
-
-            try {
-                imexCentral.updatePublicationStatus( pubId, intactStatus, null );
-                log.info("Updating imex status to " + intactStatus.toString());
-
-            } catch (ImexCentralException e) {
-                IcentralFault f = (IcentralFault) e.getCause();
-                if( f.getFaultInfo().getFaultCode() == UNKNOWN_STATUS ) {
-                    throw new PublicationImexUpdaterException("Impossible to update IMEx status of " + intactPublication.getShortLabel() + " because the status is not recognized as a valid status in IMEx central.", e);
-
-                }
-                else {
-                    throw new PublicationImexUpdaterException("Impossible to update IMEx status of " + intactPublication.getShortLabel(), e);
-                }
-            }
+            String pubId = extractPubIdFromIntactPublication(intactPublication);
+            imexCentral.updatePublicationStatus( pubId, intactStatus, null );
+            log.info("Updating imex status to " + intactStatus.toString());
         }
     }
 

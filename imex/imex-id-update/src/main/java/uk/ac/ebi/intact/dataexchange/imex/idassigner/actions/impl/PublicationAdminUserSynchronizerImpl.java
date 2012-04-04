@@ -8,7 +8,6 @@ import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.bridges.imexcentral.Operation;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.ImexCentralUpdater;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationAdminUserSynchronizer;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationImexUpdaterException;
 
 /**
  * This class is for synchronizing admin users to publications registered in IMEx central
@@ -25,13 +24,13 @@ public class PublicationAdminUserSynchronizerImpl extends ImexCentralUpdater imp
     private static String PHANTOM_CURATOR = "phantom";
     private static int UNKNOWN_USER = 10;
 
-    public void synchronizePublicationAdminUser(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException {
+    public void synchronizePublicationAdminUser(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
         String curator = intactPublication.getCurrentOwner().getLogin().toLowerCase();
 
         Publication.AdminUserList adminUserList = imexPublication.getAdminUserList();
 
         if (curator != null && !containsAdminUser(adminUserList, curator)){
-            String pubId = extractIdentifierFromPublication(intactPublication, imexPublication);
+            String pubId = extractPubIdFromIntactPublication(intactPublication);
 
             try {
                 imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, curator );
@@ -41,22 +40,11 @@ public class PublicationAdminUserSynchronizerImpl extends ImexCentralUpdater imp
                 IcentralFault f = (IcentralFault) e.getCause();
                 if( f.getFaultInfo().getFaultCode() == UNKNOWN_USER && !containsAdminUser(adminUserList, PHANTOM_CURATOR)) {
                     // unknown user, we automaticaly re-assign this record to user 'phantom'
-                    try {
-                        imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, PHANTOM_CURATOR );
-                        log.info("Updated publication admin user to phantom user ");
-                    } catch (ImexCentralException e1) {
-                        IcentralFault f1 = (IcentralFault) e1.getCause();
-
-                        if( f1.getFaultInfo().getFaultCode() == UNKNOWN_USER) {
-                            throw new PublicationImexUpdaterException("Cannot add phantom admin user to publication " + intactPublication.getShortLabel()+". A phantom user needs to be created in IMEx central with admin group INTACT.", e1);
-                        }
-                        else {
-                            throw new PublicationImexUpdaterException("Cannot add phantom admin user to publication " + intactPublication.getShortLabel(), e1);
-                        }
-                    }
+                    imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, PHANTOM_CURATOR );
+                    log.info("Updated publication admin user to phantom user ");
                 }
                 else {
-                    throw new PublicationImexUpdaterException("Cannot add "+curator+" admin user to publication " + intactPublication.getShortLabel(), e);
+                    throw e;
                 }
             }
         }

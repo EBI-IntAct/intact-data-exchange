@@ -26,7 +26,7 @@ public interface ImexCentralPublicationRegister {
      * Register a publication in IMEx central which is not existing in IMEx central. Can only register publications having valid pubmed id.
      * If it is unassigned or has a DOI number, the publication cannot be created
      * @param intactPublication
-     * @return  the record in IMEx central which have been created
+     * @return  the record in IMEx central which have been created, Null if it could not create a record in IMEx central
      * @throws PublicationImexUpdaterException if it is not possible to create a new record for this publication (may already exists, publication identifier not recognized, etc.)
      */
     public Publication registerPublicationInImexCentral(uk.ac.ebi.intact.model.Publication intactPublication) throws ImexCentralException;

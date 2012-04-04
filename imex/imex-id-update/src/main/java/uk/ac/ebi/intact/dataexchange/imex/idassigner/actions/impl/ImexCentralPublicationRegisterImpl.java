@@ -36,6 +36,8 @@ public class ImexCentralPublicationRegisterImpl extends ImexCentralUpdater imple
                 return imexCentral.getPublicationById(publicationId);
             } catch (ImexCentralException e) {
                 IcentralFault f = (IcentralFault) e.getCause();
+
+                // IMEx central did throw an Exception because this publication does not exist in IMEx central
                 if( f.getFaultInfo().getFaultCode() == NO_RECORD_FOUND ) {
                     log.info("Cannot find publication " + publicationId + " in IMEx central.", e);
                 }
@@ -48,6 +50,12 @@ public class ImexCentralPublicationRegisterImpl extends ImexCentralUpdater imple
         return null;
     }
 
+    /**
+     * Register a publication in IMEx central. Only publications having a valid pubmed ID (no unassigned pubmed id) can be registered in IMEx central using the webservice.
+     * @param intactPublication
+     * @return the record created in IMEx central, null if it could not be created in IMEx central
+     * @throws ImexCentralException
+     */
     public Publication registerPublicationInImexCentral(uk.ac.ebi.intact.model.Publication intactPublication) throws ImexCentralException{
         // create a new publication record in IMEx central
         Publication newPublication = null;
@@ -55,11 +63,12 @@ public class ImexCentralPublicationRegisterImpl extends ImexCentralUpdater imple
 
         try {
             newPublication = imexCentral.createPublicationById(pubId);
-            System.out.println("Registered publication : " + pubId + " in IMEx central.");
+            log.info("Registered publication : " + pubId + " in IMEx central.");
 
             return newPublication;
         } catch (ImexCentralException e) {
             IcentralFault f = (IcentralFault) e.getCause();
+            // IMEx central throw an Exception when the record cannot be created
             if( f.getFaultInfo().getFaultCode() == RECORD_NO_CREATED ) {
                 log.error("Cannot create a new record in IMEx central for publication " + intactPublication.getShortLabel(), e);
                 return null;

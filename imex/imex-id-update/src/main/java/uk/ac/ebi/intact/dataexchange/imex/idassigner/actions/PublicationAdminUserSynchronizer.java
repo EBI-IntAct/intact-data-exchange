@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
+import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 
 /**
  * Interface for synchronizing admin user of a publication with IMEx central
@@ -13,10 +14,12 @@ import edu.ucla.mbi.imex.central.ws.v20.Publication;
 public interface PublicationAdminUserSynchronizer {
 
     /**
-     * Synchronize the admin user of a publication and update IMEx central if necessary
+     * Synchronize the admin user of a publication and update IMEx central if necessary. It can only update publication having valid pubmed identifiers.
+     * If the user is not registered in IMEx central, a user 'phantom' will be added to the IMEx record.
      * @param intactPublication
      * @param imexPublication
-     * @throws PublicationImexUpdaterException
+     * @throws ImexCentralException : if user phantom does not exist in IMEx central (needs to be created) or IMEx central is not responding
+     * or the publication identifier is not recognized
      */
-    public void synchronizePublicationAdminUser(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException;
+    public void synchronizePublicationAdminUser(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException;
 }

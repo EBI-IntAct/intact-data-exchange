@@ -14,7 +14,8 @@ import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 public interface PublicationIdentifierSynchronizer {
 
     /**
-     *
+     * It will look at all identifiers attached to the record in IMEx central and see if the publication identifier in IntAct is also attached to the
+     * IMEx record
      * @param intactPubId
      * @param imexPublication
      * @return true if the intact publication identifier is in IMEx central, false otherwise
@@ -23,11 +24,11 @@ public interface PublicationIdentifierSynchronizer {
 
     /**
      * Update the IMEx record in case intact publication has a valid pubmed or doi identifier that is not in IMEx central.
-     * It will not update the intact publication or the IMEx record if the pubmed or doi identifier is different in IMEx central but will throw an Exception
+     * It will not update the intact publication or the IMEx record if the pubmed or doi identifier is different in IMEx central.
      * @param intactPublication
      * @param imexPublication
-     * @throws PublicationImexUpdaterException
-     * @throws ImexCentralException
+     * @throws PublicationImexUpdaterException : if the pubmed/doi identifier in IntAct is different from the one in IMEx central
+     * @throws ImexCentralException : if record not found, idnetifier s not recognized or IMEx central is not responding
      */
     public void synchronizePublicationIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException;
 

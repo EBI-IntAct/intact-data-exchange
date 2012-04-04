@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
+import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.bridges.imexcentral.PublicationStatus;
 
 /**
@@ -14,12 +15,12 @@ import uk.ac.ebi.intact.bridges.imexcentral.PublicationStatus;
 public interface PublicationStatusSynchronizer {
 
     /**
-     * Synchronize publication status with IMEx central and update the IMEx central record if necessary
+     * Synchronize publication status with IMEx central and update the IMEx central record if necessary.
      * @param intactPublication
      * @param imexPublication
-     * @throws PublicationImexUpdaterException
+     * @throws ImexCentralException is status not recognized or no records could be found or IMEx central is not responding
      */
-    public void synchronizePublicationStatusWithImexCentral(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException;
+    public void synchronizePublicationStatusWithImexCentral(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException;
 
     /**
      *
