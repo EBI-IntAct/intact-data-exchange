@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 
 public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater implements PublicationIdentifierSynchronizer {
 
-    private static int UNKNOWN_IDENTIFIER = 5;
     private static String IMEX = "imex";
     private static String PUBMED = "pmid";
     private static String DOI = "doi";

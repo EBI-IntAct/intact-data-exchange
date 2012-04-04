@@ -22,8 +22,6 @@ public class PublicationStatusSynchronizerImpl extends ImexCentralUpdater implem
 
     private static final Log log = LogFactory.getLog(PublicationStatusSynchronizerImpl.class);
 
-    private static int UNKNOWN_STATUS = 8;
-
     public void synchronizePublicationStatusWithImexCentral(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
         String imexStatus = imexPublication.getStatus();
 

@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.bridges.imexcentral.Operation;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.GlobalImexPublicationUpdater;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.ImexCentralUpdater;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationAdminUserSynchronizer;
 
@@ -22,7 +23,6 @@ public class PublicationAdminUserSynchronizerImpl extends ImexCentralUpdater imp
     private static final Log log = LogFactory.getLog(PublicationAdminUserSynchronizerImpl.class);
 
     private static String PHANTOM_CURATOR = "phantom";
-    private static int UNKNOWN_USER = 10;
 
     public void synchronizePublicationAdminUser(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
         String curator = intactPublication.getCurrentOwner().getLogin().toLowerCase();
@@ -38,7 +38,7 @@ public class PublicationAdminUserSynchronizerImpl extends ImexCentralUpdater imp
 
             } catch ( ImexCentralException e ) {
                 IcentralFault f = (IcentralFault) e.getCause();
-                if( f.getFaultInfo().getFaultCode() == UNKNOWN_USER && !containsAdminUser(adminUserList, PHANTOM_CURATOR)) {
+                if( f.getFaultInfo().getFaultCode() == GlobalImexPublicationUpdater.UNKNOWN_USER && !containsAdminUser(adminUserList, PHANTOM_CURATOR)) {
                     // unknown user, we automaticaly re-assign this record to user 'phantom'
                     imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, PHANTOM_CURATOR );
                     log.info("Updated publication admin user to phantom user ");

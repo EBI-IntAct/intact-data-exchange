@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.bridges.imexcentral.Operation;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.GlobalImexPublicationUpdater;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.ImexCentralUpdater;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationAdminGroupSynchronizer;
 
@@ -22,7 +23,6 @@ public class PublicationAdminGroupSynchronizerImpl extends ImexCentralUpdater im
     private static final Log log = LogFactory.getLog(PublicationAdminGroupSynchronizerImpl.class);
 
     private static String INTACT_ADMIN = "INTACT";
-    private static int UNKNOWN_GROUP = 11;
 
     public void synchronizePublicationAdminGroup(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
 
@@ -44,7 +44,7 @@ public class PublicationAdminGroupSynchronizerImpl extends ImexCentralUpdater im
                 log.info("Added other publication admin group : " + institution);
             } catch ( ImexCentralException e ) {
                 IcentralFault f = (IcentralFault) e.getCause();
-                if( f.getFaultInfo().getFaultCode() == UNKNOWN_GROUP ) {
+                if( f.getFaultInfo().getFaultCode() == GlobalImexPublicationUpdater.UNKNOWN_GROUP ) {
                     // unknown admin group, we cannot add another admin group for this institution
                     log.warn("The institution " + institution + " is not recognized in IMEx central so is ignored.");
                 }
