@@ -112,7 +112,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
-        String datasetQuery = "select distinct p1.ac from Component c join c.interaction as i join i.experiments as e join e.publication as p1 join i.interactor as interactor " +
+        String datasetQuery = "select distinct p1.ac from Component c join c.interaction as i join i.experiments as e join e.publication as p1 join c.interactor as interactor " +
                 "where interactor.objClass <> :protein";
 
         Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
@@ -127,7 +127,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
-        String datasetQuery = "select distinct p2.ac from Component c join c.interaction as i join i.experiments as e join e.publication as p2 join i.interactor as interactor " +
+        String datasetQuery = "select distinct p2.ac from Component c join c.interaction as i join i.experiments as e join e.publication as p2 join c.interactor as interactor " +
                 "where interactor.objClass = :protein and i.ac not in (select distinct i2.ac from InteractionImpl i2 join i2.components as comp join comp.interactor as interactor2 " +
                 "where interactor2.objClass <> :protein)";
 
