@@ -231,7 +231,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         Collection<String> potentialPublicationsToBeAssigned = CollectionUtils.subtract(potentialPublicationsForImexFiltered, publicationsHavingImexId);
 
         // publications for which we can assign a new IMEx id = potentialPublications needing an IMEx id to be assigned AND publications having IMEx curation level
-        Collection<String> publicationsToBeAssigned = CollectionUtils.intersection(potentialPublicationsForImex, publicationsHavingImexCurationLevel);
+        Collection<String> publicationsToBeAssigned = CollectionUtils.intersection(potentialPublicationsToBeAssigned, publicationsHavingImexCurationLevel);
 
         return publicationsToBeAssigned;
     }
@@ -283,6 +283,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         Collection<String> publicationsWithInteractionImexButNoImexId = CollectionUtils.subtract(publicationsWithInteractionsHavingImexId, publicationsHavingImexId);
 
         return publicationsWithInteractionImexButNoImexId;
+    }
+
+    public Collection<String> getPublicationsHavingIMExIdAndNoPPIInteractions(){
+        return CollectionUtils.intersection(publicationsHavingImexId, publicationsInvolvingOnlyNonPPIInteractions);
     }
 
     @Override

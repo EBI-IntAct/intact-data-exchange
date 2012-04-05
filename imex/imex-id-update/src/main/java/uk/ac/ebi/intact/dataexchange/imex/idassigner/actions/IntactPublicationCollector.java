@@ -15,6 +15,7 @@ public interface IntactPublicationCollector {
     public Collection<String> getPublicationsWithoutImexButWithExperimentImex();
     public Collection<String> getPublicationsHavingImexCurationLevelButAreNotEligibleImex();
     public Collection<String> getPublicationsHavingIMExIdAndNotImexCurationLevel();
+    public Collection<String> getPublicationsHavingIMExIdAndNoPPIInteractions();
     public Collection<String> getPublicationsHavingIMExIdToUpdate();
     public Collection<String> getPublicationsNeedingAnImexId();
 }
