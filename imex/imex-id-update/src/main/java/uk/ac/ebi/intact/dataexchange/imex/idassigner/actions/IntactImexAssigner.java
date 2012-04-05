@@ -65,7 +65,7 @@ public interface IntactImexAssigner {
 
     /**
      * Assign an IMEx id for all the interactions of a publication if not already done. Does not assign IMEx ids to interactions already having a primary reference to another
-     * IMEx id or interactions which are not PPI. It will clean up duplicated IMEx id and a IMEx primary reference which is invalid will become imex secondary.
+     * IMEx id or interactions which are not PPI. It will clean up duplicated IMEx id and a IMEx primary reference which is invalid will become imex secondary. It will not update interactions having valid imex primary reference which are in conflict with publication imex primary reference
      * @param intactPublication
      * @param imexId
      * @param imexCentralManager ; to fire events if provided.

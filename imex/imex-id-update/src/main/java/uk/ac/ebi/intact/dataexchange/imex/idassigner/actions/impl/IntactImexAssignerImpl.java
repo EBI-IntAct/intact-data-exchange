@@ -34,7 +34,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
     private static final Log log = LogFactory.getLog(IntactImexAssignerImpl.class);
 
-    private Pattern interaction_imex_regexp = Pattern.compile("(IM-[1-9][0-9]*)-([1-9][0-9]*])");
+    private Pattern interaction_imex_regexp = Pattern.compile("(IM-[1-9][0-9]*)-([1-9][0-9]*)");
     public static String IMEX_SECONDARY_MI = "MI:0952";
     public static String IMEX_SECONDARY = "imex secondary";
     public static String FULL_COVERAGE_MI = "MI:0957";
@@ -247,7 +247,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                         isUpdated = true;
                     }
                 }
-                else if (!hasImexId && hasConflictingImexId){
+                else if (hasConflictingImexId){
                     if (imexCentralManager != null){
                         ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.experiment_imex_conflict, intactPublication.getPublicationId(), imexId, exp.getAc(), null, "Experiment " + exp.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+")");
                         imexCentralManager.fireOnImexError(errorEvent);
@@ -285,7 +285,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String imexQuery = "select distinct x.primaryId from InteractionImpl i join i.xrefs as x join i.experiments as e join e.publication as p " +
-                "where p.ac = :publicationAc and x.cvDatabase.identifier = :imex and x.cvXrefQualifier = :imexPrimary " +
+                "where p.ac = :publicationAc and x.cvDatabase.identifier = :imex and x.cvXrefQualifier.identifier = :imexPrimary " +
                 "order by x.primaryId";
 
         Query query = daoFactory.getEntityManager().createQuery(imexQuery);
@@ -304,21 +304,23 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
             Matcher matcher = interaction_imex_regexp.matcher(id);
 
             if (matcher.find()){
-                String pubImex = matcher.group(0);
+                String pubImex = matcher.group(1);
 
+                // valid imex id in sync with publication
                 if (imexId.equals(pubImex)){
-                    int index = Integer.parseInt(matcher.group(1));
+                    int index = Integer.parseInt(matcher.group(2));
                     if (number < index){
                         number = index;
                     }
                 }
-                else {
-                    imexIds.remove(id);
-                }
+            }
+            // not valid imex id
+            else {
+                imexIds.remove(id);
             }
         }
 
-        return number++;
+        return number+1;
     }
 
     /**
@@ -418,9 +420,13 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                             // IMEx id not yet processed
                                             else {
                                                 // valid IMEx id, register it
-                                                if (existingImexIds.contains(ref.getPrimaryId())){
+                                                if (existingImexIds.contains(ref.getPrimaryId()) && ref.getPrimaryId().startsWith(imexId)){
                                                     interactionImexId = ref.getPrimaryId();
                                                     processedImexIds.add(ref.getPrimaryId());
+                                                }
+                                                // conflicting IMEx id
+                                                else if (existingImexIds.contains(ref.getPrimaryId()) && !ref.getPrimaryId().startsWith(imexId)){
+                                                    hasConflictingImexId = true;
                                                 }
                                                 // invalid interaction IMEx id, put it as imex secondary
                                                 else {
@@ -442,7 +448,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                         }
 
                         // need to create a new IMEx id
-                        if (interactionImexId != null && !hasConflictingImexId){
+                        if (interactionImexId == null && !hasConflictingImexId){
                             boolean updatedInteraction = updateImexIdentifierForInteraction(interaction, imexId + "-" + nextInteractionIndex);
 
                             if (updatedInteraction){
@@ -457,7 +463,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                 nextInteractionIndex ++;
                             }
                         }
-                        else if (interactionImexId != null && hasConflictingImexId){
+                        else if (hasConflictingImexId){
                             if (imexCentralManager != null){
                                 ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.interaction_imex_conflict, intactPublication.getPublicationId(), imexId, exp.getAc(), interaction.getAc(), "Interaction " + interaction.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+"-"+nextInteractionIndex+")");
                                 imexCentralManager.fireOnImexError(errorEvent);
