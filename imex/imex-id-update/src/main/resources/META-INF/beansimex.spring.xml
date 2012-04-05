@@ -14,55 +14,54 @@
         <property name="locations" value="classpath*:intact.properties"/>
     </bean>
 
-    <!-- updaters -->
-    <bean id="aliasUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvAliasUpdaterImpl"/>
-    <bean id="annotationUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvAnnotationUpdaterImpl"/>
-    <bean id="parentUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvParentUpdaterImpl"/>
-    <bean id="xrefUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvXrefUpdaterImpl"/>
-    <bean id="usedInClassUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.UsedInClassAnnotationUpdaterImpl">
-        <property name="classSeparator" value=","/>
+    <!-- imex central -->
+    <bean id="imexCentral" class="uk.ac.ebi.intact.bridges.imexcentral.DefaultImexCentralClient">
+        <constructor-arg index="0" value="${ic.username}"/>
+        <constructor-arg index="1" value="${ic.password}"/>
+        <constructor-arg index="2" value="${ic.endpoint}"/>
     </bean>
 
-    <bean id="aliasInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvAliasUpdaterImpl"/>
-    <bean id="annotationInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvAnnotationUpdaterImpl"/>
-    <bean id="parentInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvParentUpdaterImpl"/>
-    <bean id="xrefInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvXrefUpdaterImpl"/>
-    <bean id="usedInClassInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.UsedInClassAnnotationUpdaterImpl">
-        <property name="classSeparator" value=","/>
+    <!-- config -->
+    <bean id="imexUpdateConfig" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexAssignerConfig">
+        <property name="updateLogsDirectory" value="${update.log.directory}"/>
     </bean>
 
-    <bean id="cvUpdater" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvUpdaterImpl">
-        <property name="cvAliasUpdater" ref="aliasUpdater"/>
-        <property name="cvParentUpdater" ref="parentUpdater"/>
-        <property name="cvXrefUpdater" ref="xrefUpdater"/>
-        <property name="cvAnnotationUpdater" ref="annotationUpdater"/>
-        <property name="usedInClassAnnotationUpdater" ref="usedInClassUpdater"/>
+    <!-- actions -->
+    <bean id="imexCentralRegister" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.ImexCentralPublicationRegisterImpl">
+        <property name="imexCentral" ref="imexCentral"/>
+    </bean>
+    <bean id="intactImexAssigner" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactImexAssignerImpl">
+        <property name="imexCentral" ref="imexCentral"/>
+    </bean>
+    <bean id="intactPublicationCollector" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactPublicationsCollectorImpl" lazy-init="true"/>
+    <bean id="imexAdminGroupSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationAdminGroupSynchronizerImpl">
+        <property name="imexCentral" ref="imexCentral"/>
+    </bean>
+    <bean id="imexAdminUserSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationAdminUserSynchronizerImpl">
+        <property name="imexCentral" ref="imexCentral"/>
+    </bean>
+    <bean id="publicationIdentifierSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationIdentifierSynchronizerImpl">
+        <property name="imexCentral" ref="imexCentral"/>
+    </bean>
+    <bean id="imexStatusSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationStatusSynchronizerImpl">
+        <property name="imexCentral" ref="imexCentral"/>
     </bean>
 
-    <bean id="cvInitializer" class="uk.ac.ebi.intact.dbupdate.cv.updater.CvInitializer">
-        <property name="cvAliasUpdater" ref="aliasInitializer"/>
-        <property name="cvParentUpdater" ref="parentInitializer"/>
-        <property name="cvXrefUpdater" ref="xrefInitializer"/>
-        <property name="cvAnnotationUpdater" ref="annotationInitializer"/>
-        <property name="usedInClassAnnotationUpdater" ref="usedInClassInitializer"/>
+    <!-- Imex central manager -->
+    <bean id="imexCentralManager" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexCentralManager">
+        <property name="imexAdminGroupSynchronizer" ref="imexAdminGroupSynchronizer"/>
+        <property name="imexAdminUserSynchronizer" ref="imexAdminUserSynchronizer"/>
+        <property name="imexCentralRegister" ref="imexCentralRegister"/>
+        <property name="imexStatusSynchronizer" ref="imexStatusSynchronizer"/>
+        <property name="publicationIdentifierSynchronizer" ref="publicationIdentifierSynchronizer"/>
+        <property name="intactImexAssigner" ref="intactImexAssigner"/>
+        <property name="imexUpdateConfig" ref="imexUpdateConfig"/>
     </bean>
 
-    <!-- obsolete remapper -->
-    <bean id="obsoleteRemapper" class="uk.ac.ebi.intact.dbupdate.cv.remapper.ObsoleteCvRemapperImpl">
-        <property name="ontologyIdToDatabase">
-            <map>
-                <entry key="MI" value="MI:0488"/>
-                <entry key="MOD" value="MI:0897"/>
-            </map>
-        </property>
+    <!-- Global imex updater -->
+    <bean id="globalImexPublicationUpdater" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.GlobalImexPublicationUpdater">
+        <property name="imexCentralManager" ref="imexCentralManager"/>
+        <property name="intactPublicationCollector" ref="intactPublicationCollector"/>
     </bean>
-
-    <!-- Cv importer -->
-    <bean id="cvImporter" class="uk.ac.ebi.intact.dbupdate.cv.importer.CvImporterImpl">
-        <property name="cvUpdater" ref="cvInitializer"/>
-    </bean>
-
-    <!-- error factory-->
-    <bean id="errorFactory" class="uk.ac.ebi.intact.dbupdate.cv.errors.DefaultCvUpdateErrorFactory"/>
 
 </beans>

@@ -21,7 +21,6 @@ public class ImexCentralPublicationRegisterImpl extends ImexCentralUpdater imple
 
     private static final Log log = LogFactory.getLog(ImexCentralPublicationRegisterImpl.class);
 
-
     /**
      *
      * @param publicationId : valid pubmed id or doi number or IMEx id. Unassigned ids are not recognized

@@ -16,9 +16,7 @@ public abstract class ImexCentralUpdater {
     protected ImexCentralClient imexCentral;
     public static String UNASSIGNED_PREFIX = "unassigned";
 
-    public void ImexCentralUpdater(ImexCentralClient imexCentral){
-
-        this.imexCentral = imexCentral;
+    public void ImexCentralUpdater(){
     }
     
     protected String extractPubIdFromImexPublication(Publication publication){
@@ -48,5 +46,13 @@ public abstract class ImexCentralUpdater {
         }
 
         return pubId;
+    }
+
+    public ImexCentralClient getImexCentral() {
+        return imexCentral;
+    }
+
+    public void setImexCentral(ImexCentralClient imexCentral) {
+        this.imexCentral = imexCentral;
     }
 }

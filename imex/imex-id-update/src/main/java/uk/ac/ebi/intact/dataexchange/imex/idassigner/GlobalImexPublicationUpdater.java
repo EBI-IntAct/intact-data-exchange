@@ -43,6 +43,9 @@ public class GlobalImexPublicationUpdater {
         this.imexCentralManager = imexCentralManager;
     }
 
+    /**
+     * Assign new IMEx ids to publications that are eligible IMEx
+     */
     public void assignNewImexIdsToPublications(){
         imexCentralManager.registerListenersIfNotDoneYet();
         
@@ -139,6 +142,9 @@ public class GlobalImexPublicationUpdater {
         }
     }
 
+    /**
+     * Update existing IMEx publications in IntAct and assign interaction imex ids if not already done
+     */
     public void updateExistingImexPublications(){
         imexCentralManager.registerListenersIfNotDoneYet();
 

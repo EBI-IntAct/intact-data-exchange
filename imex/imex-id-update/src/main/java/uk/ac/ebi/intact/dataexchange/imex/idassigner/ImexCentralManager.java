@@ -250,6 +250,10 @@ public class ImexCentralManager {
             fireOnImexError(errorEvt);
                     }
     }
+    
+    public edu.ucla.mbi.imex.central.ws.v20.Publication getPublicationInImexCentralFor(String pubId) throws ImexCentralException {
+        return imexCentralRegister.getExistingPublicationInImexCentral(pubId);
+    }
 
     /**
      *
