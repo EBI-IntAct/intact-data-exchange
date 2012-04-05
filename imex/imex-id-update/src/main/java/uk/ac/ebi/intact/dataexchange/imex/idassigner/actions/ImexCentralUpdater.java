@@ -48,11 +48,11 @@ public abstract class ImexCentralUpdater {
         return pubId;
     }
 
-    public ImexCentralClient getImexCentral() {
+    public ImexCentralClient getImexCentralClient() {
         return imexCentral;
     }
 
-    public void setImexCentral(ImexCentralClient imexCentral) {
+    public void setImexCentralClient(ImexCentralClient imexCentral) {
         this.imexCentral = imexCentral;
     }
 }

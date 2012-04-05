@@ -28,23 +28,23 @@
 
     <!-- actions -->
     <bean id="imexCentralRegister" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.ImexCentralPublicationRegisterImpl">
-        <property name="imexCentral" ref="imexCentral"/>
+        <property name="imexCentralClient" ref="imexCentral"/>
     </bean>
     <bean id="intactImexAssigner" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactImexAssignerImpl">
-        <property name="imexCentral" ref="imexCentral"/>
+        <property name="imexCentralClient" ref="imexCentral"/>
     </bean>
     <bean id="intactPublicationCollector" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactPublicationsCollectorImpl" lazy-init="true"/>
     <bean id="imexAdminGroupSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationAdminGroupSynchronizerImpl">
-        <property name="imexCentral" ref="imexCentral"/>
+        <property name="imexCentralClient" ref="imexCentral"/>
     </bean>
     <bean id="imexAdminUserSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationAdminUserSynchronizerImpl">
-        <property name="imexCentral" ref="imexCentral"/>
+        <property name="imexCentralClient" ref="imexCentral"/>
     </bean>
     <bean id="publicationIdentifierSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationIdentifierSynchronizerImpl">
-        <property name="imexCentral" ref="imexCentral"/>
+        <property name="imexCentralClient" ref="imexCentral"/>
     </bean>
     <bean id="imexStatusSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationStatusSynchronizerImpl">
-        <property name="imexCentral" ref="imexCentral"/>
+        <property name="imexCentralClient" ref="imexCentral"/>
     </bean>
 
     <!-- Imex central manager -->

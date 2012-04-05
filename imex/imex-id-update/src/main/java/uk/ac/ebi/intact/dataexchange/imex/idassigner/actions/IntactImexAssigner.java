@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
+import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexCentralManager;
 import uk.ac.ebi.intact.model.Experiment;
@@ -19,7 +20,7 @@ import java.util.List;
 public interface IntactImexAssigner {
 
     /**
-     * Assign a new IMEx id to a publication and update the annotations of the publication (full coverage and imex curation). It adds an IMEx primary reference
+     * Assign a new IMEx id to a publication that has not been assigned yet and update/clean up the annotations of the publication (full coverage and imex curation). It adds an IMEx primary reference
      * to the intact publication. It is only possible to assign a new IMEx id to publications having valid pubmed ids (no unassigned and no DOI number)
      * @param intactPublication : the publication in IntAct
      * @param imexPublication : the publication in IMEx
@@ -87,4 +88,6 @@ public interface IntactImexAssigner {
      * @return true if imex primary ref have been updated, false otherwise
      */
     public boolean updateImexPrimaryRef(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication);
+
+    public ImexCentralClient getImexCentralClient();
 }

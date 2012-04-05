@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
+import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 
 /**
@@ -30,4 +31,6 @@ public interface ImexCentralPublicationRegister {
      * @throws PublicationImexUpdaterException if it is not possible to create a new record for this publication (may already exists, publication identifier not recognized, etc.)
      */
     public Publication registerPublicationInImexCentral(uk.ac.ebi.intact.model.Publication intactPublication) throws ImexCentralException;
+
+    public ImexCentralClient getImexCentralClient();
 }

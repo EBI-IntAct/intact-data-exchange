@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.ImexCentralPublicationRegisterImpl;
 
 /**
  * Unit tester of ImexcentralPublicationregister
@@ -26,7 +25,7 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.ImexCentralPub
 public class ImexCentralPublicationRegisterImplTest extends IntactBasicTestCase{
 
     @Autowired
-    private ImexCentralPublicationRegisterImpl imexCentralRegisterTest;
+    private ImexCentralPublicationRegister imexCentralRegisterTest;
 
     @Before
     public void createImexPublications() throws ImexCentralException {
@@ -36,7 +35,7 @@ public class ImexCentralPublicationRegisterImplTest extends IntactBasicTestCase{
         pubmed.setAc("12345");
         pubmedPub.getIdentifier().add(pubmed);
         pubmedPub.setImexAccession("N/A");
-        imexCentralRegisterTest.getImexCentral().createPublication(pubmedPub);
+        imexCentralRegisterTest.getImexCentralClient().createPublication(pubmedPub);
 
         Publication doiPub = new Publication();
         Identifier doi = new Identifier();
@@ -44,15 +43,15 @@ public class ImexCentralPublicationRegisterImplTest extends IntactBasicTestCase{
         doi.setAc("1/a-2345");
         doiPub.getIdentifier().add(doi);
         doiPub.setImexAccession("N/A");
-        imexCentralRegisterTest.getImexCentral().createPublication(doiPub);
+        imexCentralRegisterTest.getImexCentralClient().createPublication(doiPub);
 
         Publication imexPub = new Publication();
         Identifier imex = new Identifier();
         imex.setNs("imex");
         imex.setAc("IM-1");
         imexPub.getIdentifier().add(imex);
-        imexPub.setImexAccession("N/A");
-        imexCentralRegisterTest.getImexCentral().createPublication(imexPub);
+        imexPub.setImexAccession("IM-1");
+        imexCentralRegisterTest.getImexCentralClient().createPublication(imexPub);
     }
 
     @Test

@@ -24,22 +24,22 @@
 
     <!-- actions -->
     <bean id="imexCentralRegisterTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.ImexCentralPublicationRegisterImpl">
-        <property name="imexCentral" ref="imexCentralTest"/>
+        <property name="imexCentralClient" ref="imexCentralTest"/>
     </bean>
-    <bean id="intactImexAssignerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactImexAssignerImpl">
-        <property name="imexCentral" ref="imexCentralTest"/>
+    <bean id="assignerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactImexAssignerImpl">
+        <property name="imexCentralClient" ref="imexCentralTest"/>
     </bean>
     <bean id="imexAdminGroupSynchronizerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationAdminGroupSynchronizerImpl">
-        <property name="imexCentral" ref="imexCentralTest"/>
+        <property name="imexCentralClient" ref="imexCentralTest"/>
     </bean>
     <bean id="imexAdminUserSynchronizerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationAdminUserSynchronizerImpl">
-        <property name="imexCentral" ref="imexCentralTest"/>
+        <property name="imexCentralClient" ref="imexCentralTest"/>
     </bean>
     <bean id="publicationIdentifierSynchronizerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationIdentifierSynchronizerImpl">
-        <property name="imexCentral" ref="imexCentralTest"/>
+        <property name="imexCentralClient" ref="imexCentralTest"/>
     </bean>
     <bean id="imexStatusSynchronizerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationStatusSynchronizerImpl">
-        <property name="imexCentral" ref="imexCentralTest"/>
+        <property name="imexCentralClient" ref="imexCentralTest"/>
     </bean>
     <bean id="intactPublicationCollectorTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactPublicationsCollectorImpl" lazy-init="true"/>
 
@@ -50,7 +50,7 @@
         <property name="imexCentralRegister" ref="imexCentralRegisterTest"/>
         <property name="imexStatusSynchronizer" ref="imexStatusSynchronizerTest"/>
         <property name="publicationIdentifierSynchronizer" ref="publicationIdentifierSynchronizerTest"/>
-        <property name="intactImexAssigner" ref="intactImexAssignerTest"/>
+        <property name="intactImexAssigner" ref="assignerTest"/>
         <property name="imexUpdateConfig" ref="imexUpdateConfigTest"/>
     </bean>
 

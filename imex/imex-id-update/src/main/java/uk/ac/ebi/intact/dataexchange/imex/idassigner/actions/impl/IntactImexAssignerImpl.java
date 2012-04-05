@@ -35,13 +35,13 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     private static final Log log = LogFactory.getLog(IntactImexAssignerImpl.class);
 
     private Pattern interaction_imex_regexp = Pattern.compile("(IM-[1-9][0-9]*)-([1-9][0-9]*])");
-    private static String IMEX_SECONDARY_MI = "MI:0952";
-    private static String IMEX_SECONDARY = "imex secondary";
-    private static String FULL_COVERAGE_MI = "MI:0957";
-    private static String FULL_COVERAGE = "full coverage";
-    private static String IMEX_CURATION_MI = "MI:0959";
-    private static String IMEX_CURATION = "imex curation";
-    private static String FULL_COVERAGE_TEXT = "Only protein-protein interactions";
+    public static String IMEX_SECONDARY_MI = "MI:0952";
+    public static String IMEX_SECONDARY = "imex secondary";
+    public static String FULL_COVERAGE_MI = "MI:0957";
+    public static String FULL_COVERAGE = "full coverage";
+    public static String IMEX_CURATION_MI = "MI:0959";
+    public static String IMEX_CURATION = "imex curation";
+    public static String FULL_COVERAGE_TEXT = "Only protein-protein interactions";
 
     private Collection<ExperimentXref> experimentXrefs = new ArrayList<ExperimentXref>();
     private Collection<InteractorXref> interactionXrefs = new ArrayList<InteractorXref>();
@@ -152,6 +152,9 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
             Annotation fullCoverageAnnot = new Annotation( fullCoverage, FULL_COVERAGE_TEXT );
             annotationDao.persist(fullCoverageAnnot);
+
+            intactPublication.addAnnotation(fullCoverageAnnot);
+
         }
 
         if (!hasImexCuration){
