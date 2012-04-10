@@ -1,8 +1,8 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.transaction.TransactionStatus;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.context.IntactContext;
@@ -14,6 +14,10 @@ import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.ProteinImpl;
 
 import javax.persistence.Query;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,7 +29,7 @@ import java.util.List;
  * @since <pre>02/03/12</pre>
  */
 
-public class IntactPublicationsCollectorImpl implements IntactPublicationCollector, InitializingBean{
+public class IntactPublicationsCollectorImpl implements IntactPublicationCollector{
 
     private List<String> publicationsHavingImexId;
     private List<String> publicationsWithInteractionsHavingImexId;
@@ -34,50 +38,98 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     private List<String> publicationsHavingJournalAndYear;
     private List<String> publicationsHavingDataset;
     private List<String> publicationsHavingImexCurationLevel;
-    
+
     private Collection<String> publicationsInvolvingOnlyNonPPIInteractions;
 
-    public IntactPublicationsCollectorImpl(){        
-    }    
+    private static final Log log = LogFactory.getLog(IntactPublicationsCollectorImpl.class);
 
-    private List<String> collectPublicationCandidatesToImexWithJournalAndDate() {
-        final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
+    private boolean isInitialised;
+    
+    private final static String CELL_JOURNAL = "Cell (0092-8674)";
+    private final static String PROTEOMICS_JOURNAL = "Proteomics (1615-9853)";
+    private final static String CANCER_CELL_JOURNAL= "Cancer Cell (1535-6108)";
+    private final static String J_MOL_JOURNAL = "J Mol Signal.";
+    private final static String ONCOGENE_JOURNAL = "Oncogene (0950-9232)";
+    private final static String MOL_CANCER_JOURNAL = "Mol. Cancer";
+    private final static String NAT_IMMUNO_JOURNAL = "Nat. Immunol. (1529-2908)";
+    private final static String BIOCREATIVE_DATASET = "BioCreative - Critical Assessment of Information Extraction systems in Biology";
+
+    public IntactPublicationsCollectorImpl(){
+    }
+
+    private List<String> collectPublicationCandidatesToImexWithJournalAndDate() throws ParseException {
+        List<Object[]> publicationJournalsAndYear = collectYearAndJournalFromPublicationEligibleImex();
+
+        List<String> publications = new ArrayList<String>(publicationJournalsAndYear.size());
+
+        for (Object[] o : publicationJournalsAndYear){
+            if (o.length == 3){
+                String pubAc = (String) o[0];
+                String journal = (String) o[1];
+                try{
+                    int date = Integer.parseInt((String) o[2]);
+                    
+                    if (CELL_JOURNAL.equalsIgnoreCase(journal) || PROTEOMICS_JOURNAL.equalsIgnoreCase(journal)
+                            || CANCER_CELL_JOURNAL.equalsIgnoreCase(journal) || J_MOL_JOURNAL.equalsIgnoreCase(journal)
+                            || ONCOGENE_JOURNAL.equalsIgnoreCase(journal)){
+                        if (date >= 2006){
+                            publications.add(pubAc);
+                        }
+                    }
+                    else if (MOL_CANCER_JOURNAL.equalsIgnoreCase(journal)){
+                        if (date >= 2010){
+                            publications.add(pubAc);
+                        }
+                    }
+                    else if (NAT_IMMUNO_JOURNAL.equalsIgnoreCase(journal)){
+                        if (date >= 2011){
+                            publications.add(pubAc);
+                        }
+                    }
+                }catch (NumberFormatException e){
+                    log.error("Publication date for " + pubAc + "is not valid and is skipped.");
+                }
+
+            }
+        }
+
+        return publications;
+    }
+
+    /**
+     *
+     * @return list of object[] which are String[3] with publication ac, jounal and year of publication
+     * @throws ParseException
+     */
+    private List<Object[]> collectYearAndJournalFromPublicationEligibleImex() throws ParseException {
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
-        String journalDateQuery = "select distinct p.ac from Publication p left join p.annotations as a1 join p.annotations as a2 " +
+        String journalDateQuery = "select distinct p.ac, a1.annotationText, a2.annotationText from Publication p left join p.annotations as a1 join p.annotations as a2 " +
                 "where a1.cvTopic.identifier = :journal and a2.cvTopic.identifier = :dateJournal " +
-                "and ((a1.annotationText = :cell or a1.annotationText = :proteomics " +
-                "or a1.annotationText = :cancer or a1.annotationText = :molSignal)  " +
-                "and a2.annotationText = :year1) " +
-                "or " +
-                "(a1.annotationText = :oncogene and a2.annotationText = :year1) " +
-                "or " +
-                "((a1.annotationText = :molCancer or a1.annotationText = :molSignal) and a2.annotationText = :year2) " +
-                "or " +
-                "(a1.annotationText = :natImmuno and a2.annotationText = :year3) ";
+                "and " +
+                "(" +
+                "a1.annotationText = :cell or a1.annotationText = :proteomics or a1.annotationText = :cancer " +
+                "or a1.annotationText = :molSignal or a1.annotationText = :oncogene or a1.annotationText = :molCancer " +
+                "or a1.annotationText = :natImmuno" +
+                ")";
 
         Query query = daoFactory.getEntityManager().createQuery(journalDateQuery);
         query.setParameter("journal", CvTopic.JOURNAL_MI_REF);
         query.setParameter("dateJournal", CvTopic.PUBLICATION_YEAR_MI_REF);
-        query.setParameter("cell", "Cell (0092-8674)");
-        query.setParameter("proteomics", "Proteomics (1615-9853)");
-        query.setParameter("cancer", "Cancer Cell (1535-6108)");
-        query.setParameter("molSignal", "J Mol Signal.");
-        query.setParameter("year1", "2006");
-        query.setParameter("oncogene", "Oncogene (0950-9232)");
-        query.setParameter("molCancer", "Mol. Cancer");
-        query.setParameter("year2", "2010");
-        query.setParameter("natImmuno", "Nat. Immunol. (1529-2908)");
-        query.setParameter("year3", "2011");
+        query.setParameter("cell", CELL_JOURNAL);
+        query.setParameter("proteomics", PROTEOMICS_JOURNAL);
+        query.setParameter("cancer", CANCER_CELL_JOURNAL);
+        query.setParameter("molSignal", J_MOL_JOURNAL);
+        query.setParameter("oncogene", ONCOGENE_JOURNAL);
+        query.setParameter("molCancer", MOL_CANCER_JOURNAL);
+        query.setParameter("natImmuno", NAT_IMMUNO_JOURNAL);
 
-        List<String> publications = query.getResultList();
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus );
+        List<Object[]> publications = query.getResultList();
 
         return publications;
     }
 
     private List<String> collectPublicationCandidatesToImexWithDataset() {
-        final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String datasetQuery = "select distinct p2.ac from Publication p2 join p2.annotations as a3 " +
@@ -85,15 +137,13 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
 
         Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
         query.setParameter("dataset", CvTopic.DATASET_MI_REF);
-        query.setParameter("biocreative", "BioCreative - Critical Assessment of Information Extraction systems in Biology");
+        query.setParameter("biocreative", BIOCREATIVE_DATASET);
 
         List<String> publications = query.getResultList();
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus );
         return publications;
     }
 
     private List<String> collectPublicationCandidatesToImexWithImexCurationLevel() {
-        final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String datasetQuery = "select distinct p2.ac from Publication p2 join p2.annotations as a3 " +
@@ -104,12 +154,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("imex", "imex curation");
 
         List<String> publications = query.getResultList();
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus );
         return publications;
     }
 
     private List<String> collectPublicationsHavingNonPPIInteractions() {
-        final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String datasetQuery = "select distinct p1.ac from Component c join c.interaction as i join i.experiments as e join e.publication as p1 join c.interactor as interactor " +
@@ -119,12 +167,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("protein", ProteinImpl.class.getCanonicalName());
 
         List<String> publications = query.getResultList();
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus );
         return publications;
     }
 
     private List<String> collectPublicationsHavingPPIInteractions() {
-        final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String datasetQuery = "select distinct p2.ac from Component c join c.interaction as i join i.experiments as e join e.publication as p2 join c.interactor as interactor " +
@@ -135,12 +181,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("protein", ProteinImpl.class.getCanonicalName());
 
         List<String> publications = query.getResultList();
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus );
         return publications;
     }
 
     private List<String> collectPublicationHavingInteractionImexIds() {
-        final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String imexInteractionQuery = "select distinct p3.ac from InteractionImpl i join i.experiments as e join e.publication as p3 join i.xrefs as x " +
@@ -151,12 +195,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("imexPrimary", CvXrefQualifier.IMEX_PRIMARY_MI_REF);
 
         List<String> publications = query.getResultList();
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus );
         return publications;
     }
 
     private List<String> collectPublicationHavingExperimentImexIds() {
-        final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String imexExperimentQuery = "select distinct p4.ac from Experiment e2 join e2.publication as p4 join e2.xrefs as x2 " +
@@ -167,12 +209,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("imexPrimary", CvXrefQualifier.IMEX_PRIMARY_MI_REF);
 
         List<String> publications = query.getResultList();
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus );
         return publications;
     }
 
     private List<String> collectPublicationsHavingImexIds() {
-        final TransactionStatus transactionStatus = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String imexPublicationQuery = "select distinct p5.ac from Publication p5 join p5.xrefs as x3 " +
@@ -183,7 +223,6 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("imexPrimary", CvXrefQualifier.IMEX_PRIMARY_MI_REF);
 
         List<String> publications = query.getResultList();
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction( transactionStatus );
         return publications;
     }
 
@@ -218,8 +257,13 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     public List<String> getPublicationsHavingImexCurationLevel() {
         return publicationsHavingImexCurationLevel;
     }
-    
-    public Collection<String> getPublicationsNeedingAnImexId(){
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Collection<String> getPublicationsNeedingAnImexId() throws ParseException {
+
+        if (!isInitialised){
+            initialise();
+        }
 
         // publications having specific journal and specific dataset can be IMEx publications
         Collection<String> potentialPublicationsForImex = CollectionUtils.union(publicationsHavingDataset, publicationsHavingJournalAndYear);
@@ -236,7 +280,12 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsToBeAssigned;
     }
 
-    public Collection<String> getPublicationsHavingIMExIdToUpdate() {
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Collection<String> getPublicationsHavingIMExIdToUpdate() throws ParseException {
+
+        if (!isInitialised){
+            initialise();
+        }
 
         // publications having imex id plus imex curation level
         Collection<String> publicationsWithIMExIdToUpdate = CollectionUtils.intersection(publicationsHavingImexId, publicationsHavingImexCurationLevel);
@@ -244,7 +293,12 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithIMExIdToUpdate;
     }
 
-    public Collection<String> getPublicationsHavingIMExIdAndNotImexCurationLevel() {
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Collection<String> getPublicationsHavingIMExIdAndNotImexCurationLevel() throws ParseException {
+
+        if (!isInitialised){
+            initialise();
+        }
 
         // publications having imex id but not imex curation level
         Collection<String> publicationsWithImexAndNotImexCurationLevel = CollectionUtils.subtract(publicationsHavingImexId, publicationsHavingImexCurationLevel);
@@ -252,7 +306,12 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithImexAndNotImexCurationLevel;
     }
 
-    public Collection<String> getPublicationsHavingImexCurationLevelButAreNotEligibleImex() {
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Collection<String> getPublicationsHavingImexCurationLevelButAreNotEligibleImex() throws ParseException {
+
+        if (!isInitialised){
+            initialise();
+        }
 
         // publications having imex curation level but no IMEx id
         Collection<String> publicationsWithImexCurationLevelAndNotImexId = CollectionUtils.subtract(publicationsHavingImexCurationLevel, publicationsHavingImexId);
@@ -269,7 +328,12 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsNotEligibleForImexWithImexCurationLevel;
     }
 
-    public Collection<String> getPublicationsWithoutImexButWithExperimentImex() {
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Collection<String> getPublicationsWithoutImexButWithExperimentImex() throws ParseException {
+
+        if (!isInitialised){
+            initialise();
+        }
 
         // publications without IMEx id but with experiment having IMEx id
         Collection<String> publicationsWithExperimentImexButNoImexId = CollectionUtils.subtract(publicationsWithExperimentsHavingImexId, publicationsHavingImexId);
@@ -277,7 +341,12 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithExperimentImexButNoImexId;
     }
 
-    public Collection<String> getPublicationsWithoutImexButWithInteractionImex() {
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Collection<String> getPublicationsWithoutImexButWithInteractionImex() throws ParseException {
+
+        if (!isInitialised){
+            initialise();
+        }
 
         // publications without IMEx id but with interaction having IMEx id
         Collection<String> publicationsWithInteractionImexButNoImexId = CollectionUtils.subtract(publicationsWithInteractionsHavingImexId, publicationsHavingImexId);
@@ -285,13 +354,17 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithInteractionImexButNoImexId;
     }
 
-    public Collection<String> getPublicationsHavingIMExIdAndNoPPIInteractions(){
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Collection<String> getPublicationsHavingIMExIdAndNoPPIInteractions() throws ParseException {
+        if (!isInitialised){
+            initialise();
+        }
+
         return CollectionUtils.intersection(publicationsHavingImexId, publicationsInvolvingOnlyNonPPIInteractions);
     }
 
-    @Override
-    @Transactional(propagation = Propagation.NEVER)
-    public void afterPropertiesSet() throws Exception {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void initialise() throws ParseException {
         if (publicationsHavingImexId == null){
             publicationsHavingImexId = collectPublicationsHavingImexIds();
         }
@@ -299,13 +372,13 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
             publicationsWithInteractionsHavingImexId = collectPublicationHavingInteractionImexIds();
         }
         if (publicationsWithExperimentsHavingImexId == null){
-            publicationsWithExperimentsHavingImexId = collectPublicationHavingExperimentImexIds(); 
+            publicationsWithExperimentsHavingImexId = collectPublicationHavingExperimentImexIds();
         }
         if (publicationsHavingDataset == null){
             publicationsHavingDataset = collectPublicationCandidatesToImexWithDataset();
         }
         if (publicationsHavingJournalAndYear == null){
-            publicationsHavingJournalAndYear = collectPublicationCandidatesToImexWithJournalAndDate(); 
+            publicationsHavingJournalAndYear = collectPublicationCandidatesToImexWithJournalAndDate();
         }
         if (publicationsHavingImexCurationLevel == null){
             publicationsHavingImexCurationLevel = collectPublicationCandidatesToImexWithImexCurationLevel();
@@ -316,5 +389,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
 
             publicationsInvolvingOnlyNonPPIInteractions = CollectionUtils.subtract(proteinsInvolvingNonPPI, proteinsInvolvingPPI);
         }
+
+        isInitialised = true;
     }
 }

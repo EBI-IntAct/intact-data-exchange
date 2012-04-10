@@ -1,12 +1,15 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
 import edu.ucla.mbi.imex.central.ws.v20.IcentralFault;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.IntactPublicationCollector;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationImexUpdaterException;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorType;
 
+import java.text.ParseException;
 import java.util.Collection;
 
 /**
@@ -20,6 +23,7 @@ import java.util.Collection;
 public class GlobalImexPublicationUpdater {
 
     private ImexCentralManager imexCentralManager;
+    private static final Log log = LogFactory.getLog(GlobalImexPublicationUpdater.class);
 
     private IntactPublicationCollector intactPublicationCollector;
     public static int USER_NOT_AUTHORIZED = 2;
@@ -47,43 +51,49 @@ public class GlobalImexPublicationUpdater {
      * Assign new IMEx ids to publications that are eligible IMEx
      */
     public void assignNewImexIdsToPublications(){
+
         imexCentralManager.registerListenersIfNotDoneYet();
-        
-        Collection<String> publicationsNeedingNewImexId = intactPublicationCollector.getPublicationsNeedingAnImexId();
 
-        for (String publication : publicationsNeedingNewImexId){
-            try {
-                imexCentralManager.assignImexAndUpdatePublication(publication);
+        Collection<String> publicationsNeedingNewImexId = null;
+        try {
+            publicationsNeedingNewImexId = intactPublicationCollector.getPublicationsNeedingAnImexId();
 
-            } catch (PublicationImexUpdaterException e) {
-                ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
-                imexCentralManager.fireOnImexError(errorEvt);
-            } catch (ImexCentralException e) {
-                IcentralFault f = (IcentralFault) e.getCause();
+            for (String publication : publicationsNeedingNewImexId){
+                try {
+                    imexCentralManager.assignImexAndUpdatePublication(publication);
 
-                processImexCentralException(publication, e, f);
+                } catch (PublicationImexUpdaterException e) {
+                    ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
+                    imexCentralManager.fireOnImexError(errorEvt);
+                } catch (ImexCentralException e) {
+                    IcentralFault f = (IcentralFault) e.getCause();
+
+                    processImexCentralException(publication, e, f);
+                }
             }
-        }
 
-        // fire error event for publications without imex id, not elligible but with imex curation level
-        Collection<String> publicationsImexCurationNotElligible = intactPublicationCollector.getPublicationsHavingImexCurationLevelButAreNotEligibleImex();
-        for (String pubAc : publicationsImexCurationNotElligible){
-            ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.imex_curation_not_eligible, pubAc, null, null, null, "Publication having imex curation level but no IMEx id can be automatically assigned because is not eligible imex or does not contain any PPI interactions.");
-            imexCentralManager.fireOnImexError(errorEvt);
-        }
+            // fire error event for publications without imex id, not elligible but with imex curation level
+            Collection<String> publicationsImexCurationNotElligible = intactPublicationCollector.getPublicationsHavingImexCurationLevelButAreNotEligibleImex();
+            for (String pubAc : publicationsImexCurationNotElligible){
+                ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.imex_curation_not_eligible, pubAc, null, null, null, "Publication having imex curation level but no IMEx id can be automatically assigned because is not eligible imex or does not contain any PPI interactions.");
+                imexCentralManager.fireOnImexError(errorEvt);
+            }
 
-        // fire error event for publications without imex but experiment has imex
-        Collection<String> publicationsWithouImexAndExperimentImex = intactPublicationCollector.getPublicationsWithoutImexButWithExperimentImex();
-        for (String pubAc : publicationsWithouImexAndExperimentImex){
-            ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_not_imex_experiment_imex, pubAc, null, null, null, "Publication does not have IMEx primary reference but the experiments do have a IMEx primary reference.");
-            imexCentralManager.fireOnImexError(errorEvt);
-        }
+            // fire error event for publications without imex but experiment has imex
+            Collection<String> publicationsWithouImexAndExperimentImex = intactPublicationCollector.getPublicationsWithoutImexButWithExperimentImex();
+            for (String pubAc : publicationsWithouImexAndExperimentImex){
+                ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_not_imex_experiment_imex, pubAc, null, null, null, "Publication does not have IMEx primary reference but the experiments do have a IMEx primary reference.");
+                imexCentralManager.fireOnImexError(errorEvt);
+            }
 
-        // fire error event for publications without imex id but interactions have imex
-        Collection<String> publicationsWithouImexAndInteractionImex = intactPublicationCollector.getPublicationsWithoutImexButWithInteractionImex();
-        for (String pubAc : publicationsWithouImexAndInteractionImex){
-            ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_not_imex_interaction_imex, pubAc, null, null, null, "Publication does not have IMEx primary reference but the interactions do have a IMEx primary reference.");
-            imexCentralManager.fireOnImexError(errorEvt);
+            // fire error event for publications without imex id but interactions have imex
+            Collection<String> publicationsWithouImexAndInteractionImex = intactPublicationCollector.getPublicationsWithoutImexButWithInteractionImex();
+            for (String pubAc : publicationsWithouImexAndInteractionImex){
+                ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_not_imex_interaction_imex, pubAc, null, null, null, "Publication does not have IMEx primary reference but the interactions do have a IMEx primary reference.");
+                imexCentralManager.fireOnImexError(errorEvt);
+            }
+        } catch (ParseException e) {
+            log.fatal("Impossible to initialise the publication Collector.", e);
         }
     }
 
@@ -148,33 +158,38 @@ public class GlobalImexPublicationUpdater {
     public void updateExistingImexPublications(){
         imexCentralManager.registerListenersIfNotDoneYet();
 
-        Collection<String> publicationsToUpdate = intactPublicationCollector.getPublicationsHavingIMExIdToUpdate();
+        Collection<String> publicationsToUpdate = null;
+        try {
+            publicationsToUpdate = intactPublicationCollector.getPublicationsHavingIMExIdToUpdate();
 
-        for (String publication : publicationsToUpdate){
-            try {
-                imexCentralManager.updateIntactPublicationHavingIMEx(publication);
-            } catch (PublicationImexUpdaterException e) {
-                ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
-                imexCentralManager.fireOnImexError(errorEvt);
-            } catch (ImexCentralException e) {
-                IcentralFault f = (IcentralFault) e.getCause();
+            for (String publication : publicationsToUpdate){
+                try {
+                    imexCentralManager.updateIntactPublicationHavingIMEx(publication);
+                } catch (PublicationImexUpdaterException e) {
+                    ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
+                    imexCentralManager.fireOnImexError(errorEvt);
+                } catch (ImexCentralException e) {
+                    IcentralFault f = (IcentralFault) e.getCause();
 
-                processImexCentralException(publication, e, f);
+                    processImexCentralException(publication, e, f);
+                }
             }
-        }
 
-        // fire error event for publications with imex id and without imex curation level
-        Collection<String> publicationsWithImexIdWithouImexCuration = intactPublicationCollector.getPublicationsHavingIMExIdAndNotImexCurationLevel();
-        for (String pubAc : publicationsWithImexIdWithouImexCuration){
-            ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_imex_id_not_imex_curation, pubAc, null, null, null, "Publication does have a IMEx primary reference but does not have IMEx curation level.");
-            imexCentralManager.fireOnImexError(errorEvt);
-        }
+            // fire error event for publications with imex id and without imex curation level
+            Collection<String> publicationsWithImexIdWithouImexCuration = intactPublicationCollector.getPublicationsHavingIMExIdAndNotImexCurationLevel();
+            for (String pubAc : publicationsWithImexIdWithouImexCuration){
+                ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_imex_id_not_imex_curation, pubAc, null, null, null, "Publication does have a IMEx primary reference but does not have IMEx curation level.");
+                imexCentralManager.fireOnImexError(errorEvt);
+            }
 
-        // fire error event for publications with imex id and no PPI
-        Collection<String> publicationsWithImexIdWithoutPPIInteractions = intactPublicationCollector.getPublicationsHavingIMExIdAndNoPPIInteractions();
-        for (String pubAc : publicationsWithImexIdWithoutPPIInteractions){
-            ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_imex_id_not_PPI, pubAc, null, null, null, "Publication does have a IMEx primary reference but does not have a single PPI.");
-            imexCentralManager.fireOnImexError(errorEvt);
+            // fire error event for publications with imex id and no PPI
+            Collection<String> publicationsWithImexIdWithoutPPIInteractions = intactPublicationCollector.getPublicationsHavingIMExIdAndNoPPIInteractions();
+            for (String pubAc : publicationsWithImexIdWithoutPPIInteractions){
+                ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_imex_id_not_PPI, pubAc, null, null, null, "Publication does have a IMEx primary reference but does not have a single PPI.");
+                imexCentralManager.fireOnImexError(errorEvt);
+            }
+        } catch (ParseException e) {
+            log.fatal("Impossible to initialise the publication Collector.", e);
         }
     }
 

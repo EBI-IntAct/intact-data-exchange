@@ -33,7 +33,7 @@
     <bean id="intactImexAssigner" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactImexAssignerImpl">
         <property name="imexCentralClient" ref="imexCentral"/>
     </bean>
-    <bean id="intactPublicationCollector" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactPublicationsCollectorImpl" lazy-init="true"/>
+    <bean id="intactPublicationCollector" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactPublicationsCollectorImpl"/>
     <bean id="imexAdminGroupSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationAdminGroupSynchronizerImpl">
         <property name="imexCentralClient" ref="imexCentral"/>
     </bean>
