@@ -25,12 +25,12 @@ public class PublicationAdminUserSynchronizerImpl extends ImexCentralUpdater imp
     private static String PHANTOM_CURATOR = "phantom";
 
     public void synchronizePublicationAdminUser(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
-        String curator = intactPublication.getCurrentOwner().getLogin().toLowerCase();
+        String curator = intactPublication.getCurrentOwner() != null ? intactPublication.getCurrentOwner().getLogin().toLowerCase() : null;
 
         Publication.AdminUserList adminUserList = imexPublication.getAdminUserList();
+        String pubId = extractPubIdFromIntactPublication(intactPublication);
 
         if (curator != null && !containsAdminUser(adminUserList, curator)){
-            String pubId = extractPubIdFromIntactPublication(intactPublication);
 
             try {
                 imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, curator );
@@ -47,6 +47,11 @@ public class PublicationAdminUserSynchronizerImpl extends ImexCentralUpdater imp
                     throw e;
                 }
             }
+        }
+        else if (curator == null && !containsAdminUser(adminUserList, PHANTOM_CURATOR)){
+            // unknown user, we automaticaly re-assign this record to user 'phantom'
+            imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, PHANTOM_CURATOR );
+            log.info("Updated publication admin user to phantom user ");
         }
     }
 
