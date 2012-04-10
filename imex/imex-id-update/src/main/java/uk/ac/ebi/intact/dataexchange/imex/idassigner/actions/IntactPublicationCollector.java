@@ -1,6 +1,5 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
-import java.text.ParseException;
 import java.util.Collection;
 
 /**
@@ -30,13 +29,28 @@ public interface IntactPublicationCollector {
     public Collection<String> getPublicationsHavingImexCurationLevelButAreNotEligibleImex();
 
     /**
-     *
+     * Collect publications having an IMEx primary reference and no imex curation annotation
      * @return a collection of publication acs.
-     * @throws ParseException
      */
     public Collection<String> getPublicationsHavingIMExIdAndNotImexCurationLevel();
-    public Collection<String> getPublicationsHavingIMExIdAndNoPPIInteractions();
+
+    /**
+     * Collect publications having IMEx primary reference and without any PPI
+     * @return a collection of publication acs.
+     */
+    public Collection<String> getPublicationsHavingIMExIdAndNoPPI();
+
+    /**
+     * Collect publications having IMEx primary reference and imex-curation annotation which contain at least one PPI
+     * @return a collection of publication acs.
+     */
     public Collection<String> getPublicationsHavingIMExIdToUpdate();
+
+    /**
+     * Collect publications which do not have any IMEx primary references but are eligible IMEx (journal, dataset) and
+     * have at least one PPI
+     * @return a collection of publication acs.
+     */
     public Collection<String> getPublicationsNeedingAnImexId();
 
     /**

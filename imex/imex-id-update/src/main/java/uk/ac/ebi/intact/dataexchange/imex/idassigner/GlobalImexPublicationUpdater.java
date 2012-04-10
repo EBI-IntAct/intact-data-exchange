@@ -175,7 +175,7 @@ public class GlobalImexPublicationUpdater {
             }
 
             // fire error event for publications with imex id and no PPI
-            Collection<String> publicationsWithImexIdWithoutPPIInteractions = intactPublicationCollector.getPublicationsHavingIMExIdAndNoPPIInteractions();
+            Collection<String> publicationsWithImexIdWithoutPPIInteractions = intactPublicationCollector.getPublicationsHavingIMExIdAndNoPPI();
             for (String pubAc : publicationsWithImexIdWithoutPPIInteractions){
                 ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_imex_id_not_PPI, pubAc, null, null, null, "Publication does have a IMEx primary reference but does not have a single PPI.");
                 imexCentralManager.fireOnImexError(errorEvt);

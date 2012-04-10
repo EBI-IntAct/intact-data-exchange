@@ -355,7 +355,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Collection<String> getPublicationsHavingIMExIdAndNoPPIInteractions() {
+    public Collection<String> getPublicationsHavingIMExIdAndNoPPI() {
         if (!isInitialised){
             initialise();
         }
