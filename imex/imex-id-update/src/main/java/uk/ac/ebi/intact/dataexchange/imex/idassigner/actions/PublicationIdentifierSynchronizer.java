@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
+import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 
 /**
@@ -32,4 +33,5 @@ public interface PublicationIdentifierSynchronizer {
      */
     public void synchronizePublicationIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException;
 
+    public ImexCentralClient getImexCentralClient();
 }

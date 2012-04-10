@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
+import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.bridges.imexcentral.PublicationStatus;
 
@@ -28,4 +29,6 @@ public interface PublicationStatusSynchronizer {
      * @return the imex central publication status that is matching the intact status of the publication
      */
     public PublicationStatus getPublicationStatus( uk.ac.ebi.intact.model.Publication publication );
+
+    public ImexCentralClient getImexCentralClient();
 }

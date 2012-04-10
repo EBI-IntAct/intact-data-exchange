@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
+import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 
 /**
@@ -23,4 +24,6 @@ public interface PublicationAdminGroupSynchronizer {
      * @throws ImexCentralException if INTACT is not a valid ADMIn group and if IMEx central is not available or the publication id is not recognized
      */
     public void synchronizePublicationAdminGroup(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException;
+
+    public ImexCentralClient getImexCentralClient();
 }
