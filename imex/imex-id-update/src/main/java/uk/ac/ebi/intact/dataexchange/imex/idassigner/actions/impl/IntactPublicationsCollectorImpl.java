@@ -57,7 +57,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     public IntactPublicationsCollectorImpl(){
     }
 
-    private List<String> collectPublicationCandidatesToImexWithJournalAndDate() throws ParseException {
+    private List<String> collectPublicationCandidatesToImexWithJournalAndDate() {
         List<Object[]> publicationJournalsAndYear = collectYearAndJournalFromPublicationEligibleImex();
 
         List<String> publications = new ArrayList<String>(publicationJournalsAndYear.size());
@@ -101,7 +101,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
      * @return list of object[] which are String[3] with publication ac, jounal and year of publication
      * @throws ParseException
      */
-    private List<Object[]> collectYearAndJournalFromPublicationEligibleImex() throws ParseException {
+    private List<Object[]> collectYearAndJournalFromPublicationEligibleImex() {
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String journalDateQuery = "select distinct p.ac, a1.annotationText, a2.annotationText from Publication p left join p.annotations as a1 join p.annotations as a2 " +
@@ -259,7 +259,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Collection<String> getPublicationsNeedingAnImexId() throws ParseException {
+    public Collection<String> getPublicationsNeedingAnImexId() {
 
         if (!isInitialised){
             initialise();
@@ -281,7 +281,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Collection<String> getPublicationsHavingIMExIdToUpdate() throws ParseException {
+    public Collection<String> getPublicationsHavingIMExIdToUpdate() {
 
         if (!isInitialised){
             initialise();
@@ -294,7 +294,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Collection<String> getPublicationsHavingIMExIdAndNotImexCurationLevel() throws ParseException {
+    public Collection<String> getPublicationsHavingIMExIdAndNotImexCurationLevel() {
 
         if (!isInitialised){
             initialise();
@@ -307,7 +307,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Collection<String> getPublicationsHavingImexCurationLevelButAreNotEligibleImex() throws ParseException {
+    public Collection<String> getPublicationsHavingImexCurationLevelButAreNotEligibleImex() {
 
         if (!isInitialised){
             initialise();
@@ -329,7 +329,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Collection<String> getPublicationsWithoutImexButWithExperimentImex() throws ParseException {
+    public Collection<String> getPublicationsWithoutImexButWithExperimentImex() {
 
         if (!isInitialised){
             initialise();
@@ -342,7 +342,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Collection<String> getPublicationsWithoutImexButWithInteractionImex() throws ParseException {
+    public Collection<String> getPublicationsWithoutImexButWithInteractionImex() {
 
         if (!isInitialised){
             initialise();
@@ -355,7 +355,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Collection<String> getPublicationsHavingIMExIdAndNoPPIInteractions() throws ParseException {
+    public Collection<String> getPublicationsHavingIMExIdAndNoPPIInteractions() {
         if (!isInitialised){
             initialise();
         }
@@ -364,7 +364,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void initialise() throws ParseException {
+    public void initialise() {
         if (publicationsHavingImexId == null){
             publicationsHavingImexId = collectPublicationsHavingImexIds();
         }

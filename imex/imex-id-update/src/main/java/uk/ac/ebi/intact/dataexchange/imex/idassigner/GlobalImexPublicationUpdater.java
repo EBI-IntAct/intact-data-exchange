@@ -9,7 +9,6 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationImexUpda
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorType;
 
-import java.text.ParseException;
 import java.util.Collection;
 
 /**
@@ -54,9 +53,7 @@ public class GlobalImexPublicationUpdater {
 
         imexCentralManager.registerListenersIfNotDoneYet();
 
-        Collection<String> publicationsNeedingNewImexId = null;
-        try {
-            publicationsNeedingNewImexId = intactPublicationCollector.getPublicationsNeedingAnImexId();
+        Collection<String> publicationsNeedingNewImexId = intactPublicationCollector.getPublicationsNeedingAnImexId();
 
             for (String publication : publicationsNeedingNewImexId){
                 try {
@@ -92,9 +89,6 @@ public class GlobalImexPublicationUpdater {
                 ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_not_imex_interaction_imex, pubAc, null, null, null, "Publication does not have IMEx primary reference but the interactions do have a IMEx primary reference.");
                 imexCentralManager.fireOnImexError(errorEvt);
             }
-        } catch (ParseException e) {
-            log.fatal("Impossible to initialise the publication Collector.", e);
-        }
     }
 
     private void processImexCentralException(String publication, ImexCentralException e, IcentralFault f) {
@@ -158,9 +152,7 @@ public class GlobalImexPublicationUpdater {
     public void updateExistingImexPublications(){
         imexCentralManager.registerListenersIfNotDoneYet();
 
-        Collection<String> publicationsToUpdate = null;
-        try {
-            publicationsToUpdate = intactPublicationCollector.getPublicationsHavingIMExIdToUpdate();
+        Collection<String> publicationsToUpdate = intactPublicationCollector.getPublicationsHavingIMExIdToUpdate();
 
             for (String publication : publicationsToUpdate){
                 try {
@@ -188,9 +180,6 @@ public class GlobalImexPublicationUpdater {
                 ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_imex_id_not_PPI, pubAc, null, null, null, "Publication does have a IMEx primary reference but does not have a single PPI.");
                 imexCentralManager.fireOnImexError(errorEvt);
             }
-        } catch (ParseException e) {
-            log.fatal("Impossible to initialise the publication Collector.", e);
-        }
     }
 
     public IntactPublicationCollector getIntactPublicationCollector() {
