@@ -58,7 +58,6 @@ public class PublicationAdminUserSynchronizerTest extends IntactBasicTestCase{
         intactPub2.setAdminUserList(new Publication.AdminUserList());
         intactPub2.getAdminUserList().getUser().add("intact");
         imexAdminUserSynchronizerTest.getImexCentralClient().createPublication(intactPub2);
-
     }
 
     @Test

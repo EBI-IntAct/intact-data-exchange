@@ -35,7 +35,7 @@
     <bean id="imexAdminUserSynchronizerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationAdminUserSynchronizerImpl">
         <property name="imexCentralClient" ref="imexCentralTest"/>
     </bean>
-    <bean id="publicationIdentifierSynchronizerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationIdentifierSynchronizerImpl">
+    <bean id="identifierSynchronizerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationIdentifierSynchronizerImpl">
         <property name="imexCentralClient" ref="imexCentralTest"/>
     </bean>
     <bean id="imexStatusSynchronizerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationStatusSynchronizerImpl">
@@ -49,7 +49,7 @@
         <property name="imexAdminUserSynchronizer" ref="imexAdminUserSynchronizerTest"/>
         <property name="imexCentralRegister" ref="imexCentralRegisterTest"/>
         <property name="imexStatusSynchronizer" ref="imexStatusSynchronizerTest"/>
-        <property name="publicationIdentifierSynchronizer" ref="publicationIdentifierSynchronizerTest"/>
+        <property name="publicationIdentifierSynchronizer" ref="identifierSynchronizerTest"/>
         <property name="intactImexAssigner" ref="assignerTest"/>
         <property name="imexUpdateConfig" ref="imexUpdateConfigTest"/>
     </bean>

@@ -31,7 +31,9 @@ public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater im
 
         // no existing identifiers in IMEx central for this record
         if (imexIdentifiers == null || (imexIdentifiers != null && imexIdentifiers.isEmpty())){
-            return false;
+
+            // true if publication is unassgigned in intact, false otherwise
+            return intactPubId.startsWith(UNASSIGNED_PREFIX);
         }
         // existing identifiers
         else {
@@ -50,7 +52,7 @@ public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater im
 
         String pubId = extractPubIdFromIntactPublication(intactPublication);
 
-        // if the publication id is not in IMEx central, we need to synchronize
+        // if the publication id is not in IMEx central (exception if unassigned in intact and no identifiers in imex central), we need to synchronize
         if (!isIntactPublicationIdentifierInSyncWithImexCentral(pubId, imexPublication)){
             List<Identifier> imexIdentifiers = imexPublication.getIdentifier();
 
