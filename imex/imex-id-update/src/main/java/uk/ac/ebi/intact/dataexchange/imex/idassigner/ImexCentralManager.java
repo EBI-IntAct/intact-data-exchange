@@ -333,6 +333,16 @@ public class ImexCentralManager {
         return null;
     }
 
+    /**
+     * Check if a publication is already registered in IMEx central
+     * @param identifier : pubmed, unassigned, doi
+     * @return
+     * @throws ImexCentralException
+     */
+    public boolean isPublicationAlreadyRegisteredInImexCentral(String identifier) throws ImexCentralException {
+        return imexCentralRegister.getExistingPublicationInImexCentral(identifier) != null;
+    }
+
     public ImexCentralPublicationRegister getImexCentralRegister() {
         return imexCentralRegister;
     }
