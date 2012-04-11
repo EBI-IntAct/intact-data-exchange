@@ -142,7 +142,7 @@ public class ImexCentralManager {
         return null;
     }
 
-    public void synchronizePublicationWithImexCentral(Publication intactPublication, edu.ucla.mbi.imex.central.ws.v20.Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException {
+    public void synchronizePublicationWithImexCentral(Publication intactPublication, edu.ucla.mbi.imex.central.ws.v20.Publication imexPublication) throws ImexCentralException {
 
         imexAdminGroupSynchronizer.synchronizePublicationAdminGroup(intactPublication, imexPublication);
         imexAdminUserSynchronizer.synchronizePublicationAdminUser(intactPublication, imexPublication);
