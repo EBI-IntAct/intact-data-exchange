@@ -31,7 +31,7 @@ public class PublicationAdminGroupSynchronizerImpl extends ImexCentralUpdater im
 
         if (!containsAdminGroup(adminGroupList, INTACT_ADMIN)){
             // add first INTACT admin
-            imexCentral.updatePublicationAdminGroup(pubId, Operation.ADD, INTACT_ADMIN);
+            imexPublication = imexCentral.updatePublicationAdminGroup(pubId, Operation.ADD, INTACT_ADMIN);
             log.info("Updated publication admin group to: " + INTACT_ADMIN);
         }
 
@@ -40,7 +40,7 @@ public class PublicationAdminGroupSynchronizerImpl extends ImexCentralUpdater im
 
         if (!INTACT_ADMIN.equals(institution) && !containsAdminGroup(adminGroupList, institution)){
             try {
-                imexCentral.updatePublicationAdminGroup( intactPublication.getPublicationId(), Operation.ADD, institution );
+                imexPublication = imexCentral.updatePublicationAdminGroup( intactPublication.getPublicationId(), Operation.ADD, institution );
                 log.info("Added other publication admin group : " + institution);
             } catch ( ImexCentralException e ) {
                 IcentralFault f = (IcentralFault) e.getCause();

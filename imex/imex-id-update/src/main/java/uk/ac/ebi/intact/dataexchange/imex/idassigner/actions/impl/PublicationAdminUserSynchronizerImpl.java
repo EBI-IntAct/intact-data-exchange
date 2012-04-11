@@ -33,14 +33,14 @@ public class PublicationAdminUserSynchronizerImpl extends ImexCentralUpdater imp
         if (curator != null && !containsAdminUser(adminUserList, curator)){
 
             try {
-                imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, curator );
+                imexPublication = imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, curator );
                 log.info("Updated publication admin user to: " + curator);
 
             } catch ( ImexCentralException e ) {
                 IcentralFault f = (IcentralFault) e.getCause();
                 if( f.getFaultInfo().getFaultCode() == GlobalImexPublicationUpdater.UNKNOWN_USER && !containsAdminUser(adminUserList, PHANTOM_CURATOR)) {
                     // unknown user, we automaticaly re-assign this record to user 'phantom'
-                    imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, PHANTOM_CURATOR );
+                    imexPublication = imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, PHANTOM_CURATOR );
                     log.info("Updated publication admin user to phantom user ");
                 }
                 else {
@@ -50,7 +50,7 @@ public class PublicationAdminUserSynchronizerImpl extends ImexCentralUpdater imp
         }
         else if (curator == null && !containsAdminUser(adminUserList, PHANTOM_CURATOR)){
             // unknown user, we automaticaly re-assign this record to user 'phantom'
-            imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, PHANTOM_CURATOR );
+            imexPublication = imexCentral.updatePublicationAdminUser( pubId, Operation.ADD, PHANTOM_CURATOR );
             log.info("Updated publication admin user to phantom user ");
         }
     }

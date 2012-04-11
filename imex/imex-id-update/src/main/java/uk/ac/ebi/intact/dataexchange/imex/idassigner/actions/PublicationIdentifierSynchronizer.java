@@ -21,11 +21,12 @@ public interface PublicationIdentifierSynchronizer {
      * @param imexPublication
      * @return true if the intact publication identifier is in IMEx central, false otherwise
      */
-    public boolean isIntactPublicationIdentifierInSyncWithImexCentral(String intactPubId, Publication imexPublication);
+    public boolean isIntactPublicationIdentifierInSyncWithImexCentral(String intactPubId, Publication imexPublication) throws ImexCentralException;
 
     /**
-     * Update the IMEx record in case intact publication has a valid pubmed or doi identifier that is not in IMEx central.
-     * It will not update the intact publication or the IMEx record if the pubmed or doi identifier is different in IMEx central.
+     * Update the IMEx record in case intact publication has a valid pubmed, unassigned or doi identifier that is not in IMEx central.
+     * It will not update the intact publication and it is possible that it will not update the IMEx record if the pubmed or doi identifier is different in IMEx central.
+     * The publication record in IMEx central should have a valid IMEx id.
      * @param intactPublication
      * @param imexPublication
      * @throws PublicationImexUpdaterException : if the pubmed/doi identifier in IntAct is different from the one in IMEx central

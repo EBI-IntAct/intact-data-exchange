@@ -95,7 +95,9 @@ public class ImexCentralManager {
                     String pubId = intactPublication.getPublicationId() != null ? intactPublication.getPublicationId() : intactPublication.getShortLabel();
 
                     // if the intact publication identifier is not in sync with IMEx central, try to synchronize it first but does not update the intact publication
-                    publicationIdentifierSynchronizer.synchronizePublicationIdentifier(intactPublication, imexPublication);
+                    if (!publicationIdentifierSynchronizer.isIntactPublicationIdentifierInSyncWithImexCentral(pubId, imexPublication)){
+                        publicationIdentifierSynchronizer.synchronizePublicationIdentifier(intactPublication, imexPublication);
+                    }
 
                     // update publication annotations if necessary
                     boolean hasUpdated = intactImexAssigner.updatePublicationAnnotations(intactPublication);
@@ -150,7 +152,7 @@ public class ImexCentralManager {
     /**
      * Create a new record in IMEx central if possible, assign a new IMEx id and update publication/experiments/interactions
      * @param publicationAc
-     * @return the IMEx central record
+     * @return the IMEx central record if updated, null if could not assign
      * @throws PublicationImexUpdaterException
      * @throws ImexCentralException
      */
@@ -167,39 +169,41 @@ public class ImexCentralManager {
             // collect intact publication identifier
             String pubId = intactPublication.getPublicationId() != null ? intactPublication.getPublicationId() : intactPublication.getShortLabel();
 
-            // the publication has a valid pubmed identifier and can be registered and assign IMEx id in IMEx central
-            if (Pattern.matches(ImexCentralManager.PUBMED_REGEXP.toString(), pubId)){
+            // collect the record in IMEx central to check if a publication already exists
+            edu.ucla.mbi.imex.central.ws.v20.Publication imexPublication =  imexCentralRegister.getExistingPublicationInImexCentral(pubId);
 
-                // collect the record in IMEx central to check if a publication already exists
-                edu.ucla.mbi.imex.central.ws.v20.Publication imexPublication =  imexCentralRegister.getExistingPublicationInImexCentral(pubId);
+            // the publication is already registered in IMEx central
+            if (imexPublication != null){
 
-                // the publication is already registered in IMEx central
-                if (imexPublication != null){
-
-                    // we already have an IMEx id in IMEx central, it is not possible to update the intact publication because we have a conflict
-                    if (imexPublication.getImexAccession() != null && !imexPublication.getImexAccession().equals(NO_IMEX_ID)){
-                        ImexErrorEvent evt = new ImexErrorEvent(this, ImexErrorType.imex_in_imexCentral_not_in_intact, intactPublication.getPublicationId(), imexPublication.getImexAccession(), null, null, "It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " because it already has a valid IMEx id in IMEx central.");
-                        fireOnImexError(evt);
-                    }
-                    // the publication has been registered in IMex central but does not have an IMEx id
-                    else {
-                        assignAndUpdateIntactPublication(intactPublication, imexPublication);
-                        synchronizePublicationWithImexCentral(intactPublication, imexPublication);
-                    }
+                // we already have an IMEx id in IMEx central, it is not possible to update the intact publication because we have a conflict
+                if (imexPublication.getImexAccession() != null && !imexPublication.getImexAccession().equals(NO_IMEX_ID)){
+                    ImexErrorEvent evt = new ImexErrorEvent(this, ImexErrorType.imex_in_imexCentral_not_in_intact, intactPublication.getPublicationId(), imexPublication.getImexAccession(), null, null, "It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " because it already has a valid IMEx id in IMEx central.");
+                    fireOnImexError(evt);
                 }
-                // needs to register first the publication in IMEx central
-                else {
-                    imexPublication = imexCentralRegister.registerPublicationInImexCentral(intactPublication);
+                // the publication has been registered in IMex central but does not have an IMEx id. If it is not unassigned, we can assign IMEx id
+                else if (Pattern.matches(ImexCentralManager.PUBMED_REGEXP.toString(), pubId)){
+                    assignAndUpdateIntactPublication(intactPublication, imexPublication);
+                    synchronizePublicationWithImexCentral(intactPublication, imexPublication);
 
-                    if (imexPublication != null){
-                        // assign IMEx id to publication and update publication annotations
-                        assignAndUpdateIntactPublication(intactPublication, imexPublication);
-                        synchronizePublicationWithImexCentral(intactPublication, imexPublication);
-                    }
-                    else {
-                        ImexErrorEvent evt = new ImexErrorEvent(this, ImexErrorType.no_record_created, intactPublication.getPublicationId(), null, null, null, "It is not possible to register the publication " + intactPublication.getShortLabel() + " in IMEx central.");
-                        fireOnImexError(evt);
-                    }
+                    return imexPublication;
+                }
+                // unassigned publication, cannot use the webservice to automatically assign IMEx id for now, ask the curator to manually register and assign IMEx id to this publication
+                else {
+                    log.warn("It is not possible to assign an IMEx id to a unassigned publication. The publication needs to be registered manually by a curator in IMEx central.");
+                }
+            }
+            // the publication has a valid pubmed identifier and can be registered and assign IMEx id in IMEx central
+            else if (Pattern.matches(ImexCentralManager.PUBMED_REGEXP.toString(), pubId)) {
+                imexPublication = imexCentralRegister.registerPublicationInImexCentral(intactPublication);
+
+                if (imexPublication != null){
+                    // assign IMEx id to publication and update publication annotations
+                    assignAndUpdateIntactPublication(intactPublication, imexPublication);
+                    synchronizePublicationWithImexCentral(intactPublication, imexPublication);
+                }
+                else {
+                    ImexErrorEvent evt = new ImexErrorEvent(this, ImexErrorType.no_record_created, intactPublication.getPublicationId(), null, null, null, "It is not possible to register the publication " + intactPublication.getShortLabel() + " in IMEx central.");
+                    fireOnImexError(evt);
                 }
 
                 return imexPublication;

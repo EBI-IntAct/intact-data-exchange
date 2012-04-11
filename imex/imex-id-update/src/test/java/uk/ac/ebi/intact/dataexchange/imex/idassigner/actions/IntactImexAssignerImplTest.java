@@ -42,7 +42,7 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
     public void createImexPublications() throws ImexCentralException {
         imexPublication = new Publication();
         Identifier pubmed = new Identifier();
-        pubmed.setNs("pubmed");
+        pubmed.setNs("pmid");
         pubmed.setAc("12345");
         imexPublication.getIdentifier().add(pubmed);
 
@@ -841,7 +841,7 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
                 InteractorXref ref2 = refIterator.next();
                 Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref2.getCvDatabase().getIdentifier());
                 Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref2.getCvXrefQualifier().getIdentifier());
-                Assert.assertEquals("IM-1-2", ref2.getPrimaryId());
+                Assert.assertEquals("IM-1-" + index, ref2.getPrimaryId());
             }
             else {
                 index++;

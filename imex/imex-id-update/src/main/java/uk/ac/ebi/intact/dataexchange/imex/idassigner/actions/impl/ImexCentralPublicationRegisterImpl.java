@@ -23,7 +23,7 @@ public class ImexCentralPublicationRegisterImpl extends ImexCentralUpdater imple
 
     /**
      *
-     * @param publicationId : valid pubmed id or doi number or IMEx id. Unassigned ids are not recognized
+     * @param publicationId : valid pubmed id or doi number or IMEx id or unassigned identifier (internal identifier)
      * @return the registered publication in IMEx central matching the publication id of the publication. Null if the publication has not been registered
      * @throws ImexCentralException
      */

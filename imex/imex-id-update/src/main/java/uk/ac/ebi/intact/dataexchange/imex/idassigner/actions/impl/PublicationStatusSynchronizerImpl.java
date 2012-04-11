@@ -29,7 +29,7 @@ public class PublicationStatusSynchronizerImpl extends ImexCentralUpdater implem
 
         if (imexStatus == null || (imexStatus != null && !intactStatus.toString().equalsIgnoreCase(imexStatus))){
             String pubId = extractPubIdFromIntactPublication(intactPublication);
-            imexCentral.updatePublicationStatus( pubId, intactStatus, null );
+            imexPublication = imexCentral.updatePublicationStatus( pubId, intactStatus );
             log.info("Updating imex status to " + intactStatus.toString());
         }
     }
