@@ -6,6 +6,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,9 +72,9 @@ public class PublicationIdentifierSynchronizerImplTest extends IntactBasicTestCa
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
-    public void intact_publication_unassigned_synchronized_with_imex_central() throws ImexCentralException {
+    public void intact_publication_unassigned_not_synchronized_with_imex_central() throws ImexCentralException {
 
-        Assert.assertTrue(identifierSynchronizerTest.isIntactPublicationIdentifierInSyncWithImexCentral("unassigned604", intactPubUnassigned));
+        Assert.assertFalse(identifierSynchronizerTest.isIntactPublicationIdentifierInSyncWithImexCentral("unassigned604", intactPubUnassigned));
     }
 
     @Test
@@ -92,6 +93,7 @@ public class PublicationIdentifierSynchronizerImplTest extends IntactBasicTestCa
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void synchronize_intact_publication_identifier_already_synchronized_with_imex_central() throws ImexCentralException, PublicationImexUpdaterException {
 
         uk.ac.ebi.intact.model.Publication intactPublication = new uk.ac.ebi.intact.model.Publication(getIntactContext().getInstitution(), "12345");
@@ -101,8 +103,9 @@ public class PublicationIdentifierSynchronizerImplTest extends IntactBasicTestCa
         Assert.assertEquals("12345", intactPub12345.getIdentifier().iterator().next().getAc());
     }
 
-    /*@Test
+    @Test
     @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void synchronize_intact_publication_identifier_no_identifier_in_imex_central() throws ImexCentralException, PublicationImexUpdaterException {
         intactPub12345.getIdentifier().clear();
 
@@ -111,5 +114,19 @@ public class PublicationIdentifierSynchronizerImplTest extends IntactBasicTestCa
         identifierSynchronizerTest.synchronizePublicationIdentifier(intactPublication, intactPub12345);
 
         Assert.assertEquals("12345", intactPub12345.getIdentifier().iterator().next().getAc());
-    }*/
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
+    public void update_unassigned_identifier() throws ImexCentralException, PublicationImexUpdaterException {
+        Assert.assertTrue(intactPubUnassigned.getIdentifier().isEmpty());
+
+        uk.ac.ebi.intact.model.Publication intactPublication = new uk.ac.ebi.intact.model.Publication(getIntactContext().getInstitution(), "unassigned604");
+
+        identifierSynchronizerTest.synchronizePublicationIdentifier(intactPublication, intactPubUnassigned);
+
+        Assert.assertEquals("unassigned604", intactPubUnassigned.getIdentifier().iterator().next().getAc());
+        intactPubUnassigned.getIdentifier().clear();
+    }
 }
