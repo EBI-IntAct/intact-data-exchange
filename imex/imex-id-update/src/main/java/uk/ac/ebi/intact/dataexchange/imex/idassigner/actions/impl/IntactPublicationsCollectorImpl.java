@@ -290,7 +290,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         // publications having imex id plus imex curation level
         Collection<String> publicationsWithIMExIdToUpdate = CollectionUtils.intersection(publicationsHavingImexId, publicationsHavingImexCurationLevel);
 
-        return publicationsWithIMExIdToUpdate;
+        // filters publications having imex id but no PPI
+        Collection<String> publicationsWithIMExIdToUpdateFiltered = CollectionUtils.subtract(publicationsWithIMExIdToUpdate, publicationsInvolvingOnlyNonPPIInteractions);
+
+        return publicationsWithIMExIdToUpdateFiltered;
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)

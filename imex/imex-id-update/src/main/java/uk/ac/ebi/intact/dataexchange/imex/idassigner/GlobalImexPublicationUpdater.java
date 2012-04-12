@@ -12,7 +12,7 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorType;
 import java.util.Collection;
 
 /**
- * This class is for updating/assigning IMEx publications for the IntAct database
+ * This class is for updating/assigning IMEx publications for the all IntAct database
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

@@ -55,7 +55,7 @@
     </bean>
 
     <!-- Global imex updater -->
-    <bean id="globalImexPublicationUpdaterTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.GlobalImexPublicationUpdater">
+    <bean id="globalImexUpdaterTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.GlobalImexPublicationUpdater">
         <property name="imexCentralManager" ref="imexManagerTest"/>
         <property name="intactPublicationCollector" ref="publicationCollectorTest"/>
     </bean>
