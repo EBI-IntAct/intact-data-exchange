@@ -150,7 +150,8 @@ public class ImexCentralManager {
     }
 
     /**
-     * Create a new record in IMEx central if possible, assign a new IMEx id and update publication/experiments/interactions
+     * Create a new record in IMEx central if possible, assign a new IMEx id and update publication/experiments/interactions.
+     * The publication should not already have any IMEx accession assigned to it
      * @param publicationAc
      * @return the IMEx central record if updated, null if could not assign
      * @throws PublicationImexUpdaterException
@@ -223,7 +224,7 @@ public class ImexCentralManager {
     }
 
     /**
-     * Assign IMEx id to a publication already registered in IMEx central and update IntAct record
+     * Assign IMEx id to a publication already registered in IMEx central but without any IMEx primary reference and update IntAct record
      * @param intactPublication
      * @param imexPublication
      * @throws PublicationImexUpdaterException

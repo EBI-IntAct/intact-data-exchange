@@ -44,7 +44,7 @@
     <bean id="publicationCollectorTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactPublicationsCollectorImpl"/>
 
     <!-- Imex central manager -->
-    <bean id="imexCentralManagerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexCentralManager">
+    <bean id="imexManagerTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexCentralManager">
         <property name="imexAdminGroupSynchronizer" ref="imexAdminGroupSynchronizerTest"/>
         <property name="imexAdminUserSynchronizer" ref="imexAdminUserSynchronizerTest"/>
         <property name="imexCentralRegister" ref="imexCentralRegisterTest"/>
@@ -56,7 +56,7 @@
 
     <!-- Global imex updater -->
     <bean id="globalImexPublicationUpdaterTest" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.GlobalImexPublicationUpdater">
-        <property name="imexCentralManager" ref="imexCentralManagerTest"/>
+        <property name="imexCentralManager" ref="imexManagerTest"/>
         <property name="intactPublicationCollector" ref="publicationCollectorTest"/>
     </bean>
 
