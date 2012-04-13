@@ -15,7 +15,7 @@
     <name>IntAct Data Exchange :: IMEx :: IMEx Id update</name>
 
     <profiles>
-        <profile>
+        <!--<profile>
             <id>assign-imex-ids</id>
 
             <build>
@@ -36,8 +36,6 @@
                             <arguments>
                                 <argument>-Xmx2048m</argument>
                                 <argument>-classpath</argument>
-                                <!-- automatically creates the classpath using all project dependencies,
-                                     also adding the project build directory -->
                                 <classpath />
                                 <argument>-Djavax.net.ssl.trustStore=/Users/samuel/keystore/keystore</argument>
                                 <argument>-Djavax.net.ssl.keyStorePassword=240178</argument>
@@ -50,7 +48,7 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
+        </profile>-->
 
         <profile>
             <id>create-missing-publications</id>
