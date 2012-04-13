@@ -4,8 +4,8 @@ import edu.ucla.mbi.imex.central.ws.v20.IcentralFault;
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.bridges.imexcentral.DefaultImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.GlobalImexPublicationUpdater;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.ImexCentralPublicationRegister;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.ImexCentralUpdater;
 
@@ -36,7 +36,7 @@ public class ImexCentralPublicationRegisterImpl extends ImexCentralUpdater imple
                 IcentralFault f = (IcentralFault) e.getCause();
 
                 // IMEx central did throw an Exception because this publication does not exist in IMEx central
-                if( f.getFaultInfo().getFaultCode() == GlobalImexPublicationUpdater.NO_RECORD) {
+                if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.NO_RECORD) {
                     log.info("Cannot find publication " + publicationId + " in IMEx central.", e);
                 }
                 else {
@@ -67,7 +67,7 @@ public class ImexCentralPublicationRegisterImpl extends ImexCentralUpdater imple
         } catch (ImexCentralException e) {
             IcentralFault f = (IcentralFault) e.getCause();
             // IMEx central throw an Exception when the record cannot be created
-            if( f.getFaultInfo().getFaultCode() == GlobalImexPublicationUpdater.NO_RECORD_CREATED ) {
+            if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.NO_RECORD_CREATED ) {
                 log.error("Cannot create a new record in IMEx central for publication " + intactPublication.getShortLabel(), e);
                 return null;
             }

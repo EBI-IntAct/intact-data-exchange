@@ -4,9 +4,9 @@ import edu.ucla.mbi.imex.central.ws.v20.IcentralFault;
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.bridges.imexcentral.DefaultImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.bridges.imexcentral.Operation;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.GlobalImexPublicationUpdater;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.ImexCentralUpdater;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationAdminGroupSynchronizer;
 
@@ -44,7 +44,7 @@ public class PublicationAdminGroupSynchronizerImpl extends ImexCentralUpdater im
                 log.info("Added other publication admin group : " + institution);
             } catch ( ImexCentralException e ) {
                 IcentralFault f = (IcentralFault) e.getCause();
-                if( f.getFaultInfo().getFaultCode() == GlobalImexPublicationUpdater.UNKNOWN_GROUP ) {
+                if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.UNKNOWN_GROUP ) {
                     // unknown admin group, we cannot add another admin group for this institution
                     log.warn("The institution " + institution + " is not recognized in IMEx central so is ignored.");
                 }
