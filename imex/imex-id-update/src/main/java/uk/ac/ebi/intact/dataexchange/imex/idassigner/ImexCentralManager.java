@@ -232,30 +232,27 @@ public class ImexCentralManager {
      */
     private void assignAndUpdateIntactPublication(Publication intactPublication, edu.ucla.mbi.imex.central.ws.v20.Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException {
         // assign IMEx id to publication and update publication annotations
-        boolean hasAssigned = intactImexAssigner.assignImexIdentifier(intactPublication, imexPublication);
+        String imex = intactImexAssigner.assignImexIdentifier(intactPublication, imexPublication);
 
-        if (hasAssigned){
-            NewAssignedImexEvent evt = new NewAssignedImexEvent(this, intactPublication.getPublicationId(), imexPublication.getImexAccession(), null, null);
+        if (imex != null){
+            NewAssignedImexEvent evt = new NewAssignedImexEvent(this, intactPublication.getPublicationId(), imex, null, null);
             fireOnNewImexAssigned(evt);
-        }
 
-        // the IMEx id has been generated and is valid
-        if (imexPublication.getImexAccession() != null && !imexPublication.getImexAccession().equals(NO_IMEX_ID)){
             // update experiments
-            List<Experiment> updatedExperiments = intactImexAssigner.updateImexIdentifiersForAllExperiments(intactPublication, imexPublication.getImexAccession(), this);
+            List<Experiment> updatedExperiments = intactImexAssigner.updateImexIdentifiersForAllExperiments(intactPublication, imex, this);
 
             // update interactions
-            List<Interaction> updatedInteractions = intactImexAssigner.assignImexIdentifiersForAllInteractions(intactPublication, imexPublication.getImexAccession(), this);
+            List<Interaction> updatedInteractions = intactImexAssigner.assignImexIdentifiersForAllInteractions(intactPublication, imex, this);
 
-            IntactUpdateEvent evt = new IntactUpdateEvent(this, intactPublication.getPublicationId(), imexPublication.getImexAccession(), updatedExperiments, updatedInteractions);
-            fireOnIntactUpdate(evt);
+            IntactUpdateEvent evt2 = new IntactUpdateEvent(this, intactPublication.getPublicationId(), imex, updatedExperiments, updatedInteractions);
+            fireOnIntactUpdate(evt2);
         }
         else {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, intactPublication.getPublicationId(), imexPublication.getImexAccession(), null, null, "It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " in IMEx central.");
             fireOnImexError(errorEvt);
-                    }
+        }
     }
-    
+
     public edu.ucla.mbi.imex.central.ws.v20.Publication getPublicationInImexCentralFor(String pubId) throws ImexCentralException {
         return imexCentralRegister.getExistingPublicationInImexCentral(pubId);
     }
@@ -309,8 +306,8 @@ public class ImexCentralManager {
                     }
                 }
             }
-        }        
-        
+        }
+
         // we found a unique imex identifier
         if (imexPrimaryRef != null && !hasConflictingImexId){
 
@@ -318,7 +315,7 @@ public class ImexCentralManager {
                 IntactUpdateEvent evt = new IntactUpdateEvent(this, intactPublication.getPublicationId(), imexPrimaryRef.getPrimaryId(), Collections.EMPTY_LIST, Collections.EMPTY_LIST);
                 fireOnIntactUpdate(evt);
             }
-            
+
             return imexPrimaryRef.getPrimaryId();
         }
         else {
@@ -326,7 +323,7 @@ public class ImexCentralManager {
                 IntactUpdateEvent evt = new IntactUpdateEvent(this, intactPublication.getPublicationId(), null, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
                 fireOnIntactUpdate(evt);
             }
-            
+
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_imex_conflict, intactPublication.getPublicationId(), null, null, null, "Publication " + intactPublication.getShortLabel() + " cannot be updated because of IMEx identifier conflicts.");
             fireOnImexError(errorEvt);
         }

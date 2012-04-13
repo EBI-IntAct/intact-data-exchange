@@ -24,10 +24,10 @@ public interface IntactImexAssigner {
      * to the intact publication. It is only possible to assign a new IMEx id to publications having valid pubmed ids (no unassigned and no DOI number)
      * @param intactPublication : the publication in IntAct
      * @param imexPublication : the publication in IMEx
-     * @return true if the IMEx assigner was successful, false otherwise
+     * @return the imex id if the IMEx assigner was successful, null otherwise
      * @throws ImexCentralException if no record found or no IMEx id
      */
-    public boolean assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException;
+    public String assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException;
 
     /**
      * Add a IMEx primary reference to the experiment

@@ -66,11 +66,10 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         TransactionStatus status2 = getDataContext().beginTransaction();
 
         uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
-        boolean hasAssigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
+        String assigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
 
-        Assert.assertTrue(hasAssigned);
-        Assert.assertNotNull(imexPublication.getImexAccession());
-        Assert.assertNotSame("N/A", imexPublication.getImexAccession());
+        Assert.assertNotNull(assigned);
+        Assert.assertNotSame("N/A", assigned);
 
         Assert.assertEquals(1, intactPubReloaded.getXrefs().size());
         PublicationXref ref = intactPubReloaded.getXrefs().iterator().next();
@@ -125,11 +124,10 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         TransactionStatus status2 = getDataContext().beginTransaction();
 
         uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
-        boolean hasAssigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
+        String assigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
 
-        Assert.assertTrue(hasAssigned);
-        Assert.assertNotNull(imexPublication.getImexAccession());
-        Assert.assertNotSame("N/A", imexPublication.getImexAccession());
+        Assert.assertNotNull(assigned);
+        Assert.assertNotSame("N/A", assigned);
 
         Assert.assertEquals(1, intactPubReloaded.getXrefs().size());
         PublicationXref ref = intactPubReloaded.getXrefs().iterator().next();
@@ -188,11 +186,10 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         TransactionStatus status2 = getDataContext().beginTransaction();
 
         uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
-        boolean hasAssigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
+        String assigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
 
-        Assert.assertTrue(hasAssigned);
-        Assert.assertNotNull(imexPublication.getImexAccession());
-        Assert.assertNotSame("N/A", imexPublication.getImexAccession());
+        Assert.assertNotNull(assigned);
+        Assert.assertNotSame("N/A", assigned);
 
         Assert.assertEquals(1, intactPubReloaded.getXrefs().size());
         PublicationXref ref = intactPubReloaded.getXrefs().iterator().next();
@@ -243,11 +240,10 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         TransactionStatus status2 = getDataContext().beginTransaction();
 
         uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
-        boolean hasAssigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
+        String assigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
 
-        Assert.assertTrue(hasAssigned);
-        Assert.assertNotNull(imexPublication.getImexAccession());
-        Assert.assertNotSame("N/A", imexPublication.getImexAccession());
+        Assert.assertNotNull(assigned);
+        Assert.assertNotSame("N/A", assigned);
 
         Assert.assertEquals(1, intactPubReloaded.getXrefs().size());
         PublicationXref ref = intactPubReloaded.getXrefs().iterator().next();

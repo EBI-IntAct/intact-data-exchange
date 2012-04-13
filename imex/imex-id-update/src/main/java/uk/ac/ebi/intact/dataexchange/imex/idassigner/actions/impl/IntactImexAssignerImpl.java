@@ -49,7 +49,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     private Set<String> processedImexIds = new HashSet<String> ();
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public boolean assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
+    public String assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
 
         String pubId = extractPubIdFromIntactPublication(intactPublication);
 
@@ -60,10 +60,10 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
             updatePublicationAnnotations(intactPublication);
 
-            return true;
+            return imexPublication.getImexAccession();
         }
         else {
-            return false;
+            return null;
         }
     }
 
