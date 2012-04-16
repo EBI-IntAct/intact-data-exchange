@@ -103,10 +103,10 @@ public class ImexCentralManager {
                     boolean hasUpdated = intactImexAssigner.updatePublicationAnnotations(intactPublication);
 
                     // update experiments if necessary
-                    List<Experiment> updatedExperiments = updateImexIdentifiersForAllExperiments(intactPublication, imexId, this);
+                    List<Experiment> updatedExperiments = updateImexIdentifiersForAllExperiments(intactPublication, imexId);
 
                     // update and/or assign interactions if necessary
-                    List<Interaction> updatedInteractions = assignImexIdentifiersForAllInteractions(intactPublication, imexId, this);
+                    List<Interaction> updatedInteractions = assignImexIdentifiersForAllInteractions(intactPublication, imexId);
 
                     // if something has been updated, fire an update evt
                     if (!updatedExperiments.isEmpty() || !updatedInteractions.isEmpty() || hasUpdated){
@@ -239,10 +239,10 @@ public class ImexCentralManager {
             fireOnNewImexAssigned(evt);
 
             // update experiments
-            List<Experiment> updatedExperiments = updateImexIdentifiersForAllExperiments(intactPublication, imex, this);
+            List<Experiment> updatedExperiments = updateImexIdentifiersForAllExperiments(intactPublication, imex);
 
             // update interactions
-            List<Interaction> updatedInteractions = assignImexIdentifiersForAllInteractions(intactPublication, imex, this);
+            List<Interaction> updatedInteractions = assignImexIdentifiersForAllInteractions(intactPublication, imex);
 
             IntactUpdateEvent evt2 = new IntactUpdateEvent(this, intactPublication.getPublicationId(), imex, updatedExperiments, updatedInteractions);
             fireOnIntactUpdate(evt2);
@@ -332,7 +332,7 @@ public class ImexCentralManager {
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public List<Experiment> updateImexIdentifiersForAllExperiments(uk.ac.ebi.intact.model.Publication intactPublication, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
+    public List<Experiment> updateImexIdentifiersForAllExperiments(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException {
 
         // imex id is not null and is not default value for missing imex id
         if (imexId != null && !imexId.equals(ImexCentralManager.NO_IMEX_ID)){
@@ -340,7 +340,7 @@ public class ImexCentralManager {
 
             for (Experiment exp : intactPublication.getExperiments()){
 
-                if (intactImexAssigner.assignImexIdentifierToExperiment(exp.getAc(), imexId, imexCentralManager)){
+                if (intactImexAssigner.assignImexIdentifierToExperiment(exp.getAc(), imexId, this)){
                     updatedExp.add(exp);
                 }
             }
@@ -348,20 +348,15 @@ public class ImexCentralManager {
             return updatedExp;
         }
         else {
-            if (imexCentralManager != null){
-                ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, intactPublication.getPublicationId(), imexId, null, null, "Impossible to update IMEx identifiers to experiments of publication " + intactPublication.getShortLabel());
-                imexCentralManager.fireOnImexError(errorEvent);
-            }
-            else {
-                throw new PublicationImexUpdaterException("Impossible to update IMEx identifiers to experiments of publication " + intactPublication.getShortLabel());
-            }
+            ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, intactPublication.getPublicationId(), imexId, null, null, "Impossible to update IMEx identifiers to experiments of publication " + intactPublication.getShortLabel());
+            fireOnImexError(errorEvent);
 
             return Collections.EMPTY_LIST;
         }
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public List<Interaction> assignImexIdentifiersForAllInteractions(uk.ac.ebi.intact.model.Publication intactPublication, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
+    public List<Interaction> assignImexIdentifiersForAllInteractions(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException {
 
         // imex id is not null and is not default value for missing imex id
         if (imexId != null && !imexId.equals(ImexCentralManager.NO_IMEX_ID)){
@@ -375,7 +370,7 @@ public class ImexCentralManager {
                 Collection<Interaction> interactions = exp.getInteractions();
 
                 for (Interaction interaction : interactions){
-                    if (intactImexAssigner.assignImexIdentifierToInteraction(interaction.getAc(), imexId, imexCentralManager)){
+                    if (intactImexAssigner.assignImexIdentifierToInteraction(interaction.getAc(), imexId, this)){
                         updatedInteractions.add(interaction);
                     }
                 }
@@ -384,13 +379,8 @@ public class ImexCentralManager {
             return updatedInteractions;
         }
         else {
-            if (imexCentralManager != null){
-                ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, intactPublication.getPublicationId(), imexId, null, null, "Impossible to update IMEx identifiers to interactions of publication " + intactPublication.getShortLabel());
-                imexCentralManager.fireOnImexError(errorEvent);
-            }
-            else {
-                throw new PublicationImexUpdaterException("Impossible to update IMEx identifiers to interactions of publication " + intactPublication.getShortLabel());
-            }
+            ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, intactPublication.getPublicationId(), imexId, null, null, "Impossible to update IMEx identifiers to interactions of publication " + intactPublication.getShortLabel());
+            fireOnImexError(errorEvent);
 
             return Collections.EMPTY_LIST;
         }
