@@ -9,8 +9,10 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.core.lifecycle.LifecycleManager;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.user.User;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.text.ParseException;
@@ -498,6 +500,9 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
 
         TransactionStatus status = getDataContext().beginTransaction();
 
+        User reviewer = getMockBuilder().createReviewer("reviewer", "reviewer", "reviewer", "reviewer@ebi.ac.uk");
+        getCorePersister().saveOrUpdate(reviewer);
+
         CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
         getCorePersister().saveOrUpdate(imex);
 
@@ -519,6 +524,12 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         Annotation datasetAnn = getMockBuilder().createAnnotation("BioCreative - Critical Assessment of Information Extraction systems in Biology", dataset);
         pubWithImex.addAnnotation(datasetAnn);
 
+        LifecycleManager lifecycleManager = IntactContext.getCurrentInstance().getLifecycleManager();
+        lifecycleManager.getNewStatus().claimOwnership(pubWithImex);
+        lifecycleManager.getAssignedStatus().startCuration(pubWithImex);
+        lifecycleManager.getCurationInProgressStatus().readyForChecking(pubWithImex, "test", true);
+        lifecycleManager.getReadyForCheckingStatus().accept(pubWithImex, "accepted");
+
         // one publication without imex-primary, no PPI but with imex curation level and dataset
         Publication pubWithoutPPI = getMockBuilder().createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(1);
@@ -535,6 +546,11 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
 
         getCorePersister().saveOrUpdate(pubWithImex);
         getCorePersister().saveOrUpdate(pubWithoutPPI);
+
+        lifecycleManager.getNewStatus().claimOwnership(pubWithoutPPI);
+        lifecycleManager.getAssignedStatus().startCuration(pubWithoutPPI);
+        lifecycleManager.getCurationInProgressStatus().readyForChecking(pubWithoutPPI, "test", true);
+        lifecycleManager.getReadyForCheckingStatus().accept(pubWithoutPPI, "accepted");
 
         getDataContext().commitTransaction(status);
 

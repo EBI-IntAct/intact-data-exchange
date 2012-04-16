@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
-import edu.ucla.mbi.imex.central.ws.v20.*;
+import edu.ucla.mbi.imex.central.ws.v20.Identifier;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,9 +10,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.TransactionStatus;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.core.lifecycle.LifecycleManager;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Publication;
+import uk.ac.ebi.intact.model.user.User;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
@@ -195,6 +196,9 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
 
         TransactionStatus status = getDataContext().beginTransaction();
 
+        User reviewer = getMockBuilder().createReviewer("reviewer", "reviewer", "reviewer", "reviewer@ebi.ac.uk");
+        getCorePersister().saveOrUpdate(reviewer);
+
         CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
         getCorePersister().saveOrUpdate(imex);
 
@@ -209,7 +213,7 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         CvTopic date = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
         getCorePersister().saveOrUpdate(date);
 
-        // one publication without imex primary ref, 1 experiment, 2 interactions,journal cell 2006 -> to assign IMEX
+        // one publication without imex primary ref, 1 experiment, 2 interactions,journal cell 2006, accepted -> to assign IMEX
         Publication validPub = getMockBuilder().createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.getXrefs().clear();
@@ -222,6 +226,12 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         Annotation dateAnn = getMockBuilder().createAnnotation("2006", date);
         validPub.addAnnotation(dateAnn);
 
+        LifecycleManager lifecycleManager = getIntactContext().getLifecycleManager();
+        lifecycleManager.getNewStatus().claimOwnership(validPub);
+        lifecycleManager.getAssignedStatus().startCuration(validPub);
+        lifecycleManager.getCurationInProgressStatus().readyForChecking(validPub, "test", true);
+        lifecycleManager.getReadyForCheckingStatus().accept(validPub, "accepted");
+
         // publication not elligible imex (no journal, no datasets, no IMEx id) but imex curation level -> not updated but reported
         Publication imexCurationLevel = getMockBuilder().createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(2);
@@ -230,6 +240,11 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         imexCurationLevel.addExperiment(exp2);
         Annotation imexCurationAnn2 = getMockBuilder().createAnnotation("imex curation", imexCuration);
         imexCurationLevel.addAnnotation(imexCurationAnn2);
+
+        lifecycleManager.getNewStatus().claimOwnership(imexCurationLevel);
+        lifecycleManager.getAssignedStatus().startCuration(imexCurationLevel);
+        lifecycleManager.getCurationInProgressStatus().readyForChecking(imexCurationLevel, "test", true);
+        lifecycleManager.getReadyForCheckingStatus().accept(imexCurationLevel, "accepted");
 
         // publication without imex id but interaction does have IMEx -> not updated but reported
         // one publication without imex-primary ref but interaction with imex primary ref
@@ -243,6 +258,11 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         InteractorXref intXref = new InteractorXref( pubInteractionImex.getOwner(), imex, "IM-1-1", imexPrimary );
         interWithImex.addXref(intXref);
 
+        lifecycleManager.getNewStatus().claimOwnership(pubInteractionImex);
+        lifecycleManager.getAssignedStatus().startCuration(pubInteractionImex);
+        lifecycleManager.getCurationInProgressStatus().readyForChecking(pubInteractionImex, "test", true);
+        lifecycleManager.getReadyForCheckingStatus().accept(pubInteractionImex, "accepted");
+
         // publication without imex id but experiment does have IMEx -> not updated but reported
         Publication pubExperimentImex = getMockBuilder().createPublicationRandom();
         Experiment exp4 = getMockBuilder().createExperimentRandom(2);
@@ -251,6 +271,11 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         pubExperimentImex.addExperiment(exp4);
         ExperimentXref expXref = new ExperimentXref( pubExperimentImex.getOwner(), imex, "IM-2", imexPrimary );
         exp4.addXref(expXref);
+
+        lifecycleManager.getNewStatus().claimOwnership(pubExperimentImex);
+        lifecycleManager.getAssignedStatus().startCuration(pubExperimentImex);
+        lifecycleManager.getCurationInProgressStatus().readyForChecking(pubExperimentImex, "test", true);
+        lifecycleManager.getReadyForCheckingStatus().accept(pubExperimentImex, "accepted");
 
         // publication without imex id, elligible IMEx but experiment conflict -> experiment not updated but reported
         Publication pubExperimentImex2 = getMockBuilder().createPublicationRandom();
@@ -267,6 +292,11 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         pubExperimentImex2.addAnnotation(journalAnn3);
         Annotation dateAnn3 = getMockBuilder().createAnnotation("2010", date);
         pubExperimentImex2.addAnnotation(dateAnn3);
+
+        lifecycleManager.getNewStatus().claimOwnership(pubExperimentImex2);
+        lifecycleManager.getAssignedStatus().startCuration(pubExperimentImex2);
+        lifecycleManager.getCurationInProgressStatus().readyForChecking(pubExperimentImex2, "test", true);
+        lifecycleManager.getReadyForCheckingStatus().accept(pubExperimentImex2, "accepted");
 
         getCorePersister().saveOrUpdate(validPub, imexCurationLevel, pubInteractionImex, pubExperimentImex, pubExperimentImex2);
 

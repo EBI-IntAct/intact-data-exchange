@@ -34,6 +34,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     private List<String> publicationsHavingDataset;
     private List<String> publicationsHavingImexCurationLevel;
 
+    private List<String> publicationsAcceptedForRelease;
+
     private Collection<String> publicationsInvolvingOnlyNonPPIInteractions;
 
     private static final Log log = LogFactory.getLog(IntactPublicationsCollectorImpl.class);
@@ -121,6 +123,23 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
 
         List<Object[]> publications = query.getResultList();
 
+        return publications;
+    }
+
+    private List<String> collectPublicationAcceptedForRelease() {
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+
+        String datasetQuery = "select distinct p.ac from Publication p join p.status as s " +
+                "where s.identifier = :released or s.identifier = :accepted or s.identifier= :readyForRelease " +
+                "or s.identifier = :acceptedOnHold";
+
+        Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
+        query.setParameter("released", CvPublicationStatusType.RELEASED.identifier());
+        query.setParameter("readyForRelease", CvPublicationStatusType.READY_FOR_RELEASE.identifier());
+        query.setParameter("accepted", CvPublicationStatusType.ACCEPTED.identifier());
+        query.setParameter("acceptedOnHold", CvPublicationStatusType.ACCEPTED_ON_HOLD.identifier());
+
+        List<String> publications = query.getResultList();
         return publications;
     }
 
@@ -273,7 +292,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         // publications for which we can assign a new IMEx id = potentialPublications needing an IMEx id to be assigned AND publications having IMEx curation level
         Collection<String> publicationsToBeAssigned = CollectionUtils.intersection(potentialPublicationsToBeAssigned, publicationsHavingImexCurationLevel);
 
-        return publicationsToBeAssigned;
+        // filter publications not accepted
+        Collection<String> publicationsToBeAssignedFiltered = CollectionUtils.intersection(publicationsToBeAssigned, publicationsAcceptedForRelease);
+
+        return publicationsToBeAssignedFiltered;
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -381,6 +403,9 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         }
         if (publicationsHavingImexCurationLevel == null){
             publicationsHavingImexCurationLevel = collectPublicationCandidatesToImexWithImexCurationLevel();
+        }
+        if (publicationsAcceptedForRelease == null){
+            publicationsAcceptedForRelease = collectPublicationAcceptedForRelease();
         }
         if (publicationsInvolvingOnlyNonPPIInteractions == null){
             Collection<String> proteinsInvolvingPPI = collectPublicationsHavingPPIInteractions();
