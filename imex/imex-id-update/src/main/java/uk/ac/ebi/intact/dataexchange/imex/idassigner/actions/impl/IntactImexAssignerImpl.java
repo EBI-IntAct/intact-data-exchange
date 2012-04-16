@@ -47,6 +47,9 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     private Collection<InteractorXref> interactionXrefs = new ArrayList<InteractorXref>();
     private Collection<Annotation> publicationAnnot = new ArrayList<Annotation>();
     private Set<String> processedImexIds = new HashSet<String> ();
+    List<String> existingImexIds = new ArrayList<String>();
+
+    private int currentIndex = 1;
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public String assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
@@ -92,6 +95,16 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         pubDao.update(intactPublication);
 
         return true;
+    }
+
+    @Override
+    public void resetPublicationContext(uk.ac.ebi.intact.model.Publication pub, String imexId) {
+        this.experimentXrefs.clear();
+        this.interactionXrefs.clear();
+        this.processedImexIds.clear();
+        existingImexIds.clear();
+        existingImexIds = collectExistingInteractionImexIdsForPublication(pub);
+        this.currentIndex = getNextImexChunkNumberAndFilterValidImexIdsFrom(existingImexIds, imexId);
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -180,104 +193,87 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         return false;
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public List<Experiment> updateImexIdentifiersForAllExperiments(uk.ac.ebi.intact.model.Publication intactPublication, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public boolean assignImexIdentifierToExperiment(String expAc, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
+        DaoFactory factory = IntactContext.getCurrentInstance().getDaoFactory();
+        XrefDao<ExperimentXref> xrefDao = factory.getXrefDao(ExperimentXref.class);
 
-        DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
-        XrefDao<ExperimentXref> xrefDao = daoFactory.getXrefDao(ExperimentXref.class);
+        log.info("Processing experiment " + expAc);
 
-        // imex id is not null and is not default value for missing imex id
-        if (imexId != null && !imexId.equals(ImexCentralManager.NO_IMEX_ID)){
-            List<Experiment> updatedExp = new ArrayList<Experiment>(intactPublication.getExperiments().size());
+        Experiment exp = factory.getExperimentDao().getByAc(expAc);
 
-            for (Experiment exp : intactPublication.getExperiments()){
-                experimentXrefs.clear();
-                experimentXrefs.addAll(exp.getXrefs());
+        if (exp != null){
+            experimentXrefs.clear();
+            experimentXrefs.addAll(exp.getXrefs());
 
-                boolean hasImexId = false;
-                boolean hasConflictingImexId = false;
-                boolean isUpdated = false;
+            boolean hasImexId = false;
+            boolean hasConflictingImexId = false;
+            boolean isUpdated = false;
 
-                for (ExperimentXref ref : experimentXrefs){
+            for (ExperimentXref ref : experimentXrefs){
 
-                    // imex xref
-                    if (ref.getCvDatabase() != null && ref.getCvDatabase().getIdentifier() != null && ref.getCvDatabase().getIdentifier().equals(CvDatabase.IMEX_MI_REF)){
-                        // imex primary xref
-                        if (ref.getCvXrefQualifier() != null && ref.getCvXrefQualifier().getIdentifier() != null && ref.getCvXrefQualifier().getIdentifier().equals(CvXrefQualifier.IMEX_PRIMARY_MI_REF)){
+                // imex xref
+                if (ref.getCvDatabase() != null && ref.getCvDatabase().getIdentifier() != null && ref.getCvDatabase().getIdentifier().equals(CvDatabase.IMEX_MI_REF)){
+                    // imex primary xref
+                    if (ref.getCvXrefQualifier() != null && ref.getCvXrefQualifier().getIdentifier() != null && ref.getCvXrefQualifier().getIdentifier().equals(CvXrefQualifier.IMEX_PRIMARY_MI_REF)){
 
-                            // non null primary identifier
-                            if (ref.getPrimaryId() != null){
-                                // different imex id : conflict
-                                if (!ref.getPrimaryId().equalsIgnoreCase(imexId)){
-                                    hasConflictingImexId = true;
-                                }
-                                // identical primary identifier and imex id not found, no need to update the experiment
-                                else if (!hasImexId) {
-                                    hasImexId = true;
-                                }
-                                // identical primary identifier and imex id was already present so we delete the xref.,
-                                else {
-                                    exp.removeXref(ref);
-                                    xrefDao.delete(ref);
-                                    isUpdated = true;
-                                }
+                        // non null primary identifier
+                        if (ref.getPrimaryId() != null){
+                            // different imex id : conflict
+                            if (!ref.getPrimaryId().equalsIgnoreCase(imexId)){
+                                hasConflictingImexId = true;
                             }
-                            // null primary identifier but imex id not found, just update the imex id of the ref
+                            // identical primary identifier and imex id not found, no need to update the experiment
                             else if (!hasImexId) {
                                 hasImexId = true;
-
-                                ref.setPrimaryId(imexId);
-                                xrefDao.update(ref);
-                                isUpdated = true;
                             }
-                            // null primary identifier but imex id was found, just delete the ref 
+                            // identical primary identifier and imex id was already present so we delete the xref.,
                             else {
                                 exp.removeXref(ref);
                                 xrefDao.delete(ref);
                                 isUpdated = true;
                             }
                         }
-                    }
-                }
+                        // null primary identifier but imex id not found, just update the imex id of the ref
+                        else if (!hasImexId) {
+                            hasImexId = true;
 
-                if (!hasImexId && !hasConflictingImexId){
-                    boolean isExpUpdated = updateImexIdentifierForExperiment(exp, imexId);
-
-                    if (isExpUpdated){
-                        isUpdated = true;
+                            ref.setPrimaryId(imexId);
+                            xrefDao.update(ref);
+                            isUpdated = true;
+                        }
+                        // null primary identifier but imex id was found, just delete the ref 
+                        else {
+                            exp.removeXref(ref);
+                            xrefDao.delete(ref);
+                            isUpdated = true;
+                        }
                     }
-                }
-                else if (hasConflictingImexId){
-                    if (imexCentralManager != null){
-                        ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.experiment_imex_conflict, intactPublication.getPublicationId(), imexId, exp.getAc(), null, "Experiment " + exp.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+")");
-                        imexCentralManager.fireOnImexError(errorEvent);
-                    }
-                    else {
-                        throw new PublicationImexUpdaterException("Experiment " + exp.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+")");
-                    }
-                }
-
-                // exp updated
-                if (isUpdated){
-                    updatedExp.add(exp);
                 }
             }
-            experimentXrefs.clear();
 
-            return updatedExp;
+            if (!hasImexId && !hasConflictingImexId){
+                boolean isExpUpdated = updateImexIdentifierForExperiment(exp, imexId);
+
+                if (isExpUpdated){
+                    isUpdated = true;
+                }
+            }
+            else if (hasConflictingImexId){
+                if (imexCentralManager != null){
+                    ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.experiment_imex_conflict, null, imexId, exp.getAc(), null, "Experiment " + exp.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+")");
+                    imexCentralManager.fireOnImexError(errorEvent);
+                }
+                else {
+                    throw new PublicationImexUpdaterException("Experiment " + exp.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+")");
+                }
+            }
+
+            // exp updated
+            return isUpdated;
         }
-        else {
-            if (imexCentralManager != null){
-                ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, intactPublication.getPublicationId(), imexId, null, null, "Impossible to update IMEx identifiers to experiments of publication " + intactPublication.getShortLabel());
-                imexCentralManager.fireOnImexError(errorEvent);
-            }
-            else {
-                throw new PublicationImexUpdaterException("Impossible to update IMEx identifiers to experiments of publication " + intactPublication.getShortLabel());
-            }
-            experimentXrefs.clear();
 
-            return Collections.EMPTY_LIST;
-        }
+        return false;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -337,167 +333,141 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         return true;
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public List<Interaction> assignImexIdentifiersForAllInteractions(uk.ac.ebi.intact.model.Publication intactPublication, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public boolean assignImexIdentifierToInteraction(String interactionAc, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
+        DaoFactory factory = IntactContext.getCurrentInstance().getDaoFactory();
+        XrefDao<InteractorXref> xrefDao = factory.getXrefDao(InteractorXref.class);
 
-        // imex id is not null and is not default value for missing imex id
-        if (imexId != null && !imexId.equals(ImexCentralManager.NO_IMEX_ID)){
-            processedImexIds.clear();
-            List<Interaction> updatedInteractions = new ArrayList<Interaction>();
+        log.info("Processing interaction " + interactionAc);
 
-            List<String> existingImexIds = collectExistingInteractionImexIdsForPublication(intactPublication);
-            int nextInteractionIndex = getNextImexChunkNumberAndFilterValidImexIdsFrom(existingImexIds, imexId);
-            DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
-            XrefDao<InteractorXref> xrefDao = daoFactory.getXrefDao(InteractorXref.class);
+        Interaction interaction = factory.getInteractionDao().getByAc(interactionAc);
 
-            CvDatabase imex = daoFactory.getCvObjectDao( CvDatabase.class ).getByPsiMiRef( CvDatabase.IMEX_MI_REF );
+        if (interaction != null){
+            interactionXrefs.clear();
+            interactionXrefs.addAll(interaction.getXrefs());
+
+            CvDatabase imex = factory.getCvObjectDao( CvDatabase.class ).getByPsiMiRef( CvDatabase.IMEX_MI_REF );
             if (imex == null){
                 imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
                 IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate(imex);
             }
 
-            CvXrefQualifier imexSecondary = daoFactory.getCvObjectDao( CvXrefQualifier.class ).getByPsiMiRef( "" );
+            CvXrefQualifier imexSecondary = factory.getCvObjectDao( CvXrefQualifier.class ).getByPsiMiRef( "" );
             if (imexSecondary == null){
                 imexSecondary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, IMEX_SECONDARY_MI, IMEX_SECONDARY);
                 IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate(imexSecondary);
             }
 
-            for (Experiment exp : intactPublication.getExperiments()){
+            // if it is a true PPI interaction, we can assign an IMEx id
+            if (involvesOnlyProteins(interaction)){
+                String interactionImexId = null;
+                boolean hasConflictingImexId = false;
+                boolean isUpdated = false;
 
-                Collection<Interaction> interactions = exp.getInteractions();
+                for (InteractorXref ref : interactionXrefs){
+                    // imex xref
+                    if (ref.getCvDatabase() != null && ref.getCvDatabase().getIdentifier() != null && ref.getCvDatabase().getIdentifier().equals(CvDatabase.IMEX_MI_REF)){
+                        // imex primary xref
+                        if (ref.getCvXrefQualifier() != null && ref.getCvXrefQualifier().getIdentifier() != null && ref.getCvXrefQualifier().getIdentifier().equals(CvXrefQualifier.IMEX_PRIMARY_MI_REF)){
 
-                for (Interaction interaction : interactions){
-                    interactionXrefs.clear();
-                    interactionXrefs.addAll(interaction.getXrefs());
-
-                    // if it is a true PPI interaction, we can assign an IMEx id
-                    if (involvesOnlyProteins(interaction)){
-                        String interactionImexId = null;
-                        boolean hasConflictingImexId = false;
-                        boolean isUpdated = false;
-
-                        for (InteractorXref ref : interactionXrefs){
-                            // imex xref
-                            if (ref.getCvDatabase() != null && ref.getCvDatabase().getIdentifier() != null && ref.getCvDatabase().getIdentifier().equals(CvDatabase.IMEX_MI_REF)){
-                                // imex primary xref
-                                if (ref.getCvXrefQualifier() != null && ref.getCvXrefQualifier().getIdentifier() != null && ref.getCvXrefQualifier().getIdentifier().equals(CvXrefQualifier.IMEX_PRIMARY_MI_REF)){
-
-                                    // non null primary identifier
-                                    if (ref.getPrimaryId() != null){
-                                        // the interaction already have an IMEx id which is valid
-                                        if (interactionImexId != null){
-                                            // duplicated imex primary ref, delete it
-                                            if (ref.getPrimaryId().equalsIgnoreCase(interactionImexId)){
-                                                interaction.removeXref(ref);
-                                                xrefDao.delete(ref);
-                                                isUpdated = true;
-                                            }
-                                            // different imex id which have already been processed in other interactions, just delete it
-                                            else if (processedImexIds.contains(ref.getPrimaryId())){
-                                                interaction.removeXref(ref);
-                                                xrefDao.delete(ref);
-                                                isUpdated = true;
-                                            }
-                                            // different IMEx id but the IMEx id is not a valid interaction imex id. Keep it as imex secondary
-                                            else if (!existingImexIds.contains(ref.getPrimaryId())){
-                                                ref.setCvXrefQualifier(imexSecondary);
-                                                xrefDao.update(ref);
-                                                isUpdated = true;
-                                            }
-                                            // different IMEx id which is valid and not already processed
-                                            else {
-                                                hasConflictingImexId = true;
-                                            }
-                                        }
-                                        // No valid iMEx id has been found so far
-                                        else {
-                                            // IMEx id already in use by another interaction, just delete the xref
-                                            if (processedImexIds.contains(ref.getPrimaryId())){
-                                                interaction.removeXref(ref);
-                                                xrefDao.delete(ref);
-                                                isUpdated = true;
-                                            }
-                                            // IMEx id not yet processed
-                                            else {
-                                                // valid IMEx id, register it
-                                                if (existingImexIds.contains(ref.getPrimaryId()) && ref.getPrimaryId().startsWith(imexId)){
-                                                    interactionImexId = ref.getPrimaryId();
-                                                    processedImexIds.add(ref.getPrimaryId());
-                                                }
-                                                // conflicting IMEx id
-                                                else if (existingImexIds.contains(ref.getPrimaryId()) && !ref.getPrimaryId().startsWith(imexId)){
-                                                    hasConflictingImexId = true;
-                                                }
-                                                // invalid interaction IMEx id, put it as imex secondary
-                                                else {
-                                                    ref.setCvXrefQualifier(imexSecondary);
-                                                    xrefDao.update(ref);
-                                                    isUpdated = true;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    // null primary identifier, just delete the ref
-                                    else {
+                            // non null primary identifier
+                            if (ref.getPrimaryId() != null){
+                                // the interaction already have an IMEx id which is valid
+                                if (interactionImexId != null){
+                                    // duplicated imex primary ref, delete it
+                                    if (ref.getPrimaryId().equalsIgnoreCase(interactionImexId)){
                                         interaction.removeXref(ref);
                                         xrefDao.delete(ref);
                                         isUpdated = true;
                                     }
+                                    // different imex id which have already been processed in other interactions, just delete it
+                                    else if (processedImexIds.contains(ref.getPrimaryId())){
+                                        interaction.removeXref(ref);
+                                        xrefDao.delete(ref);
+                                        isUpdated = true;
+                                    }
+                                    // different IMEx id but the IMEx id is not a valid interaction imex id. Keep it as imex secondary
+                                    else if (!existingImexIds.contains(ref.getPrimaryId())){
+                                        ref.setCvXrefQualifier(imexSecondary);
+                                        xrefDao.update(ref);
+                                        isUpdated = true;
+                                    }
+                                    // different IMEx id which is valid and not already processed
+                                    else {
+                                        hasConflictingImexId = true;
+                                    }
+                                }
+                                // No valid iMEx id has been found so far
+                                else {
+                                    // IMEx id already in use by another interaction, just delete the xref
+                                    if (processedImexIds.contains(ref.getPrimaryId())){
+                                        interaction.removeXref(ref);
+                                        xrefDao.delete(ref);
+                                        isUpdated = true;
+                                    }
+                                    // IMEx id not yet processed
+                                    else {
+                                        // valid IMEx id, register it
+                                        if (existingImexIds.contains(ref.getPrimaryId()) && ref.getPrimaryId().startsWith(imexId)){
+                                            interactionImexId = ref.getPrimaryId();
+                                            processedImexIds.add(ref.getPrimaryId());
+                                        }
+                                        // conflicting IMEx id
+                                        else if (existingImexIds.contains(ref.getPrimaryId()) && !ref.getPrimaryId().startsWith(imexId)){
+                                            hasConflictingImexId = true;
+                                        }
+                                        // invalid interaction IMEx id, put it as imex secondary
+                                        else {
+                                            ref.setCvXrefQualifier(imexSecondary);
+                                            xrefDao.update(ref);
+                                            isUpdated = true;
+                                        }
+                                    }
                                 }
                             }
-                        }
-
-                        // need to create a new IMEx id
-                        if (interactionImexId == null && !hasConflictingImexId){
-                            boolean updatedInteraction = updateImexIdentifierForInteraction(interaction, imexId + "-" + nextInteractionIndex);
-
-                            if (updatedInteraction){
-                                isUpdated = true;
-
-                                if (imexCentralManager != null){
-                                    NewAssignedImexEvent evt = new NewAssignedImexEvent(this, intactPublication.getPublicationId(), imexId, interaction.getAc(), imexId + "-" + nextInteractionIndex);
-                                    imexCentralManager.fireOnNewImexAssigned(evt);
-                                }
-
-                                // increments the next interaction index
-                                nextInteractionIndex ++;
-                            }
-                        }
-                        else if (hasConflictingImexId){
-                            if (imexCentralManager != null){
-                                ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.interaction_imex_conflict, intactPublication.getPublicationId(), imexId, exp.getAc(), interaction.getAc(), "Interaction " + interaction.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+"-"+nextInteractionIndex+")");
-                                imexCentralManager.fireOnImexError(errorEvent);
-                            }
+                            // null primary identifier, just delete the ref
                             else {
-                                throw new PublicationImexUpdaterException("Interaction " + interaction.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+"-"+nextInteractionIndex+")");
+                                interaction.removeXref(ref);
+                                xrefDao.delete(ref);
+                                isUpdated = true;
                             }
-                        }
-
-                        if (isUpdated){
-                            updatedInteractions.add(interaction);
                         }
                     }
                 }
-            }
 
-            interactionXrefs.clear();
-            processedImexIds.clear();
-            
-            return updatedInteractions;
+                // need to create a new IMEx id
+                if (interactionImexId == null && !hasConflictingImexId){
+                    boolean updatedInteraction = updateImexIdentifierForInteraction(interaction, imexId + "-" + currentIndex);
+
+                    if (updatedInteraction){
+                        isUpdated = true;
+
+                        if (imexCentralManager != null){
+                            NewAssignedImexEvent evt = new NewAssignedImexEvent(this, null, imexId, interaction.getAc(), imexId + "-" + currentIndex);
+                            imexCentralManager.fireOnNewImexAssigned(evt);
+                        }
+
+                        // increments current index
+                        currentIndex++;
+
+                        return true;
+                    }
+                }
+                else if (hasConflictingImexId){
+                    if (imexCentralManager != null){
+                        ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.interaction_imex_conflict, null, imexId, null, interaction.getAc(), "Interaction " + interaction.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+"-"+currentIndex+")");
+                        imexCentralManager.fireOnImexError(errorEvent);
+                    }
+                    else {
+                        throw new PublicationImexUpdaterException("Interaction " + interaction.getShortLabel() + " cannot be updated because of IMEx identifier conflicts (has another IMEx primary ref than "+imexId+"-"+currentIndex+")");
+                    }
+                }
+
+                return isUpdated;
+            }
         }
-        else {
-            if (imexCentralManager != null){
-                ImexErrorEvent errorEvent = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, intactPublication.getPublicationId(), imexId, null, null, "Impossible to update IMEx identifiers to interactions of publication " + intactPublication.getShortLabel());
-                imexCentralManager.fireOnImexError(errorEvent);
-            }
-            else {
-                throw new PublicationImexUpdaterException("Impossible to update IMEx identifiers to interactions of publication " + intactPublication.getShortLabel());
-            }
-            interactionXrefs.clear();
-            processedImexIds.clear();
-            
-            return Collections.EMPTY_LIST;
-        }        
+
+        return false;
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
