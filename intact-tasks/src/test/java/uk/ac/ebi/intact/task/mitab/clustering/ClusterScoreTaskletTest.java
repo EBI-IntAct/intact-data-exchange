@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author Rafael Jimenez (rafael@ebi.ac.uk)
  * @version $Id$
- * @since TODO add POM version
+ * @since 2.1.4-SNAPSHOT
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)

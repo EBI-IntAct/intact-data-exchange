@@ -10,7 +10,7 @@ import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
 
 import java.io.File;
@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author Rafael Jimenez (rafael@ebi.ac.uk)
  * @version $Id$
- * @since TODO add POM version
+ * @since 2.1.4-SNAPSHOT
  */
 public class ClusterScoreTasklet implements Tasklet {
     private String mitabInputFileName;
@@ -91,7 +91,7 @@ public class ClusterScoreTasklet implements Tasklet {
      */
     private void saveMitabOutputFile(InteractionClusterScore interactionClusterScore) throws IOException, ConverterException {
         /* Retrieve results */
-        Map<Integer, EncoreInteractionForScoring> interactionMapping = interactionClusterScore.getInteractionMapping();
+        Map<Integer, EncoreInteraction> interactionMapping = interactionClusterScore.getInteractionMapping();
 
         PsimiTabWriter writer = new PsimiTabWriter(header);
         
@@ -100,7 +100,7 @@ public class ClusterScoreTasklet implements Tasklet {
         Encore2Binary iConverter = new Encore2Binary(interactionClusterScore.getMappingIdDbNames());
 
         for(Integer mappingId:interactionMapping.keySet()){
-            EncoreInteractionForScoring eI = interactionMapping.get(mappingId);
+            EncoreInteraction eI = interactionMapping.get(mappingId);
             BinaryInteraction bI = iConverter.getBinaryInteractionForScoring(eI);
             
             if (isFirstInteraction){
@@ -137,7 +137,7 @@ public class ClusterScoreTasklet implements Tasklet {
         binaryInteractions.addAll(mitabReader.read(mitabInputFile));
         /* Run cluster using list of binary interactions as input */
         interactionClusterScore.setBinaryInteractionIterator(binaryInteractions.iterator());
-        interactionClusterScore.setMappingIdDbNames("uniprotkb,irefindex,ddbj/embl/genbank,refseq,chebi");
+        interactionClusterScore.setMappingIdDbNames("uniprotkb,irefindex,ddbj/embl/genbank,chebi");
         interactionClusterScore.runService();
 
         /* Save mitab clustered data in files */

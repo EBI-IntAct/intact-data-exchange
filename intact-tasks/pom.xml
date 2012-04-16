@@ -60,9 +60,9 @@
 
         <!-- Cluster & Scoring MI -->
         <dependency>
-            <groupId>uk.ac.ebi.enfin.mi.cluster.score</groupId>
-            <artifactId>miClusterScore</artifactId>
-            <version>1.5-SNAPSHOT</version>
+           <groupId>uk.ac.ebi.enfin.mi.cluster</groupId>
+           <artifactId>micluster</artifactId>
+           <version>1.6-SNAPSHOT</version>
         </dependency>
 
         <!-- Logging -->
