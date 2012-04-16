@@ -8,15 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.IntactPublicationCollector;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.CvTopic;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.ProteinImpl;
+import uk.ac.ebi.intact.model.*;
 
 import javax.persistence.Query;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -174,11 +169,12 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String datasetQuery = "select distinct p2.ac from Component c join c.interaction as i join i.experiments as e join e.publication as p2 join c.interactor as interactor " +
-                "where interactor.objClass = :protein and i.ac not in (select distinct i2.ac from InteractionImpl i2 join i2.components as comp join comp.interactor as interactor2 " +
-                "where interactor2.objClass <> :protein)";
+                "where (interactor.cvInteractorType.identifier = :protein or interactor.cvInteractorType.identifier = :peptide) and i.ac not in (select distinct i2.ac from InteractionImpl i2 join i2.components as comp join comp.interactor as interactor2 " +
+                "where interactor2.cvInteractorType.identifier <> :protein and interactor2.cvInteractorType.identifier <> :peptide)";
 
         Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
-        query.setParameter("protein", ProteinImpl.class.getCanonicalName());
+        query.setParameter("protein", CvInteractorType.PROTEIN_MI_REF);
+        query.setParameter("peptide", CvInteractorType.PEPTIDE_MI_REF);
 
         List<String> publications = query.getResultList();
         return publications;

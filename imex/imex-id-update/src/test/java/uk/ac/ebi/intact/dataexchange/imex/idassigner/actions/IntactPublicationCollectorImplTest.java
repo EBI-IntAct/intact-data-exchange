@@ -232,6 +232,68 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Test
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
+    public void get_publications_Having_Imex_Curation_Level_PPI_peptide() throws ParseException {
+
+        TransactionStatus status = getDataContext().beginTransaction();
+
+        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
+        getCorePersister().saveOrUpdate(imex);
+
+        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
+        getCorePersister().saveOrUpdate(imexPrimary);
+
+        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
+        getCorePersister().saveOrUpdate(imexCuration);
+
+        CvTopic journal = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.JOURNAL_MI_REF, CvTopic.JOURNAL);
+        getCorePersister().saveOrUpdate(journal);
+        CvTopic date = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
+        getCorePersister().saveOrUpdate(date);
+
+
+        // one publication eligible IMEx and imex curation and 2 PPI (eligible imex)
+        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
+        exp1.setPublication(pubWithImex);
+        pubWithImex.addExperiment(exp1);
+        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
+        pubWithImex.addAnnotation(imexCurationAnn1);
+        Annotation journalAnn = getMockBuilder().createAnnotation("Cell (0092-8674)", journal);
+        pubWithImex.addAnnotation(journalAnn);
+        Annotation dateAnn = getMockBuilder().createAnnotation("2008", date);
+        pubWithImex.addAnnotation(dateAnn);
+
+        // one publication eligible IMEx but does have protein-peptide interaction
+        Publication pubWithoutImex = getMockBuilder().createPublicationRandom();
+        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
+        exp2.setPublication(pubWithoutImex);
+        pubWithoutImex.addExperiment(exp2);
+        Interaction interaction = exp2.getInteractions().iterator().next();
+        for (Component comp : interaction.getComponents()){
+            comp.setInteractor(getMockBuilder().createPeptideRandom());
+        }
+        Annotation imexCurationAnn2 = getMockBuilder().createAnnotation("imex curation", imexCuration);
+        pubWithoutImex.addAnnotation(imexCurationAnn2);
+        Annotation journalAnn2 = getMockBuilder().createAnnotation("Cell (0092-8674)", journal);
+        pubWithoutImex.addAnnotation(journalAnn2);
+        Annotation dateAnn2 = getMockBuilder().createAnnotation("2008", date);
+        pubWithoutImex.addAnnotation(dateAnn2);
+
+        getCorePersister().saveOrUpdate(pubWithImex);
+        getCorePersister().saveOrUpdate(pubWithoutImex);
+
+        getDataContext().commitTransaction(status);
+
+        // reset collection
+        publicationCollectorTest.initialise();
+
+        Collection<String> pubAcs = publicationCollectorTest.getPublicationsHavingImexCurationLevelButAreNotEligibleImex();
+        Assert.assertEquals(0, pubAcs.size());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_dataset_no_PPI() throws ParseException {
 
         TransactionStatus status = getDataContext().beginTransaction();
