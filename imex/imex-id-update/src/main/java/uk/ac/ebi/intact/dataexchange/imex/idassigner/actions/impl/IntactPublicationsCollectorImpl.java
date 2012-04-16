@@ -273,6 +273,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsHavingImexCurationLevel;
     }
 
+    public List<String> getPublicationsAcceptedForRelease() {
+        return publicationsAcceptedForRelease;
+    }
+
     @Transactional(propagation = Propagation.SUPPORTS)
     public Collection<String> getPublicationsNeedingAnImexId() {
 
