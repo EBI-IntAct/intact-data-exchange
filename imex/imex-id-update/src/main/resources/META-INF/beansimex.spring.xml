@@ -15,19 +15,19 @@
     </bean>
 
     <!-- imex central -->
-    <bean id="imexCentral" class="uk.ac.ebi.intact.bridges.imexcentral.DefaultImexCentralClient">
+    <!--<bean id="imexCentral" class="uk.ac.ebi.intact.bridges.imexcentral.DefaultImexCentralClient">
         <constructor-arg index="0" value="${ic.username}"/>
         <constructor-arg index="1" value="${ic.password}"/>
         <constructor-arg index="2" value="${ic.endpoint}"/>
-    </bean>
+    </bean>-->
 
     <!-- config -->
-    <bean id="imexUpdateConfig" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexAssignerConfig">
+    <!--<bean id="imexUpdateConfig" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexAssignerConfig">
         <property name="updateLogsDirectory" value="${update.log.directory}"/>
-    </bean>
+    </bean>-->
 
     <!-- actions -->
-    <bean id="imexCentralRegister" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.ImexCentralPublicationRegisterImpl">
+    <!--<bean id="imexCentralRegister" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.ImexCentralPublicationRegisterImpl">
         <property name="imexCentralClient" ref="imexCentral"/>
     </bean>
     <bean id="intactImexAssigner" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactImexAssignerImpl">
@@ -45,10 +45,10 @@
     </bean>
     <bean id="imexStatusSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.PublicationStatusSynchronizerImpl">
         <property name="imexCentralClient" ref="imexCentral"/>
-    </bean>
+    </bean>-->
 
     <!-- Imex central manager -->
-    <bean id="imexCentralManager" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexCentralManager">
+    <!--<bean id="imexCentralManager" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexCentralManager">
         <property name="imexAdminGroupSynchronizer" ref="imexAdminGroupSynchronizer"/>
         <property name="imexAdminUserSynchronizer" ref="imexAdminUserSynchronizer"/>
         <property name="imexCentralRegister" ref="imexCentralRegister"/>
@@ -56,12 +56,12 @@
         <property name="publicationIdentifierSynchronizer" ref="publicationIdentifierSynchronizer"/>
         <property name="intactImexAssigner" ref="intactImexAssigner"/>
         <property name="imexUpdateConfig" ref="imexUpdateConfig"/>
-    </bean>
+    </bean>-->
 
     <!-- Global imex updater -->
-    <bean id="globalImexPublicationUpdater" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.GlobalImexPublicationUpdater">
+    <!--<bean id="globalImexPublicationUpdater" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.GlobalImexPublicationUpdater">
         <property name="imexCentralManager" ref="imexCentralManager"/>
         <property name="intactPublicationCollector" ref="intactPublicationCollector"/>
-    </bean>
+    </bean>-->
 
 </beans>
