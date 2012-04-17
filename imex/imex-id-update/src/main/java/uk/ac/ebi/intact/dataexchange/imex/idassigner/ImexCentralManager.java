@@ -58,9 +58,16 @@ public class ImexCentralManager {
     public static Pattern PUBMED_REGEXP = Pattern.compile("\\d+");
 
     private Collection<PublicationXref> pubXrefs;
+    private Collection<String> interactionAcsChunk;
+    private Collection<String> experimentAcsChunk;
+    
+    private int maxNumberIntactObjectPerTransaction = 10;
 
     public ImexCentralManager(){
         pubXrefs = new ArrayList<PublicationXref>();
+        experimentAcsChunk = new ArrayList<String>();
+        interactionAcsChunk = new ArrayList<String>();
+        
     }
 
     /**
@@ -103,10 +110,10 @@ public class ImexCentralManager {
                     boolean hasUpdated = intactImexAssigner.updatePublicationAnnotations(intactPublication);
 
                     // update experiments if necessary
-                    List<Experiment> updatedExperiments = updateImexIdentifiersForAllExperiments(intactPublication, imexId);
+                    List<String> updatedExperiments = updateImexIdentifiersForAllExperiments(intactPublication, imexId);
 
                     // update and/or assign interactions if necessary
-                    List<Interaction> updatedInteractions = assignImexIdentifiersForAllInteractions(intactPublication, imexId);
+                    List<String> updatedInteractions = assignImexIdentifiersForAllInteractions(intactPublication, imexId);
 
                     // if something has been updated, fire an update evt
                     if (!updatedExperiments.isEmpty() || !updatedInteractions.isEmpty() || hasUpdated){
@@ -239,10 +246,10 @@ public class ImexCentralManager {
             fireOnNewImexAssigned(evt);
 
             // update experiments
-            List<Experiment> updatedExperiments = updateImexIdentifiersForAllExperiments(intactPublication, imex);
+            List<String> updatedExperiments = updateImexIdentifiersForAllExperiments(intactPublication, imex);
 
             // update interactions
-            List<Interaction> updatedInteractions = assignImexIdentifiersForAllInteractions(intactPublication, imex);
+            List<String> updatedInteractions = assignImexIdentifiersForAllInteractions(intactPublication, imex);
 
             IntactUpdateEvent evt2 = new IntactUpdateEvent(this, intactPublication.getPublicationId(), imex, updatedExperiments, updatedInteractions);
             fireOnIntactUpdate(evt2);
@@ -332,16 +339,28 @@ public class ImexCentralManager {
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public List<Experiment> updateImexIdentifiersForAllExperiments(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException {
+    public List<String> updateImexIdentifiersForAllExperiments(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException {
 
         // imex id is not null and is not default value for missing imex id
         if (imexId != null && !imexId.equals(ImexCentralManager.NO_IMEX_ID)){
-            List<Experiment> updatedExp = new ArrayList<Experiment>(intactPublication.getExperiments().size());
+            
+            List<String> updatedExp = intactImexAssigner.collectExperimentsToUpdateFrom(intactPublication, imexId);
 
-            for (Experiment exp : intactPublication.getExperiments()){
+            int processedExperiments = 0;
+            int size = updatedExp.size();
+            
+            if (size > 0){
+                while (processedExperiments < size){
+                    int chunk = 0;
+                    experimentAcsChunk.clear();
 
-                if (intactImexAssigner.assignImexIdentifierToExperiment(exp.getAc(), imexId, this)){
-                    updatedExp.add(exp);
+                    while (chunk < maxNumberIntactObjectPerTransaction && processedExperiments < size){
+                        experimentAcsChunk.add(updatedExp.get(processedExperiments));
+                        chunk++;
+                        processedExperiments++;
+                    }
+
+                    intactImexAssigner.assignImexIdentifierToExperiments(experimentAcsChunk, imexId, this);
                 }
             }
 
@@ -356,23 +375,30 @@ public class ImexCentralManager {
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public List<Interaction> assignImexIdentifiersForAllInteractions(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException {
+    public List<String> assignImexIdentifiersForAllInteractions(uk.ac.ebi.intact.model.Publication intactPublication, String imexId) throws PublicationImexUpdaterException {
 
         // imex id is not null and is not default value for missing imex id
         if (imexId != null && !imexId.equals(ImexCentralManager.NO_IMEX_ID)){
             // reset the context of imex assigner so the interaction index will be reset
             intactImexAssigner.resetPublicationContext(intactPublication, imexId);
 
-            List<Interaction> updatedInteractions = new ArrayList<Interaction>();
+            List<String> updatedInteractions = intactImexAssigner.collectInteractionsToUpdateFrom(intactPublication, imexId);
 
-            for (Experiment exp : intactPublication.getExperiments()){
+            int processedInteractions = 0;
+            int size = updatedInteractions.size();
 
-                Collection<Interaction> interactions = exp.getInteractions();
+            if (size > 0){
+                while (processedInteractions < size){
+                    int chunk = 0;
+                    interactionAcsChunk.clear();
 
-                for (Interaction interaction : interactions){
-                    if (intactImexAssigner.assignImexIdentifierToInteraction(interaction.getAc(), imexId, this)){
-                        updatedInteractions.add(interaction);
+                    while (chunk < maxNumberIntactObjectPerTransaction && processedInteractions < size){
+                        interactionAcsChunk.add(updatedInteractions.get(processedInteractions));
+                        chunk++;
+                        processedInteractions++;
                     }
+
+                    intactImexAssigner.assignImexIdentifierToInteractions(interactionAcsChunk, imexId, this);
                 }
             }
 
@@ -525,6 +551,16 @@ public class ImexCentralManager {
     public void fireOnNewImexAssigned( NewAssignedImexEvent evt) {
         for (ImexUpdateListener listener : getListeners(ImexUpdateListener.class)) {
             listener.onNewImexAssigned(evt);
+        }
+    }
+
+    public int getMaxNumberIntactObjectPerTransaction() {
+        return maxNumberIntactObjectPerTransaction;
+    }
+
+    public void setMaxNumberIntactObjectPerTransaction(int maxNumberIntactObjectPerTransaction) {
+        if (maxNumberIntactObjectPerTransaction > 0){
+            this.maxNumberIntactObjectPerTransaction = maxNumberIntactObjectPerTransaction;
         }
     }
 }

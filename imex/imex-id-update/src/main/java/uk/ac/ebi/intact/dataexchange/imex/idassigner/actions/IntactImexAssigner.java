@@ -7,6 +7,7 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexCentralManager;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,15 +47,14 @@ public interface IntactImexAssigner {
     public boolean updateImexIdentifierForInteraction(Interaction intactInteraction, String imexId) ;
 
     /**
-     * Copy the IMEx id to experiment of a publication if they don't have the IMEx primary reference. It will not add the IMEx primary reference if
+     * Copy the IMEx id to experiments of a publication if they don't have the IMEx primary reference. It will not add the IMEx primary reference if
      * there is already an IMEx primary reference to another IMEx id. It will clean up duplicated IMEx ids
-     * @param expAc
+     * @param expAcs : list of experiments acs
      * @param imexId
      * @param imexCentralManager ; to fire events if provided.
-     * @return a list of experiments which have been updated
      * @throws PublicationImexUpdaterException if IMEx id is null or imex conflict and no imexCentralManager was provided to fire an error event
      */
-    public boolean assignImexIdentifierToExperiment(String expAc, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException;
+    public void assignImexIdentifierToExperiments(Collection<String> expAcs, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException;
 
     /**
      * Collect all the interaction IMEx ids associated with this publication
@@ -64,15 +64,15 @@ public interface IntactImexAssigner {
     public List<String> collectExistingInteractionImexIdsForPublication(uk.ac.ebi.intact.model.Publication intactPublication);
 
     /**
-     * Assign an IMEx id for the interaction if not already done. Does not assign IMEx ids to interactions already having a primary reference to another
+     * Assign an IMEx id for the interactions if not already done. Does not assign IMEx ids to interactions already having a primary reference to another
      * IMEx id or interactions which are not PPI. It will clean up duplicated IMEx id and a IMEx primary reference which is invalid will become imex secondary. It will not update interactions having valid imex primary reference which are in conflict with publication imex primary reference
-     * @param interactionAc
+     * @param interactionAcs : list of interaction acs to update
      * @param imexId
      * @param imexCentralManager ; to fire events if provided.
      * @return a list of experiments which have been updated
      * @throws PublicationImexUpdaterException when IMEx id is null or imex conflict and no imexCentralManager was provided to fire an error event
      */
-    public boolean assignImexIdentifierToInteraction(String interactionAc, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException;
+    public void assignImexIdentifierToInteractions(Collection<String> interactionAcs, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException;
 
     /**
      * Add imex curation and full coverage annotations if not already present
@@ -97,4 +97,20 @@ public interface IntactImexAssigner {
      * @param imexId
      */
     public void resetPublicationContext(uk.ac.ebi.intact.model.Publication pub, String imexId);
+
+    /**
+     * Collect experiment acs associated with this publication which need to be updated for this IMEx identifier
+     * @param pub
+     * @param imex
+     * @return list if experiment acs needing to be updated
+     */
+    public List<String> collectExperimentsToUpdateFrom(uk.ac.ebi.intact.model.Publication pub, String imex);
+
+    /**
+     * Collect interaction acs associated with this publication which need to be updated for this IMEx identifier
+     * @param pub
+     * @param imex
+     * @return list of interaction acs
+     */
+    public List<String> collectInteractionsToUpdateFrom(uk.ac.ebi.intact.model.Publication pub, String imex);
 }

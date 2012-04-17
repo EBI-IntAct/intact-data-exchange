@@ -164,7 +164,6 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
     @Test
     @DirtiesContext
-    @Transactional(propagation = Propagation.NEVER)
     public void update_publication_having_imex() throws PublicationImexUpdaterException, ImexCentralException {
         TransactionStatus status = getDataContext().beginTransaction();
 
@@ -255,7 +254,7 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
                 Assert.assertEquals(1, inter.getXrefs().size());
 
                 InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertEquals("IM-3-"+index, ref2.getPrimaryId());
+                Assert.assertTrue(ref2.getPrimaryId().startsWith("IM-3-"));
                 Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
                 Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
             }
@@ -266,7 +265,6 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
     @Test
     @DirtiesContext
-    @Transactional(propagation = Propagation.NEVER)
     public void update_publication_having_imex_conflict() throws PublicationImexUpdaterException, ImexCentralException {
         TransactionStatus status = getDataContext().beginTransaction();
 
@@ -329,7 +327,6 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
     @Test
     @DirtiesContext
-    @Transactional(propagation = Propagation.NEVER)
     public void update_publication_having_imex_imex_not_recognized_in_imexcentral() throws PublicationImexUpdaterException, ImexCentralException {
         TransactionStatus status = getDataContext().beginTransaction();
 
@@ -390,7 +387,6 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
     @Test
     @DirtiesContext
-    @Transactional(propagation = Propagation.NEVER)
     public void update_publication_having_imex_noPubmedId() throws PublicationImexUpdaterException, ImexCentralException {
         TransactionStatus status = getDataContext().beginTransaction();
 
@@ -459,8 +455,6 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
         Assert.assertTrue(hasFullCuration);
         Assert.assertTrue(hasImexCuration);
 
-        int index = 0;
-
         // updated experiments imex primary ref
         for (Experiment exp : intactPubReloaded.getExperiments()){
             Assert.assertEquals(1, exp.getXrefs().size());
@@ -472,11 +466,10 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
             // updated interaction imex primary ref
             for (Interaction inter : exp.getInteractions()){
-                index++;
                 Assert.assertEquals(1, inter.getXrefs().size());
 
                 InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertEquals("IM-3-"+index, ref2.getPrimaryId());
+                Assert.assertTrue(ref2.getPrimaryId().startsWith("IM-3-"));
                 Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
                 Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
             }
@@ -487,7 +480,6 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
     @Test
     @DirtiesContext
-    @Transactional(propagation = Propagation.NEVER)
     public void assign_imex_register_update_publication() throws PublicationImexUpdaterException, ImexCentralException {
         TransactionStatus status = getDataContext().beginTransaction();
 
@@ -569,8 +561,6 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
         Assert.assertTrue(hasFullCuration);
         Assert.assertTrue(hasImexCuration);
 
-        int index = 0;
-
         // updated experiments imex primary ref
         for (Experiment exp : intactPubReloaded.getExperiments()){
             Assert.assertEquals(1, exp.getXrefs().size());
@@ -582,11 +572,10 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
             // updated interaction imex primary ref
             for (Interaction inter : exp.getInteractions()){
-                index++;
                 Assert.assertEquals(1, inter.getXrefs().size());
 
                 InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertEquals(imexPublication.getImexAccession()+"-"+index, ref2.getPrimaryId());
+                Assert.assertTrue(ref2.getPrimaryId().startsWith(imexPublication.getImexAccession()+"-"));
                 Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
                 Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
             }
@@ -597,7 +586,6 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
     @Test
     @DirtiesContext
-    @Transactional(propagation = Propagation.NEVER)
     public void cannot_assign_imex_update_publication_existingRecordWithImex() throws PublicationImexUpdaterException, ImexCentralException {
         TransactionStatus status = getDataContext().beginTransaction();
 
@@ -659,7 +647,6 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
     @Test
     @DirtiesContext
-    @Transactional(propagation = Propagation.NEVER)
     public void assign_imex_update_publication_existingRecordNoExistingImex() throws PublicationImexUpdaterException, ImexCentralException {
         TransactionStatus status = getDataContext().beginTransaction();
 
@@ -741,8 +728,6 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
         Assert.assertTrue(hasFullCuration);
         Assert.assertTrue(hasImexCuration);
 
-        int index = 0;
-
         // updated experiments imex primary ref
         for (Experiment exp : intactPubReloaded.getExperiments()){
             Assert.assertEquals(1, exp.getXrefs().size());
@@ -754,11 +739,10 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
             // updated interaction imex primary ref
             for (Interaction inter : exp.getInteractions()){
-                index++;
                 Assert.assertEquals(1, inter.getXrefs().size());
 
                 InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertEquals(imexPublication.getImexAccession()+"-"+index, ref2.getPrimaryId());
+                Assert.assertTrue(ref2.getPrimaryId().startsWith(imexPublication.getImexAccession()+"-"));
                 Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
                 Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
             }
@@ -769,7 +753,6 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
     @Test
     @DirtiesContext
-    @Transactional(propagation = Propagation.NEVER)
     public void cannot_assign_imex_update_publication_existingRecordWithoutImexNoPubmed() throws PublicationImexUpdaterException, ImexCentralException {
         TransactionStatus status = getDataContext().beginTransaction();
 

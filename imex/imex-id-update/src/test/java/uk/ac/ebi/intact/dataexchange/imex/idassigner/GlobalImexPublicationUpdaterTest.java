@@ -138,8 +138,6 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         Assert.assertTrue(hasFullCuration);
         Assert.assertTrue(hasImexCuration);
 
-        int index = 0;
-
         // updated experiments imex primary ref
         for (Experiment exp : intactPubReloaded.getExperiments()){
             Assert.assertEquals(1, exp.getXrefs().size());
@@ -151,11 +149,10 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
 
             // updated interaction imex primary ref
             for (Interaction inter : exp.getInteractions()){
-                index++;
                 Assert.assertEquals(1, inter.getXrefs().size());
 
                 InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertEquals("IM-3-"+index, ref2.getPrimaryId());
+                Assert.assertTrue(ref2.getPrimaryId().startsWith("IM-3-"));
                 Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
                 Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
             }
@@ -349,7 +346,7 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
                 Assert.assertEquals(1, inter.getXrefs().size());
 
                 InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertEquals(pubRef.getPrimaryId() +"-"+index, ref2.getPrimaryId());
+                Assert.assertTrue(ref2.getPrimaryId().startsWith(pubRef.getPrimaryId() +"-"));
                 Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
                 Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
             }
@@ -425,8 +422,6 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         Assert.assertTrue(hasFullCuration2);
         Assert.assertTrue(hasImexCuration2);
 
-        int index2 = 0;
-
         // updated experiments imex primary ref
         for (Experiment exp : intactPubReloaded5.getExperiments()){
             // does not change experiment
@@ -439,11 +434,10 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
 
             // updated interaction imex primary ref
             for (Interaction inter : exp.getInteractions()){
-                index2++;
                 Assert.assertEquals(1, inter.getXrefs().size());
 
                 InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertEquals(pubRef2.getPrimaryId()+"-"+index2, ref2.getPrimaryId());
+                Assert.assertTrue(ref2.getPrimaryId().startsWith(pubRef2.getPrimaryId() +"-"));
                 Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
                 Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
             }

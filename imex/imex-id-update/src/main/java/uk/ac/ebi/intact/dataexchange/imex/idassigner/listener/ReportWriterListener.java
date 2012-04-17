@@ -89,18 +89,12 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
         }
     }
     
-    private String writeObjectAcsFor(List<? extends AnnotatedObject> intactobjects){
+    private String writeObjectAcsFor(List<String> intactobjects){
         StringBuffer buffer = new StringBuffer();
         
-        for (AnnotatedObject obj : intactobjects){
-            if (obj.getAc() != null){
-                buffer.append(obj.getAc());
-                buffer.append(", ");
-            }
-            else{
-                buffer.append(obj.getShortLabel());
-                buffer.append(", ");
-            }
+        for (String obj : intactobjects){
+            buffer.append(obj);
+            buffer.append(", ");
         }
         return buffer.toString();
     }
