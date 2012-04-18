@@ -230,7 +230,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 "where i.ac in " +
                 "(select distinct i2.ac from Component c2 join c2.interaction as i2 join c2.interactor as interactor " +
                 " where interactor.cvInteractorType.identifier <> :protein and interactor.cvInteractorType.identifier <> :peptide)" +
-                "group by i.ac, interactor.cvInteractorType.identifier having (interactor.cvInteractorType.identifier = :protein or interactor.cvInteractorType.identifier = :peptide) order by p2.ac, i.ac";
+                "group by p2.ac, i.ac, interactor.cvInteractorType.identifier having (interactor.cvInteractorType.identifier = :protein or interactor.cvInteractorType.identifier = :peptide) order by p2.ac, i.ac";
 
         Query query = daoFactory.getEntityManager().createQuery(proteinQuery);
         query.setParameter("protein", CvInteractorType.PROTEIN_MI_REF);
