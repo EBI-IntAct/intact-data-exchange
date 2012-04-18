@@ -94,13 +94,15 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     private List<String> collectPublicationHavingAtLeastTwoProteins() {
         List<Object[]> publicationsHavingProteinPeptide = collectPublicationsHavingProteinsOrPeptides();
 
-        List<String> publications = new ArrayList<String>(publicationsHavingProteinPeptide.size());
+        // collect all the interactions having only protein-protein or peptide interactions
+        List<String> publications = collectPublicationsHavingPPIInteractions();
 
         Map<String, Set<String>> mapOfPublicationsAndInteractions = new HashMap<String, Set<String>>(publicationsHavingProteinPeptide.size());
         Map<String, Long> mapOfNumberParticipants = new HashMap<String, Long>(publicationsHavingProteinPeptide.size());
 
         Iterator<Object[]> pubIterator = publicationsHavingProteinPeptide.iterator();
 
+        // collect interactions having more than two protein/peptides in addition to other interactors
         while (pubIterator.hasNext()){
             Object[] o = pubIterator.next();
 
@@ -108,7 +110,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 String pubAc = (String) o[0];
                 String interactionAc = (String) o[1];
                 long number = (Long) o[2];
-                
+
                 if (mapOfPublicationsAndInteractions.containsKey(pubAc)){
                     mapOfPublicationsAndInteractions.get(pubAc).add(interactionAc);
                 }
@@ -127,11 +129,11 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 }
             }
         }
-        
+
         for (Map.Entry<String, Set<String>> pubEntry : mapOfPublicationsAndInteractions.entrySet()){
             Set<String> interactionsAcs = pubEntry.getValue();
             String pubAc = pubEntry.getKey();
-            
+
             for (String interactionAc : interactionsAcs){
                 if (mapOfNumberParticipants.containsKey(interactionAc) && mapOfNumberParticipants.get(interactionAc) > 1){
                     publications.add(pubAc);
@@ -225,6 +227,9 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String proteinQuery = "select p2.ac, i.ac, count(distinct c.ac) from InteractionImpl as i join i.experiments as e join e.publication as p2 join i.components as c join c.interactor as interactor " +
+                "where i.ac in " +
+                "(select distinct i2.ac from Component c2 join c2.interaction as i2 join c2.interactor as interactor " +
+                " where interactor.cvInteractorType.identifier <> :protein and interactor.cvInteractorType.identifier <> :peptide)" +
                 "group by i.ac, interactor.cvInteractorType.identifier having (interactor.cvInteractorType.identifier = :protein or interactor.cvInteractorType.identifier = :peptide) order by p2.ac, i.ac";
 
         Query query = daoFactory.getEntityManager().createQuery(proteinQuery);
@@ -232,6 +237,21 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("peptide", CvInteractorType.PEPTIDE_MI_REF);
 
         List<Object[]> publications = query.getResultList();
+        return publications;
+    }
+
+    private List<String> collectPublicationsHavingPPIInteractions() {
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+
+        String datasetQuery = "select distinct p2.ac from Component c join c.interaction as i join i.experiments as e join e.publication as p2 join c.interactor as interactor " +
+                "where (interactor.cvInteractorType.identifier = :protein or interactor.cvInteractorType.identifier = :peptide) and i.ac not in (select distinct i2.ac from InteractionImpl i2 join i2.components as comp join comp.interactor as interactor2 " +
+                "where interactor2.cvInteractorType.identifier <> :protein and interactor2.cvInteractorType.identifier <> :peptide)";
+
+        Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
+        query.setParameter("protein", CvInteractorType.PROTEIN_MI_REF);
+        query.setParameter("peptide", CvInteractorType.PEPTIDE_MI_REF);
+
+        List<String> publications = query.getResultList();
         return publications;
     }
 
