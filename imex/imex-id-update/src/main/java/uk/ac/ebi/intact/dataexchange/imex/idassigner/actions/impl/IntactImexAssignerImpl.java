@@ -316,15 +316,23 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     /**
      *
      * @param interaction
-     * @return true if it is a PPI interaction, false otherwise
+     * @return true if it is a PPI interaction (at leats two proteins or peptides), false otherwise
      */
     private boolean involvesOnlyProteins( Interaction interaction ) {
+        int numberOfProteinsPeptides = 0;
+
         for ( Component component : interaction.getComponents() ) {
-            if ( !( component.getInteractor() instanceof ProteinImpl ) ) {
-                return false;
+            if ( component.getInteractor() != null && component.getInteractor().getCvInteractorType() != null ) {
+                CvInteractorType interactorType = component.getInteractor().getCvInteractorType();
+
+                if (interactorType.getIdentifier() != null &&
+                        (interactorType.getIdentifier().endsWith(CvInteractorType.PEPTIDE_MI_REF) || interactorType.getIdentifier().endsWith(CvInteractorType.PROTEIN_MI_REF))){
+                    numberOfProteinsPeptides++;
+                }
             }
         }
-        return true;
+
+        return (numberOfProteinsPeptides > 1);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

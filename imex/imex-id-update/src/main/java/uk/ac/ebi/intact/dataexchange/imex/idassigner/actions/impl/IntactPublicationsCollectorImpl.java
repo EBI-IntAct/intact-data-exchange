@@ -12,9 +12,7 @@ import uk.ac.ebi.intact.model.*;
 
 import javax.persistence.Query;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * The publication collector collects acs of publications in different cases
@@ -36,12 +34,12 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
 
     private List<String> publicationsAcceptedForRelease;
 
-    private Collection<String> publicationsInvolvingOnlyNonPPIInteractions;
+    private Collection<String> publicationsInvolvingPPI;
 
     private static final Log log = LogFactory.getLog(IntactPublicationsCollectorImpl.class);
 
     private boolean isInitialised;
-    
+
     private final static String CELL_JOURNAL = "Cell (0092-8674)";
     private final static String PROTEOMICS_JOURNAL = "Proteomics (1615-9853)";
     private final static String CANCER_CELL_JOURNAL= "Cancer Cell (1535-6108)";
@@ -65,7 +63,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 String journal = (String) o[1];
                 try{
                     int date = Integer.parseInt((String) o[2]);
-                    
+
                     if (CELL_JOURNAL.equalsIgnoreCase(journal) || PROTEOMICS_JOURNAL.equalsIgnoreCase(journal)
                             || CANCER_CELL_JOURNAL.equalsIgnoreCase(journal) || J_MOL_JOURNAL.equalsIgnoreCase(journal)
                             || ONCOGENE_JOURNAL.equalsIgnoreCase(journal)){
@@ -87,6 +85,58 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                     log.error("Publication date for " + pubAc + "is not valid and is skipped.");
                 }
 
+            }
+        }
+
+        return publications;
+    }
+
+    private List<String> collectPublicationHavingAtLeastTwoProteins() {
+        List<Object[]> publicationsHavingProteinPeptide = collectPublicationsHavingProteinsOrPeptides();
+
+        List<String> publications = new ArrayList<String>(publicationsHavingProteinPeptide.size());
+
+        Map<String, Set<String>> mapOfPublicationsAndInteractions = new HashMap<String, Set<String>>(publicationsHavingProteinPeptide.size());
+        Map<String, Long> mapOfNumberParticipants = new HashMap<String, Long>(publicationsHavingProteinPeptide.size());
+
+        Iterator<Object[]> pubIterator = publicationsHavingProteinPeptide.iterator();
+
+        while (pubIterator.hasNext()){
+            Object[] o = pubIterator.next();
+
+            if (o.length == 3){
+                String pubAc = (String) o[0];
+                String interactionAc = (String) o[1];
+                long number = (Long) o[2];
+                
+                if (mapOfPublicationsAndInteractions.containsKey(pubAc)){
+                    mapOfPublicationsAndInteractions.get(pubAc).add(interactionAc);
+                }
+                else {
+                    Set<String> interactionList = new HashSet<String>();
+                    interactionList.add(interactionAc);
+                    mapOfPublicationsAndInteractions.put(pubAc, interactionList);
+                }
+
+                if (mapOfNumberParticipants.containsKey(interactionAc)){
+                    long newNumber = mapOfNumberParticipants.get(interactionAc)+number;
+                    mapOfNumberParticipants.put(interactionAc, newNumber);
+                }
+                else {
+                    mapOfNumberParticipants.put(interactionAc, number);
+                }
+            }
+        }
+        
+        for (Map.Entry<String, Set<String>> pubEntry : mapOfPublicationsAndInteractions.entrySet()){
+            Set<String> interactionsAcs = pubEntry.getValue();
+            String pubAc = pubEntry.getKey();
+            
+            for (String interactionAc : interactionsAcs){
+                if (mapOfNumberParticipants.containsKey(interactionAc) && mapOfNumberParticipants.get(interactionAc) > 1){
+                    publications.add(pubAc);
+                    break;
+                }
             }
         }
 
@@ -171,31 +221,17 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publications;
     }
 
-    private List<String> collectPublicationsHavingNonPPIInteractions() {
+    public List<Object[]> collectPublicationsHavingProteinsOrPeptides() {
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
-        String datasetQuery = "select distinct p1.ac from Component c join c.interaction as i join i.experiments as e join e.publication as p1 join c.interactor as interactor " +
-                "where interactor.objClass <> :protein";
+        String proteinQuery = "select p2.ac, i.ac, count(distinct c.ac) from InteractionImpl as i join i.experiments as e join e.publication as p2 join i.components as c join c.interactor as interactor " +
+                "group by i.ac, interactor.cvInteractorType.identifier having (interactor.cvInteractorType.identifier = :protein or interactor.cvInteractorType.identifier = :peptide) order by p2.ac, i.ac";
 
-        Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
-        query.setParameter("protein", ProteinImpl.class.getCanonicalName());
-
-        List<String> publications = query.getResultList();
-        return publications;
-    }
-
-    private List<String> collectPublicationsHavingPPIInteractions() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
-
-        String datasetQuery = "select distinct p2.ac from Component c join c.interaction as i join i.experiments as e join e.publication as p2 join c.interactor as interactor " +
-                "where (interactor.cvInteractorType.identifier = :protein or interactor.cvInteractorType.identifier = :peptide) and i.ac not in (select distinct i2.ac from InteractionImpl i2 join i2.components as comp join comp.interactor as interactor2 " +
-                "where interactor2.cvInteractorType.identifier <> :protein and interactor2.cvInteractorType.identifier <> :peptide)";
-
-        Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
+        Query query = daoFactory.getEntityManager().createQuery(proteinQuery);
         query.setParameter("protein", CvInteractorType.PROTEIN_MI_REF);
         query.setParameter("peptide", CvInteractorType.PEPTIDE_MI_REF);
 
-        List<String> publications = query.getResultList();
+        List<Object[]> publications = query.getResultList();
         return publications;
     }
 
@@ -241,12 +277,12 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publications;
     }
 
-    public Collection<String> getPublicationsInvolvingOnlyNonPPIInteractions() {
-        return publicationsInvolvingOnlyNonPPIInteractions;
+    public Collection<String> getPublicationsInvolvingPPI() {
+        return publicationsInvolvingPPI;
     }
 
-    public void setPublicationsInvolvingOnlyNonPPIInteractions(Collection<String> publicationsInvolvingOnlyNonPPIInteractions) {
-        this.publicationsInvolvingOnlyNonPPIInteractions = publicationsInvolvingOnlyNonPPIInteractions;
+    public void setPublicationsInvolvingPPI(Collection<String> publicationsInvolvingPPI) {
+        this.publicationsInvolvingPPI = publicationsInvolvingPPI;
     }
 
     public List<String> getPublicationsHavingImexId() {
@@ -287,8 +323,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         // publications having specific journal and specific dataset can be IMEx publications
         Collection<String> potentialPublicationsForImex = CollectionUtils.union(publicationsHavingDataset, publicationsHavingJournalAndYear);
 
-        // publications having only non PPI interactions should be excluded
-        Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.subtract(potentialPublicationsForImex, publicationsInvolvingOnlyNonPPIInteractions);
+        // filter publications having only non PPI interactions
+        Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsInvolvingPPI);
 
         // potentialPublications needing an IMEx id to be assigned = potential publications for imex - publications already having IMEx ids
         Collection<String> potentialPublicationsToBeAssigned = CollectionUtils.subtract(potentialPublicationsForImexFiltered, publicationsHavingImexId);
@@ -313,7 +349,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         Collection<String> publicationsWithIMExIdToUpdate = CollectionUtils.intersection(publicationsHavingImexId, publicationsHavingImexCurationLevel);
 
         // filters publications having imex id but no PPI
-        Collection<String> publicationsWithIMExIdToUpdateFiltered = CollectionUtils.subtract(publicationsWithIMExIdToUpdate, publicationsInvolvingOnlyNonPPIInteractions);
+        Collection<String> publicationsWithIMExIdToUpdateFiltered = CollectionUtils.intersection(publicationsWithIMExIdToUpdate, publicationsInvolvingPPI);
 
         return publicationsWithIMExIdToUpdateFiltered;
     }
@@ -345,7 +381,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         Collection<String> potentialPublicationsForImex = CollectionUtils.union(publicationsHavingDataset, publicationsHavingJournalAndYear);
 
         // publications having only non PPI interactions should be excluded
-        Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.subtract(potentialPublicationsForImex, publicationsInvolvingOnlyNonPPIInteractions);
+        Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsInvolvingPPI);
 
         // publications having imex curation level but are not eligible for automatic IMEx assignment
         Collection<String> publicationsNotEligibleForImexWithImexCurationLevel = CollectionUtils.subtract(publicationsWithImexCurationLevelAndNotImexId, potentialPublicationsForImexFiltered);
@@ -385,7 +421,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
             initialise();
         }
 
-        return CollectionUtils.intersection(publicationsHavingImexId, publicationsInvolvingOnlyNonPPIInteractions);
+        return CollectionUtils.subtract(publicationsHavingImexId, publicationsInvolvingPPI);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -411,11 +447,9 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         if (publicationsAcceptedForRelease == null){
             publicationsAcceptedForRelease = collectPublicationAcceptedForRelease();
         }
-        if (publicationsInvolvingOnlyNonPPIInteractions == null){
-            Collection<String> proteinsInvolvingPPI = collectPublicationsHavingPPIInteractions();
-            Collection<String> proteinsInvolvingNonPPI = collectPublicationsHavingNonPPIInteractions();
+        if (publicationsInvolvingPPI == null){
 
-            publicationsInvolvingOnlyNonPPIInteractions = CollectionUtils.subtract(proteinsInvolvingNonPPI, proteinsInvolvingPPI);
+            publicationsInvolvingPPI = collectPublicationHavingAtLeastTwoProteins();
         }
 
         isInitialised = true;

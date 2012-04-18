@@ -17,6 +17,9 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Unit test class for IntactPublicationCollectorImpl
@@ -425,6 +428,9 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         for (Component comp : interaction.getComponents()){
             comp.setInteractor(getMockBuilder().createNucleicAcidRandom());
         }
+        Component protein = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
+        interaction.addComponent(protein);
+
         PublicationXref pubXref2 = new PublicationXref( pubWithImex.getOwner(), imex, "IM-4", imexPrimary );
         pubWithoutPPI.addXref(pubXref2);
 
@@ -439,6 +445,95 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         Collection<String> pubAcs = publicationCollectorTest.getPublicationsHavingIMExIdAndNoPPI();
         Assert.assertEquals(1, pubAcs.size());
         Assert.assertEquals(pubWithoutPPI.getAc(), pubAcs.iterator().next());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
+    public void get_publications_Having_PPI_Interactions_one_with_NucleicAcid() throws ParseException {
+
+        TransactionStatus status = getDataContext().beginTransaction();
+
+        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
+        getCorePersister().saveOrUpdate(imex);
+
+        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
+        getCorePersister().saveOrUpdate(imexPrimary);
+
+        // one publication with imex primary ref
+        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
+        exp1.setPublication(pubWithImex);
+        pubWithImex.addExperiment(exp1);
+        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
+        pubWithImex.addXref(pubXref);
+
+        // one publication with imex-primary, one nucleic acid and the rest protein
+        Publication pubWithoutPPI = getMockBuilder().createPublicationRandom();
+        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
+        exp2.setPublication(pubWithoutPPI);
+        pubWithoutPPI.addExperiment(exp2);
+        Interaction interaction = exp2.getInteractions().iterator().next();
+        Component nucleicacid = getMockBuilder().createComponentPrey(getMockBuilder().createNucleicAcidRandom());
+        interaction.addComponent(nucleicacid);
+        PublicationXref pubXref2 = new PublicationXref( pubWithImex.getOwner(), imex, "IM-4", imexPrimary );
+        pubWithoutPPI.addXref(pubXref2);
+
+        getCorePersister().saveOrUpdate(pubWithImex);
+        getCorePersister().saveOrUpdate(pubWithoutPPI);
+
+        getDataContext().commitTransaction(status);
+
+        // reset collection
+        publicationCollectorTest.initialise();
+
+        Set<String> pubAcs = new HashSet<String> (publicationCollectorTest.getPublicationsHavingIMExIdAndNoPPI());
+        Assert.assertEquals(0, pubAcs.size());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
+    public void get_publications_Having_PPI_Interactions2() throws ParseException {
+
+        TransactionStatus status = getDataContext().beginTransaction();
+
+        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
+        getCorePersister().saveOrUpdate(imex);
+
+        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
+        getCorePersister().saveOrUpdate(imexPrimary);
+
+        // one publication with imex primary ref
+        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
+        exp1.setPublication(pubWithImex);
+        pubWithImex.addExperiment(exp1);
+        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
+        pubWithImex.addXref(pubXref);
+
+        // one publication with imex-primary, one nucleic acid and the rest protein
+        Publication pubWithoutPPI = getMockBuilder().createPublicationRandom();
+        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
+        exp2.setPublication(pubWithoutPPI);
+        pubWithoutPPI.addExperiment(exp2);
+        Interaction interaction = exp2.getInteractions().iterator().next();
+        Iterator<Component> componentIterator = interaction.getComponents().iterator();
+        componentIterator.next().setInteractor(getMockBuilder().createPeptideRandom());
+        componentIterator.next().setInteractor(getMockBuilder().createProteinRandom());
+        PublicationXref pubXref2 = new PublicationXref( pubWithImex.getOwner(), imex, "IM-4", imexPrimary );
+        pubWithoutPPI.addXref(pubXref2);
+
+        getCorePersister().saveOrUpdate(pubWithImex);
+        getCorePersister().saveOrUpdate(pubWithoutPPI);
+
+        getDataContext().commitTransaction(status);
+
+        // reset collection
+        publicationCollectorTest.initialise();
+
+        Set<String> pubAcs = new HashSet<String> (publicationCollectorTest.getPublicationsHavingIMExIdAndNoPPI());
+        Assert.assertEquals(0, pubAcs.size());
     }
 
     @Test
