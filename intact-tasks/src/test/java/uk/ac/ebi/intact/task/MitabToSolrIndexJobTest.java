@@ -80,6 +80,6 @@ public class MitabToSolrIndexJobTest extends IntactBasicTestCase{
 
         // five clustered interactions
         Assert.assertEquals(12L, solrServer.query(new SolrQuery("*:*")).getResults().getNumFound());
-        Assert.assertEquals(4L, solrServer.query(new SolrQuery("intact-miscore:[0.4 TO 0.7]")).getResults().getNumFound());
+        Assert.assertEquals(4L, solrServer.query(new SolrQuery("intact-miscore:[0.40 TO 0.75]")).getResults().getNumFound());
     }
 }
