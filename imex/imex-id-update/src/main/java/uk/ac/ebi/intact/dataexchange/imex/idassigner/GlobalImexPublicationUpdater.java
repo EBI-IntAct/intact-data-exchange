@@ -78,6 +78,13 @@ public class GlobalImexPublicationUpdater {
                 ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_not_imex_interaction_imex, pubAc, null, null, null, "Publication does not have IMEx primary reference but the interactions do have a IMEx primary reference.");
                 imexCentralManager.fireOnImexError(errorEvt);
             }
+
+        // fire error event for publications having IMEx curation level but dr-export = no
+        Collection<String> publicationsWithImexCurationLevelAndUniprotDrExportNo = intactPublicationCollector.getPublicationsHavingIMExCurationLevelAndUniprotDrExportNo();
+        for (String pubAc : publicationsWithImexCurationLevelAndUniprotDrExportNo){
+            ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.imex_curation_uniprot_dr_export_no, pubAc, null, null, null, "Publication does contain experiments having uniprot-dr-export = no and has IMEx curation level.");
+            imexCentralManager.fireOnImexError(errorEvt);
+        }
     }
 
     private void processImexCentralException(String publication, ImexCentralException e, IcentralFault f) {

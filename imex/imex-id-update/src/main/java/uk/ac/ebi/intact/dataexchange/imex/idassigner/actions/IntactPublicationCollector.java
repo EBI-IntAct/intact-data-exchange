@@ -41,6 +41,12 @@ public interface IntactPublicationCollector {
     public Collection<String> getPublicationsHavingIMExIdAndNoPPI();
 
     /**
+     * Collect publications having IMEx curation level but uniprot dr-export = no
+     * @return a collection of publication acs.
+     */
+    public Collection<String> getPublicationsHavingIMExCurationLevelAndUniprotDrExportNo();
+
+    /**
      * Collect publications having IMEx primary reference and imex-curation annotation which contain at least one PPI
      * @return a collection of publication acs.
      */

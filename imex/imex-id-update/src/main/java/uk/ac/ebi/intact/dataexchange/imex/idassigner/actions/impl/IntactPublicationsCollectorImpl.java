@@ -33,6 +33,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     private List<String> publicationsHavingImexCurationLevel;
 
     private List<String> publicationsAcceptedForRelease;
+    private List<String> publicationsHavingUniprotDRExportNo;
 
     private Collection<String> publicationsInvolvingPPI;
 
@@ -195,6 +196,20 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publications;
     }
 
+    private List<String> collectPublicationHavingUniprotDrExportNo() {
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+
+        String uniprotDrQuery = "select distinct p.ac from Publication p join p.experiments as e join e.annotations as a " +
+                "where a.cvTopic.shortLabel = :uniprotDrExport and a.annotationText = :no";
+
+        Query query = daoFactory.getEntityManager().createQuery(uniprotDrQuery);
+        query.setParameter("uniprotDrExport", CvTopic.UNIPROT_DR_EXPORT);
+        query.setParameter("no", "no");
+
+        List<String> publications = query.getResultList();
+        return publications;
+    }
+
     private List<String> collectPublicationCandidatesToImexWithDataset() {
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
@@ -346,8 +361,11 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         // filter publications having only non PPI interactions
         Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsInvolvingPPI);
 
+        // filter publications having uniprot-dr-export no
+        Collection<String> potentialPublicationsForImexUniprotDRNoFiltered = CollectionUtils.subtract(potentialPublicationsForImexFiltered, publicationsHavingUniprotDRExportNo);
+
         // potentialPublications needing an IMEx id to be assigned = potential publications for imex - publications already having IMEx ids
-        Collection<String> potentialPublicationsToBeAssigned = CollectionUtils.subtract(potentialPublicationsForImexFiltered, publicationsHavingImexId);
+        Collection<String> potentialPublicationsToBeAssigned = CollectionUtils.subtract(potentialPublicationsForImexUniprotDRNoFiltered, publicationsHavingImexId);
 
         // publications for which we can assign a new IMEx id = potentialPublications needing an IMEx id to be assigned AND publications having IMEx curation level
         Collection<String> publicationsToBeAssigned = CollectionUtils.intersection(potentialPublicationsToBeAssigned, publicationsHavingImexCurationLevel);
@@ -444,6 +462,15 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return CollectionUtils.subtract(publicationsHavingImexId, publicationsInvolvingPPI);
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Collection<String> getPublicationsHavingIMExCurationLevelAndUniprotDrExportNo() {
+        if (!isInitialised){
+            initialise();
+        }
+
+        return CollectionUtils.intersection(publicationsHavingImexCurationLevel, publicationsHavingUniprotDRExportNo);
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void initialise() {
         if (publicationsHavingImexId == null){
@@ -470,6 +497,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         if (publicationsInvolvingPPI == null){
 
             publicationsInvolvingPPI = collectPublicationHavingAtLeastTwoProteins();
+        }
+        if (publicationsHavingUniprotDRExportNo == null){
+
+            publicationsHavingUniprotDRExportNo = collectPublicationHavingUniprotDrExportNo();
         }
 
         isInitialised = true;
