@@ -55,7 +55,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
         Assert.assertEquals(1, processedBinary1.getConfidenceValues().size());
         Confidence conf = (Confidence) processedBinary1.getConfidenceValues().iterator().next();
         Assert.assertEquals("intact-miscore", conf.getType());
-        Assert.assertEquals("0.7", conf.getValue());
+        Assert.assertEquals("0.72", conf.getValue());
 
         BinaryInteraction binary2 = binaryInteractionIterator.next();
         Assert.assertTrue(binary2.getConfidenceValues().isEmpty());
@@ -64,7 +64,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
         Assert.assertEquals(1, processedBinary2.getConfidenceValues().size());
         conf = (Confidence) processedBinary2.getConfidenceValues().iterator().next();
         Assert.assertEquals("intact-miscore", conf.getType());
-        Assert.assertEquals("0.7", conf.getValue());
+        Assert.assertEquals("0.72", conf.getValue());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
         Assert.assertEquals(1, processedBinary1.getConfidenceValues().size());
         Confidence conf = (Confidence) processedBinary1.getConfidenceValues().iterator().next();
         Assert.assertEquals("intact-miscore", conf.getType());
-        Assert.assertEquals("0.5", conf.getValue());
+        Assert.assertEquals("0.50", conf.getValue());
 
         BinaryInteraction binary2 = binaryInteractionIterator.next();
         Assert.assertTrue(binary2.getConfidenceValues().isEmpty());
@@ -90,7 +90,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
         Assert.assertEquals(1, processedBinary2.getConfidenceValues().size());
         conf = (Confidence) processedBinary2.getConfidenceValues().iterator().next();
         Assert.assertEquals("intact-miscore", conf.getType());
-        Assert.assertEquals("0.5", conf.getValue());
+        Assert.assertEquals("0.50", conf.getValue());
     }
 
     @Test

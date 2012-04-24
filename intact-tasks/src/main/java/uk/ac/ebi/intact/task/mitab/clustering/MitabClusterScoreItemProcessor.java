@@ -39,7 +39,7 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
 
     public MitabClusterScoreItemProcessor(){
         scores = new TreeMap<BinaryPair, Double>();
-        scoreFormatter = new DecimalFormat("#.##");
+        scoreFormatter = new DecimalFormat("0.00");
     }
 
     @Override
