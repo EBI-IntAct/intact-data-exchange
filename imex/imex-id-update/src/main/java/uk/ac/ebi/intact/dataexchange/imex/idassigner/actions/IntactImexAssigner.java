@@ -113,4 +113,6 @@ public interface IntactImexAssigner {
      * @return list of interaction acs
      */
     public List<String> collectInteractionsToUpdateFrom(uk.ac.ebi.intact.model.Publication pub, String imex);
+
+    public void setImexCentralClient(ImexCentralClient imexClient);
 }

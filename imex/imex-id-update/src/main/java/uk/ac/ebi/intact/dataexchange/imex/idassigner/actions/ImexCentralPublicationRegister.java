@@ -33,4 +33,6 @@ public interface ImexCentralPublicationRegister {
     public Publication registerPublicationInImexCentral(uk.ac.ebi.intact.model.Publication intactPublication) throws ImexCentralException;
 
     public ImexCentralClient getImexCentralClient();
+
+    public void setImexCentralClient(ImexCentralClient imexClient);
 }

@@ -25,4 +25,6 @@ public interface PublicationAdminUserSynchronizer {
     public void synchronizePublicationAdminUser(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException;
 
     public ImexCentralClient getImexCentralClient();
+
+    public void setImexCentralClient(ImexCentralClient imexClient);
 }

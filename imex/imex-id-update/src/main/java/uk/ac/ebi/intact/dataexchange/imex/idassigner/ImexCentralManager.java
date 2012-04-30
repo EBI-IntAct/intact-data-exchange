@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
@@ -561,6 +562,18 @@ public class ImexCentralManager {
     public void setMaxNumberIntactObjectPerTransaction(int maxNumberIntactObjectPerTransaction) {
         if (maxNumberIntactObjectPerTransaction > 0){
             this.maxNumberIntactObjectPerTransaction = maxNumberIntactObjectPerTransaction;
+        }
+    }
+
+    public void resetImexCentralClient(ImexCentralClient imexCentralClient) {
+
+        if (imexCentralClient != null){
+            this.imexCentralRegister.setImexCentralClient(imexCentralClient);
+            this.imexAdminGroupSynchronizer.setImexCentralClient(imexCentralClient);
+            this.imexAdminUserSynchronizer.setImexCentralClient(imexCentralClient);
+            this.imexStatusSynchronizer.setImexCentralClient(imexCentralClient);
+            this.publicationIdentifierSynchronizer.setImexCentralClient(imexCentralClient);
+            this.intactImexAssigner.setImexCentralClient(imexCentralClient);
         }
     }
 }

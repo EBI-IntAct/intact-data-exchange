@@ -31,4 +31,6 @@ public interface PublicationStatusSynchronizer {
     public PublicationStatus getPublicationStatus( uk.ac.ebi.intact.model.Publication publication );
 
     public ImexCentralClient getImexCentralClient();
+
+    public void setImexCentralClient(ImexCentralClient imexClient);
 }

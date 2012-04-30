@@ -35,4 +35,6 @@ public interface PublicationIdentifierSynchronizer {
     public void synchronizePublicationIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException;
 
     public ImexCentralClient getImexCentralClient();
+
+    public void setImexCentralClient(ImexCentralClient imexClient);
 }
