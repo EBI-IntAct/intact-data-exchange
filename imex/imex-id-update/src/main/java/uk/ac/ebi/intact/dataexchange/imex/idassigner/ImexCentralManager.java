@@ -189,16 +189,10 @@ public class ImexCentralManager {
                     ImexErrorEvent evt = new ImexErrorEvent(this, ImexErrorType.imex_in_imexCentral_not_in_intact, intactPublication.getPublicationId(), imexPublication.getImexAccession(), null, null, "It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " because it already has a valid IMEx id in IMEx central.");
                     fireOnImexError(evt);
                 }
-                // the publication has been registered in IMex central but does not have an IMEx id. If it is not unassigned, we can assign IMEx id
-                else if (Pattern.matches(ImexCentralManager.PUBMED_REGEXP.toString(), pubId)){
-                    assignAndUpdateIntactPublication(intactPublication, imexPublication);
-                    synchronizePublicationWithImexCentral(intactPublication, imexPublication);
-
-                    return imexPublication;
-                }
-                // unassigned publication, cannot use the webservice to automatically assign IMEx id for now, ask the curator to manually register and assign IMEx id to this publication
+                // the publication has been registered in IMex central but does not have an IMEx id. We cannot assign IMEx id, the curator must have a look at it
                 else {
-                    log.warn("It is not possible to assign an IMEx id to a unassigned publication. The publication needs to be registered manually by a curator in IMEx central.");
+                    ImexErrorEvent evt = new ImexErrorEvent(this, ImexErrorType.publication_already_in_imex, intactPublication.getPublicationId(), imexPublication.getImexAccession(), null, null, "It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " because it already has a valid IMEx id in IMEx central.");
+                    fireOnImexError(evt);
                 }
             }
             // the publication has a valid pubmed identifier and can be registered and assign IMEx id in IMEx central

@@ -683,68 +683,23 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
         TransactionStatus status2 = getDataContext().beginTransaction();
 
         // updated imex identifier because not present
-        Assert.assertNotNull(imexPublication);
-        Assert.assertEquals(1, imexPublication.getIdentifier().size());
-        Identifier id = imexPublication.getIdentifier().iterator().next();
-        Assert.assertEquals("pmid", id.getNs());
-        Assert.assertEquals("12348", id.getAc());
-
-        // valid pubmed so whould have synchronized admin group, admin user and status
-        // admin group INTACT
-        Assert.assertEquals(1, imexPublication.getAdminGroupList().getGroup().size());
-        Assert.assertEquals("INTACT", imexPublication.getAdminGroupList().getGroup().iterator().next());
-        // admin user phantom because curator is not known in imex central
-        Assert.assertEquals(1, imexPublication.getAdminUserList().getUser().size());
-        Assert.assertEquals("phantom", imexPublication.getAdminUserList().getUser().iterator().next());
-        // status released
-        Assert.assertEquals("NEW", imexPublication.getStatus());
-
-        // assigned IMEx
-        Assert.assertNotNull(imexPublication.getImexAccession());
+        Assert.assertNull(imexPublication);
 
         uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
 
-        // added imex primary ref to publication
-        Assert.assertEquals(1, intactPubReloaded.getXrefs().size());
-        PublicationXref pubRef = intactPubReloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, pubRef.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, pubRef.getCvXrefQualifier().getIdentifier());
-        Assert.assertEquals(imexPublication.getImexAccession(), pubRef.getPrimaryId());
+        // not added imex primary ref to publication
+        Assert.assertEquals(0, intactPubReloaded.getXrefs().size());
 
-        // updated annotations publication
-        Assert.assertEquals(2, intactPubReloaded.getAnnotations().size());
-        boolean hasFullCuration = false;
-        boolean hasImexCuration = false;
+        // not updated annotations publication
+        Assert.assertEquals(0, intactPubReloaded.getAnnotations().size());
 
-        for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded.getAnnotations()){
-            if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
-                hasImexCuration = true;
-            }
-            else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
-                hasFullCuration = true;
-            }
-        }
-
-        Assert.assertTrue(hasFullCuration);
-        Assert.assertTrue(hasImexCuration);
-
-        // updated experiments imex primary ref
+        // not updated experiments imex primary ref
         for (Experiment exp : intactPubReloaded.getExperiments()){
-            Assert.assertEquals(1, exp.getXrefs().size());
+            Assert.assertEquals(0, exp.getXrefs().size());
 
-            ExperimentXref ref = exp.getXrefs().iterator().next();
-            Assert.assertEquals(imexPublication.getImexAccession(), ref.getPrimaryId());
-            Assert.assertEquals(imex.getIdentifier(), ref.getCvDatabase().getIdentifier());
-            Assert.assertEquals(imexPrimary.getIdentifier(), ref.getCvXrefQualifier().getIdentifier());
-
-            // updated interaction imex primary ref
+            // not updated interaction imex primary ref
             for (Interaction inter : exp.getInteractions()){
-                Assert.assertEquals(1, inter.getXrefs().size());
-
-                InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertTrue(ref2.getPrimaryId().startsWith(imexPublication.getImexAccession()+"-"));
-                Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
-                Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
+                Assert.assertEquals(0, inter.getXrefs().size());
             }
         }
 
