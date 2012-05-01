@@ -55,6 +55,9 @@ public class GlobalImexPublicationUpdater {
                     IcentralFault f = (IcentralFault) e.getCause();
 
                     processImexCentralException(publication, e, f);
+                }catch (Exception e) {
+                    ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
+                    imexCentralManager.fireOnImexError(errorEvt);
                 }
             }
 
@@ -160,6 +163,10 @@ public class GlobalImexPublicationUpdater {
                     IcentralFault f = (IcentralFault) e.getCause();
 
                     processImexCentralException(publication, e, f);
+                }
+                catch (Exception e) {
+                    ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
+                    imexCentralManager.fireOnImexError(errorEvt);
                 }
             }
 
