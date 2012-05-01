@@ -100,39 +100,39 @@ public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater im
             // there is a pubmed identifier in IMEx central and we have a pubmed identifier in IntAct
             if (pubmed != null && hasIntactPubmed){
                 // pubmed id not in sync with IMEx central, we have a conflict
-                if (!pubId.equalsIgnoreCase(pubmed)){
+                if (pubmed.length() > 0 && !pubId.equalsIgnoreCase(pubmed)){
                     throw new PublicationImexUpdaterException("pubmed id conflict with IMEx central : imex = " + imexPublication.getImexAccession() + ", intact pubmed = " + pubId + ", imex pubmed id = " + pubmed);
                 }
             }
             // there is a DOI identifier in IMEx central and we have a potential DOI identifier in IntAct
             else if (doi != null && !hasIntactPubmed && !pubId.startsWith(UNASSIGNED_PREFIX)){
                 // doi id not in sync with IMEx central, we have a conflict
-                if (!pubId.equalsIgnoreCase(doi)){
+                if (doi.length() > 0 && !pubId.equalsIgnoreCase(doi)){
                     throw new PublicationImexUpdaterException("DOI conflict with IMEx central : imex = " + imexPublication.getImexAccession() + ", intact doi = " + pubId + ", imex doi = " + pubmed);
                 }
             }
             // there is an internal identifier in IMEx central and we have a unassigned identifier in IntAct
             else if (internal != null && pubId.startsWith(UNASSIGNED_PREFIX)){
                 // internal id not in sync with IMEx central, we have a conflict
-                if (!pubId.equalsIgnoreCase(internal)){
+                if (internal.length() > 0 && !pubId.equalsIgnoreCase(internal)){
                     throw new PublicationImexUpdaterException("Internal identifier conflict with IMEx central : imex = " + imexPublication.getImexAccession() + ", intact internal identifier = " + pubId + ", imex internal identifier = " + pubmed);
                 }
             }
             // the IMEx record does not have any pubmed id but intact does have a valid Pubmed id, we need to update the record
-            else if (pubmed == null && hasIntactPubmed){
+            else if ((pubmed == null || (pubmed != null && pubmed.length() == 0)) && hasIntactPubmed){
                 imexPublication = imexCentral.updatePublicationIdentifier(imexPublication.getImexAccession(), pubId);
             }
             // the imex record does not have any DOI numbers but intact dooes have a publication id which is not pubmed or unassigned, we need to update the record
-            else if (doi == null && !hasIntactPubmed && !pubId.startsWith(UNASSIGNED_PREFIX)){
+            else if ((doi == null || (doi != null && doi.length() == 0)) && !hasIntactPubmed && !pubId.startsWith(UNASSIGNED_PREFIX)){
                 imexPublication = imexCentral.updatePublicationIdentifier(imexPublication.getImexAccession(), pubId);
             }
             // the imex record does not have any internal identifiers but intact does have a publication id which is unassigned, we need to update the record
-            else if (internal == null && pubId.startsWith(UNASSIGNED_PREFIX)){
+            else if ((internal == null || (internal != null && internal.length() == 0)) && pubId.startsWith(UNASSIGNED_PREFIX)){
                 imexPublication = imexCentral.updatePublicationIdentifier(imexPublication.getImexAccession(), pubId);
             }
 
             // pubmed in imex central and not in intact, this is an error
-            if (pubmed != null && !hasIntactPubmed){
+            if (pubmed != null && pubmed.length() > 0 && !hasIntactPubmed){
                 throw new PublicationImexUpdaterException("Publication has a valid pubmed id in IMEx central but not in intact : imex = " + imexPublication.getImexAccession() + ", intact publication identifier = " + pubId + ", imex pubmed id = " + pubmed);
             }
         }
