@@ -51,8 +51,12 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
     private int currentIndex = 1;
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String assignImexIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
+
+        if (intactPublication.getAc() != null){
+             intactPublication = IntactContext.getCurrentInstance().getDaoFactory().getPublicationDao().getByAc(intactPublication.getAc());
+        }
 
         String pubId = extractPubIdFromIntactPublication(intactPublication);
 

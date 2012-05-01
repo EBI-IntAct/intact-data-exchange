@@ -236,7 +236,7 @@ public class ImexCentralManager {
         // assign IMEx id to publication and update publication annotations
         String imex = intactImexAssigner.assignImexIdentifier(intactPublication, imexPublication);
 
-        if (imex != null){
+        if (imex != null && !imexPublication.getImexAccession().equals(ImexCentralManager.NO_IMEX_ID)){
             NewAssignedImexEvent evt = new NewAssignedImexEvent(this, intactPublication.getPublicationId(), imex, null, null);
             fireOnNewImexAssigned(evt);
 
