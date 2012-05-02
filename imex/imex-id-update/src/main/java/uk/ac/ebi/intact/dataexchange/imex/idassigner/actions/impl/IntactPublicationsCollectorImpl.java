@@ -468,7 +468,9 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
             initialise();
         }
 
-        return CollectionUtils.intersection(publicationsHavingImexCurationLevel, publicationsHavingUniprotDRExportNo);
+        Collection<String> publicationsWithoutImexButImexCurationLevel = CollectionUtils.subtract(publicationsHavingImexCurationLevel, publicationsHavingImexId);
+
+        return CollectionUtils.intersection(publicationsWithoutImexButImexCurationLevel, publicationsHavingUniprotDRExportNo);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
