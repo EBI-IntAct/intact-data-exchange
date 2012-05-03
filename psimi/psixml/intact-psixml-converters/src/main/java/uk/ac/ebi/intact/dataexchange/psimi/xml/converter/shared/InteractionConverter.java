@@ -194,7 +194,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             for (psidev.psi.mi.xml.model.Confidence psiConfidence :  psiObject.getConfidences()){
                 Confidence confidence = confConverter.psiToIntact( psiConfidence );
 
-                interaction.addConfidence( confidence);
+                interaction.getConfidences().add( confidence);
             }
             // convert author-confidence annotation in confidences
             Collection<Attribute> annotationConfidencesToCreate = IntactConverterUtils.extractAuthorConfidencesFrom(psiObject.getAttributes());
@@ -215,6 +215,11 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
                         numberOfAuthoConfToConvert ++;
                     }
                 }
+            }
+
+            // set the interaction of all confidences
+            for (Confidence conf : interaction.getConfidences()){
+                conf.setInteraction((InteractionImpl) interaction);
             }
 
             // parameter conversion
