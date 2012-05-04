@@ -35,7 +35,7 @@ public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater im
         List<Identifier> imexIdentifiers = imexPublication.getIdentifier();
 
         // no existing identifiers in IMEx central for this record. Or the publication is unassigned or DOI
-        if (imexIdentifiers == null || (imexIdentifiers != null && imexIdentifiers.isEmpty())){
+        if (imexIdentifiers == null){
 
             Publication existingPub = imexCentral.getPublicationById(intactPubId);
 
@@ -43,25 +43,20 @@ public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater im
             return areIdenticalPublications(imexPublication, existingPub);
         }
         // existing identifiers
-        else {
+        if (imexIdentifiers != null) {
             // we have a pmid in IMEx central so we should have a pmid in IntAct
-            if (!imexIdentifiers.isEmpty()){
-                for (Identifier id : imexIdentifiers){
-                    if (intactPubId.equalsIgnoreCase(id.getAc())){
-                        return true;
-                    }
+            for (Identifier id : imexIdentifiers){
+                if (intactPubId.equalsIgnoreCase(id.getAc())){
+                    return true;
                 }
-
-                return false;
-            }
-            // the publication is unassigned or doi number so we don't have any pmid in IMEx central
-            else {
-                Publication existingPub = imexCentral.getPublicationById(intactPubId);
-
-                // the publication found in IMEx central is the same as the one found in IntAct so the identifiers are in sync
-                return areIdenticalPublications(imexPublication, existingPub);
             }
         }
+
+        // check if identifier is not in IMEx central
+        Publication existingPub = imexCentral.getPublicationById(intactPubId);
+
+        // the publication found in IMEx central is the same as the one found in IntAct so the identifiers are in sync
+        return areIdenticalPublications(imexPublication, existingPub);
     }
 
     public void synchronizePublicationIdentifier(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws PublicationImexUpdaterException, ImexCentralException {
