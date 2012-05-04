@@ -203,7 +203,6 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
             List<Experiment> experiments = experimentDao.getByAc(expAcs);
 
             for (Experiment exp : experiments){
-                log.info("Processing experiment " + exp.getAc());
 
                 if (exp != null){
                     experimentXrefs.clear();
@@ -254,6 +253,8 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                     }
 
                     if (!hasImexId && !hasConflictingImexId){
+                        log.info("Processing experiment " + exp.getAc());
+
                         updateImexIdentifierForExperiment(exp, imexId);
                     }
                     else if (hasConflictingImexId){
@@ -345,7 +346,6 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
             Collection<InteractionImpl> interactions = interactionDao.getByAc(interactionAcs);
 
             for (InteractionImpl interaction : interactions){
-                log.info("Processing interaction " + interaction.getAc());
 
                 if (interaction != null){
                     interactionXrefs.clear();
@@ -439,6 +439,8 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
                         // need to create a new IMEx id
                         if (interactionImexId == null && !hasConflictingImexId){
+                            log.info("Processing interaction " + interaction.getAc());
+
                             boolean updatedInteraction = updateImexIdentifierForInteraction(interaction, imexId + "-" + currentIndex);
 
                             if (updatedInteraction){
