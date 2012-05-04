@@ -45,6 +45,7 @@ public class GlobalImexPublicationUpdater {
         Collection<String> publicationsNeedingNewImexId = intactPublicationCollector.getPublicationsNeedingAnImexId();
 
             for (String publication : publicationsNeedingNewImexId){
+                log.info("Processing update of publication " + publication);
                 try {
                     imexCentralManager.assignImexAndUpdatePublication(publication);
 
@@ -154,6 +155,8 @@ public class GlobalImexPublicationUpdater {
         Collection<String> publicationsToUpdate = intactPublicationCollector.getPublicationsHavingIMExIdToUpdate();
 
             for (String publication : publicationsToUpdate){
+                log.info("Processing new IMEx publication " + publication);
+
                 try {
                     imexCentralManager.updateIntactPublicationHavingIMEx(publication);
                 } catch (PublicationImexUpdaterException e) {

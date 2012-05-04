@@ -104,6 +104,7 @@ public class ImexCentralManager {
 
                     // if the intact publication identifier is not in sync with IMEx central, try to synchronize it first but does not update the intact publication
                     if (!publicationIdentifierSynchronizer.isIntactPublicationIdentifierInSyncWithImexCentral(pubId, imexPublication)){
+                        log.info("Publication " + pubId + " is not in sync with IMEx central, identifier will be updated.");
                         publicationIdentifierSynchronizer.synchronizePublicationIdentifier(intactPublication, imexPublication);
                     }
 

@@ -3,6 +3,8 @@ package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl;
 import edu.ucla.mbi.imex.central.ws.v20.Identifier;
 import edu.ucla.mbi.imex.central.ws.v20.Publication;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexCentralManager;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.ImexCentralUpdater;
@@ -21,6 +23,7 @@ import java.util.regex.Pattern;
  */
 
 public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater implements PublicationIdentifierSynchronizer {
+    private static final Log log = LogFactory.getLog(PublicationIdentifierSynchronizerImpl.class);
 
     private static String IMEX = "imex";
     private static String PUBMED = "pmid";
@@ -71,7 +74,9 @@ public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater im
             // the identifier in Intact is not registered in IMEx central (check done by isIntactPublicationIdentifierInSyncWithImexCentral) and the record has a valid IMEx id so we can update the record
             if (imexPublication.getImexAccession() != null && !imexPublication.getImexAccession().equals(ImexCentralManager.NO_IMEX_ID)){
                 imexPublication = imexCentral.updatePublicationIdentifier(imexPublication.getImexAccession(), pubId);
+                log.info("Updated identifier " + pubId + " for the IMEx accession " + imexPublication.getImexAccession());
             }
+            log.error("Cannot updated identifier " + pubId + " because no valid IMEx accession");
         }
         // existing identifiers
         else {
@@ -121,14 +126,17 @@ public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater im
             // the IMEx record does not have any pubmed id but intact does have a valid Pubmed id, we need to update the record
             else if ((pubmed == null || (pubmed != null && pubmed.length() == 0)) && hasIntactPubmed){
                 imexPublication = imexCentral.updatePublicationIdentifier(imexPublication.getImexAccession(), pubId);
+                log.info("Updated identifier " + pubId + " for the IMEx accession " + imexPublication.getImexAccession());
             }
             // the imex record does not have any DOI numbers but intact dooes have a publication id which is not pubmed or unassigned, we need to update the record
             else if ((doi == null || (doi != null && doi.length() == 0)) && !hasIntactPubmed && !pubId.startsWith(UNASSIGNED_PREFIX)){
                 imexPublication = imexCentral.updatePublicationIdentifier(imexPublication.getImexAccession(), pubId);
+                log.info("Updated identifier " + pubId + " for the IMEx accession " + imexPublication.getImexAccession());
             }
             // the imex record does not have any internal identifiers but intact does have a publication id which is unassigned, we need to update the record
             else if ((internal == null || (internal != null && internal.length() == 0)) && pubId.startsWith(UNASSIGNED_PREFIX)){
                 imexPublication = imexCentral.updatePublicationIdentifier(imexPublication.getImexAccession(), pubId);
+                log.info("Updated identifier " + pubId + " for the IMEx accession " + imexPublication.getImexAccession());
             }
 
             // pubmed in imex central and not in intact, this is an error
