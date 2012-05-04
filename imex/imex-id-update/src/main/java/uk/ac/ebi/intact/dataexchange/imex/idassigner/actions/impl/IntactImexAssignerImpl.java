@@ -271,7 +271,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public List<String> collectExistingInteractionImexIdsForPublication(uk.ac.ebi.intact.model.Publication intactPublication){
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
@@ -336,7 +336,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         return (numberOfProteinsPeptides > 1 || (numberOfProteinsPeptides == interaction.getComponents().size()));
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void assignImexIdentifierToInteractions(Collection<String> interactionAcs, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
         if (interactionAcs != null && !interactionAcs.isEmpty() && imexId != null){
             DaoFactory factory = IntactContext.getCurrentInstance().getDaoFactory();
