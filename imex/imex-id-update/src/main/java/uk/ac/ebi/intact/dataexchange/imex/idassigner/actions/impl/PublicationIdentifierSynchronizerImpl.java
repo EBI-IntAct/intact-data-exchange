@@ -34,10 +34,13 @@ public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater im
 
         List<Identifier> imexIdentifiers = imexPublication.getIdentifier();
 
-        // no existing identifiers in IMEx central for this record
+        // no existing identifiers in IMEx central for this record. Or the publication is unassigned or DOI
         if (imexIdentifiers == null || (imexIdentifiers != null && imexIdentifiers.isEmpty())){
 
-            return false;
+            Publication existingPub = imexCentral.getPublicationById(intactPubId);
+
+            // the publication found in IMEx central is the same as the one found in IntAct so the identifiers are in sync
+            return areIdenticalPublications(imexPublication, existingPub);
         }
         // existing identifiers
         else {
