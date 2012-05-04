@@ -271,7 +271,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<String> collectExistingInteractionImexIdsForPublication(uk.ac.ebi.intact.model.Publication intactPublication){
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
@@ -336,7 +336,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         return (numberOfProteinsPeptides > 1 || (numberOfProteinsPeptides == interaction.getComponents().size()));
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void assignImexIdentifierToInteractions(Collection<String> interactionAcs, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
         if (interactionAcs != null && !interactionAcs.isEmpty() && imexId != null){
             DaoFactory factory = IntactContext.getCurrentInstance().getDaoFactory();
@@ -531,7 +531,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<String> collectExperimentsToUpdateFrom(uk.ac.ebi.intact.model.Publication pub, String imex){
         if (pub != null && pub.getAc() != null && imex != null){
             final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
@@ -556,7 +556,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<String> collectInteractionsToUpdateFrom(uk.ac.ebi.intact.model.Publication pub, String imex){
         if (pub != null && pub.getAc() != null && imex != null){
             final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
