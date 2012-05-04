@@ -17,6 +17,7 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorType;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.NewAssignedImexEvent;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.InteractionUtils;
 
 import javax.persistence.Query;
 import java.util.*;
@@ -363,8 +364,8 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                         IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate(imexSecondary);
                     }
 
-                    // if it is a true PPI interaction, we can assign an IMEx id
-                    if (involvesOnlyProteins(interaction)){
+                    // if it is a true PPI positive interaction, we can assign an IMEx id
+                    if (involvesOnlyProteins(interaction) && !InteractionUtils.isNegative(interaction)){
                         String interactionImexId = null;
                         boolean hasConflictingImexId = false;
 

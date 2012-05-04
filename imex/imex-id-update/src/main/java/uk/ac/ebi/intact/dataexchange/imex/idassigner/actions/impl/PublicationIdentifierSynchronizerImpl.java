@@ -101,23 +101,23 @@ public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater im
             }
 
             // there is a pubmed identifier in IMEx central and we have a pubmed identifier in IntAct
-            if (pubmed != null && hasIntactPubmed){
+            if (pubmed != null && pubmed.length() > 0 && hasIntactPubmed){
                 // pubmed id not in sync with IMEx central, we have a conflict
-                if (pubmed.length() > 0 && !pubId.equalsIgnoreCase(pubmed)){
+                if (!pubId.equalsIgnoreCase(pubmed)){
                     throw new PublicationImexUpdaterException("pubmed id conflict with IMEx central : imex = " + imexPublication.getImexAccession() + ", intact pubmed = " + pubId + ", imex pubmed id = " + pubmed);
                 }
             }
             // there is a DOI identifier in IMEx central and we have a potential DOI identifier in IntAct
-            else if (doi != null && !hasIntactPubmed && !pubId.startsWith(UNASSIGNED_PREFIX)){
+            else if (doi != null && doi.length() > 0 && !hasIntactPubmed && !pubId.startsWith(UNASSIGNED_PREFIX)){
                 // doi id not in sync with IMEx central, we have a conflict
-                if (doi.length() > 0 && !pubId.equalsIgnoreCase(doi)){
+                if (!pubId.equalsIgnoreCase(doi)){
                     throw new PublicationImexUpdaterException("DOI conflict with IMEx central : imex = " + imexPublication.getImexAccession() + ", intact doi = " + pubId + ", imex doi = " + pubmed);
                 }
             }
             // there is an internal identifier in IMEx central and we have a unassigned identifier in IntAct
-            else if (internal != null && pubId.startsWith(UNASSIGNED_PREFIX)){
+            else if (internal != null && internal.length() > 0 && pubId.startsWith(UNASSIGNED_PREFIX)){
                 // internal id not in sync with IMEx central, we have a conflict
-                if (internal.length() > 0 && !pubId.equalsIgnoreCase(internal)){
+                if (!pubId.equalsIgnoreCase(internal)){
                     throw new PublicationImexUpdaterException("Internal identifier conflict with IMEx central : imex = " + imexPublication.getImexAccession() + ", intact internal identifier = " + pubId + ", imex internal identifier = " + pubmed);
                 }
             }
