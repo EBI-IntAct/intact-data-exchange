@@ -193,7 +193,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         return false;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void assignImexIdentifierToExperiments(Collection<String> expAcs, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
         if (expAcs != null && !expAcs.isEmpty() && imexId != null){
             DaoFactory factory = IntactContext.getCurrentInstance().getDaoFactory();
@@ -336,7 +336,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
         return (numberOfProteinsPeptides > 1);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void assignImexIdentifierToInteractions(Collection<String> interactionAcs, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
         if (interactionAcs != null && !interactionAcs.isEmpty() && imexId != null){
             DaoFactory factory = IntactContext.getCurrentInstance().getDaoFactory();
