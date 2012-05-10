@@ -123,10 +123,8 @@ public class ImexCentralManager {
                         fireOnIntactUpdate(evt);
                     }
 
-                    // can synchronize admin group, uswer and status only if valid pubmed id
-                    if (Pattern.matches(ImexCentralManager.PUBMED_REGEXP.toString(), pubId)){
-                        synchronizePublicationWithImexCentral(intactPublication, imexPublication);
-                    }
+                    // can synchronize admin group, uswer and status
+                    synchronizePublicationWithImexCentral(intactPublication, imexPublication);
                 }
                 // the IMEx id is not recognized in IMEx central, publication needs to be updated manually
                 else {
@@ -196,8 +194,8 @@ public class ImexCentralManager {
                     fireOnImexError(evt);
                 }
             }
-            // the publication has a valid pubmed identifier and can be registered and assign IMEx id in IMEx central
-            else if (Pattern.matches(ImexCentralManager.PUBMED_REGEXP.toString(), pubId)) {
+            // the publication can be registered and assign IMEx id in IMEx central
+            else {
                 imexPublication = imexCentralRegister.registerPublicationInImexCentral(intactPublication);
 
                 if (imexPublication != null){
@@ -211,10 +209,6 @@ public class ImexCentralManager {
                 }
 
                 return imexPublication;
-            }
-            // unassigned publication, cannot use the webservice to automatically assign IMEx id for now, ask the curator to manually register and assign IMEx id to this publication
-            else {
-                log.warn("It is not possible to assign an IMEx id to a unassigned publication. The publication needs to be registered manually by a curator in IMEx central.");
             }
         }
         // the publication does not exist in Intact

@@ -15,7 +15,7 @@ import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 public interface PublicationAdminUserSynchronizer {
 
     /**
-     * Synchronize the admin user of a publication and update IMEx central if necessary. It can only update publication having valid pubmed identifiers.
+     * Synchronize the admin user of a publication and update IMEx central if necessary. It can only update publication having having a valid pubmed identifier, doi number, jint identifier or IMEx identifier.
      * If the user is not registered in IMEx central, a user 'phantom' will be added to the IMEx record.
      * @param intactPublication
      * @param imexPublication

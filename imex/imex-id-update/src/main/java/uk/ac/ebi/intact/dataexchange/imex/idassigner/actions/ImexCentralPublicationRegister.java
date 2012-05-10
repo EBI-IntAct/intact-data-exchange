@@ -15,8 +15,8 @@ import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 public interface ImexCentralPublicationRegister {
 
     /**
-     * Retrieve an existing record in IMEx central matching the publication identifier (pubmed, doi or imex).
-     * Cannot retrieves unassigned pubmed ids. Returns null if we cannot find a record in IMEx central for this publication identifier.
+     * Retrieve an existing record in IMEx central matching the publication identifier (pubmed, doi, jint or imex).
+     * Returns null if we cannot find a record in IMEx central for this publication identifier.
      * @param publicationId
      * @return
      * @throws PublicationImexUpdaterException if it is not possible to retrieve any publications with this identifier
@@ -24,8 +24,8 @@ public interface ImexCentralPublicationRegister {
     public Publication getExistingPublicationInImexCentral(String publicationId) throws ImexCentralException;
 
     /**
-     * Register a publication in IMEx central which is not existing in IMEx central. Can only register publications having valid pubmed id.
-     * If it is unassigned or has a DOI number, the publication cannot be created
+     * Register a publication in IMEx central which is not existing in IMEx central. Can only register publications having valid pubmed id, jint identifier such as unassigned,
+     * imex ids or doi numbers.
      * @param intactPublication
      * @return  the record in IMEx central which have been created, Null if it could not create a record in IMEx central
      * @throws PublicationImexUpdaterException if it is not possible to create a new record for this publication (may already exists, publication identifier not recognized, etc.)

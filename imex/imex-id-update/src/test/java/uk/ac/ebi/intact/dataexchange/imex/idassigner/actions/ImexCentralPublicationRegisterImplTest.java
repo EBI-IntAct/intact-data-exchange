@@ -99,6 +99,6 @@ public class ImexCentralPublicationRegisterImplTest extends IntactBasicTestCase{
         uk.ac.ebi.intact.model.Publication intactPublication = new uk.ac.ebi.intact.model.Publication(getIntactContext().getInstitution(), "unassigned604");
 
         Publication pub = imexCentralRegisterTest.registerPublicationInImexCentral(intactPublication);
-        Assert.assertNull(pub);
+        Assert.assertNotNull(pub);
     }
 }

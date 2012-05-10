@@ -60,6 +60,14 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
         pubmed3.setAc("unassigned504");
         existingRecordWithoutImexNoPubmed.getIdentifier().add(pubmed3);
         imexManagerTest.getImexCentralRegister().getImexCentralClient().createPublication(existingRecordWithoutImexNoPubmed);
+
+        Publication existingRecordWithoutImexNoPubmed2 = new Publication();
+        Identifier pubmed4 = new Identifier();
+        pubmed4.setNs("jint");
+        pubmed4.setAc("unassigned604");
+        existingRecordWithoutImexNoPubmed2.getIdentifier().add(pubmed4);
+        existingRecordWithoutImexNoPubmed2.setImexAccession("IM-4");
+        imexManagerTest.getImexCentralRegister().getImexCentralClient().createPublication(existingRecordWithoutImexNoPubmed2);
     }
 
     @Test
@@ -338,7 +346,7 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
         uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
 
-        PublicationXref pubXref2 = new PublicationXref( intactPub.getOwner(), imex, "IM-4", imexPrimary );
+        PublicationXref pubXref2 = new PublicationXref( intactPub.getOwner(), imex, "IM-5", imexPrimary );
         intactPub.addXref(pubXref2);
 
         Experiment exp1 = getMockBuilder().createExperimentRandom(1);
@@ -398,7 +406,7 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
 
         uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("unassigned604");
 
-        PublicationXref pubXref = new PublicationXref( intactPub.getOwner(), imex, "IM-3", imexPrimary );
+        PublicationXref pubXref = new PublicationXref( intactPub.getOwner(), imex, "IM-4", imexPrimary );
         intactPub.addXref(pubXref);
 
         Experiment exp1 = getMockBuilder().createExperimentRandom(1);
@@ -431,10 +439,9 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
         Assert.assertEquals("jint", id.getNs());
         Assert.assertEquals("unassigned604", id.getAc());
 
-        // no valid pubmed so cannot have synchronized admin group, admin user and status
-        Assert.assertNull(imexPublication.getAdminGroupList());
-        Assert.assertNull(imexPublication.getAdminUserList());
-        Assert.assertNull(imexPublication.getStatus());
+        Assert.assertNotNull(imexPublication.getAdminGroupList());
+        Assert.assertNotNull(imexPublication.getAdminUserList());
+        Assert.assertNotNull(imexPublication.getStatus());
 
         uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
 
@@ -460,7 +467,7 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
             Assert.assertEquals(1, exp.getXrefs().size());
 
             ExperimentXref ref = exp.getXrefs().iterator().next();
-            Assert.assertEquals("IM-3", ref.getPrimaryId());
+            Assert.assertEquals("IM-4", ref.getPrimaryId());
             Assert.assertEquals(imex.getIdentifier(), ref.getCvDatabase().getIdentifier());
             Assert.assertEquals(imexPrimary.getIdentifier(), ref.getCvXrefQualifier().getIdentifier());
 
@@ -469,7 +476,7 @@ public class ImexCentralManagerTest extends IntactBasicTestCase{
                 Assert.assertEquals(1, inter.getXrefs().size());
 
                 InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertTrue(ref2.getPrimaryId().startsWith("IM-3-"));
+                Assert.assertTrue(ref2.getPrimaryId().startsWith("IM-4-"));
                 Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
                 Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
             }

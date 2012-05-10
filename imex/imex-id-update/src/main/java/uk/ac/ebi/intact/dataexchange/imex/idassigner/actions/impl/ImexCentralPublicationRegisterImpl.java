@@ -49,7 +49,6 @@ public class ImexCentralPublicationRegisterImpl extends ImexCentralUpdater imple
     }
 
     /**
-     * Register a publication in IMEx central. Only publications having a valid pubmed ID (no unassigned pubmed id) can be registered in IMEx central using the webservice.
      * @param intactPublication
      * @return the record created in IMEx central, null if it could not be created in IMEx central
      * @throws ImexCentralException

@@ -15,7 +15,7 @@ import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 public interface PublicationAdminGroupSynchronizer {
 
     /**
-     * Update IMEx central and synchronize the publication ADMIN group. It can only be applied on publications having a valid pubmed identifier.
+     * Update IMEx central and synchronize the publication ADMIN group. It can only be applied on publications having a valid pubmed identifier, doi number, jint identifier or IMEx identifier.
      * It will add INTACT admin group to the record in IMEx central if not already there and it will add the institution if different
      * from INTACT. However, some institutions in IntAct are not in IMEx central and in this case it will not add a new ADMIN group and only keep INTACT
      * admin group

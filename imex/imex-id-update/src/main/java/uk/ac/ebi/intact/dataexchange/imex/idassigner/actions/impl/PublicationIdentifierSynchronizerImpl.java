@@ -34,7 +34,7 @@ public class PublicationIdentifierSynchronizerImpl extends ImexCentralUpdater im
 
         List<Identifier> imexIdentifiers = imexPublication.getIdentifier();
 
-        // no existing identifiers in IMEx central for this record. Or the publication is unassigned or DOI
+        // no existing identifiers in IMEx central for this record.
         if (imexIdentifiers == null){
 
             Publication existingPub = imexCentral.getPublicationById(intactPubId);
