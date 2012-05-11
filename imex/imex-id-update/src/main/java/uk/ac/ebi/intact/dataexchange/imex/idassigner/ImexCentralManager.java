@@ -61,14 +61,14 @@ public class ImexCentralManager {
     private Collection<PublicationXref> pubXrefs;
     private Collection<String> interactionAcsChunk;
     private Collection<String> experimentAcsChunk;
-    
+
     private int maxNumberIntactObjectPerTransaction = 10;
 
     public ImexCentralManager(){
         pubXrefs = new ArrayList<PublicationXref>();
         experimentAcsChunk = new ArrayList<String>();
         interactionAcsChunk = new ArrayList<String>();
-        
+
     }
 
     /**
@@ -125,6 +125,7 @@ public class ImexCentralManager {
 
                     // can synchronize admin group, uswer and status
                     synchronizePublicationWithImexCentral(intactPublication, imexPublication);
+
                 }
                 // the IMEx id is not recognized in IMEx central, publication needs to be updated manually
                 else {
@@ -194,8 +195,8 @@ public class ImexCentralManager {
                     fireOnImexError(evt);
                 }
             }
-            // the publication can be registered and assign IMEx id in IMEx central
-            else {
+            // the publication has a valid pubmed identifier and can be registered and assign IMEx id in IMEx central
+            else if (Pattern.matches(ImexCentralManager.PUBMED_REGEXP.toString(), pubId)) {
                 imexPublication = imexCentralRegister.registerPublicationInImexCentral(intactPublication);
 
                 if (imexPublication != null){
@@ -209,6 +210,10 @@ public class ImexCentralManager {
                 }
 
                 return imexPublication;
+            }
+            // unassigned publication, cannot use the webservice to automatically assign IMEx id for now, ask the curator to manually register and assign IMEx id to this publication
+            else {
+                log.warn("It is not possible to register an unassigned publication. The publication needs to be registered manually by a curator in IMEx central.");
             }
         }
         // the publication does not exist in Intact
@@ -333,12 +338,12 @@ public class ImexCentralManager {
 
         // imex id is not null and is not default value for missing imex id
         if (imexId != null && !imexId.equals(ImexCentralManager.NO_IMEX_ID)){
-            
+
             List<String> updatedExp = intactImexAssigner.collectExperimentsToUpdateFrom(intactPublication, imexId);
 
             int processedExperiments = 0;
             int size = updatedExp.size();
-            
+
             if (size > 0){
                 while (processedExperiments < size){
                     int chunk = 0;

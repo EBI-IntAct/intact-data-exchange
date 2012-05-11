@@ -24,7 +24,7 @@ public interface ImexCentralPublicationRegister {
     public Publication getExistingPublicationInImexCentral(String publicationId) throws ImexCentralException;
 
     /**
-     * Register a publication in IMEx central which is not existing in IMEx central. Can only register publications having valid pubmed id, jint identifier such as unassigned,
+     * Register a publication in IMEx central which is not existing in IMEx central. Can only register publications having valid pubmed id
      * imex ids or doi numbers.
      * @param intactPublication
      * @return  the record in IMEx central which have been created, Null if it could not create a record in IMEx central
