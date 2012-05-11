@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.events;
 
 import java.util.EventObject;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Event for any update in Intact
@@ -15,10 +15,10 @@ public class IntactUpdateEvent extends EventObject{
 
     private String publicationId;
     private String imexId;
-    private List<String> updatedExp;
-    private List<String> updatedInteraction;
+    private Set<String> updatedExp;
+    private Set<String> updatedInteraction;
     
-    public IntactUpdateEvent(Object o, String pubId, String imexId, List<String> updatedExp, List<String> updatedInteraction) {
+    public IntactUpdateEvent(Object o, String pubId, String imexId, Set<String> updatedExp, Set<String> updatedInteraction) {
         super(o);
         this.publicationId = pubId;
         this.imexId = imexId;
@@ -34,11 +34,11 @@ public class IntactUpdateEvent extends EventObject{
         return imexId;
     }
 
-    public List<String> getUpdatedExp() {
+    public Set<String> getUpdatedExp() {
         return updatedExp;
     }
 
-    public List<String> getUpdatedInteraction() {
+    public Set<String> getUpdatedInteraction() {
         return updatedInteraction;
     }
 }

@@ -5,10 +5,9 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.IntactUpdateEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.NewAssignedImexEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.ImexUpdateReportHandler;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.ReportWriter;
-import uk.ac.ebi.intact.model.AnnotatedObject;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Write to disk on event fired.
@@ -89,7 +88,7 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
         }
     }
     
-    private String writeObjectAcsFor(List<String> intactobjects){
+    private String writeObjectAcsFor(Set<String> intactobjects){
         StringBuffer buffer = new StringBuffer();
         
         for (String obj : intactobjects){

@@ -195,7 +195,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void assignImexIdentifierToExperiments(Collection<String> expAcs, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
+    public void assignImexIdentifierToExperiments(Collection<String> expAcs, String imexId, ImexCentralManager imexCentralManager,Set<String> updatedExpAcs) throws PublicationImexUpdaterException {
         if (expAcs != null && !expAcs.isEmpty() && imexId != null){
             DaoFactory factory = IntactContext.getCurrentInstance().getDaoFactory();
             XrefDao<ExperimentXref> xrefDao = factory.getXrefDao(ExperimentXref.class);
@@ -234,6 +234,8 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                         exp.removeXref(ref);
                                         xrefDao.delete(ref);
                                         experimentDao.update(exp);
+
+                                        updatedExpAcs.add(exp.getAc());
                                     }
                                 }
                                 // null primary identifier but imex id not found, just update the imex id of the ref
@@ -242,12 +244,16 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
                                     ref.setPrimaryId(imexId);
                                     xrefDao.update(ref);
+
+                                    updatedExpAcs.add(exp.getAc());
                                 }
                                 // null primary identifier but imex id was found, just delete the ref 
                                 else {
                                     exp.removeXref(ref);
                                     xrefDao.delete(ref);
                                     experimentDao.update(exp);
+
+                                    updatedExpAcs.add(exp.getAc());
                                 }
                             }
                         }
@@ -257,6 +263,8 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                         log.info("Processing experiment " + exp.getAc());
 
                         updateImexIdentifierForExperiment(exp, imexId);
+
+                        updatedExpAcs.add(exp.getAc());
                     }
                     else if (hasConflictingImexId){
                         if (imexCentralManager != null){
@@ -338,7 +346,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void assignImexIdentifierToInteractions(Collection<String> interactionAcs, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException {
+    public void assignImexIdentifierToInteractions(Collection<String> interactionAcs, String imexId, ImexCentralManager imexCentralManager, Set<String> updatedInteractionAcs) throws PublicationImexUpdaterException {
         if (interactionAcs != null && !interactionAcs.isEmpty() && imexId != null){
             DaoFactory factory = IntactContext.getCurrentInstance().getDaoFactory();
             XrefDao<InteractorXref> xrefDao = factory.getXrefDao(InteractorXref.class);
@@ -384,17 +392,23 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                                 interaction.removeXref(ref);
                                                 xrefDao.delete(ref);
                                                 interactionDao.update(interaction);
+
+                                                updatedInteractionAcs.add(interaction.getAc());
                                             }
                                             // different imex id which have already been processed in other interactions, just delete it
                                             else if (processedImexIds.contains(ref.getPrimaryId())){
                                                 interaction.removeXref(ref);
                                                 xrefDao.delete(ref);
                                                 interactionDao.update(interaction);
+
+                                                updatedInteractionAcs.add(interaction.getAc());
                                             }
                                             // different IMEx id but the IMEx id is not a valid interaction imex id. Keep it as imex secondary
                                             else if (!existingImexIds.contains(ref.getPrimaryId())){
                                                 ref.setCvXrefQualifier(imexSecondary);
                                                 xrefDao.update(ref);
+
+                                                updatedInteractionAcs.add(interaction.getAc());
                                             }
                                             // different IMEx id which is valid and not already processed
                                             else {
@@ -408,6 +422,8 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                                 interaction.removeXref(ref);
                                                 xrefDao.delete(ref);
                                                 interactionDao.update(interaction);
+
+                                                updatedInteractionAcs.add(interaction.getAc());
                                             }
                                             // IMEx id not yet processed
                                             else {
@@ -424,6 +440,8 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                                 else {
                                                     ref.setCvXrefQualifier(imexSecondary);
                                                     xrefDao.update(ref);
+
+                                                    updatedInteractionAcs.add(interaction.getAc());
                                                 }
                                             }
                                         }
@@ -433,6 +451,8 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                                         interaction.removeXref(ref);
                                         xrefDao.delete(ref);
                                         interactionDao.update(interaction);
+
+                                        updatedInteractionAcs.add(interaction.getAc());
                                     }
                                 }
                             }
@@ -445,6 +465,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                             boolean updatedInteraction = updateImexIdentifierForInteraction(interaction, imexId + "-" + currentIndex);
 
                             if (updatedInteraction){
+                                updatedInteractionAcs.add(interaction.getAc());
 
                                 if (imexCentralManager != null){
                                     NewAssignedImexEvent evt = new NewAssignedImexEvent(this, null, imexId, interaction.getAc(), imexId + "-" + currentIndex);

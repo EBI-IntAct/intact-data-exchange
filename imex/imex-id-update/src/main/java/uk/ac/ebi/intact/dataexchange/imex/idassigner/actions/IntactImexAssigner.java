@@ -9,6 +9,7 @@ import uk.ac.ebi.intact.model.Interaction;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface for assigning IMEx id to a publication and updating intact publications, experiments and interactions
@@ -52,9 +53,10 @@ public interface IntactImexAssigner {
      * @param expAcs : list of experiments acs
      * @param imexId
      * @param imexCentralManager ; to fire events if provided.
+     * @param updatedExpAcs : the experiment acs which have been updated
      * @throws PublicationImexUpdaterException if IMEx id is null or imex conflict and no imexCentralManager was provided to fire an error event
      */
-    public void assignImexIdentifierToExperiments(Collection<String> expAcs, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException;
+    public void assignImexIdentifierToExperiments(Collection<String> expAcs, String imexId, ImexCentralManager imexCentralManager, Set<String> updatedExpAcs) throws PublicationImexUpdaterException;
 
     /**
      * Collect all the interaction IMEx ids associated with this publication
@@ -69,10 +71,11 @@ public interface IntactImexAssigner {
      * @param interactionAcs : list of interaction acs to update
      * @param imexId
      * @param imexCentralManager ; to fire events if provided.
+     * @param updatedIntAcs : the updated interaction acs
      * @return a list of experiments which have been updated
      * @throws PublicationImexUpdaterException when IMEx id is null or imex conflict and no imexCentralManager was provided to fire an error event
      */
-    public void assignImexIdentifierToInteractions(Collection<String> interactionAcs, String imexId, ImexCentralManager imexCentralManager) throws PublicationImexUpdaterException;
+    public void assignImexIdentifierToInteractions(Collection<String> interactionAcs, String imexId, ImexCentralManager imexCentralManager, Set<String> updatedIntAcs) throws PublicationImexUpdaterException;
 
     /**
      * Add imex curation and full coverage annotations if not already present

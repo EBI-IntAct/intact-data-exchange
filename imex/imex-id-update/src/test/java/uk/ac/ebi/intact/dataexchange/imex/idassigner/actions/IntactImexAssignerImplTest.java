@@ -18,9 +18,7 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactImexAssi
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Unit tester for IntactImexAssignerImpl
@@ -304,7 +302,8 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         List<String> expAcs = assignerTest.collectExperimentsToUpdateFrom(intactPub, "IM-1");
         Assert.assertEquals(3, expAcs.size());
 
-        assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null);
+        Set<String> expAcsUpdated = new HashSet<String>(expAcs.size());
+        assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null, expAcsUpdated);
 
         TransactionStatus status2 = getDataContext().beginTransaction();
 
@@ -363,7 +362,8 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         Assert.assertEquals(3, expAcs.size());
 
         try {
-            assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null);
+            Set<String> expAcsUpdated = new HashSet<String>(expAcs.size());
+            assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null, expAcsUpdated);
             Assert.assertTrue(false);
         } catch (PublicationImexUpdaterException e) {
             Assert.assertTrue(true);
@@ -411,7 +411,8 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         // only two experiments updated
         Assert.assertEquals(2, expAcs.size());
 
-        assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null);
+        Set<String> expAcsUpdated = new HashSet<String>(expAcs.size());
+        assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null, expAcsUpdated);
 
         TransactionStatus status2 = getDataContext().beginTransaction();
 
@@ -483,7 +484,8 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         List<String> expAcs = assignerTest.collectExperimentsToUpdateFrom(intactPub, "IM-1");
         Assert.assertEquals(3, expAcs.size());
 
-        assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null);
+        Set<String> expAcsUpdated = new HashSet<String>(expAcs.size());
+        assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null, expAcsUpdated);
 
         TransactionStatus status2 = getDataContext().beginTransaction();
 
@@ -585,7 +587,8 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         List<String> interactionAcs = assignerTest.collectInteractionsToUpdateFrom(intactPub, "IM-1");
         Assert.assertEquals(3, interactionAcs.size());
 
-        assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null);
+        Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
+        assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
         
         TransactionStatus status2 = getDataContext().beginTransaction();
 
@@ -660,7 +663,8 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         Assert.assertEquals(2, interactionAcs.size());
 
         try {
-            assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null);
+            Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
+            assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
             Assert.assertFalse(true);
         } catch (PublicationImexUpdaterException e) {
             Assert.assertTrue(true);
@@ -711,7 +715,8 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         List<String> interactionAcs = assignerTest.collectInteractionsToUpdateFrom(intactPub, "IM-1");
         Assert.assertEquals(2, interactionAcs.size());
 
-        assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null);
+        Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
+        assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
 
         TransactionStatus status2 = getDataContext().beginTransaction();
 
@@ -789,7 +794,8 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         List<String> interactionAcs = assignerTest.collectInteractionsToUpdateFrom(intactPub, "IM-1");
         Assert.assertEquals(3, interactionAcs.size());
 
-        assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null);
+        Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
+        assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
 
         TransactionStatus status2 = getDataContext().beginTransaction();
 
@@ -865,7 +871,8 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         List<String> interactionAcs = assignerTest.collectInteractionsToUpdateFrom(intactPub, "IM-1");
         Assert.assertEquals(3, interactionAcs.size());
 
-        assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null);
+        Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
+        assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
 
         TransactionStatus status2 = getDataContext().beginTransaction();
 
