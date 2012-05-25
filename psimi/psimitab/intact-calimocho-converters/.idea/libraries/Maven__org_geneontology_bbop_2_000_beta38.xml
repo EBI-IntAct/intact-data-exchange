@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.geneontology:bbop:2.000-beta38">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/geneontology/bbop/2.000-beta38/bbop-2.000-beta38.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/geneontology/bbop/2.000-beta38/bbop-2.000-beta38-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/geneontology/bbop/2.000-beta38/bbop-2.000-beta38-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
