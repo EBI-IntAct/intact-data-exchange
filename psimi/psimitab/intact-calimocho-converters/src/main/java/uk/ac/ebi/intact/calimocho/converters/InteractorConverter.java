@@ -293,8 +293,6 @@ public class InteractorConverter {
                     row.addField(InteractionKeys.KEY_STOICHIOMETRY_B, stoichiometry);
                 }
             }
-
-            // convert
         }        
     }
 }
