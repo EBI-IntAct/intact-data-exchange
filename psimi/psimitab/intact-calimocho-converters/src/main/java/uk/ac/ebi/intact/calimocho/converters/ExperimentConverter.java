@@ -54,6 +54,16 @@ public class ExperimentConverter {
                     row.addFields(InteractionKeys.KEY_TAXID_A, bioSourceField);
                 }
             }
+
+            // process participant detection method
+            if (exp.getCvIdentification() != null){
+                Field detMethod = cvObjectConverter.toCalimocho(exp.getCvIdentification());
+
+                if (detMethod != null){
+                    row.addField(InteractionKeys.KEY_PART_IDENT_METHOD_A, detMethod);
+                    row.addField(InteractionKeys.KEY_PART_IDENT_METHOD_B, detMethod);
+                }
+            }
         }
 
     }
