@@ -23,12 +23,12 @@ public class CrossReferenceConverter {
 
             String db = DATABASE_UNKNOWN;
             if (ref.getCvDatabase().getShortLabel() != null){
-                db= MitabEscapeUtils.escapeFieldElement(ref.getCvDatabase().getShortLabel());
+                db= ref.getCvDatabase().getShortLabel();
             }
 
             field.set( CalimochoKeys.KEY, db);
             field.set( CalimochoKeys.DB, db);
-            field.set( CalimochoKeys.VALUE, MitabEscapeUtils.escapeFieldElement(ref.getPrimaryId()));
+            field.set( CalimochoKeys.VALUE, ref.getPrimaryId());
 
             if (addTextValue) {
                 if (ref.getSecondaryId() != null) {

@@ -22,12 +22,12 @@ public class ConfidenceConverter {
 
             String db = CrossReferenceConverter.DATABASE_UNKNOWN;
             if (conf.getCvConfidenceType() != null && conf.getCvConfidenceType().getShortLabel() != null){
-                db= MitabEscapeUtils.escapeFieldElement(conf.getCvConfidenceType().getShortLabel());
+                db= conf.getCvConfidenceType().getShortLabel();
             }
 
             field.set( CalimochoKeys.KEY, db);
             field.set( CalimochoKeys.DB, db);
-            field.set( CalimochoKeys.VALUE, MitabEscapeUtils.escapeFieldElement(conf.getValue()));
+            field.set( CalimochoKeys.VALUE, conf.getValue());
 
             return field;
         }

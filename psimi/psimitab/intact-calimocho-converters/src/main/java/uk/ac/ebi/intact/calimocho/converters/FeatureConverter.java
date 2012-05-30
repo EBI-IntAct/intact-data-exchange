@@ -68,7 +68,7 @@ public class FeatureConverter {
 
                 if (refs.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equalsIgnoreCase(refs.getCvXrefQualifier().getIdentifier())){
                     if (refs.getPrimaryId() != null){
-                        field.set( CalimochoKeys.TEXT, MitabEscapeUtils.escapeFieldElement(refs.getPrimaryId()));
+                        field.set( CalimochoKeys.TEXT, refs.getPrimaryId());
                     }
                 }
             }

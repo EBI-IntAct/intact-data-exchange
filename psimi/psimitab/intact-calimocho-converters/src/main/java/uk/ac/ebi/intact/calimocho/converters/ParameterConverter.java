@@ -22,7 +22,7 @@ public class ParameterConverter {
 
             String db = CrossReferenceConverter.DATABASE_UNKNOWN;
             if (param.getCvParameterType() != null && param.getCvParameterType().getShortLabel() != null){
-                db= MitabEscapeUtils.escapeFieldElement(param.getCvParameterType().getShortLabel());
+                db= param.getCvParameterType().getShortLabel();
             }
 
             field.set( CalimochoKeys.KEY, db);
@@ -46,10 +46,10 @@ public class ParameterConverter {
                  return null;
             }
 
-            field.set( CalimochoKeys.VALUE, MitabEscapeUtils.escapeFieldElement(value.toString()));
+            field.set( CalimochoKeys.VALUE, value.toString());
 
             if (param.getCvParameterUnit() != null && param.getCvParameterUnit().getShortLabel() != null){
-                field.set( CalimochoKeys.TEXT, MitabEscapeUtils.escapeFieldElement(param.getCvParameterUnit().getShortLabel()));
+                field.set( CalimochoKeys.TEXT, param.getCvParameterUnit().getShortLabel());
             }
 
             return field;

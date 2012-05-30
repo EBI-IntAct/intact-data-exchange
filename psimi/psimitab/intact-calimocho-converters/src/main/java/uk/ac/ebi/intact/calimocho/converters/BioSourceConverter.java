@@ -28,16 +28,16 @@ public class BioSourceConverter {
             
             Field common = new DefaultField();
 
-            String name = MitabEscapeUtils.escapeFieldElement(organism.getShortLabel());
-            String fullName = MitabEscapeUtils.escapeFieldElement(organism.getFullName());
-            String taxId = MitabEscapeUtils.escapeFieldElement(organism.getTaxId());
+            String name = organism.getShortLabel();
+            String fullName = organism.getFullName();
+            String taxId = organism.getTaxId();
 
             common.set(CalimochoKeys.KEY, TAXID);
             common.set(CalimochoKeys.DB, TAXID);
             common.set(CalimochoKeys.VALUE, taxId);
             
             if (name != null){
-                common.set(CalimochoKeys.TEXT, MitabEscapeUtils.escapeFieldElement(name));
+                common.set(CalimochoKeys.TEXT, name);
             }
             
             if (fullName != null){
@@ -46,7 +46,7 @@ public class BioSourceConverter {
                 scientific.set(CalimochoKeys.DB, TAXID);
                 scientific.set(CalimochoKeys.VALUE, taxId);
 
-                scientific.set(CalimochoKeys.TEXT, MitabEscapeUtils.escapeFieldElement(fullName));
+                scientific.set(CalimochoKeys.TEXT, fullName);
                 
                 fields.add(common);
                 fields.add(scientific);

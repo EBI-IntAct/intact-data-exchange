@@ -5,7 +5,6 @@ import org.hupo.psi.calimocho.key.InteractionKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
 import org.hupo.psi.calimocho.model.Row;
-import psidev.psi.mi.tab.utils.MitabEscapeUtils;
 import uk.ac.ebi.intact.model.*;
 
 import java.util.ArrayList;
@@ -224,7 +223,7 @@ public class InteractorConverter {
 
                 bioRole.set(CalimochoKeys.KEY, CvDatabase.PSI_MI);
                 bioRole.set(CalimochoKeys.DB, CvDatabase.PSI_MI);
-                bioRole.set(CalimochoKeys.VALUE, MitabEscapeUtils.escapeFieldElement(CvBiologicalRole.UNSPECIFIED_PSI_REF));
+                bioRole.set(CalimochoKeys.VALUE, CvBiologicalRole.UNSPECIFIED_PSI_REF);
                 bioRole.set(CalimochoKeys.TEXT, CvBiologicalRole.UNSPECIFIED);
             }
             if (isFirst){
@@ -249,7 +248,7 @@ public class InteractorConverter {
 
                 expRoleField.set(CalimochoKeys.KEY, CvDatabase.PSI_MI);
                 expRoleField.set(CalimochoKeys.DB, CvDatabase.PSI_MI);
-                expRoleField.set(CalimochoKeys.VALUE, MitabEscapeUtils.escapeFieldElement(CvExperimentalRole.UNSPECIFIED_PSI_REF));
+                expRoleField.set(CalimochoKeys.VALUE, CvExperimentalRole.UNSPECIFIED_PSI_REF);
                 expRoleField.set(CalimochoKeys.TEXT, CvExperimentalRole.UNSPECIFIED);
                 roleFields.add(expRoleField);
             }

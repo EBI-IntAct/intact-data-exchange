@@ -8,7 +8,6 @@ import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.DefaultRow;
 import org.hupo.psi.calimocho.model.Field;
 import org.hupo.psi.calimocho.model.Row;
-import psidev.psi.mi.tab.utils.MitabEscapeUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
@@ -171,10 +170,10 @@ public class InteractionConverter {
 
             expansion.set(CalimochoKeys.KEY, db);
             expansion.set(CalimochoKeys.DB, db);
-            expansion.set(CalimochoKeys.VALUE, MitabEscapeUtils.escapeFieldElement(expansionMI));
+            expansion.set(CalimochoKeys.VALUE, expansionMI);
 
             if (expansionName != null){
-                expansion.set(CalimochoKeys.TEXT, MitabEscapeUtils.escapeFieldElement(expansionName));
+                expansion.set(CalimochoKeys.TEXT, expansionName);
             }
 
             row.addField(InteractionKeys.KEY_CONFIDENCE, expansion);

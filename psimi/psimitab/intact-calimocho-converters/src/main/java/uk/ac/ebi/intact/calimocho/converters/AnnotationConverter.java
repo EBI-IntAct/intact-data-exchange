@@ -20,11 +20,11 @@ public class AnnotationConverter {
         if (annot != null && annot.getCvTopic() != null && annot.getCvTopic().getShortLabel() != null){
             Field field = new DefaultField();
 
-            String topic = MitabEscapeUtils.escapeFieldElement(annot.getCvTopic().getShortLabel());
+            String topic = annot.getCvTopic().getShortLabel();
 
             field.set( CalimochoKeys.KEY, topic);
             field.set( CalimochoKeys.NAME, topic);
-            field.set( CalimochoKeys.VALUE, MitabEscapeUtils.escapeFieldElement(annot.getAnnotationText()));
+            field.set( CalimochoKeys.VALUE, annot.getAnnotationText());
 
             return field;
         }
