@@ -14,6 +14,8 @@ import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.NotExpandableInteractionException;
 import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -35,6 +37,10 @@ public class InteractionConverter {
     private CrossReferenceConverter xrefConverter;
     private AnnotationConverter annotConverter;
     private ParameterConverter parameterConverter;
+    private DateFormat dateFormat;
+    private DateFormat yearFormat;
+    private DateFormat monthFormat;
+    private DateFormat dayFormat;
 
     public static String CRC = "intact-crc";
 
@@ -53,6 +59,11 @@ public class InteractionConverter {
         this.xrefConverter = new CrossReferenceConverter();
         this.annotConverter = new AnnotationConverter();
         this.parameterConverter = new ParameterConverter();
+
+        dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        yearFormat = new SimpleDateFormat("yyyy");
+        monthFormat = new SimpleDateFormat("MM");
+        dayFormat = new SimpleDateFormat("dd");
 
         this.expansionName = expansionName;
         this.expansionMI = expansionMI;
@@ -253,6 +264,17 @@ public class InteractionConverter {
             neg.set(CalimochoKeys.VALUE, "true");
 
             row.addField(InteractionKeys.KEY_NEGATIVE, neg);
+        }
+
+        // process update date
+        if (binary.getUpdated() != null){
+            Field created = new DefaultField();
+            created.set( CalimochoKeys.VALUE, dateFormat.format(binary.getUpdated()) );
+            created.set( CalimochoKeys.DAY, dayFormat.format(binary.getUpdated()) );
+            created.set( CalimochoKeys.MONTH, monthFormat.format(binary.getUpdated()) );
+            created.set( CalimochoKeys.YEAR, yearFormat.format(binary.getUpdated()) );
+
+            row.addField(InteractionKeys.KEY_CREATION_DATE, created);
         }
 
         return row;

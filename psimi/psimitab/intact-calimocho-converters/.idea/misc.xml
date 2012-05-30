@@ -45,6 +45,23 @@
     <output url="file://$PROJECT_DIR$/classes" />
   </component>
   <component name="SvnBranchConfigurationManager">
+    <option name="myConfigurationMap">
+      <map>
+        <entry key="$PROJECT_DIR$">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchUrls">
+                <list>
+                  <option value="https://intact.googlecode.com/svn/repo/data-exchange/branches" />
+                  <option value="https://intact.googlecode.com/svn/repo/data-exchange/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="https://intact.googlecode.com/svn/repo/data-exchange/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
