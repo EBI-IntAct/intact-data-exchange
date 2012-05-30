@@ -61,7 +61,8 @@ public class ExperimentConverter {
 
                 if (detMethod != null){
                     row.addField(InteractionKeys.KEY_PART_IDENT_METHOD_A, detMethod);
-                    row.addField(InteractionKeys.KEY_PART_IDENT_METHOD_B, detMethod);
+                    row.addField(InteractionKeys.KEY_PART_IDENT_METHOD_B
+                            , detMethod);
                 }
             }
         }
