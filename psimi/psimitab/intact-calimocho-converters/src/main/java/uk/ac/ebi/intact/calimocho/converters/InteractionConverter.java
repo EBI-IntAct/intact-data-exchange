@@ -274,7 +274,7 @@ public class InteractionConverter {
             created.set( CalimochoKeys.MONTH, monthFormat.format(binary.getUpdated()) );
             created.set( CalimochoKeys.YEAR, yearFormat.format(binary.getUpdated()) );
 
-            row.addField(InteractionKeys.KEY_CREATION_DATE, created);
+            row.addField(InteractionKeys.KEY_UPDATE_DATE, created);
         }
 
         return row;
