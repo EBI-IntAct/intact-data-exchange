@@ -36,6 +36,7 @@ public class CvObjectConverter {
                 if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
                     Field identity = xrefConverter.toCalimocho(ref, false);
                     if (identity != null){
+                        field = identity;
                         break;
                     }
                 }
