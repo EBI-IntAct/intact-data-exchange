@@ -3,7 +3,6 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
-import psidev.psi.mi.tab.utils.MitabEscapeUtils;
 import uk.ac.ebi.intact.model.Parameter;
 
 /**
@@ -17,7 +16,7 @@ import uk.ac.ebi.intact.model.Parameter;
 public class ParameterConverter {
 
     public Field toCalimocho(Parameter param){
-        if (param != null && param.getBase() != null){
+        if (param != null){
             Field field = new DefaultField();
 
             String db = CrossReferenceConverter.DATABASE_UNKNOWN;

@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="00e6e946-ca3e-4fb7-a2ab-6b1a46310d75" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractionConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractionConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java" />
     </list>
     <ignored path="intact-calimocho-converters.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -68,7 +69,25 @@
       <file leaf-file-name="InteractionConverter.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractionConverter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="276" column="56" selection-start="10128" selection-end="10128" vertical-scroll-proportion="0.7261236">
+            <state line="238" column="60" selection-start="8743" selection-end="8743" vertical-scroll-proportion="0.15035461">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ExperimentConverter.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="53" column="67" selection-start="1754" selection-end="1754" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ParameterConverter.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="18" column="25" selection-start="469" selection-end="469" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -96,10 +115,10 @@
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CrossReferenceConverter.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/FeatureConverter.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractorConverter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CvObjectConverter.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractionConverter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java" />
       </list>
     </option>
   </component>
@@ -121,10 +140,10 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="7" />
-    <option name="y" value="24" />
-    <option name="width" value="1430" />
-    <option name="height" value="847" />
+    <option name="x" value="-8" />
+    <option name="y" value="-5" />
+    <option name="width" value="1168" />
+    <option name="height" value="877" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -152,6 +171,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -221,22 +241,21 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="project.structure.last.edited" value="Modules" />
     <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="project.structure.proportion" value="0.0" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="recentsLimit" value="5" />
     <property name="MemberChooser.sorted" value="false" />
+    <property name="recentsLimit" value="5" />
     <property name="MemberChooser.showClasses" value="true" />
-    <property name="project.structure.side.proportion" value="0.0" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="dynamic.classpath" value="false" />
+    <property name="project.structure.side.proportion" value="0.0" />
     <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -413,7 +432,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="7" y="24" width="1430" height="847" extended-state="0" />
+    <frame x="-8" y="-5" width="1168" height="877" extended-state="6" />
     <editor active="false" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998565" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -423,14 +442,14 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.41229656" sideWeight="0.1061828" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998565" sideWeight="0.6705128" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.49927744" sideWeight="0.6705128" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.41229656" sideWeight="0.8844086" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32948717" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -521,16 +540,6 @@
         <state line="35" column="33" selection-start="1314" selection-end="1314" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractorConverter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="250" column="92" selection-start="10317" selection-end="10317" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="51" column="89" selection-start="1956" selection-end="1956" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="19" column="21" selection-start="808" selection-end="808" vertical-scroll-proportion="0.0" />
@@ -558,35 +567,39 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CrossReferenceConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="62" selection-start="1008" selection-end="1008" vertical-scroll-proportion="0.52243125">
-          <folding />
-        </state>
+        <state line="30" column="62" selection-start="1008" selection-end="1008" vertical-scroll-proportion="0.52243125" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/BioSourceConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="48" column="59" selection-start="1586" selection-end="1586" vertical-scroll-proportion="0.56551725">
-          <folding />
-        </state>
+        <state line="48" column="59" selection-start="1586" selection-end="1586" vertical-scroll-proportion="0.56551725" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CvObjectConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="30" selection-start="1265" selection-end="1265" vertical-scroll-proportion="0.15730338">
-          <folding />
-        </state>
+        <state line="39" column="30" selection-start="1265" selection-end="1265" vertical-scroll-proportion="0.15730338" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractorConverter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="250" column="92" selection-start="10317" selection-end="10317" vertical-scroll-proportion="1.8026316" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="64" column="28" selection-start="2224" selection-end="2224" vertical-scroll-proportion="0.7261236">
+        <state line="53" column="67" selection-start="1754" selection-end="1754" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="25" selection-start="469" selection-end="469" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractionConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="276" column="56" selection-start="10128" selection-end="10128" vertical-scroll-proportion="0.7261236">
+        <state line="238" column="60" selection-start="8743" selection-end="8743" vertical-scroll-proportion="0.15035461">
           <folding />
         </state>
       </provider>

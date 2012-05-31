@@ -51,7 +51,7 @@ public class ExperimentConverter {
                 Collection<Field> bioSourceField = biosourceConverter.toCalimocho(exp.getBioSource());
 
                 if (!bioSourceField.isEmpty()){
-                    row.addFields(InteractionKeys.KEY_TAXID_A, bioSourceField);
+                    row.addFields(InteractionKeys.KEY_HOST_ORGANISM, bioSourceField);
                 }
             }
 
