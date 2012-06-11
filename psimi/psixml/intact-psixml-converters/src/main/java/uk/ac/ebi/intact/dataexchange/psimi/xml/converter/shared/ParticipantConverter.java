@@ -285,7 +285,7 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
 
                 confidence.setUnit(unit);
 
-                if (!participant.getConfidenceList().contains(confidence)){
+                if (!PsiConverterUtils.contains(confidence, participant.getConfidenceList())){
                     participant.getConfidenceList().add( confidence);
                 }
             }
@@ -421,18 +421,20 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             component.addConfidence( confidence);
         }
         // converts author-confidences
+        Collection<AbstractConfidence> confs = new ArrayList<AbstractConfidence>(component.getConfidences());
+
         for (Attribute authorConf : annotationConfidencesToMigrate){
 
             String value = authorConf.getValue();
-            ComponentConfidence confidence = confidenceConverter.newConfidenceInstance(value);
+            AbstractConfidence confidence = confidenceConverter.newConfidenceInstance(value);
 
             CvConfidenceType cvConfType = new CvConfidenceType();
             cvConfType.setOwner(confidenceConverter.getInstitution());
             cvConfType.setShortLabel(IntactConverterUtils.AUTHOR_SCORE);
             confidence.setCvConfidenceType( cvConfType);
 
-            if (!component.getConfidences().contains(confidence)){
-                component.addConfidence( confidence);
+            if (!IntactConverterUtils.contains(confidence, confs)){
+                component.addConfidence( (ComponentConfidence) confidence);
             }
         }
 

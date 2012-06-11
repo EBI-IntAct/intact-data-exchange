@@ -23,15 +23,18 @@ import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.UnsupportedConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.*;
-import uk.ac.ebi.intact.model.Alias;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Alias;
 import uk.ac.ebi.intact.model.Feature;
 import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.Range;
 import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Random;
 
 /**
  * Intact Converter Utils.
@@ -179,7 +182,7 @@ public class IntactConverterUtils {
         }
     }
 
-        public static void populateAnnotations(AttributeContainer attributeContainer, Annotated annotated, Institution institution) {
+    public static void populateAnnotations(AttributeContainer attributeContainer, Annotated annotated, Institution institution) {
         AnnotationConverter annotationConverter = new AnnotationConverter(institution);
 
         if (attributeContainer.hasAttributes()) {
@@ -437,5 +440,99 @@ public class IntactConverterUtils {
         }
 
         return Collections.EMPTY_LIST;
+    }
+
+    public static boolean contains(AbstractConfidence conf, Collection<AbstractConfidence> confidences){
+
+        if (conf == null || confidences == null){
+            return false;
+        }
+
+        for (AbstractConfidence confidence : confidences){
+            if (areEquals(conf, confidence)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean areEquals(AbstractConfidence conf1, AbstractConfidence conf2){
+
+        if (conf1 == null && conf2 == null){
+            return true;
+        }
+        else if (conf1 != null && conf2 == null){
+            return false;
+        }
+        else if (conf1 == null && conf2 != null){
+            return false;
+        }
+        else {
+            // comfidence type
+            CvConfidenceType type1 = conf1.getCvConfidenceType();
+            CvConfidenceType type2 = conf2.getCvConfidenceType();
+            if (type1 != null && type2 == null){
+                return false;
+            }
+            else if (type1 == null && type2 != null){
+                return false;
+            }
+            else if (type1 != null && type2 != null) {
+                // shortlabels
+                String names1 = type1.getShortLabel();
+                String names2 = type2.getShortLabel();
+
+                if (names1 != null && names2 == null){
+                    return false;
+                }
+                else if (names1 == null && names2 != null){
+                    return false;
+                }
+                else if (names1 != null && names2 != null && !names1.equalsIgnoreCase(names2)) {
+                    return false;
+                }
+
+                // full names
+                String fullName1 = type1.getFullName();
+                String fullName2 = type2.getFullName();
+
+                if (fullName1 != null && fullName2 == null){
+                    return false;
+                }
+                else if (fullName1 == null && fullName2 != null){
+                    return false;
+                }
+                else if (fullName1 != null && fullName2 != null && !fullName1.equalsIgnoreCase(fullName2)) {
+                    return false;
+                }
+
+                // identifiers
+                String id1 = type1.getIdentifier();
+                String id2 = type2.getIdentifier();
+
+                if (id1 != null && id2 == null){
+                    return false;
+                }
+                else if (id1 == null && id2 != null){
+                    return false;
+                }
+                else if (id1 != null && id2 != null && !id1.equalsIgnoreCase(id2)) {
+                    return false;
+                }
+            }
+
+            // value
+            if (conf1.getValue() != null && conf2.getValue() == null){
+                return false;
+            }
+            else if (conf1.getValue() == null && conf2.getValue() != null){
+                return false;
+            }
+            else if (conf1.getValue() != null && conf2.getValue() != null && !conf1.getValue().equalsIgnoreCase(conf2.getValue())) {
+                return false;
+            }
+        }
+        return true;
     }
 }

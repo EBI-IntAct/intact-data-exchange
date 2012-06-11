@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xerces.util.XMLChar;
 import psidev.psi.mi.xml.model.*;
+import psidev.psi.mi.xml.model.Confidence;
 import psidev.psi.mi.xml.model.Xref;
 import uk.ac.ebi.intact.core.persister.IntactCore;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.AbstractIntactPsiConverter;
@@ -753,4 +754,160 @@ public class PsiConverterUtils {
         return result.toString();
     }
 
+    public static boolean contains(Confidence conf, Collection<Confidence> confidences){
+
+        if (conf == null || confidences == null){
+            return false;
+        }
+
+        for (Confidence confidence : confidences){
+            if (areEquals(conf, confidence)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean areEquals(Confidence conf1, Confidence conf2){
+
+        if (conf1 == null && conf2 == null){
+            return true;
+        }
+        else if (conf1 != null && conf2 == null){
+            return false;
+        }
+        else if (conf1 == null && conf2 != null){
+            return false;
+        }
+        else {
+            // units
+            Unit unit1 = conf1.getUnit();
+            Unit unit2 = conf2.getUnit();
+            if (unit1 != null && unit2 == null){
+                return false;
+            }
+            else if (unit1 == null && unit2 != null){
+                return false;
+            }
+            else if (unit1 != null && unit2 != null) {
+                // names
+                Names names1 = unit1.getNames();
+                Names names2 = unit2.getNames();
+
+                if (names1 != null && names2 == null){
+                    return false;
+                }
+                else if (names1 == null && names2 != null){
+                    return false;
+                }
+                else if (names1 != null && names2 != null) {
+                    // shortlabel
+                    if (names1.getShortLabel() != null && names2.getShortLabel() == null){
+                        return false;
+                    }
+                    else if (names1.getShortLabel() == null && names2.getShortLabel() != null){
+                        return false;
+                    }
+                    else if (names1.getShortLabel() != null && names2.getShortLabel() != null && !names1.getShortLabel().equalsIgnoreCase(names2.getShortLabel())) {
+                        return false;
+                    }
+
+                    // fullname
+                    if (names1.getFullName() != null && names2.getFullName() == null){
+                        return false;
+                    }
+                    else if (names1.getFullName() == null && names2.getFullName() != null){
+                        return false;
+                    }
+                    else if (names1.getFullName() != null && names2.getFullName() != null && !names1.getFullName().equalsIgnoreCase(names2.getFullName())) {
+                        return false;
+                    }
+                }
+
+                // xrefs
+                Xref xref1 = unit1.getXref();
+                Xref xref2 = unit2.getXref();
+
+                if (xref1 != null && xref2 == null){
+                    return false;
+                }
+                else if (xref1 == null && xref2 != null){
+                    return false;
+                }
+                else if (xref1 != null && xref2 != null) {
+                    // primaryRef
+                    DbReference ref1 = xref1.getPrimaryRef();
+                    DbReference ref2 = xref2.getPrimaryRef();
+
+                    // dbAc
+                    if (ref1.getDbAc() != null && ref2.getDbAc() == null){
+                        return false;
+                    }
+                    else if (ref1.getDbAc() == null && ref2.getDbAc() != null){
+                        return false;
+                    }
+                    else if (ref1.getDbAc() != null && ref2.getDbAc() != null && !ref1.getDbAc().equalsIgnoreCase(ref2.getDbAc())) {
+                        return false;
+                    }
+
+                    // db
+                    if (ref1.getDb() != null && ref2.getDb() == null){
+                        return false;
+                    }
+                    else if (ref1.getDb() == null && ref2.getDb() != null){
+                        return false;
+                    }
+                    else if (ref1.getDb() != null && ref2.getDb() != null && !ref1.getDb().equalsIgnoreCase(ref2.getDb())) {
+                        return false;
+                    }
+
+                    // primaryId
+                    if (ref1.getId() != null && ref2.getId() == null){
+                        return false;
+                    }
+                    else if (ref1.getId() == null && ref2.getId() != null){
+                        return false;
+                    }
+                    else if (ref1.getId() != null && ref2.getId() != null && !ref1.getId().equalsIgnoreCase(ref2.getId())) {
+                        return false;
+                    }
+
+                    // reftype ac
+                    if (ref1.getRefTypeAc() != null && ref2.getRefTypeAc() == null){
+                        return false;
+                    }
+                    else if (ref1.getRefTypeAc() == null && ref2.getRefTypeAc() != null){
+                        return false;
+                    }
+                    else if (ref1.getRefTypeAc() != null && ref2.getRefTypeAc() != null && !ref1.getRefTypeAc().equalsIgnoreCase(ref2.getRefTypeAc())) {
+                        return false;
+                    }
+
+                    // reftype
+                    if (ref1.getRefType() != null && ref2.getRefType() == null){
+                        return false;
+                    }
+                    else if (ref1.getRefType() == null && ref2.getRefType() != null){
+                        return false;
+                    }
+                    else if (ref1.getRefType() != null && ref2.getRefType() != null && !ref1.getRefType().equalsIgnoreCase(ref2.getRefType())) {
+                        return false;
+                    }
+                }
+            }
+
+            // value
+            if (conf1.getValue() != null && conf2.getValue() == null){
+                return false;
+            }
+            else if (conf1.getValue() == null && conf2.getValue() != null){
+                return false;
+            }
+            else if (conf1.getValue() != null && conf2.getValue() != null && !conf1.getValue().equalsIgnoreCase(conf2.getValue())) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
