@@ -440,7 +440,10 @@ public class PsiExchangeImpl implements PsiExchange {
      * @return
      */
     public List<DateTime> getReleaseDates(File xmlFile) throws IOException {
-        return getReleaseDates(new FileInputStream(xmlFile));
+        FileInputStream fileInput = new FileInputStream(xmlFile);
+        List<DateTime> dates = getReleaseDates(fileInput);
+        fileInput.close();
+        return dates;
     }
 
     /**

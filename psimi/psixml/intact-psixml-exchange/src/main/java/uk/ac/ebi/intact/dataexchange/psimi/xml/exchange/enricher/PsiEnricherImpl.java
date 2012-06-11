@@ -17,28 +17,27 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher;
 
 import psidev.psi.mi.xml.*;
 import psidev.psi.mi.xml.converter.config.PsimiXmlConverterConfig;
-import psidev.psi.mi.xml.xmlindex.IndexedEntry;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 import psidev.psi.mi.xml.model.Interaction;
 import psidev.psi.mi.xml.model.Source;
+import psidev.psi.mi.xml.xmlindex.IndexedEntry;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
+import uk.ac.ebi.intact.dataexchange.enricher.standard.InstitutionEnricher;
+import uk.ac.ebi.intact.dataexchange.enricher.standard.IntactEntryEnricher;
+import uk.ac.ebi.intact.dataexchange.enricher.standard.InteractionEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
-import uk.ac.ebi.intact.dataexchange.enricher.standard.IntactEntryEnricher;
-import uk.ac.ebi.intact.dataexchange.enricher.standard.InstitutionEnricher;
-import uk.ac.ebi.intact.dataexchange.enricher.standard.InteractionEnricher;
-import uk.ac.ebi.intact.model.IntactEntry;
 import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.IntactEntry;
 
 import java.io.*;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Main utility to enrich a Psi file with additional information from the intact database and external sources.
@@ -61,12 +60,15 @@ public class PsiEnricherImpl implements PsiEnricher {
     }
 
     public void enrichPsiXml(File sourcePsiFile, File destinationPsiFile, EnricherConfig config) throws IOException {
-        EntrySet entrySet = readEntrySet(new FileInputStream(sourcePsiFile));
+        FileInputStream inputStream = new FileInputStream(sourcePsiFile);
+
+        EntrySet entrySet = readEntrySet(inputStream);
         entrySet = enrichEntrySet(entrySet, config);
 
-        FileWriter writer = new FileWriter(destinationPsiFile);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(destinationPsiFile));
         writeEntrySet(entrySet, writer);
         writer.close();
+        inputStream.close();
     }
 
     /**
