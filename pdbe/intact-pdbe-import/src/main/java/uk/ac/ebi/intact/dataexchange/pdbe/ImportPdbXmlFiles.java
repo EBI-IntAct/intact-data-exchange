@@ -300,7 +300,7 @@ public class ImportPdbXmlFiles {
         enricherConfig.setUpdateProteins( true );
 
         InputStream is = new FileInputStream( fileToImport );
-        Writer writer = new FileWriter( tempFile );
+        Writer writer = new BufferedWriter(new FileWriter( tempFile ));
 
         log.info( fileToImport.getAbsolutePath() + " was enriched into " + tempFile.getAbsolutePath() );
 
@@ -311,6 +311,9 @@ public class ImportPdbXmlFiles {
         } catch ( PsiEnricherException e ) {
             throw new RuntimeException( "Error while enriching: " + fileToImport.getAbsolutePath(), e );
         }
+
+        is.close();
+        writer.close();
         
         return tempFile;
     }
