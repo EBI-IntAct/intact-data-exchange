@@ -123,7 +123,9 @@ public class SolrHomeBuilder {
 
         XPath xpath = XPathFactory.newInstance().newXPath();
 
-        InputSource inputSource = new InputSource(method.getResponseBodyAsStream());
+        InputStream stream = method.getResponseBodyAsStream();
+        
+        InputSource inputSource = new InputSource(stream);
 
         try {
             NodeList snapshotsNodes = (NodeList) xpath.evaluate("/metadata/versioning/snapshot", inputSource, XPathConstants.NODESET);
@@ -134,6 +136,8 @@ public class SolrHomeBuilder {
 
             String timestamp = snapshotChildNodes.item(1).getTextContent();
             String buildNumber = snapshotChildNodes.item(3).getTextContent();
+            
+            stream.close();
 
             return new URL(baseUrl+artifactId+"-"+version.replaceAll("-SNAPSHOT", "")+"-"+timestamp+"-"+buildNumber+".jar");
 
@@ -241,9 +245,12 @@ public class SolrHomeBuilder {
                     continue;
                 }
 
-                BufferedInputStream is = new BufferedInputStream(jarFile.getInputStream(entry));
+                InputStream inputStream = jarFile.getInputStream(entry);
+                
+                BufferedInputStream is = new BufferedInputStream(inputStream);
                 writeStreamToFile(fileToCreate, is);
                 is.close();
+                inputStream.close();
             }
         }
 
@@ -284,6 +291,8 @@ public class SolrHomeBuilder {
 
         dest.flush();
         dest.close();
+        is.close();
+        fos.close();
     }
 
     public File installTemp() throws IOException {

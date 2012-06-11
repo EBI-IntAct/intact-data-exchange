@@ -26,6 +26,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -47,7 +48,8 @@ public final class IntactSolrUtils {
 
             XPath xpath = XPathFactory.newInstance().newXPath();
             String expression = "/schema/fields/field";
-            InputSource inputSource = new InputSource(method.getResponseBodyAsStream());
+            InputStream stream = method.getResponseBodyAsStream();
+            InputSource inputSource = new InputSource(stream);
 
             try {
                 NodeList nodes = (NodeList) xpath.evaluate(expression, inputSource, XPathConstants.NODESET);
@@ -56,6 +58,8 @@ public final class IntactSolrUtils {
                     final String fieldName = nodes.item(i).getAttributes().getNamedItem("name").getNodeValue();
                     schemaInfo.addFieldName(fieldName);
                 }
+
+                stream.close();
             } catch (XPathExpressionException e) {
                 e.printStackTrace();
             }

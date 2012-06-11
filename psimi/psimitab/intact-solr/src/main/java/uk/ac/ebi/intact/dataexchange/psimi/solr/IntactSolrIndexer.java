@@ -113,11 +113,17 @@ public class IntactSolrIndexer {
     }
 
     public int indexMitab(File mitabFile, boolean hasHeader) throws IOException, IntactSolrException {
-        return indexMitab(new FileInputStream(mitabFile), hasHeader);
+        FileInputStream inputStream = new FileInputStream(mitabFile);
+        int num = indexMitab(inputStream, hasHeader);
+        inputStream.close();
+        return num;
     }
 
     public int indexMitab(File mitabFile, boolean hasHeader, Integer firstLine, Integer batchSize) throws IOException, IntactSolrException {
-        return indexMitab(new FileInputStream(mitabFile), hasHeader, firstLine, batchSize);
+        FileInputStream inputStream = new FileInputStream(mitabFile);
+        int num = indexMitab(new FileInputStream(mitabFile), hasHeader, firstLine, batchSize);
+        inputStream.close();
+        return num;
     }
 
     public int indexMitabFromClasspath(String resourceUrl, boolean hasHeader) throws IOException, IntactSolrException {
@@ -129,7 +135,10 @@ public class IntactSolrIndexer {
 
         if (resourceStream == null) throw new IntactSolrException("Resource not found in the classpath: "+resourceUrl);
 
-        return indexMitab(resourceStream, hasHeader, firstLine, batchSize);
+        int num = indexMitab(resourceStream, hasHeader, firstLine, batchSize);
+
+        resourceStream.close();
+        return num;
     }
 
     /**
@@ -157,7 +166,10 @@ public class IntactSolrIndexer {
     public int indexMitab(InputStream mitabStream, boolean hasHeader, Integer firstLine, Integer batchSize) throws IOException, IntactSolrException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(mitabStream));
 
-        return indexMitab(reader, hasHeader, firstLine, batchSize);
+        int num = indexMitab(reader, hasHeader, firstLine, batchSize);
+        reader.close();
+
+        return num;
     }
 
     /**
