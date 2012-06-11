@@ -56,7 +56,7 @@ public abstract class AbstractIndexExporter<T extends AnnotatedObject> implement
         }
 
         try {
-            this.writer = new FileWriter(output);
+            this.writer = new BufferedWriter(new FileWriter(output));
         } catch (IOException e) {
             throw new IllegalArgumentException( "Cannot write on " + output.getAbsolutePath(), e );
         }
