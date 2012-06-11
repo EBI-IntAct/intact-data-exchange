@@ -101,7 +101,8 @@ public class ExportFilter {
 
         // filter the mitab file
         PsimiTabReader mitabReader = new PsimiTabReader(false);
-        Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(fileB));
+        FileInputStream inputStream = new FileInputStream(fileB);
+        Iterator<BinaryInteraction> iterator = mitabReader.iterate(inputStream);
 
         PsimiTabWriter mitabWriter = new PsimiTabWriter(false);
 
@@ -154,6 +155,8 @@ public class ExportFilter {
                 }
             }
         }
+
+        inputStream.close();
     }
 
     private static Interactor extractFirstInteractorsFor(Map<CrossReference, List<CrossReference>> elementsToFilter, Interactor interactorA, Interactor interactorB, List<CrossReference> secondInteractors) {

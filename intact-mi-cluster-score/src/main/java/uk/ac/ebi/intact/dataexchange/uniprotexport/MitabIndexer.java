@@ -45,7 +45,8 @@ public class MitabIndexer {
         PsimiTabReader mitabReader = new PsimiTabReader(true);
         File mitabAsFile = new File(mitabFile);
 
-        Iterator<psidev.psi.mi.tab.model.BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitabAsFile));
+        FileInputStream inputStream = new FileInputStream(mitabAsFile);
+        Iterator<psidev.psi.mi.tab.model.BinaryInteraction> iterator = mitabReader.iterate(inputStream);
 
         // the binary interactions to cluster
         List<psidev.psi.mi.tab.model.BinaryInteraction> interactionToProcess = new ArrayList<BinaryInteraction>();
@@ -63,6 +64,8 @@ public class MitabIndexer {
         }
 
         cluster.saveScoreInMitab(clusteredMitabFile);
+
+        inputStream.close();
     }
 
     public static void main( String[] args ) throws IOException {
