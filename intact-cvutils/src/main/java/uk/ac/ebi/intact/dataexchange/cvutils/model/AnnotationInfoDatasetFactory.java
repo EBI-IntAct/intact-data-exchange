@@ -16,10 +16,12 @@
 package uk.ac.ebi.intact.dataexchange.cvutils.model;
 
 import au.com.bytecode.opencsv.CSVReader;
-
-import java.io.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 
 /**
@@ -101,6 +103,8 @@ public final class AnnotationInfoDatasetFactory {
             log.debug( "Total lines mi2cv: " +lineCount);
             log.debug( "Lines excluding header: " +lineCountExcludingHeader);
         }
+
+        csvreader.close();
 
         return annotInfoDataset;
     }//end method

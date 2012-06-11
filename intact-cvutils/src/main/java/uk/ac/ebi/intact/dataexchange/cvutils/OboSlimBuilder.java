@@ -17,25 +17,19 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.net.URLConnection;
-import java.io.*;
-import java.util.Collection;
-import java.util.Set;
-import java.util.List;
-
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bbop.dataadapter.DataAdapterException;
+import org.obo.dataadapter.OBOParseException;
 import org.obo.datamodel.*;
 import org.obo.datamodel.impl.DefaultObjectFactory;
 import org.obo.datamodel.impl.OBOSessionImpl;
-import org.obo.dataadapter.OBOParseException;
-import org.bbop.dataadapter.DataAdapterException;
-import uk.ac.ebi.intact.model.CvObject;
-import uk.ac.ebi.intact.model.CvDagObject;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
+
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Obo Slim Builder - builds a simplified/lighter obo ontology based on a couple of given terms.
@@ -186,8 +180,9 @@ public class OboSlimBuilder {
         BufferedWriter out = new BufferedWriter( new FileWriter( cachedFile ) );
 
         out.close();
+        InputStream inputStream = con.getInputStream();
 
-        BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream() ));
+        BufferedReader in = new BufferedReader( new InputStreamReader( inputStream ));
         String inputLine;
         while ((inputLine = in.readLine()) != null)
             out.write( inputLine + "\n" );
@@ -195,6 +190,7 @@ public class OboSlimBuilder {
         in.close();
         out.flush();
         out.close();
+        inputStream.close();
     }
 
 
