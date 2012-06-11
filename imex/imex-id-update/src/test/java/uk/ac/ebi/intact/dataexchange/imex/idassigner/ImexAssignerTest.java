@@ -263,13 +263,16 @@ public class ImexAssignerTest extends IntactBasicTestCase {
     }
 
     private int countLines( String resource ) throws IOException {
-        final List lines = IOUtils.readLines( new FileInputStream( resource ) );
+        FileInputStream inputStream = new FileInputStream( resource );
+
+        final List lines = IOUtils.readLines( inputStream );
         for ( Iterator iterator = lines.iterator(); iterator.hasNext(); ) {
             String line = ( String ) iterator.next();
             if( line.startsWith( "#" ) ) {
                 iterator.remove();
             }
         }
+        inputStream.close();
         return lines.size();
     }
 
