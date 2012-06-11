@@ -109,14 +109,18 @@ public class DbImporter {
         File tempFile = new File(name + "-enriched-"+System.currentTimeMillis()+".xml");
         System.out.println( "Enriching file in: " + tempFile.getAbsolutePath() );
 
-        Writer writer = new FileWriter(tempFile);
+        Writer writer = new BufferedWriter(new FileWriter(tempFile));
 
         PsiEnricher psiEnricher = (PsiEnricher) IntactContext.getCurrentInstance().getSpringContext().getBean("psiEnricher");
         psiEnricher.enrichPsiXml(is, writer, enricherConfig);
+
+        writer.close();
+        is.close();
+
         return tempFile;
     }
 
-    private static void importIntoIntact(File tempFile) throws FileNotFoundException {
+    private static void importIntoIntact(File tempFile) throws IOException {
         InputStream enricherInput = new FileInputStream(tempFile);
 
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
@@ -135,6 +139,8 @@ public class DbImporter {
         printStats( stats, System.out );
 
         System.out.println("New prots: " + stats.getPersisted(Protein.class, true));
+
+        enricherInput.close();
     }
 
     public static void printStats(PersisterStatistics stats, PrintStream ps) {
