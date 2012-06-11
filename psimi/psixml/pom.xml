@@ -19,6 +19,7 @@
     <modules>
         <module>intact-psixml-converters</module>
         <module>intact-psixml-exchange</module>
+        <module>intact-psixml-dbimporter</module>
     </modules>
 
     <dependencyManagement>
