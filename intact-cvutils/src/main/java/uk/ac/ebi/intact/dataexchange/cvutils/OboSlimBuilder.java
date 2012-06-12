@@ -183,14 +183,17 @@ public class OboSlimBuilder {
         InputStream inputStream = con.getInputStream();
 
         BufferedReader in = new BufferedReader( new InputStreamReader( inputStream ));
-        String inputLine;
-        while ((inputLine = in.readLine()) != null)
-            out.write( inputLine + "\n" );
-
-        in.close();
-        out.flush();
-        out.close();
-        inputStream.close();
+        try{
+            String inputLine;
+            while ((inputLine = in.readLine()) != null)
+                out.write( inputLine + "\n" );
+        }
+        finally {
+            in.close();
+            out.flush();
+            out.close();
+            inputStream.close();
+        }
     }
 
 

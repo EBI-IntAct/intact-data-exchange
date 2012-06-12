@@ -59,53 +59,55 @@ public final class AnnotationInfoDatasetFactory {
         CSVReader csvreader = new CSVReader( ioreader, separator );
         String[] nextLine;
 
-        int lineCount = 0;
-        int lineCountExcludingHeader = 0;
+        try{
+            int lineCount = 0;
+            int lineCountExcludingHeader = 0;
 
-        while ( ( nextLine = csvreader.readNext() ) != null ) {
-          lineCount++;
-            // nextLine[] is an array of values from the line
-            // skip comments
-            if (nextLine[0].startsWith("#")) {
-                continue;
-            }
-
-            // skip empty lines
-            if (nextLine.length == 0) {
-                continue;
-            }
-
-           // process line
-
-            if(nextLine.length == 7){
-                lineCountExcludingHeader++;
-
-                final String shorltabel = nextLine[0];               // 1. shortlabel
-                final String fullname = nextLine[1];                 // 2. fullname
-                final String type = nextLine[2];                     // 3. type
-                final String mi = nextLine[3];                       // 4. mi
-                final String topic = nextLine[4];                    // 5. topic
-                final String reason = nextLine[5];                   // 6. exclusion reason
-                final String applyToChildrenValue = nextLine[6];     // 7. apply to children
-
-                boolean applyToChildren = false;
-                if (Boolean.parseBoolean(applyToChildrenValue.trim())) {
-                    applyToChildren = true;
+            while ( ( nextLine = csvreader.readNext() ) != null ) {
+                lineCount++;
+                // nextLine[] is an array of values from the line
+                // skip comments
+                if (nextLine[0].startsWith("#")) {
+                    continue;
                 }
 
-                AnnotationInfo annotInfo = new AnnotationInfo(shorltabel, fullname, type, mi, topic, reason, applyToChildren);
-                annotInfoDataset.addCvAnnotation(annotInfo);
+                // skip empty lines
+                if (nextLine.length == 0) {
+                    continue;
+                }
+
+                // process line
+
+                if(nextLine.length == 7){
+                    lineCountExcludingHeader++;
+
+                    final String shorltabel = nextLine[0];               // 1. shortlabel
+                    final String fullname = nextLine[1];                 // 2. fullname
+                    final String type = nextLine[2];                     // 3. type
+                    final String mi = nextLine[3];                       // 4. mi
+                    final String topic = nextLine[4];                    // 5. topic
+                    final String reason = nextLine[5];                   // 6. exclusion reason
+                    final String applyToChildrenValue = nextLine[6];     // 7. apply to children
+
+                    boolean applyToChildren = false;
+                    if (Boolean.parseBoolean(applyToChildrenValue.trim())) {
+                        applyToChildren = true;
+                    }
+
+                    AnnotationInfo annotInfo = new AnnotationInfo(shorltabel, fullname, type, mi, topic, reason, applyToChildren);
+                    annotInfoDataset.addCvAnnotation(annotInfo);
+                }
+
+            }//end while
+
+            if ( log.isDebugEnabled() ) {
+                log.debug( "Total lines mi2cv: " +lineCount);
+                log.debug( "Lines excluding header: " +lineCountExcludingHeader);
             }
-
-        }//end while
-
-        if ( log.isDebugEnabled() ) {
-            log.debug( "Total lines mi2cv: " +lineCount);
-            log.debug( "Lines excluding header: " +lineCountExcludingHeader);
         }
-
-        csvreader.close();
-
+        finally {
+            csvreader.close();
+        }
         return annotInfoDataset;
     }//end method
 
