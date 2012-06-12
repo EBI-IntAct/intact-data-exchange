@@ -22,8 +22,10 @@ import psidev.psi.mi.xml.PsimiXmlReader;
 import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Xref;
-import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.context.DataContext;
+import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
+import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.PsiExchange;
@@ -31,8 +33,6 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher.PsiEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher.PsiEnricherException;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.core.persistence.dao.CvObjectDao;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -300,20 +300,26 @@ public class ImportPdbXmlFiles {
         enricherConfig.setUpdateProteins( true );
 
         InputStream is = new FileInputStream( fileToImport );
-        Writer writer = new BufferedWriter(new FileWriter( tempFile ));
 
-        log.info( fileToImport.getAbsolutePath() + " was enriched into " + tempFile.getAbsolutePath() );
+        try{
+            Writer writer = new BufferedWriter(new FileWriter( tempFile ));
 
-        try {
-            PsiEnricher psiEnricher = (PsiEnricher) IntactContext.getCurrentInstance().getSpringContext()
-                            .getBean("psiEnricher");
-            psiEnricher.enrichPsiXml( is, writer, enricherConfig );
-        } catch ( PsiEnricherException e ) {
-            throw new RuntimeException( "Error while enriching: " + fileToImport.getAbsolutePath(), e );
+            try{
+                log.info( fileToImport.getAbsolutePath() + " was enriched into " + tempFile.getAbsolutePath() );
+                PsiEnricher psiEnricher = (PsiEnricher) IntactContext.getCurrentInstance().getSpringContext()
+                        .getBean("psiEnricher");
+                psiEnricher.enrichPsiXml( is, writer, enricherConfig );
+            }
+            catch ( PsiEnricherException e ) {
+                throw new RuntimeException( "Error while enriching: " + fileToImport.getAbsolutePath(), e );
+            }
+            finally {
+                writer.close();
+            }
         }
-
-        is.close();
-        writer.close();
+        finally {
+            is.close();
+        }
         
         return tempFile;
     }
