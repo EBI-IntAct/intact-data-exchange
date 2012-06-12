@@ -104,18 +104,25 @@ public class DbImporter {
         System.out.println("Importing: " + fileToImport);
 
         InputStream is = new FileInputStream(fileToImport);
-
         String name = fileToImport.getName().replaceAll( ".xml", "" );
         File tempFile = new File(name + "-enriched-"+System.currentTimeMillis()+".xml");
-        System.out.println( "Enriching file in: " + tempFile.getAbsolutePath() );
+        try{
 
-        Writer writer = new BufferedWriter(new FileWriter(tempFile));
+            System.out.println( "Enriching file in: " + tempFile.getAbsolutePath() );
 
-        PsiEnricher psiEnricher = (PsiEnricher) IntactContext.getCurrentInstance().getSpringContext().getBean("psiEnricher");
-        psiEnricher.enrichPsiXml(is, writer, enricherConfig);
+            Writer writer = new BufferedWriter(new FileWriter(tempFile));
 
-        writer.close();
-        is.close();
+            try{
+                PsiEnricher psiEnricher = (PsiEnricher) IntactContext.getCurrentInstance().getSpringContext().getBean("psiEnricher");
+                psiEnricher.enrichPsiXml(is, writer, enricherConfig);
+            }
+            finally {
+                writer.close();
+            }
+        }
+        finally {
+            is.close();
+        }
 
         return tempFile;
     }
@@ -123,24 +130,27 @@ public class DbImporter {
     private static void importIntoIntact(File tempFile) throws IOException {
         InputStream enricherInput = new FileInputStream(tempFile);
 
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
-        int interactionsBefore = daoFactory.getInteractionDao().countAll();
-        int experimentsBefore = daoFactory.getExperimentDao().countAll();
+        try{
+            final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDataContext().getDaoFactory();
+            int interactionsBefore = daoFactory.getInteractionDao().countAll();
+            int experimentsBefore = daoFactory.getExperimentDao().countAll();
 
-        PsiExchange psiExchange = (PsiExchange) IntactContext.getCurrentInstance().getSpringContext().getBean("psiExchange");
-        PersisterStatistics stats = psiExchange.importIntoIntact(enricherInput);
+            PsiExchange psiExchange = (PsiExchange) IntactContext.getCurrentInstance().getSpringContext().getBean("psiExchange");
+            PersisterStatistics stats = psiExchange.importIntoIntact(enricherInput);
 
-        int interactionsAfter = daoFactory.getInteractionDao().countAll();
-        int experimentsAfter = daoFactory.getExperimentDao().countAll();
+            int interactionsAfter = daoFactory.getInteractionDao().countAll();
+            int experimentsAfter = daoFactory.getExperimentDao().countAll();
 
-        System.out.println("Real Interactions Created: " + (interactionsAfter - interactionsBefore));
-        System.out.println("Real Experiments Created: " + (experimentsAfter - experimentsBefore) + "\n");
+            System.out.println("Real Interactions Created: " + (interactionsAfter - interactionsBefore));
+            System.out.println("Real Experiments Created: " + (experimentsAfter - experimentsBefore) + "\n");
 
-        printStats( stats, System.out );
+            printStats( stats, System.out );
 
-        System.out.println("New prots: " + stats.getPersisted(Protein.class, true));
-
-        enricherInput.close();
+            System.out.println("New prots: " + stats.getPersisted(Protein.class, true));
+        }
+        finally {
+            enricherInput.close();
+        }
     }
 
     public static void printStats(PersisterStatistics stats, PrintStream ps) {
