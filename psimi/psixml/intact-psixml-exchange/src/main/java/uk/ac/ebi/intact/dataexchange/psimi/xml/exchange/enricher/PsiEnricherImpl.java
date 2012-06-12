@@ -62,13 +62,21 @@ public class PsiEnricherImpl implements PsiEnricher {
     public void enrichPsiXml(File sourcePsiFile, File destinationPsiFile, EnricherConfig config) throws IOException {
         FileInputStream inputStream = new FileInputStream(sourcePsiFile);
 
-        EntrySet entrySet = readEntrySet(inputStream);
-        entrySet = enrichEntrySet(entrySet, config);
+        try{
+            EntrySet entrySet = readEntrySet(inputStream);
+            entrySet = enrichEntrySet(entrySet, config);
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(destinationPsiFile));
-        writeEntrySet(entrySet, writer);
-        writer.close();
-        inputStream.close();
+            BufferedWriter writer = new BufferedWriter(new FileWriter(destinationPsiFile));
+            try{
+                writeEntrySet(entrySet, writer);
+            }
+            finally{
+                writer.close();
+            }
+        }
+        finally{
+            inputStream.close();
+        }
     }
 
     /**

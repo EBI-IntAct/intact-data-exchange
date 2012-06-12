@@ -50,10 +50,7 @@ import uk.ac.ebi.intact.model.util.FeatureUtils;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Imports/exports data between an IntAct-model database and PSI XML.
@@ -441,8 +438,14 @@ public class PsiExchangeImpl implements PsiExchange {
      */
     public List<DateTime> getReleaseDates(File xmlFile) throws IOException {
         FileInputStream fileInput = new FileInputStream(xmlFile);
-        List<DateTime> dates = getReleaseDates(fileInput);
-        fileInput.close();
+
+        List<DateTime> dates = Collections.EMPTY_LIST;
+        try{
+            dates = getReleaseDates(fileInput);
+        }
+        finally{
+            fileInput.close();
+        }
         return dates;
     }
 
