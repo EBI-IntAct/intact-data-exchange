@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package uk.ac.ebi.intact.interolog.download;
 
@@ -15,73 +15,80 @@ import java.util.TimerTask;
 /**
  * Download files from Internet.
  * Copy from http://www.javaspecialists.eu/archive/Issue122.html
- * 
- * 
+ *
+ *
  * @author mmichaut
  * @version $Id$
  * @since 4 juin 07
  */
 public class Sucker {
-	
-	private final String outputFile;
-	  private final Stats stats;
-	  private final URL url;
 
-	  public Sucker(String path, String outputFile) throws IOException {
-	    this.outputFile = outputFile;
-	    System.out.println(new Date() + " Constructing Sucker");
-	    url = new URL(path);
-	    System.out.println(new Date() + " Connected to URL");
-	    stats = Stats.make(url);
-	  }
+    private final String outputFile;
+    private final Stats stats;
+    private final URL url;
 
-	  public Sucker(String path) throws IOException {
-	    this(path, path.replaceAll(".*\\/", ""));
-	  }
+    public Sucker(String path, String outputFile) throws IOException {
+        this.outputFile = outputFile;
+        System.out.println(new Date() + " Constructing Sucker");
+        url = new URL(path);
+        System.out.println(new Date() + " Connected to URL");
+        stats = Stats.make(url);
+    }
 
-	  private void downloadFile() throws IOException {
-	    Timer timer = new Timer();
-	    timer.schedule(new TimerTask() {
-	      public void run() {
-	        stats.print();
-	      }
-	    }, 1000, 1000);
+    public Sucker(String path) throws IOException {
+        this(path, path.replaceAll(".*\\/", ""));
+    }
 
-	    try {
-	      System.out.println(new Date() + " Opening Streams");
-	      InputStream in = url.openStream();
-	      OutputStream out = new FileOutputStream(outputFile);
-	      System.out.println(new Date() + " Streams opened");
+    private void downloadFile() throws IOException {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+                stats.print();
+            }
+        }, 1000, 1000);
 
-	      byte[] buf = new byte[1024 * 1024];
-	      int length;
-	      while ((length = in.read(buf)) != -1) {
-	        out.write(buf, 0, length);
-	        stats.bytes(length);
-	      }
-	      in.close();
-	      out.close();
-	    } finally {
-	      timer.cancel();
-	      stats.print();
-	    }
-	  }
+        try {
+            System.out.println(new Date() + " Opening Streams");
+            InputStream in = url.openStream();
+            try{
+                OutputStream out = new FileOutputStream(outputFile);
+                try{
+                    System.out.println(new Date() + " Streams opened");
 
-	  private static void usage() {
-	    System.out.println("Usage: java Sucker URL [targetfile]");
-	    System.out.println("\tThis will download the file at the URL " +
-	      "to the targetfile location");
-	    System.exit(1);
-	  }
+                    byte[] buf = new byte[1024 * 1024];
+                    int length;
+                    while ((length = in.read(buf)) != -1) {
+                        out.write(buf, 0, length);
+                        stats.bytes(length);
+                    }
+                }   finally {
+                    out.close();
+                }
+            }
+            finally {
+                in.close();
+            }
+        } finally {
+            timer.cancel();
+            stats.print();
+        }
+    }
 
-	  public static void main(String[] args) throws IOException {
-	    Sucker sucker;
-	    switch (args.length) {
-	      case 1: sucker = new Sucker(args[0]); break;
-	      case 2: sucker = new Sucker(args[0], args[1]); break;
-	      default: usage(); return;
-	    }
-	    sucker.downloadFile();
-	  }
+    private static void usage() {
+        System.out.println("Usage: java Sucker URL [targetfile]");
+        System.out.println("\tThis will download the file at the URL " +
+                "to the targetfile location");
+        System.exit(1);
+    }
+
+    public static void main(String[] args) throws IOException {
+        Sucker sucker;
+        switch (args.length) {
+            case 1: sucker = new Sucker(args[0]); break;
+            case 2: sucker = new Sucker(args[0], args[1]); break;
+            default: usage(); return;
+        }
+        sucker.downloadFile();
+    }
 
 }
