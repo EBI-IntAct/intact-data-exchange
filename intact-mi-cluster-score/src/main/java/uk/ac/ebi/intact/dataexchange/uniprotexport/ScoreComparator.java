@@ -67,44 +67,47 @@ public class ScoreComparator {
 
 
         FileWriter resultsWriter = new FileWriter(results);
-        resultsWriter.write("Interaction");
-        resultsWriter.write("\t");
-        resultsWriter.write("Score for export A");
-        resultsWriter.write("\t");
-        resultsWriter.write("Score for export B");
-        resultsWriter.write("\n");
-
-        System.out.println("Write scores of exported interactions in both exports...");
-        for (String interaction : exportedBothAAndB){
-            resultsWriter.write(interaction);
+        try{
+            resultsWriter.write("Interaction");
             resultsWriter.write("\t");
-            resultsWriter.write(exportResultsA.get(interaction));
+            resultsWriter.write("Score for export A");
             resultsWriter.write("\t");
-            resultsWriter.write(exportResultsB.get(interaction));
+            resultsWriter.write("Score for export B");
             resultsWriter.write("\n");
-        }
 
-        System.out.println("Write scores of exported interactions in first export but not second...");
-        for (String interaction : exportedANotB){
-            resultsWriter.write(interaction);
-            resultsWriter.write("\t");
-            resultsWriter.write(exportResultsA.get(interaction));
-            resultsWriter.write("\t");
-            resultsWriter.write(excludedResultsB.get(interaction));
-            resultsWriter.write("\n");
-        }
+            System.out.println("Write scores of exported interactions in both exports...");
+            for (String interaction : exportedBothAAndB){
+                resultsWriter.write(interaction);
+                resultsWriter.write("\t");
+                resultsWriter.write(exportResultsA.get(interaction));
+                resultsWriter.write("\t");
+                resultsWriter.write(exportResultsB.get(interaction));
+                resultsWriter.write("\n");
+            }
 
-        System.out.println("Write scores of exported interactions in second export but not first...");
-        for (String interaction : exportedBNotA){
-            resultsWriter.write(interaction);
-            resultsWriter.write("\t");
-            resultsWriter.write(excludedResultsA.get(interaction));
-            resultsWriter.write("\t");
-            resultsWriter.write(exportResultsB.get(interaction));
-            resultsWriter.write("\n");
-        }
+            System.out.println("Write scores of exported interactions in first export but not second...");
+            for (String interaction : exportedANotB){
+                resultsWriter.write(interaction);
+                resultsWriter.write("\t");
+                resultsWriter.write(exportResultsA.get(interaction));
+                resultsWriter.write("\t");
+                resultsWriter.write(excludedResultsB.get(interaction));
+                resultsWriter.write("\n");
+            }
 
-        resultsWriter.close();
+            System.out.println("Write scores of exported interactions in second export but not first...");
+            for (String interaction : exportedBNotA){
+                resultsWriter.write(interaction);
+                resultsWriter.write("\t");
+                resultsWriter.write(excludedResultsA.get(interaction));
+                resultsWriter.write("\t");
+                resultsWriter.write(exportResultsB.get(interaction));
+                resultsWriter.write("\n");
+            }
+        }
+        finally {
+            resultsWriter.close();
+        }
     }
 
     private static Map<String, String> extractScoreResultsFor(File file) throws FileNotFoundException, IOException{

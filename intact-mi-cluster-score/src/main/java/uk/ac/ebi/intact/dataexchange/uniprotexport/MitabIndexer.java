@@ -46,26 +46,30 @@ public class MitabIndexer {
         File mitabAsFile = new File(mitabFile);
 
         FileInputStream inputStream = new FileInputStream(mitabAsFile);
-        Iterator<psidev.psi.mi.tab.model.BinaryInteraction> iterator = mitabReader.iterate(inputStream);
 
-        // the binary interactions to cluster
-        List<psidev.psi.mi.tab.model.BinaryInteraction> interactionToProcess = new ArrayList<BinaryInteraction>();
+        try{
+            Iterator<psidev.psi.mi.tab.model.BinaryInteraction> iterator = mitabReader.iterate(inputStream);
 
-        while (iterator.hasNext()){
-            interactionToProcess.clear();
-            while (interactionToProcess.size() < 200 && iterator.hasNext()){
-                IntactBinaryInteraction interaction = (IntactBinaryInteraction) iterator.next();
+            // the binary interactions to cluster
+            List<psidev.psi.mi.tab.model.BinaryInteraction> interactionToProcess = new ArrayList<BinaryInteraction>();
 
-                interactionToProcess.add(interaction);
+            while (iterator.hasNext()){
+                interactionToProcess.clear();
+                while (interactionToProcess.size() < 200 && iterator.hasNext()){
+                    IntactBinaryInteraction interaction = (IntactBinaryInteraction) iterator.next();
+
+                    interactionToProcess.add(interaction);
+                }
+
+                cluster.setBinaryInteractionList(interactionToProcess);
+                cluster.runService();
             }
 
-            cluster.setBinaryInteractionList(interactionToProcess);
-            cluster.runService();
+            cluster.saveScoreInMitab(clusteredMitabFile);
         }
-
-        cluster.saveScoreInMitab(clusteredMitabFile);
-
-        inputStream.close();
+        finally {
+            inputStream.close();
+        }
     }
 
     public static void main( String[] args ) throws IOException {

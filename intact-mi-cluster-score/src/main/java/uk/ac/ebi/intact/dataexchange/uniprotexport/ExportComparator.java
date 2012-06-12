@@ -71,34 +71,40 @@ public class ExportComparator {
     private static void writeComparisonResultsFor(File fileANotB, Set<BinaryInteraction> binaryInteractionsANotB) throws IOException {
         FileWriter writer1 = new FileWriter(fileANotB);
 
-        for (BinaryInteraction interaction : binaryInteractionsANotB){
-            writer1.write(interaction.toString());
-            writer1.write("\n");
+        try{
+            for (BinaryInteraction interaction : binaryInteractionsANotB){
+                writer1.write(interaction.toString());
+                writer1.write("\n");
+            }
         }
-
-        writer1.close();
+        finally {
+            writer1.close();
+        }
     }
 
     private static void extractBinaryInteractionsFromFile(String fileA, Set<BinaryInteraction> binaryinteractionA) throws IOException {
         BufferedReader readerA = new BufferedReader(new FileReader(fileA));
 
-        String lineA = readerA.readLine();
+        try{
+            String lineA = readerA.readLine();
 
-        while (lineA != null){
+            while (lineA != null){
 
-            if (lineA.contains("\t")){
-                String [] interactors = lineA.split("\t");
+                if (lineA.contains("\t")){
+                    String [] interactors = lineA.split("\t");
 
-                BinaryInteraction binary = new BinaryInteraction(interactors[0], interactors[1]);
-                binaryinteractionA.add(binary);
+                    BinaryInteraction binary = new BinaryInteraction(interactors[0], interactors[1]);
+                    binaryinteractionA.add(binary);
+                }
+                else {
+                    System.err.print("The line "+lineA+ "doesn't contain any tab and is ignored \n");
+                }
+                lineA = readerA.readLine();
             }
-            else {
-                System.err.print("The line "+lineA+ "doesn't contain any tab and is ignored \n");
-            }
-            lineA = readerA.readLine();
         }
-
-        readerA.close();
+        finally {
+            readerA.close();
+        }
 
         System.out.print(binaryinteractionA.size() + " loaded binary interactions from the file " + fileA + "\n");
     }
