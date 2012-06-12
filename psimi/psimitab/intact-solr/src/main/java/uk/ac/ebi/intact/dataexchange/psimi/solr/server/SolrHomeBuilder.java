@@ -126,7 +126,8 @@ public class SolrHomeBuilder {
         InputStream stream = method.getResponseBodyAsStream();
         
         InputSource inputSource = new InputSource(stream);
-
+        String timestamp = null;
+        String buildNumber = null;
         try {
             NodeList snapshotsNodes = (NodeList) xpath.evaluate("/metadata/versioning/snapshot", inputSource, XPathConstants.NODESET);
 
@@ -134,19 +135,17 @@ public class SolrHomeBuilder {
 
             NodeList snapshotChildNodes = node.getChildNodes();
 
-            String timestamp = snapshotChildNodes.item(1).getTextContent();
-            String buildNumber = snapshotChildNodes.item(3).getTextContent();
-            
-            stream.close();
-
-            return new URL(baseUrl+artifactId+"-"+version.replaceAll("-SNAPSHOT", "")+"-"+timestamp+"-"+buildNumber+".jar");
+            timestamp = snapshotChildNodes.item(1).getTextContent();
+            buildNumber = snapshotChildNodes.item(3).getTextContent();
 
         } catch (XPathExpressionException e) {
             e.printStackTrace();
         }
+        finally {
+            stream.close();
+        }
 
-        return null;
-
+        return new URL(baseUrl+artifactId+"-"+version.replaceAll("-SNAPSHOT", "")+"-"+timestamp+"-"+buildNumber+".jar");
     }
 
     private String getBaseUrl(String repo, String groupId, String artifactId, String version) {
@@ -248,9 +247,14 @@ public class SolrHomeBuilder {
                 InputStream inputStream = jarFile.getInputStream(entry);
                 
                 BufferedInputStream is = new BufferedInputStream(inputStream);
-                writeStreamToFile(fileToCreate, is);
-                is.close();
-                inputStream.close();
+
+                try{
+                    writeStreamToFile(fileToCreate, is);
+                }
+                finally {
+                    is.close();
+                    inputStream.close();
+                }
             }
         }
 
@@ -281,18 +285,25 @@ public class SolrHomeBuilder {
 
         BufferedInputStream is = new BufferedInputStream(inputStream);
 
-        FileOutputStream fos = new FileOutputStream(fileToCreate);
-        BufferedOutputStream dest = new
-                BufferedOutputStream(fos, buffer);
-        while ((count = is.read(data, 0, buffer))
-               != -1) {
-            dest.write(data, 0, count);
-        }
+        try{
+            FileOutputStream fos = new FileOutputStream(fileToCreate);
+            BufferedOutputStream dest = new
+                    BufferedOutputStream(fos, buffer);
 
-        dest.flush();
-        dest.close();
-        is.close();
-        fos.close();
+            try{
+                while ((count = is.read(data, 0, buffer))
+                        != -1) {
+                    dest.write(data, 0, count);
+                }
+                dest.flush();
+            }
+            finally{
+                dest.close();
+            }
+        }
+        finally {
+            is.close();
+        }
     }
 
     public File installTemp() throws IOException {

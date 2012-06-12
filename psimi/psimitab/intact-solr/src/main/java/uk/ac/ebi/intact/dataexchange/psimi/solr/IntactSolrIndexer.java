@@ -114,15 +114,25 @@ public class IntactSolrIndexer {
 
     public int indexMitab(File mitabFile, boolean hasHeader) throws IOException, IntactSolrException {
         FileInputStream inputStream = new FileInputStream(mitabFile);
-        int num = indexMitab(inputStream, hasHeader);
-        inputStream.close();
+        int num = 0;
+        try{
+            num = indexMitab(inputStream, hasHeader);
+        }
+        finally {
+            inputStream.close();
+        }
         return num;
     }
 
     public int indexMitab(File mitabFile, boolean hasHeader, Integer firstLine, Integer batchSize) throws IOException, IntactSolrException {
         FileInputStream inputStream = new FileInputStream(mitabFile);
-        int num = indexMitab(new FileInputStream(mitabFile), hasHeader, firstLine, batchSize);
-        inputStream.close();
+        int num = 0;
+        try{
+            num = indexMitab(new FileInputStream(mitabFile), hasHeader, firstLine, batchSize);
+        }
+        finally {
+            inputStream.close();
+        }
         return num;
     }
 
@@ -135,9 +145,14 @@ public class IntactSolrIndexer {
 
         if (resourceStream == null) throw new IntactSolrException("Resource not found in the classpath: "+resourceUrl);
 
-        int num = indexMitab(resourceStream, hasHeader, firstLine, batchSize);
+        int num = 0;
 
-        resourceStream.close();
+        try{
+            num= indexMitab(resourceStream, hasHeader, firstLine, batchSize);
+        }
+        finally {
+            resourceStream.close();
+        }
         return num;
     }
 
@@ -166,8 +181,13 @@ public class IntactSolrIndexer {
     public int indexMitab(InputStream mitabStream, boolean hasHeader, Integer firstLine, Integer batchSize) throws IOException, IntactSolrException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(mitabStream));
 
-        int num = indexMitab(reader, hasHeader, firstLine, batchSize);
-        reader.close();
+        int num = 0;
+        try{
+            num = indexMitab(reader, hasHeader, firstLine, batchSize);
+        }
+        finally {
+            reader.close();
+        }
 
         return num;
     }

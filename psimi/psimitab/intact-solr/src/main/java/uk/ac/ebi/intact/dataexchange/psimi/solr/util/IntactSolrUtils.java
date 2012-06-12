@@ -59,9 +59,11 @@ public final class IntactSolrUtils {
                     schemaInfo.addFieldName(fieldName);
                 }
 
-                stream.close();
             } catch (XPathExpressionException e) {
                 e.printStackTrace();
+            }
+            finally {
+                stream.close();
             }
 
         } else {
