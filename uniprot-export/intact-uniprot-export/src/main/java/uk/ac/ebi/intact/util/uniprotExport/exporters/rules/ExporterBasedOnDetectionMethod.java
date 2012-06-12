@@ -23,8 +23,10 @@ import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.ExportContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -366,14 +368,17 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
         filterTrueBinaryInteractions(potentiallyEligibleInteraction, eligibleInteractions);
 
-        FileWriter writer = new FileWriter(fileForListOfInteractions);
+        Writer writer = new BufferedWriter(new FileWriter(fileForListOfInteractions));
 
-        for (String ac : eligibleInteractions){
-            writer.write(ac + "\n");
-            writer.flush();
+        try{
+            for (String ac : eligibleInteractions){
+                writer.write(ac + "\n");
+                writer.flush();
+            }
         }
-
-        writer.close();
+        finally {
+            writer.close();
+        }
 
         return eligibleInteractions;
     }

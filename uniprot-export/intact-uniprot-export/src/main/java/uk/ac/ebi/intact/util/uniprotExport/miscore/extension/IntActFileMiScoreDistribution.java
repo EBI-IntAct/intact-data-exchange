@@ -29,30 +29,36 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
         try {
             FileReader fstream = new FileReader(fileName);
             BufferedReader br = new BufferedReader(fstream);
-            String line;
-            while((line = br.readLine()) != null) {
+            try{
+                String line;
+                while((line = br.readLine()) != null) {
 
-                if (line.contains(SCORE_SEPARATOR)){
-                    String[] values = line.split(SCORE_SEPARATOR);
+                    if (line.contains(SCORE_SEPARATOR)){
+                        String[] values = line.split(SCORE_SEPARATOR);
 
-                    if (values.length == 2){
-                        scoreList.add(values[1]);
+                        if (values.length == 2){
+                            scoreList.add(values[1]);
+                        }
+                        else {
+                            System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
+                        }
                     }
                     else {
                         System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
                     }
                 }
-                else {
-                    System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
+                scores = new double[scoreList.size()];
+                int i = 0;
+                for(Object score:scoreList){
+                    scores[i] = Double.parseDouble(score.toString());
+                    i++;
                 }
             }
-            scores = new double[scoreList.size()];
-            int i = 0;
-            for(Object score:scoreList){
-                scores[i] = Double.parseDouble(score.toString());
-                i++;
+            finally {
+                br.close();
+                fstream.close();
             }
-            fstream.close();
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

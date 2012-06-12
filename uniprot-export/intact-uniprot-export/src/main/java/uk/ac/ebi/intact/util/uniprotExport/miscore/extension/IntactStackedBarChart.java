@@ -62,35 +62,38 @@ public class IntactStackedBarChart {
             FileReader fstream = new FileReader(fileName);
             BufferedReader br = new BufferedReader(fstream);
             String line;
+            try{
+                while((line = br.readLine()) != null) {
 
-            while((line = br.readLine()) != null) {
+                    if (line.contains(SCORE_SEPARATOR)){
+                        String[] values = line.split(SCORE_SEPARATOR);
 
-                if (line.contains(SCORE_SEPARATOR)){
-                    String[] values = line.split(SCORE_SEPARATOR);
+                        if (values.length == 2){
+                            String score = values[1];
 
-                    if (values.length == 2){
-                        String score = values[1];
-
-                        if (clusteredScores.containsKey(score)){
-                            Integer number = clusteredScores.get(score);
-                            number = number + 1;
-                            clusteredScores.put(score, number);
+                            if (clusteredScores.containsKey(score)){
+                                Integer number = clusteredScores.get(score);
+                                number = number + 1;
+                                clusteredScores.put(score, number);
+                            }
+                            else{
+                                Integer number = 1;
+                                clusteredScores.put(score, number);
+                            }
                         }
-                        else{
-                            Integer number = 1;
-                            clusteredScores.put(score, number);
+                        else {
+                            System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
                         }
                     }
                     else {
                         System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
                     }
                 }
-                else {
-                    System.err.println("the line " + line + " cannot be loaded because is not of the form 'id-interactorA-interactorB:score'");
-                }
-            }
 
-            fstream.close();
+            }finally {
+                br.close();
+                fstream.close();
+            }
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

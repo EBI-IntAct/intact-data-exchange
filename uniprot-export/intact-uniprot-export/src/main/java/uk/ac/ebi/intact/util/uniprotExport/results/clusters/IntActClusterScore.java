@@ -2,7 +2,9 @@ package uk.ac.ebi.intact.util.uniprotExport.results.clusters;
 
 import org.apache.log4j.Logger;
 import psidev.psi.mi.tab.PsimiTabWriter;
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Confidence;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
@@ -13,7 +15,11 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.*;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Extension of the InteractionClusterScore : use a different format to export the scores and added utility methods.
@@ -186,9 +192,13 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
             logger.info("Saving scores on ... " + fileName + "_log.txt");
             FileWriter fstream = new FileWriter(fileName + "_log.txt");
             BufferedWriter out = new BufferedWriter(fstream);
-            out.write(scoreListCSV);
-            //Close the output stream
-            out.close();
+            try{
+                out.write(scoreListCSV);
+            }
+            finally {
+                //Close the output stream
+                out.close();
+            }
         }catch (Exception e){//Catch exception if any
             logger.error("Error: " + e.getMessage());
         }
@@ -215,32 +225,36 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
         try {
             File file = new File(fileName);
 
-            FileWriter fstream = new FileWriter(fileName + ".txt");
+            Writer fstream = new BufferedWriter(new FileWriter(fileName + ".txt"));
 
-            for(Integer mappingId:interactionIds){
-                EncoreInteractionForScoring eI = interactionMapping.get(mappingId);
+            try{
+                for(Integer mappingId:interactionIds){
+                    EncoreInteractionForScoring eI = interactionMapping.get(mappingId);
 
-                // convert and write in mitab
-                if (eI != null){
-                    double score = FilterUtils.getMiClusterScoreFor(eI);
+                    // convert and write in mitab
+                    if (eI != null){
+                        double score = FilterUtils.getMiClusterScoreFor(eI);
 
-                    // write score in a text file
-                    fstream.write(Integer.toString(eI.getId()));
-                    fstream.write("-");
-                    fstream.write(eI.getInteractorA());
-                    fstream.write("-");
-                    fstream.write(eI.getInteractorB());
-                    fstream.write(":" + score);
-                    fstream.write("\n");
-                    fstream.flush();
+                        // write score in a text file
+                        fstream.write(Integer.toString(eI.getId()));
+                        fstream.write("-");
+                        fstream.write(eI.getInteractorA());
+                        fstream.write("-");
+                        fstream.write(eI.getInteractorB());
+                        fstream.write(":" + score);
+                        fstream.write("\n");
+                        fstream.flush();
 
-                    BinaryInteraction bI = iConverter.getBinaryInteractionForScoring(eI);
-                    writer.writeOrAppend(bI, file, false);
+                        BinaryInteraction bI = iConverter.getBinaryInteractionForScoring(eI);
+                        writer.writeOrAppend(bI, file, false);
+                    }
                 }
-            }
 
-            //Close the output stream
-            fstream.close();
+            }
+            finally {
+                //Close the output stream
+                fstream.close();
+            }
 
         } catch (Exception e) {
             logger.error("It is not possible to write the results in the mitab file " + fileName + " or in the text file " + fileName + ".txt");
