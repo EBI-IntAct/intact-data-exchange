@@ -140,4 +140,8 @@ public class ReportWriterListener extends AbstractImexUpdateListener {
     private String booleanToYesNo( boolean bool ) {
         return bool ? "Y" : "N";
     }
+
+    public void close() throws IOException {
+        this.reportHandler.close();
+    }
 }
