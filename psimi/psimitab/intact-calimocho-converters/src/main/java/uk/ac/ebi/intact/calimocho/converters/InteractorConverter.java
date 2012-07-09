@@ -11,6 +11,7 @@ import uk.ac.ebi.intact.model.util.InstitutionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Converts an interactor in a list of fields
@@ -57,47 +58,52 @@ public class InteractorConverter {
                 Collection<InteractorAlias> aliases = interactor.getAliases();
 
                 boolean hasFoundIdentity = false;
-
-                Collection<Field> otherIdentifiers = new ArrayList<Field>(interactorXrefs.size());
-                Collection<Field> otherXrefs = new ArrayList<Field>(interactorXrefs.size());
+                Collection<Field> otherIdentifiers = Collections.EMPTY_LIST;
+                Collection<Field> otherXrefs = Collections.EMPTY_LIST;
                 
-                // convert xrefs, and identity
-                for (InteractorXref ref : interactorXrefs){
+                if (!interactorXrefs.isEmpty()){
+                    otherIdentifiers = new ArrayList<Field>(interactorXrefs.size());
+                    otherXrefs = new ArrayList<Field>(interactorXrefs.size());
 
-                    // identity xrefs
-                    if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
-                        // first identity
-                        if (!hasFoundIdentity){
+                    // convert xrefs, and identity
+                    for (InteractorXref ref : interactorXrefs){
 
-                            Field identity = xrefConverter.intactToCalimocho(ref, false);
-                            if (identity != null){
-                                hasFoundIdentity = true;
+                        // identity xrefs
+                        if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
+                            // first identity
+                            if (!hasFoundIdentity){
 
-                                if (isFirst){
-                                    row.addField(InteractionKeys.KEY_ID_A, identity);
+                                Field identity = xrefConverter.intactToCalimocho(ref, false);
+                                if (identity != null){
+                                    hasFoundIdentity = true;
+
+                                    if (isFirst){
+                                        row.addField(InteractionKeys.KEY_ID_A, identity);
+                                    }
+                                    else {
+                                        row.addField(InteractionKeys.KEY_ID_B, identity);
+                                    }
                                 }
-                                else {
-                                    row.addField(InteractionKeys.KEY_ID_B, identity);
+                            }
+                            // other identifiers
+                            else {
+                                Field identity = xrefConverter.intactToCalimocho(ref, false);
+                                if (identity != null){
+                                    otherIdentifiers.add(identity);
                                 }
                             }
                         }
-                        // other identifiers
+                        // other xrefs
                         else {
-                            Field identity = xrefConverter.intactToCalimocho(ref, false);
-                            if (identity != null){
-                                otherIdentifiers.add(identity);
+                            Field refField = xrefConverter.intactToCalimocho(ref, true);
+                            if (refField != null){
+                                otherXrefs.add(refField);
                             }
-                        }
-                    }
-                    // other xrefs
-                    else {
-                        Field refField = xrefConverter.intactToCalimocho(ref, true);
-                        if (refField != null){
-                            otherXrefs.add(refField);
                         }
                     }
                 }
 
+                
                 // convert ac as identity or secondary identifier
                 if (interactor.getAc() != null){
                     Field acField = new DefaultField();
@@ -151,40 +157,44 @@ public class InteractorConverter {
                 }
 
                 // convert aliases
-                Collection<Field> aliasFields = new ArrayList<Field>(aliases.size());
-                for (InteractorAlias alias : aliases){
-                    Field aliasField = aliasConverter.intactToCalimocho(alias);
+                if (!aliases.isEmpty()){
+                    Collection<Field> aliasFields = new ArrayList<Field>(aliases.size());
+                    for (InteractorAlias alias : aliases){
+                        Field aliasField = aliasConverter.intactToCalimocho(alias);
 
-                    if (aliasField != null){
-                        aliasFields.add(aliasField);
+                        if (aliasField != null){
+                            aliasFields.add(aliasField);
+                        }
                     }
-                }
-                if (!aliasFields.isEmpty()){
-                    if (isFirst){
-                        row.addFields(InteractionKeys.KEY_ALIAS_A, aliasFields);
+                    if (!aliasFields.isEmpty()){
+                        if (isFirst){
+                            row.addFields(InteractionKeys.KEY_ALIAS_A, aliasFields);
+                        }
+                        else {
+                            row.addFields(InteractionKeys.KEY_ALIAS_B, aliasFields);
+                        }
                     }
-                    else {
-                        row.addFields(InteractionKeys.KEY_ALIAS_B, aliasFields);
-                    } 
-                }
+                }               
 
                 // convert annotations at the level of interactor
-                Collection<Field> annotFields = new ArrayList<Field>(annotations.size());
-                for (Annotation annots : annotations){
-                    Field annotField = annotationConverter.intactToCalimocho(annots);
+                if (!annotations.isEmpty()){
+                    Collection<Field> annotFields = new ArrayList<Field>(annotations.size());
+                    for (Annotation annots : annotations){
+                        Field annotField = annotationConverter.intactToCalimocho(annots);
 
-                    if (annotField != null){
-                        annotFields.add(annotField);
+                        if (annotField != null){
+                            annotFields.add(annotField);
+                        }
                     }
-                }
-                if (!annotFields.isEmpty()){
-                    if (isFirst){
-                        row.addFields(InteractionKeys.KEY_ANNOTATIONS_A, annotFields);
+                    if (!annotFields.isEmpty()){
+                        if (isFirst){
+                            row.addFields(InteractionKeys.KEY_ANNOTATIONS_A, annotFields);
+                        }
+                        else {
+                            row.addFields(InteractionKeys.KEY_ANNOTATIONS_B, annotFields);
+                        }
                     }
-                    else {
-                        row.addFields(InteractionKeys.KEY_ANNOTATIONS_B, annotFields);
-                    } 
-                }
+                }               
 
                 // convert organism(s)
                 if (interactor.getBioSource() != null){
@@ -330,6 +340,56 @@ public class InteractorConverter {
                     }
                     else {
                         row.addFields(InteractionKeys.KEY_PART_IDENT_METHOD_B, detMethodFields);
+                    }
+                }
+            }
+
+            // convert annotations at the level of participant
+            if (!participant.getAnnotations().isEmpty()){
+                Collection<Field> annotFields = isFirst ? row.getFields(InteractionKeys.KEY_ANNOTATIONS_A) : row.getFields(InteractionKeys.KEY_ANNOTATIONS_B);
+                
+                if (annotFields == null){
+                   annotFields = new ArrayList<Field>(participant.getAnnotations().size());
+                }
+
+                for (Annotation annots : participant.getAnnotations()){
+                    Field annotField = annotationConverter.intactToCalimocho(annots);
+
+                    if (annotField != null){
+                        annotFields.add(annotField);
+                    }
+                }
+                if (!annotFields.isEmpty()){
+                    if (isFirst){
+                        row.addFields(InteractionKeys.KEY_ANNOTATIONS_A, annotFields);
+                    }
+                    else {
+                        row.addFields(InteractionKeys.KEY_ANNOTATIONS_B, annotFields);
+                    }
+                }
+            }
+
+            // convert xrefs at the level of participant
+            if (!participant.getXrefs().isEmpty()){
+                Collection<Field> xrefFields = isFirst ? row.getFields(InteractionKeys.KEY_XREFS_A) : row.getFields(InteractionKeys.KEY_XREFS_B);
+
+                if (xrefFields == null){
+                    xrefFields = new ArrayList<Field>(participant.getXrefs().size());
+                }
+
+                for (ComponentXref xrefs : participant.getXrefs()){
+                    Field xrefField = xrefConverter.intactToCalimocho(xrefs, true);
+
+                    if (xrefField != null){
+                        xrefFields.add(xrefField);
+                    }
+                }
+                if (!xrefFields.isEmpty()){
+                    if (isFirst){
+                        row.addFields(InteractionKeys.KEY_XREFS_A, xrefFields);
+                    }
+                    else {
+                        row.addFields(InteractionKeys.KEY_XREFS_B, xrefFields);
                     }
                 }
             }
