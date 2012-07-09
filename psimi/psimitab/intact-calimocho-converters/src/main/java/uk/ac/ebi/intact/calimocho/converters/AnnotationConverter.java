@@ -3,8 +3,8 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
-import psidev.psi.mi.tab.utils.MitabEscapeUtils;
 import uk.ac.ebi.intact.model.Annotation;
+import uk.ac.ebi.intact.model.CvTopic;
 
 /**
  * Annotation converter
@@ -16,11 +16,15 @@ import uk.ac.ebi.intact.model.Annotation;
 
 public class AnnotationConverter {
 
-    public Field toCalimocho(Annotation annot){
-        if (annot != null && annot.getCvTopic() != null && annot.getCvTopic().getShortLabel() != null){
+    public Field intactToCalimocho(Annotation annot){
+        if (annot != null && annot.getCvTopic() != null){
             Field field = new DefaultField();
 
-            String topic = annot.getCvTopic().getShortLabel();
+            String topic = CvTopic.COMMENT;
+
+            if (annot.getCvTopic().getShortLabel() != null){
+                topic = annot.getCvTopic().getShortLabel();
+            }
 
             field.set( CalimochoKeys.KEY, topic);
             field.set( CalimochoKeys.NAME, topic);

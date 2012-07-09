@@ -3,7 +3,6 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
-import psidev.psi.mi.tab.utils.MitabEscapeUtils;
 import uk.ac.ebi.intact.model.BioSource;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ public class BioSourceConverter {
 
     public static String TAXID = "taxid";
     
-    public Collection<Field> toCalimocho(BioSource organism){
+    public Collection<Field> intactToCalimocho(BioSource organism){
         if (organism != null && organism.getTaxId() != null){
             Collection<Field> fields = new ArrayList<Field>(2);
             
@@ -39,6 +38,8 @@ public class BioSourceConverter {
             if (name != null){
                 common.set(CalimochoKeys.TEXT, name);
             }
+
+            fields.add(common);
             
             if (fullName != null){
                 Field scientific = new DefaultField();
@@ -48,11 +49,7 @@ public class BioSourceConverter {
 
                 scientific.set(CalimochoKeys.TEXT, fullName);
                 
-                fields.add(common);
                 fields.add(scientific);
-            }
-            else {
-                fields.add(common);
             }
             
             return fields;

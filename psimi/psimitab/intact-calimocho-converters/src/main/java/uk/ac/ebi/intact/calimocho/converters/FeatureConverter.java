@@ -3,7 +3,6 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
-import psidev.psi.mi.tab.utils.MitabEscapeUtils;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.Feature;
 import uk.ac.ebi.intact.model.FeatureXref;
@@ -20,7 +19,7 @@ import uk.ac.ebi.intact.model.util.FeatureUtils;
 
 public class FeatureConverter {
 
-    public Field toCalimocho(Feature feature){
+    public Field intactToCalimocho(Feature feature){
         if (feature != null){
             Field field = new DefaultField();
 

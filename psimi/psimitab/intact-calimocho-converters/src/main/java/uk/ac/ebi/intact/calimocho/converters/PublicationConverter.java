@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * PublicationConverter
+ * PublicationConverter : converts a publication
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -31,6 +31,15 @@ public class PublicationConverter {
     private DateFormat dayFormat;
 
     private List<String> tagsToExport;
+    
+    private final static String FULL_COVERAGE_MI = "MI:0957";
+    private final static String PARTIAL_COVERAGE_MI = "MI:0958";
+    private final static String CURATION_DEPTH_MI = "MI:0955";
+    private final static String EXPERIMENTALLY_OBSERVED_MI = "MI:1054";
+    private final static String IMPORTED_MI = "MI:1058";
+    private final static String INTERNALLY_CURATED_MI = "MI:1055";
+    private final static String PREDICTED_MI = "MI:1057";
+    private final static String TEXT_MINING_MI = "MI:1056";
 
     public PublicationConverter(){
         xrefConverter = new CrossReferenceConverter();
@@ -46,24 +55,29 @@ public class PublicationConverter {
     // tags at the publication level that will be exported as interaction annotations
     private void initializeTagsToExport(){
         // full coverage
-        tagsToExport.add("MI:0957");
+        tagsToExport.add(FULL_COVERAGE_MI);
         // partial coverage
-        tagsToExport.add("MI:0958");
+        tagsToExport.add(PARTIAL_COVERAGE_MI);
         // curation depth
-        tagsToExport.add("MI:0955");
+        tagsToExport.add(CURATION_DEPTH_MI);
         // experimentally observed
-        tagsToExport.add("MI:1054");
+        tagsToExport.add(EXPERIMENTALLY_OBSERVED_MI);
         // imported
-        tagsToExport.add("MI:1058");
+        tagsToExport.add(IMPORTED_MI);
         // internally curated
-        tagsToExport.add("MI:1055");
+        tagsToExport.add(INTERNALLY_CURATED_MI);
         // predicted
-        tagsToExport.add("MI:1057");
+        tagsToExport.add(PREDICTED_MI);
         // textMining
-        tagsToExport.add("MI:1056");
+        tagsToExport.add(TEXT_MINING_MI);
     }
 
-    public void toCalimocho(Publication pub, Row row){
+    /**
+     *
+     * @param pub : intact publication to convert
+     * @param row : the row to complete with publication details
+     */
+    public void intactToCalimocho(Publication pub, Row row){
 
         Collection<PublicationXref> pubRefs = pub.getXrefs();
         Collection<Annotation> pubAnnotations = pub.getAnnotations();
@@ -73,14 +87,14 @@ public class PublicationConverter {
             if (pubRef.getCvXrefQualifier() != null && pubRef.getCvDatabase().getShortLabel() != null) {
                 // publications
                 if (CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())) {
-                    Field primaryRef = xrefConverter.toCalimocho(pubRef, false);
+                    Field primaryRef = xrefConverter.intactToCalimocho(pubRef, false);
                     if (primaryRef != null){
                         pubIds.add(primaryRef);
                     }
                 }
                 // imexId
                 else if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())) {
-                    Field imexRef = xrefConverter.toCalimocho(pubRef, false);
+                    Field imexRef = xrefConverter.intactToCalimocho(pubRef, false);
                     if (imexRef != null){
                         pubIds.add(imexRef);
                     }
@@ -100,17 +114,17 @@ public class PublicationConverter {
             if (annot.getCvTopic() != null){
                 // tag
                 if (tagsToExport.contains(annot.getCvTopic().getIdentifier())){
-                    Field tag = annotConverter.toCalimocho(annot);
+                    Field tag = annotConverter.intactToCalimocho(annot);
                     if (tag != null){
                         row.addField(InteractionKeys.KEY_ANNOTATIONS_I, tag);
                     }
                 }
                 // author
-                else if ( CvTopic.AUTHOR_LIST_MI_REF.equals(annot)){
+                else if ( CvTopic.AUTHOR_LIST_MI_REF.equals(annot.getCvTopic().getIdentifier())){
                     author = annot.getAnnotationText();
                 }
                 // date
-                else if ( CvTopic.PUBLICATION_YEAR_MI_REF.equals(annot)){
+                else if ( CvTopic.PUBLICATION_YEAR_MI_REF.equals(annot.getCvTopic().getIdentifier())){
                     date = annot.getAnnotationText();
                 }
             }
@@ -152,7 +166,7 @@ public class PublicationConverter {
             Field identityRef = null;
             for (InstitutionXref ref : ownerRefs){
                 if (CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())) {
-                    identityRef = xrefConverter.toCalimocho(ref, false);
+                    identityRef = xrefConverter.intactToCalimocho(ref, false);
                     break;
                 }
             }

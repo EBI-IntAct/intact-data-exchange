@@ -3,7 +3,6 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
-import psidev.psi.mi.tab.utils.MitabEscapeUtils;
 import uk.ac.ebi.intact.model.Xref;
 
 /**
@@ -17,7 +16,7 @@ import uk.ac.ebi.intact.model.Xref;
 public class CrossReferenceConverter {
     public static String DATABASE_UNKNOWN = "unknown";
 
-    public Field toCalimocho(Xref ref, boolean addTextValue){
+    public Field intactToCalimocho(Xref ref, boolean addTextValue){
         if (ref != null && ref.getPrimaryId() != null){
             Field field = new DefaultField();
 

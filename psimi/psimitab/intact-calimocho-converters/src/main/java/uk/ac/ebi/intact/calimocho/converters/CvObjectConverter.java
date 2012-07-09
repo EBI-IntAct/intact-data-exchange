@@ -25,7 +25,7 @@ public class CvObjectConverter {
         this.xrefConverter = new CrossReferenceConverter();
     }
     
-    public Field toCalimocho(CvObject object){
+    public Field intactToCalimocho(CvObject object){
         if (object != null){
             Field field = null;           
 
@@ -34,7 +34,7 @@ public class CvObjectConverter {
             for (CvObjectXref ref : refs){
                 // identity xrefs
                 if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
-                    Field identity = xrefConverter.toCalimocho(ref, false);
+                    Field identity = xrefConverter.intactToCalimocho(ref, false);
                     if (identity != null){
                         field = identity;
                         break;

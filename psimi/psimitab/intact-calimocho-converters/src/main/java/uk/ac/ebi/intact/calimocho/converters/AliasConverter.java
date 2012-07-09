@@ -3,7 +3,11 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Alias;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.util.InstitutionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +35,7 @@ public class AliasConverter {
                 ORF_NAME_MI_REF) );
     }
 
-    public Field toCalimocho(Alias alias){
+    public Field intactToCalimocho(Alias alias){
         if (alias != null && alias.getName() != null){
             Field field = new DefaultField();
 
@@ -44,8 +48,21 @@ public class AliasConverter {
                     field.set(CalimochoKeys.DB, UNIPROT);
                 }
                 else {
-                    field.set(CalimochoKeys.KEY, INTACT);
-                    field.set(CalimochoKeys.DB, INTACT);
+                    String institutionName = INTACT;
+                    IntactContext context = IntactContext.getCurrentInstance();
+
+                    if (context.getInstitution() != null){
+                        Institution institution = context.getInstitution();
+
+                        CvDatabase database = InstitutionUtils.retrieveCvDatabase(context, institution);
+
+                        if (database != null && database.getShortLabel() != null){
+                            institutionName = database.getShortLabel();
+                        }
+                    }
+
+                    field.set(CalimochoKeys.KEY, institutionName);
+                    field.set(CalimochoKeys.DB, institutionName);
                 }
 
                 field.set(CalimochoKeys.TEXT, type);

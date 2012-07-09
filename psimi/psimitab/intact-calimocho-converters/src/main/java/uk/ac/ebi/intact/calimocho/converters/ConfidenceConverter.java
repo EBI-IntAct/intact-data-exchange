@@ -3,7 +3,6 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
-import psidev.psi.mi.tab.utils.MitabEscapeUtils;
 import uk.ac.ebi.intact.model.Confidence;
 
 /**
@@ -16,7 +15,7 @@ import uk.ac.ebi.intact.model.Confidence;
 
 public class ConfidenceConverter {
 
-    public Field toCalimocho(Confidence conf){
+    public Field intactToCalimocho(Confidence conf){
         if (conf != null && conf.getValue() != null){
             Field field = new DefaultField();
 

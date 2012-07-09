@@ -3,8 +3,19 @@
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="00e6e946-ca3e-4fb7-a2ab-6b1a46310d75" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/AliasConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/AliasConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/AnnotationConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/AnnotationConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/BioSourceConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/BioSourceConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ConfidenceConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ConfidenceConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CrossReferenceConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CrossReferenceConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CvObjectConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CvObjectConverter.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/FeatureConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/FeatureConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractionConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractionConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractorConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractorConverter.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/PublicationConverter.java" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/PublicationConverter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/uk/ac/ebi/intact/calimocho/converters/Playground.java" afterPath="$PROJECT_DIR$/src/test/java/uk/ac/ebi/intact/calimocho/converters/Playground.java" />
     </list>
     <ignored path="intact-calimocho-converters.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -66,28 +77,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="InteractionConverter.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractionConverter.java">
+      <file leaf-file-name="Playground.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/java/uk/ac/ebi/intact/calimocho/converters/Playground.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="238" column="60" selection-start="8743" selection-end="8743" vertical-scroll-proportion="0.15035461">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ExperimentConverter.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="53" column="67" selection-start="1754" selection-end="1754" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ParameterConverter.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="25" selection-start="469" selection-end="469" vertical-scroll-proportion="0.0">
+            <state line="32" column="13" selection-start="1201" selection-end="1201" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -104,21 +97,21 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/dataexchange/converters/App.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/AliasConverter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/PublicationConverter.java" />
         <option value="$PROJECT_DIR$/src/test/resources/base.spring.xml" />
         <option value="$PROJECT_DIR$/src/test/java/uk/ac/ebi/intact/calimocho/converters/Playground.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/AnnotationConverter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/BioSourceConverter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ConfidenceConverter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CrossReferenceConverter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/PublicationConverter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractionConverter.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/FeatureConverter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractorConverter.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CvObjectConverter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractionConverter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CrossReferenceConverter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ConfidenceConverter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/BioSourceConverter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/AnnotationConverter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/AliasConverter.java" />
       </list>
     </option>
   </component>
@@ -140,10 +133,10 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-8" />
-    <option name="y" value="-5" />
-    <option name="width" value="1168" />
-    <option name="height" value="877" />
+    <option name="x" value="64" />
+    <option name="y" value="-4" />
+    <option name="width" value="1377" />
+    <option name="height" value="905" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -171,8 +164,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -212,6 +203,14 @@
               <option name="myItemId" value="test" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="converters" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -241,6 +240,8 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -432,8 +433,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-5" width="1168" height="877" extended-state="6" />
-    <editor active="false" />
+    <frame x="64" y="-4" width="1377" height="905" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998565" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32948717" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -442,20 +443,20 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.41229656" sideWeight="0.1061828" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4108874" sideWeight="0.4180432" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998565" sideWeight="0.6705128" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.41229656" sideWeight="0.8844086" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4153499" sideWeight="0.96410257" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32948717" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32948717" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="6" side_tool="false" content_ui="combo" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -493,7 +494,7 @@
     <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
     <option name="CREATE_PATCH_EXPAND_DETAILS_DEFAULT" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added updated date" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed a few bugs" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -511,6 +512,7 @@
     <MESSAGE value="updated converters" />
     <MESSAGE value="Added participant identification method" />
     <MESSAGE value="Added updated date" />
+    <MESSAGE value="Fixed a few bugs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -520,86 +522,122 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/psidev/psi/mi/calimocho/2.2-SNAPSHOT/calimocho-2.2-SNAPSHOT-sources.jar!/org/hupo/psi/calimocho/model/DefaultRow.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="19" selection-start="800" selection-end="800" vertical-scroll-proportion="0.0" />
+        <state line="20" column="73" selection-start="563" selection-end="563" vertical-scroll-proportion="0.08906882">
+          <folding />
+        </state>
       </provider>
     </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/uk/ac/ebi/intact/dataexchange/psimi/intact-psimitab-converters/2.1.4-SNAPSHOT/intact-psimitab-converters-2.1.4-SNAPSHOT-sources.jar!/uk/ac/ebi/intact/psimitab/converters/expansion/ExpansionStrategy.java">
+    <entry file="jar://$MAVEN_REPOSITORY$/uk/ac/ebi/intact/core/intact-core/2.6.0-SNAPSHOT/intact-core-2.6.0-SNAPSHOT-sources.jar!/uk/ac/ebi/intact/model/util/InstitutionUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="0" selection-start="859" selection-end="859" vertical-scroll-proportion="0.0" />
+        <state line="41" column="29" selection-start="1348" selection-end="1348" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
       </provider>
     </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/uk/ac/ebi/intact/core/intact-core/2.6.0-SNAPSHOT/intact-core-2.6.0-SNAPSHOT-sources.jar!/uk/ac/ebi/intact/core/context/IntactContext.java">
+    <entry file="jar://$MAVEN_REPOSITORY$/uk/ac/ebi/intact/core/intact-core/2.6.0-SNAPSHOT/intact-core-2.6.0-SNAPSHOT-sources.jar!/uk/ac/ebi/intact/model/Component.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="171" column="0" selection-start="6231" selection-end="6231" vertical-scroll-proportion="0.33261338" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/uk/ac/ebi/intact/calimocho/converters/Playground.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="33" selection-start="1314" selection-end="1314" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="21" selection-start="808" selection-end="808" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/AnnotationConverter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="69" selection-start="882" selection-end="882" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ConfidenceConverter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="59" selection-start="1001" selection-end="1001" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/PublicationConverter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="8" selection-start="1141" selection-end="1338" vertical-scroll-proportion="0.0" />
+        <state line="314" column="19" selection-start="11387" selection-end="11387" vertical-scroll-proportion="0.33333334">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/FeatureConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="70" column="74" selection-start="2638" selection-end="2638" vertical-scroll-proportion="0.0" />
+        <state line="21" column="24" selection-start="591" selection-end="591" vertical-scroll-proportion="-0.29554656">
+          <folding />
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CrossReferenceConverter.java">
+    <entry file="jar://$MAVEN_REPOSITORY$/psidev/psi/mi/calimocho/2.2-SNAPSHOT/calimocho-2.2-SNAPSHOT-sources.jar!/org/hupo/psi/calimocho/model/DefaultRow.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="62" selection-start="1008" selection-end="1008" vertical-scroll-proportion="0.52243125" />
+        <state line="31" column="19" selection-start="800" selection-end="800" vertical-scroll-proportion="0.33289126">
+          <folding />
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/BioSourceConverter.java">
+    <entry file="jar://$MAVEN_REPOSITORY$/psidev/psi/mi/calimocho/2.2-SNAPSHOT/calimocho-2.2-SNAPSHOT-sources.jar!/org/hupo/psi/calimocho/model/Row.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="48" column="59" selection-start="1586" selection-end="1586" vertical-scroll-proportion="0.56551725" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CvObjectConverter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="30" selection-start="1265" selection-end="1265" vertical-scroll-proportion="0.15730338" />
+        <state line="15" column="0" selection-start="257" selection-end="257" vertical-scroll-proportion="0.29840848">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractorConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="250" column="92" selection-start="10317" selection-end="10317" vertical-scroll-proportion="1.8026316" />
+        <state line="328" column="34" selection-start="13916" selection-end="13916" vertical-scroll-proportion="0.67611337">
+          <folding>
+            <element signature="e#2282#2289#0" expanded="true" />
+            <element signature="e#2375#2382#0" expanded="true" />
+            <element signature="e#6313#6320#0" expanded="true" />
+            <element signature="e#7071#7078#0" expanded="true" />
+            <element signature="e#10756#10763#0" expanded="true" />
+            <element signature="e#12049#12056#0" expanded="true" />
+            <element signature="e#13466#13473#0" expanded="true" />
+          </folding>
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ExperimentConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="67" selection-start="1754" selection-end="1754" vertical-scroll-proportion="0.0" />
+        <state line="61" column="40" selection-start="2054" selection-end="2054" vertical-scroll-proportion="0.757085">
+          <folding />
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ParameterConverter.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CvObjectConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="25" selection-start="469" selection-end="469" vertical-scroll-proportion="0.0">
+        <state line="21" column="22" selection-start="537" selection-end="537" vertical-scroll-proportion="0.020242915">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/CrossReferenceConverter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="24" selection-start="487" selection-end="487" vertical-scroll-proportion="0.30364373">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/ConfidenceConverter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="39" selection-start="439" selection-end="439" vertical-scroll-proportion="0.2834008">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/BioSourceConverter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="57" column="26" selection-start="1739" selection-end="1739" vertical-scroll-proportion="0.8209549">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/AnnotationConverter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="42" selection-start="640" selection-end="640" vertical-scroll-proportion="0.3580902">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/InteractionConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="238" column="60" selection-start="8743" selection-end="8743" vertical-scroll-proportion="0.15035461">
+        <state line="174" column="12" selection-start="6466" selection-end="6936" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/ebi/intact/calimocho/converters/AliasConverter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="64" column="63" selection-start="2437" selection-end="2437" vertical-scroll-proportion="0.51417005">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/uk/ac/ebi/intact/calimocho/converters/Playground.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="13" selection-start="1201" selection-end="1201" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>

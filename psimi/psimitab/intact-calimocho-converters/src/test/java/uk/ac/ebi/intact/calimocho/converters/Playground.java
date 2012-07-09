@@ -55,7 +55,7 @@ public class Playground {
             for (Experiment exp : pub.getExperiments()){
                 for (Interaction inter : exp.getInteractions()){
                     try {
-                        List<Row> rows = interactionConverter.toCalimocho(inter);
+                        List<Row> rows = interactionConverter.intactToCalimocho(inter);
 
                         for (Row row : rows){
                             try {

@@ -8,7 +8,9 @@ import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.DefaultRow;
 import org.hupo.psi.calimocho.model.Field;
 import org.hupo.psi.calimocho.model.Row;
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.InstitutionUtils;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.NotExpandableInteractionException;
@@ -69,7 +71,7 @@ public class InteractionConverter {
         this.expansionMI = expansionMI;
     }
 
-    public List<Row> toCalimocho(Interaction interaction) throws NotExpandableInteractionException {
+    public List<Row> intactToCalimocho(Interaction interaction) throws NotExpandableInteractionException {
 
         if ( interaction == null ) {
             throw new IllegalArgumentException( "Interaction must not be null" );
@@ -77,14 +79,14 @@ public class InteractionConverter {
 
         List<Row> rows = new ArrayList<Row>();
 
-        // case of intra molecular interactions
+        // case of intra molecular interactions and self interactions
         if (interaction.getComponents().size() == 1) {
             Component c = interaction.getComponents().iterator().next();
 
             if (c.getStoichiometry() < 2){
                 Row row = processBinaryInteraction(interaction, false);
 
-                interactorConverter.toCalimocho(c, row, true);
+                interactorConverter.intactToCalimocho(c, row, true);
                 rows.add(row);
 
                 return rows;
@@ -127,8 +129,8 @@ public class InteractionConverter {
                 final Component componentB = iterator.next();
 
                 // convert interactors
-                interactorConverter.toCalimocho(componentA, row, true);
-                interactorConverter.toCalimocho(componentB, row, false);
+                interactorConverter.intactToCalimocho(componentA, row, true);
+                interactorConverter.intactToCalimocho(componentB, row, false);
                 rows.add(row);
             }
         }
@@ -141,7 +143,7 @@ public class InteractionConverter {
 
         // process interaction type
         if (binary.getCvInteractionType() != null){
-            Field type = cvObjectConverter.toCalimocho(binary.getCvInteractionType());
+            Field type = cvObjectConverter.intactToCalimocho(binary.getCvInteractionType());
 
             if (type != null){
                 row.addField(InteractionKeys.KEY_INTERACTION_TYPE, type);
@@ -153,7 +155,7 @@ public class InteractionConverter {
             Collection<Field> confs = new ArrayList<Field>(binary.getConfidences().size());
 
             for (Confidence conf : binary.getConfidences()){
-                Field confField = confidenceConverter.toCalimocho(conf);
+                Field confField = confidenceConverter.intactToCalimocho(conf);
 
                 if (confField != null){
                     confs.add(confField);
@@ -169,6 +171,17 @@ public class InteractionConverter {
             id.set(CalimochoKeys.KEY, CvDatabase.INTACT);
             id.set(CalimochoKeys.DB, CvDatabase.INTACT);
             id.set(CalimochoKeys.VALUE, binary.getAc());
+
+            if (binary.getOwner() != null){
+                Institution institution = binary.getOwner();
+
+                CvDatabase database = InstitutionUtils.retrieveCvDatabase(IntactContext.getCurrentInstance(), institution);
+
+                if (database != null && database.getShortLabel() != null){
+                    id.set(CalimochoKeys.KEY, database.getShortLabel());
+                    id.set(CalimochoKeys.DB, database.getShortLabel());
+                }
+            }
 
             row.addField(InteractionKeys.KEY_INTERACTION_ID, id);
         }
@@ -195,24 +208,29 @@ public class InteractionConverter {
 
         // process experiments
         for (Experiment exp : binary.getExperiments()){
-            experimentConverter.toCalimocho(exp, row);
+            experimentConverter.intactToCalimocho(exp, row);
         }
 
         //process xrefs
         Collection<InteractorXref> interactionRefs = binary.getXrefs();
-        Collection<Field> otherXrefs = new ArrayList<Field>(interactionRefs.size());
 
-        // convert xrefs
-        for (InteractorXref ref : interactionRefs){
+        if (!interactionRefs.isEmpty()){
+            Collection<Field> otherXrefs = new ArrayList<Field>(interactionRefs.size());
 
-            Field refField = xrefConverter.toCalimocho(ref, true);
-            if (refField != null){
-                otherXrefs.add(refField);
+            // convert xrefs
+            for (InteractorXref ref : interactionRefs){
+
+                Field refField = xrefConverter.intactToCalimocho(ref, true);
+                if (refField != null){
+                    otherXrefs.add(refField);
+                }
+            }
+            if (!otherXrefs.isEmpty()){
+                row.addFields(InteractionKeys.KEY_XREFS_I, otherXrefs);
             }
         }
-        row.addFields(InteractionKeys.KEY_XREFS_I, otherXrefs);
 
-        //process annotations
+        //process annotations (could have been processed with experiments)
         Collection<Annotation>  annotations = binary.getAnnotations();
         if (!annotations.isEmpty()){
             Collection<Field> annotationFields = row.getFields(InteractionKeys.KEY_ANNOTATIONS_I);
@@ -222,13 +240,15 @@ public class InteractionConverter {
             }
 
             for (Annotation annots : annotations){
-                Field annotField = annotConverter.toCalimocho(annots);
+                Field annotField = annotConverter.intactToCalimocho(annots);
 
                 if (annotField != null){
                     annotationFields.add(annotField);
                 }
             }
-            row.addFields(InteractionKeys.KEY_ANNOTATIONS_I, annotationFields);
+            if (!annotationFields.isEmpty()){
+                row.addFields(InteractionKeys.KEY_ANNOTATIONS_I, annotationFields);
+            }
         }
 
         //process parameters
@@ -236,7 +256,7 @@ public class InteractionConverter {
             Collection<Field> paramFields = new ArrayList<Field>(binary.getParameters().size());
 
             for (Parameter param : binary.getParameters()){
-                Field paramField = parameterConverter.toCalimocho(param);
+                Field paramField = parameterConverter.intactToCalimocho(param);
 
                 if (paramField != null){
                     paramFields.add(paramField);
@@ -268,13 +288,13 @@ public class InteractionConverter {
 
         // process update date
         if (binary.getUpdated() != null){
-            Field created = new DefaultField();
-            created.set( CalimochoKeys.VALUE, dateFormat.format(binary.getUpdated()) );
-            created.set( CalimochoKeys.DAY, dayFormat.format(binary.getUpdated()) );
-            created.set( CalimochoKeys.MONTH, monthFormat.format(binary.getUpdated()) );
-            created.set( CalimochoKeys.YEAR, yearFormat.format(binary.getUpdated()) );
+            Field updated = new DefaultField();
+            updated.set(CalimochoKeys.VALUE, dateFormat.format(binary.getUpdated()));
+            updated.set(CalimochoKeys.DAY, dayFormat.format(binary.getUpdated()));
+            updated.set(CalimochoKeys.MONTH, monthFormat.format(binary.getUpdated()));
+            updated.set(CalimochoKeys.YEAR, yearFormat.format(binary.getUpdated()));
 
-            row.addField(InteractionKeys.KEY_UPDATE_DATE, created);
+            row.addField(InteractionKeys.KEY_UPDATE_DATE, updated);
         }
 
         return row;

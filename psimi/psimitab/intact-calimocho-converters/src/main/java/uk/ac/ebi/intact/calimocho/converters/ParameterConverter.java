@@ -6,7 +6,7 @@ import org.hupo.psi.calimocho.model.Field;
 import uk.ac.ebi.intact.model.Parameter;
 
 /**
- * Parameter converter
+ * Parameter converter : converts interaction parameters
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -15,7 +15,12 @@ import uk.ac.ebi.intact.model.Parameter;
 
 public class ParameterConverter {
 
-    public Field toCalimocho(Parameter param){
+    /**
+     *
+     * @param param : the intact parameter
+     * @return a calimocho field tha represents the interaction parameter
+     */
+    public Field intactToCalimocho(Parameter param){
         if (param != null){
             Field field = new DefaultField();
 
