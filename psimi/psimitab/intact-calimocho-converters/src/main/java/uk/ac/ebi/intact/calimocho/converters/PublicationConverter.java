@@ -201,4 +201,15 @@ public class PublicationConverter {
             row.addField(InteractionKeys.KEY_CREATION_DATE, created);
         }
     }
+    
+    public Publication calimochoToIntact(Row row){
+
+        if (row != null){
+
+            Collection<Field> pubIds = row.getFields(InteractionKeys.KEY_PUBID);
+            Collection<Field> authorDate = row.getFields(InteractionKeys.KEY_PUBAUTH);
+        }
+
+        return null;
+    }
 }

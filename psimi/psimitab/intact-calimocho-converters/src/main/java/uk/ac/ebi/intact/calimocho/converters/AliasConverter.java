@@ -4,10 +4,9 @@ import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
 import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.Alias;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.Institution;
+import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.InstitutionUtils;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +28,8 @@ public class AliasConverter {
     public static final String UNIPROT = "uniprotkb";
     public static final String INTACT = "intact";
 
+    public static final String SYNONYM_MI="MI:1041";
+    public final static String SYNONYM = "synonym";
     static {
         uniprotKeys = new ArrayList<String>( Arrays.asList(GENE_NAME_MI_REF, GENE_NAME_SYNONYM_MI_REF,
                 ISOFORM_SYNONYM_MI_REF, LOCUS_NAME_MI_REF,
@@ -75,6 +76,39 @@ public class AliasConverter {
             field.set(CalimochoKeys.VALUE, alias.getName());
 
             return field;
+        }
+
+        return null;
+    }
+
+    /**
+     * 
+     * @param field
+     * @return the converted alias
+     */
+    public Alias calimochoToIntact(Field field){
+        if (field != null && field.get(CalimochoKeys.VALUE) != null){
+            Alias alias = new InteractorAlias();
+
+            alias.setName(field.get(CalimochoKeys.VALUE));
+            
+            String typeName = field.get(CalimochoKeys.TEXT);
+            CvAliasType aliasType;
+
+            if (typeName != null){
+                aliasType = new CvAliasType(IntactContext.getCurrentInstance().getInstitution(), typeName);
+            }
+            else {
+                aliasType = new CvAliasType(IntactContext.getCurrentInstance().getInstitution(), SYNONYM);
+
+                aliasType.setIdentifier(SYNONYM_MI);
+                CvObjectXref psiRef = XrefUtils.createIdentityXrefPsiMi(aliasType, SYNONYM_MI);
+                aliasType.addXref(psiRef);
+            }
+
+            alias.setCvAliasType(aliasType);
+
+            return alias;
         }
 
         return null;

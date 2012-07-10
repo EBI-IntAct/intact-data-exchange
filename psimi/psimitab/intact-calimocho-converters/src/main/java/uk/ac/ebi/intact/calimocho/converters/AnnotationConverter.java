@@ -35,4 +35,23 @@ public class AnnotationConverter {
 
         return null;
     }
+
+    /**
+     * 
+     * @param field
+     * @return the converted annotation
+     */
+    public Annotation calimochoToIntact(Field field){
+        if (field != null && field.get(CalimochoKeys.NAME) != null){
+            
+            String topic = field.get(CalimochoKeys.NAME);
+            CvTopic cvTopic = new CvTopic(topic);
+            
+            Annotation annot = new Annotation(cvTopic, field.get(CalimochoKeys.VALUE));
+
+            return annot;
+        }
+        
+        return null;
+    }
 }

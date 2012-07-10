@@ -68,4 +68,15 @@ public class ExperimentConverter {
         }
 
     }
+    
+    public Experiment calimochoToIntact(Row row){
+
+        if (row != null){
+
+
+
+        }
+
+        return null;
+    }
 }
