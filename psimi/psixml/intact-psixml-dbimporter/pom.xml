@@ -77,11 +77,11 @@
             <artifactId>intact-core</artifactId>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>uk.ac.ebi.uniprot.kraken</groupId>
             <artifactId>uniprotjapi</artifactId>
             <version>LATEST</version>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
     <repositories>
