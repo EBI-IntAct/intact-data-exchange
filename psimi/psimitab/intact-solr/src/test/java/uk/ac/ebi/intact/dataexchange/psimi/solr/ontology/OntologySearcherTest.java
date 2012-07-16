@@ -5,6 +5,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.AbstractSolrTestCase;
@@ -22,6 +23,7 @@ import java.net.URL;
 public class OntologySearcherTest extends AbstractSolrTestCase {
 
     @Test
+    @Ignore
     public void searchByChildId() throws Exception {
 
         // index a small ontology
@@ -39,6 +41,7 @@ public class OntologySearcherTest extends AbstractSolrTestCase {
     }
 
     @Test
+    @Ignore
     public void searchByParentId() throws Exception {
 
         // index a small ontology
