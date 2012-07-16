@@ -3,9 +3,8 @@ package uk.ac.ebi.intact.task;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -51,7 +50,7 @@ public class MitabToSolrIndexJobTest extends IntactBasicTestCase{
     @Autowired
     private SolrJettyRunner solrJettyRunner;
 
-    @Before
+    /*@Before
     public void before() throws Exception {
         solrJettyRunner.start();
     }
@@ -60,10 +59,11 @@ public class MitabToSolrIndexJobTest extends IntactBasicTestCase{
     public void after() throws Exception {
 
         solrJettyRunner.stop();
-    }
+    }*/
 
     @Test
     @DirtiesContext
+    @Ignore
     public void indexMitabSolr() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 

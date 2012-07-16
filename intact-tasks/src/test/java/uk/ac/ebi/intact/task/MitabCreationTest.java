@@ -18,9 +18,8 @@ package uk.ac.ebi.intact.task;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -31,14 +30,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.CvTopic;
+import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.model.Protein;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -65,7 +65,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @Autowired
     private SolrJettyRunner solrJettyRunner;
 
-    @Before
+    /*@Before
     public void before() throws Exception {
         solrJettyRunner.start();
     }
@@ -77,10 +77,11 @@ public class MitabCreationTest extends IntactBasicTestCase {
         // solrJettyRunner.join();
 
         solrJettyRunner.stop();
-    }
+    }*/
 
     @Test
     @DirtiesContext
+    @Ignore
     public void writeMitab() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
@@ -146,6 +147,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
+    @Ignore
     public void writeMitabSelf() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
@@ -187,6 +189,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
+    @Ignore
     public void writeMitabSelf_stoichioGreaterThan2() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
@@ -228,6 +231,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
+    @Ignore
     public void writeMitab_withXrefs() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
@@ -261,42 +265,9 @@ public class MitabCreationTest extends IntactBasicTestCase {
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("IM-1234-1")).getResults().getNumFound());
     }
 
-    /*@Test
-    @DirtiesContext
-    public void writeCompactXML_test() throws Exception {
-
-        Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
-        Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
-        Protein proteinC = getMockBuilder().createProtein("Q00002", "protC");
-
-        Interaction interaction = getMockBuilder().createInteraction(
-                getMockBuilder().createComponentBait(proteinA),
-                getMockBuilder().createComponentPrey(proteinB),
-                getMockBuilder().createComponentPrey(proteinC));
-
-        CvDatabase imexDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        interaction.addXref(getMockBuilder().createXref(interaction, "IM-1234-1", imexPrimary, imexDb));
-
-        corePersister.saveOrUpdate(interaction);
-
-        Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
-
-        Job job = (Job) applicationContext.getBean("createMitabJob");
-
-        Map<String, JobParameter> params = new HashMap<String, JobParameter>(1);
-        params.put("date", new JobParameter(System.currentTimeMillis()));
-
-        JobExecution jobExecution = jobLauncher.run(job, new JobParameters(params));
-        Assert.assertTrue( jobExecution.getAllFailureExceptions().isEmpty() );
-        Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
-
-        final SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
-        Assert.assertEquals(2L, solrServer.query(new SolrQuery("IM-1234-1")).getResults().getNumFound());
-    } */
-
     @Test
     @DirtiesContext
+    @Ignore
     public void writeMitab_negative() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
