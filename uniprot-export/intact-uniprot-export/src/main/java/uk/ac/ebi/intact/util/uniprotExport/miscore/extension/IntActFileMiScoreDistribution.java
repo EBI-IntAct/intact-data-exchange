@@ -80,6 +80,11 @@ public class IntActFileMiScoreDistribution implements MiscoreDistribution {
         miH.createChart();
     }
 
+    @Override
+    public void saveScores() {
+
+    }
+
     /**
      * Create a chart with the results of mi cluster score
      * @param diagrammName

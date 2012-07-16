@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParameters1;
@@ -26,12 +26,12 @@ public class CCLineConverter1Test extends UniprotExportBase {
     public void test_cc_convert_ok(){
         CCLineConverter1 converter = new CCLineConverter1();
 
-        List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
+        List<EncoreInteraction> interactions = createEncoreInteractions();
         interactions.add(3, createIsoformIsoformInteraction()); // cannot be converted because isoform-isoform
         interactions.add(4, createEncoreInteractionWithTransIsoform()); // can be converted but is not written twice because another isoform of the entry already interacts with same protein
         interactions.add(5, createEncoreInteractionWithTransIsoformAndMaster()); // can be converted because isoform and other uniprot entry, even if this isoform is not matching the master
 
-        List<EncoreInteractionForScoring> negativeInteractions = new ArrayList<EncoreInteractionForScoring>();
+        List<EncoreInteraction> negativeInteractions = new ArrayList<EncoreInteraction>();
         negativeInteractions.add(interactions.get(2));
         interactions.remove(2);
 
@@ -39,7 +39,7 @@ public class CCLineConverter1Test extends UniprotExportBase {
 
         String firstInteractor = "P28548";
 
-        CCParameters<SecondCCParameters1> parameters = converter.convertPositiveAndNegativeInteractionsIntoCCLines(new HashSet<EncoreInteractionForScoring>(interactions), new HashSet<EncoreInteractionForScoring>(negativeInteractions), context, firstInteractor);
+        CCParameters<SecondCCParameters1> parameters = converter.convertPositiveAndNegativeInteractionsIntoCCLines(new HashSet<EncoreInteraction>(interactions), new HashSet<EncoreInteraction>(negativeInteractions), context, firstInteractor);
         Assert.assertNotNull(parameters);
         Assert.assertEquals("P28548", parameters.getMasterUniprotAc());
         Assert.assertEquals("Kin-10", parameters.getGeneName());

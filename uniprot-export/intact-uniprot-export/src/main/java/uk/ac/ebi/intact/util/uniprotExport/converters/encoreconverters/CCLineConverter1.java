@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.apache.log4j.Logger;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
@@ -37,13 +37,13 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
     }
 
     @Override
-    public CCParameters convertPositiveAndNegativeInteractionsIntoCCLines(Set<EncoreInteractionForScoring> positiveInteractions, Set<EncoreInteractionForScoring> negativeInteractions, MiClusterContext context, String firstInteractor) {
+    public CCParameters convertPositiveAndNegativeInteractionsIntoCCLines(Set<EncoreInteraction> positiveInteractions, Set<EncoreInteraction> negativeInteractions, MiClusterContext context, String firstInteractor) {
         logger.warn("The CCline format version 1 doesn't accept negative interactions so they will be ignored.");
         return convertInteractionsIntoCCLines(positiveInteractions, context, firstInteractor);
     }
 
     @Override
-    public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(Set<EncoreInteractionForScoring> interactions, MiClusterContext context, String masterUniprot){
+    public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(Set<EncoreInteraction> interactions, MiClusterContext context, String masterUniprot){
         processedCCParametersForFeatureChains.clear();
 
         String firstIntactAc = null;
@@ -56,7 +56,7 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
 
             Map<String, Set<IntactTransSplicedProteins>> transSplicedVariants = context.getTranscriptsWithDifferentMasterAcs();
 
-            for (EncoreInteractionForScoring interaction : interactions){
+            for (EncoreInteraction interaction : interactions){
                 // get the uniprot acs of the first and second interactors
 
                 String uniprot1;

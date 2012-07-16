@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.apache.log4j.Logger;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters2;
@@ -28,7 +28,7 @@ public class GoLineConverter2 implements GoLineConverter<GOParameters2> {
      * @param firstInteractor uniprot ac of first interactor
      * @return The converted GOParameters
      */
-    public List<GOParameters2> convertInteractionIntoGOParameters(EncoreInteractionForScoring interaction, String firstInteractor, MiClusterContext context){
+    public List<GOParameters2> convertInteractionIntoGOParameters(EncoreInteraction interaction, String firstInteractor, MiClusterContext context){
         // extract the uniprot acs of the firts and second interactors
         String uniprot1;
         String uniprot2;
@@ -115,11 +115,11 @@ public class GoLineConverter2 implements GoLineConverter<GOParameters2> {
      * @param interactions : list of encore interactions involving the same interactors or feature chains of a same entry
      * @return The converted GOParameters
      */
-    public List<GOParameters2> convertInteractionsIntoGOParameters(Set<EncoreInteractionForScoring> interactions, String parentAc, MiClusterContext context){
+    public List<GOParameters2> convertInteractionsIntoGOParameters(Set<EncoreInteraction> interactions, String parentAc, MiClusterContext context){
         List<GOParameters2> goParameters = new ArrayList<GOParameters2>(interactions.size());
 
         // for each binary interaction associated with the same uniprot entry given with parentAc
-        for (EncoreInteractionForScoring interaction : interactions){
+        for (EncoreInteraction interaction : interactions){
             // extract the uniprot acs of the first and second interactors for the first interaction
             String uniprot1;
             String uniprot2;

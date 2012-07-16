@@ -336,7 +336,6 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>
-            <version>2.5.1-20110916-SNAPSHOT</version>
         </dependency>
 
         <!-- PostgreSQL -->

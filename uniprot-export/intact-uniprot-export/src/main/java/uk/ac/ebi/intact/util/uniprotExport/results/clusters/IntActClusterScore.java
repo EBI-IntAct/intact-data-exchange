@@ -6,7 +6,7 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
 import uk.ac.ebi.enfin.mi.score.scores.UnNormalizedMIScore;
@@ -56,7 +56,7 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
     }
 
     @Override
-    protected void processMethodAndType(EncoreInteractionForScoring encoreInteraction, EncoreInteractionForScoring mappingEncoreInteraction) {
+    protected void processMethodAndType(EncoreInteraction encoreInteraction, EncoreInteraction mappingEncoreInteraction) {
         Map<MethodTypePair, List<String>> existingMethodTypeToPubmed = mappingEncoreInteraction.getMethodTypePairListMap();
 
         for (Map.Entry<MethodTypePair, List<String>> entry : encoreInteraction.getMethodTypePairListMap().entrySet()){
@@ -149,7 +149,7 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
             scoreListCSV = "";
             String delimiter = "\n";
             int i = 0;
-            for(EncoreInteractionForScoring eI:this.getInteractionMapping().values()){
+            for(EncoreInteraction eI:this.getInteractionMapping().values()){
                 List<Confidence> confidenceValues = eI.getConfidenceValues();
                 Double score = null;
                 for(Confidence confidenceValue:confidenceValues){
@@ -172,12 +172,12 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
     }
 
     @Override
-    public void saveScores(String fileName){
+    public void saveResultsInMitab(String fileName){
         /* Retrieve results */
 
         try {
             logger.info("Saving MITAB ... " + fileName);
-            super.saveScoreInMitab(fileName);
+            super.saveScores(fileName);
 
         } catch (Exception e) {
             logger.error("It is not possible to write the results in the mitab file " + fileName);
@@ -218,7 +218,7 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
 
         /* Retrieve results */
 
-        Map<Integer, EncoreInteractionForScoring> interactionMapping = getInteractionMapping();
+        Map<Integer, EncoreInteraction> interactionMapping = getInteractionMapping();
         Encore2Binary iConverter = new Encore2Binary(getMappingIdDbNames());
         logger.info("Saving scores...");
 
@@ -229,7 +229,7 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
 
             try{
                 for(Integer mappingId:interactionIds){
-                    EncoreInteractionForScoring eI = interactionMapping.get(mappingId);
+                    EncoreInteraction eI = interactionMapping.get(mappingId);
 
                     // convert and write in mitab
                     if (eI != null){
@@ -268,7 +268,7 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
     }
 
     @Override
-    public Map<Integer, EncoreInteractionForScoring> getEncoreInteractionCluster() {
+    public Map<Integer, EncoreInteraction> getEncoreInteractionCluster() {
         return getInteractionMapping();
     }
 
@@ -279,7 +279,7 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
         Map<Integer, BinaryInteraction<Interactor>> binaryInteractionCluster = new HashMap<Integer, BinaryInteraction<Interactor>>();
 
         for(Integer mappingId:getInteractionMapping().keySet()){
-            EncoreInteractionForScoring eI = getInteractionMapping().get(mappingId);
+            EncoreInteraction eI = getInteractionMapping().get(mappingId);
             if (eI != null){
                 BinaryInteraction bI = iConverter.getBinaryInteractionForScoring(eI);
                 binaryInteractionCluster.put(mappingId, bI);

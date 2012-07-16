@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.converters;
 
 import org.apache.log4j.Logger;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
@@ -43,7 +43,7 @@ public class DRLineConverter1 implements DRLineConverter {
      * @return the converted DRParameter
      * @throws IOException
      */
-    public DRParameters convertInteractorIntoDRLine(String interactorAc, Set<EncoreInteractionForScoring> interactions, MiClusterContext context){
+    public DRParameters convertInteractorIntoDRLine(String interactorAc, Set<EncoreInteraction> interactions, MiClusterContext context){
         processedSecondInteractors.clear();
 
         // if the interactor ac is not null, we can create a DRParameter
@@ -54,7 +54,7 @@ public class DRLineConverter1 implements DRLineConverter {
 
             Set<IntactTransSplicedProteins> transIsoforms = transSplicedVariants.get(interactorAc);
 
-            for (EncoreInteractionForScoring interaction : interactions){
+            for (EncoreInteraction interaction : interactions){
                 // get the uniprot acs of the first and second interactors
 
                 String uniprot1;

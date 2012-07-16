@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.converters;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 
@@ -24,7 +24,7 @@ public class DRLineConverter1Test extends UniprotExportBase{
     public void test_dr_convert_ok(){
         DRLineConverter1 converter = new DRLineConverter1();
 
-        Set<EncoreInteractionForScoring> interactions = new HashSet<EncoreInteractionForScoring>(createEncoreInteractions()); // three interactions
+        Set<EncoreInteraction> interactions = new HashSet<EncoreInteraction>(createEncoreInteractions()); // three interactions
         interactions.add(createIsoformIsoformInteraction()); // does not count because isoform-isoform of same uniprot entry
         interactions.add(createEncoreInteractionWithTransIsoform()); // not counted because same interactor already interacts with isoform 2
         interactions.add(createEncoreInteractionWithTransIsoformAndMaster()); // cannot be converted because interaction with isoform of same entry

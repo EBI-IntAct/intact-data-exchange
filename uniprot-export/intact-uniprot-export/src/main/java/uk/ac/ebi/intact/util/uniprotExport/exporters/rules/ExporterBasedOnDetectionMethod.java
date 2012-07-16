@@ -4,7 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.model.*;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Interaction;
@@ -252,7 +252,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         } // i
     }
 
-    private int computeNumberOfExperimentsHavingDetectionMethod(String method, ExportContext context, EncoreInteractionForScoring interaction, Set<String> validIntactIds){
+    private int computeNumberOfExperimentsHavingDetectionMethod(String method, ExportContext context, EncoreInteraction interaction, Set<String> validIntactIds){
 
         Map<MethodTypePair, List<String>> invertedMap = WriterUtils.invertMapFromKeySelection(context.getInteractionToMethod_type(), interaction.getExperimentToPubmed().keySet());
 
@@ -310,8 +310,8 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
                     }
                 }
             }
-            else {
-                for (Map.Entry<Integer, EncoreInteractionForScoring> entry : cluster.getEncoreInteractionCluster().entrySet()){
+            else {                                                            
+                for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
                     if (canExportEncoreInteraction(entry.getValue(), context)){
                         eligibleInteractions.add(entry.getKey());
@@ -341,7 +341,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
                 }
             }
             else {
-                for (Map.Entry<Integer, EncoreInteractionForScoring> entry : cluster.getEncoreInteractionCluster().entrySet()){
+                for (Map.Entry<Integer, EncoreInteraction> entry : cluster.getEncoreInteractionCluster().entrySet()){
 
                     if (canExportNegativeEncoreInteraction(entry.getValue(), context, positiveInteractions)){
                         eligibleInteractions.add(entry.getKey());
@@ -396,7 +396,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     }
 
     @Override
-    public boolean canExportEncoreInteraction(EncoreInteractionForScoring interaction, ExportContext context) throws UniprotExportException {
+    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context) throws UniprotExportException {
 
         Set<String> detectionMethods = new HashSet(interaction.getMethodToPubmed().keySet());
 
@@ -476,7 +476,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     }
 
     @Override
-    public boolean canExportNegativeEncoreInteraction(EncoreInteractionForScoring interaction, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException {
+    public boolean canExportNegativeEncoreInteraction(EncoreInteraction interaction, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException {
         // no negative interaction can be exported
         return false;
     }
@@ -487,7 +487,7 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
         return false;
     }
 
-    protected void removeInteractionEvidencesFrom(EncoreInteractionForScoring encore, Set<String> wrongInteractions, ExportContext context){
+    protected void removeInteractionEvidencesFrom(EncoreInteraction encore, Set<String> wrongInteractions, ExportContext context){
         List<CrossReference> publicationsToRemove = new ArrayList(encore.getPublicationIds());
         List<String> publicationIdsToKeep = new ArrayList<String>(encore.getPublicationIds().size());
         List<String> methodsToRemove = new ArrayList(encore.getMethodToPubmed().keySet());

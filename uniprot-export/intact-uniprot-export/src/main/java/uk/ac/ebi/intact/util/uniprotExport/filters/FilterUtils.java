@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.filters;
 
 import psidev.psi.mi.tab.model.*;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
@@ -279,7 +279,7 @@ public class FilterUtils {
      * @param interaction
      * @return the computed Mi cluster score for this interaction
      */
-    public static double getMiClusterScoreFor(EncoreInteractionForScoring interaction){
+    public static double getMiClusterScoreFor(EncoreInteraction interaction){
         List<Confidence> confidenceValues = interaction.getConfidenceValues();
         return extractMiClusterScoreFrom(confidenceValues);
     }

@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.results.clusters;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ public interface IntactCluster {
      *
      * @return map associating clustered interaction identifier associated with a Encore interaction
      */
-    public Map<Integer, EncoreInteractionForScoring> getEncoreInteractionCluster();
+    public Map<Integer, EncoreInteraction> getEncoreInteractionCluster();
 
     /**
      *

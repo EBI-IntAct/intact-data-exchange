@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.converters;
 
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
@@ -24,5 +24,5 @@ public interface DRLineConverter {
      * @return the converted DRParameter
      * @throws java.io.IOException
      */
-    public DRParameters convertInteractorIntoDRLine(String interactorAc, Set<EncoreInteractionForScoring> interactions, MiClusterContext context);
+    public DRParameters convertInteractorIntoDRLine(String interactorAc, Set<EncoreInteraction> interactions, MiClusterContext context);
 }

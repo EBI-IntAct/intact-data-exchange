@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportUtils;
@@ -38,7 +38,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
      * @param context : the context of the export
      * @return a sorted list of InteractionDetails extracted from the interaction
      */
-    private SortedSet<InteractionDetails> sortInteractionDetails(EncoreInteractionForScoring interaction, MiClusterContext context){
+    private SortedSet<InteractionDetails> sortInteractionDetails(EncoreInteraction interaction, MiClusterContext context){
 
         // map which associates IntAct interaction Ac to pubmed id
         Map<String, String> interactionToPubmed = interaction.getExperimentToPubmed();
@@ -132,7 +132,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
 
      * @return the converted CCParameter
      */
-    public CCParameters<SecondCCParameters2> convertPositiveAndNegativeInteractionsIntoCCLines(Set<EncoreInteractionForScoring> positiveInteractions, Set<EncoreInteractionForScoring> negativeInteractions, MiClusterContext context, String firstInteractor){
+    public CCParameters<SecondCCParameters2> convertPositiveAndNegativeInteractionsIntoCCLines(Set<EncoreInteraction> positiveInteractions, Set<EncoreInteraction> negativeInteractions, MiClusterContext context, String firstInteractor){
         String firstIntactAc = null;
         String geneName1 = context.getGeneNames().get(firstInteractor);
         String taxId1 = null;
@@ -141,7 +141,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
         Map<String, Set<IntactTransSplicedProteins>> transSplicedVariants = context.getTranscriptsWithDifferentMasterAcs();
 
         if (positiveInteractions != null && !positiveInteractions.isEmpty()){
-            for (EncoreInteractionForScoring interaction : positiveInteractions){
+            for (EncoreInteraction interaction : positiveInteractions){
                 // get the uniprot acs of the first and second interactors
                 String uniprot1;
                 String uniprot2;
@@ -263,7 +263,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
         }
 
         if (negativeInteractions != null && !negativeInteractions.isEmpty()){
-            for (EncoreInteractionForScoring interaction : negativeInteractions){
+            for (EncoreInteraction interaction : negativeInteractions){
                 // get the uniprot acs of the first and second interactors
                 String uniprot1;
                 String uniprot2;
@@ -389,7 +389,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
     }
 
     @Override
-    public CCParameters convertInteractionsIntoCCLines(Set<EncoreInteractionForScoring> positiveInteractions, MiClusterContext context, String masterUniprot) {
+    public CCParameters convertInteractionsIntoCCLines(Set<EncoreInteraction> positiveInteractions, MiClusterContext context, String masterUniprot) {
         return convertPositiveAndNegativeInteractionsIntoCCLines(positiveInteractions, Collections.EMPTY_SET, context, masterUniprot);
     }
 }

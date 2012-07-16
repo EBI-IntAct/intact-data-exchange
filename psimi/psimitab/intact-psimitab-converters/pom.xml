@@ -30,7 +30,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psimitab</artifactId>
-            <version>${pom.parent.version}</version>
+            <version>${pom.version}</version>
         </dependency>
 
         <dependency>

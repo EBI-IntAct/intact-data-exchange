@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.tab.model.ConfidenceImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
@@ -292,8 +292,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return parameters;
     }
 
-    public EncoreInteractionForScoring createEncoreInteraction(){
-        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+    public EncoreInteraction createEncoreInteraction(){
+        EncoreInteraction interaction = new EncoreInteraction();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P28548-1");
@@ -334,8 +334,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interaction;
     }
 
-    public EncoreInteractionForScoring createNegativeEncoreInteraction(){
-        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+    public EncoreInteraction createNegativeEncoreInteraction(){
+        EncoreInteraction interaction = new EncoreInteraction();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P28548-2");
@@ -376,8 +376,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interaction;
     }
 
-    public EncoreInteractionForScoring createSecondEncoreInteraction(){
-        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+    public EncoreInteraction createSecondEncoreInteraction(){
+        EncoreInteraction interaction = new EncoreInteraction();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P28548-2");
@@ -417,8 +417,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         return interaction;
     }
-    public EncoreInteractionForScoring createIsoformIsoformInteraction(){
-        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+    public EncoreInteraction createIsoformIsoformInteraction(){
+        EncoreInteraction interaction = new EncoreInteraction();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P28548-2");
@@ -458,8 +458,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         return interaction;
     }
-    public EncoreInteractionForScoring createEncoreInteractionWithTransIsoformAndMaster(){
-        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+    public EncoreInteraction createEncoreInteractionWithTransIsoformAndMaster(){
+        EncoreInteraction interaction = new EncoreInteraction();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P28548");
@@ -499,8 +499,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         return interaction;
     }
-    public EncoreInteractionForScoring createEncoreInteractionWithTransIsoform(){
-        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+    public EncoreInteraction createEncoreInteractionWithTransIsoform(){
+        EncoreInteraction interaction = new EncoreInteraction();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "O17670");
@@ -541,8 +541,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interaction;
     }
 
-    public EncoreInteractionForScoring createThirdEncoreInteraction(){
-        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+    public EncoreInteraction createThirdEncoreInteraction(){
+        EncoreInteraction interaction = new EncoreInteraction();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P28548-PRO_0000068244");
@@ -600,8 +600,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interaction;
     }
 
-    public EncoreInteractionForScoring createEncoreInteractionLowScore(){
-        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+    public EncoreInteraction createEncoreInteractionLowScore(){
+        EncoreInteraction interaction = new EncoreInteraction();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P12345");
@@ -642,8 +642,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interaction;
     }
 
-    public EncoreInteractionForScoring createEncoreInteractionHighScoreSpokeExpanded(){
-        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+    public EncoreInteraction createEncoreInteractionHighScoreSpokeExpanded(){
+        EncoreInteraction interaction = new EncoreInteraction();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P12346");
@@ -684,8 +684,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interaction;
     }
 
-    public EncoreInteractionForScoring createEncoreInteractionHighScoreColocalization(){
-        EncoreInteractionForScoring interaction = new EncoreInteractionForScoring();
+    public EncoreInteraction createEncoreInteractionHighScoreColocalization(){
+        EncoreInteraction interaction = new EncoreInteraction();
 
         Map<String, String> interactorA = new HashMap<String, String>();
         interactorA.put("uniprotkb", "P12347");
@@ -730,8 +730,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interaction;
     }
 
-    public List<EncoreInteractionForScoring> createEncoreInteractions(){
-        List<EncoreInteractionForScoring> interactions = new ArrayList<EncoreInteractionForScoring>();
+    public List<EncoreInteraction> createEncoreInteractions(){
+        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
 
         interactions.add(createEncoreInteraction());
         interactions.add(createSecondEncoreInteraction());
@@ -740,8 +740,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interactions;
     }
 
-    public List<EncoreInteractionForScoring> createPositiveEncoreInteractions(){
-        List<EncoreInteractionForScoring> interactions = new ArrayList<EncoreInteractionForScoring>();
+    public List<EncoreInteraction> createPositiveEncoreInteractions(){
+        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
 
         interactions.add(createEncoreInteraction());
         interactions.add(createThirdEncoreInteraction());
@@ -749,8 +749,8 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return interactions;
     }
 
-    public List<EncoreInteractionForScoring> createNegativeEncoreInteractions(){
-        List<EncoreInteractionForScoring> interactions = new ArrayList<EncoreInteractionForScoring>();
+    public List<EncoreInteraction> createNegativeEncoreInteractions(){
+        List<EncoreInteraction> interactions = new ArrayList<EncoreInteraction>();
 
         interactions.add(createNegativeEncoreInteraction());
 
@@ -810,7 +810,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
     public IntActClusterScore createClusterForExportBasedOnMiScore(){
 
-        List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
+        List<EncoreInteraction> interactions = createEncoreInteractions();
         interactions.add(createEncoreInteractionLowScore());
         interactions.add(createEncoreInteractionHighScoreSpokeExpanded());
         interactions.add(createEncoreInteractionHighScoreColocalization());
@@ -820,33 +820,33 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
     public IntActClusterScore createNegativeCluster(){
 
-        List<EncoreInteractionForScoring> interactions = createNegativeEncoreInteractions();
+        List<EncoreInteraction> interactions = createNegativeEncoreInteractions();
 
         return createCluster(interactions);
     }
 
     public IntActClusterScore createPositiveCluster(){
 
-        List<EncoreInteractionForScoring> interactions = createPositiveEncoreInteractions();
+        List<EncoreInteraction> interactions = createPositiveEncoreInteractions();
 
         return createCluster(interactions);
     }
 
     public IntActClusterScore createClusterForExportBasedOnDetectionMethod(){
 
-        List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
+        List<EncoreInteraction> interactions = createEncoreInteractions();
         interactions.add(createEncoreInteractionHighScoreSpokeExpanded());  // two hybrid pooling : export = conditional, 2 and doesn't pass
         interactions.add(createEncoreInteractionHighScoreColocalization()); // colocalization has an export no
 
         return createCluster(interactions);
     }
 
-    private IntActClusterScore createCluster(List<EncoreInteractionForScoring> interactions){
+    private IntActClusterScore createCluster(List<EncoreInteraction> interactions){
         IntActClusterScore clusterScore = new IntActClusterScore();
-        clusterScore.setInteractionMapping(new HashMap<Integer, EncoreInteractionForScoring>());
+        clusterScore.setInteractionMapping(new HashMap<Integer, EncoreInteraction>());
         clusterScore.setInteractorMapping(new HashMap<String, List<Integer>>());
 
-        for (EncoreInteractionForScoring interaction : interactions){
+        for (EncoreInteraction interaction : interactions){
             clusterScore.getInteractionMapping().put(interaction.getId(), interaction);
 
             String interactorA = FilterUtils.extractUniprotAndIntactAcFromAccs(interaction.getInteractorAccsA())[0];

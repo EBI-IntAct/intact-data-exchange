@@ -6,15 +6,14 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/test-annotations" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/annotations" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
-      <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
       <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: uk.ac.ebi.intact.core:intact-core:2.6.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: uk.ac.ebi.intact.core:intact-core:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: uk.ac.ebi.intact.commons:intact-commons:2.1.7" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.15" level="project" />
     <orderEntry type="library" name="Maven: javax.mail:mail:1.4" level="project" />
@@ -27,7 +26,7 @@
     <orderEntry type="library" name="Maven: org.apache.geronimo.javamail:geronimo-javamail_1.4_provider:1.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-activation_1.1_spec:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-javamail_1.4_spec:1.1" level="project" />
-    <orderEntry type="library" name="Maven: uk.ac.ebi.intact.core:intact-annotations:2.6.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: uk.ac.ebi.intact.core:intact-annotations:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-core:3.6.9-intact.3" level="project" />
     <orderEntry type="library" name="Maven: antlr:antlr:2.7.7" level="project" />
     <orderEntry type="library" name="Maven: dom4j:dom4j:1.6.1" level="project" />
@@ -40,7 +39,7 @@
     <orderEntry type="library" name="Maven: cglib:cglib-nodep:2.2" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-validator:4.1.0.Final" level="project" />
     <orderEntry type="library" name="Maven: javax.validation:validation-api:1.0.0.GA" level="project" />
-    <orderEntry type="library" name="Maven: uk.ac.ebi.intact.core:intact-apt:2.6.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: uk.ac.ebi.intact.core:intact-apt:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: velocity:velocity-dep:1.4" level="project" />
     <orderEntry type="library" name="Maven: sun.jdk:tools:1.5.0" level="project" />
     <orderEntry type="library" name="Maven: xerces:xercesImpl:2.8.1" level="project" />
@@ -74,12 +73,11 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:3.0.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.aspectj:aspectjrt:1.6.8" level="project" />
     <orderEntry type="library" name="Maven: org.aspectj:aspectjweaver:1.6.8" level="project" />
-    <orderEntry type="library" name="Maven: com.oracle:oracle-thin:10.2.0.4" level="project" />
     <orderEntry type="library" name="Maven: uk.ac.ebi.intact.dataexchange.psimi:intact-psimitab-converters:2.1.4-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: uk.ac.ebi.intact.commons:irefindex-seguid:2.1.7" level="project" />
     <orderEntry type="library" name="Maven: uk.ac.ebi.intact.dataexchange.psimi:intact-psimitab:2.1.4-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: psidev.psi.mi:psimitab:1.7.11-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: psidev.psi.mi:psi25-xml:1.7.11-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: psidev.psi.mi:psimitab:1.7.10" level="project" />
+    <orderEntry type="library" name="Maven: psidev.psi.mi:psi25-xml:1.7.10" level="project" />
     <orderEntry type="library" name="Maven: psidev.psi.tools:xxindex:0.11" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:com.springsource.org.apache.commons.io:1.4.0" level="project" />
     <orderEntry type="library" name="Maven: cpdetector:cpdetector:1.0.7" level="project" />
@@ -104,7 +102,7 @@
     <orderEntry type="library" name="Maven: jdom:jdom:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:com.springsource.org.apache.commons.collections:3.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:com.springsource.org.apache.commons.lang:2.4.0" level="project" />
-    <orderEntry type="library" name="Maven: psidev.psi.mi:psimitab-search:1.7.11-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: psidev.psi.mi:psimitab-search:1.7.10" level="project" />
     <orderEntry type="library" name="Maven: org.apache.lucene:com.springsource.org.apache.lucene:2.3.2" level="project" />
     <orderEntry type="library" name="Maven: uk.ac.ebi.intact.util:intact-ols:2.0-beta-10" level="project" />
     <orderEntry type="library" name="Maven: uk.ac.ebi.pride:ols-client:1.13" level="project" />
@@ -115,7 +113,7 @@
     <orderEntry type="library" name="Maven: wsdl4j:wsdl4j:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: commons-discovery:commons-discovery:0.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:3.8.1" level="project" />
-    <orderEntry type="library" name="Maven: uk.ac.ebi.intact.bridges:intact-ontologies:2.1.3" level="project" />
+    <orderEntry type="library" name="Maven: uk.ac.ebi.intact.bridges:intact-ontologies:2.1.5" level="project" />
     <orderEntry type="library" name="Maven: org.geneontology:obo:2.000-beta38" level="project" />
     <orderEntry type="library" name="Maven: org.geneontology:bbop:2.000-beta38" level="project" />
     <orderEntry type="library" name="Maven: org.apache.lucene:lucene-core:2.3.2" level="project" />

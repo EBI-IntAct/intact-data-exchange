@@ -1,8 +1,6 @@
 package uk.ac.ebi.intact.psimitab;
 
 import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.PsimiTabWriter;
@@ -15,6 +13,9 @@ import uk.ac.ebi.intact.psimitab.processor.IntactClusterInteractorPairProcessor;
 import java.io.File;
 import java.io.StringWriter;
 import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class IntactTabTest extends AbstractPsimitabTestCase {
 
@@ -68,7 +69,7 @@ public class IntactTabTest extends AbstractPsimitabTestCase {
     @Test
     public void roundtrip() throws Exception {
 
-        String mitab = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tpsi-mi:\"MI:0018\"(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tpsi-mi:\"MI:0218\"(physical interaction)\tpsi-mi:\"MI:0469\"(intact)\tintact:EBI-446356\tintact:high\tpsi-mi:\"MI:0498\"(prey)\tpsi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\tuniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716\tgo:\"GO:0005737\"(\"C:cytoplasm\")|interpro:IPR001589(Actbind_actnin)\tpsi-mi:\"MI:0326\"(protein)\tpsi-mi:\"MI:0326\"(protein)\tyeast:4932\tSpoke\tCancer|Apoptosis\tcomment:commentA\tcomment:commentB\tic50A:100(molar)\tic50B:200(molar)\tic50C:300(molar)";
+        String mitab = "uniprotkb:P16884|intact:EBI-446344\tuniprotkb:Q60824|intact:EBI-446159\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)\tintact:Nfh\tintact:Bpag1\tpsi-mi:\"MI:0018\"(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739\ttaxid:10116(rat)\ttaxid:10090(mouse)\tpsi-mi:\"MI:0218\"(physical interaction)\tpsi-mi:\"MI:0469\"(intact)\tintact:EBI-446356\tintact:high(free-text)\tpsi-mi:\"MI:0498\"(prey)\tpsi-mi:\"MI:0496\"(bait)\tpsi-mi:\"MI:0499\"(unspecified role)\tpsi-mi:\"MI:0499\"(unspecified role)\tuniprotkb:O35482|rgd:3159|ensembl:ENSRNOG00000008716\tgo:\"GO:0005737\"(\"C:cytoplasm\")|interpro:IPR001589(Actbind_actnin)\tpsi-mi:\"MI:0326\"(protein)\tpsi-mi:\"MI:0326\"(protein)\tyeast:4932\tSpoke\tCancer|Apoptosis\tcomment:commentA\tcomment:commentB\tic50A:100(molar)\tic50B:200(molar)\tic50C:300(molar)";
 
         PsimiTabReader reader = new IntactPsimiTabReader( false );
         Collection<BinaryInteraction> bis = reader.read( mitab );

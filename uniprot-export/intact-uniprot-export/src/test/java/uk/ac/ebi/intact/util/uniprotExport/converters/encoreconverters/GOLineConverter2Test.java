@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters2;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
@@ -25,7 +25,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
     public void test_go_convert_ok(){
         GoLineConverter2 converter = new GoLineConverter2();
 
-        EncoreInteractionForScoring interaction = createEncoreInteraction();
+        EncoreInteraction interaction = createEncoreInteraction();
 
         List<GOParameters2> parameters1 = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
         Assert.assertEquals(1, parameters1.size());
@@ -40,7 +40,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
     public void test_go_convert_no_first_interactor(){
         GoLineConverter2 converter = new GoLineConverter2();
 
-        EncoreInteractionForScoring interaction = createEncoreInteraction();
+        EncoreInteraction interaction = createEncoreInteraction();
         interaction.getInteractorAccsA().clear();
 
         List<GOParameters2> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
@@ -51,7 +51,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
     public void test_go_convert_no_second_interactor(){
         GoLineConverter2 converter = new GoLineConverter2();
 
-        EncoreInteractionForScoring interaction = createEncoreInteraction();
+        EncoreInteraction interaction = createEncoreInteraction();
         interaction.getInteractorAccsB().clear();
 
         List<GOParameters2> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
@@ -63,7 +63,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
     public void test_go_convert_no_publications(){
         GoLineConverter2 converter = new GoLineConverter2();
 
-        EncoreInteractionForScoring interaction = createEncoreInteraction();
+        EncoreInteraction interaction = createEncoreInteraction();
         interaction.getPublicationIds().clear();
 
         List<GOParameters2> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
@@ -74,7 +74,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
     public void test_go_convert_one_publication_no_pubmed(){
         GoLineConverter2 converter = new GoLineConverter2();
 
-        EncoreInteractionForScoring interaction = createEncoreInteraction();
+        EncoreInteraction interaction = createEncoreInteraction();
         interaction.getPublicationIds().iterator().next().setDatabase("DOI");
 
         List<GOParameters2> parameters = converter.convertInteractionIntoGOParameters(interaction, "P28548-1", createClusterContext());
@@ -85,7 +85,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
     public void test_go_convert_simulation(){
         GoLineConverter2 converter = new GoLineConverter2();
 
-        List<EncoreInteractionForScoring> interactions = createEncoreInteractions();
+        List<EncoreInteraction> interactions = createEncoreInteractions();
         interactions.add(3, createIsoformIsoformInteraction()); // can be converted because isoform-isoform
         interactions.add(4, createEncoreInteractionWithTransIsoform()); // can be converted
         interactions.add(5, createEncoreInteractionWithTransIsoformAndMaster()); // can be converted because isoform and other uniprot entry, even if this isoform is not matching the master
@@ -94,7 +94,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
 
         String firstInteractor = "P28548";
 
-        List<GOParameters2> parameters = converter.convertInteractionsIntoGOParameters(new HashSet<EncoreInteractionForScoring>(interactions), firstInteractor, context);
+        List<GOParameters2> parameters = converter.convertInteractionsIntoGOParameters(new HashSet<EncoreInteraction>(interactions), firstInteractor, context);
         Assert.assertNotNull(parameters);
         Assert.assertEquals(17, parameters.size());
 

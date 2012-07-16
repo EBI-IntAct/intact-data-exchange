@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.exporters;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.enfin.mi.cluster.EncoreInteractionForScoring;
+import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.UniprotExportResults;
@@ -35,7 +35,7 @@ public interface InteractionExporter {
      * @return true if the encore interaction pass the uniprot export rules
      * @throws UniprotExportException
      */
-    public boolean canExportEncoreInteraction(EncoreInteractionForScoring interaction, ExportContext context) throws UniprotExportException;
+    public boolean canExportEncoreInteraction(EncoreInteraction interaction, ExportContext context) throws UniprotExportException;
 
     /**
      *
@@ -54,7 +54,7 @@ public interface InteractionExporter {
      * @return true if the negative encore interaction pass the uniprot export rules
      * @throws UniprotExportException
      */
-    public boolean canExportNegativeEncoreInteraction(EncoreInteractionForScoring interaction, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException;
+    public boolean canExportNegativeEncoreInteraction(EncoreInteraction interaction, ExportContext context, ExportedClusteredInteractions positiveInteractions) throws UniprotExportException;
 
     /**
      *
