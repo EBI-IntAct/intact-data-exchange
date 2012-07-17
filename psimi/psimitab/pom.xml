@@ -4,21 +4,21 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
         <artifactId>psimi-master</artifactId>
-        <version>2.1.4</version>
+        <version>2.1.5-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>psimitab-master</artifactId>
     <packaging>pom</packaging>
-    <version>2.1.4</version>
+    <version>2.1.5-SNAPSHOT</version>
 
     <name>IntAct Data Exchange :: PSI MI :: TAB</name>
     <description>PSI MI TAB Master POM</description>
 
     <properties>
         <currentVersion>${project.version}</currentVersion>
-        <psimi.version>1.7.10</psimi.version>
+        <psimi.version>1.7.11-SNAPSHOT</psimi.version>
     </properties>
 
     <modules>
@@ -27,7 +27,7 @@
         <module>intact-psimitab-converters</module>
         <module>intact-solr</module>
     <module>intact-solr-home</module>
-    <!--<module>intact-calimocho-converters</module>-->
+    <module>intact-calimocho-converters</module>
   </modules>
 
     <dependencyManagement>

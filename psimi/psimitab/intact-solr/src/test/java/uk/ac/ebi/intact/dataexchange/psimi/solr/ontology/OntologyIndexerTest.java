@@ -18,9 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.UniprotTaxonomyOntologyIterator;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
@@ -36,7 +34,7 @@ public class OntologyIndexerTest  {
 
     private SolrJettyRunner solrJettyRunner;
 
-    /*@Before
+    @Before
     public void before() throws Exception {
         solrJettyRunner = new SolrJettyRunner();
         solrJettyRunner.start();
@@ -47,10 +45,9 @@ public class OntologyIndexerTest  {
 //        solrJettyRunner.join();
         solrJettyRunner.stop();
         solrJettyRunner = null;
-    }*/
+    }
 
     @Test
-    @Ignore
     public void testIndexObo() throws Exception{
         StreamingUpdateSolrServer solrServer = solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
 
@@ -65,7 +62,6 @@ public class OntologyIndexerTest  {
     }
 
     @Test
-    @Ignore
     public void testTinyIndexObo() throws Exception{
         StreamingUpdateSolrServer solrServer = solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
 
@@ -81,7 +77,6 @@ public class OntologyIndexerTest  {
     }
 
     @Test
-    @Ignore
     public void testSmallIndexObo() throws Exception{
         StreamingUpdateSolrServer solrServer = solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
 
@@ -105,7 +100,6 @@ public class OntologyIndexerTest  {
     }
 
     @Test
-    @Ignore
     public void testIndexTaxonomy() throws Exception{
         StreamingUpdateSolrServer solrServer = solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
 

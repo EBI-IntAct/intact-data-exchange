@@ -44,7 +44,6 @@ import static org.junit.Assert.assertEquals;
 public class IntactSolrSearcherTest extends AbstractSolrTestCase {
 
     @Test
-    @Ignore
     public void search() throws Exception  {
         assertCount(0L, "*:*");
 
@@ -61,7 +60,6 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void search_interactors1() throws Exception  {
         assertCount(0L, "*:*");
 
@@ -86,7 +84,6 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void search_interactors2() throws Exception {
         assertCount(0L, "*:*");
 
@@ -112,7 +109,6 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void delete_by_pmid() throws Exception {
         assertCount(0L, "*:*");
 
@@ -132,7 +128,6 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void search_integrityTest() throws Exception {
         String mitab = "uniprotkb:P35568|intact:EBI-517592\tuniprotkb:Q08345-2|intact:EBI-711903\tuniprotkb:IRS1(gene name)" +
                 "\t-\tintact:irs1_human(shortLabel)\tuniprotkb:CAK II(isoform synonym)|uniprotkb:Short(isoform synonym)|intact:Q08345-2(shortLabel)" +
@@ -275,7 +270,6 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void compare_facetted_nonfacetted_interactors_search() throws Exception {
         assertCount( 0L, "*:*" );
 

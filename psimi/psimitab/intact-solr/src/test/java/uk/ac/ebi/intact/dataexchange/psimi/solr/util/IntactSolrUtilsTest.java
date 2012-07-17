@@ -15,7 +15,6 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.util;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.AbstractSolrTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
@@ -29,7 +28,6 @@ import static org.junit.Assert.assertTrue;
 public class IntactSolrUtilsTest extends AbstractSolrTestCase {
 
     @Test
-    @Ignore
     public void testRetrieveSchemaInfo() throws Exception {
         final SchemaInfo schemaInfo = IntactSolrUtils.retrieveSchemaInfo(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
 

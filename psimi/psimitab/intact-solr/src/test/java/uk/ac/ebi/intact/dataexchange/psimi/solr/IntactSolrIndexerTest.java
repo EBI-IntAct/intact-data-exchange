@@ -45,28 +45,24 @@ import static org.junit.Assert.assertEquals;
 public class IntactSolrIndexerTest extends AbstractSolrTestCase {
 
     @Test
-    @Ignore
     public void indexMitabFromClasspath() throws Exception {
         getIndexer().indexMitabFromClasspath("/mitab_samples/intact200.txt", true);
         assertCount(200, "*:*");
     }
 
     @Test
-    @Ignore
     public void indexMitabFromClasspath2() throws Exception {
         getIndexer().indexMitabFromClasspath("/mitab_samples/intact200.txt", true, 10, 20);
         assertCount(20, "*:*");
     }
     
     @Test
-    @Ignore
     public void indexMitabFromClasspath3() throws Exception {
         getIndexer().indexMitabFromClasspath("/mitab_samples/intact200.txt", true, 190, 20);
         assertCount(10, "*:*");
     }
 
     @Test
-    @Ignore
     public void indexMitabFromClasspath4() throws Exception {
         getIndexer().indexMitabFromClasspath("/mitab_samples/intact200.txt", true);
         assertCount(1, "EBI-1380413");
@@ -79,7 +75,6 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void index1() throws Exception {
         // mitab line with annotations
         String mitabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
@@ -100,7 +95,6 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void toSolrDocument_goExpansion() throws Exception {
         getIndexer().indexOntologies(new OntologyMapping[] {
                 new OntologyMapping("go", IntactSolrIndexerTest.class.getResource("/META-INF/goslim_generic.obo"))
@@ -132,7 +126,6 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void toSolrDocument_goDescriptionUpdate() throws Exception {
         getIndexer().indexOntologies(new OntologyMapping[] {
                 new OntologyMapping("go", IntactSolrIndexerTest.class.getResource("/META-INF/goslim_generic.obo"))
@@ -160,7 +153,6 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void toSolrDocument_taxidUpdate() throws Exception {
          String mitab = "uniprotkb:P35568|intact:EBI-517592\tuniprotkb:Q08345-2|intact:EBI-711903\tuniprotkb:IRS1(gene name)" +
                 "\t-\tintact:irs1_human(shortLabel)\tuniprotkb:CAK II(isoform synonym)|uniprotkb:Short(isoform synonym)|intact:Q08345-2(shortLabel)" +
@@ -191,7 +183,6 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void toSolrDocument_wildcard() throws Exception {
         String mitabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
@@ -205,7 +196,6 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void toSolrDocument_imex() throws Exception {
         String mitabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
@@ -219,7 +209,6 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void toSolrDocument_taxonomy_expansion() throws Exception {
         String mitabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
@@ -250,7 +239,6 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void retrying() throws Exception {
         getSolrJettyRunner().stop();
 

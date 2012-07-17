@@ -1,6 +1,5 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 
@@ -16,7 +15,6 @@ import java.net.URL;
 public class OntologyTermBrowsingTest extends AbstractSolrTestCase {
 
     @Test
-    @Ignore
     public void indexAndBrowseGo_is_a() throws Exception {
         assertCountInteraction( 0, "*:*" );
 
@@ -44,7 +42,6 @@ public class OntologyTermBrowsingTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void indexAndBrowseGo_part_of() throws Exception {
         assertCountInteraction( 0, "*:*" );
 

@@ -19,7 +19,6 @@ import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -41,7 +40,6 @@ public class SolrHomeBuilderTest {
     }
 
     @Test
-    @Ignore
     public void testInstall() throws Exception {
         File workingDir = new File("/tmp/lalasolr");
 

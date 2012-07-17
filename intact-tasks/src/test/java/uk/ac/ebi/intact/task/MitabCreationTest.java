@@ -18,9 +18,7 @@ package uk.ac.ebi.intact.task;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
@@ -64,7 +62,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @Autowired
     private SolrJettyRunner solrJettyRunner;
 
-    /*@Before
+    @Before
     public void before() throws Exception {
         solrJettyRunner.start();
     }
@@ -76,11 +74,10 @@ public class MitabCreationTest extends IntactBasicTestCase {
         // solrJettyRunner.join();
 
         solrJettyRunner.stop();
-    }*/
+    }
 
     @Test
     @DirtiesContext
-    @Ignore
     public void writeMitab() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
@@ -146,7 +143,6 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
-    @Ignore
     public void writeMitabSelf() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
@@ -188,7 +184,6 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
-    @Ignore
     public void writeMitabSelf_stoichioGreaterThan2() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
@@ -230,7 +225,6 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
-    @Ignore
     public void writeMitab_withXrefs() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
@@ -266,7 +260,6 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
-    @Ignore
     public void writeMitab_negative() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 

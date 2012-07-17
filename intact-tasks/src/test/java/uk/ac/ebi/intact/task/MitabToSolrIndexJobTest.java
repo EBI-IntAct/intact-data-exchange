@@ -50,7 +50,7 @@ public class MitabToSolrIndexJobTest extends IntactBasicTestCase{
     @Autowired
     private SolrJettyRunner solrJettyRunner;
 
-    /*@Before
+    @Before
     public void before() throws Exception {
         solrJettyRunner.start();
     }
@@ -59,11 +59,10 @@ public class MitabToSolrIndexJobTest extends IntactBasicTestCase{
     public void after() throws Exception {
 
         solrJettyRunner.stop();
-    }*/
+    }
 
     @Test
     @DirtiesContext
-    @Ignore
     public void indexMitabSolr() throws Exception {
         FileUtils.deleteDirectory(new File("target/lala-lucene"));
 

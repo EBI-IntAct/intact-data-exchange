@@ -33,7 +33,6 @@ import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 public class SolrDocumentConverterTest extends AbstractSolrTestCase {
 
     @Test
-    @Ignore
     public void testToSolrDocument() throws Exception {
         String rigid = "THIS_IS_A_RIGID";
         String psiMiTabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
@@ -52,7 +51,6 @@ public class SolrDocumentConverterTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void testToSolrInputDocument2BinaryInteraction() throws Exception {
         String psiMiTabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
@@ -77,7 +75,6 @@ public class SolrDocumentConverterTest extends AbstractSolrTestCase {
      }
 
     @Test
-    @Ignore
     public void testTypeAndAc() throws Exception {
         String psiMiTabLine = "intact:EBI-12345\tintact:EBI-1443\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
@@ -96,7 +93,6 @@ public class SolrDocumentConverterTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void idSelectiveAdder() throws Exception {
         String psiMiTabLine = "intact:EBI-12345\tintact:EBI-54321|uniprotkb:P12345\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
@@ -119,7 +115,6 @@ public class SolrDocumentConverterTest extends AbstractSolrTestCase {
     }
 
      @Test
-     @Ignore
      public void geneName() throws Exception {
         String psiMiTabLine = "intact:EBI-12345\tintact:EBI-54321|uniprotkb:P12345\tuniprotkb:Nefh(gene name synonym)\tuniprotkb:Dst(gene name synonym)" +
                               "\tintact:Nfh(gene name)\tintact:Bpag1(gene name)\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
