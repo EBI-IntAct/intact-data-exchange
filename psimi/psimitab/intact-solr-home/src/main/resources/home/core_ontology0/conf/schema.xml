@@ -138,8 +138,8 @@
      <field name="pname" type="string" indexed="false" stored="true" />
      <!-- term ID for the children. It is indexed = true because we want to search for it and stored = true because we want to retrieves it after a query -->
      <field name="cid" type="string" indexed="true" stored="true" />
-     <!-- child term name. It is indexed = false because we don't want to search for it, only to retrieves the value associated to an id (stored=true)-->
-     <field name="cname" type="string" indexed="false" stored="true" />
+     <!-- child term name. It is indexed = true because we can search for it, only to retrieves the value associated to an id (stored=true)-->
+     <field name="cname" type="string" indexed="true" stored="true" />
      <!-- if the relationship is cyclic. -->
      <!-- <field name="cyclic" type="boolean" indexed="true" default="false" stored="true" /> -->
      <!-- synonyms of child. It is indexed = false because we don't want to search for it, only to retrieves the value associated to an id (stored=true) -->
