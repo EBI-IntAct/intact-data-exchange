@@ -278,8 +278,6 @@ both match, the first appearing in the schema will be used.  -->
         <dynamicField name="*_s"  type="intactIndexedUnstoredString" default="-"/>
         <!-- Dynamic Stored Fields that can be used for retrieving results and selecting fields -->
         <dynamicField name="*_o"  type="intactUnindexedStoredString" default="-"/>
-        <!-- Dynamic Fields that can be used for retrieving an exact term. This applies to ontology terms where children are in the same field as the current term. It allows to query for the exact current term without the children -->
-        <dynamicField name="*_exact" type="textIntact"  default="-"/>
         <!-- Field used to store the ACs by interactorType.
 The * should correspond to an MI, in lower case and without any colon (e.g. mi0326) -->
         <dynamicField name="intact_byInteractorType_*" type="string" indexed="true" stored="true" multiValued="true" default=""/>
