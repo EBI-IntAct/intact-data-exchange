@@ -1,10 +1,9 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
-import psidev.psi.mi.tab.model.builder.Field;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.hupo.psi.calimocho.model.Field;
 
 import java.util.Collection;
-
-import org.apache.solr.client.solrj.SolrServerException;
 
 /**
  * Definition of a field enricher.
@@ -13,6 +12,8 @@ import org.apache.solr.client.solrj.SolrServerException;
  * @version $Id$
  */
 public interface FieldEnricher {
+
+    Field findFieldByName(String name) throws Exception;
     Field enrich(Field field) throws Exception;
 
     boolean isExpandableOntology( String name );

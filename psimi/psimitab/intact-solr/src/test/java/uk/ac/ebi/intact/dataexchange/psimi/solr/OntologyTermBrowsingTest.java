@@ -23,7 +23,7 @@ public class OntologyTermBrowsingTest extends AbstractSolrTestCase {
         getIndexer().indexOntologies( new OntologyMapping[]{new OntologyMapping( "go", goURL )} );
         assertCountOntologyTerm( 74, "*:*" );
 
-        getIndexer().indexMitabFromClasspath( "/mitab_samples/intact5_go_binding.txt", true );
+        getIndexer().indexMitabFromClasspath( "/mitab_samples/intact5_go_binding.txt", false );
         assertCountInteraction( 5, "*:*" );
 
         // we have 5 interactions, 3 annotated with terms part of the small ontology
@@ -34,11 +34,11 @@ public class OntologyTermBrowsingTest extends AbstractSolrTestCase {
         // 5. GO:0042169                 http://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0042169#ancchart
 
         // check interaction count when querying on GO term hierarchy
-        assertCountInteraction( 1, "go_expanded_id:\"GO:0051401\"" ); // leaf term
-        assertCountInteraction( 2, "go_expanded_id:\"GO:0042169\"" ); // leaf term
-        assertCountInteraction( 3, "go_expanded_id:\"GO:0019904\"" ); // direct parent of GO:0051401 and GO:0042169
-        assertCountInteraction( 3, "go_expanded_id:\"GO:0005515\"" ); // GO:0005515 is parent of GO:0051401 and GO:0042169
-        assertCountInteraction( 3, "go_expanded_id:\"GO:0003674\"" ); // root of the ontology
+        assertCountInteraction( 1, "xref:\"go:GO:0051401\"" ); // leaf term
+        assertCountInteraction( 2, "xref:\"go:GO:0042169\"" ); // leaf term
+        assertCountInteraction( 3, "xref:\"go:GO:0019904\"" ); // direct parent of GO:0051401 and GO:0042169
+        assertCountInteraction( 3, "xref:\"go:GO:0005515\"" ); // GO:0005515 is parent of GO:0051401 and GO:0042169
+        assertCountInteraction( 3, "xref:\"go:GO:0003674\"" ); // root of the ontology
     }
 
     @Test
@@ -80,13 +80,13 @@ public class OntologyTermBrowsingTest extends AbstractSolrTestCase {
         // Full view saved in resources directory as GO_nuclear_exosome.PNG
 
         // check interaction count when querying on GO term hierarchy
-        assertCountInteraction( 4, "go_expanded_id:\"GO:0005575\"" ); // cellular location - root of ontology
-        assertCountInteraction( 4, "go_expanded_id:\"GO:0043226\"" ); // organelle
-        assertCountInteraction( 1, "go_expanded_id:\"GO:0000788\"" ); // nuclear exosome
+        assertCountInteraction( 4, "pxref:\"go:GO:0005575\"" ); // cellular location - root of ontology
+        assertCountInteraction( 4, "pxref:\"go:GO:0043226\"" ); // organelle
+        assertCountInteraction( 1, "pxref:\"go:GO:0000788\"" ); // nuclear exosome
 
-        assertCountInteraction( 2, "go_expanded_id:\"GO:0000786\"" ); // nucleosome
+        assertCountInteraction( 2, "pxref:\"go:GO:0000786\"" ); // nucleosome
 
-        assertCountInteraction( 3, "go_expanded_id:\"GO:0000785\"" ); // chromatin
-        assertCountInteraction( 4, "go_expanded_id:\"GO:0005694\"" ); // chromosome
+        assertCountInteraction( 3, "pxref:\"go:GO:0000785\"" ); // chromatin
+        assertCountInteraction( 4, "pxref:\"go:GO:0005694\"" ); // chromosome
     }
 }

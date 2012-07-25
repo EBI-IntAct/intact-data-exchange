@@ -31,31 +31,56 @@ public class IntactSolrUtilsTest extends AbstractSolrTestCase {
     public void testRetrieveSchemaInfo() throws Exception {
         final SchemaInfo schemaInfo = IntactSolrUtils.retrieveSchemaInfo(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
 
-
-
-        assertTrue(schemaInfo.hasFieldName("line"));
-        assertTrue(schemaInfo.hasFieldName("mitab"));
+        //assertTrue(schemaInfo.hasFieldName("line"));
+       // assertTrue(schemaInfo.hasFieldName("mitab"));
         assertTrue(schemaInfo.hasFieldName("idA"));
         assertTrue(schemaInfo.hasFieldName("idB"));
         assertTrue(schemaInfo.hasFieldName("altidA"));
         assertTrue(schemaInfo.hasFieldName("altidB"));
-        assertTrue(schemaInfo.hasFieldName("detmethod"));
+        assertTrue(schemaInfo.hasFieldName("id"));
+        assertTrue(schemaInfo.hasFieldName("aliasA"));
+        assertTrue(schemaInfo.hasFieldName("aliasB"));
+        assertTrue(schemaInfo.hasFieldName("identifier"));
+        assertTrue(schemaInfo.hasFieldName("alias"));
         assertTrue(schemaInfo.hasFieldName("pubauth"));
         assertTrue(schemaInfo.hasFieldName("pubid"));
         assertTrue(schemaInfo.hasFieldName("taxidA"));
         assertTrue(schemaInfo.hasFieldName("taxidB"));
-        assertTrue(schemaInfo.hasFieldName("type"));
-        assertTrue(schemaInfo.hasFieldName("source"));
-        assertTrue(schemaInfo.hasFieldName("interaction_id"));
-        assertTrue(schemaInfo.hasFieldName("confidence"));
-        assertTrue(schemaInfo.hasFieldName("id"));
-        assertTrue(schemaInfo.hasFieldName("identifier"));
-        assertTrue(schemaInfo.hasFieldName("altid"));
-        assertTrue(schemaInfo.hasFieldName("alias"));
-        assertTrue(schemaInfo.hasFieldName("taxid"));
         assertTrue(schemaInfo.hasFieldName("species"));
-        assertTrue(schemaInfo.hasFieldName("pkey"));
-        assertTrue(schemaInfo.hasFieldName("experimentalRoleA"));
+        assertTrue(schemaInfo.hasFieldName("detmethod"));
+        assertTrue(schemaInfo.hasFieldName("type"));
+        assertTrue(schemaInfo.hasFieldName("interaction_id"));
+        assertTrue(schemaInfo.hasFieldName("source"));
+        //assertTrue(schemaInfo.hasFieldName("confidence"));
+        //assertTrue(schemaInfo.hasFieldName("altid"));
+        //assertTrue(schemaInfo.hasFieldName("taxid"));
+        assertTrue(schemaInfo.hasFieldName("uuId"));
+        assertTrue(schemaInfo.hasFieldName("complex"));
+        assertTrue(schemaInfo.hasFieldName("pbioroleA"));
+        assertTrue(schemaInfo.hasFieldName("pbioroleB"));
+        assertTrue(schemaInfo.hasFieldName("pbiorole"));
+        assertTrue(schemaInfo.hasFieldName("ptypeA"));
+        assertTrue(schemaInfo.hasFieldName("ptypeB"));
+        assertTrue(schemaInfo.hasFieldName("ptype"));
+        assertTrue(schemaInfo.hasFieldName("pxrefA"));
+        assertTrue(schemaInfo.hasFieldName("pxrefB"));
+        assertTrue(schemaInfo.hasFieldName("pxref"));
+        assertTrue(schemaInfo.hasFieldName("xref"));
+        assertTrue(schemaInfo.hasFieldName("annot"));
+        assertTrue(schemaInfo.hasFieldName("udate"));
+        assertTrue(schemaInfo.hasFieldName("negative"));
+        assertTrue(schemaInfo.hasFieldName("stc"));
+        assertTrue(schemaInfo.hasFieldName("param"));
+        assertTrue(schemaInfo.hasFieldName("pmethodA"));
+        assertTrue(schemaInfo.hasFieldName("pmethodB"));
+        assertTrue(schemaInfo.hasFieldName("pmethod"));
+        assertTrue(schemaInfo.hasFieldName("ftypeA"));
+        assertTrue(schemaInfo.hasFieldName("ftypeB"));
+        assertTrue(schemaInfo.hasFieldName("ftype"));
+        assertTrue(schemaInfo.hasFieldName("intact-miscore"));
+        assertTrue(schemaInfo.hasFieldName("geneName"));
+
+        /*assertTrue(schemaInfo.hasFieldName("experimentalRoleA"));
         assertTrue(schemaInfo.hasFieldName("experimentalRoleB"));
         assertTrue(schemaInfo.hasFieldName("experimentalRole"));
         assertTrue(schemaInfo.hasFieldName("biologicalRoleA"));
@@ -87,7 +112,6 @@ public class IntactSolrUtilsTest extends AbstractSolrTestCase {
         assertTrue(schemaInfo.hasFieldName("evidences"));
         assertTrue(schemaInfo.hasFieldName("spell"));
         assertTrue(schemaInfo.hasFieldName("uniprotkb"));
-        assertTrue(schemaInfo.hasFieldName("intact-miscore"));
-        assertTrue(schemaInfo.hasFieldName("timestamp"));
+        assertTrue(schemaInfo.hasFieldName("timestamp"));*/
     }
 }

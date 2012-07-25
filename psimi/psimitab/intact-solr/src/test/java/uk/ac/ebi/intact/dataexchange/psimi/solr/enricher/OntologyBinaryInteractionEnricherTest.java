@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.junit.*;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
@@ -40,7 +41,7 @@ public class OntologyBinaryInteractionEnricherTest {
         solrJettyRunner.start();
 
         indexer = new IntactSolrIndexer(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB),
-                                        solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+                                        (HttpSolrServer) solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
 
         enricher = new OntologyBinaryInteractionEnricher(
                 new OntologySearcher(solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB)));

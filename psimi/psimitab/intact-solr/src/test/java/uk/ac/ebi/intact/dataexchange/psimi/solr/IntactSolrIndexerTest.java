@@ -17,19 +17,18 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.OntologyIterator;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.UniprotTaxonomyOntologyIterator;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.SolrDocumentConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -66,12 +65,12 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     public void indexMitabFromClasspath4() throws Exception {
         getIndexer().indexMitabFromClasspath("/mitab_samples/intact200.txt", true);
         assertCount(1, "EBI-1380413");
-        assertCount(36, "detmethod:\"*binding*\"");
-        assertCount(1, "+detmethod:\"*binding*\" +EBI-1380413");
-        assertCount(1, "detmethod:\"*binding*\" AND EBI-1380413");
-        assertCount(36, "detmethod:\"*binding*\" OR EBI-1380413");
-        assertCount(0, "detmethod:\"*binding*\" AND EBI-1381086");
-        assertCount(37, "detmethod:\"*binding*\" OR EBI-1381086");
+        assertCount(36, "detmethod:\"binding\"");
+        assertCount(1, "+detmethod:\"binding\" +EBI-1380413");
+        assertCount(1, "detmethod:\"binding\" AND EBI-1380413");
+        assertCount(36, "detmethod:\"binding\" OR EBI-1380413");
+        assertCount(0, "detmethod:\"binding\" AND EBI-1381086");
+        assertCount(37, "detmethod:\"binding\" OR EBI-1381086");
     }
 
     @Test
@@ -80,10 +79,9 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         String mitabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
                               "\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)" +
-                              "\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
-                              "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tgo:\"GO:0030246\"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-\t" +
-                           "isoform-comment:May be produced by alternative promoter usage\t" +
-                           "isoform-comment:May be produced at very low levels due to a premature stop codon in the mRNA, leading to nonsense-mediated mRNA decay\t-\t-\t-";
+                              "\tintact:EBI-446356\t-\t-\tMI:0499(unspecified role)" +
+                              "\tMI:0499(unspecified role)\tMI:0498(prey)\tMI:0496(bait)\tMI:0326(protein)\tMI:0326(protein)\tinterpro:IPR004829|\tgo:\"GO:0030246\"\t-\t-\t-\t-\tyeast:4932\t-\t-\t-\t-" +
+                "\t-\t-\t-\t-\t-\t-\t-\t-\t-";
 
         getIndexer().indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
 
@@ -104,8 +102,9 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         String psiMiTabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
                               "\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)" +
-                              "\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
-                              "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tgo:\""+goTermToExpand+"\"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
+                              "\tintact:EBI-446356\t-\t-\tMI:0499(unspecified role)" +
+                              "\tMI:0499(unspecified role)\tMI:0498(prey)\tMI:0496(bait)\tMI:0326(protein)\tMI:0326(protein)\tinterpro:IPR004829|\tgo:\""+goTermToExpand+"\"\t-\t-\t-\t-\tyeast:4932\t-\t-\t-\t-" +
+                "\t-\t-\t-\t-\t-\t-\t-\t-\t-";
 
         OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
 
@@ -113,13 +112,13 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         Assert.assertEquals(1, ontologyNames.size());
         Assert.assertEquals("go", ontologyNames.iterator().next());
 
-        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer(), new IntactDocumentDefinition(), ontologySearcher);
+        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer(), ontologySearcher);
 
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
 
-        Collection<Object> expandedGoIds = doc.getFieldValues("go_expanded_id");
+        Collection<Object> expandedGoIds = doc.getFieldValues("pxrefB");
 
-        Assert.assertEquals(3, expandedGoIds.size());
+        Assert.assertEquals(13, expandedGoIds.size());
         Assert.assertTrue(expandedGoIds.contains(goTermToExpand));
         Assert.assertTrue(expandedGoIds.contains("GO:0003674"));
         Assert.assertTrue(expandedGoIds.contains("GO:0005488"));
@@ -135,21 +134,24 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         String psiMiTabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
                               "\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)" +
-                              "\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
-                              "\tMI:0499(unspecified role)\tinterpro:IPR004829|\t"+goTermToExpand+"\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
+                              "\tintact:EBI-446356\t-\t-\tMI:0499(unspecified role)" +
+                              "\tMI:0499(unspecified role)\tMI:0498(prey)\tMI:0496(bait)\tMI:0326(protein)\tMI:0326(protein)\tinterpro:IPR004829|\t"+goTermToExpand+"\t-\t-\t-\t-\tyeast:4932\t-\t-\t-\t-" +
+                "\t-\t-\t-\t-\t-\t-\t-\t-\t-";
 
         OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
-        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer(), new IntactDocumentDefinition(), ontologySearcher);
+        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer(), ontologySearcher);
 
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
 
-        Collection<Object> expandedGoIds = doc.getFieldValues("go_expanded");
-        Assert.assertEquals(6, expandedGoIds.size());
-        Assert.assertTrue(expandedGoIds.contains("go:\"GO:0030246\"(carbohydrate binding)"));
-        Assert.assertTrue(expandedGoIds.contains("go:\"GO:0030246\"(selectin)"));
+        Collection<Object> expandedGoIds = doc.getFieldValues("pxrefB");
+        Assert.assertEquals(14, expandedGoIds.size());
+        Assert.assertTrue(expandedGoIds.contains("go:GO:0030246"));
+        Assert.assertTrue(expandedGoIds.contains("go:GO:0030246"));
+        Assert.assertTrue(expandedGoIds.contains("carbohydrate binding"));
+        Assert.assertTrue(expandedGoIds.contains("selectin"));
 
-        IntactBinaryInteraction binaryInteraction = (IntactBinaryInteraction) converter.toBinaryInteraction(doc);
-        Assert.assertEquals("carbohydrate binding", binaryInteraction.getInteractorB().getProperties().iterator().next().getText());
+        BinaryInteraction binaryInteraction = converter.toBinaryInteraction(doc);
+        Assert.assertEquals("carbohydrate binding", binaryInteraction.getInteractorB().getXrefs().iterator().next().getText());
     }
 
     @Test
@@ -158,28 +160,31 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
                 "\t-\tintact:irs1_human(shortLabel)\tuniprotkb:CAK II(isoform synonym)|uniprotkb:Short(isoform synonym)|intact:Q08345-2(shortLabel)" +
                 "\tMI:0424(protein kinase assay)\tBantscheff et al. (2007)" +
                 "\tpubmed:17721511\ttaxid:9606(human)\ttaxid:9606(human)\tMI:0217(phosphorylation)" +
-                "\tMI:0469(intact)\tintact:EBI-1381086\t-\t" +
-                "MI:0499(unspecified role)\tMI:0499(unspecified role)" +
-                "\tMI:0502(enzyme target)\tMI:0501(enzyme)" +
-                "\tgo:\"GO:0030188\"|go:\"GO:0005159\"|" +
+                "\tMI:0469(intact)\tintact:EBI-1381086\t-\t-\t" +
+                "MI:0499(unspecified role)\tMI:0502(enzyme target)\tMI:0501(enzyme)\tMI:0499(unspecified role)\tMI:0326(protein)\tMI:0326(protein)\tgo:\"GO:0030188\"|go:\"GO:0005159\"|" +
                 "go:\"GO:0005158\"|interpro:IPR002404|" +
                 "interpro:IPR001849|interpro:IPR011993|ensembl:ENSG00000169047|rcsb pdb:1IRS|rcsb pdb:1K3A|rcsb pdb:1QQG" +
-                "\tintact:EBI-711879\tMI:0326(protein)\tMI:0326(protein)\ttaxid:-1(in vitro)\t-\t-\t-";
+                "\tintact:EBI-711879\t-\t-\t-\t-\ttaxid:-1(in vitro)\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-";
 
         OntologyIterator taxonomyIterator = new UniprotTaxonomyOntologyIterator(IntactSolrSearcherTest.class.getResourceAsStream("/META-INF/hominidae-taxonomy.tsv"));
         getIndexer().indexOntology(taxonomyIterator);
 
         OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
-        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer(), new IntactDocumentDefinition(), ontologySearcher);
+        SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer(), ontologySearcher);
 
         SolrInputDocument doc = converter.toSolrDocument(mitab);
 
-        Collection<Object> expandedTaxidA = doc.getFieldValues("taxidA_expanded");
-        Assert.assertTrue(expandedTaxidA.contains("taxid:314295(Catarrhini)"));
-        Assert.assertTrue(expandedTaxidA.contains("taxid:207598(Hominidae)"));
-        Assert.assertTrue(expandedTaxidA.contains("taxid:9605(Homo)"));
-        Assert.assertTrue(expandedTaxidA.contains("taxid:9604(Hominidae)"));
-        Assert.assertTrue(expandedTaxidA.contains("taxid:9606(Human)"));
+        Collection<Object> expandedTaxidA = doc.getFieldValues("taxidA");
+        Assert.assertTrue(expandedTaxidA.contains("taxid:314295"));
+        Assert.assertTrue(expandedTaxidA.contains("taxid:207598"));
+        Assert.assertTrue(expandedTaxidA.contains("taxid:9605"));
+        Assert.assertTrue(expandedTaxidA.contains("taxid:9604"));
+        Assert.assertTrue(expandedTaxidA.contains("taxid:9606"));
+        Assert.assertTrue(expandedTaxidA.contains("Catarrhini"));
+        Assert.assertTrue(expandedTaxidA.contains("Hominidae"));
+        Assert.assertTrue(expandedTaxidA.contains("Homo"));
+        Assert.assertTrue(expandedTaxidA.contains("Hominidae"));
+        Assert.assertTrue(expandedTaxidA.contains("Human"));
     }
 
     @Test
@@ -187,8 +192,9 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         String mitabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
                               "\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)" +
-                              "\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
-                              "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tGO:012345\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
+                              "\tintact:EBI-446356\t-\t-\tMI:0499(unspecified role)" +
+                              "\tMI:0499(unspecified role)\tMI:0498(prey)\tMI:0496(bait)\tMI:0326(protein)\tMI:0326(protein)\tinterpro:IPR004829|\tGO:012345\t-\t-\t-\t-\tyeast:4932\t-\t-\t-\t-" +
+                "\t-\t-\t-\t-\t-\t-\t-\t-\t-";
 
         getIndexer().indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
 
@@ -200,8 +206,9 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         String mitabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
                               "\ttaxid:10116(rat)\ttaxid:10090(mouse)\tMI:0218(physical interaction)\tMI:0469(intact)" +
-                              "\tintact:EBI-446356|imex:IM-1234-1\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
-                              "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tGO:012345\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
+                              "\tintact:EBI-446356|imex:IM-1234-1\t-\t-\tMI:0499(unspecified role)" +
+                              "\tMI:0499(unspecified role)\tMI:0498(prey)\tMI:0496(bait)\tMI:0326(protein)\tMI:0326(protein)\tinterpro:IPR004829|\tGO:012345\t-\t-\t-\t-\tyeast:4932\t-\t-\t-\t-" +
+                "\t-\t-\t-\t-\t-\t-\t-\t-\t-";
         
         getIndexer().indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
 
@@ -213,12 +220,13 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         String mitabLine = "uniprotkb:P16884\tuniprotkb:Q60824\tuniprotkb:Nefh(gene name)\tuniprotkb:Dst(gene name)" +
                               "\tintact:Nfh\tintact:Bpag1\tMI:0018(2 hybrid)\tLeung et al. (1999)\tpubmed:9971739" +
                               "\ttaxid:9606(human)\ttaxid:9606(human)\tMI:0218(physical interaction)\tMI:0469(intact)" +
-                              "\tintact:EBI-446356\t-\tMI:0498(prey)\tMI:0496(bait)\tMI:0499(unspecified role)" +
-                              "\tMI:0499(unspecified role)\tinterpro:IPR004829|\tGO:012345\tMI:0326(protein)\tMI:0326(protein)\tyeast:4932\t-\t-";
+                              "\tintact:EBI-446356\t-\t-\tMI:0499(unspecified role)" +
+                              "\tMI:0499(unspecified role)\tMI:0498(prey)\tMI:0496(bait)\tMI:0326(protein)\tMI:0326(protein)\tinterpro:IPR004829|\tGO:012345\t-\t-\t-\t-\tyeast:4932\t-\t-\t-\t-" +
+                "\t-\t-\t-\t-\t-\t-\t-\t-\t-";
 
         OntologyIterator taxonomyIterator = new UniprotTaxonomyOntologyIterator(IntactSolrSearcherTest.class.getResourceAsStream("/META-INF/hominidae-taxonomy.tsv"));
 
-        IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB), getSolrJettyRunner().getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB), (HttpSolrServer) getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
         indexer.indexOntology(taxonomyIterator);
         indexer.indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
 
@@ -227,8 +235,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
 
         SolrDocument doc = queryResponse.getResults().get(0);
 
-        Assert.assertEquals(26, doc.getFieldValues("species").size());
-        Assert.assertEquals(12, doc.getFieldValues("species_id").size());
+        Assert.assertEquals(1, doc.getFieldValues("taxidA_o").size());
     }
 
     private void assertCount(Number count, String searchQuery) throws IntactSolrException {

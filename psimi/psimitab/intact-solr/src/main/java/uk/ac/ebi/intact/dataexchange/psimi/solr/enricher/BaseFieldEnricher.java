@@ -16,10 +16,11 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import psidev.psi.mi.tab.model.builder.Field;
+import org.hupo.psi.calimocho.model.Field;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Field enricher that doesn't enrich anything.
@@ -32,16 +33,22 @@ public class BaseFieldEnricher implements FieldEnricher {
     public BaseFieldEnricher() {
     }
 
+    @Override
+    public Field findFieldByName(String name) throws Exception {
+        return null;
+    }
+
     public Field enrich(Field field) throws Exception {
          return field;
     }
 
     public Collection<Field> getAllParents(Field field, boolean includeItself) throws SolrServerException {
-        Collection<Field> fields = new ArrayList<Field>();
         if (includeItself) {
+            Collection<Field> fields = new ArrayList<Field>();
             fields.add(field);
+            return fields;
         }
-        return fields;
+        return Collections.EMPTY_LIST;
     }
 
     public boolean isExpandableOntology( String name ) {

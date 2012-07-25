@@ -19,7 +19,9 @@ import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServerException;
-import psidev.psi.mi.tab.model.builder.Field;
+import org.hupo.psi.calimocho.key.CalimochoKeys;
+import org.hupo.psi.calimocho.model.DefaultField;
+import org.hupo.psi.calimocho.model.Field;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.LazyLoadedOntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
@@ -42,6 +44,7 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
     private final Map<String,OntologyTerm> ontologyTermCache;
 
     private Set<String> expandableOntologies;
+    private Set<String> ontologyTermsToIgnore;
 
     public OntologyFieldEnricher(OntologySearcher ontologySearcher) {
         super();
@@ -49,6 +52,8 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
 
         cvCache = new LRUMap(50000);
         ontologyTermCache = new LRUMap(10000);
+
+        ontologyTermsToIgnore = new HashSet<String>();
     }
 
     @Override
@@ -75,11 +80,31 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
     public Field enrich(Field field) throws Exception {
         if (field == null) return null;
 
+        String value = field.get(CalimochoKeys.VALUE);
+
+        if (ontologyTermsToIgnore.contains(value)){
+            return null;
+        }
+
         final OntologyTerm ontologyTerm = findOntologyTerm(field);
 
         if (ontologyTerm == null) return field;
 
-        return convertTermToField( field.getType(), ontologyTerm );
+        return convertTermToField( field.get(CalimochoKeys.DB), ontologyTerm );
+    }
+
+    public Field findFieldByName(String name) throws Exception{
+        if (name == null) return null;
+
+        if (ontologyTermsToIgnore.contains(name)){
+            return null;
+        }
+
+        final OntologyTerm ontologyTerm = findOntologyTermByName(name);
+
+        if (ontologyTerm == null) return null;
+
+        return convertTermToField( name, ontologyTerm );
     }
 
     /**
@@ -87,7 +112,7 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
      * @param includeItself if true, the passed field will be part of the collection (its description updated from the index)
      * @return list of cv terms with parents and itself
      */
-    public Collection<Field> getAllParents(psidev.psi.mi.tab.model.builder.Field field, boolean includeItself) throws SolrServerException {
+    public Collection<Field> getAllParents(Field field, boolean includeItself) throws SolrServerException {
          return getAllParents(field, includeItself, true);
     }
 
@@ -96,16 +121,20 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
      * @param includeItself if true, the passed field will be part of the collection (its description updated from the index)
      * @return list of cv terms with parents and itself
      */
-    public Collection<Field> getAllParents(psidev.psi.mi.tab.model.builder.Field field, boolean includeItself, boolean includeSynonyms) throws SolrServerException {
+    public Collection<Field> getAllParents(Field field, boolean includeItself, boolean includeSynonyms) throws SolrServerException {
         if (ontologySearcher == null) {
             return Collections.EMPTY_LIST;
         }
 
-        List<psidev.psi.mi.tab.model.builder.Field> allParents = null;
+        List<Field> allParents = null;
 
-        final String type = field.getType();
+        final String type = field.get(CalimochoKeys.DB);
 
-        String identifier = field.getValue();
+        String identifier = field.get(CalimochoKeys.VALUE);
+
+        if (ontologyTermsToIgnore.contains(identifier)){
+            return Collections.EMPTY_LIST;
+        }
 
         if (cvCache.containsKey(identifier)) {
             return cvCache.get(identifier);
@@ -128,7 +157,28 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
     }
     
     public OntologyTerm findOntologyTerm(Field field) throws SolrServerException {
-        return findOntologyTerm(field.getValue(), field.getDescription());
+
+        String value = field.get(CalimochoKeys.VALUE);
+
+        return findOntologyTerm(value, field.get(CalimochoKeys.TEXT));
+    }
+
+    public OntologyTerm findOntologyTermByName(String name) throws SolrServerException {
+        if (ontologySearcher == null) {
+            return null;
+        }
+
+        String cacheKey = "_"+name;
+
+        if (ontologyTermCache.containsKey(cacheKey)) {
+            return ontologyTermCache.get(cacheKey);
+        }
+
+        final LazyLoadedOntologyTerm term = new LazyLoadedOntologyTerm(ontologySearcher, null, name);
+
+        ontologyTermCache.put( cacheKey, term );
+
+        return term;
     }
 
     public OntologyTerm findOntologyTerm(String id, String name) throws SolrServerException {
@@ -149,13 +199,16 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
         return term;
     }
 
-    private List<psidev.psi.mi.tab.model.builder.Field> convertTermsToFieldsIncludingSynonyms(String type, Set<OntologyTerm> terms) {
-        List<psidev.psi.mi.tab.model.builder.Field> fields = new ArrayList<psidev.psi.mi.tab.model.builder.Field>();
+    private List<Field> convertTermsToFieldsIncludingSynonyms(String type, Set<OntologyTerm> terms) {
+        List<Field> fields = new ArrayList<Field>();
 
         if (terms != null) {
             for ( OntologyTerm term : terms ) {
-                Collection<Field> fieldsWithSynonyms = convertTermToFieldIncludingSynonyms(type, term);
-                fields.addAll( fieldsWithSynonyms );
+
+                if (!ontologyTermsToIgnore.contains(term.getId())){
+                    Collection<Field> fieldsWithSynonyms = convertTermToFieldIncludingSynonyms(type, term);
+                    fields.addAll( fieldsWithSynonyms );
+                }
             }
         }
 
@@ -163,7 +216,13 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
     }
 
     private Field convertTermToField(String type, OntologyTerm term) {
-        return new Field( type, term.getId(), term.getName() );
+        Field field = new DefaultField( );
+
+        field.set(CalimochoKeys.DB, type);
+        field.set(CalimochoKeys.VALUE, term.getId());
+        field.set(CalimochoKeys.TEXT, term.getName());
+
+        return field;
     }
 
     private Collection<Field> convertTermToFieldIncludingSynonyms(String type, OntologyTerm term) {
@@ -176,5 +235,9 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
         }
 
         return fields;
+    }
+
+    public Set<String> getOntologyTermsToIgnore() {
+        return ontologyTermsToIgnore;
     }
 }

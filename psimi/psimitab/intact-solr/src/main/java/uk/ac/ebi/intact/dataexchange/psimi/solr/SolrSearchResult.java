@@ -18,10 +18,8 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
-import psidev.psi.mi.tab.model.builder.Row;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.SolrDocumentConverter;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,12 +36,15 @@ public class SolrSearchResult {
     private QueryResponse queryResponse;
 
     private Collection<String> lineList;
-    private Collection<Row> rowList;
-    private Collection<IntactBinaryInteraction> binaryInteractionList;
+    private Collection<BinaryInteraction> binaryInteractionList;
+
+    private SolrDocumentConverter solrDocumentConverter;
 
     public SolrSearchResult(SolrServer solrServer, QueryResponse queryResponse) {
         this.solrServer = solrServer;
         this.queryResponse = queryResponse;
+
+        this.solrDocumentConverter = new SolrDocumentConverter(solrServer);
     }
 
     public long getTotalCount() {
@@ -56,40 +57,23 @@ public class SolrSearchResult {
         }
 
         lineList = new ArrayList<String>(Long.valueOf(getTotalCount()).intValue());
-        SolrDocumentConverter converter = new SolrDocumentConverter(solrServer, new IntactDocumentDefinition());
 
         for (SolrDocument doc : queryResponse.getResults()) {
-            lineList.add(converter.toMitabLine(doc));
+            lineList.add(solrDocumentConverter.toMitabLine(doc));
         }
 
         return lineList;
     }
 
-    public Collection<Row> getRowList() {
-        if (rowList != null) {
-            return rowList;
-        }
-
-        rowList = new ArrayList<Row>(Long.valueOf(getTotalCount()).intValue());
-        SolrDocumentConverter converter = new SolrDocumentConverter(solrServer, new IntactDocumentDefinition());
-
-        for (SolrDocument doc : queryResponse.getResults()) {
-            rowList.add(converter.toRow(doc));
-        }
-
-        return rowList;
-    }
-
-    public Collection<IntactBinaryInteraction> getBinaryInteractionList() {
+    public Collection<BinaryInteraction> getBinaryInteractionList() {
         if (binaryInteractionList != null) {
             return binaryInteractionList;
         }
 
-        binaryInteractionList = new ArrayList<IntactBinaryInteraction>(Long.valueOf(getTotalCount()).intValue());
-        SolrDocumentConverter converter = new SolrDocumentConverter(solrServer, new IntactDocumentDefinition());
+        binaryInteractionList = new ArrayList<BinaryInteraction>(Long.valueOf(getTotalCount()).intValue());
 
         for (SolrDocument doc : queryResponse.getResults()) {
-            binaryInteractionList.add((IntactBinaryInteraction) converter.toBinaryInteraction(doc));
+            binaryInteractionList.add(solrDocumentConverter.toBinaryInteraction(doc));
         }
 
         return binaryInteractionList;

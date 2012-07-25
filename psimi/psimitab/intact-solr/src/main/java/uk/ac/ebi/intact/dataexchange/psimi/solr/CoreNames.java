@@ -24,7 +24,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 public interface CoreNames {
 
     String CORE_PUB = "core_pub";
-    String CORE_STAGE = "core_stage";
+    //String CORE_STAGE = "core_stage";
     String CORE_ONTOLOGY_PUB = "core_ontology_pub";
-    String CORE_ONTOLOGY_STAGE = "core_ontology_stage";
+    //String CORE_ONTOLOGY_STAGE = "core_ontology_stage";
 }

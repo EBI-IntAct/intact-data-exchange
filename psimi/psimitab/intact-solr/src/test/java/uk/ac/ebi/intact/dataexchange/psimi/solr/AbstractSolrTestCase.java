@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.junit.After;
 import org.junit.Before;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
@@ -26,7 +27,7 @@ public class AbstractSolrTestCase {
         solrJettyRunner.start();
 
         indexer = new IntactSolrIndexer( solrJettyRunner.getSolrServer( CoreNames.CORE_PUB ),
-                                         solrJettyRunner.getStreamingSolrServer( CoreNames.CORE_ONTOLOGY_PUB ) );
+                                         (HttpSolrServer) solrJettyRunner.getSolrServer( CoreNames.CORE_ONTOLOGY_PUB ) );
     }
 
     @After

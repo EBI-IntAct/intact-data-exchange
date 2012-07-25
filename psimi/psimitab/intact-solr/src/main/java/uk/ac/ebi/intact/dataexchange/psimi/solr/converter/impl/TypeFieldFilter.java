@@ -15,7 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl;
 
-import psidev.psi.mi.tab.model.builder.Field;
+import org.hupo.psi.calimocho.key.CalimochoKeys;
+import org.hupo.psi.calimocho.model.Field;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.FieldFilter;
 
 /**
@@ -34,6 +35,9 @@ public class TypeFieldFilter implements FieldFilter {
 
 
     public boolean acceptField(Field field) {
-        return type.equals(field.getType());
+        if (type == null){
+           return false;
+        }
+        return type.equalsIgnoreCase(field.get(CalimochoKeys.DB));
     }
 }

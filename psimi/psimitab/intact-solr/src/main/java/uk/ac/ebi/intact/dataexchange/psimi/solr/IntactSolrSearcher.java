@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
+import psidev.psi.mi.calimocho.solr.converter.SolrFieldName;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,16 +40,51 @@ public class IntactSolrSearcher {
 
     private SolrServer solrServer;
 
+    private final static String DEFAULT_PARAM_NAME = "qf";
+    private final static String QUERY_TYPE = "defType";
+    private final static String DISMAX_TYPE = "edismax";
+    private final static String DEFAULT_QUERY_FIELDS = SolrFieldName.identifier.toString()+" "+SolrFieldName.pubid.toString()+" "+SolrFieldName.pubauth.toString()+" "+SolrFieldName.species.toString()+" "+SolrFieldName.detmethod.toString()+" "+SolrFieldName.type.toString()+" "+SolrFieldName.interaction_id.toString();
+
     public IntactSolrSearcher(SolrServer solrServer) {
         this.solrServer = solrServer;
     }
 
-    public SolrSearchResult search(String query, Integer firstResult, Integer maxResults) throws IntactSolrException {
+    public SolrSearchResult search(String query, Integer firstResult, Integer maxResults, Collection<String> filteredQueries) throws IntactSolrException {
         if (query == null) throw new NullPointerException("Null query");
         
         if ("*".equals(query)) query = "*:*";
 
         SolrQuery solrQuery = new SolrQuery(query);
+        // use dismax parser for querying default fields
+        solrQuery.setParam(DEFAULT_PARAM_NAME, DEFAULT_QUERY_FIELDS);
+        solrQuery.setParam(QUERY_TYPE, DISMAX_TYPE);
+
+        if (firstResult != null) solrQuery.setStart(firstResult);
+
+        if (maxResults != null) {
+            solrQuery.setRows(maxResults);
+        } else {
+            solrQuery.setRows(Integer.MAX_VALUE);
+        }
+
+        if (filteredQueries != null){
+            for (String filter : filteredQueries){
+                solrQuery.addFilterQuery(filter);
+            }
+        }
+
+        return search(solrQuery);
+    }
+
+    public SolrSearchResult search(String query, Integer firstResult, Integer maxResults) throws IntactSolrException {
+        if (query == null) throw new NullPointerException("Null query");
+
+        if ("*".equals(query)) query = "*:*";
+
+        SolrQuery solrQuery = new SolrQuery(query);
+        // use dismax parser for querying default fields
+        solrQuery.setParam(DEFAULT_PARAM_NAME, DEFAULT_QUERY_FIELDS);
+        solrQuery.setParam(QUERY_TYPE, DISMAX_TYPE);
 
         if (firstResult != null) solrQuery.setStart(firstResult);
 
@@ -64,7 +100,7 @@ public class IntactSolrSearcher {
     public SolrSearchResult search(SolrQuery originalQuery) throws IntactSolrException {
         SolrQuery query = originalQuery.getCopy();
 
-        String[] fields = (String[]) ArrayUtils.add(FieldNames.DATA_FIELDS, "pkey");
+        String[] fields = (String[]) ArrayUtils.add(FieldNames.DATA_FIELDS, FieldNames.PKEY);
 
         if(query.getFields()!=null){
             fields = (String[]) ArrayUtils.add(fields, query.getFields().split(","));
@@ -91,22 +127,35 @@ public class IntactSolrSearcher {
 
             query.setQuery(sb.toString().trim());
         }
+        String queryString = query.getQuery();
+
+        // and, or and not should be upper case
+        query.set(queryString.replaceAll(" and ", " AND ").replaceAll(" or ", " OR ").replaceAll(" not ", " NOT ").replaceAll("\\\"", "\"").replaceAll("\\\\","\\"));
 
         QueryResponse queryResponse = executeQuery(query);
         return new SolrSearchResult(solrServer, queryResponse);
     }
 
-    public Collection<InteractorIdCount> searchInteractors(SolrQuery query, String interactorMi) throws IntactSolrException {
-        Multimap<String,InteractorIdCount> interactors = searchInteractors(query, new String[] {interactorMi});
+    public Collection<InteractorIdCount> searchInteractors(SolrQuery query, String interactorMi, int first, int maxNumberOfIdCount) throws IntactSolrException {
+        Multimap<String,InteractorIdCount> interactors = searchInteractors(query, new String[] {interactorMi}, first, maxNumberOfIdCount);
         return interactors.values();
     }
 
-    public Multimap<String,InteractorIdCount> searchInteractors(SolrQuery originalQuery, String[] interactorTypeMis) throws IntactSolrException {
+    public Multimap<String,InteractorIdCount> searchInteractors(SolrQuery originalQuery, String[] interactorTypeMis, int first, int maxNumberOfIdCount) throws IntactSolrException {
         SolrQuery query = originalQuery.getCopy();
         query.setRows(0);
+
+        // we allow faceting
         query.setFacet(true);
+
+        // we want all the facet fields with min count = 1. The facet fields with count = 0 are not interesting
         query.setFacetMinCount(1);
-        query.setFacetLimit(Integer.MAX_VALUE);
+
+        // important optimization. We don't want to return all the fields, only a certain number for pagination
+        query.set(FacetParams.FACET_OFFSET, first);
+        query.setFacetLimit(maxNumberOfIdCount);
+
+        // we sort the results : the biggest count first
         query.setFacetSort(FacetParams.FACET_SORT_COUNT);
 
         Multimap<String,InteractorIdCount> interactors = HashMultimap.create();

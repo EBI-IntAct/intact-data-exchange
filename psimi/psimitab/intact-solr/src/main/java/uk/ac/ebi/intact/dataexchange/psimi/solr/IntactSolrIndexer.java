@@ -17,10 +17,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
+import org.hupo.psi.calimocho.io.IllegalFieldException;
+import org.hupo.psi.calimocho.io.IllegalRowException;
+import org.hupo.psi.calimocho.tab.io.IllegalColumnException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
@@ -30,7 +32,6 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.failure.FailFastFailureHandling;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.failure.FailureHandlingStrategy;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologyIndexer;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
-import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -47,7 +48,7 @@ public class IntactSolrIndexer {
     private Logger log = LoggerFactory.getLogger(IntactSolrIndexer.class);
 
     private SolrServer solrServer;
-    private StreamingUpdateSolrServer ontologySolrServer;
+    private HttpSolrServer ontologySolrServer;
     private SolrDocumentConverter converter;
 
     private int timesToRetry = 100;
@@ -58,24 +59,24 @@ public class IntactSolrIndexer {
     // Constructors
 
     public IntactSolrIndexer(String solrServerUrl) throws MalformedURLException {
-        this(new CommonsHttpSolrServer(solrServerUrl));
+        this(new HttpSolrServer(solrServerUrl));
     }
 
     public IntactSolrIndexer(SolrServer solrServer) {
         this.solrServer = solrServer;
-        this.converter = new SolrDocumentConverter(solrServer, new IntactDocumentDefinition());
+        this.converter = new SolrDocumentConverter(solrServer);
 
         SolrLogger.readFromLog4j();
     }
 
     public IntactSolrIndexer(String solrServerUrl, String ontologySolrServerUrl) throws MalformedURLException {
-        this(new CommonsHttpSolrServer(solrServerUrl), new StreamingUpdateSolrServer(ontologySolrServerUrl.toString(), 2, 2));
+        this(new HttpSolrServer(solrServerUrl), new HttpSolrServer(ontologySolrServerUrl));
     }
 
-    public IntactSolrIndexer(SolrServer solrServer, StreamingUpdateSolrServer ontologySolrServer) {
+    public IntactSolrIndexer(SolrServer solrServer, HttpSolrServer ontologySolrServer) {
         this(solrServer);
         this.ontologySolrServer = ontologySolrServer;
-        this.converter = new SolrDocumentConverter(solrServer, new IntactDocumentDefinition(), new OntologySearcher(ontologySolrServer));
+        this.converter = new SolrDocumentConverter(solrServer, new OntologySearcher(ontologySolrServer));
     }
 
     ///////////////////////////
@@ -280,6 +281,12 @@ public class IntactSolrIndexer {
 
         } catch (SolrException e) {
 
+            handleAddDocumentException( e, line, retriesLeft );
+        } catch (IllegalFieldException e) {
+            handleAddDocumentException( e, line, retriesLeft );
+        } catch (IllegalColumnException e) {
+            handleAddDocumentException( e, line, retriesLeft );
+        } catch (IllegalRowException e) {
             handleAddDocumentException( e, line, retriesLeft );
         }
     }

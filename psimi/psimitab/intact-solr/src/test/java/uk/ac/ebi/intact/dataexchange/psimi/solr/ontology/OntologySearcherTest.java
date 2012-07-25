@@ -2,15 +2,15 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
+import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.AbstractSolrTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
 
 import java.net.URL;
+import java.util.List;
 
 /**
  * OntologySearcher Tester.
@@ -56,15 +56,14 @@ public class OntologySearcherTest extends AbstractSolrTestCase {
     }
 
     private void assertParentRelationshipCount( OntologySearcher searcher, String termId, int expectedCount ) throws SolrServerException {
-        final QueryResponse response = searcher.searchByChildId( termId, 0, Integer.MAX_VALUE );
+        final List<OntologyTerm> response = searcher.searchByChildId( termId, 0, Integer.MAX_VALUE );
         Assert.assertNotNull( response );
-        final SolrDocumentList documentList = response.getResults();
-        Assert.assertEquals( expectedCount, documentList.size() );
+        Assert.assertEquals( expectedCount, response.size() );
     }
 
     private void assertChildrenRelationshipCount( OntologySearcher searcher, String termId, int expectedCount ) throws SolrServerException {
-        final QueryResponse response = searcher.searchByParentId( termId, 0, Integer.MAX_VALUE );
+        final List<OntologyTerm> response = searcher.searchByParentId( termId, 0, Integer.MAX_VALUE );
         Assert.assertNotNull( response );
-        Assert.assertEquals( expectedCount, response.getResults().size() );
+        Assert.assertEquals( expectedCount, response.size() );
     }
 }

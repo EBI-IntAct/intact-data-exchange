@@ -21,8 +21,6 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
 import java.util.Collection;
 
@@ -32,36 +30,62 @@ import java.util.Collection;
  */
 public class OntologyBinaryInteractionEnricher implements BinaryInteractionEnricher{
 
-    private final OntologyFieldEnricher fieldEnricher;
+    protected final OntologyFieldEnricher fieldEnricher;
 
     public OntologyBinaryInteractionEnricher(OntologySearcher ontologySearcher) {
         this.fieldEnricher = new OntologyFieldEnricher(ontologySearcher);
     }
 
     public void enrich(BinaryInteraction binaryInteraction) throws Exception {
+        // enrich interactors
         enrich(binaryInteraction.getInteractorA());
         enrich(binaryInteraction.getInteractorB());
 
-        enrich(binaryInteraction.getInteractionTypes());
+        // enrich cvs of interaction
         enrich(binaryInteraction.getDetectionMethods());
+        enrich(binaryInteraction.getInteractionTypes());
+        enrich(binaryInteraction.getSourceDatabases());
+        enrich(binaryInteraction.getComplexExpansion());
 
-        if (binaryInteraction instanceof IntactBinaryInteraction) {
-            IntactBinaryInteraction ibi = (IntactBinaryInteraction) binaryInteraction;
-            enrich(ibi.getHostOrganism());
+        // enrich xrefs of interaction
+        enrich(binaryInteraction.getInteractionXrefs());
+
+        // enrich organism of interaction
+        if (binaryInteraction.getHostOrganism() != null){
+            enrich(binaryInteraction.getHostOrganism().getIdentifiers());
         }
     }
 
     public void enrich(Interactor interactor) throws Exception {
+
+        // enrich organisms
         if (interactor.getOrganism() != null) {
             enrich(interactor.getOrganism().getIdentifiers());
         }
 
-        if (interactor instanceof ExtendedInteractor) {
-            ExtendedInteractor ei = (ExtendedInteractor) interactor;
-            enrich(ei.getBiologicalRoles());
-            enrich(ei.getExperimentalRoles());
-            enrich(ei.getInteractorType());
-            enrich(ei.getProperties());
+        // enrich biological role
+        if (interactor.getBiologicalRoles() != null) {
+            enrich(interactor.getBiologicalRoles());
+        }
+
+        // enrich experimental roles
+        if (interactor.getExperimentalRoles() != null) {
+            enrich(interactor.getExperimentalRoles());
+        }
+
+        // enrich interactor types
+        if (interactor.getInteractorTypes()!= null) {
+            enrich(interactor.getInteractorTypes());
+        }
+
+        // enrich xrefs
+        if (interactor.getXrefs()!= null) {
+            enrich(interactor.getXrefs());
+        }
+
+        // enrich participant detection methods
+        if (interactor.getParticipantIdentificationMethods()!= null) {
+            enrich(interactor.getParticipantIdentificationMethods());
         }
     }
 

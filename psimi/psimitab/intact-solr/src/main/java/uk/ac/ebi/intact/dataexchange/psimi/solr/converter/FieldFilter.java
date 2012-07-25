@@ -15,7 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.converter;
 
-import psidev.psi.mi.tab.model.builder.Field;
+import org.hupo.psi.calimocho.model.Field;
 
 /**
  * Used to filter fields in columns.

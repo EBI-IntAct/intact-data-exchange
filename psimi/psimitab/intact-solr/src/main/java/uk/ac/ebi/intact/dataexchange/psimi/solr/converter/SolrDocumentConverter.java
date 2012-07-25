@@ -19,25 +19,41 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.hupo.psi.calimocho.io.IllegalFieldException;
+import org.hupo.psi.calimocho.io.IllegalRowException;
+import org.hupo.psi.calimocho.key.InteractionKeys;
+import org.hupo.psi.calimocho.model.Row;
+import org.hupo.psi.calimocho.tab.io.DefaultRowReader;
+import org.hupo.psi.calimocho.tab.io.IllegalColumnException;
+import org.hupo.psi.calimocho.tab.io.RowReader;
+import org.hupo.psi.calimocho.tab.io.formatter.AnnotationFieldFormatter;
+import org.hupo.psi.calimocho.tab.io.formatter.XrefFieldFormatter;
+import org.hupo.psi.calimocho.tab.util.MitabDocumentDefinitionFactory;
+import psidev.psi.mi.calimocho.solr.converter.Converter;
+import psidev.psi.mi.calimocho.solr.converter.SolrFieldName;
+import psidev.psi.mi.calimocho.solr.converter.SolrFieldUnit;
+import psidev.psi.mi.calimocho.solr.converter.TextFieldConverter;
+import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.builder.*;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.FieldNames;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.extension.AnnotationTopicsToEnrichConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.extension.FeatureTypeToEnrichConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.extension.FieldToEnrichConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.ByInteractorTypeRowDataAdder;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.ConfidenceScoreSelectiveAdder;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.GeneNameSelectiveAdder;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.IdSelectiveAdder;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.TypeFieldFilter;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BaseFieldEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.FieldEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.OntologyFieldEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.util.IntactSolrUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.util.SchemaInfo;
-import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Converts from Row to SolrDocument and vice-versa.
@@ -45,18 +61,41 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class SolrDocumentConverter {
+public class SolrDocumentConverter extends Converter{
 
-    private DocumentDefinition documentDefintion;
     private SchemaInfo schemaInfo;
+    private RowReader rowReader;
+    private PsimiTabReader mitabReader;
 
     /**
      * Access to the Ontology index.
      */
     private FieldEnricher fieldEnricher;
+    private FieldToEnrichConverter fieldEnricherConverter;
+    private FeatureTypeToEnrichConverter featureTypeFieldEnricher;
+    private AnnotationTopicsToEnrichConverter annotationTopicToEnrichConverter;
+    private static final String COLUMN_SEPARATOR = "\t";
+    private static final String FIELD_SEPARATOR = "|";
+    private static final String FIELD_EMPTY = "-";
+
+    private static final String[] DATA_FIELDS_27 = new String[] {
+            SolrFieldName.idA+FieldNames.STORED_SUFFIX, SolrFieldName.idB+FieldNames.STORED_SUFFIX, SolrFieldName.altidA+FieldNames.STORED_SUFFIX,
+            SolrFieldName.altidB+FieldNames.STORED_SUFFIX, SolrFieldName.aliasA+FieldNames.STORED_SUFFIX, SolrFieldName.aliasB+FieldNames.STORED_SUFFIX,
+            SolrFieldName.detmethod+FieldNames.STORED_SUFFIX, SolrFieldName.pubauth+FieldNames.STORED_SUFFIX, SolrFieldName.pubid+FieldNames.STORED_SUFFIX,
+            SolrFieldName.taxidA+FieldNames.STORED_SUFFIX, SolrFieldName.taxidB+FieldNames.STORED_SUFFIX, SolrFieldName.type+FieldNames.STORED_SUFFIX,
+            SolrFieldName.source+FieldNames.STORED_SUFFIX,SolrFieldName.interaction_id+FieldNames.STORED_SUFFIX, SolrFieldName.confidence+FieldNames.STORED_SUFFIX,
+            SolrFieldName.complex+FieldNames.STORED_SUFFIX, SolrFieldName.pbioroleA+FieldNames.STORED_SUFFIX, SolrFieldName.pbioroleB+FieldNames.STORED_SUFFIX,
+            SolrFieldName.ptypeB+FieldNames.STORED_SUFFIX, SolrFieldName.pxrefA+FieldNames.STORED_SUFFIX, SolrFieldName.pxrefB+FieldNames.STORED_SUFFIX,
+            SolrFieldName.xref+FieldNames.STORED_SUFFIX, SolrFieldName.pexproleA+FieldNames.STORED_SUFFIX, SolrFieldName.annotA+FieldNames.STORED_SUFFIX,
+            SolrFieldName.annotB+FieldNames.STORED_SUFFIX, SolrFieldName.annot+FieldNames.STORED_SUFFIX, SolrFieldName.taxidHost+FieldNames.STORED_SUFFIX,
+            SolrFieldName.param+FieldNames.STORED_SUFFIX, SolrFieldName.cdate+FieldNames.STORED_SUFFIX, SolrFieldName.udate+FieldNames.STORED_SUFFIX,
+            SolrFieldName.checksumA+FieldNames.STORED_SUFFIX, SolrFieldName.checksumB+FieldNames.STORED_SUFFIX, SolrFieldName.checksumI+FieldNames.STORED_SUFFIX,
+            SolrFieldName.negative+FieldNames.STORED_SUFFIX, SolrFieldName.ftypeA+FieldNames.STORED_SUFFIX, SolrFieldName.ftypeB+FieldNames.STORED_SUFFIX,
+            SolrFieldName.stcA+FieldNames.STORED_SUFFIX, SolrFieldName.stcB+FieldNames.STORED_SUFFIX, SolrFieldName.pmethodA+FieldNames.STORED_SUFFIX,
+            SolrFieldName.pmethodB+FieldNames.STORED_SUFFIX
+    };
 
     public SolrDocumentConverter(SolrServer solrServer) {
-        this.documentDefintion = new IntactDocumentDefinition();
         this.fieldEnricher = new BaseFieldEnricher();
 
         try {
@@ -64,42 +103,112 @@ public class SolrDocumentConverter {
         } catch (IOException e) {
             throw new RuntimeException("Problem fetching schema info from solr server: "+solrServer);
         }
+        rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
+        mitabReader = new PsimiTabReader(false);
+
+        keyMap = new HashMap<SolrFieldName, SolrFieldUnit>();
+        initializeKeyMap();
     }
 
-    public SolrDocumentConverter(SolrServer solrServer, DocumentDefinition documentDefintion) {
-        this(solrServer);
-        this.documentDefintion = documentDefintion;
+    @Override
+    protected void initializeKeyMap(){
+        super.initializeKeyMap();
+
+        TextFieldConverter textConverter = new TextFieldConverter();
+        XrefFieldFormatter textFormatter = new XrefFieldFormatter();
+        this.fieldEnricherConverter = new FieldToEnrichConverter(this.fieldEnricher);
+        this.featureTypeFieldEnricher = new FeatureTypeToEnrichConverter(this.fieldEnricher);
+        this.annotationTopicToEnrichConverter = new AnnotationTopicsToEnrichConverter(this.fieldEnricher);
+        AnnotationFieldFormatter annotFormatter = new AnnotationFieldFormatter(":");
+
+        // override source which is an indexed field in IntAct. We don't want this field as store only, that is why we have the boolean false.
+        // we don't want to enrich this one, there is no needs.
+        keyMap.put(SolrFieldName.source,  new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_SOURCE), textConverter, textFormatter, false));
+
+        // override taxidA and taxidB for ontology enrichment
+        keyMap.put(SolrFieldName.taxidA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_TAXID_A), this.fieldEnricherConverter, textFormatter, false));
+        keyMap.put(SolrFieldName.taxidB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_TAXID_B), this.fieldEnricherConverter, textFormatter, false));
+
+        // override cvs for enrichment with parents and synonyms
+        keyMap.put(SolrFieldName.type, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTION_TYPE), this.fieldEnricherConverter, textFormatter, false));
+        keyMap.put(SolrFieldName.detmethod, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_DETMETHOD),this.fieldEnricherConverter, textFormatter, false));
+        keyMap.put(SolrFieldName.pbioroleA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_BIOROLE_A), this.fieldEnricherConverter, textFormatter, false));
+        keyMap.put(SolrFieldName.pbioroleB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_BIOROLE_B), this.fieldEnricherConverter, textFormatter, false));
+        keyMap.put(SolrFieldName.ptypeA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTOR_TYPE_A), this.fieldEnricherConverter, textFormatter, false));
+        keyMap.put(SolrFieldName.ptypeB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTOR_TYPE_B), this.fieldEnricherConverter, textFormatter, false));
+        keyMap.put(SolrFieldName.complex, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_EXPANSION), this.fieldEnricherConverter, textFormatter, false));
+        keyMap.put(SolrFieldName.pmethodA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_PART_IDENT_METHOD_A), this.fieldEnricherConverter, textFormatter, false));
+        keyMap.put(SolrFieldName.pmethodB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_PART_IDENT_METHOD_B), this.fieldEnricherConverter, textFormatter, false));
+
+        // override ftypeA and ftypeB for enrichment with parents and synonyms
+        keyMap.put(SolrFieldName.ftypeA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_FEATURE_A), this.featureTypeFieldEnricher, textFormatter, false));
+        keyMap.put(SolrFieldName.ftypeB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_FEATURE_B), this.featureTypeFieldEnricher, textFormatter, false));
+
+        // override annot for enrichment with parents and synonyms
+        keyMap.put(SolrFieldName.annot, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_ANNOTATIONS_I), annotationTopicToEnrichConverter, annotFormatter, false));
+
+        // override xrefs, pxrefA and pxrefB for enrichemnt with synonyms
+        keyMap.put(SolrFieldName.pxrefA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_A), this.fieldEnricherConverter, textFormatter, false));
+        keyMap.put(SolrFieldName.pxrefB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_B), this.fieldEnricherConverter, textFormatter, false));
+        keyMap.put(SolrFieldName.xref, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_I), this.fieldEnricherConverter, textFormatter, false));
     }
 
-    public SolrDocumentConverter(SolrServer solrServer, DocumentDefinition documentDefintion,
-                                 FieldEnricher fieldEnricher) {
-        this(solrServer, documentDefintion);
-        this.fieldEnricher = fieldEnricher;
+    public SolrDocumentConverter(SolrServer solrServer, FieldEnricher fieldEnricher) {
+        this.fieldEnricher = fieldEnricher != null ? fieldEnricher : new BaseFieldEnricher();
+
+        try {
+            this.schemaInfo = IntactSolrUtils.retrieveSchemaInfo(solrServer);
+        } catch (IOException e) {
+            throw new RuntimeException("Problem fetching schema info from solr server: "+solrServer);
+        }
+        rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
+        mitabReader = new PsimiTabReader(false);
+
+        keyMap = new HashMap<SolrFieldName, SolrFieldUnit>();
+        initializeKeyMap();
     }
 
-    public SolrDocumentConverter(SolrServer solrServer, DocumentDefinition documentDefintion, OntologySearcher ontologySearcher) {
-        this(solrServer, documentDefintion, new OntologyFieldEnricher(ontologySearcher));
+    public SolrDocumentConverter(SolrServer solrServer, OntologySearcher ontologySearcher) {
+        this.fieldEnricher = ontologySearcher != null ? new OntologyFieldEnricher(ontologySearcher) : new BaseFieldEnricher();
+
+        try {
+            this.schemaInfo = IntactSolrUtils.retrieveSchemaInfo(solrServer);
+        } catch (IOException e) {
+            throw new RuntimeException("Problem fetching schema info from solr server: "+solrServer);
+        }
+        rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
+        mitabReader = new PsimiTabReader(false);
+
+        keyMap = new HashMap<SolrFieldName, SolrFieldUnit>();
+        initializeKeyMap();
     }
 
-    public SolrInputDocument toSolrDocument(String mitabLine) throws SolrServerException {
-        Row row = documentDefintion.createRowBuilder().createRow(mitabLine);
-        return toSolrDocument(row, mitabLine);
-    }
-
-    public SolrInputDocument toSolrDocument(BinaryInteraction binaryInteraction) throws SolrServerException {
-        Row row = documentDefintion.createInteractionRowConverter().createRow(binaryInteraction);
+    public SolrInputDocument toSolrDocument(String mitabLine) throws SolrServerException, IllegalFieldException, IllegalColumnException, IllegalRowException {
+        Row row = rowReader.readLine(mitabLine);
         return toSolrDocument(row);
     }
 
-    public SolrInputDocument toSolrDocument(Row row) throws SolrServerException {
-        return toSolrDocument(row, row.toString());
-    }
+    @Override
+    public SolrInputDocument toSolrDocument(Row row) throws SolrServerException, IllegalFieldException {
+        // use the same indexing logic as psicquic
+        SolrInputDocument doc = super.toSolrDocument(row);
 
-    protected SolrInputDocument toSolrDocument(Row row, String mitabLine) throws SolrServerException {
-        SolrInputDocument doc = new SolrInputDocument();
+        // add mi score
+        addCustomFields(row, doc, new ConfidenceScoreSelectiveAdder(FieldNames.INTACT_SCORE_NAME.toLowerCase()));
+
+        // gene names
+        addCustomFields(row, doc, new GeneNameSelectiveAdder());
+
+        // add intact by interactor type
+        addCustomFields(row, doc, new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_A,
+                InteractionKeys.KEY_INTERACTOR_TYPE_A));
+        addCustomFields(row, doc, new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_B,
+                InteractionKeys.KEY_INTERACTOR_TYPE_B));
+
+        // --------------------------------------------------------- old code ---------------------------------------
 
         // store the mitab line
-        doc.addField(FieldNames.LINE, mitabLine);
+        /*doc.addField(FieldNames.LINE, mitabLine);
 
         addColumnToDoc(doc, row, FieldNames.ID_A, IntactDocumentDefinition.ID_INTERACTOR_A, 10f, true);
         addColumnToDoc(doc, row, FieldNames.ID_B, IntactDocumentDefinition.ID_INTERACTOR_B, 10f, true);
@@ -115,10 +224,10 @@ public class SolrDocumentConverter {
         addColumnToDoc(doc, row, FieldNames.TYPE, IntactDocumentDefinition.INT_TYPE, true);
         addColumnToDoc(doc, row, FieldNames.SOURCE, IntactDocumentDefinition.SOURCE);
         addColumnToDoc(doc, row, FieldNames.INTERACTION_ID, IntactDocumentDefinition.INTERACTION_ID, 11f);
-        addColumnToDoc(doc, row, FieldNames.CONFIDENCE, IntactDocumentDefinition.CONFIDENCE);
+        addColumnToDoc(doc, row, FieldNames.CONFIDENCE, IntactDocumentDefinition.CONFIDENCE);*/
 
         // extended
-        if (documentDefintion instanceof IntactDocumentDefinition) {
+        /*if (documentDefintion instanceof IntactDocumentDefinition) {
             addColumnToDoc(doc, row, FieldNames.EXPERIMENTAL_ROLE_A, IntactDocumentDefinition.EXPERIMENTAL_ROLE_A, true);
             addColumnToDoc(doc, row, FieldNames.EXPERIMENTAL_ROLE_B, IntactDocumentDefinition.EXPERIMENTAL_ROLE_B, true);
             addColumnToDoc(doc, row, FieldNames.BIOLOGICAL_ROLE_A, IntactDocumentDefinition.BIOLOGICAL_ROLE_A, true);
@@ -140,80 +249,48 @@ public class SolrDocumentConverter {
                                                                       IntactDocumentDefinition.INTERACTOR_TYPE_A));
             addCustomFields(row, doc, new ByInteractorTypeRowDataAdder(IntactDocumentDefinition.ID_INTERACTOR_B,
                                                                       IntactDocumentDefinition.INTERACTOR_TYPE_B));
-        }
+        }*/
 
         // ac
         //doc.addField(FieldNames.PKEY, "NEW"); // pkey is generated automatically and using UUID
 
         // add the iRefIndex field from the interaction_id column to the rig field (there should be zero or one)
-        addFilteredField(row, doc, FieldNames.RIGID, IntactDocumentDefinition.INTERACTION_ID, new TypeFieldFilter("irefindex"));
+        //addFilteredField(row, doc, FieldNames.RIGID, IntactDocumentDefinition.INTERACTION_ID, new TypeFieldFilter("irefindex"));
 
         // ids
-        addCustomFields(row, doc, new IdSelectiveAdder());
-
-        // gene names
-        addCustomFields(row, doc, new GeneNameSelectiveAdder());
+        //addCustomFields(row, doc, new IdSelectiveAdder());
 
         return doc;
     }
 
-    public BinaryInteraction toBinaryInteraction(SolrDocument doc) {
-        return documentDefintion.createInteractionRowConverter().createBinaryInteraction(toRow(doc));
-    }
-
-    public BinaryInteraction toBinaryInteraction(SolrInputDocument doc) {
-        return documentDefintion.createInteractionRowConverter().createBinaryInteraction(toRow(doc));
-    }
-
-    public Row toRow(SolrDocument doc) {
+    public Row toRow(SolrDocument doc) throws IllegalFieldException, IllegalRowException, IllegalColumnException {
         return toRow((Object)doc);
     }
 
-    public Row toRow(SolrInputDocument doc) {
+    public Row toRow(SolrInputDocument doc) throws IllegalFieldException, IllegalRowException, IllegalColumnException {
         return toRow((Object)doc);
     }
 
-    protected Row toRow(Object doc) {
-        int i = 0;
+    protected Row toRow(Object doc) throws IllegalFieldException, IllegalColumnException, IllegalRowException {
 
-        Row row = new Row();
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.ID_A), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.ID_B), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.ALTID_A), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.ALTID_B), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.ALIAS_A), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.ALIAS_B), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.DETMETHOD_EXACT), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.PUBAUTH), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.PUBID), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.TAXID_A_EXACT), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.TAXID_B_EXACT), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.TYPE_EXACT), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.SOURCE), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.INTERACTION_ID), i++));
-        row.appendColumn(toColumn(getFieldValue(doc, FieldNames.CONFIDENCE), i++));
-
-        // extended
-        if (documentDefintion instanceof IntactDocumentDefinition) {
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.EXPERIMENTAL_ROLE_A_EXACT), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.EXPERIMENTAL_ROLE_B_EXACT), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.BIOLOGICAL_ROLE_A_EXACT), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.BIOLOGICAL_ROLE_B_EXACT), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.PROPERTIES_A_EXACT), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.PROPERTIES_B_EXACT), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.TYPE_A_EXACT), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.TYPE_B_EXACT), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.HOST_ORGANISM_EXACT), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.EXPANSION), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.DATASET), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.ANNOTATION_A), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.ANNOTATION_B), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.PARAMETER_A), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.PARAMETER_B), i++));
-            row.appendColumn(toColumn(getFieldValue(doc, FieldNames.PARAMETER_INTERACTION), i++));
-        }
+        Row row = rowReader.readLine(toMitabLine(doc));
 
         return row;
+    }
+
+    public BinaryInteraction toBinaryInteraction(SolrDocument doc) {
+        return toBinaryInteraction((Object) doc);
+    }
+
+    public BinaryInteraction toBinaryInteraction(SolrInputDocument doc){
+        return toBinaryInteraction((Object) doc);
+    }
+
+    protected BinaryInteraction toBinaryInteraction(Object doc) {
+
+        BinaryInteraction binaryInteraction = mitabReader.readLine(toMitabLine(doc));
+
+        return binaryInteraction;
     }
 
     private Collection<Object> getFieldValue(Object doc, String fieldName) {
@@ -226,164 +303,49 @@ public class SolrDocumentConverter {
         throw new IllegalArgumentException("Unexpected object type: "+doc.getClass().getName());
     }
 
-    protected Column toColumn(Collection<Object> strCol, int docDefinitionIndex) {
-        return toColumn(strCol, documentDefintion.getColumnDefinition(docDefinitionIndex).getBuilder());
-    }
-
-    protected Column toColumn(Collection<Object> strFields, FieldBuilder fieldBuilder) {
-        if (strFields == null || strFields.isEmpty()) {
-            return new Column();
-        }
-
-        List<Field> fields = new ArrayList<Field>(strFields.size());
-
-        for (Object strField : strFields) {
-            Field field = fieldBuilder.createField((String)strField);
-            fields.add(field);
-        }
-
-        return new Column(fields);
-    }
-
     public String toMitabLine(SolrDocument doc) {
-        return toRow(doc).toString();
+        return toMitabLine((Object)doc);
     }
 
     public String toMitabLine(SolrInputDocument doc) {
-        return toRow(doc).toString();
+        return toMitabLine((Object)doc);
     }
 
-    private void addColumnToDoc(SolrInputDocument doc, Row row, String fieldName, int columnIndex) throws SolrServerException {
-        addColumnToDoc(doc, row, fieldName, columnIndex, 1f, false);
-    }
+    protected String toMitabLine(Object doc) {
+        int size = DATA_FIELDS_27.length;
+        int index = 0;
 
-    private void addColumnToDoc(SolrInputDocument doc, Row row, String fieldName, int columnIndex, float boost) throws SolrServerException {
-        addColumnToDoc(doc, row, fieldName, columnIndex, boost, false);
-    }
+        StringBuffer sb = new StringBuffer(1064);
 
-    private void addColumnToDoc(SolrInputDocument doc, Row row, String fieldName, int columnIndex,  boolean expandableColumn) throws SolrServerException {
-        addColumnToDoc(doc, row, fieldName, columnIndex, 1f, expandableColumn);
-    }
+        // one field name is one column
+        for (String fieldName : DATA_FIELDS_27){
+            // only one value is expected because it should not be multivalued
+            Collection<Object> fieldValues = getFieldValue(doc, fieldName);
 
-    private void addColumnToDoc(SolrInputDocument doc, Row row, String fieldName, int columnIndex, float boost, boolean expandableColumn) throws SolrServerException {
-        // do not process columns not found in the row
-        if (row.getColumnCount() <= columnIndex) {
-            return;
-        }
+            if (fieldValues == null || fieldValues.isEmpty()){
+                sb.append(FIELD_EMPTY);
+            }
+            else {
+                Iterator<Object> valueIterator = fieldValues.iterator();
+                while (valueIterator.hasNext()){
+                    sb.append(String.valueOf(valueIterator.next()));
 
-        Column column = row.getColumnByIndex( columnIndex );
-
-        for (Field field : column.getFields()) {
-            if (fieldEnricher.isExpandableOntology(field.getType())) {
-                try {
-                    field = fieldEnricher.enrich(field);
-                } catch (Exception e) {
-                    throw new SolrServerException("Problem enriching field: "+field, e);
-                }
-
-                addField(doc, field.getType(), field.getValue());
-
-                if (field.getDescription() != null) {
-                    addField(doc, "spell", field.getDescription());
-                }
-
-                boolean includeItself = true;
-
-                for (Field parentField : fieldEnricher.getAllParents(field, includeItself)) {
-                    addExpandedFields(doc, fieldName, parentField);
-                    addExpandedFields(doc, field.getType(), parentField);
-                    addField(doc, field.getType(), parentField.getValue());
+                    if (valueIterator.hasNext()){
+                        sb.append(FIELD_SEPARATOR);
+                    }
                 }
             }
 
-            if (expandableColumn) {
-                addField(doc, fieldName+"_exact", field.toString(), boost);
-                addField(doc, fieldName+"_exact_id", field.getValue(), boost);
+            if (index < size){
+                sb.append(COLUMN_SEPARATOR);
             }
-            addDescriptionField(doc, field.getType(), field);
-            addField(doc, fieldName, field.toString(), boost);
-            addField(doc, fieldName + "_ms", field.toString(), boost);
-
-            if (field.getType() != null) {
-                if (schemaInfo.hasFieldName(field.getType())) {
-                    addField(doc, field.getType(), field.getValue(), boost);
-                }
-                addField(doc, field.getType()+"_xref", field.getValue(), boost);
-                addField(doc, fieldName+"_"+field.getType()+"_xref", field.getValue(), boost);
-                addField(doc, fieldName+"_"+field.getType()+"_xref_ms", field.toString(), boost);
-            }
-
-            addDescriptionField(doc, field.getType(), field);
-            addDescriptionField(doc, fieldName, field);
-        }
-    }
-
-
-    private void addFilteredField(Row row, SolrInputDocument doc, String fieldName, int columnIndex, FieldFilter filter) {
-        Collection<Field> fields = getFieldsFromColumn(row, columnIndex, filter);
-
-        if (fields == null) {
-            return;
+            index++;
         }
 
-        for (Field field : fields) {
-            addField(doc, fieldName, field.getValue());
-        }
+        return sb.toString();
     }
 
     private void addCustomFields(Row row, SolrInputDocument doc, RowDataSelectiveAdder selectiveAdder) {
         selectiveAdder.addToDoc(doc, row);
-    }
-
-    private Collection<Field> getFieldsFromColumn(Row row, int columnIndex, FieldFilter filter) {
-        List<Field> fields = new ArrayList<Field>();
-
-        // do not process columns not found in the row
-        if (row.getColumnCount() <= columnIndex) {
-            return null;
-        }
-
-        Column column = row.getColumnByIndex( columnIndex );
-
-        for (Field field : column.getFields()) {
-            if (field != null && filter.acceptField(field)) {
-                fields.add(field);
-            }
-        }
-
-        return fields;
-    }
-
-    private void addExpandedFields(SolrInputDocument doc, String fieldName, Field field) {
-        addExpandedField(doc, field, fieldName);
-        addExpandedField(doc, field, field.getType());
-    }
-
-    private void addExpandedField(SolrInputDocument doc, Field field, String fieldPrefix) {
-        addField(doc, fieldPrefix+"_expanded", field.toString());
-        addField(doc, fieldPrefix+"_expanded_id", field.getValue());
-        addField(doc, fieldPrefix+"_expanded_ms", field.toString());
-
-        addDescriptionField(doc, fieldPrefix+"_expanded", field);
-    }
-
-    private void addField(SolrInputDocument doc, String fieldName, String value) {
-        addField(doc, fieldName, value, 1.0f);
-    }
-
-    private void addField(SolrInputDocument doc, String fieldName, String value, float boost) {
-        final Collection<Object> existingValues = doc.getFieldValues(fieldName);
-
-        if (existingValues == null || !existingValues.contains(value)) {
-            doc.addField(fieldName, value, boost);
-        }
-    }
-
-    private void addDescriptionField(SolrInputDocument doc, String fieldPrefix, Field field) {
-        if (field.getDescription() != null) {
-
-            doc.addField(fieldPrefix+"_desc", field.getDescription());
-            doc.addField(fieldPrefix+"_desc_s", field.getDescription());
-        }
     }
 }

@@ -8,55 +8,167 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
  */
 public interface FieldNames {
 
-    String EXACT_PREFIX = "_exact";
+    String STORED_SUFFIX = "_o";
+    String FACET_SUFFIX = "_s";
 
-    String IDENTIFIER = "id";
+    String ID = "id";
+    String IDENTIFIER = "identifier";
+    String ALIAS = "alias";
+    String SPECIES = "species";
+    String BIOLOGICAL_ROLE = "pbiorole";
+    String INTERACTOR_TYPE = "ptype";
+    String INTERACTOR_XREF = "pxref";
+    String INTERACTOR_FEATURE = "ftype";
+    String INTERACTOR_STOICHIOMETRY = "stc";
+    String INTERACTOR_DET_METHOD = "pmethod";
+
+    String ID_FACET = "id"+FACET_SUFFIX;
+    String IDENTIFIER_FACET = "identifier"+FACET_SUFFIX;
+    String ALIAS_FACET = "alias"+FACET_SUFFIX;
+    String SPECIES_FACET = "species"+FACET_SUFFIX;
+    String BIOLOGICAL_ROLE_FACET = "pbiorole"+FACET_SUFFIX;
+    String INTERACTOR_TYPE_FACET = "ptype"+FACET_SUFFIX;
+    String INTERACTOR_XREF_FACET = "pxref"+FACET_SUFFIX;
+    String INTERACTOR_FEATURE_FACET = "ftype"+FACET_SUFFIX;
+    String INTERACTOR_STOICHIOMETRY_FACET = "stc"+FACET_SUFFIX;
+    String INTERACTOR_DET_METHOD_FACET = "pmethod"+FACET_SUFFIX;
+
     String ID_A = "idA";
     String ID_B = "idB";
+    String ID_A_STORED = "idA"+STORED_SUFFIX;
+    String ID_B_STORED = "idB"+STORED_SUFFIX;
+    String ID_A_FACET = "idA"+FACET_SUFFIX;
+    String ID_B_FACET = "idB"+FACET_SUFFIX;
+
     String ALTID_A = "altidA";
     String ALTID_B = "altidB";
+    String ALTID_A_STORED = "altidA"+STORED_SUFFIX;
+    String ALTID_B_STORED = "altidB"+STORED_SUFFIX;
+
     String ALIAS_A = "aliasA";
     String ALIAS_B = "aliasB";
+    String ALIAS_A_STORED = "aliasA"+STORED_SUFFIX;
+    String ALIAS_B_STORED = "aliasB"+STORED_SUFFIX;
+
     String DETMETHOD = "detmethod";
-    String DETMETHOD_EXACT = "detmethod"+EXACT_PREFIX;
+    String DETMETHOD_STORED = "detmethod"+ STORED_SUFFIX;
+    String DETMETHOD_FACET = "detmethod"+ FACET_SUFFIX;
+
     String PUBAUTH = "pubauth";
+    String PUBAUTH_STORED = "pubauth"+STORED_SUFFIX;
+    String PUBAUTH_FACET = "pubauth"+FACET_SUFFIX;
+
     String PUBID = "pubid";
+    String PUBID_STORED = "pubid"+STORED_SUFFIX;
+    String PUBID_FACET = "pubid"+FACET_SUFFIX;
+
     String TAXID_A = "taxidA";
-    String TAXID_A_EXACT = "taxidA"+EXACT_PREFIX;
+    String TAXID_A_STORED = "taxidA"+ STORED_SUFFIX;
+    String TAXID_A_FACET = "taxidA"+ FACET_SUFFIX;
+
     String TAXID_B = "taxidB";
-    String TAXID_B_EXACT = "taxidB"+EXACT_PREFIX;
+    String TAXID_B_STORED = "taxidB"+ STORED_SUFFIX;
+    String TAXID_B_FACET = "taxidB"+ FACET_SUFFIX;
+
     String TYPE = "type";
-    String TYPE_EXACT = "type"+EXACT_PREFIX;
+    String TYPE_STORED = "type"+ STORED_SUFFIX;
+    String TYPE_FACET = "type"+ FACET_SUFFIX;
+
     String SOURCE = "source";
+    String SOURCE_STORED = "source"+STORED_SUFFIX;
+    String SOURCE_FACET = "source"+FACET_SUFFIX;
+
     String INTERACTION_ID = "interaction_id";
-    String CONFIDENCE = "confidence";
-    String EXPERIMENTAL_ROLE_A = "experimentalRoleA";
-    String EXPERIMENTAL_ROLE_A_EXACT = "experimentalRoleA"+EXACT_PREFIX;
-    String EXPERIMENTAL_ROLE_B = "experimentalRoleB";
-    String EXPERIMENTAL_ROLE_B_EXACT = "experimentalRoleB"+EXACT_PREFIX;
-    String BIOLOGICAL_ROLE_A = "biologicalRoleA";
-    String BIOLOGICAL_ROLE_A_EXACT = "biologicalRoleA"+EXACT_PREFIX;
-    String BIOLOGICAL_ROLE_B = "biologicalRoleB";
-    String BIOLOGICAL_ROLE_B_EXACT = "biologicalRoleB"+EXACT_PREFIX;
-    String PROPERTIES_A = "propertiesA";
-    String PROPERTIES_A_EXACT = "propertiesA"+EXACT_PREFIX;
-    String PROPERTIES_B = "propertiesB";
-    String PROPERTIES_B_EXACT = "propertiesB"+EXACT_PREFIX;
-    String TYPE_A = "typeA";
-    String TYPE_A_EXACT = "typeA"+EXACT_PREFIX;
-    String TYPE_B = "typeB";
-    String TYPE_B_EXACT = "typeB"+EXACT_PREFIX;
-    String HOST_ORGANISM = "hostOrganism";
-    String HOST_ORGANISM_EXACT = "hostOrganism"+EXACT_PREFIX;
-    String EXPANSION = "expansion";
-    String DATASET = "dataset";
-    String ANNOTATION_A = "annotationA";
-    String ANNOTATION_A_EXACT = "annotationA"+EXACT_PREFIX;
-    String ANNOTATION_B = "annotationB";
-    String ANNOTATION_B_EXACT = "annotationB"+EXACT_PREFIX;
-    String PARAMETER_A = "parameterA";
-    String PARAMETER_B = "parameterB";
-    String PARAMETER_INTERACTION = "parameterInteraction";
+    String INTERACTION_ID_STORED = "interaction_id"+STORED_SUFFIX;
+    String INTERACTION_ID_FACET = "interaction_id"+FACET_SUFFIX;
+
+    String CONFIDENCE_STORED = "confidence"+STORED_SUFFIX;
+
+    String COMPLEX_EXPANSION = "complex";
+    String COMPLEX_EXPANSION_STORED = "complex"+ STORED_SUFFIX;
+    String COMPLEX_EXPANSION_FACET = "complex"+ FACET_SUFFIX;
+
+    String BIOLOGICAL_ROLE_A = "pbioroleA";
+    String BIOLOGICAL_ROLE_A_STORED = "pbioroleA"+ STORED_SUFFIX;
+    String BIOLOGICAL_ROLE_A_FACET = "pbioroleA"+ FACET_SUFFIX;
+
+    String BIOLOGICAL_ROLE_B = "pbioroleB";
+    String BIOLOGICAL_ROLE_B_STORED = "pbioroleB"+ STORED_SUFFIX;
+    String BIOLOGICAL_ROLE_B_FACET = "pbioroleB"+ FACET_SUFFIX;
+
+    String EXPERIMENTAL_ROLE_A_STORED = "pexproleA"+STORED_SUFFIX;
+
+    String EXPERIMENTAL_ROLE_B_STORED = "pexproleB"+STORED_SUFFIX;
+
+    String INTERACTOR_TYPE_A = "ptypeA";
+    String INTERACTOR_TYPE_A_STORED = "ptypeA"+ STORED_SUFFIX;
+    String INTERACTOR_TYPE_A_FACET = "ptypeA"+ FACET_SUFFIX;
+
+    String INTERACTOR_TYPE_B = "ptypeB";
+    String INTERACTOR_TYPE_B_STORED = "ptypeB"+ STORED_SUFFIX;
+    String INTERACTOR_TYPE_B_FACET = "ptypeB"+ FACET_SUFFIX;
+
+    String INTERACTOR_XREF_A = "pxrefA";
+    String INTERACTOR_XREF_A_STORED = "pxrefA"+ STORED_SUFFIX;
+    String INTERACTOR_XREF_A_FACET = "pxrefA"+ FACET_SUFFIX;
+
+    String INTERACTOR_XREF_B = "pxrefB";
+    String INTERACTOR_XREF_B_STORED = "pxrefB"+ STORED_SUFFIX;
+    String INTERACTOR_XREF_B_FACET = "pxrefB"+ FACET_SUFFIX;
+
+    String INTERACTION_XREF = "xref";
+    String INTERACTION_XREF_STORED = "xref"+ STORED_SUFFIX;
+    String INTERACTION_XREF_FACET = "xref"+ FACET_SUFFIX;
+
+    String INTERACTOR_ANNOTATIONS_A_STORED = "annotA"+STORED_SUFFIX;
+
+    String INTERACTOR_ANNOTATIONS_B_STORED = "annotA"+STORED_SUFFIX;
+
+    String INTERACTION_ANNOTATIONS = "annot";
+    String INTERACTION_ANNOTATIONS_STORED = "annot"+ STORED_SUFFIX;
+    String INTERACTION_ANNOTATIONS_FACET = "annot"+ FACET_SUFFIX;
+
+    String HOST_ORGANISM_STORED = "taxidHost"+STORED_SUFFIX;
+
+    String INTERACTION_PARAMETERS = "param";
+    String INTERACTION_PARAMETERS_STORED = "param"+ STORED_SUFFIX;
+    String INTERACTION_PARAMETERS_FACET = "param"+ FACET_SUFFIX;
+
+    String CREATION_DATE_STORED = "cdate";
+
+    String UPDATE_DATE = "udate";
+    String UPDATE_DATE_STORED = "udate"+ STORED_SUFFIX;
+    String UPDATE_DATE_FACET = "udate"+ FACET_SUFFIX;
+
+    String CHECKSUM_INTERACTOR_A_STORED = "checksumA"+STORED_SUFFIX;
+
+    String CHECKSUM_INTERACTOR_B_STORED = "checksumB"+STORED_SUFFIX;
+
+    String CHECKSUM_INTERACTION_STORED = "checksumI"+STORED_SUFFIX;
+
+    String NEGATIVE = "negative";
+    String NEGATIVE_STORED = "negative"+ STORED_SUFFIX;
+    String NEGATIVES_FACET = "negative"+ FACET_SUFFIX;
+
+    String FEATURE_INTERACTOR_A = "ftypeA";
+    String FEATURE_INTERACTOR_A_STORED = "ftypeA"+ STORED_SUFFIX;
+    String FEATURE_INTERACTOR_A_FACET = "ftypeA"+ FACET_SUFFIX;
+
+    String FEATURE_INTERACTOR_B = "ftypeB";
+    String FEATURE_INTERACTOR_B_STORED = "ftypeB"+ STORED_SUFFIX;
+    String FEATURE_INTERACTOR_B_FACET = "ftypeB"+ FACET_SUFFIX;
+
+    String STOICHIOMETRY_INTERACTOR_A_STORED = "stcA"+ STORED_SUFFIX;
+
+    String STOICHIOMETRY_INTERACTOR_B_STORED = "stcB"+ STORED_SUFFIX;
+
+    String PARTICIPANT_DET_METHOD_A = "pmethodA";
+    String PARTICIPANT_DET_METHOD_A_STORED = "pmethodA"+ STORED_SUFFIX;
+    String PARTICIPANT_DET_METHOD_A_FACET = "pmethodA"+ FACET_SUFFIX;
+
+    String PARTICIPANT_DET_METHOD_B = "pmethodB";
+    String PARTICIPANT_DET_METHOD_B_STORED = "pmethodB"+ STORED_SUFFIX;
+    String PARTICIPANT_DET_METHOD_B_FACET = "pmethodB"+ FACET_SUFFIX;
 
     String DB_GO = "go";
     String DB_INTERPRO = "interpro";
@@ -65,20 +177,20 @@ public interface FieldNames {
 
     String LINE = "line";
 
-    String PKEY = "pkey";
-    String RIGID = "rigid";
-    String RELEVANCE_SCORE = "relevancescore";
-    String EVIDENCES = "evidences";
+    String PKEY = "uuId";
 
     String INTACT_BY_INTERACTOR_TYPE_PREFIX = "intact_byInteractorType_";
     String GENE_NAME = "geneName";
+    String INTACT_SCORE_NAME = "intact-miscore";
 
     String[] DATA_FIELDS = new String[] {
-         ID_A, ID_B, ALTID_A, ALTID_B, ALIAS_A, ALIAS_B, DETMETHOD_EXACT, PUBAUTH, PUBID, TAXID_A_EXACT, TAXID_B_EXACT,
-            TYPE_EXACT, SOURCE, INTERACTION_ID, CONFIDENCE,
-            EXPERIMENTAL_ROLE_A_EXACT, EXPERIMENTAL_ROLE_B_EXACT, BIOLOGICAL_ROLE_A_EXACT, BIOLOGICAL_ROLE_B_EXACT, PROPERTIES_A_EXACT, PROPERTIES_B_EXACT,
-            TYPE_A_EXACT, TYPE_B_EXACT, HOST_ORGANISM_EXACT, EXPANSION, DATASET, ANNOTATION_A, ANNOTATION_B,
-            PARAMETER_A, PARAMETER_B, PARAMETER_INTERACTION
+         ID_A_STORED, ID_B_STORED, ALTID_A_STORED, ALTID_B_STORED, ALIAS_A_STORED, ALIAS_B_STORED, DETMETHOD_STORED, PUBAUTH_STORED, PUBID_STORED, TAXID_A_STORED, TAXID_B_STORED,
+            TYPE_STORED, SOURCE_STORED, INTERACTION_ID_STORED, CONFIDENCE_STORED, COMPLEX_EXPANSION_STORED, BIOLOGICAL_ROLE_A_STORED, BIOLOGICAL_ROLE_B_STORED,
+            EXPERIMENTAL_ROLE_A_STORED, EXPERIMENTAL_ROLE_B_STORED, INTERACTOR_TYPE_A_STORED, INTERACTOR_TYPE_B_STORED, INTERACTOR_XREF_A_STORED, INTERACTOR_XREF_B_STORED,
+            INTERACTION_XREF_STORED, INTERACTOR_ANNOTATIONS_A_STORED, INTERACTOR_ANNOTATIONS_B_STORED, INTERACTION_ANNOTATIONS_STORED, HOST_ORGANISM_STORED, INTERACTION_PARAMETERS_STORED,
+            CREATION_DATE_STORED, UPDATE_DATE_STORED, CHECKSUM_INTERACTOR_A_STORED, CHECKSUM_INTERACTOR_B_STORED, CHECKSUM_INTERACTION_STORED, NEGATIVE_STORED,
+            FEATURE_INTERACTOR_A_STORED, FEATURE_INTERACTOR_B_STORED, STOICHIOMETRY_INTERACTOR_A_STORED, STOICHIOMETRY_INTERACTOR_B_STORED, PARTICIPANT_DET_METHOD_A_STORED,
+            PARTICIPANT_DET_METHOD_B_STORED
     };
 
 

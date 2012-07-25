@@ -15,12 +15,10 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.common.SolrInputDocument;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.OboOntologyIterator;
@@ -29,7 +27,6 @@ import uk.ac.ebi.intact.bridges.ontologies.iterator.UniprotTaxonomyOntologyItera
 import uk.ac.ebi.intact.dataexchange.psimi.solr.IntactSolrException;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 
@@ -44,9 +41,9 @@ public class OntologyIndexer {
 
     private static final Log log = LogFactory.getLog( OntologyIndexer.class );
 
-    private StreamingUpdateSolrServer solrServer;
+    private HttpSolrServer solrServer;
 
-    public OntologyIndexer(StreamingUpdateSolrServer solrServer) {
+    public OntologyIndexer(HttpSolrServer solrServer) {
         this.solrServer = solrServer;
 
         SolrLogger.readFromLog4j();
@@ -136,8 +133,8 @@ public class OntologyIndexer {
         addField(doc, OntologyFieldNames.PARENT_NAME, ontologyDocument.getParentName(), true);
         addField(doc, OntologyFieldNames.CHILD_ID, ontologyDocument.getChildId(), false);
         addField(doc, OntologyFieldNames.CHILD_NAME, ontologyDocument.getChildName(), true);
-        addField(doc, OntologyFieldNames.RELATIONSHIP_TYPE, ontologyDocument.getRelationshipType(), false);
-        addField(doc, OntologyFieldNames.CYCLIC, ontologyDocument.isCyclicRelationship(), false);
+        //addField(doc, OntologyFieldNames.RELATIONSHIP_TYPE, ontologyDocument.getRelationshipType(), false);
+        //addField(doc, OntologyFieldNames.CYCLIC, ontologyDocument.isCyclicRelationship(), false);
         
         for (String synonym : ontologyDocument.getParentSynonyms()) {
             addField(doc, OntologyFieldNames.PARENT_SYNONYMS, synonym, false);

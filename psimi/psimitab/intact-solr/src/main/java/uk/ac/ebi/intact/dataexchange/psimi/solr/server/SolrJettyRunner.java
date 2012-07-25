@@ -16,8 +16,8 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.server;
 
 import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
@@ -134,18 +134,14 @@ public class SolrJettyRunner {
     }
 
     public SolrServer getSolrServer(String coreName) {
-        try {
-            solrServer = new CommonsHttpSolrServer(getSolrUrl(coreName));
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException("URL should be well formed", e);
-        }
+        solrServer = new HttpSolrServer(getSolrUrl(coreName));
 
         return solrServer;
     }
 
-    public StreamingUpdateSolrServer getStreamingSolrServer(String coreName) {
+    public ConcurrentUpdateSolrServer getStreamingSolrServer(String coreName) {
         try {
-            return new StreamingUpdateSolrServer(getSolrUrl(coreName).toString(), 4, 4);
+            return new ConcurrentUpdateSolrServer(getSolrUrl(coreName).toString(), 4, 4);
         } catch (MalformedURLException e) {
             throw new IllegalStateException("URL should be well formed", e);
         }

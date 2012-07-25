@@ -16,8 +16,12 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.util;
 
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
@@ -66,7 +70,35 @@ public final class IntactSolrUtils {
                 stream.close();
             }
 
-        } else {
+        }
+        else if (solrServer instanceof HttpSolrServer) {
+            final HttpSolrServer solr = (HttpSolrServer) solrServer;
+
+            final String url = solr.getBaseURL()+"/admin/file/?file=schema.xml";
+            final HttpUriRequest method = new HttpGet(url);
+            final HttpResponse response = solr.getHttpClient().execute(method);
+
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            String expression = "/schema/fields/field";
+            InputStream stream = response.getEntity().getContent();
+            InputSource inputSource = new InputSource(stream);
+
+            try {
+                NodeList nodes = (NodeList) xpath.evaluate(expression, inputSource, XPathConstants.NODESET);
+
+                for (int i=0; i<nodes.getLength(); i++) {
+                    final String fieldName = nodes.item(i).getAttributes().getNamedItem("name").getNodeValue();
+                    schemaInfo.addFieldName(fieldName);
+                }
+
+            } catch (XPathExpressionException e) {
+                e.printStackTrace();
+            }
+            finally {
+                stream.close();
+            }
+
+        }else {
             throw new IllegalArgumentException("Cannot get schema for SolrServer with class: "+solrServer.getClass().getName());
         }
 

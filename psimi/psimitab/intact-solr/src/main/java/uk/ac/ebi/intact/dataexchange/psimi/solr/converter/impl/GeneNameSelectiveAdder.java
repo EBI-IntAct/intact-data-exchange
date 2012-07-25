@@ -16,12 +16,14 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl;
 
 import org.apache.solr.common.SolrInputDocument;
-import psidev.psi.mi.tab.model.builder.Column;
-import psidev.psi.mi.tab.model.builder.Field;
-import psidev.psi.mi.tab.model.builder.Row;
+import org.hupo.psi.calimocho.key.CalimochoKeys;
+import org.hupo.psi.calimocho.key.InteractionKeys;
+import org.hupo.psi.calimocho.model.Field;
+import org.hupo.psi.calimocho.model.Row;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.FieldNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.RowDataSelectiveAdder;
-import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
+
+import java.util.Collection;
 
 /**
  * Looks for gene names and adds them to the "geneName" field.
@@ -30,19 +32,23 @@ import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
  * @version $Id$
  */
 public class GeneNameSelectiveAdder implements RowDataSelectiveAdder {
+    public final static String GENE_NAME = "gene name";
 
     public void addToDoc(SolrInputDocument doc, Row row) {
-        Column aliasA = row.getColumnByIndex(IntactDocumentDefinition.ALIAS_INTERACTOR_A);
-        Column aliasB = row.getColumnByIndex(IntactDocumentDefinition.ALIAS_INTERACTOR_B);
+        Collection<Field> aliasA = row.getFields(InteractionKeys.KEY_ALIAS_A);
+        Collection<Field> aliasB = row.getFields(InteractionKeys.KEY_ALIAS_B);
 
         addGeneNames(doc, aliasA);
         addGeneNames(doc, aliasB);
     }
 
-    private void addGeneNames(SolrInputDocument doc, Column column) {
-        for (Field field : column.getFields()) {
-            if ("gene name".equals(field.getDescription())) {
-                doc.addField(FieldNames.GENE_NAME, field.getValue());
+    private void addGeneNames(SolrInputDocument doc, Collection<Field> column) {
+        for (Field field : column) {
+            String text = field.get(CalimochoKeys.TEXT);
+            String value = field.get(CalimochoKeys.VALUE);
+
+            if (GENE_NAME.equalsIgnoreCase(text) && value != null) {
+                doc.addField(FieldNames.GENE_NAME, value);
             }
         }
     }

@@ -16,8 +16,8 @@ public interface OntologyFieldNames {
     String PARENT_NAME = "pname";
     String CHILD_ID = "cid";
     String CHILD_NAME = "cname";
-    String RELATIONSHIP_TYPE = "reltype";
-    String CYCLIC = "cyclic";
+    //String RELATIONSHIP_TYPE = "reltype";
+    //String CYCLIC = "cyclic";
     String PARENT_SYNONYMS = FieldName.PARENT_SYNONYMS;
     String CHILDREN_SYNONYMS = FieldName.CHILDREN_SYNONYMS;
 }

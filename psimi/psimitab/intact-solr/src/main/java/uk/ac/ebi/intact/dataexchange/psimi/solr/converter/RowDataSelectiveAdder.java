@@ -15,9 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.converter;
 
-import psidev.psi.mi.tab.model.builder.Row;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.hupo.psi.calimocho.model.Row;
 
 /**
  * Adds specific data to the document, creating any necessary field.
