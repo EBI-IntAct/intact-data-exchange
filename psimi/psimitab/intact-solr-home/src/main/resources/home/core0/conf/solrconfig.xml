@@ -1363,12 +1363,13 @@ Lucene will flush based on whichever limit is hit first.  -->
        a search component that enables you to configure the top
        results for a given query regardless of the normal lucene
        scoring.
+
+       !!! we don't want this component becausee UUID is customized. We don't want this exception : org.apache.solr.common.SolrException: Invalid UUID String: '1'
     -->
-    <searchComponent name="elevator" class="solr.QueryElevationComponent" >
-        <!-- pick a fieldType to analyze queries -->
+    <!--<searchComponent name="elevator" class="solr.QueryElevationComponent" >
         <str name="queryFieldType">string</str>
         <str name="config-file">elevate.xml</str>
-    </searchComponent>
+    </searchComponent>-->
 
     <!-- A request handler for demonstrating the elevator component -->
     <requestHandler name="/elevate" class="solr.SearchHandler" startup="lazy">
