@@ -583,8 +583,8 @@ Lucene will flush based on whichever limit is hit first.  -->
         -->
         <listener event="newSearcher" class="solr.QuerySenderListener">
             <arr name="queries">
-                <lst><str name="q">solr</str><str name="sort">price asc</str></lst>
-                <lst><str name="q">rocks</str><str name="sort">weight asc</str></lst>
+                <lst><str name="q">solr</str></lst>
+                <lst><str name="q">rocks</str></lst>
             </arr>
         </listener>
         <listener event="firstSearcher" class="solr.QuerySenderListener">
