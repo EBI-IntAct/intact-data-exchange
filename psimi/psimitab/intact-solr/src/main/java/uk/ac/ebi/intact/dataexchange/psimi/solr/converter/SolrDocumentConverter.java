@@ -52,7 +52,6 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.util.SchemaInfo;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -96,6 +95,7 @@ public class SolrDocumentConverter extends Converter{
     };
 
     public SolrDocumentConverter(SolrServer solrServer) {
+        super();
         this.fieldEnricher = new BaseFieldEnricher();
 
         try {
@@ -106,7 +106,7 @@ public class SolrDocumentConverter extends Converter{
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
         mitabReader = new PsimiTabReader(false);
 
-        keyMap = new HashMap<SolrFieldName, SolrFieldUnit>();
+        // call again the initializeKeyMap with the field enricher initialized
         initializeKeyMap();
     }
 
@@ -114,46 +114,50 @@ public class SolrDocumentConverter extends Converter{
     protected void initializeKeyMap(){
         super.initializeKeyMap();
 
-        TextFieldConverter textConverter = new TextFieldConverter();
-        XrefFieldFormatter textFormatter = new XrefFieldFormatter();
-        this.fieldEnricherConverter = new FieldToEnrichConverter(this.fieldEnricher);
-        this.featureTypeFieldEnricher = new FeatureTypeToEnrichConverter(this.fieldEnricher);
-        this.annotationTopicToEnrichConverter = new AnnotationTopicsToEnrichConverter(this.fieldEnricher);
-        AnnotationFieldFormatter annotFormatter = new AnnotationFieldFormatter(":");
+        // only override parent method when the field enricher is initialized
+        if (this.fieldEnricher != null){
+            TextFieldConverter textConverter = new TextFieldConverter();
+            XrefFieldFormatter textFormatter = new XrefFieldFormatter();
+            this.fieldEnricherConverter = new FieldToEnrichConverter(this.fieldEnricher);
+            this.featureTypeFieldEnricher = new FeatureTypeToEnrichConverter(this.fieldEnricher);
+            this.annotationTopicToEnrichConverter = new AnnotationTopicsToEnrichConverter(this.fieldEnricher);
+            AnnotationFieldFormatter annotFormatter = new AnnotationFieldFormatter(":");
 
-        // override source which is an indexed field in IntAct. We don't want this field as store only, that is why we have the boolean false.
-        // we don't want to enrich this one, there is no needs.
-        keyMap.put(SolrFieldName.source,  new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_SOURCE), textConverter, textFormatter, false));
+            // override source which is an indexed field in IntAct. We don't want this field as store only, that is why we have the boolean false.
+            // we don't want to enrich this one, there is no needs.
+            keyMap.put(SolrFieldName.source,  new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_SOURCE), textConverter, textFormatter, false));
 
-        // override taxidA and taxidB for ontology enrichment
-        keyMap.put(SolrFieldName.taxidA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_TAXID_A), this.fieldEnricherConverter, textFormatter, false));
-        keyMap.put(SolrFieldName.taxidB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_TAXID_B), this.fieldEnricherConverter, textFormatter, false));
+            // override taxidA and taxidB for ontology enrichment
+            keyMap.put(SolrFieldName.taxidA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_TAXID_A), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.taxidB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_TAXID_B), this.fieldEnricherConverter, textFormatter, false));
 
-        // override cvs for enrichment with parents and synonyms
-        keyMap.put(SolrFieldName.type, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTION_TYPE), this.fieldEnricherConverter, textFormatter, false));
-        keyMap.put(SolrFieldName.detmethod, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_DETMETHOD),this.fieldEnricherConverter, textFormatter, false));
-        keyMap.put(SolrFieldName.pbioroleA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_BIOROLE_A), this.fieldEnricherConverter, textFormatter, false));
-        keyMap.put(SolrFieldName.pbioroleB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_BIOROLE_B), this.fieldEnricherConverter, textFormatter, false));
-        keyMap.put(SolrFieldName.ptypeA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTOR_TYPE_A), this.fieldEnricherConverter, textFormatter, false));
-        keyMap.put(SolrFieldName.ptypeB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTOR_TYPE_B), this.fieldEnricherConverter, textFormatter, false));
-        keyMap.put(SolrFieldName.complex, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_EXPANSION), this.fieldEnricherConverter, textFormatter, false));
-        keyMap.put(SolrFieldName.pmethodA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_PART_IDENT_METHOD_A), this.fieldEnricherConverter, textFormatter, false));
-        keyMap.put(SolrFieldName.pmethodB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_PART_IDENT_METHOD_B), this.fieldEnricherConverter, textFormatter, false));
+            // override cvs for enrichment with parents and synonyms
+            keyMap.put(SolrFieldName.type, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTION_TYPE), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.detmethod, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_DETMETHOD),this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.pbioroleA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_BIOROLE_A), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.pbioroleB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_BIOROLE_B), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.ptypeA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTOR_TYPE_A), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.ptypeB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTOR_TYPE_B), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.complex, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_EXPANSION), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.pmethodA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_PART_IDENT_METHOD_A), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.pmethodB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_PART_IDENT_METHOD_B), this.fieldEnricherConverter, textFormatter, false));
 
-        // override ftypeA and ftypeB for enrichment with parents and synonyms
-        keyMap.put(SolrFieldName.ftypeA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_FEATURE_A), this.featureTypeFieldEnricher, textFormatter, false));
-        keyMap.put(SolrFieldName.ftypeB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_FEATURE_B), this.featureTypeFieldEnricher, textFormatter, false));
+            // override ftypeA and ftypeB for enrichment with parents and synonyms
+            keyMap.put(SolrFieldName.ftypeA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_FEATURE_A), this.featureTypeFieldEnricher, textFormatter, false));
+            keyMap.put(SolrFieldName.ftypeB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_FEATURE_B), this.featureTypeFieldEnricher, textFormatter, false));
 
-        // override annot for enrichment with parents and synonyms
-        keyMap.put(SolrFieldName.annot, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_ANNOTATIONS_I), annotationTopicToEnrichConverter, annotFormatter, false));
+            // override annot for enrichment with parents and synonyms
+            keyMap.put(SolrFieldName.annot, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_ANNOTATIONS_I), annotationTopicToEnrichConverter, annotFormatter, false));
 
-        // override xrefs, pxrefA and pxrefB for enrichemnt with synonyms
-        keyMap.put(SolrFieldName.pxrefA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_A), this.fieldEnricherConverter, textFormatter, false));
-        keyMap.put(SolrFieldName.pxrefB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_B), this.fieldEnricherConverter, textFormatter, false));
-        keyMap.put(SolrFieldName.xref, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_I), this.fieldEnricherConverter, textFormatter, false));
+            // override xrefs, pxrefA and pxrefB for enrichemnt with synonyms
+            keyMap.put(SolrFieldName.pxrefA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_A), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.pxrefB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_B), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.xref, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_I), this.fieldEnricherConverter, textFormatter, false));
+        }
     }
 
     public SolrDocumentConverter(SolrServer solrServer, FieldEnricher fieldEnricher) {
+        super();
         this.fieldEnricher = fieldEnricher != null ? fieldEnricher : new BaseFieldEnricher();
 
         try {
@@ -164,11 +168,12 @@ public class SolrDocumentConverter extends Converter{
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
         mitabReader = new PsimiTabReader(false);
 
-        keyMap = new HashMap<SolrFieldName, SolrFieldUnit>();
+        // call again the initializeKeyMap with the field enricher initialized
         initializeKeyMap();
     }
 
     public SolrDocumentConverter(SolrServer solrServer, OntologySearcher ontologySearcher) {
+        super();
         this.fieldEnricher = ontologySearcher != null ? new OntologyFieldEnricher(ontologySearcher) : new BaseFieldEnricher();
 
         try {
@@ -179,7 +184,7 @@ public class SolrDocumentConverter extends Converter{
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
         mitabReader = new PsimiTabReader(false);
 
-        keyMap = new HashMap<SolrFieldName, SolrFieldUnit>();
+        // call again the initializeKeyMap with the field enricher initialized
         initializeKeyMap();
     }
 
