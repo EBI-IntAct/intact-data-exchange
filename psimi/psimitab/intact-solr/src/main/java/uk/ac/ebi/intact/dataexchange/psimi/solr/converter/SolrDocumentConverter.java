@@ -33,7 +33,7 @@ import psidev.psi.mi.calimocho.solr.converter.Converter;
 import psidev.psi.mi.calimocho.solr.converter.SolrFieldName;
 import psidev.psi.mi.calimocho.solr.converter.SolrFieldUnit;
 import psidev.psi.mi.calimocho.solr.converter.TextFieldConverter;
-import psidev.psi.mi.tab.PsimiTabReader;
+import psidev.psi.mi.tab.io.PsimiTabReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.FieldNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.extension.AnnotationTopicsToEnrichConverter;
@@ -104,7 +104,7 @@ public class SolrDocumentConverter extends Converter{
             throw new RuntimeException("Problem fetching schema info from solr server: "+solrServer);
         }
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
-        mitabReader = new PsimiTabReader(false);
+        mitabReader = new PsimiTabReader();
 
         // call again the initializeKeyMap with the field enricher initialized
         initializeKeyMap();
@@ -166,7 +166,7 @@ public class SolrDocumentConverter extends Converter{
             throw new RuntimeException("Problem fetching schema info from solr server: "+solrServer);
         }
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
-        mitabReader = new PsimiTabReader(false);
+        mitabReader = new PsimiTabReader();
 
         // call again the initializeKeyMap with the field enricher initialized
         initializeKeyMap();
@@ -182,7 +182,7 @@ public class SolrDocumentConverter extends Converter{
             throw new RuntimeException("Problem fetching schema info from solr server: "+solrServer);
         }
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
-        mitabReader = new PsimiTabReader(false);
+        mitabReader = new PsimiTabReader();
 
         // call again the initializeKeyMap with the field enricher initialized
         initializeKeyMap();

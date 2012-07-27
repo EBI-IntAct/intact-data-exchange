@@ -19,7 +19,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.tab.PsimiTabWriter;
+import psidev.psi.mi.tab.io.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.builder.PsimiTab;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.AbstractSolrTestCase;
