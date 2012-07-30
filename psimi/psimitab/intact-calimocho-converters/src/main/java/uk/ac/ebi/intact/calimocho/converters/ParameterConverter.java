@@ -40,10 +40,10 @@ public class ParameterConverter {
                 value.append(param.getBase());
             }
             if (param.getExponent() != null && param.getExponent() != 0){
-                value.append("exponent ").append(param.getExponent());
+                value.append("^").append(param.getExponent());
             }
             if (param.getUncertainty() != null && param.getUncertainty() != 0){
-                value.append("(+/-").append(param.getUncertainty()).append(")");
+                value.append(" ~").append(param.getUncertainty());
             }
 
             if (value.length() == 0){
