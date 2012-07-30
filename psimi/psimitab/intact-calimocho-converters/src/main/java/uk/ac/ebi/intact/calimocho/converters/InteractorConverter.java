@@ -314,7 +314,7 @@ public class InteractorConverter {
             // convert stoichiometry
             if (participant.hasStoichiometry()){
                 Field stoichiometry = new DefaultField();
-                stoichiometry.set(CalimochoKeys.VALUE, Float.toString(participant.getStoichiometry()));
+                stoichiometry.set(CalimochoKeys.VALUE, Integer.toString((int) participant.getStoichiometry()));
                 if (isFirst){
                     row.addField(InteractionKeys.KEY_STOICHIOMETRY_A, stoichiometry);
                 }
