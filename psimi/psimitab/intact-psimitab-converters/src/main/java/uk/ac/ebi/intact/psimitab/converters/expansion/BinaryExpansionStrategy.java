@@ -60,6 +60,9 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
         newInteraction.setXrefs(interaction.getXrefs());
         newInteraction.setAliases(interaction.getAliases());
         newInteraction.setAnnotations(interaction.getAnnotations());
+        newInteraction.setParameters(interaction.getParameters());
+        newInteraction.setUpdated(interaction.getUpdated());
+        //TODO Check if they are all the fields for mitab 2.7
 
         return newInteraction;
     }
