@@ -200,7 +200,7 @@ public class InteractionConverter {
                 expansion.set(CalimochoKeys.TEXT, expansionName);
             }
 
-            row.addField(InteractionKeys.KEY_CONFIDENCE, expansion);
+            row.addField(InteractionKeys.KEY_EXPANSION, expansion);
         }
         else if (isExpanded && expansionMI == null){
             throw new IllegalArgumentException("Interaction is expanded but no expansion strategy has been set.");
