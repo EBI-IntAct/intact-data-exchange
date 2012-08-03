@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Confidence;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
@@ -44,7 +45,7 @@ public class InteractionConverter {
 
     private CrossReferenceConverter xConverter = new CrossReferenceConverter();
 
-    private CrossReference defaultSourceDatabase = CrossReferenceFactory.getInstance().build( "psi-mi", "MI:0469", "intact" );
+    private CrossReference defaultSourceDatabase = new CrossReferenceImpl( "psi-mi", "MI:0469", "intact" );
 
     ///////////////////////////
     // Getters & Setters
@@ -80,7 +81,7 @@ public class InteractionConverter {
         final Collection<Experiment> experiments = interaction.getExperiments();
 
         List<Author> authors = new ArrayList<Author>();
-        List<InteractionDetectionMethod> detectionMethods = new ArrayList<InteractionDetectionMethod>();
+        List<CrossReference> detectionMethods = new ArrayList<CrossReference>();
         Set<CrossReference> publications = new HashSet<CrossReference>();
         List<CrossReference> hostOrganisms = new ArrayList<CrossReference>();
         List<String> datasets = new ArrayList<String>();
@@ -106,8 +107,7 @@ public class InteractionConverter {
 
                 // det methods
                 if (experiment.getCvInteraction() != null) {
-                    detectionMethods.add((InteractionDetectionMethod) cvObjectConverter.
-                            toCrossReference(InteractionDetectionMethodImpl.class, experiment.getCvInteraction()));
+                    detectionMethods.add( cvObjectConverter.toCrossReference(CrossReferenceImpl.class, experiment.getCvInteraction()));
                 }
 
                 // publications and imex at the publication level
@@ -122,14 +122,12 @@ public class InteractionConverter {
                     if (xref.getCvXrefQualifier() != null && xref.getCvDatabase().getShortLabel() != null) {
                         // publications
                         if (CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
-                            CrossReference publication = CrossReferenceFactory.getInstance()
-                                    .build(xref.getCvDatabase().getShortLabel(), xref.getPrimaryId());
+                            CrossReference publication = new CrossReferenceImpl(xref.getCvDatabase().getShortLabel(), xref.getPrimaryId());
                             publications.add(publication);
                         }
                         // imexId
                         else if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
-                            CrossReference publication = CrossReferenceFactory.getInstance()
-                                    .build(xref.getCvDatabase().getShortLabel(), xref.getPrimaryId());
+                            CrossReference publication =  new CrossReferenceImpl(xref.getCvDatabase().getShortLabel(), xref.getPrimaryId());
                             publications.add(publication);
                         }
                     }
@@ -139,7 +137,7 @@ public class InteractionConverter {
                 String id = experiment.getBioSource().getTaxId();
                 if (id != null) {
                     String text = experiment.getBioSource().getShortLabel();
-                    hostOrganisms.add(CrossReferenceFactory.getInstance().build(TAXID, id, text));
+                    hostOrganisms.add( new CrossReferenceImpl(TAXID, id, text));
                 }
 
                 // datasets
@@ -166,7 +164,7 @@ public class InteractionConverter {
         // set interaction acs list
         List<CrossReference> interactionAcs = new ArrayList<CrossReference>();
         if ( interaction.getAc() != null ) {
-            interactionAcs.add( CrossReferenceFactory.getInstance().build( CvDatabase.INTACT, interaction.getAc() ) );
+            interactionAcs.add( new CrossReferenceImpl( CvDatabase.INTACT, interaction.getAc() ) );
         }
 
         // imex
@@ -174,7 +172,7 @@ public class InteractionConverter {
             if (xref.getCvXrefQualifier() != null) {
                 if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier()) ||
                         CvXrefQualifier.IMEX_EVIDENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
-                    interactionAcs.add(CrossReferenceFactory.getInstance().build( CvDatabase.IMEX, xref.getPrimaryId() ));
+                    interactionAcs.add(new CrossReferenceImpl( CvDatabase.IMEX, xref.getPrimaryId() ));
                 }
             }
         }
@@ -183,9 +181,8 @@ public class InteractionConverter {
 
         // set interaction type list
         if ( interaction.getCvInteractionType() != null ) {
-            List<InteractionType> interactionTypes = new ArrayList<InteractionType>();
-            interactionTypes.add( ( InteractionType ) cvObjectConverter.toCrossReference( InteractionTypeImpl.class,
-                    interaction.getCvInteractionType() ) );
+            List<CrossReference> interactionTypes = new ArrayList<CrossReference>();
+            interactionTypes.add( cvObjectConverter.toCrossReference( CrossReferenceImpl.class,interaction.getCvInteractionType() ) );
             bi.setInteractionTypes( interactionTypes );
         }
 

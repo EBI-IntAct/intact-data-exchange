@@ -18,7 +18,7 @@ package uk.ac.ebi.intact.psimitab.converters;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.CrossReferenceFactory;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.CvDatabase;
@@ -139,11 +139,11 @@ public class CrossReferenceConverter<T extends Xref> {
             String cvXrefQualifier = (withText && xref.getCvXrefQualifier() != null) ? xref.getCvXrefQualifier().getShortLabel() : null;
 
             if (secondaryId != null) {
-                ref = CrossReferenceFactory.getInstance().build(db, id, secondaryId);
+                ref = new CrossReferenceImpl(db, id, secondaryId);
             } else if (cvXrefQualifier != null) {
-                ref = CrossReferenceFactory.getInstance().build(db, id, cvXrefQualifier);
+                ref = new CrossReferenceImpl(db, id, cvXrefQualifier);
             } else {
-                ref = CrossReferenceFactory.getInstance().build(db, id, null);
+                ref = new CrossReferenceImpl(db, id, null);
             }
         }
         return ref;

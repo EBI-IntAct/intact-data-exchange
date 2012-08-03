@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.Alias;
 import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
@@ -68,21 +69,21 @@ public class InteractorConverter {
         ExtendedInteractor tabInteractor = new ExtendedInteractor();
 
         // identifiers
-        Collection<CrossReference> identifiers = xRefConverter.toCrossReferences( intactInteractor.getXrefs(), true, false );
+        List<CrossReference> identifiers = xRefConverter.toCrossReferences( intactInteractor.getXrefs(), true, false );
 
         // remove existing IntAct cross reference so we end up with at most one in the identifiers
         Collection<CrossReference> intactRefs =  removeIntactXrefs( identifiers );
 
         // add the intact AC of the interactor as an indentifier
         if (intactInteractor.getAc() != null) {
-            identifiers.add( CrossReferenceFactory.getInstance().build( CvDatabase.INTACT, intactInteractor.getAc() ) );
+            identifiers.add( new CrossReferenceImpl( CvDatabase.INTACT, intactInteractor.getAc() ) );
         }
         tabInteractor.setIdentifiers( identifiers );
 
         // alternative identifiers & aliases
         if ( intactInteractor.getAliases() != null ) {
-            Collection<CrossReference> altIds = new ArrayList<CrossReference>();
-            Collection<Alias> tabAliases = new ArrayList<Alias>();
+            List<CrossReference> altIds = new ArrayList<CrossReference>();
+            List<Alias> tabAliases = new ArrayList<Alias>();
             for ( InteractorAlias alias : intactInteractor.getAliases() ) {
                 String id = alias.getName();
                 String db = null;
@@ -105,15 +106,15 @@ public class InteractorConverter {
                             tabAliases.add( tabAlias );
                         } else {
                             if ( text != null ) {
-                                CrossReference altId = CrossReferenceFactory.getInstance().build( db, id, text );
+                                CrossReference altId = new CrossReferenceImpl( db, id, text );
                                 altIds.add( altId );
                             } else {
-                                CrossReference altId = CrossReferenceFactory.getInstance().build( db, id );
+                                CrossReference altId = new CrossReferenceImpl( db, id );
                                 altIds.add( altId );
                             }
                         }
                     } else {
-                        CrossReference altId = CrossReferenceFactory.getInstance().build( db, id );
+                        CrossReference altId =new CrossReferenceImpl( db, id );
                         altIds.add( altId );
                     }
                 }
@@ -125,7 +126,7 @@ public class InteractorConverter {
 
         if( !intactRefs.isEmpty() ) {
             if( tabInteractor.getAlternativeIdentifiers() == null ) {
-               tabInteractor.setAlternativeIdentifiers( intactRefs );
+               tabInteractor.setAlternativeIdentifiers((List<CrossReference>) intactRefs);
             } else {
                 tabInteractor.getAlternativeIdentifiers().addAll( intactRefs ); 
             }
@@ -137,12 +138,12 @@ public class InteractorConverter {
             Protein prot = (Protein)intactInteractor;
 
             if (ProteinUtils.isFromUniprot(prot)) {
-                CrossReference altId = CrossReferenceFactory.getInstance().build( CvDatabase.UNIPROT, prot.getShortLabel(),"shortlabel" );
+                CrossReference altId = new CrossReferenceImpl( CvDatabase.UNIPROT, prot.getShortLabel(),"shortlabel" );
                 tabInteractor.getAlternativeIdentifiers().add(altId);
             }
         }else{
           //if it is not a instance of protein, add the short label to alternative identifiers with INTACT as database  
-               CrossReference altId = CrossReferenceFactory.getInstance().build( CvDatabase.INTACT, intactInteractor.getShortLabel(),"shortlabel" );
+               CrossReference altId = new CrossReferenceImpl( CvDatabase.INTACT, intactInteractor.getShortLabel(),"shortlabel" );
                tabInteractor.getAlternativeIdentifiers().add(altId);
         }
 
