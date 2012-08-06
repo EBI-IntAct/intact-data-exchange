@@ -17,14 +17,15 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.FacetParams;
-import psidev.psi.mi.calimocho.solr.converter.SolrFieldName;
+import org.hupo.psi.mi.psicquic.model.PsicquicSolrException;
+import org.hupo.psi.mi.psicquic.model.PsicquicSolrServer;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,104 +37,53 @@ import java.util.Map;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class IntactSolrSearcher {
-
-    private SolrServer solrServer;
-
-    private final static String DEFAULT_PARAM_NAME = "qf";
-    private final static String QUERY_TYPE = "defType";
-    private final static String DISMAX_TYPE = "edismax";
-    private final static String DEFAULT_QUERY_FIELDS = SolrFieldName.identifier.toString()+" "+SolrFieldName.pubid.toString()+" "+SolrFieldName.pubauth.toString()+" "+SolrFieldName.species.toString()+" "+SolrFieldName.detmethod.toString()+" "+SolrFieldName.type.toString()+" "+SolrFieldName.interaction_id.toString();
+public class IntactSolrSearcher extends PsicquicSolrServer{
 
     public IntactSolrSearcher(SolrServer solrServer) {
-        this.solrServer = solrServer;
+        super(solrServer);
     }
 
-    public SolrSearchResult search(String query, Integer firstResult, Integer maxResults, Collection<String> filteredQueries) throws IntactSolrException {
-        if (query == null) throw new NullPointerException("Null query");
-        
-        if ("*".equals(query)) query = "*:*";
+    public IntactSolrSearchResult search(SolrQuery query) throws PsicquicSolrException, SolrServerException {
 
-        SolrQuery solrQuery = new SolrQuery(query);
-        // use dismax parser for querying default fields
-        solrQuery.setParam(DEFAULT_PARAM_NAME, DEFAULT_QUERY_FIELDS);
-        solrQuery.setParam(QUERY_TYPE, DISMAX_TYPE);
-
-        if (firstResult != null) solrQuery.setStart(firstResult);
-
-        if (maxResults != null) {
-            solrQuery.setRows(maxResults);
-        } else {
-            solrQuery.setRows(Integer.MAX_VALUE);
-        }
-
-        if (filteredQueries != null){
-            for (String filter : filteredQueries){
-                solrQuery.addFilterQuery(filter);
-            }
-        }
-
-        return search(solrQuery);
+        return (IntactSolrSearchResult) super.search(query, RETURN_TYPE_MITAB27);
     }
 
-    public SolrSearchResult search(String query, Integer firstResult, Integer maxResults) throws IntactSolrException {
-        if (query == null) throw new NullPointerException("Null query");
+    public IntactSolrSearchResult search(SolrQuery query, String returnType) throws PsicquicSolrException, SolrServerException {
 
-        if ("*".equals(query)) query = "*:*";
-
-        SolrQuery solrQuery = new SolrQuery(query);
-        // use dismax parser for querying default fields
-        solrQuery.setParam(DEFAULT_PARAM_NAME, DEFAULT_QUERY_FIELDS);
-        solrQuery.setParam(QUERY_TYPE, DISMAX_TYPE);
-
-        if (firstResult != null) solrQuery.setStart(firstResult);
-
-        if (maxResults != null) {
-            solrQuery.setRows(maxResults);
-        } else {
-            solrQuery.setRows(Integer.MAX_VALUE);
-        }
-
-        return search(solrQuery);
+        return (IntactSolrSearchResult) super.search(query, returnType);
     }
 
-    public SolrSearchResult search(SolrQuery originalQuery) throws IntactSolrException {
-        SolrQuery query = originalQuery.getCopy();
+    public IntactSolrSearchResult search(String q, Integer firstResult, Integer maxResults, String returnType) throws PsicquicSolrException, SolrServerException {
 
-        String[] fields = (String[]) ArrayUtils.add(FieldNames.DATA_FIELDS, FieldNames.PKEY);
+        return (IntactSolrSearchResult) super.searchWithFilters(q, firstResult, maxResults, returnType, null);
+    }
 
-        if(query.getFields()!=null){
-            fields = (String[]) ArrayUtils.add(fields, query.getFields().split(","));
+    public IntactSolrSearchResult search(String q, String returnType) throws PsicquicSolrException, SolrServerException {
+
+        return (IntactSolrSearchResult) super.searchWithFilters(q, null, null, returnType, null);
+    }
+
+    public IntactSolrSearchResult search(String q, Integer firstResult, Integer maxResults) throws PsicquicSolrException, SolrServerException {
+
+        return (IntactSolrSearchResult) super.searchWithFilters(q, firstResult, maxResults, RETURN_TYPE_MITAB27, null);
+    }
+
+    public IntactSolrSearchResult search(String q) throws PsicquicSolrException, SolrServerException {
+
+        return (IntactSolrSearchResult) super.searchWithFilters(q, null, null, RETURN_TYPE_MITAB27, null);
+    }
+
+    @Override
+    protected IntactSolrSearchResult createMitabResultsForType(SolrDocumentList docList, String mitabType) throws PsicquicSolrException {
+
+        String [] fieldNames = solrFields.get(mitabType);
+
+        if (fieldNames == null){
+            throw new PsicquicSolrException("The format " + mitabType + " is not a recognised MITAB format");
         }
 
-        query.setFields(fields);
-
-        // if using a wildcard query we convert to lower case
-        // as of http://mail-archives.apache.org/mod_mbox/lucene-solr-user/200903.mbox/%3CFD3AFB65-AEC1-40B2-A0A4-7E14A519AB05@ehatchersolutions.com%3E
-        if (query.getQuery().contains("*")) {
-            String[] tokens = query.getQuery().split(" ");
-
-            StringBuilder sb = new StringBuilder(query.getQuery().length());
-
-            for (String token : tokens) {
-                if (token.contains("*")) {
-                    sb.append(token.toLowerCase());
-                } else {
-                    sb.append(token);
-                }
-
-                sb.append(" ");
-            }
-
-            query.setQuery(sb.toString().trim());
-        }
-        String queryString = query.getQuery();
-
-        // and, or and not should be upper case
-        query.set(queryString.replaceAll(" and ", " AND ").replaceAll(" or ", " OR ").replaceAll(" not ", " NOT ").replaceAll("\\\"", "\"").replaceAll("\\\\","\\"));
-
-        QueryResponse queryResponse = executeQuery(query);
-        return new SolrSearchResult(solrServer, queryResponse);
+        IntactSolrSearchResult searchResults = new IntactSolrSearchResult(docList, fieldNames);
+        return searchResults;
     }
 
     public Collection<InteractorIdCount> searchInteractors(SolrQuery query, String interactorMi, int first, int maxNumberOfIdCount) throws IntactSolrException {

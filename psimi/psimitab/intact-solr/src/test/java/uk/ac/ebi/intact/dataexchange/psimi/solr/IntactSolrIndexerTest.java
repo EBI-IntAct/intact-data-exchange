@@ -17,10 +17,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.hupo.psi.mi.psicquic.model.PsicquicSolrException;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.tab.model.BinaryInteraction;
@@ -238,11 +240,11 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         Assert.assertEquals(1, doc.getFieldValues("taxidA_o").size());
     }
 
-    private void assertCount(Number count, String searchQuery) throws IntactSolrException {
+    private void assertCount(Number count, String searchQuery) throws IntactSolrException, SolrServerException, PsicquicSolrException {
         IntactSolrSearcher searcher = new IntactSolrSearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
-        SolrSearchResult result = searcher.search(searchQuery, null, null);
+        IntactSolrSearchResult result = (IntactSolrSearchResult) searcher.search(searchQuery, null, null, null, null);
 
-        assertEquals(count.longValue(), result.getTotalCount());
+        assertEquals(count.longValue(), result.getNumberResults());
     }
 
     @Test

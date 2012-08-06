@@ -39,43 +39,43 @@ public class IntactMiScoreTest extends AbstractSolrTestCase {
     
     @Test
     public void rangeWithResults() throws Exception {
-        final SolrSearchResult result = searcher.search("intact-miscore:[0.4 TO 0.7]", 0, Integer.MAX_VALUE);
-        assertThat(result.getTotalCount(), is(equalTo(7L)));
+        final IntactSolrSearchResult result = (IntactSolrSearchResult) searcher.search("intact-miscore:[0.4 TO 0.7]", 0, Integer.MAX_VALUE, null, null);
+        assertThat(result.getNumberResults(), is(equalTo(7L)));
     }
 
     @Test
     public void negativeRange() throws Exception {
-        final SolrSearchResult result = searcher.search("intact-miscore:[-0.4 TO -0.7]", 0, Integer.MAX_VALUE);
-        assertThat(result.getTotalCount(), is(equalTo(0L)));
+        final IntactSolrSearchResult result = (IntactSolrSearchResult) searcher.search("intact-miscore:[-0.4 TO -0.7]", 0, Integer.MAX_VALUE, null, null);
+        assertThat(result.getNumberResults(), is(equalTo(0L)));
     }
 
     @Test
     public void rangeTo1() throws Exception {
-        final SolrSearchResult result = searcher.search("intact-miscore:[0.7 TO 1]", 0, Integer.MAX_VALUE);
-        assertThat(result.getTotalCount(), is(equalTo(2L)));
+        final IntactSolrSearchResult result = (IntactSolrSearchResult) searcher.search("intact-miscore:[0.7 TO 1]", 0, Integer.MAX_VALUE, null, null);
+        assertThat(result.getNumberResults(), is(equalTo(2L)));
     }
 
     @Test
     public void rangeAll0To1() throws Exception {
-        final SolrSearchResult result = searcher.search("intact-miscore:[0 TO 1]", 0, Integer.MAX_VALUE);
-        assertThat(result.getTotalCount(), is(equalTo(13L)));
+        final IntactSolrSearchResult result = (IntactSolrSearchResult) searcher.search("intact-miscore:[0 TO 1]", 0, Integer.MAX_VALUE, null, null);
+        assertThat(result.getNumberResults(), is(equalTo(13L)));
     }
 
     @Test
     public void exactNumberResults() throws Exception {
-        final SolrSearchResult result = searcher.search("intact-miscore:0.164309", 0, Integer.MAX_VALUE);
-        assertThat(result.getTotalCount(), is(equalTo(1L)));
+        final IntactSolrSearchResult result = (IntactSolrSearchResult) searcher.search("intact-miscore:0.164309", 0, Integer.MAX_VALUE, null, null);
+        assertThat(result.getNumberResults(), is(equalTo(1L)));
     }
 
     @Test
     public void exactNumberNoResults() throws Exception {
-        final SolrSearchResult result = searcher.search("intact-miscore:0.4", 0, Integer.MAX_VALUE);
-        assertThat(result.getTotalCount(), is(equalTo(0L)));
+        final IntactSolrSearchResult result = (IntactSolrSearchResult) searcher.search("intact-miscore:0.4", 0, Integer.MAX_VALUE, null, null);
+        assertThat(result.getNumberResults(), is(equalTo(0L)));
     }
 
     @Test
     public void notRangeQuery() throws Exception {
-        final SolrSearchResult result = searcher.search("-intact-miscore:[0 TO 0.5]", 0, Integer.MAX_VALUE);
-        assertThat(result.getTotalCount(), is(equalTo(2L)));
+        final IntactSolrSearchResult result = (IntactSolrSearchResult) searcher.search("-intact-miscore:[0 TO 0.5]", 0, Integer.MAX_VALUE, null, null);
+        assertThat(result.getNumberResults(), is(equalTo(2L)));
     }
 }

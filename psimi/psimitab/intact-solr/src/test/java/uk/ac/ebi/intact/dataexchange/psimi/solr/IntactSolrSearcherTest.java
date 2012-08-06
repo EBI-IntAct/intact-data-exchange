@@ -17,9 +17,12 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.hupo.psi.mi.psicquic.model.PsicquicSolrException;
+import org.hupo.psi.mi.psicquic.model.PsicquicSolrServer;
 import org.junit.Assert;
 import org.junit.Test;
 import psidev.psi.mi.tab.model.*;
@@ -98,12 +101,12 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         // with pagination
         Assert.assertEquals(3, searcher.searchInteractors(query, "MI:0328", 0, 3).size());
         
-        final SolrSearchResult result1 = searcher.search( "GRB2", null, null );
-        assertEquals(3, result1.getTotalCount());
+        final IntactSolrSearchResult result1 = (IntactSolrSearchResult) searcher.search( "GRB2", null, null, null, null );
+        assertEquals(3, result1.getNumberResults());
 
         SolrQuery query2 = new SolrQuery("GRB2*");
-        final SolrSearchResult result2 = searcher.search( query2 );
-        assertEquals(3, result2.getTotalCount());
+        final IntactSolrSearchResult result2 = (IntactSolrSearchResult) searcher.search( "GRB2*", null, null, null, null );
+        assertEquals(3, result2.getNumberResults());
 
 
 
@@ -153,11 +156,9 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
 
         indexer.indexMitab(new ByteArrayInputStream(mitab.getBytes()), false);
 
-        SolrQuery solrQuery = new SolrQuery("P35568");
-
         IntactSolrSearcher searcher = new IntactSolrSearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
 
-        SolrSearchResult result = searcher.search(solrQuery);
+        IntactSolrSearchResult result = (IntactSolrSearchResult) searcher.search("P35568", null, null, PsicquicSolrServer.RETURN_TYPE_MITAB27, null);
 
         BinaryInteraction binaryInteraction = result.getBinaryInteractionList().iterator().next();
 
@@ -256,11 +257,11 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         return new ArrayList<T>(elements).get(position);
     }
 
-    private void assertCount(Number count, String searchQuery) throws IntactSolrException {
+    private void assertCount(Number count, String searchQuery) throws IntactSolrException, SolrServerException, PsicquicSolrException {
         IntactSolrSearcher searcher = new IntactSolrSearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
-        SolrSearchResult result = searcher.search(searchQuery, null, null);
+        IntactSolrSearchResult result = (IntactSolrSearchResult) searcher.search(searchQuery, null, null, null, null);
 
-        assertEquals(count, result.getTotalCount());
+        assertEquals(count, result.getNumberResults());
     }
 
     private void indexFromClasspath(String resource, boolean hasHeader) throws IOException, IntactSolrException {
@@ -309,20 +310,16 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         Assert.assertTrue( ebi340 );
         Assert.assertTrue( ebi421 );
 
-        SolrQuery queryNonfacetEbi340 = new SolrQuery( "P20053 +EBI-340" );
-        final SolrSearchResult nonFacetResult1 = searcher.search( queryNonfacetEbi340 );
-        Assert.assertEquals( 8, nonFacetResult1.getTotalCount() );
+        final IntactSolrSearchResult nonFacetResult1 = (IntactSolrSearchResult) searcher.search( "P20053 +EBI-340", null, null, null, null );
+        Assert.assertEquals( 8, nonFacetResult1.getNumberResults() );
 
-        SolrQuery queryNonfacetEbi421 = new SolrQuery( "P20053 +EBI-421" );
-        final SolrSearchResult nonFacetResult2 = searcher.search( queryNonfacetEbi421 );
-        Assert.assertEquals( 5, nonFacetResult2.getTotalCount() );
+        final IntactSolrSearchResult nonFacetResult2 = (IntactSolrSearchResult) searcher.search( "P20053 +EBI-421" , null, null, null, null);
+        Assert.assertEquals( 5, nonFacetResult2.getNumberResults() );
 
-        SolrQuery queryNonfacetEbi340_with_id = new SolrQuery( "P20053 +id:EBI-340" );
-        final SolrSearchResult nonFacetResult3 = searcher.search( queryNonfacetEbi340_with_id );
-        Assert.assertEquals( 8, nonFacetResult3.getTotalCount() );
+        final IntactSolrSearchResult nonFacetResult3 = (IntactSolrSearchResult) searcher.search( "P20053 +id:EBI-340", null, null, null, null );
+        Assert.assertEquals( 8, nonFacetResult3.getNumberResults() );
 
-        SolrQuery queryNonfacetEbi421_with_id = new SolrQuery( "P20053 +id:EBI-421" );
-        final SolrSearchResult nonFacetResult4 = searcher.search( queryNonfacetEbi421_with_id );
-        Assert.assertEquals( 5, nonFacetResult4.getTotalCount() );
+        final IntactSolrSearchResult nonFacetResult4 = (IntactSolrSearchResult) searcher.search( "P20053 +id:EBI-421", null, null, null, null );
+        Assert.assertEquals( 5, nonFacetResult4.getNumberResults() );
     }
 }
