@@ -43,7 +43,7 @@ public class SolrHomeBuilderTest {
     public void testInstall() throws Exception {
         File workingDir = new File("/tmp/lalasolr");
 
-        SolrHomeBuilder solrHomeBuilder = new SolrHomeBuilder();
+        IntactSolrHomeBuilder solrHomeBuilder = new IntactSolrHomeBuilder();
         solrHomeBuilder.install(new File("/tmp/lalasolr"));
         
         Assert.assertTrue(workingDir.exists());

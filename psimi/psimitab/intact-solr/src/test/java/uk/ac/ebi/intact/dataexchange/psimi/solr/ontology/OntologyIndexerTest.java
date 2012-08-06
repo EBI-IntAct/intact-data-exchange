@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.UniprotTaxonomyOntologyIterator;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
 
 
 /**
@@ -35,11 +35,11 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
  */
 public class OntologyIndexerTest  {
 
-    private SolrJettyRunner solrJettyRunner;
+    private IntactSolrJettyRunner solrJettyRunner;
 
     @Before
     public void before() throws Exception {
-        solrJettyRunner = new SolrJettyRunner();
+        solrJettyRunner = new IntactSolrJettyRunner();
         solrJettyRunner.start();
     }
 

@@ -15,7 +15,8 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
-import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
 import org.junit.Before;
 import org.junit.After;
 import org.apache.solr.client.solrj.SolrServer;
@@ -31,11 +32,11 @@ import java.io.IOException;
  */
 public abstract class AbstractSolrJettyRunnableTestCase {
 
-private SolrJettyRunner solrJettyRunner;
+private IntactSolrJettyRunner solrJettyRunner;
 
     @Before
     public void before() throws Exception {
-        solrJettyRunner = new SolrJettyRunner();
+        solrJettyRunner = new IntactSolrJettyRunner();
         solrJettyRunner.start();
     }
 

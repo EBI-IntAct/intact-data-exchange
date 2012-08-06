@@ -190,10 +190,10 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         Assert.assertEquals("pubmed", ((CrossReference) binaryInteraction.getPublications().get(0)).getDatabase());
         Assert.assertEquals("9606", get(0, ia.getOrganism().getIdentifiers()).getIdentifier());
         Assert.assertEquals("taxid", get(0, ia.getOrganism().getIdentifiers()).getDatabase());
-        Assert.assertEquals("Human", get(0, ia.getOrganism().getIdentifiers()).getText());
+        Assert.assertEquals("human", get(0, ia.getOrganism().getIdentifiers()).getText());
         Assert.assertEquals("9606", get(0, ib.getOrganism().getIdentifiers()).getIdentifier());
         Assert.assertEquals("taxid", get(0, ib.getOrganism().getIdentifiers()).getDatabase());
-        Assert.assertEquals("Human", get(0, ib.getOrganism().getIdentifiers()).getText());
+        Assert.assertEquals("human", get(0, ib.getOrganism().getIdentifiers()).getText());
         Assert.assertEquals("MI:0217", ((CrossReference) binaryInteraction.getInteractionTypes().get(0)).getIdentifier());
         Assert.assertEquals("psi-mi", ((CrossReference) binaryInteraction.getInteractionTypes().get(0)).getDatabase());
         Assert.assertEquals("phosphorylation", ((CrossReference) binaryInteraction.getInteractionTypes().get(0)).getText());

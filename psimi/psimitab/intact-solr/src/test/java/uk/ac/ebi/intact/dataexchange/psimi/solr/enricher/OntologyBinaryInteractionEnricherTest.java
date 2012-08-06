@@ -23,7 +23,8 @@ import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.IntactSolrIndexer;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -31,13 +32,13 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
  */
 public class OntologyBinaryInteractionEnricherTest {
 
-    private SolrJettyRunner solrJettyRunner;
+    private IntactSolrJettyRunner solrJettyRunner;
     private IntactSolrIndexer indexer;
     private OntologyBinaryInteractionEnricher enricher;
 
     @Before
     public void before() throws Exception {
-        solrJettyRunner = new SolrJettyRunner();
+        solrJettyRunner = new IntactSolrJettyRunner();
         solrJettyRunner.start();
 
         indexer = new IntactSolrIndexer(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB),

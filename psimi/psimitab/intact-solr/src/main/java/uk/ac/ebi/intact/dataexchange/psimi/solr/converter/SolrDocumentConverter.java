@@ -29,6 +29,7 @@ import org.hupo.psi.calimocho.tab.io.RowReader;
 import org.hupo.psi.calimocho.tab.io.formatter.AnnotationFieldFormatter;
 import org.hupo.psi.calimocho.tab.io.formatter.XrefFieldFormatter;
 import org.hupo.psi.calimocho.tab.util.MitabDocumentDefinitionFactory;
+import org.hupo.psi.mi.psicquic.model.PsicquicSolrServer;
 import psidev.psi.mi.calimocho.solr.converter.Converter;
 import psidev.psi.mi.calimocho.solr.converter.SolrFieldName;
 import psidev.psi.mi.calimocho.solr.converter.SolrFieldUnit;
@@ -76,23 +77,6 @@ public class SolrDocumentConverter extends Converter{
     private static final String COLUMN_SEPARATOR = "\t";
     private static final String FIELD_SEPARATOR = "|";
     private static final String FIELD_EMPTY = "-";
-
-    private static final String[] DATA_FIELDS_27 = new String[] {
-            SolrFieldName.idA+FieldNames.STORED_SUFFIX, SolrFieldName.idB+FieldNames.STORED_SUFFIX, SolrFieldName.altidA+FieldNames.STORED_SUFFIX,
-            SolrFieldName.altidB+FieldNames.STORED_SUFFIX, SolrFieldName.aliasA+FieldNames.STORED_SUFFIX, SolrFieldName.aliasB+FieldNames.STORED_SUFFIX,
-            SolrFieldName.detmethod+FieldNames.STORED_SUFFIX, SolrFieldName.pubauth+FieldNames.STORED_SUFFIX, SolrFieldName.pubid+FieldNames.STORED_SUFFIX,
-            SolrFieldName.taxidA+FieldNames.STORED_SUFFIX, SolrFieldName.taxidB+FieldNames.STORED_SUFFIX, SolrFieldName.type+FieldNames.STORED_SUFFIX,
-            SolrFieldName.source+FieldNames.STORED_SUFFIX,SolrFieldName.interaction_id+FieldNames.STORED_SUFFIX, SolrFieldName.confidence+FieldNames.STORED_SUFFIX,
-            SolrFieldName.complex+FieldNames.STORED_SUFFIX, SolrFieldName.pbioroleA+FieldNames.STORED_SUFFIX, SolrFieldName.pbioroleB+FieldNames.STORED_SUFFIX,
-            SolrFieldName.ptypeB+FieldNames.STORED_SUFFIX, SolrFieldName.pxrefA+FieldNames.STORED_SUFFIX, SolrFieldName.pxrefB+FieldNames.STORED_SUFFIX,
-            SolrFieldName.xref+FieldNames.STORED_SUFFIX, SolrFieldName.pexproleA+FieldNames.STORED_SUFFIX, SolrFieldName.annotA+FieldNames.STORED_SUFFIX,
-            SolrFieldName.annotB+FieldNames.STORED_SUFFIX, SolrFieldName.annot+FieldNames.STORED_SUFFIX, SolrFieldName.taxidHost+FieldNames.STORED_SUFFIX,
-            SolrFieldName.param+FieldNames.STORED_SUFFIX, SolrFieldName.cdate+FieldNames.STORED_SUFFIX, SolrFieldName.udate+FieldNames.STORED_SUFFIX,
-            SolrFieldName.checksumA+FieldNames.STORED_SUFFIX, SolrFieldName.checksumB+FieldNames.STORED_SUFFIX, SolrFieldName.checksumI+FieldNames.STORED_SUFFIX,
-            SolrFieldName.negative+FieldNames.STORED_SUFFIX, SolrFieldName.ftypeA+FieldNames.STORED_SUFFIX, SolrFieldName.ftypeB+FieldNames.STORED_SUFFIX,
-            SolrFieldName.stcA+FieldNames.STORED_SUFFIX, SolrFieldName.stcB+FieldNames.STORED_SUFFIX, SolrFieldName.pmethodA+FieldNames.STORED_SUFFIX,
-            SolrFieldName.pmethodB+FieldNames.STORED_SUFFIX
-    };
 
     public SolrDocumentConverter(SolrServer solrServer) {
         super();
@@ -317,13 +301,13 @@ public class SolrDocumentConverter extends Converter{
     }
 
     protected String toMitabLine(Object doc) {
-        int size = DATA_FIELDS_27.length;
+        int size = PsicquicSolrServer.DATA_FIELDS_27.length;
         int index = 0;
 
         StringBuffer sb = new StringBuffer(1064);
 
         // one field name is one column
-        for (String fieldName : DATA_FIELDS_27){
+        for (String fieldName : PsicquicSolrServer.DATA_FIELDS_27){
             // only one value is expected because it should not be multivalued
             Collection<Object> fieldValues = getFieldValue(doc, fieldName);
 

@@ -5,7 +5,7 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.junit.After;
 import org.junit.Before;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,12 +18,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class AbstractSolrTestCase {
 
-    private SolrJettyRunner solrJettyRunner;
+    private IntactSolrJettyRunner solrJettyRunner;
     private IntactSolrIndexer indexer;
 
     @Before
     public void before() throws Exception {
-        solrJettyRunner = new SolrJettyRunner();
+        solrJettyRunner = new IntactSolrJettyRunner();
         solrJettyRunner.start();
 
         indexer = new IntactSolrIndexer( solrJettyRunner.getSolrServer( CoreNames.CORE_PUB ),
@@ -41,7 +41,7 @@ public class AbstractSolrTestCase {
         indexer = null;
     }
 
-    public SolrJettyRunner getSolrJettyRunner() {
+    public IntactSolrJettyRunner getSolrJettyRunner() {
         return solrJettyRunner;
     }
 

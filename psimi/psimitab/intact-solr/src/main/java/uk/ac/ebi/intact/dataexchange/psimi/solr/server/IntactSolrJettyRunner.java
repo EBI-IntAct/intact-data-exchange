@@ -15,9 +15,15 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.server;
 
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.hupo.psi.mi.psicquic.model.server.SolrJettyRunner;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
@@ -27,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * TODO comment that class header
@@ -35,38 +40,20 @@ import java.net.URL;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class SolrJettyRunner {
+public class IntactSolrJettyRunner extends SolrJettyRunner {
 
-    private static Logger log = LoggerFactory.getLogger(SolrHomeBuilder.class);
-
-    private int port = 18080;
-
-    private Server server;
-    private SolrServer solrServer;
-
-    private File workingDir;
-    private File solrHome;
-
-    private URL solrHomeJar;
+    private static Logger log = LoggerFactory.getLogger(IntactSolrHomeBuilder.class);
 
 
-    public SolrJettyRunner() {
+    public IntactSolrJettyRunner() {
         this(new File(System.getProperty("java.io.tmpdir"), "solr-home-"+System.currentTimeMillis()));
     }
 
-    public SolrJettyRunner(File workingDir) {
-        this.workingDir = workingDir;
-
-        if (log.isInfoEnabled()) log.info("Jetty working dir: "+workingDir);
-
+    public IntactSolrJettyRunner(File workingDir) {
+        super(workingDir);
     }
 
-    public SolrJettyRunner(File workingDir, URL solrHomeJar) {
-        this(workingDir);
-        this.solrHomeJar = solrHomeJar;
-
-    }
-
+    @Override
     public void start() throws Exception {
         File solrWar;
 
@@ -75,7 +62,7 @@ public class SolrJettyRunner {
             solrWar = new File(workingDir, "solr.war");
 
             if (!solrHome.exists()) {
-                throw new IllegalStateException("Working dir "+workingDir+" exists, but no home/ directory could be found");
+                throw new IllegalStateException("Working dir "+workingDir+" exists, but no solr-home/ directory could be found");
             }
 
             if (!solrWar.exists()) {
@@ -85,26 +72,28 @@ public class SolrJettyRunner {
             if (log.isDebugEnabled()) log.debug("Using existing directory");
 
         } else {
-            SolrHomeBuilder solrHomeBuilder;
+            IntactSolrHomeBuilder solrHomeBuilder = new IntactSolrHomeBuilder();
 
-            if (solrHomeJar != null) {
-                solrHomeBuilder = new SolrHomeBuilder(solrHomeJar);
-            } else {
-                solrHomeBuilder = new SolrHomeBuilder();
-            }
-            
             solrHomeBuilder.install(workingDir);
 
             solrHome = solrHomeBuilder.getSolrHomeDir();
             solrWar = solrHomeBuilder.getSolrWar();
         }
 
+        // create index folder
+        FSDirectory dir = FSDirectory.open(new File(solrHome.getAbsolutePath()+"/data/index"));
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_36, new StandardAnalyzer(Version.LUCENE_36));
+        config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+        IndexWriter writer = new IndexWriter(dir, config);
+        writer.commit();
+        writer.close();
+
         System.setProperty("solr.solr.home", solrHome.getAbsolutePath());
 
         server = new Server();
 
         Connector connector=new SelectChannelConnector();
-        connector.setPort(Integer.getInteger("jetty.port",port).intValue());
+        connector.setPort(Integer.getInteger("jetty.port",getPort()).intValue());
         server.setConnectors(new Connector[]{connector});
 
         WebAppContext webapp = new WebAppContext();
@@ -117,20 +106,8 @@ public class SolrJettyRunner {
         server.start();
     }
 
-    public void join() throws InterruptedException {
-        server.join();
-    }
-
-    public void stop() throws Exception {
-        if (server != null) server.stop();
-    }
-
-    public File getSolrHome() {
-       return solrHome; 
-    }
-
     public String getSolrUrl(String coreName) {
-        return "http://localhost:"+port+"/solr/"+coreName;
+        return "http://localhost:"+getPort()+"/solr/"+coreName;
     }
 
     public SolrServer getSolrServer(String coreName) {
@@ -145,13 +122,5 @@ public class SolrJettyRunner {
         } catch (MalformedURLException e) {
             throw new IllegalStateException("URL should be well formed", e);
         }
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
     }
 }

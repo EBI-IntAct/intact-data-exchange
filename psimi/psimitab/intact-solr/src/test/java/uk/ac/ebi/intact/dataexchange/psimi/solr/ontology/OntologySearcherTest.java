@@ -35,7 +35,8 @@ public class OntologySearcherTest extends AbstractSolrTestCase {
         assertParentRelationshipCount( searcher, "GO:0000786", 3 );
         assertParentRelationshipCount( searcher, "GO:0000790", 2 );
         assertParentRelationshipCount( searcher, "GO:0000785", 1 );
-        assertParentRelationshipCount( searcher, "GO:0005575", 1 );
+        // is a root term
+        assertParentRelationshipCount( searcher, "GO:0005575", 0 );
     }
 
     @Test

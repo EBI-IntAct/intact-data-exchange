@@ -36,6 +36,12 @@
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psimitab</artifactId>
             <version>1.8.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>com.springsource.org.apache.commons.io</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
                     
         <dependency>
@@ -44,16 +50,17 @@
             <version>2.1.8-SNAPSHOT</version>
         </dependency>
 
-        <!-- calimocho -->
+        <!-- psicquic -->
         <dependency>
-            <groupId>psidev.psi.mi</groupId>
-            <artifactId>calimocho-tab</artifactId>
-            <version>2.2-SNAPSHOT</version>
+            <groupId>org.hupo.psi.mi.psicquic</groupId>
+            <artifactId>psicquic-solr</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
+        <!-- intact solr home -->
         <dependency>
-            <groupId>psidev.psi.mi</groupId>
-            <artifactId>calimocho-solr</artifactId>
-            <version>2.2-SNAPSHOT</version>
+            <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
+            <artifactId>intact-solr-home</artifactId>
+            <version>${pom.version}</version>
         </dependency>
 
         <!-- Ontologies -->
@@ -61,47 +68,12 @@
             <groupId>uk.ac.ebi.intact.bridges</groupId>
             <artifactId>intact-ontologies</artifactId>
             <version>2.1.6-SNAPSHOT</version>
-        </dependency>
-
-
-        <!-- Apache Solr -->
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>3.6.0</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
-            <version>3.6.0</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.2.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <version>4.2.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.6.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.lucene</groupId>
+                    <artifactId>lucene-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Jetty -->

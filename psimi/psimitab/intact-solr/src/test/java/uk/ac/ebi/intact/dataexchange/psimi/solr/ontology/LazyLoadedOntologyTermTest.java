@@ -20,7 +20,8 @@ import org.junit.*;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
 
 import java.net.URL;
 import java.util.Collection;
@@ -35,14 +36,14 @@ import java.util.Set;
  */
 public class LazyLoadedOntologyTermTest {
 
-    private static SolrJettyRunner solrJettyRunner;
+    private static IntactSolrJettyRunner solrJettyRunner;
 
     private static OntologySearcher searcher;
     private static HttpSolrServer solrServer;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        solrJettyRunner = new SolrJettyRunner();
+        solrJettyRunner = new IntactSolrJettyRunner();
         solrJettyRunner.start();
 
         solrServer = (HttpSolrServer) solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
