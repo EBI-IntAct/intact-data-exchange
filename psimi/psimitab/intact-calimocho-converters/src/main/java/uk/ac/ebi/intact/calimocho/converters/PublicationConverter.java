@@ -40,6 +40,7 @@ public class PublicationConverter {
     private final static String INTERNALLY_CURATED_MI = "MI:1055";
     private final static String PREDICTED_MI = "MI:1057";
     private final static String TEXT_MINING_MI = "MI:1056";
+    private final static String DATASET_MI = "MI:0875";
 
     public PublicationConverter(){
         xrefConverter = new CrossReferenceConverter();
@@ -70,6 +71,8 @@ public class PublicationConverter {
         tagsToExport.add(PREDICTED_MI);
         // textMining
         tagsToExport.add(TEXT_MINING_MI);
+        // dataset
+        tagsToExport.add(DATASET_MI);
     }
 
     /**
@@ -79,129 +82,131 @@ public class PublicationConverter {
      */
     public void intactToCalimocho(Publication pub, Row row){
 
-        Collection<PublicationXref> pubRefs = pub.getXrefs();
-        Collection<Annotation> pubAnnotations = pub.getAnnotations();
+        if (pub != null && row != null){
+            Collection<PublicationXref> pubRefs = pub.getXrefs();
+            Collection<Annotation> pubAnnotations = pub.getAnnotations();
 
-        Collection<Field> pubIds = new ArrayList<Field>(pubRefs.size());
-        for (PublicationXref pubRef : pubRefs){
-            if (pubRef.getCvXrefQualifier() != null && pubRef.getCvDatabase().getShortLabel() != null) {
-                // publications
-                if (CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())) {
-                    Field primaryRef = xrefConverter.intactToCalimocho(pubRef, false);
-                    if (primaryRef != null){
-                        pubIds.add(primaryRef);
+            Collection<Field> pubIds = new ArrayList<Field>(pubRefs.size());
+            for (PublicationXref pubRef : pubRefs){
+                if (pubRef.getCvXrefQualifier() != null && pubRef.getCvDatabase().getShortLabel() != null) {
+                    // publications
+                    if (CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())) {
+                        Field primaryRef = xrefConverter.intactToCalimocho(pubRef, false);
+                        if (primaryRef != null){
+                            pubIds.add(primaryRef);
+                        }
+                    }
+                    // imexId
+                    else if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())) {
+                        Field imexRef = xrefConverter.intactToCalimocho(pubRef, false);
+                        if (imexRef != null){
+                            pubIds.add(imexRef);
+                        }
                     }
                 }
-                // imexId
-                else if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())) {
-                    Field imexRef = xrefConverter.intactToCalimocho(pubRef, false);
-                    if (imexRef != null){
-                        pubIds.add(imexRef);
+            }
+
+            if (!pubIds.isEmpty()){
+                row.addFields(InteractionKeys.KEY_PUBID, pubIds);
+            }
+
+            String authorDateValue = null;
+            String author = null;
+            String date = null;
+
+            for (Annotation annot : pubAnnotations){
+                if (annot.getCvTopic() != null){
+                    // tag
+                    if (tagsToExport.contains(annot.getCvTopic().getIdentifier())){
+                        Field tag = annotConverter.intactToCalimocho(annot);
+                        if (tag != null){
+                            row.addField(InteractionKeys.KEY_ANNOTATIONS_I, tag);
+                        }
+                    }
+                    // author
+                    else if ( CvTopic.AUTHOR_LIST_MI_REF.equals(annot.getCvTopic().getIdentifier())){
+                        author = annot.getAnnotationText();
+                    }
+                    // date
+                    else if ( CvTopic.PUBLICATION_YEAR_MI_REF.equals(annot.getCvTopic().getIdentifier())){
+                        date = annot.getAnnotationText();
                     }
                 }
             }
-        }
 
-        if (!pubIds.isEmpty()){
-            row.addFields(InteractionKeys.KEY_PUBID, pubIds);
-        }
-        
-        String authorDateValue = null;
-        String author = null;
-        String date = null;
-        
-        for (Annotation annot : pubAnnotations){
-            if (annot.getCvTopic() != null){
-                // tag
-                if (tagsToExport.contains(annot.getCvTopic().getIdentifier())){
-                    Field tag = annotConverter.intactToCalimocho(annot);
-                    if (tag != null){
-                        row.addField(InteractionKeys.KEY_ANNOTATIONS_I, tag);
+            // create author/year value
+            if (author != null && date != null){
+
+                if (author.contains(" ")){
+                    authorDateValue = author.split(" ")[0] + " et al. ("+date+")";
+                }
+                else {
+                    authorDateValue = author + " et al. ("+date+")";
+                }
+            }
+            else if (author != null){
+                if (author.contains(" ")){
+                    authorDateValue = author.split(" ")[0] + " et al.";
+                }
+                else {
+                    authorDateValue = author + " et al.";
+                }
+            }
+            else if (date != null){
+                authorDateValue = "- ("+date+")";
+            }
+            if (authorDateValue != null){
+                Field field = new DefaultField();
+                field.set( CalimochoKeys.VALUE, authorDateValue);
+                row.addField(InteractionKeys.KEY_PUBAUTH, field);
+            }
+
+            // create source database
+            Institution institution = pub.getOwner();
+
+            if (institution != null){
+                Collection<InstitutionXref> ownerRefs = institution.getXrefs();
+
+                Field identityRef = null;
+                for (InstitutionXref ref : ownerRefs){
+                    if (CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())) {
+                        identityRef = xrefConverter.intactToCalimocho(ref, false);
+                        break;
                     }
                 }
-                // author
-                else if ( CvTopic.AUTHOR_LIST_MI_REF.equals(annot.getCvTopic().getIdentifier())){
-                    author = annot.getAnnotationText();
+
+                if (identityRef == null && institution.getShortLabel() != null){
+                    identityRef = new DefaultField();
+
+                    String db = CrossReferenceConverter.DATABASE_UNKNOWN;
+
+                    identityRef.set( CalimochoKeys.KEY, db);
+                    identityRef.set( CalimochoKeys.DB, db);
+                    identityRef.set( CalimochoKeys.VALUE, "-");
+                    identityRef.set( CalimochoKeys.TEXT, institution.getShortLabel());
                 }
-                // date
-                else if ( CvTopic.PUBLICATION_YEAR_MI_REF.equals(annot.getCvTopic().getIdentifier())){
-                    date = annot.getAnnotationText();
+                else if (institution.getShortLabel() != null){
+                    identityRef.set( CalimochoKeys.TEXT, institution.getShortLabel());
                 }
-            }
-        }
 
-        // create author/year value
-        if (author != null && date != null){
-
-            if (author.contains(" ")){
-                authorDateValue = author.split(" ")[0] + " et al. ("+date+")";
-            }
-            else {
-                authorDateValue = author + " et al. ("+date+")";
-            }
-        }
-        else if (author != null){
-            if (author.contains(" ")){
-                authorDateValue = author.split(" ")[0] + " et al.";
-            }
-            else {
-                authorDateValue = author + " et al.";
-            }
-        }
-        else if (date != null){
-            authorDateValue = "- ("+date+")";
-        }
-        if (authorDateValue != null){
-            Field field = new DefaultField();
-            field.set( CalimochoKeys.VALUE, authorDateValue);
-            row.addField(InteractionKeys.KEY_PUBAUTH, field);
-        }
-        
-        // create source database
-        Institution institution = pub.getOwner();
-        
-        if (institution != null){
-            Collection<InstitutionXref> ownerRefs = institution.getXrefs();
-
-            Field identityRef = null;
-            for (InstitutionXref ref : ownerRefs){
-                if (CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())) {
-                    identityRef = xrefConverter.intactToCalimocho(ref, false);
-                    break;
+                if (identityRef != null){
+                    row.addField(InteractionKeys.KEY_SOURCE, identityRef);
                 }
             }
 
-            if (identityRef == null && institution.getShortLabel() != null){
-                identityRef = new DefaultField();
+            // creation date of publication
+            if (pub.getCreated() != null){
+                Field created = new DefaultField();
+                created.set( CalimochoKeys.VALUE, dateFormat.format(pub.getCreated()) );
+                created.set( CalimochoKeys.DAY, dayFormat.format(pub.getCreated()) );
+                created.set( CalimochoKeys.MONTH, monthFormat.format(pub.getCreated()) );
+                created.set( CalimochoKeys.YEAR, yearFormat.format(pub.getCreated()) );
 
-                String db = CrossReferenceConverter.DATABASE_UNKNOWN;
-
-                identityRef.set( CalimochoKeys.KEY, db);
-                identityRef.set( CalimochoKeys.DB, db);
-                identityRef.set( CalimochoKeys.VALUE, "-");
-                identityRef.set( CalimochoKeys.TEXT, institution.getShortLabel());
+                row.addField(InteractionKeys.KEY_CREATION_DATE, created);
             }
-            else if (institution.getShortLabel() != null){
-                identityRef.set( CalimochoKeys.TEXT, institution.getShortLabel());
-            }
-
-            if (identityRef != null){
-                row.addField(InteractionKeys.KEY_SOURCE, identityRef);
-            }
-        }
-
-        // creation date of publication
-        if (pub.getCreated() != null){
-            Field created = new DefaultField();
-            created.set( CalimochoKeys.VALUE, dateFormat.format(pub.getCreated()) );
-            created.set( CalimochoKeys.DAY, dayFormat.format(pub.getCreated()) );
-            created.set( CalimochoKeys.MONTH, monthFormat.format(pub.getCreated()) );
-            created.set( CalimochoKeys.YEAR, yearFormat.format(pub.getCreated()) );
-
-            row.addField(InteractionKeys.KEY_CREATION_DATE, created);
         }
     }
-    
+
     public Publication calimochoToIntact(Row row){
 
         if (row != null){
