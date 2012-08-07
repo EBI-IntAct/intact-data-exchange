@@ -9,8 +9,6 @@ import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.model.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -149,10 +147,6 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         interactorA.setAc( "EBI-xxxxxxx" );
         interactorB.setAc( "EBI-yyyyyyy" );
 
-        final ComponentParameter paramB = interactorB.getActiveInstances().iterator().next().getParameters().iterator().next();
-        paramB.setFactor(30.2);
-        paramB.setExponent(1);
-
         final InteractionParameter interactionParameter =
                 getMockBuilder().createInteractionParameter(
                         getMockBuilder().createCvObject(CvParameterType.class, "MI:9898", "kD"),
@@ -160,7 +154,7 @@ public class InteractionConverterTest extends IntactBasicTestCase {
                         4d);
         interaction.getParameters().add(interactionParameter);
 
-        IntactBinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
+        BinaryInteraction<psidev.psi.mi.tab.model.Interactor> bi = interactionConverter.toBinaryInteraction( interaction );
 
         assertNotNull( bi );
         final Collection<Component> components = interaction.getComponents();
@@ -168,27 +162,11 @@ public class InteractionConverterTest extends IntactBasicTestCase {
             throw new IllegalArgumentException( "We only convert binary interaction (2 components or a single with stoichiometry 2)" );
         }
 
-        //check Parameter A
-        List<Parameter> parametersA = bi.getInteractorA().getParameters();
-
-        final Parameter parameterA = parametersA.iterator().next();
-        Assert.assertEquals( "temperature", parameterA.getType() );
-        Assert.assertEquals( "302.0", parameterA.getValue() );
-        Assert.assertEquals( "kelvin", parameterA.getUnit() );
-
-        //check Parameter B
-        List<Parameter> parametersB = bi.getInteractorB().getParameters();
-
-        final Parameter parameterB = parametersB.iterator().next();
-        Assert.assertEquals( "temperature", parameterB.getType() );
-        Assert.assertEquals( "30.2 x 10^1", parameterB.getValue() );
-        Assert.assertEquals( "kelvin", parameterB.getUnit() );
-
         //check ParametersInteraction
-        List<Parameter> parametersInteraction = bi.getParameters();
+        List<psidev.psi.mi.tab.model.Parameter> parametersInteraction = bi.getInteractionParameters();
         Assert.assertEquals(1, parametersInteraction.size());
 
-        final Parameter ip = bi.getParameters().iterator().next();
+        final psidev.psi.mi.tab.model.Parameter ip = bi.getInteractionParameters().iterator().next();
 
         Assert.assertEquals("kD", ip.getType());
         Assert.assertEquals(4d, ip.getFactor(), 0d);
@@ -239,7 +217,7 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         //3 institution xrefs 2 pubmeds, 1 psi-mi
         Assert.assertEquals(3, interaction.getOwner().getXrefs().size());
 
-        IntactBinaryInteraction bi = interactionConverter.toBinaryInteraction(interaction);
+        BinaryInteraction bi = interactionConverter.toBinaryInteraction(interaction);
         assertNotNull(bi);
 
         //after filtering pubmeds only 1 psi-mi xref should be there

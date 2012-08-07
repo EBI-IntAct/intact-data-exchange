@@ -17,12 +17,11 @@ package uk.ac.ebi.intact.psimitab.converters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.mi.tab.model.CrossReferenceImpl;
+import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -33,20 +32,22 @@ import java.util.Collection;
  * @version $Id$
  * @since 2.0.0
  */
-public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject> {
+public class CvObjectConverter<O extends CvObject> {
 
     public static final Log logger = LogFactory.getLog( CvObjectConverter.class );
+    private CrossReferenceConverter<? extends CvObjectXref> crossRefConverter;
 
-    public T toCrossReference( Class<T> clazz, O cvObject )  {
+    public CvObjectConverter(){
+        this.crossRefConverter = new CrossReferenceConverter<CvObjectXref>();
+    }
+
+    public CrossReference toCrossReference( O cvObject )  {
         if ( cvObject == null ) {
             throw new IllegalArgumentException( "CvObject must not be null. " );
         }
 
-        if ( clazz == null ) {
-            throw new IllegalArgumentException( "Class must not be null. " );
-        }
-
-        String text = cvObject.getShortLabel();
+        // name of the cv is the fullname
+        String text = cvObject.getFullName()!= null ? cvObject.getFullName() : cvObject.getShortLabel();
         String identity = cvObject.getIdentifier();
 
         if(identity == null ) {
@@ -54,13 +55,13 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
         }
 
         final CvObjectXref idXref = findMatchingIdentityXref(cvObject.getXrefs(), identity); //XrefUtils.getIdentityXref(cvObject, CvDatabase.PSI_MI_MI_REF);
-        String db = (idXref != null)? idXref.getCvDatabase().getShortLabel() : "notspecified";
 
         try {
-            Constructor<T> constructor = clazz.getConstructor( String.class, String.class, String.class );
-            return constructor.newInstance( db, identity, text );
+            CrossReference ref = crossRefConverter.createCrossReference(idXref, false);
+            ref.setText(text);
+            return ref;
         } catch ( Exception e ) {
-            throw new RuntimeException( "An exception occured while building a " + clazz.getSimpleName() + ": " + text, e );
+            throw new RuntimeException( "An exception occured while building a cv object : " + text, e );
         }
     } 
     
@@ -86,15 +87,11 @@ public class CvObjectConverter<T extends CrossReferenceImpl, O extends CvObject>
         if (identityRef == null && !identities.isEmpty()){
             identityRef = identities.iterator().next();
         }
-        
+
         return identityRef;
     }
 
-    public T toCrossReference( O cvObject ) {
-        return toCrossReference( ( Class<T> ) CrossReferenceImpl.class, cvObject );
-    }
-
-    public O fromCrossReference( Class<O> clazz, T reference ) {
+    public O fromCrossReference( Class<O> clazz ) {
         throw new UnsupportedOperationException();
     }
 }

@@ -17,9 +17,9 @@ package uk.ac.ebi.intact.psimitab.converters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.processor.PostProcessorStrategy;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.NotExpandableInteractionException;
 import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
@@ -46,7 +46,7 @@ public class Intact2BinaryInteractionConverter {
 
     private InteractionConverter interactionConverter = new InteractionConverter();
 
-    private PostProcessorStrategy<IntactBinaryInteraction> postProcessor;
+    private PostProcessorStrategy<BinaryInteraction> postProcessor;
                                     
     public Intact2BinaryInteractionConverter() {
         this(new SpokeWithoutBaitExpansion(), null);
@@ -56,7 +56,7 @@ public class Intact2BinaryInteractionConverter {
         this(expansionStrategy, null);
     }
 
-    public Intact2BinaryInteractionConverter(ExpansionStrategy expansionStrategy, PostProcessorStrategy<IntactBinaryInteraction> postProcessor) {
+    public Intact2BinaryInteractionConverter(ExpansionStrategy expansionStrategy, PostProcessorStrategy<BinaryInteraction> postProcessor) {
         this.expansionStrategy = expansionStrategy;
         this.postProcessor = postProcessor;
     }
@@ -80,11 +80,11 @@ public class Intact2BinaryInteractionConverter {
         this.postProcessor = postProssesorStrategy;
     }
 
-    public Collection<IntactBinaryInteraction> convert( Interaction ... interactions ) throws NotExpandableInteractionException {
+    public Collection<BinaryInteraction> convert( Interaction ... interactions ) throws NotExpandableInteractionException {
         return convert(Arrays.asList(interactions));
     }
 
-    public Collection<IntactBinaryInteraction> convert( Collection<Interaction> interactions ) {
+    public Collection<BinaryInteraction> convert( Collection<Interaction> interactions ) {
         if ( interactions == null ) {
             throw new IllegalArgumentException( "Interactions must not be null" );
         }
@@ -93,12 +93,12 @@ public class Intact2BinaryInteractionConverter {
             throw new NullPointerException("No expansion strategy defined");
         }
 
-        Collection<IntactBinaryInteraction> result = new ArrayList<IntactBinaryInteraction>();
+        Collection<BinaryInteraction> result = new ArrayList<BinaryInteraction>(interactions.size());
 
         for ( Interaction interaction : interactions ) {
-            IntactBinaryInteraction bi;
+            BinaryInteraction bi;
 
-            Collection<Interaction> expandedInteractions = null;
+            Collection<BinaryInteraction> expandedInteractions = null;
             try {
                 expandedInteractions = expansionStrategy.expand(interaction);
             } catch ( NotExpandableInteractionException e ) {
@@ -106,15 +106,7 @@ public class Intact2BinaryInteractionConverter {
             }
 
             if( expandedInteractions != null ) {
-                final boolean isExpanded = expandedInteractions.size() > 1;
-                for (Interaction expandedInteraction : expandedInteractions) {
-
-                    bi = interactionConverter.toBinaryInteraction(expandedInteraction, expansionStrategy, isExpanded);
-
-                    if (bi != null) {
-                        result.add(bi);
-                    }
-                }
+                result.addAll(expandedInteractions);
             }
         }
 
@@ -133,13 +125,13 @@ public class Intact2BinaryInteractionConverter {
      * @param interactions the collection of interaction on which to apply post processing.
      * @return a non null collection of interactions.
      */
-    private Collection<IntactBinaryInteraction> doPostProcessing( final Collection<IntactBinaryInteraction> interactions ) {
+    private Collection<BinaryInteraction> doPostProcessing( final Collection<BinaryInteraction> interactions ) {
 
         if ( interactions == null ) {
             throw new IllegalArgumentException( "Interaction cannot be null." );
         }
 
-        Collection<IntactBinaryInteraction> processedInteractions = null;
+        Collection<BinaryInteraction> processedInteractions = null;
 
         // Run post processing (if requested)
         if ( postProcessor != null ) {

@@ -2,15 +2,17 @@ package uk.ac.ebi.intact.psimitab.converters;
 
 import org.junit.Assert;
 import org.junit.Test;
+import psidev.psi.mi.tab.io.PsimiTabWriter;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.builder.PsimiTab;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.XrefUtils;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntactDocumentDefinition;
-import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -35,13 +37,13 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         final Component c = interaction.getComponents().iterator().next();
         c.getInteractor().setAc( "EBI-xxxxxx" );
 
-        Interactor interactor = converter.toMitab( c, interaction );
+        Interactor interactor = converter.intactToMitab(c);
         assertNotNull( interactor );
 
     }
 
     @Test
-    public void toMitabWithAllPropertiesTest(){
+    public void toMitabWithAllPropertiesTest() throws IOException {
 
         Interaction binaryInteraction = getMockBuilder().createInteractionRandomBinary();
         Iterator<Component> i = binaryInteraction.getComponents().iterator();
@@ -85,22 +87,24 @@ public class InteractorConverterTest extends IntactBasicTestCase {
 
         //Database to Mitab
         InteractionConverter interactionConverter = new InteractionConverter();
-        IntactBinaryInteraction intactBi = interactionConverter.toBinaryInteraction( binaryInteraction );
-        Assert.assertTrue("No identifier in PropertyA",checkIfPropertiesHasIdentity(intactBi.getInteractorA().getProperties()));
-        Assert.assertTrue("No identifier in PropertyB",checkIfPropertiesHasIdentity(intactBi.getInteractorB().getProperties()));
+        BinaryInteraction intactBi = interactionConverter.toBinaryInteraction( binaryInteraction );
+        Assert.assertTrue("No identifier in PropertyA",checkIfPropertiesHasIdentity(intactBi.getInteractorA().getXrefs()));
+        Assert.assertTrue("No identifier in PropertyB",checkIfPropertiesHasIdentity(intactBi.getInteractorB().getXrefs()));
 
-        Assert.assertEquals(2,checkNumberOfIdentifiersInProperties(intactBi.getInteractorA().getProperties()));
-        Assert.assertEquals(1,checkNumberOfIdentifiersInProperties(intactBi.getInteractorB().getProperties()));
+        Assert.assertEquals(2,checkNumberOfIdentifiersInProperties(intactBi.getInteractorA().getXrefs()));
+        Assert.assertEquals(1,checkNumberOfIdentifiersInProperties(intactBi.getInteractorB().getXrefs()));
 
-        List<CrossReference> propertiesA = intactBi.getInteractorA().getProperties();
+        List<CrossReference> propertiesA = intactBi.getInteractorA().getXrefs();
         Assert.assertEquals(5,propertiesA.size());
 
-        List<CrossReference> propertiesB = intactBi.getInteractorB().getProperties();
+        List<CrossReference> propertiesB = intactBi.getInteractorB().getXrefs();
         Assert.assertEquals(2,propertiesB.size());
 
-        final IntactDocumentDefinition docDef = new IntactDocumentDefinition();
-        final String line = docDef.interactionToString(intactBi);
-        System.out.println(line);
+        PsimiTabWriter writer = new PsimiTabWriter(PsimiTab.VERSION_2_7);
+        StringWriter stringWriter = new StringWriter();
+        writer.write(intactBi, stringWriter);
+
+        System.out.println(stringWriter.toString());
     }
 
     private boolean checkIfPropertiesHasIdentity(Collection<CrossReference> crossReferences) {
@@ -134,12 +138,13 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         bi.getComponents().iterator().next().setInteractor( protein );
         
         final InteractorConverter converter = new InteractorConverter();
-        final ExtendedInteractor ei = converter.toMitab(  bi.getComponents().iterator().next(), bi );
+        final Interactor ei = converter.intactToMitab(bi.getComponents().iterator().next());
 
         Assert.assertNotNull( ei );
 
         Assert.assertNotNull( ei.getIdentifiers() );
-        Assert.assertEquals( 2, ei.getIdentifiers().size() );
+        Assert.assertEquals( 1, ei.getIdentifiers().size() );
+        Assert.assertEquals( 1, ei.getAlternativeIdentifiers().size() );
 
         Assert.assertNotNull( ei.getAlternativeIdentifiers() );
         Assert.assertEquals( 1, ei.getAlternativeIdentifiers().size() );
@@ -160,20 +165,21 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         bi.getComponents().iterator().next().setInteractor( protein );
 
         final InteractorConverter converter = new InteractorConverter();
-        final ExtendedInteractor ei = converter.toMitab(  bi.getComponents().iterator().next(), bi );
+        final Interactor ei = converter.intactToMitab(bi.getComponents().iterator().next());
 
         Assert.assertNotNull( ei );
 
         Assert.assertNotNull( ei.getIdentifiers() );
-        Assert.assertEquals( 2, ei.getIdentifiers().size() );
+        Assert.assertEquals( 1, ei.getIdentifiers().size() );
 
         Assert.assertNotNull( ei.getAlternativeIdentifiers() );
         Assert.assertEquals( 2, ei.getAlternativeIdentifiers().size() );
+        Assert.assertEquals( 1, ei.getAliases().size() );
 
     }
 
     @Test
-    public void addShortLabelToAlternativeId() {
+    public void addShortLabelToAliases() {
 
         final uk.ac.ebi.intact.model.Interactor interactorA_dna = getMockBuilder().createNucleicAcidRandom();
         final Protein interactorB_protein = getMockBuilder().createProteinRandom();
@@ -187,16 +193,16 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         interactorB_protein.setShortLabel( "iamaprotein" );
 
         InteractionConverter interactionConverter = new InteractionConverter();
-        IntactBinaryInteraction intactBi = interactionConverter.toBinaryInteraction( binaryInteraction );
+        BinaryInteraction intactBi = interactionConverter.toBinaryInteraction( binaryInteraction );
 
-        Assert.assertEquals(1,intactBi.getInteractorA().getAlternativeIdentifiers().size());
-        Assert.assertEquals("iamadna",intactBi.getInteractorA().getAlternativeIdentifiers().iterator().next().getIdentifier());
-        Assert.assertEquals("intact",intactBi.getInteractorA().getAlternativeIdentifiers().iterator().next().getDatabase());
-        Assert.assertEquals("shortlabel",intactBi.getInteractorA().getAlternativeIdentifiers().iterator().next().getText());
+        Assert.assertEquals(1,intactBi.getInteractorA().getAliases().size());
+        Assert.assertEquals("iamadna",intactBi.getInteractorA().getAliases().iterator().next().getName());
+        Assert.assertEquals("intact",intactBi.getInteractorA().getAliases().iterator().next().getDbSource());
+        Assert.assertEquals("shortlabel",intactBi.getInteractorA().getAliases().iterator().next().getAliasType());
 
-        Assert.assertEquals("iamaprotein",intactBi.getInteractorB().getAlternativeIdentifiers().iterator().next().getIdentifier());
-        Assert.assertEquals("uniprotkb",intactBi.getInteractorB().getAlternativeIdentifiers().iterator().next().getDatabase());
-        Assert.assertEquals("shortlabel",intactBi.getInteractorB().getAlternativeIdentifiers().iterator().next().getText());
+        Assert.assertEquals("iamaprotein",intactBi.getInteractorB().getAliases().iterator().next().getName());
+        Assert.assertEquals("uniprotkb",intactBi.getInteractorB().getAliases().iterator().next().getDbSource());
+        Assert.assertEquals("shortlabel",intactBi.getInteractorB().getAliases().iterator().next().getAliasType());
 
     }
 }

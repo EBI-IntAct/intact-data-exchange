@@ -17,10 +17,11 @@ package uk.ac.ebi.intact.psimitab.converters.expansion;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.util.InteractionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +41,8 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
      */
     public static final Log logger = LogFactory.getLog(SpokeExpansion.class);
 
-    public static final String EXPANSION_NAME = "Spoke";
+    public static final String EXPANSION_NAME = "spoke expansion";
+    public static final String EXPANSION_MI = "MI:1060";
 
     ///////////////////////////////////////////
     // Implements ExpansionStrategy contract
@@ -53,54 +55,80 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
      * @return a non null collection of interaction, in case the expansion is not possible, we may return an empty
      *         collection.
      */
-    public Collection<Interaction> expand(Interaction interaction) throws NotExpandableInteractionException{
-        if (!isExpandable(interaction)) {
+    public Collection<BinaryInteraction> expand(Interaction interaction) throws NotExpandableInteractionException{
+        if (interaction == null) {
             throw new NotExpandableInteractionException("Interaction is not expandable: "+interaction);
         }
 
-        Collection<Interaction> interactions = new ArrayList<Interaction>();
-        Collection<Component> components = interaction.getComponents();
+        InteractionCategory category = findInteractionCategory(interaction);
 
-        if (InteractionUtils.isBinaryInteraction(interaction)) {
+        if (category == null){
+            return Collections.EMPTY_LIST;
+        }
 
-            logger.debug("Interaction was binary, no further processing involved.");
-            if (interaction.getComponents().size() == 1) {
-                // single Interaction
-                Component singleComponent = components.iterator().next();
+        Collection<BinaryInteraction> interactions = new ArrayList<BinaryInteraction>();
 
-                if (singleComponent.getStoichiometry() >= 2 ||
-                        containsRole(singleComponent.getExperimentalRoles(), new String[] {CvExperimentalRole.SELF_PSI_REF, PUTATIVE_SELF_PSI_REF})) {
-                    Interaction newSelfInteraction = buildInteraction(interaction, singleComponent, singleComponent);
-                    interactions.add(newSelfInteraction);
-                }
-            } else {
-                interactions.add(interaction);
+        if (category.equals(InteractionCategory.binary)){
+            logger.debug( "Interaction was binary, no further processing involved." );
+            BinaryInteraction binary = interactionConverter.toBinaryInteraction(interaction);
+
+            if (binary != null){
+                interactions.add( binary );
             }
+        }
+        else if (category.equals(InteractionCategory.self_intra_molecular)){
+            logger.debug( "Interaction was self/intra molecular, no further processing involved." );
+            BinaryInteraction binary2 = interactionConverter.toBinaryInteraction(interaction);
 
-        } else {
-            if (logger.isDebugEnabled()) logger.debug(components.size() + " component(s) found.");
+            if (binary2 != null){
+                interactions.add( binary2 );
+            }
+        }
+        else if (category.equals(InteractionCategory.self_inter_molecular)){
+            logger.debug( "Interaction was self/inter molecular, we duplicate interactor." );
+            BinaryInteraction binaryTemplateSelf = this.interactionConverter.processInteractionDetailsWithoutInteractors(interaction);
+            if (binaryTemplateSelf == null){
+                return Collections.EMPTY_LIST;
+            }
+            Component uniqueComponent = interaction.getComponents().iterator().next();
+            BinaryInteraction newInteraction = buildInteraction( binaryTemplateSelf, uniqueComponent, uniqueComponent );
+
+            // reset stoichiometry of duplicated interactor to 0
+            Interactor interactorB = newInteraction.getInteractorB();
+            interactorB.getStoichiometry().clear();
+            interactorB.getStoichiometry().add(0);
+
+            interactions.add( newInteraction );
+        }
+        else{
+            logger.debug( "Interaction was n-ary, will be expanded" );
+
+            BinaryInteraction binaryTemplate = this.interactionConverter.processInteractionDetailsWithoutInteractors(interaction);
+
+            if (binaryTemplate == null){
+                return Collections.EMPTY_LIST;
+            }
 
             Component baitComponent = interaction.getBait();
 
             if (baitComponent != null) {
 
-                Collection<Component> preyComponents = new ArrayList<Component>();
-                preyComponents.addAll(components);
+                Collection<Component> preyComponents = new ArrayList<Component>(interaction.getComponents().size());
+                preyComponents.addAll(interaction.getComponents());
                 preyComponents.remove(baitComponent);
 
                 for (Component preyComponent : preyComponents) {
-                    Interaction newInteraction = buildInteraction(interaction, baitComponent, preyComponent);
+                    BinaryInteraction newInteraction = buildInteraction(binaryTemplate, baitComponent, preyComponent);
                     interactions.add(newInteraction);
                 }
             } else {
-                Collection<Interaction> expandedWithoutBait = processExpansionWithoutBait(interaction);
+                Collection<BinaryInteraction> expandedWithoutBait = processExpansionWithoutBait(interaction, binaryTemplate);
                 interactions.addAll(expandedWithoutBait);
 
             }
-        }
-        if (logger.isDebugEnabled())
-            logger.debug("After expansion: " + interactions.size() + " binary interaction(s) were generated.");
 
+            logger.debug( "After expansion: " + interactions.size() + " binary interaction(s) were generated." );
+        }
 
         return interactions;
     }
@@ -130,7 +158,12 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
         return EXPANSION_NAME;
     }
 
-    protected Collection<Interaction> processExpansionWithoutBait(Interaction interaction) {
+    @Override
+    public String getMI() {
+        return EXPANSION_MI;
+    }
+
+    protected Collection<BinaryInteraction> processExpansionWithoutBait(Interaction interaction, BinaryInteraction interactionTemplate) {
         if (logger.isDebugEnabled())
             logger.debug("Could not find a bait problem for this interaction.");
         return Collections.EMPTY_LIST;

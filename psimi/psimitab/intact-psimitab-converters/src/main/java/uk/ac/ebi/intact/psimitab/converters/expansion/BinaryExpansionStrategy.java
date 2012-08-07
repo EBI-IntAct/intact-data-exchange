@@ -15,12 +15,17 @@
  */
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.BinaryInteractionImpl;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.model.Component;
+import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.InteractionImpl;
+import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
+import uk.ac.ebi.intact.psimitab.converters.InteractorConverter;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -34,37 +39,50 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
 
     protected static final String PUTATIVE_SELF_PSI_REF = "MI:0898";
 
+    protected InteractionConverter interactionConverter;
+    protected InteractorConverter interactorConverter;
+
+    public BinaryExpansionStrategy(){
+        this.interactionConverter = new InteractionConverter();
+        this.interactorConverter = new InteractorConverter();
+    }
+
     /**
      * Builds a new interaction object based the given interaction template.
      * <br/> Components are replaced by the two given ones.
      *
-     * @param interaction the interaction template.
+     * @param interaction the interaction template (no interactors, only interaction info).
      * @param c1          component to add to the newly created interaction.
      * @param c2          component to add to the newly created interaction.
      * @return a new interaction having c1 and c2 as component.
      */
-    protected Interaction buildInteraction( Interaction interaction, Component c1, Component c2 ) {
-        String shortLabel = c1.getInteractor().getShortLabel() + "-" + c2.getInteractor().getShortLabel();
+    protected BinaryInteraction buildInteraction( BinaryInteraction interaction, Component c1, Component c2 ) {
+        Interactor interactorA = interactorConverter.intactToMitab(c1);
+        Interactor interactorB = interactorConverter.intactToMitab(c2);
 
-        Interaction newInteraction = new InteractionImpl( interaction.getExperiments(),
-                                                          interaction.getCvInteractionType(),
-                                                          interaction.getCvInteractorType(),
-                                                          shortLabel,
-                                                          interaction.getOwner() );
-        newInteraction.setAc( interaction.getAc() );
-        Collection<Component> components = new ArrayList<Component>( 2 );
-        components.add( c1 );
-        components.add( c2 );
-        newInteraction.setComponents( components );
+        BinaryInteraction expandedInteraction = new BinaryInteractionImpl(interactorA, interactorB);
 
-        newInteraction.setXrefs(interaction.getXrefs());
-        newInteraction.setAliases(interaction.getAliases());
-        newInteraction.setAnnotations(interaction.getAnnotations());
-        newInteraction.setParameters(interaction.getParameters());
-        newInteraction.setUpdated(interaction.getUpdated());
-        //TODO Check if they are all the fields for mitab 2.7
+        // copy the fields of the template binary interaction. It is not thread safe
+        if (interaction != null){
+            expandedInteraction.setAnnotations(interaction.getInteractionAnnotations());
+            expandedInteraction.setAuthors(interaction.getAuthors());
+            expandedInteraction.setChecksums(interaction.getInteractionChecksums());
+            expandedInteraction.getComplexExpansion().add(new CrossReferenceImpl(CvDatabase.PSI_MI, getMI(), getName()));
+            expandedInteraction.setConfidenceValues(interaction.getConfidenceValues());
+            expandedInteraction.setCreationDate(interaction.getCreationDate());
+            expandedInteraction.setDetectionMethods(interaction.getDetectionMethods());
+            expandedInteraction.setHostOrganism(interaction.getHostOrganism());
+            expandedInteraction.setInteractionAcs(interaction.getInteractionAcs());
+            expandedInteraction.setInteractionTypes(interaction.getInteractionTypes());
+            expandedInteraction.setPublications(interaction.getPublications());
+            expandedInteraction.setSourceDatabases(interaction.getSourceDatabases());
+            expandedInteraction.setXrefs(interaction.getInteractionXrefs());
+            expandedInteraction.setParameters(interaction.getInteractionParameters());
+            expandedInteraction.setUpdateDate(interaction.getUpdateDate());
+            expandedInteraction.setNegativeInteraction(interaction.isNegativeInteraction());
+        }
 
-        return newInteraction;
+        return expandedInteraction;
     }
 
     public boolean isExpandable(Interaction interaction) {
@@ -94,5 +112,28 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
             }
         }
         return false;
+    }
+
+    @Override
+    public InteractionCategory findInteractionCategory(Interaction interaction) {
+        if (interaction.getComponents().size() == 1) {
+            Component c = interaction.getComponents().iterator().next();
+
+            // we have a self interaction but inter molecular
+            if (c.getStoichiometry() >= 2 || (c.getStoichiometry() == 0 && !containsRole(c.getExperimentalRoles(), new String[]{CvExperimentalRole.SELF_PSI_REF, PUTATIVE_SELF_PSI_REF}))){
+                return InteractionCategory.self_inter_molecular;
+            }
+            else {
+                return InteractionCategory.self_inter_molecular;
+            }
+        }
+        else if (interaction.getComponents().size() == 2){
+            return InteractionCategory.binary;
+        }
+        else if (interaction.getComponents().size() > 2){
+            return InteractionCategory.n_ary;
+        }
+
+        return null;
     }
 }

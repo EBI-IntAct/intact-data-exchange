@@ -1,10 +1,7 @@
 package uk.ac.ebi.intact.psimitab.converters;
 
 import org.junit.Test;
-import psidev.psi.mi.tab.model.InteractionDetectionMethod;
-import psidev.psi.mi.tab.model.InteractionDetectionMethodImpl;
-import psidev.psi.mi.tab.model.InteractionType;
-import psidev.psi.mi.tab.model.InteractionTypeImpl;
+import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvInteraction;
@@ -28,7 +25,7 @@ public class CvObjectConverterTest extends IntactBasicTestCase {
         CvObjectConverter converter = new CvObjectConverter();
 
         CvInteractionType t = getMockBuilder().createCvObject( CvInteractionType.class, "MI:0407", "direct interaction" );
-        InteractionType interactionType = ( InteractionType ) converter.toCrossReference( InteractionTypeImpl.class, t );
+        CrossReference interactionType = converter.toCrossReference( t );
         assertNotNull( interactionType );
         assertEquals( "psi-mi", interactionType.getDatabase() );
         assertEquals( "MI:0407", interactionType.getIdentifier() );
@@ -41,7 +38,7 @@ public class CvObjectConverterTest extends IntactBasicTestCase {
 
         CvInteraction t = getMockBuilder().createCvObject( CvInteraction.class, "MI:0027", "cosedimentation" );
 
-        InteractionDetectionMethod detectionMethod = ( InteractionDetectionMethod ) converter.toCrossReference( InteractionDetectionMethodImpl.class, t );
+        CrossReference detectionMethod = converter.toCrossReference( t );
         assertNotNull( detectionMethod );
         assertEquals( "psi-mi", detectionMethod.getDatabase() );
         assertEquals( "MI:0027", detectionMethod.getIdentifier() );
@@ -55,7 +52,7 @@ public class CvObjectConverterTest extends IntactBasicTestCase {
         CvInteraction t = CvObjectUtils.createCvObject(getMockBuilder().getInstitution(), CvInteraction.class, "MOD:00001", "test-mod");
         t.getXrefs().iterator().next().setCvDatabase(getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.PSI_MOD_MI_REF, CvDatabase.PSI_MOD));
 
-        InteractionDetectionMethod detectionMethod = ( InteractionDetectionMethod ) converter.toCrossReference( InteractionDetectionMethodImpl.class, t );
+        CrossReference detectionMethod = converter.toCrossReference( t );
         assertNotNull( detectionMethod );
         assertEquals( "psi-mod", detectionMethod.getDatabase() );
         assertEquals( "MOD:00001", detectionMethod.getIdentifier() );

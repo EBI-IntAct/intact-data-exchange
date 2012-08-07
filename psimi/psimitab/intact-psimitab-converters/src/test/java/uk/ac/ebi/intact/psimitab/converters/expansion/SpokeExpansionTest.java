@@ -1,6 +1,8 @@
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
+import junit.framework.Assert;
 import org.junit.Test;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
@@ -8,7 +10,6 @@ import uk.ac.ebi.intact.model.Interaction;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -21,7 +22,6 @@ import static org.junit.Assert.*;
  * @version 1.0
  */
 public class SpokeExpansionTest extends IntactBasicTestCase {
-
     @Test
     public void expandTest_1() throws Exception{
 
@@ -31,20 +31,22 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
 
         Interaction interaction = getMockBuilder().createInteraction( baitComponent, preyComponent1, preyComponent2 );
         SpokeExpansion spokeExpansion = new SpokeExpansion();
-        Collection<Interaction> interactions = spokeExpansion.expand( interaction );
+        Collection<BinaryInteraction> interactions = spokeExpansion.expand( interaction );
         assertNotNull( interactions );
         assertEquals( 2, interactions.size() );
 
-        for ( Interaction newInteraction : interactions ){
-            Collection<Component> components = newInteraction.getComponents();
-            assertEquals(2, components.size());
-            Iterator<Component> iterator = components.iterator();
+        for ( BinaryInteraction newInteraction : interactions ){
+            Assert.assertNotNull(newInteraction.getInteractorA());
+            Assert.assertNotNull(newInteraction.getInteractorB());
             boolean baitFound = false, preyFound = false;
-            while (iterator.hasNext()) {
-                String role = iterator.next().getCvExperimentalRole().getShortLabel();
-                if (role.equals( CvExperimentalRole.BAIT)) baitFound = true;
-                if (role.equals( CvExperimentalRole.PREY)) preyFound = true;
-            }
+
+            String roleA = newInteraction.getInteractorA().getExperimentalRoles().iterator().next().getText();
+            if (roleA.equals( CvExperimentalRole.BAIT)) baitFound = true;
+            if (roleA.equals( CvExperimentalRole.PREY)) preyFound = true;
+            String roleB = newInteraction.getInteractorB().getExperimentalRoles().iterator().next().getText();
+            if (roleB.equals( CvExperimentalRole.BAIT)) baitFound = true;
+            if (roleB.equals( CvExperimentalRole.PREY)) preyFound = true;
+
             assertTrue( baitFound && preyFound);
         }
     }
@@ -57,7 +59,7 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
 
         Interaction interaction = getMockBuilder().createInteraction( baitComponent, preyComponent );
         SpokeExpansion spokeExpansion = new SpokeExpansion();
-        Collection<Interaction> interactions = spokeExpansion.expand( interaction );
+        Collection<BinaryInteraction> interactions = spokeExpansion.expand( interaction );
         assertNotNull( interactions );
         assertEquals( 1, interactions.size() );
     }
@@ -69,7 +71,7 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
         Interaction interaction = getMockBuilder().createInteraction( "neutral1", "neutral2", "neutral3" );
         
         SpokeExpansion spokeExpansion = new SpokeExpansion();
-        Collection<Interaction> interactions = spokeExpansion.expand( interaction );
+        Collection<BinaryInteraction> interactions = spokeExpansion.expand( interaction );
     }
 
     @Test
@@ -93,7 +95,7 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
 
         assertTrue(spokeExpansion.isExpandable(interaction));
 
-        Collection<Interaction> interactions = spokeExpansion.expand( interaction );
+        Collection<BinaryInteraction> interactions = spokeExpansion.expand( interaction );
         assertNotNull( interactions );
         assertEquals( 1, interactions.size() );
     }
@@ -102,7 +104,7 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
     @Test
     public void getNameTest() throws Exception {
         SpokeExpansion spokeExpansion = new SpokeExpansion();
-        assertEquals( "Spoke", spokeExpansion.getName() );
+        assertEquals( "spoke expansion", spokeExpansion.getName() );
     }
 
 }

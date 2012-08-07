@@ -19,14 +19,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Confidence;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Annotation;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Parameter;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
-import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
+import uk.ac.ebi.intact.model.util.InstitutionUtils;
+import uk.ac.ebi.intact.model.util.InteractionUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Interaction Converter.
@@ -41,215 +43,173 @@ public class InteractionConverter {
 
     private static final String TAXID = "taxid";
 
-    private CvObjectConverter cvObjectConverter = new CvObjectConverter();
+    private CvObjectConverter cvObjectConverter;
 
-    private CrossReferenceConverter xConverter = new CrossReferenceConverter();
+    private CrossReferenceConverter xConverter;
+
+    private ConfidenceConverter confidenceConverter;
+    private ParameterConverter parameterConverter;
+    private AnnotationConverter annotationConverter;
+    private ExperimentConverter experimentConverter;
+    private InteractorConverter interactorConverter;
+
+    public static String CRC = "intact-crc";
 
     private CrossReference defaultSourceDatabase = new CrossReferenceImpl( "psi-mi", "MI:0469", "intact" );
+
+    public InteractionConverter(){
+        this.confidenceConverter = new ConfidenceConverter();
+        cvObjectConverter = new CvObjectConverter();
+        xConverter = new CrossReferenceConverter();
+        parameterConverter = new ParameterConverter();
+        annotationConverter = new AnnotationConverter();
+        experimentConverter = new ExperimentConverter();
+        interactorConverter = new InteractorConverter();
+    }
 
     ///////////////////////////
     // Getters & Setters
 
-    public IntactBinaryInteraction toBinaryInteraction( Interaction interaction ) {
-        return toBinaryInteraction( interaction, null, false );
-    }
-
-    public IntactBinaryInteraction toBinaryInteraction( Interaction interaction,
-                                                        ExpansionStrategy expansionStrategy,
-                                                        boolean isExpanded ) {
+    public BinaryInteraction toBinaryInteraction( Interaction interaction) {
 
         if ( interaction == null ) {
             throw new IllegalArgumentException( "Interaction must not be null" );
         }
 
         final Collection<Component> components = interaction.getComponents();
-        if ( components.size() != 2 ) {
-            throw new IllegalArgumentException( "We only convert binary interaction (2 components or a single with stoichiometry 2)" );
+        if ( components.size() > 2 || components.size() == 0 ) {
+            throw new IllegalArgumentException( "We only convert interaction composed of 2 components or only one" );
         }
 
         Iterator<Component> iterator = components.iterator();
-        final Component componentA = iterator.next();
-        final Component componentB = iterator.next();
+        Component componentA = iterator.next();
+        Component componentB = null;
+        if (iterator.hasNext()){
+            componentB = iterator.next();
+        }
 
         InteractorConverter interactorConverter = new InteractorConverter();
 
-        ExtendedInteractor interactorA = interactorConverter.toMitab( componentA, interaction );
-        ExtendedInteractor interactorB = interactorConverter.toMitab( componentB, interaction );
+        psidev.psi.mi.tab.model.Interactor interactorA = interactorConverter.intactToMitab(componentA);
+        psidev.psi.mi.tab.model.Interactor interactorB = interactorConverter.intactToMitab(componentB);
 
-        IntactBinaryInteraction bi = new IntactBinaryInteraction( interactorA, interactorB );
+        BinaryInteraction bi = processInteractionDetailsWithoutInteractors(interaction);
 
-        final Collection<Experiment> experiments = interaction.getExperiments();
-
-        List<Author> authors = new ArrayList<Author>();
-        List<CrossReference> detectionMethods = new ArrayList<CrossReference>();
-        Set<CrossReference> publications = new HashSet<CrossReference>();
-        List<CrossReference> hostOrganisms = new ArrayList<CrossReference>();
-        List<String> datasets = new ArrayList<String>();
-
-        if ( experiments != null ) {
-            for (Experiment experiment : experiments) {
-                if (authors.isEmpty()) {
-                    Annotation authorAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.AUTHOR_LIST_MI_REF);
-                    Annotation yearAnnot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(experiment, CvTopic.PUBLICATION_YEAR_MI_REF);
-
-                    String authorText = "-";
-
-                    if (authorAnnot != null) {
-                        authorText = authorAnnot.getAnnotationText().split(" ")[0] + " et al.";
-                    }
-
-                    if (yearAnnot != null) {
-                        authorText = authorText+" ("+yearAnnot.getAnnotationText()+")";
-                    }
-
-                    authors.add(new AuthorImpl(authorText));
-                }
-
-                // det methods
-                if (experiment.getCvInteraction() != null) {
-                    detectionMethods.add( cvObjectConverter.toCrossReference(CrossReferenceImpl.class, experiment.getCvInteraction()));
-                }
-
-                // publications and imex at the publication level
-                Collection<Xref> expAndPublicationXrefs = new HashSet<Xref>();
-                expAndPublicationXrefs.addAll(experiment.getXrefs());
-
-                if (experiment.getPublication() != null) {
-                    expAndPublicationXrefs.addAll(experiment.getPublication().getXrefs());
-                }
-
-                for (Xref xref : expAndPublicationXrefs) {
-                    if (xref.getCvXrefQualifier() != null && xref.getCvDatabase().getShortLabel() != null) {
-                        // publications
-                        if (CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
-                            CrossReference publication = new CrossReferenceImpl(xref.getCvDatabase().getShortLabel(), xref.getPrimaryId());
-                            publications.add(publication);
-                        }
-                        // imexId
-                        else if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
-                            CrossReference publication =  new CrossReferenceImpl(xref.getCvDatabase().getShortLabel(), xref.getPrimaryId());
-                            publications.add(publication);
-                        }
-                    }
-                }
-
-                // host organism
-                String id = experiment.getBioSource().getTaxId();
-                if (id != null) {
-                    String text = experiment.getBioSource().getShortLabel();
-                    hostOrganisms.add( new CrossReferenceImpl(TAXID, id, text));
-                }
-
-                // datasets
-                for ( Annotation annotation : experiment.getAnnotations() ) {
-                    if ( CvTopic.DATASET_MI_REF.equals(annotation.getCvTopic().getIdentifier()) ) {
-                        datasets.add( annotation.getAnnotationText() );
-                    }
-                }
-
-                // imex identifiers
-
-            }
-
-
-        }
-
-        bi.setAuthors( authors );
-        bi.setDetectionMethods( detectionMethods );
-        bi.setPublications( new ArrayList<CrossReference>(publications) );
-        bi.setHostOrganism( hostOrganisms );
-        bi.setDataset( datasets );
-
-
-        // set interaction acs list
-        List<CrossReference> interactionAcs = new ArrayList<CrossReference>();
-        if ( interaction.getAc() != null ) {
-            interactionAcs.add( new CrossReferenceImpl( CvDatabase.INTACT, interaction.getAc() ) );
-        }
-
-        // imex
-        for (InteractorXref xref : interaction.getXrefs()) {
-            if (xref.getCvXrefQualifier() != null) {
-                if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier()) ||
-                        CvXrefQualifier.IMEX_EVIDENCE_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
-                    interactionAcs.add(new CrossReferenceImpl( CvDatabase.IMEX, xref.getPrimaryId() ));
-                }
-            }
-        }
-
-        bi.setInteractionAcs( interactionAcs );
-
-        // set interaction type list
-        if ( interaction.getCvInteractionType() != null ) {
-            List<CrossReference> interactionTypes = new ArrayList<CrossReference>();
-            interactionTypes.add( cvObjectConverter.toCrossReference( CrossReferenceImpl.class,interaction.getCvInteractionType() ) );
-            bi.setInteractionTypes( interactionTypes );
-        }
-
-        // set source database list
-        if ( interaction.getOwner() != null) {
-            List<CrossReference> sourceDatabases = xConverter.toCrossReferences( interaction.getOwner().getXrefs(), true, false,CvDatabase.PSI_MI_MI_REF );
-
-            if ( !sourceDatabases.isEmpty() ){
-                for (CrossReference sourceXref : sourceDatabases) {
-                    sourceXref.setText(interaction.getOwner().getShortLabel());
-                }
-
-            } else {
-                String label = interaction.getOwner().getShortLabel();
-
-                if (label == null || label.isEmpty()) {
-                    label = "not specified";
-                }
-
-                label = label.toLowerCase();
-
-                CrossReference sourceXref = new CrossReferenceImpl("unknown", label, label);
-                sourceDatabases.add(sourceXref);
-
-            }
-
-            bi.setSourceDatabases( sourceDatabases );
-        }
-
-        // set interaction confidences
-        if (!interaction.getConfidences().isEmpty()){
-            List<Confidence> confidences = new ArrayList<Confidence>();
-
-            for (uk.ac.ebi.intact.model.Confidence conf : interaction.getConfidences()){
-                if (conf.getValue() != null){
-                    String type = "unknown";
-
-                    if (conf.getCvConfidenceType() != null){
-                        type = conf.getCvConfidenceType().getShortLabel();
-                    }
-
-                    Confidence mitabConf = new ConfidenceImpl(type, conf.getValue());
-                    confidences.add(mitabConf);
-                }
-            }
-
-            bi.setConfidenceValues(confidences);
-        }
-
-        // process extended
-
-        // expansion
-        if (expansionStrategy != null && isExpanded) {
-            bi.getExpansionMethods().add( expansionStrategy.getName() );
-        }
-
-        //parameters for interaction
-        for ( InteractionParameter interactionParameter : interaction.getParameters() ) {
-            uk.ac.ebi.intact.psimitab.model.Parameter parameterInteraction =
-                    new uk.ac.ebi.intact.psimitab.model.Parameter(interactionParameter.getCvParameterType().getShortLabel(),
-                            interactionParameter.getFactor(),
-                            interactionParameter.getBase(),
-                            interactionParameter.getExponent(),
-                            (interactionParameter.getCvParameterUnit() != null? interactionParameter.getCvParameterUnit().getShortLabel() : null));
-            bi.getParameters().add( parameterInteraction );
-        }
+        bi.setInteractorA(interactorA);
+        bi.setInteractorB(interactorB);
 
         return bi;
+    }
+
+    public BinaryInteraction processInteractionDetailsWithoutInteractors(Interaction interaction){
+
+        if ( interaction == null ) {
+            throw new IllegalArgumentException( "Interaction must not be null" );
+        }
+
+        BinaryInteraction binary = new BinaryInteractionImpl(null, null);
+        // process interaction type
+        if (interaction.getCvInteractionType() != null){
+            CrossReference type = cvObjectConverter.toCrossReference(interaction.getCvInteractionType());
+
+            if (type != null){
+                binary.getInteractionTypes().add(type);
+            }
+        }
+
+        // convert confidences
+        if (!interaction.getConfidences().isEmpty()){
+
+            for (uk.ac.ebi.intact.model.Confidence conf : interaction.getConfidences()){
+                Confidence confField = confidenceConverter.intactToCalimocho(conf);
+
+                if (confField != null){
+                    binary.getConfidenceValues().add(confField);
+                }
+            }
+        }
+
+        // process AC
+        if (interaction.getAc() != null){
+            CrossReference id = new CrossReferenceImpl();
+
+            id.setDatabase(CvDatabase.INTACT);
+            id.setIdentifier(interaction.getAc());
+
+            if (interaction.getOwner() != null){
+                Institution institution = interaction.getOwner();
+
+                CvDatabase database = InstitutionUtils.retrieveCvDatabase(IntactContext.getCurrentInstance(), institution);
+
+                if (database != null && database.getShortLabel() != null){
+                    id.setDatabase(database.getShortLabel());
+                }
+            }
+
+            binary.getInteractionAcs().add(id);
+        }
+
+        // process experiments
+        for (Experiment exp : interaction.getExperiments()){
+            experimentConverter.intactToCalimocho(exp, binary);
+        }
+
+        //process xrefs
+        Collection<InteractorXref> interactionRefs = interaction.getXrefs();
+
+        if (!interactionRefs.isEmpty()){
+
+            // convert xrefs
+            for (InteractorXref ref : interactionRefs){
+
+                CrossReference refField = xConverter.createCrossReference(ref, true);
+                if (refField != null){
+                    binary.getInteractionXrefs().add(refField);
+                }
+            }
+        }
+
+        //process annotations (could have been processed with experiments)
+        Collection<Annotation>  annotations = AnnotatedObjectUtils.getPublicAnnotations(interaction);
+        if (!annotations.isEmpty()){
+
+            for (Annotation annots : annotations){
+                psidev.psi.mi.tab.model.Annotation annotField = annotationConverter.intactToMitab(annots);
+
+                if (annotField != null){
+                    binary.getInteractionAnnotations().add(annotField);
+                }
+            }
+        }
+
+        //process parameters
+        if (!interaction.getParameters().isEmpty()){
+
+            for (Parameter param : interaction.getParameters()){
+                psidev.psi.mi.tab.model.Parameter paramField = parameterConverter.intactToMitab(param);
+
+                if (paramField != null){
+                    binary.getInteractionParameters().add(paramField);
+                }
+            }
+        }
+
+        //process checksum
+        if (interaction.getCrc() != null){
+            CrossReference crc = new CrossReferenceImpl(CRC, interaction.getCrc());
+            binary.getInteractionChecksums().add(crc);
+        }
+
+        //process negative
+        if (InteractionUtils.isNegative(interaction)){
+            binary.setNegativeInteraction(true);
+        }
+
+        // process update date
+        if (interaction.getUpdated() != null){
+            binary.getUpdateDate().add(interaction.getUpdated());
+        }
+
+        return binary;
     }
 }

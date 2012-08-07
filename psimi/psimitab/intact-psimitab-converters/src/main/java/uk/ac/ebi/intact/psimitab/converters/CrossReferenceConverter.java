@@ -21,7 +21,6 @@ import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.Xref;
-import uk.ac.ebi.intact.model.CvDatabase;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +36,7 @@ import java.util.List;
 public class CrossReferenceConverter<T extends Xref> {
 
     public static final Log logger = LogFactory.getLog( CrossReferenceConverter.class );
+    public static String DATABASE_UNKNOWN = "unknown";
 
     /**
      * Converts a Collection of Xrefs into a suitable format for PSIMITAB
@@ -51,7 +51,7 @@ public class CrossReferenceConverter<T extends Xref> {
             throw new IllegalArgumentException("Xref must not be null. ");
         }
 
-        List<CrossReference> crossReferences = new ArrayList<CrossReference>();
+        List<CrossReference> crossReferences = new ArrayList<CrossReference>(xrefs.size());
 
         for (Xref xref : xrefs) {
 
@@ -87,7 +87,7 @@ public class CrossReferenceConverter<T extends Xref> {
             throw new NullPointerException("You must give a non null databaseFilterMiRef");
         }
 
-        List<CrossReference> crossReferences = new ArrayList<CrossReference>();
+        List<CrossReference> crossReferences = new ArrayList<CrossReference>(xrefs.size());
 
         for (Xref xref : xrefs) {
 
@@ -120,7 +120,7 @@ public class CrossReferenceConverter<T extends Xref> {
             throw new IllegalArgumentException("Xref must not be null. ");
         }
 
-        List<CrossReference> crossReferences = new ArrayList<CrossReference>();
+        List<CrossReference> crossReferences = new ArrayList<CrossReference>(xrefs.size());
 
         for (Xref xref : xrefs) {
             CrossReference ref = createCrossReference(xref, withText);
@@ -129,9 +129,9 @@ public class CrossReferenceConverter<T extends Xref> {
         return crossReferences;
     }
 
-    private CrossReference createCrossReference(Xref xref, boolean withText) {
+    public CrossReference createCrossReference(Xref xref, boolean withText) {
         CrossReference ref = null;
-        String db = xref.getCvDatabase().getShortLabel();
+        String db = xref.getCvDatabase() != null ? xref.getCvDatabase().getShortLabel() : DATABASE_UNKNOWN;
         String id = xref.getPrimaryId();
 
         if (id != null && db != null) {

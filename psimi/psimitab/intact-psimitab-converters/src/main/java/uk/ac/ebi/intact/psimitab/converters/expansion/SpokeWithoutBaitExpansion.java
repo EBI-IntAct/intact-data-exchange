@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.psimitab.converters.expansion;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
@@ -43,11 +44,15 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
     // Implements ExpansionStrategy contract
 
     @Override
-    protected Collection<Interaction> processExpansionWithoutBait(Interaction interaction) {
-        List<Interaction> interactions = new ArrayList<Interaction>();
+    protected Collection<BinaryInteraction> processExpansionWithoutBait(Interaction interaction, BinaryInteraction interactionTemplate) {
+        List<BinaryInteraction> interactions = new ArrayList<BinaryInteraction>(interaction.getComponents().size());
         // bait was null
         if (logger.isDebugEnabled())
             logger.debug("Could not find a bait component. Pick a component arbitrarily: 1st by alphabetical order.");
+
+        if (interactionTemplate == null){
+            return Collections.EMPTY_LIST;
+        }
 
         // Collect and sort participants by name
         List<Component> sortedComponents = sortComponents(interaction.getComponents());
@@ -56,16 +61,11 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
         Component fakeBait = sortedComponents.get(0);
 
         // Build interactions
-        if( sortedComponents.size() == 1 && fakeBait.getStoichiometry() >= 2 ) {
-            Interaction spokeInteraction = buildInteraction(interaction, fakeBait, fakeBait);
-            interactions.add(spokeInteraction);
-        } else {
-            for (int i = 1; i < sortedComponents.size(); i++) {
-                Component fakePrey = sortedComponents.get(i);
+        for (int i = 1; i < sortedComponents.size(); i++) {
+            Component fakePrey = sortedComponents.get(i);
 
-                Interaction spokeInteraction = buildInteraction(interaction, fakeBait, fakePrey);
-                interactions.add(spokeInteraction);
-            }
+            BinaryInteraction spokeInteraction = buildInteraction(interactionTemplate, fakeBait, fakePrey);
+            interactions.add(spokeInteraction);
         }
 
         return interactions;

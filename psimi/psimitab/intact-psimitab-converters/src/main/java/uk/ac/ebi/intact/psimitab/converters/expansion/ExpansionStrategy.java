@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.model.Interaction;
 
 import java.util.Collection;
@@ -35,7 +36,7 @@ public interface ExpansionStrategy {
      * @return a non null collection of interaction, in case the expansion is not possible, we may return an empty
      *         collection.
      */
-    public Collection<Interaction> expand( Interaction interaction ) throws NotExpandableInteractionException;
+    public Collection<BinaryInteraction> expand( Interaction interaction ) throws NotExpandableInteractionException;
 
     /**
      * Gets the method of the ExpansionStrategy
@@ -44,10 +45,14 @@ public interface ExpansionStrategy {
      */
     public String getName();
 
+    public String getMI();
+
     /**
      * Returns true if the interaction can be expanded
      * @param interaction The interaction to check
      * @return true if it can be expanded
      */
     public boolean isExpandable( Interaction interaction );
+
+    public InteractionCategory findInteractionCategory(Interaction interaction);
 }

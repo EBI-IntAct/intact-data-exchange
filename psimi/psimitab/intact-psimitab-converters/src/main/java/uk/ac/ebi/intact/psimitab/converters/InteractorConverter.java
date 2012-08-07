@@ -19,13 +19,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.Alias;
 import psidev.psi.mi.tab.model.*;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Annotation;
+import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.Feature;
 import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.model.util.InstitutionUtils;
 import uk.ac.ebi.intact.model.util.ProteinUtils;
-import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
 import java.util.*;
 
@@ -42,9 +43,15 @@ public class InteractorConverter {
 
     private static final Log log = LogFactory.getLog( InteractorConverter.class );
 
-    private CrossReferenceConverter<InteractorXref> xRefConverter = new CrossReferenceConverter<InteractorXref>();
+    private CrossReferenceConverter<InteractorXref> xRefConverter;
+    private AliasConverter aliasConverter;
+    private AnnotationConverter annotationConverter;
+    private BioSourceConverter organismConverter;
+    private CvObjectConverter<CvObject> cvObjectConverter;
+    private FeatureConverter featureConverter;
 
     private static final List<String> uniprotKeys;
+    public static String CRC64 = "crc64";
 
     static {
         uniprotKeys = new ArrayList<String>( Arrays.asList( GENE_NAME_MI_REF, GENE_NAME_SYNONYM_MI_REF,
@@ -52,183 +59,251 @@ public class InteractorConverter {
                                                             ORF_NAME_MI_REF ) );
     }
 
+    public InteractorConverter(){
+        xRefConverter = new CrossReferenceConverter<InteractorXref>();
+        aliasConverter = new AliasConverter();
+        annotationConverter = new AnnotationConverter();
+        organismConverter = new BioSourceConverter();
+        cvObjectConverter = new CvObjectConverter<CvObject>();
+        featureConverter = new FeatureConverter();
+    }
+
     /**
      *  Converts the database IntactInteractor data model to intactpsimitab datamodel
      *
-     * @param component The component to be converted
-     * @param interaction      Passed to get the components of the interaction
+     * @param participant The component to be converted
      * @return ExtendedInteractor with additional fields specific to Intact
      */
-    public ExtendedInteractor toMitab( uk.ac.ebi.intact.model.Component component, Interaction interaction ) {
-        if ( component == null ) {
-            throw new IllegalArgumentException( "component must not be null" );
-        }
+    public psidev.psi.mi.tab.model.Interactor intactToMitab(uk.ac.ebi.intact.model.Component participant) {
 
-        final Interactor intactInteractor = component.getInteractor();
+        if (participant != null){
+            psidev.psi.mi.tab.model.Interactor mitabInteractor = new psidev.psi.mi.tab.model.Interactor();
+            Interactor interactor = participant.getInteractor();
 
-        ExtendedInteractor tabInteractor = new ExtendedInteractor();
+            // converts interactor details
+            if (interactor != null){
+                Collection<InteractorXref> interactorXrefs = interactor.getXrefs();
+                Collection<Annotation>  annotations = AnnotatedObjectUtils.getPublicAnnotations(interactor);
+                Collection<InteractorAlias> aliases = interactor.getAliases();
 
-        // identifiers
-        List<CrossReference> identifiers = xRefConverter.toCrossReferences( intactInteractor.getXrefs(), true, false );
+                boolean hasFoundIdentity = false;
 
-        // remove existing IntAct cross reference so we end up with at most one in the identifiers
-        Collection<CrossReference> intactRefs =  removeIntactXrefs( identifiers );
+                if (!interactorXrefs.isEmpty()){
 
-        // add the intact AC of the interactor as an indentifier
-        if (intactInteractor.getAc() != null) {
-            identifiers.add( new CrossReferenceImpl( CvDatabase.INTACT, intactInteractor.getAc() ) );
-        }
-        tabInteractor.setIdentifiers( identifiers );
+                    // convert xrefs, and identity
+                    for (InteractorXref ref : interactorXrefs){
 
-        // alternative identifiers & aliases
-        if ( intactInteractor.getAliases() != null ) {
-            List<CrossReference> altIds = new ArrayList<CrossReference>();
-            List<Alias> tabAliases = new ArrayList<Alias>();
-            for ( InteractorAlias alias : intactInteractor.getAliases() ) {
-                String id = alias.getName();
-                String db = null;
-                String mi = null;
-                if ( alias.getCvAliasType() != null ) {
-                    mi = alias.getCvAliasType().getIdentifier();
+                        // identity xrefs
+                        if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
+                            // first identity
+                            if (!hasFoundIdentity){
 
-                    if ( uniprotKeys.contains( mi ) ) {
-                        db = CvDatabase.UNIPROT;
-                    } else {
-                        db = CvDatabase.INTACT;
-                    }
-                }
-                if ( id != null && db != null ) {
-                    if ( alias.getCvAliasType() != null ) {
-                        String text = alias.getCvAliasType().getShortLabel();
-                        if ( mi.equals( GENE_NAME_MI_REF ) ) {
-                            Alias tabAlias = new AliasImpl( db, id );
-                            tabAlias.setAliasType(GENE_NAME);
-                            tabAliases.add( tabAlias );
-                        } else {
-                            if ( text != null ) {
-                                CrossReference altId = new CrossReferenceImpl( db, id, text );
-                                altIds.add( altId );
-                            } else {
-                                CrossReference altId = new CrossReferenceImpl( db, id );
-                                altIds.add( altId );
+                                CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                                if (identity != null){
+                                    hasFoundIdentity = true;
+
+                                    mitabInteractor.getIdentifiers().add(identity);
+                                }
+                            }
+                            // other identifiers
+                            else {
+                                CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                                if (identity != null){
+                                    hasFoundIdentity = true;
+
+                                    mitabInteractor.getAlternativeIdentifiers().add(identity);
+                                }
                             }
                         }
-                    } else {
-                        CrossReference altId =new CrossReferenceImpl( db, id );
-                        altIds.add( altId );
+                        // other xrefs
+                        else {
+                            CrossReference xref = xRefConverter.createCrossReference(ref, true);
+                            if (xref != null){
+                                hasFoundIdentity = true;
+
+                                mitabInteractor.getXrefs().add(xref);
+                            }
+                        }
                     }
                 }
 
-            }
-            tabInteractor.setAlternativeIdentifiers( altIds );
-            tabInteractor.setAliases( tabAliases );
-        }
+                // if it is a protein from uniprot, assume the short label is the uniprot ID and add it to the
+                // aliases
+                if (interactor instanceof Protein) {
+                    Protein prot = (Protein)interactor;
 
-        if( !intactRefs.isEmpty() ) {
-            if( tabInteractor.getAlternativeIdentifiers() == null ) {
-               tabInteractor.setAlternativeIdentifiers((List<CrossReference>) intactRefs);
-            } else {
-                tabInteractor.getAlternativeIdentifiers().addAll( intactRefs ); 
-            }
-        }
+                    if (ProteinUtils.isFromUniprot(prot)) {
+                        Alias altId = new AliasImpl( CvDatabase.UNIPROT, prot.getShortLabel(),"shortlabel" );
+                        mitabInteractor.getAliases().add(altId);
+                    }
+                }else{
+                    //if it is not a instance of protein, add the short label to alternative identifiers with INTACT as database
+                    Alias altId = new AliasImpl( CvDatabase.INTACT, interactor.getShortLabel(),"shortlabel" );
+                    mitabInteractor.getAliases().add(altId);
+                }
 
-        // if it is a protein from uniprot, assume the short label is the uniprot ID and add it to the
-        // alternative identifiers
-        if (intactInteractor instanceof Protein) {
-            Protein prot = (Protein)intactInteractor;
+                // convert ac as identity or secondary identifier
+                if (interactor.getAc() != null){
+                    CrossReference acField = new CrossReferenceImpl();
 
-            if (ProteinUtils.isFromUniprot(prot)) {
-                CrossReference altId = new CrossReferenceImpl( CvDatabase.UNIPROT, prot.getShortLabel(),"shortlabel" );
-                tabInteractor.getAlternativeIdentifiers().add(altId);
-            }
-        }else{
-          //if it is not a instance of protein, add the short label to alternative identifiers with INTACT as database  
-               CrossReference altId = new CrossReferenceImpl( CvDatabase.INTACT, intactInteractor.getShortLabel(),"shortlabel" );
-               tabInteractor.getAlternativeIdentifiers().add(altId);
-        }
+                    String db = CvDatabase.INTACT;
 
-        // taxid
-        if ( intactInteractor.getBioSource() != null ) {
-            int taxid = Integer.parseInt( intactInteractor.getBioSource().getTaxId() );
-            String name = intactInteractor.getBioSource().getShortLabel();
-            Organism oragnism = new OrganismImpl( taxid, name );
-            tabInteractor.setOrganism( oragnism );
-        }
+                    acField.setDatabase(db);
+                    acField.setIdentifier(interactor.getAc());
 
-         // process extended
-        CvObjectConverter cvObjectConverter = new CvObjectConverter();
-        CrossReferenceConverter xConverter = new CrossReferenceConverter();
+                    if (interactor.getOwner() != null){
+                        Institution institution = interactor.getOwner();
 
-        // properties
-        List<CrossReference> properties = xConverter.toCrossReferences( intactInteractor.getXrefs(), false, true );
-        //get again the identifiers with text
-        Collection<CrossReference> identifiersWithText = xRefConverter.toCrossReferences( intactInteractor.getXrefs(), true, true );
-        properties.addAll(identifiersWithText);
-        
-        // if molecule type is small molecule, export all chebi ids to that list.
-        if( CvObjectUtils.isSmallMoleculeType( intactInteractor.getCvInteractorType() ) ) {
-            final Collection<InteractorXref> chebiXrefs =
-                    AnnotatedObjectUtils.searchXrefs( intactInteractor, CvDatabase.CHEBI_MI_REF, null );
-            for ( CrossReference chebiCrossReference : xRefConverter.toCrossReferences( chebiXrefs, true ) ) {
-                if( !properties.contains( chebiCrossReference  ) ) {
-                    properties.add( chebiCrossReference );
+                        CvDatabase database = InstitutionUtils.retrieveCvDatabase(IntactContext.getCurrentInstance(), institution);
+
+                        if (database != null && database.getShortLabel() != null){
+                            acField.setDatabase(database.getShortLabel());
+                        }
+                    }
+
+                    if (!hasFoundIdentity){
+
+                        mitabInteractor.getIdentifiers().add(acField);
+                    }
+                    else {
+                        mitabInteractor.getAlternativeIdentifiers().add(acField);
+                    }
+                }
+
+                // convert aliases
+                if (!aliases.isEmpty()){
+
+                    for (InteractorAlias alias : aliases){
+                        Alias aliasField = aliasConverter.intactToMitab(alias);
+
+                        if (aliasField != null){
+                            mitabInteractor.getAliases().add(aliasField);
+                        }
+                    }
+                }
+
+                // convert annotations at the level of interactor
+                if (!annotations.isEmpty()){
+                    for (Annotation annots : annotations){
+                        psidev.psi.mi.tab.model.Annotation annotField = annotationConverter.intactToMitab(annots);
+
+                        if (annotField != null){
+                            mitabInteractor.getAnnotations().add(annotField);
+                        }
+                    }
+                }
+
+                // convert organism(s)
+                if (interactor.getBioSource() != null){
+                    Organism bioSourceField = organismConverter.intactToMitab(interactor.getBioSource());
+
+                    mitabInteractor.setOrganism(bioSourceField);
+                }
+
+                // convert interactor type
+                if (interactor.getCvInteractorType() != null){
+                    CrossReference type = cvObjectConverter.toCrossReference(interactor.getCvInteractorType());
+                    if (type != null){
+                        mitabInteractor.getInteractorTypes().add(type);
+                    }
+                }
+
+                // convert checksum (crc64 : only if sequence available)
+                if (interactor instanceof Polymer){
+                    Polymer polymer = (Polymer) interactor;
+                    if (polymer.getCrc64() != null){
+                        Checksum crc64 = new ChecksumImpl(CRC64, polymer.getCrc64());
+
+                        mitabInteractor.getChecksums().add(crc64);
+                    }
                 }
             }
-        }
-        tabInteractor.setProperties( properties );
 
-        // interactor type
-        CrossReference interactorTypeA = cvObjectConverter.toCrossReference( intactInteractor.getCvInteractorType() );
-        tabInteractor.setInteractorType( interactorTypeA );
+            // convert biological role
+            CrossReference bioRole = null;
+            if (participant.getCvBiologicalRole() != null){
+                bioRole = cvObjectConverter.toCrossReference(participant.getCvBiologicalRole());
+            }
 
-        // experimental roles & parameters
-        List<CrossReference> experimentRoles = new ArrayList<CrossReference>();
-        List<CrossReference> biologicalRoles = new ArrayList<CrossReference>();
+            if (bioRole == null){
+                bioRole = new CrossReferenceImpl(CvDatabase.PSI_MI, CvBiologicalRole.UNSPECIFIED_PSI_REF, CvBiologicalRole.UNSPECIFIED);
+            }
 
-        //earlier here there used to be  a forloop, where we get the components and iterate over it, now it is not needed as we have passed the component directly 
-            if ( component.getInteractor().equals( intactInteractor ) ) {
-                biologicalRoles.add( cvObjectConverter.toCrossReference( component.getCvBiologicalRole() ) );
-                experimentRoles.add( cvObjectConverter.toCrossReference( component.getCvExperimentalRole() ) );
+            mitabInteractor.getBiologicalRoles().add(bioRole);
 
-                //parameters
-                for ( ComponentParameter componentParameter : component.getParameters() ) {
-                    uk.ac.ebi.intact.psimitab.model.Parameter parameter =
-                            new uk.ac.ebi.intact.psimitab.model.Parameter(componentParameter.getCvParameterType().getShortLabel(),
-                                                                          componentParameter.getFactor(),
-                                                                          componentParameter.getBase(),
-                                                                          componentParameter.getExponent(),
-                                                                          (componentParameter.getCvParameterUnit() != null? componentParameter.getCvParameterUnit().getShortLabel() : null));
-                    tabInteractor.getParameters().add( parameter );
+            // convert experimental roles
+            for (CvExperimentalRole expRole : participant.getExperimentalRoles()){
+                CrossReference expRoleField = cvObjectConverter.toCrossReference(expRole);
+                if (expRoleField != null){
+                    mitabInteractor.getExperimentalRoles().add(expRoleField);
                 }
             }
 
+            if (mitabInteractor.getExperimentalRoles().isEmpty()){
+                CrossReference expRoleField = new CrossReferenceImpl(CvDatabase.PSI_MI, CvExperimentalRole.UNSPECIFIED_PSI_REF, CvExperimentalRole.UNSPECIFIED);
 
-        tabInteractor.setExperimentalRoles( experimentRoles );
-        tabInteractor.setBiologicalRoles( biologicalRoles );
-
-        // annotations
-        Collection<Annotation> publicAnnotations = AnnotatedObjectUtils.getPublicAnnotations( intactInteractor );
-        for (Annotation intactAnnotation : publicAnnotations ) {
-            uk.ac.ebi.intact.psimitab.model.Annotation annot =
-                    new uk.ac.ebi.intact.psimitab.model.Annotation(intactAnnotation.getCvTopic().getShortLabel(),
-                                                                   intactAnnotation.getAnnotationText());
-            tabInteractor.getAnnotations().add(annot);
-        }
-
-        return tabInteractor;
-    }
-
-    private Collection<CrossReference> removeIntactXrefs( Collection<CrossReference> identifiers ) {
-
-        Collection<CrossReference> refs = new ArrayList<CrossReference>( identifiers.size() );
-        for ( Iterator<CrossReference> iterator = identifiers.iterator(); iterator.hasNext(); ) {
-            CrossReference reference = iterator.next();
-            if( CvDatabase.INTACT.equals( reference.getDatabase() ) ) {
-                refs.add( reference );
-                iterator.remove();
+                mitabInteractor.getExperimentalRoles().add(expRoleField);
             }
+
+            // convert features
+            if (!participant.getFeatures().isEmpty()){
+                Collection<Feature> features = participant.getFeatures();
+
+                for (Feature feature : features){
+                    psidev.psi.mi.tab.model.Feature featureField = featureConverter.intactToMitab(feature);
+                    if (featureField != null){
+                        mitabInteractor.getFeatures().add(featureField);
+                    }
+                }
+            }
+
+            // convert stoichiometry
+            if (participant.hasStoichiometry()){
+
+                mitabInteractor.getStoichiometry().add((int) participant.getStoichiometry());
+            }
+
+            // convert participant identification methods
+            if (!participant.getParticipantDetectionMethods().isEmpty()){
+                mitabInteractor.getParticipantIdentificationMethods().clear();
+
+                for (CvIdentification detMethod : participant.getParticipantDetectionMethods()){
+                    CrossReference methodField = cvObjectConverter.toCrossReference(detMethod);
+                    if (methodField != null){
+                        mitabInteractor.getParticipantIdentificationMethods().add(methodField);
+                    }
+                }
+            }
+
+            // convert annotations at the level of participant
+            Collection<Annotation> annotations = AnnotatedObjectUtils.getPublicAnnotations(participant);
+            if (!annotations.isEmpty()){
+
+                for (Annotation annots : participant.getAnnotations()){
+                    psidev.psi.mi.tab.model.Annotation annotField = annotationConverter.intactToMitab(annots);
+
+                    if (annotField != null){
+                        mitabInteractor.getAnnotations().add(annotField);
+                    }
+                }
+            }
+
+            // convert xrefs at the level of participant
+            if (!participant.getXrefs().isEmpty()){
+
+                for (ComponentXref xrefs : participant.getXrefs()){
+                    CrossReference xrefField = xRefConverter.createCrossReference(xrefs, true);
+
+                    if (xrefField != null){
+                        mitabInteractor.getXrefs().add(xrefField);
+                    }
+                }
+            }
+
+            return mitabInteractor;
         }
-        return refs;
+
+       return null;
     }
 
     public Component fromMitab() {
