@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Confidence;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.*;
@@ -26,8 +27,10 @@ import uk.ac.ebi.intact.model.Parameter;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.InstitutionUtils;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
+import uk.ac.ebi.intact.psimitab.converters.util.PsimitabTools;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 
 /**
@@ -41,7 +44,8 @@ public class InteractionConverter {
 
     public static final Log logger = LogFactory.getLog( InteractionConverter.class );
 
-    private static final String TAXID = "taxid";
+    private static final String SMALLMOLECULE_MI_REF = "MI:0328";
+    private static final String UNKNOWN_TAXID = "-3";
 
     private CvObjectConverter cvObjectConverter;
 
@@ -94,9 +98,27 @@ public class InteractionConverter {
         psidev.psi.mi.tab.model.Interactor interactorB = interactorConverter.intactToMitab(componentB);
 
         BinaryInteraction bi = processInteractionDetailsWithoutInteractors(interaction);
-
         bi.setInteractorA(interactorA);
         bi.setInteractorB(interactorB);
+
+        // order interactors
+        PsimitabTools.reorderInteractors(bi, new Comparator<Interactor>() {
+
+            public int compare(Interactor o1, Interactor o2) {
+                final Collection<CrossReference> type1Coll = o1.getInteractorTypes();
+                final Collection<CrossReference> type2Coll = o2.getInteractorTypes();
+
+                CrossReference type1 = (type1Coll != null && !type1Coll.isEmpty()) ? type1Coll.iterator().next() : null;
+                CrossReference type2 = (type2Coll != null && !type2Coll.isEmpty()) ? type2Coll.iterator().next() : null;
+
+                if (type1 != null && SMALLMOLECULE_MI_REF.equals(type1.getIdentifier())) {
+                    return 1;
+                } else if (type2 != null && SMALLMOLECULE_MI_REF.equals(type2.getIdentifier())) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
 
         return bi;
     }
