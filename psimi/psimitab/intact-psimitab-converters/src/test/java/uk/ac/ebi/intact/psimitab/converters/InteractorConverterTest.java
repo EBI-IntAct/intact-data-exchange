@@ -174,7 +174,7 @@ public class InteractorConverterTest extends IntactBasicTestCase {
 
         Assert.assertNotNull( ei.getAlternativeIdentifiers() );
         Assert.assertEquals( 2, ei.getAlternativeIdentifiers().size() );
-        Assert.assertEquals( 1, ei.getAliases().size() );
+        Assert.assertEquals( 2, ei.getAliases().size() );
 
     }
 

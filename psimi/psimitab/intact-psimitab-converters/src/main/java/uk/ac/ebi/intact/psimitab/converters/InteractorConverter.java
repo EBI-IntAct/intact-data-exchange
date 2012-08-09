@@ -17,18 +17,17 @@ package uk.ac.ebi.intact.psimitab.converters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.mi.tab.model.Alias;
-import psidev.psi.mi.tab.model.*;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.Annotation;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
+import psidev.psi.mi.tab.model.Organism;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Feature;
-import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.InstitutionUtils;
-import uk.ac.ebi.intact.model.util.ProteinUtils;
+import uk.ac.ebi.intact.psimitab.converters.enrichers.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import static uk.ac.ebi.intact.model.CvAliasType.*;
 
@@ -43,15 +42,26 @@ public class InteractorConverter {
 
     private static final Log log = LogFactory.getLog( InteractorConverter.class );
 
-    private CrossReferenceConverter<InteractorXref> xRefConverter;
-    private AliasConverter aliasConverter;
-    private AnnotationConverter annotationConverter;
-    private BioSourceConverter organismConverter;
-    private CvObjectConverter<CvObject> cvObjectConverter;
-    private FeatureConverter featureConverter;
+    protected CrossReferenceConverter<InteractorXref> xRefConverter;
+    protected AliasConverter aliasConverter;
+    protected AnnotationConverter annotationConverter;
+    protected BioSourceConverter organismConverter;
+    protected CvObjectConverter<CvObject> cvObjectConverter;
+    protected FeatureConverter featureConverter;
 
-    private static final List<String> uniprotKeys;
-    public static String CRC64 = "crc64";
+    protected static final List<String> uniprotKeys;
+    public static final String CRC64 = "crc64";
+    public static final String UNKNOWN_TAXID = "-3";
+    public static final String DISPLAY_SHORT = "display_short";
+    public static final String DISPLAY_LONG = "display_long";
+    public static final String SHORTLABEL = "shortlabel";
+    public final static String GENE="MI:0250";
+
+    private ProteinConverter proteinConverter;
+    private SmallMoleculeConverter smallMoleculeConverter;
+    private GeneConverter geneConverter;
+    private NucleicAcidConverter nucleicAcidConverter;
+    private DefaultInteractorEnricher defaultEnricher;
 
     static {
         uniprotKeys = new ArrayList<String>( Arrays.asList( GENE_NAME_MI_REF, GENE_NAME_SYNONYM_MI_REF,
@@ -66,6 +76,12 @@ public class InteractorConverter {
         organismConverter = new BioSourceConverter();
         cvObjectConverter = new CvObjectConverter<CvObject>();
         featureConverter = new FeatureConverter();
+
+        nucleicAcidConverter = new NucleicAcidConverter(xRefConverter, aliasConverter);
+        proteinConverter = new ProteinConverter(xRefConverter, aliasConverter);
+        smallMoleculeConverter = new SmallMoleculeConverter(xRefConverter, aliasConverter);
+        geneConverter = new GeneConverter(xRefConverter, aliasConverter);
+        defaultEnricher = new DefaultInteractorEnricher(xRefConverter, aliasConverter);
     }
 
     /**
@@ -82,104 +98,32 @@ public class InteractorConverter {
 
             // converts interactor details
             if (interactor != null){
-                Collection<InteractorXref> interactorXrefs = interactor.getXrefs();
                 Collection<Annotation>  annotations = AnnotatedObjectUtils.getPublicAnnotations(interactor);
-                Collection<InteractorAlias> aliases = interactor.getAliases();
 
-                boolean hasFoundIdentity = false;
+                CvInteractorType interactorType = interactor.getCvInteractorType();
 
-                if (!interactorXrefs.isEmpty()){
-
-                    // convert xrefs, and identity
-                    for (InteractorXref ref : interactorXrefs){
-
-                        // identity xrefs
-                        if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
-                            // first identity
-                            if (!hasFoundIdentity){
-
-                                CrossReference identity = xRefConverter.createCrossReference(ref, false);
-                                if (identity != null){
-                                    hasFoundIdentity = true;
-
-                                    mitabInteractor.getIdentifiers().add(identity);
-                                }
-                            }
-                            // other identifiers
-                            else {
-                                CrossReference identity = xRefConverter.createCrossReference(ref, false);
-                                if (identity != null){
-                                    hasFoundIdentity = true;
-
-                                    mitabInteractor.getAlternativeIdentifiers().add(identity);
-                                }
-                            }
-                        }
-                        // other xrefs
-                        else {
-                            CrossReference xref = xRefConverter.createCrossReference(ref, true);
-                            if (xref != null){
-                                hasFoundIdentity = true;
-
-                                mitabInteractor.getXrefs().add(xref);
-                            }
-                        }
-                    }
+                // enrich proteins following data best practices
+                if (interactor instanceof Protein){
+                    Protein protein = (Protein) interactor;
+                    proteinConverter.enrichProteinFromIntact(protein, mitabInteractor);
                 }
-
-                // if it is a protein from uniprot, assume the short label is the uniprot ID and add it to the
-                // aliases
-                if (interactor instanceof Protein) {
-                    Protein prot = (Protein)interactor;
-
-                    if (ProteinUtils.isFromUniprot(prot)) {
-                        Alias altId = new AliasImpl( CvDatabase.UNIPROT, prot.getShortLabel(),"shortlabel" );
-                        mitabInteractor.getAliases().add(altId);
-                    }
-                }else{
-                    //if it is not a instance of protein, add the short label to alternative identifiers with INTACT as database
-                    Alias altId = new AliasImpl( CvDatabase.INTACT, interactor.getShortLabel(),"shortlabel" );
-                    mitabInteractor.getAliases().add(altId);
+                // enrich small molecules following data best practices
+                else if (interactor instanceof SmallMolecule){
+                    SmallMolecule smallMolecule = (SmallMolecule) interactor;
+                    smallMoleculeConverter.enrichSmallMoleculeFromIntact(smallMolecule, mitabInteractor);
                 }
-
-                // convert ac as identity or secondary identifier
-                if (interactor.getAc() != null){
-                    CrossReference acField = new CrossReferenceImpl();
-
-                    String db = CvDatabase.INTACT;
-
-                    acField.setDatabase(db);
-                    acField.setIdentifier(interactor.getAc());
-
-                    if (interactor.getOwner() != null){
-                        Institution institution = interactor.getOwner();
-
-                        CvDatabase database = InstitutionUtils.retrieveCvDatabase(IntactContext.getCurrentInstance(), institution);
-
-                        if (database != null && database.getShortLabel() != null){
-                            acField.setDatabase(database.getShortLabel());
-                        }
-                    }
-
-                    if (!hasFoundIdentity){
-
-                        mitabInteractor.getIdentifiers().add(acField);
-                    }
-                    else {
-                        mitabInteractor.getAlternativeIdentifiers().add(acField);
-                    }
+                // enrich genes following data best practices
+                else if (interactorType != null && GENE.equalsIgnoreCase(interactorType.getIdentifier())){
+                    geneConverter.enrichGeneFromIntact(interactor, mitabInteractor);
                 }
-
-                // convert aliases
-                if (!aliases.isEmpty()){
-
-                    for (InteractorAlias alias : aliases){
-                        Alias aliasField = aliasConverter.intactToMitab(alias);
-
-                        if (aliasField != null){
-                            mitabInteractor.getAliases().add(aliasField);
-                        }
-                    }
+                // enrich small molecules following data best practices
+                else if (interactor instanceof NucleicAcid){
+                    NucleicAcid nucleicAcid = (NucleicAcid) interactor;
+                    nucleicAcidConverter.enrichNucleicAcidFromIntact(nucleicAcid, mitabInteractor);
+                }
+                // default enricher
+                else {
+                    defaultEnricher.enrichInteractorFromIntact(interactor, mitabInteractor);
                 }
 
                 // convert annotations at the level of interactor
@@ -201,20 +145,10 @@ public class InteractorConverter {
                 }
 
                 // convert interactor type
-                if (interactor.getCvInteractorType() != null){
-                    CrossReference type = cvObjectConverter.toCrossReference(interactor.getCvInteractorType());
+                if (interactorType != null){
+                    CrossReference type = cvObjectConverter.toCrossReference(interactorType);
                     if (type != null){
                         mitabInteractor.getInteractorTypes().add(type);
-                    }
-                }
-
-                // convert checksum (crc64 : only if sequence available)
-                if (interactor instanceof Polymer){
-                    Polymer polymer = (Polymer) interactor;
-                    if (polymer.getCrc64() != null){
-                        Checksum crc64 = new ChecksumImpl(CRC64, polymer.getCrc64());
-
-                        mitabInteractor.getChecksums().add(crc64);
                     }
                 }
             }
@@ -308,5 +242,25 @@ public class InteractorConverter {
 
     public Component fromMitab() {
         throw new UnsupportedOperationException();
+    }
+
+    public ProteinConverter getProteinConverter() {
+        return proteinConverter;
+    }
+
+    public SmallMoleculeConverter getSmallMoleculeConverter() {
+        return smallMoleculeConverter;
+    }
+
+    public GeneConverter getGeneConverter() {
+        return geneConverter;
+    }
+
+    public NucleicAcidConverter getNucleicAcidConverter() {
+        return nucleicAcidConverter;
+    }
+
+    public DefaultInteractorEnricher getDefaultEnricher() {
+        return defaultEnricher;
     }
 }
