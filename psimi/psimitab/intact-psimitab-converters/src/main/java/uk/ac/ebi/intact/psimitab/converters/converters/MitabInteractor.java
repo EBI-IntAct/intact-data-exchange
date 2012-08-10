@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.psimitab.converters;
+package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;

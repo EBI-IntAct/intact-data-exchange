@@ -17,7 +17,7 @@ package uk.ac.ebi.intact.psimitab.converters.expansion;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.InteractionConverter;
 
 import java.util.Collection;
 import java.util.Collections;

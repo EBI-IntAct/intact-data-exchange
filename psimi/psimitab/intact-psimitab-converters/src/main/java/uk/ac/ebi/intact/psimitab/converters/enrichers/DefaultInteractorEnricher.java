@@ -5,9 +5,9 @@ import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.InteractorAlias;
 import uk.ac.ebi.intact.model.InteractorXref;
 import uk.ac.ebi.intact.model.Polymer;
-import uk.ac.ebi.intact.psimitab.converters.AliasConverter;
-import uk.ac.ebi.intact.psimitab.converters.CrossReferenceConverter;
-import uk.ac.ebi.intact.psimitab.converters.InteractorConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.AliasConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.CrossReferenceConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.InteractorConverter;
 
 import java.util.Collection;
 

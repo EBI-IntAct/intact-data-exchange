@@ -23,9 +23,9 @@ import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
-import uk.ac.ebi.intact.psimitab.converters.InteractorConverter;
-import uk.ac.ebi.intact.psimitab.converters.MitabInteractor;
+import uk.ac.ebi.intact.psimitab.converters.converters.InteractionConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.InteractorConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.MitabInteractor;
 
 import java.util.Collection;
 

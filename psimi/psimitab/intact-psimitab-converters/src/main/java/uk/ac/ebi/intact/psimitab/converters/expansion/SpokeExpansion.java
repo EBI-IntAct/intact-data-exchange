@@ -25,7 +25,7 @@ import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.InteractionConverter;
 
 import java.util.*;
 

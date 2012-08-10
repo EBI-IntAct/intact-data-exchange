@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.psimitab.converters;
+package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;

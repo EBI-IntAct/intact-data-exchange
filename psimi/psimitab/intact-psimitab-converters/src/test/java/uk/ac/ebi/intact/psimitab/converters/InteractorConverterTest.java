@@ -10,6 +10,9 @@ import psidev.psi.mi.tab.model.builder.PsimiTab;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.XrefUtils;
+import uk.ac.ebi.intact.psimitab.converters.converters.InteractionConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.InteractorConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.MitabInteractor;
 
 import java.io.IOException;
 import java.io.StringWriter;

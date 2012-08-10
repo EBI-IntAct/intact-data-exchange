@@ -7,6 +7,7 @@ import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvInteraction;
 import uk.ac.ebi.intact.model.CvInteractionType;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.psimitab.converters.converters.CvObjectConverter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

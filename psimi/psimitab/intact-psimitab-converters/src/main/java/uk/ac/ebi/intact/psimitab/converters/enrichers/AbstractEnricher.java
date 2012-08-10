@@ -6,8 +6,8 @@ import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.InstitutionUtils;
-import uk.ac.ebi.intact.psimitab.converters.AliasConverter;
-import uk.ac.ebi.intact.psimitab.converters.CrossReferenceConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.AliasConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.CrossReferenceConverter;
 
 import java.util.Collection;
 

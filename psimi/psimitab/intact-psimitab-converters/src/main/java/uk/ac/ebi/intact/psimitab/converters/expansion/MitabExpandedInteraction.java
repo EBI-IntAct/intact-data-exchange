@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import uk.ac.ebi.intact.psimitab.converters.MitabInteractor;
+import uk.ac.ebi.intact.psimitab.converters.converters.MitabInteractor;
 
 /**
  * A Mitab interaction contains a binary interaction and the rigdata model of the two interactors  (so we can compute the rigid of interaction)

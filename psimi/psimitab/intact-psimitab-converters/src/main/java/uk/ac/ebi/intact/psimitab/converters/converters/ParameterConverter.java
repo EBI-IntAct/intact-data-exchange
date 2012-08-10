@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.psimitab.converters;
+package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import psidev.psi.mi.tab.model.ParameterImpl;
 import uk.ac.ebi.intact.model.Parameter;

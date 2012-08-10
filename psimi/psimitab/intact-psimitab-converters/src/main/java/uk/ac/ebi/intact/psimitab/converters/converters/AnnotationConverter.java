@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.psimitab.converters;
+package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import psidev.psi.mi.tab.model.Annotation;
 import psidev.psi.mi.tab.model.AnnotationImpl;

@@ -9,6 +9,7 @@ import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.psimitab.converters.converters.InteractionConverter;
 
 import java.util.ArrayList;
 import java.util.Collection;

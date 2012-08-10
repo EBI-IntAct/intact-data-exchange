@@ -6,9 +6,9 @@ import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
 import uk.ac.ebi.intact.irefindex.seguid.RogidGenerator;
 import uk.ac.ebi.intact.irefindex.seguid.SeguidException;
 import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.psimitab.converters.AliasConverter;
-import uk.ac.ebi.intact.psimitab.converters.CrossReferenceConverter;
-import uk.ac.ebi.intact.psimitab.converters.InteractorConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.AliasConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.CrossReferenceConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.InteractorConverter;
 
 import java.util.Collection;
 
