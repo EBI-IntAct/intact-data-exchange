@@ -96,6 +96,7 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
             MitabExpandedInteraction newInteraction = buildInteraction( binaryTemplateSelf, uniqueComponent, uniqueComponent );
 
             BinaryInteraction expandedBinary = newInteraction.getBinaryInteraction();
+            interactions.add(expandedBinary);
 
             // reset stoichiometry of duplicated interactor to 0
             Interactor interactorB = expandedBinary.getInteractorB();
@@ -113,6 +114,9 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
                     expandedBinary.getInteractionChecksums().add(checksum);
                 }
             }
+
+            // flip interactors if necessary
+            interactionConverter.flipInteractorsIfNecessary(expandedBinary);
         }
         else{
             logger.debug( "Interaction was n-ary, will be expanded" );
@@ -159,6 +163,9 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
                     else {
                         onlyProtein = false;
                     }
+
+                    // flip interactors if necessary
+                    interactionConverter.flipInteractorsIfNecessary(expandedBinary2);
                 }
                 // process rigid if possible
                 if (onlyProtein){

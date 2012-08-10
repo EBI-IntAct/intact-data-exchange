@@ -156,6 +156,9 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
                     else {
                         onlyProtein = false;
                     }
+
+                    // flip interactors if necessary
+                    interactionConverter.flipInteractorsIfNecessary(expandedBinary2);
                 }
             }
 

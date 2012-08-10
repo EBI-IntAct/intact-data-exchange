@@ -94,6 +94,9 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
             else {
                 onlyProtein = false;
             }
+
+            // flip interactors if necessary
+            interactionConverter.flipInteractorsIfNecessary(expandedBinary2);
         }
 
         // process rigid if possible
