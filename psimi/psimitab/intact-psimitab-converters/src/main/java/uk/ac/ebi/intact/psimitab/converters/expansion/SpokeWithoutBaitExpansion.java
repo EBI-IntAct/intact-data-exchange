@@ -18,9 +18,13 @@ package uk.ac.ebi.intact.psimitab.converters.expansion;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Checksum;
+import psidev.psi.mi.tab.model.ChecksumImpl;
+import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Interactor;
+import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
 
 import java.util.*;
 
@@ -60,12 +64,48 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
         // Pick the first one
         Component fakeBait = sortedComponents.get(0);
 
+        Set<RigDataModel> rigDataModels = new HashSet<RigDataModel>(sortedComponents.size() - 1);
+        boolean isFirst = true;
+        boolean onlyProtein = true;
+
         // Build interactions
         for (int i = 1; i < sortedComponents.size(); i++) {
             Component fakePrey = sortedComponents.get(i);
 
-            BinaryInteraction spokeInteraction = buildInteraction(interactionTemplate, fakeBait, fakePrey);
-            interactions.add(spokeInteraction);
+            MitabExpandedInteraction spokeInteraction = buildInteraction(interactionTemplate, fakeBait, fakePrey);
+            BinaryInteraction expandedBinary2 = spokeInteraction.getBinaryInteraction();
+            interactions.add( expandedBinary2 );
+
+            // count the first interactor rogid only once
+            if (isFirst){
+                isFirst = false;
+
+                if (spokeInteraction.getMitabInteractorA().getRigDataModel() != null){
+                    rigDataModels.add(spokeInteraction.getMitabInteractorA().getRigDataModel());
+                }
+                else {
+                    onlyProtein = false;
+                }
+            }
+
+            if (spokeInteraction.getMitabInteractorB().getRigDataModel() != null){
+                rigDataModels.add(spokeInteraction.getMitabInteractorB().getRigDataModel());
+            }
+            else {
+                onlyProtein = false;
+            }
+        }
+
+        // process rigid if possible
+        if (onlyProtein){
+
+            String rigid = interactionConverter.calculateRigidFor(rigDataModels);
+
+            // add rigid to the first binary interaction because all the biary interactions are pointing to the same checksum list
+            if (rigid != null){
+                Checksum checksum = new ChecksumImpl(InteractionConverter.RIGID, rigid);
+                interactions.iterator().next().getInteractionChecksums().add(checksum);
+            }
         }
 
         return interactions;

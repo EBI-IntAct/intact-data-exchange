@@ -25,6 +25,7 @@ import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
 import uk.ac.ebi.intact.psimitab.converters.InteractorConverter;
+import uk.ac.ebi.intact.psimitab.converters.MitabInteractor;
 
 import java.util.Collection;
 
@@ -56,9 +57,11 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
      * @param c2          component to add to the newly created interaction.
      * @return a new interaction having c1 and c2 as component.
      */
-    protected BinaryInteraction buildInteraction( BinaryInteraction interaction, Component c1, Component c2 ) {
-        Interactor interactorA = interactorConverter.intactToMitab(c1);
-        Interactor interactorB = interactorConverter.intactToMitab(c2);
+    protected MitabExpandedInteraction buildInteraction( BinaryInteraction interaction, Component c1, Component c2 ) {
+        MitabInteractor mitabInteractorA = interactorConverter.intactToMitab(c1);
+        MitabInteractor mitabInteractorB = interactorConverter.intactToMitab(c2);
+        Interactor interactorA = mitabInteractorA != null ? mitabInteractorA.getInteractor() : null;
+        Interactor interactorB = mitabInteractorB != null ? mitabInteractorB.getInteractor() : null;
 
         BinaryInteraction expandedInteraction = new BinaryInteractionImpl(interactorA, interactorB);
 
@@ -82,7 +85,9 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
             expandedInteraction.setNegativeInteraction(interaction.isNegativeInteraction());
         }
 
-        return expandedInteraction;
+        MitabExpandedInteraction mitabExpandednResults = new MitabExpandedInteraction(expandedInteraction, mitabInteractorA, mitabInteractorB);
+
+        return mitabExpandednResults;
     }
 
     public boolean isExpandable(Interaction interaction) {

@@ -18,14 +18,16 @@ package uk.ac.ebi.intact.psimitab.converters.expansion;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Checksum;
+import psidev.psi.mi.tab.model.ChecksumImpl;
 import psidev.psi.mi.tab.model.Interactor;
+import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvExperimentalRole;
 import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Process an interaction and expand it using the spoke model.
@@ -91,14 +93,26 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
                 return Collections.EMPTY_LIST;
             }
             Component uniqueComponent = interaction.getComponents().iterator().next();
-            BinaryInteraction newInteraction = buildInteraction( binaryTemplateSelf, uniqueComponent, uniqueComponent );
+            MitabExpandedInteraction newInteraction = buildInteraction( binaryTemplateSelf, uniqueComponent, uniqueComponent );
+
+            BinaryInteraction expandedBinary = newInteraction.getBinaryInteraction();
 
             // reset stoichiometry of duplicated interactor to 0
-            Interactor interactorB = newInteraction.getInteractorB();
+            Interactor interactorB = expandedBinary.getInteractorB();
             interactorB.getStoichiometry().clear();
             interactorB.getStoichiometry().add(0);
 
-            interactions.add( newInteraction );
+            // computes Rigid if necessary
+            RigDataModel rigDatamodel = newInteraction.getMitabInteractorA().getRigDataModel();
+
+            if (rigDatamodel != null){
+                String rigid = interactionConverter.calculateRigidFor(Arrays.asList(rigDatamodel));
+
+                if (rigid != null){
+                    Checksum checksum = new ChecksumImpl(InteractionConverter.RIGID, rigid);
+                    expandedBinary.getInteractionChecksums().add(checksum);
+                }
+            }
         }
         else{
             logger.debug( "Interaction was n-ary, will be expanded" );
@@ -117,10 +131,47 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
                 preyComponents.addAll(interaction.getComponents());
                 preyComponents.remove(baitComponent);
 
+                Set<RigDataModel> rigDataModels = new HashSet<RigDataModel>(preyComponents.size());
+                boolean isFirst = true;
+                boolean onlyProtein = true;
+
                 for (Component preyComponent : preyComponents) {
-                    BinaryInteraction newInteraction = buildInteraction(binaryTemplate, baitComponent, preyComponent);
-                    interactions.add(newInteraction);
+                    MitabExpandedInteraction newInteraction = buildInteraction(binaryTemplate, baitComponent, preyComponent);
+
+                    BinaryInteraction expandedBinary2 = newInteraction.getBinaryInteraction();
+                    interactions.add( expandedBinary2 );
+
+                    // count the first interactor rogid only once
+                    if (isFirst){
+                        isFirst = false;
+
+                        if (newInteraction.getMitabInteractorA().getRigDataModel() != null){
+                            rigDataModels.add(newInteraction.getMitabInteractorA().getRigDataModel());
+                        }
+                        else {
+                            onlyProtein = false;
+                        }
+                    }
+
+                    if (newInteraction.getMitabInteractorB().getRigDataModel() != null){
+                        rigDataModels.add(newInteraction.getMitabInteractorB().getRigDataModel());
+                    }
+                    else {
+                        onlyProtein = false;
+                    }
                 }
+                // process rigid if possible
+                if (onlyProtein){
+
+                    String rigid = interactionConverter.calculateRigidFor(rigDataModels);
+
+                    // add rigid to the first binary interaction because all the biary interactions are pointing to the same checksum list
+                    if (rigid != null){
+                        Checksum checksum = new ChecksumImpl(InteractionConverter.RIGID, rigid);
+                        interactions.iterator().next().getInteractionChecksums().add(checksum);
+                    }
+                }
+
             } else {
                 Collection<BinaryInteraction> expandedWithoutBait = processExpansionWithoutBait(interaction, binaryTemplate);
                 interactions.addAll(expandedWithoutBait);

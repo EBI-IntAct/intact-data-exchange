@@ -21,6 +21,9 @@ import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
+import uk.ac.ebi.intact.irefindex.seguid.RigidGenerator;
+import uk.ac.ebi.intact.irefindex.seguid.SeguidException;
 import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Parameter;
@@ -29,6 +32,7 @@ import uk.ac.ebi.intact.model.util.InstitutionUtils;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.psimitab.converters.util.PsimitabTools;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -58,6 +62,7 @@ public class InteractionConverter {
     private InteractorConverter interactorConverter;
 
     public static String CRC = "intact-crc";
+    public static String RIGID = "rigid";
 
     private CrossReference defaultSourceDatabase = new CrossReferenceImpl( "psi-mi", "MI:0469", "intact" );
 
@@ -94,17 +99,44 @@ public class InteractionConverter {
 
         InteractorConverter interactorConverter = new InteractorConverter();
 
-        psidev.psi.mi.tab.model.Interactor interactorA = interactorConverter.intactToMitab(componentA);
-        psidev.psi.mi.tab.model.Interactor interactorB = interactorConverter.intactToMitab(componentB);
+        MitabInteractor convertedInteractorA = interactorConverter.intactToMitab(componentA);
+        MitabInteractor convertedInteractorB = interactorConverter.intactToMitab(componentB);
+        psidev.psi.mi.tab.model.Interactor interactorA = convertedInteractorA != null ? convertedInteractorA.getInteractor() : null;
+        psidev.psi.mi.tab.model.Interactor interactorB = convertedInteractorB != null ? convertedInteractorB.getInteractor() : null;
 
         BinaryInteraction bi = processInteractionDetailsWithoutInteractors(interaction);
         bi.setInteractorA(interactorA);
         bi.setInteractorB(interactorB);
 
+        if (convertedInteractorA != null && convertedInteractorB != null && convertedInteractorA.getRigDataModel() != null
+                && convertedInteractorB.getRigDataModel() != null){
+            String rigid = calculateRigidFor(Arrays.asList(convertedInteractorA.getRigDataModel(), convertedInteractorB.getRigDataModel()));
+
+            // add rigid for interaction checksum
+            if (rigid != null){
+                Checksum checksum = new ChecksumImpl(RIGID, rigid);
+                bi.getInteractionChecksums().add(checksum);
+            }
+        }
+
         // order interactors
+        flipInteractorsIfNecessary(bi);
+
+        return bi;
+    }
+
+    public void flipInteractorsIfNecessary(BinaryInteraction bi) {
         PsimitabTools.reorderInteractors(bi, new Comparator<Interactor>() {
 
             public int compare(Interactor o1, Interactor o2) {
+
+                if (o1 == null){
+                   return -1;
+                }
+                else if (o2 == null){
+                   return 1;
+                }
+
                 final Collection<CrossReference> type1Coll = o1.getInteractorTypes();
                 final Collection<CrossReference> type2Coll = o2.getInteractorTypes();
 
@@ -119,9 +151,31 @@ public class InteractionConverter {
                 return 0;
             }
         });
-
-        return bi;
     }
+
+    public String calculateRigidFor(Collection<RigDataModel> interactorRigModels){
+
+        if (interactorRigModels == null || interactorRigModels.isEmpty()){
+            return null;
+        }
+        RigidGenerator rigidGenerator = new RigidGenerator();
+
+        for (RigDataModel interactorModel : interactorRigModels){
+            rigidGenerator.addSequence(interactorModel.getSequence(), interactorModel.getTaxid());
+        }
+
+        String rig = null;
+        try {
+            rig = rigidGenerator.calculateRigid();
+
+        } catch (SeguidException e) {
+            throw new RuntimeException("An error occured while generating RIG identifier for " +
+                    "interaction ", e);
+        }
+
+        return rig;
+    }
+
 
     public BinaryInteraction processInteractionDetailsWithoutInteractors(Interaction interaction){
 

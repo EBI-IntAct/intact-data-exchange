@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.model.Organism;
+import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.psimitab.converters.enrichers.*;
@@ -90,10 +91,12 @@ public class InteractorConverter {
      * @param participant The component to be converted
      * @return ExtendedInteractor with additional fields specific to Intact
      */
-    public psidev.psi.mi.tab.model.Interactor intactToMitab(uk.ac.ebi.intact.model.Component participant) {
+    public MitabInteractor intactToMitab(uk.ac.ebi.intact.model.Component participant) {
 
         if (participant != null){
             psidev.psi.mi.tab.model.Interactor mitabInteractor = new psidev.psi.mi.tab.model.Interactor();
+            MitabInteractor convertedInteractorResult = new MitabInteractor(mitabInteractor);
+
             Interactor interactor = participant.getInteractor();
 
             // converts interactor details
@@ -105,7 +108,8 @@ public class InteractorConverter {
                 // enrich proteins following data best practices
                 if (interactor instanceof Protein){
                     Protein protein = (Protein) interactor;
-                    proteinConverter.enrichProteinFromIntact(protein, mitabInteractor);
+                    RigDataModel rigDataModel = proteinConverter.enrichProteinFromIntact(protein, mitabInteractor);
+                    convertedInteractorResult.setRigDataModel(rigDataModel);
                 }
                 // enrich small molecules following data best practices
                 else if (interactor instanceof SmallMolecule){
@@ -234,7 +238,7 @@ public class InteractorConverter {
                 }
             }
 
-            return mitabInteractor;
+            return convertedInteractorResult;
         }
 
        return null;

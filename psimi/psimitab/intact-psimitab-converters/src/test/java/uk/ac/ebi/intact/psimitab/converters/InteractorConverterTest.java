@@ -37,8 +37,9 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         final Component c = interaction.getComponents().iterator().next();
         c.getInteractor().setAc( "EBI-xxxxxx" );
 
-        Interactor interactor = converter.intactToMitab(c);
+        MitabInteractor interactor = converter.intactToMitab(c);
         assertNotNull( interactor );
+        assertNotNull( interactor.getInteractor() );
 
     }
 
@@ -138,16 +139,16 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         bi.getComponents().iterator().next().setInteractor( protein );
         
         final InteractorConverter converter = new InteractorConverter();
-        final Interactor ei = converter.intactToMitab(bi.getComponents().iterator().next());
+        final MitabInteractor interactor = converter.intactToMitab(bi.getComponents().iterator().next());
+        assertNotNull( interactor );
+        assertNotNull( interactor.getInteractor() );
 
-        Assert.assertNotNull( ei );
+        Assert.assertNotNull( interactor.getInteractor().getIdentifiers() );
+        Assert.assertEquals( 1, interactor.getInteractor().getIdentifiers().size() );
+        Assert.assertEquals( 1, interactor.getInteractor().getAlternativeIdentifiers().size() );
 
-        Assert.assertNotNull( ei.getIdentifiers() );
-        Assert.assertEquals( 1, ei.getIdentifiers().size() );
-        Assert.assertEquals( 1, ei.getAlternativeIdentifiers().size() );
-
-        Assert.assertNotNull( ei.getAlternativeIdentifiers() );
-        Assert.assertEquals( 1, ei.getAlternativeIdentifiers().size() );
+        Assert.assertNotNull( interactor.getInteractor().getAlternativeIdentifiers() );
+        Assert.assertEquals( 1, interactor.getInteractor().getAlternativeIdentifiers().size() );
 
     }
 
@@ -165,16 +166,16 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         bi.getComponents().iterator().next().setInteractor( protein );
 
         final InteractorConverter converter = new InteractorConverter();
-        final Interactor ei = converter.intactToMitab(bi.getComponents().iterator().next());
+        final MitabInteractor interactor = converter.intactToMitab(bi.getComponents().iterator().next());
+        assertNotNull( interactor );
+        assertNotNull( interactor.getInteractor() );
 
-        Assert.assertNotNull( ei );
+        Assert.assertNotNull( interactor.getInteractor().getIdentifiers() );
+        Assert.assertEquals( 1, interactor.getInteractor().getIdentifiers().size() );
 
-        Assert.assertNotNull( ei.getIdentifiers() );
-        Assert.assertEquals( 1, ei.getIdentifiers().size() );
-
-        Assert.assertNotNull( ei.getAlternativeIdentifiers() );
-        Assert.assertEquals( 2, ei.getAlternativeIdentifiers().size() );
-        Assert.assertEquals( 2, ei.getAliases().size() );
+        Assert.assertNotNull( interactor.getInteractor().getAlternativeIdentifiers() );
+        Assert.assertEquals( 2, interactor.getInteractor().getAlternativeIdentifiers().size() );
+        Assert.assertEquals( 2, interactor.getInteractor().getAliases().size() );
 
     }
 
