@@ -28,6 +28,7 @@ public class ProteinConverter extends AbstractEnricher{
 
     public ProteinConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv){
         super(xrefConv, alisConv);
+        this.rogidGenerator = new RogidGenerator();
     }
 
     /**
