@@ -357,4 +357,14 @@ public class IntactSolrIndexer {
     public void setTimesToRetry(int timesToRetry) {
         this.timesToRetry = timesToRetry;
     }
+
+    public void shutdown(){
+        if (ontologySolrServer != null){
+            ontologySolrServer.shutdown();
+        }
+        if (solrServer != null && solrServer instanceof HttpSolrServer){
+            HttpSolrServer httpsolrserver = (HttpSolrServer) solrServer;
+            httpsolrserver.shutdown();
+        }
+    }
 }

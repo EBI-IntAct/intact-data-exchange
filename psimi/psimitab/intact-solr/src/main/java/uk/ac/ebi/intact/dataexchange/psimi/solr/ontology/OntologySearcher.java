@@ -19,6 +19,7 @@ import org.apache.commons.collections.map.LRUMap;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -302,5 +303,13 @@ public class OntologySearcher implements Serializable {
         }
 
         return ontologyNames;
+    }
+
+    public void shutdown(){
+
+        if (this.solrServer != null && this.solrServer instanceof HttpSolrServer){
+            HttpSolrServer httpsolrServer = (HttpSolrServer) solrServer;
+            httpsolrServer.shutdown();
+        }
     }
 }

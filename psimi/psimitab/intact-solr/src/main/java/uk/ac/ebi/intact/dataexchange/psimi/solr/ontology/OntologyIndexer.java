@@ -203,5 +203,11 @@ public class OntologyIndexer {
         public void remove() {
             ontologyIterator.remove();
         }
+
+        public void shutDown(){
+            if (solrServer != null){
+                solrServer.shutdown();
+            }
+        }
     }
 }
