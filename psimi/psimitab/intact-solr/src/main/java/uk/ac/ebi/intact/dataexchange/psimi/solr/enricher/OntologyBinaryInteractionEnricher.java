@@ -93,7 +93,7 @@ public class OntologyBinaryInteractionEnricher implements BinaryInteractionEnric
         if (xrefs == null) {
             return;
         }
-        
+
         for (CrossReference xref : xrefs) {
             enrich(xref);
         }

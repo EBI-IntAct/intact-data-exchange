@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.Interactor;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -24,5 +25,5 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 public interface BinaryInteractionEnricher {
 
     void enrich(BinaryInteraction binaryInteraction) throws Exception;
-
+    void enrich(Interactor interactor) throws Exception;
 }
