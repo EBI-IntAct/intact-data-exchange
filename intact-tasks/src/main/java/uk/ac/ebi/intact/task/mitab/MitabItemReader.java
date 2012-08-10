@@ -17,7 +17,6 @@ package uk.ac.ebi.intact.task.mitab;
 
 import org.springframework.batch.item.file.FlatFileItemReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.builder.DocumentDefinition;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -25,18 +24,12 @@ import psidev.psi.mi.tab.model.builder.DocumentDefinition;
  */
 public class MitabItemReader extends FlatFileItemReader<BinaryInteraction>{
 
-    private DocumentDefinition documentDefinition;
+    public MitabItemReader(){
+        setLineMapper(new MitabLineMapper());
+    }
 
     @Override
     protected void doOpen() throws Exception {
-
         super.doOpen();
-    }
-
-    public void setDocumentDefinition(DocumentDefinition documentDefinition) {
-        this.documentDefinition = documentDefinition;
-        MitabLineMapper mitabLineMapper = new MitabLineMapper();
-        mitabLineMapper.setDocumentDefinition(documentDefinition);
-        setLineMapper(mitabLineMapper);
     }
 }

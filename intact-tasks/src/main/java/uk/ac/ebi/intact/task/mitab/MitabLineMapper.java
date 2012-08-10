@@ -16,9 +16,8 @@
 package uk.ac.ebi.intact.task.mitab;
 
 import org.springframework.batch.item.file.LineMapper;
+import psidev.psi.mi.tab.io.PsimiTabReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.builder.DocumentDefinition;
-import psidev.psi.mi.tab.model.builder.MitabDocumentDefinition;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -26,24 +25,18 @@ import psidev.psi.mi.tab.model.builder.MitabDocumentDefinition;
  */
 public class MitabLineMapper implements LineMapper<BinaryInteraction>{
 
-    private DocumentDefinition documentDefinition;
+    private PsimiTabReader psimitabReader;
 
     public MitabLineMapper() {
+        this.psimitabReader = new PsimiTabReader();
     }
 
     public BinaryInteraction mapLine(String line, int lineNumber) throws Exception {
-        if (documentDefinition == null) {
-            documentDefinition = new MitabDocumentDefinition();
-        }
         
         try {
-            return documentDefinition.interactionFromString(line);
+            return psimitabReader.readLine(line);
         } catch (Exception e) {
             throw new Exception("Problem converting to binary interaction line "+lineNumber+": "+line);
         }
-    }
-
-    public void setDocumentDefinition(DocumentDefinition documentDefinition) {
-        this.documentDefinition = documentDefinition;
     }
 }

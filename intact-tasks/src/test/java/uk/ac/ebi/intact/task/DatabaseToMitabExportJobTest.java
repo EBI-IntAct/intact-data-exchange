@@ -14,7 +14,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import psidev.psi.mi.tab.PsimiTabReader;
+import psidev.psi.mi.tab.io.PsimiTabReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
@@ -87,7 +87,7 @@ public class DatabaseToMitabExportJobTest extends IntactBasicTestCase{
         File generatedMitab = new File("target/lala.txt");
         Assert.assertTrue(generatedMitab.exists());
         
-        PsimiTabReader reader = new PsimiTabReader(true);
+        PsimiTabReader reader = new PsimiTabReader();
         Collection<BinaryInteraction> binaryInteractions = reader.read(generatedMitab);
         Assert.assertEquals(5, binaryInteractions.size());
     }
@@ -125,7 +125,7 @@ public class DatabaseToMitabExportJobTest extends IntactBasicTestCase{
         File generatedMitab = new File("target/lala.txt");
         Assert.assertTrue(generatedMitab.exists());
 
-        PsimiTabReader reader = new PsimiTabReader(true);
+        PsimiTabReader reader = new PsimiTabReader();
         Collection<BinaryInteraction> binaryInteractions = reader.read(generatedMitab);
         Assert.assertEquals(4, binaryInteractions.size());
     }
@@ -165,7 +165,7 @@ public class DatabaseToMitabExportJobTest extends IntactBasicTestCase{
         File generatedMitab = new File("target/lala.txt");
         Assert.assertTrue(generatedMitab.exists());
 
-        PsimiTabReader reader = new PsimiTabReader(true);
+        PsimiTabReader reader = new PsimiTabReader();
         Collection<BinaryInteraction> binaryInteractions = reader.read(generatedMitab);
         Assert.assertEquals(4, binaryInteractions.size());
     }
@@ -200,7 +200,7 @@ public class DatabaseToMitabExportJobTest extends IntactBasicTestCase{
         File generatedMitab = new File("target/lala.txt");
         Assert.assertTrue(generatedMitab.exists());
 
-        PsimiTabReader reader = new PsimiTabReader(true);
+        PsimiTabReader reader = new PsimiTabReader();
         Collection<BinaryInteraction> binaryInteractions = reader.read(generatedMitab);
         Assert.assertEquals(0, binaryInteractions.size());
     }

@@ -15,47 +15,79 @@
  */
 package uk.ac.ebi.intact.task.mitab.index;
 
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.core.io.Resource;
 import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamException;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BinaryInteractionEnricher;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.OntologyBinaryInteractionEnricher;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.OntologyCrossReferenceEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
+import uk.ac.ebi.intact.task.mitab.BinaryIteractionItemProcessor;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class OntologyEnricherItemProcessor implements ItemProcessor<BinaryInteraction,BinaryInteraction> {
+public class OntologyEnricherItemProcessor implements BinaryIteractionItemProcessor, ItemStream {
 
-    private Resource ontologiesSolrUrl;
+    private String ontologiesSolrUrl;
 
     private BinaryInteractionEnricher enricher;
+    private boolean processOnlyInteractors = false;
 
     public BinaryInteraction process(BinaryInteraction item) throws Exception {
-        if (enricher == null) {
 
-            if (ontologiesSolrUrl == null) {
-                throw new NullPointerException("ontologiesSolrUrl is null");
-            }
-            
-            SolrServer ontologiesSolrServer = new CommonsHttpSolrServer(ontologiesSolrUrl.getURL());
-            OntologySearcher ontologySearcher = new OntologySearcher(ontologiesSolrServer);
-            enricher = new OntologyBinaryInteractionEnricher(ontologySearcher);
+        if (!processOnlyInteractors){
+            enricher.enrich(item);
         }
-
-        enricher.enrich(item);
+        else {
+            if (item.getInteractorA() != null){
+                enricher.enrich(item.getInteractorA());
+            }
+            if (item.getInteractorB() != null){
+                enricher.enrich(item.getInteractorB());
+            }
+        }
 
         return item;
     }
 
-    public void setOntologiesSolrUrl(Resource ontologiesSolrUrl) {
+    public void setOntologiesSolrUrl(String ontologiesSolrUrl) {
         this.ontologiesSolrUrl = ontologiesSolrUrl;
     }
 
     public void setEnricher(BinaryInteractionEnricher enricher) {
         this.enricher = enricher;
+    }
+
+    @Override
+    public void onlyProcessInteractors(boolean onlyInteractors) {
+        this.processOnlyInteractors = onlyInteractors;
+    }
+
+    @Override
+    public void open(ExecutionContext executionContext) throws ItemStreamException {
+        if (enricher == null) {
+
+            if (ontologiesSolrUrl == null) {
+                throw new ItemStreamException("ontologiesSolrUrl is null");
+            }
+
+            SolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl);
+            OntologySearcher ontologySearcher = new OntologySearcher(ontologiesSolrServer);
+            enricher = new OntologyCrossReferenceEnricher(ontologySearcher);
+        }
+    }
+
+    @Override
+    public void update(ExecutionContext executionContext) throws ItemStreamException {
+        // nothing to do
+    }
+
+    @Override
+    public void close() throws ItemStreamException {
+        this.enricher = null;
     }
 }

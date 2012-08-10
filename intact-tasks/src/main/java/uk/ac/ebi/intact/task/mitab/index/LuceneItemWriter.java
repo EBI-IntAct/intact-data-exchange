@@ -17,16 +17,16 @@ package uk.ac.ebi.intact.task.mitab.index;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import psidev.psi.mi.search.index.PsimiIndexWriter;
 import psidev.psi.mi.search.index.impl.BinaryInteractionIndexWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.search.IntactPsimiTabIndexWriter;
 import uk.ac.ebi.intact.task.mitab.BinaryInteractionItemWriter;
 
 import java.io.File;
@@ -48,21 +48,13 @@ public class LuceneItemWriter implements BinaryInteractionItemWriter, ItemStream
             return;
         }
 
-        PsimiIndexWriter psimiIndexWriter;
-
-        BinaryInteraction first = items.iterator().next();
-
-        if (first instanceof IntactBinaryInteraction) {
-            psimiIndexWriter = new IntactPsimiTabIndexWriter();
-        } else {
-            psimiIndexWriter = new BinaryInteractionIndexWriter();
-        }
+        PsimiIndexWriter psimiIndexWriter = new BinaryInteractionIndexWriter();
 
         for (BinaryInteraction binaryInteraction : items) {
             psimiIndexWriter.addBinaryInteractionToIndex(indexWriter, binaryInteraction);
         }
 
-        indexWriter.flush();
+        indexWriter.commit();
     }
 
     public void setDirectory(File directory) {
@@ -74,8 +66,8 @@ public class LuceneItemWriter implements BinaryInteractionItemWriter, ItemStream
             throw new NullPointerException("No directory set");
         }
         try {
-            Directory luceneDirectory = FSDirectory.getDirectory(directory);
-            indexWriter = new IndexWriter(luceneDirectory, new StandardAnalyzer());
+            Directory luceneDirectory = FSDirectory.open(directory);
+            indexWriter = new IndexWriter(luceneDirectory, new IndexWriterConfig(Version.LUCENE_36, new StandardAnalyzer(Version.LUCENE_36)));
         } catch (Throwable e) {
             throw new ItemStreamException("Problem creating lucene index writer for directory: "+directory, e);
         }
@@ -88,8 +80,7 @@ public class LuceneItemWriter implements BinaryInteractionItemWriter, ItemStream
     public void close() throws ItemStreamException {
         if (indexWriter != null) {
             try {
-                indexWriter.flush();
-                indexWriter.optimize();
+                indexWriter.commit();
                 indexWriter.close();
             } catch (IOException e) {
                 throw new ItemStreamException("Problem optimizing and closing index writer");

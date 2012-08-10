@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
 import uk.ac.ebi.intact.model.*;
 
 import javax.annotation.Resource;
@@ -60,18 +60,16 @@ public class MitabCreationTest extends IntactBasicTestCase {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private SolrJettyRunner solrJettyRunner;
+    private IntactSolrJettyRunner solrJettyRunner;
 
     @Before
     public void before() throws Exception {
+        solrJettyRunner.setPort(18080);
         solrJettyRunner.start();
     }
 
     @After
     public void after() throws Exception {
-
-        // uncommenting this will cause the test to hang - which might be used to perform extra solr query.
-        // solrJettyRunner.join();
 
         solrJettyRunner.stop();
     }

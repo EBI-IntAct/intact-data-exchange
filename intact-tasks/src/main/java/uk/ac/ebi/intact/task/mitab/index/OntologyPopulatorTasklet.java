@@ -18,14 +18,12 @@ package uk.ac.ebi.intact.task.mitab.index;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.core.io.Resource;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.bridges.ontologies.iterator.UniprotTaxonomyOntologyIterator;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologyIndexer;
@@ -38,7 +36,7 @@ import java.util.List;
  */
 public class OntologyPopulatorTasklet implements Tasklet{
 
-    private Resource ontologiesSolrUrl;
+    private String ontologiesSolrUrl;
     private List<OntologyMapping> oboOntologyMappings;
     private List<OntologyMapping> taxonomyOntologyMappings;
     private boolean indexUniprotTaxonomy;
@@ -47,7 +45,7 @@ public class OntologyPopulatorTasklet implements Tasklet{
         if (ontologiesSolrUrl == null) {
             throw new NullPointerException("ontologiesSolrUrl is null");
         }
-        StreamingUpdateSolrServer ontologiesSolrServer = new StreamingUpdateSolrServer(ontologiesSolrUrl.getURL().toString(), 10, 4);
+        HttpSolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl);
         ontologiesSolrServer.setMaxRetries(1);
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(ontologiesSolrServer);
@@ -71,6 +69,8 @@ public class OntologyPopulatorTasklet implements Tasklet{
         long count = countDocs(ontologiesSolrServer);
         contribution.getExitStatus().addExitDescription("Total docs in index: "+count);
 
+        ontologiesSolrServer.shutdown();
+
         return RepeatStatus.FINISHED;
     }
 
@@ -82,7 +82,7 @@ public class OntologyPopulatorTasklet implements Tasklet{
         return count;
     }
 
-    public void setOntologiesSolrUrl(Resource ontologiesSolrUrl) {
+    public void setOntologiesSolrUrl(String ontologiesSolrUrl) {
         this.ontologiesSolrUrl = ontologiesSolrUrl;
     }
 

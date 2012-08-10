@@ -6,7 +6,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import psidev.psi.mi.tab.PsimiTabReader;
+import psidev.psi.mi.tab.io.PsimiTabReader;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.converter.ConverterException;
 
@@ -32,7 +32,6 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
     private File clusteredMitabFile;
     private Map<BinaryPair, Double> scores;
     private String miScoreLabel;
-    private boolean hasHeader = false;
     private DecimalFormat scoreFormatter;
     
     private String[] databasesForUniqIdentifier;
@@ -84,10 +83,6 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
         this.miScoreLabel = miScoreLabel;
     }
 
-    public boolean isHasHeader() {
-        return hasHeader;
-    }
-
     public DecimalFormat getScoreFormatter() {
         return scoreFormatter;
     }
@@ -96,10 +91,6 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
         if (scoreFormatter != null){
             this.scoreFormatter = scoreFormatter;
         }
-    }
-
-    public void setHasHeader(boolean hasHeader) {
-        this.hasHeader = hasHeader;
     }
 
     /**
@@ -167,7 +158,7 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
             throw new ItemStreamException("The Mitab cluster score item processor needs a clustered mitab file containing the scores to be able to process the non clustered MITAB file");
         }
 
-        PsimiTabReader mitabReader = new PsimiTabReader(hasHeader);
+        PsimiTabReader mitabReader = new PsimiTabReader();
 
         try {
             Iterator<BinaryInteraction> binaryInteractionIterator = mitabReader.iterate(clusteredMitabFile);

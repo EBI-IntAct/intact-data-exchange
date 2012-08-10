@@ -18,24 +18,18 @@ package uk.ac.ebi.intact.task.mitab;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.CrossReferenceImpl;
-import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
-import uk.ac.ebi.intact.irefindex.seguid.RigidGenerator;
-import uk.ac.ebi.intact.irefindex.seguid.RogidGenerator;
-import uk.ac.ebi.intact.irefindex.seguid.SeguidException;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.PsimitabTools;
-import uk.ac.ebi.intact.psimitab.converters.InteractionConverter;
+import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
-import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -44,220 +38,69 @@ import java.util.*;
 public class InteractionExpansionCompositeProcessor implements ItemProcessor<Interaction, Collection<? extends BinaryInteraction>> {
     private static final Log log = LogFactory.getLog( InteractionExpansionCompositeProcessor.class );
 
-    private static final String SMALLMOLECULE_MI_REF = "MI:0328";
-    private static final String UNKNOWN_TAXID = "-3";
-
     private ExpansionStrategy expansionStategy;
 
-    private List<ItemProcessor<BinaryInteraction, BinaryInteraction>> binaryItemProcessors;
+    private List<BinaryIteractionItemProcessor> binaryItemProcessors;
+
+    private Intact2BinaryInteractionConverter intactInteractionConverter;
 
     public InteractionExpansionCompositeProcessor() {
         this.expansionStategy = new SpokeWithoutBaitExpansion();
-        this.binaryItemProcessors = new ArrayList<ItemProcessor<BinaryInteraction, BinaryInteraction>>();
+        this.binaryItemProcessors = new ArrayList<BinaryIteractionItemProcessor>();
+        this.intactInteractionConverter = new Intact2BinaryInteractionConverter(this.expansionStategy);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Collection<? extends BinaryInteraction> process(Interaction item) throws Exception {
-        if (!expansionStategy.isExpandable(item)) {
-            if (log.isWarnEnabled()) log.warn("Filtered interaction: "+item.getAc()+" (not expandable)");
+
+        if (item == null){
             return null;
         }
 
-        Collection<Interaction> interactions;
+        // reattach the interaction object to the entity manager because connection may have been closed after reading the object
+        Interaction intactInteraction = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().merge(item);
 
-        boolean expanded = false;
+        Collection<BinaryInteraction> binaryInteractions = intactInteractionConverter.convert(intactInteraction);
 
-        try {
-            interactions = expansionStategy.expand(item);
-        } catch (Throwable e) {
-            throw new InteractionExpansionException("Problem expanding interaction: "+item, e);
-        }
-
-        // if we have more than one interaction, it means that we have spoke expanded interactions
-        if (interactions != null && interactions.size() > 1) {
-
-            expanded = true;
-        }
-        else if (interactions == null){
-            interactions = Collections.EMPTY_LIST;
-        }
-
-        if (interactions.isEmpty()) {
+        if (binaryInteractions.isEmpty()) {
             if (log.isErrorEnabled()) {
-                log.error("Expansion did not generate any interaction for: "+item);
-                throw new InteractionExpansionException("Could not expand interaction: "+item);
+                log.error("Could not not generate any binary interactions for: "+item);
+                throw new InteractionExpansionException("Could not not generate any binary interactions for: "+item);
             }
         }
-
-        Collection<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>(interactions.size());
-
-        InteractionConverter interactionConverter = new InteractionConverter();
 
         log.info("Processing interaction : " + item.getAc());
 
-        for (Interaction interaction : interactions) {
+        boolean isFirst = true;
 
-            IntactBinaryInteraction binaryInteraction = interactionConverter.toBinaryInteraction(interaction);
+        for (BinaryInteraction binaryInteraction : binaryInteractions) {
 
-            //adding the expansion strategy here
-            if (expanded) {
-                binaryInteraction.getExpansionMethods().add(expansionStategy.getName());
+            if (isFirst){
+                for (BinaryIteractionItemProcessor delegate : binaryItemProcessors) {
+                    delegate.onlyProcessInteractors(false);
+                    binaryInteraction = delegate.process(binaryInteraction);
+                }
             }
-
-            for (ItemProcessor<BinaryInteraction,BinaryInteraction> delegate : binaryItemProcessors) {
-                binaryInteraction = (IntactBinaryInteraction) delegate.process(binaryInteraction);
-            }
-
-            flipInteractorsIfNecessary(binaryInteraction);
-
-            Interactor[] pair = findInteractors(interaction, binaryInteraction);
-
-            // Update Interactors' ROGID - first, identify in which order they are stored in MITAB
-            RogidGenerator rogidGenerator = new RogidGenerator();
-            RigDataModel rigA = buildRigDataModel(pair[0]);
-            RigDataModel rigB = buildRigDataModel(pair[1]);
-            try {
-                final String rogA = rogidGenerator.calculateRogid(rigA.getSequence(), rigA.getTaxid());
-                binaryInteraction.getInteractorA().getAlternativeIdentifiers().add(
-                        new CrossReferenceImpl("irefindex", rogA, "rogid"));
-
-                final String rogB = rogidGenerator.calculateRogid(rigB.getSequence(), rigB.getTaxid());
-                binaryInteraction.getInteractorB().getAlternativeIdentifiers().add(
-                        new CrossReferenceImpl("irefindex", rogB, "rogid"));
-
-                // Update Interaction RIGID
-                RigidGenerator rigidGenerator = new RigidGenerator();
-                rigidGenerator.addSequence(rigA.getSequence(), rigA.getTaxid());
-                rigidGenerator.addSequence(rigB.getSequence(), rigB.getTaxid());
-                String rig = rigidGenerator.calculateRigid();
-                binaryInteraction.getInteractionAcs().add(new CrossReferenceImpl("irefindex", rig, "rigid"));
-
-                binaryInteractions.add(binaryInteraction);
-
-            } catch (SeguidException e) {
-                throw new RuntimeException("An error occured while generating RIG/ROG identifier for " +
-                        "interaction " + interaction.getAc(), e);
+            else {
+                for (BinaryIteractionItemProcessor delegate : binaryItemProcessors) {
+                    delegate.onlyProcessInteractors(true);
+                    binaryInteraction = delegate.process(binaryInteraction);
+                }
             }
         }
-
-//        BinaryInteraction[] binaryInteractionArr = binaryInteractions.toArray(new BinaryInteraction[binaryInteractions.size()]);
-//
-//        for (int i=0; i<binaryInteractionArr.length; i++) {
-//            for (ItemProcessor<BinaryInteraction,BinaryInteraction> delegate : binaryItemProcessors) {
-//                binaryInteractionArr[i] = delegate.process(binaryInteractionArr[i]);
-//            }
-//        }
-//
-//        binaryInteractions = Arrays.asList(binaryInteractionArr);
 
         return binaryInteractions;
     }
 
-    private RigDataModel buildRigDataModel(Interactor interactor) {
-
-        String taxid;
-
-        if (interactor.getBioSource() != null) {
-            taxid = interactor.getBioSource().getTaxId();
-        } else {
-            taxid = UNKNOWN_TAXID;
-        }
-
-        String seq = null;
-        if (interactor.getClass().isAssignableFrom(Polymer.class)) {
-            Polymer polymer = (Polymer) interactor;
-            seq = polymer.getSequence();
-        }
-
-        if (seq == null) {
-            if (interactor instanceof SmallMolecule) {
-                // find INCHI key
-                final Annotation annotation = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(interactor, "MI:2010");// INCHI_MI_REF
-                if (annotation != null) {
-                    seq = annotation.getAnnotationText();
-                }
-            }
-
-            if (seq == null) {
-                seq = interactor.getAc();
-            }
-        }
-
-        return new RigDataModel(seq, taxid);
-    }
-
-    private Interactor[] findInteractors(Interaction interaction, IntactBinaryInteraction binaryInteraction) {
-
-        Interactor[] pair = new Interactor[2];
-
-        String interactorA = getIntactAc(binaryInteraction.getInteractorA());
-        String interactorB = getIntactAc(binaryInteraction.getInteractorB());
-
-        for (uk.ac.ebi.intact.model.Component component : interaction.getComponents()) {
-
-            final String interactorAc = component.getInteractor().getAc();
-
-            if (interactorAc.equals(interactorA) && pair[0] == null) {
-                pair[0] = component.getInteractor();
-            } else if (interactorAc.equals(interactorB)) {
-                pair[1] = component.getInteractor();
-            } else {
-                throw new IllegalStateException("Interaction AC: " + interaction.getAc() + " with " +
-                        interaction.getComponents().size() + " participants" +
-                        ", found Interactor '" + interactorAc +
-                        "' when expecting '" + interactorA + "' or '" + interactorB + "'");
-            }
-        }
-
-        if (pair[0] == null) {
-            System.out.println(interaction);
-            throw new IllegalStateException("Interaction '" + interaction.getAc() + "': Could not identify interactor A: AC='" + interactorA + "' ");
-        }
-
-        if (pair[1] == null) {
-            System.out.println(interaction);
-            throw new IllegalStateException("Interaction '" + interaction.getAc() + "':Could not identify interactor B: AC='" + interactorB + "' ");
-        }
-
-        return pair;
-    }
-
-    private String getIntactAc(ExtendedInteractor interactor) {
-        for (CrossReference reference : interactor.getIdentifiers()) {
-            if (reference.getDatabase().equalsIgnoreCase("intact")) {
-                return reference.getIdentifier();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Flips the interactors if necessary, so the small molecule is always interactor A
-     *
-     * @param bi
-     */
-    private void flipInteractorsIfNecessary(IntactBinaryInteraction bi) {
-        PsimitabTools.reorderInteractors(bi, new Comparator<ExtendedInteractor>() {
-
-            public int compare(ExtendedInteractor o1, ExtendedInteractor o2) {
-                final CrossReference type1 = o1.getInteractorType();
-                final CrossReference type2 = o2.getInteractorType();
-
-                if (type1 != null && SMALLMOLECULE_MI_REF.equals(type1.getIdentifier())) {
-                    return 1;
-                } else if (type2 != null && SMALLMOLECULE_MI_REF.equals(type2.getIdentifier())) {
-                    return -1;
-                }
-                return 0;
-            }
-        });
-    }
-
     public void setExpansionStategy(ExpansionStrategy expansionStategy) {
         this.expansionStategy = expansionStategy;
+
+        this.intactInteractionConverter = new Intact2BinaryInteractionConverter(this.expansionStategy);
     }
 
-    public void setBinaryItemProcessors(List<ItemProcessor<BinaryInteraction, BinaryInteraction>> delegates) {
-        this.binaryItemProcessors = delegates;
+    public void setBinaryItemProcessors(List<BinaryIteractionItemProcessor> delegates) {
+        if(delegates != null){
+            this.binaryItemProcessors = delegates;
+        }
     }
 }

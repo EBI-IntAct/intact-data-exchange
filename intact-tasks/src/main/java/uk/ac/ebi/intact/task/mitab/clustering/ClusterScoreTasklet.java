@@ -5,18 +5,19 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.repeat.RepeatStatus;
-import psidev.psi.mi.tab.PsimiTabReader;
-import psidev.psi.mi.tab.PsimiTabWriter;
+import psidev.psi.mi.tab.io.PsimiTabReader;
+import psidev.psi.mi.tab.io.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.builder.PsimiTab;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 
@@ -34,6 +35,7 @@ public class ClusterScoreTasklet implements Tasklet {
     private File mitabOutputFile;
     private boolean header = true;
     private String scoreName;
+    private String databaseToCluster = "uniprotkb,irefindex,ddbj/embl/genbank,chebi";
 
     public ClusterScoreTasklet(String mitabInputFolderName, String mitabOutputFolderName) {
         this.mitabInputFileName = mitabInputFolderName;
@@ -93,23 +95,26 @@ public class ClusterScoreTasklet implements Tasklet {
         /* Retrieve results */
         Map<Integer, EncoreInteraction> interactionMapping = interactionClusterScore.getInteractionMapping();
 
-        PsimiTabWriter writer = new PsimiTabWriter(header);
-        
-        boolean isFirstInteraction = true;
+        PsimiTabWriter writer = new PsimiTabWriter(PsimiTab.VERSION_2_5);
 
-        Encore2Binary iConverter = new Encore2Binary(interactionClusterScore.getMappingIdDbNames());
+        BufferedWriter outputWriter = new BufferedWriter(new FileWriter(mitabOutputFile));
 
-        for(Integer mappingId:interactionMapping.keySet()){
-            EncoreInteraction eI = interactionMapping.get(mappingId);
-            BinaryInteraction bI = iConverter.getBinaryInteractionForScoring(eI);
-            
-            if (isFirstInteraction){
-                isFirstInteraction = false;
-                writer.writeOrAppend(bI, mitabOutputFile, true);
+        try{
+            if (header){
+                writer.writeMitabHeader(outputWriter);
             }
-            else {
-                writer.writeOrAppend(bI, mitabOutputFile, false);
+
+            Encore2Binary iConverter = new Encore2Binary(interactionClusterScore.getMappingIdDbNames());
+
+            for(Integer mappingId:interactionMapping.keySet()){
+                EncoreInteraction eI = interactionMapping.get(mappingId);
+                BinaryInteraction bI = iConverter.getBinaryInteractionForScoring(eI);
+
+                writer.write(bI, outputWriter);
             }
+        }
+        finally {
+            outputWriter.close();
         }
     }
 
@@ -127,17 +132,15 @@ public class ClusterScoreTasklet implements Tasklet {
         this.checkInputMitabFile();
 
         /* Get mitab file */
-        PsimiTabReader mitabReader = new PsimiTabReader(header);
+        PsimiTabReader mitabReader = new PsimiTabReader();
 
         InteractionClusterScore interactionClusterScore = new InteractionClusterScore();
         interactionClusterScore.setScoreName(scoreName);
 
         /* Get binaryInteractions from mitab file */
-        List<BinaryInteraction> binaryInteractions = new ArrayList<BinaryInteraction>();
-        binaryInteractions.addAll(mitabReader.read(mitabInputFile));
+        interactionClusterScore.setBinaryInteractionIterator(mitabReader.iterate(mitabInputFile));
         /* Run cluster using list of binary interactions as input */
-        interactionClusterScore.setBinaryInteractionIterator(binaryInteractions.iterator());
-        interactionClusterScore.setMappingIdDbNames("uniprotkb,irefindex,ddbj/embl/genbank,chebi");
+        interactionClusterScore.setMappingIdDbNames(databaseToCluster);
         interactionClusterScore.runService();
 
         /* Save mitab clustered data in files */
@@ -161,5 +164,13 @@ public class ClusterScoreTasklet implements Tasklet {
 
     public void setScoreName(String scoreName) {
         this.scoreName = scoreName;
+    }
+
+    public String getDatabaseToCluster() {
+        return databaseToCluster;
+    }
+
+    public void setDatabaseToCluster(String databaseToCluster) {
+        this.databaseToCluster = databaseToCluster;
     }
 }

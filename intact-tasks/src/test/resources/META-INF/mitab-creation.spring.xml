@@ -15,10 +15,10 @@
            http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
 
     <!-- Initialize the datasource -->
-	<bean id="intactDataSourceInitializer" class="uk.ac.ebi.intact.core.batch.BatchDatasourceInitializer">
-		<property name="dataSource" ref="intactBatchDataSource"/>
-		<property name="initScripts" value="classpath*:/org/springframework/batch/core/schema-h2.sql"/>
-	</bean>
+    <bean id="intactDataSourceInitializer" class="uk.ac.ebi.intact.core.batch.BatchDatasourceInitializer">
+        <property name="dataSource" ref="intactBatchDataSource"/>
+        <property name="initScripts" value="classpath*:/org/springframework/batch/core/schema-h2.sql"/>
+    </bean>
 
     <bean id="intactBatchDataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="org.h2.Driver"/>
@@ -28,44 +28,40 @@
     </bean>
 
     <!-- Some beans -->
-    <bean id="solrJettyRunner" class="uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner"/>
-    
+    <bean id="solrJettyRunner" class="uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner"/>
+
     <bean id="mitabWriter" class="uk.ac.ebi.intact.task.mitab.MitabItemWriter">
-        <property name="outputFile" value="target/lala.txt"/>
-     </bean>
-
-    <bean id="luceneMitabWriter" class="uk.ac.ebi.intact.task.mitab.index.LuceneItemWriter">
-        <property name="directory" value="target/lala-lucene"/>
+        <property name="resource">
+            <bean class="org.springframework.core.io.FileSystemResource">
+                <constructor-arg value="target/lala.txt"/>
+            </bean>
+        </property>
+        <property name="mitabVersion" value="42"/>
     </bean>
 
-    <bean id="solrMitabWriter" class="uk.ac.ebi.intact.task.mitab.index.SolrItemWriter">
-        <property name="interactionsSolrUrl" value="http://localhost:18080/solr/core_pub"/>
+    <bean id="mitabCalimochoReader" class="org.hupo.psi.mi.psicquic.indexing.batch.reader.MitabCalimochoReader">
+        <property name="resource">
+            <bean class="org.springframework.core.io.FileSystemResource">
+                <constructor-arg value="target/lala.txt"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="solrMitabWriter" class="uk.ac.ebi.intact.task.mitab.index.IntactSolrItemWriter">
+        <property name="solrUrl" value="http://localhost:18080/solr/core_pub"/>
         <property name="ontologiesSolrUrl" value="http://localhost:18080/solr/core_ontology_pub"/>
-        <property name="documentDefinition">
-            <bean class="uk.ac.ebi.intact.psimitab.IntactDocumentDefinition"/>
-        </property>
-    </bean>
-
-    <bean id="compositeMitabWriter" class="uk.ac.ebi.intact.task.mitab.MitabCollectionCompositeWriter">
-        <property name="delegates">
-            <list>
-                <ref bean="mitabWriter"/>
-                <ref bean="luceneMitabWriter"/>
-                <ref bean="solrMitabWriter"/>
-            </list>
-        </property>
     </bean>
 
     <bean id="interactionExpansionCompositeItemProcessor"
-            class="uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor">
+          class="uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor">
         <property name="binaryItemProcessors">
-          <list>
-            <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyEnricherItemProcessor">
-                <property name="ontologiesSolrUrl" value="http://localhost:18080/solr/core_ontology_pub"/>
-            </bean>
-          </list>
+            <list>
+                <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyEnricherItemProcessor">
+                    <property name="ontologiesSolrUrl" value="http://localhost:18080/solr/core_ontology_pub"/>
+                </bean>
+            </list>
         </property>
-      </bean>
+    </bean>
 
     <bean id="smallOntologyPopulator" class="uk.ac.ebi.intact.task.mitab.index.OntologyPopulatorTasklet" scope="prototype">
         <property name="ontologiesSolrUrl" value="http://localhost:18080/solr/core_ontology_pub"/>
@@ -97,20 +93,35 @@
     </bean>
 
     <!-- Some tests jobs -->
-     <batch:job id="createMitabJob" job-repository="intactJobRepository">
-         <batch:step id="prepareOntologies" next="interactionsToMitabStep">
-             <batch:tasklet ref="smallOntologyPopulator"/>
-         </batch:step>
-        <batch:step id="interactionsToMitabStep" parent="intactBatchStep">
+    <batch:job id="createMitabJob" job-repository="intactJobRepository">
+        <batch:step id="prepareOntologies" next="dbExport">
+            <batch:tasklet ref="smallOntologyPopulator"/>
+        </batch:step>
+        <batch:step id="dbExport" next="interactionsToMitabStep">
             <batch:tasklet>
                 <batch:chunk reader="interactionReaderExcludeNegative"
-                             processor="interactionExpansionCompositeItemProcessor"
-                             writer="compositeMitabWriter">
+                             processor="SimpleInteractionExpansionCompositeItemProcessor"
+                             writer="intactToMitabWriter"
+                             skip-limit="10000">
                     <batch:streams>
                         <batch:stream ref="interactionReaderExcludeNegative"/>
                         <batch:stream ref="mitabWriter"/>
-                        <batch:stream ref="luceneMitabWriter"/>
+                    </batch:streams>
+
+                    <batch:skippable-exception-classes>
+                        <batch:include class="uk.ac.ebi.intact.task.mitab.InteractionExpansionException"/>
+                    </batch:skippable-exception-classes>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="interactionsToMitabStep" parent="intactBatchStep">
+            <batch:tasklet>
+                <batch:chunk reader="mitabCalimochoReader"
+                             writer="solrMitabWriter">
+                    <batch:streams>
+                        <batch:stream ref="mitabCalimochoReader"/>
                         <batch:stream ref="solrMitabWriter"/>
+                        <batch:stream ref="smallOntologyPopulator"/>
                     </batch:streams>
                 </batch:chunk>
             </batch:tasklet>

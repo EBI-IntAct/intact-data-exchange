@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import psidev.psi.mi.tab.PsimiTabReader;
+import psidev.psi.mi.tab.io.PsimiTabReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Confidence;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
@@ -40,7 +40,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
     @Test
     public void process_binaryInteraction_one_existing_mi_score() throws Exception, IOException {
 
-        PsimiTabReader mitabReader = new PsimiTabReader(true);
+        PsimiTabReader mitabReader = new PsimiTabReader();
 
         Iterator<BinaryInteraction> binaryInteractionIterator = mitabReader.iterate(new File(MitabClusterScoreItemProcessorTest.class.getResource("/mitab.txt").getFile()));
 
@@ -70,7 +70,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
     @Test
     public void process_binaryInteraction_several_existing_scores() throws Exception, IOException {
 
-        PsimiTabReader mitabReader = new PsimiTabReader(true);
+        PsimiTabReader mitabReader = new PsimiTabReader();
 
         Iterator<BinaryInteraction> binaryInteractionIterator = mitabReader.iterate(new File(MitabClusterScoreItemProcessorTest.class.getResource("/mitab.txt").getFile()));
 
@@ -96,7 +96,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
     @Test
     public void process_binaryInteraction_no_mi_score() throws Exception, IOException {
 
-        PsimiTabReader mitabReader = new PsimiTabReader(true);
+        PsimiTabReader mitabReader = new PsimiTabReader();
 
         Iterator<BinaryInteraction> binaryInteractionIterator = mitabReader.iterate(new File(MitabClusterScoreItemProcessorTest.class.getResource("/mitab.txt").getFile()));
 

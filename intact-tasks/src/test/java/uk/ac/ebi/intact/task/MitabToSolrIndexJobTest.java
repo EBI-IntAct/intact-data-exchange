@@ -3,7 +3,10 @@ package uk.ac.ebi.intact.task;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
@@ -18,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.server.SolrJettyRunner;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -46,10 +49,11 @@ public class MitabToSolrIndexJobTest extends IntactBasicTestCase{
     private ApplicationContext applicationContext;
 
     @Autowired
-    private SolrJettyRunner solrJettyRunner;
+    private IntactSolrJettyRunner solrJettyRunner;
 
     @Before
     public void before() throws Exception {
+        solrJettyRunner.setPort(18080);
         solrJettyRunner.start();
     }
 

@@ -15,13 +15,11 @@
  */
 package uk.ac.ebi.intact.task.mitab.index;
 
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.core.io.Resource;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,29 +28,34 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class SolrCleanerTasklet implements Tasklet {
+public class MultipleSolrCoreCleanerTasklet implements Tasklet {
 
-    private List<Resource> solrUrls;
+    private List<String> solrUrls;
 
-    public SolrCleanerTasklet() {
+    public MultipleSolrCoreCleanerTasklet() {
         solrUrls = Collections.EMPTY_LIST;
     }
 
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        for (Resource solrUrl : solrUrls) {
-            SolrServer ontologiesSolrServer = new CommonsHttpSolrServer(solrUrl.getURL());
+        for (String solrUrl : solrUrls) {
+            // delete all previous records
+            HttpSolrServer solrServer = new HttpSolrServer(solrUrl);
+            solrServer.deleteByQuery("*:*");
 
-            ontologiesSolrServer.deleteByQuery("*:*");
-            ontologiesSolrServer.commit();
-            ontologiesSolrServer.optimize();
+            // optimize here
+            solrServer.optimize();
 
             contribution.getExitStatus().addExitDescription("Cleared: " + solrUrl);
+
+            solrServer.shutdown();
         }
 
         return RepeatStatus.FINISHED;
     }
 
-    public void setSolrUrls(List<Resource> solrUrls) {
-        this.solrUrls = solrUrls;
+    public void setSolrUrls(List<String> solrUrls) {
+        if (solrUrls != null){
+            this.solrUrls = solrUrls;
+        }
     }
 }
