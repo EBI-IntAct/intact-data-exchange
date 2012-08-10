@@ -32,6 +32,13 @@ public class MitabItemWriter extends FlatFileItemWriter<BinaryInteraction> imple
     private static final String RESTART_DATA_NAME = "current.count";
 
     @Override
+    public void afterPropertiesSet() throws Exception {
+        // important to override this method or the writer will complain
+        setLineAggregator(new MitabLineAggregator(mitabVersion, false));
+        super.afterPropertiesSet();
+    }
+
+    @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
 
         if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {

@@ -46,7 +46,7 @@ import java.util.Map;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@ContextConfiguration(locations = {"/META-INF/mitab-creation.spring.xml"})
+@ContextConfiguration(locations = {"/META-INF/mitab-creation.spring.xml", "/META-INF/job-tests.spring.xml"})
 @Transactional(propagation = Propagation.NEVER)
 public class MitabCreationTest extends IntactBasicTestCase {
 

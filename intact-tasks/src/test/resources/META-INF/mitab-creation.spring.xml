@@ -52,13 +52,15 @@
         <property name="ontologiesSolrUrl" value="http://localhost:18080/solr/core_ontology_pub"/>
     </bean>
 
+    <bean id="ontologyEnricherItemProcessor" class="uk.ac.ebi.intact.task.mitab.index.OntologyEnricherItemProcessor">
+        <property name="ontologiesSolrUrl" value="http://localhost:18080/solr/core_ontology_pub"/>
+    </bean>
+
     <bean id="interactionExpansionCompositeItemProcessor"
           class="uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor">
         <property name="binaryItemProcessors">
             <list>
-                <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyEnricherItemProcessor">
-                    <property name="ontologiesSolrUrl" value="http://localhost:18080/solr/core_ontology_pub"/>
-                </bean>
+                 <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyEnricherItemProcessor"/>
             </list>
         </property>
     </bean>
@@ -97,15 +99,16 @@
         <batch:step id="prepareOntologies" next="dbExport">
             <batch:tasklet ref="smallOntologyPopulator"/>
         </batch:step>
-        <batch:step id="dbExport" next="interactionsToMitabStep">
+        <batch:step id="dbExport" next="interactionsToMitabStep" parent="intactBatchStep">
             <batch:tasklet>
                 <batch:chunk reader="interactionReaderExcludeNegative"
-                             processor="SimpleInteractionExpansionCompositeItemProcessor"
+                             processor="interactionExpansionCompositeItemProcessor"
                              writer="intactToMitabWriter"
                              skip-limit="10000">
                     <batch:streams>
                         <batch:stream ref="interactionReaderExcludeNegative"/>
                         <batch:stream ref="mitabWriter"/>
+                        <batch:stream ref="ontologyEnricherItemProcessor"/>
                     </batch:streams>
 
                     <batch:skippable-exception-classes>
@@ -121,7 +124,6 @@
                     <batch:streams>
                         <batch:stream ref="mitabCalimochoReader"/>
                         <batch:stream ref="solrMitabWriter"/>
-                        <batch:stream ref="smallOntologyPopulator"/>
                     </batch:streams>
                 </batch:chunk>
             </batch:tasklet>

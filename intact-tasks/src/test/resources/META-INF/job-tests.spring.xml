@@ -22,6 +22,15 @@
             </list>
         </property>
     </bean>
+    <bean id="mitabWriter25" class="uk.ac.ebi.intact.task.mitab.MitabItemWriter">
+        <property name="resource">
+            <bean class="org.springframework.core.io.FileSystemResource">
+                <constructor-arg value="target/lala.txt"/>
+            </bean>
+        </property>
+        <property name="mitabVersion" value="15"/>
+    </bean>
+
 
     <bean id="SimpleInteractionExpansionCompositeItemProcessor"
           class="uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor">
@@ -31,8 +40,12 @@
         <property name="resource" value="classpath:/mitab.txt"/>
     </bean>
 
-    <bean id="solrMitabReader" class="uk.ac.ebi.intact.task.mitab.MitabItemReader">
-        <property name="resource" value="classpath:/resulting_mitab_score.txt"/>
+    <bean id="solrMitabReader" class="org.hupo.psi.mi.psicquic.indexing.batch.reader.MitabCalimochoReader">
+        <property name="resource">
+            <bean class="org.springframework.core.io.FileSystemResource">
+                <constructor-arg value="src/test/resources/resulting_mitab_score.txt"/>
+            </bean>
+        </property>
     </bean>
 
     <bean id="mitabClusteredProcessor" class="uk.ac.ebi.intact.task.mitab.clustering.MitabClusterScoreItemProcessor">
@@ -85,11 +98,11 @@
         <batch:tasklet>
             <batch:chunk reader="nonClusteredMitabReader"
                          processor="mitabClusteredProcessor"
-                         writer="mitabWriter">
+                         writer="mitabWriter25">
                 <batch:streams>
                     <batch:stream ref="nonClusteredMitabReader"/>
                     <batch:stream ref="mitabClusteredProcessor"/>
-                    <batch:stream ref="mitabWriter"/>
+                    <batch:stream ref="mitabWriter25"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
