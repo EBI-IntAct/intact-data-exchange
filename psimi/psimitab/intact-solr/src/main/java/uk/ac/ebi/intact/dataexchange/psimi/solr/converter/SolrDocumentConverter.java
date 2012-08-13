@@ -34,8 +34,9 @@ import psidev.psi.mi.calimocho.solr.converter.Converter;
 import psidev.psi.mi.calimocho.solr.converter.SolrFieldName;
 import psidev.psi.mi.calimocho.solr.converter.SolrFieldUnit;
 import psidev.psi.mi.calimocho.solr.converter.TextFieldConverter;
-import psidev.psi.mi.tab.io.PsimiTabReader;
+import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.FieldNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.extension.AnnotationTopicsToEnrichConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.extension.FeatureTypeToEnrichConverter;
@@ -267,15 +268,15 @@ public class SolrDocumentConverter extends Converter{
         return row;
     }
 
-    public BinaryInteraction toBinaryInteraction(SolrDocument doc) {
+    public BinaryInteraction toBinaryInteraction(SolrDocument doc) throws ConverterException {
         return toBinaryInteraction((Object) doc);
     }
 
-    public BinaryInteraction toBinaryInteraction(SolrInputDocument doc){
+    public BinaryInteraction toBinaryInteraction(SolrInputDocument doc) throws ConverterException {
         return toBinaryInteraction((Object) doc);
     }
 
-    protected BinaryInteraction toBinaryInteraction(Object doc) {
+    protected BinaryInteraction toBinaryInteraction(Object doc) throws ConverterException {
 
         BinaryInteraction binaryInteraction = mitabReader.readLine(toMitabLine(doc));
 

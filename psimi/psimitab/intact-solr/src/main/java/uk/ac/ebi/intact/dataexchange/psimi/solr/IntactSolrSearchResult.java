@@ -17,7 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.solr.common.SolrDocumentList;
 import org.hupo.psi.mi.psicquic.model.PsicquicSearchResults;
-import psidev.psi.mi.tab.io.PsimiTabReader;
+import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.xml.converter.ConverterException;
 

@@ -19,9 +19,9 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.tab.io.PsimiTabWriter;
+import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.builder.PsimiTab;
+import psidev.psi.mi.tab.model.builder.PsimiTabVersion;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.AbstractSolrTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.FieldNames;
 
@@ -75,7 +75,7 @@ public class SolrDocumentConverterTest extends AbstractSolrTestCase {
         Assert.assertEquals("MI:0326", binaryInteraction.getInteractorA().getInteractorTypes().iterator().next().getIdentifier());
         Assert.assertEquals("MI:0326", binaryInteraction.getInteractorB().getInteractorTypes().iterator().next().getIdentifier());
 
-        PsimiTabWriter writer = new PsimiTabWriter(PsimiTab.VERSION_2_7);
+        PsimiTabWriter writer = new PsimiTabWriter(PsimiTabVersion.v2_7);
         //binaryinteraction back to solrinputdoc
         StringWriter stringWriter = new StringWriter();
         writer.write(binaryInteraction, stringWriter);
