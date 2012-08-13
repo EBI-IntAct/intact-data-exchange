@@ -29,7 +29,7 @@
         <excludeInferred>true</excludeInferred>
         <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
         <db.hbm2ddl>none</db.hbm2ddl>
-        <spring.version>3.0.2.RELEASE</spring.version>
+        <spring.version>3.1.2.RELEASE</spring.version>
     </properties>
 
     <build>
@@ -356,14 +356,14 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.0.20070617</version>
+            <version>1.3.168</version>
         </dependency>
 
         <!-- Other -->
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
+            <version>3.2.1</version>
         </dependency>
 
         <!--Spring-->
