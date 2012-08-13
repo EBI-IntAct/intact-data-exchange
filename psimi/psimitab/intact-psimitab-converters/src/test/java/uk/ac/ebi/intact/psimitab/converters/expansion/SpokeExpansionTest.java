@@ -80,6 +80,7 @@ public class SpokeExpansionTest extends IntactBasicTestCase {
         Component selfComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
         selfComponent.getCvExperimentalRole().setShortLabel(CvExperimentalRole.SELF);
         selfComponent.getCvExperimentalRole().setIdentifier(CvExperimentalRole.SELF_PSI_REF);
+        selfComponent.getCvExperimentalRole().getXrefs().iterator().next().setPrimaryId(CvExperimentalRole.PREY_PSI_REF);
         selfComponent.setStoichiometry( 2 );
 
         Interaction interaction = getMockBuilder().createInteractionRandomBinary( );

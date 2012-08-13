@@ -2,11 +2,10 @@ package uk.ac.ebi.intact.psimitab.converters;
 
 import org.junit.Assert;
 import org.junit.Test;
-import psidev.psi.mi.tab.io.PsimiTabWriter;
+import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.Interactor;
-import psidev.psi.mi.tab.model.builder.PsimiTab;
+import psidev.psi.mi.tab.model.builder.PsimiTabVersion;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.XrefUtils;
@@ -93,18 +92,19 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         InteractionConverter interactionConverter = new InteractionConverter();
         BinaryInteraction intactBi = interactionConverter.toBinaryInteraction( binaryInteraction );
         Assert.assertTrue("No identifier in PropertyA",checkIfPropertiesHasIdentity(intactBi.getInteractorA().getXrefs()));
-        Assert.assertTrue("No identifier in PropertyB",checkIfPropertiesHasIdentity(intactBi.getInteractorB().getXrefs()));
+        // two xrefs but no identity
+        Assert.assertFalse("No identifier in PropertyB", checkIfPropertiesHasIdentity(intactBi.getInteractorB().getXrefs()));
 
-        Assert.assertEquals(2,checkNumberOfIdentifiersInProperties(intactBi.getInteractorA().getXrefs()));
-        Assert.assertEquals(1,checkNumberOfIdentifiersInProperties(intactBi.getInteractorB().getXrefs()));
+        Assert.assertEquals(1,checkNumberOfIdentifiersInProperties(intactBi.getInteractorA().getXrefs()));
+        Assert.assertEquals(0,checkNumberOfIdentifiersInProperties(intactBi.getInteractorB().getXrefs()));
 
         List<CrossReference> propertiesA = intactBi.getInteractorA().getXrefs();
-        Assert.assertEquals(5,propertiesA.size());
+        Assert.assertEquals(4,propertiesA.size());
 
         List<CrossReference> propertiesB = intactBi.getInteractorB().getXrefs();
-        Assert.assertEquals(2,propertiesB.size());
+        Assert.assertEquals(1,propertiesB.size());
 
-        PsimiTabWriter writer = new PsimiTabWriter(PsimiTab.VERSION_2_7);
+        PsimiTabWriter writer = new PsimiTabWriter(PsimiTabVersion.v2_7);
         StringWriter stringWriter = new StringWriter();
         writer.write(intactBi, stringWriter);
 
@@ -178,7 +178,8 @@ public class InteractorConverterTest extends IntactBasicTestCase {
 
         Assert.assertNotNull( interactor.getInteractor().getAlternativeIdentifiers() );
         Assert.assertEquals( 2, interactor.getInteractor().getAlternativeIdentifiers().size() );
-        Assert.assertEquals( 2, interactor.getInteractor().getAliases().size() );
+        // two aliases plus display_short and display_long
+        Assert.assertEquals( 4, interactor.getInteractor().getAliases().size() );
 
     }
 
@@ -199,14 +200,26 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         InteractionConverter interactionConverter = new InteractionConverter();
         BinaryInteraction intactBi = interactionConverter.toBinaryInteraction( binaryInteraction );
 
-        Assert.assertEquals(1,intactBi.getInteractorA().getAliases().size());
-        Assert.assertEquals("iamadna",intactBi.getInteractorA().getAliases().iterator().next().getName());
-        Assert.assertEquals("intact",intactBi.getInteractorA().getAliases().iterator().next().getDbSource());
-        Assert.assertEquals("shortlabel",intactBi.getInteractorA().getAliases().iterator().next().getAliasType());
+        // display short plus display long, shortlabel, gene name
+        Assert.assertEquals(4,intactBi.getInteractorA().getAliases().size());
+        boolean hasFoundAliasLabel = false;
+        for (psidev.psi.mi.tab.model.Alias al : intactBi.getInteractorA().getAliases()){
+           if (al.getName().equalsIgnoreCase("iamadna")){
+               Assert.assertEquals("ddbj/embl/genbank",al.getDbSource());
+               Assert.assertEquals("shortlabel",al.getAliasType());
+               hasFoundAliasLabel = true;
+           }
+        }
+        Assert.assertTrue(hasFoundAliasLabel);
 
-        Assert.assertEquals("iamaprotein",intactBi.getInteractorB().getAliases().iterator().next().getName());
-        Assert.assertEquals("uniprotkb",intactBi.getInteractorB().getAliases().iterator().next().getDbSource());
-        Assert.assertEquals("shortlabel",intactBi.getInteractorB().getAliases().iterator().next().getAliasType());
+        boolean hasFoundAliasLabel2 = false;
+        for (psidev.psi.mi.tab.model.Alias al : intactBi.getInteractorB().getAliases()){
+            if (al.getName().equalsIgnoreCase("iamaprotein") && al.getDbSource().equalsIgnoreCase("uniprotkb")){
+                Assert.assertEquals("shortlabel",al.getAliasType());
+                hasFoundAliasLabel2=true;
+            }
+        }
+        Assert.assertTrue(hasFoundAliasLabel2);
 
     }
 }

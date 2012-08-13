@@ -83,8 +83,6 @@ public abstract class AbstractEnricher {
                     else {
                         CrossReference identity = xRefConverter.createCrossReference(ref, false);
                         if (identity != null){
-                            hasFoundIdentity = true;
-
                             mitabInteractor.getAlternativeIdentifiers().add(identity);
                         }
                     }
@@ -93,8 +91,6 @@ public abstract class AbstractEnricher {
                 else {
                     CrossReference xref = xRefConverter.createCrossReference(ref, true);
                     if (xref != null){
-                        hasFoundIdentity = true;
-
                         mitabInteractor.getXrefs().add(xref);
                     }
                 }

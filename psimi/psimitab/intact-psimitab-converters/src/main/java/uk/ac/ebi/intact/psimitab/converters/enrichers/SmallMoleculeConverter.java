@@ -152,8 +152,6 @@ public class SmallMoleculeConverter extends AbstractEnricher{
                     else {
                         CrossReference identity = xRefConverter.createCrossReference(ref, false);
                         if (identity != null){
-                            hasFoundIdentity = true;
-
                             mitabInteractor.getAlternativeIdentifiers().add(identity);
                         }
                     }
@@ -162,8 +160,6 @@ public class SmallMoleculeConverter extends AbstractEnricher{
                 else {
                     CrossReference xref = xRefConverter.createCrossReference(ref, true);
                     if (xref != null){
-                        hasFoundIdentity = true;
-
                         mitabInteractor.getXrefs().add(xref);
                     }
                 }

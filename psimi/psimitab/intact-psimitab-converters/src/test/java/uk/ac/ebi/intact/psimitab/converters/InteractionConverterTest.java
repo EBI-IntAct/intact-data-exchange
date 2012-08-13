@@ -41,9 +41,13 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         i.next().getInteractor().setAc( "EBI-yyyyyyy" );
 
         Experiment exp = interaction.getExperiments().iterator().next();
+        ExperimentXref pubRef = exp.getXrefs().iterator().next();
+        Publication pub = exp.getPublication();
         CvDatabase imex = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
         CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        exp.addXref(getMockBuilder().createXref(exp, "IM-1234", imexPrimary, imex));
+        pub.addXref(getMockBuilder().createXref(pub, "IM-1234", imexPrimary, imex));
+        pub.addXref(getMockBuilder().createXref(pub, pubRef.getPrimaryId(), pubRef.getCvXrefQualifier(), pubRef.getCvDatabase()));
+        pub.setOwner((Institution) IntactContext.getCurrentInstance().getSpringContext().getBean("institutionIntact"));
 
         interaction.addXref(getMockBuilder().createXref(interaction,  "IM-1234-1", imexPrimary, imex));
 
@@ -74,6 +78,8 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         CvDatabase imex = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
         CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
         pub.addXref(getMockBuilder().createXref(pub, "IM-1234", imexPrimary, imex));
+        ExperimentXref pubRef = interaction.getExperiments().iterator().next().getXrefs().iterator().next();
+        pub.addXref(getMockBuilder().createXref(pub, pubRef.getPrimaryId(), pubRef.getCvXrefQualifier(), pubRef.getCvDatabase()));
 
         BinaryInteraction bi = interactionConverter.toBinaryInteraction( interaction );
 
@@ -164,10 +170,10 @@ public class InteractionConverterTest extends IntactBasicTestCase {
         }
 
         //check ParametersInteraction
-        List<psidev.psi.mi.tab.model.Parameter> parametersInteraction = bi.getInteractionParameters();
+        List<psidev.psi.mi.tab.model.Parameter> parametersInteraction = bi.getParameters();
         Assert.assertEquals(1, parametersInteraction.size());
 
-        final psidev.psi.mi.tab.model.Parameter ip = bi.getInteractionParameters().iterator().next();
+        final psidev.psi.mi.tab.model.Parameter ip = bi.getParameters().iterator().next();
 
         Assert.assertEquals("kD", ip.getType());
         Assert.assertEquals(4d, ip.getFactor(), 0d);

@@ -104,7 +104,7 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
 
                 if (rigid != null){
                     Checksum checksum = new ChecksumImpl(InteractionConverter.RIGID, rigid);
-                    expandedBinary.getInteractionChecksums().add(checksum);
+                    expandedBinary.getChecksums().add(checksum);
                 }
             }
 
@@ -170,7 +170,7 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
                 // add rigid to the first binary interaction because all the biary interactions are pointing to the same checksum list
                 if (rigid != null){
                     Checksum checksum = new ChecksumImpl(InteractionConverter.RIGID, rigid);
-                    interactions.iterator().next().getInteractionChecksums().add(checksum);
+                    interactions.iterator().next().getChecksums().add(checksum);
                 }
             }
 

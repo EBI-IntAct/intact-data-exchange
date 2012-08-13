@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.psimitab.converters.converters;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.intact.model.CvObject;
 import uk.ac.ebi.intact.model.CvObjectXref;
 import uk.ac.ebi.intact.model.CvXrefQualifier;
@@ -56,12 +57,18 @@ public class CvObjectConverter<O extends CvObject> {
 
         final CvObjectXref idXref = findMatchingIdentityXref(cvObject.getXrefs(), identity); //XrefUtils.getIdentityXref(cvObject, CvDatabase.PSI_MI_MI_REF);
 
-        try {
-            CrossReference ref = crossRefConverter.createCrossReference(idXref, false);
-            ref.setText(text);
+        if (idXref != null){
+            try {
+                CrossReference ref = crossRefConverter.createCrossReference(idXref, false);
+                ref.setText(text);
+                return ref;
+            } catch ( Exception e ) {
+                throw new RuntimeException( "An exception occured while building a cv object : " + text, e );
+            }
+        }
+        else {
+            CrossReference ref = new CrossReferenceImpl(CrossReferenceConverter.DATABASE_UNKNOWN, identity, text);
             return ref;
-        } catch ( Exception e ) {
-            throw new RuntimeException( "An exception occured while building a cv object : " + text, e );
         }
     } 
     

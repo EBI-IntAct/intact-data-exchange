@@ -92,7 +92,7 @@ public class PublicationConverter {
                     if (tagsToExport.contains(annot.getCvTopic().getIdentifier())){
                         psidev.psi.mi.tab.model.Annotation tag = annotationConverter.intactToMitab(annot);
                         if (tag != null){
-                            binary.getInteractionAnnotations().add(tag);
+                            binary.getAnnotations().add(tag);
                         }
                     }
                     // author
@@ -152,7 +152,7 @@ public class PublicationConverter {
                     String db = CrossReferenceConverter.DATABASE_UNKNOWN;
 
                     identityRef.setDatabase(db);
-                    identityRef.setIdentifier("-");
+                    identityRef.setIdentifier(institution.getShortLabel());
                     identityRef.setText(institution.getShortLabel());
                 }
                 else if (institution.getShortLabel() != null){

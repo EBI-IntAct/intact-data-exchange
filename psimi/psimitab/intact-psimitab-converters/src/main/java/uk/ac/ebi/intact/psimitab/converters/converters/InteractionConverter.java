@@ -115,7 +115,7 @@ public class InteractionConverter {
             // add rigid for interaction checksum
             if (rigid != null){
                 Checksum checksum = new ChecksumImpl(RIGID, rigid);
-                bi.getInteractionChecksums().add(checksum);
+                bi.getChecksums().add(checksum);
             }
         }
 
@@ -205,7 +205,7 @@ public class InteractionConverter {
             }
         }
 
-        // process AC
+        // process AC and source
         if (interaction.getAc() != null){
             CrossReference id = new CrossReferenceImpl();
 
@@ -239,8 +239,11 @@ public class InteractionConverter {
             for (InteractorXref ref : interactionRefs){
 
                 CrossReference refField = xConverter.createCrossReference(ref, true);
-                if (refField != null){
-                    binary.getInteractionXrefs().add(refField);
+                if (refField != null && CvDatabase.IMEX.equalsIgnoreCase(refField.getDatabase())){
+                    binary.getInteractionAcs().add(refField);
+                }
+                else if (refField != null){
+                    binary.getXrefs().add(refField);
                 }
             }
         }
@@ -253,7 +256,7 @@ public class InteractionConverter {
                 psidev.psi.mi.tab.model.Annotation annotField = annotationConverter.intactToMitab(annots);
 
                 if (annotField != null){
-                    binary.getInteractionAnnotations().add(annotField);
+                    binary.getAnnotations().add(annotField);
                 }
             }
         }
@@ -265,7 +268,7 @@ public class InteractionConverter {
                 psidev.psi.mi.tab.model.Parameter paramField = parameterConverter.intactToMitab(param);
 
                 if (paramField != null){
-                    binary.getInteractionParameters().add(paramField);
+                    binary.getParameters().add(paramField);
                 }
             }
         }
@@ -273,7 +276,7 @@ public class InteractionConverter {
         //process checksum
         if (interaction.getCrc() != null){
             CrossReference crc = new CrossReferenceImpl(CRC, interaction.getCrc());
-            binary.getInteractionChecksums().add(crc);
+            binary.getChecksums().add(crc);
         }
 
         //process negative

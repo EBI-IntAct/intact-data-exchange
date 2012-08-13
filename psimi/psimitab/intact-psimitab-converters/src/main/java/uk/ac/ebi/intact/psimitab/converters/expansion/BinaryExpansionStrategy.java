@@ -67,9 +67,9 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
 
         // copy the fields of the template binary interaction. It is not thread safe
         if (interaction != null){
-            expandedInteraction.setAnnotations(interaction.getInteractionAnnotations());
+            expandedInteraction.setAnnotations(interaction.getAnnotations());
             expandedInteraction.setAuthors(interaction.getAuthors());
-            expandedInteraction.setChecksums(interaction.getInteractionChecksums());
+            expandedInteraction.setChecksums(interaction.getChecksums());
             expandedInteraction.getComplexExpansion().add(new CrossReferenceImpl(CvDatabase.PSI_MI, getMI(), getName()));
             expandedInteraction.setConfidenceValues(interaction.getConfidenceValues());
             expandedInteraction.setCreationDate(interaction.getCreationDate());
@@ -79,8 +79,8 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
             expandedInteraction.setInteractionTypes(interaction.getInteractionTypes());
             expandedInteraction.setPublications(interaction.getPublications());
             expandedInteraction.setSourceDatabases(interaction.getSourceDatabases());
-            expandedInteraction.setXrefs(interaction.getInteractionXrefs());
-            expandedInteraction.setParameters(interaction.getInteractionParameters());
+            expandedInteraction.setXrefs(interaction.getXrefs());
+            expandedInteraction.setParameters(interaction.getParameters());
             expandedInteraction.setUpdateDate(interaction.getUpdateDate());
             expandedInteraction.setNegativeInteraction(interaction.isNegativeInteraction());
         }

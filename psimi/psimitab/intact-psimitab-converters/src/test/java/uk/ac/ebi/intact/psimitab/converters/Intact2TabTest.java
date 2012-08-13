@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.psimitab.converters;
 
 import org.junit.Test;
-import psidev.psi.mi.tab.io.PsimiTabWriter;
+import psidev.psi.mi.tab.PsimiTabWriter;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.Experiment;
