@@ -248,8 +248,8 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         //Assert.assertEquals(1, ib.getParameters().size());
         //Assert.assertEquals("temperature", get(0, ib.getParameters()).getType());
         //Assert.assertEquals("2", get(0, ib.getParameters()).getValue());
-        Assert.assertEquals(1, binaryInteraction.getInteractionParameters().size());
-        Assert.assertEquals("kd", ((Parameter) binaryInteraction.getInteractionParameters().get(0)).getType());
+        Assert.assertEquals(1, binaryInteraction.getParameters().size());
+        Assert.assertEquals("kd", ((Parameter) binaryInteraction.getParameters().get(0)).getType());
         Assert.assertEquals("0.5", ((Parameter) binaryInteraction.getInteractionAcs().get(0)).getValue());
     }
 
