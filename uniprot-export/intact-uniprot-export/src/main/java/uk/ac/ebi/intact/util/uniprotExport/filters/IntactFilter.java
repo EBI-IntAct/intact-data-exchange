@@ -8,9 +8,7 @@ import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
-import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.QueryBuilder;
@@ -313,17 +311,17 @@ public class IntactFilter implements InteractionFilter {
                 if (this.interactionConverter.getExpansionStrategy().isExpandable(intactInteraction)){
                     try {
                         // we convert the interaction in binary interaction
-                        Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
+                        Collection<BinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
 
                         if (!toBinary.isEmpty()){
                             //logger.info("Processing interaction " + interactionAc);
                             processClusterContext(context, interactionAc, toBinary);
 
-                            for (IntactBinaryInteraction binary : toBinary){
+                            for (BinaryInteraction<Interactor> binary : toBinary){
 
-                                ExtendedInteractor interactorA = binary.getInteractorA();
+                                Interactor interactorA = binary.getInteractorA();
                                 String uniprotA = null;
-                                ExtendedInteractor interactorB = binary.getInteractorB();
+                                Interactor interactorB = binary.getInteractorB();
                                 String uniprotB = null;
 
                                 for (CrossReference refA : interactorA.getIdentifiers()){
@@ -406,16 +404,16 @@ public class IntactFilter implements InteractionFilter {
             if (this.interactionConverter.getExpansionStrategy().isExpandable(intactInteraction)){
                 try {
                     // we convert the interaction in binary interaction
-                    Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
+                    Collection<BinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
                     if (toBinary.size() == 1){
                         //logger.info("Processing interaction " + interaction);
                         processClusterContext(context, interaction, toBinary);
 
-                        for (IntactBinaryInteraction binary : toBinary){
+                        for (BinaryInteraction binary : toBinary){
 
-                            ExtendedInteractor interactorA = binary.getInteractorA();
+                            Interactor interactorA = binary.getInteractorA();
                             String uniprotA = null;
-                            ExtendedInteractor interactorB = binary.getInteractorB();
+                            Interactor interactorB = binary.getInteractorB();
                             String uniprotB = null;
 
                             for (CrossReference refA : interactorA.getIdentifiers()){
@@ -492,7 +490,7 @@ public class IntactFilter implements InteractionFilter {
                 if (this.interactionConverter.getExpansionStrategy().isExpandable(intactInteraction)){
                     try {
                         // we convert the interaction in binary interaction
-                        Collection<IntactBinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
+                        Collection<BinaryInteraction> toBinary = this.interactionConverter.convert(intactInteraction);
 
                         if (excludeSpokeExpanded && toBinary.size() == 1){
                             //logger.info("Processing interaction " + interactionAc);
@@ -525,14 +523,14 @@ public class IntactFilter implements InteractionFilter {
         return i;
     }
 
-    private void processClustering(Collection<BinaryInteraction> binaryInteractions, MiClusterContext context, String interactionAc, Collection<IntactBinaryInteraction> toBinary, boolean excludeNonUniprot) {
+    private void processClustering(Collection<BinaryInteraction> binaryInteractions, MiClusterContext context, String interactionAc, Collection<BinaryInteraction> toBinary, boolean excludeNonUniprot) {
         processClusterContext(context, interactionAc, toBinary);
 
-        for (IntactBinaryInteraction binary : toBinary){
+        for (BinaryInteraction<Interactor> binary : toBinary){
 
-            ExtendedInteractor interactorA = binary.getInteractorA();
+            Interactor interactorA = binary.getInteractorA();
             String uniprotA = null;
-            ExtendedInteractor interactorB = binary.getInteractorB();
+            Interactor interactorB = binary.getInteractorB();
             String uniprotB = null;
 
             if (interactorA != null){
@@ -552,21 +550,31 @@ public class IntactFilter implements InteractionFilter {
                 }
             }
 
+            // process intra molecular interactions as self interactions
+            if (interactorA == null){
+                uniprotA = uniprotB;
+                binary.setInteractorA(interactorB);
+            }
+            else if (uniprotB == null){
+                uniprotB = uniprotA;
+                binary.setInteractorB(interactorA);
+            }
+
             if ((uniprotA != null && uniprotB != null && excludeNonUniprot) || !excludeNonUniprot){
 
                 FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
                 removeNonPubmedPublicationsFrom(binary);
 
-                binary.getInteractorA().getAlternativeIdentifiers().clear();
-                binary.getInteractorA().getAliases().clear();
-                binary.getInteractorB().getAlternativeIdentifiers().clear();
-                binary.getInteractorB().getAliases().clear();
+                removeNonIntactXrefsFrom(interactorA.getAlternativeIdentifiers());
+                interactorA.getAliases().clear();
+                removeNonIntactXrefsFrom(interactorB.getAlternativeIdentifiers());
+                interactorB.getAliases().clear();
                 binaryInteractions.add(binary);
             }
         }
     }
 
-    protected void removeNonPubmedPublicationsFrom(IntactBinaryInteraction interaction){
+    protected void removeNonPubmedPublicationsFrom(BinaryInteraction<Interactor> interaction){
         List<CrossReference> publications = new ArrayList(interaction.getPublications());
 
         for (CrossReference pub : publications){
@@ -576,16 +584,26 @@ public class IntactFilter implements InteractionFilter {
         }
     }
 
-    private void processClusterContext(MiClusterContext context, String interactionAc, Collection<IntactBinaryInteraction> toBinary) {
+    protected void removeNonIntactXrefsFrom(Collection<CrossReference> identifiers){
+        List<CrossReference> xrefs = new ArrayList(identifiers);
+
+        for (CrossReference xref : xrefs){
+            if (!WriterUtils.INTACT.equalsIgnoreCase(xref.getDatabase())){
+                identifiers.remove(xref);
+            }
+        }
+    }
+
+    private void processClusterContext(MiClusterContext context, String interactionAc, Collection<BinaryInteraction> toBinary) {
         // process the context information
-        List<InteractionDetectionMethod> detectionMethods = toBinary.iterator().next().getDetectionMethods();
+        List<CrossReference> detectionMethods = toBinary.iterator().next().getDetectionMethods();
         String detectionMI = detectionMethods.iterator().next().getIdentifier();
 
         if (!context.getMiTerms().containsKey(detectionMI)){
             context.getMiTerms().put(detectionMI, detectionMethods.iterator().next().getText());
         }
 
-        List<InteractionType> interactionTypes = toBinary.iterator().next().getInteractionTypes();
+        List<CrossReference> interactionTypes = toBinary.iterator().next().getInteractionTypes();
         String typeMi = interactionTypes.iterator().next().getIdentifier();
 
         if (!context.getMiTerms().containsKey(typeMi)){

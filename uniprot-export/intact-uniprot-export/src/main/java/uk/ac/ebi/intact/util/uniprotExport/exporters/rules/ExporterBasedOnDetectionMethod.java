@@ -591,14 +591,14 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
             String typeMi = pair.getType();
 
-            for (InteractionDetectionMethod method : binary.getDetectionMethods()){
+            for (CrossReference method : binary.getDetectionMethods()){
                 if (method.getIdentifier().equals(detectionMI)){
                     methodsToRemove.remove(method);
                     break;
                 }
             }
 
-            for (InteractionType type : binary.getInteractionTypes()){
+            for (CrossReference type : binary.getInteractionTypes()){
                 if (type.getIdentifier().equals(typeMi)){
                     typesToRemove.remove(type);
                     break;

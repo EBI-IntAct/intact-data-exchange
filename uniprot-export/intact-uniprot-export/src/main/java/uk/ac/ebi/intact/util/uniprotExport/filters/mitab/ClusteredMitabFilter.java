@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.filters.mitab;
 
 import org.apache.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
-import psidev.psi.mi.tab.PsimiTabReader;
+import psidev.psi.mi.tab.io.PsimiTabReader;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
@@ -43,12 +43,12 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
 
     public ClusteredMitabFilter(InteractionExporter exporter, String mitab){
         super(exporter, mitab);
-        this.mitabReader = new PsimiTabReader(false);
+        this.mitabReader = new PsimiTabReader();
     }
 
     public ClusteredMitabFilter(InteractionExporter exporter){
         super(exporter);
-        this.mitabReader = new PsimiTabReader(false);
+        this.mitabReader = new PsimiTabReader();
     }
 
     protected MiClusterScoreResults clusterMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
@@ -228,14 +228,14 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
                 }
             }
 
-            for (InteractionDetectionMethod method : binary.getDetectionMethods()){
+            for (CrossReference method : binary.getDetectionMethods()){
                 if (method.getIdentifier().equals(detectionMI)){
                     methodsToRemove.remove(method);
                     break;
                 }
             }
 
-            for (InteractionType type : binary.getInteractionTypes()){
+            for (CrossReference type : binary.getInteractionTypes()){
                 if (type.getIdentifier().equals(typeMi)){
                     typeToRemove.remove(type);
                     break;

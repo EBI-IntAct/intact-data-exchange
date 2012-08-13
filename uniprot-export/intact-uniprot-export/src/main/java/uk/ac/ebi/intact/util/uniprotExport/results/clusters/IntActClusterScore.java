@@ -1,10 +1,11 @@
 package uk.ac.ebi.intact.util.uniprotExport.results.clusters;
 
 import org.apache.log4j.Logger;
-import psidev.psi.mi.tab.PsimiTabWriter;
+import psidev.psi.mi.tab.io.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.builder.PsimiTab;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
@@ -43,7 +44,7 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
         super();
 
         setMappingIdDbNames("uniprotkb,intact");
-        writer = new PsimiTabWriter();
+        writer = new PsimiTabWriter(PsimiTab.VERSION_2_5);
 
         // we want direct interaction = 5
         setDirectInteractionWeight_5();
@@ -226,7 +227,7 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
             File file = new File(fileName);
 
             Writer fstream = new BufferedWriter(new FileWriter(fileName + ".txt"));
-
+            Writer mitabWriter = new BufferedWriter(new FileWriter(file));
             try{
                 for(Integer mappingId:interactionIds){
                     EncoreInteraction eI = interactionMapping.get(mappingId);
@@ -246,7 +247,7 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
                         fstream.flush();
 
                         BinaryInteraction bI = iConverter.getBinaryInteractionForScoring(eI);
-                        writer.writeOrAppend(bI, file, false);
+                        writer.write(bI, mitabWriter);
                     }
                 }
 

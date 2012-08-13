@@ -29,8 +29,8 @@ public class FilterUtils {
      * @param context
      */
     public static void processGeneNames(Interactor interactorA, String intactA, Interactor interactorB, String intactB, MiClusterContext context) {
-        String geneNameA = retrieveInteractorGeneName(interactorA);
-        String geneNameB = retrieveInteractorGeneName(interactorB);
+        String geneNameA = interactorA != null ? retrieveInteractorGeneName(interactorA) : null;
+        String geneNameB = interactorB != null ? retrieveInteractorGeneName(interactorB) : null;
 
         Map<String, String> geneNames = context.getGeneNames();
 

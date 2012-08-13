@@ -1,15 +1,10 @@
 package uk.ac.ebi.intact.util.uniprotExport.filters.mitab;
 
 import org.apache.log4j.Logger;
-import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.CrossReference;
-import psidev.psi.mi.tab.model.InteractionDetectionMethod;
-import psidev.psi.mi.tab.model.InteractionType;
+import psidev.psi.mi.tab.io.PsimiTabReader;
+import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
-import uk.ac.ebi.intact.psimitab.IntactPsimiTabReader;
-import uk.ac.ebi.intact.psimitab.model.ExtendedInteractor;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
@@ -38,16 +33,16 @@ import java.util.List;
 
 public class NonClusteredMitabFilter extends AbstractMitabFilter {
     private static final Logger logger = Logger.getLogger(NonClusteredMitabFilter.class);
-    protected IntactPsimiTabReader mitabReader;
+    protected PsimiTabReader mitabReader;
 
     public NonClusteredMitabFilter(InteractionExporter exporter, String mitab){
         super(exporter, mitab);
-        this.mitabReader = new IntactPsimiTabReader(true);
+        this.mitabReader = new PsimiTabReader();
     }
 
     public NonClusteredMitabFilter(InteractionExporter exporter){
         super(exporter);
-        this.mitabReader = new IntactPsimiTabReader(true);
+        this.mitabReader = new PsimiTabReader();
     }
 
     protected MiClusterScoreResults computeMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
@@ -70,7 +65,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
         while (iterator.hasNext()){
             interactionToProcess.clear();
             while (interactionToProcess.size() < 200 && iterator.hasNext()){
-                IntactBinaryInteraction interaction = (IntactBinaryInteraction) iterator.next();
+                BinaryInteraction<Interactor> interaction = iterator.next();
                 String intactAc = null;
 
                 for (CrossReference ref : interaction.getInteractionAcs()){
@@ -80,14 +75,13 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
                     }
                 }
 
-                ExtendedInteractor interactorA = interaction.getInteractorA();
+                Interactor interactorA = interaction.getInteractorA();
                 String uniprotA = null;
-                ExtendedInteractor interactorB = interaction.getInteractorB();
+                Interactor interactorB = interaction.getInteractorB();
                 String uniprotB = null;
 
                 if (interactorA != null){
                     CrossReference uniprot1 = null;
-                    CrossReference intact1 = null;
 
                     for (CrossReference refA : interactorA.getIdentifiers()){
                         if (UNIPROT.equalsIgnoreCase(refA.getDatabase())){
@@ -97,10 +91,6 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
                             //}
                             uniprot1 = refA;
                         }
-                        else if (INTACT.equalsIgnoreCase(refA.getDatabase())){
-
-                            intact1 = refA;
-                        }
                     }
 
                     interactorA.getIdentifiers().clear();
@@ -108,13 +98,9 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
                     if (uniprot1 != null){
                         interactorA.getIdentifiers().add(uniprot1);
                     }
-                    if (intact1 != null){
-                        interactorA.getIdentifiers().add(intact1);
-                    }
                 }
                 if (interactorB != null){
                     CrossReference uniprot2 = null;
-                    CrossReference intact2 = null;
 
                     for (CrossReference refB : interactorB.getIdentifiers()){
                         if (UNIPROT.equalsIgnoreCase(refB.getDatabase())){
@@ -124,20 +110,22 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
                             //}
                             uniprot2 = refB;
                         }
-                        else if (INTACT.equalsIgnoreCase(refB.getDatabase())){
-
-                            intact2 = refB;
-                        }
                     }
-
                     interactorB.getIdentifiers().clear();
 
                     if (uniprot2 != null){
                         interactorB.getIdentifiers().add(uniprot2);
                     }
-                    if (intact2 != null){
-                        interactorB.getIdentifiers().add(intact2);
-                    }
+                }
+
+                // process intra molecular interactions as self interactions
+                if (interactorA == null){
+                    uniprotA = uniprotB;
+                    interaction.setInteractorA(interactorB);
+                }
+                else if (uniprotB == null){
+                    uniprotB = uniprotA;
+                    interaction.setInteractorB(interactorA);
                 }
 
                 if (intactAc != null){
@@ -166,38 +154,38 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
         return new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
     }
 
-    private void processClustering(MiClusterContext context, List<BinaryInteraction> interactionToProcess, IntactBinaryInteraction interaction, String intactAc, ExtendedInteractor interactorA, String uniprotA, ExtendedInteractor interactorB, String uniprotB, boolean excludedSpokeExpanded) {
+    private void processClustering(MiClusterContext context, List<BinaryInteraction> interactionToProcess, BinaryInteraction<Interactor> interaction, String intactAc, Interactor interactorA, String uniprotA, Interactor interactorB, String uniprotB, boolean excludedSpokeExpanded) {
         if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
 
             FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
             processMiTerms(interaction, context);
             removeNonPubmedPublicationsFrom(interaction);
 
-            List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
+            List<CrossReference> detectionMethods = interaction.getDetectionMethods();
             String detectionMI = detectionMethods.iterator().next().getIdentifier();
 
-            List<InteractionType> interactionTypes = interaction.getInteractionTypes();
+            List<CrossReference> interactionTypes = interaction.getInteractionTypes();
             String typeMi = interactionTypes.iterator().next().getIdentifier();
 
             MethodTypePair entry = new MethodTypePair(detectionMI, typeMi);
             context.getInteractionToMethod_type().put(intactAc, entry);
 
-            interaction.getInteractorA().getAlternativeIdentifiers().clear();
+            removeNonIntactXrefsFrom(interaction.getInteractorA().getAlternativeIdentifiers());
             interaction.getInteractorA().getAliases().clear();
-            interaction.getInteractorB().getAlternativeIdentifiers().clear();
+            removeNonIntactXrefsFrom(interaction.getInteractorB().getAlternativeIdentifiers());
             interaction.getInteractorB().getAliases().clear();
 
-            if (!interaction.getExpansionMethods().isEmpty() && !excludedSpokeExpanded){
+            if (!interaction.getComplexExpansion().isEmpty() && !excludedSpokeExpanded){
                 logger.info(intactAc + " passes the filters");
                 interactionToProcess.add(interaction);
 
                 context.getSpokeExpandedInteractions().add(intactAc);
             }
-            else if (interaction.getExpansionMethods().isEmpty()) {
+            else if (interaction.getComplexExpansion().isEmpty()) {
                 logger.info(intactAc + " passes the filters");
                 interactionToProcess.add(interaction);
             }
-            else if (!interaction.getExpansionMethods().isEmpty()){
+            else if (!interaction.getComplexExpansion().isEmpty()){
                 context.getSpokeExpandedInteractions().add(intactAc);
             }
         }
@@ -265,7 +253,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
         while (iterator.hasNext()){
             interactionToProcess.clear();
             while (interactionToProcess.size() < 200 && iterator.hasNext()){
-                IntactBinaryInteraction interaction = (IntactBinaryInteraction) iterator.next();
+                BinaryInteraction interaction = (BinaryInteraction) iterator.next();
 
                 interactionToProcess.add(interaction);
             }

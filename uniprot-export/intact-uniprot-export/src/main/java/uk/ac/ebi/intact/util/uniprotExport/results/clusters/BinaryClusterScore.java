@@ -1,9 +1,10 @@
 package uk.ac.ebi.intact.util.uniprotExport.results.clusters;
 
 import org.apache.log4j.Logger;
-import psidev.psi.mi.tab.PsimiTabWriter;
+import psidev.psi.mi.tab.io.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
+import psidev.psi.mi.tab.model.builder.PsimiTab;
 import uk.ac.ebi.enfin.mi.cluster.Binary2Encore;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
@@ -34,7 +35,7 @@ public class BinaryClusterScore implements IntactCluster {
     private PsimiTabWriter writer;
 
     public BinaryClusterScore(){
-        writer = new PsimiTabWriter();
+        writer = new PsimiTabWriter(PsimiTab.VERSION_2_5);
     }
 
     @Override
@@ -79,6 +80,7 @@ public class BinaryClusterScore implements IntactCluster {
         try {
             File file = new File(fileName);
             Writer fstream = new BufferedWriter(new FileWriter(fileName + ".txt"));
+            Writer mitabWriter = new BufferedWriter(new FileWriter(file));
             try{
                 for(Integer mappingId:interactionMapping.keySet()){
                     BinaryInteraction<Interactor> eI = interactionMapping.get(mappingId);
@@ -97,7 +99,7 @@ public class BinaryClusterScore implements IntactCluster {
                         fstream.write("\n");
                         fstream.flush();
 
-                        writer.writeOrAppend(eI, file, false);
+                        writer.write(eI, mitabWriter);
                     }
                 }
             }
@@ -128,6 +130,7 @@ public class BinaryClusterScore implements IntactCluster {
             File file = new File(fileName);
 
             Writer fstream = new BufferedWriter(new FileWriter(fileName + ".txt"));
+            Writer mitabWriter = new BufferedWriter(new FileWriter(file));
 
             try{
                 for(Integer mappingId:interactionIds){
@@ -147,7 +150,7 @@ public class BinaryClusterScore implements IntactCluster {
                         fstream.write("\n");
                         fstream.flush();
 
-                        writer.writeOrAppend(eI, file, false);
+                        writer.write(eI, mitabWriter);
                     }
                 }
             }
