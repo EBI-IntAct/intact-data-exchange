@@ -48,7 +48,7 @@ public class OntologyBinaryInteractionEnricher implements BinaryInteractionEnric
         enrich(binaryInteraction.getComplexExpansion());
 
         // enrich xrefs of interaction
-        enrich(binaryInteraction.getInteractionXrefs());
+        enrich(binaryInteraction.getXrefs());
 
         // enrich organism of interaction
         if (binaryInteraction.getHostOrganism() != null){

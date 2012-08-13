@@ -25,7 +25,7 @@ public class OntologyCrossReferenceEnricher extends OntologyBinaryInteractionEnr
         enrich(binaryInteraction.getInteractorB());
 
         // enrich xrefs of interaction
-        enrich(binaryInteraction.getInteractionXrefs());
+        enrich(binaryInteraction.getXrefs());
     }
 
     @Override
