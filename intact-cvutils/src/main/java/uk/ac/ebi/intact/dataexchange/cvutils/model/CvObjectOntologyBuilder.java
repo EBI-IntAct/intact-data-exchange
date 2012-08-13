@@ -421,7 +421,7 @@ public class CvObjectOntologyBuilder {
             Set<Synonym> syn = oboObj.getSynonyms();
             CvObjectAlias alias_;
             for ( Synonym aSyn : syn ) {
-                SynonymCategory synCat = aSyn.getSynonymCategory();
+                SynonymType synCat = aSyn.getSynonymType();
                 if ( synCat != null && synCat.getID() != null && synCat.getID().equalsIgnoreCase( CvObjectOntologyBuilder.ALIAS_IDENTIFIER ) ) {
                     String aliasName = aSyn.getText();
                     alias_ = ( CvObjectAlias ) toAlias( cvObject, aliasName );
@@ -449,7 +449,7 @@ public class CvObjectOntologyBuilder {
 
                     } else {
                         for (OboCategory category : categories) {
-                            for (TermCategory oboCat : childObj.getCategories()) {
+                            for (TermSubset oboCat : childObj.getSubsets()) {
                                 if (category.getName().equalsIgnoreCase(oboCat.getName())) {
                                     if (log.isTraceEnabled()) {
                                         log.trace("Adding child after subset check: " + childObj.getID() + "   " + childObj.getName());
@@ -677,7 +677,7 @@ public class CvObjectOntologyBuilder {
 
         for ( Synonym synonym : oboObj.getSynonyms() ) {
             if( synonym != null ) {
-                SynonymCategory synCat = synonym.getSynonymCategory();
+                SynonymType synCat = synonym.getSynonymType();
 
                 if ( synCat != null &&
                      synCat.getID() != null &&
@@ -1008,7 +1008,7 @@ public class CvObjectOntologyBuilder {
             return true;
 
         for ( OboCategory category : categories ) {
-            for ( TermCategory oboCat : oboObject.getCategories() ) {
+            for ( TermSubset oboCat : oboObject.getSubsets() ) {
                 if ( category.getName().equalsIgnoreCase( oboCat.getName() ) ) {
                     return true;
                 } 

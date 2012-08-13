@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOSession;
-import org.obo.datamodel.TermCategory;
+import org.obo.datamodel.TermSubset;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
 import uk.ac.ebi.intact.model.*;
@@ -159,10 +159,10 @@ public class CvObjectOntologyBuilderTest extends IntactBasicTestCase{
 
         OBOObject interactionDetection = ( OBOObject ) oboSession.getObject( "MI:0001" );
 
-        Assert.assertEquals( 2, interactionDetection.getCategories().size() );
+        Assert.assertEquals( 2, interactionDetection.getSubsets().size() );
         if ( log.isDebugEnabled() )
             log.debug( "interactionDetection: " + interactionDetection.getID() + "    " + interactionDetection.getName() );
-        for ( TermCategory term : interactionDetection.getCategories() ) {
+        for ( TermSubset term : interactionDetection.getSubsets() ) {
             if ( log.isDebugEnabled() )
                 log.debug( "Category of MI:0001:  " + term.getName() + "    " + term.getDesc() );
         }
@@ -170,10 +170,10 @@ public class CvObjectOntologyBuilderTest extends IntactBasicTestCase{
         log.debug( "------------------------------------------------" );
         OBOObject interactorType = ( OBOObject ) oboSession.getObject( "MI:0313" );
 
-        Assert.assertEquals( 2, interactorType.getCategories().size() );
+        Assert.assertEquals( 2, interactorType.getSubsets().size() );
         if ( log.isDebugEnabled() )
             log.debug( "interactorType: " + interactorType.getID() + "    " + interactorType.getName() );
-        for ( TermCategory term : interactorType.getCategories() ) {
+        for ( TermSubset term : interactorType.getSubsets() ) {
             if ( log.isDebugEnabled() ) log.debug( "Category of MI:0313: " + term.getName() + "    " + term.getDesc() );
         }
 

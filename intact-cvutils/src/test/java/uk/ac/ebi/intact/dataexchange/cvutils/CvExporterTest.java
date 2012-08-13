@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.obo.dataadapter.OBOParseException;
 import org.obo.datamodel.*;
 import org.obo.datamodel.impl.*;
- 
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.CvDagObject;
@@ -34,8 +33,6 @@ import uk.ac.ebi.intact.model.CvObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -134,10 +131,10 @@ public class CvExporterTest {
 
         Synonym syn = new SynonymImpl();
         syn.setText( "mi" );
-        SynonymCategory synCat = new SynonymCategoryImpl();
+        SynonymType synCat = new SynonymTypeImpl();
         synCat.setID( "PSI-MI-short" );
 
-        syn.setSynonymCategory( synCat );
+        syn.setSynonymType( synCat );
         syn.setScope( 1 );
         obj1.addSynonym( syn );
 

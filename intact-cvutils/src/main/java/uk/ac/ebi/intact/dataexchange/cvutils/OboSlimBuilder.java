@@ -150,8 +150,8 @@ public class OboSlimBuilder {
         OBOSession session2export = new OBOSessionImpl( objFactory );
 
         // Transfers Session meta data such as synonym category, namespaces
-        for ( SynonymCategory category : session.getSynonymCategories() ) {
-            session2export.addSynonymCategory( category );
+        for ( SynonymType category : session.getSynonymTypes() ) {
+            session2export.addSynonymType( category );
         }
 
         session2export.setDefaultNamespace( session.getDefaultNamespace() );
@@ -159,8 +159,8 @@ public class OboSlimBuilder {
             session2export.addNamespace( namespace );
         }
 
-        for ( TermCategory category : session.getCategories() ) {
-            session2export.addCategory( category );
+        for ( TermSubset category : session.getSubsets() ) {
+            session2export.addSubset( category );
         }
 
         // Add all selected OBO objects

@@ -218,14 +218,14 @@ public class CvExporter {
 
         oboSession.addPropertyValue(new PropertyValueImpl("auto-generated-by", "IntAct CvExporter"));
 
-        oboSession.addSynonymCategory(new SynonymCategoryImpl(defaultOntologyConfig.getAliasSynonymCategory(), defaultOntologyConfig.getAliasSynonymDefinition()));
-        oboSession.addSynonymCategory(new SynonymCategoryImpl(defaultOntologyConfig.getShortLabelSynonymCategory(), defaultOntologyConfig.getShortLabelSynonymDefinition()));
+        oboSession.addSynonymType(new SynonymTypeImpl(defaultOntologyConfig.getAliasSynonymCategory(), defaultOntologyConfig.getAliasSynonymDefinition()));
+        oboSession.addSynonymType(new SynonymTypeImpl(defaultOntologyConfig.getShortLabelSynonymCategory(), defaultOntologyConfig.getShortLabelSynonymDefinition()));
 
         for (ExternalOntologyConfig conf : ontoConfigs){
             oboSession.addNamespace( new Namespace( conf.getDefaultNamespace() ) );
 
-            oboSession.addSynonymCategory(new SynonymCategoryImpl(conf.getAliasSynonymCategory(), conf.getAliasSynonymDefinition()));
-            oboSession.addSynonymCategory(new SynonymCategoryImpl(conf.getShortLabelSynonymCategory(), conf.getShortLabelSynonymDefinition()));
+            oboSession.addSynonymType(new SynonymTypeImpl(conf.getAliasSynonymCategory(), conf.getAliasSynonymDefinition()));
+            oboSession.addSynonymType(new SynonymTypeImpl(conf.getShortLabelSynonymCategory(), conf.getShortLabelSynonymDefinition()));
         }    
     }
 
@@ -481,9 +481,9 @@ public class CvExporter {
     private void addPsimiShortSyn(OBOClass oboObj, String synonym) {
         Synonym syn = new SynonymImpl();
         syn.setText( synonym );
-        SynonymCategory synCat = new SynonymCategoryImpl();
+        SynonymType synCat = new SynonymTypeImpl();
         synCat.setID(synonym);
-        syn.setSynonymCategory( synCat );
+        syn.setSynonymType( synCat );
         syn.setScope( 1 );
         oboObj.addSynonym( syn );
     }
@@ -530,9 +530,9 @@ public class CvExporter {
     private Synonym createAlias( CvObjectAlias cvAlias, String aliasId ) {
         Synonym syn = new SynonymImpl();
         syn.setText( cvAlias.getName() );
-        SynonymCategory synCat = new SynonymCategoryImpl();
+        SynonymType synCat = new SynonymTypeImpl();
         synCat.setID(aliasId);
-        syn.setSynonymCategory( synCat );
+        syn.setSynonymType( synCat );
         syn.setScope( 1 );
         return syn;
     }
@@ -540,9 +540,9 @@ public class CvExporter {
     private Synonym createSynonym( String shortLabel, String shortLabelId ) {
         Synonym syn = new SynonymImpl();
         syn.setText( shortLabel );
-        SynonymCategory synCat = new SynonymCategoryImpl();
+        SynonymType synCat = new SynonymTypeImpl();
         synCat.setID(shortLabelId);
-        syn.setSynonymCategory( synCat );
+        syn.setSynonymType( synCat );
         syn.setScope( 1 );
         return syn;
     }

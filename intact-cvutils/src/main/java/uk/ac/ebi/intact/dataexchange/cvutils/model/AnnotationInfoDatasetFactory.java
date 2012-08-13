@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.cvutils.model;
 
+import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,7 +39,7 @@ public final class AnnotationInfoDatasetFactory {
     }
 
     public static AnnotationInfoDataset buildFromCsv( InputStream is) throws IOException {
-        return buildFromCsv(is, CSVReader.DEFAULT_SEPARATOR, CSVReader.DEFAULT_QUOTE_CHARACTER);
+        return buildFromCsv(is, CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER);
     }
 
     public static AnnotationInfoDataset buildFromTabResource(InputStream is) throws IOException {
