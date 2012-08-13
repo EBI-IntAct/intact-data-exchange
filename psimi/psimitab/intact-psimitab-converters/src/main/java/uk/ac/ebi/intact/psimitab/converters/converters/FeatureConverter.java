@@ -44,6 +44,11 @@ public class FeatureConverter {
                 }
             }
 
+            // if no ranges are specified, use undetermined range
+            if (rangesMitab.isEmpty()){
+                rangesMitab.add("?-?");
+            }
+
             psidev.psi.mi.tab.model.Feature mitabFeature = new FeatureImpl(name, rangesMitab);
 
             for (FeatureXref refs : feature.getXrefs()){
