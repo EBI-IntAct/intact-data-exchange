@@ -275,7 +275,7 @@ public class InteractionConverter {
 
         //process checksum
         if (interaction.getCrc() != null){
-            CrossReference crc = new CrossReferenceImpl(CRC, interaction.getCrc());
+            Checksum crc = new ChecksumImpl(CRC, interaction.getCrc());
             binary.getChecksums().add(crc);
         }
 
