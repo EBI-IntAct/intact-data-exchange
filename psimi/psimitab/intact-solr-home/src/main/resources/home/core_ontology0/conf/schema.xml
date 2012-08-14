@@ -131,7 +131,7 @@
      <!-- unique document identifier must be stored=true and indexed=true-->
      <field name="id" type="string" required="true" indexed="true" stored="true" />
      <!-- ontology name. Ex psi-mi. Is indexed=true because used for faceting. It is stored = true because we want to retrieve the result after a query-->
-     <field name="ontology" type="string" required="true" indexed="true" stored="true" />
+     <field name="ontology" type="string" required="true" indexed="true" stored="false" />
      <!-- term ID for the parent term. It is indexed = true because we want to search for it and stored = true because we want to retrieves it after a query-->
      <field name="pid" type="string" indexed="true" stored="true" />
      <!-- parent term name. It is indexed = false because we don't want to search for it, only to retrieves the value associated to an id (stored=true)-->
