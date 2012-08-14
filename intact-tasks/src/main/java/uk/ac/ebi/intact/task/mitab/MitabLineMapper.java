@@ -16,7 +16,7 @@
 package uk.ac.ebi.intact.task.mitab;
 
 import org.springframework.batch.item.file.LineMapper;
-import psidev.psi.mi.tab.io.PsimiTabReader;
+import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 
 /**

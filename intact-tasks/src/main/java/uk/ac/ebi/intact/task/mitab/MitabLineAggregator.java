@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.builder.MitabWriterUtils;
-import psidev.psi.mi.tab.model.builder.PsimiTab;
+import psidev.psi.mi.tab.model.builder.PsimiTabVersion;
 
 /**
  * This is an aggregator of a Binary interaction
@@ -19,12 +19,12 @@ public class MitabLineAggregator implements LineAggregator<BinaryInteraction> {
 
     private static final Log log = LogFactory.getLog(MitabLineAggregator.class);
     private boolean started = false;
-    private int version = PsimiTab.VERSION_2_7;
+    private PsimiTabVersion version = PsimiTabVersion.v2_7;
 
 
-    public MitabLineAggregator(int version, boolean started){
+    public MitabLineAggregator(PsimiTabVersion version, boolean started){
         super();
-        if (version == PsimiTab.VERSION_2_5 || version == PsimiTab.VERSION_2_6 || version == PsimiTab.VERSION_2_7){
+        if (version != null){
             this.version=version;
         }
 

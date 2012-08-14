@@ -1,6 +1,5 @@
 package uk.ac.ebi.intact.task;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.junit.After;
@@ -24,7 +23,6 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,7 +64,6 @@ public class MitabToSolrIndexJobTest extends IntactBasicTestCase{
     @Test
     @DirtiesContext
     public void indexMitabSolr() throws Exception {
-        FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
         Job job = (Job) applicationContext.getBean("mitabSolrIndexJob");
 

@@ -17,8 +17,6 @@ package uk.ac.ebi.intact.task.mitab.index;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BinaryInteractionEnricher;
@@ -30,7 +28,7 @@ import uk.ac.ebi.intact.task.mitab.BinaryIteractionItemProcessor;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class OntologyEnricherItemProcessor implements BinaryIteractionItemProcessor, ItemStream {
+public class OntologyEnricherItemProcessor implements BinaryIteractionItemProcessor {
 
     private String ontologiesSolrUrl;
 
@@ -38,6 +36,16 @@ public class OntologyEnricherItemProcessor implements BinaryIteractionItemProces
     private boolean processOnlyInteractors = false;
 
     public BinaryInteraction process(BinaryInteraction item) throws Exception {
+        if (enricher == null) {
+
+            if (ontologiesSolrUrl == null) {
+                throw new ItemStreamException("ontologiesSolrUrl is null");
+            }
+
+            SolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl);
+            OntologySearcher ontologySearcher = new OntologySearcher(ontologiesSolrServer);
+            enricher = new OntologyCrossReferenceEnricher(ontologySearcher);
+        }
 
         if (!processOnlyInteractors){
             enricher.enrich(item);
@@ -65,29 +73,5 @@ public class OntologyEnricherItemProcessor implements BinaryIteractionItemProces
     @Override
     public void onlyProcessInteractors(boolean onlyInteractors) {
         this.processOnlyInteractors = onlyInteractors;
-    }
-
-    @Override
-    public void open(ExecutionContext executionContext) throws ItemStreamException {
-        if (enricher == null) {
-
-            if (ontologiesSolrUrl == null) {
-                throw new ItemStreamException("ontologiesSolrUrl is null");
-            }
-
-            SolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl);
-            OntologySearcher ontologySearcher = new OntologySearcher(ontologiesSolrServer);
-            enricher = new OntologyCrossReferenceEnricher(ontologySearcher);
-        }
-    }
-
-    @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
-        // nothing to do
-    }
-
-    @Override
-    public void close() throws ItemStreamException {
-        this.enricher = null;
     }
 }

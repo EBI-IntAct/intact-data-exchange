@@ -28,7 +28,9 @@
                 <constructor-arg value="target/lala.txt"/>
             </bean>
         </property>
-        <property name="mitabVersion" value="15"/>
+        <property name="mitabVersion">
+            <value type="psidev.psi.mi.tab.model.builder.PsimiTabVersion">v2_5</value>
+        </property>
     </bean>
 
 

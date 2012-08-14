@@ -15,10 +15,12 @@
  */
 package uk.ac.ebi.intact.task;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
@@ -38,7 +40,6 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
 import uk.ac.ebi.intact.model.*;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,7 +78,6 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @Test
     @DirtiesContext
     public void writeMitab() throws Exception {
-        FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
         CvTopic hidden = getMockBuilder().createCvObject( CvTopic.class, null, "hidden" );
 
@@ -126,10 +126,9 @@ public class MitabCreationTest extends IntactBasicTestCase {
         Assert.assertEquals(5L, solrServer.query(new SolrQuery("*:*")).getResults().getNumFound());
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("P12345")).getResults().getNumFound());
         Assert.assertEquals(1L, solrServer.query(new SolrQuery("Q00002")).getResults().getNumFound());
-        Assert.assertEquals(2L, solrServer.query(new SolrQuery("go:\"GO:0003674\"")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrServer.query(new SolrQuery("pxrefA:\"go:GO:0003674\"")).getResults().getNumFound());
         Assert.assertEquals(2L, solrServer.query(new SolrQuery("species:Catarrhini")).getResults().getNumFound());
         Assert.assertEquals(0L, solrServer.query(new SolrQuery("\"Could not map sequence\"")).getResults().getNumFound());
-
         // checking that the hidden annotation is still there
         final TransactionStatus transactionStatus = getDataContext().beginTransaction();
 
@@ -142,7 +141,6 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @Test
     @DirtiesContext
     public void writeMitabSelf() throws Exception {
-        FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
         Experiment exp = getMockBuilder().createExperimentRandom(3);
 
@@ -183,7 +181,6 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @Test
     @DirtiesContext
     public void writeMitabSelf_stoichioGreaterThan2() throws Exception {
-        FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
         Experiment exp = getMockBuilder().createExperimentRandom(3);
 
@@ -224,7 +221,6 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @Test
     @DirtiesContext
     public void writeMitab_withXrefs() throws Exception {
-        FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
         Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
         Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
@@ -259,7 +255,6 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @Test
     @DirtiesContext
     public void writeMitab_negative() throws Exception {
-        FileUtils.deleteDirectory(new File("target/lala-lucene"));
 
         Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
         Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");

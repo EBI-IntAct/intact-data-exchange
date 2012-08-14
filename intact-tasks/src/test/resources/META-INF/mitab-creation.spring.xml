@@ -36,7 +36,9 @@
                 <constructor-arg value="target/lala.txt"/>
             </bean>
         </property>
-        <property name="mitabVersion" value="42"/>
+        <property name="mitabVersion">
+            <value type="psidev.psi.mi.tab.model.builder.PsimiTabVersion">v2_7</value>
+        </property>
     </bean>
 
     <bean id="mitabCalimochoReader" class="org.hupo.psi.mi.psicquic.indexing.batch.reader.MitabCalimochoReader">
@@ -60,7 +62,9 @@
           class="uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor">
         <property name="binaryItemProcessors">
             <list>
-                 <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyEnricherItemProcessor"/>
+                <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyEnricherItemProcessor">
+                    <property name="ontologiesSolrUrl" value="http://localhost:18080/solr/core_ontology_pub"/>
+                </bean>
             </list>
         </property>
     </bean>
@@ -108,7 +112,6 @@
                     <batch:streams>
                         <batch:stream ref="interactionReaderExcludeNegative"/>
                         <batch:stream ref="mitabWriter"/>
-                        <batch:stream ref="ontologyEnricherItemProcessor"/>
                     </batch:streams>
 
                     <batch:skippable-exception-classes>

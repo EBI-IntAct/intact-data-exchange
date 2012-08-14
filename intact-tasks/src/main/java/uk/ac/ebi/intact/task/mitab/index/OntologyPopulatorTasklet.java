@@ -41,12 +41,23 @@ public class OntologyPopulatorTasklet implements Tasklet{
     private List<OntologyMapping> taxonomyOntologyMappings;
     private boolean indexUniprotTaxonomy;
 
+    // settings SOLRServer
+    public static int maxTotalConnections = 128;
+    public static int defaultMaxConnectionsPerHost = 32;
+    public static int connectionTimeOut = 100000;
+    public static int soTimeOut = 100000;
+    public static boolean allowCompression = true;
+
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         if (ontologiesSolrUrl == null) {
             throw new NullPointerException("ontologiesSolrUrl is null");
         }
         HttpSolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl);
-        ontologiesSolrServer.setMaxRetries(1);
+        ontologiesSolrServer.setMaxTotalConnections(maxTotalConnections);
+        ontologiesSolrServer.setDefaultMaxConnectionsPerHost(defaultMaxConnectionsPerHost);
+        ontologiesSolrServer.setConnectionTimeout(connectionTimeOut);
+        ontologiesSolrServer.setSoTimeout(soTimeOut);
+        ontologiesSolrServer.setAllowCompression(allowCompression);
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(ontologiesSolrServer);
 
@@ -96,5 +107,45 @@ public class OntologyPopulatorTasklet implements Tasklet{
 
     public void setTaxonomyOntologyMappings(List<OntologyMapping> taxonomyOntologyMappings) {
         this.taxonomyOntologyMappings = taxonomyOntologyMappings;
+    }
+
+    public static int getMaxTotalConnections() {
+        return maxTotalConnections;
+    }
+
+    public static void setMaxTotalConnections(int maxTotalConnections) {
+        OntologyPopulatorTasklet.maxTotalConnections = maxTotalConnections;
+    }
+
+    public static int getDefaultMaxConnectionsPerHost() {
+        return defaultMaxConnectionsPerHost;
+    }
+
+    public static void setDefaultMaxConnectionsPerHost(int defaultMaxConnectionsPerHost) {
+        OntologyPopulatorTasklet.defaultMaxConnectionsPerHost = defaultMaxConnectionsPerHost;
+    }
+
+    public static int getConnectionTimeOut() {
+        return connectionTimeOut;
+    }
+
+    public static void setConnectionTimeOut(int connectionTimeOut) {
+        OntologyPopulatorTasklet.connectionTimeOut = connectionTimeOut;
+    }
+
+    public static int getSoTimeOut() {
+        return soTimeOut;
+    }
+
+    public static void setSoTimeOut(int soTimeOut) {
+        OntologyPopulatorTasklet.soTimeOut = soTimeOut;
+    }
+
+    public static boolean isAllowCompression() {
+        return allowCompression;
+    }
+
+    public static void setAllowCompression(boolean allowCompression) {
+        OntologyPopulatorTasklet.allowCompression = allowCompression;
     }
 }

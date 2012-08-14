@@ -5,10 +5,10 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.repeat.RepeatStatus;
-import psidev.psi.mi.tab.io.PsimiTabReader;
-import psidev.psi.mi.tab.io.PsimiTabWriter;
+import psidev.psi.mi.tab.PsimiTabReader;
+import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.builder.PsimiTab;
+import psidev.psi.mi.tab.model.builder.PsimiTabVersion;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
@@ -95,7 +95,7 @@ public class ClusterScoreTasklet implements Tasklet {
         /* Retrieve results */
         Map<Integer, EncoreInteraction> interactionMapping = interactionClusterScore.getInteractionMapping();
 
-        PsimiTabWriter writer = new PsimiTabWriter(PsimiTab.VERSION_2_5);
+        PsimiTabWriter writer = new PsimiTabWriter(PsimiTabVersion.v2_5);
 
         BufferedWriter outputWriter = new BufferedWriter(new FileWriter(mitabOutputFile));
 

@@ -71,13 +71,6 @@
            <version>1.7-SNAPSHOT</version>
         </dependency>
 
-        <!-- psimitab search for indexing using lucene -->
-        <dependency>
-            <groupId>psidev.psi.mi</groupId>
-            <artifactId>psimitab-search</artifactId>
-            <version>1.7.11-SNAPSHOT</version>
-        </dependency>
-
         <!-- Logging -->
         <dependency>
             <groupId>log4j</groupId>

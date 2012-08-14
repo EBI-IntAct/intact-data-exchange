@@ -20,7 +20,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.builder.PsimiTab;
+import psidev.psi.mi.tab.model.builder.PsimiTabVersion;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -28,7 +28,7 @@ import psidev.psi.mi.tab.model.builder.PsimiTab;
  */
 public class MitabItemWriter extends FlatFileItemWriter<BinaryInteraction> implements BinaryInteractionItemWriter, ItemStream{
 
-    private int mitabVersion = PsimiTab.VERSION_2_7;
+    private PsimiTabVersion mitabVersion = PsimiTabVersion.v2_7;
     private static final String RESTART_DATA_NAME = "current.count";
 
     @Override
@@ -50,11 +50,11 @@ public class MitabItemWriter extends FlatFileItemWriter<BinaryInteraction> imple
         super.open(executionContext);
     }
 
-    public int getMitabVersion() {
+    public PsimiTabVersion getMitabVersion() {
         return mitabVersion;
     }
 
-    public void setMitabVersion(int mitabVersion) {
+    public void setMitabVersion(PsimiTabVersion mitabVersion) {
         this.mitabVersion = mitabVersion;
     }
 }
