@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.filters.mitab;
 
 import org.apache.log4j.Logger;
-import psidev.psi.mi.tab.io.PsimiTabReader;
+import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;

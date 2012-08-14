@@ -1,10 +1,10 @@
 package uk.ac.ebi.intact.util.uniprotExport.results.clusters;
 
 import org.apache.log4j.Logger;
-import psidev.psi.mi.tab.io.PsimiTabWriter;
+import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Interactor;
-import psidev.psi.mi.tab.model.builder.PsimiTab;
+import psidev.psi.mi.tab.model.builder.PsimiTabVersion;
 import uk.ac.ebi.enfin.mi.cluster.Binary2Encore;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
@@ -35,7 +35,7 @@ public class BinaryClusterScore implements IntactCluster {
     private PsimiTabWriter writer;
 
     public BinaryClusterScore(){
-        writer = new PsimiTabWriter(PsimiTab.VERSION_2_5);
+        writer = new PsimiTabWriter(PsimiTabVersion.v2_5);
     }
 
     @Override

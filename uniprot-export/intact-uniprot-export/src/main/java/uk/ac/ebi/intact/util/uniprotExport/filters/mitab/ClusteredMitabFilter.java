@@ -2,7 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.filters.mitab;
 
 import org.apache.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
-import psidev.psi.mi.tab.io.PsimiTabReader;
+import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
@@ -199,8 +199,8 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
     protected void removeNotExportedInteractionEvidencesFrom(BinaryInteraction<Interactor> binary, List<InteractionImpl> exportedInteractionEvidences){
         List<CrossReference> publicationsToRemove = new ArrayList(binary.getPublications());
         List<CrossReference> interactionsToRemove = new ArrayList(binary.getInteractionAcs());
-        List<InteractionDetectionMethod> methodsToRemove = new ArrayList(binary.getDetectionMethods());
-        List<InteractionType> typeToRemove = new ArrayList(binary.getInteractionTypes());
+        List<CrossReference> methodsToRemove = new ArrayList(binary.getDetectionMethods());
+        List<CrossReference> typeToRemove = new ArrayList(binary.getInteractionTypes());
 
         for (InteractionImpl interaction : exportedInteractionEvidences){
 

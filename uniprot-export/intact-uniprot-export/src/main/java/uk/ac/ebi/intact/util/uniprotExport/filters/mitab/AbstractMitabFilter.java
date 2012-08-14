@@ -1,8 +1,7 @@
 package uk.ac.ebi.intact.util.uniprotExport.filters.mitab;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.tab.model.InteractionDetectionMethod;
-import psidev.psi.mi.tab.model.InteractionType;
+import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.IntactFilter;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
@@ -41,20 +40,20 @@ public abstract class AbstractMitabFilter extends IntactFilter{
     }
 
     protected void processMiTerms(BinaryInteraction interaction, MiClusterContext context){
-        List<InteractionDetectionMethod> detectionMethods = interaction.getDetectionMethods();
+        List<CrossReference> detectionMethods = interaction.getDetectionMethods();
 
         Map<String, String> miTerms = context.getMiTerms();
 
-        for (InteractionDetectionMethod method : detectionMethods){
+        for (CrossReference method : detectionMethods){
             if (!miTerms.containsKey(method.getIdentifier())){
                 String methodName = method.getText() != null ? method.getText() : "-";
                 miTerms.put(method.getIdentifier(), methodName);
             }
         }
 
-        List<InteractionType> types = interaction.getInteractionTypes();
+        List<CrossReference> types = interaction.getInteractionTypes();
 
-        for (InteractionType type : types){
+        for (CrossReference type : types){
             if (!miTerms.containsKey(type.getIdentifier())){
                 String methodName = type.getText() != null ? type.getText() : "-";
                 miTerms.put(type.getIdentifier(), methodName);

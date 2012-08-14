@@ -446,14 +446,14 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
     @Override
     public boolean canExportBinaryInteraction(BinaryInteraction<Interactor> interaction, ExportContext context) throws UniprotExportException {
 
-        Set<InteractionDetectionMethod> detectionMethods = new HashSet(interaction.getDetectionMethods());
+        Set<CrossReference> detectionMethods = new HashSet(interaction.getDetectionMethods());
 
         Set<String> intactIds = new HashSet<String>();
         Set<String> invalidIntactIds = new HashSet<String>();
 
         boolean passRules = false;
 
-        for (InteractionDetectionMethod method : detectionMethods){
+        for (CrossReference method : detectionMethods){
             intactIds.clear();
             int numberOfExperimentWithThisMethod = computeForBinaryInteractionNumberOfExperimentsHavingDetectionMethod(method.getIdentifier(), context, interaction, intactIds);
 
@@ -572,8 +572,8 @@ public class ExporterBasedOnDetectionMethod extends AbstractInteractionExporter 
 
     protected void removeInteractionEvidencesFrom(BinaryInteraction<Interactor> binary, Set<String> invalidInteractions, ExportContext context){
         List<CrossReference> interactionsToRemove = new ArrayList(binary.getInteractionAcs());
-        List<InteractionDetectionMethod> methodsToRemove = new ArrayList(binary.getDetectionMethods());
-        List<InteractionType> typesToRemove = new ArrayList(binary.getInteractionTypes());
+        List<CrossReference> methodsToRemove = new ArrayList(binary.getDetectionMethods());
+        List<CrossReference> typesToRemove = new ArrayList(binary.getInteractionTypes());
 
         Collection<String> validInteractions = new ArrayList<String>(binary.getInteractionAcs().size());
 
