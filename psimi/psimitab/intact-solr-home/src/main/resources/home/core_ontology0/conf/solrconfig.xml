@@ -648,7 +648,7 @@ Lucene will flush based on whichever limit is hit first.  -->
          using enableRemoteStreaming="true"
 
       -->
-        <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048" />
+        <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="20048" />
 
         <!-- HTTP Caching
 
