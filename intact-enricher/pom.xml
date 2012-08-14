@@ -60,6 +60,16 @@
             <groupId>uk.ac.ebi.intact.bridges</groupId>
             <artifactId>intact-uniprot</artifactId>
             <version>${bridges.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-beans</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- ChEBI -->
