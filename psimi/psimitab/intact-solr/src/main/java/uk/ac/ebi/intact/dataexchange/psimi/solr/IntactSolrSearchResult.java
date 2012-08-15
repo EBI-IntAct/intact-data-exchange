@@ -17,9 +17,9 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.solr.common.SolrDocumentList;
 import org.hupo.psi.mi.psicquic.model.PsicquicSearchResults;
+import psidev.psi.mi.tab.PsimiTabException;
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import psidev.psi.mi.xml.converter.ConverterException;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -40,12 +40,12 @@ public class IntactSolrSearchResult extends PsicquicSearchResults{
         this.mitabReader = new PsimiTabReader();
     }
 
-    public Collection<BinaryInteraction> getBinaryInteractionList() throws ConverterException, IOException {
+    public Collection<BinaryInteraction> getBinaryInteractionList() throws PsimiTabException, IOException {
 
         return mitabReader.read(getMitab());
     }
 
-    public Iterator<BinaryInteraction> getBinaryInteractionIterator() throws ConverterException, IOException {
+    public Iterator<BinaryInteraction> getBinaryInteractionIterator() throws PsimiTabException, IOException {
 
         return mitabReader.iterate(getMitab());
     }
