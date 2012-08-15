@@ -239,7 +239,8 @@ public class InteractionConverter {
             for (InteractorXref ref : interactionRefs){
 
                 CrossReference refField = xConverter.createCrossReference(ref, true);
-                if (refField != null && CvDatabase.IMEX.equalsIgnoreCase(refField.getDatabase())){
+                if (refField != null && CvDatabase.IMEX.equalsIgnoreCase(refField.getDatabase()) && CvXrefQualifier.IMEX_PRIMARY.equalsIgnoreCase(refField.getText())){
+                    refField.setText(null);
                     binary.getInteractionAcs().add(refField);
                 }
                 else if (refField != null){
