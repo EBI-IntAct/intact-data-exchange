@@ -310,11 +310,11 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx1", "14704431");
 
-        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        List<CrossReference> organismA = new ArrayList<CrossReference>();
         CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
         organismA.add(orgA);
 
-        Collection<CrossReference> organismB = new ArrayList<CrossReference>();
+        List<CrossReference> organismB = new ArrayList<CrossReference>();
         CrossReference orgB = new CrossReferenceImpl("taxid", "9606", "Homo sapiens");
         organismB.add(orgB);
 
@@ -354,7 +354,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         experimentToPubmed.put("EBI-xxxxxx2", "14704431");
         experimentToPubmed.put("EBI-xxxxxx3", "15199141");
 
-        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        List<CrossReference> organismA = new ArrayList<CrossReference>();
         CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
         organismA.add(orgA);
 
@@ -396,7 +396,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         experimentToPubmed.put("EBI-xxxxxx2", "14704431");
         experimentToPubmed.put("EBI-xxxxxx3", "15199141");
 
-        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        List<CrossReference> organismA = new ArrayList<CrossReference>();
         CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
         organismA.add(orgA);
 
@@ -437,7 +437,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         experimentToPubmed.put("EBI-xxxxxx2", "14704431");
         experimentToPubmed.put("EBI-xxxxxx3", "15199141");
 
-        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        List<CrossReference> organismA = new ArrayList<CrossReference>();
         CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
         organismA.add(orgA);
 
@@ -478,7 +478,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         experimentToPubmed.put("EBI-xxxxxx2", "14704431");
         experimentToPubmed.put("EBI-xxxxxx3", "15199141");
 
-        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        List<CrossReference> organismA = new ArrayList<CrossReference>();
         CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
         organismA.add(orgA);
 
@@ -519,7 +519,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         experimentToPubmed.put("EBI-xxxxxx2", "14704431");
         experimentToPubmed.put("EBI-xxxxxx3", "15199141");
 
-        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        List<CrossReference> organismA = new ArrayList<CrossReference>();
         CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
         organismA.add(orgA);
 
@@ -570,11 +570,11 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         experimentToPubmed.put("EBI-xxxxxx8", "18212739");
         experimentToPubmed.put("EBI-xxxxxx9", "15115758");
 
-        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        List<CrossReference> organismA = new ArrayList<CrossReference>();
         CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
         organismA.add(orgA);
 
-        Collection<CrossReference> organismB = new ArrayList<CrossReference>();
+        List<CrossReference> organismB = new ArrayList<CrossReference>();
         CrossReference orgB = new CrossReferenceImpl("taxid", "9606", "Homo sapiens");
         organismB.add(orgB);
 
@@ -618,11 +618,11 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx10", "19705531");
 
-        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        List<CrossReference> organismA = new ArrayList<CrossReference>();
         CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
         organismA.add(orgA);
 
-        Collection<CrossReference> organismB = new ArrayList<CrossReference>();
+        List<CrossReference> organismB = new ArrayList<CrossReference>();
         CrossReference orgB = new CrossReferenceImpl("taxid", "9606", "Homo sapiens");
         organismB.add(orgB);
 
@@ -660,11 +660,11 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx11", "19705532");
 
-        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        List<CrossReference> organismA = new ArrayList<CrossReference>();
         CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
         organismA.add(orgA);
 
-        Collection<CrossReference> organismB = new ArrayList<CrossReference>();
+        List<CrossReference> organismB = new ArrayList<CrossReference>();
         CrossReference orgB = new CrossReferenceImpl("taxid", "9606", "Homo sapiens");
         organismB.add(orgB);
 
@@ -706,11 +706,11 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         Map<String, String> experimentToPubmed = new HashMap<String, String>();
         experimentToPubmed.put("EBI-xxxxxx12", "19705533");
 
-        Collection<CrossReference> organismA = new ArrayList<CrossReference>();
+        List<CrossReference> organismA = new ArrayList<CrossReference>();
         CrossReference orgA = new CrossReferenceImpl("taxid", "6239", "Caenorhabditis elegans");
         organismA.add(orgA);
 
-        Collection<CrossReference> organismB = new ArrayList<CrossReference>();
+        List<CrossReference> organismB = new ArrayList<CrossReference>();
         CrossReference orgB = new CrossReferenceImpl("taxid", "9606", "Homo sapiens");
         organismB.add(orgB);
 

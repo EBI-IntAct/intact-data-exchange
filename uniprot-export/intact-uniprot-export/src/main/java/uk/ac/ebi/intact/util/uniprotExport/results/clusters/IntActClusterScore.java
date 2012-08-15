@@ -227,7 +227,7 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
             File file = new File(fileName);
 
             Writer fstream = new BufferedWriter(new FileWriter(fileName + ".txt"));
-            Writer mitabWriter = new BufferedWriter(new FileWriter(file));
+            BufferedWriter mitabWriter = new BufferedWriter(new FileWriter(file));
             try{
                 for(Integer mappingId:interactionIds){
                     EncoreInteraction eI = interactionMapping.get(mappingId);
@@ -255,6 +255,7 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
             finally {
                 //Close the output stream
                 fstream.close();
+                mitabWriter.close();
             }
 
         } catch (Exception e) {

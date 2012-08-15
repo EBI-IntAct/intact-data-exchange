@@ -80,7 +80,7 @@ public class BinaryClusterScore implements IntactCluster {
         try {
             File file = new File(fileName);
             Writer fstream = new BufferedWriter(new FileWriter(fileName + ".txt"));
-            Writer mitabWriter = new BufferedWriter(new FileWriter(file));
+            BufferedWriter mitabWriter = new BufferedWriter(new FileWriter(file));
             try{
                 for(Integer mappingId:interactionMapping.keySet()){
                     BinaryInteraction<Interactor> eI = interactionMapping.get(mappingId);
@@ -106,6 +106,7 @@ public class BinaryClusterScore implements IntactCluster {
             finally{
                 //Close the output stream
                 fstream.close();
+                mitabWriter.close();
             }
 
         } catch (Exception e) {
@@ -130,7 +131,7 @@ public class BinaryClusterScore implements IntactCluster {
             File file = new File(fileName);
 
             Writer fstream = new BufferedWriter(new FileWriter(fileName + ".txt"));
-            Writer mitabWriter = new BufferedWriter(new FileWriter(file));
+            BufferedWriter mitabWriter = new BufferedWriter(new FileWriter(file));
 
             try{
                 for(Integer mappingId:interactionIds){
