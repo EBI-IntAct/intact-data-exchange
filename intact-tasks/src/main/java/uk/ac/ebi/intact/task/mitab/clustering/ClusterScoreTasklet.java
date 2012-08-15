@@ -5,11 +5,11 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.repeat.RepeatStatus;
+import psidev.psi.mi.tab.PsimiTabException;
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.PsimiTabWriter;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.builder.PsimiTabVersion;
-import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.Encore2Binary;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.score.InteractionClusterScore;
@@ -91,7 +91,7 @@ public class ClusterScoreTasklet implements Tasklet {
      * Save clustered results including scores in mitab files
      * @param interactionClusterScore
      */
-    private void saveMitabOutputFile(InteractionClusterScore interactionClusterScore) throws IOException, ConverterException {
+    private void saveMitabOutputFile(InteractionClusterScore interactionClusterScore) throws IOException, PsimiTabException {
         /* Retrieve results */
         Map<Integer, EncoreInteraction> interactionMapping = interactionClusterScore.getInteractionMapping();
 

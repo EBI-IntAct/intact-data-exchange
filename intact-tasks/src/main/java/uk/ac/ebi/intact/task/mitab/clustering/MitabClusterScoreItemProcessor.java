@@ -8,12 +8,14 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.*;
-import psidev.psi.mi.xml.converter.ConverterException;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * This processor retrieves cluster score for a binary interactions.
@@ -181,8 +183,6 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
 
         } catch (IOException e) {
             throw new ItemStreamException("Impossible to read the clustered mitab file " + clusteredMitabFile.getAbsolutePath(), e);
-        } catch (ConverterException e) {
-            throw new ItemStreamException("Conversion problem while reading clustered mitab file " + clusteredMitabFile.getAbsolutePath(), e);
         }
     }
 
