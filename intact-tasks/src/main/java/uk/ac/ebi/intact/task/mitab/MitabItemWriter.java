@@ -19,8 +19,11 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.FlatFileItemWriter;
+import org.springframework.core.io.FileSystemResource;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.builder.PsimiTabVersion;
+
+import java.io.File;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
@@ -30,6 +33,7 @@ public class MitabItemWriter extends FlatFileItemWriter<BinaryInteraction> imple
 
     private PsimiTabVersion mitabVersion = PsimiTabVersion.v2_7;
     private static final String RESTART_DATA_NAME = "current.count";
+    private String fileName;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -47,6 +51,7 @@ public class MitabItemWriter extends FlatFileItemWriter<BinaryInteraction> imple
         else {
             setLineAggregator(new MitabLineAggregator(mitabVersion, false));
         }
+
         super.open(executionContext);
     }
 
@@ -56,6 +61,24 @@ public class MitabItemWriter extends FlatFileItemWriter<BinaryInteraction> imple
 
     public void setMitabVersion(PsimiTabVersion mitabVersion) {
         this.mitabVersion = mitabVersion;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+
+        File file = new File(fileName);
+        String parent = file.getParent();
+        File parentFile = new File(parent);
+
+        if (parentFile == null){
+            parentFile.mkdirs();
+        }
+
+        setResource(new FileSystemResource(file));
     }
 }
     
