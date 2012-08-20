@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Item writer that will write mitab publication files
+ * Item writer that will write mitab publication files and the global mitab file
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -39,6 +39,9 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
     private PsimiTabVersion version = PsimiTabVersion.v2_7;
 
     private GlobalMitabItemWriter globalMitabItemWriter;
+
+    private final static String HAS_HEADER = "has_header";
+    private boolean hasHeader = false;
 
     public PublicationMitabItemWriter(){
         dateFormat = new SimpleDateFormat("yyyy");
@@ -69,13 +72,21 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
             this.globalMitabItemWriter.setResource(new FileSystemResource(parentFolder + "/intact.txt"));
         }
 
+        if (executionContext.containsKey(HAS_HEADER)) {
+            this.hasHeader = Boolean.getBoolean(executionContext.getString(HAS_HEADER));
+        }
+        else {
+            this.hasHeader = false;
+        }
+
         currentYear = null;
     }
 
     @Override
     public void update(ExecutionContext executionContext) throws ItemStreamException {
         Assert.notNull(executionContext, "ExecutionContext must not be null");
-        // nothing to update
+
+        executionContext.put(HAS_HEADER, Boolean.toString(this.hasHeader));
     }
 
     @Override
@@ -92,6 +103,13 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
 
         if (parentFolder == null){
             throw new WriteFailedException("You must open the writer before writing files.");
+        }
+
+        List<String> lines = new ArrayList<String>(items.size());
+
+        if (!hasHeader){
+            hasHeader = true;
+            lines.add(MitabWriterUtils.buildHeader(this.version));
         }
 
         for (Collection<PublicationFileEntry> publicationEntries : items){
@@ -113,11 +131,9 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
                     currentYear = initializeYearDirectory(folderName);
                 }
 
-                List<String> lines = new ArrayList<String>(2);
-
                 // now can write a file per publication entry
                 for (PublicationFileEntry publicationEntry : publicationEntries){
-                    String fileName = publicationEntry.getEntryName() + ".xml";
+                    String fileName = publicationEntry.getEntryName() + ".txt";
 
                     log.info("write publication entry : " + fileName);
 
@@ -137,10 +153,10 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
                         this.psiWriter.close();
                     }
                 }
-
-                this.globalMitabItemWriter.write(lines);
             }
         }
+
+        this.globalMitabItemWriter.write(lines);
     }
 
     public String getParentFolderPaths() {

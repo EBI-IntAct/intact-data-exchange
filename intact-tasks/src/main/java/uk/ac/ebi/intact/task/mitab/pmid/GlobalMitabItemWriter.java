@@ -23,6 +23,9 @@ public class GlobalMitabItemWriter extends FlatFileItemWriter<String> {
         }
 
         super.afterPropertiesSet();
+
+        // we don't want transactional
+        setTransactional(false);
     }
 
     public SimpleLineAggregator getSimpleLineAggregator() {
