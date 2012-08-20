@@ -40,6 +40,8 @@ public class MitabItemWriter extends FlatFileItemWriter<BinaryInteraction> imple
         // important to override this method or the writer will complain
         setLineAggregator(new MitabLineAggregator(mitabVersion, false));
         super.afterPropertiesSet();
+
+        setTransactional(false);
     }
 
     @Override
