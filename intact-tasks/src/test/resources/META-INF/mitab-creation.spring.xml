@@ -28,6 +28,38 @@
     </bean>
 
     <!-- Some beans -->
+    <!-- reader of the publications, ordered by the publication created date-->
+    <bean id="orderedByCreatedPublicationReaderTest" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+        <property name="queryString" value="select p from Publication p order by p.created, p.ac"/>
+    </bean>
+
+    <bean id="releaseFileNameGeneratorTest" class="uk.ac.ebi.intact.task.util.FileNameGenerator">
+        <property name="separator" value="_"/>
+        <property name="negativeTag" value="negative"/>
+    </bean>
+
+    <bean id="publicationMitabProcessorTest" class="uk.ac.ebi.intact.task.mitab.pmid.PublicationMitabItemProcessor">
+        <property name="compositeProcessor" ref="interactionExpansionCompositeItemProcessor"/>
+        <property name="publicationNameGenerator" ref="releaseFileNameGeneratorTest"/>
+    </bean>
+
+    <bean id="simpleLineAggregator" class="uk.ac.ebi.intact.task.mitab.pmid.SimpleLineAggregator"/>
+
+    <bean id="globalMitabWriterTest" class="uk.ac.ebi.intact.task.mitab.pmid.GlobalMitabItemWriter">
+        <property name="resource">
+            <bean class="org.springframework.core.io.FileSystemResource">
+                <constructor-arg value="target/lala.txt"/>
+            </bean>
+        </property>
+        <property name="simpleLineAggregator" ref="simpleLineAggregator"/>
+    </bean>
+
+    <bean id="publicationMitabWriterTest" class="uk.ac.ebi.intact.task.mitab.pmid.PublicationMitabItemWriter">
+        <property name="parentFolderPaths" value="target/psimitab"/>
+        <property name="globalMitabItemWriter" ref="globalMitabWriterTest"/>
+
+    </bean>
+
     <bean id="solrJettyRunner" class="uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner"/>
 
     <bean id="mitabWriter" class="uk.ac.ebi.intact.task.mitab.MitabItemWriter">

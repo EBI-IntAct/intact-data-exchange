@@ -17,11 +17,9 @@ package uk.ac.ebi.intact.task.mitab;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
@@ -35,54 +33,51 @@ import java.util.List;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class InteractionExpansionCompositeProcessor implements ItemProcessor<Interaction, Collection<? extends BinaryInteraction>> {
+public class InteractionExpansionCompositeProcessor implements IntactBinaryInteractionProcessor {
     private static final Log log = LogFactory.getLog( InteractionExpansionCompositeProcessor.class );
 
     private ExpansionStrategy expansionStategy;
 
-    private List<BinaryIteractionItemProcessor> binaryItemProcessors;
+    private List<BinaryInteractionItemProcessor> binaryItemProcessors;
 
     private Intact2BinaryInteractionConverter intactInteractionConverter;
 
     public InteractionExpansionCompositeProcessor() {
         this.expansionStategy = new SpokeWithoutBaitExpansion();
-        this.binaryItemProcessors = new ArrayList<BinaryIteractionItemProcessor>();
+        this.binaryItemProcessors = new ArrayList<BinaryInteractionItemProcessor>();
         this.intactInteractionConverter = new Intact2BinaryInteractionConverter(this.expansionStategy);
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public Collection<? extends BinaryInteraction> process(Interaction item) throws Exception {
+    public Collection<? extends BinaryInteraction> process(Interaction intactInteraction) throws Exception {
 
-        if (item == null){
+        if (intactInteraction == null){
             return null;
         }
-
-        // reattach the interaction object to the entity manager because connection may have been closed after reading the object
-        Interaction intactInteraction = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().merge(item);
 
         Collection<BinaryInteraction> binaryInteractions = intactInteractionConverter.convert(intactInteraction);
 
         if (binaryInteractions.isEmpty()) {
             if (log.isErrorEnabled()) {
-                log.error("Could not not generate any binary interactions for: "+item);
-                throw new InteractionExpansionException("Could not not generate any binary interactions for: "+item);
+                log.error("Could not not generate any binary interactions for: "+intactInteraction);
+                throw new InteractionExpansionException("Could not not generate any binary interactions for: "+intactInteraction);
             }
         }
 
-        log.info("Processing interaction : " + item.getAc());
+        log.info("Processing interaction : " + intactInteraction.getAc());
 
         boolean isFirst = true;
 
         for (BinaryInteraction binaryInteraction : binaryInteractions) {
 
             if (isFirst){
-                for (BinaryIteractionItemProcessor delegate : binaryItemProcessors) {
+                for (BinaryInteractionItemProcessor delegate : binaryItemProcessors) {
                     delegate.onlyProcessInteractors(false);
                     binaryInteraction = delegate.process(binaryInteraction);
                 }
             }
             else {
-                for (BinaryIteractionItemProcessor delegate : binaryItemProcessors) {
+                for (BinaryInteractionItemProcessor delegate : binaryItemProcessors) {
                     delegate.onlyProcessInteractors(true);
                     binaryInteraction = delegate.process(binaryInteraction);
                 }
@@ -98,7 +93,7 @@ public class InteractionExpansionCompositeProcessor implements ItemProcessor<Int
         this.intactInteractionConverter = new Intact2BinaryInteractionConverter(this.expansionStategy);
     }
 
-    public void setBinaryItemProcessors(List<BinaryIteractionItemProcessor> delegates) {
+    public void setBinaryItemProcessors(List<BinaryInteractionItemProcessor> delegates) {
         if(delegates != null){
             this.binaryItemProcessors = delegates;
         }

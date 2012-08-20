@@ -22,13 +22,13 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BinaryInteractionEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.OntologyCrossReferenceEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
-import uk.ac.ebi.intact.task.mitab.BinaryIteractionItemProcessor;
+import uk.ac.ebi.intact.task.mitab.BinaryInteractionItemProcessor;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class OntologyEnricherItemProcessor implements BinaryIteractionItemProcessor {
+public class OntologyEnricherItemProcessor implements BinaryInteractionItemProcessor {
 
     private String ontologiesSolrUrl;
 

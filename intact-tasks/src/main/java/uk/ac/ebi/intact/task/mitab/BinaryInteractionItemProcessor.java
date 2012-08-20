@@ -12,7 +12,7 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
  * @since <pre>10/08/12</pre>
  */
 
-public interface BinaryIteractionItemProcessor extends ItemProcessor<BinaryInteraction,BinaryInteraction> {
+public interface BinaryInteractionItemProcessor extends ItemProcessor<BinaryInteraction,BinaryInteraction> {
 
     /**
      * This methods will disable/enable the processing of the all binary interaction or just the processing of the interactors
