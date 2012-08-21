@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
@@ -27,6 +28,7 @@ import uk.ac.ebi.intact.bridges.ontologies.iterator.UniprotTaxonomyOntologyItera
 import uk.ac.ebi.intact.dataexchange.psimi.solr.IntactSolrException;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 
@@ -104,7 +106,7 @@ public class OntologyIndexer {
                 throw new IntactSolrException("Problem indexing documents using iterator", e);
             }
         }
-        commitSolr(true);
+        commitSolr(false);
     }
 
     public void index(OntologyDocument ontologyDocument) throws IntactSolrException {
@@ -162,6 +164,7 @@ public class OntologyIndexer {
     private void commitSolr(boolean optimize) throws IntactSolrException {
         try {
             if (optimize) {
+                solrServer.commit();
                 solrServer.optimize();
             }
             else {
@@ -210,9 +213,16 @@ public class OntologyIndexer {
             ontologyIterator.remove();
         }
 
-        public void shutDown(){
+        public void shutDown() throws IOException, SolrServerException {
             if (solrServer != null){
+                solrServer.optimize();
                 solrServer.shutdown();
+            }
+        }
+
+        public void optimize() throws IOException, SolrServerException {
+            if (solrServer != null){
+                solrServer.optimize();
             }
         }
     }
