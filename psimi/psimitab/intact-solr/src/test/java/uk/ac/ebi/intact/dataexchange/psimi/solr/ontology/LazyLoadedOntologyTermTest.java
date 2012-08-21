@@ -15,7 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.junit.*;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
@@ -38,14 +38,14 @@ public class LazyLoadedOntologyTermTest {
     private static IntactSolrJettyRunner solrJettyRunner;
 
     private static OntologySearcher searcher;
-    private static ConcurrentUpdateSolrServer solrServer;
+    private static HttpSolrServer solrServer;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         solrJettyRunner = new IntactSolrJettyRunner();
         solrJettyRunner.start();
 
-        solrServer = solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        solrServer = (HttpSolrServer) solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
         searcher = new OntologySearcher(solrServer);
 
         createIndex();
@@ -159,7 +159,7 @@ public class LazyLoadedOntologyTermTest {
         OntologyDocument c22_c31 = new OntologyDocument("test", "C2-2", "children 2-2", "C3-1", "children 3-1", "OBO_REL:is_a", false);
         OntologyDocument c31 = new OntologyDocument("test", "C3-1", "children 3-1", null, null, null, false);
 
-        ConcurrentUpdateSolrServer solrServer = solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        HttpSolrServer solrServer = (HttpSolrServer) solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
         solrServer.deleteByQuery("*:*");
         solrServer.commit();
         solrServer.optimize();

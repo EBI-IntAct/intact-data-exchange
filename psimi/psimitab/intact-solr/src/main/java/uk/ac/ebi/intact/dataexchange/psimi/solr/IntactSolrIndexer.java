@@ -17,7 +17,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
@@ -49,7 +48,7 @@ public class IntactSolrIndexer {
     private Logger log = LoggerFactory.getLogger(IntactSolrIndexer.class);
 
     private SolrServer solrServer;
-    private ConcurrentUpdateSolrServer ontologySolrServer;
+    private HttpSolrServer ontologySolrServer;
     private SolrDocumentConverter converter;
 
     private int timesToRetry = 100;
@@ -71,10 +70,10 @@ public class IntactSolrIndexer {
     }
 
     public IntactSolrIndexer(String solrServerUrl, String ontologySolrServerUrl) throws MalformedURLException {
-        this(new HttpSolrServer(solrServerUrl), new ConcurrentUpdateSolrServer(ontologySolrServerUrl,2,2));
+        this(new HttpSolrServer(solrServerUrl), new HttpSolrServer(ontologySolrServerUrl));
     }
 
-    public IntactSolrIndexer(SolrServer solrServer, ConcurrentUpdateSolrServer ontologySolrServer) {
+    public IntactSolrIndexer(SolrServer solrServer, HttpSolrServer ontologySolrServer) {
         this(solrServer);
         this.ontologySolrServer = ontologySolrServer;
         this.converter = new SolrDocumentConverter(solrServer, new OntologySearcher(ontologySolrServer));

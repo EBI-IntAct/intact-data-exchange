@@ -18,7 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
@@ -43,9 +43,9 @@ public class OntologyIndexer {
 
     private static final Log log = LogFactory.getLog( OntologyIndexer.class );
 
-    private ConcurrentUpdateSolrServer solrServer;
+    private HttpSolrServer solrServer;
 
-    public OntologyIndexer(ConcurrentUpdateSolrServer solrServer) {
+    public OntologyIndexer(HttpSolrServer solrServer) {
         this.solrServer = solrServer;
 
         SolrLogger.readFromLog4j();
