@@ -249,7 +249,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
         Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
 
         final SolrServer solrServer = solrJettyRunner.getSolrServer(CoreNames.CORE_PUB);
-        Assert.assertEquals(2L, solrServer.query(new SolrQuery("IM-1234-1")).getResults().getNumFound());
+        Assert.assertEquals(2L, solrServer.query(new SolrQuery("interaction_id:IM-1234-1")).getResults().getNumFound());
     }
 
     @Test
