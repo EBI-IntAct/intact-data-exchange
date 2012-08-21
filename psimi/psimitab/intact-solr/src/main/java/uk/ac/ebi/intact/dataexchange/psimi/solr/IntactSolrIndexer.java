@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
@@ -48,7 +49,7 @@ public class IntactSolrIndexer {
     private Logger log = LoggerFactory.getLogger(IntactSolrIndexer.class);
 
     private SolrServer solrServer;
-    private HttpSolrServer ontologySolrServer;
+    private ConcurrentUpdateSolrServer ontologySolrServer;
     private SolrDocumentConverter converter;
 
     private int timesToRetry = 100;
@@ -70,10 +71,10 @@ public class IntactSolrIndexer {
     }
 
     public IntactSolrIndexer(String solrServerUrl, String ontologySolrServerUrl) throws MalformedURLException {
-        this(new HttpSolrServer(solrServerUrl), new HttpSolrServer(ontologySolrServerUrl));
+        this(new HttpSolrServer(solrServerUrl), new ConcurrentUpdateSolrServer(ontologySolrServerUrl,2,2));
     }
 
-    public IntactSolrIndexer(SolrServer solrServer, HttpSolrServer ontologySolrServer) {
+    public IntactSolrIndexer(SolrServer solrServer, ConcurrentUpdateSolrServer ontologySolrServer) {
         this(solrServer);
         this.ontologySolrServer = ontologySolrServer;
         this.converter = new SolrDocumentConverter(solrServer, new OntologySearcher(ontologySolrServer));
@@ -311,7 +312,6 @@ public class IntactSolrIndexer {
 
     private void commitSolr(boolean optimize, int retriesLeft) throws IOException, IntactSolrException {
         try {
-            solrServer.commit();
 
             if (optimize) {
                 solrServer.optimize();
@@ -320,6 +320,9 @@ public class IntactSolrIndexer {
                 // as files on the file system can be deleted and create NFS Stale File Handles.
 //                this.converter
                 
+            }
+            else {
+                solrServer.commit();
             }
 
         } catch ( SolrServerException e ) {

@@ -119,6 +119,9 @@ public class OntologySearcher implements Serializable {
     private OntologyNames searchOntologyNamesById(String fieldId, String id, Integer firstResult, Integer maxResults) throws SolrServerException {
         SolrQuery query = new SolrQuery(fieldId + ":\"" + id + "\"");
 
+        // order by unique id
+        query.addSortField(OntologyFieldNames.ID, SolrQuery.ORDER.asc);
+
         if (firstResult != null) query.setStart(firstResult);
         if (maxResults != null) query.setRows(maxResults);
 
@@ -129,6 +132,9 @@ public class OntologySearcher implements Serializable {
 
     private OntologyNames searchOntologyNamesByName(String fieldId, String name, Integer firstResult, Integer maxResults) throws SolrServerException {
         SolrQuery query = new SolrQuery(fieldId + ":\"" + name + "\"");
+
+        // order by unique id
+        query.addSortField(OntologyFieldNames.ID, SolrQuery.ORDER.asc);
 
         if (firstResult != null) query.setStart(firstResult);
         if (maxResults != null) query.setRows(maxResults);
@@ -196,6 +202,8 @@ public class OntologySearcher implements Serializable {
 
     private List<OntologyTerm> searchById(String fieldId, String id, Integer firstResult, Integer maxResults) throws SolrServerException {
         SolrQuery query = new SolrQuery(fieldId + ":\"" + id + "\"");
+        // order by unique id
+        query.addSortField(OntologyFieldNames.ID, SolrQuery.ORDER.asc);
 
         if (firstResult != null) query.setStart(firstResult);
         if (maxResults != null) query.setRows(maxResults);
@@ -285,8 +293,16 @@ public class OntologySearcher implements Serializable {
             SolrQuery query = new SolrQuery("*:*");
             query.setStart(0);
             query.setRows(0);
+
+            // prepare faceting
             query.setFacet(true);
             query.setParam(FacetParams.FACET_FIELD, "ontology");
+            query.setFacetLimit(10);
+            query.setFacetMinCount(1);
+            query.set(FacetParams.FACET_OFFSET, 0);
+
+            // order by unique id
+            query.addSortField(OntologyFieldNames.ID, SolrQuery.ORDER.asc);
 
             QueryResponse response = search(query);
             FacetField facetField = response.getFacetField("ontology");

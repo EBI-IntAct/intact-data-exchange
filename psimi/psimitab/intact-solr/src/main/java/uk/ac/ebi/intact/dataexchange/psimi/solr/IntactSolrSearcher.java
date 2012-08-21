@@ -29,6 +29,7 @@ import org.hupo.psi.mi.psicquic.model.PsicquicSolrServer;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,7 +75,7 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
     }
 
     @Override
-    protected IntactSolrSearchResult createMitabResultsForType(SolrDocumentList docList, String mitabType) throws PsicquicSolrException {
+    protected IntactSolrSearchResult createMitabResultsForType(SolrDocumentList docList, String mitabType, List<FacetField> facetFields) throws PsicquicSolrException {
 
         String [] fieldNames = solrFields.get(mitabType);
 

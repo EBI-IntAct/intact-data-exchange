@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hupo.psi.mi.psicquic.model.PsicquicSolrException;
@@ -147,7 +146,7 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         Assert.assertEquals(42, mitab.split("\t").length);
 
         IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB),
-                                                          (HttpSolrServer) getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+                                                          getSolrJettyRunner().getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
         indexer.indexOntologies(new OntologyMapping[] {
                 new OntologyMapping("go", IntactSolrIndexerTest.class.getResource("/META-INF/goslim_generic.obo"))});
 

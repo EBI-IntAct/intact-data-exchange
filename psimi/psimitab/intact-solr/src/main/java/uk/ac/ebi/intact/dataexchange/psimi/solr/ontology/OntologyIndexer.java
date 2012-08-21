@@ -17,7 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyDocument;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
@@ -41,9 +41,9 @@ public class OntologyIndexer {
 
     private static final Log log = LogFactory.getLog( OntologyIndexer.class );
 
-    private HttpSolrServer solrServer;
+    private ConcurrentUpdateSolrServer solrServer;
 
-    public OntologyIndexer(HttpSolrServer solrServer) {
+    public OntologyIndexer(ConcurrentUpdateSolrServer solrServer) {
         this.solrServer = solrServer;
 
         SolrLogger.readFromLog4j();
@@ -96,12 +96,14 @@ public class OntologyIndexer {
     public void indexOntology(OntologyIterator ontologyIterator, DocumentFilter documentFilter) {
         Iterator<SolrInputDocument> iter = new SolrInputDocumentIterator(ontologyIterator, documentFilter);
 
-        try {
-            solrServer.add(iter);
-        } catch (Throwable e) {
-            throw new IntactSolrException("Problem indexing documents using iterator", e);
+        while (iter.hasNext()){
+            try {
+                SolrInputDocument doc = iter.next();
+                solrServer.add(doc);
+            } catch (Throwable e) {
+                throw new IntactSolrException("Problem indexing documents using iterator", e);
+            }
         }
-
         commitSolr(true);
     }
 
@@ -159,8 +161,12 @@ public class OntologyIndexer {
 
     private void commitSolr(boolean optimize) throws IntactSolrException {
         try {
-            solrServer.commit();
-            if (optimize) solrServer.optimize();
+            if (optimize) {
+                solrServer.optimize();
+            }
+            else {
+                solrServer.commit();
+            }
         } catch (Exception e) {
             throw new IntactSolrException("Problem during commit", e);
         }

@@ -15,15 +15,16 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.IntactSolrIndexer;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
-import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
 
 /**
@@ -42,7 +43,7 @@ public class OntologyBinaryInteractionEnricherTest {
         solrJettyRunner.start();
 
         indexer = new IntactSolrIndexer(solrJettyRunner.getSolrServer(CoreNames.CORE_PUB),
-                                        (HttpSolrServer) solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+                                        solrJettyRunner.getStreamingSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
 
         enricher = new OntologyBinaryInteractionEnricher(
                 new OntologySearcher(solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB)));
