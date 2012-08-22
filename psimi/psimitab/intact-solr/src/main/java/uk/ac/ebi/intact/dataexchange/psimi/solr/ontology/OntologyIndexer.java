@@ -46,6 +46,7 @@ public class OntologyIndexer {
     private HttpSolrServer solrServer;
 
     private int commitInterval = 50000;
+    private int numberOfTries = 5;
 
     public OntologyIndexer(HttpSolrServer solrServer) {
         this.solrServer = solrServer;
@@ -114,7 +115,22 @@ public class OntologyIndexer {
                 SolrInputDocument doc = iter.next();
                 solrServer.add(doc);
             } catch (Throwable e) {
-                throw new IntactSolrException("Problem indexing documents using iterator", e);
+                int numberOfTries = 1;
+                boolean isSuccessful = false;
+
+                while (numberOfTries <= this.numberOfTries && !isSuccessful){
+                    try {
+                        SolrInputDocument doc = iter.next();
+                        solrServer.add(doc);
+                        isSuccessful = true;
+                    } catch (Exception e2) {
+                        numberOfTries++;
+                    }
+                }
+
+                if (!isSuccessful){
+                    throw new IntactSolrException("Problem indexing documents using iterator", e);
+                }
             }
         }
         commitSolr(false);
@@ -134,7 +150,20 @@ public class OntologyIndexer {
         try {
             solrServer.add(doc);
         } catch (Exception e) {
-            throw new IntactSolrException("Problem adding ontology document to SOLR server: "+ontologyDocument, e);
+            int numberOfTries = 1;
+            boolean isSuccessful = false;
+
+            while (numberOfTries <= this.numberOfTries && !isSuccessful){
+                try {
+                    solrServer.add(doc);
+                    isSuccessful = true;
+                } catch (Exception e2) {
+                    numberOfTries++;
+                }
+            }
+            if (!isSuccessful){
+                throw new IntactSolrException("Problem adding ontology document to SOLR server: "+ontologyDocument, e);
+            }
         }
     }
 
@@ -182,7 +211,28 @@ public class OntologyIndexer {
                 solrServer.commit();
             }
         } catch (Exception e) {
-            throw new IntactSolrException("Problem during commit", e);
+            int numberOfTries = 1;
+            boolean isSuccessful = false;
+
+            while (numberOfTries <= this.numberOfTries && !isSuccessful){
+                try {
+                    if (optimize) {
+                        solrServer.commit();
+                        solrServer.optimize();
+                    }
+                    else {
+                        solrServer.commit();
+                    }
+
+                    isSuccessful = true;
+                } catch (Exception e2) {
+                    numberOfTries++;
+                }
+            }
+
+            if (!isSuccessful){
+                throw new IntactSolrException("Problem during commit", e);
+            }
         }
     }
 
@@ -205,6 +255,10 @@ public class OntologyIndexer {
 
     public void setCommitInterval(int commitInterval) {
         this.commitInterval = commitInterval;
+    }
+
+    public void setNumberOfTries(int numberOfTries) {
+        this.numberOfTries = numberOfTries;
     }
 
     private class SolrInputDocumentIterator implements Iterator<SolrInputDocument> {
