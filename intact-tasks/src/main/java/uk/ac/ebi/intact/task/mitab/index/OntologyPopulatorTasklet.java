@@ -51,9 +51,6 @@ public class OntologyPopulatorTasklet implements Tasklet{
     // settings SOLRServer
     private int maxTotalConnections = 128;
     private int defaultMaxConnectionsPerHost = 32;
-    private int connectionTimeOut = 100000;
-    private int soTimeOut = 100000;
-    private boolean allowCompression = true;
 
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         if (ontologiesSolrUrl == null) {
@@ -90,9 +87,6 @@ public class OntologyPopulatorTasklet implements Tasklet{
     private HttpSolrServer createSolrServer() {
         HttpSolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl, createHttpClient());
 
-        ontologiesSolrServer.setConnectionTimeout(connectionTimeOut);
-        ontologiesSolrServer.setSoTimeout(soTimeOut);
-        ontologiesSolrServer.setAllowCompression(allowCompression);
         return ontologiesSolrServer;
     }
 
@@ -134,30 +128,6 @@ public class OntologyPopulatorTasklet implements Tasklet{
 
     public void setDefaultMaxConnectionsPerHost(int defaultMaxConnectionsPerHost) {
         this.defaultMaxConnectionsPerHost = defaultMaxConnectionsPerHost;
-    }
-
-    public int getConnectionTimeOut() {
-        return connectionTimeOut;
-    }
-
-    public void setConnectionTimeOut(int connectionTimeOut) {
-        this.connectionTimeOut = connectionTimeOut;
-    }
-
-    public int getSoTimeOut() {
-        return soTimeOut;
-    }
-
-    public void setSoTimeOut(int soTimeOut) {
-        this.soTimeOut = soTimeOut;
-    }
-
-    public boolean isAllowCompression() {
-        return allowCompression;
-    }
-
-    public void setAllowCompression(boolean allowCompression) {
-        this.allowCompression = allowCompression;
     }
 
     public void setOntologiesSolrUrl(String ontologiesSolrUrl) {
