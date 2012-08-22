@@ -44,8 +44,8 @@ public class OntologyEnricherItemProcessor implements BinaryInteractionItemProce
     // settings SOLRServer
     private int maxTotalConnections = 128;
     private int defaultMaxConnectionsPerHost = 32;
-    private int connectionTimeOut = 100000;
-    private int soTimeOut = 100000;
+    private int connectionTimeOut = 20000;
+    private int soTimeOut = 20000;
     private boolean allowCompression = true;
 
     public BinaryInteraction process(BinaryInteraction item) throws Exception {
