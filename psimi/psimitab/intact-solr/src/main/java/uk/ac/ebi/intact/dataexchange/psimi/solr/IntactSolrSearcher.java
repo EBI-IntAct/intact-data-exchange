@@ -27,10 +27,7 @@ import org.apache.solr.common.params.FacetParams;
 import org.hupo.psi.mi.psicquic.model.PsicquicSolrException;
 import org.hupo.psi.mi.psicquic.model.PsicquicSolrServer;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Convenience class to simplify searching.
@@ -113,23 +110,24 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
 
         Multimap<String,InteractorIdCount> interactors = HashMultimap.create();
 
-        Map<String,String> fieldNameToTypeMap = new HashMap<String,String>(interactorTypeMis.length);
-
         for (String mi : interactorTypeMis) {
             final String fieldName = createFieldName(mi);
 
             query.addFacetField(fieldName);
-            fieldNameToTypeMap.put(fieldName, mi);
         }
 
         QueryResponse queryResponse = executeQuery(query);
 
-        for (Map.Entry<String,String> entry : fieldNameToTypeMap.entrySet()) {
-            FacetField ff = queryResponse.getFacetField(entry.getKey());
+        List<FacetField> facetFields = queryResponse.getFacetFields();
 
+        if (facetFields == null || facetFields.isEmpty()){
+            return interactors;
+        }
+
+        for (FacetField ff : facetFields) {
             if (ff != null && ff.getValues() != null) {
                 for (FacetField.Count c : ff.getValues()) {
-                    interactors.put(entry.getValue(), new InteractorIdCount(c.getName(), c.getCount()));
+                    interactors.put(ff.getName(), new InteractorIdCount(c.getName(), c.getCount()));
                 }
             }
         }
