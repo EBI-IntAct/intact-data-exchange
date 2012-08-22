@@ -89,6 +89,7 @@ public class OntologyPopulatorTasklet implements Tasklet{
 
         ontologiesSolrServer.setConnectionTimeout(300000);
         ontologiesSolrServer.setSoTimeout(300000);
+        ontologiesSolrServer.setAllowCompression(true);
 
         return ontologiesSolrServer;
     }
