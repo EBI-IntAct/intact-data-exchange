@@ -20,7 +20,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.hupo.psi.mi.psicquic.model.server.SolrJettyRunner;
@@ -110,8 +109,12 @@ public class IntactSolrJettyRunner extends SolrJettyRunner {
         return "http://localhost:"+getPort()+"/solr/"+coreName;
     }
 
-    public SolrServer getSolrServer(String coreName) {
-        solrServer = new HttpSolrServer(getSolrUrl(coreName));
+    public HttpSolrServer getSolrServer(String coreName) {
+        solrServer = new HttpSolrServer(getSolrUrl(coreName), createHttpClient());
+
+        solrServer.setConnectionTimeout(100000);
+        solrServer.setSoTimeout(100000);
+        solrServer.setAllowCompression(true);
 
         return solrServer;
     }

@@ -45,6 +45,8 @@ public class OntologyIndexer {
 
     private HttpSolrServer solrServer;
 
+    private int commitInterval = 1000;
+
     public OntologyIndexer(HttpSolrServer solrServer) {
         this.solrServer = solrServer;
 
@@ -98,7 +100,16 @@ public class OntologyIndexer {
     public void indexOntology(OntologyIterator ontologyIterator, DocumentFilter documentFilter) {
         Iterator<SolrInputDocument> iter = new SolrInputDocumentIterator(ontologyIterator, documentFilter);
 
+        int numberDoc = 0;
         while (iter.hasNext()){
+            numberDoc++;
+
+            // flush every commit interval
+            if (numberDoc >= commitInterval){
+                commitSolr(false);
+                numberDoc = 0;
+            }
+
             try {
                 SolrInputDocument doc = iter.next();
                 solrServer.add(doc);
@@ -175,6 +186,27 @@ public class OntologyIndexer {
         }
     }
 
+    public void shutDown() throws IOException, SolrServerException {
+        if (solrServer != null){
+            solrServer.optimize();
+            solrServer.shutdown();
+        }
+    }
+
+    public void optimize() throws IOException, SolrServerException {
+        if (solrServer != null){
+            solrServer.optimize();
+        }
+    }
+
+    public int getCommitInterval() {
+        return commitInterval;
+    }
+
+    public void setCommitInterval(int commitInterval) {
+        this.commitInterval = commitInterval;
+    }
+
     private class SolrInputDocumentIterator implements Iterator<SolrInputDocument> {
 
         private OntologyIterator ontologyIterator;
@@ -211,19 +243,6 @@ public class OntologyIndexer {
         @Override
         public void remove() {
             ontologyIterator.remove();
-        }
-
-        public void shutDown() throws IOException, SolrServerException {
-            if (solrServer != null){
-                solrServer.optimize();
-                solrServer.shutdown();
-            }
-        }
-
-        public void optimize() throws IOException, SolrServerException {
-            if (solrServer != null){
-                solrServer.optimize();
-            }
         }
     }
 }

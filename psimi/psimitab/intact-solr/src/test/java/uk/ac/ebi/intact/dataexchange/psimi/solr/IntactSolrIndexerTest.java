@@ -277,6 +277,6 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
            Thread.sleep(500);
         }
 
-        assertCount(0, "*:*");
+        assertCount(200, "*:*");
     }
 }

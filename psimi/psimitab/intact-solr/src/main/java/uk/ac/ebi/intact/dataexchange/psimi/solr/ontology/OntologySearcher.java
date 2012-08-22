@@ -119,13 +119,10 @@ public class OntologySearcher implements Serializable {
     private OntologyNames searchOntologyNamesById(String fieldId, String id, Integer firstResult, Integer maxResults) throws SolrServerException {
         SolrQuery query = new SolrQuery(fieldId + ":\"" + id + "\"");
 
-        // order by unique id
-        query.addSortField(OntologyFieldNames.ID, SolrQuery.ORDER.asc);
-
         if (firstResult != null) query.setStart(firstResult);
         if (maxResults != null) query.setRows(maxResults);
 
-        QueryResponse response = search(query);
+        QueryResponse response = search(query, new String[] {OntologyFieldNames.CHILD_NAME, OntologyFieldNames.CHILDREN_SYNONYMS});
 
         return extractNamesAndSynonymsFrom(response);
     }
@@ -133,13 +130,10 @@ public class OntologySearcher implements Serializable {
     private OntologyNames searchOntologyNamesByName(String fieldId, String name, Integer firstResult, Integer maxResults) throws SolrServerException {
         SolrQuery query = new SolrQuery(fieldId + ":\"" + name + "\"");
 
-        // order by unique id
-        query.addSortField(OntologyFieldNames.ID, SolrQuery.ORDER.asc);
-
         if (firstResult != null) query.setStart(firstResult);
         if (maxResults != null) query.setRows(maxResults);
 
-        QueryResponse response = search(query);
+        QueryResponse response = search(query, new String[] {OntologyFieldNames.CHILD_NAME, OntologyFieldNames.CHILDREN_SYNONYMS});
 
         return extractNamesAndSynonymsFrom(response);
     }
@@ -166,7 +160,15 @@ public class OntologySearcher implements Serializable {
         return null;
     }
 
-    public QueryResponse search(SolrQuery query) throws SolrServerException{
+    public QueryResponse search(SolrQuery query, String [] fieldNames) throws SolrServerException{
+
+        if (fieldNames != null && fieldNames.length > 0){
+            query.setFields(fieldNames);
+        }
+
+        // order by unique id
+        query.addSortField(OntologyFieldNames.ID, SolrQuery.ORDER.asc);
+
         return solrServer.query(query);
     }
 
@@ -202,20 +204,21 @@ public class OntologySearcher implements Serializable {
 
     private List<OntologyTerm> searchById(String fieldId, String id, Integer firstResult, Integer maxResults) throws SolrServerException {
         SolrQuery query = new SolrQuery(fieldId + ":\"" + id + "\"");
-        // order by unique id
-        query.addSortField(OntologyFieldNames.ID, SolrQuery.ORDER.asc);
 
         if (firstResult != null) query.setStart(firstResult);
         if (maxResults != null) query.setRows(maxResults);
 
         if (FieldName.CHILDREN_ID.equalsIgnoreCase(fieldId)){
-            return processParentsHits(search(query), id);
+            return processParentsHits(search(query,
+                    new String[] {OntologyFieldNames.PARENT_ID, OntologyFieldNames.PARENT_NAME, OntologyFieldNames.PARENT_SYNONYMS}), id);
         }
         else if (FieldName.PARENT_ID.equalsIgnoreCase(fieldId)) {
-            return processChildrenHits(search(query), id);
+            return processChildrenHits(search(query,
+                    new String[] {OntologyFieldNames.CHILD_ID, OntologyFieldNames.CHILD_NAME, OntologyFieldNames.CHILDREN_SYNONYMS}), id);
         }
         else {
-            return processParentsHits(search(query), id);
+            return processParentsHits(search(query,
+                    new String[] {OntologyFieldNames.PARENT_ID, OntologyFieldNames.PARENT_NAME, OntologyFieldNames.PARENT_SYNONYMS}), id);
         }
     }
 
@@ -304,7 +307,7 @@ public class OntologySearcher implements Serializable {
             // order by unique id
             query.addSortField(OntologyFieldNames.ID, SolrQuery.ORDER.asc);
 
-            QueryResponse response = search(query);
+            QueryResponse response = search(query, null);
             FacetField facetField = response.getFacetField("ontology");
 
             if (facetField.getValues() == null) {
