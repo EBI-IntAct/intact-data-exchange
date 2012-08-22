@@ -112,8 +112,8 @@ public class IntactSolrJettyRunner extends SolrJettyRunner {
     public HttpSolrServer getSolrServer(String coreName) {
         solrServer = new HttpSolrServer(getSolrUrl(coreName), createHttpClient());
 
-        solrServer.setConnectionTimeout(100000);
-        solrServer.setSoTimeout(100000);
+        solrServer.setConnectionTimeout(5000);
+        solrServer.setSoTimeout(5000);
         solrServer.setAllowCompression(true);
 
         return solrServer;

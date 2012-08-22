@@ -45,7 +45,7 @@ public class OntologyIndexer {
 
     private HttpSolrServer solrServer;
 
-    private int commitInterval = 1000;
+    private int commitInterval = 10000;
 
     public OntologyIndexer(HttpSolrServer solrServer) {
         this.solrServer = solrServer;
