@@ -204,7 +204,6 @@ public class OntologyIndexer {
     private void commitSolr(boolean optimize) throws IntactSolrException {
         try {
             if (optimize) {
-                solrServer.commit();
                 solrServer.optimize();
             }
             else {
@@ -217,7 +216,6 @@ public class OntologyIndexer {
             while (numberOfTries <= this.numberOfTries && !isSuccessful){
                 try {
                     if (optimize) {
-                        solrServer.commit();
                         solrServer.optimize();
                     }
                     else {
