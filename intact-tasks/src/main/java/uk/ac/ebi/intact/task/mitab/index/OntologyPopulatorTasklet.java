@@ -87,6 +87,9 @@ public class OntologyPopulatorTasklet implements Tasklet{
     private HttpSolrServer createSolrServer() {
         HttpSolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl, createHttpClient());
 
+        ontologiesSolrServer.setConnectionTimeout(300000);
+        ontologiesSolrServer.setSoTimeout(300000);
+
         return ontologiesSolrServer;
     }
 
