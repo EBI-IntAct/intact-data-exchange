@@ -86,6 +86,25 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
     }
 
     @Test
+    public void search_interactors_count() throws Exception  {
+        assertCount(0L, "*:*");
+
+        indexFromClasspath("/mitab_samples/intact200.txt", true);
+
+        IntactSolrSearcher searcher = new IntactSolrSearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
+
+        //MI:0326(protein)	MI:0328(small molecule)
+        SolrQuery query = new SolrQuery("*:*")
+                .setRows(0)
+                .setFacet(true)
+                .setFacetMinCount(1)
+                .setFacetLimit(Integer.MAX_VALUE);
+
+        Assert.assertEquals(129, searcher.countAllInteractors(query, new String [] {"mi0326"}));
+        Assert.assertEquals(5, searcher.countAllInteractors(query, new String [] {"mi0328"}));
+    }
+
+    @Test
     public void search_interactors2() throws Exception {
         assertCount(0L, "*:*");
 

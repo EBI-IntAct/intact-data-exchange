@@ -40,6 +40,8 @@ import java.util.Map;
  */
 public class IntactSolrSearcher extends PsicquicSolrServer{
 
+    private int CHUNK_FACET_THRESHOLD=50;
+
     public IntactSolrSearcher(SolrServer solrServer) {
         super(solrServer);
     }
@@ -133,6 +135,61 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
         }
 
         return interactors;
+    }
+
+    public int countAllInteractors(SolrQuery originalQuery, String[] interactorTypeMis) throws IntactSolrException {
+        boolean endOfFacetResults = false;
+
+        int numberOfResult= 0;
+        int firstResults = 0;
+
+        while (!endOfFacetResults){
+            int chunkResults = 0;
+
+            SolrQuery query = originalQuery.getCopy();
+            query.setRows(0);
+
+            // we allow faceting
+            query.setFacet(true);
+
+            // we want all the facet fields with min count = 1. The facet fields with count = 0 are not interesting
+            query.setFacetMinCount(1);
+
+            // important optimization. We don't want to return all the fields, only a certain number for pagination
+            query.set(FacetParams.FACET_OFFSET, firstResults);
+            query.setFacetLimit(CHUNK_FACET_THRESHOLD);
+
+            // we sort the results : the biggest count first
+            query.setFacetSort(FacetParams.FACET_SORT_COUNT);
+
+            for (String mi : interactorTypeMis) {
+                final String fieldName = createFieldName(mi);
+
+                query.addFacetField(fieldName);
+            }
+
+            QueryResponse queryResponse = executeQuery(query);
+
+            List<FacetField> facetFields = queryResponse.getFacetFields();
+
+            if (facetFields == null || facetFields.isEmpty()){
+                endOfFacetResults = true;
+            }
+            else {
+                for (FacetField facetField : facetFields){
+                    chunkResults += facetField.getValueCount();
+                    numberOfResult += facetField.getValueCount();
+                }
+
+                if (chunkResults < CHUNK_FACET_THRESHOLD){
+                    endOfFacetResults = true;
+                }
+            }
+
+            firstResults+=CHUNK_FACET_THRESHOLD;
+        }
+
+        return numberOfResult;
     }
 
     private String createFieldName(String mi) {
