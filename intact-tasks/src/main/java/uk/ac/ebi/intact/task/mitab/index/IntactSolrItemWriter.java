@@ -41,12 +41,22 @@ public class IntactSolrItemWriter extends SolrItemWriter {
 
         // create ontologySearcher
         if (ontologiesSolrUrl != null) {
-            HttpSolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl);
+            HttpSolrServer ontologiesSolrServer = createOntologySolrServer();
+
             ontologySearcher = new OntologySearcher(ontologiesSolrServer);
         }
 
         // create new SolrDocumentConverter
         this.solrConverter = new SolrDocumentConverter(solrServer, ontologySearcher);
+    }
+
+    private HttpSolrServer createOntologySolrServer() {
+        HttpSolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl, createHttpClient());
+
+        solrServer.setConnectionTimeout(getConnectionTimeOut());
+        solrServer.setSoTimeout(getSoTimeOut());
+        solrServer.setAllowCompression(isAllowCompression());
+        return ontologiesSolrServer;
     }
 
     @Override

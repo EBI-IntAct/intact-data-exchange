@@ -15,6 +15,13 @@
  */
 package uk.ac.ebi.intact.task.mitab.index;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -41,11 +48,18 @@ public class OntologyPopulatorTasklet implements Tasklet{
     private List<OntologyMapping> taxonomyOntologyMappings;
     private boolean indexUniprotTaxonomy;
 
+    // settings SOLRServer
+    private int maxTotalConnections = 128;
+    private int defaultMaxConnectionsPerHost = 32;
+    private int connectionTimeOut = 100000;
+    private int soTimeOut = 100000;
+    private boolean allowCompression = true;
+
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         if (ontologiesSolrUrl == null) {
             throw new NullPointerException("ontologiesSolrUrl is null");
         }
-        HttpSolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl);
+        HttpSolrServer ontologiesSolrServer = createSolrServer();
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(ontologiesSolrServer);
 
@@ -73,12 +87,77 @@ public class OntologyPopulatorTasklet implements Tasklet{
         return RepeatStatus.FINISHED;
     }
 
+    private HttpSolrServer createSolrServer() {
+        HttpSolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl, createHttpClient());
+
+        ontologiesSolrServer.setConnectionTimeout(connectionTimeOut);
+        ontologiesSolrServer.setSoTimeout(soTimeOut);
+        ontologiesSolrServer.setAllowCompression(allowCompression);
+        return ontologiesSolrServer;
+    }
+
     private long countDocs(SolrServer ontologiesSolrServer) throws SolrServerException {
         SolrQuery countQuery = new SolrQuery("*:*");
         countQuery.setRows(0);
         QueryResponse queryResponse = ontologiesSolrServer.query(countQuery);
         long count = queryResponse.getResults().getNumFound();
         return count;
+    }
+
+    private HttpClient createHttpClient() {
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory
+                .getSocketFactory()));
+        schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory
+                .getSocketFactory()));
+
+        PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
+        cm.setMaxTotal(maxTotalConnections);
+        cm.setDefaultMaxPerRoute(defaultMaxConnectionsPerHost);
+
+        HttpClient httpClient = new DefaultHttpClient(cm);
+
+        return httpClient;
+    }
+
+    public int getMaxTotalConnections() {
+        return maxTotalConnections;
+    }
+
+    public void setMaxTotalConnections(int maxTotalConnections) {
+        this.maxTotalConnections = maxTotalConnections;
+    }
+
+    public int getDefaultMaxConnectionsPerHost() {
+        return defaultMaxConnectionsPerHost;
+    }
+
+    public void setDefaultMaxConnectionsPerHost(int defaultMaxConnectionsPerHost) {
+        this.defaultMaxConnectionsPerHost = defaultMaxConnectionsPerHost;
+    }
+
+    public int getConnectionTimeOut() {
+        return connectionTimeOut;
+    }
+
+    public void setConnectionTimeOut(int connectionTimeOut) {
+        this.connectionTimeOut = connectionTimeOut;
+    }
+
+    public int getSoTimeOut() {
+        return soTimeOut;
+    }
+
+    public void setSoTimeOut(int soTimeOut) {
+        this.soTimeOut = soTimeOut;
+    }
+
+    public boolean isAllowCompression() {
+        return allowCompression;
+    }
+
+    public void setAllowCompression(boolean allowCompression) {
+        this.allowCompression = allowCompression;
     }
 
     public void setOntologiesSolrUrl(String ontologiesSolrUrl) {
