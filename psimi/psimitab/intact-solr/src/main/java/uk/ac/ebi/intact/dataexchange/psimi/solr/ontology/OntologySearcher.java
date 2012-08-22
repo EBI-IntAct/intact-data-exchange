@@ -27,6 +27,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.FacetParams;
 import uk.ac.ebi.intact.bridges.ontologies.FieldName;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.IntactSolrException;
 
 import java.io.Serializable;
 import java.util.*;
@@ -274,7 +275,7 @@ public class OntologySearcher implements Serializable {
     }
 
     private OntologyTerm newInternalOntologyTerm(String id,
-                                                   String name, Set<OntologyTerm> synonyms) throws SolrServerException {
+                                                 String name, Set<OntologyTerm> synonyms) throws SolrServerException {
         return new LazyLoadedOntologyTerm( this, id, name, synonyms );
     }
 
@@ -322,6 +323,17 @@ public class OntologySearcher implements Serializable {
         }
 
         return ontologyNames;
+    }
+
+    public long countAllDocuments(){
+        SolrQuery query = new SolrQuery("*:*");
+        query.setRows(0);
+
+        try {
+            return solrServer.query(query).getResults().getNumFound();
+        } catch (SolrServerException e) {
+            throw new IntactSolrException("Problem searching with query: "+query, e);
+        }
     }
 
     public void shutdown(){
