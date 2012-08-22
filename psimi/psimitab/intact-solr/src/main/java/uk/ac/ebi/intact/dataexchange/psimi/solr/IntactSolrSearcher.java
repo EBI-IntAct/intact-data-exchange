@@ -37,7 +37,7 @@ import java.util.*;
  */
 public class IntactSolrSearcher extends PsicquicSolrServer{
 
-    private int CHUNK_FACET_THRESHOLD=50;
+    private int CHUNK_FACET_THRESHOLD=200;
 
     public IntactSolrSearcher(SolrServer solrServer) {
         super(solrServer);
@@ -127,7 +127,7 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
         for (FacetField ff : facetFields) {
             if (ff != null && ff.getValues() != null) {
                 for (FacetField.Count c : ff.getValues()) {
-                    interactors.put(ff.getName(), new InteractorIdCount(c.getName(), c.getCount()));
+                    interactors.put(extractInteractorTypeFromFieldName(ff.getName()), new InteractorIdCount(c.getName(), c.getCount()));
                 }
             }
         }
@@ -192,6 +192,10 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
 
     private String createFieldName(String mi) {
         return FieldNames.INTACT_BY_INTERACTOR_TYPE_PREFIX +mi.replaceAll(":", "").toLowerCase();
+    }
+
+    private String extractInteractorTypeFromFieldName(String mi) {
+        return mi.substring(Math.min(mi.length()-1, FieldNames.INTACT_BY_INTERACTOR_TYPE_PREFIX.length()+1)).toUpperCase();
     }
 
     private QueryResponse executeQuery(SolrQuery query) {
