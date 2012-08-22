@@ -53,9 +53,6 @@ public class IntactSolrItemWriter extends SolrItemWriter {
     private HttpSolrServer createOntologySolrServer() {
         HttpSolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl, createHttpClient());
 
-        solrServer.setConnectionTimeout(getConnectionTimeOut());
-        solrServer.setSoTimeout(getSoTimeOut());
-        solrServer.setAllowCompression(isAllowCompression());
         return ontologiesSolrServer;
     }
 
