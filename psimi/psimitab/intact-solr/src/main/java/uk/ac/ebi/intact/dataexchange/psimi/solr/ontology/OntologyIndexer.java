@@ -50,19 +50,18 @@ public class OntologyIndexer {
 
     public OntologyIndexer(HttpSolrServer solrServer) {
         this.solrServer = solrServer;
-        solrServer.setMaxRetries(0);
 
         SolrLogger.readFromLog4j();
     }
 
     public void indexObo(OntologyMapping[] ontologyMappings) throws IntactSolrException {
-       indexObo(ontologyMappings, new DefaultDocumentFilter());
+        indexObo(ontologyMappings, new DefaultDocumentFilter());
     }
 
     public void indexObo(OntologyMapping[] ontologyMappings, DocumentFilter documentFilter) throws IntactSolrException {
-       for (OntologyMapping om : ontologyMappings) {
-           indexObo(om.getName(), om.getUrl(), documentFilter);
-       }
+        for (OntologyMapping om : ontologyMappings) {
+            indexObo(om.getName(), om.getUrl(), documentFilter);
+        }
     }
 
     public void indexObo(String ontologyName, URL oboUrl) throws IntactSolrException {
@@ -102,30 +101,43 @@ public class OntologyIndexer {
     public void indexOntology(OntologyIterator ontologyIterator, DocumentFilter documentFilter) {
         Iterator<SolrInputDocument> iter = new SolrInputDocumentIterator(ontologyIterator, documentFilter);
 
-        try {
-            solrServer.add(iter);
-        } catch (Throwable e) {
-            int numberOfTries = 1;
-            boolean isSuccessful = false;
+        int numberDoc = 0;
+        while (iter.hasNext()){
+            numberDoc++;
 
-            while (numberOfTries <= this.numberOfTries && !isSuccessful){
-                try {
-                    solrServer.add(iter);
-                } catch (Exception e2) {
-                    numberOfTries++;
+            // flush every commit interval
+            if (numberDoc >= commitInterval){
+                commitSolr(false);
+                numberDoc = 0;
+            }
+
+            try {
+                SolrInputDocument doc = iter.next();
+                solrServer.add(doc);
+            } catch (Throwable e) {
+                int numberOfTries = 1;
+                boolean isSuccessful = false;
+
+                while (numberOfTries <= this.numberOfTries && !isSuccessful){
+                    try {
+                        SolrInputDocument doc = iter.next();
+                        solrServer.add(doc);
+                        isSuccessful = true;
+                    } catch (Exception e2) {
+                        numberOfTries++;
+                    }
+                }
+
+                if (!isSuccessful){
+                    throw new IntactSolrException("Problem indexing documents using iterator", e);
                 }
             }
-
-            if (!isSuccessful){
-                throw new IntactSolrException("Problem indexing documents using iterator", e);
-            }
         }
-
         commitSolr(false);
     }
 
     public void index(OntologyDocument ontologyDocument) throws IntactSolrException {
-         index(ontologyDocument, new DefaultDocumentFilter());
+        index(ontologyDocument, new DefaultDocumentFilter());
     }
 
     public void index(OntologyDocument ontologyDocument, DocumentFilter documentFilter) throws IntactSolrException {
@@ -167,7 +179,7 @@ public class OntologyIndexer {
         addField(doc, OntologyFieldNames.CHILD_NAME, ontologyDocument.getChildName(), true);
         //addField(doc, OntologyFieldNames.RELATIONSHIP_TYPE, ontologyDocument.getRelationshipType(), false);
         //addField(doc, OntologyFieldNames.CYCLIC, ontologyDocument.isCyclicRelationship(), false);
-        
+
         for (String synonym : ontologyDocument.getParentSynonyms()) {
             addField(doc, OntologyFieldNames.PARENT_SYNONYMS, synonym, false);
         }
