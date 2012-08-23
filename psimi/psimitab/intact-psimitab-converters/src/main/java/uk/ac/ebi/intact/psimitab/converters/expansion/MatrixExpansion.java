@@ -96,6 +96,9 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
             interactorB.getStoichiometry().clear();
             interactorB.getStoichiometry().add(0);
 
+            // update participant detection method if not done at the level of participant
+            interactionConverter.processExperimentParticipantIdentificationMethods(interaction, expandedBinary);
+
             // computes Rigid if necessary
             RigDataModel rigDatamodel = newInteraction.getMitabInteractorA().getRigDataModel();
 
@@ -137,6 +140,9 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
 
                     BinaryInteraction expandedBinary2 = newInteraction2.getBinaryInteraction();
                     interactions.add( expandedBinary2 );
+
+                    // update participant detection method if not done at the level of participant
+                    interactionConverter.processExperimentParticipantIdentificationMethods(interaction, expandedBinary2);
 
                     // count the first interactor rogid only once
                     if (isFirst){

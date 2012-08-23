@@ -108,6 +108,9 @@ public class InteractionConverter {
         bi.setInteractorA(interactorA);
         bi.setInteractorB(interactorB);
 
+        // process participant detection methods after setting the interactors
+        processExperimentParticipantIdentificationMethods(interaction, bi);
+
         if (convertedInteractorA != null && convertedInteractorB != null && convertedInteractorA.getRigDataModel() != null
                 && convertedInteractorB.getRigDataModel() != null){
             String rigid = calculateRigidFor(Arrays.asList(convertedInteractorA.getRigDataModel(), convertedInteractorB.getRigDataModel()));
@@ -123,6 +126,16 @@ public class InteractionConverter {
         flipInteractorsIfNecessary(bi);
 
         return bi;
+    }
+
+    public void processExperimentParticipantIdentificationMethods(Interaction interaction, BinaryInteraction binary){
+
+        if (interaction != null){
+            for (Experiment exp : interaction.getExperiments()){
+
+                this.experimentConverter.processParticipantDetectionMethod(exp, binary);
+            }
+        }
     }
 
     public void flipInteractorsIfNecessary(BinaryInteraction bi) {
@@ -227,7 +240,7 @@ public class InteractionConverter {
 
         // process experiments
         for (Experiment exp : interaction.getExperiments()){
-            experimentConverter.intactToCalimocho(exp, binary);
+            experimentConverter.intactToCalimocho(exp, binary, false);
         }
 
         //process xrefs

@@ -28,7 +28,7 @@ public class ExperimentConverter {
         this.organismConverter = new BioSourceConverter();
     }
 
-    public void intactToCalimocho(Experiment exp, BinaryInteraction binary){
+    public void intactToCalimocho(Experiment exp, BinaryInteraction binary, boolean processParticipantDetMethod){
 
         if (exp != null && binary != null){
             // process publication
@@ -56,24 +56,33 @@ public class ExperimentConverter {
             }
 
             // process participant detection method
-            if (exp.getCvIdentification() != null){
-                CrossReference detMethod = cvObjectConverter.toCrossReference(exp.getCvIdentification());
-
-                Interactor interactorA = binary.getInteractorA();
-                Interactor interactorB = binary.getInteractorB();
-
-                processParticipantDetectionMethodFor(interactorA, detMethod);
-                processParticipantDetectionMethodFor(interactorB, detMethod);
+            if (processParticipantDetMethod){
+                processParticipantDetectionMethod(exp, binary);
             }
         }
 
+    }
+
+    public void processParticipantDetectionMethod(Experiment exp, BinaryInteraction binary){
+        // process participant detection method
+        if (exp != null && exp.getCvIdentification() != null){
+            CrossReference detMethod = cvObjectConverter.toCrossReference(exp.getCvIdentification());
+
+            Interactor interactorA = binary.getInteractorA();
+            Interactor interactorB = binary.getInteractorB();
+
+            processParticipantDetectionMethodFor(interactorA, detMethod);
+            processParticipantDetectionMethodFor(interactorB, detMethod);
+        }
     }
 
     private void processParticipantDetectionMethodFor(Interactor interactor, CrossReference detMethod){
 
         if (interactor != null && detMethod != null){
 
-            interactor.getParticipantIdentificationMethods().add(detMethod);
+            if (interactor.getParticipantIdentificationMethods().isEmpty()){
+                interactor.getParticipantIdentificationMethods().add(detMethod);
+            }
         }
     }
 
