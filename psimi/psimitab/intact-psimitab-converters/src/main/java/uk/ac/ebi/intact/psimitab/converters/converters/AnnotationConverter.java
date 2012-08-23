@@ -40,7 +40,7 @@ public class AnnotationConverter {
 
             if (!topicsToExclude.contains(topic)){
                 Annotation annot = new AnnotationImpl(topic);
-                annot.setText(MitabEscapeUtils.escapeFieldElement(intactAnnotation.getAnnotationText()));
+                annot.setText(MitabEscapeUtils.escapeColumn(MitabEscapeUtils.escapeFieldElement(intactAnnotation.getAnnotationText())));
 
                 return annot;
             }
