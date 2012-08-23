@@ -96,8 +96,11 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
             interactorB.getStoichiometry().clear();
             interactorB.getStoichiometry().add(0);
 
-            // update participant detection method if not done at the level of participant
-            interactionConverter.processExperimentParticipantIdentificationMethods(interaction, expandedBinary);
+            // process participant detection methods after setting the interactors if not done at the level of interactiors
+            if (interactorB.getParticipantIdentificationMethods().isEmpty()){
+                interactionConverter.processExperimentParticipantIdentificationMethods(interaction, expandedBinary.getInteractorA());
+                interactionConverter.processExperimentParticipantIdentificationMethods(interaction, expandedBinary.getInteractorB());
+            }
 
             // computes Rigid if necessary
             RigDataModel rigDatamodel = newInteraction.getMitabInteractorA().getRigDataModel();
@@ -138,11 +141,16 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
                     // build a new interaction
                     MitabExpandedInteraction newInteraction2 = buildInteraction( binaryTemplate, c1, c2 );
 
+                    // process participant detection methods after setting the interactors if not done at the level of interactiors
+                    if (newInteraction2.getMitabInteractorA().getInteractor().getParticipantIdentificationMethods().isEmpty()){
+                        interactionConverter.processExperimentParticipantIdentificationMethods(interaction, newInteraction2.getMitabInteractorA().getInteractor());
+                    }
+                    if (newInteraction2.getMitabInteractorB().getInteractor().getParticipantIdentificationMethods().isEmpty()){
+                        interactionConverter.processExperimentParticipantIdentificationMethods(interaction, newInteraction2.getMitabInteractorB().getInteractor());
+                    }
+
                     BinaryInteraction expandedBinary2 = newInteraction2.getBinaryInteraction();
                     interactions.add( expandedBinary2 );
-
-                    // update participant detection method if not done at the level of participant
-                    interactionConverter.processExperimentParticipantIdentificationMethods(interaction, expandedBinary2);
 
                     // count the first interactor rogid only once
                     if (isFirst){

@@ -108,8 +108,13 @@ public class InteractionConverter {
         bi.setInteractorA(interactorA);
         bi.setInteractorB(interactorB);
 
-        // process participant detection methods after setting the interactors
-        processExperimentParticipantIdentificationMethods(interaction, bi);
+        // process participant detection methods after setting the interactors if not done at the level of interactiors
+        if (interactorA != null && interactorA.getParticipantIdentificationMethods().isEmpty()){
+            processExperimentParticipantIdentificationMethods(interaction, interactorA);
+        }
+        if (interactorB != null && interactorB.getParticipantIdentificationMethods().isEmpty()){
+            processExperimentParticipantIdentificationMethods(interaction, interactorB);
+        }
 
         if (convertedInteractorA != null && convertedInteractorB != null && convertedInteractorA.getRigDataModel() != null
                 && convertedInteractorB.getRigDataModel() != null){
@@ -128,12 +133,12 @@ public class InteractionConverter {
         return bi;
     }
 
-    public void processExperimentParticipantIdentificationMethods(Interaction interaction, BinaryInteraction binary){
+    public void processExperimentParticipantIdentificationMethods(Interaction interaction, Interactor interactor){
 
         if (interaction != null){
             for (Experiment exp : interaction.getExperiments()){
 
-                this.experimentConverter.processParticipantDetectionMethod(exp, binary);
+                this.experimentConverter.addParticipantDetectionMethodForInteractor(exp, interactor);
             }
         }
     }

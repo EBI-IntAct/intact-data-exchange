@@ -98,8 +98,13 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
             BinaryInteraction expandedBinary = newInteraction.getBinaryInteraction();
             interactions.add(expandedBinary);
 
-            // update participant detection method if not done at the level of participant
-            interactionConverter.processExperimentParticipantIdentificationMethods(interaction, expandedBinary);
+            // process participant detection methods after setting the interactors if not done at the level of interactiors
+            if (newInteraction.getMitabInteractorA().getInteractor().getParticipantIdentificationMethods().isEmpty()){
+                interactionConverter.processExperimentParticipantIdentificationMethods(interaction, newInteraction.getMitabInteractorA().getInteractor());
+            }
+            if (newInteraction.getMitabInteractorB().getInteractor().getParticipantIdentificationMethods().isEmpty()){
+                interactionConverter.processExperimentParticipantIdentificationMethods(interaction, newInteraction.getMitabInteractorB().getInteractor());
+            }
 
             // reset stoichiometry of duplicated interactor to 0
             Interactor interactorB = expandedBinary.getInteractorB();
@@ -148,8 +153,13 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
                     BinaryInteraction expandedBinary2 = newInteraction.getBinaryInteraction();
                     interactions.add( expandedBinary2 );
 
-                    // update participant detection method if not done at the level of participant
-                    interactionConverter.processExperimentParticipantIdentificationMethods(interaction, expandedBinary2);
+                    // process participant detection methods after setting the interactors if not done at the level of interactiors
+                    if (newInteraction.getMitabInteractorA().getInteractor().getParticipantIdentificationMethods().isEmpty()){
+                        interactionConverter.processExperimentParticipantIdentificationMethods(interaction, newInteraction.getMitabInteractorA().getInteractor());
+                    }
+                    if (newInteraction.getMitabInteractorB().getInteractor().getParticipantIdentificationMethods().isEmpty()){
+                        interactionConverter.processExperimentParticipantIdentificationMethods(interaction, newInteraction.getMitabInteractorB().getInteractor());
+                    }
 
                     // count the first interactor rogid only once
                     if (isFirst){

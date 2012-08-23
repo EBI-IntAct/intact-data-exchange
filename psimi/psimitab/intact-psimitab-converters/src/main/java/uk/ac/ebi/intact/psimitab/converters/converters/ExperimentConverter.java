@@ -76,6 +76,18 @@ public class ExperimentConverter {
         }
     }
 
+    public void addParticipantDetectionMethodForInteractor(Experiment exp, Interactor interactor){
+        // process participant detection method
+        if (exp != null && exp.getCvIdentification() != null && interactor != null){
+            CrossReference detMethod = cvObjectConverter.toCrossReference(exp.getCvIdentification());
+
+            if (detMethod != null){
+
+                interactor.getParticipantIdentificationMethods().add(detMethod);
+            }
+        }
+    }
+
     private void processParticipantDetectionMethodFor(Interactor interactor, CrossReference detMethod){
 
         if (interactor != null && detMethod != null){
