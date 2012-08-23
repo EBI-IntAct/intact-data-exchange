@@ -321,6 +321,11 @@ Lucene will flush based on whichever limit is hit first.  -->
            <maxTime>1000</maxTime>
          </autoCommit>
         -->
+        <autoCommit>
+            <maxDocs>50000</maxDocs> <!-- maximum uncommited docs before autocommit triggered -->
+            <maxTime>15000</maxTime> <!-- maximum time (in MS) after adding a doc before an autocommit is triggered -->
+            <openSearcher>false</openSearcher>
+        </autoCommit>
 
         <!-- Update Related Event Listeners
 
