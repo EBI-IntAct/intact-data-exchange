@@ -51,7 +51,7 @@ public class IntactSolrIndexer {
     private HttpSolrServer ontologySolrServer;
     private SolrDocumentConverter converter;
 
-    private int timesToRetry = 100;
+    private int timesToRetry = 5;
 
     private FailureHandlingStrategy failureHandlingStrategy = new FailFastFailureHandling();
 

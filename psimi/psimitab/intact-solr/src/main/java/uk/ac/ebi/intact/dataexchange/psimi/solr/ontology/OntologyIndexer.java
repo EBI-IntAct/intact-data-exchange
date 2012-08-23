@@ -50,6 +50,7 @@ public class OntologyIndexer {
 
     public OntologyIndexer(HttpSolrServer solrServer) {
         this.solrServer = solrServer;
+        solrServer.setMaxRetries(0);
 
         SolrLogger.readFromLog4j();
     }
@@ -101,38 +102,25 @@ public class OntologyIndexer {
     public void indexOntology(OntologyIterator ontologyIterator, DocumentFilter documentFilter) {
         Iterator<SolrInputDocument> iter = new SolrInputDocumentIterator(ontologyIterator, documentFilter);
 
-        int numberDoc = 0;
-        while (iter.hasNext()){
-            numberDoc++;
+        try {
+            solrServer.add(iter);
+        } catch (Throwable e) {
+            int numberOfTries = 1;
+            boolean isSuccessful = false;
 
-            // flush every commit interval
-            if (numberDoc >= commitInterval){
-                commitSolr(false);
-                numberDoc = 0;
+            while (numberOfTries <= this.numberOfTries && !isSuccessful){
+                try {
+                    solrServer.add(iter);
+                } catch (Exception e2) {
+                    numberOfTries++;
+                }
             }
 
-            try {
-                SolrInputDocument doc = iter.next();
-                solrServer.add(doc);
-            } catch (Throwable e) {
-                int numberOfTries = 1;
-                boolean isSuccessful = false;
-
-                while (numberOfTries <= this.numberOfTries && !isSuccessful){
-                    try {
-                        SolrInputDocument doc = iter.next();
-                        solrServer.add(doc);
-                        isSuccessful = true;
-                    } catch (Exception e2) {
-                        numberOfTries++;
-                    }
-                }
-
-                if (!isSuccessful){
-                    throw new IntactSolrException("Problem indexing documents using iterator", e);
-                }
+            if (!isSuccessful){
+                throw new IntactSolrException("Problem indexing documents using iterator", e);
             }
         }
+
         commitSolr(false);
     }
 
