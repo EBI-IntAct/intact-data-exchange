@@ -43,7 +43,7 @@ public class InteractionOntologyLuceneIndexer {
 
     private static final Log log = LogFactory.getLog(InteractionOntologyLuceneIndexer.class);
 
-    private OntologySearcher ontologYSearcher;
+    private OntologySearcher ontologySearcher;
     private IntactSolrSearcher interactionSearcher;
     private Map<InteractionOntologyTerm, InteractionOntologyTermResults> processedTerms;
 
@@ -55,7 +55,7 @@ public class InteractionOntologyLuceneIndexer {
             throw new IllegalArgumentException("The interaction solr url cannot bet null");
         }
 
-        this.ontologYSearcher = new OntologySearcher(createSolrServer(ontologySolrUrl));
+        this.ontologySearcher = new OntologySearcher(createSolrServer(ontologySolrUrl));
         this.interactionSearcher = new IntactSolrSearcher(createSolrServer(interactionOntologyUrl));
         this.processedTerms = new HashMap<InteractionOntologyTerm, InteractionOntologyTermResults>();
     }
@@ -116,6 +116,8 @@ public class InteractionOntologyLuceneIndexer {
         for (Map.Entry<InteractionOntologyTerm, InteractionOntologyTermResults> termResult : this.processedTerms.entrySet()){
             createAndIndexDocumentsFor(termResult.getKey(), termResult.getValue(), termIndexWriter);
         }
+
+        termIndexWriter.commit();
     }
 
     private void registerFieldCountResultsFor(Collection<FieldCount> fieldCounts) throws SolrServerException {
@@ -123,7 +125,7 @@ public class InteractionOntologyLuceneIndexer {
         for (FieldCount fieldCount : fieldCounts){
             String db = fieldCount.getType() != null ? fieldCount.getType() : "psi-mi";
 
-            LazyLoadedOntologyTerm term = new LazyLoadedOntologyTerm(ontologYSearcher, fieldCount.getValue());
+            LazyLoadedOntologyTerm term = new LazyLoadedOntologyTerm(ontologySearcher, fieldCount.getValue());
 
             Set<OntologyTerm> parents = term.getAllParentsToRoot();
 
@@ -298,6 +300,11 @@ public class InteractionOntologyLuceneIndexer {
                 facetFieldCounts.add(fieldCount);
             }
         }
+    }
+
+    public void shutDown(){
+        this.ontologySearcher.shutdown();
+        this.interactionSearcher.shutdown();
     }
 
     private static class FieldCount {

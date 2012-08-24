@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 
 /**
- * contains term name and identifier
+ * contains term name and identifier and the interaction results
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -12,6 +12,7 @@ public class InteractionOntologyTerm {
 
     private String name;
     private String identifier;
+    private InteractionOntologyTermResults results;
 
     public InteractionOntologyTerm(String name, String identifier){
          this.name = name;
@@ -44,5 +45,13 @@ public class InteractionOntologyTerm {
         int result = identifier != null ? identifier.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
+    }
+
+    public InteractionOntologyTermResults getResults() {
+        return results;
+    }
+
+    public void setResults(InteractionOntologyTermResults results) {
+        this.results = results;
     }
 }
