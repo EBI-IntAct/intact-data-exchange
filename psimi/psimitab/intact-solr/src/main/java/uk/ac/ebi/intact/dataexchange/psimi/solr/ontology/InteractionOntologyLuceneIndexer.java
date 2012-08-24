@@ -86,7 +86,7 @@ public class InteractionOntologyLuceneIndexer {
         return ontologiesSolrServer;
     }
 
-    private void loadAndIndexAllFacetFieldCounts(File directory) throws SolrServerException, PsicquicSolrException, IOException {
+    public void loadAndIndexAllFacetFieldCounts(File directory) throws SolrServerException, PsicquicSolrException, IOException {
 
         this.processedTerms.clear();
 
