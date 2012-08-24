@@ -2,7 +2,6 @@ package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import psidev.psi.mi.tab.model.Annotation;
 import psidev.psi.mi.tab.model.AnnotationImpl;
-import psidev.psi.mi.tab.utils.MitabEscapeUtils;
 import uk.ac.ebi.intact.model.CvTopic;
 
 import java.util.HashSet;
@@ -40,7 +39,7 @@ public class AnnotationConverter {
 
             if (!topicsToExclude.contains(topic)){
                 Annotation annot = new AnnotationImpl(topic);
-                annot.setText(MitabEscapeUtils.escapeColumn(intactAnnotation.getAnnotationText()));
+                annot.setText(intactAnnotation.getAnnotationText());
 
                 return annot;
             }
