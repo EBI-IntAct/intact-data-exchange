@@ -27,7 +27,8 @@ import org.apache.solr.common.params.FacetParams;
 import org.hupo.psi.mi.psicquic.model.PsicquicSolrException;
 import org.hupo.psi.mi.psicquic.model.PsicquicSolrServer;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Convenience class to simplify searching.
@@ -71,6 +72,11 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
     public IntactSolrSearchResult search(String q) throws PsicquicSolrException, SolrServerException {
 
         return (IntactSolrSearchResult) super.searchWithFilters(q, null, null, RETURN_TYPE_MITAB27, null);
+    }
+
+    @Override
+    public IntactSolrSearchResult searchWithFacets(String q, Integer firstResult, Integer maxResults, String returnType, String[] queryFilter, String[] facets, Integer firstFacet, Integer maxFacet) throws PsicquicSolrException, SolrServerException {
+        return (IntactSolrSearchResult) super.searchWithFacets(q, firstResult, maxResults, returnType, queryFilter, facets, firstFacet, maxFacet);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     @Override

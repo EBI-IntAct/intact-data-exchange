@@ -184,6 +184,10 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
         return terms;
     }
 
+    public Set<String> getSynonymsStr() {
+        return synonymsStr;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
