@@ -93,7 +93,7 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
                 return Collections.EMPTY_LIST;
             }
             Component uniqueComponent = interaction.getComponents().iterator().next();
-            MitabExpandedInteraction newInteraction = buildInteraction( binaryTemplateSelf, uniqueComponent, uniqueComponent );
+            MitabExpandedInteraction newInteraction = buildInteraction( binaryTemplateSelf, uniqueComponent, uniqueComponent, false );
 
             BinaryInteraction expandedBinary = newInteraction.getBinaryInteraction();
             interactions.add(expandedBinary);
@@ -148,7 +148,7 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
                 boolean onlyProtein = true;
 
                 for (Component preyComponent : preyComponents) {
-                    MitabExpandedInteraction newInteraction = buildInteraction(binaryTemplate, baitComponent, preyComponent);
+                    MitabExpandedInteraction newInteraction = buildInteraction(binaryTemplate, baitComponent, preyComponent, true);
 
                     BinaryInteraction expandedBinary2 = newInteraction.getBinaryInteraction();
                     interactions.add( expandedBinary2 );

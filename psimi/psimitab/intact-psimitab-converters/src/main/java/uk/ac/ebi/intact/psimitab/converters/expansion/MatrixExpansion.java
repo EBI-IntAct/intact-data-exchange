@@ -87,7 +87,7 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
                 return Collections.EMPTY_LIST;
             }
             Component uniqueComponent = interaction.getComponents().iterator().next();
-            MitabExpandedInteraction newInteraction = buildInteraction( binaryTemplateSelf, uniqueComponent, uniqueComponent );
+            MitabExpandedInteraction newInteraction = buildInteraction( binaryTemplateSelf, uniqueComponent, uniqueComponent, false );
 
             BinaryInteraction expandedBinary = newInteraction.getBinaryInteraction();
 
@@ -139,7 +139,7 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
                 for ( int j = ( i + 1 ); j < components.length; j++ ) {
                     Component c2 = components[j];
                     // build a new interaction
-                    MitabExpandedInteraction newInteraction2 = buildInteraction( binaryTemplate, c1, c2 );
+                    MitabExpandedInteraction newInteraction2 = buildInteraction( binaryTemplate, c1, c2, true );
 
                     // process participant detection methods after setting the interactors if not done at the level of interactiors
                     if (newInteraction2.getMitabInteractorA().getInteractor().getParticipantIdentificationMethods().isEmpty()){

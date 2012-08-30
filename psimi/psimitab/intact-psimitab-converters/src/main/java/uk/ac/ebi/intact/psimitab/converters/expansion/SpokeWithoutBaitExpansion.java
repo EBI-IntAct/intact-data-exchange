@@ -72,7 +72,7 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
         for (int i = 1; i < sortedComponents.size(); i++) {
             Component fakePrey = sortedComponents.get(i);
 
-            MitabExpandedInteraction spokeInteraction = buildInteraction(interactionTemplate, fakeBait, fakePrey);
+            MitabExpandedInteraction spokeInteraction = buildInteraction(interactionTemplate, fakeBait, fakePrey, true);
             BinaryInteraction expandedBinary2 = spokeInteraction.getBinaryInteraction();
             interactions.add( expandedBinary2 );
 

@@ -57,7 +57,7 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
      * @param c2          component to add to the newly created interaction.
      * @return a new interaction having c1 and c2 as component.
      */
-    protected MitabExpandedInteraction buildInteraction( BinaryInteraction interaction, Component c1, Component c2 ) {
+    protected MitabExpandedInteraction buildInteraction( BinaryInteraction interaction, Component c1, Component c2, boolean isExpanded ) {
         MitabInteractor mitabInteractorA = interactorConverter.intactToMitab(c1);
         MitabInteractor mitabInteractorB = interactorConverter.intactToMitab(c2);
         Interactor interactorA = mitabInteractorA != null ? mitabInteractorA.getInteractor() : null;
@@ -70,7 +70,9 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
             expandedInteraction.setAnnotations(interaction.getAnnotations());
             expandedInteraction.setAuthors(interaction.getAuthors());
             expandedInteraction.setChecksums(interaction.getChecksums());
-            expandedInteraction.getComplexExpansion().add(new CrossReferenceImpl(CvDatabase.PSI_MI, getMI(), getName()));
+            if (isExpanded){
+                expandedInteraction.getComplexExpansion().add(new CrossReferenceImpl(CvDatabase.PSI_MI, getMI(), getName()));
+            }
             expandedInteraction.setConfidenceValues(interaction.getConfidenceValues());
             expandedInteraction.setCreationDate(interaction.getCreationDate());
             expandedInteraction.setDetectionMethods(interaction.getDetectionMethods());
