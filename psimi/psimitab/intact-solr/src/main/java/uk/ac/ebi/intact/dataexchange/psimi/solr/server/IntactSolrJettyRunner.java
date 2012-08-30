@@ -119,6 +119,13 @@ public class IntactSolrJettyRunner extends SolrJettyRunner {
         return solrServer;
     }
 
+    public HttpSolrServer getSolrServerNoTimeOut(String coreName) {
+        solrServer = new HttpSolrServer(getSolrUrl(coreName), createHttpClient());
+        solrServer.setAllowCompression(true);
+
+        return solrServer;
+    }
+
     public ConcurrentUpdateSolrServer getStreamingSolrServer(String coreName) {
         try {
             return new ConcurrentUpdateSolrServer(getSolrUrl(coreName).toString(), 4, 4);

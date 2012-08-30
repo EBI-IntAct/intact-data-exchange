@@ -45,7 +45,7 @@ public class LazyLoadedOntologyTermTest {
         solrJettyRunner = new IntactSolrJettyRunner();
         solrJettyRunner.start();
 
-        solrServer = (HttpSolrServer) solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        solrServer = solrJettyRunner.getSolrServerNoTimeOut(CoreNames.CORE_ONTOLOGY_PUB);
         searcher = new OntologySearcher(solrServer);
 
         createIndex();
@@ -159,7 +159,7 @@ public class LazyLoadedOntologyTermTest {
         OntologyDocument c22_c31 = new OntologyDocument("test", "C2-2", "children 2-2", "C3-1", "children 3-1", "OBO_REL:is_a", false);
         OntologyDocument c31 = new OntologyDocument("test", "C3-1", "children 3-1", null, null, null, false);
 
-        HttpSolrServer solrServer = (HttpSolrServer) solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        HttpSolrServer solrServer = solrJettyRunner.getSolrServerNoTimeOut(CoreNames.CORE_ONTOLOGY_PUB);
         solrServer.deleteByQuery("*:*");
         solrServer.commit();
         solrServer.optimize();

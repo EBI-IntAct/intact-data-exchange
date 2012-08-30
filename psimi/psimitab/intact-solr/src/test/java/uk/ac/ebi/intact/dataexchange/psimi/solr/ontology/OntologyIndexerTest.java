@@ -52,7 +52,7 @@ public class OntologyIndexerTest  {
 
     @Test
     public void testIndexObo() throws Exception{
-        HttpSolrServer solrServer = (HttpSolrServer) solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        HttpSolrServer solrServer = solrJettyRunner.getSolrServerNoTimeOut(CoreNames.CORE_ONTOLOGY_PUB);
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
 
@@ -66,7 +66,7 @@ public class OntologyIndexerTest  {
 
     @Test
     public void testTinyIndexObo() throws Exception{
-        HttpSolrServer solrServer = (HttpSolrServer) solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        HttpSolrServer solrServer = solrJettyRunner.getSolrServerNoTimeOut(CoreNames.CORE_ONTOLOGY_PUB);
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
 
@@ -81,7 +81,7 @@ public class OntologyIndexerTest  {
 
     @Test
     public void testSmallIndexObo() throws Exception{
-        HttpSolrServer solrServer = (HttpSolrServer) solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        HttpSolrServer solrServer = solrJettyRunner.getSolrServerNoTimeOut(CoreNames.CORE_ONTOLOGY_PUB);
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
 
@@ -104,7 +104,7 @@ public class OntologyIndexerTest  {
 
     @Test
     public void testIndexTaxonomy() throws Exception{
-        HttpSolrServer solrServer = (HttpSolrServer) solrJettyRunner.getSolrServer(CoreNames.CORE_ONTOLOGY_PUB);
+        HttpSolrServer solrServer = solrJettyRunner.getSolrServerNoTimeOut(CoreNames.CORE_ONTOLOGY_PUB);
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
 

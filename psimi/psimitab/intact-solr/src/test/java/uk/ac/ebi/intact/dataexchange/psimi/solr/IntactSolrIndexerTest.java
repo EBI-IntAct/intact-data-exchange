@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -108,7 +107,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
                               "\tMI:0499(unspecified role)\tMI:0498(prey)\tMI:0496(bait)\tMI:0326(protein)\tMI:0326(protein)\tinterpro:IPR004829|\tgo:\""+goTermToExpand+"\"\t-\t-\t-\t-\tyeast:4932\t-\t-\t-\t-" +
                 "\t-\t-\t-\t-\t-\t-\t-\t-\t-";
 
-        OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServerNoTimeOut(CoreNames.CORE_ONTOLOGY_PUB));
 
         final Set<String> ontologyNames = ontologySearcher.getOntologyNames();
         Assert.assertEquals(1, ontologyNames.size());
@@ -140,7 +139,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
                               "\tMI:0499(unspecified role)\tMI:0498(prey)\tMI:0496(bait)\tMI:0326(protein)\tMI:0326(protein)\tinterpro:IPR004829|\t"+goTermToExpand+"\t-\t-\t-\t-\tyeast:4932\t-\t-\t-\t-" +
                 "\t-\t-\t-\t-\t-\t-\t-\t-\t-";
 
-        OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServerNoTimeOut(CoreNames.CORE_ONTOLOGY_PUB));
         SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer(), ontologySearcher);
 
         SolrInputDocument doc = converter.toSolrDocument(psiMiTabLine);
@@ -171,7 +170,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         OntologyIterator taxonomyIterator = new UniprotTaxonomyOntologyIterator(IntactSolrSearcherTest.class.getResourceAsStream("/META-INF/hominidae-taxonomy.tsv"));
         getIndexer().indexOntology(taxonomyIterator);
 
-        OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        OntologySearcher ontologySearcher = new OntologySearcher(getSolrJettyRunner().getSolrServerNoTimeOut(CoreNames.CORE_ONTOLOGY_PUB));
         SolrDocumentConverter converter = new SolrDocumentConverter(getSolrServer(), ontologySearcher);
 
         SolrInputDocument doc = converter.toSolrDocument(mitab);
@@ -228,7 +227,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
 
         OntologyIterator taxonomyIterator = new UniprotTaxonomyOntologyIterator(IntactSolrSearcherTest.class.getResourceAsStream("/META-INF/hominidae-taxonomy.tsv"));
 
-        IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB), (HttpSolrServer) getSolrJettyRunner().getSolrServer(CoreNames.CORE_ONTOLOGY_PUB));
+        IntactSolrIndexer indexer = new IntactSolrIndexer(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB), getSolrJettyRunner().getSolrServerNoTimeOut(CoreNames.CORE_ONTOLOGY_PUB));
         indexer.indexOntology(taxonomyIterator);
         indexer.indexMitab(new ByteArrayInputStream(mitabLine.getBytes()), false);
 

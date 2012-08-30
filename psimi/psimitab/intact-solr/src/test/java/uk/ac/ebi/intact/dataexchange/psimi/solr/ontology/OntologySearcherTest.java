@@ -29,7 +29,7 @@ public class OntologySearcherTest extends AbstractSolrTestCase {
         getIndexer().indexOntologies( new OntologyMapping[]{new OntologyMapping( "go", goURL )} );
         assertCountOntologyTerm( 44, "*:*" ); // 33 is_a + 11 part_of + 1 leaf + 1 root
 
-        final SolrServer server = getSolrJettyRunner().getSolrServer( CoreNames.CORE_ONTOLOGY_PUB );
+        final SolrServer server = getSolrJettyRunner().getSolrServerNoTimeOut( CoreNames.CORE_ONTOLOGY_PUB );
         OntologySearcher searcher = new OntologySearcher( server );
 
         assertParentRelationshipCount( searcher, "GO:0000786", 3 );
@@ -47,7 +47,7 @@ public class OntologySearcherTest extends AbstractSolrTestCase {
         getIndexer().indexOntologies( new OntologyMapping[]{new OntologyMapping( "go", goURL )} );
         assertCountOntologyTerm( 44, "*:*" ); // 33 is_a + 11 part_of + 1 leaf + 1 root
 
-        final SolrServer server = getSolrJettyRunner().getSolrServer( CoreNames.CORE_ONTOLOGY_PUB );
+        final SolrServer server = getSolrJettyRunner().getSolrServerNoTimeOut( CoreNames.CORE_ONTOLOGY_PUB );
         OntologySearcher searcher = new OntologySearcher( server );
 
         assertChildrenRelationshipCount( searcher, "GO:0000786", 1 );
