@@ -129,17 +129,17 @@
      termOffsets: Store offset information with the term vector. This will increase storage costs.
    -->
      <!-- unique document identifier must be stored=true and indexed=true-->
-     <field name="id" type="string" required="true" indexed="true" stored="true" />
+     <field name="id" type="string" required="true" indexed="true" stored="true" multiValued="false"/>
      <!-- ontology name. Ex psi-mi. Is indexed=true because used for faceting. It is stored = true because we want to retrieve the result after a query-->
-     <field name="ontology" type="string" required="true" indexed="true" stored="false" />
+     <field name="ontology" type="string" required="true" indexed="true" stored="false" multiValued="false"/>
      <!-- term ID for the parent term. It is indexed = true because we want to search for it and stored = true because we want to retrieves it after a query-->
-     <field name="pid" type="string" indexed="true" stored="true" />
+     <field name="pid" type="string" indexed="true" stored="true" multiValued="false"/>
      <!-- parent term name. It is indexed = false because we don't want to search for it, only to retrieves the value associated to an id (stored=true)-->
-     <field name="pname" type="string" indexed="false" stored="true" />
+     <field name="pname" type="string" indexed="false" stored="true" multiValued="false"/>
      <!-- term ID for the children. It is indexed = true because we want to search for it and stored = true because we want to retrieves it after a query -->
-     <field name="cid" type="string" indexed="true" stored="true" />
+     <field name="cid" type="string" indexed="true" stored="true" multiValued="false"/>
      <!-- child term name. It is indexed = true because we can search for it, only to retrieves the value associated to an id (stored=true)-->
-     <field name="cname" type="string" indexed="true" stored="true" />
+     <field name="cname" type="string" indexed="true" stored="true" multiValued="false"/>
      <!-- if the relationship is cyclic. -->
      <!-- <field name="cyclic" type="boolean" indexed="true" default="false" stored="true" /> -->
      <!-- synonyms of child. It is indexed = false because we don't want to search for it, only to retrieves the value associated to an id (stored=true) -->
