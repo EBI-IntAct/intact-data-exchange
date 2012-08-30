@@ -102,7 +102,7 @@ not normally be changed by applications.
         <fieldType name="booleanIntact" 				class="solr.BoolField" 		indexed="true" stored="false" multiValued="false" required="true"/>
         <!-- score fields that will be double
         -->
-        <fieldType name="doubleIntact" class="solr.SortableDoubleField" sortMissingLast="true" omitNorms="true" indexed="true" stored="false"/>
+        <fieldType name="doubleIntact" class="solr.SortableDoubleField" sortMissingLast="true" omitNorms="true" indexed="true" stored="false" multiValued="false"/>
         <!-- The StrField type is not analyzed, but indexed/stored verbatim.
            - StrField and TextField support an optional compressThreshold which
            limits compression (if enabled in the derived fields) to values which
