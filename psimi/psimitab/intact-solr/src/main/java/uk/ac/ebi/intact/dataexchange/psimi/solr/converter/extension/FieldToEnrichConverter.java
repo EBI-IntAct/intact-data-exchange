@@ -34,12 +34,15 @@ public class FieldToEnrichConverter extends TextFieldConverter {
     }
 
     @Override
-    public void indexFieldValues(Field field, SolrFieldName name, SolrInputDocument doc, Set<String> uniques) {
+    public SolrInputDocument indexFieldValues(Field field, SolrFieldName name, SolrInputDocument doc, Set<String> uniques) {
+
         // index the normal field first
         super.indexFieldValues(field, name, doc, uniques);
 
         // enrich with synonyms and parent names plus synonyms
         enrichIndexWithParentsAndSynonyms(field, name, doc, uniques);
+
+        return doc;
     }
 
     public void indexEnrichedFieldValues(Field field, SolrFieldName name, SolrInputDocument doc, Set<String> uniques) {
@@ -78,7 +81,7 @@ public class FieldToEnrichConverter extends TextFieldConverter {
                     indexEnrichedFieldValues(parentField, name, doc, uniques);
                 }
             } catch (SolrServerException e) {
-                e.printStackTrace();
+                throw new RuntimeException("Impossible to enrich " + field.toString(), e);
             }
         }
     }

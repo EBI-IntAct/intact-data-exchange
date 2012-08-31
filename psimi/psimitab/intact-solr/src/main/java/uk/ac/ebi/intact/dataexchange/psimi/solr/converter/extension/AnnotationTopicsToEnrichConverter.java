@@ -32,13 +32,15 @@ public class AnnotationTopicsToEnrichConverter extends AnnotationFieldConverter 
         }
     }
 
-    public void indexFieldValues(Field field, SolrFieldName fName, SolrInputDocument doc, Set<String> uniques) {
+    public SolrInputDocument indexFieldValues(Field field, SolrFieldName fName, SolrInputDocument doc, Set<String> uniques) {
 
         // index the normal field first
         super.indexFieldValues(field, fName, doc, uniques);
 
         // enrich with synonyms and parent names plus synonyms
         enrichIndexWithParentsAndSynonyms(field, fName, doc, uniques);
+
+        return doc;
     }
 
     public void enrichTopic(Field field, SolrFieldName fName, SolrInputDocument doc, Set<String> uniques, String annotationText){
@@ -85,7 +87,7 @@ public class AnnotationTopicsToEnrichConverter extends AnnotationFieldConverter 
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Impossible to enrich " + field.toString(), e);
         }
     }
 }

@@ -71,10 +71,10 @@ public class SolrDocumentConverter extends Converter{
     /**
      * Access to the Ontology index.
      */
-    private FieldEnricher fieldEnricher;
-    private FieldToEnrichConverter fieldEnricherConverter;
-    private FeatureTypeToEnrichConverter featureTypeFieldEnricher;
-    private AnnotationTopicsToEnrichConverter annotationTopicToEnrichConverter;
+    protected static FieldEnricher fieldEnricher;
+    protected static FieldToEnrichConverter fieldEnricherConverter;
+    protected static FeatureTypeToEnrichConverter featureTypeFieldEnricher;
+    protected static AnnotationTopicsToEnrichConverter annotationTopicToEnrichConverter;
     private static final String COLUMN_SEPARATOR = "\t";
     private static final String FIELD_SEPARATOR = "|";
     private static final String FIELD_EMPTY = "-";
@@ -91,21 +91,19 @@ public class SolrDocumentConverter extends Converter{
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
         mitabReader = new PsimiTabReader();
 
-        // call again the initializeKeyMap with the field enricher initialized
-        initializeKeyMap();
+        // override the static initializeKeyMap with the field enricher initialized
+        overrideKeyMap();
     }
 
-    @Override
-    protected void initializeKeyMap(){
-        super.initializeKeyMap();
+    protected static void overrideKeyMap(){
 
         // only override parent method when the field enricher is initialized
-        if (this.fieldEnricher != null){
+        if (fieldEnricher != null){
             TextFieldConverter textConverter = new TextFieldConverter();
             XrefFieldFormatter textFormatter = new XrefFieldFormatter();
-            this.fieldEnricherConverter = new FieldToEnrichConverter(this.fieldEnricher);
-            this.featureTypeFieldEnricher = new FeatureTypeToEnrichConverter(this.fieldEnricher);
-            this.annotationTopicToEnrichConverter = new AnnotationTopicsToEnrichConverter(this.fieldEnricher);
+            fieldEnricherConverter = new FieldToEnrichConverter(fieldEnricher);
+            featureTypeFieldEnricher = new FeatureTypeToEnrichConverter(fieldEnricher);
+            annotationTopicToEnrichConverter = new AnnotationTopicsToEnrichConverter(fieldEnricher);
             AnnotationFieldFormatter annotFormatter = new AnnotationFieldFormatter(":");
 
             // override source which is an indexed field in IntAct. We don't want this field as store only, that is why we have the boolean false.
@@ -113,31 +111,31 @@ public class SolrDocumentConverter extends Converter{
             keyMap.put(SolrFieldName.source,  new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_SOURCE), textConverter, textFormatter, false));
 
             // override taxidA and taxidB for ontology enrichment
-            keyMap.put(SolrFieldName.taxidA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_TAXID_A), this.fieldEnricherConverter, textFormatter, false));
-            keyMap.put(SolrFieldName.taxidB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_TAXID_B), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.taxidA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_TAXID_A), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.taxidB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_TAXID_B), fieldEnricherConverter, textFormatter, false));
 
             // override cvs for enrichment with parents and synonyms
-            keyMap.put(SolrFieldName.type, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTION_TYPE), this.fieldEnricherConverter, textFormatter, false));
-            keyMap.put(SolrFieldName.detmethod, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_DETMETHOD),this.fieldEnricherConverter, textFormatter, false));
-            keyMap.put(SolrFieldName.pbioroleA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_BIOROLE_A), this.fieldEnricherConverter, textFormatter, false));
-            keyMap.put(SolrFieldName.pbioroleB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_BIOROLE_B), this.fieldEnricherConverter, textFormatter, false));
-            keyMap.put(SolrFieldName.ptypeA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTOR_TYPE_A), this.fieldEnricherConverter, textFormatter, false));
-            keyMap.put(SolrFieldName.ptypeB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTOR_TYPE_B), this.fieldEnricherConverter, textFormatter, false));
-            keyMap.put(SolrFieldName.complex, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_EXPANSION), this.fieldEnricherConverter, textFormatter, false));
-            keyMap.put(SolrFieldName.pmethodA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_PART_IDENT_METHOD_A), this.fieldEnricherConverter, textFormatter, false));
-            keyMap.put(SolrFieldName.pmethodB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_PART_IDENT_METHOD_B), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.type, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTION_TYPE), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.detmethod, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_DETMETHOD), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.pbioroleA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_BIOROLE_A), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.pbioroleB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_BIOROLE_B), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.ptypeA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTOR_TYPE_A), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.ptypeB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTOR_TYPE_B), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.complex, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_EXPANSION), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.pmethodA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_PART_IDENT_METHOD_A), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.pmethodB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_PART_IDENT_METHOD_B), fieldEnricherConverter, textFormatter, false));
 
             // override ftypeA and ftypeB for enrichment with parents and synonyms
-            keyMap.put(SolrFieldName.ftypeA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_FEATURE_A), this.featureTypeFieldEnricher, textFormatter, false));
-            keyMap.put(SolrFieldName.ftypeB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_FEATURE_B), this.featureTypeFieldEnricher, textFormatter, false));
+            keyMap.put(SolrFieldName.ftypeA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_FEATURE_A), featureTypeFieldEnricher, textFormatter, false));
+            keyMap.put(SolrFieldName.ftypeB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_FEATURE_B), featureTypeFieldEnricher, textFormatter, false));
 
             // override annot for enrichment with parents and synonyms
             keyMap.put(SolrFieldName.annot, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_ANNOTATIONS_I), annotationTopicToEnrichConverter, annotFormatter, false));
 
             // override xrefs, pxrefA and pxrefB for enrichemnt with synonyms
-            keyMap.put(SolrFieldName.pxrefA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_A), this.fieldEnricherConverter, textFormatter, false));
-            keyMap.put(SolrFieldName.pxrefB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_B), this.fieldEnricherConverter, textFormatter, false));
-            keyMap.put(SolrFieldName.xref, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_I), this.fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.pxrefA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_A), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.pxrefB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_B), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.xref, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_I), fieldEnricherConverter, textFormatter, false));
         }
     }
 
@@ -153,8 +151,8 @@ public class SolrDocumentConverter extends Converter{
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
         mitabReader = new PsimiTabReader();
 
-        // call again the initializeKeyMap with the field enricher initialized
-        initializeKeyMap();
+        // override the static initializeKeyMap with the field enricher initialized
+        overrideKeyMap();
     }
 
     public SolrDocumentConverter(SolrServer solrServer, OntologySearcher ontologySearcher) {
@@ -169,8 +167,8 @@ public class SolrDocumentConverter extends Converter{
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
         mitabReader = new PsimiTabReader();
 
-        // call again the initializeKeyMap with the field enricher initialized
-        initializeKeyMap();
+        // override the static initializeKeyMap with the field enricher initialized
+        overrideKeyMap();
     }
 
     public SolrInputDocument toSolrDocument(String mitabLine) throws SolrServerException, IllegalFieldException, IllegalColumnException, IllegalRowException {
@@ -194,61 +192,6 @@ public class SolrDocumentConverter extends Converter{
                 InteractionKeys.KEY_INTERACTOR_TYPE_A));
         addCustomFields(row, doc, new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_B,
                 InteractionKeys.KEY_INTERACTOR_TYPE_B));
-
-        // --------------------------------------------------------- old code ---------------------------------------
-
-        // store the mitab line
-        /*doc.addField(FieldNames.LINE, mitabLine);
-
-        addColumnToDoc(doc, row, FieldNames.ID_A, IntactDocumentDefinition.ID_INTERACTOR_A, 10f, true);
-        addColumnToDoc(doc, row, FieldNames.ID_B, IntactDocumentDefinition.ID_INTERACTOR_B, 10f, true);
-        addColumnToDoc(doc, row, FieldNames.ALTID_A, IntactDocumentDefinition.ALTID_INTERACTOR_A, 8f);
-        addColumnToDoc(doc, row, FieldNames.ALTID_B, IntactDocumentDefinition.ALTID_INTERACTOR_B, 8f);
-        addColumnToDoc(doc, row, FieldNames.ALIAS_A, IntactDocumentDefinition.ALIAS_INTERACTOR_A, 7f);
-        addColumnToDoc(doc, row, FieldNames.ALIAS_B, IntactDocumentDefinition.ALIAS_INTERACTOR_B, 7f);
-        addColumnToDoc(doc, row, FieldNames.DETMETHOD, IntactDocumentDefinition.INT_DET_METHOD, true);
-        addColumnToDoc(doc, row, FieldNames.PUBAUTH, IntactDocumentDefinition.PUB_AUTH);
-        addColumnToDoc(doc, row, FieldNames.PUBID, IntactDocumentDefinition.PUB_ID);
-        addColumnToDoc(doc, row, FieldNames.TAXID_A, IntactDocumentDefinition.TAXID_A, true);
-        addColumnToDoc(doc, row, FieldNames.TAXID_B, IntactDocumentDefinition.TAXID_B, true);
-        addColumnToDoc(doc, row, FieldNames.TYPE, IntactDocumentDefinition.INT_TYPE, true);
-        addColumnToDoc(doc, row, FieldNames.SOURCE, IntactDocumentDefinition.SOURCE);
-        addColumnToDoc(doc, row, FieldNames.INTERACTION_ID, IntactDocumentDefinition.INTERACTION_ID, 11f);
-        addColumnToDoc(doc, row, FieldNames.CONFIDENCE, IntactDocumentDefinition.CONFIDENCE);*/
-
-        // extended
-        /*if (documentDefintion instanceof IntactDocumentDefinition) {
-            addColumnToDoc(doc, row, FieldNames.EXPERIMENTAL_ROLE_A, IntactDocumentDefinition.EXPERIMENTAL_ROLE_A, true);
-            addColumnToDoc(doc, row, FieldNames.EXPERIMENTAL_ROLE_B, IntactDocumentDefinition.EXPERIMENTAL_ROLE_B, true);
-            addColumnToDoc(doc, row, FieldNames.BIOLOGICAL_ROLE_A, IntactDocumentDefinition.BIOLOGICAL_ROLE_A, true);
-            addColumnToDoc(doc, row, FieldNames.BIOLOGICAL_ROLE_B, IntactDocumentDefinition.BIOLOGICAL_ROLE_B, true);
-            addColumnToDoc(doc, row, FieldNames.PROPERTIES_A, IntactDocumentDefinition.PROPERTIES_A, true);
-            addColumnToDoc(doc, row, FieldNames.PROPERTIES_B, IntactDocumentDefinition.PROPERTIES_B, true);
-            addColumnToDoc(doc, row, FieldNames.TYPE_A, IntactDocumentDefinition.INTERACTOR_TYPE_A, true);
-            addColumnToDoc(doc, row, FieldNames.TYPE_B, IntactDocumentDefinition.INTERACTOR_TYPE_B, true);
-            addColumnToDoc(doc, row, FieldNames.HOST_ORGANISM, IntactDocumentDefinition.HOST_ORGANISM, true);
-            addColumnToDoc(doc, row, FieldNames.EXPANSION, IntactDocumentDefinition.EXPANSION_METHOD);
-            addColumnToDoc(doc, row, FieldNames.DATASET, IntactDocumentDefinition.DATASET);
-            addColumnToDoc(doc, row, FieldNames.ANNOTATION_A, IntactDocumentDefinition.ANNOTATIONS_A);
-            addColumnToDoc(doc, row, FieldNames.ANNOTATION_B, IntactDocumentDefinition.ANNOTATIONS_B);
-            addColumnToDoc(doc, row, FieldNames.PARAMETER_A, IntactDocumentDefinition.PARAMETERS_A);
-            addColumnToDoc(doc, row, FieldNames.PARAMETER_B, IntactDocumentDefinition.PARAMETERS_B);
-            addColumnToDoc(doc, row, FieldNames.PARAMETER_INTERACTION, IntactDocumentDefinition.PARAMETERS_INTERACTION);
-
-            addCustomFields(row, doc, new ByInteractorTypeRowDataAdder(IntactDocumentDefinition.ID_INTERACTOR_A,
-                                                                      IntactDocumentDefinition.INTERACTOR_TYPE_A));
-            addCustomFields(row, doc, new ByInteractorTypeRowDataAdder(IntactDocumentDefinition.ID_INTERACTOR_B,
-                                                                      IntactDocumentDefinition.INTERACTOR_TYPE_B));
-        }*/
-
-        // ac
-        //doc.addField(FieldNames.PKEY, "NEW"); // pkey is generated automatically and using UUID
-
-        // add the iRefIndex field from the interaction_id column to the rig field (there should be zero or one)
-        //addFilteredField(row, doc, FieldNames.RIGID, IntactDocumentDefinition.INTERACTION_ID, new TypeFieldFilter("irefindex"));
-
-        // ids
-        //addCustomFields(row, doc, new IdSelectiveAdder());
 
         return doc;
     }

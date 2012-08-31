@@ -160,7 +160,7 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
                 "MI:0502(enzyme target)\tMI:0501(enzyme)\tMI:0499(unspecified role)\tMI:0499(unspecified role)\tMI:0326(protein)\tMI:0326(protein)\tgo:\"GO:0030188\"|go:\"GO:0005159\"|" +
                 "go:\"GO:0005158\"|interpro:IPR002404|" +
                 "interpro:IPR001849|interpro:IPR011993|ensembl:ENSG00000169047|rcsb pdb:1IRS|rcsb pdb:1K3A|rcsb pdb:1QQG" +
-                "\tintact:EBI-711879\t-\tcaution:note1|temperature:1(celsius)\tcaution:note2|temperature:2(farenheit)\tdataset:\"happy data\"\ttaxid:-1(in vitro)\tkd:0.5\t-\t-\t-" +
+                "\tintact:EBI-711879\t-\tcaution:note1\tcaution:note2\tdataset:\"happy data\"\ttaxid:-1(in vitro)\tkd:0.5\t-\t-\t-" +
                 "\t-\t-\t-\t-\t-\t-\t-\t-\t-";
 
         Assert.assertEquals(42, mitab.split("\t").length);
@@ -241,7 +241,9 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         Assert.assertEquals("enzyme", get(0, ib.getBiologicalRoles()).getText());
         Assert.assertEquals("GO:0030188", get(0, ia.getXrefs()).getIdentifier());
         Assert.assertEquals("go", get(0, ia.getXrefs()).getDatabase());
-        Assert.assertEquals("chaperone regulator activity", get(0, ia.getXrefs()).getText());
+        //Assert.assertEquals("chaperone regulator activity", get(0, ia.getXrefs()).getText());
+        // do not enrich the mitab xref value itself, only add parent terms and synonyms!!!!
+        Assert.assertNull(get(0, ia.getXrefs()).getText());
         Assert.assertEquals(10, ia.getXrefs().size());
         Assert.assertEquals("EBI-711879", get(0, ib.getXrefs()).getIdentifier());
         Assert.assertEquals("intact", get(0, ib.getXrefs()).getDatabase());
@@ -269,7 +271,7 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         //Assert.assertEquals("2", get(0, ib.getParameters()).getValue());
         Assert.assertEquals(1, binaryInteraction.getParameters().size());
         Assert.assertEquals("kd", ((Parameter) binaryInteraction.getParameters().get(0)).getType());
-        Assert.assertEquals("0.5", ((Parameter) binaryInteraction.getInteractionAcs().get(0)).getValue());
+        Assert.assertEquals("0.5", ((Parameter) binaryInteraction.getParameters().get(0)).getValue());
     }
 
     private <T> T get(int position, Collection<T> elements) {

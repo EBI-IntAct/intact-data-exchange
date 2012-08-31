@@ -152,7 +152,9 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
         Assert.assertTrue(expandedGoIds.contains("selectin"));
 
         BinaryInteraction binaryInteraction = converter.toBinaryInteraction(doc);
-        Assert.assertEquals("carbohydrate binding", binaryInteraction.getInteractorB().getXrefs().iterator().next().getText());
+        //Assert.assertEquals("carbohydrate binding", binaryInteraction.getInteractorB().getXrefs().iterator().next().getText());
+        // do not enrich the mitab xref value itself, only add parent terms and synonyms!!!!
+        Assert.assertEquals("lalalala!", binaryInteraction.getInteractorB().getXrefs().iterator().next().getText());
     }
 
     @Test

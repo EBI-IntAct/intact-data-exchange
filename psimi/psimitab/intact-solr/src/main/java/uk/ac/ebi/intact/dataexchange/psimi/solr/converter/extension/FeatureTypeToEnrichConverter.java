@@ -33,7 +33,7 @@ public class FeatureTypeToEnrichConverter implements SolrFieldConverter{
     }
 
     @Override
-    public void indexFieldValues(Field field, SolrFieldName name, SolrInputDocument doc, Set<String> uniques) {
+    public SolrInputDocument indexFieldValues(Field field, SolrFieldName name, SolrInputDocument doc, Set<String> uniques) {
         // index the normal field first
         String db = field.get(CalimochoKeys.DB);
         String nameField = name.toString();
@@ -46,6 +46,8 @@ public class FeatureTypeToEnrichConverter implements SolrFieldConverter{
 
         // enrich with synonyms and parent names plus synonyms
         enrichIndexWithParentsAndSynonyms(field, name, doc, uniques);
+
+        return doc;
     }
 
     public void enrichIndexWithParentsAndSynonyms(Field field, SolrFieldName name, SolrInputDocument doc, Set<String> uniques){
@@ -77,7 +79,7 @@ public class FeatureTypeToEnrichConverter implements SolrFieldConverter{
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Impossible to enrich " + field.toString(), e);
         }
     }
 }
