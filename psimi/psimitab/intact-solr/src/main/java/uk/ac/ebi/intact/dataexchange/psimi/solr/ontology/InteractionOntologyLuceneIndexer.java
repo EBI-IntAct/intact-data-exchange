@@ -123,9 +123,18 @@ public class InteractionOntologyLuceneIndexer {
     private void registerFieldCountResultsFor(Collection<FieldCount> fieldCounts) throws SolrServerException {
 
         for (FieldCount fieldCount : fieldCounts){
+
             String db = fieldCount.getType() != null ? fieldCount.getType() : "psi-mi";
 
-            LazyLoadedOntologyTerm term = new LazyLoadedOntologyTerm(ontologySearcher, fieldCount.getValue());
+            LazyLoadedOntologyTerm term;
+            // annotations anf feature type : only the name, no id is provided
+            if (fieldCount.getSearchFieldName().equals(FieldNames.INTERACTOR_FEATURE)
+                    || fieldCount.getSearchFieldName().equals(FieldNames.INTERACTION_ANNOTATIONS)){
+                term = new LazyLoadedOntologyTerm(ontologySearcher, null, fieldCount.getValue());
+            }
+            else {
+                term = new LazyLoadedOntologyTerm(ontologySearcher, fieldCount.getValue());
+            }
 
             Set<OntologyTerm> parents = term.getAllParentsToRoot();
 

@@ -34,8 +34,8 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
 
     private final OntologySearcher searcher;
 
-    private final String id;
-    private final String name;
+    private String id;
+    private String name;
     private Set<String> synonymsStr;
 
     private List<OntologyTerm> parents;
@@ -67,6 +67,9 @@ public class LazyLoadedOntologyTerm implements OntologyTerm, Serializable {
             childName = ontologyNames.getName();
 
             synonymsStr = ontologyNames.getSynonyms();
+            if (this.id == null){
+                this.id = ontologyNames.getId();
+            }
         }
 
         return childName == null ? defaultValue : childName;

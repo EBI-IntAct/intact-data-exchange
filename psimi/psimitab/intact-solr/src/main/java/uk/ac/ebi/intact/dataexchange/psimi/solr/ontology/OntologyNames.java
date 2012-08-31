@@ -15,8 +15,9 @@ public class OntologyNames {
 
     private String name;
     private Set<String> synonyms;
+    private String id;
 
-    public OntologyNames(String name){
+    public OntologyNames(String name, String id){
         this.name = name;
         this.synonyms = new HashSet<String>();
     }
@@ -27,5 +28,9 @@ public class OntologyNames {
 
     public Set<String> getSynonyms() {
         return synonyms;
+    }
+
+    public String getId() {
+        return id;
     }
 }

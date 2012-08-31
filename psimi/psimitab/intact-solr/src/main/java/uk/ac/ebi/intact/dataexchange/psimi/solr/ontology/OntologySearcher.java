@@ -144,7 +144,7 @@ public class OntologySearcher implements Serializable {
             final SolrDocument solrDocument = response.getResults().iterator().next();
             String childName = (String) solrDocument.getFieldValue(OntologyFieldNames.CHILD_NAME);
 
-            OntologyNames ontologyNames = new OntologyNames(childName);
+            OntologyNames ontologyNames = new OntologyNames(childName, (String) solrDocument.getFieldValue(OntologyFieldNames.CHILD_ID));
 
             Collection<Object> fieldValues = solrDocument.getFieldValues(OntologyFieldNames.CHILDREN_SYNONYMS);
 
