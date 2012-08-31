@@ -51,7 +51,7 @@ public class InteractionOntologyLuceneIndexer {
         if (ontologySolrUrl == null){
             throw new IllegalArgumentException("The ontology solr url cannot bet null");
         }
-        if (interactionSearcher == null){
+        if (interactionOntologyUrl == null){
             throw new IllegalArgumentException("The interaction solr url cannot bet null");
         }
 
