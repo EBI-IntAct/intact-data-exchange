@@ -59,25 +59,6 @@ public class OntologyFieldEnricher extends BaseFieldEnricher {
     protected void initializeOntologyTermsToIgnore(){
         // molecular interaction is root term for psi mi
         ontologyTermsToIgnore.add("MI:0000");
-        // curation content is root term for some topics of publication
-        ontologyTermsToIgnore.add("MI:1045");
-        // attribut name is root term for cv topic
-        ontologyTermsToIgnore.add("MI:0590");
-        // biological role is root term for biological role
-        ontologyTermsToIgnore.add("MI:0500");
-        // curation quality is root term for some topics of publication
-        ontologyTermsToIgnore.add("MI:0954");
-        // feature type is root term for feature type
-        ontologyTermsToIgnore.add("MI:0116");
-        // interaction detection method is root term for interaction detection method
-        ontologyTermsToIgnore.add("MI:0001");
-        // interaction type is root term for interaction type
-        ontologyTermsToIgnore.add("MI:0190");
-        // interactor type is root term for interactor type
-        ontologyTermsToIgnore.add("MI:0313");
-        // participant detection method is root term for participant detection method
-        ontologyTermsToIgnore.add("MI:0002");
-
     }
 
     @Override
