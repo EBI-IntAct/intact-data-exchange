@@ -78,6 +78,7 @@ public class AnnotationTopicsToEnrichConverter extends AnnotationFieldConverter 
                 Field exact_field = fieldEnricher.findFieldByName(type);
 
                 if (exact_field != null){
+
                     Collection<Field> parentsAndSynonyms = fieldEnricher.getAllParents(exact_field, true);
                     for (Field parentField : parentsAndSynonyms) {
                         // index parents and synonyms as normal fields. Stored only so don't add the field _s
