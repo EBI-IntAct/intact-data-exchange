@@ -71,10 +71,10 @@ public class SolrDocumentConverter extends Converter{
     /**
      * Access to the Ontology index.
      */
-    protected static FieldEnricher fieldEnricher;
-    protected static FieldToEnrichConverter fieldEnricherConverter;
-    protected static FeatureTypeToEnrichConverter featureTypeFieldEnricher;
-    protected static AnnotationTopicsToEnrichConverter annotationTopicToEnrichConverter;
+    protected FieldEnricher fieldEnricher;
+    protected FieldToEnrichConverter fieldEnricherConverter;
+    protected FeatureTypeToEnrichConverter featureTypeFieldEnricher;
+    protected AnnotationTopicsToEnrichConverter annotationTopicToEnrichConverter;
     private static final String COLUMN_SEPARATOR = "\t";
     private static final String FIELD_SEPARATOR = "|";
     private static final String FIELD_EMPTY = "-";
@@ -95,7 +95,7 @@ public class SolrDocumentConverter extends Converter{
         overrideKeyMap();
     }
 
-    protected static void overrideKeyMap(){
+    protected void overrideKeyMap(){
 
         // only override parent method when the field enricher is initialized
         if (fieldEnricher != null){
