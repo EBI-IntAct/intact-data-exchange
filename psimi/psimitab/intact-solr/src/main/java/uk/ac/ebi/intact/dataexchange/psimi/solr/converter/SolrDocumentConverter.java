@@ -22,11 +22,13 @@ import org.apache.solr.common.SolrInputDocument;
 import org.hupo.psi.calimocho.io.IllegalFieldException;
 import org.hupo.psi.calimocho.io.IllegalRowException;
 import org.hupo.psi.calimocho.key.InteractionKeys;
+import org.hupo.psi.calimocho.model.Field;
 import org.hupo.psi.calimocho.model.Row;
 import org.hupo.psi.calimocho.tab.io.DefaultRowReader;
 import org.hupo.psi.calimocho.tab.io.IllegalColumnException;
 import org.hupo.psi.calimocho.tab.io.RowReader;
 import org.hupo.psi.calimocho.tab.io.formatter.AnnotationFieldFormatter;
+import org.hupo.psi.calimocho.tab.io.formatter.PositiveIntegerFieldFormatter;
 import org.hupo.psi.calimocho.tab.io.formatter.XrefFieldFormatter;
 import org.hupo.psi.calimocho.tab.util.MitabDocumentDefinitionFactory;
 import org.hupo.psi.mi.psicquic.model.PsicquicSolrServer;
@@ -104,6 +106,7 @@ public class SolrDocumentConverter extends Converter{
             fieldEnricherConverter = new FieldToEnrichConverter(fieldEnricher);
             featureTypeFieldEnricher = new FeatureTypeToEnrichConverter(fieldEnricher);
             annotationTopicToEnrichConverter = new AnnotationTopicsToEnrichConverter(fieldEnricher);
+            PositiveIntegerFieldFormatter integerFormatter = new PositiveIntegerFieldFormatter();
             AnnotationFieldFormatter annotFormatter = new AnnotationFieldFormatter(":");
 
             // override source which is an indexed field in IntAct. We don't want this field as store only, that is why we have the boolean false.
@@ -136,6 +139,10 @@ public class SolrDocumentConverter extends Converter{
             keyMap.put(SolrFieldName.pxrefA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_A), fieldEnricherConverter, textFormatter, false));
             keyMap.put(SolrFieldName.pxrefB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_B), fieldEnricherConverter, textFormatter, false));
             keyMap.put(SolrFieldName.xref, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_XREFS_I), fieldEnricherConverter, textFormatter, false));
+
+            // override stcA and stcB temporarily because of bugs in psicquic calimocho indexer
+            keyMap.put(SolrFieldName.stcA,  new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_STOICHIOMETRY_A), textConverter, integerFormatter, true));
+            keyMap.put(SolrFieldName.stcB,  new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_STOICHIOMETRY_B), textConverter, integerFormatter, true));
         }
     }
 
@@ -192,6 +199,18 @@ public class SolrDocumentConverter extends Converter{
                 InteractionKeys.KEY_INTERACTOR_TYPE_A));
         addCustomFields(row, doc, new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_B,
                 InteractionKeys.KEY_INTERACTOR_TYPE_B));
+
+        // index stc and stc_s temporarily because of bugs in converter
+        Collection<Field> stcA = row.getFields(InteractionKeys.KEY_STOICHIOMETRY_A);
+        Collection<Field> stcB = row.getFields(InteractionKeys.KEY_STOICHIOMETRY_B);
+        if ((stcA != null && !stcA.isEmpty()) || (stcB != null && !stcB.isEmpty())){
+            doc.addField(SolrFieldName.stc.toString(), "true");
+            doc.addField(SolrFieldName.stc.toString()+"_s", "true");
+        }
+        else {
+            doc.addField(SolrFieldName.stc.toString(), "false");
+            doc.addField(SolrFieldName.stc.toString()+"_s", "false");
+        }
 
         return doc;
     }
