@@ -156,9 +156,11 @@ public class InteractionOntologyLuceneIndexer {
         registerOntologyTermResults(fieldCount, db, interactionTerm);
 
         // register synonyms
-        for (String synonym : term.getSynonymsStr()){
-            InteractionOntologyTerm termSynonym = new InteractionOntologyTerm(synonym, term.getId());
-            registerOntologyTermResults(fieldCount, db, termSynonym);
+        if (term.getSynonymsStr() != null){
+            for (String synonym : term.getSynonymsStr()){
+                InteractionOntologyTerm termSynonym = new InteractionOntologyTerm(synonym, term.getId());
+                registerOntologyTermResults(fieldCount, db, termSynonym);
+            }
         }
     }
 
