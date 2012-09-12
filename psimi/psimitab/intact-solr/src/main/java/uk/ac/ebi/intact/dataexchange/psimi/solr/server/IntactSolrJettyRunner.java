@@ -81,7 +81,7 @@ public class IntactSolrJettyRunner extends SolrJettyRunner {
 
         // create index folder
         FSDirectory dir = FSDirectory.open(new File(solrHome.getAbsolutePath()+"/data/index"));
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_36, new StandardAnalyzer(Version.LUCENE_36));
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_30, new StandardAnalyzer(Version.LUCENE_30));
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter writer = new IndexWriter(dir, config);
         writer.commit();

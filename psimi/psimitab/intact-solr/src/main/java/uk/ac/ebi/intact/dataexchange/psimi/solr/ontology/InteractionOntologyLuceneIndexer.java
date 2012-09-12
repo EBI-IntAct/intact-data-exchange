@@ -94,7 +94,7 @@ public class InteractionOntologyLuceneIndexer {
         if (!directory.exists()){
             directory.mkdirs();
         }
-        IndexWriterConfig indexConfig = new IndexWriterConfig(Version.LUCENE_36, new StandardAnalyzer(Version.LUCENE_36));
+        IndexWriterConfig indexConfig = new IndexWriterConfig(Version.LUCENE_30, new StandardAnalyzer(Version.LUCENE_30));
         Directory luceneDirectory = FSDirectory.open(directory);
 
         final IndexWriter termIndexWriter = new IndexWriter(luceneDirectory, indexConfig);
