@@ -104,6 +104,7 @@ public class InteractionOntologyLuceneIndexer {
         int chunk = 50;
 
         Collection<FieldCount> fieldCounts = loadFieldCountsFor(first, chunk, facetFieldsWithResults.toArray(new String[]{}), facetFieldsWithResults);
+        registerFieldCountResultsFor(fieldCounts);
 
         while (!facetFieldsWithResults.isEmpty()){
             first+=chunk;
@@ -219,81 +220,108 @@ public class InteractionOntologyLuceneIndexer {
             // add detection methods fields
             if (FieldNames.DETMETHOD_FACET.equals(facetField.getName())){
 
-                fieldsWithResults.add(FieldNames.DETMETHOD_FACET);
-
                 List<FacetField.Count> facetCounts = facetField.getValues();
+
+                // we reached the max number of results
+                if (facetCounts.size() == max){
+                    fieldsWithResults.add(FieldNames.DETMETHOD_FACET);
+                }
 
                 collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.DETMETHOD);
             }
             // add interaction type fields
             else if (FieldNames.TYPE_FACET.equals(facetField.getName())){
 
-                fieldsWithResults.add(FieldNames.TYPE_FACET);
-
                 List<FacetField.Count> facetCounts = facetField.getValues();
+
+                // we reached the max number of results
+                if (facetCounts.size() == max){
+                    fieldsWithResults.add(FieldNames.TYPE_FACET);
+                }
 
                 collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.TYPE);
             }
             // add biological role fields
             else if (FieldNames.BIOLOGICAL_ROLE_FACET.equals(facetField.getName())){
 
-                fieldsWithResults.add(FieldNames.BIOLOGICAL_ROLE_FACET);
-
                 List<FacetField.Count> facetCounts = facetField.getValues();
+
+                // we reached the max number of results
+                if (facetCounts.size() == max){
+                    fieldsWithResults.add(FieldNames.BIOLOGICAL_ROLE_FACET);
+                }
 
                 collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.BIOLOGICAL_ROLE);
             }
             // add interactor types fields
             else if (FieldNames.INTERACTOR_TYPE_FACET.equals(facetField.getName())){
 
-                fieldsWithResults.add(FieldNames.INTERACTOR_TYPE_FACET);
-
                 List<FacetField.Count> facetCounts = facetField.getValues();
+
+                // we reached the max number of results
+                if (facetCounts.size() == max){
+                    fieldsWithResults.add(FieldNames.INTERACTOR_TYPE_FACET);
+                }
 
                 collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.INTERACTOR_TYPE);
             }
             // add biological role fields
             else if (FieldNames.INTERACTOR_DET_METHOD_FACET.equals(facetField.getName())){
 
-                fieldsWithResults.add(FieldNames.DETMETHOD_FACET);
-
                 List<FacetField.Count> facetCounts = facetField.getValues();
+
+                // we reached the max number of results
+                if (facetCounts.size() == max){
+                    fieldsWithResults.add(FieldNames.INTERACTOR_DET_METHOD_FACET);
+                }
 
                 collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.INTERACTOR_DET_METHOD);
             }
             // add annotation fields for interaction
             else if (FieldNames.INTERACTION_ANNOTATIONS_FACET.equals(facetField.getName())){
 
-                fieldsWithResults.add(FieldNames.INTERACTION_ANNOTATIONS_FACET);
-
                 List<FacetField.Count> facetCounts = facetField.getValues();
+
+                // we reached the max number of results
+                if (facetCounts.size() == max){
+                    fieldsWithResults.add(FieldNames.INTERACTION_ANNOTATIONS_FACET);
+                }
 
                 collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.INTERACTION_ANNOTATIONS);
             }
             // add feature type fields for interactors
             else if (FieldNames.INTERACTOR_FEATURE_FACET.equals(facetField.getName())){
 
-                fieldsWithResults.add(FieldNames.INTERACTOR_FEATURE_FACET);
-
                 List<FacetField.Count> facetCounts = facetField.getValues();
+
+                // we reached the max number of results
+                if (facetCounts.size() == max){
+                    fieldsWithResults.add(FieldNames.INTERACTOR_FEATURE_FACET);
+                }
 
                 collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.INTERACTOR_FEATURE);
             }
             // add interactionXrefs
             else if (FieldNames.INTERACTION_XREF_FACET.equals(facetField.getName())){
 
-                fieldsWithResults.add(FieldNames.INTERACTION_XREF_FACET);
-
                 List<FacetField.Count> facetCounts = facetField.getValues();
+
+                // we reached the max number of results
+                if (facetCounts.size() == max){
+                    fieldsWithResults.add(FieldNames.INTERACTION_XREF_FACET);
+                }
 
                 collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.INTERACTION_XREF);
             }
             // add interactor
             else if (FieldNames.INTERACTOR_XREF_FACET.equals(facetField.getName())){
 
-                fieldsWithResults.add(FieldNames.INTERACTOR_XREF_FACET);
-
                 List<FacetField.Count> facetCounts = facetField.getValues();
+
+                // we reached the max number of results
+                if (facetCounts.size() == max){
+                    fieldsWithResults.add(FieldNames.INTERACTOR_XREF_FACET);
+                }
 
                 collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.INTERACTOR_XREF);
             }
