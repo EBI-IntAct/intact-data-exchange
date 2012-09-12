@@ -223,7 +223,7 @@ public class InteractionOntologyLuceneIndexer {
                 List<FacetField.Count> facetCounts = facetField.getValues();
 
                 // we reached the max number of results
-                if (facetCounts.size() == max){
+                if (facetCounts != null && facetCounts.size() == max){
                     fieldsWithResults.add(FieldNames.DETMETHOD_FACET);
                 }
 
@@ -235,7 +235,7 @@ public class InteractionOntologyLuceneIndexer {
                 List<FacetField.Count> facetCounts = facetField.getValues();
 
                 // we reached the max number of results
-                if (facetCounts.size() == max){
+                if (facetCounts != null && facetCounts.size() == max){
                     fieldsWithResults.add(FieldNames.TYPE_FACET);
                 }
 
@@ -247,7 +247,7 @@ public class InteractionOntologyLuceneIndexer {
                 List<FacetField.Count> facetCounts = facetField.getValues();
 
                 // we reached the max number of results
-                if (facetCounts.size() == max){
+                if (facetCounts != null && facetCounts.size() == max){
                     fieldsWithResults.add(FieldNames.BIOLOGICAL_ROLE_FACET);
                 }
 
@@ -259,7 +259,7 @@ public class InteractionOntologyLuceneIndexer {
                 List<FacetField.Count> facetCounts = facetField.getValues();
 
                 // we reached the max number of results
-                if (facetCounts.size() == max){
+                if (facetCounts != null && facetCounts.size() == max){
                     fieldsWithResults.add(FieldNames.INTERACTOR_TYPE_FACET);
                 }
 
@@ -271,7 +271,7 @@ public class InteractionOntologyLuceneIndexer {
                 List<FacetField.Count> facetCounts = facetField.getValues();
 
                 // we reached the max number of results
-                if (facetCounts.size() == max){
+                if (facetCounts != null && facetCounts.size() == max){
                     fieldsWithResults.add(FieldNames.INTERACTOR_DET_METHOD_FACET);
                 }
 
@@ -283,7 +283,7 @@ public class InteractionOntologyLuceneIndexer {
                 List<FacetField.Count> facetCounts = facetField.getValues();
 
                 // we reached the max number of results
-                if (facetCounts.size() == max){
+                if (facetCounts != null && facetCounts.size() == max){
                     fieldsWithResults.add(FieldNames.INTERACTION_ANNOTATIONS_FACET);
                 }
 
@@ -295,7 +295,7 @@ public class InteractionOntologyLuceneIndexer {
                 List<FacetField.Count> facetCounts = facetField.getValues();
 
                 // we reached the max number of results
-                if (facetCounts.size() == max){
+                if (facetCounts != null && facetCounts.size() == max){
                     fieldsWithResults.add(FieldNames.INTERACTOR_FEATURE_FACET);
                 }
 
@@ -307,7 +307,7 @@ public class InteractionOntologyLuceneIndexer {
                 List<FacetField.Count> facetCounts = facetField.getValues();
 
                 // we reached the max number of results
-                if (facetCounts.size() == max){
+                if (facetCounts != null && facetCounts.size() == max){
                     fieldsWithResults.add(FieldNames.INTERACTION_XREF_FACET);
                 }
 
@@ -319,7 +319,7 @@ public class InteractionOntologyLuceneIndexer {
                 List<FacetField.Count> facetCounts = facetField.getValues();
 
                 // we reached the max number of results
-                if (facetCounts.size() == max){
+                if (facetCounts != null && facetCounts.size() == max){
                     fieldsWithResults.add(FieldNames.INTERACTOR_XREF_FACET);
                 }
 
