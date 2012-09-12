@@ -54,7 +54,7 @@ public class InteractionOntologyLuceneSearcher {
 
         InteractionOntologyTerm term = null;
 
-        Collection<InteractionOntologyTerm> terms = search(value, new WhitespaceAnalyzer(Version.LUCENE_36));
+        Collection<InteractionOntologyTerm> terms = search(value, new WhitespaceAnalyzer(Version.LUCENE_30));
 
         if (!terms.isEmpty()) {
             term = terms.iterator().next();
@@ -64,11 +64,11 @@ public class InteractionOntologyLuceneSearcher {
     }
 
     public List<InteractionOntologyTerm> search(String strQuery) throws IOException, ParseException {
-        return search(strQuery, new StandardAnalyzer(Version.LUCENE_36));
+        return search(strQuery, new StandardAnalyzer(Version.LUCENE_30));
     }
 
     public List<InteractionOntologyTerm> search(String strQuery, Analyzer analyzer) throws IOException, ParseException {
-        QueryParser queryParser = new QueryParser(Version.LUCENE_36, "identifier", analyzer);
+        QueryParser queryParser = new QueryParser(Version.LUCENE_30, "identifier", analyzer);
         return search(queryParser.parse(strQuery), new Sort(new SortField("count", SortField.INT, true)));
     }
 
@@ -124,7 +124,7 @@ public class InteractionOntologyLuceneSearcher {
     }
 
     private String highlightText(String fieldName, String text, Highlighter highlighter) throws IOException {
-        TokenStream tokenStream = new StandardAnalyzer(Version.LUCENE_36).tokenStream(fieldName, new StringReader(text));
+        TokenStream tokenStream = new StandardAnalyzer(Version.LUCENE_30).tokenStream(fieldName, new StringReader(text));
 
         try {
             return highlighter.getBestFragments(tokenStream, text, 5, "...");
