@@ -15,6 +15,7 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.SolrDocumentList;
 import org.hupo.psi.mi.psicquic.model.PsicquicSearchResults;
 import psidev.psi.mi.tab.PsimiTabException;
@@ -24,6 +25,7 @@ import psidev.psi.mi.tab.model.BinaryInteraction;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Solr result wrapper, which facilitates getting the interactions;
@@ -38,6 +40,11 @@ public class IntactSolrSearchResult extends PsicquicSearchResults{
     public IntactSolrSearchResult(SolrDocumentList results, String [] fieldNames){
         super(results, fieldNames);
         this.mitabReader = new PsimiTabReader();
+    }
+
+    public IntactSolrSearchResult(SolrDocumentList results, String [] fieldNames, List<FacetField> facetFields){
+        super(results, fieldNames, facetFields);
+        mitabReader = new PsimiTabReader();
     }
 
     public Collection<BinaryInteraction> getBinaryInteractionList() throws PsimiTabException, IOException {

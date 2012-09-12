@@ -88,7 +88,7 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
             throw new PsicquicSolrException("The format " + mitabType + " is not a recognised MITAB format");
         }
 
-        IntactSolrSearchResult searchResults = new IntactSolrSearchResult(docList, fieldNames);
+        IntactSolrSearchResult searchResults = new IntactSolrSearchResult(docList, fieldNames, facetFields);
         return searchResults;
     }
 
