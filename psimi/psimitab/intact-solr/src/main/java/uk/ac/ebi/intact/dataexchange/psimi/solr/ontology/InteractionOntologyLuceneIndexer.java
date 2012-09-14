@@ -47,6 +47,8 @@ public class InteractionOntologyLuceneIndexer {
     private IntactSolrSearcher interactionSearcher;
     private Map<InteractionOntologyTerm, InteractionOntologyTermResults> processedTerms;
 
+    private int numberRetries = 10;
+
     public InteractionOntologyLuceneIndexer(String ontologySolrUrl, String interactionOntologyUrl) {
         if (ontologySolrUrl == null){
             throw new IllegalArgumentException("The ontology solr url cannot bet null");
@@ -99,14 +101,21 @@ public class InteractionOntologyLuceneIndexer {
 
         final IndexWriter termIndexWriter = new IndexWriter(luceneDirectory, indexConfig);
 
+        termIndexWriter.deleteAll();
+        termIndexWriter.commit();
+
         List<String> facetFieldsWithResults = initializeListOfFacetFieldsToRetrieve();
         int first = 0;
-        int chunk = 50;
+        int chunk = 200;
 
+        log.info("Loading facet fields with ontology terms...");
+        System.out.println("Loading facet fields with ontology terms...");
         Collection<FieldCount> fieldCounts = loadFieldCountsFor(first, chunk, facetFieldsWithResults.toArray(new String[]{}), facetFieldsWithResults);
         registerFieldCountResultsFor(fieldCounts);
 
         while (!facetFieldsWithResults.isEmpty()){
+            log.info("loaded " + first + " terms");
+            System.out.println("loaded " + first + " terms");
             first+=chunk;
 
             fieldCounts = loadFieldCountsFor(first, chunk, facetFieldsWithResults.toArray(new String[]{}), facetFieldsWithResults);
@@ -114,6 +123,8 @@ public class InteractionOntologyLuceneIndexer {
         }
 
         // index registered terms
+        log.info("Indexing facet fields with ontology terms...");
+        System.out.println("Indexing facet fields with ontology terms...");
         for (Map.Entry<InteractionOntologyTerm, InteractionOntologyTermResults> termResult : this.processedTerms.entrySet()){
             createAndIndexDocumentsFor(termResult.getKey(), termResult.getValue(), termIndexWriter);
         }
@@ -129,23 +140,85 @@ public class InteractionOntologyLuceneIndexer {
 
             LazyLoadedOntologyTerm term;
             // annotations anf feature type : only the name, no id is provided
-            if (fieldCount.getSearchFieldName().equals(FieldNames.INTERACTOR_FEATURE)
-                    || fieldCount.getSearchFieldName().equals(FieldNames.INTERACTION_ANNOTATIONS)){
-                term = new LazyLoadedOntologyTerm(ontologySearcher, null, fieldCount.getValue());
+            try{
+                if (fieldCount.getSearchFieldName().equals(FieldNames.INTERACTOR_FEATURE)
+                        || fieldCount.getSearchFieldName().equals(FieldNames.INTERACTION_ANNOTATIONS)){
+                    term = new LazyLoadedOntologyTerm(ontologySearcher, null, fieldCount.getType());
+                }
+                else {
+                    term = new LazyLoadedOntologyTerm(ontologySearcher, fieldCount.getValue());
+                }
             }
-            else {
-                term = new LazyLoadedOntologyTerm(ontologySearcher, fieldCount.getValue());
+            catch (SolrServerException e){
+                int numberTries=1;
+
+                try {
+                    while(numberTries<numberRetries){
+                        Thread.sleep(4000);
+                        try{
+                            if (fieldCount.getSearchFieldName().equals(FieldNames.INTERACTOR_FEATURE)
+                                    || fieldCount.getSearchFieldName().equals(FieldNames.INTERACTION_ANNOTATIONS)){
+                                term = new LazyLoadedOntologyTerm(ontologySearcher, null, fieldCount.getType());
+                            }
+                            else {
+                                term = new LazyLoadedOntologyTerm(ontologySearcher, fieldCount.getValue());
+                            }
+                            break;
+                        }
+                        catch (SolrServerException e2){
+                            numberTries++;
+                            log.error("Number of tries " + numberTries, e2);
+                        }
+                    }
+
+                    throw new SolrServerException(e);
+                } catch (InterruptedException e1) {
+                    throw new SolrServerException("Impossible to retry connection to solr server", e);
+                }
             }
 
-            Set<OntologyTerm> parents = term.getAllParentsToRoot();
+            try{
+                Set<OntologyTerm> parents = term.getAllParentsToRoot();
 
-            // register term
-            createAndRegisterInteractionTerm(fieldCount, db, term);
+                // register term
+                createAndRegisterInteractionTerm(fieldCount, db, term);
 
-            // register parents
-            for (OntologyTerm parent : parents){
-                LazyLoadedOntologyTerm lazyParent = (LazyLoadedOntologyTerm) parent;
-                createAndRegisterInteractionTerm(fieldCount, db, lazyParent);
+                // register parents
+                for (OntologyTerm parent : parents){
+                    LazyLoadedOntologyTerm lazyParent = (LazyLoadedOntologyTerm) parent;
+                    createAndRegisterInteractionTerm(fieldCount, db, lazyParent);
+                }
+            }
+            catch (IllegalStateException e){
+                int numberTries=1;
+
+                try {
+                    while(numberTries<numberRetries){
+                        Thread.sleep(4000);
+                        try{
+                            Set<OntologyTerm> parents = term.getAllParentsToRoot();
+
+                            // register term
+                            createAndRegisterInteractionTerm(fieldCount, db, term);
+
+                            // register parents
+                            for (OntologyTerm parent : parents){
+                                LazyLoadedOntologyTerm lazyParent = (LazyLoadedOntologyTerm) parent;
+                                createAndRegisterInteractionTerm(fieldCount, db, lazyParent);
+                            }
+
+                            break;
+                        }
+                        catch (IllegalStateException e2){
+                            numberTries++;
+                            log.error("Number of tries " + numberTries, e2);
+                        }
+                    }
+
+                    throw new SolrServerException(e);
+                } catch (InterruptedException e1) {
+                    throw new SolrServerException("Impossible to retry connection to solr server", e);
+                }
             }
         }
     }
@@ -177,6 +250,8 @@ public class InteractionOntologyLuceneIndexer {
     private void createAndIndexDocumentsFor(InteractionOntologyTerm ontologyTerm, InteractionOntologyTermResults results, IndexWriter termIndexWriter) throws SolrServerException, IOException {
         String value = ontologyTerm.getIdentifier();
 
+        log.info("Indexing term " + ontologyTerm.getIdentifier() + ", name = " + ontologyTerm.getName());
+        System.out.println("Indexing term " + ontologyTerm.getIdentifier() + ", name = " + ontologyTerm.getName());
         // index current term
         Document document = new Document();
         document.add(new Field("identifier", value, Field.Store.YES, Field.Index.NOT_ANALYZED));
@@ -211,7 +286,30 @@ public class InteractionOntologyLuceneIndexer {
 
         fieldsWithResults.clear();
 
-        IntactSolrSearchResult result = interactionSearcher.searchWithFacets("*", 0, 0, PsicquicSolrServer.RETURN_TYPE_MITAB27, null, facetFieldNames, first, max);
+        IntactSolrSearchResult result = null;
+        try{
+            result = interactionSearcher.searchWithFacets("*", 0, 0, PsicquicSolrServer.RETURN_TYPE_MITAB27, null, facetFieldNames, first, max);
+        }
+        catch (SolrServerException e){
+            int numberTries = 1;
+
+            while (numberTries < numberRetries){
+                numberTries++;
+                try{
+                    Thread.sleep(4000);
+
+                    result = interactionSearcher.searchWithFacets("*", 0, 0, PsicquicSolrServer.RETURN_TYPE_MITAB27, null, facetFieldNames, first, max);
+                    break;
+                }
+                catch (SolrServerException e2){
+                    log.error("Number of tries : " +numberTries);
+                } catch (InterruptedException e1) {
+                    throw new SolrServerException("Impossible to connect to solr server", e1);
+                }
+            }
+
+            throw new SolrServerException(e);
+        }
 
         List<FacetField> facetFields = result.getFacetFieldList();
 
@@ -391,5 +489,13 @@ public class InteractionOntologyLuceneIndexer {
             return value;
         }
     }
+
+    /*public static void main(String[] args) throws IOException, SolrServerException, PsicquicSolrException {
+         InteractionOntologyLuceneIndexer indexer = new InteractionOntologyLuceneIndexer("http://jweb-2b.ebi.ac.uk:21030/intact/solr/core_ontology_pub","http://jweb-2b.ebi.ac.uk:21030/intact/solr/core_pub");
+
+        indexer.loadAndIndexAllFacetFieldCounts(new File("/home/marine/Desktop/ontology-dir"));
+
+        System.out.println("finished");
+    }*/
 }
 

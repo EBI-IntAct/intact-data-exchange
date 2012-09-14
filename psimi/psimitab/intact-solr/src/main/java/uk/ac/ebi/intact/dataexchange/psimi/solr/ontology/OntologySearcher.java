@@ -123,7 +123,7 @@ public class OntologySearcher implements Serializable {
         if (firstResult != null) query.setStart(firstResult);
         if (maxResults != null) query.setRows(maxResults);
 
-        QueryResponse response = search(query, new String[] {OntologyFieldNames.CHILD_NAME, OntologyFieldNames.CHILDREN_SYNONYMS});
+        QueryResponse response = search(query, new String[] {OntologyFieldNames.CHILD_NAME, OntologyFieldNames.CHILDREN_SYNONYMS, OntologyFieldNames.CHILD_ID});
 
         return extractNamesAndSynonymsFrom(response);
     }
@@ -134,7 +134,7 @@ public class OntologySearcher implements Serializable {
         if (firstResult != null) query.setStart(firstResult);
         if (maxResults != null) query.setRows(maxResults);
 
-        QueryResponse response = search(query, new String[] {OntologyFieldNames.CHILD_NAME, OntologyFieldNames.CHILDREN_SYNONYMS});
+        QueryResponse response = search(query, new String[] {OntologyFieldNames.CHILD_NAME, OntologyFieldNames.CHILDREN_SYNONYMS, OntologyFieldNames.CHILD_ID});
 
         return extractNamesAndSynonymsFrom(response);
     }

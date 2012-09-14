@@ -19,6 +19,7 @@ public class OntologyNames {
 
     public OntologyNames(String name, String id){
         this.name = name;
+        this.id = id;
         this.synonyms = new HashSet<String>();
     }
 
