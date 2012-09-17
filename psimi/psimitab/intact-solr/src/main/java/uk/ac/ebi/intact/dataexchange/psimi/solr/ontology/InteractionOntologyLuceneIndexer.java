@@ -71,7 +71,7 @@ public class InteractionOntologyLuceneIndexer {
 
         PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
         cm.setMaxTotal(138);
-        cm.setDefaultMaxPerRoute(32);
+        cm.setDefaultMaxPerRoute(24);
 
         HttpClient httpClient = new DefaultHttpClient(cm);
 
@@ -101,8 +101,7 @@ public class InteractionOntologyLuceneIndexer {
 
         final IndexWriter termIndexWriter = new IndexWriter(luceneDirectory, indexConfig);
 
-        termIndexWriter.deleteAll();
-        termIndexWriter.commit();
+        clearpreviousIndex(termIndexWriter);
 
         List<String> facetFieldsWithResults = initializeListOfFacetFieldsToRetrieve();
         int first = 0;
@@ -132,58 +131,25 @@ public class InteractionOntologyLuceneIndexer {
         termIndexWriter.commit();
     }
 
+    private void clearpreviousIndex(IndexWriter termIndexWriter) throws IOException {
+        termIndexWriter.deleteAll();
+        termIndexWriter.commit();
+    }
+
     private void registerFieldCountResultsFor(Collection<FieldCount> fieldCounts) throws SolrServerException {
 
         for (FieldCount fieldCount : fieldCounts){
 
             String db = fieldCount.getType() != null ? fieldCount.getType() : "psi-mi";
 
-            LazyLoadedOntologyTerm term;
-            // annotations anf feature type : only the name, no id is provided
-            try{
-                if (fieldCount.getSearchFieldName().equals(FieldNames.INTERACTOR_FEATURE)
-                        || fieldCount.getSearchFieldName().equals(FieldNames.INTERACTION_ANNOTATIONS)){
-                    term = new LazyLoadedOntologyTerm(ontologySearcher, null, fieldCount.getType());
-                }
-                else {
-                    term = new LazyLoadedOntologyTerm(ontologySearcher, fieldCount.getValue());
-                }
-            }
-            catch (SolrServerException e){
-                int numberTries=1;
-
-                try {
-                    while(numberTries<numberRetries){
-                        Thread.sleep(4000);
-                        try{
-                            if (fieldCount.getSearchFieldName().equals(FieldNames.INTERACTOR_FEATURE)
-                                    || fieldCount.getSearchFieldName().equals(FieldNames.INTERACTION_ANNOTATIONS)){
-                                term = new LazyLoadedOntologyTerm(ontologySearcher, null, fieldCount.getType());
-                            }
-                            else {
-                                term = new LazyLoadedOntologyTerm(ontologySearcher, fieldCount.getValue());
-                            }
-                            break;
-                        }
-                        catch (SolrServerException e2){
-                            numberTries++;
-                            log.error("Number of tries " + numberTries, e2);
-                        }
-                    }
-
-                    throw new SolrServerException(e);
-                } catch (InterruptedException e1) {
-                    throw new SolrServerException("Impossible to retry connection to solr server", e);
-                }
-            }
+            LazyLoadedOntologyTerm term = loadOntologyTerm(fieldCount);
 
             try{
-                Set<OntologyTerm> parents = term.getAllParentsToRoot();
-
                 // register term
                 createAndRegisterInteractionTerm(fieldCount, db, term);
 
                 // register parents
+                Set<OntologyTerm> parents = term.getAllParentsToRoot();
                 for (OntologyTerm parent : parents){
                     LazyLoadedOntologyTerm lazyParent = (LazyLoadedOntologyTerm) parent;
                     createAndRegisterInteractionTerm(fieldCount, db, lazyParent);
@@ -196,12 +162,11 @@ public class InteractionOntologyLuceneIndexer {
                     while(numberTries<numberRetries){
                         Thread.sleep(4000);
                         try{
-                            Set<OntologyTerm> parents = term.getAllParentsToRoot();
-
                             // register term
                             createAndRegisterInteractionTerm(fieldCount, db, term);
 
                             // register parents
+                            Set<OntologyTerm> parents = term.getAllParentsToRoot();
                             for (OntologyTerm parent : parents){
                                 LazyLoadedOntologyTerm lazyParent = (LazyLoadedOntologyTerm) parent;
                                 createAndRegisterInteractionTerm(fieldCount, db, lazyParent);
@@ -221,6 +186,52 @@ public class InteractionOntologyLuceneIndexer {
                 }
             }
         }
+    }
+
+    private LazyLoadedOntologyTerm loadOntologyTerm(FieldCount fieldCount) throws SolrServerException {
+        LazyLoadedOntologyTerm term;
+        try{
+            // feature type and annotation topic : only the name, no id is provided.
+            if (fieldCount.getSearchFieldName().equals(FieldNames.INTERACTOR_FEATURE)
+                    || fieldCount.getSearchFieldName().equals(FieldNames.INTERACTION_ANNOTATIONS)){
+                term = new LazyLoadedOntologyTerm(ontologySearcher, null, fieldCount.getType());
+            }
+            else if (fieldCount.getSearchFieldName().equals(FieldNames.INTERACTOR_FEATURE)
+                    || fieldCount.getSearchFieldName().equals(FieldNames.INTERACTION_ANNOTATIONS)){
+                term = new LazyLoadedOntologyTerm(ontologySearcher, null, fieldCount.getType());
+            }
+            else {
+                term = new LazyLoadedOntologyTerm(ontologySearcher, fieldCount.getValue());
+            }
+        }
+        catch (SolrServerException e){
+            int numberTries=1;
+
+            try {
+                while(numberTries<numberRetries){
+                    Thread.sleep(4000);
+                    try{
+                        if (fieldCount.getSearchFieldName().equals(FieldNames.INTERACTOR_FEATURE)
+                                || fieldCount.getSearchFieldName().equals(FieldNames.INTERACTION_ANNOTATIONS)){
+                            term = new LazyLoadedOntologyTerm(ontologySearcher, null, fieldCount.getType());
+                        }
+                        else {
+                            term = new LazyLoadedOntologyTerm(ontologySearcher, fieldCount.getValue());
+                        }
+                        break;
+                    }
+                    catch (SolrServerException e2){
+                        numberTries++;
+                        log.error("Number of tries " + numberTries, e2);
+                    }
+                }
+
+                throw new SolrServerException(e);
+            } catch (InterruptedException e1) {
+                throw new SolrServerException("Impossible to retry connection to solr server", e);
+            }
+        }
+        return term;
     }
 
     private void createAndRegisterInteractionTerm(FieldCount fieldCount, String db, LazyLoadedOntologyTerm term) {
