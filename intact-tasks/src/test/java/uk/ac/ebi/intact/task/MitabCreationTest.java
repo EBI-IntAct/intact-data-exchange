@@ -79,6 +79,8 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @DirtiesContext
     public void writeMitab() throws Exception {
 
+        TransactionStatus status = getDataContext().beginTransaction();
+
         CvTopic hidden = getMockBuilder().createCvObject( CvTopic.class, null, "hidden" );
 
         CvTopic internalRemark = getMockBuilder().createCvObject( CvTopic.class, null, "internal-remark" );
@@ -112,6 +114,8 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
         Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
 
+        getDataContext().commitTransaction(status);
+
         Job job = (Job) applicationContext.getBean("createMitabJob");
 
         Map<String, JobParameter> params = new HashMap<String, JobParameter>(1);
@@ -142,6 +146,8 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @DirtiesContext
     public void writeMitabSelf() throws Exception {
 
+        TransactionStatus status = getDataContext().beginTransaction();
+
         Experiment exp = getMockBuilder().createExperimentRandom(3);
 
         corePersister.saveOrUpdate(exp);
@@ -164,6 +170,8 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
         Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
 
+        getDataContext().commitTransaction(status);
+
         Job job = (Job) applicationContext.getBean("createMitabJob");
 
         Map<String, JobParameter> params = new HashMap<String, JobParameter>(1);
@@ -182,6 +190,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @DirtiesContext
     public void writeMitabSelf_stoichioGreaterThan2() throws Exception {
 
+        TransactionStatus status = getDataContext().beginTransaction();
         Experiment exp = getMockBuilder().createExperimentRandom(3);
 
         corePersister.saveOrUpdate(exp);
@@ -204,6 +213,8 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
         Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
 
+        getDataContext().commitTransaction(status);
+
         Job job = (Job) applicationContext.getBean("createMitabJob");
 
         Map<String, JobParameter> params = new HashMap<String, JobParameter>(1);
@@ -221,6 +232,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @Test
     @DirtiesContext
     public void writeMitab_withXrefs() throws Exception {
+        TransactionStatus status = getDataContext().beginTransaction();
 
         Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
         Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
@@ -239,6 +251,8 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
 
+        getDataContext().commitTransaction(status);
+
         Job job = (Job) applicationContext.getBean("createMitabJob");
 
         Map<String, JobParameter> params = new HashMap<String, JobParameter>(1);
@@ -256,6 +270,8 @@ public class MitabCreationTest extends IntactBasicTestCase {
     @DirtiesContext
     public void writeMitab_negative() throws Exception {
 
+        TransactionStatus status = getDataContext().beginTransaction();
+
         Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
         Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
         Protein proteinC = getMockBuilder().createProtein("Q00002", "protC");
@@ -270,6 +286,8 @@ public class MitabCreationTest extends IntactBasicTestCase {
         corePersister.saveOrUpdate(interaction);
 
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
+
+        getDataContext().commitTransaction(status);
 
         Job job = (Job) applicationContext.getBean("createMitabJob");
 
