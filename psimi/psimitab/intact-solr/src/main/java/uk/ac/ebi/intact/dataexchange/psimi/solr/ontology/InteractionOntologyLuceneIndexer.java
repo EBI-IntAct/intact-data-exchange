@@ -508,6 +508,6 @@ public class InteractionOntologyLuceneIndexer {
         indexer.loadAndIndexAllFacetFieldCounts(new File("/home/marine/Desktop/ontology-dir"));
 
         System.out.println("finished");
-    } */
+    }*/
 }
 

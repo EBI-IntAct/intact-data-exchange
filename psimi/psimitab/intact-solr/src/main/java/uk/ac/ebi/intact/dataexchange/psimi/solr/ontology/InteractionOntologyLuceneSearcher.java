@@ -63,12 +63,35 @@ public class InteractionOntologyLuceneSearcher {
         return term;
     }
 
+    public InteractionOntologyTerm findByName(String value) throws IOException, ParseException {
+        if (value == null || value.trim().length() == 0) return null;
+
+        if (!value.startsWith("\"")) {
+            value = "\"" + value + "\"";
+        }
+
+        InteractionOntologyTerm term = null;
+
+        Collection<InteractionOntologyTerm> terms = searchByName(value, new WhitespaceAnalyzer(Version.LUCENE_30));
+
+        if (!terms.isEmpty()) {
+            term = terms.iterator().next();
+        }
+
+        return term;
+    }
+
     public List<InteractionOntologyTerm> search(String strQuery) throws IOException, ParseException {
         return search(strQuery, new StandardAnalyzer(Version.LUCENE_30));
     }
 
     public List<InteractionOntologyTerm> search(String strQuery, Analyzer analyzer) throws IOException, ParseException {
         QueryParser queryParser = new QueryParser(Version.LUCENE_30, "identifier", analyzer);
+        return search(queryParser.parse(strQuery), new Sort(new SortField("count", SortField.INT, true)));
+    }
+
+    public List<InteractionOntologyTerm> searchByName(String strQuery, Analyzer analyzer) throws IOException, ParseException {
+        QueryParser queryParser = new QueryParser(Version.LUCENE_30, "label", analyzer);
         return search(queryParser.parse(strQuery), new Sort(new SortField("count", SortField.INT, true)));
     }
 
@@ -117,7 +140,7 @@ public class InteractionOntologyLuceneSearcher {
             label = highlightText("label", label, highlighter);
         }
 
-        InteractionOntologyTerm term = new InteractionOntologyTerm(identifier, label);
+        InteractionOntologyTerm term = new InteractionOntologyTerm(label, identifier);
         term.setResults(new InteractionOntologyTermResults(databaseLabel, fieldName, count));
 
         return term;
