@@ -50,7 +50,7 @@ public class OntologyPopulatorTasklet implements Tasklet{
 
     // settings SOLRServer
     private int maxTotalConnections = 128;
-    private int defaultMaxConnectionsPerHost = 32;
+    private int defaultMaxConnectionsPerHost = 24;
 
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         if (ontologiesSolrUrl == null) {
@@ -87,8 +87,6 @@ public class OntologyPopulatorTasklet implements Tasklet{
     private HttpSolrServer createSolrServer() {
         HttpSolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl, createHttpClient());
 
-        //ontologiesSolrServer.setConnectionTimeout(500000);
-        //ontologiesSolrServer.setSoTimeout(500000);
         ontologiesSolrServer.setAllowCompression(true);
 
         return ontologiesSolrServer;

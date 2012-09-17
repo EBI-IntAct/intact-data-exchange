@@ -43,9 +43,7 @@ public class OntologyEnricherItemProcessor implements BinaryInteractionItemProce
 
     // settings SOLRServer
     private int maxTotalConnections = 128;
-    private int defaultMaxConnectionsPerHost = 32;
-    private int connectionTimeOut = 20000;
-    private int soTimeOut = 20000;
+    private int defaultMaxConnectionsPerHost = 24;
     private boolean allowCompression = true;
 
     public BinaryInteraction process(BinaryInteraction item) throws Exception {
@@ -77,9 +75,6 @@ public class OntologyEnricherItemProcessor implements BinaryInteractionItemProce
 
     private HttpSolrServer createSolrServer() {
         HttpSolrServer ontologiesSolrServer = new HttpSolrServer(ontologiesSolrUrl, createHttpClient());
-
-        ontologiesSolrServer.setConnectionTimeout(connectionTimeOut);
-        ontologiesSolrServer.setSoTimeout(soTimeOut);
         ontologiesSolrServer.setAllowCompression(allowCompression);
         return ontologiesSolrServer;
     }
@@ -114,22 +109,6 @@ public class OntologyEnricherItemProcessor implements BinaryInteractionItemProce
 
     public void setDefaultMaxConnectionsPerHost(int defaultMaxConnectionsPerHost) {
         this.defaultMaxConnectionsPerHost = defaultMaxConnectionsPerHost;
-    }
-
-    public int getConnectionTimeOut() {
-        return connectionTimeOut;
-    }
-
-    public void setConnectionTimeOut(int connectionTimeOut) {
-        this.connectionTimeOut = connectionTimeOut;
-    }
-
-    public int getSoTimeOut() {
-        return soTimeOut;
-    }
-
-    public void setSoTimeOut(int soTimeOut) {
-        this.soTimeOut = soTimeOut;
     }
 
     public boolean isAllowCompression() {
