@@ -15,7 +15,7 @@ public class InteractionOntologyTerm {
     private InteractionOntologyTermResults results;
 
     public InteractionOntologyTerm(String name, String identifier){
-         this.name = name;
+        this.name = name;
         this.identifier = identifier;
     }
 

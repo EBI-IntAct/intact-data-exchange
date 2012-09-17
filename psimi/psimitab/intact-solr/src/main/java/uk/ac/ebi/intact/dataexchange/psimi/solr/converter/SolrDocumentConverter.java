@@ -27,7 +27,6 @@ import org.hupo.psi.calimocho.tab.io.DefaultRowReader;
 import org.hupo.psi.calimocho.tab.io.IllegalColumnException;
 import org.hupo.psi.calimocho.tab.io.RowReader;
 import org.hupo.psi.calimocho.tab.io.formatter.AnnotationFieldFormatter;
-import org.hupo.psi.calimocho.tab.io.formatter.PositiveIntegerFieldFormatter;
 import org.hupo.psi.calimocho.tab.io.formatter.XrefFieldFormatter;
 import org.hupo.psi.calimocho.tab.util.MitabDocumentDefinitionFactory;
 import org.hupo.psi.mi.psicquic.model.PsicquicSolrServer;
@@ -105,7 +104,6 @@ public class SolrDocumentConverter extends Converter{
             fieldEnricherConverter = new FieldToEnrichConverter(fieldEnricher);
             featureTypeFieldEnricher = new FeatureTypeToEnrichConverter(fieldEnricher);
             annotationTopicToEnrichConverter = new AnnotationTopicsToEnrichConverter(fieldEnricher);
-            PositiveIntegerFieldFormatter integerFormatter = new PositiveIntegerFieldFormatter();
             AnnotationFieldFormatter annotFormatter = new AnnotationFieldFormatter(":");
 
             // override source which is an indexed field in IntAct. We don't want this field as store only, that is why we have the boolean false.
@@ -117,6 +115,8 @@ public class SolrDocumentConverter extends Converter{
             keyMap.put(SolrFieldName.taxidB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_TAXID_B), fieldEnricherConverter, textFormatter, false));
 
             // override cvs for enrichment with parents and synonyms
+            keyMap.put(SolrFieldName.idA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_ID_A), fieldEnricherConverter, textFormatter, false));
+            keyMap.put(SolrFieldName.idB, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_ID_B), fieldEnricherConverter, textFormatter, false));
             keyMap.put(SolrFieldName.type, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_INTERACTION_TYPE), fieldEnricherConverter, textFormatter, false));
             keyMap.put(SolrFieldName.detmethod, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_DETMETHOD), fieldEnricherConverter, textFormatter, false));
             keyMap.put(SolrFieldName.pbioroleA, new SolrFieldUnit(Arrays.asList(InteractionKeys.KEY_BIOROLE_A), fieldEnricherConverter, textFormatter, false));

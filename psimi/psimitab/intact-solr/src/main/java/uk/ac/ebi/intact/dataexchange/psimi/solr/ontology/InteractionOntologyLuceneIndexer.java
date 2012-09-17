@@ -80,9 +80,6 @@ public class InteractionOntologyLuceneIndexer {
 
     private HttpSolrServer createSolrServer(String solrUrl) {
         HttpSolrServer ontologiesSolrServer = new HttpSolrServer(solrUrl, createHttpClient());
-
-        ontologiesSolrServer.setConnectionTimeout(20000);
-        ontologiesSolrServer.setSoTimeout(20000);
         ontologiesSolrServer.setAllowCompression(true);
 
         return ontologiesSolrServer;
@@ -196,10 +193,6 @@ public class InteractionOntologyLuceneIndexer {
                     || fieldCount.getSearchFieldName().equals(FieldNames.INTERACTION_ANNOTATIONS)){
                 term = new LazyLoadedOntologyTerm(ontologySearcher, null, fieldCount.getType());
             }
-            else if (fieldCount.getSearchFieldName().equals(FieldNames.INTERACTOR_FEATURE)
-                    || fieldCount.getSearchFieldName().equals(FieldNames.INTERACTION_ANNOTATIONS)){
-                term = new LazyLoadedOntologyTerm(ontologySearcher, null, fieldCount.getType());
-            }
             else {
                 term = new LazyLoadedOntologyTerm(ontologySearcher, fieldCount.getValue());
             }
@@ -265,15 +258,23 @@ public class InteractionOntologyLuceneIndexer {
         System.out.println("Indexing term " + ontologyTerm.getIdentifier() + ", name = " + ontologyTerm.getName());
         // index current term
         Document document = new Document();
-        document.add(new Field("identifier", value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+        if (ontologyTerm.getIdentifier() != null) {
+            document.add(new Field("identifier", value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+        }
         if (ontologyTerm.getName() != null) {
             document.add(new Field("label", ontologyTerm.getName(), Field.Store.YES, Field.Index.ANALYZED));
             document.add(new Field("label_sorted", ontologyTerm.getName(), Field.Store.NO, Field.Index.NOT_ANALYZED));
         }
-        document.add(new Field("databaseLabel", results.getDatabaseLabel(), Field.Store.YES, Field.Index.ANALYZED));
-        document.add(new Field("databaseLabel_sorted", results.getDatabaseLabel(), Field.Store.NO, Field.Index.NOT_ANALYZED));
-        document.add(new Field("count", String.valueOf(results.getCount()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        document.add(new Field("fieldName", results.getSearchField(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        if (results != null){
+            if (results.getDatabaseLabel() != null){
+                document.add(new Field("databaseLabel", results.getDatabaseLabel(), Field.Store.YES, Field.Index.ANALYZED));
+                document.add(new Field("databaseLabel_sorted", results.getDatabaseLabel(), Field.Store.NO, Field.Index.NOT_ANALYZED));
+            }
+            document.add(new Field("count", String.valueOf(results.getCount()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+            if (results.getSearchField() != null){
+                document.add(new Field("fieldName", results.getSearchField(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+            }
+        }
 
         termIndexWriter.addDocument(document);
     }
@@ -507,6 +508,6 @@ public class InteractionOntologyLuceneIndexer {
         indexer.loadAndIndexAllFacetFieldCounts(new File("/home/marine/Desktop/ontology-dir"));
 
         System.out.println("finished");
-    }*/
+    } */
 }
 
