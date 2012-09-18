@@ -163,7 +163,7 @@ public class GeneConverter extends AbstractEnricher{
                 mitabInteractor.getAliases().add(aliasField);
 
                 // create display short which should be gene name or gene name synonym
-                if (CvAliasType.GENE_NAME.equals(aliasField.getAliasType()) || CvAliasType.GENE_NAME_SYNONYM.equals(aliasField.getAliasType())){
+                if (CvAliasType.GENE_NAME.equals(aliasField.getAliasType())){
                     psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, aliasField.getName(),InteractorConverter.DISPLAY_SHORT );
                     mitabInteractor.getAliases().add(displayShort);
                 }
