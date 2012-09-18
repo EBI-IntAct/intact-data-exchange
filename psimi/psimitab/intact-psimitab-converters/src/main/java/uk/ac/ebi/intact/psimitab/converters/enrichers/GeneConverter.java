@@ -20,6 +20,7 @@ import java.util.Collection;
 public class GeneConverter extends AbstractEnricher{
 
     private static final String ENSEMBL_GENOME_MI = "MI:1013";
+    private boolean hasFoundDisplayShort = false;
 
     public GeneConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv){
         super(xrefConv, alisConv);
@@ -32,6 +33,7 @@ public class GeneConverter extends AbstractEnricher{
      * @return the standard InchiKey for the small molecule. Can be null if no standard inchi key available
      */
     public void enrichGeneFromIntact(uk.ac.ebi.intact.model.Interactor gene, Interactor mitabInteractor){
+        hasFoundDisplayShort = false;
 
         if (gene != null && mitabInteractor != null){
             Collection<InteractorXref> interactorXrefs = gene.getXrefs();
@@ -40,14 +42,14 @@ public class GeneConverter extends AbstractEnricher{
             // xrefs
             boolean hasFoundENSEMBLIdentity = processXrefs(mitabInteractor, interactorXrefs);
 
-            // ac and display long
-            processAccessionAndDisplay(gene, mitabInteractor, hasFoundENSEMBLIdentity);
-
             // convert aliases
             if (!aliases.isEmpty()){
 
                 processAliases(mitabInteractor, aliases);
             }
+
+            // ac and display long
+            processAccessionAndDisplay(gene, mitabInteractor, hasFoundENSEMBLIdentity);
 
             // uses crc64 for checksum
             if (gene instanceof Polymer){
@@ -62,6 +64,11 @@ public class GeneConverter extends AbstractEnricher{
 
     @Override
     protected void processAccessionAndDisplay(uk.ac.ebi.intact.model.Interactor mol, Interactor mitabInteractor, boolean hasFoundEMBLIdentity) {
+        // do display short has been found so far, we need to add the shortlabel as display short
+        if (!hasFoundDisplayShort){
+            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT  );
+            mitabInteractor.getAliases().add(displayLong);
+        }
         // if it is a small molecule from CHEBI, Assume the short label is the molecule name
         // aliases
         if (hasFoundEMBLIdentity){
@@ -164,6 +171,7 @@ public class GeneConverter extends AbstractEnricher{
 
                 // create display short which should be gene name or gene name synonym
                 if (CvAliasType.GENE_NAME.equals(aliasField.getAliasType())){
+                    hasFoundDisplayShort = true;
                     psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, aliasField.getName(),InteractorConverter.DISPLAY_SHORT );
                     mitabInteractor.getAliases().add(displayShort);
                 }
