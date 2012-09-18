@@ -205,9 +205,9 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         boolean hasFoundAliasLabel = false;
         for (psidev.psi.mi.tab.model.Alias al : intactBi.getInteractorA().getAliases()){
            if (al.getName().equalsIgnoreCase("iamadna")){
-               Assert.assertEquals("ddbj/embl/genbank",al.getDbSource());
-               Assert.assertEquals("shortlabel",al.getAliasType());
-               hasFoundAliasLabel = true;
+               if ("ddbj/embl/genbank".equals(al.getDbSource()) && "shortlabel".equals(al.getAliasType())){
+                   hasFoundAliasLabel = true;
+               }
            }
         }
         Assert.assertTrue(hasFoundAliasLabel);
