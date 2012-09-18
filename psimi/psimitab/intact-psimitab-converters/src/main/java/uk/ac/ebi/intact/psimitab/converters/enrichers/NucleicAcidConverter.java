@@ -57,12 +57,13 @@ public class NucleicAcidConverter extends AbstractEnricher{
 
     @Override
     protected void processAccessionAndDisplay(uk.ac.ebi.intact.model.Interactor mol, Interactor mitabInteractor, boolean hasFoundEMBLIdentity) {
+        // the shortlabel is the display short
+        psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT );
+        mitabInteractor.getAliases().add(displayShort);
         // aliases
         if (hasFoundEMBLIdentity){
             String identifier = mitabInteractor.getIdentifiers().iterator().next().getIdentifier();
-            // the identifier is the display short
-            psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, identifier, InteractorConverter.DISPLAY_SHORT );
-            mitabInteractor.getAliases().add(displayShort);
+
             // the shortlabel is a chebi shortlabel as well
             psidev.psi.mi.tab.model.Alias shortLabel = new AliasImpl( CvDatabase.DDBG, mol.getShortLabel(), InteractorConverter.SHORTLABEL );
             mitabInteractor.getAliases().add(shortLabel);
@@ -87,10 +88,6 @@ public class NucleicAcidConverter extends AbstractEnricher{
                 psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvDatabase.INTACT, mol.getShortLabel(), InteractorConverter.SHORTLABEL  );
                 mitabInteractor.getAliases().add(altId);
 
-                // add ac as display short as well
-                psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, mol.getAc(), InteractorConverter.DISPLAY_SHORT  );
-                mitabInteractor.getAliases().add(displayShort);
-
                 // add ac as unique id and add it as display_long as well
                 CrossReference acField = createCrossReferenceFromAc(mol);
                 mitabInteractor.getIdentifiers().add(acField);
@@ -103,10 +100,6 @@ public class NucleicAcidConverter extends AbstractEnricher{
             else {
                 CrossReference id = new CrossReferenceImpl( CvDatabase.INTACT, mol.getShortLabel());
                 mitabInteractor.getIdentifiers().add(id);
-
-                // add shortlabel as display short as well
-                psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT  );
-                mitabInteractor.getAliases().add(displayShort);
 
                 // add shortlabel as display long as well
                 psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_LONG  );
