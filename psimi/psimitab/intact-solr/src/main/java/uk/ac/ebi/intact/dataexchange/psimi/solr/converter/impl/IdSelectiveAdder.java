@@ -34,22 +34,35 @@ import java.util.Collection;
  */
 public class IdSelectiveAdder implements RowDataSelectiveAdder {
 
-    public void addToDoc(SolrInputDocument doc, Row row) {
+    public boolean addToDoc(SolrInputDocument doc, Row row) {
         Collection<Field> colIdA = row.getFields(InteractionKeys.KEY_ID_A);
         Collection<Field> colIdB = row.getFields(InteractionKeys.KEY_ID_B);
 
-        addFields(doc, colIdA);
-        addFields(doc, colIdB);
+        boolean added = false;
+
+        if (addFields(doc, colIdA)){
+            added = true;
+        }
+        if (addFields(doc, colIdB)){
+            added = true;
+        }
+
+        return added;
     }
 
-    private void addFields(SolrInputDocument doc, Collection<Field> column) {
+    private boolean addFields(SolrInputDocument doc, Collection<Field> column) {
+        boolean added = false;
+
         for (Field field : column) {
             String fieldName = field.get(CalimochoKeys.DB)+"_id";
             String value = field.get(CalimochoKeys.VALUE);
 
             if (value != null){
                 doc.addField(fieldName, value);
+                added = true;
             }
         }
+
+        return added;
     }
 }

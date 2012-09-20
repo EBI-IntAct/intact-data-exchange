@@ -34,22 +34,35 @@ import java.util.Collection;
 public class GeneNameSelectiveAdder implements RowDataSelectiveAdder {
     public final static String GENE_NAME = "gene name";
 
-    public void addToDoc(SolrInputDocument doc, Row row) {
+    public boolean addToDoc(SolrInputDocument doc, Row row) {
         Collection<Field> aliasA = row.getFields(InteractionKeys.KEY_ALIAS_A);
         Collection<Field> aliasB = row.getFields(InteractionKeys.KEY_ALIAS_B);
 
-        addGeneNames(doc, aliasA);
-        addGeneNames(doc, aliasB);
+        boolean added = false;
+
+        if (addGeneNames(doc, aliasA)){
+            added = true;
+        }
+        if (addGeneNames(doc, aliasB)){
+            added = true;
+        }
+
+        return added;
     }
 
-    private void addGeneNames(SolrInputDocument doc, Collection<Field> column) {
+    private boolean addGeneNames(SolrInputDocument doc, Collection<Field> column) {
+        boolean added = false;
+
         for (Field field : column) {
             String text = field.get(CalimochoKeys.TEXT);
             String value = field.get(CalimochoKeys.VALUE);
 
             if (GENE_NAME.equalsIgnoreCase(text) && value != null) {
                 doc.addField(FieldNames.GENE_NAME, value);
+                added = true;
             }
         }
+
+        return added;
     }
 }

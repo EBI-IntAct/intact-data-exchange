@@ -31,5 +31,5 @@ public interface RowDataSelectiveAdder {
      * @param doc the solr document
      * @param row The row containing the data
      */
-    void addToDoc(SolrInputDocument doc, Row row);
+    boolean addToDoc(SolrInputDocument doc, Row row);
 }

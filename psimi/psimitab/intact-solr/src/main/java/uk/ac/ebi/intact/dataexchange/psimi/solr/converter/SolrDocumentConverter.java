@@ -79,6 +79,13 @@ public class SolrDocumentConverter extends Converter{
     private static final String FIELD_SEPARATOR = "|";
     private static final String FIELD_EMPTY = "-";
 
+    private RowDataSelectiveAdder confidenceSelectiveAdder;
+    private RowDataSelectiveAdder geneSelectiveAdder;
+    private RowDataSelectiveAdder idATypeSelectiveAdder;
+    private RowDataSelectiveAdder idBTypeSelectiveAdder;
+    private RowDataSelectiveAdder altidATypeSelectiveAdder;
+    private RowDataSelectiveAdder altidBTypeSelectiveAdder;
+
     public SolrDocumentConverter(SolrServer solrServer) {
         super();
         this.fieldEnricher = new BaseFieldEnricher();
@@ -90,6 +97,17 @@ public class SolrDocumentConverter extends Converter{
         }
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
         mitabReader = new PsimiTabReader();
+
+        confidenceSelectiveAdder = new ConfidenceScoreSelectiveAdder(FieldNames.INTACT_SCORE_NAME.toLowerCase());
+        geneSelectiveAdder = new GeneNameSelectiveAdder();
+        idATypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_A,
+                InteractionKeys.KEY_INTERACTOR_TYPE_A);
+        idBTypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_B,
+                InteractionKeys.KEY_INTERACTOR_TYPE_B);
+        altidATypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ALTID_A,
+                InteractionKeys.KEY_INTERACTOR_TYPE_A);
+        altidBTypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ALTID_B,
+                InteractionKeys.KEY_INTERACTOR_TYPE_B);
 
         // override the static initializeKeyMap with the field enricher initialized
         overrideKeyMap();
@@ -153,6 +171,17 @@ public class SolrDocumentConverter extends Converter{
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
         mitabReader = new PsimiTabReader();
 
+        confidenceSelectiveAdder = new ConfidenceScoreSelectiveAdder(FieldNames.INTACT_SCORE_NAME.toLowerCase());
+        geneSelectiveAdder = new GeneNameSelectiveAdder();
+        idATypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_A,
+                InteractionKeys.KEY_INTERACTOR_TYPE_A);
+        idBTypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_B,
+                InteractionKeys.KEY_INTERACTOR_TYPE_B);
+        altidATypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ALTID_A,
+                InteractionKeys.KEY_INTERACTOR_TYPE_A);
+        altidBTypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ALTID_B,
+                InteractionKeys.KEY_INTERACTOR_TYPE_B);
+
         // override the static initializeKeyMap with the field enricher initialized
         overrideKeyMap();
     }
@@ -169,6 +198,17 @@ public class SolrDocumentConverter extends Converter{
         rowReader = new DefaultRowReader(MitabDocumentDefinitionFactory.mitab27());
         mitabReader = new PsimiTabReader();
 
+        confidenceSelectiveAdder = new ConfidenceScoreSelectiveAdder(FieldNames.INTACT_SCORE_NAME.toLowerCase());
+        geneSelectiveAdder = new GeneNameSelectiveAdder();
+        idATypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_A,
+                InteractionKeys.KEY_INTERACTOR_TYPE_A);
+        idBTypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_B,
+                InteractionKeys.KEY_INTERACTOR_TYPE_B);
+        altidATypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ALTID_A,
+                InteractionKeys.KEY_INTERACTOR_TYPE_A);
+        altidBTypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ALTID_B,
+                InteractionKeys.KEY_INTERACTOR_TYPE_B);
+
         // override the static initializeKeyMap with the field enricher initialized
         overrideKeyMap();
     }
@@ -184,16 +224,18 @@ public class SolrDocumentConverter extends Converter{
         SolrInputDocument doc = super.toSolrDocument(row);
 
         // add mi score
-        addCustomFields(row, doc, new ConfidenceScoreSelectiveAdder(FieldNames.INTACT_SCORE_NAME.toLowerCase()));
+        addCustomFields(row, doc, confidenceSelectiveAdder);
 
         // gene names
-        addCustomFields(row, doc, new GeneNameSelectiveAdder());
+        addCustomFields(row, doc, geneSelectiveAdder);
 
-        // add intact by interactor type
-        addCustomFields(row, doc, new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_A,
-                InteractionKeys.KEY_INTERACTOR_TYPE_A));
-        addCustomFields(row, doc, new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ID_B,
-                InteractionKeys.KEY_INTERACTOR_TYPE_B));
+        // add intact by interactor type for idA or idB and if not in altidA/altidB
+        if (! addCustomFields(row, doc, idATypeSelectiveAdder)){
+            addCustomFields(row, doc, altidATypeSelectiveAdder);
+        }
+        if (! addCustomFields(row, doc, idBTypeSelectiveAdder)){
+            addCustomFields(row, doc, altidBTypeSelectiveAdder);
+        }
 
         return doc;
     }
@@ -280,7 +322,7 @@ public class SolrDocumentConverter extends Converter{
         return sb.toString();
     }
 
-    private void addCustomFields(Row row, SolrInputDocument doc, RowDataSelectiveAdder selectiveAdder) {
-        selectiveAdder.addToDoc(doc, row);
+    private boolean addCustomFields(Row row, SolrInputDocument doc, RowDataSelectiveAdder selectiveAdder) {
+        return selectiveAdder.addToDoc(doc, row);
     }
 }

@@ -28,7 +28,7 @@ public class ConfidenceScoreSelectiveAdder implements RowDataSelectiveAdder {
         }
     }
 
-    public void addToDoc(SolrInputDocument doc, Row row) {
+    public boolean addToDoc(SolrInputDocument doc, Row row) {
         Collection<Field> confidences = row.getFields(InteractionKeys.KEY_CONFIDENCE);
 
         for (Field field : confidences) {
@@ -39,13 +39,15 @@ public class ConfidenceScoreSelectiveAdder implements RowDataSelectiveAdder {
                     // only one score is indexed
                     Double value = Double.parseDouble(field.get(CalimochoKeys.VALUE));
                     doc.addField(FieldNames.INTACT_SCORE_NAME, value);
-                    return;
+                    return true;
                 }
                 catch (NumberFormatException e){
                     e.printStackTrace();
-                    return;
+                    return false;
                 }
             }
         }
+
+        return false;
     }
 }

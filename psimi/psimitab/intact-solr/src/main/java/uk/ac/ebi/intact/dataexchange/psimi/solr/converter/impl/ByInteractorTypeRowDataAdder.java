@@ -54,10 +54,12 @@ public class ByInteractorTypeRowDataAdder implements RowDataSelectiveAdder {
         }
     }
 
-    public void addToDoc(SolrInputDocument doc, Row row) {
+    public boolean addToDoc(SolrInputDocument doc, Row row) {
         if (row.getFields(columnInteractorType) == null) {
-            return;
+            return false;
         }
+
+        boolean added = false;
 
         Collection<Field> colId = row.getFields(columnKey);
         Collection<Field> colType = row.getFields(columnInteractorType);
@@ -66,14 +68,18 @@ public class ByInteractorTypeRowDataAdder implements RowDataSelectiveAdder {
 
         if (typeId != null){
             // e.g. acByInteractorType_mi1234
+
             for (Field idField : colId) {
                 String value = idField.get(CalimochoKeys.VALUE);
                 if (databaseName.equalsIgnoreCase(idField.get(CalimochoKeys.DB)) && value != null) {
                     String fieldName = FieldNames.INTACT_BY_INTERACTOR_TYPE_PREFIX +(typeId.replaceAll(":", "").toLowerCase());
                     doc.addField(fieldName, value);
+                    added = true;
                 }
             }
         }
+
+        return added;
     }
 
     private String getInteractorTypeId(Collection<Field> colType) {
