@@ -58,6 +58,10 @@ public class OntologyBinaryInteractionEnricher implements BinaryInteractionEnric
 
     public void enrich(Interactor interactor) throws Exception {
 
+        if (interactor == null){
+            return;
+        }
+
         // enrich organisms
         if (interactor.getOrganism() != null) {
             enrich(interactor.getOrganism().getIdentifiers());
