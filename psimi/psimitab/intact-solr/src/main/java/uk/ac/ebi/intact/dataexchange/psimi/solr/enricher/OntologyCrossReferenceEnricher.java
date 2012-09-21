@@ -32,7 +32,7 @@ public class OntologyCrossReferenceEnricher extends OntologyBinaryInteractionEnr
     public void enrich(Interactor interactor) throws Exception {
 
         // enrich xrefs
-        if (interactor.getXrefs()!= null) {
+        if (interactor != null && interactor.getXrefs()!= null) {
             enrich(interactor.getXrefs());
         }
     }
