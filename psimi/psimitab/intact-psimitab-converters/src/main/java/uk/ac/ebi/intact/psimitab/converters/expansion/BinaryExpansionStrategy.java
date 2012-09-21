@@ -131,7 +131,7 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
                 return InteractionCategory.self_inter_molecular;
             }
             else {
-                return InteractionCategory.self_inter_molecular;
+                return InteractionCategory.self_intra_molecular;
             }
         }
         else if (interaction.getComponents().size() == 2){
