@@ -28,7 +28,9 @@ import org.hupo.psi.mi.psicquic.model.PsicquicSolrException;
 import org.hupo.psi.mi.psicquic.model.PsicquicSolrServer;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Convenience class to simplify searching.
@@ -141,11 +143,12 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
         return interactors;
     }
 
-    public int countAllInteractors(SolrQuery originalQuery, String[] interactorTypeMis) throws IntactSolrException {
+    public Map<String, Integer> countAllInteractors(SolrQuery originalQuery, String[] interactorTypeMis) throws IntactSolrException {
         boolean endOfFacetResults = false;
 
-        int numberOfResult= 0;
         int firstResults = 0;
+
+        Map<String, Integer> results = new HashMap<String, Integer>();
 
         while (!endOfFacetResults){
             int chunkResults = 0;
@@ -175,14 +178,22 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
             QueryResponse queryResponse = executeQuery(query);
 
             List<FacetField> facetFields = queryResponse.getFacetFields();
-
             if (facetFields == null || facetFields.isEmpty()){
                 endOfFacetResults = true;
             }
             else {
                 for (FacetField facetField : facetFields){
-                    chunkResults += facetField.getValueCount();
-                    numberOfResult += facetField.getValueCount();
+                    if (facetField.getValueCount() > 0){
+                        chunkResults += facetField.getValueCount();
+
+                        if (results.containsKey(facetField.getName())){
+                            int current = results.get(facetField.getName());
+                            results.put(facetField.getName(), current+facetField.getValueCount());
+                        }
+                        else {
+                            results.put(facetField.getName(), facetField.getValueCount());
+                        }
+                    }
                 }
 
                 if (chunkResults < CHUNK_FACET_THRESHOLD){
@@ -193,7 +204,7 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
             firstResults+=CHUNK_FACET_THRESHOLD;
         }
 
-        return numberOfResult;
+        return results;
     }
 
     private String createFieldName(String mi) {

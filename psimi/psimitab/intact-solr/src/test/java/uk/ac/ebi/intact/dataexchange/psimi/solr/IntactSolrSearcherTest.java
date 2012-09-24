@@ -100,8 +100,8 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
                 .setFacetMinCount(1)
                 .setFacetLimit(Integer.MAX_VALUE);
 
-        Assert.assertEquals(129, searcher.countAllInteractors(query, new String [] {"mi0326"}));
-        Assert.assertEquals(5, searcher.countAllInteractors(query, new String [] {"mi0328"}));
+        Assert.assertEquals(new Integer(129), searcher.countAllInteractors(query, new String [] {"mi0326"}).get("intact_byInteractorType_mi0326"));
+        Assert.assertEquals(new Integer(5), searcher.countAllInteractors(query, new String [] {"mi0328"}).get("intact_byInteractorType_mi0328"));
     }
 
     @Test
