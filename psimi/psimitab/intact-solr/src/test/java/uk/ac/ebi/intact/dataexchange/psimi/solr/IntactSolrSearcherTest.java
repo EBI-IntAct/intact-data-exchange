@@ -114,11 +114,11 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
 
         IntactSolrSearcher searcher = new IntactSolrSearcher(getSolrJettyRunner().getSolrServer(CoreNames.CORE_PUB));
 
-        Assert.assertEquals(129, searcher.searchInteractors(query, "MI:0326", 0, 130).size());
-        Assert.assertEquals(5, searcher.searchInteractors(query, "MI:0328", 0, 6).size());
+        Assert.assertEquals(129, searcher.searchInteractors(query, new IntactFacetField("MI:0326", 0, 130)).size());
+        Assert.assertEquals(5, searcher.searchInteractors(query, new IntactFacetField("MI:0328", 0, 6)).size());
 
         // with pagination
-        Assert.assertEquals(3, searcher.searchInteractors(query, "MI:0328", 0, 3).size());
+        Assert.assertEquals(3, searcher.searchInteractors(query, new IntactFacetField("MI:0328", 0, 3)).size());
         
         final IntactSolrSearchResult result1 = (IntactSolrSearchResult) searcher.search( "GRB2", null, null, null, null );
         assertEquals(3, result1.getNumberResults());
@@ -300,10 +300,10 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
 
         IntactSolrSearcher searcher = new IntactSolrSearcher( getSolrJettyRunner().getSolrServer( CoreNames.CORE_PUB ) );
 
-        Assert.assertEquals( 34, searcher.searchInteractors( query, "MI:0326", 0, 35 ).size());
+        Assert.assertEquals( 34, searcher.searchInteractors( query, new IntactFacetField("MI:0326", 0, 35 )).size());
 
         // use pagination
-        Assert.assertEquals( 30, searcher.searchInteractors( query, "MI:0326", 4, 35 ).size());
+        Assert.assertEquals( 30, searcher.searchInteractors( query, new IntactFacetField("MI:0326", 4, 35 )).size());
 
         SolrQuery queryFacetted = new SolrQuery( "P20053" )
                 .setRows( 0 )

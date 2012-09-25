@@ -94,12 +94,12 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
         return searchResults;
     }
 
-    public Collection<InteractorIdCount> searchInteractors(SolrQuery query, String interactorMi, int first, int maxNumberOfIdCount) throws IntactSolrException {
-        Multimap<String,InteractorIdCount> interactors = searchInteractors(query, new String[] {interactorMi}, first, maxNumberOfIdCount);
+    public Collection<InteractorIdCount> searchInteractors(SolrQuery query, IntactFacetField intactFacetField) throws IntactSolrException {
+        Multimap<String,InteractorIdCount> interactors = searchInteractors(query, new IntactFacetField[] {intactFacetField});
         return interactors.values();
     }
 
-    public Multimap<String,InteractorIdCount> searchInteractors(SolrQuery originalQuery, String[] interactorTypeMis, int first, int maxNumberOfIdCount) throws IntactSolrException {
+    public Multimap<String,InteractorIdCount> searchInteractors(SolrQuery originalQuery, IntactFacetField[] intactFacetFields) throws IntactSolrException {
         SolrQuery query = originalQuery.getCopy();
         query.setRows(0);
 
@@ -109,19 +109,26 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
         // we want all the facet fields with min count = 1. The facet fields with count = 0 are not interesting
         query.setFacetMinCount(1);
 
-        // important optimization. We don't want to return all the fields, only a certain number for pagination
-        query.set(FacetParams.FACET_OFFSET, first);
-        query.setFacetLimit(maxNumberOfIdCount);
-
-        // we sort the results : the biggest count first
-        query.setFacetSort(FacetParams.FACET_SORT_COUNT);
-
         Multimap<String,InteractorIdCount> interactors = HashMultimap.create();
 
-        for (String mi : interactorTypeMis) {
-            final String fieldName = createFieldName(mi);
+        if (intactFacetFields != null){
 
-            query.addFacetField(fieldName);
+            // we sort the results : the biggest count first
+            query.setFacetSort(FacetParams.FACET_SORT_COUNT);
+
+            for (IntactFacetField facetField : intactFacetFields) {
+                final String fieldName = createFieldName(facetField.getFieldName());
+
+                // important optimization. We don't want to return all the fields, only a certain number for pagination
+                if (facetField.getFirst() != null){
+                    query.set("f."+fieldName+".facet.offset", facetField.getFirst());
+                }
+                if (facetField.getMax() != null){
+                    query.set("f."+fieldName+".facet.limit", facetField.getMax());
+                }
+
+                query.addFacetField(fieldName);
+            }
         }
 
         QueryResponse queryResponse = executeQuery(query);
