@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-    <artifactId>dataexchange-master</artifactId>
+    <artifactId>intact-dataexchange-master</artifactId>
     <packaging>pom</packaging>
     <version>2.1.6-SNAPSHOT</version>
 
