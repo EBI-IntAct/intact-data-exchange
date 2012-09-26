@@ -2,13 +2,13 @@
 
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange.plugins</groupId>
-        <artifactId>intact-plugins-master</artifactId>
+        <artifactId>plugins-master</artifactId>
         <version>2.1.6-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>intact-cv-maven-plugin</artifactId>
+    <artifactId>cv-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <version>2.1.6-SNAPSHOT</version>
 

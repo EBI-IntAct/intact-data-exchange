@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-    <artifactId>intact-dataexchange-master</artifactId>
+    <artifactId>dataexchange-master</artifactId>
     <packaging>pom</packaging>
     <version>2.1.6-SNAPSHOT</version>
 
@@ -36,6 +36,7 @@
         <module>ebeye</module>
         <module>pdbe</module>
         <module>intact-tasks</module>
+        <module>plugins</module>
         <module>imex</module>
         <module>intact-mi-cluster-score</module>
   </modules>
