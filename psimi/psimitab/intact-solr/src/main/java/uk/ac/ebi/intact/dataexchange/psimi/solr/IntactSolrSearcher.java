@@ -201,6 +201,9 @@ public class IntactSolrSearcher extends PsicquicSolrServer{
                             results.put(facetField.getName(), facetField.getValueCount());
                         }
                     }
+                    else if (!results.containsKey(facetField.getName())){
+                        results.put(facetField.getName(), 0);
+                    }
                 }
 
                 if (chunkResults < CHUNK_FACET_THRESHOLD){
