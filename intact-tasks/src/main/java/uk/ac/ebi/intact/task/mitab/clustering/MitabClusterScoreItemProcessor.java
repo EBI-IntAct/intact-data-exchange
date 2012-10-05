@@ -103,7 +103,7 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
     private String extractInteractorIdentifier(Interactor interactor){
 
         if (interactor == null){
-            return null;
+            return "-";
         }
 
         if (!interactor.getIdentifiers().isEmpty() && databasesForUniqIdentifier == null){
@@ -132,7 +132,7 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
             log.warn("Interactor without identifiers : " + interactor.toString() + ". This interactor will be ignored");
         }
 
-        return null;
+        return "-";
     }
 
     private Double extractClusterScoreFrom(List<Confidence> confidences){
