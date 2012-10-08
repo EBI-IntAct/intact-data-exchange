@@ -45,7 +45,7 @@
 
     <bean id="simpleLineAggregator" class="uk.ac.ebi.intact.task.mitab.pmid.SimpleLineAggregator"/>
 
-    <bean id="globalMitabWriterTest" class="uk.ac.ebi.intact.task.mitab.pmid.GlobalMitabItemWriter">
+    <bean id="globalPositiveMitabWriterTest" class="uk.ac.ebi.intact.task.mitab.pmid.GlobalMitabItemWriter">
         <property name="resource">
             <bean class="org.springframework.core.io.FileSystemResource">
                 <constructor-arg value="target/lala.txt"/>
@@ -54,10 +54,19 @@
         <property name="simpleLineAggregator" ref="simpleLineAggregator"/>
     </bean>
 
+    <bean id="globalNegativeMitabWriterTest" class="uk.ac.ebi.intact.task.mitab.pmid.GlobalMitabItemWriter">
+        <property name="resource">
+            <bean class="org.springframework.core.io.FileSystemResource">
+                <constructor-arg value="target/lala_negative.txt"/>
+            </bean>
+        </property>
+        <property name="simpleLineAggregator" ref="simpleLineAggregator"/>
+    </bean>
+
     <bean id="publicationMitabWriterTest" class="uk.ac.ebi.intact.task.mitab.pmid.PublicationMitabItemWriter">
         <property name="parentFolderPaths" value="target/psimitab"/>
-        <property name="globalMitabItemWriter" ref="globalMitabWriterTest"/>
-
+        <property name="globalPositiveMitabItemWriter" ref="globalPositiveMitabWriterTest"/>
+        <property name="globalNegativeMitabItemWriter" ref="globalNegativeMitabWriterTest"/>
     </bean>
 
     <bean id="solrJettyRunner" class="uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner"/>

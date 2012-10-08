@@ -26,7 +26,9 @@ public class PublicationFileEntry implements Comparable<PublicationFileEntry>{
      */
     private StringBuffer binaryInteractions;
 
-    public PublicationFileEntry(Date createdDate, String pubId, StringBuffer mitab){
+    private boolean isNegative;
+
+    public PublicationFileEntry(Date createdDate, String pubId, StringBuffer mitab, boolean isNegative){
         super();
         this.createdDate = createdDate;
         this.entryName = pubId;
@@ -107,5 +109,9 @@ public class PublicationFileEntry implements Comparable<PublicationFileEntry>{
         result = createdDate.hashCode();
         result = 31 * result + entryName.hashCode();
         return result;
+    }
+
+    public boolean isNegative() {
+        return isNegative;
     }
 }

@@ -108,19 +108,22 @@ public class PublicationMitabItemWriterTest extends IntactBasicTestCase{
         String secondDate = "2009-07-09";
 
         PublicationFileEntry oldEntry = pubEntries.iterator().next();
-        PublicationFileEntry newEntry = new PublicationFileEntry(dateFormatForEntry.parse(secondDate), "12345_10", oldEntry.getBinaryInteractions());
+        PublicationFileEntry newEntry = new PublicationFileEntry(dateFormatForEntry.parse(secondDate), "12345_10", oldEntry.getBinaryInteractions(), false);
         pubEntries2.add(newEntry);
 
         DateFormat format = new SimpleDateFormat("yyyy");
 
         // open the writer for the first time
         writer.open(stepExecution.getExecutionContext());
-        writer.getGlobalMitabItemWriter().open(stepExecution.getExecutionContext());
+        writer.getGlobalPositiveMitabItemWriter().open(stepExecution.getExecutionContext());
+        writer.getGlobalNegativeMitabItemWriter().open(stepExecution.getExecutionContext());
 
         writer.write(Arrays.asList(pubEntries, pubEntries2));
-        writer.getGlobalMitabItemWriter().update(stepExecution.getExecutionContext());
+        writer.getGlobalPositiveMitabItemWriter().update(stepExecution.getExecutionContext());
+        writer.getGlobalNegativeMitabItemWriter().update(stepExecution.getExecutionContext());
         writer.close();
-        writer.getGlobalMitabItemWriter().close();
+        writer.getGlobalPositiveMitabItemWriter().close();
+        writer.getGlobalNegativeMitabItemWriter().close();
 
         File pmid = new File(writer.getParentFolderPaths());
 

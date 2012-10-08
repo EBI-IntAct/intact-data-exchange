@@ -208,7 +208,7 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
         String entryName = publicationNameGenerator.createPublicationName(publicationName, null, isNegative);
 
         // create a publication entry
-        PublicationFileEntry publicationEntry = new PublicationFileEntry(date, entryName, mitab);
+        PublicationFileEntry publicationEntry = new PublicationFileEntry(date, entryName, mitab, isNegative);
         // add the publication entry to the list of publication entries
         publicationEntries.add(publicationEntry);
 

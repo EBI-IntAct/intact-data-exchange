@@ -86,7 +86,8 @@
                     <batch:stream ref="orderedByCreatedPublicationReader"/>
                     <batch:stream ref="publicationMitabWriterTest"/>
                     <batch:stream ref="publicationMitabProcessorTest"/>
-                    <batch:stream ref="globalMitabWriterTest"/>
+                    <batch:stream ref="globalPositiveMitabWriterTest"/>
+                    <batch:stream ref="globalNegativeMitabWriterTest"/>
                 </batch:streams>
 
                 <batch:skippable-exception-classes>

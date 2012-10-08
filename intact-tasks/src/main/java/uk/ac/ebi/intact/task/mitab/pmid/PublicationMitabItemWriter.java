@@ -38,7 +38,8 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
 
     private PsimiTabVersion version = PsimiTabVersion.v2_7;
 
-    private GlobalMitabItemWriter globalMitabItemWriter;
+    private GlobalMitabItemWriter globalPositiveMitabItemWriter;
+    private GlobalMitabItemWriter globalNegativeMitabItemWriter;
 
     private final static String HAS_HEADER = "has_header";
     private boolean hasHeader = false;
@@ -66,10 +67,15 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
             throw new ItemStreamException( "Impossible to write in : " + parentFolder.getAbsolutePath() );
         }
 
-        if (this.globalMitabItemWriter == null){
-            this.globalMitabItemWriter = new GlobalMitabItemWriter();
-            this.globalMitabItemWriter.setLineAggregator(new SimpleLineAggregator());
-            this.globalMitabItemWriter.setResource(new FileSystemResource(parentFolder + "/intact.txt"));
+        if (this.globalPositiveMitabItemWriter == null){
+            this.globalPositiveMitabItemWriter = new GlobalMitabItemWriter();
+            this.globalPositiveMitabItemWriter.setLineAggregator(new SimpleLineAggregator());
+            this.globalPositiveMitabItemWriter.setResource(new FileSystemResource(parentFolder + "/intact.txt"));
+        }
+        if (this.getGlobalNegativeMitabItemWriter() == null){
+            this.globalNegativeMitabItemWriter = new GlobalMitabItemWriter();
+            this.globalNegativeMitabItemWriter.setLineAggregator(new SimpleLineAggregator());
+            this.globalNegativeMitabItemWriter.setResource(new FileSystemResource(parentFolder + "/intact_negative.txt"));
         }
 
         if (executionContext.containsKey(HAS_HEADER)) {
@@ -106,10 +112,12 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
         }
 
         List<String> lines = new ArrayList<String>(items.size());
+        List<String> negativeLines = new ArrayList<String>(items.size());
 
         if (!hasHeader){
             hasHeader = true;
             lines.add(MitabWriterUtils.buildHeader(this.version));
+            negativeLines.add(MitabWriterUtils.buildHeader(this.version));
         }
 
         for (Collection<PublicationFileEntry> publicationEntries : items){
@@ -147,7 +155,12 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
                         String line = publicationEntry.getBinaryInteractions().toString();
                         psiWriter.write(line);
 
-                        lines.add(line);
+                        if (publication.isNegative()){
+                            negativeLines.add(line);
+                        }
+                        else {
+                            lines.add(line);
+                        }
                     }
                     finally {
                         this.psiWriter.close();
@@ -156,7 +169,12 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
             }
         }
 
-        this.globalMitabItemWriter.write(lines);
+        if (!lines.isEmpty()){
+            this.globalPositiveMitabItemWriter.write(lines);
+        }
+        if (!negativeLines.isEmpty()){
+            this.globalNegativeMitabItemWriter.write(negativeLines);
+        }
     }
 
     public String getParentFolderPaths() {
@@ -189,11 +207,19 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
         this.version = version;
     }
 
-    public GlobalMitabItemWriter getGlobalMitabItemWriter() {
-        return globalMitabItemWriter;
+    public GlobalMitabItemWriter getGlobalPositiveMitabItemWriter() {
+        return globalPositiveMitabItemWriter;
     }
 
-    public void setGlobalMitabItemWriter(GlobalMitabItemWriter globalMitabItemWriter) {
-        this.globalMitabItemWriter = globalMitabItemWriter;
+    public void setGlobalPositiveMitabItemWriter(GlobalMitabItemWriter globalPositiveMitabItemWriter) {
+        this.globalPositiveMitabItemWriter = globalPositiveMitabItemWriter;
+    }
+
+    public GlobalMitabItemWriter getGlobalNegativeMitabItemWriter() {
+        return globalNegativeMitabItemWriter;
+    }
+
+    public void setGlobalNegativeMitabItemWriter(GlobalMitabItemWriter globalNegativeMitabItemWriter) {
+        this.globalNegativeMitabItemWriter = globalNegativeMitabItemWriter;
     }
 }
