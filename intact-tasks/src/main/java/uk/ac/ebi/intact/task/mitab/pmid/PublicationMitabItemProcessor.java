@@ -226,7 +226,7 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
         Assert.notNull(executionContext, "ExecutionContext must not be null");
 
         if (this.compositeProcessor == null){
-            this.compositeProcessor = new InteractionExpansionCompositeProcessor();
+            this.compositeProcessor = new InteractionExpansionCompositeProcessor(false, false);
         }
 
         clearIntactBuilders();
