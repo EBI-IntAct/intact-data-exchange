@@ -38,6 +38,7 @@ public class PublicationFileEntry implements Comparable<PublicationFileEntry>{
         if (mitab != null){
             this.binaryInteractions.append(mitab);
         }
+        this.isNegative = isNegative;
     }
 
     public Date getCreatedDate() {
