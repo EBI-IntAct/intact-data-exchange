@@ -44,6 +44,14 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
      */
     public static final Log logger = LogFactory.getLog( SpokeWithoutBaitExpansion.class );
 
+    public SpokeWithoutBaitExpansion() {
+        super();
+    }
+
+    public SpokeWithoutBaitExpansion(boolean processExperimentDetails, boolean processPublicationDetails) {
+        super(processExperimentDetails, processPublicationDetails);
+    }
+
     ///////////////////////////////////////////
     // Implements ExpansionStrategy contract
 

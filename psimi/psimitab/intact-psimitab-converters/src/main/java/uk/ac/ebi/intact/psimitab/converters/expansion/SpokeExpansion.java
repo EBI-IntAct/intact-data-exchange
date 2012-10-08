@@ -46,6 +46,14 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
     public static final String EXPANSION_NAME = "spoke expansion";
     public static final String EXPANSION_MI = "MI:1060";
 
+    public SpokeExpansion() {
+        super();
+    }
+
+    public SpokeExpansion(boolean processExperimentDetails, boolean processPublicationDetails) {
+        super(processExperimentDetails, processPublicationDetails);
+    }
+
     ///////////////////////////////////////////
     // Implements ExpansionStrategy contract
 

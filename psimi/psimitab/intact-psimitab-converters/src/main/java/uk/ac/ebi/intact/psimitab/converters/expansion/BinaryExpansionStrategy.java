@@ -43,8 +43,14 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
     protected InteractionConverter interactionConverter;
     protected InteractorConverter interactorConverter;
 
+
     public BinaryExpansionStrategy(){
         this.interactionConverter = new InteractionConverter();
+        this.interactorConverter = new InteractorConverter();
+    }
+
+    public BinaryExpansionStrategy(boolean processExperimentDetails, boolean processPublicationDetails){
+        this.interactionConverter = new InteractionConverter(processExperimentDetails, processPublicationDetails);
         this.interactorConverter = new InteractorConverter();
     }
 

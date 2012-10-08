@@ -28,12 +28,12 @@ public class ExperimentConverter {
         this.organismConverter = new BioSourceConverter();
     }
 
-    public void intactToCalimocho(Experiment exp, BinaryInteraction binary, boolean processParticipantDetMethod){
+    public void intactToMitab(Experiment exp, BinaryInteraction binary, boolean processParticipantDetMethod, boolean processPublication){
 
         if (exp != null && binary != null){
             // process publication
             Publication pub = exp.getPublication();
-            if (pub != null){
+            if (pub != null && processPublication){
                 publicationConverter.intactToMitab(pub, binary);
             }
 

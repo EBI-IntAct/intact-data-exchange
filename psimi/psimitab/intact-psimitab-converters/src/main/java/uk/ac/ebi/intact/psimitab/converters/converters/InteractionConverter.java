@@ -61,10 +61,11 @@ public class InteractionConverter {
     private ExperimentConverter experimentConverter;
     private InteractorConverter interactorConverter;
 
+    private boolean processExperimentDetails=true;
+    private boolean processPublicationDetails = true;
+
     public static String CRC = "intact-crc";
     public static String RIGID = "rigid";
-
-    private CrossReference defaultSourceDatabase = new CrossReferenceImpl( "psi-mi", "MI:0469", "intact" );
 
     public InteractionConverter(){
         this.confidenceConverter = new ConfidenceConverter();
@@ -74,6 +75,19 @@ public class InteractionConverter {
         annotationConverter = new AnnotationConverter();
         experimentConverter = new ExperimentConverter();
         interactorConverter = new InteractorConverter();
+    }
+
+    public InteractionConverter(boolean processExperimentDetails, boolean processPublicationsDetails){
+        this.confidenceConverter = new ConfidenceConverter();
+        cvObjectConverter = new CvObjectConverter();
+        xConverter = new CrossReferenceConverter();
+        parameterConverter = new ParameterConverter();
+        annotationConverter = new AnnotationConverter();
+        experimentConverter = new ExperimentConverter();
+        interactorConverter = new InteractorConverter();
+
+        this.processExperimentDetails = processExperimentDetails;
+        this.processPublicationDetails = processPublicationsDetails;
     }
 
     ///////////////////////////
@@ -109,10 +123,10 @@ public class InteractionConverter {
         bi.setInteractorB(interactorB);
 
         // process participant detection methods after setting the interactors if not done at the level of interactiors
-        if (interactorA != null && interactorA.getParticipantIdentificationMethods().isEmpty()){
+        if (processExperimentDetails && interactorA != null && interactorA.getParticipantIdentificationMethods().isEmpty()){
             processExperimentParticipantIdentificationMethods(interaction, interactorA);
         }
-        if (interactorB != null && interactorB.getParticipantIdentificationMethods().isEmpty()){
+        if (processExperimentDetails && interactorB != null && interactorB.getParticipantIdentificationMethods().isEmpty()){
             processExperimentParticipantIdentificationMethods(interaction, interactorB);
         }
 
@@ -244,8 +258,10 @@ public class InteractionConverter {
         }
 
         // process experiments
-        for (Experiment exp : interaction.getExperiments()){
-            experimentConverter.intactToCalimocho(exp, binary, false);
+        if (processExperimentDetails){
+            for (Experiment exp : interaction.getExperiments()){
+                experimentConverter.intactToMitab(exp, binary, false, processPublicationDetails);
+            }
         }
 
         //process xrefs
@@ -309,5 +325,21 @@ public class InteractionConverter {
         }
 
         return binary;
+    }
+
+    public boolean isProcessExperimentDetails() {
+        return processExperimentDetails;
+    }
+
+    public void setProcessExperimentDetails(boolean processExperimentDetails) {
+        this.processExperimentDetails = processExperimentDetails;
+    }
+
+    public boolean isProcessPublicationDetails() {
+        return processPublicationDetails;
+    }
+
+    public void setProcessPublicationDetails(boolean processPublicationDetails) {
+        this.processPublicationDetails = processPublicationDetails;
     }
 }

@@ -17,7 +17,6 @@ package uk.ac.ebi.intact.psimitab.converters.expansion;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.converters.converters.InteractionConverter;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -28,10 +27,12 @@ import java.util.Collections;
  */
 public class NoExpansion extends BinaryExpansionStrategy{
 
-    private InteractionConverter interactionConverter;
-
     public NoExpansion(){
-        this.interactionConverter = new InteractionConverter();
+        super();
+    }
+
+    public NoExpansion(boolean processExperimentDetails, boolean processPublicationDetails) {
+        super(processExperimentDetails, processPublicationDetails);
     }
 
     public Collection<BinaryInteraction> expand(Interaction interaction) throws NotExpandableInteractionException {

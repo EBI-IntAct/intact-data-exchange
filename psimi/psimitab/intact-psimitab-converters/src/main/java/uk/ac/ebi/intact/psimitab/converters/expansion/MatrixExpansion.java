@@ -44,6 +44,14 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
     public static final String EXPANSION_NAME = "matrix expansion";
     public static final String EXPANSION_MI = "MI:1061";
 
+    public MatrixExpansion() {
+        super();
+    }
+
+    public MatrixExpansion(boolean processExperimentDetails, boolean processPublicationDetails) {
+        super(processExperimentDetails, processPublicationDetails);
+    }
+
     /**
      * Apply the matrix expansion to the given interaction. Essentially, an interaction is created between any two
      * components.
@@ -98,8 +106,8 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
 
             // process participant detection methods after setting the interactors if not done at the level of interactiors
             if (interactorB.getParticipantIdentificationMethods().isEmpty()){
-                interactionConverter.processExperimentParticipantIdentificationMethods(interaction, expandedBinary.getInteractorA());
                 interactionConverter.processExperimentParticipantIdentificationMethods(interaction, expandedBinary.getInteractorB());
+                expandedBinary.getInteractorA().setParticipantIdentificationMethods(expandedBinary.getInteractorB().getParticipantIdentificationMethods());
             }
 
             // computes Rigid if necessary

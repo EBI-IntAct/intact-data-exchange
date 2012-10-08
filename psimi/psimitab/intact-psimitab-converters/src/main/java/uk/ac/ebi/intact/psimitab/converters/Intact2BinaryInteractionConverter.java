@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.processor.PostProcessorStrategy;
 import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.psimitab.converters.converters.InteractionConverter;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.NotExpandableInteractionException;
 import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
@@ -45,8 +44,6 @@ public class Intact2BinaryInteractionConverter {
 
     private ExpansionStrategy expansionStrategy;
 
-    private InteractionConverter interactionConverter = new InteractionConverter();
-
     private PostProcessorStrategy<BinaryInteraction> postProcessor;
                                     
     public Intact2BinaryInteractionConverter() {
@@ -60,6 +57,10 @@ public class Intact2BinaryInteractionConverter {
     public Intact2BinaryInteractionConverter(ExpansionStrategy expansionStrategy, PostProcessorStrategy<BinaryInteraction> postProcessor) {
         this.expansionStrategy = expansionStrategy;
         this.postProcessor = postProcessor;
+    }
+
+    public Intact2BinaryInteractionConverter(boolean processExperimentDetails, boolean processPublicationDetails) {
+        this(new SpokeWithoutBaitExpansion(processExperimentDetails, processPublicationDetails), null);
     }
 
     /////////////////////
@@ -97,7 +98,6 @@ public class Intact2BinaryInteractionConverter {
         Collection<BinaryInteraction> result = new ArrayList<BinaryInteraction>(interactions.size());
 
         for ( Interaction interaction : interactions ) {
-            BinaryInteraction bi;
 
             Collection<BinaryInteraction> expandedInteractions = null;
             try {
