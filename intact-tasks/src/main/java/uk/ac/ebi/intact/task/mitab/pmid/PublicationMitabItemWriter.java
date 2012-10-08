@@ -155,7 +155,7 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
                         String line = publicationEntry.getBinaryInteractions().toString();
                         psiWriter.write(line);
 
-                        if (publication.isNegative()){
+                        if (publicationEntry.isNegative()){
                             negativeLines.add(line);
                         }
                         else {
