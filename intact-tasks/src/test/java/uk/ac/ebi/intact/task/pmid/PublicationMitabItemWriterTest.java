@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.task.pmid;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -82,6 +83,10 @@ public class PublicationMitabItemWriterTest extends IntactBasicTestCase{
     @DirtiesContext
     @Transactional(propagation = Propagation.NEVER)
     public void test_write_publications() throws Exception {
+        File pmid = new File(writer.getParentFolderPaths());
+        if (pmid.exists()){
+            FileUtils.deleteDirectory(pmid);
+        }
         TransactionStatus status = getDataContext().beginTransaction();
 
         // contains small scale experiment
@@ -125,7 +130,7 @@ public class PublicationMitabItemWriterTest extends IntactBasicTestCase{
         writer.getGlobalPositiveMitabItemWriter().close();
         writer.getGlobalNegativeMitabItemWriter().close();
 
-        File pmid = new File(writer.getParentFolderPaths());
+        pmid = new File(writer.getParentFolderPaths());
 
         Assert.assertTrue(pmid.exists());
         File year = new File(pmid, format.format(pub.getCreated()));
