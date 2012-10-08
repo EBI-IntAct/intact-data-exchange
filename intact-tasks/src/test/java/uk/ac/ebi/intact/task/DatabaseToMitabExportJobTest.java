@@ -202,6 +202,6 @@ public class DatabaseToMitabExportJobTest extends IntactBasicTestCase{
 
         PsimiTabReader reader = new PsimiTabReader();
         Collection<BinaryInteraction> binaryInteractions = reader.read(generatedMitab);
-        Assert.assertEquals(0, binaryInteractions.size());
+        Assert.assertEquals(2, binaryInteractions.size());
     }
 }

@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.BinaryInteractionImpl;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.OrganismImpl;
 import psidev.psi.mi.tab.model.builder.MitabWriterUtils;
 import psidev.psi.mi.tab.model.builder.PsimiTabVersion;
 import uk.ac.ebi.intact.core.context.IntactContext;
@@ -17,6 +20,8 @@ import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Publication;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
+import uk.ac.ebi.intact.psimitab.converters.converters.ExperimentConverter;
+import uk.ac.ebi.intact.psimitab.converters.converters.PublicationConverter;
 import uk.ac.ebi.intact.task.mitab.IntactBinaryInteractionProcessor;
 import uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor;
 import uk.ac.ebi.intact.task.util.FileNameGenerator;
@@ -48,10 +53,16 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
 
     private IntactBinaryInteractionProcessor compositeProcessor;
 
+    private BinaryInteraction binaryTemplate;
+    private PublicationConverter publicationConverter;
+    private ExperimentConverter experimentConverter;
+
     public PublicationMitabItemProcessor(){
         currentStringBuilder = new StringBuffer(1064);
         currentNegativeStringBuilder = new StringBuffer(1064);
         publicationNameGenerator = new FileNameGenerator();
+        publicationConverter = new PublicationConverter();
+        experimentConverter = new ExperimentConverter();
     }
 
     @Override
@@ -68,6 +79,9 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
             return null;
         }
 
+        // convert the publication
+        convertPublicationToMitab(publication);
+
         // iterator of experiments
         Iterator<Experiment> iterator = publication.getExperiments().iterator();
 
@@ -79,8 +93,14 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
 
         // convert experiments in one to several publication entry(ies)
         while (iterator.hasNext()){
+            // clear previous experiment details
+            clearExperimentDetails();
+
             // the processed experiment
             Experiment exp = iterator.next();
+
+            // convert experiment details
+            convertExperimentToMitab(exp);
 
             // number of interactions attached to the processed experiment
             int interactionSize = exp.getInteractions().size();
@@ -92,11 +112,11 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
                 for (Interaction interaction : exp.getInteractions()){
                     // the experiments does contain negative interactions. Normally in intact, one experiment containing one negative should only contain negative
                     if (InteractionUtils.isNegative(interaction)){
-                        processIntactInteraction(interaction, this.currentNegativeStringBuilder);
+                        processIntactInteraction(interaction, this.currentNegativeStringBuilder, exp);
                     }
                     // positive interactions
                     else {
-                        processIntactInteraction(interaction, this.currentStringBuilder);
+                        processIntactInteraction(interaction, this.currentStringBuilder, exp);
                     }
                 }
             }
@@ -117,11 +137,65 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
         return publicationEntries;
     }
 
-    private void processIntactInteraction(Interaction interaction, StringBuffer builder) throws Exception {
+    private void convertPublicationToMitab(Publication publication) {
+        binaryTemplate = new BinaryInteractionImpl();
+
+        if (publication == null){
+           return;
+        }
+
+        publicationConverter.intactToMitab(publication, binaryTemplate);
+    }
+
+    private void convertExperimentToMitab(Experiment experiment) {
+        if (this.binaryTemplate == null){
+            this.binaryTemplate = new BinaryInteractionImpl();
+        }
+        if (experiment == null){
+            return;
+        }
+
+        experimentConverter.intactToMitab(experiment, binaryTemplate, true, false);
+    }
+
+    private void processIntactInteraction(Interaction interaction, StringBuffer builder, Experiment exp) throws Exception {
         Collection<? extends BinaryInteraction> binaryInteractions = this.compositeProcessor.process(interaction);
         if (binaryInteractions != null && !binaryInteractions.isEmpty()){
+            boolean isFirst = true;
+
             for (BinaryInteraction binary : binaryInteractions){
+                copyPublicationAndExperimentDetailsTo(binary, isFirst, exp);
                 builder.append(MitabWriterUtils.buildLine(binary, this.version));
+
+                isFirst = false;
+            }
+        }
+    }
+
+    private void copyPublicationAndExperimentDetailsTo(BinaryInteraction binary, boolean isFirst, Experiment exp){
+
+        if (binary != null && this.binaryTemplate != null){
+            // we override all the shared collections of the expanded binary interactions excepted annotations (can come from publication and interactions)
+            // experiment details
+            binary.setDetectionMethods(binaryTemplate.getDetectionMethods());
+            binary.setHostOrganism(binaryTemplate.getHostOrganism());
+
+            if (binary.getInteractorA() != null && binary.getInteractorA().getParticipantIdentificationMethods().isEmpty()){
+                 experimentConverter.addParticipantDetectionMethodForInteractor(exp,  binary.getInteractorA());
+            }
+            if (binary.getInteractorB() != null && binary.getInteractorB().getParticipantIdentificationMethods().isEmpty()){
+                experimentConverter.addParticipantDetectionMethodForInteractor(exp,  binary.getInteractorB());
+            }
+
+            // publication details
+            binary.setPublications(binaryTemplate.getPublications());
+            binary.setAuthors(binaryTemplate.getAuthors());
+            binary.setSourceDatabases(binaryTemplate.getSourceDatabases());
+            binary.setCreationDate(binaryTemplate.getCreationDate());
+
+            // we don't need to update all the interactions as they all share the same annotation collection
+            if (isFirst){
+               binary.getAnnotations().addAll(binaryTemplate.getAnnotations());
             }
         }
     }
@@ -190,5 +264,12 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
 
     public void setCompositeProcessor(IntactBinaryInteractionProcessor compositeProcessor) {
         this.compositeProcessor = compositeProcessor;
+    }
+
+    private void clearExperimentDetails(){
+         if (this.binaryTemplate != null){
+             this.binaryTemplate.setDetectionMethods(new ArrayList<CrossReference>());
+             this.binaryTemplate.setHostOrganism(new OrganismImpl());
+         }
     }
 }

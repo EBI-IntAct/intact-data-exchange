@@ -62,7 +62,7 @@ public class PublicationMitabItemWriterTest extends IntactBasicTestCase{
 
         mitabProcessor.setPublicationNameGenerator(fileNameGenerator);
 
-        InteractionExpansionCompositeProcessor processor = new InteractionExpansionCompositeProcessor();
+        InteractionExpansionCompositeProcessor processor = new InteractionExpansionCompositeProcessor(false, false);
         OntologyEnricherItemProcessor ontologyEnricher = new OntologyEnricherItemProcessor();
         ontologyEnricher.setOntologiesSolrUrl("http://localhost:18080/solr/core_ontology_pub");
 

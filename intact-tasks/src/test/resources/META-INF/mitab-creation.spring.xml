@@ -92,6 +92,8 @@
 
     <bean id="interactionExpansionCompositeItemProcessor"
           class="uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor">
+        <constructor-arg index="0" value="false"/>
+        <constructor-arg index="1" value="false"/>
         <property name="binaryItemProcessors">
             <list>
                 <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyEnricherItemProcessor">
@@ -106,14 +108,6 @@
         <property name="indexUniprotTaxonomy" value="false"/>
         <property name="oboOntologyMappings">
             <list>
-                <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyMappingFactoryBean">
-                    <property name="name" value="psi-mi"/>
-                    <property name="resource" value="http://psidev.cvs.sourceforge.net/viewvc/psidev/psi/mi/rel25/data/psi-mi25.obo?revision=1.52"/>
-                </bean>
-                <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyMappingFactoryBean">
-                    <property name="name" value="psi-mod"/>
-                    <property name="resource" value="http://psidev.cvs.sourceforge.net/viewvc/psidev/psi/mod/data/PSI-MOD.obo"/>
-                </bean>
                 <bean class="uk.ac.ebi.intact.task.mitab.index.OntologyMappingFactoryBean">
                     <property name="name" value="go"/>
                     <property name="resource" value="classpath:/META-INF/goslim_generic.obo"/>

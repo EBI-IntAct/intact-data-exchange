@@ -36,6 +36,8 @@
 
     <bean id="SimpleInteractionExpansionCompositeItemProcessor"
           class="uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor">
+        <constructor-arg index="0" value="false"/>
+        <constructor-arg index="1" value="false"/>
     </bean>
 
     <bean id="nonClusteredMitabReader" class="uk.ac.ebi.intact.task.mitab.MitabItemReader">
@@ -69,17 +71,22 @@
         <property name="databaseToCluster" value="uniprotkb,irefindex,ddbj/embl/genbank,chebi"/>
     </bean>
 
+    <bean id="orderedByCreatedPublicationReader" class="org.springframework.batch.item.database.JpaPagingItemReader" parent="baseModelReader" lazy-init="true">
+        <property name="queryString" value="select p from Publication p order by p.created, p.ac"/>
+    </bean>
 
     <!-- Export from the database to mitab and enriching mitab -->
     <batch:step id="databaseMitabExport" parent="intactBatchStep">
         <batch:tasklet>
-            <batch:chunk reader="interactionReaderExcludeNegative"
-                         processor="SimpleInteractionExpansionCompositeItemProcessor"
-                         writer="intactToMitabWriter"
-                         skip-limit="10000">
+            <batch:chunk reader="orderedByCreatedPublicationReader"
+                         processor="publicationMitabProcessorTest"
+                         writer="publicationMitabWriterTest"
+                         skip-limit="1000">
                 <batch:streams>
-                    <batch:stream ref="interactionReaderExcludeNegative"/>
-                    <batch:stream ref="mitabWriter"/>
+                    <batch:stream ref="orderedByCreatedPublicationReader"/>
+                    <batch:stream ref="publicationMitabWriterTest"/>
+                    <batch:stream ref="publicationMitabProcessorTest"/>
+                    <batch:stream ref="globalMitabWriterTest"/>
                 </batch:streams>
 
                 <batch:skippable-exception-classes>
