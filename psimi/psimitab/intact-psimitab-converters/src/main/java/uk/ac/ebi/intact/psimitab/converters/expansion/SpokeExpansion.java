@@ -107,10 +107,10 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
             interactions.add(expandedBinary);
 
             // process participant detection methods after setting the interactors if not done at the level of interactiors
-            if (newInteraction.getMitabInteractorA().getInteractor().getParticipantIdentificationMethods().isEmpty()){
+            if (interactionConverter.isProcessExperimentDetails() && newInteraction.getMitabInteractorA().getInteractor().getParticipantIdentificationMethods().isEmpty()){
                 interactionConverter.processExperimentParticipantIdentificationMethods(interaction, newInteraction.getMitabInteractorA().getInteractor());
             }
-            if (newInteraction.getMitabInteractorB().getInteractor().getParticipantIdentificationMethods().isEmpty()){
+            if (interactionConverter.isProcessExperimentDetails() && newInteraction.getMitabInteractorB().getInteractor().getParticipantIdentificationMethods().isEmpty()){
                 interactionConverter.processExperimentParticipantIdentificationMethods(interaction, newInteraction.getMitabInteractorB().getInteractor());
             }
 

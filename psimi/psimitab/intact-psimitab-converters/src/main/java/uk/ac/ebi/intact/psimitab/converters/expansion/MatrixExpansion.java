@@ -105,7 +105,7 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
             interactorB.getStoichiometry().add(0);
 
             // process participant detection methods after setting the interactors if not done at the level of interactiors
-            if (interactorB.getParticipantIdentificationMethods().isEmpty()){
+            if (interactionConverter.isProcessExperimentDetails() && interactorB.getParticipantIdentificationMethods().isEmpty()){
                 interactionConverter.processExperimentParticipantIdentificationMethods(interaction, expandedBinary.getInteractorB());
                 expandedBinary.getInteractorA().setParticipantIdentificationMethods(expandedBinary.getInteractorB().getParticipantIdentificationMethods());
             }

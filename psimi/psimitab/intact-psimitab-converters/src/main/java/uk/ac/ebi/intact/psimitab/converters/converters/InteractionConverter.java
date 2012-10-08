@@ -331,15 +331,7 @@ public class InteractionConverter {
         return processExperimentDetails;
     }
 
-    public void setProcessExperimentDetails(boolean processExperimentDetails) {
-        this.processExperimentDetails = processExperimentDetails;
-    }
-
     public boolean isProcessPublicationDetails() {
         return processPublicationDetails;
-    }
-
-    public void setProcessPublicationDetails(boolean processPublicationDetails) {
-        this.processPublicationDetails = processPublicationDetails;
     }
 }
