@@ -98,7 +98,7 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
     /**
      *
      * @param interactor
-     * @return the first identifier of an interactor, null otherwise
+     * @return the first alternative identifier of an interactor (which is intact normally), null if no other alternative identifiers found
      */
     private String extractInteractorIdentifier(Interactor interactor){
 
@@ -106,18 +106,34 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
             return "-";
         }
 
-        if (!interactor.getIdentifiers().isEmpty() && databasesForUniqIdentifier == null){
-            if (interactor.getIdentifiers().size() > 1){
-                log.warn("Interactor with more than one identifiers : " + interactor.toString() + ". Only the first identifier is taken into account");
-            }
+        // we don't want to check for the database, we take the first identifier
+        if (databasesForUniqIdentifier == null){
+            // we have an identifier and no requirements for the database
+            if (!interactor.getIdentifiers().isEmpty() && databasesForUniqIdentifier == null){
+                if (interactor.getIdentifiers().size() > 1){
+                    log.warn("Interactor with more than one identifiers : " + interactor.toString() + ". Only the first identifier is taken into account");
+                }
 
-            return interactor.getIdentifiers().iterator().next().getIdentifier();
+                return interactor.getIdentifiers().iterator().next().getIdentifier();
+            }
+            // we don't have an identifier but an alternative identifier and no requirements for the database
+            else if (!interactor.getAlternativeIdentifiers().isEmpty() && databasesForUniqIdentifier == null){
+                if (interactor.getAlternativeIdentifiers().size() > 1){
+                    log.warn("Interactor with more than one identifiers : " + interactor.toString() + ". Only the first identifier is taken into account");
+                }
+
+                return interactor.getAlternativeIdentifiers().iterator().next().getIdentifier();
+            }
+            else {
+                throw new IllegalStateException("Interactor without identifiers : " + interactor.toString() + ". This interactor will be ignored");
+            }
         }
-        else if (!interactor.getIdentifiers().isEmpty()){
+        // we will look first in the alternative identifiers where we have intact acs
+        else if (!interactor.getAlternativeIdentifiers().isEmpty()){
             
             for (String db : databasesForUniqIdentifier){
 
-                for (CrossReference ref : interactor.getIdentifiers()){
+                for (CrossReference ref : interactor.getAlternativeIdentifiers()){
                     if (ref.getDatabase() != null && ref.getDatabase().equalsIgnoreCase(db)){
                         return ref.getIdentifier();
                     }
@@ -126,13 +142,24 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
 
             log.warn("The identifiers of interactor " + interactor.toString() + " are not recognized so only the first identifier will be taken into account");
 
-            return interactor.getIdentifiers().iterator().next().getIdentifier();
-        }
-        else {
-            log.warn("Interactor without identifiers : " + interactor.toString() + ". This interactor will be ignored");
-        }
+            if (!interactor.getIdentifiers().isEmpty()){
+                for (String db : databasesForUniqIdentifier){
 
-        return "-";
+                    for (CrossReference ref : interactor.getIdentifiers()){
+                        if (ref.getDatabase() != null && ref.getDatabase().equalsIgnoreCase(db)){
+                            return ref.getIdentifier();
+                        }
+                    }
+                }
+                return interactor.getIdentifiers().iterator().next().getIdentifier();
+            }
+
+            return interactor.getAlternativeIdentifiers().iterator().next().getIdentifier();
+        }
+        // we cannot identify this interactor
+        else {
+            throw new IllegalStateException("Interactor without identifiers : " + interactor.toString() + ".");
+        }
     }
 
     private Double extractClusterScoreFrom(List<Confidence> confidences){

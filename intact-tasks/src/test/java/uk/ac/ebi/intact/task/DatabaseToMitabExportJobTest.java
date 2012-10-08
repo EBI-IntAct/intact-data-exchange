@@ -197,7 +197,7 @@ public class DatabaseToMitabExportJobTest extends IntactBasicTestCase{
         Assert.assertTrue( jobExecution.getAllFailureExceptions().isEmpty() );
         Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
 
-        File generatedMitab = new File("target/lala.txt");
+        File generatedMitab = new File("target/lala_negative.txt");
         Assert.assertTrue(generatedMitab.exists());
 
         PsimiTabReader reader = new PsimiTabReader();

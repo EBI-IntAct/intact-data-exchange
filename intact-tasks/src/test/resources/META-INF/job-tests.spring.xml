@@ -57,7 +57,6 @@
         <property name="clusteredMitabFile" value="classpath:/mitab-clustered.txt"/>
         <property name="databasesForUniqIdentifier">
             <list>
-                <value>uniprotkb</value>
                 <value>intact</value>
             </list>
         </property>
