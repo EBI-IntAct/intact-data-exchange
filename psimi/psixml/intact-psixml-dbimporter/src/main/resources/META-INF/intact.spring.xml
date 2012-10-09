@@ -11,10 +11,6 @@
            http://www.springframework.org/schema/tx
            http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
-    <bean id="intactInitializer" class="uk.ac.ebi.intact.core.context.IntactInitializer" init-method="init">
-        <property name="autoPersist" value="false"/>
-    </bean>
-
     <bean id="intactConfig" class="uk.ac.ebi.intact.core.config.IntactConfiguration">
         <property name="acPrefix" value="EBI"/>
         <property name="defaultInstitution" ref="institutionIntact"/>
@@ -33,8 +29,6 @@
     </bean>
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
-
-    <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="persistenceUnitName" value="intact-core-default"/>
@@ -59,7 +53,7 @@
 
     <bean id="intactDataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${db.driver}"/>
-        <property name="url" value="${db.jdbcurl}"/>
+        <property name="url" value="${db.url}"/>
         <property name="username" value="${db.user}"/>
         <property name="password" value="${db.password}"/>
     </bean>

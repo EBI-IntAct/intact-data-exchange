@@ -16,7 +16,8 @@
     <name>IntAct Data Exchange :: PSI MI :: XML :: DB Importer</name>
 
     <properties>
-        <db.jdbcurl>jdbc:${db}:thin:@${db.host}:${db.port}:${db.alias}</db.jdbcurl>
+        <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
+        <db.hbm2ddl>none</db.hbm2ddl>
     </properties>
 
     <profiles>
