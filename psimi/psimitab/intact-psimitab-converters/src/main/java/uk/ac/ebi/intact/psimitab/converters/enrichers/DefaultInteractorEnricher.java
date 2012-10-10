@@ -66,9 +66,6 @@ public class DefaultInteractorEnricher extends AbstractEnricher{
         // the shortlabel is the display short
         psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT );
         mitabInteractor.getAliases().add(displayShort);
-        // the shortlabel is a INTACT shortlabel as well
-        psidev.psi.mi.tab.model.Alias shortLabel = new AliasImpl( CvDatabase.INTACT, mol.getShortLabel(), InteractorConverter.SHORTLABEL );
-        mitabInteractor.getAliases().add(shortLabel);
 
         // aliases
         if (hasFoundIdentity){

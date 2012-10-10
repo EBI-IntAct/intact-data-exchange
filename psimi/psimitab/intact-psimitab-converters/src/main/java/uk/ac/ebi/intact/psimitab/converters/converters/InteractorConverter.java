@@ -52,7 +52,6 @@ public class InteractorConverter {
 
     protected static final List<String> uniprotKeys;
     public static final String CRC64 = "crc64";
-    public static final String UNKNOWN_TAXID = "-3";
     public static final String DISPLAY_SHORT = "display_short";
     public static final String DISPLAY_LONG = "display_long";
     public static final String SHORTLABEL = "shortlabel";

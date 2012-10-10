@@ -179,7 +179,7 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         Assert.assertNotNull( interactor.getInteractor().getAlternativeIdentifiers() );
         Assert.assertEquals( 2, interactor.getInteractor().getAlternativeIdentifiers().size() );
         // two aliases plus display_short and display_long
-        Assert.assertEquals( 4, interactor.getInteractor().getAliases().size() );
+        Assert.assertEquals( 3, interactor.getInteractor().getAliases().size() );
 
     }
 
@@ -201,7 +201,7 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         BinaryInteraction intactBi = interactionConverter.toBinaryInteraction( binaryInteraction );
 
         // display short plus display long, shortlabel, gene name
-        Assert.assertEquals(4,intactBi.getInteractorA().getAliases().size());
+        Assert.assertEquals(3,intactBi.getInteractorA().getAliases().size());
         boolean hasFoundAliasLabel = false;
         for (psidev.psi.mi.tab.model.Alias al : intactBi.getInteractorA().getAliases()){
            if (al.getName().equalsIgnoreCase("iamadna")){

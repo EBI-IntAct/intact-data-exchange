@@ -64,9 +64,6 @@ public class NucleicAcidConverter extends AbstractEnricher{
         if (hasFoundEMBLIdentity){
             String identifier = mitabInteractor.getIdentifiers().iterator().next().getIdentifier();
 
-            // the shortlabel is a chebi shortlabel as well
-            psidev.psi.mi.tab.model.Alias shortLabel = new AliasImpl( CvDatabase.DDBG, mol.getShortLabel(), InteractorConverter.SHORTLABEL );
-            mitabInteractor.getAliases().add(shortLabel);
             // the interactor unique id is the display long
             psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, identifier, InteractorConverter.DISPLAY_LONG  );
             mitabInteractor.getAliases().add(displayLong);
@@ -84,9 +81,6 @@ public class NucleicAcidConverter extends AbstractEnricher{
 
             // ac will be identifier and shortlabel is an alias
             if(mol.getAc() != null){
-                // add shortlabel as intact alias
-                psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvDatabase.INTACT, mol.getShortLabel(), InteractorConverter.SHORTLABEL  );
-                mitabInteractor.getAliases().add(altId);
 
                 // add ac as unique id and add it as display_long as well
                 CrossReference acField = createCrossReferenceFromAc(mol);

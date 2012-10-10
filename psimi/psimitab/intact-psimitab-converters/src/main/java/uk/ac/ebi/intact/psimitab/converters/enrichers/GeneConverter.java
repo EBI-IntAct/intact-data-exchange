@@ -69,13 +69,18 @@ public class GeneConverter extends AbstractEnricher{
             psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT  );
             mitabInteractor.getAliases().add(displayLong);
         }
+
         // if it is a small molecule from CHEBI, Assume the short label is the molecule name
         // aliases
         if (hasFoundEMBLIdentity){
             String identifier = mitabInteractor.getIdentifiers().iterator().next().getIdentifier();
-            // the shortlabel is a ENSEMBL shortlabel as well
-            psidev.psi.mi.tab.model.Alias shortLabel = new AliasImpl( CvDatabase.ENSEMBL, mol.getShortLabel(), InteractorConverter.SHORTLABEL );
-            mitabInteractor.getAliases().add(shortLabel);
+            // we have a display short so the current shortlabel has not been exported as display_short
+            if (hasFoundDisplayShort){
+                // the shortlabel is a ENSEMBL shortlabel as well
+                psidev.psi.mi.tab.model.Alias shortLabel = new AliasImpl( CvDatabase.ENSEMBL, mol.getShortLabel(), InteractorConverter.SHORTLABEL );
+                mitabInteractor.getAliases().add(shortLabel);
+            }
+
             // the interactor unique id is the display long
             psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, identifier, InteractorConverter.DISPLAY_LONG  );
             mitabInteractor.getAliases().add(displayLong);
@@ -93,9 +98,11 @@ public class GeneConverter extends AbstractEnricher{
 
             // ac will be identifier and shortlabel is an alias
             if(mol.getAc() != null){
-                // add shortlabel as intact alias
-                psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvDatabase.INTACT, mol.getShortLabel(), InteractorConverter.SHORTLABEL  );
-                mitabInteractor.getAliases().add(altId);
+                // add shortlabel as intact alias only if the display_short is not the shortlabel to not duplicate aliases
+                if (hasFoundDisplayShort){
+                    psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvDatabase.INTACT, mol.getShortLabel(), InteractorConverter.SHORTLABEL  );
+                    mitabInteractor.getAliases().add(altId);
+                }
 
                 // add ac as unique id and add it as display_long as well
                 CrossReference acField = createCrossReferenceFromAc(mol);

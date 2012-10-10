@@ -25,6 +25,7 @@ public class ProteinConverter extends AbstractEnricher{
     protected RogidGenerator rogidGenerator;
     public static final String UNKNOWN_TAXID = "-3";
     public final static String ROGID = "rogid";
+    private boolean hasFoundDisplayShort;
 
     public ProteinConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv){
         super(xrefConv, alisConv);
@@ -38,6 +39,7 @@ public class ProteinConverter extends AbstractEnricher{
      * @return the RigDataModel for the protein rogid. Can be null if no sequence available
      */
     public RigDataModel enrichProteinFromIntact(Polymer polymer, Interactor mitabInteractor){
+        hasFoundDisplayShort = false;
 
         if (polymer != null && mitabInteractor != null){
             Collection<InteractorXref> interactorXrefs = polymer.getXrefs();
@@ -85,9 +87,7 @@ public class ProteinConverter extends AbstractEnricher{
             // the shortlabel is the uniprot ID
             psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, polymer.getShortLabel(), InteractorConverter.DISPLAY_LONG );
             mitabInteractor.getAliases().add(displayLong);
-            // the shortlabel is a uniprot shortlabel as well
-            psidev.psi.mi.tab.model.Alias shortLabel = new AliasImpl( CvDatabase.UNIPROT, polymer.getShortLabel(), InteractorConverter.SHORTLABEL );
-            mitabInteractor.getAliases().add(shortLabel);
+
 
             // convert ac as identity or secondary identifier
             if (polymer.getAc() != null){
@@ -102,9 +102,11 @@ public class ProteinConverter extends AbstractEnricher{
 
             // ac will be identifier and shortlabel is an alias
             if(polymer.getAc() != null){
-                // add shortlabel as intact alias
-                psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvDatabase.INTACT, polymer.getShortLabel(),InteractorConverter.SHORTLABEL );
-                mitabInteractor.getAliases().add(altId);
+                if (!hasFoundDisplayShort){
+                    // add shortlabel as intact alias
+                    psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvDatabase.PSI_MI, polymer.getShortLabel(),InteractorConverter.DISPLAY_SHORT );
+                    mitabInteractor.getAliases().add(altId);
+                }
 
                 // add ac as unique id and add it as display_long as well
                 CrossReference acField = createCrossReferenceFromAc(polymer);
@@ -119,8 +121,15 @@ public class ProteinConverter extends AbstractEnricher{
                 CrossReference id = new CrossReferenceImpl( CvDatabase.INTACT, polymer.getShortLabel());
                 mitabInteractor.getIdentifiers().add(id);
 
-                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, polymer.getShortLabel(),InteractorConverter.DISPLAY_LONG );
-                mitabInteractor.getAliases().add(displayLong);
+                if (!hasFoundDisplayShort){
+                    // add shortlabel as intact alias
+                    psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvDatabase.PSI_MI, polymer.getShortLabel(),InteractorConverter.DISPLAY_SHORT );
+                    mitabInteractor.getAliases().add(altId);
+                }
+                else {
+                    psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, polymer.getShortLabel(),InteractorConverter.DISPLAY_LONG );
+                    mitabInteractor.getAliases().add(displayLong);
+                }
             }
         }
     }
@@ -181,6 +190,7 @@ public class ProteinConverter extends AbstractEnricher{
                 if (CvAliasType.GENE_NAME.equals(aliasField.getAliasType())){
                     psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, aliasField.getName(),InteractorConverter.DISPLAY_SHORT );
                     mitabInteractor.getAliases().add(displayShort);
+                    hasFoundDisplayShort = true;
                 }
             }
         }

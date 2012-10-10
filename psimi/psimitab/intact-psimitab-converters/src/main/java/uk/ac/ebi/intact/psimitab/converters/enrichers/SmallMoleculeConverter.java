@@ -74,9 +74,6 @@ public class SmallMoleculeConverter extends AbstractEnricher{
             // the shortlabel is the display short
             psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT );
             mitabInteractor.getAliases().add(displayShort);
-            // the shortlabel is a chebi shortlabel as well
-            psidev.psi.mi.tab.model.Alias shortLabel = new AliasImpl( CvDatabase.CHEBI, mol.getShortLabel(), InteractorConverter.SHORTLABEL );
-            mitabInteractor.getAliases().add(shortLabel);
             // the interactor unique id is the display long
             psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mitabInteractor.getIdentifiers().iterator().next().getIdentifier(), InteractorConverter.DISPLAY_LONG  );
             mitabInteractor.getAliases().add(displayLong);
@@ -94,9 +91,6 @@ public class SmallMoleculeConverter extends AbstractEnricher{
 
             // ac will be identifier and shortlabel is an alias
             if(mol.getAc() != null){
-                // add shortlabel as intact alias
-                psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvDatabase.INTACT, mol.getShortLabel(), InteractorConverter.SHORTLABEL  );
-                mitabInteractor.getAliases().add(altId);
 
                 // add shortlabel as display short as well
                 psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT  );
