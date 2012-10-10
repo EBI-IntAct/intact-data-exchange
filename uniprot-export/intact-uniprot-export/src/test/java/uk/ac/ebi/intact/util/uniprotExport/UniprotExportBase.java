@@ -910,7 +910,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         getCorePersister().saveOrUpdate(dr_export);
 
         CvConfidenceType confidence = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
-                CvConfidenceType.class, null, "author-score");
+                CvConfidenceType.class, "MI:1221", "author score");
         getCorePersister().saveOrUpdate(confidence);
 
         CvTopic accepted = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
@@ -961,7 +961,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         getCorePersister().saveOrUpdate(dr_export);
 
         CvConfidenceType confidence = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),
-                CvConfidenceType.class, null, "author-score");
+                CvConfidenceType.class, "MI:1221", "author score");
         getCorePersister().saveOrUpdate(confidence);
 
         CvTopic accepted = CvObjectUtils.createCvObject(getIntactContext().getInstitution(),

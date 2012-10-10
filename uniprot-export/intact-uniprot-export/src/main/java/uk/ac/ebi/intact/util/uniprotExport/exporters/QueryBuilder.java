@@ -25,7 +25,8 @@ import java.util.List;
 
 public class QueryBuilder {
 
-    private final static String AUTHOR_SCORE = "author-score";
+    private final static String AUTHOR_SCORE = "author score";
+    private final static String AUTHOR_SCORE_MI = "MI:1221";
     private final static String INFERRED_AUTHOR = "MI:0363";
     private final static String RELEASED = "released";
     private static final String READY_FOR_RELEASE = "ready for release";
@@ -53,12 +54,9 @@ public class QueryBuilder {
     private final String interactionsFromExperimentExportYes = "select distinct(i8.ac) from InteractionImpl i8 " +
             "join i8.experiments as e4 join e4.annotations as an4 where an4.cvTopic.shortLabel = :drExport " +
             "and trim(upper(an4.annotationText)) = :yes";
-    /*private final String interactionsFromExperimentExportConditional = "select distinct(i9.ac) from InteractionImpl i9 " +
-            "join i9.annotations as an5 join i9.experiments as e5 join e5.annotations as an6 where " +
-            "an6.cvTopic.shortLabel = :drExport and an5.cvTopic.identifier = :confidence and trim(upper(an5.annotationText)) = trim(upper(an6.annotationText))";*/
     private final String interactionsFromExperimentExportConditional = "select distinct(i9.ac) from InteractionImpl i9 " +
             "join i9.confidences as confidence join i9.experiments as e5 join e5.annotations as an6 where " +
-            "an6.cvTopic.shortLabel = :drExport and confidence.cvConfidenceType.shortLabel = :confidence and trim(upper(confidence.value)) = trim(upper(an6.annotationText))";
+            "an6.cvTopic.shortLabel = :drExport and confidence.cvConfidenceType.identifier = :confidence and trim(upper(confidence.value)) = trim(upper(an6.annotationText))";
     private final String interactionsFromExperimentExportSpecified = "select distinct(i10.ac) from InteractionImpl i10 " +
             "join i10.experiments as e6 join e6.annotations as an7 where an7.cvTopic.shortLabel = :drExport";
 
@@ -289,7 +287,7 @@ public class QueryBuilder {
 
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(interactionsFromExperimentExportConditional);
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
-        query.setParameter("confidence", AUTHOR_SCORE);
+        query.setParameter("confidence", AUTHOR_SCORE_MI);
 
         List<String> interactions = query.getResultList();
 
@@ -321,7 +319,7 @@ public class QueryBuilder {
         Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(interactionsDrExportNotPassed);
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
         query.setParameter("yes", "YES");
-        query.setParameter("confidence", AUTHOR_SCORE);
+        query.setParameter("confidence", AUTHOR_SCORE_MI);
 
         List<String> interactions = query.getResultList();
 
@@ -373,7 +371,7 @@ public class QueryBuilder {
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
         query.setParameter("no", "NO");
         query.setParameter("yes", "YES");
-        query.setParameter("confidence", AUTHOR_SCORE);
+        query.setParameter("confidence", AUTHOR_SCORE_MI);
         query.setParameter("negative", CvTopic.NEGATIVE);
         query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
         query.setParameter("identity", CvXrefQualifier.IDENTITY_MI_REF);
@@ -421,7 +419,7 @@ public class QueryBuilder {
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
         query.setParameter("no", "NO");
         query.setParameter("yes", "YES");
-        query.setParameter("confidence", AUTHOR_SCORE);
+        query.setParameter("confidence", AUTHOR_SCORE_MI);
         query.setParameter("noUniprotUpdate", CvTopic.NON_UNIPROT);
         query.setParameter("negative", CvTopic.NEGATIVE);
         query.setParameter("uniprot", CvDatabase.UNIPROT_MI_REF);
@@ -495,7 +493,7 @@ public class QueryBuilder {
             query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
             query.setParameter("no", "NO");
             query.setParameter("yes", "YES");
-            query.setParameter("confidence", AUTHOR_SCORE);
+            query.setParameter("confidence", AUTHOR_SCORE_MI);
         }
 
         if (excludeSpokeExpanded && excludeNonUniprotInteractors){
@@ -570,7 +568,7 @@ public class QueryBuilder {
                 query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
                 query.setParameter("no", "NO");
                 query.setParameter("yes", "YES");
-                query.setParameter("confidence", AUTHOR_SCORE);
+                query.setParameter("confidence", AUTHOR_SCORE_MI);
             }
 
             if (excludeSpokeExpanded && excludeNonUniprotInteractors){
@@ -653,7 +651,7 @@ public class QueryBuilder {
             query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
             query.setParameter("no", "NO");
             query.setParameter("yes", "YES");
-            query.setParameter("confidence", AUTHOR_SCORE);
+            query.setParameter("confidence", AUTHOR_SCORE_MI);
         }
 
         if (excludeNegativeInteractions){
@@ -709,7 +707,7 @@ public class QueryBuilder {
         query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
         query.setParameter("no", "NO");
         query.setParameter("yes", "YES");
-        query.setParameter("confidence", AUTHOR_SCORE);
+        query.setParameter("confidence", AUTHOR_SCORE_MI);
         query.setParameter("negative", CvTopic.NEGATIVE);
         query.setParameter("inferred_author", INFERRED_AUTHOR);
         query.setParameter("inferred_curator", CvInteraction.INFERRED_BY_CURATOR_MI_REF);
