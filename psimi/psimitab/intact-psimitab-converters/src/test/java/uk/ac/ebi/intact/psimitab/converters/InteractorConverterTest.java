@@ -205,7 +205,7 @@ public class InteractorConverterTest extends IntactBasicTestCase {
         boolean hasFoundAliasLabel = false;
         for (psidev.psi.mi.tab.model.Alias al : intactBi.getInteractorA().getAliases()){
            if (al.getName().equalsIgnoreCase("iamadna")){
-               if ("ddbj/embl/genbank".equals(al.getDbSource()) && "shortlabel".equals(al.getAliasType())){
+               if ("psi-mi".equals(al.getDbSource()) && "display_short".equals(al.getAliasType())){
                    hasFoundAliasLabel = true;
                }
            }
@@ -214,8 +214,8 @@ public class InteractorConverterTest extends IntactBasicTestCase {
 
         boolean hasFoundAliasLabel2 = false;
         for (psidev.psi.mi.tab.model.Alias al : intactBi.getInteractorB().getAliases()){
-            if (al.getName().equalsIgnoreCase("iamaprotein") && al.getDbSource().equalsIgnoreCase("uniprotkb")){
-                Assert.assertEquals("shortlabel",al.getAliasType());
+            if (al.getName().equalsIgnoreCase("iamaprotein") && al.getDbSource().equalsIgnoreCase("psi-mi")){
+                Assert.assertEquals("display_long",al.getAliasType());
                 hasFoundAliasLabel2=true;
             }
         }
