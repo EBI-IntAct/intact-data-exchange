@@ -196,27 +196,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
                 interaction.addConfidence( confidence);
             }
-            // convert author-confidence annotation in confidences
-            Collection<Attribute> annotationConfidencesToCreate = IntactConverterUtils.extractAuthorConfidencesFrom(psiObject.getAttributes());
-
-            Collection<AbstractConfidence> confs = new ArrayList<AbstractConfidence>(interaction.getConfidences());
-            if (!annotationConfidencesToCreate.isEmpty()){
-                for (Attribute authorConf : annotationConfidencesToCreate){
-
-                    String value = authorConf.getValue();
-                    AbstractConfidence confidence = confConverter.newConfidenceInstance(value);
-
-                    CvConfidenceType cvConfType = new CvConfidenceType();
-                    cvConfType.setOwner(confConverter.getInstitution());
-                    cvConfType.setShortLabel(IntactConverterUtils.AUTHOR_SCORE);
-                    confidence.setCvConfidenceType( cvConfType);
-
-                    if (!IntactConverterUtils.contains(confidence, confs)){
-                        interaction.addConfidence( (Confidence) confidence);
-                        numberOfAuthoConfToConvert ++;
-                    }
-                }
-            }
 
             // parameter conversion
             for (psidev.psi.mi.xml.model.Parameter psiParameter :  psiObject.getParameters()){
@@ -317,7 +296,6 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     public psidev.psi.mi.xml.model.Interaction intactToPsi(Interaction intactObject) {
 
         psidev.psi.mi.xml.model.Interaction interaction = super.intactToPsi(intactObject);
-        int numberOfAuthorConf = 0;
 
         if (!isNewPsiObjectCreated()) {
             return interaction;
@@ -449,7 +427,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             interaction.getConfidences().add( confidence);
 
             // in case of author-score and for retro-compatibility, we add an author-confidence annotation
-            if (conf.getCvConfidenceType() != null && IntactConverterUtils.AUTHOR_SCORE.equalsIgnoreCase(conf.getCvConfidenceType().getShortLabel())){
+            if (conf.getCvConfidenceType() != null && IntactConverterUtils.AUTHOR_SCORE_MI.equalsIgnoreCase(conf.getCvConfidenceType().getIdentifier())){
                 Attribute authConf = new Attribute(IntactConverterUtils.AUTH_CONF_MI, IntactConverterUtils.AUTH_CONF, conf.getValue());
 
                 if (!interaction.getAttributes().contains(authConf)){
@@ -458,11 +436,10 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             }
         }
 
-        // collect annotations which have a spcial meaning for psi xml
-        numberOfAuthorConf += processSpecializedAnnotations(annotations, interaction);
+        // collect annotations which have a special meaning for psi xml
+        processSpecializedAnnotations(annotations, interaction);
 
         // converts interaction parameters
-
         for (uk.ac.ebi.intact.model.InteractionParameter param : parameters){
             psidev.psi.mi.xml.model.Parameter parameter = paramConverter.intactToPsi(param);
             interaction.getParameters().add(parameter);
@@ -470,19 +447,15 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
 
         intactEndConversion(intactObject);
 
-        failIfInconsistentPsiConversion(intactObject, interaction, numberOfAuthorConf);
+        failIfInconsistentPsiConversion(intactObject, interaction);
 
         return interaction;
     }
 
-    private int processSpecializedAnnotations( Collection<Annotation> annotations, psidev.psi.mi.xml.model.Interaction interaction) {
+    private void processSpecializedAnnotations( Collection<Annotation> annotations, psidev.psi.mi.xml.model.Interaction interaction) {
         // set boolean values
 
         final Iterator<Annotation> it = annotations.iterator();
-
-        if (!it.hasNext()){
-            return 0;
-        }
 
         int numberOfAuthConf = 0;
 
@@ -497,32 +470,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             else if (annotation.getCvTopic().getShortLabel().equals( INTRA_MOLECULAR )){
                 interaction.setIntraMolecular( true );
             }
-            else if (IntactConverterUtils.AUTH_CONF_MI.equals(annotation.getCvTopic().getIdentifier())){
-                if (annotation.getAnnotationText() != null){
-                    psidev.psi.mi.xml.model.Confidence confidence = new psidev.psi.mi.xml.model.Confidence();
-                    confidence.setValue(annotation.getAnnotationText());
-
-                    Names names = new Names();
-                    names.setFullName(IntactConverterUtils.AUTH_CONF);
-                    names.setShortLabel(IntactConverterUtils.AUTH_CONF_MI);
-
-                    psidev.psi.mi.xml.model.Xref xref = new psidev.psi.mi.xml.model.Xref();
-                    xref.setPrimaryRef(new DbReference(CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF, IntactConverterUtils.AUTH_CONF_MI, CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF));
-                    Unit unit = new Unit();
-                    unit.setNames(names);
-                    unit.setXref(xref);
-
-                    confidence.setUnit(unit);
-
-                    if (!PsiConverterUtils.contains(confidence, interaction.getConfidences())){
-                        interaction.getConfidences().add( confidence);
-                        numberOfAuthConf ++;
-                    }
-                }
-            }
         }
-
-        return numberOfAuthConf;
     }
 
     private void updateExperimentParticipantDetectionMethod(Interaction interaction) {
@@ -724,7 +672,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
     }
 
-    protected void failIfInconsistentPsiConversion(Interaction intact, psidev.psi.mi.xml.model.Interaction psi, int numberOfAuthorConfAttributes) {
+    protected void failIfInconsistentPsiConversion(Interaction intact, psidev.psi.mi.xml.model.Interaction psi) {
         Collection<Experiment> experiments;
         Collection<Component> participants;
         Collection<Confidence> confidences;
@@ -743,8 +691,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         failIfInconsistentCollectionSize("participant", participants, psi.getParticipants());
 
         Collection<Confidence> confs = confidences;
-        if (confs.size() + numberOfAuthorConfAttributes > 0 && psi.getConfidences().size() > 0 && (confs.size() + numberOfAuthorConfAttributes) != psi.getConfidences().size()) {
-            throw new InconsistentConversionException("Confidence", confs.size(), psi.getConfidences().size() + numberOfAuthorConfAttributes);
+        if (confs.size() > 0 && psi.getConfidences().size() > 0 && (confs.size()) != psi.getConfidences().size()) {
+            throw new InconsistentConversionException("Confidence", confs.size(), psi.getConfidences().size());
         }
     }
 

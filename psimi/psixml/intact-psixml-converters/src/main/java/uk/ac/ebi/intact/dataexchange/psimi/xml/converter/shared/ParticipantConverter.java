@@ -15,7 +15,6 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
@@ -251,13 +250,12 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
         }
 
         // confidences
-
         for (ComponentConfidence conf : confs){
             psidev.psi.mi.xml.model.Confidence confidence = confidenceConverter.intactToPsi( conf);
             participant.getConfidenceList().add( confidence);
 
             // in case of author-score and for retro-compatibility, we add an author-confidence annotation
-            if (conf.getCvConfidenceType() != null && IntactConverterUtils.AUTHOR_SCORE.equalsIgnoreCase(conf.getCvConfidenceType().getShortLabel())){
+            if (conf.getCvConfidenceType() != null && IntactConverterUtils.AUTHOR_SCORE_MI.equalsIgnoreCase(conf.getCvConfidenceType().getIdentifier())){
                 Attribute authConf = new Attribute(IntactConverterUtils.AUTH_CONF_MI, IntactConverterUtils.AUTH_CONF, conf.getValue());
 
                 if (!participant.getAttributes().contains(authConf)){
@@ -266,33 +264,7 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             }
         }
 
-        // if we had author-conf annotations, we convert them in confidences also
-        Collection<Annotation> annotationsToConvertInConfidence = IntactConverterUtils.extractAuthorConfidencesAnnotationsFrom(intactObject.getAnnotations());
-        for (Annotation ann : annotationsToConvertInConfidence){
-            if (ann.getAnnotationText() != null){
-                psidev.psi.mi.xml.model.Confidence confidence = new psidev.psi.mi.xml.model.Confidence();
-                confidence.setValue(ann.getAnnotationText());
-
-                Names names = new Names();
-                names.setFullName(IntactConverterUtils.AUTH_CONF);
-                names.setShortLabel(IntactConverterUtils.AUTH_CONF_MI);
-
-                psidev.psi.mi.xml.model.Xref xref = new psidev.psi.mi.xml.model.Xref();
-                xref.setPrimaryRef(new DbReference(CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF, IntactConverterUtils.AUTH_CONF_MI, CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF));
-                Unit unit = new Unit();
-                unit.setNames(names);
-                unit.setXref(xref);
-
-                confidence.setUnit(unit);
-
-                if (!PsiConverterUtils.contains(confidence, participant.getConfidenceList())){
-                    participant.getConfidenceList().add( confidence);
-                }
-            }
-        }
-
         // component parameters
-
         for (uk.ac.ebi.intact.model.ComponentParameter param : params){
             psidev.psi.mi.xml.model.Parameter parameter = participantParameterConverter.intactToPsi(param);
             participant.getParameters().add(parameter);
@@ -315,16 +287,10 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
 
         Component component = new Component();
 
-        // author confidence annotations to migrate to componentConfidences later
-        Collection<Attribute> annotationConfidencesToMigrate = IntactConverterUtils.extractAuthorConfidencesFrom(participant.getAttributes());
-
-        // all other attributes will be converted into annotations
-        Collection<Attribute> attributesToConvert = CollectionUtils.subtract(participant.getAttributes(), annotationConfidencesToMigrate);
-
         // populates names, xrefs and attributes
         IntactConverterUtils.populateNames(participant.getNames(), component);
         IntactConverterUtils.populateXref(participant.getXref(), component, new XrefConverter<ComponentXref>(getInstitution(), ComponentXref.class));
-        IntactConverterUtils.populateAnnotations(attributesToConvert, component, getInstitution());
+        IntactConverterUtils.populateAnnotations(participant.getAttributes(), component, getInstitution());
 
         component.setOwner(getInstitution());
 
@@ -420,23 +386,6 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
             ComponentConfidence confidence = confidenceConverter.psiToIntact( psiConfidence );
             component.addConfidence( confidence);
         }
-        // converts author-confidences
-        Collection<AbstractConfidence> confs = new ArrayList<AbstractConfidence>(component.getConfidences());
-
-        for (Attribute authorConf : annotationConfidencesToMigrate){
-
-            String value = authorConf.getValue();
-            AbstractConfidence confidence = confidenceConverter.newConfidenceInstance(value);
-
-            CvConfidenceType cvConfType = new CvConfidenceType();
-            cvConfType.setOwner(confidenceConverter.getInstitution());
-            cvConfType.setShortLabel(IntactConverterUtils.AUTHOR_SCORE);
-            confidence.setCvConfidenceType( cvConfType);
-
-            if (!IntactConverterUtils.contains(confidence, confs)){
-                component.addConfidence( (ComponentConfidence) confidence);
-            }
-        }
 
         // converts parameters
         for (psidev.psi.mi.xml.model.Parameter psiParameter : participant.getParameters()){
@@ -479,12 +428,6 @@ public class ParticipantConverter extends AbstractAnnotatedObjectConverter<Compo
                 }
             }
         }
-
-//        ConfidenceConverter confConverter= new ConfidenceConverter( institution );
-//        for (psidev.psi.mi.xml.model.Confidence psiConfidence :  participant.getConfidenceList()){
-//           Confidence confidence = confConverter.psiToIntact( psiConfidence );
-//            component.Confidence( confidence);
-//        }
 
         return component;
     }

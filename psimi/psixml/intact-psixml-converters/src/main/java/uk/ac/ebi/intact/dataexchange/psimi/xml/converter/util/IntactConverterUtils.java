@@ -45,7 +45,8 @@ import java.util.Random;
 public class IntactConverterUtils {
 
     private static final Log log = LogFactory.getLog(IntactConverterUtils.class);
-    public static final String AUTHOR_SCORE = "author-score";
+    public static final String AUTHOR_SCORE = "author score";
+    public static final String AUTHOR_SCORE_MI = "MI:1221";
     public static final String AUTH_CONF_MI = "MI:0621";
     public static final String AUTH_CONF = "author-confidence";
 
@@ -393,12 +394,6 @@ public class IntactConverterUtils {
             ComponentParameter parameter = paramConverter.psiToIntact( psiParameter );
             component.addParameter(parameter);
         }
-
-//        ConfidenceConverter confConverter= new ConfidenceConverter( institution );
-//        for (psidev.psi.mi.xml.model.Confidence psiConfidence :  participant.getConfidenceList()){
-//           Confidence confidence = confConverter.psiToIntact( psiConfidence );
-//            component.Confidence( confidence);
-//        }
 
         return component;
     }
