@@ -6,7 +6,6 @@ import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.ClusterContext;
 import uk.ac.ebi.enfin.mi.cluster.InteractionClusterAdv;
 import uk.ac.ebi.enfin.mi.cluster.cache.CacheStrategy;
-import uk.ac.ebi.intact.psimitab.IntactBinaryInteraction;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +41,7 @@ public class MitabIndexer {
 
         InteractionClusterAdv cluster = new InteractionClusterAdv();
 
-        PsimiTabReader mitabReader = new PsimiTabReader(true);
+        PsimiTabReader mitabReader = new PsimiTabReader();
         File mitabAsFile = new File(mitabFile);
 
         FileInputStream inputStream = new FileInputStream(mitabAsFile);
@@ -56,7 +55,7 @@ public class MitabIndexer {
             while (iterator.hasNext()){
                 interactionToProcess.clear();
                 while (interactionToProcess.size() < 200 && iterator.hasNext()){
-                    IntactBinaryInteraction interaction = (IntactBinaryInteraction) iterator.next();
+                    BinaryInteraction interaction = iterator.next();
 
                     interactionToProcess.add(interaction);
                 }

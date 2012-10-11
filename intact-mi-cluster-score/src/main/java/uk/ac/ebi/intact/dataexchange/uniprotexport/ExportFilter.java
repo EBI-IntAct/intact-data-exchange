@@ -38,6 +38,8 @@ public class ExportFilter {
         String fileB = args[1];
         File results = new File(args[2]);
 
+        BufferedWriter writer = new BufferedWriter(new FileWriter(results));
+
         // read the elements to filter and put them in a collection
         Map<CrossReference, List<CrossReference>> elementsToFilter = new HashMap<CrossReference, List<CrossReference>>();
 
@@ -99,13 +101,13 @@ public class ExportFilter {
         }
 
         // filter the mitab file
-        PsimiTabReader mitabReader = new PsimiTabReader(false);
+        PsimiTabReader mitabReader = new PsimiTabReader();
         FileInputStream inputStream = new FileInputStream(fileB);
 
         try{
             Iterator<psidev.psi.mi.tab.model.BinaryInteraction> iterator = mitabReader.iterate(inputStream);
 
-            PsimiTabWriter mitabWriter = new PsimiTabWriter(false);
+            PsimiTabWriter mitabWriter = new PsimiTabWriter();
 
             while(iterator.hasNext()){
                 psidev.psi.mi.tab.model.BinaryInteraction<Interactor> binaryInteraction = iterator.next();
@@ -152,7 +154,7 @@ public class ExportFilter {
                     }
 
                     if (hasFoundInteractorB){
-                        mitabWriter.writeOrAppend(binaryInteraction, results, false);
+                        mitabWriter.write(binaryInteraction, writer);
                     }
                 }
             }
@@ -161,6 +163,8 @@ public class ExportFilter {
         finally {
             inputStream.close();
         }
+
+        writer.close();
     }
 
     private static Interactor extractFirstInteractorsFor(Map<CrossReference, List<CrossReference>> elementsToFilter, Interactor interactorA, Interactor interactorB, List<CrossReference> secondInteractors) {
