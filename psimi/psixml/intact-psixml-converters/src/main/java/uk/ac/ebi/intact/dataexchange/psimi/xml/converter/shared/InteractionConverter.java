@@ -57,6 +57,8 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
     public static final String MODELLED = "modelled";
     public static final String INTRA_MOLECULAR = "intra-molecular";
     public static final String NEGATIVE = "negative";
+    protected static final String PUTATIVE_SELF_PSI_REF = "MI:0898";
+
 
     private static final String TRUE = "true";
 
@@ -445,11 +447,32 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             interaction.getParameters().add(parameter);
         }
 
+        // check if intra molecular
+        if (intactObject.getComponents().size() == 1){
+            Component c = intactObject.getComponents().iterator().next();
+            if (c.getStoichiometry() == 1 || (c.getStoichiometry() == 0 && containsRole(c.getExperimentalRoles(), new String[]{CvExperimentalRole.SELF_PSI_REF, PUTATIVE_SELF_PSI_REF}))){
+                interaction.setIntraMolecular(true);
+            }
+        }
+
         intactEndConversion(intactObject);
 
         failIfInconsistentPsiConversion(intactObject, interaction);
 
         return interaction;
+    }
+
+    protected boolean containsRole(Collection<CvExperimentalRole> experimentalRoles, String[] rolesToFind) {
+        if (experimentalRoles != null) {
+            for (CvExperimentalRole expRole : experimentalRoles) {
+                for (String roleToFind : rolesToFind) {
+                    if (roleToFind.equals(expRole.getIdentifier())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private void processSpecializedAnnotations( Collection<Annotation> annotations, psidev.psi.mi.xml.model.Interaction interaction) {
