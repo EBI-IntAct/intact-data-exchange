@@ -450,7 +450,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         // check if intra molecular
         if (intactObject.getComponents().size() == 1){
             Component c = intactObject.getComponents().iterator().next();
-            if (c.getStoichiometry() == 1 || (c.getStoichiometry() == 0 && containsRole(c.getExperimentalRoles(), new String[]{CvExperimentalRole.SELF_PSI_REF, PUTATIVE_SELF_PSI_REF}))){
+            if (c.getStoichiometry() == 1f || (c.getStoichiometry() == 0 && containsRole(c.getExperimentalRoles(), new String[]{CvExperimentalRole.SELF_PSI_REF, PUTATIVE_SELF_PSI_REF}))){
                 interaction.setIntraMolecular(true);
             }
         }
