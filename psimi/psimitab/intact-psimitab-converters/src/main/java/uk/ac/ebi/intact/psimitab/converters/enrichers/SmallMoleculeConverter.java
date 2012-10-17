@@ -27,6 +27,11 @@ public class SmallMoleculeConverter extends AbstractEnricher{
     public SmallMoleculeConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv){
         super(xrefConv, alisConv);
     }
+
+    public SmallMoleculeConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
+        super(xrefConv, alisConv, defaultInstitution);
+    }
+
     /**
      * Enrich the mitab interactor following data best practices for small molecules
      * @param smallMolecule
@@ -106,7 +111,7 @@ public class SmallMoleculeConverter extends AbstractEnricher{
             }
             // the shortlabel will be identifier because we need an identifier and will be displayLong as well
             else {
-                CrossReference id = new CrossReferenceImpl( CvDatabase.INTACT, mol.getShortLabel());
+                CrossReference id = new CrossReferenceImpl( defaultInstitution, mol.getShortLabel());
                 mitabInteractor.getIdentifiers().add(id);
 
                 // add shortlabel as display short as well

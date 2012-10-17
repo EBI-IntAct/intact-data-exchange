@@ -52,6 +52,14 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
         super(processExperimentDetails, processPublicationDetails);
     }
 
+    public SpokeWithoutBaitExpansion(String defaultInstitution) {
+        super(defaultInstitution);
+    }
+
+    public SpokeWithoutBaitExpansion(boolean processExperimentDetails, boolean processPublicationDetails, String defaultInstitution) {
+        super(processExperimentDetails, processPublicationDetails, defaultInstitution);
+    }
+
     ///////////////////////////////////////////
     // Implements ExpansionStrategy contract
 

@@ -32,6 +32,10 @@ public class ProteinConverter extends AbstractEnricher{
         this.rogidGenerator = new RogidGenerator();
     }
 
+    public ProteinConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
+        super(xrefConv, alisConv, defaultInstitution);
+    }
+
     /**
      * Enrich the mitab interactor following data best practices for proteins
      * @param polymer
@@ -118,7 +122,7 @@ public class ProteinConverter extends AbstractEnricher{
             }
             // the shortlabel will be identifier because we need an identifier and will be displayLong as well
             else {
-                CrossReference id = new CrossReferenceImpl( CvDatabase.INTACT, polymer.getShortLabel());
+                CrossReference id = new CrossReferenceImpl( defaultInstitution, polymer.getShortLabel());
                 mitabInteractor.getIdentifiers().add(id);
 
                 if (!hasFoundDisplayShort){

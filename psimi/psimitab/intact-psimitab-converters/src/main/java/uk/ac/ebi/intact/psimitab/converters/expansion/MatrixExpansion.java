@@ -52,6 +52,14 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
         super(processExperimentDetails, processPublicationDetails);
     }
 
+    public MatrixExpansion(String defaultInstitution) {
+        super(defaultInstitution);
+    }
+
+    public MatrixExpansion(boolean processExperimentDetails, boolean processPublicationDetails, String defaultInstitution) {
+        super(processExperimentDetails, processPublicationDetails, defaultInstitution);
+    }
+
     /**
      * Apply the matrix expansion to the given interaction. Essentially, an interaction is created between any two
      * components.

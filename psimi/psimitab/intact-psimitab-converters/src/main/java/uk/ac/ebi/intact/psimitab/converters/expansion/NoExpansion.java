@@ -35,6 +35,14 @@ public class NoExpansion extends BinaryExpansionStrategy{
         super(processExperimentDetails, processPublicationDetails);
     }
 
+    public NoExpansion(String defaultInstitution) {
+        super(defaultInstitution);
+    }
+
+    public NoExpansion(boolean processExperimentDetails, boolean processPublicationDetails, String defaultInstitution) {
+        super(processExperimentDetails, processPublicationDetails, defaultInstitution);
+    }
+
     public Collection<BinaryInteraction> expand(Interaction interaction) throws NotExpandableInteractionException {
 
         BinaryInteraction binaryInteraction = interactionConverter.toBinaryInteraction(interaction);

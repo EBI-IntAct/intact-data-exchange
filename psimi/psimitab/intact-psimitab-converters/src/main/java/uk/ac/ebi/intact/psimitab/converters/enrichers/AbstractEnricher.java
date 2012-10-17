@@ -3,9 +3,10 @@ package uk.ac.ebi.intact.psimitab.converters.enrichers;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.InstitutionUtils;
+import uk.ac.ebi.intact.model.CvDatabase;
+import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.model.InteractorAlias;
+import uk.ac.ebi.intact.model.InteractorXref;
 import uk.ac.ebi.intact.psimitab.converters.converters.AliasConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.CrossReferenceConverter;
 
@@ -23,29 +24,29 @@ public abstract class AbstractEnricher {
 
     protected CrossReferenceConverter<InteractorXref> xRefConverter;
     protected AliasConverter aliasConverter;
+    protected String defaultInstitution = CvDatabase.INTACT;
 
     public AbstractEnricher(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv){
         xRefConverter = xrefConv != null ? xrefConv : new CrossReferenceConverter<InteractorXref>();
         aliasConverter = alisConv != null ? alisConv : new AliasConverter();
     }
 
+    public AbstractEnricher(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv, String defaultInstitution){
+        xRefConverter = xrefConv != null ? xrefConv : new CrossReferenceConverter<InteractorXref>();
+        aliasConverter = alisConv != null ? alisConv : new AliasConverter();
+        if (defaultInstitution != null){
+            this.defaultInstitution = defaultInstitution;
+        }
+    }
+
     protected CrossReference createCrossReferenceFromAc(uk.ac.ebi.intact.model.Interactor mol) {
         CrossReference acField = new CrossReferenceImpl();
 
-        String db = CvDatabase.INTACT;
+        String db = defaultInstitution;
 
         acField.setDatabase(db);
         acField.setIdentifier(mol.getAc());
 
-        if (mol.getOwner() != null){
-            Institution institution = mol.getOwner();
-
-            CvDatabase database = InstitutionUtils.retrieveCvDatabase(IntactContext.getCurrentInstance(), institution);
-
-            if (database != null && database.getShortLabel() != null){
-                acField.setDatabase(database.getShortLabel());
-            }
-        }
         return acField;
     }
 

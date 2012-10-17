@@ -54,6 +54,14 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
         super(processExperimentDetails, processPublicationDetails);
     }
 
+    public SpokeExpansion(String defaultInstitution) {
+        super(defaultInstitution);
+    }
+
+    public SpokeExpansion(boolean processExperimentDetails, boolean processPublicationDetails, String defaultInstitution) {
+        super(processExperimentDetails, processPublicationDetails, defaultInstitution);
+    }
+
     ///////////////////////////////////////////
     // Implements ExpansionStrategy contract
 

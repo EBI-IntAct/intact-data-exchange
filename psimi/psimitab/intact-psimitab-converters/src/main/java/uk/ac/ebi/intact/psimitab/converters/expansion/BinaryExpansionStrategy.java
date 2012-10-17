@@ -54,6 +54,16 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
         this.interactorConverter = new InteractorConverter();
     }
 
+    public BinaryExpansionStrategy(String defaultInstitution){
+        this.interactionConverter = new InteractionConverter(defaultInstitution);
+        this.interactorConverter = new InteractorConverter(defaultInstitution);
+    }
+
+    public BinaryExpansionStrategy(boolean processExperimentDetails, boolean processPublicationDetails, String defaultInstitution){
+        this.interactionConverter = new InteractionConverter(processExperimentDetails, processPublicationDetails, defaultInstitution);
+        this.interactorConverter = new InteractorConverter(defaultInstitution);
+    }
+
     /**
      * Builds a new interaction object based the given interaction template.
      * <br/> Components are replaced by the two given ones.

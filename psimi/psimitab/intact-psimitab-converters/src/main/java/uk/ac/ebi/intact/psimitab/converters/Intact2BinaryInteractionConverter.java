@@ -63,6 +63,14 @@ public class Intact2BinaryInteractionConverter {
         this(new SpokeWithoutBaitExpansion(processExperimentDetails, processPublicationDetails), null);
     }
 
+    public Intact2BinaryInteractionConverter(String defaultInstitution) {
+        this(new SpokeWithoutBaitExpansion(defaultInstitution), null);
+    }
+
+    public Intact2BinaryInteractionConverter(boolean processExperimentDetails, boolean processPublicationDetails, String defaultInstitution) {
+        this(new SpokeWithoutBaitExpansion(processExperimentDetails, processPublicationDetails, defaultInstitution), null);
+    }
+
     /////////////////////
     // Getters & Setters
 

@@ -23,6 +23,10 @@ public class NucleicAcidConverter extends AbstractEnricher{
         super(xrefConv, alisConv);
     }
 
+    public NucleicAcidConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
+        super(xrefConv, alisConv, defaultInstitution);
+    }
+
     /**
      * Enrich the mitab interactor following data best practices for nucleic acids
      * @param nucleicAcid
@@ -92,7 +96,7 @@ public class NucleicAcidConverter extends AbstractEnricher{
             }
             // the shortlabel will be identifier because we need an identifier and will be displayLong as well
             else {
-                CrossReference id = new CrossReferenceImpl( CvDatabase.INTACT, mol.getShortLabel());
+                CrossReference id = new CrossReferenceImpl( defaultInstitution, mol.getShortLabel());
                 mitabInteractor.getIdentifiers().add(id);
 
                 // add shortlabel as display long as well

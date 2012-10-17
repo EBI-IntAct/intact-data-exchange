@@ -26,6 +26,10 @@ public class GeneConverter extends AbstractEnricher{
         super(xrefConv, alisConv);
     }
 
+    public GeneConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
+        super(xrefConv, alisConv, defaultInstitution);
+    }
+
     /**
      * Enrich the mitab interactor following data best practices for nucleic acids
      * @param gene
@@ -100,7 +104,7 @@ public class GeneConverter extends AbstractEnricher{
             if(mol.getAc() != null){
                 // add shortlabel as intact alias only if the display_short is not the shortlabel to not duplicate aliases
                 if (hasFoundDisplayShort){
-                    psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvDatabase.INTACT, mol.getShortLabel(), InteractorConverter.SHORTLABEL  );
+                    psidev.psi.mi.tab.model.Alias altId = new AliasImpl( defaultInstitution, mol.getShortLabel(), InteractorConverter.SHORTLABEL  );
                     mitabInteractor.getAliases().add(altId);
                 }
 
@@ -114,7 +118,7 @@ public class GeneConverter extends AbstractEnricher{
             }
             // the shortlabel will be identifier because we need an identifier and will be displayLong as well
             else {
-                CrossReference id = new CrossReferenceImpl( CvDatabase.INTACT, mol.getShortLabel());
+                CrossReference id = new CrossReferenceImpl( defaultInstitution, mol.getShortLabel());
                 mitabInteractor.getIdentifiers().add(id);
 
                 // add shortlabel as display long as well

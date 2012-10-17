@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
 import uk.ac.ebi.intact.irefindex.seguid.RigidGenerator;
 import uk.ac.ebi.intact.irefindex.seguid.SeguidException;
@@ -28,7 +27,6 @@ import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.Parameter;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.InstitutionUtils;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.psimitab.converters.util.PsimitabTools;
 
@@ -64,6 +62,8 @@ public class InteractionConverter {
     private boolean processExperimentDetails=true;
     private boolean processPublicationDetails = true;
 
+    private String defaultInstitution = CvDatabase.INTACT;
+
     public static String CRC = "intact-crc";
     public static String RIGID = "rigid";
 
@@ -74,7 +74,7 @@ public class InteractionConverter {
         parameterConverter = new ParameterConverter();
         annotationConverter = new AnnotationConverter();
         experimentConverter = new ExperimentConverter();
-        interactorConverter = new InteractorConverter();
+        this.interactorConverter = new InteractorConverter();
     }
 
     public InteractionConverter(boolean processExperimentDetails, boolean processPublicationsDetails){
@@ -84,10 +84,41 @@ public class InteractionConverter {
         parameterConverter = new ParameterConverter();
         annotationConverter = new AnnotationConverter();
         experimentConverter = new ExperimentConverter();
-        interactorConverter = new InteractorConverter();
 
         this.processExperimentDetails = processExperimentDetails;
         this.processPublicationDetails = processPublicationsDetails;
+        this.interactorConverter = new InteractorConverter();
+    }
+
+    public InteractionConverter(String defaultInstitution){
+        this.confidenceConverter = new ConfidenceConverter();
+        cvObjectConverter = new CvObjectConverter();
+        xConverter = new CrossReferenceConverter();
+        parameterConverter = new ParameterConverter();
+        annotationConverter = new AnnotationConverter();
+        experimentConverter = new ExperimentConverter();
+        this.interactorConverter = new InteractorConverter(defaultInstitution);
+
+        if (defaultInstitution != null){
+            this.defaultInstitution = defaultInstitution;
+        }
+    }
+
+    public InteractionConverter(boolean processExperimentDetails, boolean processPublicationsDetails, String defaultInstitution){
+        this.confidenceConverter = new ConfidenceConverter();
+        cvObjectConverter = new CvObjectConverter();
+        xConverter = new CrossReferenceConverter();
+        parameterConverter = new ParameterConverter();
+        annotationConverter = new AnnotationConverter();
+        experimentConverter = new ExperimentConverter();
+
+        this.processExperimentDetails = processExperimentDetails;
+        this.processPublicationDetails = processPublicationsDetails;
+        this.interactorConverter = new InteractorConverter(defaultInstitution);
+
+        if (defaultInstitution != null){
+            this.defaultInstitution = defaultInstitution;
+        }
     }
 
     ///////////////////////////
@@ -110,8 +141,6 @@ public class InteractionConverter {
         if (iterator.hasNext()){
             componentB = iterator.next();
         }
-
-        InteractorConverter interactorConverter = new InteractorConverter();
 
         MitabInteractor convertedInteractorA = interactorConverter.intactToMitab(componentA);
         MitabInteractor convertedInteractorB = interactorConverter.intactToMitab(componentB);
@@ -241,18 +270,8 @@ public class InteractionConverter {
         if (interaction.getAc() != null){
             CrossReference id = new CrossReferenceImpl();
 
-            id.setDatabase(CvDatabase.INTACT);
+            id.setDatabase(defaultInstitution);
             id.setIdentifier(interaction.getAc());
-
-            if (interaction.getOwner() != null){
-                Institution institution = interaction.getOwner();
-
-                CvDatabase database = InstitutionUtils.retrieveCvDatabase(IntactContext.getCurrentInstance(), institution);
-
-                if (database != null && database.getShortLabel() != null){
-                    id.setDatabase(database.getShortLabel());
-                }
-            }
 
             binary.getInteractionAcs().add(id);
         }

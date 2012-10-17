@@ -84,6 +84,21 @@ public class InteractorConverter {
         defaultEnricher = new DefaultInteractorEnricher(xRefConverter, aliasConverter);
     }
 
+    public InteractorConverter(String defaultInstitution){
+        xRefConverter = new CrossReferenceConverter<InteractorXref>();
+        aliasConverter = new AliasConverter();
+        annotationConverter = new AnnotationConverter();
+        organismConverter = new BioSourceConverter();
+        cvObjectConverter = new CvObjectConverter<CvObject>();
+        featureConverter = new FeatureConverter();
+
+        nucleicAcidConverter = new NucleicAcidConverter(xRefConverter, aliasConverter, defaultInstitution);
+        proteinConverter = new ProteinConverter(xRefConverter, aliasConverter, defaultInstitution);
+        smallMoleculeConverter = new SmallMoleculeConverter(xRefConverter, aliasConverter, defaultInstitution);
+        geneConverter = new GeneConverter(xRefConverter, aliasConverter, defaultInstitution);
+        defaultEnricher = new DefaultInteractorEnricher(xRefConverter, aliasConverter, defaultInstitution);
+    }
+
     /**
      *  Converts the database IntactInteractor data model to intactpsimitab datamodel
      *
