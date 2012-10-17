@@ -567,9 +567,9 @@ public class IntactFilter implements InteractionFilter {
                 removeNonPubmedPublicationsFrom(binary);
 
                 removeNonIntactXrefsFrom(binary.getInteractorA().getAlternativeIdentifiers());
-                interactorA.getAliases().clear();
+                binary.getInteractorA().getAliases().clear();
                 removeNonIntactXrefsFrom(binary.getInteractorB().getAlternativeIdentifiers());
-                interactorB.getAliases().clear();
+                binary.getInteractorB().getAliases().clear();
                 binaryInteractions.add(binary);
             }
         }
