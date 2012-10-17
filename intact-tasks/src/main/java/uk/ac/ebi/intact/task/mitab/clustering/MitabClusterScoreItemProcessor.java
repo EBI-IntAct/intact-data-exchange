@@ -109,7 +109,7 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
         // we don't want to check for the database, we take the first identifier
         if (databasesForUniqIdentifier == null){
             // we have an identifier and no requirements for the database
-            if (!interactor.getIdentifiers().isEmpty() && databasesForUniqIdentifier == null){
+            if (!interactor.getIdentifiers().isEmpty()){
                 if (interactor.getIdentifiers().size() > 1){
                     log.warn("Interactor with more than one identifiers : " + interactor.toString() + ". Only the first identifier is taken into account");
                 }
@@ -117,7 +117,7 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
                 return interactor.getIdentifiers().iterator().next().getIdentifier();
             }
             // we don't have an identifier but an alternative identifier and no requirements for the database
-            else if (!interactor.getAlternativeIdentifiers().isEmpty() && databasesForUniqIdentifier == null){
+            else if (!interactor.getAlternativeIdentifiers().isEmpty()){
                 if (interactor.getAlternativeIdentifiers().size() > 1){
                     log.warn("Interactor with more than one identifiers : " + interactor.toString() + ". Only the first identifier is taken into account");
                 }
@@ -128,33 +128,37 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
                 throw new IllegalStateException("Interactor without identifiers : " + interactor.toString() + ". This interactor will be ignored");
             }
         }
-        // we will look first in the alternative identifiers where we have intact acs
-        else if (!interactor.getAlternativeIdentifiers().isEmpty()){
+        // we will look first in the unique identifiers where we have intact acs
+        else if (!interactor.getAlternativeIdentifiers().isEmpty() || !interactor.getIdentifiers().isEmpty()){
             
             for (String db : databasesForUniqIdentifier){
 
-                for (CrossReference ref : interactor.getAlternativeIdentifiers()){
+                for (CrossReference ref : interactor.getIdentifiers()){
                     if (ref.getDatabase() != null && ref.getDatabase().equalsIgnoreCase(db)){
                         return ref.getIdentifier();
                     }
                 }
             }
 
-            log.warn("The identifiers of interactor " + interactor.toString() + " are not recognized so only the first identifier will be taken into account");
+            log.warn("The unique identifiers of interactor " + interactor.toString() + " are not recognized. We will look at the alternative identifiers");
 
-            if (!interactor.getIdentifiers().isEmpty()){
+            if (!interactor.getAlternativeIdentifiers().isEmpty()){
                 for (String db : databasesForUniqIdentifier){
 
-                    for (CrossReference ref : interactor.getIdentifiers()){
+                    for (CrossReference ref : interactor.getAlternativeIdentifiers()){
                         if (ref.getDatabase() != null && ref.getDatabase().equalsIgnoreCase(db)){
                             return ref.getIdentifier();
                         }
                     }
                 }
-                return interactor.getIdentifiers().iterator().next().getIdentifier();
             }
 
-            return interactor.getAlternativeIdentifiers().iterator().next().getIdentifier();
+            if (!interactor.getIdentifiers().isEmpty()){
+                return interactor.getIdentifiers().iterator().next().getIdentifier();
+            }
+            else {
+                return interactor.getAlternativeIdentifiers().iterator().next().getIdentifier();
+            }
         }
         // we cannot identify this interactor
         else {

@@ -54,6 +54,18 @@ public class InteractionExpansionCompositeProcessor implements IntactBinaryInter
         this.intactInteractionConverter = new Intact2BinaryInteractionConverter(this.expansionStategy);
     }
 
+    public InteractionExpansionCompositeProcessor(String defaultInstitution) {
+        this.expansionStategy = new SpokeWithoutBaitExpansion(defaultInstitution);
+        this.binaryItemProcessors = new ArrayList<BinaryInteractionItemProcessor>();
+        this.intactInteractionConverter = new Intact2BinaryInteractionConverter(this.expansionStategy);
+    }
+
+    public InteractionExpansionCompositeProcessor(boolean processExperimentDetails, boolean processPublicationDetails, String defaultInstitution) {
+        this.expansionStategy = new SpokeWithoutBaitExpansion(processExperimentDetails, processPublicationDetails, defaultInstitution);
+        this.binaryItemProcessors = new ArrayList<BinaryInteractionItemProcessor>();
+        this.intactInteractionConverter = new Intact2BinaryInteractionConverter(this.expansionStategy);
+    }
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Collection<? extends BinaryInteraction> process(Interaction intactInteraction) throws Exception {
 
