@@ -7,6 +7,7 @@ import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
@@ -88,7 +89,7 @@ public class IntactFilter implements InteractionFilter {
      * we create a new IntactFilter
      */
     public IntactFilter(InteractionExporter exporter){
-        this.interactionConverter = new Intact2BinaryInteractionConverter();
+        this.interactionConverter = new Intact2BinaryInteractionConverter(CvDatabase.INTACT);
         this.exporter = exporter;
         this.queryFactory = new QueryBuilder();
         negativeInteractions.addAll(this.queryFactory.getNegativeInteractionsPassingFilter());
@@ -555,19 +556,19 @@ public class IntactFilter implements InteractionFilter {
                 uniprotA = uniprotB;
                 binary.setInteractorA(interactorB);
             }
-            else if (uniprotB == null){
+            else if (interactorB == null){
                 uniprotB = uniprotA;
                 binary.setInteractorB(interactorA);
             }
 
             if ((uniprotA != null && uniprotB != null && excludeNonUniprot) || !excludeNonUniprot){
 
-                FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+                FilterUtils.processGeneNames(binary.getInteractorA(), uniprotA, binary.getInteractorB(), uniprotB, context);
                 removeNonPubmedPublicationsFrom(binary);
 
-                removeNonIntactXrefsFrom(interactorA.getAlternativeIdentifiers());
+                removeNonIntactXrefsFrom(binary.getInteractorA().getAlternativeIdentifiers());
                 interactorA.getAliases().clear();
-                removeNonIntactXrefsFrom(interactorB.getAlternativeIdentifiers());
+                removeNonIntactXrefsFrom(binary.getInteractorB().getAlternativeIdentifiers());
                 interactorB.getAliases().clear();
                 binaryInteractions.add(binary);
             }

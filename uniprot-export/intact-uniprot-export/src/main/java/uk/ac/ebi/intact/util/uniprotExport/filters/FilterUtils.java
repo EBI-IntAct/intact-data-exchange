@@ -49,6 +49,9 @@ public class FilterUtils {
      * @returnthe gene name of an interactor. If it doesn't exist, will return the locus name and if it doesn't exist, the ORF name
      */
     public static String retrieveInteractorGeneName(Interactor interactor){
+        if (interactor == null){
+            return null;
+        }
         Collection<Alias> aliases = interactor.getAliases();
         String geneName = null;
         String locusName = null;

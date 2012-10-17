@@ -96,12 +96,21 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
                 }
             }
 
+            if (interactorA == null){
+               uniprotA = uniprotB;
+               interaction.setInteractorA(interactorB);
+            }
+            else if (interactorB == null){
+                uniprotB = uniprotA;
+                interaction.setInteractorB(interactorA);
+            }
+
             if (!intactAcs.isEmpty()){
                 if (excludeNonUniprotInteractors && uniprotA != null && uniprotB != null){
-                    processClustering(clusterScore, context, binaryIdentifier, interaction, intactAcs, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded);
+                    processClustering(clusterScore, context, binaryIdentifier, interaction, intactAcs, interaction.getInteractorA(), uniprotA, interaction.getInteractorB(), uniprotB, excludeSpokeExpanded);
                 }
                 else if (!excludeNonUniprotInteractors){
-                    processClustering(clusterScore, context, binaryIdentifier, interaction, intactAcs, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded);
+                    processClustering(clusterScore, context, binaryIdentifier, interaction, intactAcs, interaction.getInteractorA(), uniprotA, interaction.getInteractorB(), uniprotB, excludeSpokeExpanded);
                 }
             }
 

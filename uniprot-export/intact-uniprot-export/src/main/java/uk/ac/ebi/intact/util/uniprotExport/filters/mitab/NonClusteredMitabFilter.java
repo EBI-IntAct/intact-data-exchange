@@ -130,10 +130,10 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
 
                 if (intactAc != null){
                     if (excludeNonUniprotInteractors && uniprotA != null && uniprotB != null){
-                        processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded);
+                        processClustering(context, interactionToProcess, interaction, intactAc, interaction.getInteractorA(), uniprotA, interaction.getInteractorB(), uniprotB, excludeSpokeExpanded);
                     }
                     else if (!excludeNonUniprotInteractors){
-                        processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded);
+                        processClustering(context, interactionToProcess, interaction, intactAc, interaction.getInteractorA(), uniprotA, interaction.getInteractorB(), uniprotB, excludeSpokeExpanded);
                     }
                 }
             }
