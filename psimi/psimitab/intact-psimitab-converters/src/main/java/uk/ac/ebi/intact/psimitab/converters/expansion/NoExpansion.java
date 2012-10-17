@@ -63,6 +63,9 @@ public class NoExpansion extends BinaryExpansionStrategy{
     }
 
     public boolean isExpandable(Interaction interaction) {
+        if ( interaction.getComponents().size() > 2 || interaction.getComponents().size() == 0 ) {
+            return false;
+        }
         return true;
     }
 }

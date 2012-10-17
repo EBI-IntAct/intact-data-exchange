@@ -113,12 +113,8 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
     }
 
     protected boolean isExpandableBasic(Interaction interaction) {
-        if (interaction.getComponents().size() == 1) {
-            Component c = interaction.getComponents().iterator().next();
-
-            return (c.getStoichiometry() >= 2 ||
-                    containsRole(c.getExperimentalRoles(), new String[]{CvExperimentalRole.SELF_PSI_REF, PUTATIVE_SELF_PSI_REF}));
-
+        if (interaction.getComponents().isEmpty()) {
+            return false;
         }
 
         return true;
