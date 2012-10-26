@@ -56,7 +56,14 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
         
         String firstInteractor = extractInteractorIdentifier(interactorA);
         String secondInteractor = extractInteractorIdentifier(interactorB);
-        
+
+        if (firstInteractor == null){
+            firstInteractor = secondInteractor;
+        }
+        else if (secondInteractor == null){
+            secondInteractor = firstInteractor;
+        }
+
         BinaryPair currentPair = new BinaryPair(firstInteractor, secondInteractor);
         
         if (scores.containsKey(currentPair)){
@@ -103,7 +110,7 @@ public class MitabClusterScoreItemProcessor implements ItemProcessor<BinaryInter
     private String extractInteractorIdentifier(Interactor interactor){
 
         if (interactor == null){
-            return "-";
+            return null;
         }
 
         // we don't want to check for the database, we take the first identifier
