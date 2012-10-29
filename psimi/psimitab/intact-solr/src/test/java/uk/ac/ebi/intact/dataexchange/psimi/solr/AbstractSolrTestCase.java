@@ -1,8 +1,10 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.hupo.psi.mi.psicquic.model.PsicquicSolrException;
 import org.junit.After;
 import org.junit.Before;
@@ -51,9 +53,10 @@ public class AbstractSolrTestCase {
     }
 
     public void assertCountOntologyTerm( Number expectedCount, String searchQuery ) throws SolrServerException, PsicquicSolrException {
-        IntactSolrSearcher searcher = new IntactSolrSearcher( solrJettyRunner.getSolrServer( CoreNames.CORE_ONTOLOGY_PUB ) );
-        IntactSolrSearchResult result = (IntactSolrSearchResult) searcher.search( searchQuery, null, null, null, null );
-        assertEquals( expectedCount.longValue(), result.getNumberResults() );
+        HttpSolrServer solrServer = solrJettyRunner.getSolrServer( CoreNames.CORE_ONTOLOGY_PUB );
+        SolrQuery solrQuery = new SolrQuery(searchQuery);
+        org.apache.solr.client.solrj.response.QueryResponse solrResponse = solrServer.query(solrQuery);
+        assertEquals( expectedCount.longValue(), solrResponse.getResults().getNumFound());
     }
 
     public void assertCountInteraction( Number expectedCount, String searchQuery ) throws IntactSolrException, SolrServerException, PsicquicSolrException {

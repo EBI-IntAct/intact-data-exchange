@@ -23,6 +23,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.hupo.psi.mi.psicquic.model.PsicquicSolrException;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.bridges.ontologies.OntologyMapping;
@@ -249,6 +250,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
+    @Ignore
     // cannot retry like that
     public void retrying() throws Exception {
         getSolrJettyRunner().stop();
