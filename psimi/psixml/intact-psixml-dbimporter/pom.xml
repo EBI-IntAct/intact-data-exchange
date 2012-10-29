@@ -66,7 +66,13 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.bridges</groupId>
             <artifactId>intact-uniprot</artifactId>
-            <version>2.1.6-SNAPSHOT</version>
+            <version>2.1.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi</groupId>
@@ -75,7 +81,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>
-            <version>2.6.1-SNAPSHOT</version>
+            <version>2.6.1</version>
         </dependency>
 
         <!--Spring-->
@@ -100,7 +106,7 @@
             <version>${spring.version}</version>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>uk.ac.ebi.uniprot.kraken</groupId>
             <artifactId>uniprotjapi</artifactId>
             <version>LATEST</version>
@@ -110,7 +116,7 @@
                     <artifactId>spring-context</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency>-->
 
     </dependencies>
 
