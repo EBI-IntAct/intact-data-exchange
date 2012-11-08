@@ -339,7 +339,7 @@ public class InteractionOntologyLuceneIndexer {
 
         for (FacetField facetField : facetFields){
             // uniprot taxonomy
-            if (FieldNames.SOURCE_FACET.equals(facetField.getName())){
+            if (FieldNames.SPECIES_FACET.equals(facetField.getName())){
 
                 List<FacetField.Count> facetCounts = facetField.getValues();
 
