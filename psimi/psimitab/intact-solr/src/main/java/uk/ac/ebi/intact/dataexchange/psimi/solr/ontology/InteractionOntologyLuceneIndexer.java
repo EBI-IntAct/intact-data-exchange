@@ -47,6 +47,8 @@ public class InteractionOntologyLuceneIndexer {
     private IntactSolrSearcher interactionSearcher;
     private Map<InteractionOntologyTerm, InteractionOntologyTermResults> processedTerms;
 
+    private String [] xrefFilters = new String[] {"chebi", "interpro", "go"};
+
     private int numberRetries = 10;
 
     public InteractionOntologyLuceneIndexer(String ontologySolrUrl, String interactionOntologyUrl) {
@@ -281,6 +283,12 @@ public class InteractionOntologyLuceneIndexer {
 
     private List<String> initializeListOfFacetFieldsToRetrieve() {
         List<String> facetFieldsWithResults = new ArrayList<String>(9);
+        // uniprot taxonomy
+        facetFieldsWithResults.add(FieldNames.SPECIES_FACET);
+        // chebi taxonomy
+        facetFieldsWithResults.add(FieldNames.ID_FACET);
+
+        // psi mi ontologies
         facetFieldsWithResults.add(FieldNames.DETMETHOD_FACET);
         facetFieldsWithResults.add(FieldNames.TYPE_FACET);
         facetFieldsWithResults.add(FieldNames.BIOLOGICAL_ROLE_FACET);
@@ -288,6 +296,8 @@ public class InteractionOntologyLuceneIndexer {
         facetFieldsWithResults.add(FieldNames.INTERACTOR_DET_METHOD_FACET);
         facetFieldsWithResults.add(FieldNames.INTERACTION_ANNOTATIONS_FACET);
         facetFieldsWithResults.add(FieldNames.INTERACTOR_FEATURE_FACET);
+
+        // GO and interpro ontologies
         facetFieldsWithResults.add(FieldNames.INTERACTION_XREF_FACET);
         facetFieldsWithResults.add(FieldNames.INTERACTOR_XREF_FACET);
 
@@ -328,9 +338,32 @@ public class InteractionOntologyLuceneIndexer {
         Collection<FieldCount> facetFieldCounts = new ArrayList<FieldCount>(facetFields.size());
 
         for (FacetField facetField : facetFields){
+            // uniprot taxonomy
+            if (FieldNames.SOURCE_FACET.equals(facetField.getName())){
 
+                List<FacetField.Count> facetCounts = facetField.getValues();
+
+                // we reached the max number of results
+                if (facetCounts != null && facetCounts.size() == max){
+                    fieldsWithResults.add(FieldNames.SPECIES_FACET);
+                }
+
+                collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.SPECIES);
+            }
+            // CHEBI taxonomy
+            else if (FieldNames.ID_FACET.equals(facetField.getName())){
+
+                List<FacetField.Count> facetCounts = facetField.getValues();
+
+                // we reached the max number of results
+                if (facetCounts != null && facetCounts.size() == max){
+                    fieldsWithResults.add(FieldNames.ID_FACET);
+                }
+
+                collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.ID, "chebi");
+            }
             // add detection methods fields
-            if (FieldNames.DETMETHOD_FACET.equals(facetField.getName())){
+            else if (FieldNames.DETMETHOD_FACET.equals(facetField.getName())){
 
                 List<FacetField.Count> facetCounts = facetField.getValues();
 
@@ -423,7 +456,7 @@ public class InteractionOntologyLuceneIndexer {
                     fieldsWithResults.add(FieldNames.INTERACTION_XREF_FACET);
                 }
 
-                collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.INTERACTION_XREF);
+                collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.INTERACTION_XREF, xrefFilters);
             }
             // add interactor
             else if (FieldNames.INTERACTOR_XREF_FACET.equals(facetField.getName())){
@@ -435,7 +468,7 @@ public class InteractionOntologyLuceneIndexer {
                     fieldsWithResults.add(FieldNames.INTERACTOR_XREF_FACET);
                 }
 
-                collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.INTERACTOR_XREF);
+                collectFacetCountsFor(facetFieldCounts, facetCounts, FieldNames.INTERACTOR_XREF, xrefFilters);
             }
         }
 
@@ -447,6 +480,37 @@ public class InteractionOntologyLuceneIndexer {
             for (FacetField.Count count : facetCounts){
                 FieldCount fieldCount = new FieldCount(count.getName(), count.getCount(), searchFieldName);
                 facetFieldCounts.add(fieldCount);
+            }
+        }
+    }
+
+    private void collectFacetCountsFor(Collection<FieldCount> facetFieldCounts, List<FacetField.Count> facetCounts, String searchFieldName, String prefix) {
+        if (facetCounts != null && !facetCounts.isEmpty()){
+            for (FacetField.Count count : facetCounts){
+                if (prefix == null || (prefix != null && count.getName().startsWith(prefix+":"))){
+                    FieldCount fieldCount = new FieldCount(count.getName(), count.getCount(), searchFieldName);
+                    facetFieldCounts.add(fieldCount);
+                }
+            }
+        }
+    }
+
+    private void collectFacetCountsFor(Collection<FieldCount> facetFieldCounts, List<FacetField.Count> facetCounts, String searchFieldName, String[] prefixes) {
+        if (facetCounts != null && !facetCounts.isEmpty()){
+            for (FacetField.Count count : facetCounts){
+                if (prefixes == null){
+                    FieldCount fieldCount = new FieldCount(count.getName(), count.getCount(), searchFieldName);
+                    facetFieldCounts.add(fieldCount);
+                }
+                else {
+                    for (String prefix : prefixes){
+                        if (prefix != null && count.getName().startsWith(prefix+":")){
+                            FieldCount fieldCount = new FieldCount(count.getName(), count.getCount(), searchFieldName);
+                            facetFieldCounts.add(fieldCount);
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
@@ -500,6 +564,14 @@ public class InteractionOntologyLuceneIndexer {
         public String getValue() {
             return value;
         }
+    }
+
+    public String[] getXrefFilters() {
+        return xrefFilters;
+    }
+
+    public void setXrefFilters(String[] xrefFilters) {
+        this.xrefFilters = xrefFilters;
     }
 
     /*public static void main(String[] args) throws IOException, SolrServerException, PsicquicSolrException {
