@@ -10,7 +10,7 @@
 
     <artifactId>intact-tasks</artifactId>
     <packaging>jar</packaging>
-    <version>2.1.6.2</version>
+    <version>2.1.6.3</version>
 
     <name>IntAct Data Exchange :: Tasks</name>
     <description>General Tasks and Jobs</description>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-solr-core</artifactId>
-            <version>2.1.6.2</version>
+            <version>2.1.6.3</version>
         </dependency>
 
         <!-- Cluster & Scoring MI -->
