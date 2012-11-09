@@ -48,7 +48,6 @@ import java.util.Map;
  * @version $Id$
  */
 @ContextConfiguration(locations = {"/META-INF/mitab-creation.spring.xml", "/META-INF/job-tests.spring.xml"})
-@Transactional(propagation = Propagation.NEVER)
 public class MitabCreationTest extends IntactBasicTestCase {
 
     @Resource(name = "intactBatchJobLauncher")
@@ -77,6 +76,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
+    @Transactional(propagation = Propagation.NEVER)
     public void writeMitab() throws Exception {
 
         TransactionStatus status = getDataContext().beginTransaction();
@@ -144,6 +144,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
+    @Transactional(propagation = Propagation.NEVER)
     public void writeMitabSelf() throws Exception {
 
         TransactionStatus status = getDataContext().beginTransaction();
@@ -188,6 +189,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
+    @Transactional(propagation = Propagation.NEVER)
     public void writeMitabSelf_stoichioGreaterThan2() throws Exception {
 
         TransactionStatus status = getDataContext().beginTransaction();
@@ -231,6 +233,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
+    @Transactional(propagation = Propagation.NEVER)
     public void writeMitab_withXrefs() throws Exception {
         TransactionStatus status = getDataContext().beginTransaction();
 
@@ -268,6 +271,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Test
     @DirtiesContext
+    @Transactional(propagation = Propagation.NEVER)
     public void writeMitab_negative() throws Exception {
 
         TransactionStatus status = getDataContext().beginTransaction();
