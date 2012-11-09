@@ -33,7 +33,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.CoreNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.server.IntactSolrJettyRunner;
@@ -52,9 +51,6 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
     @Resource(name = "intactBatchJobLauncher")
     private JobLauncher jobLauncher;
-
-    @Autowired
-    private CorePersister corePersister;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -92,7 +88,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
         Experiment exp = getMockBuilder().createExperimentRandom(3);
         exp.addAnnotation( new Annotation(exp.getOwner(), internalRemark, "some internal information" ) );
 
-        corePersister.saveOrUpdate(exp);
+        getCorePersister().saveOrUpdate(exp);
 
         Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
         Protein proteinB = getMockBuilder().createProtein("Q00001", "protB");
@@ -110,7 +106,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
         proteinA.getBioSource().setTaxId("9606");
 
-        corePersister.saveOrUpdate(interaction);
+        getCorePersister().saveOrUpdate(interaction);
 
         Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
 
@@ -151,7 +147,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
         Experiment exp = getMockBuilder().createExperimentRandom(3);
 
-        corePersister.saveOrUpdate(exp);
+        getCorePersister().saveOrUpdate(exp);
 
         Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
 
@@ -167,7 +163,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
         proteinA.getBioSource().setTaxId("9606");
 
-        corePersister.saveOrUpdate(interaction);
+        getCorePersister().saveOrUpdate(interaction);
 
         Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
 
@@ -195,7 +191,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
         TransactionStatus status = getDataContext().beginTransaction();
         Experiment exp = getMockBuilder().createExperimentRandom(3);
 
-        corePersister.saveOrUpdate(exp);
+        getCorePersister().saveOrUpdate(exp);
 
         Protein proteinA = getMockBuilder().createProtein("P12345", "protA");
 
@@ -211,7 +207,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
         proteinA.getBioSource().setTaxId("9606");
 
-        corePersister.saveOrUpdate(interaction);
+        getCorePersister().saveOrUpdate(interaction);
 
         Assert.assertEquals(4, getDaoFactory().getInteractionDao().countAll());
 
@@ -250,7 +246,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
         CvXrefQualifier imexPrimary = getMockBuilder().createCvObject(CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
         interaction.addXref(getMockBuilder().createXref(interaction, "IM-1234-1", imexPrimary, imexDb));
 
-        corePersister.saveOrUpdate(interaction);
+        getCorePersister().saveOrUpdate(interaction);
 
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
 
@@ -287,7 +283,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
 
         interaction.addAnnotation(getMockBuilder().createAnnotation("because of this and that", null, CvTopic.NEGATIVE));
 
-        corePersister.saveOrUpdate(interaction);
+        getCorePersister().saveOrUpdate(interaction);
 
         Assert.assertEquals(1, getDaoFactory().getInteractionDao().countAll());
 
