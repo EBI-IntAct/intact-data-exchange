@@ -89,6 +89,7 @@ public class InteractionExpansionCompositeProcessor implements IntactBinaryInter
         for (BinaryInteraction binaryInteraction : binaryInteractions) {
 
             if (isFirst){
+                isFirst = false;
                 for (BinaryInteractionItemProcessor delegate : binaryItemProcessors) {
                     delegate.onlyProcessInteractors(false);
                     binaryInteraction = delegate.process(binaryInteraction);
