@@ -45,15 +45,16 @@
         </property>
     </bean>
 
-    <bean id="intactReleaseDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <bean id="intactReleaseDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${db.driver}"/>
         <property name="url" value="${db.url}"/>
         <property name="username" value="${db.user}"/>
         <property name="password" value="${db.password}"/>
-        <property name="maxActive" value="10"/>
-        <property name="maxIdle" value="5"/>
-        <property name="minIdle" value="2"/>
-        <property name="maxWait" value="5000"/>
+        <property name="initialSize" value="5" />
+        <property name="maxActive" value="20" />
+        <property name="MaxIdle" value="10"/>
+        <property name="MinIdle" value="2"/>
+        <property name="maxWait" value="5000" />
     </bean>
 
 </beans>
