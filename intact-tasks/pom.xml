@@ -3,14 +3,14 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>2.1.7-SNAPSHOT</version>
+        <version>2.1.6</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-tasks</artifactId>
     <packaging>jar</packaging>
-    <version>2.1.7-SNAPSHOT</version>
+    <version>2.1.6.4</version>
 
     <name>IntAct Data Exchange :: Tasks</name>
     <description>General Tasks and Jobs</description>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-batch</artifactId>
-            <version>2.6.2-SNAPSHOT</version>
+            <version>2.6.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-io</groupId>
@@ -43,13 +43,13 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>
-            <version>2.6.2-SNAPSHOT</version>
+            <version>2.6.1</version>
         </dependency>
 
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psimitab-converters</artifactId>
-            <version>2.1.7-SNAPSHOT</version>
+            <version>2.1.6</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
@@ -61,14 +61,14 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-solr-core</artifactId>
-            <version>2.1.7-SNAPSHOT</version>
+            <version>2.1.6.3</version>
         </dependency>
 
         <!-- Cluster & Scoring MI -->
         <dependency>
-           <groupId>uk.ac.ebi.enfin.mi.cluster</groupId>
-           <artifactId>micluster</artifactId>
-           <version>1.7.1</version>
+            <groupId>uk.ac.ebi.enfin.mi.cluster</groupId>
+            <artifactId>micluster</artifactId>
+            <version>1.7.1</version>
         </dependency>
 
         <!-- Logging -->
