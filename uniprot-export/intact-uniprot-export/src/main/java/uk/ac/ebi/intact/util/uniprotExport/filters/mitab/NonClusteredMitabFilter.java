@@ -123,7 +123,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
                     uniprotA = uniprotB;
                     interaction.setInteractorA(interactorB);
                 }
-                else if (uniprotB == null){
+                else if (interactorB == null){
                     uniprotB = uniprotA;
                     interaction.setInteractorB(interactorA);
                 }
