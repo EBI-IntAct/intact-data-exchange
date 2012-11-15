@@ -211,7 +211,7 @@ not normally be changed by applications.
         <!-- IntAct specific fields necessary for filtering external curators/institutions -->
         <field name="source" type="textIntact" default="-"/>
         <field name="intact-miscore" type="doubleIntact" default="0"/>
-        <field name="geneName" type="stringIntact" default=""/>
+        <field name="geneName" type="textIntact" default=""/>
 
         <!-- old IntAct Extended -->
 
