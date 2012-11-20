@@ -147,7 +147,7 @@ public class InteractorConverter extends AbstractAnnotatedObjectConverter<Intera
                         sequence = IntactCore.ensureInitializedSequence(polymer);
                     }
                     else {
-                        sequence = interactor.getSequence();
+                        sequence = polymer.getSequence();
                     }
                     interactor.setSequence( sequence );
                 }
