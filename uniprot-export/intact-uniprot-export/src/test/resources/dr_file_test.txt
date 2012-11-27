@@ -1,4 +1,0 @@
-DR   IntAct; Q9NET8; 2.
-DR   IntAct; Q22534; 1.
-DR   IntAct; Q17862; 1.
-DR   IntAct; P33327; 1.
