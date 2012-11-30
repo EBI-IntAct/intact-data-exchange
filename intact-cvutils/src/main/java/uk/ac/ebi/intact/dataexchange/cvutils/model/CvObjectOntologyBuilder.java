@@ -92,6 +92,7 @@ public class CvObjectOntologyBuilder {
         mi2Class.put( "MI:0647", CvParameterUnit.class );
         mi2Class.put( "IAX:0001", CvTissue.class );
         mi2Class.put( "IAX:0002", CvCellType.class );
+        mi2Class.put("MI:1064", CvConfidenceType.class);
 
         //
         class2mi = new HashMap<String, String>();
@@ -211,10 +212,12 @@ public class CvObjectOntologyBuilder {
                 for ( String child : children ) {
                     Set<String> linkedSet4child = map4misWithMoreParent.get( oboObj.getID() );
 
-                    LinkedHashSet<String> newLinkedSet4child = new LinkedHashSet<String>();
-                    newLinkedSet4child.addAll( linkedSet4child );
+                    if (linkedSet4child != null){
+                        LinkedHashSet<String> newLinkedSet4child = new LinkedHashSet<String>();
+                        newLinkedSet4child.addAll( linkedSet4child );
 
-                    map4misWithMoreParent.put( child, newLinkedSet4child );
+                        map4misWithMoreParent.put( child, newLinkedSet4child );
+                    }
                 }
 
                 /*
@@ -247,10 +250,12 @@ public class CvObjectOntologyBuilder {
                * */
                 if ( cvClass == null ) {
                     cvClass = findCvClassforMI( oboObj.getID() );
-                    String processedKey_ = createCvKey( cvClass, oboObj.getID() );
+                    if (cvClass != null){
+                        String processedKey_ = createCvKey( cvClass, oboObj.getID() );
 
-                    if ( processed.containsKey( processedKey_ ) ) {
-                        return ( T ) processed.get( processedKey_ );
+                        if ( processed.containsKey( processedKey_ ) ) {
+                            return ( T ) processed.get( processedKey_ );
+                        }
                     }
                 }
 
@@ -546,13 +551,11 @@ public class CvObjectOntologyBuilder {
                         final String parentId = parentLink.getParent().getID();
                         cvClass = findCvClassforMI(parentId);
 
-                        if (cvClass == null) {
-                            throw new RuntimeException("Couldn't find class type for identifier: " + parentId);
+                        if (cvClass != null) {
+                            hashSet.add(cvClass.getSimpleName());
+                            //parentMap.put(miIdentifierRight+":"+cvClass.getSimpleName(),id);
+                            map4misWithMoreParent.put(oboObj.getID(), hashSet);
                         }
-
-                        hashSet.add(cvClass.getSimpleName());
-                        //parentMap.put(miIdentifierRight+":"+cvClass.getSimpleName(),id);
-                        map4misWithMoreParent.put(oboObj.getID(), hashSet);
                     }  
                 }
             }
