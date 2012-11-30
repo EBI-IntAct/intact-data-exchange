@@ -1,6 +1,0 @@
-!gaf-version: 2.0
-UniProtKB	Q9NET8			GO:0005515	PMID:14704431	IPI	UniProtKB:Q22534-2							IntAct		
-UniProtKB	Q22534			GO:0005515	PMID:14704431	IPI	UniProtKB:Q9NET8							IntAct	occurs_in(GO:xxxxxx1)|occurs_in(GO:xxxxxx2)		UniProtKB:Q22534-2
-UniProtKB	Q9NET8			GO:0005515	PMID:14704431	IPI	UniProtKB:Q17862:PRO_xxxxxxx							IntAct		
-UniProtKB	Q17862			GO:0005515	PMID:14704431	IPI	UniProtKB:Q9NET8							IntAct		UniProtKB:Q17862:PRO_xxxxxxx
-UniProtKB	P33327			GO:0042802	PMID:18467557	IPI	UniProtKB:P33327-3							IntAct		UniProtKB:P33327-3
