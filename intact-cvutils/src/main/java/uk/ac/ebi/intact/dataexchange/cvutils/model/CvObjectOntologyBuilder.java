@@ -314,9 +314,11 @@ public class CvObjectOntologyBuilder {
                     }
                     Dbxref defDbxref = ( Dbxref ) dbxrefArray[i];
                     CvTermXref cvtermXref = addQualifiersForOtherDbXreferences( defDbxref, firstDatabasexref, uniqueResid );
-                    xref = toXref( cvObject, cvtermXref.getId(), cvtermXref.getQualifier(), cvtermXref.getDatabase() );
-                    if ( xref != null ) {
-                        cvObject.addXref( xref );
+                    if (cvtermXref != null){
+                        xref = toXref( cvObject, cvtermXref.getId(), cvtermXref.getQualifier(), cvtermXref.getDatabase() );
+                        if ( xref != null ) {
+                            cvObject.addXref( xref );
+                        }
                     }
                 }
             } else {
@@ -662,7 +664,7 @@ public class CvObjectOntologyBuilder {
             database = CvDatabase.CHEBI;
             qualifier = CvXrefQualifier.IDENTITY;
         } else {
-            throw new IllegalArgumentException( "Unknown database: " + defDbxref.getDatabaseID() + " (" + defDbxref.getDatabase() + ")" );
+            return null;
         }
 
         if ( log.isTraceEnabled() )
