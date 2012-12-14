@@ -18,12 +18,12 @@ package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import uk.ac.ebi.intact.bridges.citexplore.exceptions.PublicationNotFoundException;
+import uk.ac.ebi.intact.bridges.citexplore.exceptions.UnexpectedException;
+import uk.ac.ebi.intact.bridges.citexplore.util.ExperimentAutoFill;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
-import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
-import uk.ac.ebi.intact.util.cdb.PublicationNotFoundException;
-import uk.ac.ebi.intact.util.cdb.UnexpectedException;
 
 /**
  * TODO comment this

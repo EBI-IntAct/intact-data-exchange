@@ -19,6 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import uk.ac.ebi.intact.bridges.citexplore.exceptions.InvalidPubmedException;
+import uk.ac.ebi.intact.bridges.citexplore.util.ExperimentAutoFill;
 import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
@@ -27,8 +29,6 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.ExperimentUtils;
-import uk.ac.ebi.intact.util.cdb.ExperimentAutoFill;
-import uk.ac.ebi.intact.util.cdb.InvalidPubmedException;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -122,7 +122,7 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
 
         if (autoFill != null) {
             if (experiment.getShortLabel() == null || !ExperimentUtils.matchesSyncedLabel(experiment.getShortLabel())) {
-                experiment.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(autoFill.getShortlabel(false)));
+                experiment.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(autoFill.getShortlabel()));
             }
             experiment.setFullName(autoFill.getFullname());
 
