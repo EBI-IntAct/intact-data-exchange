@@ -40,6 +40,13 @@ public class IdSequenceGenerator {
         return instance.get();
     }
 
+    /**
+     * Remove threadlocal instance
+     */
+    public static void removeInstance(){
+        instance.remove();
+    }
+
     public synchronized int nextId() {
         currentId++;
         return currentId;

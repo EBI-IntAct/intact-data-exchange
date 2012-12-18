@@ -792,4 +792,11 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         }
         this.interactionTypeConverter.setCheckInitializedCollections(check);
     }
+
+    /**
+     * Remove ontology threadlocal
+     */
+    public static void removeOntology(){
+        ontology.remove();
+    }
 }

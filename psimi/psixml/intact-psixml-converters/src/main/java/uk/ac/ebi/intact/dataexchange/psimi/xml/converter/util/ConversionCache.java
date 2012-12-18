@@ -15,14 +15,13 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
+import org.apache.commons.collections.map.IdentityMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.collections.map.IdentityMap;
-
-import java.util.Map;
-import java.util.HashMap;
-
 import psidev.psi.mi.xml.model.HasId;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Stores a cache of elements with id
@@ -48,6 +47,13 @@ public class ConversionCache {
             return new ConversionCache();
         }
     };
+
+    /**
+     * Remove threadlocal instance
+     */
+    public static void remove(){
+        instance.remove();
+    }
 
     public static Object getElement(Object id) {
         if (id == null) return null;

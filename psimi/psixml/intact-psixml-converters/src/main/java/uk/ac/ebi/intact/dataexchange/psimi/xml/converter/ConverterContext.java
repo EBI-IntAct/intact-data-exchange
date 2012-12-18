@@ -63,6 +63,10 @@ public class ConverterContext {
         return instance.get();
     }
 
+    public static void removeInstance() {
+        instance.remove();
+    }
+
     private ConverterContext() {
         this.generateExpandedXml = true;
         this.configInteractor = new InteractorConverterConfig();
