@@ -38,11 +38,13 @@ import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.persister.CorePersister;
 import uk.ac.ebi.intact.core.persister.PersisterException;
 import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.EntryConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InstitutionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared.InteractionConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IdSequenceGenerator;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher.PsiEnricherException;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.FeatureUtils;
@@ -104,6 +106,24 @@ public class PsiExchangeImpl implements PsiExchange {
             throw new IllegalArgumentException("You must give a non null psiVersion");
         }
         this.psiVersion = psiVersion;
+    }
+
+    @Override
+    public void close() {
+        // close ontology threadlocal from interactionConverter
+        InteractionConverter.removeOntology();
+
+        // close converterContext threadlocal
+        ConverterContext.removeInstance();
+
+        // close ConverterCache threadlocal
+        ConversionCache.remove();
+
+        // close idSequenceGenerator threadlocal
+        IdSequenceGenerator.removeInstance();
+
+        // close XML ConverterContext threadlocal
+        psidev.psi.mi.xml.converter.ConverterContext.remove();
     }
 
     /**

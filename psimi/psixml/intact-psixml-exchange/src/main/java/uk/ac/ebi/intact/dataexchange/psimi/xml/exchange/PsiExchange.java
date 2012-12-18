@@ -1,21 +1,18 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange;
 
-import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
+import psidev.psi.mi.xml.PsimiXmlForm;
+import psidev.psi.mi.xml.PsimiXmlVersion;
+import psidev.psi.mi.xml.model.EntrySet;
+import psidev.psi.mi.xml.xmlindex.IndexedEntry;
 import uk.ac.ebi.intact.core.persister.PersisterException;
-import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.core.persister.stats.PersisterStatistics;
 import uk.ac.ebi.intact.model.IntactEntry;
+import uk.ac.ebi.intact.model.Interaction;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.io.File;
-
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Propagation;
-import psidev.psi.mi.xml.xmlindex.IndexedEntry;
-import psidev.psi.mi.xml.model.EntrySet;
-import psidev.psi.mi.xml.PsimiXmlForm;
-import psidev.psi.mi.xml.PsimiXmlVersion;
 
 /**
  * Psi Exchange definition.
@@ -50,4 +47,6 @@ public interface PsiExchange {
     public PsimiXmlVersion getPsiVersion();
 
     public void setPsiVersion(PsimiXmlVersion psiVersion);
+
+    public void close();
 }
