@@ -29,11 +29,11 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
     private static final Logger logger = Logger.getLogger(CCLineConverter1.class);
 
     // set containing the SecondCCParameters in case of feature chains
-    //private Set<SecondCCParameters1> processedCCParametersForFeatureChains;
+    private Set<SecondCCParameters1> processedCCParametersForFeatureChains;
 
     public CCLineConverter1(){
         super();
-        //processedCCParametersForFeatureChains = new HashSet<SecondCCParameters1>();
+        processedCCParametersForFeatureChains = new HashSet<SecondCCParameters1>();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
 
     @Override
     public CCParameters<SecondCCParameters1> convertInteractionsIntoCCLines(Set<EncoreInteraction> interactions, MiClusterContext context, String masterUniprot){
-        //processedCCParametersForFeatureChains.clear();
+        processedCCParametersForFeatureChains.clear();
 
         String firstIntactAc = null;
         String geneName1 = context.getGeneNames().get(masterUniprot);
@@ -191,7 +191,7 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                             }
                             geneName2 = geneName1;
                         }
-                        else {
+                        /*else {
                             firstUniprot = uniprot1;
                             secondUniprot = uniprot2;
                             taxId2 = organismsB[0];
@@ -204,11 +204,11 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                                 geneName1 = context.getGeneNames().get(uniprot1);
                             }
                             geneName2 = geneName1;
-                        }
-                        // we don't allow self interactions with isoforms or isoforms interacting with isoforms
-                        /*else {
-                            logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because the two interactors are isoforms of the same uniprot entry " + masterUniprot);
                         }*/
+                        // we don't allow self interactions with isoforms or isoforms interacting with isoforms
+                        else {
+                            logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because the two interactors are isoforms of the same uniprot entry " + masterUniprot);
+                        }
                     }
                     else {
                         logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because the two interactors are not related to the master uniprot " + masterUniprot);
@@ -222,12 +222,12 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
 
                             SecondCCParameters1 secondCCInteractor = new SecondCCParameters1Impl(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
 
-                            //if (!containsFeatureChain){
+                            if (!containsFeatureChain){
                                 secondCCInteractors.add(secondCCInteractor);
-                            //}
-                            //else {
-                            //    processedCCParametersForFeatureChains.add(secondCCInteractor);
-                            //}
+                            }
+                            else {
+                                processedCCParametersForFeatureChains.add(secondCCInteractor);
+                            }
                         }
                         else{
                             logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " doesn't have valid evidences.");
@@ -243,7 +243,7 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
             }
 
             // update existing secondCCParameters if we had feature chains to merge information
-            /*if (!processedCCParametersForFeatureChains.isEmpty()){
+            if (!processedCCParametersForFeatureChains.isEmpty()){
                 for (SecondCCParameters1 secondParameter : processedCCParametersForFeatureChains){
                     String firstUniprot = secondParameter.getFirstUniprotAc();
                     String secondUniprotAc = secondParameter.getSecondUniprotAc();
@@ -271,7 +271,7 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                         secondCCInteractors.add(secondParameter);
                     }
                 }
-            }*/
+            }
 
             if (!secondCCInteractors.isEmpty()){
                 return new CCParameters1(masterUniprot, geneName1, taxId1, secondCCInteractors);
@@ -280,7 +280,7 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
 
         logger.debug("Interactor " + masterUniprot + " doesn't have any valid second CC parameters and will be skipped.");
 
-        //processedCCParametersForFeatureChains.clear();
+        processedCCParametersForFeatureChains.clear();
         return null;
     }
 }
