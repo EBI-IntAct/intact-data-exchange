@@ -191,10 +191,24 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                             }
                             geneName2 = geneName1;
                         }
-                        // we don't allow self interactions with isoforms or isoforms interacting with isoforms
                         else {
-                            logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because the two interactors are isoforms of the same uniprot entry " + masterUniprot);
+                            firstUniprot = uniprot1;
+                            secondUniprot = uniprot2;
+                            taxId2 = organismsB[0];
+                            secondIntactAc = intact2;
+
+                            taxId1 = organismsA[0];
+                            firstIntactAc = intact1;
+
+                            if (geneName1 == null){
+                                geneName1 = context.getGeneNames().get(uniprot1);
+                            }
+                            geneName2 = geneName1;
                         }
+                        // we don't allow self interactions with isoforms or isoforms interacting with isoforms
+                        /*else {
+                            logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because the two interactors are isoforms of the same uniprot entry " + masterUniprot);
+                        }*/
                     }
                     else {
                         logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " is not converted because the two interactors are not related to the master uniprot " + masterUniprot);
