@@ -55,7 +55,7 @@ public class CCLineConverter2Test extends UniprotExportBase{
                 Assert.assertEquals("P28548-1", secondPar.getFirstUniprotAc());
                 Assert.assertEquals("Q22534", secondPar.getSecondUniprotAc());
                 Assert.assertTrue(secondPar.doesInteract());
-                Assert.assertEquals("EBI-317777", secondPar.getFirstIntacAc());
+                Assert.assertEquals("EBI-317777", secondPar.getFirstIntactAc());
                 Assert.assertEquals("EBI-327642", secondPar.getSecondIntactAc());
                 Assert.assertEquals(1, secondPar.getInteractionDetails().size());
                 Assert.assertEquals("9606", secondPar.getTaxId());
@@ -67,7 +67,7 @@ public class CCLineConverter2Test extends UniprotExportBase{
                 Assert.assertEquals("P28548-2", secondPar.getFirstUniprotAc());
                 Assert.assertEquals("O17670", secondPar.getSecondUniprotAc());
                 Assert.assertTrue(secondPar.doesInteract());
-                Assert.assertEquals("EBI-317778", secondPar.getFirstIntacAc());
+                Assert.assertEquals("EBI-317778", secondPar.getFirstIntactAc());
                 Assert.assertEquals("EBI-311862", secondPar.getSecondIntactAc());
                 Assert.assertEquals(1, secondPar.getInteractionDetails().size());
                 Assert.assertEquals("6239", secondPar.getTaxId());
@@ -78,7 +78,7 @@ public class CCLineConverter2Test extends UniprotExportBase{
                 Assert.assertEquals("P28548-2", secondPar.getFirstUniprotAc());
                 Assert.assertEquals("P28548-1", secondPar.getSecondUniprotAc());
                 Assert.assertTrue(secondPar.doesInteract());
-                Assert.assertEquals("EBI-317778", secondPar.getFirstIntacAc());
+                Assert.assertEquals("EBI-317778", secondPar.getFirstIntactAc());
                 Assert.assertEquals("EBI-317777", secondPar.getSecondIntactAc());
                 Assert.assertEquals("Kin-10", secondPar.getGeneName());
             }
@@ -86,7 +86,7 @@ public class CCLineConverter2Test extends UniprotExportBase{
                 Assert.assertEquals("P28548", secondPar.getFirstUniprotAc());
                 Assert.assertEquals("P12347-4", secondPar.getSecondUniprotAc());
                 Assert.assertTrue(secondPar.doesInteract());
-                Assert.assertEquals("EBI-317888", secondPar.getFirstIntacAc());
+                Assert.assertEquals("EBI-317888", secondPar.getFirstIntactAc());
                 Assert.assertEquals("EBI-99999999", secondPar.getSecondIntactAc());
                 Assert.assertEquals("name-5", secondPar.getGeneName());
             }
@@ -94,7 +94,7 @@ public class CCLineConverter2Test extends UniprotExportBase{
                 Assert.assertEquals("P12347-4", secondPar.getFirstUniprotAc());
                 Assert.assertEquals("O17670", secondPar.getSecondUniprotAc());
                 Assert.assertTrue(secondPar.doesInteract());
-                Assert.assertEquals("EBI-99999999", secondPar.getFirstIntacAc());
+                Assert.assertEquals("EBI-99999999", secondPar.getFirstIntactAc());
                 Assert.assertEquals("EBI-311862", secondPar.getSecondIntactAc());
                 Assert.assertEquals("eya-1", secondPar.getGeneName());
             }
@@ -102,7 +102,7 @@ public class CCLineConverter2Test extends UniprotExportBase{
                 Assert.assertEquals("P28548-PRO_0000068244", secondPar.getFirstUniprotAc());
                 Assert.assertEquals("Q21361", secondPar.getSecondUniprotAc());
                 Assert.assertFalse(secondPar.doesInteract());
-                Assert.assertEquals("EBI-317779", secondPar.getFirstIntacAc());
+                Assert.assertEquals("EBI-317779", secondPar.getFirstIntactAc());
                 Assert.assertEquals("EBI-311862", secondPar.getSecondIntactAc());
                 Assert.assertEquals(3, secondPar.getInteractionDetails().size());
                 Assert.assertEquals("9606", secondPar.getTaxId());

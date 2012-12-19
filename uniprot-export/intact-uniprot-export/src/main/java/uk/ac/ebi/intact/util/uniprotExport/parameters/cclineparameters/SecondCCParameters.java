@@ -14,7 +14,7 @@ public abstract interface SecondCCParameters extends Comparable{
     /**
      * the Intact AC of the first interactor
      */
-    public String getFirstIntacAc();
+    public String getFirstIntactAc();
 
     /**
      * The uniprot ac of the first interactor (can be isoform and feature chain)

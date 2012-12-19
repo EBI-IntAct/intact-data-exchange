@@ -70,7 +70,7 @@ public class CCLineWriter2 implements CCLineWriter<CCParameters<SecondCCParamete
         SortedSet<SecondCCParameters2> secondParameters = parameters.getSecondCCParameters();
 
         for (SecondCCParameters2 secondInteractor : secondParameters){
-            String firstIntactAc = secondInteractor.getFirstIntacAc();
+            String firstIntactAc = secondInteractor.getFirstIntactAc();
 
             // write introduction
             writeInteractionIntroduction(secondInteractor.doesInteract(), firstIntactAc, secondInteractor.getSecondIntactAc());

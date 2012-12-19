@@ -36,7 +36,7 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
     }
 
     @Override
-    public String getFirstIntacAc() {
+    public String getFirstIntactAc() {
         return this.firstIntact;
     }
 
@@ -118,6 +118,14 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
 
                     if( uniprotID1 != null && uniprotID2 != null ) {
                         score = uniprotID1.compareTo( uniprotID2 );
+
+                        // if both uniprot ids are the same, compare the first intact acs if we don't have isoforms
+                        if (score == 0){
+                            final String firstIntactAc1 = firstIntact;
+                            final String firstIntactAc2 = cc2.getFirstIntactAc();
+
+                            score = firstIntactAc1.compareTo( firstIntactAc2 );
+                        }
                     }
                 }
             }

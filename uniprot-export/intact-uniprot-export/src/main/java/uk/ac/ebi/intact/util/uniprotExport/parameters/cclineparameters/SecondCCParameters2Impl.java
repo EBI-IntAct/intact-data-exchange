@@ -87,7 +87,7 @@ public class SecondCCParameters2Impl implements SecondCCParameters2 {
     }
 
     @Override
-    public String getFirstIntacAc() {
+    public String getFirstIntactAc() {
         return this.firstIntact;
     }
 

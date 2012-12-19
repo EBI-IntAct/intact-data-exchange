@@ -28,7 +28,7 @@ public class CCLineConverter1Test extends UniprotExportBase {
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
         interactions.add(3, createIsoformIsoformInteraction()); // cannot be converted because isoform-isoform
-        interactions.add(4, createEncoreInteractionWithTransIsoform()); // can be converted but is not written twice because another isoform of the entry already interacts with same protein
+        interactions.add(4, createEncoreInteractionWithTransIsoform()); // can be converted but is written twice because another isoform of the entry already interacts with same protein
         interactions.add(5, createEncoreInteractionWithTransIsoformAndMaster()); // can be converted because isoform and other uniprot entry, even if this isoform is not matching the master
 
         List<EncoreInteraction> negativeInteractions = new ArrayList<EncoreInteraction>();
@@ -44,17 +44,17 @@ public class CCLineConverter1Test extends UniprotExportBase {
         Assert.assertEquals("P28548", parameters.getMasterUniprotAc());
         Assert.assertEquals("Kin-10", parameters.getGeneName());
         Assert.assertEquals("6239", parameters.getTaxId());
-        Assert.assertEquals(3, parameters.getSecondCCParameters().size());
+        Assert.assertEquals(4, parameters.getSecondCCParameters().size());
 
         int i = 0;
 
         for (SecondCCParameters1 secondPar : parameters.getSecondCCParameters()){
             i++;
 
-            if (i == 3){
+            if (i == 4){
                 Assert.assertEquals("P28548-1", secondPar.getFirstUniprotAc());
                 Assert.assertEquals("Q22534", secondPar.getSecondUniprotAc());
-                Assert.assertEquals("EBI-317777", secondPar.getFirstIntacAc());
+                Assert.assertEquals("EBI-317777", secondPar.getFirstIntactAc());
                 Assert.assertEquals("EBI-327642", secondPar.getSecondIntactAc());
                 Assert.assertEquals(1, secondPar.getNumberOfInteractionEvidences());
                 Assert.assertEquals("9606", secondPar.getTaxId());
@@ -66,7 +66,7 @@ public class CCLineConverter1Test extends UniprotExportBase {
                     Assert.assertFalse(true);
                 }
                 Assert.assertEquals("O17670", secondPar.getSecondUniprotAc());
-                if (!"EBI-317778".equalsIgnoreCase(secondPar.getFirstIntacAc()) && !"EBI-99999999".equalsIgnoreCase(secondPar.getFirstIntacAc())){
+                if (!"EBI-317778".equalsIgnoreCase(secondPar.getFirstIntactAc()) && !"EBI-99999999".equalsIgnoreCase(secondPar.getFirstIntactAc())){
                     Assert.assertFalse(true);
                 }
                 Assert.assertEquals("EBI-311862", secondPar.getSecondIntactAc());
@@ -75,9 +75,16 @@ public class CCLineConverter1Test extends UniprotExportBase {
                 Assert.assertEquals("eya-1", secondPar.getGeneName());
             }
             else if (i == 2){
+                Assert.assertEquals("P12347-4", secondPar.getFirstUniprotAc());
+                Assert.assertEquals("O17670", secondPar.getSecondUniprotAc());
+                Assert.assertEquals("EBI-99999999", secondPar.getFirstIntactAc());
+                Assert.assertEquals("EBI-311862", secondPar.getSecondIntactAc());
+                Assert.assertEquals("eya-1", secondPar.getGeneName());
+            }
+            else if (i == 3){
                 Assert.assertEquals("P28548", secondPar.getFirstUniprotAc());
                 Assert.assertEquals("P12347-4", secondPar.getSecondUniprotAc());
-                Assert.assertEquals("EBI-317888", secondPar.getFirstIntacAc());
+                Assert.assertEquals("EBI-317888", secondPar.getFirstIntactAc());
                 Assert.assertEquals("EBI-99999999", secondPar.getSecondIntactAc());
                 Assert.assertEquals("Kin-10", secondPar.getGeneName());
             }

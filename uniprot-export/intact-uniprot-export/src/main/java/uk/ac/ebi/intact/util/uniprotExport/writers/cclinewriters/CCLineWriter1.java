@@ -94,7 +94,7 @@ public class CCLineWriter1 implements CCLineWriter<CCParameters<SecondCCParamete
             writer.write(';');
             writer.write(' ');
             writer.write("IntAct=");
-            writer.write(secondInteractor.getFirstIntacAc());
+            writer.write(secondInteractor.getFirstIntactAc());
             writer.write(',');
             writer.write(' ');
             writer.write(secondInteractor.getSecondIntactAc());
