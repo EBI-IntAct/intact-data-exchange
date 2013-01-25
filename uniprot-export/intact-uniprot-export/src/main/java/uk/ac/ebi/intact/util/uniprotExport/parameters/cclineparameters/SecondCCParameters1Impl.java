@@ -118,22 +118,6 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
 
                     if( uniprotID1 != null && uniprotID2 != null ) {
                         score = uniprotID1.compareTo( uniprotID2 );
-
-                        // if both uniprot ids are the same, compare the first intact acs if we don't have isoforms
-                        if (score == 0){
-                            final String firstIntactAc1 = firstIntact;
-                            final String firstIntactAc2 = cc2.getFirstIntactAc();
-
-                            score = firstIntactAc1.compareTo( firstIntactAc2 );
-
-                            // if both first intact acs are the same compare second intact acs
-                            if (score == 0){
-                                final String secondIntactAc1 = secondIntact;
-                                final String secondIntactAc2 = cc2.getSecondIntactAc();
-
-                                score = secondIntactAc1.compareTo( secondIntactAc2 );
-                            }
-                        }
                     }
                 }
             }
@@ -161,14 +145,6 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
             return false;
         }
         else if (secondUniprotAc != null ? !secondUniprotAc.equalsIgnoreCase(ccLine1.getSecondUniprotAc()) : ccLine1.secondUniprotAc != null){
-
-            return false;
-        }
-        else if (firstIntact != null ? !firstIntact.equalsIgnoreCase(ccLine1.getFirstIntactAc()) : ccLine1.firstIntact != null){
-
-            return false;
-        }
-        else if (secondIntact != null ? !secondIntact.equalsIgnoreCase(ccLine1.getSecondIntactAc()) : ccLine1.secondIntact != null){
 
             return false;
         }
