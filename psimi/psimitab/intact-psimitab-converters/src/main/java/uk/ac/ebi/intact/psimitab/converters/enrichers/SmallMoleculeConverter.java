@@ -155,6 +155,14 @@ public class SmallMoleculeConverter extends AbstractEnricher{
                         }
                     }
                 }
+                // secondary acs are alternative identifiers
+                else if (ref.getCvXrefQualifier() != null && (CvXrefQualifier.SECONDARY_AC_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())
+                        || intactSecondary.equals(ref.getCvXrefQualifier().getShortLabel()))){
+                    CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                    if (identity != null){
+                        mitabInteractor.getAlternativeIdentifiers().add(identity);
+                    }
+                }
                 // other xrefs
                 else {
                     CrossReference xref = xRefConverter.createCrossReference(ref, true);

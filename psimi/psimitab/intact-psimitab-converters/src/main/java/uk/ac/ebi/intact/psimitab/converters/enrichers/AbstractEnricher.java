@@ -25,6 +25,7 @@ public abstract class AbstractEnricher {
     protected CrossReferenceConverter<InteractorXref> xRefConverter;
     protected AliasConverter aliasConverter;
     protected String defaultInstitution = CvDatabase.INTACT;
+    protected String intactSecondary = "intact-secondary";
 
     public AbstractEnricher(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv){
         xRefConverter = xrefConv != null ? xrefConv : new CrossReferenceConverter<InteractorXref>();
@@ -86,6 +87,14 @@ public abstract class AbstractEnricher {
                         if (identity != null){
                             mitabInteractor.getAlternativeIdentifiers().add(identity);
                         }
+                    }
+                }
+                // secondary acs are alternative identifiers
+                else if (ref.getCvXrefQualifier() != null && (CvXrefQualifier.SECONDARY_AC_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())
+                || intactSecondary.equals(ref.getCvXrefQualifier().getShortLabel()))){
+                    CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                    if (identity != null){
+                        mitabInteractor.getAlternativeIdentifiers().add(identity);
                     }
                 }
                 // other xrefs
