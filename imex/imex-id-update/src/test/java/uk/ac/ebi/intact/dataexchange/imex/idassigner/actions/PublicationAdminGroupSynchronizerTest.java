@@ -42,6 +42,7 @@ public class PublicationAdminGroupSynchronizerTest extends IntactBasicTestCase{
         intactPub.getIdentifier().add(pubmed);
         intactPub.setAdminGroupList(new Publication.AdminGroupList());
         intactPub.getAdminGroupList().getGroup().add("INTACT");
+        intactPub.getAdminGroupList().getGroup().add("INTACT Curators");
         imexAdminGroupSynchronizerTest.getImexCentralClient().createPublication(intactPub);
 
         noIntactPub = new Publication();
@@ -92,7 +93,7 @@ public class PublicationAdminGroupSynchronizerTest extends IntactBasicTestCase{
 
         imexAdminGroupSynchronizerTest.synchronizePublicationAdminGroup(intactPublication, intactPub);
 
-        Assert.assertEquals(1, intactPub.getAdminGroupList().getGroup().size());
+        Assert.assertEquals(2, intactPub.getAdminGroupList().getGroup().size());
         Assert.assertEquals("INTACT", intactPub.getAdminGroupList().getGroup().iterator().next());
     }
 

@@ -22,31 +22,44 @@ public class PublicationAdminGroupSynchronizerImpl extends ImexCentralUpdater im
 
     private static final Log log = LogFactory.getLog(PublicationAdminGroupSynchronizerImpl.class);
 
+    /**
+     * This group is for publication curated and owned by INTACT
+     */
     private static String INTACT_ADMIN = "INTACT";
+    /**
+     * This group is for publications maintained and reviewed by INTACT but not owned by IntAct
+     */
+    private static String INTACT_ADMIN_CURATOR = "INTACT Curators";
 
     public void synchronizePublicationAdminGroup(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
 
         Publication.AdminGroupList adminGroupList = imexPublication.getAdminGroupList();
         String pubId = extractPubIdFromIntactPublication(intactPublication);
 
-        if (!containsAdminGroup(adminGroupList, INTACT_ADMIN)){
-            // add first INTACT admin
-            imexPublication = imexCentral.updatePublicationAdminGroup(pubId, Operation.ADD, INTACT_ADMIN);
-            log.info("Updated publication admin group to: " + INTACT_ADMIN);
-        }
-
         // add other database admin group if it exists
         final String institution = intactPublication.getOwner().getShortLabel().toUpperCase();
 
-        if (!INTACT_ADMIN.equals(institution) && !containsAdminGroup(adminGroupList, institution)){
+        if (!containsAdminGroup(adminGroupList, institution)){
             try {
                 imexPublication = imexCentral.updatePublicationAdminGroup( intactPublication.getPublicationId(), Operation.ADD, institution );
                 log.info("Added other publication admin group : " + institution);
+
+                // now add intact admin group curators for publications maintained by intact but not owned by INTACT
+                if (!INTACT_ADMIN.equals(institution) && !containsAdminGroup(adminGroupList, INTACT_ADMIN_CURATOR)){
+                    // add first INTACT admin
+                    imexPublication = imexCentral.updatePublicationAdminGroup(pubId, Operation.ADD, INTACT_ADMIN_CURATOR);
+                    log.info("Updated publication admin group to: " + INTACT_ADMIN_CURATOR);
+                }
             } catch ( ImexCentralException e ) {
                 IcentralFault f = (IcentralFault) e.getCause();
                 if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.UNKNOWN_GROUP ) {
                     // unknown admin group, we cannot add another admin group for this institution
-                    log.warn("The institution " + institution + " is not recognized in IMEx central so is ignored.");
+                    log.warn("The institution " + institution + " is not recognized in IMEx central so we will add INTACT admin group.");
+                    if (!containsAdminGroup(adminGroupList, INTACT_ADMIN)){
+                        // add first INTACT admin
+                        imexPublication = imexCentral.updatePublicationAdminGroup(pubId, Operation.ADD, INTACT_ADMIN);
+                        log.info("Updated publication admin group to: " + INTACT_ADMIN);
+                    }
                 }
                 else {
                     throw e;
