@@ -213,7 +213,7 @@ not normally be changed by applications.
         <field name="source" type="textIntact" default="-"/>
         <field name="intact-miscore" type="doubleIntact" default="0"/>
         <field name="geneName" type="textIntact" default=""/>
-        <field name="binary" type="intactIndexedUnstoredString" default=""/>
+        <field name="binary" type="intactIndexedUnstoredSortString" default=""/>
 
         <!-- old IntAct Extended -->
 
