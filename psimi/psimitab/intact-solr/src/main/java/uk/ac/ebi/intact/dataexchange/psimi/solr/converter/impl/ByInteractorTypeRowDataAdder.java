@@ -75,6 +75,8 @@ public class ByInteractorTypeRowDataAdder implements RowDataSelectiveAdder {
                     String fieldName = FieldNames.INTACT_BY_INTERACTOR_TYPE_PREFIX +(typeId.replaceAll(":", "").toLowerCase());
                     doc.addField(fieldName, value);
                     added = true;
+                    // only index first one
+                    break;
                 }
             }
         }

@@ -41,6 +41,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.FieldNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.extension.AnnotationTopicsToEnrichConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.extension.FeatureTypeToEnrichConverter;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.extension.FieldToEnrichConverter;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.BinaryIdSelectiveAdder;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.ByInteractorTypeRowDataAdder;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.ConfidenceScoreSelectiveAdder;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.impl.GeneNameSelectiveAdder;
@@ -85,6 +86,7 @@ public class SolrDocumentConverter extends Converter{
     private RowDataSelectiveAdder idBTypeSelectiveAdder;
     private RowDataSelectiveAdder altidATypeSelectiveAdder;
     private RowDataSelectiveAdder altidBTypeSelectiveAdder;
+    private RowDataSelectiveAdder binarySelectiveAdder;
 
     public SolrDocumentConverter(SolrServer solrServer) {
         super();
@@ -108,6 +110,7 @@ public class SolrDocumentConverter extends Converter{
                 InteractionKeys.KEY_INTERACTOR_TYPE_A);
         altidBTypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ALTID_B,
                 InteractionKeys.KEY_INTERACTOR_TYPE_B);
+        binarySelectiveAdder = new BinaryIdSelectiveAdder();
 
         // override the static initializeKeyMap with the field enricher initialized
         overrideKeyMap();
@@ -181,6 +184,7 @@ public class SolrDocumentConverter extends Converter{
                 InteractionKeys.KEY_INTERACTOR_TYPE_A);
         altidBTypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ALTID_B,
                 InteractionKeys.KEY_INTERACTOR_TYPE_B);
+        binarySelectiveAdder = new BinaryIdSelectiveAdder();
 
         // override the static initializeKeyMap with the field enricher initialized
         overrideKeyMap();
@@ -208,6 +212,7 @@ public class SolrDocumentConverter extends Converter{
                 InteractionKeys.KEY_INTERACTOR_TYPE_A);
         altidBTypeSelectiveAdder = new ByInteractorTypeRowDataAdder(InteractionKeys.KEY_ALTID_B,
                 InteractionKeys.KEY_INTERACTOR_TYPE_B);
+        binarySelectiveAdder = new BinaryIdSelectiveAdder();
 
         // override the static initializeKeyMap with the field enricher initialized
         overrideKeyMap();
@@ -236,6 +241,9 @@ public class SolrDocumentConverter extends Converter{
         if (! addCustomFields(row, doc, idBTypeSelectiveAdder)){
             addCustomFields(row, doc, altidBTypeSelectiveAdder);
         }
+
+        addCustomFields(row, doc, binarySelectiveAdder);
+
 
         return doc;
     }

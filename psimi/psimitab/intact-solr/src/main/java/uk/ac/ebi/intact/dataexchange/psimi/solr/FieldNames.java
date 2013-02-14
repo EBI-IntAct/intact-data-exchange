@@ -170,18 +170,12 @@ public interface FieldNames {
     String PARTICIPANT_DET_METHOD_B_STORED = "pmethodB"+ STORED_SUFFIX;
     String PARTICIPANT_DET_METHOD_B_FACET = "pmethodB"+ FACET_SUFFIX;
 
-    String DB_GO = "go";
-    String DB_INTERPRO = "interpro";
-    String DB_PSIMI = "psi-mi";
-    String DB_CHEBI = "chebi";
-
-    String LINE = "line";
-
     String PKEY = "uuId";
 
     String INTACT_BY_INTERACTOR_TYPE_PREFIX = "intact_byInteractorType_";
     String GENE_NAME = "geneName";
     String INTACT_SCORE_NAME = "intact-miscore";
+    String BINARY = "binary";
 
     String[] DATA_FIELDS = new String[] {
          ID_A_STORED, ID_B_STORED, ALTID_A_STORED, ALTID_B_STORED, ALIAS_A_STORED, ALIAS_B_STORED, DETMETHOD_STORED, PUBAUTH_STORED, PUBID_STORED, TAXID_A_STORED, TAXID_B_STORED,
