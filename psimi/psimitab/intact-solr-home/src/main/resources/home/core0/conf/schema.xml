@@ -112,6 +112,7 @@ not normally be changed by applications.
 
         <fieldType name="intactIndexedUnstoredString" class="solr.StrField"  		sortMissingLast="true" indexed="true" stored="false" omitNorms="true"  multiValued="true" required="true"/>
         <fieldType name="intactUnindexedStoredString" class="solr.StrField"  		sortMissingLast="true" indexed="false" stored="true" omitNorms="true" multiValued="false" required="true"/>
+        <fieldType name="intactIndexedUnstoredSortString" class="solr.StrField"  		sortMissingLast="true" indexed="true" stored="false" omitNorms="true"  multiValued="false" required="true"/>
     </types>
 
 
@@ -212,6 +213,7 @@ not normally be changed by applications.
         <field name="source" type="textIntact" default="-"/>
         <field name="intact-miscore" type="doubleIntact" default="0"/>
         <field name="geneName" type="textIntact" default=""/>
+        <field name="binary" type="intactIndexedUnstoredString" default=""/>
 
         <!-- old IntAct Extended -->
 
