@@ -77,7 +77,7 @@ public class NucleicAcidConverter extends AbstractEnricher{
 
                 // add ac as alternative id
                 CrossReference acField = createCrossReferenceFromAc(mol);
-                mitabInteractor.getAlternativeIdentifiers().add(acField);
+                mitabInteractor.getAlternativeIdentifiers().add(0, acField);
             }
         }
         // no identity

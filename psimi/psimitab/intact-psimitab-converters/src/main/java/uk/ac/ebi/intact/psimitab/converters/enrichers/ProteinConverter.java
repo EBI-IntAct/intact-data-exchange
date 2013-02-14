@@ -99,7 +99,7 @@ public class ProteinConverter extends AbstractEnricher{
 
                 // add ac as alternative id
                 CrossReference acField = createCrossReferenceFromAc(polymer);
-                mitabInteractor.getAlternativeIdentifiers().add(acField);
+                mitabInteractor.getAlternativeIdentifiers().add(0, acField);
             }
         }
         // no uniprot identity
