@@ -223,7 +223,10 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                             SecondCCParameters1 secondCCInteractor = new SecondCCParameters1Impl(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
 
                             if (!containsFeatureChain){
-                                secondCCInteractors.add(secondCCInteractor);
+                                // do not add secondCCInteractor : remove the existing one and keep the one with more interaction evidences
+                                if (!secondCCInteractors.add(secondCCInteractor)){
+                                    processSecondParameterWithMoreInteractions(secondCCInteractors, secondCCInteractor);
+                                }
                             }
                             else {
                                 processedCCParametersForFeatureChains.add(secondCCInteractor);
@@ -282,5 +285,26 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
 
         processedCCParametersForFeatureChains.clear();
         return null;
+    }
+
+    private void processSecondParameterWithMoreInteractions(SortedSet<SecondCCParameters1> secondCCInteractors, SecondCCParameters1 secondCCInteractor) {
+        Iterator<SecondCCParameters1> secondCCparameterIterator = secondCCInteractors.iterator();
+
+        boolean needToAddNewParameter = false;
+        while (secondCCparameterIterator.hasNext()){
+            SecondCCParameters1 secondCCParameter = secondCCparameterIterator.next();
+            // we have the existing interactor
+            if (secondCCParameter.equals(secondCCInteractor)){
+                // the new CC parameter should replace the old one as we have more results
+                if (secondCCInteractor.getNumberOfInteractionEvidences() > secondCCParameter.getNumberOfInteractionEvidences()){
+                    secondCCparameterIterator.remove();
+                    needToAddNewParameter = true;
+                }
+            }
+        }
+
+        if (needToAddNewParameter){
+            secondCCInteractors.add(secondCCInteractor);
+        }
     }
 }
