@@ -238,6 +238,7 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                     String secondUniprotAc = secondParameter.getSecondUniprotAc();
 
                     boolean hasFoundExistingSecondCC = false;
+                    SecondCCParameters1 parameterToRemove = null;
 
                     for (SecondCCParameters1 existingParameters : secondCCInteractors){
                         if (firstUniprot.equals(existingParameters.getFirstUniprotAc())){
@@ -247,17 +248,20 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                                 // do not merge numbers for consistency in links
                                 //int newNumberOfExp = existingParameters.getNumberOfInteractionEvidences() + secondParameter.getNumberOfInteractionEvidences();
                                 //existingParameters.setNumberOfInteractionEvidences(newNumberOfExp);
-
-                                if (existingParameters.getGeneName().equals("-") && !secondParameter.getGeneName().equals("-")){
-                                    existingParameters.setGeneName(secondParameter.getGeneName());
+                                if (existingParameters.getNumberOfInteractionEvidences() < secondParameter.getNumberOfInteractionEvidences()){
+                                    parameterToRemove = existingParameters;
                                 }
                                 break;
                             }
                         }
                     }
 
+                    if (parameterToRemove != null){
+                        secondCCInteractors.remove(parameterToRemove);
+                        secondCCInteractors.add(parameterToRemove);
+                    }
                     // if this information could not be merged, add it to the list of secondCCParameters
-                    if (!hasFoundExistingSecondCC){
+                    else if (!hasFoundExistingSecondCC){
                         secondCCInteractors.add(secondParameter);
                     }
                 }
