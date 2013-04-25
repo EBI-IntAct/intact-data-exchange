@@ -28,8 +28,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     private List<String> publicationsWithInteractionsHavingImexId;
     private List<String> publicationsWithExperimentsHavingImexId;
 
-    private List<String> publicationsHavingJournalAndYear;
-    private List<String> publicationsHavingDataset;
+    private List<String> publicationsElligibleForImex;
     private List<String> publicationsHavingImexCurationLevel;
 
     private List<String> publicationsAcceptedForRelease;
@@ -54,6 +53,45 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     private List<String> collectPublicationCandidatesToImexWithJournalAndDate() {
+        List<Object[]> publicationJournalsAndYear = collectYearAndJournalFromPublicationEligibleImex();
+
+        List<String> publications = new ArrayList<String>(publicationJournalsAndYear.size());
+
+        for (Object[] o : publicationJournalsAndYear){
+            if (o.length == 3){
+                String pubAc = (String) o[0];
+                String journal = (String) o[1];
+                try{
+                    int date = Integer.parseInt((String) o[2]);
+
+                    if (CELL_JOURNAL.equalsIgnoreCase(journal) || PROTEOMICS_JOURNAL.equalsIgnoreCase(journal)
+                            || CANCER_CELL_JOURNAL.equalsIgnoreCase(journal) || J_MOL_JOURNAL.equalsIgnoreCase(journal)
+                            || ONCOGENE_JOURNAL.equalsIgnoreCase(journal)){
+                        if (date >= 2006){
+                            publications.add(pubAc);
+                        }
+                    }
+                    else if (MOL_CANCER_JOURNAL.equalsIgnoreCase(journal)){
+                        if (date >= 2010){
+                            publications.add(pubAc);
+                        }
+                    }
+                    else if (NAT_IMMUNO_JOURNAL.equalsIgnoreCase(journal)){
+                        if (date >= 2011){
+                            publications.add(pubAc);
+                        }
+                    }
+                }catch (NumberFormatException e){
+                    log.error("Publication date for " + pubAc + "is not valid and is skipped.");
+                }
+
+            }
+        }
+
+        return publications;
+    }
+
+    private List<String> collectPublicationCandidatesToImexWithDate() {
         List<Object[]> publicationJournalsAndYear = collectYearAndJournalFromPublicationEligibleImex();
 
         List<String> publications = new ArrayList<String>(publicationJournalsAndYear.size());
@@ -179,18 +217,57 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publications;
     }
 
+    private List<String> collectPublicationsElligibleForImex(){
+        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+
+        String publicationsToAssign = "select distinct p.ac from ia_publication p, ia_pub2annot pa, ia_annotation a, ia_publication_xref x " +
+                "where p.ac = pa.publication_ac " +
+                "and pa.annotation_ac = a.ac " +
+                "and a.topic_ac = (select ac from ia_controlledvocab where shortlabel = :curation) " +
+                "and a.description = :imex " +
+                "and x.parent_ac = p.ac " +
+                "and x.database_ac = (select ac from ia_controlledvocab where shortlabel = :imexDatabase) " +
+                "and x.qualifier_ac = (select ac from ia_controlledvocab where shortlabel = :imexPrimary)" +
+                "and to_number(to_char(p.created, :yearFormat)) > :2005Year " +
+                "and p.owner_ac = ( " +
+                "select ac from ia_institution where " +
+                "lower(shortlabel) = :intact " +
+                "or lower(shortlabel) = :i2d " +
+                "or lower(shortlabel) = :innatedb " +
+                "or lower(shortlabel) = :molecularConnections " +
+                "or lower(shortlabel) = :uniprot " +
+                "or lower(shortlabel) = :mbinfo " +
+                "or lower(shortlabel) = :mpidb" +
+                ")";
+
+        Query query = daoFactory.getEntityManager().createNativeQuery(publicationsToAssign);
+        query.setParameter("yearFormat", "YYYY");
+        query.setParameter("2005Year", 2005);
+        query.setParameter("curation", "curation depth");
+        query.setParameter("imex", "imex curation");
+        query.setParameter("imexDatabase", CvDatabase.IMEX);
+        query.setParameter("imexPrimary", CvXrefQualifier.IMEX_PRIMARY);
+        query.setParameter("intact", "intact");
+        query.setParameter("i2d", "i2d");
+        query.setParameter("innatedb", "innatedb");
+        query.setParameter("molecularConnections", "molecular connections");
+        query.setParameter("uniprot", "uniprot");
+        query.setParameter("mbinfo", "mbinfo");
+        query.setParameter("mpidb", "mpidb");
+
+        return query.getResultList();
+    }
+
     private List<String> collectPublicationAcceptedForRelease() {
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String datasetQuery = "select distinct p.ac from Publication p join p.status as s " +
-                "where s.identifier = :released or s.identifier = :accepted or s.identifier= :readyForRelease " +
-                "or s.identifier = :acceptedOnHold";
+                "where s.identifier = :released or s.identifier = :accepted or s.identifier= :readyForRelease";
 
         Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
         query.setParameter("released", CvPublicationStatusType.RELEASED.identifier());
         query.setParameter("readyForRelease", CvPublicationStatusType.READY_FOR_RELEASE.identifier());
         query.setParameter("accepted", CvPublicationStatusType.ACCEPTED.identifier());
-        query.setParameter("acceptedOnHold", CvPublicationStatusType.ACCEPTED_ON_HOLD.identifier());
 
         List<String> publications = query.getResultList();
         return publications;
@@ -200,11 +277,12 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
         String uniprotDrQuery = "select distinct p.ac from Publication p join p.experiments as e join e.annotations as a " +
-                "where a.cvTopic.shortLabel = :uniprotDrExport and a.annotationText = :no";
+                "where a.cvTopic.shortLabel = :uniprotDrExport and (a.annotationText = :no or a.annotationText = :no2)";
 
         Query query = daoFactory.getEntityManager().createQuery(uniprotDrQuery);
         query.setParameter("uniprotDrExport", CvTopic.UNIPROT_DR_EXPORT);
         query.setParameter("no", "no");
+        query.setParameter("no2", "No");
 
         List<String> publications = query.getResultList();
         return publications;
@@ -332,12 +410,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithExperimentsHavingImexId;
     }
 
-    public List<String> getPublicationsHavingJournalAndYear() {
-        return publicationsHavingJournalAndYear;
-    }
-
-    public List<String> getPublicationsHavingDataset() {
-        return publicationsHavingDataset;
+    public List<String> getPublicationsElligibleForImex() {
+        return publicationsElligibleForImex;
     }
 
     public List<String> getPublicationsHavingImexCurationLevel() {
@@ -355,8 +429,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
             initialise();
         }
 
-        // publications having specific journal and specific dataset can be IMEx publications
-        Collection<String> potentialPublicationsForImex = CollectionUtils.union(publicationsHavingDataset, publicationsHavingJournalAndYear);
+        // publications having creation date > 2006, come from IMEx databases, has imex curation depth and does not have IMEx id
+        Collection<String> potentialPublicationsForImex = publicationsElligibleForImex;
 
         // filter publications having only non PPI interactions
         Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsInvolvingPPI);
@@ -364,14 +438,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         // filter publications having uniprot-dr-export no
         Collection<String> potentialPublicationsForImexUniprotDRNoFiltered = CollectionUtils.subtract(potentialPublicationsForImexFiltered, publicationsHavingUniprotDRExportNo);
 
-        // potentialPublications needing an IMEx id to be assigned = potential publications for imex - publications already having IMEx ids
-        Collection<String> potentialPublicationsToBeAssigned = CollectionUtils.subtract(potentialPublicationsForImexUniprotDRNoFiltered, publicationsHavingImexId);
-
-        // publications for which we can assign a new IMEx id = potentialPublications needing an IMEx id to be assigned AND publications having IMEx curation level
-        Collection<String> publicationsToBeAssigned = CollectionUtils.intersection(potentialPublicationsToBeAssigned, publicationsHavingImexCurationLevel);
-
         // filter publications not accepted
-        Collection<String> publicationsToBeAssignedFiltered = CollectionUtils.intersection(publicationsToBeAssigned, publicationsAcceptedForRelease);
+        Collection<String> publicationsToBeAssignedFiltered = CollectionUtils.intersection(potentialPublicationsForImexUniprotDRNoFiltered, publicationsAcceptedForRelease);
 
         return publicationsToBeAssignedFiltered;
     }
@@ -415,8 +483,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         // publications having imex curation level but no IMEx id
         Collection<String> publicationsWithImexCurationLevelAndNotImexId = CollectionUtils.subtract(publicationsHavingImexCurationLevel, publicationsHavingImexId);
 
-        // publications having specific journal and specific dataset can be IMEx publications
-        Collection<String> potentialPublicationsForImex = CollectionUtils.union(publicationsHavingDataset, publicationsHavingJournalAndYear);
+        // publications having date > 2006, comes from IMEx partner
+        Collection<String> potentialPublicationsForImex = publicationsElligibleForImex;
 
         // publications having only non PPI interactions should be excluded
         Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsInvolvingPPI);
@@ -484,11 +552,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         if (publicationsWithExperimentsHavingImexId == null){
             publicationsWithExperimentsHavingImexId = collectPublicationHavingExperimentImexIds();
         }
-        if (publicationsHavingDataset == null){
-            publicationsHavingDataset = collectPublicationCandidatesToImexWithDataset();
-        }
-        if (publicationsHavingJournalAndYear == null){
-            publicationsHavingJournalAndYear = collectPublicationCandidatesToImexWithJournalAndDate();
+        if (publicationsElligibleForImex == null){
+            publicationsElligibleForImex = collectPublicationsElligibleForImex();
         }
         if (publicationsHavingImexCurationLevel == null){
             publicationsHavingImexCurationLevel = collectPublicationCandidatesToImexWithImexCurationLevel();
