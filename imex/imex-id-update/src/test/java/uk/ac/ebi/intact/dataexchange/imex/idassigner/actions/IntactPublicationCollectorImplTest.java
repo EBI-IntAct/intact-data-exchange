@@ -175,6 +175,50 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Test
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
+    public void get_publications_Not_Eligible_Imex_because_no_imex_curation_depth() throws ParseException {
+        IntactMockBuilder builder = new IntactMockBuilder();
+        TransactionStatus status = getDataContext().beginTransaction();
+
+        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
+        getCorePersister().saveOrUpdate(imex);
+
+        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
+        getCorePersister().saveOrUpdate(imexPrimary);
+
+        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
+        getCorePersister().saveOrUpdate(imexCuration);
+
+        // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
+        Publication pubWithImex = builder.createPublicationRandom();
+        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
+        exp1.setPublication(pubWithImex);
+        pubWithImex.addExperiment(exp1);
+        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
+        pubWithImex.addXref(pubXref);
+        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
+        pubWithImex.addAnnotation(imexCurationAnn1);
+
+        // one publication without imex-primary, not eligible IMEx no curation depth
+        Publication pubWithoutImex = builder.createPublicationRandom();
+        Experiment exp2 = getMockBuilder().createExperimentRandom(2);
+        exp2.setPublication(pubWithoutImex);
+        pubWithoutImex.addExperiment(exp2);
+
+        getCorePersister().saveOrUpdate(pubWithImex);
+        getCorePersister().saveOrUpdate(pubWithoutImex);
+
+        getDataContext().commitTransaction(status);
+
+        // reset collection
+        publicationCollectorTest.initialise();
+
+        Collection<String> pubAcs = publicationCollectorTest.getPublicationsNeedingAnImexId();
+        Assert.assertEquals(0, pubAcs.size());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    @DirtiesContext
     public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_other_institution() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();
 
