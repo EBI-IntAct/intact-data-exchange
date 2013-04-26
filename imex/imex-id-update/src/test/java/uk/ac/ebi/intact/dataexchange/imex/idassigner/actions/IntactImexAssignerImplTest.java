@@ -76,9 +76,10 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
         Assert.assertEquals(imexPublication.getImexAccession(), ref.getPrimaryId());
 
-        Assert.assertEquals(2, intactPubReloaded.getAnnotations().size());
+        Assert.assertEquals(3, intactPubReloaded.getAnnotations().size());
         boolean hasFullCuration = false;
         boolean hasImexCuration = false;
+        boolean hasImexDepth = false;
 
         for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded.getAnnotations()){
             if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
@@ -87,10 +88,14 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
             else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
                 hasFullCuration = true;
             }
+            else if ("curation depth".equals(ann.getCvTopic().getShortLabel()) && "imex curation".equalsIgnoreCase(ann.getAnnotationText())){
+                hasImexDepth = true;
+            }
         }
 
         Assert.assertTrue(hasFullCuration);
         Assert.assertTrue(hasImexCuration);
+        Assert.assertTrue(hasImexDepth);
 
         getDataContext().commitTransaction(status2);
     }
@@ -134,9 +139,10 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
         Assert.assertEquals(imexPublication.getImexAccession(), ref.getPrimaryId());
 
-        Assert.assertEquals(2, intactPubReloaded.getAnnotations().size());
+        Assert.assertEquals(3, intactPubReloaded.getAnnotations().size());
         boolean hasFullCuration = false;
         boolean hasImexCuration = false;
+        boolean hasImexDepth = false;
 
         for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded.getAnnotations()){
             if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
@@ -145,10 +151,14 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
             else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
                 hasFullCuration = true;
             }
+            else if ("curation depth".equals(ann.getCvTopic().getShortLabel()) && "imex curation".equalsIgnoreCase(ann.getAnnotationText())){
+                hasImexDepth = true;
+            }
         }
 
         Assert.assertTrue(hasFullCuration);
         Assert.assertTrue(hasImexCuration);
+        Assert.assertTrue(hasImexDepth);
 
         getDataContext().commitTransaction(status2);
     }
@@ -196,9 +206,10 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
         Assert.assertEquals(imexPublication.getImexAccession(), ref.getPrimaryId());
 
-        Assert.assertEquals(2, intactPubReloaded.getAnnotations().size());
+        Assert.assertEquals(3, intactPubReloaded.getAnnotations().size());
         boolean hasFullCuration = false;
         boolean hasImexCuration = false;
+        boolean hasImexDepth = false;
 
         for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded.getAnnotations()){
             if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
@@ -207,10 +218,15 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
             else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
                 hasFullCuration = true;
             }
+            else if ("curation depth".equals(ann.getCvTopic().getShortLabel()) && "imex curation".equalsIgnoreCase(ann.getAnnotationText())){
+                hasImexDepth = true;
+            }
         }
 
         Assert.assertTrue(hasFullCuration);
         Assert.assertTrue(hasImexCuration);
+        Assert.assertTrue(hasImexDepth);
+
 
         getDataContext().commitTransaction(status2);
     }
@@ -250,9 +266,10 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
         Assert.assertEquals(imexPublication.getImexAccession(), ref.getPrimaryId());
 
-        Assert.assertEquals(2, intactPubReloaded.getAnnotations().size());
+        Assert.assertEquals(3, intactPubReloaded.getAnnotations().size());
         boolean hasFullCuration = false;
         boolean hasImexCuration = false;
+        boolean hasImexDepth = false;
 
         for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded.getAnnotations()){
             if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
@@ -261,10 +278,14 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
             else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
                 hasFullCuration = true;
             }
+            else if ("curation depth".equals(ann.getCvTopic().getShortLabel()) && "imex curation".equalsIgnoreCase(ann.getAnnotationText())){
+                hasImexDepth = true;
+            }
         }
 
         Assert.assertTrue(hasFullCuration);
         Assert.assertTrue(hasImexCuration);
+        Assert.assertTrue(hasImexDepth);
 
         getDataContext().commitTransaction(status2);
     }

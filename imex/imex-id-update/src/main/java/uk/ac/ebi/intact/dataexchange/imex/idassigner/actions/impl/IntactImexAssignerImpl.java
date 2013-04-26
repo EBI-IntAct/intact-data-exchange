@@ -42,6 +42,8 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
     public static String FULL_COVERAGE = "full coverage";
     public static String IMEX_CURATION_MI = "MI:0959";
     public static String IMEX_CURATION = "imex curation";
+    public static String CURATION_DEPTH_MI = "MI:0955";
+    public static String CURATION_DEPTH = "curation depth";
     public static String FULL_COVERAGE_TEXT = "Only protein-protein interactions";
 
     private Collection<ExperimentXref> experimentXrefs = new ArrayList<ExperimentXref>();
@@ -119,6 +121,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
 
         boolean hasImexCuration = false;
         boolean hasFullCoverage = false;
+        boolean hasCurationDepth = false;
 
         for (Annotation ann : publicationAnnot){
 
@@ -155,6 +158,33 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                     hasImexCuration = true;
                 }
             }
+            // curation depth annot
+            else if (ann.getCvTopic() != null && ann.getCvTopic().getIdentifier() != null && ann.getCvTopic().getIdentifier().equals(CURATION_DEPTH_MI)){
+                if (ann.getAnnotationText() != null && ann.getAnnotationText().trim().equalsIgnoreCase(IMEX_CURATION)){
+                    // annotation is a duplicate, we delete it
+                    if (hasCurationDepth){
+                        intactPublication.removeAnnotation(ann);
+                        annotationDao.delete(ann);
+                    }
+                    // we found imex curation
+                    else {
+                        hasCurationDepth = true;
+                    }
+                }
+                else{
+                    // annotation is a duplicate, we delete it
+                    if (hasCurationDepth){
+                        intactPublication.removeAnnotation(ann);
+                        annotationDao.delete(ann);
+                    }
+                    // we found imex curation
+                    else {
+                        ann.setAnnotationText(IMEX_CURATION);
+                        annotationDao.update(ann);
+                        hasCurationDepth = true;
+                    }
+                }
+            }
         }
 
         if (!hasFullCoverage){
@@ -184,9 +214,22 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
             intactPublication.addAnnotation(imexCurationAnnot);
         }
 
+        if (!hasCurationDepth){
+            CvTopic curationDepth = daoFactory.getCvObjectDao( CvTopic.class ).getByPsiMiRef( CURATION_DEPTH_MI );
+            if (curationDepth == null){
+                curationDepth = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CURATION_DEPTH_MI, CURATION_DEPTH);
+                IntactContext.getCurrentInstance().getCorePersister().saveOrUpdate(curationDepth);
+            }
+
+            Annotation curationDepthAnnot = new Annotation( curationDepth, IMEX_CURATION );
+            annotationDao.persist(curationDepthAnnot);
+
+            intactPublication.addAnnotation(curationDepthAnnot);
+        }
+
         publicationAnnot.clear();
 
-        if (!hasFullCoverage || !hasImexCuration){
+        if (!hasFullCoverage || !hasImexCuration || !hasCurationDepth){
             publicationDao.update(intactPublication);
             return true;
         }

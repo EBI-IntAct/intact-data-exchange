@@ -11,7 +11,9 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.IntactPublicationCo
 import uk.ac.ebi.intact.model.*;
 
 import javax.persistence.Query;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -52,6 +54,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     public IntactPublicationsCollectorImpl(){
     }
 
+    @Deprecated
     private List<String> collectPublicationCandidatesToImexWithJournalAndDate() {
         List<Object[]> publicationJournalsAndYear = collectYearAndJournalFromPublicationEligibleImex();
 
@@ -91,6 +94,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publications;
     }
 
+    @Deprecated
     private List<String> collectPublicationCandidatesToImexWithDate() {
         List<Object[]> publicationJournalsAndYear = collectYearAndJournalFromPublicationEligibleImex();
 
@@ -189,6 +193,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
      * @return list of object[] which are String[3] with publication ac, jounal and year of publication
      * @throws ParseException
      */
+    @Deprecated
     private List<Object[]> collectYearAndJournalFromPublicationEligibleImex() {
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
@@ -220,33 +225,33 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     private List<String> collectPublicationsElligibleForImex(){
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 
-        String publicationsToAssign = "select distinct p.ac from ia_publication p, ia_pub2annot pa, ia_annotation a, ia_publication_xref x " +
-                "where p.ac = pa.publication_ac " +
-                "and pa.annotation_ac = a.ac " +
-                "and a.topic_ac = (select ac from ia_controlledvocab where shortlabel = :curation) " +
-                "and a.description = :imex " +
-                "and x.parent_ac = p.ac " +
-                "and x.database_ac = (select ac from ia_controlledvocab where shortlabel = :imexDatabase) " +
-                "and x.qualifier_ac = (select ac from ia_controlledvocab where shortlabel = :imexPrimary)" +
-                "and to_number(to_char(p.created, :yearFormat)) > :2005Year " +
-                "and p.owner_ac = ( " +
-                "select ac from ia_institution where " +
-                "lower(shortlabel) = :intact " +
-                "or lower(shortlabel) = :i2d " +
-                "or lower(shortlabel) = :innatedb " +
-                "or lower(shortlabel) = :molecularConnections " +
-                "or lower(shortlabel) = :uniprot " +
-                "or lower(shortlabel) = :mbinfo " +
-                "or lower(shortlabel) = :mpidb" +
+        String publicationsToAssign = "select distinct p.ac from Publication as p join p.annotations as a" +
+                " where a.cvTopic.identifier = :curation " +
+                "and a.annotationText = :imex " +
+                "and year(p.created) > year(:dateLimit) " +
+                "and ( lower(p.owner.shortLabel) = :intact " +
+                "or lower(p.owner.shortLabel) = :i2d " +
+                "or lower(p.owner.shortLabel) = :innatedb " +
+                "or lower(p.owner.shortLabel) = :molecularConnections " +
+                "or lower(p.owner.shortLabel) = :uniprot " +
+                "or lower(p.owner.shortLabel) = :mbinfo " +
+                "or lower(p.owner.shortLabel) = :mpidb" +
+                ") " +
+                "and p.ac not in (" +
+                "select distinct p2.ac from Publication as p2 join p2.xrefs as x where " +
+                "x.cvDatabase.identifier = :imexDatabase " +
+                " and x.cvXrefQualifier.identifier = :imexPrimary " +
                 ")";
 
-        Query query = daoFactory.getEntityManager().createNativeQuery(publicationsToAssign);
-        query.setParameter("yearFormat", "YYYY");
-        query.setParameter("2005Year", 2005);
-        query.setParameter("curation", "curation depth");
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.set(2005, 12, 31);
+
+        Query query = daoFactory.getEntityManager().createQuery(publicationsToAssign);
+        query.setParameter("dateLimit", cal.getTime());
+        query.setParameter("curation", "MI:0955");
         query.setParameter("imex", "imex curation");
-        query.setParameter("imexDatabase", CvDatabase.IMEX);
-        query.setParameter("imexPrimary", CvXrefQualifier.IMEX_PRIMARY);
+        query.setParameter("imexDatabase", CvDatabase.IMEX_MI_REF);
+        query.setParameter("imexPrimary", CvXrefQualifier.IMEX_PRIMARY_MI_REF);
         query.setParameter("intact", "intact");
         query.setParameter("i2d", "i2d");
         query.setParameter("innatedb", "innatedb");
@@ -288,6 +293,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publications;
     }
 
+    @Deprecated
     private List<String> collectPublicationCandidatesToImexWithDataset() {
         final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
 

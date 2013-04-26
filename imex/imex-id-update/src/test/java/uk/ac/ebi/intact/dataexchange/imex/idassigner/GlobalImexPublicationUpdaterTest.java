@@ -12,9 +12,13 @@ import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.lifecycle.LifecycleManager;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.user.User;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 /**
  * Unit tester of GlobalImexPublicationUpdater
@@ -210,8 +214,10 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         CvTopic date = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
         getCorePersister().saveOrUpdate(date);
 
+        IntactMockBuilder builder = new IntactMockBuilder();
+
         // one publication without imex primary ref, 1 experiment, 2 interactions,journal cell 2006, accepted -> to assign IMEX
-        Publication validPub = getMockBuilder().createPublicationRandom();
+        Publication validPub = builder.createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.getXrefs().clear();
         exp1.setPublication(validPub);
@@ -230,13 +236,16 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         lifecycleManager.getReadyForCheckingStatus().accept(validPub, "accepted");
 
         // publication not elligible imex (no journal, no datasets, no IMEx id) but imex curation level -> not updated but reported
-        Publication imexCurationLevel = getMockBuilder().createPublicationRandom();
+        Publication imexCurationLevel = builder.createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(2);
         exp2.getXrefs().clear();
         exp2.setPublication(imexCurationLevel);
         imexCurationLevel.addExperiment(exp2);
         Annotation imexCurationAnn2 = getMockBuilder().createAnnotation("imex curation", imexCuration);
         imexCurationLevel.addAnnotation(imexCurationAnn2);
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.set(2005, 12, 31);
+        imexCurationLevel.setCreated(cal.getTime());
 
         lifecycleManager.getNewStatus().claimOwnership(imexCurationLevel);
         lifecycleManager.getAssignedStatus().startCuration(imexCurationLevel);
@@ -245,7 +254,7 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
 
         // publication without imex id but interaction does have IMEx -> not updated but reported
         // one publication without imex-primary ref but interaction with imex primary ref
-        Publication pubInteractionImex = getMockBuilder().createPublicationRandom();
+        Publication pubInteractionImex = builder.createPublicationRandom();
         Experiment exp3 = getMockBuilder().createExperimentRandom(1);
         exp3.getXrefs().clear();
         exp3.setPublication(pubInteractionImex);
@@ -261,7 +270,7 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         lifecycleManager.getReadyForCheckingStatus().accept(pubInteractionImex, "accepted");
 
         // publication without imex id but experiment does have IMEx -> not updated but reported
-        Publication pubExperimentImex = getMockBuilder().createPublicationRandom();
+        Publication pubExperimentImex = builder.createPublicationRandom();
         Experiment exp4 = getMockBuilder().createExperimentRandom(2);
         exp4.getXrefs().clear();
         exp4.setPublication(pubExperimentImex);
@@ -275,7 +284,7 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         lifecycleManager.getReadyForCheckingStatus().accept(pubExperimentImex, "accepted");
 
         // publication without imex id, elligible IMEx but experiment conflict -> experiment not updated but reported
-        Publication pubExperimentImex2 = getMockBuilder().createPublicationRandom();
+        Publication pubExperimentImex2 = builder.createPublicationRandom();
         Experiment exp5 = getMockBuilder().createExperimentRandom(2);
         exp5.getXrefs().clear();
         exp5.setPublication(pubExperimentImex2);

@@ -11,15 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.lifecycle.LifecycleManager;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.user.User;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 import java.text.ParseException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Unit test class for IntactPublicationCollectorImpl
@@ -127,8 +125,8 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Test
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
-    public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_no_journal_dataset_imexRef() throws ParseException {
-
+    public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_because_too_old() throws ParseException {
+        IntactMockBuilder builder = new IntactMockBuilder();
         TransactionStatus status = getDataContext().beginTransaction();
 
         CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
@@ -141,7 +139,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         getCorePersister().saveOrUpdate(imexCuration);
 
         // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithImex = builder.createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.setPublication(pubWithImex);
         pubWithImex.addExperiment(exp1);
@@ -150,13 +148,16 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
         pubWithImex.addAnnotation(imexCurationAnn1);
 
-        // one publication without imex-primary, not eligible IMEx (no journal, no dataset, no imex but PPI) but does have imex-curation level
-        Publication pubWithoutImex = getMockBuilder().createPublicationRandom();
+        // one publication without imex-primary, not eligible IMEx too old
+        Publication pubWithoutImex = builder.createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(2);
         exp2.setPublication(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
         Annotation imexCurationAnn2 = getMockBuilder().createAnnotation("imex curation", imexCuration);
         pubWithoutImex.addAnnotation(imexCurationAnn2);
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.set(2005, 12, 31);
+        pubWithoutImex.setCreated(cal.getTime());
 
         getCorePersister().saveOrUpdate(pubWithImex);
         getCorePersister().saveOrUpdate(pubWithoutImex);
@@ -174,7 +175,8 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Test
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
-    public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_journal_no_PPI() throws ParseException {
+    public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_other_institution() throws ParseException {
+        IntactMockBuilder builder = new IntactMockBuilder();
 
         TransactionStatus status = getDataContext().beginTransaction();
 
@@ -194,7 +196,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
 
 
         // one publication eligible IMEx and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithImex = builder.createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.setPublication(pubWithImex);
         pubWithImex.addExperiment(exp1);
@@ -238,7 +240,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_Imex_Curation_Level_PPI_peptide() throws ParseException {
-
+        IntactMockBuilder builder = new IntactMockBuilder();
         TransactionStatus status = getDataContext().beginTransaction();
 
         CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
@@ -257,7 +259,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
 
 
         // one publication eligible IMEx and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithImex = builder.createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.setPublication(pubWithImex);
         pubWithImex.addExperiment(exp1);
@@ -269,7 +271,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         pubWithImex.addAnnotation(dateAnn);
 
         // one publication eligible IMEx but does have protein-peptide interaction
-        Publication pubWithoutImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithoutImex = builder.createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(1);
         exp2.setPublication(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
@@ -300,7 +302,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_dataset_no_PPI() throws ParseException {
-
+        IntactMockBuilder builder = new IntactMockBuilder();
         TransactionStatus status = getDataContext().beginTransaction();
 
         CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
@@ -316,7 +318,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         getCorePersister().saveOrUpdate(dataset);
 
         // one publication eligible imex and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithImex = builder.createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.setPublication(pubWithImex);
         pubWithImex.addExperiment(exp1);
@@ -326,7 +328,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         pubWithImex.addAnnotation(datasetAnn);
 
         // one publication without imex-primary, not eligible IMEx (eligible journal, no dataset, no imex, no PPI) but does have imex-curation level
-        Publication pubWithoutImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithoutImex = builder.createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(1);
         exp2.setPublication(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
@@ -356,7 +358,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_having_IMEx_Id_And_Not_Imex_Curation_Level() throws ParseException {
-
+        IntactMockBuilder builder = new IntactMockBuilder();
         TransactionStatus status = getDataContext().beginTransaction();
 
         CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
@@ -369,7 +371,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         getCorePersister().saveOrUpdate(imexCuration);
 
         // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithImex = builder.createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.setPublication(pubWithImex);
         pubWithImex.addExperiment(exp1);
@@ -379,7 +381,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         pubWithImex.addAnnotation(imexCurationAnn1);
 
         // one publication with imex-primary and no imex curation level
-        Publication pubWithoutImexCuration = getMockBuilder().createPublicationRandom();
+        Publication pubWithoutImexCuration = builder.createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(2);
         exp2.setPublication(pubWithoutImexCuration);
         pubWithoutImexCuration.addExperiment(exp2);
@@ -402,7 +404,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_IMEx_Id_And_No_PPI_Interactions() throws ParseException {
-
+        IntactMockBuilder builder = new IntactMockBuilder();
         TransactionStatus status = getDataContext().beginTransaction();
 
         CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
@@ -412,7 +414,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         getCorePersister().saveOrUpdate(imexPrimary);
 
         // one publication with imex primary ref
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithImex = builder.createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.setPublication(pubWithImex);
         pubWithImex.addExperiment(exp1);
@@ -420,7 +422,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         pubWithImex.addXref(pubXref);
 
         // one publication with imex-primary, no PPI
-        Publication pubWithoutPPI = getMockBuilder().createPublicationRandom();
+        Publication pubWithoutPPI = builder.createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(1);
         exp2.setPublication(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
@@ -451,7 +453,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_PPI_Interactions_one_with_NucleicAcid() throws ParseException {
-
+        IntactMockBuilder builder = new IntactMockBuilder();
         TransactionStatus status = getDataContext().beginTransaction();
 
         CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
@@ -461,7 +463,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         getCorePersister().saveOrUpdate(imexPrimary);
 
         // one publication with imex primary ref
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithImex = builder.createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.setPublication(pubWithImex);
         pubWithImex.addExperiment(exp1);
@@ -469,7 +471,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         pubWithImex.addXref(pubXref);
 
         // one publication with imex-primary, one nucleic acid and the rest protein
-        Publication pubWithoutPPI = getMockBuilder().createPublicationRandom();
+        Publication pubWithoutPPI = builder.createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(1);
         exp2.setPublication(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
@@ -495,7 +497,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_PPI_Interactions2() throws ParseException {
-
+        IntactMockBuilder builder = new IntactMockBuilder();
         TransactionStatus status = getDataContext().beginTransaction();
 
         CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
@@ -505,7 +507,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         getCorePersister().saveOrUpdate(imexPrimary);
 
         // one publication with imex primary ref
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithImex = builder.createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.setPublication(pubWithImex);
         pubWithImex.addExperiment(exp1);
@@ -513,7 +515,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         pubWithImex.addXref(pubXref);
 
         // one publication with imex-primary, one nucleic acid and the rest protein
-        Publication pubWithoutPPI = getMockBuilder().createPublicationRandom();
+        Publication pubWithoutPPI = builder.createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(1);
         exp2.setPublication(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
@@ -540,7 +542,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_IMEx_Id_ToUpdate() throws ParseException {
-
+        IntactMockBuilder builder = new IntactMockBuilder();
         TransactionStatus status = getDataContext().beginTransaction();
 
         CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
@@ -553,7 +555,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         getCorePersister().saveOrUpdate(imexCuration);
 
         // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithImex = builder.createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.setPublication(pubWithImex);
         pubWithImex.addExperiment(exp1);
@@ -563,7 +565,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         pubWithImex.addAnnotation(imexCurationAnn1);
 
         // one publication with imex-primary, no PPI
-        Publication pubWithoutPPI = getMockBuilder().createPublicationRandom();
+        Publication pubWithoutPPI = builder.createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(1);
         exp2.setPublication(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
@@ -592,7 +594,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_needing_An_Imex_Id() throws ParseException {
-
+        IntactMockBuilder builder = new IntactMockBuilder();
         TransactionStatus status = getDataContext().beginTransaction();
 
         User reviewer = getMockBuilder().createReviewer("reviewer", "reviewer", "reviewer", "reviewer@ebi.ac.uk");
@@ -610,7 +612,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         getCorePersister().saveOrUpdate(dataset);
 
         // one publication without imex primary ref but imex curation and 2 PPI (eligible imex with dataset)
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
+        Publication pubWithImex = builder.createPublicationRandom();
         Experiment exp1 = getMockBuilder().createExperimentRandom(2);
         exp1.setPublication(pubWithImex);
         pubWithImex.addExperiment(exp1);
@@ -626,7 +628,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         lifecycleManager.getReadyForCheckingStatus().accept(pubWithImex, "accepted");
 
         // one publication without imex-primary, no PPI but with imex curation level and dataset
-        Publication pubWithoutPPI = getMockBuilder().createPublicationRandom();
+        Publication pubWithoutPPI = builder.createPublicationRandom();
         Experiment exp2 = getMockBuilder().createExperimentRandom(1);
         exp2.setPublication(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
