@@ -6,13 +6,13 @@
     <parent>
         <artifactId>psimitab-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-        <version>2.1.7-SNAPSHOT</version>
+        <version>2.1.6</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-solr-core</artifactId>
-    <version>2.1.7-SNAPSHOT</version>
+    <version>2.1.6.7</version>
 
     <name>IntAct Data Exchange :: PSI MI :: TAB :: Lucene SOLR integration</name>
 
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psimitab</artifactId>
-            <version>1.8.4-SNAPSHOT</version>
+            <version>1.8.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
@@ -53,27 +53,27 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.commons</groupId>
             <artifactId>intact-commons</artifactId>
-            <version>2.1.9-SNAPSHOT</version>
+            <version>2.1.8</version>
         </dependency>
 
         <!-- psicquic -->
         <dependency>
             <groupId>org.hupo.psi.mi.psicquic</groupId>
             <artifactId>psicquic-solr</artifactId>
-            <version>1.2.2-SNAPSHOT</version>
+            <version>1.2.1.2</version>
         </dependency>
         <!-- intact solr home -->
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-solr-home</artifactId>
-            <version>${pom.version}</version>
+            <version>2.1.6.2</version>
         </dependency>
 
         <!-- Ontologies -->
         <dependency>
             <groupId>uk.ac.ebi.intact.bridges</groupId>
             <artifactId>intact-ontologies</artifactId>
-            <version>2.1.7-SNAPSHOT</version>
+            <version>2.1.6</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.lucene</groupId>
