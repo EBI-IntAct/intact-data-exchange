@@ -103,9 +103,10 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
         enricher.enrich( smallMolecule );
 
         Assert.assertEquals("imatinib",smallMolecule.getShortLabel());
-        Assert.assertEquals( 3, smallMolecule.getAnnotations().size() );
+        Assert.assertEquals( 4, smallMolecule.getAnnotations().size() );
         assertHasAnnotation( smallMolecule, "function", "tyrosine kinase inhibitor" );
         assertHasAnnotation( smallMolecule, "function", "antineoplastic agent" );
+        assertHasAnnotation( smallMolecule, "function", "apoptosis inducer" );
         assertHasAnnotation( smallMolecule, "standard inchi", "InChI=1S/C29H31N7O/c1-21-5-10-25(18-27(21)34-29-31-13-11-26(33-29)24-4-3-12-30-19-24)32-28(37)23-8-6-22(7-9-23)20-36-16-14-35(2)15-17-36/h3-13,18-19H,14-17,20H2,1-2H3,(H,32,37)(H,31,33,34)" );
         assertHasAlias( smallMolecule, "iupac name", "4-[(4-methylpiperazin-1-yl)methyl]-N-{4-methyl-3-" +
                                                      "[(4-pyridin-3-ylpyrimidin-2-yl)amino]phenyl}benzamide" );
@@ -156,7 +157,7 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
     public void enrich_chebi_xrefs_disabled(){
         Assert.assertNotNull( config );
         config.setUpdateSmallMoleculeChebiXrefs( false );
-        
+
         final SmallMolecule smallMolecule = getMockBuilder().createSmallMolecule( "CHEBI:11930", "imatinib" );
         Assert.assertEquals(1,smallMolecule.getXrefs().size());
 
