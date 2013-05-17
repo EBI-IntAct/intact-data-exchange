@@ -22,7 +22,7 @@
         <core.version>2.6.2</core.version>
         <bridges.version>2.1.7</bridges.version>
         <commons.version>2.1.9</commons.version>
-        <uniprot.version>LATEST</uniprot.version>
+        <uniprot.version>2013.05</uniprot.version>
     </properties>
 
     <scm>
