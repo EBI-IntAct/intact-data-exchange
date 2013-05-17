@@ -19,16 +19,11 @@
         <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/psimi/psimitab/intact-psimitab-converters/</url>
     </scm>
 
-    <properties>
-        <commons.version>2.1.9-SNAPSHOT</commons.version>
-    </properties>
-
     <dependencies>
 
         <dependency>
             <groupId>uk.ac.ebi.intact.commons</groupId>
             <artifactId>intact-commons</artifactId>
-            <version>${commons.version}</version>
         </dependency>
 
         <dependency>
@@ -45,7 +40,6 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>
-            <version>2.6.2-SNAPSHOT</version>
         </dependency>
 
         <!-- Third party -->

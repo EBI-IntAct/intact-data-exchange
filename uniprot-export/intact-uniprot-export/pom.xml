@@ -34,19 +34,18 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>
-            <version>2.6.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>uk.ac.ebi.intact.bridges</groupId>
             <artifactId>intact-uniprot</artifactId>
-            <version>2.1.7-SNAPSHOT</version>
+            <version>${bridges.version}</version>
         </dependency>
 
         <dependency>
             <groupId>uk.ac.ebi.intact.bridges</groupId>
             <artifactId>intact-taxonomy</artifactId>
-            <version>2.1.7-SNAPSHOT</version>
+            <version>${bridges.version}</version>
         </dependency>
 
         <dependency>
@@ -66,7 +65,7 @@
         <dependency>
             <groupId>uk.ac.ebi.enfin.mi.cluster.score</groupId>
             <artifactId>miClusterScore</artifactId>
-            <version>1.6.3-SNAPSHOT</version>
+            <version>1.6.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>

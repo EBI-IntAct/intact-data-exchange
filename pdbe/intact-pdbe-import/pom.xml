@@ -6,7 +6,7 @@
         <groupId>uk.ac.ebi.intact.dataexchange.pdbe</groupId>
         <version>2.1.7-SNAPSHOT</version>
     </parent>
-                        
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-pdbe-import</artifactId>
@@ -17,6 +17,7 @@
     <dependencies>
 
         <!-- IntAct dependencies -->
+        <!-- Not modify the version -->
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>

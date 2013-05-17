@@ -24,8 +24,8 @@
     <modules>
         <module>intact-psimitab-converters</module>
         <module>intact-solr</module>
-    <module>intact-solr-home</module>
-    <module>intact-calimocho-converters</module>
+        <module>intact-solr-home</module>
+        <module>intact-calimocho-converters</module>
   </modules>
 
     <dependencyManagement>

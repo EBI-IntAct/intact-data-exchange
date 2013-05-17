@@ -7,7 +7,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    
+
     <artifactId>intact-ebi-search-engine-export</artifactId>
 
     <packaging>jar</packaging>
