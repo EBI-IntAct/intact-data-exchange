@@ -12,7 +12,7 @@
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>intact-dataexchange-master</artifactId>
     <packaging>pom</packaging>
-    <version>2.1.7</version>
+    <version>2.1.8-SNAPSHOT</version>
 
     <name>IntAct Data Exchange</name>
     <description>Data Exchange Master POM</description>
@@ -26,9 +26,9 @@
     </properties>
 
     <scm>
-        <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/tags/intact-dataexchange-master-2.1.7</connection>
-        <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/tags/intact-dataexchange-master-2.1.7</developerConnection>
-        <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/tags/intact-dataexchange-master-2.1.7</url>
+        <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk</connection>
+        <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk</developerConnection>
+        <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk</url>
     </scm>
 
     <modules>
