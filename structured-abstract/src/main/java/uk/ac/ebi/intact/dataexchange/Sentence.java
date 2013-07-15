@@ -37,15 +37,35 @@ public class Sentence {
         this.detMethod = detMethod;
     }
 
-    public void addProteinsObject(Component participant) {
+    public void addInteractorObject(Component participant) {
         interactorsObject.add(new SimpleInteractor(participant));
     }
 
-    public void addProteinsSubject(Component participant) {
+    public void addInteractorSubject(Component participant) {
         interactorsSubject.add(new SimpleInteractor(participant));
     }
 
-    public void addMintAc(String mintAc) {
+    public void addInteractionAc(String mintAc) {
         interactionAcs.add(mintAc);
+    }
+
+    public List<String> getInteractionAcs() {
+        return interactionAcs;
+    }
+
+    public List<SimpleInteractor> getInteractorsObject() {
+        return interactorsObject;
+    }
+
+    public List<SimpleInteractor> getInteractorsSubject() {
+        return interactorsSubject;
+    }
+
+    public String getInteractionTypeMI() {
+        return interactionTypeMI;
+    }
+
+    public CvInteraction getDetMethod() {
+        return detMethod;
     }
 }
