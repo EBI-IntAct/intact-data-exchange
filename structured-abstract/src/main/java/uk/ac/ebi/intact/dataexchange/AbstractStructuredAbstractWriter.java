@@ -15,7 +15,7 @@ import java.util.*;
  * @since <pre>15/07/13</pre>
  */
 
-public class AbstractStructuredAbstractWriter {
+public abstract class AbstractStructuredAbstractWriter {
     private static final Log log = LogFactory.getLog(AbstractStructuredAbstractWriter.class);
 
     /**
@@ -203,27 +203,28 @@ public class AbstractStructuredAbstractWriter {
 
         int count = 1;// counter for control number of mintAc present in list
         // mintAcs linking as view interaction
+        this.writer.write(" (");
         if (sentence.getInteractionAcs().size() == 1) {
-            interaction_link += getMintAcOutput(2, mintAcs.get(0), 0);
+            writeInteractionAc(sentence.getInteractionAcs().iterator().next(), 0);
 
         } else {
-            interaction_link += "View Interaction: ";
-            for (String mintAc : mintAcs) {
+            writer.write("View Interaction: ");
+            for (String mintAc : sentence.getInteractionAcs()) {
 
                 // // COMMA insert for multiple MINTACs
                 if (count >= 2)
-                    interaction_link += ", ";
-                interaction_link += getMintAcOutput(2, mintAc, count);
+                    writer.write(", ");
+                writeInteractionAc(mintAc, count);
                 count++;
             }
 
         }
-
-        sentence += " (" + interaction_link + ")";
-        return sentence;
+        this.writer.write(")");
     }
 
-    private void writeInteractionType(Sentence sentence) throws IOException {
+    protected abstract void writeInteractionAc(String mintAC, int num_int);
+
+    protected void writeInteractionType(Sentence sentence) throws IOException {
         this.writer.write(" ");
         if (this.sentencePropertiesMap.containsKey(sentence.getInteractionTypeMI())){
             SentenceProperty sentenceProperty = this.sentencePropertiesMap.get(sentence.getInteractionTypeMI());
