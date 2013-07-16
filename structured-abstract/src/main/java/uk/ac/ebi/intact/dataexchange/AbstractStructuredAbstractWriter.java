@@ -144,6 +144,11 @@ public abstract class AbstractStructuredAbstractWriter {
         this.sentencesPropertiesPath = sentencesPropertiesPath;
     }
 
+    /**
+     * Write structured abstract for publication
+     * @param publication
+     * @throws IOException
+     */
     public void writeStructuredAbstract(Publication publication) throws IOException {
         if (publication == null){
             throw new IllegalArgumentException("The publication cannot be null");
@@ -167,133 +172,50 @@ public abstract class AbstractStructuredAbstractWriter {
         }
     }
 
-    protected void writeSentence(Sentence sentence) throws IOException {
-        this.stringBuilder.setLength(0);
-
-        // PROTEIN SUBJECT------------------------------------------
-        writeInteractorNames(sentence.getInteractorsSubject());
-
-        // add proteins Subject if there is only this participant
-        if ((sentence.getInteractorsObject().size() == 0) && (sentence.getInteractorsSubject().size() == 1)) {
-            String subject = this.stringBuilder.toString();
-            this.stringBuilder.append(" and ");
-            this.stringBuilder.append(subject);
-            this.stringBuilder.append(" ");
+    /**
+     * Write structured abstract for experiment
+     * @param experiment
+     * @throws IOException
+     */
+    public void writeStructuredAbstract(Experiment experiment) throws IOException {
+        if (experiment == null){
+            throw new IllegalArgumentException("The experiment cannot be null");
         }
 
-        this.writer.write(this.stringBuilder.toString());
-        this.stringBuilder.setLength(0);
+        // clear
+        clear();
 
-        // load sentence properties if not done yet
-        if (this.sentencePropertiesMap.isEmpty()){
-           loadSentenceProperties();
+        // read and collect abstract for each interaction
+        for (Interaction in : experiment.getInteractions()) {
+            collectStructuredAbstractFrom(in);
         }
 
-        // write interaction type
-        writeInteractionType(sentence);
-
-        // PROTEIN OBJECT------------------------------------------
-        writeInteractorNames(sentence.getInteractorsSubject());
-
-        this.writer.write(this.stringBuilder.toString());
-        this.writer.write(" by ");
-
-        // write interaction detection method
-        writeMIOutput(sentence.getDetMethod().getIdentifier(), sentence.getDetMethod().getFullName());
-
-        int count = 1;// counter for control number of mintAc present in list
-        // mintAcs linking as view interaction
-        this.writer.write(" (");
-        if (sentence.getInteractionAcs().size() == 1) {
-            writeInteractionAc(sentence.getInteractionAcs().iterator().next(), 0);
-
-        } else {
-            writer.write("View Interaction: ");
-            for (String mintAc : sentence.getInteractionAcs()) {
-
-                // // COMMA insert for multiple MINTACs
-                if (count >= 2)
-                    writer.write(", ");
-                writeInteractionAc(mintAc, count);
-                count++;
-            }
-
-        }
-        this.writer.write(")");
-    }
-
-    protected abstract void writeInteractionAc(String mintAC, int num_int);
-
-    protected void writeInteractionType(Sentence sentence) throws IOException {
-        this.writer.write(" ");
-        if (this.sentencePropertiesMap.containsKey(sentence.getInteractionTypeMI())){
-            SentenceProperty sentenceProperty = this.sentencePropertiesMap.get(sentence.getInteractionTypeMI());
-            if (sentence.getInteractorsObject().size() == 0) {
-                writeMIOutput(sentence.getInteractionTypeMI(), sentenceProperty.getPluralVerb());
-
-            }// if there is ONE subject, use
-            else if (sentence.getInteractorsSubject().size() == 1) {
-                writeMIOutput(sentence.getInteractionTypeMI(), sentenceProperty.getSingularVerb());
-            } else {
-                writeMIOutput(sentence.getInteractionTypeMI(), sentenceProperty.getPluralVerb());
-            }
-
-            // add conjunction only if there are object proteins
-            if (sentence.getInteractorsObject().size() > 0) {
-                this.writer.write(" ");
-                this.writer.write(sentenceProperty.getConjunction());
-                this.writer.write(" ");
-            }
-        }
-        else{
-            writeMIOutput(sentence.getInteractionTypeMI(), "");
-            // add conjunction only if there are object proteins
-            if (sentence.getInteractorsObject().size() > 0) {
-                this.writer.write("  ");
-            }
+        // write all collected sentences
+        for (Sentence sentence : this.sentenceMap.values()) {
+            writeSentence(sentence);
         }
     }
 
-    protected void writeMIOutput(String MIcode, String verb) throws IOException {
-        this.writer.write("<a href=\"http://www.ebi.ac.uk/ontology-lookup/?termId=");
-        this.writer.write(MIcode);
-        this.writer.write(" \" style=\"text-decoration:none; \">");
-        this.writer.write(verb);
-        this.writer.write("</a>");
-    }
-
-    protected void writeInteractorNames(List<SimpleInteractor> interactors) {
-        int countSubj = 1;
-        int subjectSize = interactors.size();
-        for (SimpleInteractor component : interactors) {
-
-            if (countSubj > 1) {
-                if (countSubj == subjectSize)// last protein
-                {
-                    this.stringBuilder.append(" and ");
-                } else {
-                    this.stringBuilder.append(", ");
-                }
-            }
-            countSubj++;
-
-            String interactorName = "";
-            if (component.getAuthorAssignedName() != null) {
-                interactorName = component.getAuthorAssignedName();
-            } else {
-                interactorName = component.getShortName();
-            }
-
-            writeXrefOutput(component.getXref(), interactorName);
+    /**
+     * Write structured abstract for interaction
+     * @param interaction
+     * @throws IOException
+     */
+    public void writeStructuredAbstract(Interaction interaction) throws IOException {
+        if (interaction == null){
+            throw new IllegalArgumentException("The publication cannot be null");
         }
-    }
 
-    protected void writeXrefOutput(Xref xref, String proteinName) {
-        this.stringBuilder.append("<a href=\"");
-        this.stringBuilder.append(XrefLinkUtils.getPrimaryIdLink(xref, this.cvTermUrls));
-        this.stringBuilder.append(" \" style=\"text-decoration:none; \"><b>");
-        this.stringBuilder.append(proteinName);
-        this.stringBuilder.append("</b></a>");
+        // clear
+        clear();
+
+        // read and collect abstract for interaction
+        collectStructuredAbstractFrom(interaction);
+
+        // write all collected sentences
+        for (Sentence sentence : this.sentenceMap.values()) {
+            writeSentence(sentence);
+        }
     }
 
     protected void collectStructuredAbstractFrom(Interaction interaction){
@@ -309,7 +231,9 @@ public abstract class AbstractStructuredAbstractWriter {
             sentence = this.sentenceMap.get(key);
         }
         // 2. else create it and put it in HashMap
-        else {
+        else if (interaction.getCvInteractionType() != null
+                && !interaction.getExperiments().isEmpty()
+                && interaction.getExperiments().iterator().next().getCvInteraction() != null){
             sentence = new Sentence(interaction.getCvInteractionType(), interaction.getExperiments().iterator().next().getCvInteraction());
 
             if (interaction.getExperiments().size() > 1) {
@@ -338,6 +262,9 @@ public abstract class AbstractStructuredAbstractWriter {
             }
             this.sentenceMap.put(key, sentence);
         }
+        else {
+            throw new IllegalArgumentException("The interaction must hav a non null interaction type and a non null interaction detection method");
+        }
         // add interactionAc to sentence
         sentence.addInteractionAc(interaction.getAc());
     }
@@ -365,6 +292,135 @@ public abstract class AbstractStructuredAbstractWriter {
             stringBuilder.append(interaction.getExperiments().iterator().next().getCvInteraction().getIdentifier());
         }
     }
+
+    protected void writeSentence(Sentence sentence) throws IOException {
+
+        // PROTEIN SUBJECT------------------------------------------
+        buildInteractorNamesFrom(sentence.getInteractorsSubject());
+
+        // add proteins Subject if there is only this participant
+        if ((sentence.getInteractorsObject().size() == 0) && (sentence.getInteractorsSubject().size() == 1)) {
+            String subject = this.stringBuilder.toString();
+            this.writer.write(subject);
+            this.writer.write(" and ");
+            this.writer.write(subject);
+            this.writer.write(" ");
+        }
+        else {
+            this.writer.write(this.stringBuilder.toString());
+        }
+
+        // load sentence properties if not done yet
+        if (this.sentencePropertiesMap.isEmpty()){
+           loadSentenceProperties();
+        }
+
+        // write interaction type
+        writeInteractionType(sentence);
+
+        // PROTEIN OBJECT------------------------------------------
+        buildInteractorNamesFrom(sentence.getInteractorsSubject());
+
+        this.writer.write(this.stringBuilder.toString());
+        this.writer.write(" by ");
+
+        // write interaction detection method
+        writeMIOutput(sentence.getDetMethod().getIdentifier(), sentence.getDetMethod().getFullName() != null ? sentence.getDetMethod().getFullName() : sentence.getDetMethod().getShortLabel());
+
+        // mintAcs linking as view interaction
+        this.writer.write(" (");
+        if (sentence.getInteractionAcs().size() == 1) {
+            writeInteractionAc(sentence.getInteractionAcs().iterator().next(), 0);
+
+        } else {
+            Iterator<String> interactionAcIterator = sentence.getInteractionAcs().iterator();
+            int count = 1;
+            while (interactionAcIterator.hasNext()){
+                String ac = interactionAcIterator.next();
+                writeInteractionAc(ac, count);
+                if (interactionAcIterator.hasNext()){
+                    writer.write(", ");
+                }
+                count++;
+            }
+        }
+        this.writer.write(")");
+    }
+
+    protected void buildInteractorNamesFrom(List<SimpleInteractor> interactors) {
+        this.stringBuilder.setLength(0);
+
+        int subjectSize = interactors.size();
+        Iterator<SimpleInteractor> interactorIterator = interactors.iterator();
+        boolean isLast;
+        while (interactorIterator.hasNext()){
+            SimpleInteractor simple = interactorIterator.next();
+
+            isLast = interactorIterator.hasNext();
+            // last element
+            if (isLast && subjectSize > 1){
+                this.stringBuilder.append(" and ");
+            }
+            // other element
+            else if (subjectSize > 1){
+                this.stringBuilder.append(", ");
+            }
+
+            String interactorName;
+            if (simple.getAuthorAssignedName() != null) {
+                interactorName = simple.getAuthorAssignedName();
+            } else {
+                interactorName = simple.getShortName();
+            }
+
+            buildXrefOutput(simple.getXref(), interactorName);
+        }
+    }
+
+    protected abstract void buildXrefOutput(Xref xref, String proteinName);
+
+    protected abstract void writeInteractionAc(String mintAC, int num_int) throws IOException;
+
+    protected void writeInteractionType(Sentence sentence) throws IOException {
+        this.writer.write(" ");
+        if (this.sentencePropertiesMap.containsKey(sentence.getInteractionTypeMI())){
+            SentenceProperty sentenceProperty = this.sentencePropertiesMap.get(sentence.getInteractionTypeMI());
+            if (sentence.getInteractorsObject().size() == 0) {
+                writeMIOutput(sentence.getInteractionTypeMI(), sentenceProperty.getPluralVerb());
+
+            }// if there is ONE subject, use
+            else if (sentence.getInteractorsSubject().size() == 1) {
+                writeMIOutput(sentence.getInteractionTypeMI(), sentenceProperty.getSingularVerb());
+            } else {
+                writeMIOutput(sentence.getInteractionTypeMI(), sentenceProperty.getPluralVerb());
+            }
+
+            // add conjunction only if there are object proteins
+            if (sentence.getInteractorsObject().size() > 0) {
+                this.writer.write(" ");
+                this.writer.write(sentenceProperty.getConjunction());
+                this.writer.write(" ");
+            }
+        }
+        else{
+            if (sentence.getInteractorsObject().size() == 0) {
+                writeMIOutput(sentence.getInteractionTypeMI(), "interact with");
+
+            }// if there is ONE subject, use
+            else if (sentence.getInteractorsSubject().size() == 1) {
+                writeMIOutput(sentence.getInteractionTypeMI(), "interacts with");
+            } else {
+                writeMIOutput(sentence.getInteractionTypeMI(), "interact with");
+            }
+
+            // add conjunction only if there are object proteins
+            if (sentence.getInteractorsObject().size() > 0) {
+                this.writer.write("  ");
+            }
+        }
+    }
+
+    protected abstract void writeMIOutput(String MIcode, String verb) throws IOException;
 
     protected void loadSentenceProperties(){
         this.sentencePropertiesMap.clear();
@@ -453,5 +509,17 @@ public abstract class AbstractStructuredAbstractWriter {
         preyMi.add(CvExperimentalRole.ELECTRON_DONOR_MI_REF);
         preyMi.add(CvExperimentalRole.FLUROPHORE_DONOR_MI_REF);
         preyMi.add(CvExperimentalRole.ENZYME_PSI_REF);
+    }
+
+    protected StringBuilder getStringBuilder() {
+        return stringBuilder;
+    }
+
+    protected Writer getWriter() {
+        return writer;
+    }
+
+    protected Map<String, String> getCvTermUrls() {
+        return cvTermUrls;
     }
 }
