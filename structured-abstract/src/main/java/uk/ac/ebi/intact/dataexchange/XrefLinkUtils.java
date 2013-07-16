@@ -28,7 +28,7 @@ public class XrefLinkUtils {
     /**
      * The pattern to replace the ac.
      */
-    private static Pattern ourSearchUrlPat = Pattern.compile("\\$\\{ac\\}");
+    private static Pattern ourSearchUrlPat = Pattern.compile("(\\$)?\\{ac\\}");
 
     /**
      * Return the primary id as a link. Only used when viewing a xref.

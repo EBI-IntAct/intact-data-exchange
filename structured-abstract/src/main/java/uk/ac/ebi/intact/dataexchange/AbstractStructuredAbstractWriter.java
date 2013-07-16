@@ -167,10 +167,20 @@ public abstract class AbstractStructuredAbstractWriter {
         }
 
         // write all collected sentences
-        for (Sentence sentence : this.sentenceMap.values()) {
-            writeSentence(sentence);
+        writeSentences();
+    }
+
+    protected void writeSentences() throws IOException {
+        Iterator<Sentence> sentenceIterator = this.sentenceMap.values().iterator();
+        while (sentenceIterator.hasNext()) {
+            writeSentence(sentenceIterator.next());
+            if (sentenceIterator.hasNext()){
+                writeLineSeparator();
+            }
         }
     }
+
+    protected abstract void writeLineSeparator() throws IOException;
 
     /**
      * Write structured abstract for experiment
@@ -191,9 +201,7 @@ public abstract class AbstractStructuredAbstractWriter {
         }
 
         // write all collected sentences
-        for (Sentence sentence : this.sentenceMap.values()) {
-            writeSentence(sentence);
-        }
+        writeSentences();
     }
 
     /**
@@ -213,9 +221,7 @@ public abstract class AbstractStructuredAbstractWriter {
         collectStructuredAbstractFrom(interaction);
 
         // write all collected sentences
-        for (Sentence sentence : this.sentenceMap.values()) {
-            writeSentence(sentence);
-        }
+        writeSentences();
     }
 
     protected void collectStructuredAbstractFrom(Interaction interaction){
@@ -319,7 +325,7 @@ public abstract class AbstractStructuredAbstractWriter {
         writeInteractionType(sentence);
 
         // PROTEIN OBJECT------------------------------------------
-        buildInteractorNamesFrom(sentence.getInteractorsSubject());
+        buildInteractorNamesFrom(sentence.getInteractorsObject());
 
         this.writer.write(this.stringBuilder.toString());
         this.writer.write(" by ");
@@ -345,6 +351,7 @@ public abstract class AbstractStructuredAbstractWriter {
             }
         }
         this.writer.write(")");
+        this.writer.flush();
     }
 
     protected void buildInteractorNamesFrom(List<SimpleInteractor> interactors) {
@@ -353,16 +360,17 @@ public abstract class AbstractStructuredAbstractWriter {
         int subjectSize = interactors.size();
         Iterator<SimpleInteractor> interactorIterator = interactors.iterator();
         boolean isLast;
+        boolean isFirst = true;
         while (interactorIterator.hasNext()){
             SimpleInteractor simple = interactorIterator.next();
 
-            isLast = interactorIterator.hasNext();
+            isLast = !interactorIterator.hasNext();
             // last element
             if (isLast && subjectSize > 1){
                 this.stringBuilder.append(" and ");
             }
             // other element
-            else if (subjectSize > 1){
+            else if (!isFirst && subjectSize > 1){
                 this.stringBuilder.append(", ");
             }
 
@@ -374,6 +382,7 @@ public abstract class AbstractStructuredAbstractWriter {
             }
 
             buildXrefOutput(simple.getXref(), interactorName);
+            isFirst = false;
         }
     }
 

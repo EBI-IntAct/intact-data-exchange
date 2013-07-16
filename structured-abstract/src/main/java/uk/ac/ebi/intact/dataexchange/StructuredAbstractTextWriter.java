@@ -45,4 +45,9 @@ public class StructuredAbstractTextWriter extends AbstractStructuredAbstractWrit
         getWriter().write(" ");
         getWriter().write(mintAC);
     }
+
+    @Override
+    protected void writeLineSeparator() throws IOException {
+        getWriter().write("\n");
+    }
 }

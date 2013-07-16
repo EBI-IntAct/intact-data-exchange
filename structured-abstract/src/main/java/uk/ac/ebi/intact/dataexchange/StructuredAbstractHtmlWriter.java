@@ -62,4 +62,9 @@ public class StructuredAbstractHtmlWriter extends AbstractStructuredAbstractWrit
         }
         getWriter().write("</a>");
     }
+
+    @Override
+    protected void writeLineSeparator() throws IOException {
+        getWriter().write("<br/>");
+    }
 }
