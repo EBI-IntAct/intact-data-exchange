@@ -41,6 +41,7 @@
         <module>intact-tasks</module>
         <module>imex</module>
         <module>intact-mi-cluster-score</module>
+    <module>structured-abstract</module>
   </modules>
 
     <build>
