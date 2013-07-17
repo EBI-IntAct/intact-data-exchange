@@ -5,12 +5,12 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>2.1.7</version>
+        <version>2.1.8-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>structured-abstract</artifactId>
-    <version>2.1.8-alpha-2</version>
+    <version>2.1.8-SNAPSHOT</version>
 
     <name>IntAct structured abstract</name>
 
