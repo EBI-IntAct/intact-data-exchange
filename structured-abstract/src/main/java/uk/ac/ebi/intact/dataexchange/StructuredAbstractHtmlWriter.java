@@ -31,12 +31,19 @@ public class StructuredAbstractHtmlWriter extends AbstractStructuredAbstractWrit
     }
 
     @Override
-    protected void buildXrefOutput(Xref xref, String proteinName) {
-        getStringBuilder().append("<a href=\"");
-        getStringBuilder().append(XrefLinkUtils.getPrimaryIdLink(xref, getCvTermUrls()));
-        getStringBuilder().append(" \" style=\"text-decoration:none; \"><b>");
-        getStringBuilder().append(proteinName);
-        getStringBuilder().append("</b></a>");
+    protected void buildXrefOutput(Xref xref, String proteinName, String ac) {
+        String linkValue = XrefLinkUtils.getPrimaryIdLink(ac, xref, getCvTermUrls());
+        if (linkValue == null){
+            getStringBuilder().append(" ");
+            getStringBuilder().append(proteinName);
+        }
+        else {
+            getStringBuilder().append("<a href=\"");
+            getStringBuilder().append(linkValue);
+            getStringBuilder().append(" \" style=\"text-decoration:none; \"><b>");
+            getStringBuilder().append(proteinName);
+            getStringBuilder().append("</b></a>");
+        }
     }
 
     @Override

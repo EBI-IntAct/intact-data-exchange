@@ -381,12 +381,12 @@ public abstract class AbstractStructuredAbstractWriter {
                 interactorName = simple.getShortName();
             }
 
-            buildXrefOutput(simple.getXref(), interactorName);
+            buildXrefOutput(simple.getXref(), interactorName, simple.getAc());
             isFirst = false;
         }
     }
 
-    protected abstract void buildXrefOutput(Xref xref, String proteinName);
+    protected abstract void buildXrefOutput(Xref xref, String proteinName, String ac);
 
     protected abstract void writeInteractionAc(String mintAC, int num_int) throws IOException;
 

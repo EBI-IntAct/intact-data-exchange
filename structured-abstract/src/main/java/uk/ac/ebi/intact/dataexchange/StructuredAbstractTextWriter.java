@@ -29,7 +29,7 @@ public class StructuredAbstractTextWriter extends AbstractStructuredAbstractWrit
     }
 
     @Override
-    protected void buildXrefOutput(Xref xref, String proteinName) {
+    protected void buildXrefOutput(Xref xref, String proteinName, String ac) {
         getStringBuilder().append(" ");
         getStringBuilder().append(proteinName);
     }

@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 public class XrefLinkUtils {
 
-    private static final String ourEmptyPidLink = "---";
+    private static final String ourEmptyPidLink = "http://www.ebi.ac.uk/intact/molecule/";
 
     /**
      * The pattern to replace spaces in the Primary Id.
@@ -41,13 +41,14 @@ public class XrefLinkUtils {
      *         primary id is returned as the link if there is 'search-url' is
      *         found among the annotations for given xreference.
      */
-    public static String getPrimaryIdLink(Xref xref, Map<String, String> cvTermsUrlsCache) {
-        // Return the empty link if there is no primary id. This is a raw
-        // pid (may contains spaces in its name).
-        String pidraw = xref.getPrimaryId();
-        if (pidraw == null) {
-            return ourEmptyPidLink;
+    public static String getPrimaryIdLink(String ac, Xref xref, Map<String, String> cvTermsUrlsCache) {
+        if (ac == null && xref == null){
+            return null;
         }
+        else if (xref == null || (xref != null && xref.getPrimaryId() == null)){
+            return ourEmptyPidLink+ac;
+        }
+
         // The short label of the database of the xref.
         String dbname = xref.getCvDatabase().getShortLabel();
 
@@ -68,16 +69,19 @@ public class XrefLinkUtils {
                     break;
                 }
             }
-            if (searchUrl == null) {
+            if (searchUrl == null && ac != null) {
                 // The db has no annotation "search-url". Don't search again in
                 // the future.
-                return ourEmptyPidLink;
+                return ourEmptyPidLink+ac;
+            }
+            else if (searchUrl == null){
+                return null;
             }
             // Cache the url.
             cvTermsUrlsCache.put(dbname, searchUrl);
         }
         // Match against the spaces.
-        Matcher pidmatch = ourPrimaryIDPat.matcher(pidraw);
+        Matcher pidmatch = ourPrimaryIDPat.matcher(xref.getPrimaryId());
 
         // The primary id after replacing spaces with %20 characters.
         String pid = pidmatch.replaceAll("%20");

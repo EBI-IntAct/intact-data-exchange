@@ -14,6 +14,7 @@ public class SimpleInteractor {
 
     public static final String IPI = "MI:0675";
 
+    private String ac;
     private String shortName;
     private Xref xref;
     private String authorAssignedName;
@@ -28,6 +29,9 @@ public class SimpleInteractor {
         if (interactor == null){
             throw new IllegalArgumentException("The component must have a non null interactor.");
         }
+
+        // ac
+        this.ac = interactor.getAc();
 
         // shortlabel is interactor shortlabel
         this.shortName = interactor.getShortLabel();
@@ -55,6 +59,16 @@ public class SimpleInteractor {
                 else {
                     lastIdentifier = xref;
                 }
+            }
+        }
+
+        // alias is gene name
+        for (Alias alias : interactor.getAliases()) {
+            if (alias.getCvAliasType() != null && alias.getCvAliasType().getIdentifier() != null
+                    && alias.getCvAliasType().getIdentifier().equalsIgnoreCase(CvAliasType.GENE_NAME_MI_REF)
+                    && alias.getName() != null && alias.getName().length() > 0){
+                this.shortName = alias.getName();
+                break;
             }
         }
 
@@ -89,5 +103,9 @@ public class SimpleInteractor {
 
     public String getAuthorAssignedName() {
         return authorAssignedName;
+    }
+
+    public String getAc() {
+        return ac;
     }
 }
