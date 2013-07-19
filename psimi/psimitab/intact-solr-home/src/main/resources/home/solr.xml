@@ -41,6 +41,7 @@
   <cores adminPath="/admin/cores">
       <core name="core_pub" instanceDir="core0" />
       <core name="core_ontology_pub" instanceDir="core_ontology0" />
+      <core name="core_complex_pub" instanceDir="core_complex0"/> <!-- added by Oscar -->
     <!--<core name="core_pub,core0" instanceDir="core0" />
     <core name="core_stage,core1" instanceDir="core1" />
     <core name="core_ontology_pub,core_ontology0" instanceDir="core_ontology0" />
