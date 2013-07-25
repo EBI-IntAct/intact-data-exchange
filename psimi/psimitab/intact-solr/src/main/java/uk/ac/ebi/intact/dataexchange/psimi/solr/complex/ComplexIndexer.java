@@ -19,11 +19,15 @@ public class ComplexIndexer {
     private int commitInterval = 50000;
     private int numberOfTries = 5;
 
+    /************************************************/
+    /*                 Constructor                  */
+    /************************************************/
     public ComplexIndexer(HttpSolrServer solrServer){
         // Receive a HttpSolrServer such as parameter
         this.solrServer = solrServer;
         // Activate the Log
         SolrLogger.readFromLog4j();
     }
+
 
 }
