@@ -31,8 +31,8 @@ public class ComplexMapping {
     /******************************/
     /*      Override Methods      */
     /******************************/
-    //@Override
-    public boolean equals( ComplexMapping other ){
+    @Override
+    public boolean equals( Object other ){
         // Object level comparisons
         if ( this == other ) return true;
         if ( other == null || getClass() != other.getClass() ) return false;

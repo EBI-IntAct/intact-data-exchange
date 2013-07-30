@@ -21,11 +21,13 @@ public final class ComplexDocument {
     private String             ID;
     private Collection<String> complexID;
     private String             complexName;
+    private Collection<String> complexOrganism;
     private Collection<String> complexAlias;
     private Collection<String> complexType;
     private Collection<String> complexXref;
     private String             complexAC;
     private String             description;
+    private String             organismName;
 
     //Interactor attributes
     private Collection<String> interactorID;
@@ -41,9 +43,9 @@ public final class ComplexDocument {
     private Collection<String> ecoXref;
     private Collection<String> publicationID;
 
-    /*************************/
-    /*      Constructor      */
-    /*************************/
+    /**************************/
+    /*      Constructors      */
+    /**************************/
     public ComplexDocument(String ID_,
                            String complexName_,
                            String complexAC_,
@@ -57,6 +59,7 @@ public final class ComplexDocument {
 
         //Initialize collections
         this.complexID          = new HashSet<String>();
+        this.complexOrganism    = new HashSet<String>();
         this.complexAlias       = new HashSet<String>();
         this.complexType        = new HashSet<String>();
         this.complexXref        = new HashSet<String>();
@@ -72,6 +75,14 @@ public final class ComplexDocument {
         this.ecoXref            = new HashSet<String>();
         this.publicationID      = new HashSet<String>();
     }
+    public ComplexDocument(String ID_,
+                           String complexName_,
+                           String complexAC_,
+                           String description_,
+                           String organismName_){
+        this(ID_, complexName_, complexAC_, description_);
+        this.organismName = organismName_;
+    }
 
     /*********************/
     /*      Getters      */
@@ -80,7 +91,9 @@ public final class ComplexDocument {
     public String getComplexName()  { return complexName; }
     public String getComplexAC()    { return complexAC; }
     public String getDescription()  { return description; }
+    public String getOrganismName() { return organismName; }
     public Collection<String> getComplexID()            { return new HashSet<String>(complexID); }
+    public Collection<String> getComplexOrganism()      { return new HashSet<String>(complexOrganism); }
     public Collection<String> getComplexAlias()         { return new HashSet<String>(complexAlias); }
     public Collection<String> getComplexType()          { return new HashSet<String>(complexType); }
     public Collection<String> getComplexXref()          { return new HashSet<String>(complexXref); }
@@ -99,6 +112,7 @@ public final class ComplexDocument {
     /*      Adders      */
     /********************/
     public boolean addComplexID(String ID)              { return complexID.add(ID); }
+    public boolean addComplexOrganism(String Organism)  { return complexOrganism.add(Organism); }
     public boolean addComplexAlias(String Alias)        { return complexAlias.add(Alias); }
     public boolean addComplexType(String Type)          { return complexType.add(Type); }
     public boolean addComplexXref(String Xref)          { return complexXref.add(Xref); }
@@ -120,6 +134,12 @@ public final class ComplexDocument {
         boolean result = true;
         for(String ID : IDs)
             result = result || addComplexID(ID);
+        return result;
+    }
+    public boolean addComplexOrganism(Collection<String> Organisms) {
+        boolean result = true;
+        for(String Organism : Organisms)
+            result = result || addComplexOrganism(Organism);
         return result;
     }
     public boolean addComplexAlias(Collection<String> Aliass){
@@ -212,10 +232,11 @@ public final class ComplexDocument {
 
         // ComplexDocument level comparisons
         ComplexDocument otherComplexDocument = (ComplexDocument) other;
-        if ( ID          != null ? !ID.equals(otherComplexDocument.ID)                   : otherComplexDocument.ID          != null ) return false;
-        if ( complexName != null ? !complexName.equals(otherComplexDocument.complexName) : otherComplexDocument.complexName != null ) return false;
-        if ( complexAC   != null ? !complexAC.equals(otherComplexDocument.complexAC)     : otherComplexDocument.complexAC   != null ) return false;
-        if ( description != null ? !description.equals(otherComplexDocument.description) : otherComplexDocument.description != null ) return false;
+        if ( ID             != null ? !ID.equals(otherComplexDocument.ID)                     : otherComplexDocument.ID             != null ) return false;
+        if ( complexName    != null ? !complexName.equals(otherComplexDocument.complexName)   : otherComplexDocument.complexName    != null ) return false;
+        if ( complexAC      != null ? !complexAC.equals(otherComplexDocument.complexAC)       : otherComplexDocument.complexAC      != null ) return false;
+        if ( description    != null ? !description.equals(otherComplexDocument.description)   : otherComplexDocument.description    != null ) return false;
+        if ( organismName   != null ? !organismName.equals(otherComplexDocument.organismName) : otherComplexDocument.organismName   != null ) return false;
 
         // If all checked is equal return true
         return true;
@@ -225,10 +246,11 @@ public final class ComplexDocument {
     public int hashCode(){
         int result = 0;
 
-        result =               (ID          != null ? ID.hashCode()          : 0);
-        result = 31 * result + (complexName != null ? complexName.hashCode() : 0);
-        result = 31 * result + (complexAC   != null ? complexAC.hashCode()   : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result =               (ID              != null ? ID.hashCode()             : 0);
+        result = 31 * result + (complexName     != null ? complexName.hashCode()    : 0);
+        result = 31 * result + (complexAC       != null ? complexAC.hashCode()      : 0);
+        result = 31 * result + (description     != null ? description.hashCode()    : 0);
+        result = 31 * result + (organismName    != null ? organismName.hashCode()   : 0);
 
         return result;
     }
@@ -241,6 +263,7 @@ public final class ComplexDocument {
         sb.append(", complexName = '").append(complexName).append("'");
         sb.append(", complexAC = '").append(complexAC).append("'");
         sb.append(", description = '").append(description).append("'");
+        sb.append(", organismName = '").append(organismName).append("'");
         sb.append("}");
         return sb.toString();
     }

@@ -10,11 +10,13 @@ public interface ComplexFieldName {
     String ID                   = "id";
     String COMPLEX_ID           = "complex_id";
     String COMPLEX_NAME         = "complex_name";
+    String COMPLEX_ORGANISM     = "complex_organism";
     String COMPLEX_ALIAS        = "complex_alias";
     String COMPLEX_TYPE         = "complex_type";
     String COMPLEX_XREF         = "complex_xref";
     String COMPLEX_AC           = "complex_AC";
     String DESCRIPTION          = "description";
+    String ORGANISM_NAME        = "organism_name";
 
     String INTERACTOR_ID        = "interactor_id";
     String INTERACTOR_ALIAS     = "interactor_alias";
