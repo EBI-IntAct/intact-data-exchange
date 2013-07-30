@@ -64,10 +64,12 @@
     <field name="complex_id"            type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_name"          type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
     <field name="complex_alias"         type="textAlias"    indexed="true"  stored="false"  multiValued="true"/>
+    <field name="complex_organism"      type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_type"          type="text"         indexed="true"  stored="false"  multivalued="true"/> <!-- Faceting -->
     <field name="complex_xref"          type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_AC"            type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
     <field name="description"           type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
+    <field name="organism_name"         type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
     <!-- interactor information -->
     <field name="interactor_id"         type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="interactor_alias"      type="textAlias"    indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
