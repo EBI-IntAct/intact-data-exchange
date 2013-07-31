@@ -60,8 +60,8 @@ public class ComplexMapping {
     public String toString(){
         final StringBuilder sb = new StringBuilder();
         sb.append("ComplexMapping{");
-        sb.append("name = '").append(name).append("'");
-        sb.append("url  = '").append(url).append("'");
+        sb.append("name = '")   .append(name)   .append("'");
+        sb.append("url  = '")   .append(url)    .append("'");
         sb.append("}");
         return sb.toString();
     }

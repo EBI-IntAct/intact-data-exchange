@@ -2,7 +2,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
 
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.SolrDocumentList;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -15,32 +14,27 @@ public class ComplexSearchResults {
     /********************************/
     /*      Private attributes      */
     /********************************/
-    private long numberResults;
-    private SolrDocumentList results;
-    private List<FacetField> facetFields;
-    private String[] fieldNames;
+    private long numberResults              = 0 ;
+    private SolrDocumentList results        = null ;
+    private List<FacetField> facetFields    = null ;
+    private String[] fieldNames             = null ;
 
     /**************************/
     /*      Constructors      */
     /**************************/
-    public ComplexSearchResults( SolrDocumentList results_, String[] fieldNames_) {
-        this.results    = results_;
-        this.fieldNames = fieldNames_;
-        this.numberResults = (this.results != null ?  this.results.getNumFound() : 0);
-    }
-
-    public ComplexSearchResults( SolrDocumentList results_, String[] fieldNames_, List<FacetField> facetFields_) {
-        this(results_, fieldNames_);
-        this.facetFields = facetFields_;
+    public ComplexSearchResults ( SolrDocumentList results_, List < FacetField > facetFields_) {
+        this.results    = results_ ;
+        this.facetFields = facetFields_ ;
+        this.numberResults = ( this.results != null ?  this.results.getNumFound ( ) : 0 ) ;
     }
 
     /*********************************/
     /*      Getters and Setters      */
     /*********************************/
-    public SolrDocumentList getSolrDocumentList()   { return results; }
-    public long             getNumberResults()      { return numberResults; }
-    public String[]         getFieldNames()         { return fieldNames; }
-    public List<FacetField> getFacetFieldList() {
-        return facetFields != null ? facetFields : Collections.EMPTY_LIST;
+    public SolrDocumentList getSolrDocumentList ( )   { return results ;       }
+    public long             getNumberResults ( )      { return numberResults ; }
+    public String [ ]         getFieldNames ( )       { return fieldNames ;    }
+    public List < FacetField >  getFacetFieldList ( ) {
+        return facetFields != null ? facetFields : Collections.EMPTY_LIST ;
     }
 }

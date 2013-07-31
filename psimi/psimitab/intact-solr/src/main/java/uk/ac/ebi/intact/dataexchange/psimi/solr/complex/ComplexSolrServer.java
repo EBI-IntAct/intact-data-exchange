@@ -1,9 +1,15 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
-import org.biopax.paxtools.impl.level3.InteractionImpl;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.params.FacetParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Complex Solr Server that wraps a solrServer
@@ -17,8 +23,317 @@ public class ComplexSolrServer {
     /********************************/
     /*      Private attributes      */
     /********************************/
-    private final Logger logger = LoggerFactory.getLogger(ComplexSolrServer.class);
-    protected SolrServer solrServer;
+    private final Logger logger                     = LoggerFactory.getLogger( ComplexSolrServer.class ) ;
+    protected SolrServer solrServer                 = null      ;
+    protected String[] solrFields                   = null      ;
+    // static attributes
+    private final static String DISMAX_PARAM_NAME   = "qf"      ;
+    private final static String DISMAX_TYPE         = "edismax" ;
+    private final static String DEFAULT_MM_PARAM    = "mm"      ;
+    private final static String QUERY_TYPE          = "defType" ;
 
-    private InteractionImpl
+    /*************************/
+    /*      Constructor      */
+    /*************************/
+    public ComplexSolrServer ( SolrServer solrServer_ ) {
+        if ( solrServer_ == null ) {
+            throw new IllegalArgumentException("You must pass a not null SolrServer to create a new ComplexSorlServer") ;
+        }
+        this.solrServer = solrServer_ ;
+
+        // initialize default solr fields
+        this.solrFields = new String[] {
+                // Complex fields
+                ComplexFieldName.ID,                ComplexFieldName.COMPLEX_ID,
+                ComplexFieldName.COMPLEX_NAME,      ComplexFieldName.COMPLEX_ORGANISM,
+                ComplexFieldName.COMPLEX_ALIAS,     ComplexFieldName.COMPLEX_TYPE,
+                ComplexFieldName.COMPLEX_XREF,      ComplexFieldName.COMPLEX_AC,
+                ComplexFieldName.DESCRIPTION,       ComplexFieldName.ORGANISM_NAME,
+                // Interactor fields
+                ComplexFieldName.INTERACTOR_ID,     ComplexFieldName.INTERACTOR_ALIAS,
+                ComplexFieldName.INTERACTOR_TYPE,
+                // Other fields
+                ComplexFieldName.BIOROLE,           ComplexFieldName.FEATURES,
+                ComplexFieldName.SOURCE,            ComplexFieldName.NUMBER_PARTICIPANTS,
+                ComplexFieldName.PATHWAY_XREF,      ComplexFieldName.ECO_XREF,
+                ComplexFieldName.PUBLICATION_ID
+        } ;
+    }
+
+    /******************************************************/
+    /*      Methods to interact with the Solr Server      */
+    /******************************************************/
+    public void shutdown ( ) {
+        if ( this.solrServer != null && this.solrServer instanceof HttpSolrServer ) {
+            ( ( HttpSolrServer ) this.solrServer ).shutdown();
+        }
+    }
+
+    /**********************************************************/
+    /*      Protected Methods to set query parameters up      */
+    /**********************************************************/
+    protected String checkQuery ( String query ) throws ComplexSorlException {
+        if ( query == null ) throw new NullPointerException ( "You have not to search with a null query" ) ;
+        // Format wildcard query
+        if ( query.equals ( "*" ) ) query = "*:*" ;
+        return query ;
+    }
+    protected SolrQuery setParameters ( SolrQuery squery ) {
+        // Use dismax parser for querying default fields
+        squery.setParam ( DISMAX_PARAM_NAME, new StringBuilder ( )
+                .append ( ComplexFieldName.ID )                 .append ( ComplexFieldName.COMPLEX_ID )
+                .append ( ComplexFieldName.COMPLEX_ALIAS )      .append ( ComplexFieldName.INTERACTOR_ID )
+                .append ( ComplexFieldName.INTERACTOR_ALIAS )   .append ( ComplexFieldName.COMPLEX_XREF )
+                .toString ( ) );
+        squery.setParam ( QUERY_TYPE, DISMAX_TYPE ) ;
+        squery.setParam ( DEFAULT_MM_PARAM, "1" ) ;
+        return squery ;
+    }
+    protected SolrQuery setFirstResult ( SolrQuery squery, Integer firstResult ) {
+        squery.setStart ( firstResult != null ? firstResult : 0 ) ;
+        return squery ;
+    }
+    protected SolrQuery setMaxResults ( SolrQuery squery, Integer maxResults ) {
+        // Set max results using the maxResult parameter
+        // WARNING in solr 3.6
+        // * an *NumberFormatException* occurs if _rows_ > 2147483647
+        // * an *ArrayIndexOutOfBoundsException* occurs if _rows_ + _start_ > 2147483647; e.g. _rows_ = 2147483640 and _start_ = 8
+        // we need to substract to avoid this exception
+        squery.setRows(maxResults != null ? maxResults : Integer.MAX_VALUE - squery.getStart()) ;
+        return squery ;
+    }
+    protected SolrQuery setFilters ( SolrQuery squery, String [ ] filters ) {
+        if ( filters != null && filters.length > 0 ){
+            for ( String filter : filters ) {
+                if ( ! filter.equals ( "*" ) ) {
+                    squery.addFilterQuery ( filter ) ;
+                }
+            }
+        }
+        return squery ;
+    }
+    protected SolrQuery setFirstFacet ( SolrQuery squery, Integer firstFacet ) {
+        squery.set ( FacetParams.FACET_OFFSET, firstFacet != null ? firstFacet : 0 ) ;
+        return squery ;
+    }
+    protected SolrQuery setMaxFacets ( SolrQuery squery, Integer maxFacets ) {
+        // set max results
+        // WARNING in solr 3.6
+        // * an *NumberFormatException* occurs if _rows_ > 2147483647
+        // * an *ArrayIndexOutOfBoundsException* occurs if _rows_ + _start_ > 2147483647; e.g. _rows_ = 2147483640 and _start_ = 8
+        // we need to substract to avoid this exception
+        squery.setFacetLimit(maxFacets != null ? maxFacets : Integer.MAX_VALUE - maxFacets) ;
+        return squery ;
+    }
+    protected SolrQuery setFacets ( SolrQuery squery, String [ ] facets ) {
+        if ( facets != null && facets.length > 0 ){
+            // set faceting enable
+            squery.setFacet ( true ) ;
+            squery.setFacetMinCount ( 1 ) ;
+            squery.setFacetSort ( FacetParams.FACET_SORT_COUNT ) ;
+            squery.addFacetField ( facets ) ;
+        }
+        return squery ;
+    }
+    protected SolrQuery setFacets ( SolrQuery squery, String [ ] facets, Integer firstFacet, Integer maxFacets ) {
+        squery = setFacets ( squery, facets ) ;
+        if ( facets != null && facets.length > 0 ){
+            squery = setFirstFacet ( squery, firstFacet ) ;
+            squery = setMaxFacets ( squery, maxFacets ) ;
+        }
+        return squery ;
+    }
+    protected SolrQuery setFields ( SolrQuery squery ) {
+        String [ ] fields = null ;
+
+        // check if the query has fields
+        String gotFields = squery.getFields() ;
+        if ( gotFields != null ) {
+            fields = ( String [ ] ) ArrayUtils.addAll( this.solrFields, gotFields.split ( "," ) ) ;
+        }
+        squery.setFields ( fields ) ;
+        return squery ;
+    }
+    protected SolrQuery checkNegativeFilter ( SolrQuery squery ) {
+        Boolean hasNotNegative = false;
+        String query = squery.getQuery ( ) ;
+        String negative = new StringBuilder ( ) .append ( "negative" ) .append ( ":" ) .toString ( ) ;
+        // If query has a field named such as the name stored is negative
+        if ( query == null || ! query.contains ( negative ) ) {
+            hasNotNegative = true ;
+        }
+        else {
+            String [ ] queries = squery.getFilterQueries ( ) ;
+            if ( queries != null && queries.length > 0 ) {
+                hasNotNegative = false;
+                for ( String filter : queries ) {
+                    hasNotNegative = hasNotNegative || filter.contains ( negative ) ;
+                }
+            }
+        }
+        if ( ! hasNotNegative ) { squery.addFilterQuery ( new StringBuilder ( ) .append ( negative ) .append ( "false" ) .toString ( ) ) ; }
+        return squery ;
+    }
+    protected String formatQuery ( String query ) {
+        return formatQuery ( query, this.solrFields ) ;
+    }
+    protected String formatQuery ( String query, String [] checkFields ) {
+        boolean hasField ; // It will be used for check if has at least one of the checkFields
+
+        // If query contains a wildcard we need to process that
+        if ( query.contains ( "*" ) ) {
+            String [ ] tokens = query.split ( " " ) ; // Get token in the query
+            StringBuilder sb = new StringBuilder ( query.length ( ) ) ; // This StringBuilder will be the processed query
+            // Check all generated tokens
+            for ( String token : tokens ) {
+                // If token contains * we need to check all available fields
+                if ( token.contains ( "*" ) ){
+                    // This loop ranges all checkFields and store in hasField if the token starts with anyone
+                    hasField = true ;
+                    for ( String check : checkFields ){
+                        hasField = hasField || token.startsWith ( new StringBuilder ( ) .append ( check ) .append ( ":" ) .toString ( ) ) ;
+                    }
+                    // If the token starts with any checkFields
+                    if ( hasField ) {
+                        // Do not change que field name, but cast to lower case the value.
+                        // For example: id:ABC-123 --> id:abc-123
+                        int firstIndex = token.indexOf ( ":" ) ;
+                        String prefix  = token.substring ( 0, firstIndex + 1 ) ;
+                        String correctedValue = token.substring ( firstIndex + 1 ) .toLowerCase ( ) ;
+                        sb.append ( prefix ) .append ( correctedValue ) ;
+                    }
+                    // The token does not start with any checkFields
+                    else {
+                        sb.append ( token.toLowerCase ( ) ) ;
+                    }
+                }
+                // The token does not contain *
+                else {
+                    sb.append ( token ) ;
+                }
+                // Here we still are inside of the external for
+                sb.append ( " " ) ;
+            } // End of the external for
+            // Create a new query and trim that
+            query = sb .toString() .trim() ;
+        } // End if query contains a wildcard then return que same query
+        return query ;
+    }
+
+    /**************************************/
+    /*      Protected Search Methods      */
+    /**************************************/
+    public ComplexSearchResults search ( SolrQuery solrQuery )
+        throws ComplexSorlException, SolrServerException {
+
+        // Set default fields to search
+        solrQuery = setFields ( solrQuery );
+        // Format query to expand wildcard
+        String query = formatQuery ( solrQuery.getQuery ( ) ) ;
+        // Change all AND, OR and NOT to lower case and set it such as new query
+        solrQuery.setQuery ( query
+                            .replaceAll ( " and ", " AND " )
+                            .replaceAll ( " or ",  " OR " )
+                            .replaceAll ( " not ", " NOT " )
+                            .replaceAll ( "^not ", "NOT " )
+                           ) ;
+        // Check if query has negative filters and if it has add a new filter query
+        solrQuery = checkNegativeFilter ( solrQuery ) ;
+
+        // Send the query to the Solr Server
+        QueryResponse solrResponse = solrServer.query ( solrQuery ) ;
+        return solrResponse != null ? new ComplexSearchResults ( solrResponse.getResults ( ), solrResponse.getFacetFields ( ) ) : null ;
+    }
+
+
+    /***********************************/
+    /*      Public Search Methods      */
+    /***********************************/
+
+    // This method is for make easier search with filters. This filters can be null
+    public ComplexSearchResults search ( String query,
+                                         Integer firstResult,
+                                         Integer maxResult,
+                                         String queryFilter
+                                       )
+        throws ComplexSorlException, SolrServerException {
+
+        // Only call to other method but change query filter type.
+        return searchWithFilters ( query,
+                firstResult,
+                maxResult,
+                queryFilter != null ? new String[]{queryFilter} : null ) ;
+
+    }
+
+    // This method is for search with filters
+    public ComplexSearchResults searchWithFilters ( String query,
+                                                    Integer firstResult,
+                                                    Integer maxResults,
+                                                    String [ ] queryFilters
+                                                  )
+        throws ComplexSorlException, SolrServerException {
+
+        // First step, check query for null and wildcard
+        query = checkQuery ( query ) ;
+
+        // Create a new Solr Query using the query parameter
+        SolrQuery solrQuery = new SolrQuery ( query ) ;
+
+        // Set the parameters for the query
+        solrQuery = setParameters ( solrQuery ) ;
+
+        // Set first result using the firstResult parameter
+        solrQuery = setFirstResult ( solrQuery, firstResult ) ;
+
+        // Set Max result using the maxResults parameter
+        solrQuery = setMaxResults ( solrQuery, maxResults ) ;
+        
+        // Apply any filter using queryFilter parameter
+        solrQuery = setFilters ( solrQuery, queryFilters ) ;
+        
+        // Set query using the query parameter
+        solrQuery.setQuery ( query ) ;
+
+        return search ( solrQuery ) ;
+    }
+
+    public ComplexSearchResults searchWithFacets ( String query,
+                                                   Integer firstResult,
+                                                   Integer maxResults,
+                                                   String [ ] queryFilters,
+                                                   String [ ] facets,
+                                                   Integer firstFacet,
+                                                   Integer maxFacet
+                                                 )
+        throws ComplexSorlException, SolrServerException {
+
+        // First step, check query for null and wildcard
+        query = checkQuery ( query ) ;
+
+        // Create a new Solr Query using the query parameter
+        SolrQuery solrQuery = new SolrQuery ( query ) ;
+
+        // Set the parameters for the query
+        solrQuery = setParameters ( solrQuery ) ;
+
+        // Set first result using the firstResult parameter
+        solrQuery = setFirstResult ( solrQuery, firstResult ) ;
+
+        // Set Max result using the maxResults parameter
+        solrQuery = setMaxResults ( solrQuery, maxResults ) ;
+
+        // Apply any filter using queryFilter parameter
+        solrQuery = setFilters ( solrQuery, queryFilters ) ;
+
+        // Set facets using the facets, firstFacet and maxFacet parameters
+        solrQuery = setFacets ( solrQuery, facets, firstFacet, maxFacet ) ;
+
+        // Set query using the query parameter
+        solrQuery.setQuery ( query ) ;
+
+
+        return search ( solrQuery ) ;
+    }
+
 }
