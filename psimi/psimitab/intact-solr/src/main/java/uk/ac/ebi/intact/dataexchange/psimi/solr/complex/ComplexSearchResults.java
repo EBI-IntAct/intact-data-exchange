@@ -26,6 +26,22 @@ public class ComplexSearchResults {
         this.results    = results_ ;
         this.facetFields = facetFields_ ;
         this.numberResults = ( this.results != null ?  this.results.getNumFound ( ) : 0 ) ;
+        this.fieldNames = new String [ ] {
+                // Complex fields
+                ComplexFieldNames.ID,                ComplexFieldNames.COMPLEX_ID,
+                ComplexFieldNames.COMPLEX_NAME,      ComplexFieldNames.COMPLEX_ORGANISM,
+                ComplexFieldNames.COMPLEX_ALIAS,     ComplexFieldNames.COMPLEX_TYPE,
+                ComplexFieldNames.COMPLEX_XREF,      ComplexFieldNames.COMPLEX_AC,
+                ComplexFieldNames.DESCRIPTION,       ComplexFieldNames.ORGANISM_NAME,
+                // Interactor fields
+                ComplexFieldNames.INTERACTOR_ID,     ComplexFieldNames.INTERACTOR_ALIAS,
+                ComplexFieldNames.INTERACTOR_TYPE,
+                // Other fields
+                ComplexFieldNames.BIOROLE,           ComplexFieldNames.FEATURES,
+                ComplexFieldNames.SOURCE,            ComplexFieldNames.NUMBER_PARTICIPANTS,
+                ComplexFieldNames.PATHWAY_XREF,      ComplexFieldNames.ECO_XREF,
+                ComplexFieldNames.PUBLICATION_ID
+        } ;
     }
 
     /*********************************/
@@ -33,7 +49,7 @@ public class ComplexSearchResults {
     /*********************************/
     public SolrDocumentList getSolrDocumentList ( )   { return results ;       }
     public long             getNumberResults ( )      { return numberResults ; }
-    public String [ ]         getFieldNames ( )       { return fieldNames ;    }
+    public String [ ]       getFieldNames ( )         { return fieldNames ;    }
     public List < FacetField >  getFacetFieldList ( ) {
         return facetFields != null ? facetFields : Collections.EMPTY_LIST ;
     }

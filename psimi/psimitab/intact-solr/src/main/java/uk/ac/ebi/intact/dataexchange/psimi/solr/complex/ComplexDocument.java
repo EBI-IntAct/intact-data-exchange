@@ -134,91 +134,91 @@ public final class ComplexDocument {
     public boolean addComplexID  (  Collection < String >  IDs ) {
         boolean result = true;
         for ( String ID : IDs )
-            result = result || addComplexID ( ID ) ;
+            result = result && addComplexID ( ID ) ;
         return result;
     }
     public boolean addComplexOrganism ( Collection < String >  Organisms )  {
         boolean result = true;
         for ( String Organism : Organisms )
-            result = result || addComplexOrganism ( Organism ) ;
+            result = result && addComplexOrganism ( Organism ) ;
         return result;
     }
     public boolean addComplexAlias ( Collection < String >  Aliass ) {
         boolean result = true;
         for ( String Alias : Aliass )
-            result = result || addComplexAlias ( Alias ) ;
+            result = result && addComplexAlias ( Alias ) ;
         return result;
     }
     public boolean addComplexType ( Collection < String >  Types ) {
         boolean result = true;
         for ( String Type : Types )
-            result = result || addComplexType ( Type ) ;
+            result = result && addComplexType ( Type ) ;
         return result;
     }
     public boolean addComplexXref ( Collection < String >  Xrefs ) {
         boolean result = true;
         for ( String Xref : Xrefs )
-            result = result || addComplexXref ( Xref ) ;
+            result = result && addComplexXref ( Xref ) ;
         return result;
     }
     public boolean addInteractorID ( Collection < String >  IDs ) {
         boolean result = true;
         for ( String ID : IDs )
-            result = result || addInteractorID ( ID ) ;
+            result = result && addInteractorID ( ID ) ;
         return result;
     }
     public boolean addInteractorAlias ( Collection < String >  Aliass ) {
         boolean result = true;
         for ( String Alias : Aliass )
-            result = result || addInteractorAlias ( Alias ) ;
+            result = result && addInteractorAlias ( Alias ) ;
         return result;
     }
     public boolean addInteractorType ( Collection < String >  Types ) {
         boolean result = true;
         for ( String Type : Types )
-            result = result || addInteractorType ( Type ) ;
+            result = result && addInteractorType ( Type ) ;
         return result;
     }
     public boolean addBiorole ( Collection < String >  Roles ) {
         boolean result = true;
         for ( String Rol : Roles )
-            result = result || addBiorole ( Rol ) ;
+            result = result && addBiorole ( Rol ) ;
         return result;
     }
     public boolean addFeatures ( Collection < String >  Features ) {
         boolean result = true;
         for ( String Feature : Features )
-            result = result || addFeatures ( Feature ) ;
+            result = result && addFeatures ( Feature ) ;
         return result;
     }
     public boolean addSource ( Collection < String >  Sources ) {
         boolean result = true;
         for ( String Source : Sources )
-            result = result || addSource ( Source ) ;
+            result = result && addSource ( Source ) ;
         return result;
     }
     public boolean addNumberParticipants ( Collection < String >  Numbers ) {
         boolean result = true;
         for ( String Number : Numbers )
-            result = result || addNumberParticipants ( Number ) ;
+            result = result && addNumberParticipants ( Number ) ;
         return result;
     }
     public boolean addPathwayXref ( Collection < String >  Xrefs ) {
         boolean result = true;
         for ( String Xref : Xrefs )
-            result = result || addPathwayXref ( Xref ) ;
+            result = result && addPathwayXref ( Xref ) ;
         return result;
     }
     public boolean addEcoXref ( Collection < String >  Xrefs ) {
         boolean result = true;
         for ( String Xref : Xrefs )
-            result = result || addEcoXref ( Xref ) ;
+            result = result && addEcoXref ( Xref ) ;
         return result;
     }
     public boolean addPublicationID ( Collection < String >  IDs ) {
         boolean result = true;
         for ( String ID : IDs )
-            result = result || addPublicationID ( ID ) ;
+            result = result && addPublicationID ( ID ) ;
         return result;
     }
 

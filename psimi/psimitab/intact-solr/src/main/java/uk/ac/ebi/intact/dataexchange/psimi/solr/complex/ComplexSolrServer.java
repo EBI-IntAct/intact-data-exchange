@@ -154,7 +154,7 @@ public class ComplexSolrServer {
         // * an *NumberFormatException* occurs if _rows_ > 2147483647
         // * an *ArrayIndexOutOfBoundsException* occurs if _rows_ + _start_ > 2147483647; e.g. _rows_ = 2147483640 and _start_ = 8
         // we need to substract to avoid this exception
-        squery.setFacetLimit(maxFacets != null ? maxFacets : Integer.MAX_VALUE - maxFacets) ;
+        squery.setFacetLimit ( maxFacets != null ? maxFacets : Integer.MAX_VALUE - squery.getStart ( ) ) ;
         return squery ;
     }
 
@@ -201,30 +201,25 @@ public class ComplexSolrServer {
 
     // checkNegativeFilter is a method to check if the query has at least a negative filter
     protected SolrQuery checkNegativeFilter ( SolrQuery squery ) {
-        Boolean hasNotNegative = false;
+        Boolean hasNegative = false;
         String query = squery.getQuery ( ) ; // Getting the current query
         // String for check if the query has a negative filter
         String negative = new StringBuilder ( ) .append ( "negative" ) .append ( ":" ) .toString ( ) ;
         // If query has a field named such as the name stored is negative
-        if ( query == null || ! query.contains ( negative ) ) {
-            hasNotNegative = true ;
-        }
+        if ( query != null || query.contains ( negative ) ) { hasNegative = true ; }
         else {
             // Then the query does not have a negative filter but besides we need to check if exist in the filters
             String [ ] queries = squery.getFilterQueries ( ) ;
             // If queries is not null and is longer than 0
             if ( queries != null && queries.length > 0 ) {
-                // Check all filters, but we are checking if the query has a negative filter
-                hasNotNegative = false;
+                // Check all filters searching a negative filter
                 for ( String filter : queries ) {
-                    hasNotNegative = hasNotNegative || filter.contains ( negative ) ;
+                    hasNegative = hasNegative || filter.contains ( negative ) ;
                 }
-                // Then we need to change the value of the variable to the opposite
-                hasNotNegative = ! hasNotNegative ;
             }
         }
         // If the query has negative filter we enable it
-        if ( ! hasNotNegative ) {
+        if ( hasNegative ) {
             squery.addFilterQuery ( new StringBuilder ( ) .append ( negative )
                                         .append("false") .toString ( ) ) ;
         }
@@ -249,7 +244,7 @@ public class ComplexSolrServer {
                 // If token contains * we need to check all available fields
                 if ( token.contains ( "*" ) ){
                     // This loop ranges all checkFields and store in hasField if the token starts with anyone
-                    hasField = true ;
+                    hasField = false ;
                     for ( String check : checkFields ){
                         hasField = hasField || token.startsWith ( new StringBuilder ( ) .append ( check ) .append ( ":" ) .toString ( ) ) ;
                     }
