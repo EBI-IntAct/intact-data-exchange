@@ -94,7 +94,7 @@
         <dependency>
             <groupId>uk.ac.ebi.uniprot.kraken</groupId>
             <artifactId>uniprotjapi</artifactId>
-            <version>${uniprot.version}</version>
+            <version>LATEST</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
