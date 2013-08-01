@@ -27,7 +27,8 @@ public class ComplexSolrServer {
     /********************************/
     private final Logger logger                     = LoggerFactory.getLogger( ComplexSolrServer.class ) ;
     protected SolrServer solrServer                 = null      ;
-    protected String[] solrFields                   = null      ;
+    protected String [ ] solrFields                 = null      ;
+    protected String [ ] defaultFields              = null      ;
     // static attributes to set parameters to the query
     private final static String DISMAX_PARAM_NAME   = "qf"      ;
     private final static String DISMAX_TYPE         = "edismax" ;
@@ -42,22 +43,28 @@ public class ComplexSolrServer {
             throw new IllegalArgumentException ( "You must pass a not null SolrServer to create a new ComplexSorlServer" ) ;
         }
         this.solrServer = solrServer_ ;
-        // initialize default solr fields
+        // initialize solr fields
         this.solrFields = new String [ ] {
                 // Complex fields
-                ComplexFieldName.ID,                ComplexFieldName.COMPLEX_ID,
-                ComplexFieldName.COMPLEX_NAME,      ComplexFieldName.COMPLEX_ORGANISM,
-                ComplexFieldName.COMPLEX_ALIAS,     ComplexFieldName.COMPLEX_TYPE,
-                ComplexFieldName.COMPLEX_XREF,      ComplexFieldName.COMPLEX_AC,
-                ComplexFieldName.DESCRIPTION,       ComplexFieldName.ORGANISM_NAME,
+                ComplexFieldNames.ID,                ComplexFieldNames.COMPLEX_ID,
+                ComplexFieldNames.COMPLEX_NAME,      ComplexFieldNames.COMPLEX_ORGANISM,
+                ComplexFieldNames.COMPLEX_ALIAS,     ComplexFieldNames.COMPLEX_TYPE,
+                ComplexFieldNames.COMPLEX_XREF,      ComplexFieldNames.COMPLEX_AC,
+                ComplexFieldNames.DESCRIPTION,       ComplexFieldNames.ORGANISM_NAME,
                 // Interactor fields
-                ComplexFieldName.INTERACTOR_ID,     ComplexFieldName.INTERACTOR_ALIAS,
-                ComplexFieldName.INTERACTOR_TYPE,
+                ComplexFieldNames.INTERACTOR_ID,     ComplexFieldNames.INTERACTOR_ALIAS,
+                ComplexFieldNames.INTERACTOR_TYPE,
                 // Other fields
-                ComplexFieldName.BIOROLE,           ComplexFieldName.FEATURES,
-                ComplexFieldName.SOURCE,            ComplexFieldName.NUMBER_PARTICIPANTS,
-                ComplexFieldName.PATHWAY_XREF,      ComplexFieldName.ECO_XREF,
-                ComplexFieldName.PUBLICATION_ID
+                ComplexFieldNames.BIOROLE,           ComplexFieldNames.FEATURES,
+                ComplexFieldNames.SOURCE,            ComplexFieldNames.NUMBER_PARTICIPANTS,
+                ComplexFieldNames.PATHWAY_XREF,      ComplexFieldNames.ECO_XREF,
+                ComplexFieldNames.PUBLICATION_ID
+        } ;
+        // initialize default fields to search
+        this.defaultFields = new String [ ] {
+                ComplexFieldNames.ID,               ComplexFieldNames.COMPLEX_ID,
+                ComplexFieldNames.COMPLEX_ALIAS,    ComplexFieldNames.INTERACTOR_ID,
+                ComplexFieldNames.INTERACTOR_ALIAS, ComplexFieldNames.COMPLEX_XREF
         } ;
         // Initialize the logger
         SolrLogger.readFromLog4j ( ) ;
@@ -87,12 +94,13 @@ public class ComplexSolrServer {
     }
     // setParameters is a method to set the default fields in the query
     protected SolrQuery setParameters ( SolrQuery squery ) {
+        // Create a proper String with default fields to search
+        StringBuilder defaults = new StringBuilder ( ) ;
+        for ( String field : defaultFields ){
+            defaults .append ( field ) .append ( " " ) ;
+        }
         // Use dismax parser for querying default fields
-        squery.setParam ( DISMAX_PARAM_NAME, new StringBuilder ( )
-                .append ( ComplexFieldName.ID )                 .append ( ComplexFieldName.COMPLEX_ID )
-                .append ( ComplexFieldName.COMPLEX_ALIAS )      .append ( ComplexFieldName.INTERACTOR_ID )
-                .append ( ComplexFieldName.INTERACTOR_ALIAS )   .append ( ComplexFieldName.COMPLEX_XREF )
-                .toString ( ) );
+        squery.setParam ( DISMAX_PARAM_NAME, defaults .toString ( ) );
         // Set the query type parameters such as a dismax type
         squery.setParam ( QUERY_TYPE, DISMAX_TYPE ) ;
         // Set the default MM parameter with one
