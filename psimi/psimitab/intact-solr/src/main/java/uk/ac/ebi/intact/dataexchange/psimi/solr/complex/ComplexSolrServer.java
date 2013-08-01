@@ -9,10 +9,12 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
 
 
 /**
- * Complex Solr Server that wraps a solrServer
+ * Complex Solr Server that wraps a solrServer and allow to search
+ * with filters and/or facets
  *
  * @author Oscar Forner (oforner@ebi.ac.uk)
  * @version $Id$
@@ -40,7 +42,6 @@ public class ComplexSolrServer {
             throw new IllegalArgumentException ( "You must pass a not null SolrServer to create a new ComplexSorlServer" ) ;
         }
         this.solrServer = solrServer_ ;
-
         // initialize default solr fields
         this.solrFields = new String [ ] {
                 // Complex fields
@@ -58,12 +59,17 @@ public class ComplexSolrServer {
                 ComplexFieldName.PATHWAY_XREF,      ComplexFieldName.ECO_XREF,
                 ComplexFieldName.PUBLICATION_ID
         } ;
+        // Initialize the logger
+        SolrLogger.readFromLog4j ( ) ;
     }
 
     /******************************************************/
     /*      Methods to interact with the Solr Server      */
     /******************************************************/
+    // shutdown is a method to stop the Solr Server
     public void shutdown ( ) {
+        if ( logger.isInfoEnabled ( ) ) logger.info ( "Shuting the Solr Server down in the Complex Solr Server" ) ;
+        // If the solrServer is not null and is an instance of HttpSolrServer we can shut down it
         if ( this.solrServer != null && this.solrServer instanceof HttpSolrServer ) {
             ( ( HttpSolrServer ) this.solrServer ) .shutdown ( ) ;
         }
@@ -162,7 +168,7 @@ public class ComplexSolrServer {
         }
         return squery ;
     }
-    // setFields is a method to set the fields in the query
+    // setFields is a method to set the fields (splited by ,) in the query
     protected SolrQuery setFields ( SolrQuery squery ) {
         String [ ] fields = null ;
         // Check if the query has fields
@@ -171,36 +177,49 @@ public class ComplexSolrServer {
             // Then add this fields to the query
             fields = ( String [ ] ) ArrayUtils.addAll( this.solrFields, gotFields.split ( "," ) ) ;
         }
-        //
+        // Set the new fields
         squery.setFields ( fields ) ;
         return squery ;
     }
+    // checkNegativeFilter is a method to check if the query has at least a negative filter
     protected SolrQuery checkNegativeFilter ( SolrQuery squery ) {
         Boolean hasNotNegative = false;
-        String query = squery.getQuery ( ) ;
+        String query = squery.getQuery ( ) ; // Getting the current query
+        // String for check if the query has a negative filter
         String negative = new StringBuilder ( ) .append ( "negative" ) .append ( ":" ) .toString ( ) ;
         // If query has a field named such as the name stored is negative
         if ( query == null || ! query.contains ( negative ) ) {
             hasNotNegative = true ;
         }
         else {
+            // Then the query does not have a negative filter but besides we need to check if exist in the filters
             String [ ] queries = squery.getFilterQueries ( ) ;
+            // If queries is not null and is longer than 0
             if ( queries != null && queries.length > 0 ) {
+                // Check all filters, but we are checking if the query has a negative filter
                 hasNotNegative = false;
                 for ( String filter : queries ) {
                     hasNotNegative = hasNotNegative || filter.contains ( negative ) ;
                 }
+                // Then we need to change the value of the variable to the opposite
+                hasNotNegative = ! hasNotNegative ;
             }
         }
-        if ( ! hasNotNegative ) { squery.addFilterQuery ( new StringBuilder ( ) .append ( negative ) .append ( "false" ) .toString ( ) ) ; }
+        // If the query has negative filter we enable it
+        if ( ! hasNotNegative ) {
+            squery.addFilterQuery ( new StringBuilder ( ) .append ( negative )
+                                        .append("false") .toString ( ) ) ;
+        }
         return squery ;
     }
+    // formatQuery is a method to expand the wildcard if the query has that
     protected String formatQuery ( String query ) {
+        // Format the query with the fields saved in the solrFields attribute
         return formatQuery ( query, this.solrFields ) ;
     }
+    // formatQuery is a method to expand the wildcard if the query has that with the Solr Fields passed such as parameters
     protected String formatQuery ( String query, String [] checkFields ) {
         boolean hasField ; // It will be used for check if has at least one of the checkFields
-
         // If query contains a wildcard we need to process that
         if ( query.contains ( "*" ) ) {
             String [ ] tokens = query.split ( " " ) ; // Get token in the query
@@ -217,7 +236,9 @@ public class ComplexSolrServer {
                     // If the token starts with any checkFields
                     if ( hasField ) {
                         // Do not change que field name, but cast to lower case the value.
-                        // For example: id:ABC-123 --> id:abc-123
+                        // For example: id:ABC-123 ---> id:abc-123
+                        //                          or
+                        //              ID:ABC-123 ---> ID:abc-123
                         int firstIndex = token.indexOf ( ":" ) ;
                         String prefix  = token.substring ( 0, firstIndex + 1 ) ;
                         String correctedValue = token.substring ( firstIndex + 1 ) .toLowerCase ( ) ;
@@ -261,7 +282,7 @@ public class ComplexSolrServer {
         // Check if query has negative filters and if it has add a new filter query
         solrQuery = checkNegativeFilter ( solrQuery ) ;
 
-        // Send the query to the Solr Server
+        // Send the query to the Solr Server and return the answer
         QueryResponse solrResponse = solrServer.query ( solrQuery ) ;
         return solrResponse != null ? new ComplexSearchResults ( solrResponse.getResults ( ), solrResponse.getFacetFields ( ) ) : null ;
     }
@@ -294,7 +315,14 @@ public class ComplexSolrServer {
                                                     String [ ] queryFilters
                                                   )
         throws ComplexSorlException, SolrServerException {
-
+        if ( logger.isInfoEnabled ( ) ) {
+            logger.info ( new StringBuilder ( )
+                    .append ( "Searching with filters; Query: " )
+                    .append ( query )
+                    .append ( " Filters: " )
+                    .append ( queryFilters )
+                    .toString ( ) ) ;
+        }
         // First step, check query for null and wildcard
         query = checkQuery ( query ) ;
 
@@ -328,7 +356,16 @@ public class ComplexSolrServer {
                                                    Integer maxFacet
                                                  )
         throws ComplexSorlException, SolrServerException {
-
+        if ( logger.isInfoEnabled ( ) ) {
+            logger.info ( new StringBuilder ( )
+                    .append ( "Searching with filters and facets; Query: " )
+                    .append ( query )
+                    .append ( " Filters: " )
+                    .append ( queryFilters )
+                    .append ( " Facets: " )
+                    .append ( facets )
+                    .toString ( ) ) ;
+        }
         // First step, check query for null and wildcard
         query = checkQuery ( query ) ;
 
@@ -352,7 +389,6 @@ public class ComplexSolrServer {
 
         // Set query using the query parameter
         solrQuery.setQuery ( query ) ;
-
 
         return search ( solrQuery ) ;
     }
