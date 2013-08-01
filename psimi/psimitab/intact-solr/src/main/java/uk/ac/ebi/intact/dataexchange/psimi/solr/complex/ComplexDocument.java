@@ -228,16 +228,16 @@ public final class ComplexDocument {
     @Override
     public boolean equals ( Object other ) {
         // Object level comparisons
-        if  (  this == other  )  return true;
-        if  (  other == null || getClass ( ) != other.getClass ( ) ) return false;
+        if  ( this == other )  return true;
+        if  ( other == null || getClass ( ) != other.getClass ( ) ) return false;
 
         // ComplexDocument level comparisons
         ComplexDocument otherComplexDocument =  ( ComplexDocument ) other;
-        if  (  ID             != null ? !ID.equals ( otherComplexDocument.ID )                      : otherComplexDocument.ID             != null  )  return false;
-        if  (  complexName    != null ? !complexName.equals ( otherComplexDocument.complexName )    : otherComplexDocument.complexName    != null  )  return false;
-        if  (  complexAC      != null ? !complexAC.equals ( otherComplexDocument.complexAC )        : otherComplexDocument.complexAC      != null  )  return false;
-        if  (  description    != null ? !description.equals ( otherComplexDocument.description )    : otherComplexDocument.description    != null  )  return false;
-        if  (  organismName   != null ? !organismName.equals ( otherComplexDocument.organismName )  : otherComplexDocument.organismName   != null  )  return false;
+        if  ( ID             != null ? !ID.equals ( otherComplexDocument.ID )                      : otherComplexDocument.ID             != null  )  return false;
+        if  ( complexName    != null ? !complexName.equals ( otherComplexDocument.complexName )    : otherComplexDocument.complexName    != null  )  return false;
+        if  ( complexAC      != null ? !complexAC.equals ( otherComplexDocument.complexAC )        : otherComplexDocument.complexAC      != null  )  return false;
+        if  ( description    != null ? !description.equals ( otherComplexDocument.description )    : otherComplexDocument.description    != null  )  return false;
+        if  ( organismName   != null ? !organismName.equals ( otherComplexDocument.organismName )  : otherComplexDocument.organismName   != null  )  return false;
 
         // If all checked is equal return true
         return true;
@@ -245,7 +245,7 @@ public final class ComplexDocument {
     
     @Override
     public int hashCode ( ) {
-        int result = 0;
+        int result;
 
         result =                ( ID              != null ? ID.hashCode ( )              : 0 ) ;
         result = 31 * result +  ( complexName     != null ? complexName.hashCode ( )     : 0 ) ;
