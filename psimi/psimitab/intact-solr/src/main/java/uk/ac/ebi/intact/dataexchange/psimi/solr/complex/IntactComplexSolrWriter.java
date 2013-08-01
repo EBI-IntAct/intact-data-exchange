@@ -18,17 +18,17 @@ public class IntactComplexSolrWriter extends SolrItemWriter{
     /*      Private attributes      */
     /********************************/
     private String complexSorlUrl;
-    private ComplexSearcher complexSearcher;
+    private ComplexSolrServer complexSearcher;
 
     /**************************/
     /*      Constructors      */
     /**************************/
-    public IntactComplexSolrServer(){ super(); }
+    public IntactComplexSolrWriter ( ) { super ( ) ; }
 
     /*********************************/
     /*      Getters and Setters      */
     /*********************************/
-    public setComplexUrl( String complexSorlUrl_ ){
+    public void setComplexUrl( String complexSorlUrl_ ){
         this.complexSorlUrl = complexSorlUrl_;
     }
 
@@ -36,15 +36,16 @@ public class IntactComplexSolrWriter extends SolrItemWriter{
     /*      Override methods      */
     /******************************/
     @Override
-    public void open( ExecutionContext executionContext ) throws ItemStreamException {
-        super.open( executionContext );
+    public void open ( org.springframework.batch.item.ExecutionContext executionContext ) throws ItemStreamException {
+        super.open ( executionContext ) ;
 
         // check if complexServer is null and create one if it is required
         if ( complexSorlUrl != null ) {
             HttpSolrServer complexesSolrServer = new HttpSolrServer(complexSorlUrl, createHttpClient());
-            complexSearcher = new ComplexSearcher(complexesSolrServer);
+            complexSearcher = new ComplexSolrServer(complexesSolrServer);
         }
 
-        this.solrConverter = new SolrDocumentConverter(solrServer, complexSearcher);
+        // TODO
+        //this.solrConverter = new SolrDocumentConverter(solrServer, complexSearcher);
     }
 }

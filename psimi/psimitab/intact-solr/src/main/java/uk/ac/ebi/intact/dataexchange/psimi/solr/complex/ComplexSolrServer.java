@@ -26,7 +26,7 @@ public class ComplexSolrServer {
     private final Logger logger                     = LoggerFactory.getLogger( ComplexSolrServer.class ) ;
     protected SolrServer solrServer                 = null      ;
     protected String[] solrFields                   = null      ;
-    // static attributes
+    // static attributes to set parameters to the query
     private final static String DISMAX_PARAM_NAME   = "qf"      ;
     private final static String DISMAX_TYPE         = "edismax" ;
     private final static String DEFAULT_MM_PARAM    = "mm"      ;
@@ -37,12 +37,12 @@ public class ComplexSolrServer {
     /*************************/
     public ComplexSolrServer ( SolrServer solrServer_ ) {
         if ( solrServer_ == null ) {
-            throw new IllegalArgumentException("You must pass a not null SolrServer to create a new ComplexSorlServer") ;
+            throw new IllegalArgumentException ( "You must pass a not null SolrServer to create a new ComplexSorlServer" ) ;
         }
         this.solrServer = solrServer_ ;
 
         // initialize default solr fields
-        this.solrFields = new String[] {
+        this.solrFields = new String [ ] {
                 // Complex fields
                 ComplexFieldName.ID,                ComplexFieldName.COMPLEX_ID,
                 ComplexFieldName.COMPLEX_NAME,      ComplexFieldName.COMPLEX_ORGANISM,
@@ -65,19 +65,21 @@ public class ComplexSolrServer {
     /******************************************************/
     public void shutdown ( ) {
         if ( this.solrServer != null && this.solrServer instanceof HttpSolrServer ) {
-            ( ( HttpSolrServer ) this.solrServer ).shutdown();
+            ( ( HttpSolrServer ) this.solrServer ) .shutdown ( ) ;
         }
     }
 
     /**********************************************************/
     /*      Protected Methods to set query parameters up      */
     /**********************************************************/
+    // checkQuery is a method to check if the query contains a wildcard or is null
     protected String checkQuery ( String query ) throws ComplexSorlException {
         if ( query == null ) throw new NullPointerException ( "You have not to search with a null query" ) ;
         // Format wildcard query
         if ( query.equals ( "*" ) ) query = "*:*" ;
         return query ;
     }
+    // setParameters is a method to set the default fields in the query
     protected SolrQuery setParameters ( SolrQuery squery ) {
         // Use dismax parser for querying default fields
         squery.setParam ( DISMAX_PARAM_NAME, new StringBuilder ( )
@@ -85,14 +87,18 @@ public class ComplexSolrServer {
                 .append ( ComplexFieldName.COMPLEX_ALIAS )      .append ( ComplexFieldName.INTERACTOR_ID )
                 .append ( ComplexFieldName.INTERACTOR_ALIAS )   .append ( ComplexFieldName.COMPLEX_XREF )
                 .toString ( ) );
+        // Set the query type parameters such as a dismax type
         squery.setParam ( QUERY_TYPE, DISMAX_TYPE ) ;
+        // Set the default MM parameter with one
         squery.setParam ( DEFAULT_MM_PARAM, "1" ) ;
         return squery ;
     }
+    // setFirstResult is a method to set the first result in the query (an integer)
     protected SolrQuery setFirstResult ( SolrQuery squery, Integer firstResult ) {
         squery.setStart ( firstResult != null ? firstResult : 0 ) ;
         return squery ;
     }
+    // setMaxResults is a method to set the maximum result in the query (an integer)
     protected SolrQuery setMaxResults ( SolrQuery squery, Integer maxResults ) {
         // Set max results using the maxResult parameter
         // WARNING in solr 3.6
@@ -102,9 +108,13 @@ public class ComplexSolrServer {
         squery.setRows(maxResults != null ? maxResults : Integer.MAX_VALUE - squery.getStart()) ;
         return squery ;
     }
+    // setFilters is a method to set the filters in the query (a String array)
     protected SolrQuery setFilters ( SolrQuery squery, String [ ] filters ) {
+        // If String array is not null and is longer than 0
         if ( filters != null && filters.length > 0 ){
+            // Then we range the String array
             for ( String filter : filters ) {
+                // Add the filter to the query if is not equal to *
                 if ( ! filter.equals ( "*" ) ) {
                     squery.addFilterQuery ( filter ) ;
                 }
@@ -112,10 +122,12 @@ public class ComplexSolrServer {
         }
         return squery ;
     }
+    // setFirstFacet is a method to set the first result with facet (an integer)
     protected SolrQuery setFirstFacet ( SolrQuery squery, Integer firstFacet ) {
         squery.set ( FacetParams.FACET_OFFSET, firstFacet != null ? firstFacet : 0 ) ;
         return squery ;
     }
+    // setMaxFacets is a method to set the maximum result in the query (an integer)
     protected SolrQuery setMaxFacets ( SolrQuery squery, Integer maxFacets ) {
         // set max results
         // WARNING in solr 3.6
@@ -125,7 +137,9 @@ public class ComplexSolrServer {
         squery.setFacetLimit(maxFacets != null ? maxFacets : Integer.MAX_VALUE - maxFacets) ;
         return squery ;
     }
+    // setFacets is a method to set the facets in the query (a String array)
     protected SolrQuery setFacets ( SolrQuery squery, String [ ] facets ) {
+        // If String array is not null and is longer than 0
         if ( facets != null && facets.length > 0 ){
             // set faceting enable
             squery.setFacet ( true ) ;
@@ -135,22 +149,29 @@ public class ComplexSolrServer {
         }
         return squery ;
     }
+    // setFacets is a method to set the facets, the first result with facets and the maximum result with facet
     protected SolrQuery setFacets ( SolrQuery squery, String [ ] facets, Integer firstFacet, Integer maxFacets ) {
+        // call setFacets to set facets
         squery = setFacets ( squery, facets ) ;
+        // and if facets String array is not null and is longer than 0
         if ( facets != null && facets.length > 0 ){
+            // set the first result with facets
             squery = setFirstFacet ( squery, firstFacet ) ;
+            // set the maximum result with facets
             squery = setMaxFacets ( squery, maxFacets ) ;
         }
         return squery ;
     }
+    // setFields is a method to set the fields in the query
     protected SolrQuery setFields ( SolrQuery squery ) {
         String [ ] fields = null ;
-
-        // check if the query has fields
+        // Check if the query has fields
         String gotFields = squery.getFields() ;
         if ( gotFields != null ) {
+            // Then add this fields to the query
             fields = ( String [ ] ) ArrayUtils.addAll( this.solrFields, gotFields.split ( "," ) ) ;
         }
+        //
         squery.setFields ( fields ) ;
         return squery ;
     }
