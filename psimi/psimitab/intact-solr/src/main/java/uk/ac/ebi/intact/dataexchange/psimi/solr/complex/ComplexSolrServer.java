@@ -280,7 +280,7 @@ public class ComplexSolrServer {
     /**************************************/
     /*      Protected Search Methods      */
     /**************************************/
-    public ComplexSearchResults search ( SolrQuery solrQuery )
+    public ComplexResultIterator search ( SolrQuery solrQuery )
         throws ComplexSorlException, SolrServerException {
 
         // Set default fields to search
@@ -299,7 +299,7 @@ public class ComplexSolrServer {
 
         // Send the query to the Solr Server and return the answer
         QueryResponse solrResponse = solrServer.query ( solrQuery ) ;
-        return solrResponse != null ? new ComplexSearchResults ( solrResponse.getResults ( ), solrResponse.getFacetFields ( ) ) : null ;
+        return solrResponse != null ? new ComplexResultIterator ( solrResponse.getResults ( ) ) : null ;
     }
 
 
@@ -308,7 +308,7 @@ public class ComplexSolrServer {
     /***********************************/
 
     // This method is for make easier search with filters. This filters can be null
-    public ComplexSearchResults search ( String query,
+    public ComplexResultIterator search ( String query,
                                          Integer firstResult,
                                          Integer maxResult,
                                          String queryFilter
@@ -324,7 +324,7 @@ public class ComplexSolrServer {
     }
 
     // This method is for search with filters
-    public ComplexSearchResults searchWithFilters ( String query,
+    public ComplexResultIterator searchWithFilters ( String query,
                                                     Integer firstResult,
                                                     Integer maxResults,
                                                     String [ ] queryFilters
@@ -362,7 +362,7 @@ public class ComplexSolrServer {
         return search ( solrQuery ) ;
     }
 
-    public ComplexSearchResults searchWithFacets ( String query,
+    public ComplexResultIterator searchWithFacets ( String query,
                                                    Integer firstResult,
                                                    Integer maxResults,
                                                    String [ ] queryFilters,
