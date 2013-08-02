@@ -68,7 +68,7 @@
     <field name="complex_organism"      type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
     <field name="complex_organism_f"    type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_type"          type="text"         indexed="true"  stored="false"  multivalued="true"/> <!-- Faceting -->
-    <field name="complex_type"          type="facetString"  indexed="true"  stored="false"  multivalued="true"/>
+    <field name="complex_type_f"          type="facetString"  indexed="true"  stored="false"  multivalued="true"/>
     <field name="complex_xref"          type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_AC"            type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
     <field name="description"           type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
