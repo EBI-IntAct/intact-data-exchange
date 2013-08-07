@@ -66,10 +66,10 @@
     <field name="complex_name"              type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
     <field name="complex_alias"             type="textAlias"    indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_organism"          type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
-    <field name="complex_organism_f"        type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
+    <field name="complex_organism_f"        type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
     <field name="complex_organism_ontology" type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
     <field name="complex_type"              type="text"         indexed="true"  stored="false"  multivalued="true"/> <!-- Faceting -->
-    <field name="complex_type_f"            type="facetString"  indexed="true"  stored="false"  multivalued="true"/>
+    <field name="complex_type_f"            type="facetString"  indexed="true"  stored="false"  multivalued="false"/>
     <field name="complex_type_ontology"     type="text"         indexed="true"  stored="false"  multivalued="true"/>
     <field name="complex_xref"              type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_AC"                type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
@@ -78,19 +78,19 @@
     <!-- interactor information -->
     <field name="interactor_id"             type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="interactor_alias"          type="textAlias"    indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
-    <field name="interactor_alias_f"        type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
+    <field name="interactor_alias_f"        type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
     <field name="interactor_type"           type="text"         indexed="true"  stored="false"  multivalued="true"/>
     <field name="interactor_type_ontology"  type="text"         indexed="true"  stored="false"  multivalued="true"/>
     <!-- fields same as PSICQUIC -->
     <field name="biorole"                   type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
-    <field name="biorole_f"                 type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
+    <field name="biorole_f"                 type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
     <field name="biorole_ontology"          type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
     <field name="features"                  type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
-    <field name="features_f"                type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
+    <field name="features_f"                type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
     <field name="features_ontology"         type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
     <!-- fields same as Intact -->
     <field name="source"                    type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
-    <field name="source_f"                  type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
+    <field name="source_f"                  type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
     <field name="source_ontology"           type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
     <!-- other fields -->
     <field name="number_participants"       type="int"          indexed="true"  stored="false"  multiValued="false"/> <!-- Faceting -->
