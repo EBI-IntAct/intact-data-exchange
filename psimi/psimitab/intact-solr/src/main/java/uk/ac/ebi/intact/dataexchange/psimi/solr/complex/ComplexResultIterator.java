@@ -80,27 +80,31 @@ public class ComplexResultIterator implements Iterator < ComplexSearchResults > 
     /******************************/
     @Override
     public boolean hasNext ( ) {
-        return iterator.hasNext ( ) ;
+        return nextResult != null ;
     }
 
     @Override
     public ComplexSearchResults next ( ) {
+        ComplexSearchResults result = null ;
         if ( iterator != null && iterator.hasNext ( ) ) {
-            ComplexSearchResults result = getFieldValues ( ) ;
             // Swap values between nextResult and this result
             ComplexSearchResults swap = nextResult ;
-            nextResult = result ;
+            nextResult = getFieldValues ( ) ;
             result = swap ;
-
-            return result ;
         }
         else {
-            return null ;
+            if ( nextResult != null ) {
+                result = nextResult;
+                nextResult = null ;
+            }
+            else { result = null ; }
         }
+        return result ;
     }
 
     @Override
-    public void remove() {
-        throw new UnsupportedOperationException ( "This method is unsupportted in ComplexResultIterator class" ) ;
+    public void remove ( ) {
+        throw new UnsupportedOperationException ( "This method is unsupported in ComplexResultIterator class" ) ;
     }
 }
+
