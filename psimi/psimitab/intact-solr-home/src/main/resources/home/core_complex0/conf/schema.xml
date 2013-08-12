@@ -72,6 +72,7 @@
     <field name="complex_type_f"            type="facetString"  indexed="true"  stored="false"  multivalued="false"/>
     <field name="complex_type_ontology"     type="text"         indexed="true"  stored="false"  multivalued="true"/>
     <field name="complex_xref"              type="text"         indexed="true"  stored="false"  multiValued="true"/>
+    <field name="complex_xref_ontology"     type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_AC"                type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
     <field name="description"               type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
     <field name="organism_name"             type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
