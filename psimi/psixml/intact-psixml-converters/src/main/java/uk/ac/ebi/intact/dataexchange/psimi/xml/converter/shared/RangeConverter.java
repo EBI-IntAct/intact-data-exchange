@@ -71,12 +71,12 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
         if (psiObject.getBegin() != null) {
             final int begin = Long.valueOf(psiObject.getBegin().getPosition()).intValue();
             beginIntervalFrom = begin;
-            beginIntervalTo = begin;
+            beginIntervalTo = beginIntervalFrom;
         }
         if (psiObject.getEnd() != null) {
             final int end = Long.valueOf(psiObject.getEnd().getPosition()).intValue();
             endIntervalFrom = end;
-            endIntervalTo = end;
+            endIntervalTo = endIntervalFrom;
         }
 
         Interval beginInterval = psiObject.getBeginInterval();
