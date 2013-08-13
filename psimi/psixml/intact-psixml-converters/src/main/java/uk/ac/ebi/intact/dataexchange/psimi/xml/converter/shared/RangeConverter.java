@@ -119,13 +119,17 @@ public class RangeConverter extends AbstractIntactPsiConverter<Range, psidev.psi
                 || isCertain( psiObject.getEndStatus()) || isRaggedNTerminal( psiObject.getEndStatus() ))){
             throw new PsiConversionException( "Cannot convert a range end position of type range, less-than, more-than or certain without specific location (begin, end) to the IntAct data model." );
         }
-        else if ( beginIntervalFrom == null || endIntervalTo == null ) {
+
+        if ( beginIntervalFrom == null) {
 
             // set the values to 0 as this means undertermined in the IntAct model
             beginIntervalFrom = 0;
-            beginIntervalTo = 0;
+            beginIntervalTo = beginIntervalFrom;
+
+        }
+        if (endIntervalTo == null){
             endIntervalFrom = 0;
-            endIntervalTo = 0;
+            endIntervalTo = endIntervalFrom;
         }
 
         // create the range
