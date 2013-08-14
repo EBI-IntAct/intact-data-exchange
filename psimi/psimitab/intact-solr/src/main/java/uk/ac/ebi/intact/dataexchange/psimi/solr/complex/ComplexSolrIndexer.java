@@ -11,12 +11,12 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
  * @version $Id$
  * @since 23/07/13
  */
-public class ComplexIndexer {
+public class ComplexSolrIndexer {
 
     /********************************/
     /*      Private attributes      */
     /********************************/
-    private static final Log log = LogFactory.getLog( ComplexIndexer.class );
+    private static final Log log = LogFactory.getLog( ComplexSolrIndexer.class );
     private HttpSolrServer solrServer;
     private int commitInterval = 50000;
     private int numberOfTries = 5;
@@ -24,7 +24,7 @@ public class ComplexIndexer {
     /************************************************/
     /*                 Constructor                  */
     /************************************************/
-    public ComplexIndexer(HttpSolrServer solrServer_) throws IntactSolrException {
+    public ComplexSolrIndexer(HttpSolrServer solrServer_) throws IntactSolrException {
         if (solrServer_ == null){
             throw new IllegalArgumentException("You must pass a HttpSolrServer to the constructor");
         }

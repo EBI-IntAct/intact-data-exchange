@@ -13,17 +13,17 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.SolrDocumentConverter;
  * @version $Id$
  * @since 25/07/13
  */
-public class IntactComplexSolrWriter extends SolrItemWriter{
+public class ComplexSolrWriter extends SolrItemWriter{
     /********************************/
     /*      Private attributes      */
     /********************************/
     private String complexSorlUrl;
-    private ComplexSolrServer complexSearcher;
+    private ComplexSolrSearcher complexSearcher;
 
     /**************************/
     /*      Constructors      */
     /**************************/
-    public IntactComplexSolrWriter ( ) { super ( ) ; }
+    public ComplexSolrWriter ( ) { super ( ) ; }
 
     /*********************************/
     /*      Getters and Setters      */
@@ -42,7 +42,7 @@ public class IntactComplexSolrWriter extends SolrItemWriter{
         // check if complexServer is null and create one if it is required
         if ( complexSorlUrl != null ) {
             HttpSolrServer complexesSolrServer = new HttpSolrServer(complexSorlUrl, createHttpClient());
-            complexSearcher = new ComplexSolrServer(complexesSolrServer);
+            complexSearcher = new ComplexSolrSearcher ( complexesSolrServer);
         }
 
         // TODO

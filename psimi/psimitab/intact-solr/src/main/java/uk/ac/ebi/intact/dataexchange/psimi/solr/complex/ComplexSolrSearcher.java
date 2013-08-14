@@ -20,12 +20,12 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
  * @version $Id$
  * @since 29/07/13
  */
-public class ComplexSolrServer {
+public class ComplexSolrSearcher {
 
     /********************************/
     /*      Private attributes      */
     /********************************/
-    private final Logger logger                     = LoggerFactory.getLogger( ComplexSolrServer.class ) ;
+    private final Logger logger                     = LoggerFactory.getLogger( ComplexSolrSearcher.class ) ;
     protected SolrServer solrServer                 = null      ;
     protected String [ ] solrFields                 = null      ;
     protected String [ ] defaultFields              = null      ;
@@ -38,7 +38,7 @@ public class ComplexSolrServer {
     /*************************/
     /*      Constructor      */
     /*************************/
-    public ComplexSolrServer ( SolrServer solrServer_ ) {
+    public ComplexSolrSearcher ( SolrServer solrServer_ ) {
         if ( solrServer_ == null ) {
             throw new IllegalArgumentException ( "You must pass a not null SolrServer to create a new ComplexSorlServer" ) ;
         }
@@ -57,7 +57,7 @@ public class ComplexSolrServer {
                 // Other fields
                 ComplexFieldNames.BIOROLE,           ComplexFieldNames.FEATURES,
                 ComplexFieldNames.SOURCE,            ComplexFieldNames.NUMBER_PARTICIPANTS,
-                ComplexFieldNames.PATHWAY_XREF,      ComplexFieldNames.ECO_XREF,
+                //ComplexFieldNames.PATHWAY_XREF,      ComplexFieldNames.ECO_XREF,
                 ComplexFieldNames.PUBLICATION_ID
         } ;
         // initialize default fields to search
