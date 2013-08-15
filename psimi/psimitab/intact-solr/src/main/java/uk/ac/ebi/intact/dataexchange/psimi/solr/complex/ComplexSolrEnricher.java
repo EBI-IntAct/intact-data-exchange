@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrInputDocument;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BaseFieldEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.LazyLoadedOntologyTerm;
@@ -52,7 +53,7 @@ public class ComplexSolrEnricher  extends BaseFieldEnricher {
     }
 
     // is for enrich interactor_type* fields and return a SolrDocument
-    protected SolrDocument InteractorPartEnrich ( CvDagObject cvDagObject, SolrDocument solrDocument ) throws Exception {
+    protected SolrInputDocument InteractorPartEnrich ( CvDagObject cvDagObject, SolrInputDocument solrDocument ) throws Exception {
         // add all alias to interactor_type
         for ( CvObjectAlias Alias : cvDagObject.getAliases ( ) ) {
             solrDocument.addField ( ComplexFieldNames.INTERACTOR_TYPE, Alias.getName ( ) ) ;
@@ -70,7 +71,7 @@ public class ComplexSolrEnricher  extends BaseFieldEnricher {
     }
 
     // is for enrich complex_organism* fields and return a SolrDocument
-    protected SolrDocument OrganismPartEnrich ( InteractionImpl interaction, SolrDocument solrDocument ) throws Exception {
+    protected SolrInputDocument OrganismPartEnrich ( InteractionImpl interaction, SolrInputDocument solrDocument ) throws Exception {
         // retrieve the ontology term for this interaction (using BioSource)
         final OntologyTerm ontologyTerm = findOntologyTerm ( interaction ) ;
         // add name, all synonyms and tax id to complex_organism
@@ -87,7 +88,7 @@ public class ComplexSolrEnricher  extends BaseFieldEnricher {
     }
 
     // is for enrich complex_xref* fields and return a SolrDocument
-    protected SolrDocument XrefPartEnrich ( Collection < InteractorXref > interactorXrefs, SolrDocument solrDocument ) throws Exception {
+    protected SolrInputDocument XrefPartEnrich ( Collection < InteractorXref > interactorXrefs, SolrInputDocument solrDocument ) throws Exception {
         // needed variables to enrich
         String shortLabel = null ;
         String ID = null ;
@@ -125,9 +126,9 @@ public class ComplexSolrEnricher  extends BaseFieldEnricher {
     /*      Enrich Methods      */
     /****************************/
     // enrich fields in the SolrDocument passed as parameter
-    public SolrDocument enrich (
+    public SolrInputDocument enrich (
             InteractionImpl interaction,
-            SolrDocument solrDocument )
+            SolrInputDocument solrDocument )
             throws Exception {
         // check parameters and information
         if ( interaction == null ) { return null ; }
@@ -145,8 +146,8 @@ public class ComplexSolrEnricher  extends BaseFieldEnricher {
     }
 
     // enrich fields in an empty SolrDocument
-    public SolrDocument enrich ( InteractionImpl interaction ) throws Exception {
-        return enrich ( interaction, new SolrDocument ( ) ) ;
+    public SolrInputDocument enrich ( InteractionImpl interaction ) throws Exception {
+        return enrich ( interaction, new SolrInputDocument ( ) ) ;
     }
 
     /**************************/
