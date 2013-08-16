@@ -71,6 +71,9 @@
     <field name="complex_type"              type="text"         indexed="true"  stored="false"  multivalued="true"/> <!-- Faceting -->
     <field name="complex_type_f"            type="facetString"  indexed="true"  stored="false"  multivalued="false"/>
     <field name="complex_type_ontology"     type="text"         indexed="true"  stored="false"  multivalued="true"/>
+    <field name="interaction_type"          type="text"         indexed="true"  stored="false"  multivalued="true"/> <!-- Faceting -->
+    <field name="interaction_type_f"        type="facetString"  indexed="true"  stored="false"  multivalued="false"/>
+    <field name="interaction_type_ontology" type="text"         indexed="true"  stored="false"  multivalued="true"/>
     <field name="complex_xref"              type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_xref_ontology"     type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_AC"                type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
