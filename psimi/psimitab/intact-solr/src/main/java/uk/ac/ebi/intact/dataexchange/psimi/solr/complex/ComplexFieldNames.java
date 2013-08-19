@@ -17,6 +17,9 @@ public interface ComplexFieldNames {
     String COMPLEX_TYPE                 = "complex_type";
     String COMPLEX_TYPE_F               = "complex_type_f";
     String COMPLEX_TYPE_ONTOLOGY        = "complex_type_ontology";
+    String INTERACTION_TYPE             = "interaction_type";
+    String INTERACTION_TYPE_F           = "interaction_type_f";
+    String INTERACTION_TYPE_ONTOLOGY    = "interaction_type_ontology";
     String COMPLEX_XREF                 = "complex_xref";
     String COMPLEX_XREF_ONTOLOGY        = "complex_xref_ontology";
     String COMPLEX_AC                   = "complex_AC";

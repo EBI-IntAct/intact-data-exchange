@@ -65,7 +65,9 @@ public class ComplexSolrEnricher  extends BaseFieldEnricher {
 
         // add parents to interaction_type_ontology
         for ( CvDagObject parent : cvDagObject.getParents ( ) ) {
-            solrDocument.addField ( ComplexFieldNames.INTERACTOR_TYPE_ONTOLOGY, parent ) ;
+            solrDocument.addField ( ComplexFieldNames.INTERACTOR_TYPE_ONTOLOGY, parent.getIdentifier ( ) ) ;
+            solrDocument.addField ( ComplexFieldNames.INTERACTOR_TYPE_ONTOLOGY, parent.getShortLabel ( ) ) ;
+            solrDocument.addField ( ComplexFieldNames.INTERACTOR_TYPE_ONTOLOGY, parent.getFullName ( ) ) ;
         }
         return solrDocument ;
     }
@@ -82,7 +84,8 @@ public class ComplexSolrEnricher  extends BaseFieldEnricher {
         solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM, interaction.getBioSource ( ) .getTaxId ( ) ) ;
         // add parents to complex_organism_ontology
         for ( OntologyTerm parent : ontologyTerm.getAllParentsToRoot ( true ) ) {
-            solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM_ONTOLOGY, parent ) ;
+            solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM_ONTOLOGY, parent.getId ( ) ) ;
+            solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM_ONTOLOGY, parent.getName ( ) ) ;
         }
         return solrDocument ;
     }
@@ -102,19 +105,19 @@ public class ComplexSolrEnricher  extends BaseFieldEnricher {
                 ID = interactorXref.getPrimaryId ( ) ;
                 ontologyTerm_aux = findOntologyTerm ( ID, shortLabel ) ;
                 // check if the "db_<id>" is GO
-                if ( new StringBuilder ( ) .append ( "db_" )
-                        .append ( ID ) .toString ( )
-                        .equals ( interactorXref.getCvDatabase ( ) .GO ) ) {
+                if ( CvDatabase.GO.equals ( ID ) ) {
                     // then add short label, id, name and synonyms to complex_xref
                     solrDocument.addField ( ComplexFieldNames.COMPLEX_XREF, shortLabel ) ;
                     solrDocument.addField ( ComplexFieldNames.COMPLEX_XREF, ID ) ;
                     solrDocument.addField ( ComplexFieldNames.COMPLEX_XREF, ontologyTerm_aux.getName ( ) ) ;
                     for ( OntologyTerm synonym : ontologyTerm_aux.getSynonyms ( ) ) {
-                        solrDocument.addField ( ComplexFieldNames.COMPLEX_XREF, synonym ) ;
+                        solrDocument.addField ( ComplexFieldNames.COMPLEX_XREF, synonym.getId ( ) ) ;
+                        solrDocument.addField ( ComplexFieldNames.COMPLEX_XREF, synonym.getName ( ) ) ;
                     }
                     // add parents to complex_xref_ontology
                     for ( OntologyTerm parent : ontologyTerm_aux.getAllParentsToRoot ( true ) ) {
-                        solrDocument.addField ( ComplexFieldNames.COMPLEX_XREF_ONTOLOGY, parent ) ;
+                        solrDocument.addField ( ComplexFieldNames.COMPLEX_XREF_ONTOLOGY, parent.getId ( ) ) ;
+                        solrDocument.addField ( ComplexFieldNames.COMPLEX_XREF_ONTOLOGY, parent.getName ( ) ) ;
                     }
                 }
             }
