@@ -278,6 +278,8 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             publication = createUnassignedPublication(bibref, experiment);
         }
 
+        publication.setFullName(experiment.getFullName());
+
         ExperimentXref imexPrimary=null;
         for (ExperimentXref refs : experiment.getXrefs()){
             if (refs.getCvDatabase() != null && CvDatabase.IMEX_MI_REF.equals(refs.getCvDatabase().getIdentifier())){
