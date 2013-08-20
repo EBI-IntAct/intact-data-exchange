@@ -77,7 +77,6 @@
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psi25-xml</artifactId>
-            <version>1.8.3</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>

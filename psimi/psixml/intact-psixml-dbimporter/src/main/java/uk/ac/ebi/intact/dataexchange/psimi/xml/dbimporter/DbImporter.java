@@ -91,6 +91,9 @@ public class DbImporter {
             System.out.println("Import time: " + importTime.toDurationMillis() + "ms");
             System.out.println("Total time: " + totalTime.toDurationMillis() + "ms");
             System.out.println("\n---------------------------------------------------------\n");
+
+            System.out.println("\nDelete enriched file: " + tempFile+ "(Original: "+fileToImport+"\n");
+            tempFile.delete();
         }
     }
 
