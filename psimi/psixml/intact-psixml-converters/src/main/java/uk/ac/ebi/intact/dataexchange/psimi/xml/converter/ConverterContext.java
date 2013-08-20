@@ -52,6 +52,8 @@ public class ConverterContext {
     private Set<String> dnaTypeLabels;
     private Set<String> rnaTypeLabels;
 
+    private boolean isCheckingExperimentForPrimaryRefs = false;
+
     private static ThreadLocal<ConverterContext> instance = new ThreadLocal<ConverterContext>() {
         @Override
         protected ConverterContext initialValue() {
@@ -218,5 +220,13 @@ public class ConverterContext {
 
     public void setDefaultInstitutionPrimaryIdForAcs(String defaultInstitutionPrimaryIdForAcs) {
         this.defaultInstitutionPrimaryIdForAcs = defaultInstitutionPrimaryIdForAcs;
+    }
+
+    public boolean isCheckingExperimentForPrimaryRefs() {
+        return isCheckingExperimentForPrimaryRefs;
+    }
+
+    public void setCheckingExperimentForPrimaryRefs(boolean checkingExperimentForPrimaryRefs) {
+        isCheckingExperimentForPrimaryRefs = checkingExperimentForPrimaryRefs;
     }
 }

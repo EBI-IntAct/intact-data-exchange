@@ -152,7 +152,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         // fail if the primary reference does not point to Pubmed and primary-reference
         boolean hasValidPrimaryRef = true;
-        final Bibref bibref = psiObject.getBibref();
+        Bibref bibref = psiObject.getBibref();
         DbReference validPubmedPrimaryRef = null;
         DbReference validDOIPrimaryRef = null;
 
@@ -181,15 +181,28 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
                 addMessageToContext(MessageLevel.WARN, message, true);
 
                 // for backward compatibility, check experiment for pubmed
-                if (validPubmedPrimaryRef == null && psiObject.getXref() != null){
+                if ( ConverterContext.getInstance().isCheckingExperimentForPrimaryRefs()
+                      &&  validPubmedPrimaryRef == null && psiObject.getXref() != null){
                     for (DbReference ref : psiObject.getXref().getAllDbReferences()){
                         if (hasValidPubmedPrimaryRef( ref )){
                             validPubmedPrimaryRef = ref;
+                            if (bibref.getXref().getPrimaryRef() == null){
+                                bibref.getXref().setPrimaryRef(ref);
+                            }
+                            else {
+                                bibref.getXref().getSecondaryRef().add(ref);
+                            }
                             break;
                         }
                         else if (hasValidDOIPrimaryRef(ref)){
                             if (validDOIPrimaryRef != null){
                                 validDOIPrimaryRef = ref;
+                                if (bibref.getXref().getPrimaryRef() == null){
+                                    bibref.getXref().setPrimaryRef(ref);
+                                }
+                                else {
+                                    bibref.getXref().getSecondaryRef().add(ref);
+                                }
                             }
                         }
                     }
@@ -206,14 +219,41 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             log.warn(message);
             addMessageToContext(MessageLevel.WARN, message, true);
 
-            for (DbReference ref : psiObject.getXref().getAllDbReferences()){
-                if (hasValidPubmedPrimaryRef( ref )){
-                    validPubmedPrimaryRef = ref;
-                    break;
-                }
-                else if (hasValidDOIPrimaryRef(ref)){
-                    if (validDOIPrimaryRef != null){
-                        validDOIPrimaryRef = ref;
+            if (ConverterContext.getInstance().isCheckingExperimentForPrimaryRefs()){
+                for (DbReference ref : psiObject.getXref().getAllDbReferences()){
+                    if (hasValidPubmedPrimaryRef( ref )){
+                        if (bibref == null){
+                            bibref = new Bibref(new Xref(ref));
+                        }
+                        else if (bibref.getXref() == null){
+                            bibref.setXref(new Xref(ref));
+                        }
+                        else if (bibref.getXref().getPrimaryRef() == null) {
+                            bibref.getXref().setPrimaryRef(ref);
+                        }
+                        else{
+                            bibref.getXref().getSecondaryRef().add(ref);
+                        }
+                        validPubmedPrimaryRef = ref;
+                        break;
+                    }
+                    else if (hasValidDOIPrimaryRef(ref)){
+                        if (validDOIPrimaryRef != null){
+                            if (bibref == null){
+                                bibref = new Bibref(new Xref(ref));
+                            }
+                            else if (bibref.getXref() == null){
+                                bibref.setXref(new Xref(ref));
+                            }
+                            else if (bibref.getXref().getPrimaryRef() == null) {
+                                bibref.getXref().setPrimaryRef(ref);
+                            }
+                            else{
+                                bibref.getXref().getSecondaryRef().add(ref);
+                            }
+                            validDOIPrimaryRef = ref;
+                            bibref.getXref().getSecondaryRef().add(ref);
+                        }
                     }
                 }
             }
@@ -317,21 +357,23 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             if (bibref.getXref() != null && bibref.getXref().getPrimaryRef() != null){
                 isBibRefSet = true;
             }
+            else if (ConverterContext.getInstance().isCheckingExperimentForPrimaryRefs()){
+                isBibRefSet = extractPrimaryRefFromExperiment(intactObject, bibref);
+            }
 
             Publication publication = intactObject.getPublication();
 
             // the shortlabel of the publication is the pubmed id by default
-            if ((bibref.getXref() == null || bibref.getXref().getPrimaryRef() == null) && publication.getXrefs().isEmpty() && publication.getShortLabel() != null){
+            if (!isBibRefSet && publication.getXrefs().isEmpty() && publication.getShortLabel() != null){
                 Xref xref = new Xref();
                 xref.setPrimaryRef(new DbReference(CvDatabase.PUBMED, CvDatabase.PUBMED_MI_REF, publication.getShortLabel(), CvXrefQualifier.PRIMARY_REFERENCE, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF));
                 bibref.setXref(xref);
-
                 isBibRefSet = true;
             }
-            else if ((bibref.getXref() == null || bibref.getXref().getPrimaryRef() == null) && publication.getXrefs().isEmpty() && !publication.getAnnotations().isEmpty()){
+            else if (!isBibRefSet && publication.getXrefs().isEmpty() && !publication.getAnnotations().isEmpty()){
                 PsiConverterUtils.populateAttributes( publication, bibref, annotationConverter );
             }
-            else if ((bibref.getXref() == null || bibref.getXref().getPrimaryRef() == null) && !publication.getXrefs().isEmpty()){
+            else if (!isBibRefSet && !publication.getXrefs().isEmpty()){
                 PsiConverterUtils.populateXref(publication, bibref, publicationXrefConverter);
             }
 
@@ -342,27 +384,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
             log.error("Experiment without publication : " + intactObject.getShortLabel());
 
             // we extract the primary ref from the experiment if possible
-            if (!intactObject.getXrefs().isEmpty()){
-                Collection<uk.ac.ebi.intact.model.Xref> primaryRefs = searchXrefs(intactObject, CvDatabase.PUBMED_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, isCheckInitializedCollections());
-
-                if (primaryRefs.isEmpty()){
-                    primaryRefs = searchXrefs(intactObject, CvDatabase.DOI_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, isCheckInitializedCollections());
-                }
-
-                if (!primaryRefs.isEmpty()){
-                    Iterator<uk.ac.ebi.intact.model.Xref> iterator = primaryRefs.iterator();
-                    uk.ac.ebi.intact.model.Xref primaryRef = iterator.next();
-
-                    Xref xref = new Xref();
-                    xref.setPrimaryRef(new DbReference(primaryRef.getCvDatabase().getShortLabel(), primaryRef.getCvDatabase().getIdentifier(), primaryRef.getPrimaryId(), primaryRef.getCvXrefQualifier().getShortLabel(), primaryRef.getCvXrefQualifier().getIdentifier()));
-                    bibref.setXref(xref);
-
-                    while (iterator.hasNext()){
-                        primaryRef = iterator.next();
-                        xref.getSecondaryRef().add(new DbReference(primaryRef.getCvDatabase().getShortLabel(), primaryRef.getCvDatabase().getIdentifier(), primaryRef.getPrimaryId(), primaryRef.getCvXrefQualifier().getShortLabel(), primaryRef.getCvXrefQualifier().getIdentifier()));
-                    }
-                }
-            }
+            isBibRefSet = extractPrimaryRefFromExperiment(intactObject, bibref);
         }
 
         // create bibref if possible
@@ -381,6 +403,34 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         intactEndConversion(intactObject);
 
         return expDesc;
+    }
+
+    private boolean extractPrimaryRefFromExperiment(Experiment intactObject, Bibref bibref) {
+        if (!intactObject.getXrefs().isEmpty()){
+            Collection<uk.ac.ebi.intact.model.Xref> primaryRefs = searchXrefs(intactObject, CvDatabase.PUBMED_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, isCheckInitializedCollections());
+
+            if (primaryRefs.isEmpty()){
+                primaryRefs = searchXrefs(intactObject, CvDatabase.DOI_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, isCheckInitializedCollections());
+            }
+
+            if (!primaryRefs.isEmpty()){
+                Iterator<uk.ac.ebi.intact.model.Xref> iterator = primaryRefs.iterator();
+                uk.ac.ebi.intact.model.Xref primaryRef = iterator.next();
+
+                Xref xref = new Xref();
+                xref.setPrimaryRef(new DbReference(primaryRef.getCvDatabase().getShortLabel(), primaryRef.getCvDatabase().getIdentifier(), primaryRef.getPrimaryId(), primaryRef.getCvXrefQualifier().getShortLabel(), primaryRef.getCvXrefQualifier().getIdentifier()));
+                bibref.setXref(xref);
+
+                while (iterator.hasNext()){
+                    primaryRef = iterator.next();
+                    xref.getSecondaryRef().add(new DbReference(primaryRef.getCvDatabase().getShortLabel(), primaryRef.getCvDatabase().getIdentifier(), primaryRef.getPrimaryId(), primaryRef.getCvXrefQualifier().getShortLabel(), primaryRef.getCvXrefQualifier().getIdentifier()));
+                }
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean hasValidPrimaryRef( DbReference primaryRef ) {
