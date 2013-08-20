@@ -28,6 +28,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.PsiConverterUtils;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.PublicationUtils;
 
 import java.util.*;
@@ -152,33 +153,74 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         // fail if the primary reference does not point to Pubmed and primary-reference
         boolean hasValidPrimaryRef = true;
         final Bibref bibref = psiObject.getBibref();
+        DbReference validPubmedPrimaryRef = null;
+        DbReference validDOIPrimaryRef = null;
 
         // we have a bibref xref
         if( bibref != null && bibref.getXref() != null ) {
             IntactConverterUtils.populateXref(psiObject.getBibref().getXref(), experiment, this.xrefConverter);
 
-            final DbReference primaryRef = bibref.getXref().getPrimaryRef();
-            if ( ! hasValidPrimaryRef( primaryRef ) ) {
+            for (DbReference ref : bibref.getXref().getAllDbReferences()){
+                if (hasValidPubmedPrimaryRef( ref )){
+                    validPubmedPrimaryRef = ref;
+                    break;
+                }
+                else if (hasValidDOIPrimaryRef(ref)){
+                    if (validDOIPrimaryRef != null){
+                        validDOIPrimaryRef = ref;
+                    }
+                }
+            }
+
+            // for backward compatibility, check experiment xrefs for doi or pubmed
+            if (validDOIPrimaryRef == null && validPubmedPrimaryRef == null){
                 final String message = "Bibref in ExperimentDescription [PSI Id=" + psiObject.getId() + "] " +
                         "should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
-                        "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + "): " + primaryRef;
+                        "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + "): " + bibref.getXref().getPrimaryRef();
                 log.warn(message);
                 addMessageToContext(MessageLevel.WARN, message, true);
 
-                hasValidPrimaryRef = false;
+                // for backward compatibility, check experiment for pubmed
+                if (validPubmedPrimaryRef == null && psiObject.getXref() != null){
+                    for (DbReference ref : psiObject.getXref().getAllDbReferences()){
+                        if (hasValidPubmedPrimaryRef( ref )){
+                            validPubmedPrimaryRef = ref;
+                            break;
+                        }
+                        else if (hasValidDOIPrimaryRef(ref)){
+                            if (validDOIPrimaryRef != null){
+                                validDOIPrimaryRef = ref;
+                            }
+                        }
+                    }
+                }
+
+                hasValidPrimaryRef = (validDOIPrimaryRef != null || validPubmedPrimaryRef != null);
             }
         }
-        // no bibref at all
-        else if (bibref == null) {
+        // no bibref at all, have a look at experiment xrefs
+        else if (bibref == null && psiObject.getXref() != null) {
             final String message = "No bibref defined in ExperimentDescription [PSI Id=" + psiObject.getId() + "]. " +
                     "It should have a primary-reference (refTypeAc=" + CvXrefQualifier.PRIMARY_REFERENCE_MI_REF + ") " +
                     "with reference to Pubmed (dbAc=" + CvDatabase.PUBMED_MI_REF + ") or a DOI (dbAc=" + CvDatabase.DOI_MI_REF + ")";
             log.warn(message);
             addMessageToContext(MessageLevel.WARN, message, true);
 
-            hasValidPrimaryRef = false;
+            for (DbReference ref : psiObject.getXref().getAllDbReferences()){
+                if (hasValidPubmedPrimaryRef( ref )){
+                    validPubmedPrimaryRef = ref;
+                    break;
+                }
+                else if (hasValidDOIPrimaryRef(ref)){
+                    if (validDOIPrimaryRef != null){
+                        validDOIPrimaryRef = ref;
+                    }
+                }
+            }
+
+            hasValidPrimaryRef = (validDOIPrimaryRef != null || validPubmedPrimaryRef != null);
         }
-        // one bibref but no xref objects
+        // one bibref but no xref objects or no bibref and no experiment xref
         else {
             hasValidPrimaryRef = false;
         }
@@ -187,13 +229,13 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         Publication publication;
         // we have a pubmed or doi primary reference
         if( hasValidPrimaryRef ) {
-            publication = createPublication(bibref);
+            publication = createPublication(bibref, validPubmedPrimaryRef != null ? validPubmedPrimaryRef : validDOIPrimaryRef);
             experiment.setPublication(publication);
             publication.addExperiment(experiment);
         }
         // we need to create a unassigned publication
         else {
-            publication = createUnassignedPublication(bibref);
+            publication = createUnassignedPublication(bibref, experiment);
         }
 
         ExperimentXref imexPrimary=null;
@@ -354,10 +396,30 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         return true;
     }
 
-    private Publication createPublication(Bibref bibref) {
-        final DbReference primaryRef = bibref.getXref().getPrimaryRef();
+    private boolean hasValidPubmedPrimaryRef( DbReference primaryRef ) {
+        if ( (primaryRef.getRefTypeAc() != null && !CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(primaryRef.getRefTypeAc())) ||
+                (primaryRef.getRefTypeAc() == null && !CvXrefQualifier.PRIMARY_REFERENCE.equals(primaryRef.getRefType().toLowerCase())) ||
+                (primaryRef.getDbAc() != null && !CvDatabase.PUBMED_MI_REF.equals(primaryRef.getDbAc())) ||
+                (primaryRef.getDbAc() == null && !CvDatabase.PUBMED.equals(primaryRef.getDb().toLowerCase()))
+                ) {
+            return false;
+        }
+        return true;
+    }
 
-        String pubId = primaryRef.getId();
+    private boolean hasValidDOIPrimaryRef( DbReference primaryRef ) {
+        if ( (primaryRef.getRefTypeAc() != null && !CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(primaryRef.getRefTypeAc())) ||
+                (primaryRef.getRefTypeAc() == null && !CvXrefQualifier.PRIMARY_REFERENCE.equals(primaryRef.getRefType().toLowerCase())) ||
+                (primaryRef.getDbAc() != null && !CvDatabase.DOI_MI_REF.equals(primaryRef.getDbAc())) ||
+                (primaryRef.getDbAc() == null && !CvDatabase.DOI.equals(primaryRef.getDb().toLowerCase()))
+                ) {
+            return false;
+        }
+        return true;
+    }
+
+    private Publication createPublication(Bibref bibref, DbReference validPrimaryRef) {
+        String pubId = validPrimaryRef.getId();
 
         Publication publication = (Publication) ConversionCache.getElement("pub:"+pubId);
 
@@ -366,7 +428,6 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         }
 
         publication = new Publication(getInstitution(), pubId);
-        publication.setPublicationId(pubId);
 
         IntactConverterUtils.populateXref(bibref.getXref(), publication, this.publicationXrefConverter);
         IntactConverterUtils.populateAnnotations(bibref, publication, getInstitution(), this.annotationConverter);
@@ -378,7 +439,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         return publication;
     }
 
-    private Publication createUnassignedPublication(Bibref bibRef) {
+    private Publication createUnassignedPublication(Bibref bibRef, Experiment exp) {
 
         String pubId = PublicationUtils.nextUnassignedId(IntactContext.getCurrentInstance());
 
@@ -389,8 +450,12 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         }
 
         publication = new Publication(getInstitution(), pubId);
-        publication.setPublicationId(pubId);
-
+        CvDatabase pubmed = CvObjectUtils.createCvObject(getInstitution(), CvDatabase.class, CvDatabase.PUBMED_MI_REF, CvDatabase.PUBMED);
+        CvXrefQualifier primary = CvObjectUtils.createCvObject(getInstitution(), CvXrefQualifier.class, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, CvXrefQualifier.PRIMARY_REFERENCE);
+        // add unassigned as primary ref
+        publication.addXref(new PublicationXref(getInstitution(), pubmed, pubId, primary));
+        // add unassigned to exeriment
+        exp.addXref(new ExperimentXref(getInstitution(), pubmed, pubId, primary));
         if (bibRef != null){
             IntactConverterUtils.populateXref(bibRef.getXref(), publication, this.publicationXrefConverter);
             IntactConverterUtils.populateAnnotations(bibRef, publication, getInstitution(), this.annotationConverter);
