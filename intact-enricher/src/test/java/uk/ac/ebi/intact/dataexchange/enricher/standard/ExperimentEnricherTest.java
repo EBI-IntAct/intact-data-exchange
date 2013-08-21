@@ -60,7 +60,7 @@ public class ExperimentEnricherTest extends EnricherBasicTestCase {
         final String pubmedId = "15733859";
 
         Publication publication = getMockBuilder().createPublication(pubmedId);
-        Experiment experiment = getMockBuilder().createExperimentEmpty();
+        Experiment experiment = getMockBuilder().createExperimentEmpty("lala", pubmedId);
         experiment.setPublication(publication);
 
         CvTopic publicationYearTopic = CvObjectUtils.createCvObject(experiment.getOwner(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
