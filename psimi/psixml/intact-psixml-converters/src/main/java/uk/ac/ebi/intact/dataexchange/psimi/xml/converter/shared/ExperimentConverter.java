@@ -527,14 +527,14 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         Collection<Attribute> attributes = new ArrayList<Attribute>(expDesc.getAttributes().size());
 
-        for (Attribute attr : attributes){
+        for (Attribute attr : expDesc.getAttributes()){
             if (attr.getNameAc() != null){
                 if (publicationTopicsMi.contains(attr.getNameAc())){
                     attributes.add(attr);
                 }
             }
             else if (attr.getName() != null){
-                if (publicationTopics.contains(attr.getNameAc().toLowerCase())){
+                if (publicationTopics.contains(attr.getName().toLowerCase())){
                     attributes.add(attr);
                 }
             }
