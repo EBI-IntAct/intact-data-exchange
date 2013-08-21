@@ -69,7 +69,7 @@ public class InteractionEnricher extends AnnotatedObjectEnricher<Interaction> {
              componentEnricher.enrich(component);
         }
         
-        if (objectToEnrich.getCvInteractionType() != null) {
+        if (getEnricherContext().getConfig().isUpdateCvTerms() && objectToEnrich.getCvInteractionType() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvInteractionType());
         }
 

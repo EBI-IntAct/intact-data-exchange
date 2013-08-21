@@ -22,8 +22,6 @@ import org.springframework.stereotype.Controller;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.DataItem;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.OntologyDataItem;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.InteractorFetcher;
 import uk.ac.ebi.intact.model.*;
@@ -58,12 +56,6 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
     @Autowired
     private CvObjectFetcher cvObjectFetcher;
 
-    @Autowired
-    private EnricherConfig enricherConfig;
-
-    @Autowired
-    private EnricherContext enricherContext;
-
     public InteractorEnricher() {
     }
 
@@ -91,14 +83,14 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         // replace short label invalid chars
         objectToEnrich.setShortLabel(replaceLabelInvalidChars(objectToEnrich.getShortLabel()));
 
-        if (objectToEnrich.getCvInteractorType() != null) {
+        if (getEnricherContext().getConfig().isUpdateCvTerms() && objectToEnrich.getCvInteractorType() != null) {
             cvObjectEnricher.enrich(objectToEnrich.getCvInteractorType());
         }
 
         if (objectToEnrich instanceof Protein) {
 
             // TODO use the EnricherConfig to find out if we want to enrich the protein or not.
-            if( enricherConfig.isUpdateProteins() ) {
+            if( getEnricherContext().getConfig().isUpdateProteins() ) {
 
                 Protein proteinToEnrich = (Protein) objectToEnrich;
 
@@ -191,10 +183,10 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
     private void enrichWithChebi( Interactor objectToEnrich ) {
 
         // check in the config whether we want to enrich small molecules or not
-        log.debug( "enricherConfig.isUpdateSmallMolecules()="+enricherConfig.isUpdateSmallMolecules() );
-        log.debug( "enricherContext.getConfig().isUpdateSmallMolecules()="+enricherContext.getConfig().isUpdateSmallMolecules() );
+        log.debug( "enricherConfig.isUpdateSmallMolecules()="+getEnricherContext().getConfig().isUpdateSmallMolecules() );
+        log.debug( "enricherContext.getConfig().isUpdateSmallMolecules()="+getEnricherContext().getConfig().isUpdateSmallMolecules() );
 
-        if( enricherConfig.isUpdateSmallMolecules() ) {
+        if( getEnricherContext().getConfig().isUpdateSmallMolecules() ) {
 
             if ( objectToEnrich == null ) {
                 throw new NullPointerException( "You must give a non null objectToEnrich" );
@@ -221,7 +213,7 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                     }
 
                     // Check on chebi identifier, and if need be fix their qualifiers
-                    if( enricherConfig.isUpdateSmallMoleculeChebiXrefs() ) {
+                    if( getEnricherContext().getConfig().isUpdateSmallMoleculeChebiXrefs() ) {
                         updateSmallMoleculeXrefs( objectToEnrich, chebiEntity );
                     }
 

@@ -42,6 +42,7 @@ public class ExperimentEnricherTest extends EnricherBasicTestCase {
         Experiment experiment = getMockBuilder().createExperimentEmpty();
         experiment.setShortLabel("lalalssla");
         experiment.setPublication(publication);
+        publication.getXrefs().add(getMockBuilder().createPrimaryReferenceXref(publication, pubmedId));
 
         experiment.setOwner(new Institution("ucla"));
 
@@ -49,9 +50,9 @@ public class ExperimentEnricherTest extends EnricherBasicTestCase {
 
         Assert.assertEquals("kang-2005", experiment.getShortLabel());
         Assert.assertEquals("The flexible loop of Bcl-2 is required for molecular interaction with immunosuppressant FK-506 binding protein 38 (FKBP38).", experiment.getFullName());
-        Assert.assertEquals(2, experiment.getAnnotations().size());
+        Assert.assertEquals(3, experiment.getAnnotations().size());
 
-        Assert.assertEquals("dip", experiment.getOwner().getShortLabel());
+        Assert.assertEquals("ucla", experiment.getOwner().getShortLabel());
     }
 
     @Test

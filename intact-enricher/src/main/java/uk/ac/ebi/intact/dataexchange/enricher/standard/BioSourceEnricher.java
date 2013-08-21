@@ -58,54 +58,92 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
 
         TaxonomyTerm term = bioSourceFetcher.fetchByTaxId(taxId);
 
+        String label = objectToEnrich.getShortLabel();
+        String fullName = objectToEnrich.getFullName();
 
-        // update labels if no tissue or celltype are present
+        // we don't have cell types so we override
         if (objectToEnrich.getCvTissue() == null &&
-                objectToEnrich.getCvCellType() == null) {
-            String label = term.getCommonName();
-            String fullName = term.getScientificName();
-
-            if (label == null || label.length() == 0) {
+                objectToEnrich.getCvCellType() == null && term != null){
+            if (term.getCommonName() != null){
+                label = term.getCommonName();
+            }
+            else if (term.getScientificName() != null){
+                label = term.getScientificName();
+            }
+            else if (label == null && fullName != null) {
                 label = fullName;
             }
-
-            if (label != null) {
-                label = AnnotatedObjectUtils.prepareShortLabel(label.toLowerCase());
-                objectToEnrich.setShortLabel(label);
+            else if (label == null){
+                label = objectToEnrich.getTaxId();
             }
-
-            if (fullName != null) {
-                objectToEnrich.setFullName(fullName);
+            fullName = term.getScientificName();
+        }
+        // the label is null and needs to be updated
+        else if (label == null){
+            if (fullName != null){
+               label = fullName;
             }
+            else if (term != null && term.getCommonName() != null){
+                label = term.getCommonName();
             }
+            else if (term != null && term.getScientificName() != null){
+                label = term.getScientificName();
+            }
+            else {
+                label = objectToEnrich.getTaxId();
+            }
+        }
 
         if (objectToEnrich.getCvCellType() != null) {
-            cvObjectEnricher.enrich(objectToEnrich.getCvCellType());
+            // update cell types if required
+            if (getEnricherContext().getConfig().isUpdateCellTypesAndTissues()){
+                cvObjectEnricher.enrich(objectToEnrich.getCvCellType());
+            }
+            // only override name when not provided because shortlabel is mandatory
+            if (objectToEnrich.getShortLabel() == null && objectToEnrich.getCvCellType().getShortLabel() != null){
+                label = label+"-"+ objectToEnrich.getCvCellType().getShortLabel();
+            }
         }
         if (objectToEnrich.getCvTissue() != null) {
-            cvObjectEnricher.enrich(objectToEnrich.getCvTissue());
+            // update cell types if required
+            if (getEnricherContext().getConfig().isUpdateCellTypesAndTissues()){
+                cvObjectEnricher.enrich(objectToEnrich.getCvTissue());
+            }
+            // only override name when not provided because shortlabel is mandatory
+            if (objectToEnrich.getShortLabel() == null && objectToEnrich.getCvTissue().getShortLabel() != null){
+                label = label+"-"+ objectToEnrich.getCvTissue().getShortLabel();
+            }
+        }
+
+        if (label != null) {
+            label = AnnotatedObjectUtils.prepareShortLabel(label.toLowerCase());
+            objectToEnrich.setShortLabel(label);
+        }
+
+        if (fullName != null) {
+            objectToEnrich.setFullName(fullName);
         }
 
         // check if it has a newt xref
-        checkNewtXref(objectToEnrich);
+        checkUniprotTaxonomyXref(objectToEnrich);
 
         super.enrich(objectToEnrich);
     }
 
-    protected void checkNewtXref(BioSource organism) {
-        boolean hasNewt = false;
+    protected void checkUniprotTaxonomyXref(BioSource organism) {
+        boolean hasUniprotTaxonomy = false;
 
         for (BioSourceXref xref : organism.getXrefs()) {
-            if (CvDatabase.NEWT_MI_REF.equals(xref.getCvDatabase().getMiIdentifier())) {
-                hasNewt = true;
+            if ("MI:0942".equals(xref.getCvDatabase().getIdentifier())) {
+                hasUniprotTaxonomy = true;
                 break;
             }
         }
 
-        if (!hasNewt) {
+        if (!hasUniprotTaxonomy) {
             CvObjectBuilder cvObjectBuilder = new CvObjectBuilder();
             CvXrefQualifier identityQual = cvObjectBuilder.createIdentityCvXrefQualifier(organism.getOwner());
-            CvDatabase newtDb = CvObjectUtils.createCvObject(organism.getOwner(), CvDatabase.class, CvDatabase.NEWT_MI_REF, CvDatabase.UNIPROT);
+            CvDatabase newtDb = CvObjectUtils.createCvObject(organism.getOwner(), CvDatabase.class, "MI:0942", "uniprot taxonomy");
 
             BioSourceXref newtXref = XrefUtils.createIdentityXref(organism, organism.getTaxId(), identityQual, newtDb);
             organism.getXrefs().add(newtXref);

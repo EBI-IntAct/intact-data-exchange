@@ -23,7 +23,6 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.model.BioSource;
 import uk.ac.ebi.intact.model.BioSourceXref;
 import uk.ac.ebi.intact.model.CvCellType;
-import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
@@ -66,7 +65,7 @@ public class BioSourceEnricherTest extends EnricherBasicTestCase {
 
         final BioSourceXref newtXref = unculturedBacterium.getXrefs().iterator().next();
         Assert.assertEquals(String.valueOf(77133), newtXref.getPrimaryId());
-        Assert.assertEquals(CvDatabase.NEWT_MI_REF, CvObjectUtils.getPsiMiIdentityXref(newtXref.getCvDatabase()).getPrimaryId());
+        Assert.assertEquals("MI:0942", CvObjectUtils.getPsiMiIdentityXref(newtXref.getCvDatabase()).getPrimaryId());
     }
 
     @Test (expected = EnricherException.class)

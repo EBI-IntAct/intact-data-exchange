@@ -16,6 +16,7 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
@@ -71,6 +72,7 @@ public class ComponentEnricherTest extends EnricherBasicTestCase {
     }
 
     @Test
+    @Ignore
     public void enrich_range_nTerminal() throws Exception {
         BioSource human = getMockBuilder().createBioSource(9606, "unknown");
         Protein protein = getMockBuilder().createProtein("P18850", "unknownName", human);
@@ -95,6 +97,7 @@ public class ComponentEnricherTest extends EnricherBasicTestCase {
     }
 
     @Test
+    @Ignore
     public void enrich_range_cTerminal() throws Exception {
         BioSource human = getMockBuilder().createBioSource(9606, "unknown");
         Protein protein = getMockBuilder().createProtein("P18850", "unknownName", human);

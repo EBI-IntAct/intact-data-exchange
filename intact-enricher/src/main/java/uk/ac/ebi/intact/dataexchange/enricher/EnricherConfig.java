@@ -31,6 +31,8 @@ public class EnricherConfig {
     //private String oboUrl = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
     private String oboUrl = "http://psidev.cvs.sourceforge.net/viewvc/psidev/psi/mi/rel25/data/psi-mi25.obo";
     private boolean updateSmallMoleculeChebiXrefs = true;
+    private boolean updateCvTerms = true;
+    private boolean updateCellTypesAndTissues = false;
 
     public EnricherConfig() {
     }
@@ -89,5 +91,21 @@ public class EnricherConfig {
 
     public void setUpdateSmallMoleculeChebiXrefs( boolean updateSmallMoleculeChebiXrefs ) {
         this.updateSmallMoleculeChebiXrefs = updateSmallMoleculeChebiXrefs;
+    }
+
+    public boolean isUpdateCvTerms() {
+        return updateCvTerms;
+    }
+
+    public void setUpdateCvTerms(boolean updateCvTerms) {
+        this.updateCvTerms = updateCvTerms;
+    }
+
+    public boolean isUpdateCellTypesAndTissues() {
+        return updateCellTypesAndTissues;
+    }
+
+    public void setUpdateCellTypesAndTissues(boolean updateCellTypesAndTissues) {
+        this.updateCellTypesAndTissues = updateCellTypesAndTissues;
     }
 }

@@ -17,8 +17,8 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.model.AnnotatedObject;
-import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.model.Xref;
 
 /**
@@ -31,20 +31,23 @@ public abstract class AnnotatedObjectEnricher<T extends AnnotatedObject<?,?>> {
 
     @Autowired
     private ApplicationContext applicationContext;
+    @Autowired
+    private EnricherContext enricherContext;
 
     public void enrich(T objectToEnrich) {
         CvObjectEnricher cvObjectEnricher = (CvObjectEnricher) applicationContext.getBean("cvObjectEnricher");
-        InstitutionEnricher institutionEnricher = (InstitutionEnricher) applicationContext.getBean("institutionEnricher");
 
-        for (Xref xref : objectToEnrich.getXrefs()) {
-            if (xref.getCvXrefQualifier() != null) {
-                cvObjectEnricher.enrich(xref.getCvXrefQualifier());
+        if (enricherContext.getConfig().isUpdateCvTerms()){
+            for (Xref xref : objectToEnrich.getXrefs()) {
+                if (xref.getCvXrefQualifier() != null) {
+                    cvObjectEnricher.enrich(xref.getCvXrefQualifier());
+                }
+                cvObjectEnricher.enrich(xref.getCvDatabase());
             }
-            cvObjectEnricher.enrich(xref.getCvDatabase());
         }
+    }
 
-        if (!(objectToEnrich instanceof Institution)) {
-            institutionEnricher.enrich(objectToEnrich.getOwner());
-        }
+    protected EnricherContext getEnricherContext() {
+        return enricherContext;
     }
 }
