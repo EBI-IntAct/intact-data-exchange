@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.DataItem;
 import uk.ac.ebi.chebi.webapps.chebiWS.model.Entity;
-import uk.ac.ebi.chebi.webapps.chebiWS.model.OntologyDataItem;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.InteractorFetcher;
 import uk.ac.ebi.intact.model.*;
@@ -209,7 +208,8 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
                     String chebiAsciiName = chebiEntity.getChebiAsciiName();
                     // update shortlabel
                     if ( chebiAsciiName != null ) {
-                        smallMoleculeToEnrich.setShortLabel( prepareSmallMoleculeShortLabel( chebiAsciiName ) );
+                        smallMoleculeToEnrich.setShortLabel( AnnotatedObjectUtils.prepareShortLabel( chebiAsciiName ) );
+                        smallMoleculeToEnrich.setFullName(chebiAsciiName);
                     }
 
                     // Check on chebi identifier, and if need be fix their qualifiers
@@ -219,31 +219,41 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
 
                     // IUPAC name
                     CvAliasType iupacAlias = cvObjectFetcher.fetchByTermId( CvAliasType.class, "MI:2007" );
+                    CvAliasType synonymAlias = cvObjectFetcher.fetchByTermId( CvAliasType.class, CvAliasType.SYNONYM_MI_REF);
                     for ( DataItem item : chebiEntity.getIupacNames() ) {
                         updateAliases( smallMoleculeToEnrich, iupacAlias, item.getData() );
                     }
 
                     for ( DataItem item : chebiEntity.getSynonyms() ) {
                         boolean hasSameLabel = item.getData().toLowerCase().equals( smallMoleculeToEnrich.getShortLabel() );
-                        if( item.getType().equals( "INN" ) && ! hasSameLabel ) {
-                            updateAliases( smallMoleculeToEnrich, null, item.getData() );
+                        if( ! hasSameLabel ) {
+                            updateAliases( smallMoleculeToEnrich, synonymAlias, item.getData() );
                         }
                     }
 
                     //update annotation (inchi)
-                    String inchiId = chebiEntity.getInchi();
                     CvTopic inchiCvTopic = cvObjectFetcher.fetchByTermId( CvTopic.class, CvTopic.INCHI_ID_MI_REF );
-                    if( inchiCvTopic != null ){
-                        updateAnnotations( smallMoleculeToEnrich, inchiCvTopic, inchiId );
+                    CvTopic inchiKeyType = cvObjectFetcher.fetchByTermId(CvTopic.class, CvTopic.INCHI_KEY_MI_REF);
+                    CvTopic smilesType = cvObjectFetcher.fetchByTermId(CvTopic.class, CvTopic.SMILES_STRING_MI_REF);
+
+                    //InChI
+                    if (chebiEntity.getInchi() != null && !chebiEntity.getInchi().isEmpty()) {
+                        if( inchiCvTopic != null ){
+                            updateAnnotations( smallMoleculeToEnrich, inchiCvTopic, chebiEntity.getInchi() );
+                        }
                     }
 
-                    // update aliases (ontology role)
-                    CvTopic functionTopic = cvObjectFetcher.fetchByTermId( CvTopic.class, CvTopic.FUNCTION_MI_REF );
-                    if( functionTopic != null ) {
-                        for ( OntologyDataItem parent : chebiEntity.getOntologyParents() ) {
-                            if( "has role".equals( parent.getType() ) ) {
-                                updateAnnotations( smallMoleculeToEnrich, functionTopic, parent.getChebiName() );
-                            }
+                    //Standard InChKey
+                    if (chebiEntity.getInchiKey() != null && !chebiEntity.getInchiKey().isEmpty()) {
+                        if( inchiKeyType != null ){
+                            updateAnnotations( smallMoleculeToEnrich, inchiKeyType, chebiEntity.getInchiKey() );
+                        }
+                    }
+
+                    //SMILES
+                    if (chebiEntity.getSmiles() != null && !chebiEntity.getSmiles().isEmpty()) {
+                        if( smilesType != null ){
+                            updateAnnotations( smallMoleculeToEnrich, smilesType, chebiEntity.getSmiles() );
                         }
                     }
                 }
@@ -319,21 +329,6 @@ public class InteractorEnricher extends AnnotatedObjectEnricher<Interactor> {
         if (uniprotProt.getSequence() != null && !uniprotProt.getSequence().equals(proteinToEnrich.getSequence())) {
             proteinToEnrich.setSequence(uniprotProt.getSequence());
         }
-    }
-
-    /**
-     * max size is 255 only
-     * @param name chebiasciiname to be edited
-     * @return altered chebiasciiname
-     */
-    private String prepareSmallMoleculeShortLabel(String name){
-        if ( name == null ) {
-            throw new NullPointerException( "You must give a non null name" );
-        }
-        if(name.length()>255){
-            return name.substring( 0,255 );
-        }
-        return name.trim().toLowerCase();
     }
 
     private void updateAliases(Interactor interactor, UniprotProtein uniprotProt) {

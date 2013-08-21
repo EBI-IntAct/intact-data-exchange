@@ -68,7 +68,7 @@ public class ExperimentEnricherTest extends EnricherBasicTestCase {
 
         enricher.enrich(experiment);
 
-        Assert.assertEquals(2, experiment.getAnnotations().size());
+        Assert.assertEquals(3, experiment.getAnnotations().size());
     }
 
     @Test
