@@ -235,7 +235,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 "or lower(p.owner.shortLabel) = :molecularConnections " +
                 "or lower(p.owner.shortLabel) = :uniprot " +
                 "or lower(p.owner.shortLabel) = :mbinfo " +
-                "or lower(p.owner.shortLabel) = :mpidb" +
+                "or lower(p.owner.shortLabel) = :mpidb " +
+                "or lower(p.owner.shortLabel) = :mint" +
                 ") " +
                 "and p.ac not in (" +
                 "select distinct p2.ac from Publication as p2 join p2.xrefs as x where " +
@@ -259,6 +260,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("uniprot", "uniprot");
         query.setParameter("mbinfo", "mbinfo");
         query.setParameter("mpidb", "mpidb");
+        query.setParameter("mint", "mint");
 
         return query.getResultList();
     }
