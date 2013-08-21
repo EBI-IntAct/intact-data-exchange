@@ -63,11 +63,11 @@ public class GlobalImexPublicationUpdater {
             }
 
             // fire error event for publications without imex id, not elligible but with imex curation level
-            Collection<String> publicationsImexCurationNotElligible = intactPublicationCollector.getPublicationsHavingImexCurationLevelButAreNotEligibleImex();
+            /*Collection<String> publicationsImexCurationNotElligible = intactPublicationCollector.getPublicationsHavingImexCurationLevelButAreNotEligibleImex();
             for (String pubAc : publicationsImexCurationNotElligible){
                 ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.imex_curation_not_eligible, pubAc, null, null, null, "Publication having imex curation level but no IMEx id can be automatically assigned because is not eligible imex or does not contain any PPI interactions.");
                 imexCentralManager.fireOnImexError(errorEvt);
-            }
+            }*/
 
             // fire error event for publications without imex but experiment has imex
             Collection<String> publicationsWithouImexAndExperimentImex = intactPublicationCollector.getPublicationsWithoutImexButWithExperimentImex();
