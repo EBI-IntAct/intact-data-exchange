@@ -3,7 +3,9 @@ package uk.ac.ebi.intact.util.uniprotExport.filters.mitab;
 import org.apache.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
 import psidev.psi.mi.tab.PsimiTabReader;
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.Interactor;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.core.context.IntactContext;
@@ -21,7 +23,6 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
-import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntActClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
 import java.io.File;
@@ -53,7 +54,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
 
     protected MiClusterScoreResults clusterMiScoreInteractionEligibleUniprotExport(String mitabFile) throws IOException, ConverterException {
         BinaryClusterScore clusterScore = new BinaryClusterScore();
-        IntActClusterScore negativeClusterScore = new IntActClusterScore();
+        BinaryClusterScore negativeClusterScore = new BinaryClusterScore();
         MiClusterContext context = new MiClusterContext();
         context.setTranscriptsWithDifferentMasterAcs(this.transcriptsWithDifferentParentAcs);
         context.setInteractionComponentXrefs(this.interactionComponentXrefs);
@@ -98,34 +99,38 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
 
             if (interactorA == null){
                uniprotA = uniprotB;
-               interaction.setInteractorA(interactorB);
             }
             else if (interactorB == null){
                 uniprotB = uniprotA;
-                interaction.setInteractorB(interactorA);
             }
 
             if (!intactAcs.isEmpty()){
                 if (excludeNonUniprotInteractors && uniprotA != null && uniprotB != null){
-                    processClustering(clusterScore, context, binaryIdentifier, interaction, intactAcs, interaction.getInteractorA(), uniprotA, interaction.getInteractorB(), uniprotB, excludeSpokeExpanded);
+                    if (!interaction.isNegativeInteraction()){
+                        processClustering(clusterScore, context, binaryIdentifier, interaction, intactAcs, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, false);
+                    }
+                    else {
+                        processClustering(negativeClusterScore, context, binaryIdentifier, interaction, intactAcs, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, true);
+                    }
                 }
                 else if (!excludeNonUniprotInteractors){
-                    processClustering(clusterScore, context, binaryIdentifier, interaction, intactAcs, interaction.getInteractorA(), uniprotA, interaction.getInteractorB(), uniprotB, excludeSpokeExpanded);
+                    if (!interaction.isNegativeInteraction()){
+                        processClustering(clusterScore, context, binaryIdentifier, interaction, intactAcs, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, false);
+                    }
+                    else{
+                        processClustering(negativeClusterScore, context, binaryIdentifier, interaction, intactAcs, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, true);
+
+                    }
                 }
             }
 
             binaryIdentifier++;
         }
 
-        // process negative interactions not in mitab
-        if (!this.negativeInteractions.isEmpty()){
-            super.clusterNegativeIntactInteractions(context, negativeClusterScore);
-        }
-
         return new MiClusterScoreResults(new ExportedClusteredInteractions(clusterScore), new ExportedClusteredInteractions(negativeClusterScore), context);
     }
 
-    private void processClustering(BinaryClusterScore clusterScore, MiClusterContext context, Integer binaryIdentifier, BinaryInteraction<Interactor> interaction, Set<String> intactAcs, Interactor interactorA, String uniprotA, Interactor interactorB, String uniprotB, boolean excludeSpokeExpanded) {
+    private void processClustering(BinaryClusterScore clusterScore, MiClusterContext context, Integer binaryIdentifier, BinaryInteraction<Interactor> interaction, Set<String> intactAcs, Interactor interactorA, String uniprotA, Interactor interactorB, String uniprotB, boolean excludeSpokeExpanded, boolean isNegative) {
         TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         InteractionDao interactionDao = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao();
 
@@ -137,7 +142,8 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
         for (InteractionImpl intact : interactionsInIntact){
             String intactAc = intact.getAc();
 
-            if (this.eligibleInteractionsForUniprotExport.contains(intactAc)){
+            if ((!isNegative && this.eligibleInteractionsForUniprotExport.contains(intactAc))
+                    || (isNegative && this.negativeInteractions.contains(intactAc))){
                 Collection<Experiment> experiments = intact.getExperiments();
                 if (experiments.size() == 1){
 
@@ -171,7 +177,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
             }
         }
 
-        if (canBeProcessed && !interaction.getInteractionAcs().isEmpty()){
+        if (canBeProcessed && !intactAcs.isEmpty()){
             logger.info(interactionsInIntactPassingExport.size() + " intact interactions involving "+uniprotA+" and "+uniprotB+" are eligible for uniprot export");
 
             FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
@@ -180,7 +186,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
                 removeNotExportedInteractionEvidencesFrom(interaction, interactionsInIntactPassingExport);
             }
 
-            processMiTerms(interaction, context);
+            processMiTerms(interaction, context, intactAcs.iterator().next());
             clusterScore.getBinaryInteractionCluster().put(binaryIdentifier, interaction);
 
             if (clusterScore.getInteractorCluster().containsKey(uniprotA)){

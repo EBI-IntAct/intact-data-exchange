@@ -74,22 +74,6 @@ public class FilterUtils {
             }
         }
 
-        if (geneName == null && !interactor.getAlternativeIdentifiers().isEmpty()){
-            for (CrossReference ref : interactor.getAlternativeIdentifiers()){
-                if (UNIPROT.equalsIgnoreCase(ref.getDatabase())){
-                    if (CvAliasType.GENE_NAME.equalsIgnoreCase(ref.getText())){
-                        geneName = ref.getIdentifier();
-                    }
-                    else if (CvAliasType.LOCUS_NAME.equalsIgnoreCase(ref.getText())){
-                        locusName = ref.getIdentifier();
-                    }
-                    else if (CvAliasType.ORF_NAME.equalsIgnoreCase(ref.getText())){
-                        orf = ref.getIdentifier();
-                    }
-                }
-            }
-        }
-
         // if gene name is null, get locus name. If locus name is null, get orf name. If orf name is null return "-"
         if( geneName == null ) {
             if (locusName == null){

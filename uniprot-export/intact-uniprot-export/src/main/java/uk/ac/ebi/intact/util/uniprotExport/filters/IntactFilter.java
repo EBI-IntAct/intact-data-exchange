@@ -554,43 +554,48 @@ public class IntactFilter implements InteractionFilter {
             // process intra molecular interactions as self interactions
             if (interactorA == null){
                 uniprotA = uniprotB;
-                binary.setInteractorA(interactorB);
             }
             else if (interactorB == null){
                 uniprotB = uniprotA;
-                binary.setInteractorB(interactorA);
             }
 
             if ((uniprotA != null && uniprotB != null && excludeNonUniprot) || !excludeNonUniprot){
 
-                FilterUtils.processGeneNames(binary.getInteractorA(), uniprotA, binary.getInteractorB(), uniprotB, context);
+                FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
                 removeNonPubmedPublicationsFrom(binary);
+                if (interactorA != null){
+                    removeNonIntactXrefsFrom(binary.getInteractorA().getAlternativeIdentifiers());
+                    binary.getInteractorA().getAliases().clear();
+                }
+                if (interactorB != null){
+                    removeNonIntactXrefsFrom(binary.getInteractorB().getAlternativeIdentifiers());
+                    binary.getInteractorB().getAliases().clear();
+                }
 
-                removeNonIntactXrefsFrom(binary.getInteractorA().getAlternativeIdentifiers());
-                binary.getInteractorA().getAliases().clear();
-                removeNonIntactXrefsFrom(binary.getInteractorB().getAlternativeIdentifiers());
-                binary.getInteractorB().getAliases().clear();
                 binaryInteractions.add(binary);
             }
         }
     }
 
     protected void removeNonPubmedPublicationsFrom(BinaryInteraction<Interactor> interaction){
-        List<CrossReference> publications = new ArrayList(interaction.getPublications());
 
-        for (CrossReference pub : publications){
+        Iterator<CrossReference> pubIterator = interaction.getPublications().iterator();
+
+        while(pubIterator.hasNext()){
+            CrossReference pub = pubIterator.next();
             if (!WriterUtils.PUBMED.equalsIgnoreCase(pub.getDatabase())){
-                interaction.getPublications().remove(pub);
+                pubIterator.remove();
             }
         }
     }
 
     protected void removeNonIntactXrefsFrom(Collection<CrossReference> identifiers){
-        List<CrossReference> xrefs = new ArrayList(identifiers);
+        Iterator<CrossReference> idIterator = identifiers.iterator();
 
-        for (CrossReference xref : xrefs){
-            if (!WriterUtils.INTACT.equalsIgnoreCase(xref.getDatabase())){
-                identifiers.remove(xref);
+        while(idIterator.hasNext()){
+            CrossReference id = idIterator.next();
+            if (!WriterUtils.INTACT.equalsIgnoreCase(id.getDatabase())){
+                idIterator.remove();
             }
         }
     }

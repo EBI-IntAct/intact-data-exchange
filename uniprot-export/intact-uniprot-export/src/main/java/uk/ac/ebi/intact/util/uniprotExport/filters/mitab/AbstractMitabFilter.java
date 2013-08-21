@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.util.uniprotExport.filters.mitab;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
+import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.IntactFilter;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
@@ -39,7 +40,7 @@ public abstract class AbstractMitabFilter extends IntactFilter{
         eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
     }
 
-    protected void processMiTerms(BinaryInteraction interaction, MiClusterContext context){
+    protected void processMiTerms(BinaryInteraction interaction, MiClusterContext context, String intactAc){
         List<CrossReference> detectionMethods = interaction.getDetectionMethods();
 
         Map<String, String> miTerms = context.getMiTerms();
@@ -59,6 +60,12 @@ public abstract class AbstractMitabFilter extends IntactFilter{
                 miTerms.put(type.getIdentifier(), methodName);
             }
         }
+
+        String detectionMI = detectionMethods.iterator().next().getIdentifier();
+        String typeMi = types.iterator().next().getIdentifier();
+
+        MethodTypePair entry = new MethodTypePair(detectionMI, typeMi);
+        context.getInteractionToMethod_type().put(intactAc, entry);
     }
 
     public Set<String> getEligibleInteractionsForUniprotExport() {
