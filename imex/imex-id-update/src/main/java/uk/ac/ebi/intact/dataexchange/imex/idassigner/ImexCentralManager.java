@@ -191,7 +191,7 @@ public class ImexCentralManager {
                 }
                 // the publication has been registered in IMex central but does not have an IMEx id. We cannot assign IMEx id, the curator must have a look at it
                 else {
-                    ImexErrorEvent evt = new ImexErrorEvent(this, ImexErrorType.publication_already_in_imex, intactPublication.getPublicationId(), imexPublication.getImexAccession(), null, null, "It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " because it already has a valid IMEx id in IMEx central.");
+                    ImexErrorEvent evt = new ImexErrorEvent(this, ImexErrorType.publication_already_in_imex, intactPublication.getPublicationId(), imexPublication.getImexAccession(), null, null, "It is not possible to assign a valid IMEx id to the publication " + intactPublication.getShortLabel() + " because it already registered in IMEx central with another institution");
                     fireOnImexError(evt);
                 }
             }

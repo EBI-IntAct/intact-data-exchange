@@ -56,20 +56,36 @@ public class PublicationAdminGroupSynchronizerImpl extends ImexCentralUpdater im
                             // unknown intact admin group, we cannot add another admin group for this institution
                             log.warn("The intact curator admin group is not recognized in IMEx central, we cannot tag the publication as maintained and review by INTACT.");
                         }
-                        else {
+                        // operation invalid is fired if group already assigned
+                        else if (f.getFaultInfo().getFaultCode() != DefaultImexCentralClient.OPERATION_NOT_VALID) {
                             throw e;
                         }
                     }
                 }
             } catch ( ImexCentralException e ) {
                 IcentralFault f = (IcentralFault) e.getCause();
-                if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.UNKNOWN_GROUP ) {
+                if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.UNKNOWN_GROUP || f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.OPERATION_NOT_VALID ) {
                     // unknown admin group, we cannot add another admin group for this institution
-                    log.warn("The institution " + institution + " is not recognized in IMEx central so we will add INTACT admin group.");
-                    if (!containsAdminGroup(adminGroupList, INTACT_ADMIN)){
-                        // add first INTACT admin
-                        imexPublication = imexCentral.updatePublicationAdminGroup(pubId, Operation.ADD, INTACT_ADMIN);
-                        log.info("Updated publication admin group to: " + INTACT_ADMIN);
+                    if (f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.UNKNOWN_GROUP){
+                        log.warn("The institution " + institution + " is not recognized in IMEx central so we will add INTACT admin group.");
+                    }
+
+                    if (!INTACT_ADMIN.equals(institution) && !containsAdminGroup(adminGroupList, INTACT_ADMIN)){
+                        try {
+                            // add first INTACT admin
+                            imexPublication = imexCentral.updatePublicationAdminGroup(pubId, Operation.ADD, INTACT_ADMIN);
+                            log.info("Updated publication admin group to: " + INTACT_ADMIN);
+                        } catch ( ImexCentralException e2 ) {
+                            IcentralFault f2 = (IcentralFault) e2.getCause();
+                            if( f2.getFaultInfo().getFaultCode() == DefaultImexCentralClient.UNKNOWN_GROUP) {
+                                // unknown intact admin group, we cannot add another admin group for this institution
+                                log.warn("The intact curator admin group is not recognized in IMEx central, we cannot tag the publication as maintained and review by INTACT.");
+                            }
+                            // operation invalid is fired if group already assigned
+                            else if (f2.getFaultInfo().getFaultCode() != DefaultImexCentralClient.OPERATION_NOT_VALID){
+                                throw e;
+                            }
+                        }
                     }
                 }
                 else {
@@ -88,6 +104,10 @@ public class PublicationAdminGroupSynchronizerImpl extends ImexCentralUpdater im
                 if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.UNKNOWN_GROUP ) {
                     // unknown intact admin group, we cannot add another admin group for this institution
                     log.warn("The intact curator admin group is not recognized in IMEx central, we cannot tag the publication as maintained and review by INTACT.");
+                }
+                // operation invalid is fired if group already assigned
+                else if (f.getFaultInfo().getFaultCode() != DefaultImexCentralClient.OPERATION_NOT_VALID) {
+                    throw e;
                 }
                 else {
                     throw e;

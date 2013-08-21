@@ -533,7 +533,9 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
             initialise();
         }
 
-        return CollectionUtils.subtract(publicationsHavingImexId, publicationsInvolvingPPI);
+        Collection<String> publicationsNoPPI = CollectionUtils.subtract(publicationsHavingImexId, publicationsInvolvingPPI);
+
+        return CollectionUtils.intersection(publicationsNoPPI, publicationsAcceptedForRelease);
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
