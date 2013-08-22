@@ -296,6 +296,11 @@ public class InteractionConverter {
                     refField.setText(null);
                     binary.getInteractionAcs().add(refField);
                 }
+                // identity
+                else if (refField != null && CvXrefQualifier.IDENTITY.equalsIgnoreCase(refField.getText())){
+                    refField.setText(null);
+                    binary.getInteractionAcs().add(refField);
+                }
                 else if (refField != null){
                     binary.getXrefs().add(refField);
                 }
