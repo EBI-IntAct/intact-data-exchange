@@ -18,26 +18,26 @@ import java.util.*;
  */
 
 public abstract class AbstractMitabFilter extends IntactFilter{
-    //protected List<String> eligibleInteractionsNotInMitab = new ArrayList<String>();
 
     protected static final String INTACT = "intact";
     protected static final String UNIPROT = "uniprotkb";
 
+    protected Set<String> interactionsToExclude;
+
     protected String mitab;
 
     public AbstractMitabFilter(InteractionExporter exporter, String mitab){
-        super(exporter);
+        super(exporter, false);
         this.mitab = mitab;
-
-        //eligibleInteractionsNotInMitab.addAll(this.queryFactory.getReleasedSelfInteractionAcsPassingFilters());
+        this.interactionsToExclude = new HashSet<String>();
+        this.interactionsToExclude.addAll(this.queryFactory.getInteractionAcsExcludedWithFilters());
     }
 
     public AbstractMitabFilter(InteractionExporter exporter){
-        super(exporter);
-
+        super(exporter, false);
         this.mitab = null;
-
-        eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
+        this.interactionsToExclude = new HashSet<String>();
+        this.interactionsToExclude.addAll(this.queryFactory.getInteractionAcsExcludedWithFilters());
     }
 
     protected void processMiTerms(BinaryInteraction interaction, MiClusterContext context, String intactAc){

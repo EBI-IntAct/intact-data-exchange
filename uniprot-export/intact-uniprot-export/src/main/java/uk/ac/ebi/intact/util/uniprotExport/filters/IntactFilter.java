@@ -68,12 +68,12 @@ public class IntactFilter implements InteractionFilter {
     /**
      * The list of negative interactions
      */
-    protected Set<String> negativeInteractions = new HashSet<String>();
+    protected Set<String> negativeInteractions;
 
     /**
      * The list of positive interactions to be processed
      */
-    protected Set<String> eligibleInteractionsForUniprotExport = new HashSet<String>();
+    protected Set<String> eligibleInteractionsForUniprotExport;
 
     /**
      * The map of intact isoform proteins pointing to a parent with a different uniprot entry
@@ -86,14 +86,24 @@ public class IntactFilter implements InteractionFilter {
     protected Map<String, Set<String>> interactionComponentXrefs = new HashMap<String, Set<String>>();
 
     /**
-     * we create a new IntactFilter
+     * we create a new IntactFilter with a list of interactions to export
      */
     public IntactFilter(InteractionExporter exporter){
-        this.interactionConverter = new Intact2BinaryInteractionConverter(CvDatabase.INTACT);
+        this(exporter, true);
+    }
+
+    public IntactFilter(InteractionExporter exporter, boolean initialiseListOfInteractionsToExport){
+
         this.exporter = exporter;
         this.queryFactory = new QueryBuilder();
-        negativeInteractions.addAll(this.queryFactory.getNegativeInteractionsPassingFilter());
-        eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
+
+        if (initialiseListOfInteractionsToExport){
+            this.interactionConverter = new Intact2BinaryInteractionConverter(CvDatabase.INTACT);
+            negativeInteractions = new HashSet<String>();
+            negativeInteractions.addAll(this.queryFactory.getNegativeInteractionsPassingFilter());
+            eligibleInteractionsForUniprotExport = new HashSet<String>();
+            eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
+        }
 
         buildTranscriptsWithDifferentParents();
         buildInteractionGoComponentXrefs();

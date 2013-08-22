@@ -156,8 +156,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
     }
 
     private void processClustering(MiClusterContext context, List<BinaryInteraction> interactionToProcess, BinaryInteraction<Interactor> interaction, String intactAc, Interactor interactorA, String uniprotA, Interactor interactorB, String uniprotB, boolean excludedSpokeExpanded, boolean isNegative) {
-        if ((!isNegative && this.eligibleInteractionsForUniprotExport.contains(intactAc))
-                || (isNegative && this.negativeInteractions.contains(intactAc))){
+        if (!this.interactionsToExclude.contains(intactAc)){
 
             FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
             processMiTerms(interaction, context, intactAc);

@@ -142,8 +142,7 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
         for (InteractionImpl intact : interactionsInIntact){
             String intactAc = intact.getAc();
 
-            if ((!isNegative && this.eligibleInteractionsForUniprotExport.contains(intactAc))
-                    || (isNegative && this.negativeInteractions.contains(intactAc))){
+            if (!this.interactionsToExclude.contains(intactAc)){
                 Collection<Experiment> experiments = intact.getExperiments();
                 if (experiments.size() == 1){
 
