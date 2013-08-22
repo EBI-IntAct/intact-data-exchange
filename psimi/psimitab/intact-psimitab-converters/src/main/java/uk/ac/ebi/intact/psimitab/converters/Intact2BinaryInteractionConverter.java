@@ -156,4 +156,12 @@ public class Intact2BinaryInteractionConverter {
 
         return processedInteractions;
     }
+
+    public boolean isAddPublicationIdentifiers() {
+        return expansionStrategy.isAddPublicationIdentifiers();
+    }
+
+    public void setAddPublicationIdentifiers(boolean addPublicationIdentifiers) {
+        this.expansionStrategy.setAddPublicationIdentifiers(addPublicationIdentifiers);
+    }
 }

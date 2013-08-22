@@ -33,6 +33,8 @@ public class PublicationConverter {
     private final static String TEXT_MINING_MI = "MI:1056";
     private final static String DATASET_MI = "MI:0875";
 
+    public boolean addPublicationIdentifiers = false;
+
     public PublicationConverter(){
         this.annotationConverter = new AnnotationConverter();
         this.xrefConverter = new CrossReferenceConverter<InstitutionXref>();
@@ -77,6 +79,10 @@ public class PublicationConverter {
                     }
                     // imexId
                     else if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())) {
+                        binary.getPublications().add(new CrossReferenceImpl(pubRef.getCvDatabase().getShortLabel(), pubRef.getPrimaryId()));
+                    }
+                    // publication identifiers
+                    else if (addPublicationIdentifiers && CvXrefQualifier.IDENTITY_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())){
                         binary.getPublications().add(new CrossReferenceImpl(pubRef.getCvDatabase().getShortLabel(), pubRef.getPrimaryId()));
                     }
                 }
@@ -169,5 +175,13 @@ public class PublicationConverter {
                 binary.getCreationDate().add(pub.getCreated());
             }
         }
+    }
+
+    public boolean isAddPublicationIdentifiers() {
+        return addPublicationIdentifiers;
+    }
+
+    public void setAddPublicationIdentifiers(boolean addPublicationIdentifiers) {
+        this.addPublicationIdentifiers = addPublicationIdentifiers;
     }
 }

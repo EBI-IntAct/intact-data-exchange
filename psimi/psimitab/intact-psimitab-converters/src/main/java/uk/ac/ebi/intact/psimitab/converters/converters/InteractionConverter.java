@@ -358,4 +358,12 @@ public class InteractionConverter {
     public boolean isProcessPublicationDetails() {
         return processPublicationDetails;
     }
+
+    public boolean isAddPublicationIdentifiers() {
+        return experimentConverter.isAddPublicationIdentifiers();
+    }
+
+    public void setAddPublicationIdentifiers(boolean addPublicationIdentifiers) {
+        this.experimentConverter.setAddPublicationIdentifiers(addPublicationIdentifiers);
+    }
 }

@@ -21,7 +21,7 @@ public class ExperimentConverter {
     private PublicationConverter publicationConverter;
     private CvObjectConverter<CvObject> cvObjectConverter;
     public BioSourceConverter organismConverter;
-    
+
     public ExperimentConverter(){
         this.publicationConverter = new PublicationConverter();
         this.cvObjectConverter = new CvObjectConverter<CvObject>();
@@ -98,4 +98,11 @@ public class ExperimentConverter {
         }
     }
 
+    public boolean isAddPublicationIdentifiers() {
+        return publicationConverter.isAddPublicationIdentifiers();
+    }
+
+    public void setAddPublicationIdentifiers(boolean addPublicationIdentifiers) {
+        this.publicationConverter.setAddPublicationIdentifiers(addPublicationIdentifiers);
+    }
 }
