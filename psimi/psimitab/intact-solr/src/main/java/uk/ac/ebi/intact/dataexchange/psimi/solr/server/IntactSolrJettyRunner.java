@@ -15,11 +15,6 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.solr.server;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.hupo.psi.mi.psicquic.model.server.SolrJettyRunner;
@@ -78,14 +73,6 @@ public class IntactSolrJettyRunner extends SolrJettyRunner {
             solrHome = solrHomeBuilder.getSolrHomeDir();
             solrWar = solrHomeBuilder.getSolrWar();
         }
-
-        // create index folder
-        FSDirectory dir = FSDirectory.open(new File(solrHome.getAbsolutePath()+"/data/index"));
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_30, new StandardAnalyzer(Version.LUCENE_30));
-        config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
-        IndexWriter writer = new IndexWriter(dir, config);
-        writer.commit();
-        writer.close();
 
         System.setProperty("solr.solr.home", solrHome.getAbsolutePath());
 
