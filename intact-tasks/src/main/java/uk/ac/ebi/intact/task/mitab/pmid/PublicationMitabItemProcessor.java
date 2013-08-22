@@ -57,12 +57,15 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
     private PublicationConverter publicationConverter;
     private ExperimentConverter experimentConverter;
 
+    private boolean addPublicationIdentifiers = false;
+
     public PublicationMitabItemProcessor(){
         currentStringBuilder = new StringBuffer(1064);
         currentNegativeStringBuilder = new StringBuffer(1064);
         publicationNameGenerator = new FileNameGenerator();
         publicationConverter = new PublicationConverter();
         experimentConverter = new ExperimentConverter();
+        experimentConverter.setAddPublicationIdentifiers(addPublicationIdentifiers);
     }
 
     @Override
@@ -227,6 +230,7 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
 
         if (this.compositeProcessor == null){
             this.compositeProcessor = new InteractionExpansionCompositeProcessor(false, false);
+            ((InteractionExpansionCompositeProcessor) this.compositeProcessor).setAddPublicationIdentifiers(this.addPublicationIdentifiers);
         }
 
         clearIntactBuilders();
@@ -271,5 +275,14 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
              this.binaryTemplate.setDetectionMethods(new ArrayList<CrossReference>());
              this.binaryTemplate.setHostOrganism(new OrganismImpl());
          }
+    }
+
+    public boolean isAddPublicationIdentifiers() {
+        return addPublicationIdentifiers;
+    }
+
+    public void setAddPublicationIdentifiers(boolean addPublicationIdentifiers) {
+        this.addPublicationIdentifiers = addPublicationIdentifiers;
+        this.experimentConverter.setAddPublicationIdentifiers(this.addPublicationIdentifiers);
     }
 }
