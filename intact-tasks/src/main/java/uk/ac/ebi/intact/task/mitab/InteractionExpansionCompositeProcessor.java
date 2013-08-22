@@ -117,12 +117,4 @@ public class InteractionExpansionCompositeProcessor implements IntactBinaryInter
             this.binaryItemProcessors = delegates;
         }
     }
-
-    public boolean isAddPublicationIdentifiers() {
-        return intactInteractionConverter.isAddPublicationIdentifiers();
-    }
-
-    public void setAddPublicationIdentifiers(boolean addPublicationIdentifiers) {
-        this.intactInteractionConverter.setAddPublicationIdentifiers(addPublicationIdentifiers);
-    }
 }

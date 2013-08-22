@@ -16,9 +16,7 @@
 
 
     <bean id="interactionToBinaryInteractionProcessor"
-          class="uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor">
-        <property name="addPublicationIdentifiers" value="false"/>
-    </bean>
+          class="uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor"/>
 
     <bean id="mitabReader" class="uk.ac.ebi.intact.task.mitab.MitabItemReader"
           abstract="true" scope="prototype"/>
