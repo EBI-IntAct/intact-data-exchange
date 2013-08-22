@@ -34,6 +34,7 @@ public class PublicationConverter {
     private final static String DATASET_MI = "MI:0875";
 
     public boolean addPublicationIdentifiers = false;
+    private String defaultInstitution = CvDatabase.INTACT;
 
     public PublicationConverter(){
         this.annotationConverter = new AnnotationConverter();
@@ -173,6 +174,16 @@ public class PublicationConverter {
             // creation date of publication
             if (pub.getCreated() != null){
                 binary.getCreationDate().add(pub.getCreated());
+            }
+
+            // process AC and source
+            if (pub.getAc() != null && addPublicationIdentifiers){
+                CrossReference id = new CrossReferenceImpl();
+
+                id.setDatabase(defaultInstitution);
+                id.setIdentifier(pub.getAc());
+
+                binary.getPublications().add(id);
             }
         }
     }
