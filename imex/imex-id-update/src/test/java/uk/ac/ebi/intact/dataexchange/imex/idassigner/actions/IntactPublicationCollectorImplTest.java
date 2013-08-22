@@ -467,6 +467,7 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
 
         // one publication with imex-primary, no PPI
         Publication pubWithoutPPI = builder.createPublicationRandom();
+        pubWithoutPPI.setStatus(getDaoFactory().getCvObjectDao(CvPublicationStatus.class).getByShortLabel("released"));
         Experiment exp2 = getMockBuilder().createExperimentRandom(1);
         exp2.setPublication(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);

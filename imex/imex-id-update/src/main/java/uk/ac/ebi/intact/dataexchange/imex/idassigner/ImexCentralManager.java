@@ -64,6 +64,10 @@ public class ImexCentralManager {
 
     private int maxNumberIntactObjectPerTransaction = 10;
 
+    private boolean updatePublicationStatus = true;
+    private boolean updatePublicationAdminGroup = true;
+    private boolean updatePublicationAdminUser = true;
+
     public ImexCentralManager(){
         pubXrefs = new ArrayList<PublicationXref>();
         experimentAcsChunk = new ArrayList<String>();
@@ -152,9 +156,15 @@ public class ImexCentralManager {
 
     public void synchronizePublicationWithImexCentral(Publication intactPublication, edu.ucla.mbi.imex.central.ws.v20.Publication imexPublication) throws ImexCentralException {
 
-        imexAdminGroupSynchronizer.synchronizePublicationAdminGroup(intactPublication, imexPublication);
-        imexAdminUserSynchronizer.synchronizePublicationAdminUser(intactPublication, imexPublication);
-        imexStatusSynchronizer.synchronizePublicationStatusWithImexCentral(intactPublication, imexPublication);
+        if (updatePublicationAdminGroup){
+            imexAdminGroupSynchronizer.synchronizePublicationAdminGroup(intactPublication, imexPublication);
+        }
+        if (updatePublicationAdminUser){
+            imexAdminUserSynchronizer.synchronizePublicationAdminUser(intactPublication, imexPublication);
+        }
+        if (updatePublicationStatus){
+            imexStatusSynchronizer.synchronizePublicationStatusWithImexCentral(intactPublication, imexPublication);
+        }
     }
 
     /**
@@ -571,5 +581,29 @@ public class ImexCentralManager {
             this.publicationIdentifierSynchronizer.setImexCentralClient(imexCentralClient);
             this.intactImexAssigner.setImexCentralClient(imexCentralClient);
         }
+    }
+
+    public boolean isUpdatePublicationStatus() {
+        return updatePublicationStatus;
+    }
+
+    public void setUpdatePublicationStatus(boolean updatePublicationStatus) {
+        this.updatePublicationStatus = updatePublicationStatus;
+    }
+
+    public boolean isUpdatePublicationAdminGroup() {
+        return updatePublicationAdminGroup;
+    }
+
+    public void setUpdatePublicationAdminGroup(boolean updatePublicationAdminGroup) {
+        this.updatePublicationAdminGroup = updatePublicationAdminGroup;
+    }
+
+    public boolean isUpdatePublicationAdminUser() {
+        return updatePublicationAdminUser;
+    }
+
+    public void setUpdatePublicationAdminUser(boolean updatePublicationAdminUser) {
+        this.updatePublicationAdminUser = updatePublicationAdminUser;
     }
 }
