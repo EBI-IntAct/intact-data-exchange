@@ -55,8 +55,4 @@ public interface ExpansionStrategy {
     public boolean isExpandable( Interaction interaction );
 
     public InteractionCategory findInteractionCategory(Interaction interaction);
-
-    public boolean isAddPublicationIdentifiers();
-
-    public void setAddPublicationIdentifiers(boolean addPublicationIdentifiers);
 }

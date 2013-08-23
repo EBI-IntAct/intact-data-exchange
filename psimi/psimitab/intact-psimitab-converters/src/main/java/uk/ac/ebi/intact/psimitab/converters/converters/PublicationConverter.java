@@ -33,7 +33,6 @@ public class PublicationConverter {
     private final static String TEXT_MINING_MI = "MI:1056";
     private final static String DATASET_MI = "MI:0875";
 
-    public boolean addPublicationIdentifiers = false;
     private String defaultInstitution = CvDatabase.INTACT;
 
     public PublicationConverter(){
@@ -80,10 +79,6 @@ public class PublicationConverter {
                     }
                     // imexId
                     else if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())) {
-                        binary.getPublications().add(new CrossReferenceImpl(pubRef.getCvDatabase().getShortLabel(), pubRef.getPrimaryId()));
-                    }
-                    // publication identifiers
-                    else if (addPublicationIdentifiers && CvXrefQualifier.IDENTITY_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())){
                         binary.getPublications().add(new CrossReferenceImpl(pubRef.getCvDatabase().getShortLabel(), pubRef.getPrimaryId()));
                     }
                 }
@@ -175,24 +170,6 @@ public class PublicationConverter {
             if (pub.getCreated() != null){
                 binary.getCreationDate().add(pub.getCreated());
             }
-
-            // process AC and source
-            if (pub.getAc() != null && addPublicationIdentifiers){
-                CrossReference id = new CrossReferenceImpl();
-
-                id.setDatabase(defaultInstitution);
-                id.setIdentifier(pub.getAc());
-
-                binary.getPublications().add(id);
-            }
         }
-    }
-
-    public boolean isAddPublicationIdentifiers() {
-        return addPublicationIdentifiers;
-    }
-
-    public void setAddPublicationIdentifiers(boolean addPublicationIdentifiers) {
-        this.addPublicationIdentifiers = addPublicationIdentifiers;
     }
 }

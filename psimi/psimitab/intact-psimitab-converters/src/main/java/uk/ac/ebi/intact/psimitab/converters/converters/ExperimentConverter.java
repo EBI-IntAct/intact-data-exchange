@@ -97,12 +97,4 @@ public class ExperimentConverter {
             }
         }
     }
-
-    public boolean isAddPublicationIdentifiers() {
-        return publicationConverter.isAddPublicationIdentifiers();
-    }
-
-    public void setAddPublicationIdentifiers(boolean addPublicationIdentifiers) {
-        this.publicationConverter.setAddPublicationIdentifiers(addPublicationIdentifiers);
-    }
 }

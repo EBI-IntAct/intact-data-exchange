@@ -155,12 +155,4 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
 
         return null;
     }
-
-    public boolean isAddPublicationIdentifiers() {
-        return interactionConverter.isAddPublicationIdentifiers();
-    }
-
-    public void setAddPublicationIdentifiers(boolean addPublicationIdentifiers) {
-        this.interactionConverter.setAddPublicationIdentifiers(addPublicationIdentifiers);
-    }
 }
