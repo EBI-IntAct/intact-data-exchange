@@ -33,4 +33,12 @@ public interface PublicationStatusSynchronizer {
     public ImexCentralClient getImexCentralClient();
 
     public void setImexCentralClient(ImexCentralClient imexClient);
+
+    /**
+     * Synchronize publication status with IMEx central and update the IMEx central record if necessary.
+     * @param intactPublication
+     * @param imexPublication
+     * @throws ImexCentralException is status not recognized or no records could be found or IMEx central is not responding
+     */
+    public void discardPublicationInImexCentral(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException;
 }

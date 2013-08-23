@@ -62,4 +62,15 @@ public class PublicationStatusSynchronizerImpl extends ImexCentralUpdater implem
             return PublicationStatus.INPROGRESS;
         }
     }
+
+    @Override
+    public void discardPublicationInImexCentral(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException {
+        String imexStatus = imexPublication.getStatus();
+
+        if (imexStatus == null || (imexStatus != null && !PublicationStatus.DISCARDED.toString().equalsIgnoreCase(imexStatus))){
+            String pubId = extractPubIdFromIntactPublication(intactPublication);
+            imexPublication = imexCentral.updatePublicationStatus( pubId, PublicationStatus.DISCARDED );
+            log.info("Updating imex status to DISCARDED");
+        }
+    }
 }
