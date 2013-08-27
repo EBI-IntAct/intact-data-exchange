@@ -49,7 +49,7 @@ public class ComplexSolrConverter {
         String db, id ;
         for ( Xref xref : complex.getXrefs ( ) ) {
             id = xref.getPrimaryId ( ) ;
-            db = xref.getCvDatabase ( ) .getShortLabel() ;
+            db = xref.getCvDatabase ( ) .getShortLabel ( ) ;
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, id ) ;
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, db ) ;
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, new StringBuilder ( )
@@ -67,7 +67,7 @@ public class ComplexSolrConverter {
         boolean one = false;
         for ( Alias alias : complex.getAliases ( ) ) {
             a_name = alias.getName ( ) ;
-            a_type = alias.getCvAliasType ( ) .getShortLabel() ;
+            a_type = alias.getCvAliasType ( ) .getShortLabel ( ) ;
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, a_name ) ;
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, a_type ) ;
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, new StringBuilder ( )
@@ -123,7 +123,7 @@ public class ComplexSolrConverter {
         // to avoid stack overflow problems I change the recursive algorithm to this iterative algorithm
         Stack < Interactor > stack = new Stack < Interactor > ( ) ;
         stack.push ( complex ) ;
-        HashSet< String > indexed = new HashSet < String > ( ) ;
+        Set < String > indexed = new HashSet < String > ( ) ;
         indexed.add ( complex.getAc ( ) ) ;
         Interactor interactorAux;
         float number_participants = 0 , stoichiometry = 0 ;

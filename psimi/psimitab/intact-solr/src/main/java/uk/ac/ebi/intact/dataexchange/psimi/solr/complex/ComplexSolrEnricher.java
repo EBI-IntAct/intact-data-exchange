@@ -5,7 +5,6 @@ import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BaseFieldEnricher;
