@@ -148,7 +148,6 @@ public class ComplexSolrWriter implements ItemWriter< InteractionImpl >, ItemStr
 
     @Override
     public void write(List<? extends InteractionImpl > interactions) throws Exception {
-        if ( solrUrl == null ) { throw new IllegalStateException ( "No URL for SolrServer configured for ComplexSolrWriter" ) ; }
         if ( solrServer == null ) { throw new IllegalStateException ( "No HttpSolrServer configured for ComplexSolrWriter" ) ; }
         if ( ! interactions.isEmpty ( ) ) {
             this.needToCommitOnClose = false ;

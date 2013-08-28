@@ -18,7 +18,6 @@ public class ComplexResultIterator implements Iterator < ComplexSearchResults > 
     /*      Private attributes      */
     /********************************/
     private Iterator < SolrDocument > iterator  = null ;
-    private long numberResults                  = 0    ;
     // we have prepared the next value
     private ComplexSearchResults nextResult     = null ;
 
@@ -28,7 +27,6 @@ public class ComplexResultIterator implements Iterator < ComplexSearchResults > 
     public ComplexResultIterator ( SolrDocumentList results ) {
         if ( results != null ) {
             iterator = results.iterator ( ) ;
-            numberResults = results.getNumFound ( ) ;
             nextResult = iterator.hasNext ( ) ? getFieldValues ( ) : null ;
         }
         else {
@@ -41,7 +39,6 @@ public class ComplexResultIterator implements Iterator < ComplexSearchResults > 
     /*      Getters and Setters      */
     /*********************************/
     public Iterator < SolrDocument > getIterator ( ) { return iterator      ; }
-    public long getNumberResults ( )                 { return numberResults ; }
 
     /*******************************/
     /*      Protected Methods      */

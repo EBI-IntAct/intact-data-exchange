@@ -35,6 +35,14 @@ public class ComplexSolrSearcher {
     private final static String DEFAULT_MM_PARAM    = "mm"      ;
     private final static String QUERY_TYPE          = "defType" ;
 
+    /*********************************/
+    /*      Getters for statics      */
+    /*********************************/
+    public static String getDismaxParamName ( ) { return DISMAX_PARAM_NAME ; }
+    public static String getDismaxType ( )      { return DISMAX_TYPE       ; }
+    public static String getDefaultMmParam ( )  { return DEFAULT_MM_PARAM  ; }
+    public static String getQueryType ( )       { return QUERY_TYPE        ; }
+
     /*************************/
     /*      Constructor      */
     /*************************/
@@ -154,7 +162,15 @@ public class ComplexSolrSearcher {
         // * an *NumberFormatException* occurs if _rows_ > 2147483647
         // * an *ArrayIndexOutOfBoundsException* occurs if _rows_ + _start_ > 2147483647; e.g. _rows_ = 2147483640 and _start_ = 8
         // we need to substract to avoid this exception
-        squery.setFacetLimit ( maxFacets != null ? maxFacets : Integer.MAX_VALUE - squery.getStart ( ) ) ;
+        if ( maxFacets != null ) {
+            squery.setFacetLimit ( maxFacets ) ;
+        }
+        else {
+            if ( squery.getStart ( ) == null )  {
+                squery.setStart ( 0 ) ;
+            }
+            squery.setFacetLimit ( Integer.MAX_VALUE - squery.getStart ( ) ) ;
+        }
         return squery ;
     }
 
@@ -295,7 +311,7 @@ public class ComplexSolrSearcher {
                             .replaceAll ( "^not ", "NOT " )
                            ) ;
         // Check if query has negative filters and if it has add a new filter query
-        solrQuery = checkNegativeFilter ( solrQuery ) ;
+        //solrQuery = checkNegativeFilter ( solrQuery ) ;
 
         // Send the query to the Solr Server and return the answer
         QueryResponse solrResponse = solrServer.query ( solrQuery ) ;
