@@ -17,6 +17,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.xml.sax.SAXException;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.converter.ComplexSolrConverter;
 import uk.ac.ebi.intact.model.InteractionImpl;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -94,7 +95,7 @@ public class ComplexSolrWriter implements ItemWriter< InteractionImpl >, ItemStr
             this.solrServer = new HttpSolrServer ( this.solrUrl, createHttpClient ( ) ) ;
             this.solrServer.setMaxRetries ( 0 ) ;
             this.solrServer.setAllowCompression ( this.allowCompression ) ;
-            this.complexSolrConverter = new ComplexSolrConverter ( this.solrServer ) ;
+            this.complexSolrConverter = new ComplexSolrConverter( this.solrServer ) ;
         }
         return this.solrServer ;
     }

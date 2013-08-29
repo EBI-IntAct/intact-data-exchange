@@ -94,7 +94,7 @@ public class ComplexSolrSearcher {
     /*      Protected Methods to set query parameters up      */
     /**********************************************************/
     // checkQuery is a method to check if the query contains a wildcard or is null
-    protected String checkQuery ( String query ) throws ComplexSorlException {
+    protected String checkQuery ( String query ) {
         if ( query == null ) throw new NullPointerException ( "You have not to search with a null query" ) ;
         // Format wildcard query
         if ( query.equals ( "*" ) ) query = "*:*" ;
@@ -297,7 +297,7 @@ public class ComplexSolrSearcher {
     /*      Protected Search Methods      */
     /**************************************/
     public ComplexResultIterator search ( SolrQuery solrQuery )
-        throws ComplexSorlException, SolrServerException {
+        throws SolrServerException {
 
         // Set default fields to search
         solrQuery = setFields ( solrQuery );
@@ -329,7 +329,7 @@ public class ComplexSolrSearcher {
                                          Integer maxResult,
                                          String queryFilter
                                        )
-        throws ComplexSorlException, SolrServerException {
+        throws SolrServerException {
 
         // Only call to other method but change query filter type.
         return searchWithFilters ( query,
@@ -345,7 +345,7 @@ public class ComplexSolrSearcher {
                                                     Integer maxResults,
                                                     String [ ] queryFilters
                                                   )
-        throws ComplexSorlException, SolrServerException {
+        throws SolrServerException {
         if ( logger.isInfoEnabled ( ) ) {
             logger.info ( new StringBuilder ( )
                     .append ( "Searching with filters; Query: " )
@@ -386,7 +386,7 @@ public class ComplexSolrSearcher {
                                                    Integer firstFacet,
                                                    Integer maxFacet
                                                  )
-        throws ComplexSorlException, SolrServerException {
+        throws SolrServerException {
         if ( logger.isInfoEnabled ( ) ) {
             logger.info ( new StringBuilder ( )
                     .append ( "Searching with filters and facets; Query: " )

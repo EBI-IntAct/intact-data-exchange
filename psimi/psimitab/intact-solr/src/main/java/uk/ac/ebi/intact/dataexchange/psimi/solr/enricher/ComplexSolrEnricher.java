@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
+package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
 
 import org.apache.commons.collections.map.LRUMap;
@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexFieldNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.BaseFieldEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.LazyLoadedOntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
