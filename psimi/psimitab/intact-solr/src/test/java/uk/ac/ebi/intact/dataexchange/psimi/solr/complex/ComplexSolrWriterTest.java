@@ -86,7 +86,7 @@ public class ComplexSolrWriterTest {
         this.complexSolrWriter.open ( executionContext ) ;
         Assert.assertNotNull("Test Open without url", this.complexSolrWriter.solrServer) ;
     }
-
+    /*
     @Test
     public void testUpdate() throws Exception {
         ExecutionContext executionContext = new ExecutionContext ( ) ;
@@ -113,4 +113,5 @@ public class ComplexSolrWriterTest {
         this.complexSolrWriter.write ( list ) ;
         Assert.assertFalse ( "Test write", this.complexSolrWriter.getNeedToCommitOnClose ( ) ) ;
     }
+    */
 }
