@@ -209,7 +209,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         Assert.assertEquals(2, getDaoFactory().getComponentDao().countAll());
         Assert.assertEquals(2, getDaoFactory().getProteinDao().countAll());
 
-        Assert.assertEquals(5, getDaoFactory().getBioSourceDao().countAll());
+        Assert.assertEquals(4, getDaoFactory().getBioSourceDao().countAll());
         Assert.assertEquals(1, getDaoFactory().getCvObjectDao(CvCellType.class).countAll());
     }
 
