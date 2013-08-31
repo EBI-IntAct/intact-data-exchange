@@ -636,7 +636,6 @@ public class QueryBuilder {
 
         query.setParameter("released", RELEASED);
         query.setParameter("ready_for_release", READY_FOR_RELEASE);
-        query.setParameter("negative", CvTopic.NEGATIVE);
 
         if (excludeLowConfidenceInteractions){
             query.setParameter("drExport", CvTopic.UNIPROT_DR_EXPORT);
