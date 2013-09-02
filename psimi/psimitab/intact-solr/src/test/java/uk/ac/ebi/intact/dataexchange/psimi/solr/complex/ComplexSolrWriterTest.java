@@ -48,7 +48,7 @@ public class ComplexSolrWriterTest {
     public void testSetDefaultMaxConnectionsPerHost() throws Exception {
         int max = 32 ;
         Assert.assertEquals ( "Test get original max connections per host", 24, this.complexSolrWriter.getDefaultMaxConnectionsPerHost ( ) ) ;
-        this.complexSolrWriter.setDefaultMaxConnectionsPerHost(max); ;
+        this.complexSolrWriter.setDefaultMaxConnectionsPerHost(max) ;
         Assert.assertEquals ( "Test set/get max connections per host", max, this.complexSolrWriter.getDefaultMaxConnectionsPerHost() ) ;
     }
 

@@ -104,7 +104,7 @@ public class ComplexSolrWriter implements ItemWriter< InteractionImpl >, ItemStr
     /*      Override methods      */
     /******************************/
     @Override
-    public void open ( org.springframework.batch.item.ExecutionContext executionContext ) throws ItemStreamException {
+    public void open ( ExecutionContext executionContext ) throws ItemStreamException {
         if ( this.solrUrl != null ) {
             try {
                 createSolrServer ( ) ;
@@ -119,7 +119,7 @@ public class ComplexSolrWriter implements ItemWriter< InteractionImpl >, ItemStr
     }
 
     @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
+    public void update ( ExecutionContext executionContext ) throws ItemStreamException {
         if ( this.solrServer != null ) {
             try {
                 this.solrServer.commit ( ) ;
@@ -133,7 +133,7 @@ public class ComplexSolrWriter implements ItemWriter< InteractionImpl >, ItemStr
     }
 
     @Override
-    public void close() throws ItemStreamException {
+    public void close ( ) throws ItemStreamException {
         if ( this.solrServer != null ) {
             if ( this.needToCommitOnClose ) {
                 try {
@@ -148,7 +148,7 @@ public class ComplexSolrWriter implements ItemWriter< InteractionImpl >, ItemStr
     }
 
     @Override
-    public void write(List<? extends InteractionImpl > interactions) throws Exception {
+    public void write ( List < ? extends InteractionImpl > interactions ) throws Exception {
         if ( solrServer == null ) { throw new IllegalStateException ( "No HttpSolrServer configured for ComplexSolrWriter" ) ; }
         if ( ! interactions.isEmpty ( ) ) {
             this.needToCommitOnClose = false ;
