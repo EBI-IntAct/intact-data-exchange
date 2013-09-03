@@ -253,7 +253,7 @@ public class ImexCentralManager {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public edu.ucla.mbi.imex.central.ws.v20.Publication registerAndUpdatePublication(String publicationAc) throws PublicationImexUpdaterException, ImexCentralException {
+    public edu.ucla.mbi.imex.central.ws.v20.Publication registerAndUpdatePublication(String publicationAc) throws ImexCentralException {
         DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
         PublicationDao pubDao = daoFactory.getPublicationDao();
 
@@ -282,9 +282,15 @@ public class ImexCentralManager {
 
                 return imexPublication;
             }
-            // unassigned publication, cannot use the webservice to automatically assign IMEx id for now, ask the curator to manually register and assign IMEx id to this publication
             else {
-                log.warn("It is not possible to register an unassigned publication. The publication needs to be registered manually by a curator in IMEx central.");
+                // unassigned publication, cannot use the webservice to automatically assign IMEx id for now, ask the curator to manually register and assign IMEx id to this publication
+                if (!Pattern.matches(ImexCentralManager.PUBMED_REGEXP.toString(), pubId)){
+                    log.warn("It is not possible to register an unassigned publication. The publication needs to be registered manually by a curator in IMEx central.");
+                }
+                // the publication is already registered, we just update status and users
+                else if (imexPublication.getOwner() != null && imexPublication.getOwner().toLowerCase().equals(INTACT_CURATOR)){
+                    synchronizePublicationWithImexCentral(intactPublication, imexPublication);
+                }
             }
         }
         // the publication does not exist in Intact
@@ -375,7 +381,7 @@ public class ImexCentralManager {
     /**
      * This method discard a publication in IMEx central if it is already registered in IMEx central
      */
-    public edu.ucla.mbi.imex.central.ws.v20.Publication discardPublication(String publicationAc) throws PublicationImexUpdaterException, ImexCentralException {
+    public edu.ucla.mbi.imex.central.ws.v20.Publication discardPublication(String publicationAc) throws ImexCentralException {
         DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
         PublicationDao pubDao = daoFactory.getPublicationDao();
 
@@ -391,13 +397,13 @@ public class ImexCentralManager {
             edu.ucla.mbi.imex.central.ws.v20.Publication imexPublication =  imexCentralRegister.getExistingPublicationInImexCentral(pubId);
 
             // the publication is already registered in IMEx central
-            if (imexPublication != null){
+            if (imexPublication != null && imexPublication.getOwner() != null && imexPublication.getOwner().toLowerCase().equals(INTACT_CURATOR)){
 
                 this.imexStatusSynchronizer.discardPublicationInImexCentral(intactPublication, imexPublication);
             }
             // the publication is not in IMEx central, nothing to do
             else {
-                log.warn("The publication is not registered in IMEx central. We don't have to discard it.");
+                log.warn("The publication is not registered in IMEx central by IntAct. We don't have to discard it.");
             }
         }
         // the publication does not exist in Intact
