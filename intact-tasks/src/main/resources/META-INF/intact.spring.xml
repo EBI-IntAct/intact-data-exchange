@@ -63,30 +63,4 @@
         </property>
     </bean>
 
-    <bean id="curatedComplexReader" class="org.springframework.batch.item.database.JpaPagingItemReader" parent="baseModelReader" lazy-init="true">
-        <property name="queryString" value="select i from InteractionImpl i join i.annotations as a where a.cvTopic.shortLabel = :curatedComplex order by i.created, i.ac"/>
-        <property name="parameterValues">
-            <map>
-                <entry key="curatedComplex" value="curated-complex"/>
-            </map>
-        </property>
-    </bean>
-
-    <bean id="curatedComplexWriter" class="uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexSolrWriter" parent="baseModelWriter">
-        <property name="solrUrl" value="http://localhost:8983/solr/core_complex_pub" />
-    </bean>
-
-    <!-- Job for Complex -->
-    <batch:step id="indexSolrComplex" parent="intactBatchStep">
-        <batch:tasklet>
-            <batch:chunk reader="curatedComplexReader"
-                         writer="curatedComplexWriter">
-                <batch:streams>
-                    <batch:stream ref="curatedComplexReader"/>
-                    <batch:stream ref="curatedComplexWriter"/>
-                </batch:streams>
-            </batch:chunk>
-        </batch:tasklet>
-    </batch:step>
-
 </beans>
