@@ -51,33 +51,34 @@ public class ComplexSolrConverter {
         Set < String > indexed = new HashSet < String > ( ) ;
         boolean stc = false;
 
-        solrDocument = participants ( complex, solrDocument, numbers, indexed, stc ) ;
+        solrDocument = participants ( complex, solrDocument, numbers, indexed) ;
 
-        solrDocument.addField ( ComplexFieldNames.STC, stc ) ;
         solrDocument.addField ( ComplexFieldNames.PARAM, complex.getParameters ( ) .isEmpty ( ) ) ;
 
         return solrDocument ;
     }
 
     protected SolrInputDocument participants (
-            InteractionImpl complex,
+            Interactor complex,
             SolrInputDocument solrDocument,
             Map < String, Integer > numbers,
-            Set < String > indexed,
-            boolean stc )
+            Set < String > indexed )
             throws Exception {
 
-        float number_participants = 0.0f , stoichiometry = 0.0f ;
+        float number_participants = 0.0f, number_recursive = 0.0f, stoichiometry = 0.0f ;
         String AC = null ;
+        boolean stc = false;
 
         // if interactorAux is an instance of InteractionImpl we need to get all its components
-        for ( Component component : complex.getComponents ( ) ) {
-            //if ( component instanceof InteractionImpl ) {
+        if ( complex instanceof InteractionImpl ) {
+            for ( Component component : ( ( InteractionImpl ) complex ).getComponents ( ) ) {
                 AC = component.getAc ( ) ;
                 stoichiometry = component.getStoichiometry ( ) ;
                 stc |= stoichiometry != 0.0f ;
                 number_participants += stoichiometry == 0.0f ? 1.0f : stoichiometry ;
-            //}
+                number_recursive += number_participants;
+                participants(component.getInteractor ( ), solrDocument, numbers, indexed);
+            }
         }
 
         if ( ! indexed.contains ( complex.getAc ( ) ) ) {
@@ -108,12 +109,13 @@ public class ComplexSolrConverter {
                     solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF,
                             new StringBuilder ( ) .append ( shortLabel ) .append ( ":" ) .append ( ID ) .toString ( ) ) ;
                     if ( xref.getCvXrefQualifier ( ) != null ){
-                        solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF, cvXrefQualifier.getShortLabel() ) ;
+                        solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF, cvXrefQualifier.getShortLabel ( ) ) ;
                     }
                 }
             }
             indexed.add ( complex.getAc ( ) ) ;
         }
+        solrDocument.addField ( ComplexFieldNames.STC, stc ) ;
         return solrDocument ;
     }
 
