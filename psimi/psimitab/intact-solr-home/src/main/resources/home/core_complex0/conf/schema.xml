@@ -81,17 +81,17 @@
     <field name="organism_name"             type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
     <!-- interactor information -->
     <field name="id"                        type="text"         indexed="true"  stored="false"  multiValued="true"/>
-    <field name="udate" 			        type="int"  	    indexed="true"  stored="false"  multiValued="false" default="0"/>
+    <field name="udate" 	            type="int"  	indexed="true"  stored="false"  multiValued="false" default="0"/>
     <field name="alias"                     type="textAlias"    indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
     <field name="alias_f"                   type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
     <field name="ptype"                     type="text"         indexed="true"  stored="false"  multivalued="true"/>
     <field name="ptype_ontology"            type="text"         indexed="true"  stored="false"  multivalued="true"/>
     <field name="pxref"                     type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="pxref_ontology"            type="text"         indexed="true"  stored="false"  multiValued="true"/>
-    <field name="stc" 			            type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
-    <field name="stc_f" 		            type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
-    <field name="param" 			        type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
-    <field name="param_f" 		            type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
+    <field name="stc" 			    type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
+    <field name="stc_f" 		    type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
+    <field name="param" 		    type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
+    <field name="param_f" 		    type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
       <!-- fields same as PSICQUIC -->
     <field name="pbiorole"                  type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
     <field name="pbiorole_f"                type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
