@@ -484,6 +484,7 @@ public class IntactFilter implements InteractionFilter {
         FilterConfig config = FilterContext.getInstance().getConfig();
         boolean excludeSpokeExpanded = config.excludeSpokeExpandedInteractions();
         boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
+        boolean excludeIntraMolecular = config.isExcludeIntraMolecularInteractions();
 
         final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
         TransactionStatus transactionStatus = dataContext.beginTransaction();
@@ -505,11 +506,11 @@ public class IntactFilter implements InteractionFilter {
 
                         if (excludeSpokeExpanded && toBinary.size() == 1){
                             //logger.info("Processing interaction " + interactionAc);
-                            processClustering(binaryInteractions, context, interactionAc, toBinary, excludeNonUniprotInteractors);
+                            processClustering(binaryInteractions, context, interactionAc, toBinary, excludeNonUniprotInteractors, excludeIntraMolecular);
                         }
                         else if (!excludeSpokeExpanded && !toBinary.isEmpty()){
                             //logger.info("Processing interaction " + interactionAc);
-                            processClustering(binaryInteractions, context, interactionAc, toBinary, excludeNonUniprotInteractors);
+                            processClustering(binaryInteractions, context, interactionAc, toBinary, excludeNonUniprotInteractors, excludeIntraMolecular);
                         }
                     } catch (Exception e) {
                         logger.error("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.", e);
@@ -534,7 +535,7 @@ public class IntactFilter implements InteractionFilter {
         return i;
     }
 
-    private void processClustering(Collection<BinaryInteraction> binaryInteractions, MiClusterContext context, String interactionAc, Collection<BinaryInteraction> toBinary, boolean excludeNonUniprot) {
+    private void processClustering(Collection<BinaryInteraction> binaryInteractions, MiClusterContext context, String interactionAc, Collection<BinaryInteraction> toBinary, boolean excludeNonUniprot, boolean excludeIntraMolecular) {
         processClusterContext(context, interactionAc, toBinary);
 
         for (BinaryInteraction<Interactor> binary : toBinary){
@@ -561,28 +562,34 @@ public class IntactFilter implements InteractionFilter {
                 }
             }
 
-            // process intra molecular interactions as self interactions
-            if (interactorA == null){
-                uniprotA = uniprotB;
+            // process intra molecular interactions as self interactions?
+            // process intra molecular interactions ?
+            if (excludeIntraMolecular && (uniprotA == null || uniprotB == null)){
+                logger.info(binary.toString() + " does not pass the filters because is intra molecular");
             }
-            else if (interactorB == null){
-                uniprotB = uniprotA;
-            }
-
-            if ((uniprotA != null && uniprotB != null && excludeNonUniprot) || !excludeNonUniprot){
-
-                FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
-                removeNonPubmedPublicationsFrom(binary);
-                if (interactorA != null){
-                    removeNonIntactXrefsFrom(binary.getInteractorA().getAlternativeIdentifiers());
-                    binary.getInteractorA().getAliases().clear();
+            else{
+                if (interactorA == null){
+                    uniprotA = uniprotB;
                 }
-                if (interactorB != null){
-                    removeNonIntactXrefsFrom(binary.getInteractorB().getAlternativeIdentifiers());
-                    binary.getInteractorB().getAliases().clear();
+                else if (interactorB == null){
+                    uniprotB = uniprotA;
                 }
 
-                binaryInteractions.add(binary);
+                if ((uniprotA != null && uniprotB != null && excludeNonUniprot) || !excludeNonUniprot){
+
+                    FilterUtils.processGeneNames(interactorA, uniprotA, interactorB, uniprotB, context);
+                    removeNonPubmedPublicationsFrom(binary);
+                    if (interactorA != null){
+                        removeNonIntactXrefsFrom(binary.getInteractorA().getAlternativeIdentifiers());
+                        binary.getInteractorA().getAliases().clear();
+                    }
+                    if (interactorB != null){
+                        removeNonIntactXrefsFrom(binary.getInteractorB().getAlternativeIdentifiers());
+                        binary.getInteractorB().getAliases().clear();
+                    }
+
+                    binaryInteractions.add(binary);
+                }
             }
         }
     }

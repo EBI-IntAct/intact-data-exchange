@@ -69,7 +69,7 @@ public class CCLineWriter1 implements CCLineWriter<CCParameters<SecondCCParamete
 
         for (SecondCCParameters1 secondInteractor : secondParameters){
             writer.write("CC       ");
-
+            boolean isSelf = secondInteractor.getSecondUniprotAc().equals(firstUniprotAc);
             if (secondInteractor.getSecondUniprotAc().equals(firstUniprotAc)) {
 
                 writer.write("Self");
@@ -82,7 +82,7 @@ public class CCLineWriter1 implements CCLineWriter<CCParameters<SecondCCParamete
             }
 
             // generated warning message if the two protein are from different organism
-            if (!firstTaxId.equals(secondInteractor.getTaxId())) {
+            if (secondInteractor.getTaxId() != null && !firstTaxId.equals(secondInteractor.getTaxId())) {
                 writer.write(' ');
                 writer.write("(xeno)");
             }

@@ -57,6 +57,7 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
         FilterConfig config = FilterContext.getInstance().getConfig();
         boolean excludeSpokeExpanded = config.excludeSpokeExpandedInteractions();
         boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
+        boolean excludeIntraMolecular = config.isExcludeIntraMolecularInteractions();
 
         File mitabAsFile = new File(mitabFile);
         Iterator<BinaryInteraction> iterator = mitabReader.iterate(new FileInputStream(mitabAsFile));
@@ -114,29 +115,34 @@ public class NonClusteredMitabFilter extends AbstractMitabFilter {
                     }
                 }
 
-                // process intra molecular interactions as self interactions
-                if (interactorA == null){
-                    uniprotA = uniprotB;
+                // process intra molecular interactions ?
+                if (excludeIntraMolecular && (uniprotA == null || uniprotB == null)){
+                    logger.info(intactAc + " does not pass the filters because is intra molecular");
                 }
-                else if (interactorB == null){
-                    uniprotB = uniprotA;
-                }
-
-                if (intactAc != null){
-                    if (excludeNonUniprotInteractors && uniprotA != null && uniprotB != null){
-                        if (!interaction.isNegativeInteraction()){
-                            processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, false);
-                        }
-                        else {
-                            processClustering(context, negativeInteractionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, true);
-                        }
+                else{
+                    if (interactorA == null){
+                        uniprotA = uniprotB;
                     }
-                    else if (!excludeNonUniprotInteractors){
-                        if (!interaction.isNegativeInteraction()){
-                            processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, false);
+                    else if (interactorB == null){
+                        uniprotB = uniprotA;
+                    }
+
+                    if (intactAc != null){
+                        if (excludeNonUniprotInteractors && uniprotA != null && uniprotB != null){
+                            if (!interaction.isNegativeInteraction()){
+                                processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, false);
+                            }
+                            else {
+                                processClustering(context, negativeInteractionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, true);
+                            }
                         }
-                        else{
-                            processClustering(context, negativeInteractionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, true);
+                        else if (!excludeNonUniprotInteractors){
+                            if (!interaction.isNegativeInteraction()){
+                                processClustering(context, interactionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, false);
+                            }
+                            else{
+                                processClustering(context, negativeInteractionToProcess, interaction, intactAc, interactorA, uniprotA, interactorB, uniprotB, excludeSpokeExpanded, true);
+                            }
                         }
                     }
                 }

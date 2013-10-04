@@ -106,24 +106,24 @@ public class GOLineConverter1Test extends UniprotExportBase{
 
                 Assert.assertEquals(2, par.getPubmedIds().size());
                 Iterator<String> pubIterator = par.getPubmedIds().iterator();
-                Assert.assertEquals("15199141", pubIterator.next());
                 Assert.assertEquals("14704431", pubIterator.next());
+                Assert.assertEquals("15199141", pubIterator.next());
             }
             // feature chain
             else if ("P28548".equals(par.getFirstProtein()) && "Q21361".equals(par.getSecondProtein())){
                 Assert.assertEquals(4, par.getPubmedIds().size());
                 Iterator<String> pubIterator = par.getPubmedIds().iterator();
                 Assert.assertEquals("15199141", pubIterator.next());
-                Assert.assertEquals("18212739", pubIterator.next());
                 Assert.assertEquals("15115758", pubIterator.next());
+                Assert.assertEquals("18212739", pubIterator.next());
                 Assert.assertEquals("14704431", pubIterator.next());
             }
             // master protein and trans variant
             else if ("P28548".equals(par.getFirstProtein()) && "P12347-4".equals(par.getSecondProtein())){
                 Assert.assertEquals(2, par.getPubmedIds().size());
                 Iterator<String> pubIterator = par.getPubmedIds().iterator();
-                Assert.assertEquals("15199141", pubIterator.next());
                 Assert.assertEquals("14704431", pubIterator.next());
+                Assert.assertEquals("15199141", pubIterator.next());
             }
             // first interaction with isoform
             else if ("P28548-1".equals(par.getFirstProtein())){
@@ -136,8 +136,8 @@ public class GOLineConverter1Test extends UniprotExportBase{
                 Assert.assertEquals("O17670", par.getSecondProtein());
                 Assert.assertEquals(2, par.getPubmedIds().size());
                 Iterator<String> pubIterator = par.getPubmedIds().iterator();
-                Assert.assertEquals("15199141", pubIterator.next());
                 Assert.assertEquals("14704431", pubIterator.next());
+                Assert.assertEquals("15199141", pubIterator.next());
             }
             else {
                 Assert.assertFalse(true);
