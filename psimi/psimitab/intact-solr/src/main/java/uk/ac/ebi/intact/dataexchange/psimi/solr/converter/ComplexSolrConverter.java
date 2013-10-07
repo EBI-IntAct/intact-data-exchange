@@ -5,6 +5,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.hupo.psi.mi.psicquic.registry.ServiceType;
 import org.hupo.psi.mi.psicquic.registry.client.registry.DefaultPsicquicRegistryClient;
 import org.hupo.psi.mi.psicquic.wsclient.PsicquicSimpleClient;
+import org.springframework.batch.core.ChunkListener;
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
@@ -15,6 +16,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
 import uk.ac.ebi.intact.model.*;
 
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.util.*;
 
 /**
@@ -66,13 +68,11 @@ public class ComplexSolrConverter {
             throws Exception {
 
         float number_participants = 0.0f, number_recursive = 0.0f, stoichiometry = 0.0f ;
-        String AC = null ;
         boolean stc = false;
 
         // if interactorAux is an instance of InteractionImpl we need to get all its components
         if ( complex instanceof InteractionImpl ) {
-            for ( Component component : ( ( InteractionImpl ) complex ).getComponents ( ) ) {
-                AC = component.getAc ( ) ;
+            for ( Component component : ( ( InteractionImpl ) complex ) .getComponents() ) {
                 stoichiometry = component.getStoichiometry ( ) ;
                 stc |= stoichiometry != 0.0f ;
                 number_participants += stoichiometry == 0.0f ? 1.0f : stoichiometry ;
@@ -81,18 +81,21 @@ public class ComplexSolrConverter {
             }
         }
 
-        if ( ! indexed.contains ( complex.getAc ( ) ) ) {
+        String AC = complex.getAc ( ) ;
+        if ( ! indexed.contains ( AC ) ) {
             // now, we get the information of the interactorAux
             String shortLabel = null ;
             String ID = null;
             CvXrefQualifier cvXrefQualifier = null ;
-            solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID, complex.getAc ( ) ) ;
+            solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID, AC ) ;
             for ( InteractorXref xref : complex.getXrefs ( ) ) {
                 cvXrefQualifier = xref.getCvXrefQualifier ( ) ;
                 if ( cvXrefQualifier != null &&
                         (  cvXrefQualifier.getIdentifier ( ) .equals ( CvXrefQualifier.IDENTITY_MI_REF )
                                 || cvXrefQualifier.getIdentifier ( ) .equals ( CvXrefQualifier.SECONDARY_AC_MI_REF )
-                                || cvXrefQualifier.getShortLabel ( ) .equalsIgnoreCase ( "intact-secondary" ) ) ) {
+                                || cvXrefQualifier.getShortLabel ( ) .equalsIgnoreCase ( "intact-secondary" )
+                        )
+                    ) {
                     shortLabel = xref.getCvDatabase ( ) .getShortLabel ( ) ;
                     ID = xref.getPrimaryId() ;
                     solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID, ID ) ;
@@ -101,7 +104,7 @@ public class ComplexSolrConverter {
                             new StringBuilder ( ) .append ( shortLabel ) .append ( ":" ) .append ( ID ) .toString ( ) ) ;
                 }
                 else {
-                    if ( xref.getCvDatabase ( ) .getIdentifier() .equals(CvDatabase.GO_MI_REF) ) {
+                    if ( xref.getCvDatabase ( ) .getIdentifier() .equals ( CvDatabase.GO_MI_REF ) ) {
                         solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF_ONTOLOGY, ID ) ;
                     }
                     solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF, ID ) ;
@@ -113,7 +116,7 @@ public class ComplexSolrConverter {
                     }
                 }
             }
-            indexed.add ( complex.getAc ( ) ) ;
+            indexed.add ( AC ) ;
         }
         solrDocument.addField ( ComplexFieldNames.STC, stc ) ;
         return solrDocument ;
@@ -159,7 +162,9 @@ public class ComplexSolrConverter {
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, a_type ) ;
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, new StringBuilder ( )
                         .append ( a_type ) .append ( ":" ) .append ( a_name ) .toString ( ) ) ;
-            if ( ! one && alias.getCvAliasType ( ) . getShortLabel ( ) .equals ( "recommended name" ) ) {
+            //  We have to change getShortLabel to a static
+            if ( ! one && alias.getCvAliasType ( ) . getShortLabel() .equals ( "recommended name" ) ) {
+                // Check for the systematic_name > first synonym > short_label
                 one = true ;
                 solrDocument.addField ( ComplexFieldNames.COMPLEX_NAME, alias.getName ( ) ) ;
             }
@@ -180,6 +185,7 @@ public class ComplexSolrConverter {
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM_F, ontologyTerm.getName ( ) ) ;
             solrDocument.addField ( ComplexFieldNames.ORGANISM_NAME, ontologyTerm.getName ( ) ) ;
         }
+
         // add info to complex_organism_ontology field:
         // It will do by the enricher
         // add info to interaction_type field:
@@ -201,8 +207,10 @@ public class ComplexSolrConverter {
         // add info to complex_AC field:
         solrDocument.addField ( ComplexFieldNames.COMPLEX_AC, complex.getAc ( ) ) ;
         // add info to description field:
+        CvTopic cvTopic = null ;
         for ( Annotation annotation : complex.getAnnotations ( ) ) {
-            if ( annotation.getCvTopic ( ) .getShortLabel ( ) .equals ( "curated_complex" ) ) {
+            cvTopic = annotation != null ? annotation.getCvTopic ( ) : null ;
+            if ( cvTopic != null && cvTopic.getShortLabel ( ) .equals ( "curated_complex" ) ) {
                 solrDocument.addField ( ComplexFieldNames.DESCRIPTION, annotation.getAnnotationText ( ) ) ;
                 break ; // We only want the first one
             }
@@ -222,7 +230,8 @@ public class ComplexSolrConverter {
         indexed.add ( complex.getAc ( ) ) ;
         Interactor interactorAux;
         boolean stc = false;
-        float number_participants = 0.0f , stoichiometry = 0.0f ;
+        float stoichiometry = 0.0f ;
+        int number_participants = 0 ;
         do {
             interactorAux = stack.pop ( ) ;
             // if interactorAux is an instance of InteractionImpl we need to get all its components
@@ -236,7 +245,7 @@ public class ComplexSolrConverter {
                         stc |= stoichiometry != 0.0f ;
                         indexed.add ( AC ) ;
                     }
-                    number_participants += stoichiometry == 0.0f ? 1 : stoichiometry ;
+                    number_participants += stoichiometry == 0.0f ? 1 : (int) stoichiometry ;
                 }
             }
             // now, we get the information of the interactorAux
@@ -278,6 +287,7 @@ public class ComplexSolrConverter {
         // add info to features, features_f, biorole, biorole_f, interactor_alias and interactor_alias_f fields:
         CvBiologicalRole biologicalRole = null ;
         CvFeatureType featureType = null ;
+
         for ( Component component : complex.getComponents ( ) ) {
             biologicalRole = component.getCvBiologicalRole ( ) ;
             solrDocument.addField ( ComplexFieldNames.BIOROLE, biologicalRole.getShortLabel ( ) ) ;
@@ -343,23 +353,37 @@ public class ComplexSolrConverter {
         //add info to update
         solrDocument.addField ( ComplexFieldNames.UDATE, complex.getUpdated ( ) .getDate ( ) ) ;
         */
-        // that is the new code
-        DefaultPsicquicRegistryClient defaultPsicquicRegistryClient = new DefaultPsicquicRegistryClient ( ) ;
-        // I need to create a Map to get the real name for the Data Base
-        PsicquicSimpleClient psicquicSimpleClient = null ;
+
         String DB = null ;
         String ID = null ;
+        TreeMap < String, String > tree = new TreeMap < String, String > ( ) ;
+        String list = null ;
+        // Make the chunks for batching
+        for ( Xref xref : complex.getXrefs ( ) ) {
+            DB = xref.getCvDatabase ( ).getShortLabel ( ) ;
+            ID = xref.getPrimaryId ( ) ;
+            if ( xref.getCvXrefQualifier ( ) .equals ( "exp_evidence" ) ){
+                System.err.println( xref.toString ( ) + ": " + DB + ", " + ID );
+                if ( DB != null && ID != null ) {
+                    if ( ! tree.containsKey ( DB ) ) list = "" ;
+                    else list = tree.get ( DB ) ;
+                    list += " " + ID  ;
+                    tree.put ( DB, list ) ;
+                }
+            }
+        }
+
+        // that is the new code
+        DefaultPsicquicRegistryClient defaultPsicquicRegistryClient = new DefaultPsicquicRegistryClient ( ) ;
+        PsicquicSimpleClient psicquicSimpleClient = null ;
         PsimiTabReader psimiTabReader = new PsimiTabReader ( ) ;
         for ( ServiceType serviceType : defaultPsicquicRegistryClient.listActiveServices ( ) ) {
             psicquicSimpleClient = new PsicquicSimpleClient ( serviceType.getRestUrl ( ) ) ;
-            InputStream inputStream = psicquicSimpleClient.getByInteraction (
-                    // it needs a map to the real names of the DB
-                    new StringBuilder ( ) .append ( serviceType.getName ( ) )
-                    .append ( "/" )
-                    .append ( serviceType.getRestUrl ( ) )
-                    .toString ( )
-            ) ;
-            for ( BinaryInteraction interaction : psimiTabReader.read ( inputStream ) ){
+            //psicquicSimpleClient.setReadTimeout(10000);
+            InputStream inputStream = null ;
+            try{
+                inputStream = psicquicSimpleClient.getByQuery("interactor_id:" + tree.get ( serviceType.getName ( ) ) ) ;
+                for ( BinaryInteraction interaction : psimiTabReader.read ( inputStream ) ){
                 for ( Object crossReference : interaction.getPublications ( ) ) {
                     DB = ((CrossReference)crossReference).getDatabase ( ) ;
                     ID = ((CrossReference)crossReference).getIdentifier ( ) ;
@@ -373,6 +397,14 @@ public class ComplexSolrConverter {
                     ) ;
                 }
             }
+            }
+            catch (SocketTimeoutException e) {
+                // we have to log that
+            }
+            finally {
+                if ( inputStream != null ) inputStream.close ( ) ;
+            }
+            //
 
         }
 
@@ -383,7 +415,12 @@ public class ComplexSolrConverter {
         /////////////////////////
 
         // Enrich the Solr Document and return that
-        return complexSolrEnricher.enrich ( complex, solrDocument ) ;
+        solrDocument = complexSolrEnricher.enrich ( complex, solrDocument ) ;
+        //System.err.println("Id:");
+        //for ( Object values : solrDocument.getFieldValues ( ComplexFieldNames.ID ) ){
+        //    System.err.println((String)values);
+        //}
+        return solrDocument;
     }
 
     public SolrInputDocument convertComplexToSolrDocument ( InteractionImpl complex ) throws Exception {

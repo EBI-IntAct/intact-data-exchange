@@ -77,27 +77,27 @@
     <field name="complex_xref"              type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_xref_ontology"     type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="complex_AC"                type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
-    <field name="description"               type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
+    <field name="description"               type="string"       indexed="false" stored="true"   multiValued="false"/> <!-- required="true"/> -->
     <field name="organism_name"             type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
     <!-- interactor information -->
     <field name="id"                        type="text"         indexed="true"  stored="false"  multiValued="true"/>
-    <field name="udate" 	            type="int"  	indexed="true"  stored="false"  multiValued="false" default="0"/>
+    <field name="udate" 	                type="int"  	    indexed="true"  stored="false"  multiValued="false" default="0"/>
     <field name="alias"                     type="textAlias"    indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
-    <field name="alias_f"                   type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
+    <field name="alias_f"                   type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
     <field name="ptype"                     type="text"         indexed="true"  stored="false"  multivalued="true"/>
     <field name="ptype_ontology"            type="text"         indexed="true"  stored="false"  multivalued="true"/>
     <field name="pxref"                     type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="pxref_ontology"            type="text"         indexed="true"  stored="false"  multiValued="true"/>
-    <field name="stc" 			    type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
-    <field name="stc_f" 		    type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
-    <field name="param" 		    type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
-    <field name="param_f" 		    type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
+    <field name="stc" 			            type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
+    <field name="stc_f" 		            type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
+    <field name="param" 		            type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
+    <field name="param_f" 		            type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
       <!-- fields same as PSICQUIC -->
     <field name="pbiorole"                  type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
-    <field name="pbiorole_f"                type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
+    <field name="pbiorole_f"                type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
     <field name="pbiorole_ontology"         type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
     <field name="ftype"                     type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
-    <field name="ftype_f"                   type="facetString"  indexed="true"  stored="false"  multiValued="false"/>
+    <field name="ftype_f"                   type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
     <field name="ftype_ontology"            type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
     <!-- fields same as Intact -->
     <field name="source"                    type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
@@ -109,14 +109,14 @@
     <field name="pathway_xref"              type="text"         indexed="true"  stored="false"  multiValued="true"/>
     <field name="eco_xref"                  type="text"         indexed="true"  stored="false"  multiValued="true"/>
     -->
-    <field name="pubid"            type="text"         indexed="true"  stored="false"  multiValued="true"/>
+    <field name="pubid"                     type="text"         indexed="true"  stored="false"  multiValued="true"/>
   </fields>
-
+    <!--
     <copyField source="id" 		    dest="identifier"/>
     <copyField source="alias" 		dest="identifier"/>
-
+    -->
   <!-- field to use to determine and enforce document uniqueness. -->
-  <uniqueKey>id</uniqueKey>
+  <uniqueKey>doc_id</uniqueKey>
   
   <!-- field for the QueryParser to use when an explicit fieldname is absent -->
   <defaultSearchField>complex_alias</defaultSearchField>

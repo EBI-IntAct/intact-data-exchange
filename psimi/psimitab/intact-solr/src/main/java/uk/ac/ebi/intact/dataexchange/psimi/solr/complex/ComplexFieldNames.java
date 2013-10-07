@@ -33,7 +33,7 @@ public interface ComplexFieldNames {
     String INTERACTOR_TYPE              = "ptype";
     String INTERACTOR_TYPE_ONTOLOGY     = "ptype_ontology";
     String INTERACTOR_XREF              = "pxref";
-    String INTERACTOR_XREF_ONTOLOGY     = "pxref_f";
+    String INTERACTOR_XREF_ONTOLOGY     = "pxref_ontology";
     String STC                          = "stc";
     String STC_F                        = "stc_f";
     String PARAM                        = "param";

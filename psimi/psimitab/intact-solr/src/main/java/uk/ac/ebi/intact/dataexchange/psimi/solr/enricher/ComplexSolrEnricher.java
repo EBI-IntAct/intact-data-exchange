@@ -76,15 +76,17 @@ public class ComplexSolrEnricher  extends BaseFieldEnricher {
         // retrieve the ontology term for this interaction (using BioSource)
         final OntologyTerm ontologyTerm = findOntologyTerm ( interaction ) ;
         // add name, all synonyms and tax id to complex_organism
-        solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM, ontologyTerm.getName( ) ) ;
-        for ( OntologyTerm synonym : ontologyTerm.getSynonyms ( ) ) {
-            solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM, synonym ) ;
-        }
-        solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM, interaction.getBioSource ( ) .getTaxId ( ) ) ;
-        // add parents to complex_organism_ontology
-        for ( OntologyTerm parent : ontologyTerm.getAllParentsToRoot ( true ) ) {
-            solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM_ONTOLOGY, parent.getId ( ) ) ;
-            solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM_ONTOLOGY, parent.getName ( ) ) ;
+        if ( ontologyTerm != null ) {
+            solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM, ontologyTerm.getName( ) ) ;
+            for ( OntologyTerm synonym : ontologyTerm.getSynonyms ( ) ) {
+                solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM, synonym ) ;
+            }
+            solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM, interaction.getBioSource ( ) .getTaxId ( ) ) ;
+            // add parents to complex_organism_ontology
+            for ( OntologyTerm parent : ontologyTerm.getAllParentsToRoot ( true ) ) {
+                solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM_ONTOLOGY, parent.getId ( ) ) ;
+                solrDocument.addField ( ComplexFieldNames.COMPLEX_ORGANISM_ONTOLOGY, parent.getName ( ) ) ;
+            }
         }
         return solrDocument ;
     }
@@ -164,7 +166,7 @@ public class ComplexSolrEnricher  extends BaseFieldEnricher {
         // get BioSource information from interaction
         BioSource bioSource = interaction.getBioSource ( ) ;
         // return an OntologyTerm using tax id and short label
-        return findOntologyTerm(bioSource.getTaxId(), bioSource.getShortLabel()) ;
+       return bioSource != null ? findOntologyTerm(bioSource.getTaxId(), bioSource.getShortLabel()) : null ;
     }
 
     // is for find the ontology term using the tax id and te short name

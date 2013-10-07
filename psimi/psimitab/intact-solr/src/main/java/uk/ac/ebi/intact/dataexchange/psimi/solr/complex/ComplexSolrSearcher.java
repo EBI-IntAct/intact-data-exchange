@@ -54,7 +54,7 @@ public class ComplexSolrSearcher {
         // initialize solr fields
         this.solrFields = new String [ ] {
                 // Complex fields
-                ComplexFieldNames.ID,                ComplexFieldNames.COMPLEX_ID,
+                ComplexFieldNames.PUBLICATION_ID,    ComplexFieldNames.COMPLEX_ID,
                 ComplexFieldNames.COMPLEX_NAME,      ComplexFieldNames.COMPLEX_ORGANISM,
                 ComplexFieldNames.COMPLEX_ALIAS,     ComplexFieldNames.COMPLEX_TYPE,
                 ComplexFieldNames.COMPLEX_XREF,      ComplexFieldNames.COMPLEX_AC,
@@ -66,13 +66,12 @@ public class ComplexSolrSearcher {
                 ComplexFieldNames.BIOROLE,           ComplexFieldNames.FEATURES,
                 ComplexFieldNames.SOURCE,            ComplexFieldNames.NUMBER_PARTICIPANTS,
                 //ComplexFieldNames.PATHWAY_XREF,      ComplexFieldNames.ECO_XREF,
-                ComplexFieldNames.PUBLICATION_ID
         } ;
         // initialize default fields to search
         this.defaultFields = new String [ ] {
-                ComplexFieldNames.ID,               ComplexFieldNames.COMPLEX_ID,
+                ComplexFieldNames.COMPLEX_XREF,     ComplexFieldNames.COMPLEX_ID,
                 ComplexFieldNames.COMPLEX_ALIAS,    ComplexFieldNames.INTERACTOR_ID,
-                ComplexFieldNames.INTERACTOR_ALIAS, ComplexFieldNames.COMPLEX_XREF
+                ComplexFieldNames.INTERACTOR_ALIAS
         } ;
         // Initialize the logger
         SolrLogger.readFromLog4j ( ) ;
