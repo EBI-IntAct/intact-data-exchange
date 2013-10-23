@@ -57,6 +57,15 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
         }
         return result .toString ( ) .trim ( ) ;
     }
+
+    protected String getAllFieldsValues ( SolrDocument solrDocument ) {
+        StringBuilder result = new StringBuilder ( ) ;
+        for ( String field : solrDocument.getFieldNames ( ) ) {
+            result.append(field).append(":").append(getFieldValues(solrDocument,field)).append("\n");
+        }
+        return result.toString();
+    }
+
     // getFieldValues is a method to retrieve data for this specific fields
     protected ComplexSearchResults getFieldValues ( ) {
         // How we created this ComplexSearchResults without parameters, we need to set the values using getters
@@ -68,7 +77,9 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
         result.setComplexName    ( getFieldValues ( solrDocument, ComplexFieldNames.COMPLEX_NAME  ) ) ;
         result.setCuratedComplex ( getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION   ) ) ;
         result.setOrganismName   ( getFieldValues ( solrDocument, ComplexFieldNames.ORGANISM_NAME ) ) ;
-        result.setDescription    ( getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION   ) ) ;
+        //result.setDescription    ( getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION   ) ) ;
+
+        result.setDescription    ( getAllFieldsValues ( solrDocument ) ) ;
 
         return result ;
     }
