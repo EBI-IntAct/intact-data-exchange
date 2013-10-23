@@ -42,6 +42,8 @@ public class ComplexSearchResults {
     public String getOrganismName ( )   { return organismName   ; }
     public String getDescription ( )    { return description    ; }
 
+    public String Test1()               { return ""; }
+
     public void setComplexAC ( String AC )           { complexAC = AC           ; }
     public void setComplexName ( String Name )       { complexName = Name       ; }
     public void setCuratedComplex ( String Curated ) { curatedComplex = Curated ; }
