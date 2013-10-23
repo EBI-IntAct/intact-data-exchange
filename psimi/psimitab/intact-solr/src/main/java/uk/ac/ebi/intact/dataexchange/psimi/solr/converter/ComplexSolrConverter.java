@@ -384,19 +384,19 @@ public class ComplexSolrConverter {
             try{
                 inputStream = psicquicSimpleClient.getByQuery("interactor_id:" + tree.get ( serviceType.getName ( ) ) ) ;
                 for ( BinaryInteraction interaction : psimiTabReader.read ( inputStream ) ){
-                for ( Object crossReference : interaction.getPublications ( ) ) {
-                    DB = ((CrossReference)crossReference).getDatabase ( ) ;
-                    ID = ((CrossReference)crossReference).getIdentifier ( ) ;
-                    solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, DB ) ;
-                    solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, ID ) ;
-                    solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, new StringBuilder ( )
-                            .append ( DB )
-                            .append ( ":" )
-                            .append ( ID )
-                            .toString ( )
-                    ) ;
+                    for ( Object crossReference : interaction.getPublications ( ) ) {
+                        DB = ((CrossReference)crossReference).getDatabase ( ) ;
+                        ID = ((CrossReference)crossReference).getIdentifier ( ) ;
+                        solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, DB ) ;
+                        solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, ID ) ;
+                        solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, new StringBuilder ( )
+                                .append ( DB )
+                                .append ( ":" )
+                                .append ( ID )
+                                .toString ( )
+                        ) ;
+                    }
                 }
-            }
             }
             catch (SocketTimeoutException e) {
                 // we have to log that

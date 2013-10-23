@@ -15,6 +15,7 @@ public class ComplexSearchResults {
     private String complexName      = null ;
     private String curatedComplex   = null ;
     private String organismName     = null ;
+    private String description      = null ;
 
     /*************************/
     /*      Constructor      */
@@ -23,11 +24,13 @@ public class ComplexSearchResults {
     public ComplexSearchResults ( String complexAC_,
                                   String complexName_,
                                   String curatedComplex_,
-                                  String organismName_ ) {
+                                  String organismName_,
+                                  String description_) {
         this.complexAC      = complexAC_        ;
         this.complexName    = complexName_      ;
         this.curatedComplex = curatedComplex_   ;
         this.organismName   = organismName_     ;
+        this.description    = description_      ;
     }
 
     /*********************************/
@@ -37,9 +40,11 @@ public class ComplexSearchResults {
     public String getComplexName ( )    { return complexName    ; }
     public String getCuratedComplex ( ) { return curatedComplex ; }
     public String getOrganismName ( )   { return organismName   ; }
+    public String getDescription ( )    { return description    ; }
 
     public void setComplexAC ( String AC )           { complexAC = AC           ; }
     public void setComplexName ( String Name )       { complexName = Name       ; }
     public void setCuratedComplex ( String Curated ) { curatedComplex = Curated ; }
     public void setOrganismName ( String Name )      { organismName = Name      ; }
+    public void setDescription ( String Desc )       { description = Desc       ; }
 }
