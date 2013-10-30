@@ -18,7 +18,7 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
     /*      Private attributes      */
     /********************************/
     private Iterator < SolrDocument > iterator  = null ;
-    // we have prepared the next value
+    // we have been prepared the next value
     private ComplexSearchResults nextResult     = null ;
 
     /*************************/
@@ -58,6 +58,7 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
         return result .toString ( ) .trim ( ) ;
     }
 
+    // This method was only used for testing
     protected String getAllFieldsValues ( SolrDocument solrDocument ) {
         StringBuilder result = new StringBuilder ( ) ;
         for ( String field : solrDocument.getFieldNames ( ) ) {
@@ -77,9 +78,7 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
         result.setComplexName    ( getFieldValues ( solrDocument, ComplexFieldNames.COMPLEX_NAME  ) ) ;
         result.setCuratedComplex ( getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION   ) ) ;
         result.setOrganismName   ( getFieldValues ( solrDocument, ComplexFieldNames.ORGANISM_NAME ) ) ;
-        //result.setDescription    ( getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION   ) ) ;
-
-        result.setDescription    ( getAllFieldsValues ( solrDocument ) ) ;
+        result.setDescription    ( getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION   ) ) ;
 
         return result ;
     }

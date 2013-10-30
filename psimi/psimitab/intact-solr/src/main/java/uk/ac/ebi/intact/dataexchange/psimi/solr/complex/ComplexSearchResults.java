@@ -8,15 +8,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
  * @since 30/07/13
  */
 public class ComplexSearchResults {
-    /********************************/
-    /*      Private attributes      */
-    /********************************/
-    private String complexAC        = null ;
-    private String complexName      = null ;
-    private String curatedComplex   = null ;
-    private String organismName     = null ;
-    private String description      = null ;
-
     /*************************/
     /*      Constructor      */
     /*************************/
@@ -42,11 +33,19 @@ public class ComplexSearchResults {
     public String getOrganismName ( )   { return organismName   ; }
     public String getDescription ( )    { return description    ; }
 
-    public String Test1()               { return ""; }
-
     public void setComplexAC ( String AC )           { complexAC = AC           ; }
     public void setComplexName ( String Name )       { complexName = Name       ; }
     public void setCuratedComplex ( String Curated ) { curatedComplex = Curated ; }
     public void setOrganismName ( String Name )      { organismName = Name      ; }
     public void setDescription ( String Desc )       { description = Desc       ; }
+
+    /********************************/
+    /*      Private attributes      */
+    /********************************/
+    private String complexAC        = null ;
+    private String complexName      = null ;
+    private String curatedComplex   = null ;
+    private String organismName     = null ;
+    private String description      = null ;
+
 }
