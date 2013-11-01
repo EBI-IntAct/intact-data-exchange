@@ -46,6 +46,7 @@ public class ComplexSolrConverter {
     /******************************************/
     /*      Protected methods to convert      */
     /******************************************/
+    /*
     // recursive method to get participants and their sons.
     protected SolrInputDocument participants (
             InteractionImpl complex,
@@ -124,6 +125,7 @@ public class ComplexSolrConverter {
         solrDocument.addField ( ComplexFieldNames.STC, stc ) ;
         return solrDocument ;
     }
+    */
 
     protected SolrInputDocument ComplexID ( InteractionImpl complex,
                                             SolrInputDocument solrDocument ) throws Exception {
@@ -153,15 +155,7 @@ public class ComplexSolrConverter {
         solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, complex.getShortLabel ( ) ) ;
         solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, complex.getFullName ( ) ) ;
         names[3] = complex.getShortLabel ( ) ;
-        OntologyTerm ontologyTerm = complexSolrEnricher.findOntologyTerm ( complex ) ;
-        if ( ontologyTerm != null ) {
-            for ( OntologyTerm synonym : ontologyTerm.getSynonyms ( ) ) {
-                if ( synonym != null ) {
-                    names[2] = synonym.getName ( ) ;
-                    break ;
-                }
-            }
-        }
+
         for ( Alias alias : complex.getAliases ( ) ) {
             a_name = alias.getName ( ) ;
             a_type = alias.getCvAliasType ( ) .getShortLabel ( ) ;
@@ -181,6 +175,20 @@ public class ComplexSolrConverter {
                 }
             }
         }
+
+        // Only is necessary search the first synonym if we have not a recommended name or a systematic name
+        if ( names[0] == null && names[1] == null ) {
+            OntologyTerm ontologyTerm = complexSolrEnricher.findOntologyTerm ( complex ) ;
+            if ( ontologyTerm != null ) {
+                for ( OntologyTerm synonym : ontologyTerm.getSynonyms ( ) ) {
+                    if ( synonym != null ) {
+                        names[2] = synonym.getName ( ) ;
+                        break ;
+                    }
+                }
+            }
+        }
+
         // Assign the value for complex_name
         int i = 0;
         while ( i < 4 ) {
