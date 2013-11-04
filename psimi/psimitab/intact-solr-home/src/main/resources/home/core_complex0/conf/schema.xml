@@ -101,7 +101,6 @@
         <!-- fields same as Intact -->
         <field name="source"                    type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
         <field name="source_f"                  type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
-        <field name="source_e"                  type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
         <!-- other fields -->
         <field name="number_participants"       type="int"          indexed="true"  stored="false"  multiValued="false"/> <!-- Faceting -->
         <!--
