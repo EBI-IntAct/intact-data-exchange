@@ -200,7 +200,7 @@ public class ComplexSolrSearcher {
         return squery ;
     }
 
-    // setFields is a method to set the fields (splited by ,) in the query
+    // indexFields is a method to set the fields (splited by ,) in the query
     protected SolrQuery setFields ( SolrQuery squery ) {
         String [ ] fields = null ;
         // Check if the query has fields

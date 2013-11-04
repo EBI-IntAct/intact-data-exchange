@@ -11,12 +11,11 @@ import java.util.Collection;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public interface FieldEnricher {
+public interface FieldEnricher extends OntologyEnricher{
 
     Field findFieldByName(String name) throws Exception;
-    Field enrich(Field field) throws Exception;
-
-    boolean isExpandableOntology( String name );
 
     Collection<Field> getAllParents(Field field, boolean includeItself) throws SolrServerException;
+
+    Field enrich(Field object) throws Exception;
 }

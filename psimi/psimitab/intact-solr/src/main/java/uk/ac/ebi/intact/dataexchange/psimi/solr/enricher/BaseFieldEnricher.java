@@ -17,6 +17,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.hupo.psi.calimocho.model.Field;
+import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,5 +54,15 @@ public class BaseFieldEnricher implements FieldEnricher {
 
     public boolean isExpandableOntology( String name ) {
         return false;
+    }
+
+    @Override
+    public OntologyTerm findOntologyTerm(String id, String name) throws SolrServerException {
+        return null;
+    }
+
+    @Override
+    public OntologyTerm findOntologyTermByName(String name) throws SolrServerException {
+        return null;
     }
 }

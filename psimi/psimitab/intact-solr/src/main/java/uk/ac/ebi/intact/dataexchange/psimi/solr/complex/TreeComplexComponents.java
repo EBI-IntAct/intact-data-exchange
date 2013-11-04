@@ -1,6 +1,8 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.ComplexSolrEnricher;
 import uk.ac.ebi.intact.model.*;
 
 import java.util.ArrayList;
@@ -18,14 +20,21 @@ import java.util.HashMap;
 
 public class TreeComplexComponents {
 
+    /********************************/
+    /*      Private attributes      */
+    /********************************/
+    private InteractionImpl complex = null ;
+    private Collection<TreeComponents> complexSons = null ;
+    private HashMap <String,TreeComponents> map = null ;
+
     /*************************/
     /*      Constructor      */
     /*************************/
-    public TreeComplexComponents(InteractionImpl c) {
+    public TreeComplexComponents(InteractionImpl c, ComplexSolrEnricher enricher) {
         complex = c ;
         complexSons = new ArrayList();
         for ( Component component : complex.getComponents() ) {
-            complexSons.add ( new TreeComponents ( component ) );
+            complexSons.add ( new TreeComponents ( component, enricher ) );
         }
     }
 
@@ -48,11 +57,10 @@ public class TreeComplexComponents {
         return STC ;
     }
 
-    public SolrInputDocument setFields( SolrInputDocument solrDocument ) {
-        for ( TreeComponents tree : complexSons ) {
-            tree.setFields(solrDocument);
+    public void indexFields( SolrInputDocument solrDocument ) throws SolrServerException {
+        for (TreeComponents comp : complexSons){
+            comp.indexFields(solrDocument);
         }
-        return setFields(solrDocument, complex);
     }
 
     /*********************************/
@@ -60,11 +68,16 @@ public class TreeComplexComponents {
     /*********************************/
     private class TreeComponents {
 
+        /*************************************/
+        /*      Private Tree attributes      */
+        /*************************************/
+        private TreeNode root = null ;
+
         /*******************************/
         /*      Tree Constructor       */
         /*******************************/
-        public TreeComponents( Component component_param ) {
-            root = new TreeNode ( component_param ) ;
+        public TreeComponents( Component component_param, ComplexSolrEnricher enricher ) {
+            root = new TreeNode ( component_param, enricher ) ;
         }
 
         /***************************************/
@@ -78,26 +91,36 @@ public class TreeComplexComponents {
             return root.getSTC() ;
         }
 
-        public SolrInputDocument setFields( SolrInputDocument solrDocument ) {
-            return root.setFields ( solrDocument ) ;
+        public void indexFields( SolrInputDocument solrDocument ) throws SolrServerException {
+            root.indexFields( solrDocument );
         }
 
         /************************************/
         /*      Private TreeNode Class      */
         /************************************/
         private class TreeNode{
+            /*****************************************/
+            /*      Private TreeNode attributes      */
+            /*****************************************/
+            private Component component = null ;
+            private Collection<TreeComponents> sons = null ;
+            private Integer numberOfParticipants = null ;
+            private boolean STC;
+            private int STC_flag = 0;
+            private ComplexSolrEnricher enricher;
 
             /*******************************/
             /*      TreeNode Constructor   */
             /*******************************/
-            public TreeNode( Component component_param) {
+            public TreeNode( Component component_param, ComplexSolrEnricher enricher) {
                 component = component_param ;
+                this.enricher = enricher;
                 if ( component.getInteractor() instanceof InteractionImpl ) {
                     sons = new ArrayList();
                     for ( Component comp : ((InteractionImpl) component.getInteractor()).getComponents() ) {
                         TreeComponents tree = null ;
                         if ( ! map.containsKey ( comp.getAc() ) ) {
-                            tree = new TreeComponents ( comp ) ;
+                            tree = new TreeComponents ( comp, enricher ) ;
                             map.put ( comp.getAc(), tree ) ;
                         }
                         else {
@@ -118,13 +141,13 @@ public class TreeComplexComponents {
             public Component                    getComponent()  { return component    ; }
             public Collection<TreeComponents>   getSons()       { return sons         ; }
 
-            public int                          getNumberOfParticipants()   {
+            public int getNumberOfParticipants()   {
                 if ( numberOfParticipants == null ) {
                     int stoichiometry = (int) component.getStoichiometry() ;
-                    numberOfParticipants = stoichiometry == 0 ? 1 : stoichiometry ;
+                    int number = stoichiometry == 0 ? 1 : stoichiometry ;
                     if ( hasSons() ) {
                         for ( TreeComponents tree : sons ) {
-                            numberOfParticipants += tree.getNumberOfParticipants();
+                            numberOfParticipants += number * tree.getNumberOfParticipants();
                         }
                     }
                 }
@@ -145,68 +168,85 @@ public class TreeComplexComponents {
                 return STC;
             }
 
-            public SolrInputDocument setFields(SolrInputDocument solrDocument) {
-                return TreeComplexComponents.setFields(solrDocument, component.getInteractor());
+            protected void indexInteractorAC(Interactor interactor,
+                                             SolrInputDocument solrDocument){
+                // stored field
+                solrDocument.addField(ComplexFieldNames.INTERACTOR_ID, interactor.getAc());
+                // search fields
+                solrDocument.addField(ComplexFieldNames.INTERACTOR_ID, interactor.getAc()) ;
+                // index source of complex id
+                if ( interactor.getOwner() != null ) {
+                    solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID, interactor.getOwner().getShortLabel() ) ;
+                    solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID, interactor.getOwner().getShortLabel() + ":" + interactor.getAc() ) ;
+                }
             }
 
-            /*****************************************/
-            /*      Private TreeNode attributes      */
-            /*****************************************/
-            private Component component = null ;
-            private Collection<TreeComponents> sons = null ;
-            private Integer numberOfParticipants = null ;
-            private boolean STC;
-            private int STC_flag = 0;
+            protected void indexInteractorNames(Interactor interactor,
+                                             SolrInputDocument solrDocument){
+
+                // shortname
+                solrDocument.addField ( ComplexFieldNames.INTERACTOR_ALIAS, interactor.getShortLabel ( ) ) ;
+                // fullname
+                if (interactor.getFullName() != null){
+                    solrDocument.addField ( ComplexFieldNames.INTERACTOR_ALIAS, interactor.getFullName ( ) ) ;
+                }
+                // aliases
+                for ( Alias alias : interactor.getAliases ( ) ) {
+                    if (alias.getName() != null){
+                        if (alias.getCvAliasType() != null){
+                            CvAliasType type = alias.getCvAliasType();
+                            solrDocument.addField ( ComplexFieldNames.INTERACTOR_ALIAS, type.getShortLabel() ) ;
+                            solrDocument.addField ( ComplexFieldNames.INTERACTOR_ALIAS, alias.getName() ) ;
+                            solrDocument.addField ( ComplexFieldNames.INTERACTOR_ALIAS, type.getShortLabel()+":"+alias.getName()) ;
+                        }
+                        else{
+                            solrDocument.addField ( ComplexFieldNames.INTERACTOR_ALIAS, alias.getName());
+                        }
+                    }
+                }
+            }
+
+            private void indexFields(SolrInputDocument solrDocument) throws SolrServerException {
+
+                Interactor interactor = component.getInteractor();
+                if (interactor != null){
+                    // index interactor ac
+                    indexInteractorAC(interactor, solrDocument);
+
+                    // index interactor names
+                    indexInteractorNames(interactor, solrDocument);
+
+                    // index interactor type
+                    enricher.enrichInteractorType(interactor.getCvInteractorType(), solrDocument);
+
+                    // index and enrich xrefs
+                    enricher.enrichInteractorXref(interactor.getXrefs(), solrDocument);
+                }
+
+                // index biological role
+                if (component.getCvBiologicalRole() != null){
+                    enricher.enrichBiologicalRole(component.getCvBiologicalRole(), solrDocument);
+                }
+
+                // index features
+                indexfeatures(solrDocument);
+
+                // enrich sons if necessary
+                if (hasSons()){
+                    for (TreeComponents t : sons){
+                         t.indexFields(solrDocument);
+                    }
+                }
+            }
+
+            protected void indexfeatures(SolrInputDocument doc) {
+                for (Feature f : component.getFeatures()){
+                    if (f.getCvFeatureType() != null){
+                        enricher.enrichFeatureType(f.getCvFeatureType(), doc);
+                    }
+                }
+            }
         } // End TreeNode Class
 
-        /*************************************/
-        /*      Private Tree attributes      */
-        /*************************************/
-        private TreeNode root = null ;
     } // End Tree Class
-
-
-    /***********************************/
-    /*      Private static method      */
-    /***********************************/
-    private static SolrInputDocument setFields(SolrInputDocument solrDocument, Interactor interactor) {
-        String shortLabel = null ;
-        String ID = null;
-        CvXrefQualifier cvXrefQualifier = null ;
-        solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID, interactor.getAc ( ) ) ;
-        for ( InteractorXref xref : interactor.getXrefs ( ) ) {
-            cvXrefQualifier = xref.getCvXrefQualifier ( ) ;
-            if ( cvXrefQualifier != null &&
-                    (  cvXrefQualifier.getIdentifier ( ) .equals ( CvXrefQualifier.IDENTITY_MI_REF )
-                            || cvXrefQualifier.getIdentifier ( ) .equals ( CvXrefQualifier.SECONDARY_AC_MI_REF )
-                            || cvXrefQualifier.getShortLabel ( ) .equalsIgnoreCase ( "intact-secondary" ) ) ) {
-                shortLabel = xref.getCvDatabase ( ) .getShortLabel ( ) ;
-                ID = xref.getPrimaryId() ;
-                solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID, ID ) ;
-                solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID, shortLabel ) ;
-                solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID,
-                        new StringBuilder ( ) .append ( shortLabel ) .append ( ":" ) .append ( ID ) .toString ( ) ) ;
-            }
-            else {
-                if ( xref.getCvDatabase ( ) .getIdentifier() .equals(CvDatabase.GO_MI_REF) ) {
-                    solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF_ONTOLOGY, ID ) ;
-                }
-                solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF, ID ) ;
-                solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF, shortLabel ) ;
-                solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF,
-                        new StringBuilder ( ) .append ( shortLabel ) .append ( ":" ) .append ( ID ) .toString ( ) ) ;
-                if ( xref.getCvXrefQualifier ( ) != null ){
-                    solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF, cvXrefQualifier.getShortLabel() ) ;
-                }
-            }
-        }
-        return solrDocument;
-    }
-
-    /********************************/
-    /*      Private attributes      */
-    /********************************/
-    private InteractionImpl complex = null ;
-    private Collection<TreeComponents> complexSons = null ;
-    private HashMap <String,TreeComponents> map = null ;
 } // End Wrapper class

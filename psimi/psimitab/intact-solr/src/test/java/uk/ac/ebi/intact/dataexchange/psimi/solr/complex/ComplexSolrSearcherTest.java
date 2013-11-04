@@ -7,16 +7,12 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.NamedList;
-import org.hupo.psi.mi.psicquic.registry.ServiceType;
-import org.hupo.psi.mi.psicquic.registry.client.registry.DefaultPsicquicRegistryClient;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 /**
  *  Test all methods of ComplexSolrSearcher
