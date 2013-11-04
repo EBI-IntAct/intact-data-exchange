@@ -81,6 +81,7 @@
         <field name="description"               type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
         <field name="organism_name"             type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
         <field name="udate" 	                type="int"  	indexed="true"  stored="false"  multiValued="false" default="0"/>
+        <field name="param" 		            type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
         <!-- interactor information -->
         <field name="id"                        type="text"         indexed="true"  stored="false"  multiValued="true"/>
         <field name="alias"                     type="textAlias"    indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
@@ -90,7 +91,6 @@
         <field name="pxref"                     type="text"         indexed="true"  stored="false"  multiValued="true"/>
         <field name="pxref_e"                   type="text"         indexed="true"  stored="false"  multiValued="true"/>
         <field name="stc" 			            type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
-        <field name="param" 		            type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
         <!-- fields same as PSICQUIC -->
         <field name="pbiorole"                  type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
         <field name="pbiorole_f"                type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
