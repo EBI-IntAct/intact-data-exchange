@@ -108,7 +108,7 @@
         <field name="eco_xref"                  type="text"         indexed="true"  stored="false"  multiValued="true"/>
         -->
         <field name="pubid"            type="text"         indexed="true"  stored="false"  multiValued="true"/>
-        <field name="identifier" 	type="text" default=""/>
+        <field name="identifier" 	type="text" default="" indexed="true"  stored="false" multiValued="true"/>
     </fields>
 
     <copyField source="id" 		    dest="identifier"/>
