@@ -93,8 +93,15 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         // enrich normal cv term
         enrichCvTerm(ComplexFieldNames.INTERACTOR_TYPE, ComplexFieldNames.INTERACTOR_TYPE_F, cvDagObject, solrDocument);
         // add parents to interaction_type_ontology
+        enrichCvTermParents(ComplexFieldNames.INTERACTOR_TYPE, ComplexFieldNames.INTERACTOR_TYPE_F, cvDagObject, solrDocument);
+    }
+
+    protected void enrichCvTermParents(String fieldName, String facetName, CvDagObject cvDagObject, SolrInputDocument solrDocument) {
         for ( CvDagObject parent : cvDagObject.getParents ( ) ) {
-            enrichCvTerm(ComplexFieldNames.INTERACTOR_TYPE, ComplexFieldNames.INTERACTOR_TYPE_F, parent, solrDocument);
+            enrichCvTerm(fieldName, facetName, parent, solrDocument);
+            if (!parent.getParents().isEmpty()){
+                enrichCvTermParents(fieldName, facetName, parent, solrDocument);
+            }
         }
     }
 
@@ -105,9 +112,8 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         // enrich normal cv term
         enrichCvTerm(ComplexFieldNames.COMPLEX_TYPE, ComplexFieldNames.COMPLEX_TYPE_F, cvDagObject, solrDocument);
         // add parents to interaction_type_ontology
-        for ( CvDagObject parent : cvDagObject.getParents ( ) ) {
-            enrichCvTerm(ComplexFieldNames.COMPLEX_TYPE, ComplexFieldNames.COMPLEX_TYPE_F, parent, solrDocument);
-        }
+        enrichCvTermParents(ComplexFieldNames.COMPLEX_TYPE, ComplexFieldNames.COMPLEX_TYPE_F, cvDagObject, solrDocument);
+
     }
 
     public void enrichBiologicalRole(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
@@ -116,9 +122,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         // enrich normal cv term
         enrichCvTerm(ComplexFieldNames.BIOROLE, ComplexFieldNames.BIOROLE_F, cvDagObject, solrDocument);
         // add parents to interaction_type_ontology
-        for ( CvDagObject parent : cvDagObject.getParents ( ) ) {
-            enrichCvTerm(ComplexFieldNames.BIOROLE, ComplexFieldNames.BIOROLE_F, parent, solrDocument);
-        }
+        enrichCvTermParents(ComplexFieldNames.BIOROLE, ComplexFieldNames.BIOROLE_F, cvDagObject, solrDocument);
     }
 
     public void enrichFeatureType(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
@@ -127,9 +131,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         // enrich normal cv term
         enrichCvTerm(ComplexFieldNames.FEATURES, ComplexFieldNames.FEATURES_F, cvDagObject, solrDocument);
         // add parents to interaction_type_ontology
-        for ( CvDagObject parent : cvDagObject.getParents ( ) ) {
-            enrichCvTerm(ComplexFieldNames.FEATURES, ComplexFieldNames.FEATURES_F, parent, solrDocument);
-        }
+        enrichCvTermParents(ComplexFieldNames.FEATURES, ComplexFieldNames.FEATURES_F, cvDagObject, solrDocument);
     }
 
     public void enrichInteractionType(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
@@ -138,9 +140,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         // enrich normal cv term
         enrichCvTerm(ComplexFieldNames.INTERACTION_TYPE, ComplexFieldNames.INTERACTION_TYPE_F, cvDagObject, solrDocument);
         // add parents to interaction_type_ontology
-        for ( CvDagObject parent : cvDagObject.getParents ( ) ) {
-            enrichCvTerm(ComplexFieldNames.INTERACTION_TYPE, ComplexFieldNames.INTERACTION_TYPE_F, parent, solrDocument);
-        }
+        enrichCvTermParents(ComplexFieldNames.INTERACTION_TYPE, ComplexFieldNames.INTERACTION_TYPE_F, cvDagObject, solrDocument);
     }
 
     // is for enrich complex_organism* fields and return a SolrDocument

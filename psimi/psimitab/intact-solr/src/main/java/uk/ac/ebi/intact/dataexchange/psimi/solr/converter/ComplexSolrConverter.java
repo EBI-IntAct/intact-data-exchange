@@ -250,7 +250,7 @@ public class ComplexSolrConverter {
         }
 
         if (complex.getCvInteractorType() != null){
-            this.complexSolrEnricher.enrichInteractorType(complex.getCvInteractorType(), solrDocument);
+            this.complexSolrEnricher.enrichComplexType(complex.getCvInteractorType(), solrDocument);
         }
 
         // add info to interaction_type_ontology field:
