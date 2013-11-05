@@ -98,6 +98,18 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         }
     }
 
+    // is for enrich complex_type* fields and return a SolrDocument
+    public void enrichComplexType(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
+        // enrich Cv term exact
+        enrichCvTerm(ComplexFieldNames.COMPLEX_TYPE_EXACT, null, cvDagObject, solrDocument);
+        // enrich normal cv term
+        enrichCvTerm(ComplexFieldNames.COMPLEX_TYPE, ComplexFieldNames.COMPLEX_TYPE_F, cvDagObject, solrDocument);
+        // add parents to interaction_type_ontology
+        for ( CvDagObject parent : cvDagObject.getParents ( ) ) {
+            enrichCvTerm(ComplexFieldNames.COMPLEX_TYPE, ComplexFieldNames.COMPLEX_TYPE_F, parent, solrDocument);
+        }
+    }
+
     public void enrichBiologicalRole(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
         // enrich Cv term exact
         enrichCvTerm(ComplexFieldNames.BIOROLE_EXACT, null, cvDagObject, solrDocument);
