@@ -181,7 +181,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
 
     // is for enrich complex_xref* fields and return a SolrDocument
     public void enrichInteractionXref(Collection<? extends Xref> interactorXrefs, SolrInputDocument solrDocument) throws SolrServerException {
-        enrichXrefs(ComplexFieldNames.COMPLEX_XREF, ComplexFieldNames.COMPLEX_XREF_EXACT, ComplexFieldNames.ID, interactorXrefs, solrDocument, true);
+        enrichXrefs(ComplexFieldNames.COMPLEX_XREF, ComplexFieldNames.COMPLEX_XREF_EXACT, ComplexFieldNames.COMPLEX_ID, interactorXrefs, solrDocument, true);
 
     }
 
