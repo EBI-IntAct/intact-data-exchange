@@ -150,8 +150,11 @@ public class TreeComplexComponents {
                             numberOfParticipants += number * tree.getNumberOfParticipants();
                         }
                     }
+                    else{
+                        numberOfParticipants = number;
+                    }
                 }
-                return numberOfParticipants ;
+                return numberOfParticipants;
             }
 
             public boolean getSTC() {
