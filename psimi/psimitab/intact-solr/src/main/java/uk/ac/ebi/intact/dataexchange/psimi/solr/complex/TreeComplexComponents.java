@@ -173,8 +173,6 @@ public class TreeComplexComponents {
 
             protected void indexInteractorAC(Interactor interactor,
                                              SolrInputDocument solrDocument){
-                // stored field
-                solrDocument.addField(ComplexFieldNames.INTERACTOR_ID, interactor.getAc());
                 // search fields
                 solrDocument.addField(ComplexFieldNames.INTERACTOR_ID, interactor.getAc()) ;
                 // index source of complex id
