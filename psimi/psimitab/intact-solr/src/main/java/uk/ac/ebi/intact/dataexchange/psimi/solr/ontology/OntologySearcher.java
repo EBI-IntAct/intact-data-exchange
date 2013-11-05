@@ -259,13 +259,13 @@ public class OntologySearcher implements Serializable {
             Collection<Object> fieldValues = solrDocument.getFieldValues(termSynonymsKey);
             Set<OntologyTerm> synonyms = new HashSet<OntologyTerm>();
 
-            if (parentId != null && fieldValues != null) {
+            if (parentId != null && parentId.length() > 0 && fieldValues != null) {
                 for (Object fieldValue : fieldValues) {
                     synonyms.add(new LazyLoadedOntologyTerm(this, parentId, fieldValue.toString(), Collections.EMPTY_SET));
                 }
             }
 
-            if (parentId != null && !processedIds.contains(parentId)) {
+            if (parentId != null && parentId.length() > 0 && !processedIds.contains(parentId)) {
                 terms.add(newInternalOntologyTerm(parentId, parentName, synonyms));
                 processedIds.add(parentId);
             }
