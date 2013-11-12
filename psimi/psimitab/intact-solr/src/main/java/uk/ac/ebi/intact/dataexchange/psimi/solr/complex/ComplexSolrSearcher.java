@@ -1,6 +1,12 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -46,11 +52,7 @@ public class ComplexSolrSearcher {
     /*************************/
     /*      Constructor      */
     /*************************/
-    public ComplexSolrSearcher ( SolrServer solrServer_ ) {
-        if ( solrServer_ == null ) {
-            throw new IllegalArgumentException ( "You must pass a not null SolrServer to create a new ComplexSorlServer" ) ;
-        }
-        this.solrServer = solrServer_ ;
+    public void initFunction( ) {
         // initialize solr fields
         this.solrFields = new String [ ] {
                 // Complex fields
@@ -75,6 +77,33 @@ public class ComplexSolrSearcher {
         } ;
         // Initialize the logger
         SolrLogger.readFromLog4j ( ) ;
+    }
+
+    public ComplexSolrSearcher ( SolrServer solrServer_ ) {
+        if ( solrServer_ == null ) {
+            throw new IllegalArgumentException ( "You must pass a not null SolrServer to create a new ComplexSorlServer" ) ;
+        }
+        this.solrServer = solrServer_ ;
+
+        initFunction();
+    }
+
+    public ComplexSolrSearcher ( String solrUrl, int maxConnHost,
+                                 int maxConnTotal, int maxRetries,
+                                 boolean compresion ) {
+        SchemeRegistry schemeRegistry = new SchemeRegistry( ) ;
+        schemeRegistry.register ( new Scheme( "http",   80, PlainSocketFactory.getSocketFactory() ) ) ;
+        schemeRegistry.register ( new Scheme ( "https", 443, org.apache.http.conn.ssl.SSLSocketFactory.getSocketFactory() ) ) ;
+        PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
+        cm.setMaxTotal(maxConnTotal);
+        cm.setDefaultMaxPerRoute(maxConnHost);
+        HttpClient httpClient = new DefaultHttpClient(cm);
+        HttpSolrServer server = new HttpSolrServer(solrUrl, httpClient);
+        server.setMaxRetries(maxRetries);
+        server.setAllowCompression(compresion);
+        this.solrServer = server;
+
+        initFunction();
     }
 
     /******************************************************/
