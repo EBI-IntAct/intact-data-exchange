@@ -143,6 +143,7 @@ public class TreeComplexComponents {
 
             public int getNumberOfParticipants()   {
                 if ( numberOfParticipants == null ) {
+                    numberOfParticipants = 0;
                     int stoichiometry = (int) component.getStoichiometry() ;
                     int number = stoichiometry == 0 ? 1 : stoichiometry ;
                     if ( hasSons() ) {

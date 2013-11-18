@@ -27,17 +27,17 @@ public class ComplexSearchResults {
     /*********************************/
     /*      Getters and Setters      */
     /*********************************/
-    public String getComplexAC ( )      { return complexAC      ; }
-    public String getComplexName ( )    { return complexName    ; }
+    public String getComplexAC      ( ) { return complexAC      ; }
+    public String getComplexName    ( ) { return complexName    ; }
     public String getCuratedComplex ( ) { return curatedComplex ; }
-    public String getOrganismName ( )   { return organismName   ; }
-    public String getDescription ( )    { return description    ; }
+    public String getOrganismName   ( ) { return organismName   ; }
+    public String getDescription    ( ) { return description    ; }
 
-    public void setComplexAC ( String AC )           { complexAC = AC           ; }
-    public void setComplexName ( String Name )       { complexName = Name       ; }
+    public void setComplexAC      ( String AC )      { complexAC = AC           ; }
+    public void setComplexName    ( String Name )    { complexName = Name       ; }
     public void setCuratedComplex ( String Curated ) { curatedComplex = Curated ; }
-    public void setOrganismName ( String Name )      { organismName = Name      ; }
-    public void setDescription ( String Desc )       { description = Desc       ; }
+    public void setOrganismName   ( String Name )    { organismName = Name      ; }
+    public void setDescription    ( String Desc )    { description = Desc       ; }
 
     /********************************/
     /*      Private attributes      */

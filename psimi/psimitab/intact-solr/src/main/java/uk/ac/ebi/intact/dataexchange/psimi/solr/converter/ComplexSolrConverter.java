@@ -220,7 +220,7 @@ public class ComplexSolrConverter {
     /*****************************/
     /*      Convert Methods      */
     /*****************************/
-    public void toSolrDocument(
+    protected void toSolrDocument(
             InteractionImpl complex,
             SolrInputDocument solrDocument)
             throws Exception {
@@ -281,68 +281,6 @@ public class ComplexSolrConverter {
         ///   INTERACTOR FIELDS   ///
         /////////////////////////////
 
-        // add info to interactor_id field:
-        // to avoid stack overflow problems I change the recursive algorithm to this iterative algorithm
-        // I decided to make a recursive algorithm can be easier, because this algorithm does not calculate
-        //  the number of participants right.
-        /*Stack < Interactor > stack = new Stack < Interactor > ( ) ;
-        stack.push ( complex ) ;
-        Set < String > indexed = new HashSet < String > ( ) ;
-        indexed.add ( complex.getAc ( ) ) ;
-        Interactor interactorAux;
-        boolean stc = false;
-        float stoichiometry = 0.0f ;
-        int number_participants = 0 ;
-        do {
-            interactorAux = stack.pop ( ) ;
-            // if interactorAux is an instance of InteractionImpl we need to get all its components
-            if ( interactorAux instanceof InteractionImpl ) {
-                String AC = null ;
-                for ( Component component : ( ( InteractionImpl) interactorAux ) .getComponents ( ) ) {
-                    AC = component.getAc ( ) ;
-                    stoichiometry = component.getStoichiometry ( ) ;
-                    if ( ! indexed.contains ( AC ) ) {
-                        stack.push ( component.getInteractor ( ) ) ;
-                        stc |= stoichiometry != 0.0f ;
-                        indexed.add ( AC ) ;
-                    }
-                    number_participants += stoichiometry == 0.0f ? 1 : (int) stoichiometry ;
-                }
-            }
-            // now, we get the information of the interactorAux
-            String shortLabel = null ;
-            String ID = null;
-            CvXrefQualifier cvXrefQualifier = null ;
-            solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID, interactorAux.getAc ( ) ) ;
-            for ( InteractorXref xref : interactorAux.getXrefs ( ) ) {
-                cvXrefQualifier = xref.getCvXrefQualifier ( ) ;
-                if ( cvXrefQualifier != null &&
-                        (  cvXrefQualifier.getIdentifier ( ) .equals ( CvXrefQualifier.IDENTITY_MI_REF )
-                        || cvXrefQualifier.getIdentifier ( ) .equals ( CvXrefQualifier.SECONDARY_AC_MI_REF )
-                        || cvXrefQualifier.getShortLabel ( ) .equalsIgnoreCase ( "intact-secondary" ) ) ) {
-                    shortLabel = xref.getCvDatabase ( ) .getShortLabel ( ) ;
-                    ID = xref.getPrimaryId() ;
-                    solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID, ID ) ;
-                    solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID, shortLabel ) ;
-                    solrDocument.addField ( ComplexFieldNames.INTERACTOR_ID,
-                           new StringBuilder ( ) .append ( shortLabel ) .append ( ":" ) .append ( ID ) .toString ( ) ) ;
-                }
-                else {
-                    if ( xref.getCvDatabase ( ) .getIdentifier() .equals(CvDatabase.GO_MI_REF) ) {
-                        solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF_EXACT, ID ) ;
-                    }
-                    solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF, ID ) ;
-                    solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF, shortLabel ) ;
-                    solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF,
-                           new StringBuilder ( ) .append ( shortLabel ) .append ( ":" ) .append ( ID ) .toString ( ) ) ;
-                    if ( xref.getCvXrefQualifier ( ) != null ){
-                        solrDocument.addField ( ComplexFieldNames.INTERACTOR_XREF, cvXrefQualifier.getShortLabel() ) ;
-                    }
-                }
-            }
-        } while ( ! stack.isEmpty ( ) ) ;
-        */
-
         // Create a TreeComplexComponents
         TreeComplexComponents tree = new TreeComplexComponents(complex, this.complexSolrEnricher);
 
@@ -370,19 +308,6 @@ public class ComplexSolrConverter {
         // add info to features_ontology field:
         // It will do by the enricher
 
-        ////////////////////////
-        ///   OTHER FIELDS   ///
-        ////////////////////////
-
-
-        /////////////////////////
-        ///   ENRICH FIELDS   ///
-        /////////////////////////
-
-        // Enrich the Solr Document and return that
-        /*BufferedWriter traceFile = new BufferedWriter( new FileWriter("TraceInfo.txt", true));
-        traceFile.write("TraceInfo: "+solrDocument.toString() + "\n");
-        traceFile.close();*/
     }
 
     public SolrInputDocument toSolrDocument(InteractionImpl complex) throws Exception {
