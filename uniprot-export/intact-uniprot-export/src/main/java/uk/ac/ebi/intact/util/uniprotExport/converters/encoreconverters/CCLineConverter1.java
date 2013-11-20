@@ -162,7 +162,8 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                     // we have an interaction which can be self interaction or which involves isoforms of same uniprot entry. They must have same gene name
                     else if (isUniprot1FromSameUniprotEntry && isUniprot2FromSameUniprotEntry) {
                         // if uniprot 1 is the master uniprot, we can convert this interaction even if second interactor is an isoform 
-                        if (uniprot1.equalsIgnoreCase(masterUniprot)){
+                        // we also excludes self interactions with feature chains
+                        if (uniprot1.equalsIgnoreCase(masterUniprot) && !containsFeatureChain){
                             firstUniprot = uniprot1;
                             secondUniprot = uniprot2;
                             taxId2 = organismsB[0];
@@ -177,7 +178,8 @@ public class CCLineConverter1 extends AbstractCCLineConverter {
                             geneName2 = geneName1;
                         }
                         // if uniprot 2 is the master uniprot, we can convert this interaction even if first interactor is an isoform 
-                        else if (uniprot2.equalsIgnoreCase(masterUniprot)){
+                        // we also excludes self interactions with feature chains
+                        else if (uniprot2.equalsIgnoreCase(masterUniprot) && !containsFeatureChain){
                             firstUniprot = uniprot2;
                             secondUniprot = uniprot1;
                             taxId2 = organismsA[0];
