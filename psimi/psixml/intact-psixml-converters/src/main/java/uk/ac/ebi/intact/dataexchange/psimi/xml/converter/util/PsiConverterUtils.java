@@ -499,14 +499,19 @@ public class PsiConverterUtils {
         return nonRedundantExps.values();
     }
 
-    public static Collection<psidev.psi.mi.xml.model.Interactor> nonRedundantInteractorsFromPsiEntry(Entry psiEntry) {
-        Map<Integer, psidev.psi.mi.xml.model.Interactor> nonRedundantInteractors = new HashMap<Integer, psidev.psi.mi.xml.model.Interactor>();
+    public static Collection<Object> nonRedundantInteractorsFromPsiEntry(Entry psiEntry) {
+        Map<Integer, Object> nonRedundantInteractors = new HashMap<Integer, Object>();
 
         if( ConverterContext.getInstance().isGenerateExpandedXml() ) {
             // iterate to get the unique experiments/interactors
             for (psidev.psi.mi.xml.model.Interaction interaction : psiEntry.getInteractions()) {
                 for (Participant participant : interaction.getParticipants()) {
-                    nonRedundantInteractors.put(participant.getInteractor().getId(), participant.getInteractor());
+                    if (participant.getInteractor() != null){
+                        nonRedundantInteractors.put(participant.getInteractor().getId(), participant.getInteractor());
+                    }
+                    else if (participant.getInteraction() != null){
+                        nonRedundantInteractors.put(participant.getInteraction().getId(), participant.getInteraction());
+                    }
                 }
             }
         } else {

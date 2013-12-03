@@ -590,7 +590,7 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
         List<Component> components = new ArrayList<Component>(psiInteraction.getParticipants().size());
 
         for (Participant participant : psiInteraction.getParticipants()) {
-            if (participant.getInteractor() == null) {
+            if (participant.getInteractor() == null && participant.getInteraction() == null) {
                 throw new PsiConversionException("Participant without interactor found: "+participant+" in interaction: "+interaction);
             }
 

@@ -74,7 +74,7 @@ public class InteractionConverterTest extends AbstractConverterTest {
 
         Assert.assertEquals(1, interaction.getParameters().size());
         final InteractionParameter param = interaction.getParameters().iterator().next();
-        Assert.assertEquals("temperature of inter", param.getCvParameterType().getShortLabel());
+        Assert.assertEquals("temperature of interaction", param.getCvParameterType().getShortLabel());
         Assert.assertEquals("MI:0836", param.getCvParameterType().getIdentifier());
         Assert.assertEquals("kelvin", param.getCvParameterUnit().getShortLabel());
         Assert.assertEquals("MI:0838", param.getCvParameterUnit().getIdentifier());

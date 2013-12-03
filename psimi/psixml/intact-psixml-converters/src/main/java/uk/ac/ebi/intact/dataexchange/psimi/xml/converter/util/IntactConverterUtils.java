@@ -124,7 +124,7 @@ public class IntactConverterUtils {
 
         if (annotatedObject instanceof Institution) {
             xref.setOwner((Institution)annotatedObject);
-        } else if (xref instanceof CvObjectXref) {
+        } else if (xref instanceof CvObjectXref && xref.getCvXrefQualifier() != null) {
             ((CvObjectXref)xref).prepareParentMi();
         }
     }

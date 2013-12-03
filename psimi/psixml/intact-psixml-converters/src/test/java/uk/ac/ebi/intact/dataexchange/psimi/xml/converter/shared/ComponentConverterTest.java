@@ -56,7 +56,7 @@ public class ComponentConverterTest extends IntactBasicTestCase {
         
         Assert.assertEquals(1, component.getParameters().size());
         final ComponentParameter param = component.getParameters().iterator().next();
-        Assert.assertEquals("temperature of inter", param.getCvParameterType().getShortLabel());
+        Assert.assertEquals("temperature of interaction", param.getCvParameterType().getShortLabel());
         Assert.assertEquals("MI:0836", param.getCvParameterType().getIdentifier());
         Assert.assertEquals("kelvin", param.getCvParameterUnit().getShortLabel());
         Assert.assertEquals("MI:0838", param.getCvParameterUnit().getIdentifier());
