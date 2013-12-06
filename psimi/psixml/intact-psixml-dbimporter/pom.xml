@@ -20,6 +20,11 @@
         <db.hbm2ddl>none</db.hbm2ddl>
         <spring.version>3.1.2.RELEASE</spring.version>
     </properties>
+    <scm>
+        <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/psimi/psixml/intact-psixml-dbimporter</connection>
+        <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/psimi/psixml/intact-psixml-dbimporter</developerConnection>
+        <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/psimi/psixml/intact-psixml-dbimporter</url>
+    </scm>
 
     <profiles>
         <profile>
