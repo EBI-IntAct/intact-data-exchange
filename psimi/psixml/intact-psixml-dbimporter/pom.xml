@@ -55,6 +55,82 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>convert-chembl-xml</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2024m</argument>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath />
+                                <argument>uk.ac.ebi.intact.dataexchange.psimi.xml.dbimporter.ChemblComplexXmlConverter</argument>
+                                <!-- the chembl tabular file listing components of a comples-->
+                                <argument>${input_components}</argument>
+                                <!-- the chembl tabular file listing the complexes-->
+                                <argument>${input_targets}</argument>
+                                <!-- the output XML file-->
+                                <argument>${output_file}</argument>
+                                <!-- the pubmed id of imported complexes-->
+                                <argument>${pubmed}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>convert-pdb-xml</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2024m</argument>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath />
+                                <argument>uk.ac.ebi.intact.dataexchange.psimi.xml.dbimporter.PDBComplexXmlConverter</argument>
+                                <!-- the PDB incomplete XML file-->
+                                <argument>${input_file}</argument>
+                                <!-- the output XML file-->
+                                <argument>${output_file}</argument>
+                                <!-- the pubmed id of imported complexes-->
+                                <argument>${pubmed}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>
