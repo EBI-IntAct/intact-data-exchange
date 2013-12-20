@@ -45,10 +45,11 @@ public class ComplexSolrSearcherTest {
     public void testCheckQuery() throws Exception {
         String query = null;
         // Test wildcard query
-        query = "*:*";
+        query = "*";
         Assert.assertSame ( "Test wildcard query",
                 query,
                 this.complexSolrSearcher.checkQuery ( "*" ) ) ;
+        query = "*:*";
         Assert.assertSame ( "Test wildcard query 2",
                 query,
                 this.complexSolrSearcher.checkQuery ( query ) ) ;
@@ -71,7 +72,7 @@ public class ComplexSolrSearcherTest {
         catch ( Throwable e ) {
             exception = e ;
         }
-        Assert.assertTrue("Test query is null", exception instanceof NullPointerException) ;
+        Assert.assertTrue("Test query is null", exception instanceof IllegalArgumentException) ;
     }
 
     @Test
@@ -79,7 +80,7 @@ public class ComplexSolrSearcherTest {
         SolrQuery solrQuery = new SolrQuery ( "*:*" ) ;
         boolean hasParameters = true ;
         // Query
-        solrQuery = this.complexSolrSearcher.setParameters(solrQuery) ;
+        this.complexSolrSearcher.setParameters(solrQuery) ;
 
         // Test parameters
         String dismaxParamName = solrQuery.get ( ComplexSolrSearcher.getDismaxParamName ( ) ) ;
@@ -110,15 +111,15 @@ public class ComplexSolrSearcherTest {
         SolrQuery solrQuery = new SolrQuery ( "*:*" ) ;
         Integer firstResult = null ;
         // Test null parameter
-        solrQuery = this.complexSolrSearcher.setFirstResult ( solrQuery, firstResult ) ;
+        this.complexSolrSearcher.setFirstResult ( solrQuery, firstResult ) ;
         Assert.assertSame ( "Test null parameter", 0, solrQuery.getStart ( ) ) ;
         // Test first result set to zero
         firstResult = 0 ;
-        solrQuery = this.complexSolrSearcher.setFirstResult ( solrQuery, firstResult ) ;
+        this.complexSolrSearcher.setFirstResult ( solrQuery, firstResult ) ;
         Assert.assertSame ( "Test first result is zero", firstResult, solrQuery.getStart ( ) ) ;
         // Test first result set to twelve
         firstResult = 12 ;
-        solrQuery = this.complexSolrSearcher.setFirstResult ( solrQuery, firstResult ) ;
+        this.complexSolrSearcher.setFirstResult ( solrQuery, firstResult ) ;
         Assert.assertSame ( "Test first result is twelve", firstResult, solrQuery.getStart ( ) ) ;
     }
 
@@ -128,15 +129,15 @@ public class ComplexSolrSearcherTest {
         solrQuery.setStart ( 0 ) ;
         Integer maxParameters = null ;
         // Test null parameter
-        solrQuery = this.complexSolrSearcher.setMaxResults ( solrQuery, maxParameters ) ;
+        this.complexSolrSearcher.setMaxResults ( solrQuery, maxParameters ) ;
         Assert.assertTrue ( "Test null parameter", Integer.MAX_VALUE == solrQuery.getRows ( ) ) ;
         // Test max parameter set to zero
         maxParameters = 0 ;
-        solrQuery = this.complexSolrSearcher.setMaxResults ( solrQuery, maxParameters ) ;
+        this.complexSolrSearcher.setMaxResults ( solrQuery, maxParameters ) ;
         Assert.assertSame ( "Test max parameters is zero", maxParameters, solrQuery.getRows ( ) ) ;
         // Test max parameter set to twelve
         maxParameters = 12 ;
-        solrQuery = this.complexSolrSearcher.setMaxResults ( solrQuery, maxParameters ) ;
+        this.complexSolrSearcher.setMaxResults ( solrQuery, maxParameters ) ;
         Assert.assertSame ( "Test max parameter is twelve", maxParameters, solrQuery.getRows ( ) ) ;
     }
 
@@ -147,14 +148,14 @@ public class ComplexSolrSearcherTest {
         String [ ] filters = new String [ ] {"First", "*", "Second", "Third", "Fourth", "*"} ;
         String [ ] filtersResult = new String [ ] {"First", "Second", "Third", "Fourth"} ;
         // Test null parameter
-        solrQuery = this.complexSolrSearcher.setFilters ( solrQuery, null ) ;
+        this.complexSolrSearcher.setFilters ( solrQuery, null ) ;
         Assert.assertTrue("Test null parameter", new SolrQuery ( "*:*" ) .toString() .equals(solrQuery.toString()) ) ;
         // Test filter array is empty
-        solrQuery = this.complexSolrSearcher.setFilters ( solrQuery, empty ) ;
+        this.complexSolrSearcher.setFilters ( solrQuery, empty ) ;
         Assert.assertTrue ( "Test filter array is empty", new SolrQuery ( "*:*" ).toString() .equals(solrQuery.toString()) ) ;
         // Test filter array has 4 elements: First, *, Second, Third, Forth and *
         // but he need to discard the * filters
-        solrQuery = this.complexSolrSearcher.setFilters ( solrQuery, filters ) ;
+        this.complexSolrSearcher.setFilters ( solrQuery, filters ) ;
         Assert.assertArrayEquals ( "Test filter array values", solrQuery.getFilterQueries ( ), filtersResult ) ;
     }
 
@@ -163,15 +164,15 @@ public class ComplexSolrSearcherTest {
         SolrQuery solrQuery = new SolrQuery ( "*:*" ) ;
         Integer firstFacet = null ;
         // Test null parameter
-        solrQuery = this.complexSolrSearcher.setFirstFacet ( solrQuery, firstFacet ) ;
+        this.complexSolrSearcher.setFirstFacet ( solrQuery, firstFacet ) ;
         Assert.assertTrue("Test null parameter", solrQuery.get(FacetParams.FACET_OFFSET).equals("0")) ;
         // Test first facet set to zero
         firstFacet = 0 ;
-        solrQuery = this.complexSolrSearcher.setFirstFacet ( solrQuery, firstFacet ) ;
+        this.complexSolrSearcher.setFirstFacet ( solrQuery, firstFacet ) ;
         Assert.assertTrue("Test first facet set to zero", solrQuery.get(FacetParams.FACET_OFFSET).equals("0")) ;
         // Test first facet set to twelve
         firstFacet = 12 ;
-        solrQuery = this.complexSolrSearcher.setFirstFacet ( solrQuery, firstFacet ) ;
+        this.complexSolrSearcher.setFirstFacet ( solrQuery, firstFacet ) ;
         Assert.assertTrue("Test first facet set to twelve", solrQuery.get(FacetParams.FACET_OFFSET).equals("12")); ;
     }
 
@@ -180,15 +181,15 @@ public class ComplexSolrSearcherTest {
         SolrQuery solrQuery = new SolrQuery ( "*:*" ) ;
         Integer maxFacets = null ;
         // Test null parameter
-        solrQuery = this.complexSolrSearcher.setMaxFacets ( solrQuery, maxFacets ) ;
+        this.complexSolrSearcher.setMaxFacets ( solrQuery, maxFacets ) ;
         Assert.assertTrue("Test null parameter", Integer.MAX_VALUE == solrQuery.getFacetLimit()) ;
         // Test max facets set to zero
         maxFacets = 0 ;
-        solrQuery = this.complexSolrSearcher.setMaxFacets ( solrQuery, maxFacets ) ;
+        this.complexSolrSearcher.setMaxFacets ( solrQuery, maxFacets ) ;
         Assert.assertTrue ( "Test max facets set to zero", maxFacets == solrQuery.getFacetLimit()) ;
         // Test max facets set to twelve
         maxFacets = 12 ;
-        solrQuery = this.complexSolrSearcher.setMaxFacets ( solrQuery, maxFacets ) ;
+        this.complexSolrSearcher.setMaxFacets ( solrQuery, maxFacets ) ;
         Assert.assertTrue ( "Test max facets set to twelve", maxFacets == solrQuery.getFacetLimit()) ;
     }
 
@@ -204,13 +205,13 @@ public class ComplexSolrSearcherTest {
         //
 
         // Test null parameter
-        solrQuery = this.complexSolrSearcher.setFacets ( solrQuery, null ) ;
+        this.complexSolrSearcher.setFacets ( solrQuery, null ) ;
         Assert.assertEquals("Test null parameter", solrQueryCopy, solrQuery) ;
         // Test length of facets array is 0
-        solrQuery = this.complexSolrSearcher.setFacets ( solrQuery, emptyFacets ) ;
+        this.complexSolrSearcher.setFacets ( solrQuery, emptyFacets ) ;
         Assert.assertEquals ( "Test length of facets array is 0", solrQueryCopy, solrQuery ) ;
         // Test four facets
-        solrQuery = this.complexSolrSearcher.setFacets ( solrQuery, facets ) ;
+        this.complexSolrSearcher.setFacets ( solrQuery, facets ) ;
         Assert.assertTrue ( "Test if facet was enabled", solrQuery.toString ( ) .contains ( "facet=true" ) ) ;
         Assert.assertEquals ( "Test facet min count is equal to one", 1, solrQuery.getFacetMinCount ( ) );
         Assert.assertEquals ( "Test facet sort is equal to facetparams", FacetParams.FACET_SORT_COUNT, solrQuery.getFacetSortString ( ) ) ;
@@ -224,17 +225,17 @@ public class ComplexSolrSearcherTest {
         Integer firstFacet = 0, maxFacets = 256 ;
 
         // Test null parameter
-        solrQuery = this.complexSolrSearcher.setFacets ( solrQuery, null, firstFacet, maxFacets ) ;
+        this.complexSolrSearcher.setFacets ( solrQuery, null, firstFacet, maxFacets ) ;
         Assert.assertEquals("Test null parameter", solrQueryCopy, solrQuery) ;
         Assert.assertNull ( "Test null parameter firstFacet", solrQuery.get ( FacetParams.FACET_OFFSET ) ) ;
         Assert.assertEquals ( "Test null parameter maxFacets", 25, solrQuery.getFacetLimit ( ) ); ;
         // Test length of facets array is 0
-        solrQuery = this.complexSolrSearcher.setFacets ( solrQuery, emptyFacets, firstFacet, maxFacets ) ;
+        this.complexSolrSearcher.setFacets ( solrQuery, emptyFacets, firstFacet, maxFacets ) ;
         Assert.assertEquals ( "Test length of facets array is 0", solrQueryCopy, solrQuery ) ;
         Assert.assertNull ( "Test length of facets array is 0 firstFacet", solrQuery.get ( FacetParams.FACET_OFFSET ) ) ;
         Assert.assertEquals ( "Test length of facets array is 0 maxFacets", 25, solrQuery.getFacetLimit ( ) ); ;
         // Test four facets
-        solrQuery = this.complexSolrSearcher.setFacets ( solrQuery, facets, firstFacet, maxFacets ) ;
+        this.complexSolrSearcher.setFacets ( solrQuery, facets, firstFacet, maxFacets ) ;
         Assert.assertTrue ( "Test if facet was enabled", solrQuery.toString ( ) .contains ( "facet=true" ) ) ;
         Assert.assertEquals ( "Test facet min count is equal to one", 1, solrQuery.getFacetMinCount ( ) );
         Assert.assertEquals ( "Test facet sort is equal to facetparams", FacetParams.FACET_SORT_COUNT, solrQuery.getFacetSortString ( ) ) ;
@@ -248,11 +249,11 @@ public class ComplexSolrSearcherTest {
         SolrQuery solrQuery = new SolrQuery ( "*:*" ) ;
         String fields = "First,Second,Third,Fourth" ;
         // Test fields is null
-        solrQuery = this.complexSolrSearcher.setFields ( solrQuery ) ;
+        this.complexSolrSearcher.setFields ( solrQuery ) ;
         Assert.assertNull ( "Test null fields", solrQuery.getFields ( ) ) ;
         // Test fields is First,Second,Third,Forth
         solrQuery.setFields ( fields ) ;
-        solrQuery = this.complexSolrSearcher.setFields ( solrQuery ) ;
+        this.complexSolrSearcher.setFields ( solrQuery ) ;
         Assert.assertArrayEquals ( "Test fields is First,Second,Third,Fourth",
                 solrQuery.getFields ( ) .split ( "," ) ,
                 ArrayUtils.addAll ( this.complexSolrSearcher.solrFields,

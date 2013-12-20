@@ -56,24 +56,14 @@ public class ComplexSolrSearcher {
         // initialize solr fields
         this.solrFields = new String [ ] {
                 // Complex fields
-                ComplexFieldNames.PUBLICATION_ID,    ComplexFieldNames.COMPLEX_ID,
-                ComplexFieldNames.COMPLEX_NAME,      ComplexFieldNames.COMPLEX_ORGANISM,
-                ComplexFieldNames.COMPLEX_ALIAS,     ComplexFieldNames.COMPLEX_TYPE,
-                ComplexFieldNames.COMPLEX_XREF,      ComplexFieldNames.COMPLEX_AC,
-                ComplexFieldNames.DESCRIPTION,       ComplexFieldNames.ORGANISM_NAME,
-                // Interactor fields
-                ComplexFieldNames.INTERACTOR_ID,     ComplexFieldNames.INTERACTOR_ALIAS,
-                ComplexFieldNames.INTERACTOR_TYPE,
-                // Other fields
-                ComplexFieldNames.BIOROLE,           ComplexFieldNames.FEATURES,
-                ComplexFieldNames.SOURCE,            ComplexFieldNames.NUMBER_PARTICIPANTS,
-                //ComplexFieldNames.PATHWAY_XREF,      ComplexFieldNames.ECO_XREF,
+                ComplexFieldNames.COMPLEX_NAME,      ComplexFieldNames.COMPLEX_AC,
+                ComplexFieldNames.ORGANISM_NAME,     ComplexFieldNames.DESCRIPTION
         } ;
         // initialize default fields to search
         this.defaultFields = new String [ ] {
                 ComplexFieldNames.COMPLEX_XREF,     ComplexFieldNames.COMPLEX_ID,
                 ComplexFieldNames.COMPLEX_ALIAS,    ComplexFieldNames.INTERACTOR_ID,
-                ComplexFieldNames.INTERACTOR_ALIAS
+                ComplexFieldNames.INTERACTOR_ALIAS, ComplexFieldNames.COMPLEX_ORGANISM
         } ;
         // Initialize the logger
         SolrLogger.readFromLog4j ( ) ;
@@ -121,11 +111,12 @@ public class ComplexSolrSearcher {
     /**********************************************************/
     /*      Protected Methods to set query parameters up      */
     /**********************************************************/
-    // checkQuery is a method to check if the query contains a wildcard or is null
+    // checkQuery is a method to check if the query is null
     protected String checkQuery ( String query ) {
-        if ( query == null ) throw new NullPointerException ( "You have not to search with a null query" ) ;
-        // Format wildcard query
-        if ( query.equals ( "*" ) ) query = "*:*" ;
+        //
+        // ComplexSearcherException about a illegal parameter
+        //
+        if ( query == null ) throw new IllegalArgumentException ( "You have not to search with a null query" ) ;
         return query ;
     }
 
@@ -232,32 +223,6 @@ public class ComplexSolrSearcher {
         }
         // Set the new fields
         squery.setFields ( fields ) ;
-    }
-
-    // checkNegativeFilter is a method to check if the query has at least a negative filter
-    protected void checkNegativeFilter ( SolrQuery squery ) {
-        Boolean hasNegative = false;
-        String query = squery.getQuery ( ) ; // Getting the current query
-        // String for check if the query has a negative filter
-        String negative = new StringBuilder ( ) .append ( "negative" ) .append ( ":" ) .toString ( ) ;
-        // If query has a field named such as the name stored is negative
-        if ( query != null || query.contains ( negative ) ) { hasNegative = true ; }
-        else {
-            // Then the query does not have a negative filter but besides we need to check if exist in the filters
-            String [ ] queries = squery.getFilterQueries ( ) ;
-            // If queries is not null and is longer than 0
-            if ( queries != null && queries.length > 0 ) {
-                // Check all filters searching a negative filter
-                for ( String filter : queries ) {
-                    hasNegative = hasNegative || filter.contains ( negative ) ;
-                }
-            }
-        }
-        // If the query has negative filter we enable it
-        if ( hasNegative ) {
-            squery.addFilterQuery ( new StringBuilder ( ) .append ( negative )
-                                        .append("false") .toString ( ) ) ;
-        }
     }
 
     // formatQuery is a method to expand the wildcard if the query has that
