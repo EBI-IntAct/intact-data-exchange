@@ -236,7 +236,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 "or lower(p.owner.shortLabel) = :uniprot " +
                 "or lower(p.owner.shortLabel) = :mbinfo " +
                 "or lower(p.owner.shortLabel) = :mpidb " +
-                "or lower(p.owner.shortLabel) = :mint" +
+                "or lower(p.owner.shortLabel) = :mint " +
+                "or lower(p.owner.shortLabel) = :bhf" +
                 ") " +
                 "and p.ac not in (" +
                 "select distinct p2.ac from Publication as p2 join p2.xrefs as x where " +
@@ -261,6 +262,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("mbinfo", "mbinfo");
         query.setParameter("mpidb", "mpidb");
         query.setParameter("mint", "mint");
+        query.setParameter("bhf", "bhf-ucl");
 
         return query.getResultList();
     }
