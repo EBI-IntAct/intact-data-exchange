@@ -151,12 +151,12 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         if ( ontologyTerm != null ) {
             // enrich exact organism
             enrichOrganism(ComplexFieldNames.COMPLEX_ORGANISM_EXACT, null, solrDocument, ontologyTerm);
-            // enrich orgnaism for query
+            // enrich organism for query
             enrichOrganism(ComplexFieldNames.COMPLEX_ORGANISM, ComplexFieldNames.COMPLEX_ORGANISM_F, solrDocument, ontologyTerm);
             // sort field
             solrDocument.addField(ComplexFieldNames.COMPLEX_ORGANISM_SORT, ontologyTerm.getId());
             // stored field to retrieve from the index
-            solrDocument.addField(ComplexFieldNames.ORGANISM_NAME, ontologyTerm.getName()+"("+ontologyTerm.getId()+")");
+            solrDocument.addField(ComplexFieldNames.ORGANISM_NAME, ontologyTerm.getName()+"; "+ontologyTerm.getId());
             // add parents to complex_organism_ontology
             for ( OntologyTerm parent : ontologyTerm.getAllParentsToRoot ( true ) ) {
                 enrichOrganism(ComplexFieldNames.COMPLEX_ORGANISM, ComplexFieldNames.COMPLEX_ORGANISM_F, solrDocument, parent);
