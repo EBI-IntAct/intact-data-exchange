@@ -1,10 +1,12 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
 
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class is for manage the complex results of a search
@@ -18,6 +20,7 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
     /*      Private attributes      */
     /********************************/
     private Iterator < SolrDocument > iterator  = null ;
+    private List<FacetField> facetFields        = null ;
     // we have been prepared the next value
     private ComplexSearchResults nextResult     = null ;
     private int numberOfResults                 = 0    ;
@@ -36,12 +39,25 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
         }
     }
 
+    public ComplexResultIterator ( SolrDocumentList results, List<FacetField> facets ) {
+        this(results);
+        this.facetFields = facets;
+    }
 
     /*********************************/
     /*      Getters and Setters      */
     /*********************************/
     public Iterator < SolrDocument > getIterator ( ) { return iterator ; }
     public int getNumberOfResults ( ) { return numberOfResults ; }
+    public List<FacetField> getFacetFields() { return facetFields; }
+    public FacetField getFacetField( String facetFieldName ) {
+        if ( this.facetFields != null && facetFieldName != null ) {
+            for (FacetField f : this.facetFields ) {
+                if ( f.getName() .equals( facetFieldName ) ) return f;
+            }
+        }
+        return null;
+    }
 
     /*******************************/
     /*      Protected Methods      */

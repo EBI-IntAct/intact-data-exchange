@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
 
+import java.util.Collections;
+
 
 /**
  * Complex Solr Server that wraps a solrServer and allow to search
@@ -279,7 +281,7 @@ public class ComplexSolrSearcher {
     /**************************************/
     /*      Protected Search Methods      */
     /**************************************/
-    public ComplexResultIterator search ( SolrQuery solrQuery )
+    protected ComplexResultIterator search ( SolrQuery solrQuery )
         throws SolrServerException {
 
         // Set default fields to search
@@ -298,7 +300,10 @@ public class ComplexSolrSearcher {
 
         // Send the query to the Solr Server and return the answer
         QueryResponse solrResponse = solrServer.query ( solrQuery ) ;
-        return solrResponse != null ? new ComplexResultIterator ( solrResponse.getResults ( ) ) : null ;
+        if ( solrResponse != null && solrResponse.getFacetFields().equals(Collections.EMPTY_LIST) ) {
+            return new ComplexResultIterator ( solrResponse.getResults ( ) ) ;
+        }
+        return solrResponse != null ? new ComplexResultIterator ( solrResponse.getResults ( ), solrResponse.getFacetFields() ) : null ;
     }
 
 
@@ -360,6 +365,41 @@ public class ComplexSolrSearcher {
 
         return search ( solrQuery ) ;
     }
+
+
+    public ComplexResultIterator searchWithFacets ( String query,
+                                                    Integer firstResult,
+                                                    Integer maxResults,
+                                                    String queryFilter,
+                                                    String facet) throws SolrServerException {
+
+        return searchWithFacets(query,
+                firstResult,
+                maxResults,
+                queryFilter,
+                facet,
+                null,
+                null) ;
+    }
+
+    public ComplexResultIterator searchWithFacets ( String query,
+                                                    Integer firstResult,
+                                                    Integer maxResults,
+                                                    String queryFilter,
+                                                    String facet,
+                                                    Integer firstFacet,
+                                                    Integer maxFacet ) throws SolrServerException {
+
+        return searchWithFacets(query,
+                firstResult,
+                maxResults,
+                queryFilter != null ? new String[]{queryFilter} : null,
+                facet != null ? new String[]{facet} : null,
+                firstFacet,
+                maxFacet);
+
+    }
+
 
     public ComplexResultIterator searchWithFacets ( String query,
                                                    Integer firstResult,

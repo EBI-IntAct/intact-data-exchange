@@ -74,9 +74,9 @@ public class ComplexSolrConverter {
             if (alias.getName() != null){
                 if (alias.getCvAliasType() != null){
                     CvAliasType type = alias.getCvAliasType();
-                    solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, type.getShortLabel() ) ;
+//                    solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, type.getShortLabel() ) ;
                     solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, alias.getName() ) ;
-                    solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, type.getShortLabel()+":"+alias.getName()) ;
+//                    solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, type.getShortLabel()+":"+alias.getName()) ;
                     if (firstRecommended == null && COMPLEX_RECOMMENDED_NAME_MI.equals(type.getIdentifier())){
                         firstRecommended = alias.getName();
                     }
