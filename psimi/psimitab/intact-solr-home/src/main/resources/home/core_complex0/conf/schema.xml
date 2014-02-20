@@ -80,11 +80,11 @@
         <field name="complex_AC"                type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
         <field name="description"               type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
         <field name="organism_name"             type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
-        <field name="udate" 	                type="int"  	indexed="true"  stored="false"  multiValued="false" default="0"/>
+        <field name="udate" 	                type="int"  	    indexed="true"  stored="false"  multiValued="false" default="0"/>
         <field name="param" 		            type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
         <!-- interactor information -->
         <field name="id"                        type="text"         indexed="true"  stored="false"  multiValued="true"/>
-        <field name="alias"                     type="textAlias"    indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
+        <field name="alias"                     type="text"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
         <field name="ptype"                     type="text"         indexed="true"  stored="false"  multivalued="true"/>
         <field name="ptype_f"                   type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
         <field name="ptype_e"                   type="text"         indexed="true"  stored="false"  multivalued="true"/>
@@ -107,8 +107,8 @@
         <field name="pathway_xref"              type="text"         indexed="true"  stored="false"  multiValued="true"/>
         <field name="eco_xref"                  type="text"         indexed="true"  stored="false"  multiValued="true"/>
         -->
-        <field name="pubid"            type="text"         indexed="true"  stored="false"  multiValued="true"/>
-        <field name="identifier" 	type="text" default="" indexed="true"  stored="false" multiValued="true"/>
+        <field name="pubid"                     type="text"         indexed="true"  stored="false"  multiValued="true"/>
+        <field name="identifier" 	            type="text"         indexed="true"  stored="false"  multiValued="true" default=""/>
     </fields>
 
     <copyField source="id" 		    dest="identifier"/>
