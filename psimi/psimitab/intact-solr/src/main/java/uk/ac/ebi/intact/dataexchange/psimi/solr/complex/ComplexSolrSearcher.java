@@ -281,7 +281,7 @@ public class ComplexSolrSearcher {
     /**************************************/
     /*      Protected Search Methods      */
     /**************************************/
-    protected ComplexResultIterator search ( SolrQuery solrQuery )
+    protected QueryResponse search ( SolrQuery solrQuery )
         throws SolrServerException {
 
         // Set default fields to search
@@ -299,11 +299,7 @@ public class ComplexSolrSearcher {
         //solrQuery = checkNegativeFilter ( solrQuery ) ;
 
         // Send the query to the Solr Server and return the answer
-        QueryResponse solrResponse = solrServer.query ( solrQuery ) ;
-        if ( solrResponse != null && solrResponse.getFacetFields().equals(Collections.EMPTY_LIST) ) {
-            return new ComplexResultIterator ( solrResponse.getResults ( ) ) ;
-        }
-        return solrResponse != null ? new ComplexResultIterator ( solrResponse.getResults ( ), solrResponse.getFacetFields() ) : null ;
+        return solrServer.query ( solrQuery ) ;
     }
 
 
@@ -363,7 +359,9 @@ public class ComplexSolrSearcher {
         // Set query using the query parameter
         solrQuery.setQuery ( query ) ;
 
-        return search ( solrQuery ) ;
+        QueryResponse response = search ( solrQuery );
+
+        return response != null ? new ComplexResultIterator( response.getResults() ) : null ;
     }
 
 
@@ -444,7 +442,10 @@ public class ComplexSolrSearcher {
         // Set query using the query parameter
         solrQuery.setQuery ( query ) ;
 
-        return search ( solrQuery ) ;
+        QueryResponse response = search ( solrQuery ) ;
+        if ( response != null && response.getFacetFields() != null )
+            return new ComplexResultIterator( response.getResults(), response.getFacetFields() );
+        return null;
     }
 
 }
