@@ -93,7 +93,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         // enrich normal cv term
         enrichCvTerm(ComplexFieldNames.INTERACTOR_TYPE, ComplexFieldNames.INTERACTOR_TYPE_F, cvDagObject, solrDocument);
         // add parents to interaction_type_ontology
-        enrichCvTermParents(ComplexFieldNames.INTERACTOR_TYPE, ComplexFieldNames.INTERACTOR_TYPE_F, cvDagObject, solrDocument);
+        enrichCvTermParents(ComplexFieldNames.INTERACTOR_TYPE, null, cvDagObject, solrDocument);
     }
 
     protected void enrichCvTermParents(String fieldName, String facetName, CvDagObject cvDagObject, SolrInputDocument solrDocument) {
@@ -112,7 +112,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         // enrich normal cv term
         enrichCvTerm(ComplexFieldNames.COMPLEX_TYPE, ComplexFieldNames.COMPLEX_TYPE_F, cvDagObject, solrDocument);
         // add parents to interaction_type_ontology
-        enrichCvTermParents(ComplexFieldNames.COMPLEX_TYPE, ComplexFieldNames.COMPLEX_TYPE_F, cvDagObject, solrDocument);
+        enrichCvTermParents(ComplexFieldNames.COMPLEX_TYPE, null, cvDagObject, solrDocument);
 
     }
 
@@ -122,7 +122,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         // enrich normal cv term
         enrichCvTerm(ComplexFieldNames.BIOROLE, ComplexFieldNames.BIOROLE_F, cvDagObject, solrDocument);
         // add parents to interaction_type_ontology
-        enrichCvTermParents(ComplexFieldNames.BIOROLE, ComplexFieldNames.BIOROLE_F, cvDagObject, solrDocument);
+        enrichCvTermParents(ComplexFieldNames.BIOROLE, null, cvDagObject, solrDocument);
     }
 
     public void enrichFeatureType(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
@@ -131,7 +131,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         // enrich normal cv term
         enrichCvTerm(ComplexFieldNames.FEATURES, ComplexFieldNames.FEATURES_F, cvDagObject, solrDocument);
         // add parents to interaction_type_ontology
-        enrichCvTermParents(ComplexFieldNames.FEATURES, ComplexFieldNames.FEATURES_F, cvDagObject, solrDocument);
+        enrichCvTermParents(ComplexFieldNames.FEATURES, null, cvDagObject, solrDocument);
     }
 
     public void enrichInteractionType(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
@@ -140,7 +140,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         // enrich normal cv term
         enrichCvTerm(ComplexFieldNames.INTERACTION_TYPE, ComplexFieldNames.INTERACTION_TYPE_F, cvDagObject, solrDocument);
         // add parents to interaction_type_ontology
-        enrichCvTermParents(ComplexFieldNames.INTERACTION_TYPE, ComplexFieldNames.INTERACTION_TYPE_F, cvDagObject, solrDocument);
+        enrichCvTermParents(ComplexFieldNames.INTERACTION_TYPE, null, cvDagObject, solrDocument);
     }
 
     // is for enrich complex_organism* fields and return a SolrDocument
@@ -159,7 +159,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
             solrDocument.addField(ComplexFieldNames.ORGANISM_NAME, ontologyTerm.getName()+"; "+ontologyTerm.getId());
             // add parents to complex_organism_ontology
             for ( OntologyTerm parent : ontologyTerm.getAllParentsToRoot ( true ) ) {
-                enrichOrganism(ComplexFieldNames.COMPLEX_ORGANISM, ComplexFieldNames.COMPLEX_ORGANISM_F, solrDocument, parent);
+                enrichOrganism(ComplexFieldNames.COMPLEX_ORGANISM, null, solrDocument, parent);
             }
         }
     }
@@ -231,7 +231,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
                                                 if (db != null && pubid != null){
                                                     solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, db ) ;
                                                     solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, pubid ) ;
-                                                    solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, db+":"+pubid) ;
+                                                    solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, db + ":" + pubid ) ;
                                                 }
                                             }
                                         }
