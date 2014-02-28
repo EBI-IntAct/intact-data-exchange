@@ -391,8 +391,8 @@ public class ComplexSolrSearcher {
         return searchWithFacets(query,
                 firstResult,
                 maxResults,
-                queryFilter != null ? new String[]{queryFilter} : null,
-                facet != null ? new String[]{facet} : null,
+                queryFilter != null ? queryFilter.split(",") : null,
+                facet != null ? facet.split(",") : null,
                 firstFacet,
                 maxFacet);
 
@@ -443,8 +443,9 @@ public class ComplexSolrSearcher {
         solrQuery.setQuery ( query ) ;
 
         QueryResponse response = search ( solrQuery ) ;
-        if ( response != null && response.getFacetFields() != null )
+        if ( response != null && response.getFacetFields() != null ) {
             return new ComplexResultIterator( response.getResults(), response.getFacetFields() );
+        }
         return null;
     }
 

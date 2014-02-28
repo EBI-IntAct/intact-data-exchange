@@ -4,9 +4,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class is for manage the complex results of a search
@@ -19,11 +17,11 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
     /********************************/
     /*      Private attributes      */
     /********************************/
-    private Iterator < SolrDocument > iterator  = null ;
-    private List<FacetField> facetFields        = null ;
+    private Iterator < SolrDocument > iterator          = null ;
+    private Map<String,List<FacetField.Count>> facetFields    = null ;
     // we have been prepared the next value
-    private ComplexSearchResults nextResult     = null ;
-    private int numberOfResults                 = 0    ;
+    private ComplexSearchResults nextResult             = null ;
+    private int numberOfResults                         = 0    ;
 
     /*************************/
     /*      Constructor      */
@@ -41,7 +39,10 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
 
     public ComplexResultIterator ( SolrDocumentList results, List<FacetField> facets ) {
         this(results);
-        this.facetFields = facets;
+        this.facetFields = new HashMap<String, List<FacetField.Count>>();
+        for ( FacetField f : facets ) {
+            this.facetFields.put(f.getName(), f.getValues());
+        }
     }
 
     /*********************************/
@@ -49,12 +50,10 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
     /*********************************/
     public Iterator < SolrDocument > getIterator ( ) { return iterator ; }
     public int getNumberOfResults ( ) { return numberOfResults ; }
-    public List<FacetField> getFacetFields() { return facetFields; }
-    public FacetField getFacetField( String facetFieldName ) {
+    public Map<String,List<FacetField.Count>> getFacetFields() { return facetFields; }
+    public List<FacetField.Count> getFacetField( String facetFieldName ) {
         if ( this.facetFields != null && facetFieldName != null ) {
-            for (FacetField f : this.facetFields ) {
-                if ( f.getName() .equals( facetFieldName ) ) return f;
-            }
+            return this.facetFields.get(facetFieldName);
         }
         return null;
     }
