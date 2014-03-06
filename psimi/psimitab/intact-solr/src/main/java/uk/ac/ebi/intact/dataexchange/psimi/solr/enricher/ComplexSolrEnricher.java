@@ -175,7 +175,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         solrDocument.addField ( fieldName, ontologyTerm.getId() ) ;
         // facet field
         if (facetField != null){
-            solrDocument.addField(facetField, ontologyTerm.getName()+"("+ontologyTerm.getId()+")");
+            solrDocument.addField(facetField, ontologyTerm.getName());
         }
     }
 
