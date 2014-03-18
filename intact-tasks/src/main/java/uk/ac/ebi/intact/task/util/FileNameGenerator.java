@@ -15,6 +15,8 @@ public class FileNameGenerator {
     private String newCharacter = "_";
     private String charactersToReplace = "\\/|\\.|;|,| |\\)|\\(|\\\n|\\\t";
 
+    private String characterToTruncate = "(";
+
     /**
      * separator for the entry name
      */
@@ -46,6 +48,16 @@ public class FileNameGenerator {
     }
 
     public String replaceBadCharactersFor(String name){
+        String newPublication = name.trim().replaceAll(charactersToReplace, newCharacter);
+
+        return newPublication;
+    }
+
+    public String truncateToFirstBadCharacter(String name){
+        StringBuffer buffer = new StringBuffer();
+        for (char c : name.toCharArray()){
+
+        }
         String newPublication = name.trim().replaceAll(charactersToReplace, newCharacter);
 
         return newPublication;
@@ -87,6 +99,27 @@ public class FileNameGenerator {
         return buffer.toString();
     }
 
+    public String createSpeciesName(String name, Integer chunk, boolean isNegative){
+        StringBuffer buffer = new StringBuffer();
+
+        String truncatedName = name;
+        if (name.contains(characterToTruncate)){
+            truncatedName = name.substring(0, name.indexOf(characterToTruncate));
+        }
+
+        buffer.append(replaceBadCharactersFor(truncatedName));
+        if (chunk != null){
+            buffer.append(separator);
+            buffer.append(decimalFormat.format(chunk));
+        }
+        if (isNegative && negativeTag != null){
+            buffer.append(separator);
+            buffer.append(negativeTag);
+        }
+
+        return buffer.toString();
+    }
+
     public String getSeparator() {
         return separator;
     }
@@ -101,5 +134,13 @@ public class FileNameGenerator {
 
     public void setNegativeTag(String negativeTag) {
         this.negativeTag = negativeTag;
+    }
+
+    public String getCharacterToTruncate() {
+        return characterToTruncate;
+    }
+
+    public void setCharacterToTruncate(String characterToTruncate) {
+        this.characterToTruncate = characterToTruncate;
     }
 }
