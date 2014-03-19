@@ -76,13 +76,13 @@ public class ComplexResultIteratorTest {
         ComplexSearchResults complexSearchResults = this.complexResultIterator.next ( ) ;
         Assert.assertEquals ( "Test complex_ac, first", this.complexResultIterator.getFieldValues ( solrDocument, ComplexFieldNames.COMPLEX_AC ), complexSearchResults.getComplexAC ( ) ) ;
         Assert.assertEquals ( "Test complex_name, first", this.complexResultIterator.getFieldValues ( solrDocument, ComplexFieldNames.COMPLEX_NAME ), complexSearchResults.getComplexName ( ) ) ;
-        Assert.assertEquals ( "Test description, first", this.complexResultIterator.getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION ), complexSearchResults.getCuratedComplex ( ) ) ;
+        Assert.assertEquals ( "Test description, first", this.complexResultIterator.getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION ), complexSearchResults.getDescription ( ) ) ;
         Assert.assertEquals ( "Test organism_name, first", this.complexResultIterator.getFieldValues ( solrDocument, ComplexFieldNames.ORGANISM_NAME ), complexSearchResults.getOrganismName ( ) ) ;
         solrDocument = iterator.next ( ) ;
         complexSearchResults = this.complexResultIterator.next ( ) ;
         Assert.assertEquals ( "Test complex_ac, second", this.complexResultIterator.getFieldValues ( solrDocument, ComplexFieldNames.COMPLEX_AC ), complexSearchResults.getComplexAC ( ) ) ;
         Assert.assertEquals ( "Test complex_name, second", this.complexResultIterator.getFieldValues ( solrDocument, ComplexFieldNames.COMPLEX_NAME ), complexSearchResults.getComplexName ( ) ) ;
-        Assert.assertEquals ( "Test description, second", this.complexResultIterator.getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION ), complexSearchResults.getCuratedComplex ( ) ) ;
+        Assert.assertEquals ( "Test description, second", this.complexResultIterator.getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION ), complexSearchResults.getDescription ( ) ) ;
         Assert.assertEquals ( "Test organism_name, second", this.complexResultIterator.getFieldValues ( solrDocument, ComplexFieldNames.ORGANISM_NAME ), complexSearchResults.getOrganismName ( ) ) ;
 
         Assert.assertNull ( "Test what happens when it does not have next", this.complexResultIterator.next ( ) ) ;

@@ -361,7 +361,12 @@ public class ComplexSolrSearcher {
 
         QueryResponse response = search ( solrQuery );
 
-        return response != null ? new ComplexResultIterator( response.getResults() ) : null ;
+        ComplexResultIterator iterator = null;
+        if ( response != null ) {
+            iterator = new ComplexResultIterator( response.getResults() );
+            iterator.setTotalNumberOfResults(response.getResults().getNumFound());
+        }
+        return iterator ;
     }
 
 
@@ -443,10 +448,12 @@ public class ComplexSolrSearcher {
         solrQuery.setQuery ( query ) ;
 
         QueryResponse response = search ( solrQuery ) ;
+        ComplexResultIterator iterator = null;
         if ( response != null && response.getFacetFields() != null ) {
-            return new ComplexResultIterator( response.getResults(), response.getFacetFields() );
+            iterator = new ComplexResultIterator( response.getResults(), response.getFacetFields() );
+            iterator.setTotalNumberOfResults( response.getResults().getNumFound() );
         }
-        return null;
+        return iterator;
     }
 
 }

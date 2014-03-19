@@ -17,11 +17,12 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
     /********************************/
     /*      Private attributes      */
     /********************************/
-    private Iterator < SolrDocument > iterator          = null ;
-    private Map<String,List<FacetField.Count>> facetFields    = null ;
+    private Iterator < SolrDocument > iterator              = null ;
+    private Map<String,List<FacetField.Count>> facetFields  = null ;
     // we have been prepared the next value
-    private ComplexSearchResults nextResult             = null ;
-    private int numberOfResults                         = 0    ;
+    private ComplexSearchResults nextResult                 = null ;
+    private long numberOfResults                            = 0L   ;
+    private long totalNumberOfResults                       = 0L   ;
 
     /*************************/
     /*      Constructor      */
@@ -49,7 +50,9 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
     /*      Getters and Setters      */
     /*********************************/
     public Iterator < SolrDocument > getIterator ( ) { return iterator ; }
-    public int getNumberOfResults ( ) { return numberOfResults ; }
+    public long getNumberOfResults ( ) { return numberOfResults ; }
+    public void setTotalNumberOfResults ( long total ) { totalNumberOfResults = total; }
+    public long getTotalNumberOfResults ( ) { return totalNumberOfResults; }
     public Map<String,List<FacetField.Count>> getFacetFields() { return facetFields; }
     public List<FacetField.Count> getFacetField( String facetFieldName ) {
         if ( this.facetFields != null && facetFieldName != null ) {
@@ -94,7 +97,6 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
         // Get field values for this specific fields
         result.setComplexAC      ( getFieldValues ( solrDocument, ComplexFieldNames.COMPLEX_AC    ) ) ;
         result.setComplexName    ( getFieldValues ( solrDocument, ComplexFieldNames.COMPLEX_NAME  ) ) ;
-        result.setCuratedComplex ( getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION   ) ) ;
         result.setOrganismName   ( getFieldValues ( solrDocument, ComplexFieldNames.ORGANISM_NAME ) ) ;
         result.setDescription    ( getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION   ) ) ;
 

@@ -22,7 +22,7 @@ public interface ComplexFieldNames {
     final static String INTERACTION_TYPE_F           = "type_f";
     final static String INTERACTION_TYPE_EXACT       = "type_e";
     final static String COMPLEX_XREF                 = "complex_xref";
-    final static String COMPLEX_XREF_EXACT        = "complex_xref_e";
+    final static String COMPLEX_XREF_EXACT           = "complex_xref_e";
     final static String COMPLEX_AC                   = "complex_AC";
     final static String DESCRIPTION                  = "description";
     final static String ORGANISM_NAME                = "organism_name";
@@ -31,19 +31,19 @@ public interface ComplexFieldNames {
     final static String INTERACTOR_ID                = "id";
     final static String INTERACTOR_ALIAS             = "alias";
     final static String INTERACTOR_TYPE              = "ptype";
-    final static String INTERACTOR_TYPE_F           = "ptype_f";
-    final static String INTERACTOR_TYPE_EXACT = "ptype_e";
+    final static String INTERACTOR_TYPE_F            = "ptype_f";
+    final static String INTERACTOR_TYPE_EXACT        = "ptype_e";
     final static String INTERACTOR_XREF              = "pxref";
-    final static String INTERACTOR_XREF_EXACT = "pxref_e";
+    final static String INTERACTOR_XREF_EXACT        = "pxref_e";
     final static String STC                          = "stc";
     final static String PARAM                        = "param";
 
     final static String BIOROLE                      = "pbiorole";
     final static String BIOROLE_F                    = "pbiorole_f";
-    final static String BIOROLE_EXACT = "pbiorole_e";
+    final static String BIOROLE_EXACT                = "pbiorole_e";
     final static String FEATURES                     = "ftype";
     final static String FEATURES_F                   = "ftype_f";
-    final static String FEATURES_EXACT = "ftype_e";
+    final static String FEATURES_EXACT               = "ftype_e";
     final static String SOURCE                       = "source";
     final static String SOURCE_F                     = "source_f";
 
