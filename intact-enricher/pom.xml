@@ -91,7 +91,7 @@
             <version>2.1</version>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>uk.ac.ebi.uniprot.kraken</groupId>
             <artifactId>uniprotjapi</artifactId>
             <version>LATEST</version>
@@ -109,7 +109,7 @@
                     <artifactId>spring-core</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency> -->
 
     </dependencies>
 
