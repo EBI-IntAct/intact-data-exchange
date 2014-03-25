@@ -41,6 +41,8 @@ public class InteractionEnricherTest extends EnricherBasicTestCase {
     
     @Test
     public void enrich_default() {
+        enricherContext.getConfig().setUpdateInteractionShortLabels(false);
+
         BioSource ecoli = getMockBuilder().createBioSource(83333, "lala");
         Interactor interactor1 = getMockBuilder().createProtein("P45531", "unk1", ecoli);
         Interactor interactor2 = getMockBuilder().createProtein("P45532", "unk2", ecoli);
