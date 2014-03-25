@@ -75,6 +75,7 @@ public class PsiConverterUtilsTest {
 
     @Test
     public void populateNames() {
+        ConverterContext.getInstance().getInteractorConfig().setExcludeInteractorAliases(false);
         IntactMockBuilder mockBuilder = new IntactMockBuilder( );
         Protein protein = mockBuilder.createProteinRandom();
         Assert.assertEquals( 1, protein.getAliases().size() );
