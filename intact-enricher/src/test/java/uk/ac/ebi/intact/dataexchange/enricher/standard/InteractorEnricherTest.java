@@ -75,7 +75,7 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
 
         enricher.enrich( smallMolecule );
 
-        Assert.assertEquals("all-trans-retinoic a",smallMolecule.getShortLabel());
+        Assert.assertEquals("all-trans-retinoic acid",smallMolecule.getShortLabel());
         Assert.assertEquals("standard inchi",smallMolecule.getAnnotations().iterator().next().getCvTopic().getShortLabel());
     }
 

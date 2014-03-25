@@ -79,7 +79,7 @@ public class BioSourceEnricherTest extends EnricherBasicTestCase {
         BioSource organism = getMockBuilder().createBioSource(224325, "Unknown");
         enricher.enrich(organism);
 
-        Assert.assertEquals("strain atcc 49558 / ", organism.getShortLabel());
+        Assert.assertEquals("strain atcc 49558 / vc-16 / dsm 4304 / jcm 9628 / nbrc 100126", organism.getShortLabel());
         Assert.assertEquals("Archaeoglobus fulgidus", organism.getFullName());
     }
 
