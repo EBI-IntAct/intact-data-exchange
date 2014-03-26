@@ -169,7 +169,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         solrDocument.addField ( fieldName, ontologyTerm.getName( ) ) ;
         // synonyms
         for ( OntologyTerm synonym : ontologyTerm.getSynonyms ( ) ) {
-            solrDocument.addField ( fieldName, synonym ) ;
+            solrDocument.addField ( fieldName, synonym.getName() ) ;
         }
         // taxid
         solrDocument.addField ( fieldName, ontologyTerm.getId() ) ;
