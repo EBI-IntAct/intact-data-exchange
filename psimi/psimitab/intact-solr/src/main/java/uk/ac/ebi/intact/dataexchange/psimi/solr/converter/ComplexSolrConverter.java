@@ -8,6 +8,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.ComplexSolrEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
 import uk.ac.ebi.intact.model.*;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 /**
@@ -36,6 +37,10 @@ public class ComplexSolrConverter {
     }
     public ComplexSolrConverter ( SolrServer solrServer ) {
         this ( new OntologySearcher ( solrServer ) ) ;
+    }
+
+    public void setComplexPropertiesFile(String file) throws IOException {
+        this.complexSolrEnricher.setComplexProperties(file);
     }
 
     /******************************************/
@@ -235,6 +240,5 @@ public class ComplexSolrConverter {
         toSolrDocument(complex, doc) ;
         return doc;
     }
-
 
 }
