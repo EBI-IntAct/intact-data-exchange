@@ -255,7 +255,9 @@ public class InteractionConverter extends AbstractAnnotatedObjectConverter<Inter
             refs = interaction.getXrefs();
         }
         for (Xref xref : refs) {
-            if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getIdentifier())) {
+            if (CvDatabase.IMEX_MI_REF.equals(xref.getCvDatabase().getIdentifier())
+                    && xref.getCvXrefQualifier() != null
+                    && CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
                 return xref;
             }
         }
