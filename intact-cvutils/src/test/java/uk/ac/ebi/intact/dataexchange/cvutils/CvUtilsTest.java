@@ -102,8 +102,8 @@ public class CvUtilsTest extends IntactBasicTestCase {
 
         List<CvObject> notInPsiCvs = CvUtils.getCvsInIntactNotInPsi(exclusionList);
        
-        //6 terms are added : hidden, used-in-class, on-hold,correction comment, negative, positive
-        Assert.assertEquals( 6, notInPsiCvs.size() );
+        //6 terms are added : hidden, used-in-class, on-hold,correction comment, negative, positive, postaladdress
+        Assert.assertEquals( 7, notInPsiCvs.size() );
 
         Date cutoffDate = sdf.parse( "2008-06-19" );
 
@@ -111,11 +111,11 @@ public class CvUtilsTest extends IntactBasicTestCase {
         Assert.assertEquals( 2, cvsbefore.size() );
 
         List<CvObject> cvsafter = CvUtils.getCvsAddedAfter( cutoffDate,null );
-        Assert.assertEquals( 42, cvsafter.size() );
+        Assert.assertEquals( 43, cvsafter.size() );
 
         //with exclusion list
         List<CvObject> cvsafterWithExclusion = CvUtils.getCvsAddedAfter( cutoffDate,exclusionList );
-        Assert.assertEquals( 40, cvsafterWithExclusion.size() );
+        Assert.assertEquals( 41, cvsafterWithExclusion.size() );
     
     }
 

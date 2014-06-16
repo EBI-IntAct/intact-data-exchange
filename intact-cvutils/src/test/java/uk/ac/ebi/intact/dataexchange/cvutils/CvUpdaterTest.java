@@ -406,7 +406,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
         final TransactionStatus transactionStatus2 = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
         int totalCvsAfterUpdate = getDaoFactory().getCvObjectDao().countAll();
 
-        Assert.assertEquals(968, totalCvsAfterUpdate);
+        Assert.assertEquals(969, totalCvsAfterUpdate);
         Assert.assertEquals(930, stats.getCreatedCvs().size());
 
         //54-1 obsolete term
@@ -495,7 +495,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     public void institutionWithNonMiAnnotations() throws Exception {
 
         Institution institution = IntactContext.getCurrentInstance().getInstitution();
-        final Annotation annotation = getMockBuilder().createAnnotation("nowhere", "IA:0999", "postaladdress");
+        final Annotation annotation = getMockBuilder().createAnnotation("nowhere", null, "postaladdress");
         institution.addAnnotation(annotation);
         persisterHelper.save(annotation.getCvTopic());
         persisterHelper.save(institution);
