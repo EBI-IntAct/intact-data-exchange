@@ -112,15 +112,15 @@ public class ComplexSolrSearcherTest {
         Integer firstResult = null ;
         // Test null parameter
         this.complexSolrSearcher.setFirstResult ( solrQuery, firstResult ) ;
-        Assert.assertSame ( "Test null parameter", 0, solrQuery.getStart ( ) ) ;
+        Assert.assertTrue ( "Test null parameter", solrQuery.getStart ( ).equals(0) ) ;
         // Test first result set to zero
         firstResult = 0 ;
         this.complexSolrSearcher.setFirstResult ( solrQuery, firstResult ) ;
-        Assert.assertSame ( "Test first result is zero", firstResult, solrQuery.getStart ( ) ) ;
+        Assert.assertTrue ( "Test first result is zero", firstResult.equals(solrQuery.getStart ( )) ) ;
         // Test first result set to twelve
         firstResult = 12 ;
         this.complexSolrSearcher.setFirstResult ( solrQuery, firstResult ) ;
-        Assert.assertSame ( "Test first result is twelve", firstResult, solrQuery.getStart ( ) ) ;
+        Assert.assertTrue ( "Test first result is twelve", firstResult.equals(solrQuery.getStart ( ))) ;
     }
 
     @Test
@@ -134,11 +134,11 @@ public class ComplexSolrSearcherTest {
         // Test max parameter set to zero
         maxParameters = 0 ;
         this.complexSolrSearcher.setMaxResults ( solrQuery, maxParameters ) ;
-        Assert.assertSame ( "Test max parameters is zero", maxParameters, solrQuery.getRows ( ) ) ;
+        Assert.assertTrue ( "Test max parameters is zero", solrQuery.getRows ( ).equals(0) ) ;
         // Test max parameter set to twelve
         maxParameters = 12 ;
         this.complexSolrSearcher.setMaxResults ( solrQuery, maxParameters ) ;
-        Assert.assertSame ( "Test max parameter is twelve", maxParameters, solrQuery.getRows ( ) ) ;
+        Assert.assertTrue ( "Test max parameter is twelve", solrQuery.getRows ( ).equals(12)  ) ;
     }
 
     @Test
