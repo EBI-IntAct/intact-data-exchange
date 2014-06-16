@@ -79,7 +79,7 @@ public class QueryBuilder {
     private final String inferredInteractions = "select distinct(infer.ac) from InteractionImpl as infer join " +
             "infer.experiments as exp join exp.cvInteraction as det where det.identifier = :inferred_author or det.identifier = :inferred_curator";
 
-    private final String isoformsWithDifferentParents = "select iso.ac, x2.primaryid, x1.primaryid from ia_interactor iso, ia_interactor parent, ia_interactor_xref x1, ia_interactor_xref x1_1, ia_interactor_xref x2 " +
+    private final String isoformsWithDifferentParents = "select iso.ac as ac, x2.primaryid as primaryid2, x1.primaryid as primaryid1 from ia_interactor iso, ia_interactor parent, ia_interactor_xref x1, ia_interactor_xref x1_1, ia_interactor_xref x2 " +
             "where iso.ac = x1.parent_ac " +
             "and x1_1.parent_ac = iso.ac " +
             "and parent.ac = x2.parent_ac " +
