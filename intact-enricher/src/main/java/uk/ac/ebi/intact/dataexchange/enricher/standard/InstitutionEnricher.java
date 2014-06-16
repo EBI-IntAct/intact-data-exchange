@@ -72,8 +72,6 @@ public class InstitutionEnricher extends AnnotatedObjectEnricher<Institution>{
     protected void enrichInstitutionFromReference(Institution institutionToEnrich, Institution reference) {
         institutionToEnrich.setShortLabel(reference.getShortLabel());
         institutionToEnrich.setFullName(reference.getFullName());
-        institutionToEnrich.setPostalAddress(reference.getPostalAddress());
-        institutionToEnrich.setUrl(reference.getUrl());
         institutionToEnrich.setXrefs(reference.getXrefs());
         institutionToEnrich.setAliases(reference.getAliases());
         institutionToEnrich.setAnnotations(reference.getAnnotations());

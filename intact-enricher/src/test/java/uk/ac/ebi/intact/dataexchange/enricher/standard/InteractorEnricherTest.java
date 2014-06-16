@@ -104,7 +104,7 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
 
         Assert.assertEquals("imatinib",smallMolecule.getShortLabel());
         Assert.assertEquals( 3, smallMolecule.getAnnotations().size() );
-        assertHasAnnotation( smallMolecule, "smiles string", "CN1CCN(Cc2ccc(cc2)C(=O)Nc3ccc(C)c(Nc4nccc(n4)c5cccnc5)c3)CC1" );
+        assertHasAnnotation( smallMolecule, "smiles string", "CN1CCN(CC1)Cc1ccc(cc1)C(=O)Nc1ccc(C)c(Nc2nccc(n2)-c2cccnc2)c1" );
         assertHasAnnotation( smallMolecule, "inchi key", "KTUFNOKKBVMGRW-UHFFFAOYSA-N" );
         assertHasAnnotation( smallMolecule, "standard inchi", "InChI=1S/C29H31N7O/c1-21-5-10-25(18-27(21)34-29-31-13-11-26(33-29)24-4-3-12-30-19-24)32-28(37)23-8-6-22(7-9-23)20-36-16-14-35(2)15-17-36/h3-13,18-19H,14-17,20H2,1-2H3,(H,32,37)(H,31,33,34)" );
         assertHasAlias( smallMolecule, "iupac name", "4-[(4-methylpiperazin-1-yl)methyl]-N-{4-methyl-3-" +
@@ -145,7 +145,7 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
 
         enricher.enrich( smallMolecule );
 
-        Assert.assertEquals( 5, smallMolecule.getXrefs().size() );
+        Assert.assertEquals( 4, smallMolecule.getXrefs().size() );
         assertHasXref( smallMolecule, "chebi", "CHEBI:45783",  "identity" );
         assertHasXref( smallMolecule, "chebi", "CHEBI:45781",  "secondary-ac" );
         assertHasXref( smallMolecule, "chebi", "CHEBI:305376",  "secondary-ac" );
