@@ -372,6 +372,17 @@ public class PsiMockFactory {
         return dbRef;
     }
 
+    public static DbReference createDbReference(String refType, String refTypeAc, String id, String dbType, String dbAc) {
+        DbReference dbRef = new DbReference(id, dbType);
+        dbRef.setDbAc(dbAc);
+        dbRef.setRefType(refType);
+        dbRef.setRefTypeAc(refTypeAc);
+        dbRef.setSecondary(nextString("secondary"));
+        dbRef.setVersion(nextString("version"));
+
+        return dbRef;
+    }
+
     public static DbReference createDbReferencePsiMi(String psiMiRef) {
         DbReference ref = createDbReference(CvXrefQualifier.IDENTITY, CvXrefQualifier.IDENTITY_MI_REF, CvDatabase.PSI_MI, CvDatabase.PSI_MI_MI_REF);
         ref.setId(psiMiRef);

@@ -108,7 +108,8 @@ public class InteractionConverterTest extends AbstractConverterTest {
     @Test
     public void psiToIntact_imexXref_redundant() throws Exception {
         Interaction psiInteraction = PsiMockFactory.createMockInteraction();
-        psiInteraction.getXref().getSecondaryRef().add(PsiMockFactory.createDbReferenceDatabaseOnly("IM-0000", CvDatabase.IMEX_MI_REF, CvDatabase.IMEX));
+        psiInteraction.getXref().getSecondaryRef().add(PsiMockFactory.createDbReference(CvXrefQualifier.IMEX_PRIMARY, CvXrefQualifier.IMEX_PRIMARY_MI_REF,
+                "IM-0000", CvDatabase.IMEX, CvDatabase.IMEX_MI_REF));
         psiInteraction.setImexId("IM-0000");
 
         InteractionConverter converter = new InteractionConverter(new Institution("testInstitution"));

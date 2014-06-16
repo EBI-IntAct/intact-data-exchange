@@ -48,16 +48,6 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
         }
         IntactConverterUtils.populateAnnotations(psiObject, institution, institution, annotationConverter);
 
-        for (Attribute attribute : psiObject.getAttributes()) {
-            String attributeName = attribute.getName();
-
-            if (attributeName.equals("postalAddress")) {
-                institution.setPostalAddress(attribute.getValue());
-            } else if (attributeName.equals("url")) {
-                institution.setUrl(attribute.getValue());
-            }
-        }
-
         setInstitution(institution);
 
         psiEndConversion(psiObject);
@@ -112,16 +102,6 @@ public class InstitutionConverter extends AbstractAnnotatedObjectConverter<Insti
         }
 
         source.setReleaseDate(new Date());
-
-        // add postal adress and url if possible
-        if (intactObject.getPostalAddress() != null){
-            Attribute att = new Attribute("postalAddress", intactObject.getPostalAddress());
-            source.getAttributes().add(att);
-        }
-        if (intactObject.getUrl() != null){
-            Attribute att = new Attribute("url", intactObject.getUrl());
-            source.getAttributes().add(att);
-        }
 
         intactEndConversion(intactObject);
         return source;
