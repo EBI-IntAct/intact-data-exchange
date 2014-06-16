@@ -35,7 +35,6 @@
         <module>psimi</module>
         <module>intact-enricher</module>
         <module>uniprot-export</module>
-        <module>ebeye</module>
         <module>pdbe</module>
         <module>intact-tasks</module>
         <module>imex</module>
