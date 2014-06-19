@@ -108,7 +108,16 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
 
         experiment.setOwner(getInstitution());
 
-        IntactConverterUtils.populateNames(psiObject.getNames(), experiment, this.aliasConverter);
+        String shortLabel = IntactConverterUtils.getShortLabelFromNames(psiObject.getNames());
+        if (shortLabel == null) {
+            shortLabel = IntactConverterUtils.createExperimentTempShortLabel();
+        }
+        experiment.setShortLabel(shortLabel);
+
+        if (psiObject.getNames() != null) {
+            experiment.setFullName(psiObject.getNames().getFullName());
+        }
+
         IntactConverterUtils.populateXref(psiObject.getXref(), experiment, this.xrefConverter);
         IntactConverterUtils.populateAnnotations(psiObject, experiment, getInstitution(), this.annotationConverter);
 
