@@ -142,7 +142,29 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.bridges</groupId>
             <artifactId>intact-uniprot</artifactId>
-            <version>${bridges.version}</version>
+            <version>2.1.10</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.bridges</groupId>
+            <artifactId>intact-taxonomy</artifactId>
+            <version>2.1.10</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.bridges</groupId>
+            <artifactId>intact-citexplore</artifactId>
+            <version>2.1.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -182,7 +204,7 @@
             <version>${spring.version}</version>
         </dependency>
 
-        <!--<dependency>
+        <dependency>
             <groupId>uk.ac.ebi.uniprot.kraken</groupId>
             <artifactId>uniprotjapi</artifactId>
             <version>LATEST</version>
@@ -192,7 +214,7 @@
                     <artifactId>spring-context</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>-->
+        </dependency>
 
     </dependencies>
 
