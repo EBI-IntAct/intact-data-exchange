@@ -21,9 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.model.BioSource;
-import uk.ac.ebi.intact.model.BioSourceXref;
 import uk.ac.ebi.intact.model.CvCellType;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
  * TODO comment this
@@ -61,11 +59,7 @@ public class BioSourceEnricherTest extends EnricherBasicTestCase {
 
         enricher.enrich(unculturedBacterium);
 
-        Assert.assertEquals(1, unculturedBacterium.getXrefs().size());
-
-        final BioSourceXref newtXref = unculturedBacterium.getXrefs().iterator().next();
-        Assert.assertEquals(String.valueOf(77133), newtXref.getPrimaryId());
-        Assert.assertEquals("MI:0942", CvObjectUtils.getPsiMiIdentityXref(newtXref.getCvDatabase()).getPrimaryId());
+        Assert.assertEquals(0, unculturedBacterium.getXrefs().size());
     }
 
     @Test (expected = EnricherException.class)

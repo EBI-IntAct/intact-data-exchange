@@ -21,13 +21,7 @@ import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.BioSourceFetcher;
 import uk.ac.ebi.intact.model.BioSource;
-import uk.ac.ebi.intact.model.BioSourceXref;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.CvObjectBuilder;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.XrefUtils;
 
 /**
  * TODO comment this
@@ -124,30 +118,7 @@ public class BioSourceEnricher extends AnnotatedObjectEnricher<BioSource> {
             objectToEnrich.setFullName(fullName);
         }
 
-        // check if it has a newt xref
-        checkUniprotTaxonomyXref(objectToEnrich);
-
         super.enrich(objectToEnrich);
-    }
-
-    protected void checkUniprotTaxonomyXref(BioSource organism) {
-        boolean hasUniprotTaxonomy = false;
-
-        for (BioSourceXref xref : organism.getXrefs()) {
-            if ("MI:0942".equals(xref.getCvDatabase().getIdentifier())) {
-                hasUniprotTaxonomy = true;
-                break;
-            }
-        }
-
-        if (!hasUniprotTaxonomy) {
-            CvObjectBuilder cvObjectBuilder = new CvObjectBuilder();
-            CvXrefQualifier identityQual = cvObjectBuilder.createIdentityCvXrefQualifier(organism.getOwner());
-            CvDatabase newtDb = CvObjectUtils.createCvObject(organism.getOwner(), CvDatabase.class, "MI:0942", "uniprot taxonomy");
-
-            BioSourceXref newtXref = XrefUtils.createIdentityXref(organism, organism.getTaxId(), identityQual, newtDb);
-            organism.getXrefs().add(newtXref);
-        }
     }
 
 }
