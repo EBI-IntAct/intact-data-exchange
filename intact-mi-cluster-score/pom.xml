@@ -342,7 +342,7 @@
         <dependency>
             <groupId>uk.ac.ebi.enfin.mi.cluster</groupId>
             <artifactId>micluster</artifactId>
-            <version>1.7.4.5-SNAPSHOT</version> <!--1.7.3-->
+            <version>1.7.4.7-SNAPSHOT</version> <!--1.7.3-->
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
