@@ -1,12 +1,9 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -16,8 +13,6 @@ import org.apache.solr.common.params.FacetParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.SolrLogger;
-
-import java.util.Collections;
 
 
 /**
@@ -81,18 +76,21 @@ public class ComplexSolrSearcher {
     }
 
     public ComplexSolrSearcher ( String solrUrl, int maxConnHost,
-                                 int maxConnTotal, int maxRetries,
-                                 boolean compresion ) {
-        SchemeRegistry schemeRegistry = new SchemeRegistry( ) ;
-        schemeRegistry.register ( new Scheme( "http",   80, PlainSocketFactory.getSocketFactory() ) ) ;
-        schemeRegistry.register ( new Scheme ( "https", 443, org.apache.http.conn.ssl.SSLSocketFactory.getSocketFactory() ) ) ;
-        PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
+                                 int maxConnTotal, int connectionTimeOut,
+                                 int socketTimeOut ) {
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setMaxTotal(maxConnTotal);
         cm.setDefaultMaxPerRoute(maxConnHost);
-        HttpClient httpClient = new DefaultHttpClient(cm);
-        HttpSolrServer server = new HttpSolrServer(solrUrl, httpClient);
-        server.setMaxRetries(maxRetries);
-        server.setAllowCompression(compresion);
+
+        RequestConfig.Builder requestBuilder = RequestConfig.custom();
+        requestBuilder = requestBuilder.setConnectTimeout(connectionTimeOut);
+        requestBuilder = requestBuilder.setSocketTimeout(socketTimeOut);
+
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        builder.setDefaultRequestConfig(requestBuilder.build());
+        builder.setConnectionManager(cm);
+
+        HttpSolrServer server = new HttpSolrServer(solrUrl, builder.build());
         this.solrServer = server;
 
         initFunction();

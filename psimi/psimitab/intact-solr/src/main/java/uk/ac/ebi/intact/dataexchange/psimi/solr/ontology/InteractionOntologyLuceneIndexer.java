@@ -3,12 +3,9 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.ontology;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -65,24 +62,23 @@ public class InteractionOntologyLuceneIndexer {
     }
 
     private HttpClient createHttpClient() {
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory
-                .getSocketFactory()));
-        schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory
-                .getSocketFactory()));
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        cm.setMaxTotal(128);
+        cm.setDefaultMaxPerRoute(32);
 
-        PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
-        cm.setMaxTotal(138);
-        cm.setDefaultMaxPerRoute(24);
+        RequestConfig.Builder requestBuilder = RequestConfig.custom();
+        requestBuilder = requestBuilder.setConnectTimeout(20000);
+        requestBuilder = requestBuilder.setSocketTimeout(20000);
 
-        HttpClient httpClient = new DefaultHttpClient(cm);
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        builder.setDefaultRequestConfig(requestBuilder.build());
+        builder.setConnectionManager(cm);
 
-        return httpClient;
+        return builder.build();
     }
 
     private HttpSolrServer createSolrServer(String solrUrl) {
         HttpSolrServer ontologiesSolrServer = new HttpSolrServer(solrUrl, createHttpClient());
-        ontologiesSolrServer.setAllowCompression(true);
 
         return ontologiesSolrServer;
     }
