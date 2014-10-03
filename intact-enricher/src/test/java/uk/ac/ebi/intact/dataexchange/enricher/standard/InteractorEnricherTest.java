@@ -104,7 +104,7 @@ public class InteractorEnricherTest extends EnricherBasicTestCase {
 
         Assert.assertEquals("imatinib",smallMolecule.getShortLabel());
         Assert.assertEquals( 3, smallMolecule.getAnnotations().size() );
-        assertHasAnnotation( smallMolecule, "smiles string", "CN1CCN(CC1)Cc1ccc(cc1)C(=O)Nc1ccc(C)c(Nc2nccc(n2)-c2cccnc2)c1" );
+        assertHasAnnotation( smallMolecule, "smiles string", "CN1CCN(Cc2ccc(cc2)C(=O)Nc2ccc(C)c(Nc3nccc(n3)-c3cccnc3)c2)CC1" );
         assertHasAnnotation( smallMolecule, "inchi key", "KTUFNOKKBVMGRW-UHFFFAOYSA-N" );
         assertHasAnnotation( smallMolecule, "standard inchi", "InChI=1S/C29H31N7O/c1-21-5-10-25(18-27(21)34-29-31-13-11-26(33-29)24-4-3-12-30-19-24)32-28(37)23-8-6-22(7-9-23)20-36-16-14-35(2)15-17-36/h3-13,18-19H,14-17,20H2,1-2H3,(H,32,37)(H,31,33,34)" );
         assertHasAlias( smallMolecule, "iupac name", "4-[(4-methylpiperazin-1-yl)methyl]-N-{4-methyl-3-" +
