@@ -2,7 +2,6 @@ package uk.ac.ebi.intact.task.mitab.clustering;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -39,7 +38,6 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Ignore
     public void process_binaryInteraction_one_existing_mi_score() throws Exception, IOException {
 
         PsimiTabReader mitabReader = new PsimiTabReader();
@@ -70,7 +68,6 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Ignore
     public void process_binaryInteraction_several_existing_scores() throws Exception, IOException {
 
         PsimiTabReader mitabReader = new PsimiTabReader();
@@ -97,7 +94,6 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Ignore
     public void process_binaryInteraction_no_mi_score() throws Exception, IOException {
 
         PsimiTabReader mitabReader = new PsimiTabReader();

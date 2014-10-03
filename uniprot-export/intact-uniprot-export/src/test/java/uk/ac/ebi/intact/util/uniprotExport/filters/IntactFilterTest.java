@@ -1,7 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.filters;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
@@ -28,7 +27,6 @@ public class IntactFilterTest extends UniprotExportBase{
 
     @Test
     @DirtiesContext
-    @Ignore
     public void test_simulation() throws UniprotExportException, IntactClonerException {
         FilterConfig config = FilterContext.getInstance().getConfig();
         // accept negative interactions

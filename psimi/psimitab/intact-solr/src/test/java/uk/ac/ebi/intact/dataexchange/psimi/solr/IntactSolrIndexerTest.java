@@ -64,7 +64,6 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void indexMitabFromClasspath4() throws Exception {
         getIndexer().indexMitabFromClasspath("/mitab_samples/intact200.txt", true);
         assertCount(1, "EBI-1380413");
@@ -96,7 +95,6 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
-    @Ignore
     public void toSolrDocument_goExpansion() throws Exception {
         getIndexer().indexOntologies(new OntologyMapping[] {
                 new OntologyMapping("go", IntactSolrIndexerTest.class.getResource("/META-INF/goslim_generic.obo"))
