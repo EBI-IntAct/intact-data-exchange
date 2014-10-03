@@ -95,6 +95,7 @@ public class IntactSolrIndexerTest extends AbstractSolrTestCase {
     }
 
     @Test
+    @Ignore
     public void toSolrDocument_goExpansion() throws Exception {
         getIndexer().indexOntologies(new OntologyMapping[] {
                 new OntologyMapping("go", IntactSolrIndexerTest.class.getResource("/META-INF/goslim_generic.obo"))
