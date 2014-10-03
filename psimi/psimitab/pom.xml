@@ -18,7 +18,7 @@
 
     <properties>
         <currentVersion>${project.version}</currentVersion>
-        <psimi.version>1.8.4</psimi.version>
+        <psimi.version>1.8.5</psimi.version>
     </properties>
 
     <modules>
@@ -34,7 +34,7 @@
             <dependency>
                 <groupId>psidev.psi.mi</groupId>
                 <artifactId>psimitab</artifactId>
-                <version>1.8.5-SNAPSHOT</version>
+                <version>${psimi.version}</version>
             </dependency>
             <dependency>
                 <groupId>psidev.psi.mi</groupId>
