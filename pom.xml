@@ -19,7 +19,7 @@
     <url>http://www.ebi.ac.uk/~intact/devsite/dataexchange</url>
 
     <properties>
-        <core.version>2.6.7-SNAPSHOT</core.version>
+        <core.version>2.6.8-SNAPSHOT</core.version>
         <bridges.version>2.1.12-SNAPSHOT</bridges.version>
         <commons.version>2.1.11-SNAPSHOT</commons.version>
     </properties>
