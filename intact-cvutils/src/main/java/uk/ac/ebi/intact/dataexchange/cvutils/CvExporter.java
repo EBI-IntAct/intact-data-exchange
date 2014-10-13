@@ -389,7 +389,7 @@ public class CvExporter {
                 } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.XREF_VALIDATION_REGEXP ) ) {
                     String annotationText = "\\\""+annotation.getAnnotationText()+"\\\"";
                     oboObj.addPropertyValue(new PropertyValueImpl("xref", CvTopic.XREF_VALIDATION_REGEXP+":"+annotationText));
-                } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.COMMENT ) ) {
+                } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.COMMENT ) && annotation.getAnnotationText() != null ) {
                     oboObj.setComment( removeLineReturns(annotation.getAnnotationText() ));
                 } else if ( cvTopic.getShortLabel().equalsIgnoreCase( CvTopic.OBSOLETE ) ) {
                     oboObj.setObsolete( true );
