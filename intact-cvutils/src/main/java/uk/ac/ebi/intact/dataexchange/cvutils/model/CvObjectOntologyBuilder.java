@@ -398,7 +398,7 @@ public class CvObjectOntologyBuilder {
                     int firstIndex = xref.indexOf( '"' );
                     int lastIndex = xref.lastIndexOf( '"' );
 
-                    String annotationText = xref.substring( firstIndex + 1, lastIndex );
+                    String annotationText = firstIndex > -1 && lastIndex > -1 ? xref.substring( firstIndex + 1, lastIndex ) : xref;
                     Annotation annot = toAnnotation( CvTopic.XREF_VALIDATION_REGEXP, annotationText );
                     if ( annot != null ) {
                         cvObject.addAnnotation( annot );
