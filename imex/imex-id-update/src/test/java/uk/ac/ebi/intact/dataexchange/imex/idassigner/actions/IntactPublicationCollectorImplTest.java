@@ -2,16 +2,30 @@ package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
 import junit.framework.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import psidev.psi.mi.jami.model.Experiment;
+import psidev.psi.mi.jami.model.Publication;
+import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.utils.XrefUtils;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.core.lifecycle.LifecycleManager;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
+import uk.ac.ebi.intact.jami.dao.IntactDao;
+import uk.ac.ebi.intact.jami.model.extension.*;
+import uk.ac.ebi.intact.jami.service.PublicationService;
+import uk.ac.ebi.intact.jami.synchronizer.FinderException;
+import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
+import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.user.User;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
@@ -26,49 +40,40 @@ import java.util.*;
  * @version $Id$
  * @since <pre>10/04/12</pre>
  */
-@ContextConfiguration(locations = {"classpath*:/META-INF/intact.spring.xml",
-        "classpath*:/META-INF/standalone/*-standalone.spring.xml",
-        "classpath*:/META-INF/beansimex-test.spring.xml"})
-public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath*:/META-INF/intact-jami-test.spring.xml",
+        "classpath*:/META-INF/imex-test.spring.xml"})
+public class IntactPublicationCollectorImplTest {
     
     @Autowired
+    @Qualifier("intactPublicationCollector")
     private IntactPublicationCollector publicationCollectorTest;
     
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
-    public void get_publications_Without_Imex_But_With_Interaction_Imex() throws ParseException {
+    public void get_publications_Without_Imex_But_With_Interaction_Imex() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
 
-        TransactionStatus status = getDataContext().beginTransaction();
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-        
         // one publication with imex primary ref
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
-        pubWithImex.addXref(pubXref);
+        pubWithImex.assignImexId("IM-3");
+        pubService.saveOrUpdate(pubWithImex);
         
         // one publication without imex-primary ref but interaction with imex primary ref
-        Publication pubWithoutImex = getMockBuilder().createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(2);
-        exp2.setPublication(pubWithoutImex);
+        IntactPublication pubWithoutImex = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
-        Interaction interWithImex = exp2.getInteractions().iterator().next();
-        interWithImex.getXrefs().clear();
-        InteractorXref intXref = new InteractorXref( pubWithoutImex.getOwner(), imex, "IM-4-1", imexPrimary );
-        interWithImex.addXref(intXref);
-        
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutImex);
-        
-        getDataContext().commitTransaction(status);
+        IntactInteractionEvidence interWithImex = new IntactInteractionEvidence();
+        interWithImex.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        interWithImex.assignImexId("IM-4-1");
+        exp2.addInteractionEvidence(interWithImex);
+
+        pubService.saveOrUpdate(pubWithoutImex);
 
         // reset collections
         publicationCollectorTest.initialise();
@@ -80,38 +85,27 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
-    public void get_publications_Without_Imex_But_With_Experiment_Imex() throws ParseException {
+    public void get_publications_Without_Imex_But_With_Experiment_Imex() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
 
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         // one publication with imex primary ref
-        Publication pubWithImex = getMockBuilder().createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
-        pubWithImex.addXref(pubXref);
+        pubWithImex.assignImexId("IM-3");
+        pubService.saveOrUpdate(pubWithImex);
 
         // one publication without imex-primary ref but interaction with imex primary ref
-        Publication pubWithoutImex = getMockBuilder().createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(2);
-        exp2.setPublication(pubWithoutImex);
+        IntactPublication pubWithoutImex = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
-        ExperimentXref intXref = new ExperimentXref( pubWithoutImex.getOwner(), imex, "IM-4", imexPrimary );
-        exp2.addXref(intXref);
+        exp2.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-4", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
 
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutImex);
-
-        getDataContext().commitTransaction(status);
+        pubService.saveOrUpdate(pubWithoutImex);
 
         // reset collection
         publicationCollectorTest.initialise();
@@ -123,7 +117,6 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_because_too_old() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();
@@ -173,7 +166,6 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Not_Eligible_Imex_because_no_imex_curation_depth() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();
@@ -217,7 +209,6 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_other_institution() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();
@@ -281,7 +272,6 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_Imex_Curation_Level_PPI_peptide() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();
@@ -343,7 +333,6 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_dataset_no_PPI() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();
@@ -399,7 +388,6 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_having_IMEx_Id_And_Not_Imex_Curation_Level() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();
@@ -445,7 +433,6 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
         Assert.assertEquals(pubWithoutImexCuration.getAc(), pubAcs.iterator().next());
     }
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_IMEx_Id_And_No_PPI_Interactions() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();
@@ -495,7 +482,6 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_PPI_Interactions_one_with_NucleicAcid() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();
@@ -539,7 +525,6 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_PPI_Interactions2() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();
@@ -584,7 +569,6 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_Having_IMEx_Id_ToUpdate() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();
@@ -636,7 +620,6 @@ public class IntactPublicationCollectorImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
     public void get_publications_needing_An_Imex_Id() throws ParseException {
         IntactMockBuilder builder = new IntactMockBuilder();

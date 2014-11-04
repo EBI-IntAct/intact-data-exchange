@@ -3,13 +3,22 @@ package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.persistence.dao.DaoFactory;
+import psidev.psi.mi.jami.model.Annotation;
+import psidev.psi.mi.jami.model.Protein;
+import psidev.psi.mi.jami.model.Xref;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.IntactPublicationCollector;
-import uk.ac.ebi.intact.model.*;
-
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
+import uk.ac.ebi.intact.jami.dao.IntactDao;
+import uk.ac.ebi.intact.jami.model.extension.IntactExperiment;
+import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
+import uk.ac.ebi.intact.jami.model.lifecycle.LifeCycleStatus;
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -23,7 +32,8 @@ import java.util.*;
  * @version $Id$
  * @since <pre>02/03/12</pre>
  */
-
+@Service("intactPublicationCollector")
+@Scope( BeanDefinition.SCOPE_PROTOTYPE )
 public class IntactPublicationsCollectorImpl implements IntactPublicationCollector{
 
     private List<String> publicationsHavingImexId;
@@ -50,6 +60,9 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     private final static String MOL_CANCER_JOURNAL = "Mol. Cancer";
     private final static String NAT_IMMUNO_JOURNAL = "Nat. Immunol. (1529-2908)";
     private final static String BIOCREATIVE_DATASET = "BioCreative - Critical Assessment of Information Extraction systems in Biology";
+
+    private final static String DATASET_MI = "MI:0875";
+    private final static String UNIPROT_DR_EXPORT = "uniprot-dr-export";
 
     public IntactPublicationsCollectorImpl(){
     }
@@ -195,20 +208,21 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
      */
     @Deprecated
     private List<Object[]> collectYearAndJournalFromPublicationEligibleImex() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
-
-        String journalDateQuery = "select distinct p.ac, a1.annotationText, a2.annotationText from Publication p left join p.annotations as a1 join p.annotations as a2 " +
-                "where a1.cvTopic.identifier = :journal and a2.cvTopic.identifier = :dateJournal " +
+        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
+        EntityManager manager = intactDao.getEntityManager();
+        String journalDateQuery = "select distinct p.ac, a1.value, a2.value from IntactPublication p left join p.dbAnnotations as a1 " +
+                "join p.dbAnnotations as a2 " +
+                "where a1.topic.identifier = :journal and a2.topic.identifier = :dateJournal " +
                 "and " +
                 "(" +
-                "a1.annotationText = :cell or a1.annotationText = :proteomics or a1.annotationText = :cancer " +
-                "or a1.annotationText = :molSignal or a1.annotationText = :oncogene or a1.annotationText = :molCancer " +
-                "or a1.annotationText = :natImmuno" +
+                "a1.value = :cell or a1.value = :proteomics or a1.value = :cancer " +
+                "or a1.value = :molSignal or a1.value = :oncogene or a1.value = :molCancer " +
+                "or a1.value = :natImmuno" +
                 ")";
 
-        Query query = daoFactory.getEntityManager().createQuery(journalDateQuery);
-        query.setParameter("journal", CvTopic.JOURNAL_MI_REF);
-        query.setParameter("dateJournal", CvTopic.PUBLICATION_YEAR_MI_REF);
+        Query query = manager.createQuery(journalDateQuery);
+        query.setParameter("journal", Annotation.PUBLICATION_JOURNAL_MI);
+        query.setParameter("dateJournal", Annotation.PUBLICATION_YEAR_MI);
         query.setParameter("cell", CELL_JOURNAL);
         query.setParameter("proteomics", PROTEOMICS_JOURNAL);
         query.setParameter("cancer", CANCER_CELL_JOURNAL);
@@ -217,43 +231,41 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("molCancer", MOL_CANCER_JOURNAL);
         query.setParameter("natImmuno", NAT_IMMUNO_JOURNAL);
 
-        List<Object[]> publications = query.getResultList();
-
-        return publications;
+        return query.getResultList();
     }
 
     private List<String> collectPublicationsElligibleForImex(){
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
-
-        String publicationsToAssign = "select distinct p.ac from Publication as p join p.annotations as a" +
-                " where a.cvTopic.identifier = :curation " +
-                "and a.annotationText = :imex " +
+        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
+        EntityManager manager = intactDao.getEntityManager();
+        String publicationsToAssign = "select distinct p.ac from IntactPublication as p join p.dbAnnotations as a" +
+                " where a.topic.identifier = :curation " +
+                "and a.value = :imex " +
                 "and year(p.created) > year(:dateLimit) " +
-                "and ( lower(p.owner.shortLabel) = :intact " +
-                "or lower(p.owner.shortLabel) = :i2d " +
-                "or lower(p.owner.shortLabel) = :innatedb " +
-                "or lower(p.owner.shortLabel) = :molecularConnections " +
-                "or lower(p.owner.shortLabel) = :uniprot " +
-                "or lower(p.owner.shortLabel) = :mbinfo " +
-                "or lower(p.owner.shortLabel) = :mpidb " +
-                "or lower(p.owner.shortLabel) = :mint " +
-                "or lower(p.owner.shortLabel) = :bhf" +
+                "and ( lower(p.source.shortName) = :intact " +
+                "or lower(p.source.shortName) = :i2d " +
+                "or lower(p.source.shortName) = :innatedb " +
+                "or lower(p.source.shortName) = :molecularConnections " +
+                "or lower(p.source.shortName) = :uniprot " +
+                "or lower(p.source.shortName) = :mbinfo " +
+                "or lower(p.source.shortName) = :mpidb " +
+                "or lower(p.source.shortName) = :mint " +
+                "or lower(p.source.shortName) = :bhf" +
                 ") " +
                 "and p.ac not in (" +
-                "select distinct p2.ac from Publication as p2 join p2.xrefs as x where " +
-                "x.cvDatabase.identifier = :imexDatabase " +
-                " and x.cvXrefQualifier.identifier = :imexPrimary " +
+                "select distinct p2.ac from IntactPublication as p2 join p2.dbXrefs as x where " +
+                "x.database.identifier = :imexDatabase " +
+                " and x.qualifier.identifier = :imexPrimary " +
                 ")";
 
         Calendar cal = GregorianCalendar.getInstance();
         cal.set(2005, 12, 31);
 
-        Query query = daoFactory.getEntityManager().createQuery(publicationsToAssign);
+        Query query = manager.createQuery(publicationsToAssign);
         query.setParameter("dateLimit", cal.getTime());
         query.setParameter("curation", "MI:0955");
         query.setParameter("imex", "imex curation");
-        query.setParameter("imexDatabase", CvDatabase.IMEX_MI_REF);
-        query.setParameter("imexPrimary", CvXrefQualifier.IMEX_PRIMARY_MI_REF);
+        query.setParameter("imexDatabase", Xref.IMEX_MI);
+        query.setParameter("imexPrimary", Xref.IMEX_PRIMARY);
         query.setParameter("intact", "intact");
         query.setParameter("i2d", "i2d");
         query.setParameter("innatedb", "innatedb");
@@ -268,28 +280,26 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     private List<String> collectPublicationAcceptedForRelease() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
+        EntityManager manager = intactDao.getEntityManager();
+        String datasetQuery = "select distinct p.ac from IntactPublication p join p.cvStatus as s " +
+                "where s.shortName = :released or s.shortName = :accepted or s.shortName= :readyForRelease";
+        Query query = manager.createQuery(datasetQuery);
+        query.setParameter("released", LifeCycleStatus.RELEASED.toString());
+        query.setParameter("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.toString());
+        query.setParameter("accepted", LifeCycleStatus.ACCEPTED.toString());
 
-        String datasetQuery = "select distinct p.ac from Publication p join p.status as s " +
-                "where s.identifier = :released or s.identifier = :accepted or s.identifier= :readyForRelease";
-
-        Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
-        query.setParameter("released", CvPublicationStatusType.RELEASED.identifier());
-        query.setParameter("readyForRelease", CvPublicationStatusType.READY_FOR_RELEASE.identifier());
-        query.setParameter("accepted", CvPublicationStatusType.ACCEPTED.identifier());
-
-        List<String> publications = query.getResultList();
-        return publications;
+        return query.getResultList();
     }
 
     private List<String> collectPublicationHavingUniprotDrExportNo() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
+        EntityManager manager = intactDao.getEntityManager();
+        String uniprotDrQuery = "select distinct p.ac from IntactPublication p join p.experiments as e join e.annotations as a " +
+                "where a.topic.shortName = :uniprotDrExport and (a.value = :no or a.value = :no2)";
 
-        String uniprotDrQuery = "select distinct p.ac from Publication p join p.experiments as e join e.annotations as a " +
-                "where a.cvTopic.shortLabel = :uniprotDrExport and (a.annotationText = :no or a.annotationText = :no2)";
-
-        Query query = daoFactory.getEntityManager().createQuery(uniprotDrQuery);
-        query.setParameter("uniprotDrExport", CvTopic.UNIPROT_DR_EXPORT);
+        Query query = manager.createQuery(uniprotDrQuery);
+        query.setParameter("uniprotDrExport", UNIPROT_DR_EXPORT);
         query.setParameter("no", "no");
         query.setParameter("no2", "No");
 
@@ -299,105 +309,112 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
 
     @Deprecated
     private List<String> collectPublicationCandidatesToImexWithDataset() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
+        EntityManager manager = intactDao.getEntityManager();
 
-        String datasetQuery = "select distinct p2.ac from Publication p2 join p2.annotations as a3 " +
-                "where a3.cvTopic.identifier = :dataset and a3.annotationText = :biocreative";
+        String datasetQuery = "select distinct p2.ac from IntactPublication p2 join p2.dbAnnotations as a3 " +
+                "where a3.topic.identifier = :dataset and a3.value = :biocreative";
 
-        Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
-        query.setParameter("dataset", CvTopic.DATASET_MI_REF);
+        Query query = manager.createQuery(datasetQuery);
+        query.setParameter("dataset", DATASET_MI);
         query.setParameter("biocreative", BIOCREATIVE_DATASET);
 
-        List<String> publications = query.getResultList();
-        return publications;
+        return query.getResultList();
     }
 
     private List<String> collectPublicationCandidatesToImexWithImexCurationLevel() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
+        EntityManager manager = intactDao.getEntityManager();
+        String datasetQuery = "select distinct p2.ac from IntactPublication p2 join p2.dbAnnotations as a3 " +
+                "where a3.topic.identifier = :curation and a3.value = :imex";
 
-        String datasetQuery = "select distinct p2.ac from Publication p2 join p2.annotations as a3 " +
-                "where a3.cvTopic.identifier = :curation and a3.annotationText = :imex";
-
-        Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
+        Query query = manager.createQuery(datasetQuery);
         query.setParameter("curation", "MI:0955");
         query.setParameter("imex", "imex curation");
 
-        List<String> publications = query.getResultList();
-        return publications;
+        return query.getResultList();
     }
 
     public List<Object[]> collectPublicationsHavingProteinsOrPeptides() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
-
-        String proteinQuery = "select p2.ac, i.ac, count(distinct c.ac) from InteractionImpl as i join i.experiments as e join e.publication as p2 join i.components as c join c.interactor as interactor " +
+        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
+        EntityManager manager = intactDao.getEntityManager();
+        String proteinQuery = "select p2.ac, i.ac, count(distinct c.ac) from IntactInteractionEvidence as i join i.experiments as e " +
+                "join e.publication as p2 join i.participants as c join c.interactor as interactor " +
                 "where i.ac in " +
-                "(select distinct i2.ac from Component c2 join c2.interaction as i2 join c2.interactor as interactor " +
-                " where interactor.cvInteractorType.identifier <> :protein and interactor.cvInteractorType.identifier <> :peptide)" +
-                "group by p2.ac, i.ac, interactor.cvInteractorType.identifier having (interactor.cvInteractorType.identifier = :protein or interactor.cvInteractorType.identifier = :peptide) order by p2.ac, i.ac";
+                "(select distinct i2.ac from IntactParticipantEvidence c2 join c2.dbParentInteraction as i2 join c2.interactor as interactor " +
+                " where interactor.interactorType.identifier <> :protein and interactor.interactorType.identifier <> :peptide)" +
+                "group by p2.ac, i.ac, interactor.interactorType.identifier having (interactor.interactorType.identifier = :protein " +
+                "or interactor.interactorType.identifier = :peptide) order by p2.ac, i.ac";
 
-        Query query = daoFactory.getEntityManager().createQuery(proteinQuery);
-        query.setParameter("protein", CvInteractorType.PROTEIN_MI_REF);
-        query.setParameter("peptide", CvInteractorType.PEPTIDE_MI_REF);
+        Query query = manager.createQuery(proteinQuery);
+        query.setParameter("protein", Protein.PROTEIN_MI);
+        query.setParameter("peptide", Protein.PEPTIDE_MI);
 
-        List<Object[]> publications = query.getResultList();
-        return publications;
+        return query.getResultList();
     }
 
     private List<String> collectPublicationsHavingPPIInteractions() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
+        EntityManager manager = intactDao.getEntityManager();
+        String datasetQuery = "select distinct p2.ac from IntactParticipantEvidence c join c.dbParentInteraction as i " +
+                "join i.experiments as e " +
+                "join e.publication as p2 " +
+                "join c.interactor as interactor " +
+                "where (interactor.interactorType.identifier = :protein " +
+                "or interactor.interactorType.identifier = :peptide) " +
+                "and i.ac not in (select distinct i2.ac from IntactInteractionEvidence i2 " +
+                "join i2.participants as comp " +
+                "join comp.interactor as interactor2 " +
+                "where interactor2.interactorType.identifier <> :protein and interactor2.interactorType.identifier <> :peptide)";
 
-        String datasetQuery = "select distinct p2.ac from Component c join c.interaction as i join i.experiments as e join e.publication as p2 join c.interactor as interactor " +
-                "where (interactor.cvInteractorType.identifier = :protein or interactor.cvInteractorType.identifier = :peptide) and i.ac not in (select distinct i2.ac from InteractionImpl i2 join i2.components as comp join comp.interactor as interactor2 " +
-                "where interactor2.cvInteractorType.identifier <> :protein and interactor2.cvInteractorType.identifier <> :peptide)";
+        Query query = manager.createQuery(datasetQuery);
+        query.setParameter("protein", Protein.PROTEIN_MI);
+        query.setParameter("peptide", Protein.PEPTIDE_MI);
 
-        Query query = daoFactory.getEntityManager().createQuery(datasetQuery);
-        query.setParameter("protein", CvInteractorType.PROTEIN_MI_REF);
-        query.setParameter("peptide", CvInteractorType.PEPTIDE_MI_REF);
-
-        List<String> publications = query.getResultList();
-        return publications;
+        return query.getResultList();
     }
 
     private List<String> collectPublicationHavingInteractionImexIds() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
+        EntityManager manager = intactDao.getEntityManager();
 
-        String imexInteractionQuery = "select distinct p3.ac from InteractionImpl i join i.experiments as e join e.publication as p3 join i.xrefs as x " +
-                "where x.cvDatabase.identifier = :imex and x.cvXrefQualifier.identifier = :imexPrimary";
+        String imexInteractionQuery = "select distinct p3.ac from IntactInteractionEvidence i join i.experiments as e " +
+                "join e.publication as p3 join i.dbXrefs as x " +
+                "where x.database.identifier = :imex and x.qualifier.identifier = :imexPrimary";
 
-        Query query = daoFactory.getEntityManager().createQuery(imexInteractionQuery);
-        query.setParameter("imex", CvDatabase.IMEX_MI_REF);
-        query.setParameter("imexPrimary", CvXrefQualifier.IMEX_PRIMARY_MI_REF);
+        Query query = manager.createQuery(imexInteractionQuery);
+        query.setParameter("imex", Xref.IMEX_MI);
+        query.setParameter("imexPrimary", Xref.IMEX_PRIMARY_MI);
 
-        List<String> publications = query.getResultList();
-        return publications;
+        return query.getResultList();
     }
 
     private List<String> collectPublicationHavingExperimentImexIds() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
+        EntityManager manager = intactDao.getEntityManager();
 
-        String imexExperimentQuery = "select distinct p4.ac from Experiment e2 join e2.publication as p4 join e2.xrefs as x2 " +
-                "where x2.cvDatabase.identifier = :imex and x2.cvXrefQualifier.identifier = :imexPrimary";
+        String imexExperimentQuery = "select distinct p4.ac from IntactExperiment e2 join e2.publication as p4 join e2.xrefs as x2 " +
+                "where x2.database.identifier = :imex and x2.database.identifier = :imexPrimary";
 
-        Query query = daoFactory.getEntityManager().createQuery(imexExperimentQuery);
-        query.setParameter("imex", CvDatabase.IMEX_MI_REF);
-        query.setParameter("imexPrimary", CvXrefQualifier.IMEX_PRIMARY_MI_REF);
+        Query query = manager.createQuery(imexExperimentQuery);
+        query.setParameter("imex", Xref.IMEX_MI);
+        query.setParameter("imexPrimary", Xref.IMEX_PRIMARY_MI);
 
-        List<String> publications = query.getResultList();
-        return publications;
+        return query.getResultList();
     }
 
     private List<String> collectPublicationsHavingImexIds() {
-        final DaoFactory daoFactory = IntactContext.getCurrentInstance().getDaoFactory();
+        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
+        EntityManager manager = intactDao.getEntityManager();
 
-        String imexPublicationQuery = "select distinct p5.ac from Publication p5 join p5.xrefs as x3 " +
-                "where x3.cvDatabase.identifier = :imex and x3.cvXrefQualifier.identifier = :imexPrimary";
+        String imexPublicationQuery = "select distinct p5.ac from IntactPublication p5 join p5.dbXrefs as x3 " +
+                "where x3.database.identifier = :imex and x3.database.identifier = :imexPrimary";
 
-        Query query = daoFactory.getEntityManager().createQuery(imexPublicationQuery);
-        query.setParameter("imex", CvDatabase.IMEX_MI_REF);
-        query.setParameter("imexPrimary", CvXrefQualifier.IMEX_PRIMARY_MI_REF);
+        Query query = manager.createQuery(imexPublicationQuery);
+        query.setParameter("imex", Xref.IMEX_MI);
+        query.setParameter("imexPrimary", Xref.IMEX_PRIMARY_MI);
 
-        List<String> publications = query.getResultList();
-        return publications;
+        return query.getResultList();
     }
 
     public Collection<String> getPublicationsInvolvingPPI() {
@@ -432,7 +449,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsAcceptedForRelease;
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsNeedingAnImexId() {
 
         if (!isInitialised){
@@ -454,7 +471,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsToBeAssignedFiltered;
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsHavingIMExIdToUpdate() {
 
         if (!isInitialised){
@@ -470,7 +487,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithIMExIdToUpdateFiltered;
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsHavingIMExIdAndNotImexCurationLevel() {
 
         if (!isInitialised){
@@ -483,7 +500,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithImexAndNotImexCurationLevel;
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsHavingImexCurationLevelButAreNotEligibleImex() {
 
         if (!isInitialised){
@@ -505,7 +522,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsNotEligibleForImexWithImexCurationLevel;
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsWithoutImexButWithExperimentImex() {
 
         if (!isInitialised){
@@ -518,7 +535,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithExperimentImexButNoImexId;
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsWithoutImexButWithInteractionImex() {
 
         if (!isInitialised){
@@ -531,7 +548,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithInteractionImexButNoImexId;
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsHavingIMExIdAndNoPPI() {
         if (!isInitialised){
             initialise();
@@ -542,7 +559,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return CollectionUtils.intersection(publicationsNoPPI, publicationsAcceptedForRelease);
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsHavingIMExCurationLevelAndUniprotDrExportNo() {
         if (!isInitialised){
             initialise();
@@ -553,7 +570,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return CollectionUtils.intersection(publicationsWithoutImexButImexCurationLevel, publicationsHavingUniprotDRExportNo);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
     public void initialise() {
         if (publicationsHavingImexId == null){
             publicationsHavingImexId = collectPublicationsHavingImexIds();

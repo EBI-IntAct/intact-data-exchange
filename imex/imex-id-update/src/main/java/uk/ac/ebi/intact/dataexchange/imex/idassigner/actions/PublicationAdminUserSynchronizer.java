@@ -1,8 +1,9 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 
-import edu.ucla.mbi.imex.central.ws.v20.Publication;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralClient;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
+import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
+import psidev.psi.mi.jami.bridges.imex.ImexCentralClient;
+import psidev.psi.mi.jami.bridges.imex.extension.ImexPublication;
+import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
 
 /**
  * Interface for synchronizing admin user of a publication with IMEx central
@@ -19,12 +20,10 @@ public interface PublicationAdminUserSynchronizer {
      * If the user is not registered in IMEx central, a user 'phantom' will be added to the IMEx record.
      * @param intactPublication
      * @param imexPublication
-     * @throws ImexCentralException : if user phantom does not exist in IMEx central (needs to be created) or IMEx central is not responding
+     * @throws psidev.psi.mi.jami.bridges.exception.BridgeFailedException : if user phantom does not exist in IMEx central (needs to be created) or IMEx central is not responding
      * or the publication identifier is not recognized
      */
-    public void synchronizePublicationAdminUser(uk.ac.ebi.intact.model.Publication intactPublication, Publication imexPublication) throws ImexCentralException;
+    public void synchronizePublicationAdminUser(IntactPublication intactPublication, ImexPublication imexPublication) throws BridgeFailedException;
 
     public ImexCentralClient getImexCentralClient();
-
-    public void setImexCentralClient(ImexCentralClient imexClient);
 }

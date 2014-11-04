@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <!-- Needed by Spring to find the annotations in the code -->
+    <context:component-scan base-package="uk.ac.ebi.intact.dataexchange.imex.idassigner"/>
+
+    <!-- imex central client -->
+    <bean id="imexCentralClient" class="psidev.psi.mi.jami.bridges.imex.mock.MockImexCentralClient"/>
+
+    <!-- config -->
+    <bean id="imexUpdateConfig" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.ImexAssignerConfig">
+        <property name="updateLogsDirectory" value="target/reports"/>
+    </bean>
+
+    <!-- actions -->
+    <bean id="imexCentralRegister" class="psidev.psi.mi.jami.imex.actions.impl.ImexCentralPublicationRegisterImpl">
+        <constructor-arg index="0" ref="imexCentralClient"/>
+    </bean>
+    <bean id="intactImexAssigner" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactImexAssignerImpl">
+        <constructor-arg index="0" ref="imexCentralClient"/>
+    </bean>
+    <bean id="intactPublicationCollector" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactPublicationsCollectorImpl"/>
+    <bean id="imexAdminGroupSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactPublicationAdminGroupSynchronizerImpl">
+        <constructor-arg index="0" ref="imexCentralClient"/>
+    </bean>
+    <bean id="imexAdminUserSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactPublicationAdminUserSynchronizerImpl">
+        <constructor-arg index="0" ref="imexCentralClient"/>
+    </bean>
+    <bean id="publicationIdentifierSynchronizer" class="psidev.psi.mi.jami.imex.actions.impl.PublicationIdentifierSynchronizerImpl">
+        <constructor-arg index="0" ref="imexCentralClient"/>
+    </bean>
+    <bean id="imexStatusSynchronizer" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactPublicationStatusSynchronizerImpl">
+        <constructor-arg index="0" ref="imexCentralClient"/>
+    </bean>
+
+    <!-- listener -->
+    <bean id="imexPublicationListener" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.IntactPublicationImexEnricherListener">
+        <constructor-arg index="0" ref="imexCentralManager"/>
+    </bean>
+
+    <!-- enricher -->
+    <bean id="intactPublicationRegister" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.enrichers.IntactImexPublicationRegister">
+        <constructor-arg index="0" ref="imexCentralClient"/>
+        <property name="adminUserSynchronizer" ref="imexAdminUserSynchronizer"/>
+        <property name="adminGroupSynchronizer" ref="imexAdminGroupSynchronizer"/>
+        <property name="publicationEnricherListener" ref="imexPublicationListener"/>
+        <property name="publicationRegister" ref="imexCentralRegister"/>
+        <property name="statusSynchronizer" ref="imexStatusSynchronizer"/>
+    </bean>
+    <bean id="intactPublicationUpdater" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.enrichers.IntactImexPublicationUpdater">
+        <constructor-arg index="0" ref="imexCentralClient"/>
+        <property name="adminUserSynchronizer" ref="imexAdminUserSynchronizer"/>
+        <property name="adminGroupSynchronizer" ref="imexAdminGroupSynchronizer"/>
+        <property name="publicationEnricherListener" ref="imexPublicationListener"/>
+        <property name="identifierSynchronizer" ref="publicationIdentifierSynchronizer"/>
+        <property name="statusSynchronizer" ref="imexStatusSynchronizer"/>
+    </bean>
+    <bean id="intactPublicationAssigner" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.enrichers.IntactImexPublicationAssigner">
+        <constructor-arg index="0" ref="imexCentralClient"/>
+        <property name="publicationUpdater" ref="intactPublicationUpdater"/>
+        <property name="publicationEnricherListener" ref="imexPublicationListener"/>
+        <property name="publicationRegister" ref="imexCentralRegister"/>
+        <property name="imexAssigner" ref="intactImexAssigner"/>
+    </bean>
+
+</beans>

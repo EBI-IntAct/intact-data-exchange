@@ -5,9 +5,12 @@ import edu.ucla.mbi.imex.central.ws.v20.Publication;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,9 +28,13 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
  * @version $Id$
  * @since <pre>11/04/12</pre>
  */
+@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath*:/META-INF/intact.spring.xml",
         "classpath*:/META-INF/standalone/*-standalone.spring.xml",
-        "classpath*:/META-INF/beansimex-test.spring.xml"})
+        "classpath*:/META-INF/imex-test.spring.xml"})
+@Transactional(value = "jamiTransactionManager")
+@TransactionConfiguration
+@DirtiesContext
 public class ImexCentralManagerTest extends IntactBasicTestCase{
 
     @Autowired

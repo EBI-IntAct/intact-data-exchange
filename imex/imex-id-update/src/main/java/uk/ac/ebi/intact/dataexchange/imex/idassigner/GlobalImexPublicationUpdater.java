@@ -3,12 +3,14 @@ package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 import edu.ucla.mbi.imex.central.ws.v20.IcentralFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.bridges.imexcentral.DefaultImexCentralClient;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
+import org.springframework.stereotype.Service;
+import psidev.psi.mi.jami.bridges.imex.ImexCentralClient;
+import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.IntactPublicationCollector;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationImexUpdaterException;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorType;
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 import java.util.Collection;
 
@@ -19,20 +21,13 @@ import java.util.Collection;
  * @version $Id$
  * @since <pre>30/03/12</pre>
  */
-
+@Service("globalImexPublicationUpdater")
 public class GlobalImexPublicationUpdater {
 
-    private ImexCentralManager imexCentralManager;
     private static final Log log = LogFactory.getLog(GlobalImexPublicationUpdater.class);
 
-    private IntactPublicationCollector intactPublicationCollector;
-
     public ImexCentralManager getImexCentralManager() {
-        return imexCentralManager;
-    }
-
-    public void setImexCentralManager(ImexCentralManager imexCentralManager) {
-        this.imexCentralManager = imexCentralManager;
+        return ApplicationContextProvider.getBean("imexCentralManager");
     }
 
     /**
@@ -40,7 +35,10 @@ public class GlobalImexPublicationUpdater {
      */
     public void assignNewImexIdsToPublications(){
 
-        imexCentralManager.registerListenersIfNotDoneYet();
+        ImexCentralManager imexCentralManager = getImexCentralManager();
+        IntactPublicationCollector intactPublicationCollector = ApplicationContextProvider.getBean("intactPublicationCollector");
+
+        getImexCentralManager().registerListenersIfNotDoneYet();
 
         Collection<String> publicationsNeedingNewImexId = intactPublicationCollector.getPublicationsNeedingAnImexId();
 
@@ -49,25 +47,19 @@ public class GlobalImexPublicationUpdater {
                 try {
                     imexCentralManager.assignImexAndUpdatePublication(publication);
 
-                } catch (PublicationImexUpdaterException e) {
+                }
+                catch (PublicationImexUpdaterException e) {
                     ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
                     imexCentralManager.fireOnImexError(errorEvt);
-                } catch (ImexCentralException e) {
-                    IcentralFault f = (IcentralFault) e.getCause();
-
-                    processImexCentralException(publication, e, f);
-                }catch (Exception e) {
+                }
+                catch (EnricherException e) {
+                    processEnricherException(imexCentralManager, publication, e);
+                }
+                catch (Exception e) {
                     ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
                     imexCentralManager.fireOnImexError(errorEvt);
                 }
             }
-
-            // fire error event for publications without imex id, not elligible but with imex curation level
-            /*Collection<String> publicationsImexCurationNotElligible = intactPublicationCollector.getPublicationsHavingImexCurationLevelButAreNotEligibleImex();
-            for (String pubAc : publicationsImexCurationNotElligible){
-                ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.imex_curation_not_eligible, pubAc, null, null, null, "Publication having imex curation level but no IMEx id can be automatically assigned because is not eligible imex or does not contain any PPI interactions.");
-                imexCentralManager.fireOnImexError(errorEvt);
-            }*/
 
             // fire error event for publications without imex but experiment has imex
             Collection<String> publicationsWithouImexAndExperimentImex = intactPublicationCollector.getPublicationsWithoutImexButWithExperimentImex();
@@ -91,52 +83,89 @@ public class GlobalImexPublicationUpdater {
         }
     }
 
-    private void processImexCentralException(String publication, ImexCentralException e, IcentralFault f) {
-        if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.USER_NOT_AUTHORIZED ) {
+    private void processEnricherException(ImexCentralManager imexCentralManager, String publication, EnricherException e) {
+        if (e.getCause() instanceof IcentralFault){
+            IcentralFault f = (IcentralFault) e.getCause();
+
+            processImexCentralException(publication, e, f, imexCentralManager);
+        }
+        else if (e.getCause() != null){
+            Throwable child = e.getCause();
+            if (child.getCause() instanceof IcentralFault){
+                IcentralFault f = (IcentralFault) child.getCause();
+
+                processImexCentralException(publication, e, f, imexCentralManager);
+            }
+            // possible brige exception wrapping icentral fault
+            else if (child.getCause() != null){
+                Throwable child2 = child.getCause();
+                if (child2.getCause() instanceof IcentralFault){
+                    IcentralFault f = (IcentralFault) child2.getCause();
+
+                    processImexCentralException(publication, e, f, imexCentralManager);
+                }
+                else {
+                    ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
+                    imexCentralManager.fireOnImexError(errorEvt);
+                }
+            }
+            else{
+                ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
+                imexCentralManager.fireOnImexError(errorEvt);
+            }
+        }
+        else{
+            ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
+            imexCentralManager.fireOnImexError(errorEvt);
+        }
+    }
+
+    private void processImexCentralException(String publication, Exception e, IcentralFault f, ImexCentralManager imexCentralManager) {
+        if( f.getFaultInfo().getFaultCode() == ImexCentralClient.USER_NOT_AUTHORIZED ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.user_not_authorized, publication, null, null, null, "missing/unknown user and/or missing/invalid password provided : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
-        else if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.OPERATION_NOT_VALID ) {
+        else if( f.getFaultInfo().getFaultCode() == ImexCentralClient.OPERATION_NOT_VALID ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.operation_not_valid, publication, null, null, null, "invalid operation : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
-        else if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.IDENTIFIER_MISSING ) {
+        else if( f.getFaultInfo().getFaultCode() == ImexCentralClient.IDENTIFIER_MISSING ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.identifier_missing, publication, null, null, null, "missing identifier : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
-        else if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.IDENTIFIER_UNKNOWN ) {
+        else if( f.getFaultInfo().getFaultCode() == ImexCentralClient.IDENTIFIER_UNKNOWN ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.identifier_unknown, publication, null, null, null, "unrecognized identifier : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
-        else if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.NO_RECORD ) {
+        else if( f.getFaultInfo().getFaultCode() == ImexCentralClient.NO_RECORD ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.no_record, publication, null, null, null, "query returned no records : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
-        else if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.NO_RECORD_CREATED ) {
+        else if( f.getFaultInfo().getFaultCode() == ImexCentralClient.NO_RECORD_CREATED ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.no_record_created, publication, null, null, null, "requested records were not created : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
-        else if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.STATUS_UNKNOWN ) {
+        else if( f.getFaultInfo().getFaultCode() == ImexCentralClient.STATUS_UNKNOWN ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.status_unknown, publication, null, null, null, "unknown status : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
-        else if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.NO_IMEX_ID ) {
+        else if( f.getFaultInfo().getFaultCode() == ImexCentralClient.NO_IMEX_ID ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, publication, null, null, null, "IMEx identifier missing : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
-        else if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.UNKNOWN_USER ) {
+        else if( f.getFaultInfo().getFaultCode() == ImexCentralClient.UNKNOWN_USER ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.unknown_user, publication, null, null, null, "passed user parameter does not specify a known user : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
-        else if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.UNKNOWN_GROUP ) {
+        else if( f.getFaultInfo().getFaultCode() == ImexCentralClient.UNKNOWN_GROUP ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.unknown_group, publication, null, null, null, "passed group parameter does not specify a known group : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
-        else if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.OPERATION_NOT_SUPPORTED ) {
+        else if( f.getFaultInfo().getFaultCode() == ImexCentralClient.OPERATION_NOT_SUPPORTED ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.operation_not_supported, publication, null, null, null, "operation not (yet) supported : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
-        else if( f.getFaultInfo().getFaultCode() == DefaultImexCentralClient.INTERNAL_SERVER_ERROR ) {
+        else if( f.getFaultInfo().getFaultCode() == ImexCentralClient.INTERNAL_SERVER_ERROR ) {
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.internal_server_error, publication, null, null, null, "internal server error : " + e.getMessage());
             imexCentralManager.fireOnImexError(errorEvt);
         }
@@ -150,7 +179,10 @@ public class GlobalImexPublicationUpdater {
      * Update existing IMEx publications in IntAct and assign interaction imex ids if not already done
      */
     public void updateExistingImexPublications(){
+        ImexCentralManager imexCentralManager = getImexCentralManager();
+
         imexCentralManager.registerListenersIfNotDoneYet();
+        IntactPublicationCollector intactPublicationCollector = ApplicationContextProvider.getBean("intactPublicationCollector");
 
         Collection<String> publicationsToUpdate = intactPublicationCollector.getPublicationsHavingIMExIdToUpdate();
 
@@ -162,10 +194,8 @@ public class GlobalImexPublicationUpdater {
                 } catch (PublicationImexUpdaterException e) {
                     ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
                     imexCentralManager.fireOnImexError(errorEvt);
-                } catch (ImexCentralException e) {
-                    IcentralFault f = (IcentralFault) e.getCause();
-
-                    processImexCentralException(publication, e, f);
+                } catch (EnricherException e) {
+                    processEnricherException(imexCentralManager, publication, e);
                 }
                 catch (Exception e) {
                     ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.fatal_error, publication, null, null, null, e.getMessage());
@@ -186,13 +216,5 @@ public class GlobalImexPublicationUpdater {
                 ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_imex_id_not_PPI, pubAc, null, null, null, "Publication does have a IMEx primary reference but does not have a single PPI.");
                 imexCentralManager.fireOnImexError(errorEvt);
             }
-    }
-
-    public IntactPublicationCollector getIntactPublicationCollector() {
-        return intactPublicationCollector;
-    }
-
-    public void setIntactPublicationCollector(IntactPublicationCollector intactPublicationCollector) {
-        this.intactPublicationCollector = intactPublicationCollector;
     }
 }

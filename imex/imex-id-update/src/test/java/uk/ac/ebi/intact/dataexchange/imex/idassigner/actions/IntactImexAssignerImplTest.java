@@ -5,18 +5,27 @@ import edu.ucla.mbi.imex.central.ws.v20.Publication;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.TransactionStatus;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.impl.IntactImexAssignerImpl;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
+import psidev.psi.mi.jami.bridges.imex.extension.ImexPublication;
+import psidev.psi.mi.jami.model.Experiment;
+import psidev.psi.mi.jami.model.InteractionEvidence;
+import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.utils.XrefUtils;
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
+import uk.ac.ebi.intact.jami.dao.IntactDao;
+import uk.ac.ebi.intact.jami.model.extension.*;
+import uk.ac.ebi.intact.jami.service.PublicationService;
+import uk.ac.ebi.intact.jami.synchronizer.FinderException;
+import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
+import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
 
 import java.util.*;
 
@@ -27,298 +36,68 @@ import java.util.*;
  * @version $Id$
  * @since <pre>05/04/12</pre>
  */
-@ContextConfiguration(locations = {"classpath*:/META-INF/intact.spring.xml",
-        "classpath*:/META-INF/standalone/*-standalone.spring.xml",
-        "classpath*:/META-INF/beansimex-test.spring.xml"})
-public class IntactImexAssignerImplTest extends IntactBasicTestCase{
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath*:/META-INF/intact-jami-test.spring.xml",
+        "classpath*:/META-INF/imex-test.spring.xml"})
+public class IntactImexAssignerImplTest{
 
     @Autowired
+    @Qualifier("intactImexAssigner")
     private IntactImexAssigner assignerTest;
 
-    private Publication imexPublication;
+    private ImexPublication imexPublication;
 
     @Before
-    public void createImexPublications() throws ImexCentralException {
-        imexPublication = new Publication();
+    public void createImexPublications() throws BridgeFailedException {
+        Publication pub = new Publication();
         Identifier pubmed = new Identifier();
         pubmed.setNs("pmid");
         pubmed.setAc("12345");
-        imexPublication.getIdentifier().add(pubmed);
-
+        pub.getIdentifier().add(pubmed);
+        imexPublication = new ImexPublication(pub);
         assignerTest.getImexCentralClient().createPublication(imexPublication);
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
-    public void assignImexPublication_validPubId_succesfull() throws ImexCentralException {
+    public void assignImexPublication_validPubId_succesfull() throws BridgeFailedException {
 
-        Assert.assertNull(imexPublication.getImexAccession());
+        Assert.assertNull(imexPublication.getImexId());
 
-        TransactionStatus status = getDataContext().beginTransaction();
+        psidev.psi.mi.jami.model.Publication intactPub = new IntactPublication("12345");
 
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
-        getCorePersister().saveOrUpdate(intactPub);
-
-        getDataContext().commitTransaction(status);
-
-        TransactionStatus status2 = getDataContext().beginTransaction();
-
-        uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
-        String assigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
+        psidev.psi.mi.jami.model.Publication assigned = assignerTest.assignImexIdentifier(intactPub, imexPublication);
 
         Assert.assertNotNull(assigned);
-        Assert.assertNotSame("N/A", assigned);
+        Assert.assertNotNull(assigned.getImexId());
 
-        Assert.assertEquals(1, intactPubReloaded.getXrefs().size());
-        PublicationXref ref = intactPubReloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
-        Assert.assertEquals(imexPublication.getImexAccession(), ref.getPrimaryId());
-
-        Assert.assertEquals(3, intactPubReloaded.getAnnotations().size());
-        boolean hasFullCuration = false;
-        boolean hasImexCuration = false;
-        boolean hasImexDepth = false;
-
-        for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded.getAnnotations()){
-            if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
-                hasImexCuration = true;
-            }
-            else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
-                hasFullCuration = true;
-            }
-            else if ("curation depth".equals(ann.getCvTopic().getShortLabel()) && "imex curation".equalsIgnoreCase(ann.getAnnotationText())){
-                hasImexDepth = true;
-            }
-        }
-
-        Assert.assertTrue(hasFullCuration);
-        Assert.assertTrue(hasImexCuration);
-        Assert.assertTrue(hasImexDepth);
-
-        getDataContext().commitTransaction(status2);
+        Assert.assertEquals(1, intactPub.getXrefs().size());
+        Assert.assertFalse(XrefUtils.collectAllXrefsHavingDatabaseQualifierAndId(intactPub.getXrefs(),
+                Xref.IMEX_MI, Xref.IMEX, assigned.getImexId(), Xref.IMEX_PRIMARY_MI, Xref.IMEX_PRIMARY).isEmpty());
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     @DirtiesContext
-    public void assignImexPublication_validPubId_existingAnnotations() throws ImexCentralException {
-        Assert.assertNull(imexPublication.getImexAccession());
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
+    public void updateImexIdentifiersForAllExperiments() throws BridgeFailedException, PublicationImexUpdaterException, SynchronizerException, PersisterException, FinderException {
 
-        TransactionStatus status = getDataContext().beginTransaction();
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
+        IntactPublication intactPub = new IntactPublication("12345");
 
-        CvTopic fullCoverage = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, IntactImexAssignerImpl.FULL_COVERAGE_MI, IntactImexAssignerImpl.FULL_COVERAGE);
-        getCorePersister().saveOrUpdate(fullCoverage);
-        Annotation fullCoverageAnnot = new Annotation( fullCoverage, IntactImexAssignerImpl.FULL_COVERAGE_TEXT );
-        intactPub.addAnnotation(fullCoverageAnnot);
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, IntactImexAssignerImpl.IMEX_CURATION_MI, IntactImexAssignerImpl.IMEX_CURATION);
-        getCorePersister().saveOrUpdate(imexCuration);
-        Annotation imexCurationAnnot = new Annotation( imexCuration, null );
-        intactPub.addAnnotation(imexCurationAnnot);
-
-        getCorePersister().saveOrUpdate(intactPub);
-
-        Assert.assertEquals(2, intactPub.getAnnotations().size());
-
-        getDataContext().commitTransaction(status);
-
-        TransactionStatus status2 = getDataContext().beginTransaction();
-
-        uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
-        String assigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
-
-        Assert.assertNotNull(assigned);
-        Assert.assertNotSame("N/A", assigned);
-
-        Assert.assertEquals(1, intactPubReloaded.getXrefs().size());
-        PublicationXref ref = intactPubReloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
-        Assert.assertEquals(imexPublication.getImexAccession(), ref.getPrimaryId());
-
-        Assert.assertEquals(3, intactPubReloaded.getAnnotations().size());
-        boolean hasFullCuration = false;
-        boolean hasImexCuration = false;
-        boolean hasImexDepth = false;
-
-        for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded.getAnnotations()){
-            if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
-                hasImexCuration = true;
-            }
-            else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
-                hasFullCuration = true;
-            }
-            else if ("curation depth".equals(ann.getCvTopic().getShortLabel()) && "imex curation".equalsIgnoreCase(ann.getAnnotationText())){
-                hasImexDepth = true;
-            }
-        }
-
-        Assert.assertTrue(hasFullCuration);
-        Assert.assertTrue(hasImexCuration);
-        Assert.assertTrue(hasImexDepth);
-
-        getDataContext().commitTransaction(status2);
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.NEVER)
-    @DirtiesContext
-    public void assignImexPublication_validPubId_duplicatedAnnotations() throws ImexCentralException {
-        Assert.assertNull(imexPublication.getImexAccession());
-
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
-
-        CvTopic fullCoverage = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, IntactImexAssignerImpl.FULL_COVERAGE_MI, IntactImexAssignerImpl.FULL_COVERAGE);
-        getCorePersister().saveOrUpdate(fullCoverage);
-        Annotation fullCoverageAnnot = new Annotation( fullCoverage, IntactImexAssignerImpl.FULL_COVERAGE_TEXT );
-        Annotation fullCoverageAnnot2 = new Annotation( fullCoverage, null );
-        intactPub.addAnnotation(fullCoverageAnnot);
-        intactPub.getAnnotations().add(fullCoverageAnnot2);
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, IntactImexAssignerImpl.IMEX_CURATION_MI, IntactImexAssignerImpl.IMEX_CURATION);
-        getCorePersister().saveOrUpdate(imexCuration);
-        Annotation imexCurationAnnot = new Annotation( imexCuration, null );
-        Annotation imexCurationAnnot2 = new Annotation( imexCuration, null );
-        intactPub.addAnnotation(imexCurationAnnot);
-        intactPub.getAnnotations().add(imexCurationAnnot2);
-
-        getCorePersister().saveOrUpdate(intactPub);
-
-        Assert.assertEquals(4, intactPub.getAnnotations().size());
-
-        getDataContext().commitTransaction(status);
-
-        TransactionStatus status2 = getDataContext().beginTransaction();
-
-        uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
-        String assigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
-
-        Assert.assertNotNull(assigned);
-        Assert.assertNotSame("N/A", assigned);
-
-        Assert.assertEquals(1, intactPubReloaded.getXrefs().size());
-        PublicationXref ref = intactPubReloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
-        Assert.assertEquals(imexPublication.getImexAccession(), ref.getPrimaryId());
-
-        Assert.assertEquals(3, intactPubReloaded.getAnnotations().size());
-        boolean hasFullCuration = false;
-        boolean hasImexCuration = false;
-        boolean hasImexDepth = false;
-
-        for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded.getAnnotations()){
-            if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
-                hasImexCuration = true;
-            }
-            else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
-                hasFullCuration = true;
-            }
-            else if ("curation depth".equals(ann.getCvTopic().getShortLabel()) && "imex curation".equalsIgnoreCase(ann.getAnnotationText())){
-                hasImexDepth = true;
-            }
-        }
-
-        Assert.assertTrue(hasFullCuration);
-        Assert.assertTrue(hasImexCuration);
-        Assert.assertTrue(hasImexDepth);
-
-
-        getDataContext().commitTransaction(status2);
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.NEVER)
-    @DirtiesContext
-    public void assignImexPublication_validPubId_differentFullCuration() throws ImexCentralException {
-        Assert.assertNull(imexPublication.getImexAccession());
-
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
-
-        CvTopic fullCoverage = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, IntactImexAssignerImpl.FULL_COVERAGE_MI, IntactImexAssignerImpl.FULL_COVERAGE);
-        getCorePersister().saveOrUpdate(fullCoverage);
-        Annotation fullCoverageAnnot = new Annotation( fullCoverage, null );
-        intactPub.addAnnotation(fullCoverageAnnot);
-
-        getCorePersister().saveOrUpdate(intactPub);
-
-        Assert.assertEquals(1, intactPub.getAnnotations().size());
-
-        getDataContext().commitTransaction(status);
-
-        TransactionStatus status2 = getDataContext().beginTransaction();
-
-        uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
-        String assigned = assignerTest.assignImexIdentifier(intactPubReloaded, imexPublication);
-
-        Assert.assertNotNull(assigned);
-        Assert.assertNotSame("N/A", assigned);
-
-        Assert.assertEquals(1, intactPubReloaded.getXrefs().size());
-        PublicationXref ref = intactPubReloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
-        Assert.assertEquals(imexPublication.getImexAccession(), ref.getPrimaryId());
-
-        Assert.assertEquals(3, intactPubReloaded.getAnnotations().size());
-        boolean hasFullCuration = false;
-        boolean hasImexCuration = false;
-        boolean hasImexDepth = false;
-
-        for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded.getAnnotations()){
-            if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
-                hasImexCuration = true;
-            }
-            else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
-                hasFullCuration = true;
-            }
-            else if ("curation depth".equals(ann.getCvTopic().getShortLabel()) && "imex curation".equalsIgnoreCase(ann.getAnnotationText())){
-                hasImexDepth = true;
-            }
-        }
-
-        Assert.assertTrue(hasFullCuration);
-        Assert.assertTrue(hasImexCuration);
-        Assert.assertTrue(hasImexDepth);
-
-        getDataContext().commitTransaction(status2);
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.NEVER)
-    @DirtiesContext
-    public void updateImexIdentifiersForAllExperiments() throws ImexCentralException, PublicationImexUpdaterException {
-
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
-
-        Experiment exp1 = getMockBuilder().createExperimentRandom(1);
-        exp1.getXrefs().clear();
-        exp1.setPublication(intactPub);
+        Experiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
 
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(intactPub);
-        exp2.getXrefs().clear();
+        Experiment exp2 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp2);
 
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.setPublication(intactPub);
-        exp3.getXrefs().clear();
+        Experiment exp3 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp3);
 
-        getCorePersister().saveOrUpdate(intactPub);
+        pubService.saveOrUpdate(intactPub);
 
         Assert.assertEquals(3, intactPub.getExperiments().size());
-
-        getDataContext().commitTransaction(status);
 
         List<String> expAcs = assignerTest.collectExperimentsToUpdateFrom(intactPub, "IM-1");
         Assert.assertEquals(3, expAcs.size());
@@ -326,107 +105,70 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         Set<String> expAcsUpdated = new HashSet<String>(expAcs.size());
         assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null, expAcsUpdated);
 
-        TransactionStatus status2 = getDataContext().beginTransaction();
-
-        uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
+        psidev.psi.mi.jami.model.Publication intactPubReloaded = dao.getPublicationDao().getByAc(intactPub.getAc());
         List<Experiment> experiments = new ArrayList<Experiment>(intactPubReloaded.getExperiments());
         
         for (Experiment exp : experiments){
             Assert.assertEquals(1, exp.getXrefs().size());
-            ExperimentXref ref = exp.getXrefs().iterator().next();
-            Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref.getCvDatabase().getIdentifier());
-            Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
-            Assert.assertEquals("IM-1", ref.getPrimaryId());
+            Assert.assertFalse(XrefUtils.collectAllXrefsHavingDatabaseQualifierAndId(exp.getXrefs(),
+                    Xref.IMEX_MI, Xref.IMEX, "IM-1", Xref.IMEX_PRIMARY_MI, Xref.IMEX_PRIMARY).isEmpty());
         }
-
-        getDataContext().commitTransaction(status2);
     }
 
-    @Test
-    @Transactional(propagation = Propagation.NEVER)
+    @Test(expected = PublicationImexUpdaterException.class)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     @DirtiesContext
-    public void updateImexIdentifiersForAllExperiments_conflict() throws ImexCentralException {
-        TransactionStatus status = getDataContext().beginTransaction();
+    public void updateImexIdentifiersForAllExperiments_conflict() throws BridgeFailedException, SynchronizerException,
+            PersisterException, FinderException, PublicationImexUpdaterException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
+        IntactPublication intactPub = new IntactPublication("12345");
 
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        Experiment exp1 = getMockBuilder().createExperimentRandom(1);
-        exp1.setPublication(intactPub);
-        exp1.getXrefs().clear();
+        Experiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
-        ExperimentXref expXref = new ExperimentXref( exp1.getOwner(), imex, "IM-3", imexPrimary );
-        exp1.addXref(expXref);
 
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(intactPub);
-        exp2.getXrefs().clear();
+        Experiment exp2 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp2);
 
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.setPublication(intactPub);
-        exp3.getXrefs().clear();
+        Experiment exp3 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp3);
+        exp3.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-3", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
 
-        getCorePersister().saveOrUpdate(intactPub);
+        pubService.saveOrUpdate(intactPub);
 
         Assert.assertEquals(3, intactPub.getExperiments().size());
-
-        getDataContext().commitTransaction(status);
 
         List<String> expAcs = assignerTest.collectExperimentsToUpdateFrom(intactPub, "IM-1");
         Assert.assertEquals(3, expAcs.size());
 
-        try {
-            Set<String> expAcsUpdated = new HashSet<String>(expAcs.size());
-            assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null, expAcsUpdated);
-            Assert.assertTrue(false);
-        } catch (PublicationImexUpdaterException e) {
-            Assert.assertTrue(true);
-        }
+        Set<String> expAcsUpdated = new HashSet<String>(expAcs.size());
+        assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null, expAcsUpdated);
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     @DirtiesContext
-    public void updateImexIdentifiersForAllExperiments_existingImex() throws ImexCentralException, PublicationImexUpdaterException {
-        TransactionStatus status = getDataContext().beginTransaction();
+    public void updateImexIdentifiersForAllExperiments_existingImex() throws BridgeFailedException, PublicationImexUpdaterException,
+            SynchronizerException, PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
+        IntactPublication intactPub = new IntactPublication("12345");
 
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        Experiment exp1 = getMockBuilder().createExperimentRandom(1);
-        exp1.setPublication(intactPub);
-        exp1.getXrefs().clear();
+        IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
-        ExperimentXref expXref = new ExperimentXref( exp1.getOwner(), imex, "IM-1", imexPrimary );
-        exp1.addXref(expXref);
+        exp1.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-1", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
 
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(intactPub);
-        exp2.getXrefs().clear();
+        IntactExperiment exp2 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp2);
 
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.setPublication(intactPub);
-        exp3.getXrefs().clear();
+        IntactExperiment exp3 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp3);
 
-        getCorePersister().saveOrUpdate(intactPub);
+        pubService.saveOrUpdate(intactPub);
 
         Assert.assertEquals(3, intactPub.getExperiments().size());
-
-        getDataContext().commitTransaction(status);
 
         List<String> expAcs = assignerTest.collectExperimentsToUpdateFrom(intactPub, "IM-1");
         // only two experiments updated
@@ -435,135 +177,107 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         Set<String> expAcsUpdated = new HashSet<String>(expAcs.size());
         assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null, expAcsUpdated);
 
-        TransactionStatus status2 = getDataContext().beginTransaction();
-
         // check that exp1 has not been updated
-        Experiment exp1Reloaded = getDaoFactory().getExperimentDao().getByAc(exp1.getAc());
+        Experiment exp1Reloaded = dao.getExperimentDao().getByAc(exp1.getAc());
         Assert.assertEquals(1, exp1Reloaded.getXrefs().size());
-        ExperimentXref ref = exp1Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
-        Assert.assertEquals("IM-1", ref.getPrimaryId());
+        Assert.assertFalse(XrefUtils.collectAllXrefsHavingDatabaseQualifierAndId(exp1Reloaded.getXrefs(),
+                Xref.IMEX_MI, Xref.IMEX, "IM-1", Xref.IMEX_PRIMARY_MI, Xref.IMEX_PRIMARY).isEmpty());
 
-        Experiment exp2Reloaded = getDaoFactory().getExperimentDao().getByAc(exp2.getAc());
+        Experiment exp2Reloaded = dao.getExperimentDao().getByAc(exp2.getAc());
         Assert.assertEquals(1, exp2Reloaded.getXrefs().size());
-        ExperimentXref ref2 = exp2Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref2.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref2.getCvXrefQualifier().getIdentifier());
-        Assert.assertEquals("IM-1", ref2.getPrimaryId());
+        Assert.assertFalse(XrefUtils.collectAllXrefsHavingDatabaseQualifierAndId(exp2Reloaded.getXrefs(),
+                Xref.IMEX_MI, Xref.IMEX, "IM-1", Xref.IMEX_PRIMARY_MI, Xref.IMEX_PRIMARY).isEmpty());
 
-        Experiment exp3Reloaded = getDaoFactory().getExperimentDao().getByAc(exp3.getAc());
+        Experiment exp3Reloaded = dao.getExperimentDao().getByAc(exp3.getAc());
         Assert.assertEquals(1, exp3Reloaded.getXrefs().size());
-        ExperimentXref ref3 = exp3Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref3.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref3.getCvXrefQualifier().getIdentifier());
-        Assert.assertEquals("IM-1", ref3.getPrimaryId());
-
-        getDataContext().commitTransaction(status2);
+        Assert.assertFalse(XrefUtils.collectAllXrefsHavingDatabaseQualifierAndId(exp3Reloaded.getXrefs(),
+                Xref.IMEX_MI, Xref.IMEX, "IM-1", Xref.IMEX_PRIMARY_MI, Xref.IMEX_PRIMARY).isEmpty());
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     @DirtiesContext
-    public void updateImexIdentifiersForAllExperiments_duplicatedImex() throws ImexCentralException, PublicationImexUpdaterException {
-        TransactionStatus status = getDataContext().beginTransaction();
+    public void updateImexIdentifiersForAllExperiments_duplicatedImex() throws BridgeFailedException, PublicationImexUpdaterException,
+            SynchronizerException, PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
+        IntactPublication intactPub = new IntactPublication("12345");
 
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        Experiment exp1 = getMockBuilder().createExperimentRandom(1);
-        exp1.setPublication(intactPub);
-        exp1.getXrefs().clear();
+        IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
-        ExperimentXref expXref = new ExperimentXref( exp1.getOwner(), imex, "IM-1", imexPrimary );
-        exp1.addXref(expXref);
-        ExperimentXref expXref2 = new ExperimentXref( exp1.getOwner(), imex, "IM-1", imexPrimary );
-        exp1.getXrefs().add(expXref2);
+        exp1.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-1", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
+        exp1.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-1", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
 
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(intactPub);
-        exp2.getXrefs().clear();
+        IntactExperiment exp2 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp2);
 
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.setPublication(intactPub);
-        exp3.getXrefs().clear();
+        IntactExperiment exp3 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp3);
 
-        getCorePersister().saveOrUpdate(intactPub);
+        pubService.saveOrUpdate(intactPub);
 
         Assert.assertEquals(3, intactPub.getExperiments().size());
-        Assert.assertEquals(2, exp1.getXrefs().size());
-
-        getDataContext().commitTransaction(status);
 
         List<String> expAcs = assignerTest.collectExperimentsToUpdateFrom(intactPub, "IM-1");
-        Assert.assertEquals(3, expAcs.size());
+        // only two experiments updated
+        Assert.assertEquals(2, expAcs.size());
 
         Set<String> expAcsUpdated = new HashSet<String>(expAcs.size());
         assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null, expAcsUpdated);
 
-        TransactionStatus status2 = getDataContext().beginTransaction();
+        // check that exp1 has not been updated
+        Experiment exp1Reloaded = dao.getExperimentDao().getByAc(exp1.getAc());
+        Assert.assertEquals(1, exp1Reloaded.getXrefs().size());
+        Assert.assertFalse(XrefUtils.collectAllXrefsHavingDatabaseQualifierAndId(exp1Reloaded.getXrefs(),
+                Xref.IMEX_MI, Xref.IMEX, "IM-1", Xref.IMEX_PRIMARY_MI, Xref.IMEX_PRIMARY).isEmpty());
 
-        uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(intactPub.getAc());
-        List<Experiment> experiments = new ArrayList<Experiment>(intactPubReloaded.getExperiments());
+        Experiment exp2Reloaded = dao.getExperimentDao().getByAc(exp2.getAc());
+        Assert.assertEquals(1, exp2Reloaded.getXrefs().size());
+        Assert.assertFalse(XrefUtils.collectAllXrefsHavingDatabaseQualifierAndId(exp2Reloaded.getXrefs(),
+                Xref.IMEX_MI, Xref.IMEX, "IM-1", Xref.IMEX_PRIMARY_MI, Xref.IMEX_PRIMARY).isEmpty());
 
-        for (Experiment exp : experiments){
-            Assert.assertEquals(1, exp.getXrefs().size());
-            ExperimentXref ref = exp.getXrefs().iterator().next();
-            Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref.getCvDatabase().getIdentifier());
-            Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
-            Assert.assertEquals("IM-1", ref.getPrimaryId());
-        }
-
-        getDataContext().commitTransaction(status2);
+        Experiment exp3Reloaded = dao.getExperimentDao().getByAc(exp3.getAc());
+        Assert.assertEquals(1, exp3Reloaded.getXrefs().size());
+        Assert.assertFalse(XrefUtils.collectAllXrefsHavingDatabaseQualifierAndId(exp3Reloaded.getXrefs(),
+                Xref.IMEX_MI, Xref.IMEX, "IM-1", Xref.IMEX_PRIMARY_MI, Xref.IMEX_PRIMARY).isEmpty());
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     @DirtiesContext
-    public void collectExistingInteractionImexIds() throws ImexCentralException {
-        TransactionStatus status = getDataContext().beginTransaction();
+    public void collectExistingInteractionImexIds() throws BridgeFailedException, SynchronizerException,
+            PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
+        IntactPublication intactPub = new IntactPublication("12345");
 
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-        
-        Experiment exp1 = getMockBuilder().createExperimentRandom(1);
-        exp1.setPublication(intactPub);
+        IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
-        InteractorXref expXref = new InteractorXref( exp1.getOwner(), imex, "IM-1-1", imexPrimary );
-        exp1.getInteractions().iterator().next().addXref(expXref);
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        ev1.assignImexId("IM-1-1");
+        exp1.addInteractionEvidence(ev1);
 
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(intactPub);
-        exp2.getXrefs().clear();
+        IntactExperiment exp2 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp2);
-        InteractorXref expXref2 = new InteractorXref( exp2.getOwner(), imex, "IM-1-2", imexPrimary );
-        exp2.getInteractions().iterator().next().addXref(expXref2);
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        ev2.assignImexId("IM-1-2");
+        exp2.addInteractionEvidence(ev2);
 
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.setPublication(intactPub);
-        exp3.getXrefs().clear();
+        IntactExperiment exp3 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp3);
-        InteractorXref expXref3 = new InteractorXref( exp3.getOwner(), imex, "IM-1", imexPrimary );
-        exp3.getInteractions().iterator().next().addXref(expXref3);
+        IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12347")));
+        ev3.assignImexId("IM-1");
+        exp3.addInteractionEvidence(ev3);
 
-        getCorePersister().saveOrUpdate(intactPub);
+        pubService.saveOrUpdate(intactPub);
 
-        Assert.assertEquals(3, getDaoFactory().getInteractionDao().countAll());
+        Assert.assertEquals(3, dao.getInteractionDao().countAll());
 
-        getDataContext().commitTransaction(status);
-        
         List<String> imexIds = assignerTest.collectExistingInteractionImexIdsForPublication(intactPub);
         Assert.assertEquals(3, imexIds.size());
 
@@ -574,34 +288,37 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     @DirtiesContext
-    public void updateImexIdentifiersForAllInteractions() throws ImexCentralException, PublicationImexUpdaterException {
+    public void updateImexIdentifiersForAllInteractions() throws BridgeFailedException, PublicationImexUpdaterException,
+            SynchronizerException, PersisterException, FinderException {
 
-        TransactionStatus status = getDataContext().beginTransaction();
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
+        IntactPublication intactPub = new IntactPublication("12345");
 
-        Experiment exp1 = getMockBuilder().createExperimentRandom(1);
-        exp1.setPublication(intactPub);
+        IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
-        Interaction int1 = exp1.getInteractions().iterator().next();
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        exp1.addInteractionEvidence(ev1);
 
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(intactPub);
+        IntactExperiment exp2 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp2);
-        Interaction int2 = exp2.getInteractions().iterator().next();
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp2.addInteractionEvidence(ev2);
 
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.setPublication(intactPub);
+        IntactExperiment exp3 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp3);
-        Interaction int3 = exp3.getInteractions().iterator().next();
+        IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12347")));
+        exp3.addInteractionEvidence(ev3);
 
-        getCorePersister().saveOrUpdate(intactPub);
+        pubService.saveOrUpdate(intactPub);
 
-        Assert.assertEquals(3, getDaoFactory().getInteractionDao().countAll());
-
-        getDataContext().commitTransaction(status);
+        Assert.assertEquals(3, dao.getInteractionDao().countAll());
 
         assignerTest.resetPublicationContext(intactPub, "IM-1");
 
@@ -610,126 +327,107 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
 
         Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
         assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
-        
-        TransactionStatus status2 = getDataContext().beginTransaction();
 
-        Interaction int1Reloaded = getDaoFactory().getInteractionDao().getByAc(int1.getAc());
+        InteractionEvidence int1Reloaded = dao.getInteractionDao().getByAc(ev1.getAc());
         Assert.assertEquals(1, int1Reloaded.getXrefs().size());
-        InteractorXref ref = int1Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref.getPrimaryId().startsWith("IM-1-"));
+        Xref ref = int1Reloaded.getXrefs().iterator().next();
+        Assert.assertEquals(Xref.IMEX_MI, ref.getDatabase().getMIIdentifier());
+        Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref.getQualifier().getMIIdentifier());
+        Assert.assertTrue(ref.getId().startsWith("IM-1-"));
 
-        Interaction int2Reloaded = getDaoFactory().getInteractionDao().getByAc(int2.getAc());
+        InteractionEvidence int2Reloaded = dao.getInteractionDao().getByAc(ev2.getAc());
         Assert.assertEquals(1, int2Reloaded.getXrefs().size());
-        InteractorXref ref2 = int2Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref2.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref2.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref2.getPrimaryId().startsWith("IM-1-"));
+        Xref ref2 = int2Reloaded.getXrefs().iterator().next();
+        Assert.assertEquals(Xref.IMEX_MI, ref2.getDatabase().getMIIdentifier());
+        Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref2.getQualifier().getMIIdentifier());
+        Assert.assertTrue(ref2.getId().startsWith("IM-1-"));
 
-        Interaction int3Reloaded = getDaoFactory().getInteractionDao().getByAc(int3.getAc());
+        InteractionEvidence int3Reloaded = dao.getInteractionDao().getByAc(ev3.getAc());
         Assert.assertEquals(1, int3Reloaded.getXrefs().size());
-        InteractorXref ref3 = int3Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref3.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref3.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref3.getPrimaryId().startsWith("IM-1-"));
+        Xref ref3 = int3Reloaded.getXrefs().iterator().next();
+        Assert.assertEquals(Xref.IMEX_MI, ref3.getDatabase().getMIIdentifier());
+        Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref3.getQualifier().getMIIdentifier());
+        Assert.assertTrue(ref3.getId().startsWith("IM-1-"));
         
-        Assert.assertNotSame(ref3.getPrimaryId(), ref2.getPrimaryId());
-        Assert.assertNotSame(ref.getPrimaryId(), ref2.getPrimaryId());
-        Assert.assertNotSame(ref.getPrimaryId(), ref3.getPrimaryId());
-
-        getDataContext().commitTransaction(status2);
+        Assert.assertNotSame(ref3.getId(), ref2.getId());
+        Assert.assertNotSame(ref.getId(), ref2.getId());
+        Assert.assertNotSame(ref.getId(), ref3.getId());
     }
 
-    @Test
-    @Transactional(propagation = Propagation.NEVER)
+    @Test(expected = PublicationImexUpdaterException.class)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     @DirtiesContext
-    public void updateImexIdentifiersForAllInteractions_conflict() throws ImexCentralException {
-        TransactionStatus status = getDataContext().beginTransaction();
+    public void updateImexIdentifiersForAllInteractions_conflict() throws BridgeFailedException, SynchronizerException,
+            PersisterException, FinderException, PublicationImexUpdaterException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
+        IntactPublication intactPub = new IntactPublication("12345");
 
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        Experiment exp1 = getMockBuilder().createExperimentRandom(1);
-        exp1.setPublication(intactPub);
+        IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
-        InteractorXref expXref = new InteractorXref( exp1.getOwner(), imex, "IM-1-1", imexPrimary );
-        exp1.getInteractions().iterator().next().addXref(expXref);
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        ev1.assignImexId("IM-1-1");
+        exp1.addInteractionEvidence(ev1);
 
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(intactPub);
-        exp2.getXrefs().clear();
+        IntactExperiment exp2 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp2);
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp2.addInteractionEvidence(ev2);
 
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.setPublication(intactPub);
-        exp3.getXrefs().clear();
+        IntactExperiment exp3 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp3);
-        InteractorXref expXref3 = new InteractorXref( exp3.getOwner(), imex, "IM-2-1", imexPrimary );
-        exp3.getInteractions().iterator().next().addXref(expXref3);
+        IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12347")));
+        ev3.assignImexId("IM-3-1");
+        exp3.addInteractionEvidence(ev3);
 
-        getCorePersister().saveOrUpdate(intactPub);
+        pubService.saveOrUpdate(intactPub);
 
-        Assert.assertEquals(3, getDaoFactory().getInteractionDao().countAll());
-
-        getDataContext().commitTransaction(status);
+        Assert.assertEquals(3, dao.getInteractionDao().countAll());
 
         assignerTest.resetPublicationContext(intactPub, "IM-1");
         List<String> interactionAcs = assignerTest.collectInteractionsToUpdateFrom(intactPub, "IM-1");
         Assert.assertEquals(2, interactionAcs.size());
 
-        try {
-            Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
-            assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
-            Assert.assertFalse(true);
-        } catch (PublicationImexUpdaterException e) {
-            Assert.assertTrue(true);
-        }
+        Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
+        assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     @DirtiesContext
-    public void updateImexIdentifiersForAllInteractions_existingImex() throws ImexCentralException, PublicationImexUpdaterException {
-        TransactionStatus status = getDataContext().beginTransaction();
+    public void updateImexIdentifiersForAllInteractions_existingImex() throws BridgeFailedException, PublicationImexUpdaterException,
+            SynchronizerException, PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
+        IntactPublication intactPub = new IntactPublication("12345");
 
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        Experiment exp1 = getMockBuilder().createExperimentRandom(1);
-        exp1.setPublication(intactPub);
+        IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
-        InteractorXref expXref = new InteractorXref( exp1.getOwner(), imex, "IM-1-1", imexPrimary );
-        Interaction int1 = exp1.getInteractions().iterator().next();
-        int1.addXref(expXref);
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        ev1.assignImexId("IM-1-1");
+        exp1.addInteractionEvidence(ev1);
 
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(intactPub);
-        exp2.getXrefs().clear();
-        Interaction int2 = exp2.getInteractions().iterator().next();
+        IntactExperiment exp2 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp2);
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp2.addInteractionEvidence(ev2);
 
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.setPublication(intactPub);
-        exp3.getXrefs().clear();
+        IntactExperiment exp3 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp3);
-        Interaction int3 = exp3.getInteractions().iterator().next();
+        IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12347")));
+        exp3.addInteractionEvidence(ev3);
 
-        getCorePersister().saveOrUpdate(intactPub);
+        pubService.saveOrUpdate(intactPub);
 
-        Assert.assertEquals(3, getDaoFactory().getInteractionDao().countAll());
-
-        getDataContext().commitTransaction(status);
+        Assert.assertEquals(3, dao.getInteractionDao().countAll());
 
         assignerTest.resetPublicationContext(intactPub, "IM-1");
 
@@ -739,194 +437,97 @@ public class IntactImexAssignerImplTest extends IntactBasicTestCase{
         Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
         assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
 
-        TransactionStatus status2 = getDataContext().beginTransaction();
-
-        Interaction int1Reloaded = getDaoFactory().getInteractionDao().getByAc(int1.getAc());
+        InteractionEvidence int1Reloaded = dao.getInteractionDao().getByAc(ev1.getAc());
         Assert.assertEquals(1, int1Reloaded.getXrefs().size());
-        InteractorXref ref = int1Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref.getPrimaryId().startsWith("IM-1-"));
+        Xref ref = int1Reloaded.getXrefs().iterator().next();
+        Assert.assertEquals(Xref.IMEX_MI, ref.getDatabase().getMIIdentifier());
+        Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref.getQualifier().getMIIdentifier());
+        Assert.assertTrue(ref.getId().startsWith("IM-1-"));
 
-        Interaction int2Reloaded = getDaoFactory().getInteractionDao().getByAc(int2.getAc());
+        InteractionEvidence int2Reloaded = dao.getInteractionDao().getByAc(ev2.getAc());
         Assert.assertEquals(1, int2Reloaded.getXrefs().size());
-        InteractorXref ref2 = int2Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref2.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref2.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref2.getPrimaryId().startsWith("IM-1-"));
+        Xref ref2 = int2Reloaded.getXrefs().iterator().next();
+        Assert.assertEquals(Xref.IMEX_MI, ref2.getDatabase().getMIIdentifier());
+        Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref2.getQualifier().getMIIdentifier());
+        Assert.assertTrue(ref2.getId().startsWith("IM-1-"));
 
-        Interaction int3Reloaded = getDaoFactory().getInteractionDao().getByAc(int3.getAc());
+        InteractionEvidence int3Reloaded = dao.getInteractionDao().getByAc(ev3.getAc());
         Assert.assertEquals(1, int3Reloaded.getXrefs().size());
-        InteractorXref ref3 = int3Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref3.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref3.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref3.getPrimaryId().startsWith("IM-1-"));
+        Xref ref3 = int3Reloaded.getXrefs().iterator().next();
+        Assert.assertEquals(Xref.IMEX_MI, ref3.getDatabase().getMIIdentifier());
+        Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref3.getQualifier().getMIIdentifier());
+        Assert.assertTrue(ref3.getId().startsWith("IM-1-"));
 
-        Assert.assertNotSame(ref3.getPrimaryId(), ref2.getPrimaryId());
-        Assert.assertNotSame(ref.getPrimaryId(), ref2.getPrimaryId());
-        Assert.assertNotSame(ref.getPrimaryId(), ref3.getPrimaryId());
-
-        getDataContext().commitTransaction(status2);
+        Assert.assertNotSame(ref3.getId(), ref2.getId());
+        Assert.assertNotSame(ref.getId(), ref2.getId());
+        Assert.assertNotSame(ref.getId(), ref3.getId());
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     @DirtiesContext
-    public void updateImexIdentifiersForAllInteractions_duplicatedImex() throws ImexCentralException, PublicationImexUpdaterException {
-        TransactionStatus status = getDataContext().beginTransaction();
+    public void updateImexIdentifiersForAllInteractions_duplicatedImex() throws BridgeFailedException, PublicationImexUpdaterException,
+            SynchronizerException, PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
+        IntactPublication intactPub = new IntactPublication("12345");
 
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        Experiment exp1 = getMockBuilder().createExperimentRandom(1);
-        exp1.setPublication(intactPub);
+        IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
-        InteractorXref expXref = new InteractorXref( exp1.getOwner(), imex, "IM-1-1", imexPrimary );
-        Interaction int1 = exp1.getInteractions().iterator().next();
-        InteractorXref expXref2 = new InteractorXref( exp1.getOwner(), imex, "IM-1-1", imexPrimary );
-        int1.addXref(expXref);
-        int1.getXrefs().add(expXref2);
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        ev1.assignImexId("IM-1-1");
+        ev1.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-1", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
+        exp1.addInteractionEvidence(ev1);
 
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(intactPub);
-        exp2.getXrefs().clear();
+        IntactExperiment exp2 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp2);
-        Interaction int2 = exp2.getInteractions().iterator().next();
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp2.addInteractionEvidence(ev2);
 
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.setPublication(intactPub);
-        exp3.getXrefs().clear();
+        IntactExperiment exp3 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp3);
-        Interaction int3 = exp3.getInteractions().iterator().next();
+        IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12347")));
+        exp3.addInteractionEvidence(ev3);
 
-        getCorePersister().saveOrUpdate(intactPub);
+        pubService.saveOrUpdate(intactPub);
 
-        Assert.assertEquals(3, getDaoFactory().getInteractionDao().countAll());
-
-        getDataContext().commitTransaction(status);
+        Assert.assertEquals(3, dao.getInteractionDao().countAll());
 
         assignerTest.resetPublicationContext(intactPub, "IM-1");
 
         List<String> interactionAcs = assignerTest.collectInteractionsToUpdateFrom(intactPub, "IM-1");
-        Assert.assertEquals(3, interactionAcs.size());
+        Assert.assertEquals(2, interactionAcs.size());
 
         Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
         assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
 
-        TransactionStatus status2 = getDataContext().beginTransaction();
-
-        Interaction int1Reloaded = getDaoFactory().getInteractionDao().getByAc(int1.getAc());
+        InteractionEvidence int1Reloaded = dao.getInteractionDao().getByAc(ev1.getAc());
         Assert.assertEquals(1, int1Reloaded.getXrefs().size());
-        InteractorXref ref = int1Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref.getPrimaryId().startsWith("IM-1-"));
+        Xref ref = int1Reloaded.getXrefs().iterator().next();
+        Assert.assertEquals(Xref.IMEX_MI, ref.getDatabase().getMIIdentifier());
+        Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref.getQualifier().getMIIdentifier());
+        Assert.assertTrue(ref.getId().startsWith("IM-1-"));
 
-        Interaction int2Reloaded = getDaoFactory().getInteractionDao().getByAc(int2.getAc());
+        InteractionEvidence int2Reloaded = dao.getInteractionDao().getByAc(ev2.getAc());
         Assert.assertEquals(1, int2Reloaded.getXrefs().size());
-        InteractorXref ref2 = int2Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref2.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref2.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref2.getPrimaryId().startsWith("IM-1-"));
+        Xref ref2 = int2Reloaded.getXrefs().iterator().next();
+        Assert.assertEquals(Xref.IMEX_MI, ref2.getDatabase().getMIIdentifier());
+        Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref2.getQualifier().getMIIdentifier());
+        Assert.assertTrue(ref2.getId().startsWith("IM-1-"));
 
-        Interaction int3Reloaded = getDaoFactory().getInteractionDao().getByAc(int3.getAc());
+        InteractionEvidence int3Reloaded = dao.getInteractionDao().getByAc(ev3.getAc());
         Assert.assertEquals(1, int3Reloaded.getXrefs().size());
-        InteractorXref ref3 = int3Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref3.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref3.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref3.getPrimaryId().startsWith("IM-1-"));
+        Xref ref3 = int3Reloaded.getXrefs().iterator().next();
+        Assert.assertEquals(Xref.IMEX_MI, ref3.getDatabase().getMIIdentifier());
+        Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref3.getQualifier().getMIIdentifier());
+        Assert.assertTrue(ref3.getId().startsWith("IM-1-"));
 
-        Assert.assertNotSame(ref3.getPrimaryId(), ref2.getPrimaryId());
-        Assert.assertNotSame(ref.getPrimaryId(), ref2.getPrimaryId());
-        Assert.assertNotSame(ref.getPrimaryId(), ref3.getPrimaryId());
-
-        getDataContext().commitTransaction(status2);
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.NEVER)
-    @DirtiesContext
-    public void updateImexIdentifiersForAllInteractions_secondaryImex() throws ImexCentralException, PublicationImexUpdaterException {
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        uk.ac.ebi.intact.model.Publication intactPub = getMockBuilder().createPublication("12345");
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        Experiment exp1 = getMockBuilder().createExperimentRandom(1);
-        exp1.setPublication(intactPub);
-        intactPub.addExperiment(exp1);
-        InteractorXref expXref = new InteractorXref( exp1.getOwner(), imex, "IM-1", imexPrimary );
-        Interaction int1 = exp1.getInteractions().iterator().next();
-        int1.addXref(expXref);
-
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(intactPub);
-        exp2.getXrefs().clear();
-        intactPub.addExperiment(exp2);
-        Interaction int2 = exp2.getInteractions().iterator().next();
-
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.setPublication(intactPub);
-        exp3.getXrefs().clear();
-        intactPub.addExperiment(exp3);
-        Interaction int3 = exp3.getInteractions().iterator().next();
-
-        getCorePersister().saveOrUpdate(intactPub);
-
-        Assert.assertEquals(3, getDaoFactory().getInteractionDao().countAll());
-
-        getDataContext().commitTransaction(status);
-
-        assignerTest.resetPublicationContext(intactPub, "IM-1");
-
-        List<String> interactionAcs = assignerTest.collectInteractionsToUpdateFrom(intactPub, "IM-1");
-        Assert.assertEquals(3, interactionAcs.size());
-
-        Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
-        assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
-
-        TransactionStatus status2 = getDataContext().beginTransaction();
-
-        Interaction int1Reloaded = getDaoFactory().getInteractionDao().getByAc(int1.getAc());
-        Assert.assertEquals(2, int1Reloaded.getXrefs().size());
-        Iterator<InteractorXref> refIterator = int1Reloaded.getXrefs().iterator();
-        InteractorXref ref = refIterator.next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref.getCvDatabase().getIdentifier());
-        Assert.assertEquals("imex secondary", ref.getCvXrefQualifier().getShortLabel());
-        Assert.assertEquals("IM-1", ref.getPrimaryId());
-        InteractorXref ref2 = refIterator.next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref2.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref2.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref2.getPrimaryId().startsWith("IM-1-"));
-
-        Interaction int2Reloaded = getDaoFactory().getInteractionDao().getByAc(int2.getAc());
-        Assert.assertEquals(1, int2Reloaded.getXrefs().size());
-        InteractorXref ref3 = int2Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref3.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref3.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref3.getPrimaryId().startsWith("IM-1-"));
-
-        Interaction int3Reloaded = getDaoFactory().getInteractionDao().getByAc(int3.getAc());
-        Assert.assertEquals(1, int3Reloaded.getXrefs().size());
-        InteractorXref ref4 = int3Reloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, ref4.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, ref4.getCvXrefQualifier().getIdentifier());
-        Assert.assertTrue(ref4.getPrimaryId().startsWith("IM-1-"));
-
-        Assert.assertNotSame(ref4.getPrimaryId(), ref3.getPrimaryId());
-        Assert.assertNotSame(ref2.getPrimaryId(), ref3.getPrimaryId());
-        Assert.assertNotSame(ref2.getPrimaryId(), ref4.getPrimaryId());
-
-        getDataContext().commitTransaction(status2);
+        Assert.assertNotSame(ref3.getId(), ref2.getId());
+        Assert.assertNotSame(ref.getId(), ref2.getId());
+        Assert.assertNotSame(ref.getId(), ref3.getId());
     }
 }

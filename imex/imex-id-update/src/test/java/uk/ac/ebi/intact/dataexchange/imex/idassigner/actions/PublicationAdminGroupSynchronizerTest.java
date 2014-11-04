@@ -23,7 +23,7 @@ import java.util.Iterator;
  */
 @ContextConfiguration(locations = {"classpath*:/META-INF/intact.spring.xml",
         "classpath*:/META-INF/standalone/*-standalone.spring.xml",
-        "classpath*:/META-INF/beansimex-test.spring.xml"})
+        "classpath*:/META-INF/imex-test.spring.xml"})
 public class PublicationAdminGroupSynchronizerTest extends IntactBasicTestCase{
 
     @Autowired
