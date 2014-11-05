@@ -6,8 +6,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -17,6 +15,7 @@ import psidev.psi.mi.jami.bridges.imex.extension.ImexPublication;
 import psidev.psi.mi.jami.imex.actions.PublicationStatusSynchronizer;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
+import uk.ac.ebi.intact.jami.model.extension.IntactSource;
 import uk.ac.ebi.intact.jami.model.lifecycle.LifeCycleStatus;
 import uk.ac.ebi.intact.jami.service.PublicationService;
 import uk.ac.ebi.intact.jami.synchronizer.FinderException;
@@ -35,14 +34,14 @@ import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
         "classpath*:/META-INF/imex-test.spring.xml"})
 public class PublicationStatusSynchronizerImplTest {
 
-    @Autowired
-    @Qualifier("intactImexStatusSynchronizer")
     private PublicationStatusSynchronizer imexStatusSynchronizerTest;
     private ImexPublication intactPub1;
     private ImexPublication intactPub2;
 
     @Before
     public void createImexPublications() throws BridgeFailedException {
+        this.imexStatusSynchronizerTest = ApplicationContextProvider.getBean("intactImexStatusSynchronizer");
+
         Publication pub = new Publication();
         Identifier pubmed = new Identifier();
         pubmed.setNs("pmid");
@@ -70,10 +69,9 @@ public class PublicationStatusSynchronizerImplTest {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
         IntactPublication intactPublication = new IntactPublication("12345");
+        intactPublication.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(intactPublication);
-
         imexStatusSynchronizerTest.synchronizePublicationStatusWithImexCentral(intactPublication, intactPub1);
-
         Assert.assertEquals(PublicationStatus.NEW, intactPub1.getStatus());
     }
 
@@ -84,6 +82,7 @@ public class PublicationStatusSynchronizerImplTest {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
         IntactPublication intactPublication = new IntactPublication("12345");
+        intactPublication.setSource(new IntactSource("intact"));
         intactPublication.setStatus(LifeCycleStatus.RELEASED);
         pubService.saveOrUpdate(intactPublication);
 

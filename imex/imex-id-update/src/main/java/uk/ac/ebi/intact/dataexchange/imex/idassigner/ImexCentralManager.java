@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
-import psidev.psi.mi.jami.bridges.imex.ImexCentralClient;
 import psidev.psi.mi.jami.bridges.imex.extension.ImexPublication;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.imex.actions.ImexCentralPublicationRegister;
@@ -29,10 +28,9 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateListener
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.LoggingImexUpdateListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ReportWriterListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.FileImexUpdateReportHandler;
-
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 import uk.ac.ebi.intact.jami.dao.PublicationDao;
-
 import uk.ac.ebi.intact.jami.interceptor.IntactTransactionSynchronization;
 import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
 import uk.ac.ebi.intact.jami.synchronizer.FinderException;
@@ -64,36 +62,15 @@ public class ImexCentralManager {
     private IntactTransactionSynchronization afterCommitExecutor;
 
     @Autowired
-    @Qualifier("imexCentralClient")
-    private ImexCentralClient imexCentralClient;
-
-    @Autowired
-    @Qualifier("intactPublicationUpdater")
-    private IntactImexPublicationUpdater publicationUpdater;
-
-    @Autowired
-    @Qualifier("intactPublicationRegister")
-    private IntactImexPublicationRegister publicationRegister;
-
-    @Autowired
-    @Qualifier("intactPublicationAssigner")
-    private IntactImexPublicationAssigner publicationImexAssigner;
-
-    @Autowired
-    @Qualifier("imexCentralRegister")
-    private ImexCentralPublicationRegister imexCentralRegister;
-
-    @Autowired
-    @Qualifier("intactImexStatusSynchronizer")
-    private PublicationStatusSynchronizer imexStatusSynchronizer;
-
-    @Autowired
-    @Qualifier("intactImexAssigner")
-    private IntactImexAssigner intactImexAssigner;
-
-    @Autowired
     @Qualifier("imexUpdateConfig")
     private ImexAssignerConfig imexUpdateConfig;
+
+    private IntactImexPublicationUpdater publicationUpdater;
+    private IntactImexPublicationRegister publicationRegister;
+    private IntactImexPublicationAssigner publicationImexAssigner;
+    private ImexCentralPublicationRegister imexCentralRegister;
+    private PublicationStatusSynchronizer imexStatusSynchronizer;
+    private IntactImexAssigner intactImexAssigner;
 
     /**
      * List of listeners
@@ -477,6 +454,12 @@ public class ImexCentralManager {
     }
 
     public ImexCentralPublicationRegister getImexCentralRegister() {
+        if (this.imexCentralRegister == null){
+            this.imexCentralRegister = ApplicationContextProvider.getBean("imexCentralRegister");
+            if (this.imexCentralRegister == null){
+                throw new IllegalArgumentException("A ImexCentralPublicationRegister bean with name 'imexCentralRegister' is expected and cannot be found in the spring application context");
+            }
+        }
         return imexCentralRegister;
     }
 
@@ -485,6 +468,12 @@ public class ImexCentralManager {
     }
 
     public PublicationStatusSynchronizer getImexStatusSynchronizer() {
+        if (this.imexStatusSynchronizer == null){
+            this.imexStatusSynchronizer = ApplicationContextProvider.getBean("intactImexStatusSynchronizer");
+            if (this.imexStatusSynchronizer == null){
+                throw new IllegalArgumentException("A PublicationStatusSynchronizer bean with name 'intactImexStatusSynchronizer' is expected and cannot be found in the spring application context");
+            }
+        }
         return imexStatusSynchronizer;
     }
 
@@ -493,6 +482,12 @@ public class ImexCentralManager {
     }
 
     public IntactImexAssigner getIntactImexAssigner() {
+        if (this.intactImexAssigner == null){
+            this.intactImexAssigner = ApplicationContextProvider.getBean("intactImexAssigner");
+            if (this.intactImexAssigner == null){
+                throw new IllegalArgumentException("A IntactImexAssigner bean with name 'intactImexAssigner' is expected and cannot be found in the spring application context");
+            }
+        }
         return intactImexAssigner;
     }
 
@@ -599,14 +594,32 @@ public class ImexCentralManager {
     }
 
     public IntactImexPublicationUpdater getPublicationUpdater() {
+        if (this.publicationUpdater == null){
+            this.publicationUpdater = ApplicationContextProvider.getBean("intactPublicationUpdater");
+            if (this.publicationUpdater == null){
+                throw new IllegalArgumentException("A IntactImexPublicationUpdater bean with name 'intactPublicationUpdater' is expected and cannot be found in the spring application context");
+            }
+        }
         return publicationUpdater;
     }
 
     public IntactImexPublicationRegister getPublicationRegister() {
+        if (this.publicationRegister == null){
+            this.publicationRegister = ApplicationContextProvider.getBean("intactPublicationRegister");
+            if (this.publicationRegister == null){
+                throw new IllegalArgumentException("A ImexPublicationRegister bean with name 'intactPublicationRegister' is expected and cannot be found in the spring application context");
+            }
+        }
         return publicationRegister;
     }
 
     public IntactImexPublicationAssigner getPublicationImexAssigner() {
+        if (this.publicationImexAssigner == null){
+            this.publicationImexAssigner = ApplicationContextProvider.getBean("intactPublicationAssigner");
+            if (this.publicationImexAssigner == null){
+                throw new IllegalArgumentException("A IntactImexPublicationAssigner bean with name 'intactPublicationAssigner' is expected and cannot be found in the spring application context");
+            }
+        }
         return publicationImexAssigner;
     }
 

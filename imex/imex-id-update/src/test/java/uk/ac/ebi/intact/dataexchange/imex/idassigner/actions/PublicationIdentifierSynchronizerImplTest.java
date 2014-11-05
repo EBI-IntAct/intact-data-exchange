@@ -6,8 +6,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,8 +33,6 @@ import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
         "classpath*:/META-INF/imex-test.spring.xml"})
 public class PublicationIdentifierSynchronizerImplTest {
 
-    @Autowired
-    @Qualifier("publicationIdentifierSynchronizer")
     private PublicationIdentifierSynchronizer identifierSynchronizerTest;
     private ImexPublication intactPub12345;
     private ImexPublication intactDoi;
@@ -45,6 +41,9 @@ public class PublicationIdentifierSynchronizerImplTest {
 
     @Before
     public void createImexPublications() throws BridgeFailedException {
+
+        this.identifierSynchronizerTest = ApplicationContextProvider.getBean("publicationIdentifierSynchronizer");
+
         Publication pub = new Publication();
         Identifier pubmed = new Identifier();
         pubmed.setNs("pmid");

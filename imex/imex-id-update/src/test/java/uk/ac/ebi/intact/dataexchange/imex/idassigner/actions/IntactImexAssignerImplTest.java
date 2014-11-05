@@ -6,8 +6,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,14 +39,15 @@ import java.util.*;
         "classpath*:/META-INF/imex-test.spring.xml"})
 public class IntactImexAssignerImplTest{
 
-    @Autowired
-    @Qualifier("intactImexAssigner")
     private IntactImexAssigner assignerTest;
 
     private ImexPublication imexPublication;
 
     @Before
     public void createImexPublications() throws BridgeFailedException {
+
+        this.assignerTest = ApplicationContextProvider.getBean("intactImexAssigner");
+
         Publication pub = new Publication();
         Identifier pubmed = new Identifier();
         pubmed.setNs("pmid");

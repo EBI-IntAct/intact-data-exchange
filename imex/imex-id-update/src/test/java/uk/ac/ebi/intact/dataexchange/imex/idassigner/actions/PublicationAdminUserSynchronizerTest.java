@@ -6,8 +6,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,8 +37,6 @@ import java.util.Iterator;
         "classpath*:/META-INF/imex-test.spring.xml"})
 public class PublicationAdminUserSynchronizerTest {
 
-    @Autowired
-    @Qualifier("intactImexAdminUserSynchronizer")
     private PublicationAdminUserSynchronizer imexAdminUserSynchronizerTest;
     private ImexPublication intactPub;
     private ImexPublication noIntactPub;
@@ -48,6 +44,9 @@ public class PublicationAdminUserSynchronizerTest {
 
     @Before
     public void createImexPublications() throws BridgeFailedException {
+
+        this.imexAdminUserSynchronizerTest = ApplicationContextProvider.getBean("intactImexAdminUserSynchronizer");
+
         Publication pub = new Publication();
         Identifier pubmed = new Identifier();
         pubmed.setNs("pmid");
