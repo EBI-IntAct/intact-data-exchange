@@ -164,7 +164,6 @@ public class IntactPublicationCollectorImplTest {
             PersisterException, FinderException {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
-
         // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
         IntactPublication pubWithImex = new IntactPublication("12345");
         Experiment exp1 = new IntactExperiment(pubWithImex);
@@ -179,7 +178,6 @@ public class IntactPublicationCollectorImplTest {
         pubWithImex.setSource(new IntactSource("intact"));
         pubWithImex.setCurationDepth(CurationDepth.IMEx);
         pubService.saveOrUpdate(pubWithImex);
-
         // one publication without imex-primary, not eligible IMEx no curation depth
         IntactPublication pubWithoutImex = new IntactPublication("12345");
         pubWithoutImex.setCurationDepth(CurationDepth.MIMIx);

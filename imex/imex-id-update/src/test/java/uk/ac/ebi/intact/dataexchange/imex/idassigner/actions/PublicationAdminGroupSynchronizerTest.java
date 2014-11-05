@@ -137,7 +137,6 @@ public class PublicationAdminGroupSynchronizerTest{
         group.remove();
     }
 
-    @Test(expected = BridgeFailedException.class)
     @DirtiesContext
     public void synchronize_unknown_admin_add_intact() throws BridgeFailedException, SynchronizerException, PersisterException, FinderException {
 

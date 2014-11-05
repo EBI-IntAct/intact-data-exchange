@@ -80,7 +80,7 @@ public class PublicationAdminUserSynchronizerTest {
     @DirtiesContext
     @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     public void synchronize_intact_user() throws BridgeFailedException, SynchronizerException, PersisterException, FinderException {
-        User user = new User("default", "default", "default", "default@ebi.ac.uk") ;
+        User user = new User("intact", "intact", "default", "default@ebi.ac.uk") ;
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
         dao.getUserDao().persist(user);
 
@@ -103,7 +103,7 @@ public class PublicationAdminUserSynchronizerTest {
     @DirtiesContext
     public void synchronize_intact_user_alreadyPresent() throws BridgeFailedException, SynchronizerException, FinderException, PersisterException {
 
-        User user = new User("default", "default", "default", "default@ebi.ac.uk") ;
+        User user = new User("intact", "intact", "default", "default@ebi.ac.uk") ;
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
         dao.getUserDao().persist(user);
 
@@ -131,7 +131,7 @@ public class PublicationAdminUserSynchronizerTest {
 
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
-        IntactPublication intactPublication = new IntactPublication("12345");
+        IntactPublication intactPublication = new IntactPublication("12347");
         intactPublication.setSource(new IntactSource("intact"));
         intactPublication.setCurrentOwner(user);
         pubService.saveOrUpdate(intactPublication);

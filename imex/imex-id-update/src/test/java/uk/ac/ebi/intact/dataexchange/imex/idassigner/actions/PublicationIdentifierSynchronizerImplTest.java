@@ -16,6 +16,7 @@ import psidev.psi.mi.jami.imex.actions.PublicationIdentifierSynchronizer;
 import psidev.psi.mi.jami.utils.XrefUtils;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
+import uk.ac.ebi.intact.jami.model.extension.IntactSource;
 import uk.ac.ebi.intact.jami.service.PublicationService;
 import uk.ac.ebi.intact.jami.synchronizer.FinderException;
 import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
@@ -113,6 +114,7 @@ public class PublicationIdentifierSynchronizerImplTest {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
         IntactPublication intactPublication = new IntactPublication("12345");
+        intactPublication.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(intactPublication);
 
         identifierSynchronizerTest.synchronizePublicationIdentifier(intactPublication, intactPub12345);
@@ -129,6 +131,7 @@ public class PublicationIdentifierSynchronizerImplTest {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
         IntactPublication intactPublication = new IntactPublication("12345");
+        intactPublication.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(intactPublication);
 
         identifierSynchronizerTest.synchronizePublicationIdentifier(intactPublication, intactPub12345);
@@ -145,6 +148,7 @@ public class PublicationIdentifierSynchronizerImplTest {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
         IntactPublication intactPublication = new IntactPublication("unassigned604");
+        intactPublication.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(intactPublication);
 
         identifierSynchronizerTest.synchronizePublicationIdentifier(intactPublication, intactPubUnassigned);
@@ -153,7 +157,7 @@ public class PublicationIdentifierSynchronizerImplTest {
         intactPubUnassigned.getIdentifiers().clear();
     }
 
-    @Test(expected = PublicationImexUpdaterException.class)
+    @Test(expected = EnricherException.class)
     @DirtiesContext
     public void synchronized_mismatch_pubmedId_aborted() throws BridgeFailedException, SynchronizerException, PersisterException, FinderException,
             EnricherException {
@@ -161,12 +165,13 @@ public class PublicationIdentifierSynchronizerImplTest {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
         IntactPublication intactPublication = new IntactPublication("12346");
+        intactPublication.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(intactPublication);
 
         identifierSynchronizerTest.synchronizePublicationIdentifier(intactPublication, intactPub12345);
     }
 
-    @Test(expected = PublicationImexUpdaterException.class)
+    @Test(expected = EnricherException.class)
     @DirtiesContext
     public void synchronized_mismatch_unassigned_intact_aborted() throws BridgeFailedException, SynchronizerException,
             PersisterException, FinderException, EnricherException {
@@ -174,12 +179,13 @@ public class PublicationIdentifierSynchronizerImplTest {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
         IntactPublication intactPublication = new IntactPublication("unassigned604");
+        intactPublication.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(intactPublication);
 
         identifierSynchronizerTest.synchronizePublicationIdentifier(intactPublication, intactPub12345);
     }
 
-    @Test(expected = PublicationImexUpdaterException.class)
+    @Test(expected = EnricherException.class)
     @DirtiesContext
     public void synchronized_mismatch_doi_aborted() throws BridgeFailedException, SynchronizerException, PersisterException, FinderException,
             EnricherException {
@@ -187,12 +193,13 @@ public class PublicationIdentifierSynchronizerImplTest {
 
         IntactPublication intactPublication = new IntactPublication();
         intactPublication.getIdentifiers().add(XrefUtils.createDoiIdentity("1234-5(7a)"));
+        intactPublication.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(intactPublication);
 
         identifierSynchronizerTest.synchronizePublicationIdentifier(intactPublication, intactDoi);
     }
 
-    @Test(expected = EnricherException.class)
+    @Test(expected = BridgeFailedException.class)
     @DirtiesContext
     public void synchronized_new_identifier_already_existing_aborted() throws PublicationImexUpdaterException, SynchronizerException,
             PersisterException, FinderException, BridgeFailedException, EnricherException {
@@ -200,6 +207,7 @@ public class PublicationIdentifierSynchronizerImplTest {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
         IntactPublication intactPublication = new IntactPublication("12345");
+        intactPublication.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(intactPublication);
         identifierSynchronizerTest.synchronizePublicationIdentifier(intactPublication, intactPubUnassigned);
 

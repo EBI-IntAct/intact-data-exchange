@@ -81,7 +81,7 @@ public class PublicationStatusSynchronizerImplTest {
 
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
-        IntactPublication intactPublication = new IntactPublication("12345");
+        IntactPublication intactPublication = new IntactPublication("12346");
         intactPublication.setSource(new IntactSource("intact"));
         intactPublication.setStatus(LifeCycleStatus.RELEASED);
         pubService.saveOrUpdate(intactPublication);
