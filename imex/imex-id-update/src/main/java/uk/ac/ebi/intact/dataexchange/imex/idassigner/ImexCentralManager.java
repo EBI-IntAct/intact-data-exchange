@@ -84,7 +84,7 @@ public class ImexCentralManager {
     private ImexCentralPublicationRegister imexCentralRegister;
 
     @Autowired
-    @Qualifier("imexStatusSynchronizer")
+    @Qualifier("intactImexStatusSynchronizer")
     private PublicationStatusSynchronizer imexStatusSynchronizer;
 
     @Autowired

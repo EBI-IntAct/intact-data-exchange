@@ -5,12 +5,23 @@ import edu.ucla.mbi.imex.central.ws.v20.Publication;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
+import psidev.psi.mi.jami.bridges.imex.extension.ImexPublication;
+import psidev.psi.mi.jami.imex.actions.PublicationAdminGroupSynchronizer;
+import psidev.psi.mi.jami.model.Source;
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
+import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
+import uk.ac.ebi.intact.jami.model.extension.IntactSource;
+import uk.ac.ebi.intact.jami.service.PublicationService;
+import uk.ac.ebi.intact.jami.synchronizer.FinderException;
+import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
+import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
 
 import java.util.Iterator;
 
@@ -21,115 +32,127 @@ import java.util.Iterator;
  * @version $Id$
  * @since <pre>10/04/12</pre>
  */
-@ContextConfiguration(locations = {"classpath*:/META-INF/intact.spring.xml",
-        "classpath*:/META-INF/standalone/*-standalone.spring.xml",
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath*:/META-INF/intact-jami-test.spring.xml",
         "classpath*:/META-INF/imex-test.spring.xml"})
-public class PublicationAdminGroupSynchronizerTest extends IntactBasicTestCase{
+public class PublicationAdminGroupSynchronizerTest{
 
     @Autowired
+    @Qualifier("intactImexAdminGroupSynchronizer")
     private PublicationAdminGroupSynchronizer imexAdminGroupSynchronizerTest;
-    private Publication intactPub;
-    private Publication noIntactPub;
-    private Publication intactPub2;
-    private Publication noIntactPub2;
+    private ImexPublication intactPub;
+    private ImexPublication noIntactPub;
+    private ImexPublication intactPub2;
+    private ImexPublication noIntactPub2;
 
     @Before
-    public void createImexPublications() throws ImexCentralException {
-        intactPub = new Publication();
+    public void createImexPublications() throws BridgeFailedException {
+        Publication pub = new Publication();
         Identifier pubmed = new Identifier();
         pubmed.setNs("pmid");
         pubmed.setAc("12345");
-        intactPub.getIdentifier().add(pubmed);
-        intactPub.setAdminGroupList(new Publication.AdminGroupList());
-        intactPub.getAdminGroupList().getGroup().add("INTACT");
-        intactPub.getAdminGroupList().getGroup().add("INTACT Curators");
+        pub.getIdentifier().add(pubmed);
+        pub.setAdminGroupList(new Publication.AdminGroupList());
+        pub.getAdminGroupList().getGroup().add("INTACT");
+        pub.getAdminGroupList().getGroup().add("INTACT Curators");
+        intactPub = new ImexPublication(pub);
         imexAdminGroupSynchronizerTest.getImexCentralClient().createPublication(intactPub);
 
-        noIntactPub = new Publication();
+        Publication pub2 = new Publication();
         Identifier pubmed2 = new Identifier();
         pubmed2.setNs("pmid");
         pubmed2.setAc("12346");
-        noIntactPub.getIdentifier().add(pubmed2);
+        pub2.getIdentifier().add(pubmed2);
+        noIntactPub = new ImexPublication(pub2);
         imexAdminGroupSynchronizerTest.getImexCentralClient().createPublication(noIntactPub);
 
-        intactPub2 = new Publication();
+        Publication pub3 = new Publication();
         Identifier pubmed3 = new Identifier();
         pubmed3.setNs("pmid");
         pubmed3.setAc("12347");
-        intactPub2.getIdentifier().add(pubmed3);
-        intactPub2.setAdminGroupList(new Publication.AdminGroupList());
-        intactPub2.getAdminGroupList().getGroup().add("INTACT");
+        pub3.getIdentifier().add(pubmed3);
+        pub3.setAdminGroupList(new Publication.AdminGroupList());
+        pub3.getAdminGroupList().getGroup().add("INTACT");
+        intactPub2 = new ImexPublication(pub3);
         imexAdminGroupSynchronizerTest.getImexCentralClient().createPublication(intactPub2);
 
-        noIntactPub2 = new Publication();
+        Publication pub4 = new Publication();
         Identifier pubmed4 = new Identifier();
         pubmed4.setNs("pmid");
         pubmed4.setAc("12348");
-        noIntactPub2.getIdentifier().add(pubmed4);
+        pub4.getIdentifier().add(pubmed4);
+        noIntactPub2 = new ImexPublication(pub4);
         imexAdminGroupSynchronizerTest.getImexCentralClient().createPublication(noIntactPub2);
 
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    public void synchronize_intact_admin() throws ImexCentralException {
+    @DirtiesContext
+    public void synchronize_intact_admin() throws BridgeFailedException, SynchronizerException, PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
-        uk.ac.ebi.intact.model.Publication intactPublication = new uk.ac.ebi.intact.model.Publication(getIntactContext().getInstitution(), "12346");
-        intactPublication.getOwner().setShortLabel("intact");
+        IntactPublication intactPublication = new IntactPublication("12346");
+        intactPublication.setSource(new IntactSource("intact"));
+        pubService.saveOrUpdate(intactPublication);
         
         imexAdminGroupSynchronizerTest.synchronizePublicationAdminGroup(intactPublication, noIntactPub);
         
-        Assert.assertEquals(1, noIntactPub.getAdminGroupList().getGroup().size());
-        Assert.assertEquals("INTACT", noIntactPub.getAdminGroupList().getGroup().iterator().next());
-        noIntactPub.getAdminGroupList().getGroup().clear();
+        Assert.assertEquals(1, noIntactPub.getSources().size());
+        Assert.assertEquals("INTACT", noIntactPub.getSources().iterator().next().getShortName().toUpperCase());
+        noIntactPub.getSources().clear();
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    public void synchronize_intact_admin_alreadyPresent() throws ImexCentralException {
+    @DirtiesContext
+    public void synchronize_intact_admin_alreadyPresent() throws BridgeFailedException, SynchronizerException, PersisterException, FinderException {
 
-        uk.ac.ebi.intact.model.Publication intactPublication = new uk.ac.ebi.intact.model.Publication(getIntactContext().getInstitution(), "12345");
-        intactPublication.getOwner().setShortLabel("intact");
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+
+        IntactPublication intactPublication = new IntactPublication("12345");
+        intactPublication.setSource(new IntactSource("intact"));
+        pubService.saveOrUpdate(intactPublication);
 
         imexAdminGroupSynchronizerTest.synchronizePublicationAdminGroup(intactPublication, intactPub);
 
-        Assert.assertEquals(2, intactPub.getAdminGroupList().getGroup().size());
-        Assert.assertEquals("INTACT", intactPub.getAdminGroupList().getGroup().iterator().next());
+        Assert.assertEquals(2, intactPub.getSources().size());
+        Assert.assertEquals("INTACT", intactPub.getSources().iterator().next().getShortName().toUpperCase());
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    public void synchronize_matrixDb_admin_alreadyPresent() throws ImexCentralException {
+    @DirtiesContext
+    public void synchronize_matrixDb_admin_alreadyPresent() throws BridgeFailedException, SynchronizerException, PersisterException, FinderException {
 
-        uk.ac.ebi.intact.model.Publication intactPublication = new uk.ac.ebi.intact.model.Publication(getIntactContext().getInstitution(), "12347");
-        intactPublication.getOwner().setShortLabel("matrixdb");
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+
+        IntactPublication intactPublication = new IntactPublication("12347");
+        intactPublication.setSource(new IntactSource("matrixdb"));
+        pubService.saveOrUpdate(intactPublication);
 
         imexAdminGroupSynchronizerTest.synchronizePublicationAdminGroup(intactPublication, intactPub2);
 
-        Assert.assertEquals(2, intactPub2.getAdminGroupList().getGroup().size());
-        Iterator<String> group = intactPub2.getAdminGroupList().getGroup().iterator();
+        Assert.assertEquals(2, intactPub2.getSources().size());
+        Iterator<Source> group = intactPub2.getSources().iterator();
         
-        Assert.assertEquals("INTACT", group.next());
-        Assert.assertEquals("MATRIXDB", group.next());
+        Assert.assertEquals("INTACT", group.next().getShortName().toUpperCase());
+        Assert.assertEquals("MATRIXDB", group.next().getShortName().toUpperCase());
         group.remove();
     }
 
-    @Test
-    @Transactional(propagation = Propagation.NEVER)
-    public void synchronize_unknown_admin_add_intact() {
+    @Test(expected = BridgeFailedException.class)
+    @DirtiesContext
+    public void synchronize_unknown_admin_add_intact() throws BridgeFailedException, SynchronizerException, PersisterException, FinderException {
 
-        uk.ac.ebi.intact.model.Publication intactPublication = new uk.ac.ebi.intact.model.Publication(getIntactContext().getInstitution(), "12348");
-        intactPublication.getOwner().setShortLabel("i2d");
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
 
-        try {
-            imexAdminGroupSynchronizerTest.synchronizePublicationAdminGroup(intactPublication, noIntactPub2);
-            Assert.assertEquals(1, noIntactPub2.getAdminGroupList().getGroup().size());
-            Iterator<String> group = noIntactPub2.getAdminGroupList().getGroup().iterator();
+        IntactPublication intactPublication = new IntactPublication("12348");
+        intactPublication.setSource(new IntactSource("i2d"));
+        pubService.saveOrUpdate(intactPublication);
 
-            Assert.assertEquals("INTACT", group.next());
-            noIntactPub2.getAdminGroupList().getGroup().clear();
-        } catch (ImexCentralException e) {
-            Assert.assertFalse(true);
-        }
+        imexAdminGroupSynchronizerTest.synchronizePublicationAdminGroup(intactPublication, noIntactPub2);
+        Assert.assertEquals(1, noIntactPub2.getSources().size());
+        Iterator<Source> group = noIntactPub2.getSources().iterator();
+
+        Assert.assertEquals("INTACT", group.next().getShortName().toUpperCase());
+        noIntactPub2.getSources().clear();
     }
 }

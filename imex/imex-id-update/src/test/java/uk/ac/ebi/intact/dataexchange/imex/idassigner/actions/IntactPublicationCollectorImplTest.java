@@ -8,27 +8,20 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import psidev.psi.mi.jami.model.Experiment;
-import psidev.psi.mi.jami.model.Publication;
-import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.model.*;
+import psidev.psi.mi.jami.model.impl.DefaultNucleicAcid;
+import psidev.psi.mi.jami.model.impl.DefaultProtein;
+import psidev.psi.mi.jami.utils.AnnotationUtils;
 import psidev.psi.mi.jami.utils.XrefUtils;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.lifecycle.LifecycleManager;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 import uk.ac.ebi.intact.jami.model.extension.*;
+import uk.ac.ebi.intact.jami.model.lifecycle.LifeCycleStatus;
 import uk.ac.ebi.intact.jami.service.PublicationService;
 import uk.ac.ebi.intact.jami.synchronizer.FinderException;
 import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
 import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.user.User;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import uk.ac.ebi.intact.jami.utils.IntactUtils;
 
 import java.text.ParseException;
 import java.util.*;
@@ -62,6 +55,7 @@ public class IntactPublicationCollectorImplTest {
         Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
         pubWithImex.assignImexId("IM-3");
+        pubWithImex.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(pubWithImex);
         
         // one publication without imex-primary ref but interaction with imex primary ref
@@ -72,7 +66,7 @@ public class IntactPublicationCollectorImplTest {
         interWithImex.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
         interWithImex.assignImexId("IM-4-1");
         exp2.addInteractionEvidence(interWithImex);
-
+        pubWithoutImex.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(pubWithoutImex);
 
         // reset collections
@@ -97,14 +91,15 @@ public class IntactPublicationCollectorImplTest {
         Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
         pubWithImex.assignImexId("IM-3");
+        pubWithImex.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(pubWithImex);
 
-        // one publication without imex-primary ref but interaction with imex primary ref
+        // one publication without imex-primary ref but experiment with imex primary ref
         IntactPublication pubWithoutImex = new IntactPublication("12346");
         Experiment exp2 = new IntactExperiment(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
         exp2.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-4", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
-
+        pubWithoutImex.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(pubWithoutImex);
 
         // reset collection
@@ -118,44 +113,42 @@ public class IntactPublicationCollectorImplTest {
 
     @Test
     @DirtiesContext
-    public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_because_too_old() throws ParseException {
-        IntactMockBuilder builder = new IntactMockBuilder();
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
-        getCorePersister().saveOrUpdate(imexCuration);
+    public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_because_too_old() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
-        pubWithImex.addXref(pubXref);
-        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithImex.addAnnotation(imexCurationAnn1);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubService.saveOrUpdate(pubWithImex);
 
         // one publication without imex-primary, not eligible IMEx too old
-        Publication pubWithoutImex = builder.createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(2);
-        exp2.setPublication(pubWithoutImex);
+        IntactPublication pubWithoutImex = new IntactPublication("12345");
+        pubWithoutImex.setCurationDepth(CurationDepth.IMEx);
+        Experiment exp2 = new IntactExperiment(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
-        Annotation imexCurationAnn2 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithoutImex.addAnnotation(imexCurationAnn2);
+        IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
+        ev4.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp2.addInteractionEvidence(ev3);
+        exp2.addInteractionEvidence(ev4);
         Calendar cal = GregorianCalendar.getInstance();
         cal.set(2005, 12, 31);
         pubWithoutImex.setCreated(cal.getTime());
-
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutImex);
-
-        getDataContext().commitTransaction(status);
+        pubWithoutImex.setSource(new IntactSource("intact"));
+        pubService.saveOrUpdate(pubWithoutImex);
 
         // reset collection
         publicationCollectorTest.initialise();
@@ -167,39 +160,39 @@ public class IntactPublicationCollectorImplTest {
 
     @Test
     @DirtiesContext
-    public void get_publications_Not_Eligible_Imex_because_no_imex_curation_depth() throws ParseException {
-        IntactMockBuilder builder = new IntactMockBuilder();
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
-        getCorePersister().saveOrUpdate(imexCuration);
+    public void get_publications_Not_Eligible_Imex_because_no_imex_curation_depth() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
-        pubWithImex.addXref(pubXref);
-        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithImex.addAnnotation(imexCurationAnn1);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubService.saveOrUpdate(pubWithImex);
 
         // one publication without imex-primary, not eligible IMEx no curation depth
-        Publication pubWithoutImex = builder.createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(2);
-        exp2.setPublication(pubWithoutImex);
+        IntactPublication pubWithoutImex = new IntactPublication("12345");
+        pubWithoutImex.setCurationDepth(CurationDepth.MIMIx);
+        Experiment exp2 = new IntactExperiment(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
-
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutImex);
-
-        getDataContext().commitTransaction(status);
+        IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
+        ev4.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp2.addInteractionEvidence(ev3);
+        exp2.addInteractionEvidence(ev4);
+        pubWithoutImex.setSource(new IntactSource("intact"));
+        pubService.saveOrUpdate(pubWithoutImex);
 
         // reset collection
         publicationCollectorTest.initialise();
@@ -210,58 +203,36 @@ public class IntactPublicationCollectorImplTest {
 
     @Test
     @DirtiesContext
-    public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_other_institution() throws ParseException {
-        IntactMockBuilder builder = new IntactMockBuilder();
+    public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_other_institution() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
-        getCorePersister().saveOrUpdate(imexCuration);
-
-        CvTopic journal = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.JOURNAL_MI_REF, CvTopic.JOURNAL);
-        getCorePersister().saveOrUpdate(journal);
-        CvTopic date = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
-        getCorePersister().saveOrUpdate(date);
-
-
-        // one publication eligible IMEx and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithImex.addAnnotation(imexCurationAnn1);
-        Annotation journalAnn = getMockBuilder().createAnnotation("Cell (0092-8674)", journal);
-        pubWithImex.addAnnotation(journalAnn);
-        Annotation dateAnn = getMockBuilder().createAnnotation("2008", date);
-        pubWithImex.addAnnotation(dateAnn);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubService.saveOrUpdate(pubWithImex);
 
         // one publication without imex-primary, not eligible IMEx (eligible journal, no dataset, no imex, no PPI) but does have imex-curation level
-        Publication pubWithoutImex = getMockBuilder().createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(pubWithoutImex);
+        IntactPublication pubWithoutImex = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
-        Interaction interaction = exp2.getInteractions().iterator().next();
-        for (Component comp : interaction.getComponents()){
-            comp.setInteractor(getMockBuilder().createNucleicAcidRandom());
-        }
-        Annotation imexCurationAnn2 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithoutImex.addAnnotation(imexCurationAnn2);
-        Annotation journalAnn2 = getMockBuilder().createAnnotation("Cell (0092-8674)", journal);
-        pubWithoutImex.addAnnotation(journalAnn2);
-        Annotation dateAnn2 = getMockBuilder().createAnnotation("2008", date);
-        pubWithoutImex.addAnnotation(dateAnn2);
-
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutImex);
-
-        getDataContext().commitTransaction(status);
+        InteractionEvidence interaction = new IntactInteractionEvidence();
+        interaction.setExperimentAndAddInteractionEvidence(exp2);
+        interaction.getParticipants().add(new IntactParticipantEvidence(new DefaultNucleicAcid("test")));
+        pubWithoutImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithoutImex.setSource(new IntactSource("intact"));
+        pubService.saveOrUpdate(pubWithoutImex);
 
         // reset collection
         publicationCollectorTest.initialise();
@@ -273,57 +244,38 @@ public class IntactPublicationCollectorImplTest {
 
     @Test
     @DirtiesContext
-    public void get_publications_Having_Imex_Curation_Level_PPI_peptide() throws ParseException {
-        IntactMockBuilder builder = new IntactMockBuilder();
-        TransactionStatus status = getDataContext().beginTransaction();
+    public void get_publications_Having_Imex_Curation_Level_PPI_peptide() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
-        getCorePersister().saveOrUpdate(imexCuration);
-
-        CvTopic journal = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.JOURNAL_MI_REF, CvTopic.JOURNAL);
-        getCorePersister().saveOrUpdate(journal);
-        CvTopic date = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
-        getCorePersister().saveOrUpdate(date);
-
-
-        // one publication eligible IMEx and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithImex.addAnnotation(imexCurationAnn1);
-        Annotation journalAnn = getMockBuilder().createAnnotation("Cell (0092-8674)", journal);
-        pubWithImex.addAnnotation(journalAnn);
-        Annotation dateAnn = getMockBuilder().createAnnotation("2008", date);
-        pubWithImex.addAnnotation(dateAnn);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubService.saveOrUpdate(pubWithImex);
 
         // one publication eligible IMEx but does have protein-peptide interaction
-        Publication pubWithoutImex = builder.createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(pubWithoutImex);
+        IntactPublication pubWithoutImex = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
-        Interaction interaction = exp2.getInteractions().iterator().next();
-        for (Component comp : interaction.getComponents()){
-            comp.setInteractor(getMockBuilder().createPeptideRandom());
-        }
-        Annotation imexCurationAnn2 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithoutImex.addAnnotation(imexCurationAnn2);
-        Annotation journalAnn2 = getMockBuilder().createAnnotation("Cell (0092-8674)", journal);
-        pubWithoutImex.addAnnotation(journalAnn2);
-        Annotation dateAnn2 = getMockBuilder().createAnnotation("2008", date);
-        pubWithoutImex.addAnnotation(dateAnn2);
-
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutImex);
-
-        getDataContext().commitTransaction(status);
+        InteractionEvidence interaction = new IntactInteractionEvidence();
+        interaction.setExperimentAndAddInteractionEvidence(exp2);
+        interaction.getParticipants().add(new IntactParticipantEvidence(new DefaultProtein("test")));
+        interaction.getParticipants().add(new IntactParticipantEvidence(new DefaultProtein("test2",
+                IntactUtils.createMIInteractionType(Protein.PEPTIDE, Protein.PEPTIDE_MI))));
+        pubWithoutImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithoutImex.setSource(new IntactSource("intact"));
+        pubService.saveOrUpdate(pubWithoutImex);
 
         // reset collection
         publicationCollectorTest.initialise();
@@ -334,50 +286,35 @@ public class IntactPublicationCollectorImplTest {
 
     @Test
     @DirtiesContext
-    public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_dataset_no_PPI() throws ParseException {
-        IntactMockBuilder builder = new IntactMockBuilder();
-        TransactionStatus status = getDataContext().beginTransaction();
+    public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_dataset_no_PPI() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
-        getCorePersister().saveOrUpdate(imexCuration);
-
-        CvTopic dataset = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.DATASET_MI_REF, CvTopic.DATASET);
-        getCorePersister().saveOrUpdate(dataset);
-
-        // one publication eligible imex and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithImex.addAnnotation(imexCurationAnn1);
-        Annotation datasetAnn = getMockBuilder().createAnnotation("BioCreative - Critical Assessment of Information Extraction systems in Biology", dataset);
-        pubWithImex.addAnnotation(datasetAnn);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubService.saveOrUpdate(pubWithImex);
 
         // one publication without imex-primary, not eligible IMEx (eligible journal, no dataset, no imex, no PPI) but does have imex-curation level
-        Publication pubWithoutImex = builder.createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(pubWithoutImex);
+        IntactPublication pubWithoutImex = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
-        Interaction interaction = exp2.getInteractions().iterator().next();
-        for (Component comp : interaction.getComponents()){
-            comp.setInteractor(getMockBuilder().createNucleicAcidRandom());
-        }
-        Annotation imexCurationAnn2 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithoutImex.addAnnotation(imexCurationAnn2);
-        Annotation datasetAnn2 = getMockBuilder().createAnnotation("BioCreative - Critical Assessment of Information Extraction systems in Biology", dataset);
-        pubWithoutImex.addAnnotation(datasetAnn2);
-
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutImex);
-
-        getDataContext().commitTransaction(status);
+        InteractionEvidence interaction = new IntactInteractionEvidence();
+        interaction.setExperimentAndAddInteractionEvidence(exp2);
+        interaction.getParticipants().add(new IntactParticipantEvidence(new DefaultNucleicAcid("test")));
+        pubWithoutImex.getAnnotations().add(AnnotationUtils.createAnnotation("imex curation", null));
+        pubService.saveOrUpdate(pubWithoutImex);
 
         // reset collection
         publicationCollectorTest.initialise();
@@ -389,41 +326,40 @@ public class IntactPublicationCollectorImplTest {
 
     @Test
     @DirtiesContext
-    public void get_publications_having_IMEx_Id_And_Not_Imex_Curation_Level() throws ParseException {
-        IntactMockBuilder builder = new IntactMockBuilder();
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
-        getCorePersister().saveOrUpdate(imexCuration);
+    public void get_publications_having_IMEx_Id_And_Not_Imex_Curation_Level() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
-        pubWithImex.addXref(pubXref);
-        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithImex.addAnnotation(imexCurationAnn1);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubService.saveOrUpdate(pubWithImex);
 
         // one publication with imex-primary and no imex curation level
-        Publication pubWithoutImexCuration = builder.createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(2);
-        exp2.setPublication(pubWithoutImexCuration);
+        IntactPublication pubWithoutImexCuration = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutImexCuration);
         pubWithoutImexCuration.addExperiment(exp2);
-        PublicationXref pubXref2 = new PublicationXref( pubWithImex.getOwner(), imex, "IM-4", imexPrimary );
-        pubWithoutImexCuration.addXref(pubXref2);
-
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutImexCuration);
-
-        getDataContext().commitTransaction(status);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.MIMIx);
+        pubWithoutImexCuration.assignImexId("IM-4");
+        IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
+        ev4.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp2.addInteractionEvidence(ev3);
+        exp2.addInteractionEvidence(ev4);
+        pubService.saveOrUpdate(pubWithoutImexCuration);
 
         // reset collection
         publicationCollectorTest.initialise();
@@ -434,44 +370,36 @@ public class IntactPublicationCollectorImplTest {
     }
     @Test
     @DirtiesContext
-    public void get_publications_Having_IMEx_Id_And_No_PPI_Interactions() throws ParseException {
-        IntactMockBuilder builder = new IntactMockBuilder();
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
+    public void get_publications_Having_IMEx_Id_And_No_PPI_Interactions() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
+        // one publication with imex primary ref
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         // one publication with imex primary ref
-        Publication pubWithImex = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
-        pubWithImex.addXref(pubXref);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithImex.assignImexId("Im-4");
+        pubService.saveOrUpdate(pubWithImex);
 
         // one publication with imex-primary, no PPI
-        Publication pubWithoutPPI = builder.createPublicationRandom();
-        pubWithoutPPI.setStatus(getDaoFactory().getCvObjectDao(CvPublicationStatus.class).getByShortLabel("released"));
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(pubWithoutPPI);
+        IntactPublication pubWithoutPPI = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
-        Interaction interaction = exp2.getInteractions().iterator().next();
-        for (Component comp : interaction.getComponents()){
-            comp.setInteractor(getMockBuilder().createNucleicAcidRandom());
-        }
-        Component protein = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
-        interaction.addComponent(protein);
-
-        PublicationXref pubXref2 = new PublicationXref( pubWithImex.getOwner(), imex, "IM-4", imexPrimary );
-        pubWithoutPPI.addXref(pubXref2);
-
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutPPI);
-
-        getDataContext().commitTransaction(status);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithoutPPI.assignImexId("IM-5");
+        pubService.saveOrUpdate(pubWithoutPPI);
 
         // reset collection
         publicationCollectorTest.initialise();
@@ -483,39 +411,41 @@ public class IntactPublicationCollectorImplTest {
 
     @Test
     @DirtiesContext
-    public void get_publications_Having_PPI_Interactions_one_with_NucleicAcid() throws ParseException {
-        IntactMockBuilder builder = new IntactMockBuilder();
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
+    public void get_publications_Having_PPI_Interactions_one_with_NucleicAcid() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
+        // one publication with imex primary ref
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         // one publication with imex primary ref
-        Publication pubWithImex = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
-        pubWithImex.addXref(pubXref);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithImex.assignImexId("Im-4");
+        pubService.saveOrUpdate(pubWithImex);
 
         // one publication with imex-primary, one nucleic acid and the rest protein
-        Publication pubWithoutPPI = builder.createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(pubWithoutPPI);
+        IntactPublication pubWithoutPPI = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
-        Interaction interaction = exp2.getInteractions().iterator().next();
-        Component nucleicacid = getMockBuilder().createComponentPrey(getMockBuilder().createNucleicAcidRandom());
-        interaction.addComponent(nucleicacid);
-        PublicationXref pubXref2 = new PublicationXref( pubWithImex.getOwner(), imex, "IM-4", imexPrimary );
-        pubWithoutPPI.addXref(pubXref2);
-
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutPPI);
-
-        getDataContext().commitTransaction(status);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.MIMIx);
+        IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
+        ev4.addParticipant(new IntactParticipantEvidence(new IntactNucleicAcid("test")));
+        exp2.addInteractionEvidence(ev3);
+        exp2.addInteractionEvidence(ev4);
+        pubService.saveOrUpdate(pubWithoutPPI);
 
         // reset collection
         publicationCollectorTest.initialise();
@@ -526,40 +456,42 @@ public class IntactPublicationCollectorImplTest {
 
     @Test
     @DirtiesContext
-    public void get_publications_Having_PPI_Interactions2() throws ParseException {
-        IntactMockBuilder builder = new IntactMockBuilder();
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
+    public void get_publications_Having_PPI_Interactions2() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
+        // one publication with imex primary ref
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         // one publication with imex primary ref
-        Publication pubWithImex = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
-        pubWithImex.addXref(pubXref);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithImex.assignImexId("Im-3");
+        pubService.saveOrUpdate(pubWithImex);
 
         // one publication with imex-primary, one nucleic acid and the rest protein
-        Publication pubWithoutPPI = builder.createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(pubWithoutPPI);
+        IntactPublication pubWithoutPPI = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
-        Interaction interaction = exp2.getInteractions().iterator().next();
-        Iterator<Component> componentIterator = interaction.getComponents().iterator();
-        componentIterator.next().setInteractor(getMockBuilder().createPeptideRandom());
-        componentIterator.next().setInteractor(getMockBuilder().createProteinRandom());
-        PublicationXref pubXref2 = new PublicationXref( pubWithImex.getOwner(), imex, "IM-4", imexPrimary );
-        pubWithoutPPI.addXref(pubXref2);
-
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutPPI);
-
-        getDataContext().commitTransaction(status);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
+        ev4.addParticipant(new IntactParticipantEvidence(new IntactNucleicAcid("test")));
+        exp2.addInteractionEvidence(ev3);
+        exp2.addInteractionEvidence(ev4);
+        pubWithoutPPI.assignImexId("IM-4");
+        pubService.saveOrUpdate(pubWithoutPPI);
 
         // reset collection
         publicationCollectorTest.initialise();
@@ -570,45 +502,39 @@ public class IntactPublicationCollectorImplTest {
 
     @Test
     @DirtiesContext
-    public void get_publications_Having_IMEx_Id_ToUpdate() throws ParseException {
-        IntactMockBuilder builder = new IntactMockBuilder();
-        TransactionStatus status = getDataContext().beginTransaction();
+    public void get_publications_Having_IMEx_Id_ToUpdate() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
+        // one publication with imex primary ref
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
-        getCorePersister().saveOrUpdate(imexCuration);
-
-        // one publication with imex primary ref and imex curation and 2 PPI (eligible imex)
-        Publication pubWithImex = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        // one publication with imex primary ref
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
-        pubWithImex.addXref(pubXref);
-        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithImex.addAnnotation(imexCurationAnn1);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithImex.assignImexId("Im-3");
+        pubService.saveOrUpdate(pubWithImex);
 
         // one publication with imex-primary, no PPI
-        Publication pubWithoutPPI = builder.createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(pubWithoutPPI);
+        IntactPublication pubWithoutPPI = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
-        Interaction interaction = exp2.getInteractions().iterator().next();
-        for (Component comp : interaction.getComponents()){
-            comp.setInteractor(getMockBuilder().createNucleicAcidRandom());
-        }
-        PublicationXref pubXref2 = new PublicationXref( pubWithImex.getOwner(), imex, "IM-4", imexPrimary );
-        pubWithoutPPI.addXref(pubXref2);
-
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutPPI);
-
-        getDataContext().commitTransaction(status);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
+        ev4.addParticipant(new IntactParticipantEvidence(new IntactNucleicAcid("test")));
+        exp2.addInteractionEvidence(ev4);
+        pubWithoutPPI.assignImexId("IM-4");
+        pubService.saveOrUpdate(pubWithoutPPI);
 
         // reset collection
         publicationCollectorTest.initialise();
@@ -621,63 +547,40 @@ public class IntactPublicationCollectorImplTest {
 
     @Test
     @DirtiesContext
-    public void get_publications_needing_An_Imex_Id() throws ParseException {
-        IntactMockBuilder builder = new IntactMockBuilder();
-        TransactionStatus status = getDataContext().beginTransaction();
+    public void get_publications_needing_An_Imex_Id() throws ParseException, SynchronizerException,
+            PersisterException, FinderException {
+        // one publication with imex primary ref
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        User reviewer = getMockBuilder().createReviewer("reviewer", "reviewer", "reviewer", "reviewer@ebi.ac.uk");
-        getCorePersister().saveOrUpdate(reviewer);
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
-        getCorePersister().saveOrUpdate(imexCuration);
-        CvTopic dataset = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.DATASET_MI_REF, CvTopic.DATASET);
-        getCorePersister().saveOrUpdate(dataset);
-
-        // one publication without imex primary ref but imex curation and 2 PPI (eligible imex with dataset)
-        Publication pubWithImex = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.setPublication(pubWithImex);
+        // one publication with imex primary ref
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithImex.addAnnotation(imexCurationAnn1);
-        Annotation datasetAnn = getMockBuilder().createAnnotation("BioCreative - Critical Assessment of Information Extraction systems in Biology", dataset);
-        pubWithImex.addAnnotation(datasetAnn);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithImex.setStatus(LifeCycleStatus.RELEASED);
+        pubService.saveOrUpdate(pubWithImex);
 
-        LifecycleManager lifecycleManager = IntactContext.getCurrentInstance().getLifecycleManager();
-        lifecycleManager.getNewStatus().claimOwnership(pubWithImex);
-        lifecycleManager.getAssignedStatus().startCuration(pubWithImex);
-        lifecycleManager.getCurationInProgressStatus().readyForChecking(pubWithImex, "test", true);
-        lifecycleManager.getReadyForCheckingStatus().accept(pubWithImex, "accepted");
 
         // one publication without imex-primary, no PPI but with imex curation level and dataset
-        Publication pubWithoutPPI = builder.createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(1);
-        exp2.setPublication(pubWithoutPPI);
+        IntactPublication pubWithoutPPI = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
-        Interaction interaction = exp2.getInteractions().iterator().next();
-        for (Component comp : interaction.getComponents()){
-            comp.setInteractor(getMockBuilder().createNucleicAcidRandom());
-        }
-        Annotation imexCurationAnn2 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithoutPPI.addAnnotation(imexCurationAnn2);
-        Annotation datasetAnn2 = getMockBuilder().createAnnotation("BioCreative - Critical Assessment of Information Extraction systems in Biology", dataset);
-        pubWithoutPPI.addAnnotation(datasetAnn2);
-
-        getCorePersister().saveOrUpdate(pubWithImex);
-        getCorePersister().saveOrUpdate(pubWithoutPPI);
-
-        lifecycleManager.getNewStatus().claimOwnership(pubWithoutPPI);
-        lifecycleManager.getAssignedStatus().startCuration(pubWithoutPPI);
-        lifecycleManager.getCurationInProgressStatus().readyForChecking(pubWithoutPPI, "test", true);
-        lifecycleManager.getReadyForCheckingStatus().accept(pubWithoutPPI, "accepted");
-
-        getDataContext().commitTransaction(status);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
+        ev4.addParticipant(new IntactParticipantEvidence(new IntactNucleicAcid("test")));
+        exp2.addInteractionEvidence(ev4);
+        pubWithImex.setStatus(LifeCycleStatus.RELEASED);
+        pubService.saveOrUpdate(pubWithoutPPI);
 
         // reset collection
         publicationCollectorTest.initialise();

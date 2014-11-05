@@ -1,24 +1,36 @@
 package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
 import edu.ucla.mbi.imex.central.ws.v20.Identifier;
+import edu.ucla.mbi.imex.central.ws.v20.Publication;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.TransactionStatus;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.lifecycle.LifecycleManager;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.user.User;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
+import psidev.psi.mi.jami.bridges.imex.extension.ImexPublication;
+import psidev.psi.mi.jami.model.*;
+import psidev.psi.mi.jami.utils.XrefUtils;
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
+import uk.ac.ebi.intact.jami.dao.IntactDao;
+import uk.ac.ebi.intact.jami.model.extension.*;
+import uk.ac.ebi.intact.jami.model.lifecycle.LifeCycleStatus;
+import uk.ac.ebi.intact.jami.model.user.User;
+import uk.ac.ebi.intact.jami.service.PublicationService;
+import uk.ac.ebi.intact.jami.synchronizer.FinderException;
+import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
+import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Unit tester of GlobalImexPublicationUpdater
@@ -27,114 +39,105 @@ import java.util.GregorianCalendar;
  * @version $Id$
  * @since <pre>12/04/12</pre>
  */
-@ContextConfiguration(locations = {"classpath*:/META-INF/intact.spring.xml",
-        "classpath*:/META-INF/standalone/*-standalone.spring.xml",
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath*:/META-INF/intact-jami-test.spring.xml",
         "classpath*:/META-INF/imex-test.spring.xml"})
-public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
+public class GlobalImexPublicationUpdaterTest{
 
     @Autowired
+    @Qualifier("globalImexPublicationUpdater")
     private GlobalImexPublicationUpdater globalImexUpdaterTest;
 
     @Before
-    public void createImexRecords() throws ImexCentralException {
-        edu.ucla.mbi.imex.central.ws.v20.Publication existingRecordWithImex = new edu.ucla.mbi.imex.central.ws.v20.Publication();
+    public void createImexRecords() throws BridgeFailedException {
+        Publication pub = new edu.ucla.mbi.imex.central.ws.v20.Publication();
         Identifier pubmed = new Identifier();
         pubmed.setNs("pmid");
         pubmed.setAc("12345");
-        existingRecordWithImex.getIdentifier().add(pubmed);
-        existingRecordWithImex.setImexAccession("IM-3");
-        globalImexUpdaterTest.getImexCentralManager().getImexCentralRegister().getImexCentralClient().createPublication(existingRecordWithImex);
+        pub.getIdentifier().add(pubmed);
+        pub.setImexAccession("IM-3");
+        globalImexUpdaterTest.getImexCentralManager().getImexCentralRegister().getImexCentralClient().createPublication(new ImexPublication(pub));
 
-        edu.ucla.mbi.imex.central.ws.v20.Publication existingRecordWithImex2 = new edu.ucla.mbi.imex.central.ws.v20.Publication();
+        Publication pub2 = new edu.ucla.mbi.imex.central.ws.v20.Publication();
         Identifier pubmed2 = new Identifier();
         pubmed2.setNs("pmid");
         pubmed2.setAc("12346");
-        existingRecordWithImex2.getIdentifier().add(pubmed2);
-        existingRecordWithImex2.setImexAccession("IM-4");
-        globalImexUpdaterTest.getImexCentralManager().getImexCentralRegister().getImexCentralClient().createPublication(existingRecordWithImex2);
+        pub2.getIdentifier().add(pubmed2);
+        pub2.setImexAccession("IM-4");
+        globalImexUpdaterTest.getImexCentralManager().getImexCentralRegister().getImexCentralClient().createPublication(new ImexPublication(pub2));
 
-        edu.ucla.mbi.imex.central.ws.v20.Publication existingRecordWithImex3 = new edu.ucla.mbi.imex.central.ws.v20.Publication();
+        Publication pub3 = new edu.ucla.mbi.imex.central.ws.v20.Publication();
         Identifier pubmed3 = new Identifier();
         pubmed3.setNs("pmid");
         pubmed3.setAc("12347");
-        existingRecordWithImex3.getIdentifier().add(pubmed3);
-        existingRecordWithImex3.setImexAccession("IM-5");
-        globalImexUpdaterTest.getImexCentralManager().getImexCentralRegister().getImexCentralClient().createPublication(existingRecordWithImex3);
+        pub3.getIdentifier().add(pubmed3);
+        pub3.setImexAccession("IM-5");
+        globalImexUpdaterTest.getImexCentralManager().getImexCentralRegister().getImexCentralClient().createPublication(new ImexPublication(pub3));
 
     }
 
     @Test
     @DirtiesContext
-    public void update_Existing_Imex_Publications(){
-
-        TransactionStatus status = getDataContext().beginTransaction();
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
-        getCorePersister().saveOrUpdate(imexCuration);
+    @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager")
+    public void update_Existing_Imex_Publications() throws SynchronizerException, PersisterException, FinderException {
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         // one publication with imex primary ref, 1 experiment, 2 interactions
-        Publication pubWithImex = getMockBuilder().createPublication("12345");
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.getXrefs().clear();
-        exp1.setPublication(pubWithImex);
+        IntactPublication pubWithImex = new IntactPublication("12345");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
         pubWithImex.addExperiment(exp1);
-        PublicationXref pubXref = new PublicationXref( pubWithImex.getOwner(), imex, "IM-3", imexPrimary );
-        pubWithImex.addXref(pubXref);
-        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithImex.addAnnotation(imexCurationAnn1);
+        pubWithImex.assignImexId("IM-3");
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubService.saveOrUpdate(pubWithImex);
 
         // publication with imex id and no imex curation level -> not updated but reported
-        Publication pubWithImex2 = getMockBuilder().createPublication("12346");
-        Experiment exp2 = getMockBuilder().createExperimentRandom(2);
-        exp2.getXrefs().clear();
-        exp2.setPublication(pubWithImex2);
-        pubWithImex2.addExperiment(exp2);
-        PublicationXref pubXref2 = new PublicationXref( pubWithImex2.getOwner(), imex, "IM-4", imexPrimary );
-        pubWithImex2.addXref(pubXref2);
+        IntactPublication pubWithoutCurationDepth = new IntactPublication("12346");
+        Experiment exp2 = new IntactExperiment(pubWithoutCurationDepth);
+        pubWithoutCurationDepth.addExperiment(exp2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.MIMIx);
+        IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
+        ev4.addParticipant(new IntactParticipantEvidence(new IntactProtein("test")));
+        exp2.addInteractionEvidence(ev4);
+        pubWithoutCurationDepth.assignImexId("IM-4");
+        pubService.saveOrUpdate(pubWithoutCurationDepth);
 
         // publication with imex id and no PPI -> not updated but reported
-        Publication pubWithImex3 = getMockBuilder().createPublication("12347");
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.getXrefs().clear();
-        Interaction interaction = exp3.getInteractions().iterator().next();
-        for (Component comp : interaction.getComponents()){
-            comp.setInteractor(getMockBuilder().createNucleicAcidRandom());
-        }
-
-        exp3.setPublication(pubWithImex3);
-        pubWithImex3.addExperiment(exp3);
-        PublicationXref pubXref3 = new PublicationXref( pubWithImex3.getOwner(), imex, "IM-5", imexPrimary );
-        pubWithImex3.addXref(pubXref3);
-        Annotation imexCurationAnn3 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubWithImex3.addAnnotation(imexCurationAnn3);
-
-        getCorePersister().saveOrUpdate(pubWithImex, pubWithImex2, pubWithImex3);
-
-        getDataContext().commitTransaction(status);
+        IntactPublication pubWithoutPPI = new IntactPublication("12347");
+        Experiment exp3 = new IntactExperiment(pubWithoutPPI);
+        pubWithoutPPI.addExperiment(exp3);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        IntactInteractionEvidence ev5 = new IntactInteractionEvidence();
+        ev5.addParticipant(new IntactParticipantEvidence(new IntactNucleicAcid("test")));
+        exp3.addInteractionEvidence(ev5);
+        pubWithoutPPI.assignImexId("IM-5");
+        pubService.saveOrUpdate(pubWithoutPPI);
 
         // update existing publications
         globalImexUpdaterTest.updateExistingImexPublications();
 
-        TransactionStatus status2 = getDataContext().beginTransaction();
-
-        uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(pubWithImex.getAc());
+        IntactPublication intactPubReloaded = dao.getPublicationDao().getByAc(pubWithImex.getAc());
 
         // updated annotations publication
-        Assert.assertEquals(3, intactPubReloaded.getAnnotations().size());
+        Assert.assertEquals(2, intactPubReloaded.getAnnotations().size());
         boolean hasFullCuration = false;
         boolean hasImexCuration = false;
 
-        for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded.getAnnotations()){
-            if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
+        for (Annotation ann : intactPubReloaded.getAnnotations()){
+            if ("imex curation".equals(ann.getTopic().getShortName())){
                 hasImexCuration = true;
             }
-            else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
+            else if ("full coverage".equals(ann.getTopic().getShortName())
+                    && "Only protein-protein interactions".equalsIgnoreCase(ann.getValue())){
                 hasFullCuration = true;
             }
         }
@@ -146,191 +149,151 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         for (Experiment exp : intactPubReloaded.getExperiments()){
             Assert.assertEquals(1, exp.getXrefs().size());
 
-            ExperimentXref ref = exp.getXrefs().iterator().next();
-            Assert.assertEquals("IM-3", ref.getPrimaryId());
-            Assert.assertEquals(imex.getIdentifier(), ref.getCvDatabase().getIdentifier());
-            Assert.assertEquals(imexPrimary.getIdentifier(), ref.getCvXrefQualifier().getIdentifier());
+            Xref ref = exp.getXrefs().iterator().next();
+            Assert.assertEquals("IM-3", ref.getId());
+            Assert.assertEquals(Xref.IMEX_MI, ref.getDatabase().getMIIdentifier());
+            Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref.getQualifier().getMIIdentifier());
 
+            Set<String> imexIds  = new HashSet<String>(3);
             // updated interaction imex primary ref
-            for (Interaction inter : exp.getInteractions()){
+            for (InteractionEvidence inter : exp.getInteractionEvidences()){
                 Assert.assertEquals(1, inter.getXrefs().size());
 
-                InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertTrue(ref2.getPrimaryId().startsWith("IM-3-"));
-                Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
-                Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
+                ref = inter.getXrefs().iterator().next();
+                Assert.assertTrue(ref.getId().startsWith("IM-3-"));
+                Assert.assertEquals(Xref.IMEX_MI, ref.getDatabase().getMIIdentifier());
+                Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref.getQualifier().getMIIdentifier());
+
+                imexIds.add(ref.getId());
             }
+
+            Assert.assertEquals(2, imexIds.size());
         }
 
         // pub 2 is not updated because error
-        uk.ac.ebi.intact.model.Publication intactPubReloaded2 = getDaoFactory().getPublicationDao().getByAc(pubWithImex2.getAc());
+        IntactPublication intactPubReloaded2 = dao.getPublicationDao().getByAc(pubWithoutCurationDepth.getAc());
 
         Assert.assertEquals(0, intactPubReloaded2.getAnnotations().size());
         for (Experiment exp : intactPubReloaded2.getExperiments()){
             Assert.assertEquals(0, exp.getXrefs().size());
 
             // updated interaction imex primary ref
-            for (Interaction inter : exp.getInteractions()){
+            for (Interaction inter : exp.getInteractionEvidences()){
                 Assert.assertEquals(0, inter.getXrefs().size());
             }
         }
 
         // pub 3 is not updated because error
-        uk.ac.ebi.intact.model.Publication intactPubReloaded3 = getDaoFactory().getPublicationDao().getByAc(pubWithImex3.getAc());
+        IntactPublication intactPubReloaded3 = dao.getPublicationDao().getByAc(pubWithoutPPI.getAc());
 
-        Assert.assertEquals(1, intactPubReloaded3.getAnnotations().size());
+        Assert.assertEquals(0, intactPubReloaded3.getAnnotations().size());
         for (Experiment exp : intactPubReloaded3.getExperiments()){
             Assert.assertEquals(0, exp.getXrefs().size());
 
             // updated interaction imex primary ref
-            for (Interaction inter : exp.getInteractions()){
+            for (Interaction inter : exp.getInteractionEvidences()){
                 Assert.assertEquals(0, inter.getXrefs().size());
             }
         }
-
-        getDataContext().commitTransaction(status2);
     }
 
     @Test
     @DirtiesContext
-    public void assign_new_Imex_to_Publications(){
+    @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager")
+    public void assign_new_Imex_to_Publications() throws SynchronizerException, FinderException, PersisterException {
 
-        TransactionStatus status = getDataContext().beginTransaction();
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+        IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
-        User reviewer = getMockBuilder().createReviewer("reviewer", "reviewer", "reviewer", "reviewer@ebi.ac.uk");
-        getCorePersister().saveOrUpdate(reviewer);
-
-        CvDatabase imex = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvDatabase.class, CvDatabase.IMEX_MI_REF, CvDatabase.IMEX);
-        getCorePersister().saveOrUpdate(imex);
-
-        CvXrefQualifier imexPrimary = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.class, CvXrefQualifier.IMEX_PRIMARY_MI_REF, CvXrefQualifier.IMEX_PRIMARY);
-        getCorePersister().saveOrUpdate(imexPrimary);
-
-        CvTopic imexCuration = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, "MI:0955", "curation depth");
-        getCorePersister().saveOrUpdate(imexCuration);
-
-        CvTopic journal = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.JOURNAL_MI_REF, CvTopic.JOURNAL);
-        getCorePersister().saveOrUpdate(journal);
-        CvTopic date = CvObjectUtils.createCvObject(IntactContext.getCurrentInstance().getInstitution(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
-        getCorePersister().saveOrUpdate(date);
-
-        IntactMockBuilder builder = new IntactMockBuilder();
+        User reviewer = new User("reviewer", "reviewer", "reviewer", "reviewer@ebi.ac.uk");
+        dao.getUserDao().persist(reviewer);
 
         // one publication without imex primary ref, 1 experiment, 2 interactions,journal cell 2006, accepted -> to assign IMEX
-        Publication validPub = builder.createPublicationRandom();
-        Experiment exp1 = getMockBuilder().createExperimentRandom(2);
-        exp1.getXrefs().clear();
-        exp1.setPublication(validPub);
-        validPub.addExperiment(exp1);
-        Annotation imexCurationAnn1 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        validPub.addAnnotation(imexCurationAnn1);
-        Annotation journalAnn = getMockBuilder().createAnnotation("Cell (0092-8674)", journal);
-        validPub.addAnnotation(journalAnn);
-        Annotation dateAnn = getMockBuilder().createAnnotation("2006", date);
-        validPub.addAnnotation(dateAnn);
-
-        LifecycleManager lifecycleManager = getIntactContext().getLifecycleManager();
-        lifecycleManager.getNewStatus().claimOwnership(validPub);
-        lifecycleManager.getAssignedStatus().startCuration(validPub);
-        lifecycleManager.getCurationInProgressStatus().readyForChecking(validPub, "test", true);
-        lifecycleManager.getReadyForCheckingStatus().accept(validPub, "accepted");
+        IntactPublication pubWithImex = new IntactPublication("12348");
+        Experiment exp1 = new IntactExperiment(pubWithImex);
+        pubWithImex.addExperiment(exp1);
+        IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp1.addInteractionEvidence(ev1);
+        exp1.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithImex.setStatus(LifeCycleStatus.ACCEPTED);
+        pubService.saveOrUpdate(pubWithImex);
 
         // publication not elligible imex (no journal, no datasets, no IMEx id) but imex curation level -> not updated but reported
-        Publication imexCurationLevel = builder.createPublicationRandom();
-        Experiment exp2 = getMockBuilder().createExperimentRandom(2);
-        exp2.getXrefs().clear();
-        exp2.setPublication(imexCurationLevel);
-        imexCurationLevel.addExperiment(exp2);
-        Annotation imexCurationAnn2 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        imexCurationLevel.addAnnotation(imexCurationAnn2);
+        IntactPublication pub2 = new IntactPublication("12349");
+        Experiment exp2 = new IntactExperiment(pub2);
+        pubWithImex.addExperiment(exp2);
+        IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
+        ev4.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp2.addInteractionEvidence(ev1);
+        exp2.addInteractionEvidence(ev2);
+        pubWithImex.setSource(new IntactSource("intact"));
+        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithImex.setStatus(LifeCycleStatus.ACCEPTED);
         Calendar cal = GregorianCalendar.getInstance();
         cal.set(2005, 12, 31);
-        imexCurationLevel.setCreated(cal.getTime());
-
-        lifecycleManager.getNewStatus().claimOwnership(imexCurationLevel);
-        lifecycleManager.getAssignedStatus().startCuration(imexCurationLevel);
-        lifecycleManager.getCurationInProgressStatus().readyForChecking(imexCurationLevel, "test", true);
-        lifecycleManager.getReadyForCheckingStatus().accept(imexCurationLevel, "accepted");
+        pub2.setCreated(cal.getTime());
+        pubService.saveOrUpdate(pubWithImex);
 
         // publication without imex id but interaction does have IMEx -> not updated but reported
         // one publication without imex-primary ref but interaction with imex primary ref
-        Publication pubInteractionImex = builder.createPublicationRandom();
-        Experiment exp3 = getMockBuilder().createExperimentRandom(1);
-        exp3.getXrefs().clear();
-        exp3.setPublication(pubInteractionImex);
-        pubInteractionImex.addExperiment(exp3);
-        Interaction interWithImex = exp3.getInteractions().iterator().next();
-        interWithImex.getXrefs().clear();
-        InteractorXref intXref = new InteractorXref( pubInteractionImex.getOwner(), imex, "IM-1-1", imexPrimary );
-        interWithImex.addXref(intXref);
-
-        lifecycleManager.getNewStatus().claimOwnership(pubInteractionImex);
-        lifecycleManager.getAssignedStatus().startCuration(pubInteractionImex);
-        lifecycleManager.getCurationInProgressStatus().readyForChecking(pubInteractionImex, "test", true);
-        lifecycleManager.getReadyForCheckingStatus().accept(pubInteractionImex, "accepted");
+        IntactPublication pubWithoutImex = new IntactPublication("12350");
+        Experiment exp3 = new IntactExperiment(pubWithoutImex);
+        pubWithoutImex.addExperiment(exp3);
+        IntactInteractionEvidence interWithImex = new IntactInteractionEvidence();
+        interWithImex.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        interWithImex.assignImexId("IM-4-1");
+        exp3.addInteractionEvidence(interWithImex);
+        pubWithoutImex.setSource(new IntactSource("intact"));
+        pubWithImex.setStatus(LifeCycleStatus.ACCEPTED);
+        pubService.saveOrUpdate(pubWithoutImex);
 
         // publication without imex id but experiment does have IMEx -> not updated but reported
-        Publication pubExperimentImex = builder.createPublicationRandom();
-        Experiment exp4 = getMockBuilder().createExperimentRandom(2);
-        exp4.getXrefs().clear();
-        exp4.setPublication(pubExperimentImex);
-        pubExperimentImex.addExperiment(exp4);
-        ExperimentXref expXref = new ExperimentXref( pubExperimentImex.getOwner(), imex, "IM-2", imexPrimary );
-        exp4.addXref(expXref);
-
-        lifecycleManager.getNewStatus().claimOwnership(pubExperimentImex);
-        lifecycleManager.getAssignedStatus().startCuration(pubExperimentImex);
-        lifecycleManager.getCurationInProgressStatus().readyForChecking(pubExperimentImex, "test", true);
-        lifecycleManager.getReadyForCheckingStatus().accept(pubExperimentImex, "accepted");
+        IntactPublication pubWithoutImex2 = new IntactPublication("12351");
+        Experiment exp4 = new IntactExperiment(pubWithoutImex2);
+        pubWithoutImex2.addExperiment(exp4);
+        exp2.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-4", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
+        pubWithoutImex2.setSource(new IntactSource("intact"));
+        pubWithoutImex2.setStatus(LifeCycleStatus.ACCEPTED);
+        pubService.saveOrUpdate(pubWithoutImex2);
 
         // publication without imex id, elligible IMEx but experiment conflict -> experiment not updated but reported
-        Publication pubExperimentImex2 = builder.createPublicationRandom();
-        Experiment exp5 = getMockBuilder().createExperimentRandom(2);
-        exp5.getXrefs().clear();
-        exp5.setPublication(pubExperimentImex2);
-        pubExperimentImex2.addExperiment(exp5);
-        ExperimentXref expXref2 = new ExperimentXref( pubExperimentImex2.getOwner(), imex, "IM-3", imexPrimary );
-        exp5.addXref(expXref2);
+        IntactPublication pubWithoutImex3 = new IntactPublication("12352");
+        pubWithoutImex3.setCurationDepth(CurationDepth.IMEx);
+        Experiment exp5 = new IntactExperiment(pubWithoutImex3);
+        pubWithoutImex3.addExperiment(exp5);
+        exp3.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-5", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
+        pubWithoutImex3.setSource(new IntactSource("intact"));
+        pubWithoutImex3.setStatus(LifeCycleStatus.ACCEPTED);
 
-        Annotation imexCurationAnn3 = getMockBuilder().createAnnotation("imex curation", imexCuration);
-        pubExperimentImex2.addAnnotation(imexCurationAnn3);
-        Annotation journalAnn3 = getMockBuilder().createAnnotation("Cell (0092-8674)", journal);
-        pubExperimentImex2.addAnnotation(journalAnn3);
-        Annotation dateAnn3 = getMockBuilder().createAnnotation("2010", date);
-        pubExperimentImex2.addAnnotation(dateAnn3);
-
-        lifecycleManager.getNewStatus().claimOwnership(pubExperimentImex2);
-        lifecycleManager.getAssignedStatus().startCuration(pubExperimentImex2);
-        lifecycleManager.getCurationInProgressStatus().readyForChecking(pubExperimentImex2, "test", true);
-        lifecycleManager.getReadyForCheckingStatus().accept(pubExperimentImex2, "accepted");
-
-        getCorePersister().saveOrUpdate(validPub, imexCurationLevel, pubInteractionImex, pubExperimentImex, pubExperimentImex2);
-
-        getDataContext().commitTransaction(status);
+        pubService.saveOrUpdate(pubWithoutImex2);
 
         // update existing publications
         globalImexUpdaterTest.assignNewImexIdsToPublications();
 
-        TransactionStatus status2 = getDataContext().beginTransaction();
-
-        uk.ac.ebi.intact.model.Publication intactPubReloaded = getDaoFactory().getPublicationDao().getByAc(validPub.getAc());
+        IntactPublication intactPubReloaded = dao.getPublicationDao().getByAc(pubWithImex.getAc());
 
         // added imex primary ref to publication (pub registered in IMEx central)
         Assert.assertEquals(1, intactPubReloaded.getXrefs().size());
-        PublicationXref pubRef = intactPubReloaded.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, pubRef.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, pubRef.getCvXrefQualifier().getIdentifier());
+        Assert.assertNotNull(intactPubReloaded.getImexId());
 
         // updated annotations publication
-        Assert.assertEquals(5, intactPubReloaded.getAnnotations().size());
+        Assert.assertEquals(2, intactPubReloaded.getAnnotations().size());
         boolean hasFullCuration = false;
         boolean hasImexCuration = false;
 
-        for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded.getAnnotations()){
-            if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
+        for (Annotation ann : intactPubReloaded.getAnnotations()){
+            if ("imex curation".equals(ann.getTopic().getShortName())){
                 hasImexCuration = true;
             }
-            else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
+            else if ("full coverage".equals(ann.getTopic().getShortName())
+                    && "Only protein-protein interactions".equalsIgnoreCase(ann.getValue())){
                 hasFullCuration = true;
             }
         }
@@ -338,45 +301,47 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
         Assert.assertTrue(hasFullCuration);
         Assert.assertTrue(hasImexCuration);
 
-        int index = 0;
-
         // updated experiments imex primary ref
         for (Experiment exp : intactPubReloaded.getExperiments()){
             Assert.assertEquals(1, exp.getXrefs().size());
 
-            ExperimentXref ref = exp.getXrefs().iterator().next();
-            Assert.assertEquals(pubRef.getPrimaryId(), ref.getPrimaryId());
-            Assert.assertEquals(imex.getIdentifier(), ref.getCvDatabase().getIdentifier());
-            Assert.assertEquals(imexPrimary.getIdentifier(), ref.getCvXrefQualifier().getIdentifier());
+            Xref ref = exp.getXrefs().iterator().next();
+            Assert.assertNotNull(ref.getId());
+            Assert.assertEquals(Xref.IMEX_MI, ref.getDatabase().getMIIdentifier());
+            Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref.getQualifier().getMIIdentifier());
 
+            Set<String> imexIds  = new HashSet<String>(3);
             // updated interaction imex primary ref
-            for (Interaction inter : exp.getInteractions()){
-                index++;
+            for (InteractionEvidence inter : exp.getInteractionEvidences()){
                 Assert.assertEquals(1, inter.getXrefs().size());
 
-                InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertTrue(ref2.getPrimaryId().startsWith(pubRef.getPrimaryId() +"-"));
-                Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
-                Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
+                ref = inter.getXrefs().iterator().next();
+                Assert.assertTrue(ref.getId().startsWith("IM-3-"));
+                Assert.assertEquals(Xref.IMEX_MI, ref.getDatabase().getMIIdentifier());
+                Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref.getQualifier().getMIIdentifier());
+
+                imexIds.add(ref.getId());
             }
+
+            Assert.assertEquals(2, imexIds.size());
         }
 
         // pub 2 is not updated because error
-        uk.ac.ebi.intact.model.Publication intactPubReloaded2 = getDaoFactory().getPublicationDao().getByAc(imexCurationLevel.getAc());
+        IntactPublication intactPubReloaded2 = dao.getPublicationDao().getByAc(pub2.getAc());
 
         Assert.assertEquals(0, intactPubReloaded2.getXrefs().size());
-        Assert.assertEquals(1, intactPubReloaded2.getAnnotations().size());
+        Assert.assertEquals(0, intactPubReloaded2.getAnnotations().size());
         for (Experiment exp : intactPubReloaded2.getExperiments()){
             Assert.assertEquals(0, exp.getXrefs().size());
 
             // updated interaction imex primary ref
-            for (Interaction inter : exp.getInteractions()){
+            for (Interaction inter : exp.getInteractionEvidences()){
                 Assert.assertEquals(0, inter.getXrefs().size());
             }
         }
 
         // pub 3 is not updated because error
-        uk.ac.ebi.intact.model.Publication intactPubReloaded3 = getDaoFactory().getPublicationDao().getByAc(pubInteractionImex.getAc());
+        IntactPublication intactPubReloaded3 = dao.getPublicationDao().getByAc(pubWithImex.getAc());
 
         Assert.assertEquals(0, intactPubReloaded3.getXrefs().size());
         Assert.assertEquals(0, intactPubReloaded3.getAnnotations().size());
@@ -384,13 +349,13 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
             Assert.assertEquals(0, exp.getXrefs().size());
 
             // interaction with one conflict ref not deleted
-            for (Interaction inter : exp.getInteractions()){
+            for (Interaction inter : exp.getInteractionEvidences()){
                 Assert.assertEquals(1, inter.getXrefs().size());
             }
         }
 
         // pub 4 is not updated because error
-        uk.ac.ebi.intact.model.Publication intactPubReloaded4 = getDaoFactory().getPublicationDao().getByAc(pubExperimentImex.getAc());
+        IntactPublication intactPubReloaded4 = dao.getPublicationDao().getByAc(pubWithoutImex2.getAc());
 
         Assert.assertEquals(0, intactPubReloaded4.getXrefs().size());
         Assert.assertEquals(0, intactPubReloaded4.getAnnotations().size());
@@ -400,30 +365,28 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
             Assert.assertEquals(1, exp.getXrefs().size());
 
             // updated interaction imex primary ref
-            for (Interaction inter : exp.getInteractions()){
+            for (Interaction inter : exp.getInteractionEvidences()){
                 Assert.assertEquals(0, inter.getXrefs().size());
             }
         }
 
         // pub 5 is updated because publication is IMEx eligible, it will report the experiment as imex conflict and not do anything in experiment
-        uk.ac.ebi.intact.model.Publication intactPubReloaded5 = getDaoFactory().getPublicationDao().getByAc(pubExperimentImex2.getAc());
+        IntactPublication intactPubReloaded5 = dao.getPublicationDao().getByAc(pubWithoutImex3.getAc());
 
         // added imex primary ref to publication (pub not registered in IMEx central)
         Assert.assertEquals(1, intactPubReloaded5.getXrefs().size());
-        PublicationXref pubRef2 = intactPubReloaded5.getXrefs().iterator().next();
-        Assert.assertEquals(CvDatabase.IMEX_MI_REF, pubRef2.getCvDatabase().getIdentifier());
-        Assert.assertEquals(CvXrefQualifier.IMEX_PRIMARY_MI_REF, pubRef2.getCvXrefQualifier().getIdentifier());
-
+        Assert.assertNotNull(intactPubReloaded5.getImexId());
         // updated annotations publication
-        Assert.assertEquals(5, intactPubReloaded5.getAnnotations().size());
+        Assert.assertEquals(2, intactPubReloaded5.getAnnotations().size());
         boolean hasFullCuration2 = false;
         boolean hasImexCuration2 = false;
 
-        for (uk.ac.ebi.intact.model.Annotation ann : intactPubReloaded5.getAnnotations()){
-            if ("imex curation".equals(ann.getCvTopic().getShortLabel())){
+        for (Annotation ann : intactPubReloaded5.getAnnotations()){
+            if ("imex curation".equals(ann.getTopic().getShortName())){
                 hasImexCuration2 = true;
             }
-            else if ("full coverage".equals(ann.getCvTopic().getShortLabel()) && "Only protein-protein interactions".equalsIgnoreCase(ann.getAnnotationText())){
+            else if ("full coverage".equals(ann.getTopic().getShortName())
+                    && "Only protein-protein interactions".equalsIgnoreCase(ann.getValue())){
                 hasFullCuration2 = true;
             }
         }
@@ -436,22 +399,17 @@ public class GlobalImexPublicationUpdaterTest extends IntactBasicTestCase{
             // does not change experiment
             Assert.assertEquals(1, exp.getXrefs().size());
 
-            ExperimentXref ref = exp.getXrefs().iterator().next();
-            Assert.assertEquals("IM-3", ref.getPrimaryId());
-            Assert.assertEquals(imex.getIdentifier(), ref.getCvDatabase().getIdentifier());
-            Assert.assertEquals(imexPrimary.getIdentifier(), ref.getCvXrefQualifier().getIdentifier());
+            Xref ref = exp.getXrefs().iterator().next();
+            Assert.assertEquals("IM-3", ref.getId());
+            Assert.assertEquals(Xref.IMEX_MI, ref.getDatabase().getMIIdentifier());
+            Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref.getQualifier().getMIIdentifier());
 
             // updated interaction imex primary ref
-            for (Interaction inter : exp.getInteractions()){
+            for (InteractionEvidence inter : exp.getInteractionEvidences()){
                 Assert.assertEquals(1, inter.getXrefs().size());
 
-                InteractorXref ref2 = inter.getXrefs().iterator().next();
-                Assert.assertTrue(ref2.getPrimaryId().startsWith(pubRef2.getPrimaryId() +"-"));
-                Assert.assertEquals(imex.getIdentifier(), ref2.getCvDatabase().getIdentifier());
-                Assert.assertEquals(imexPrimary.getIdentifier(), ref2.getCvXrefQualifier().getIdentifier());
+                Assert.assertNotNull(inter.getImexId());
             }
         }
-
-        getDataContext().commitTransaction(status2);
     }
 }

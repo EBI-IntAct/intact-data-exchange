@@ -5,13 +5,23 @@ import edu.ucla.mbi.imex.central.ws.v20.Publication;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.bridges.imexcentral.ImexCentralException;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
-import uk.ac.ebi.intact.model.CvPublicationStatusType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
+import psidev.psi.mi.jami.bridges.imex.PublicationStatus;
+import psidev.psi.mi.jami.bridges.imex.extension.ImexPublication;
+import psidev.psi.mi.jami.imex.actions.PublicationStatusSynchronizer;
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
+import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
+import uk.ac.ebi.intact.jami.model.lifecycle.LifeCycleStatus;
+import uk.ac.ebi.intact.jami.service.PublicationService;
+import uk.ac.ebi.intact.jami.synchronizer.FinderException;
+import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
+import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
 
 /**
  * Unit tester of publicationStatus synchronizer
@@ -20,57 +30,65 @@ import uk.ac.ebi.intact.model.CvPublicationStatusType;
  * @version $Id$
  * @since <pre>11/04/12</pre>
  */
-@ContextConfiguration(locations = {"classpath*:/META-INF/intact.spring.xml",
-        "classpath*:/META-INF/standalone/*-standalone.spring.xml",
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath*:/META-INF/intact-jami-test.spring.xml",
         "classpath*:/META-INF/imex-test.spring.xml"})
-public class PublicationStatusSynchronizerImplTest extends IntactBasicTestCase{
+public class PublicationStatusSynchronizerImplTest {
 
     @Autowired
+    @Qualifier("intactImexStatusSynchronizer")
     private PublicationStatusSynchronizer imexStatusSynchronizerTest;
-    private Publication intactPub1;
-    private Publication intactPub2;
+    private ImexPublication intactPub1;
+    private ImexPublication intactPub2;
 
     @Before
-    public void createImexPublications() throws ImexCentralException {
-        intactPub1 = new Publication();
+    public void createImexPublications() throws BridgeFailedException {
+        Publication pub = new Publication();
         Identifier pubmed = new Identifier();
         pubmed.setNs("pmid");
         pubmed.setAc("12345");
-        intactPub1.getIdentifier().add(pubmed);
-        intactPub1.setStatus("NEW");
+        pub.getIdentifier().add(pubmed);
+        pub.setStatus("NEW");
+        intactPub1 = new ImexPublication(pub);
         imexStatusSynchronizerTest.getImexCentralClient().createPublication(intactPub1);
 
-        intactPub2 = new Publication();
+        Publication pub2 = new Publication();
         Identifier pubmed2 = new Identifier();
         pubmed2.setNs("pmid");
         pubmed2.setAc("12346");
-        intactPub2.getIdentifier().add(pubmed2);
-        intactPub2.setStatus("INPROGRESS");
+        pub2.getIdentifier().add(pubmed2);
+        pub2.setStatus("INPROGRESS");
+        intactPub2 = new ImexPublication(pub2);
         imexStatusSynchronizerTest.getImexCentralClient().createPublication(intactPub2);
 
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    public void synchronize_no_change_status_new() throws ImexCentralException {
+    @DirtiesContext
+    public void synchronize_no_change_status_new() throws BridgeFailedException, SynchronizerException, PersisterException, FinderException {
 
-        uk.ac.ebi.intact.model.Publication intactPublication = getMockBuilder().createPublication("12345");
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+
+        IntactPublication intactPublication = new IntactPublication("12345");
+        pubService.saveOrUpdate(intactPublication);
 
         imexStatusSynchronizerTest.synchronizePublicationStatusWithImexCentral(intactPublication, intactPub1);
 
-        Assert.assertEquals("NEW", intactPub1.getStatus());
+        Assert.assertEquals(PublicationStatus.NEW, intactPub1.getStatus());
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
-    public void synchronize_release_status_update() throws ImexCentralException {
+    @DirtiesContext
+    public void synchronize_release_status_update() throws BridgeFailedException, SynchronizerException, PersisterException, FinderException {
 
-        uk.ac.ebi.intact.model.Publication intactPublication = getMockBuilder().createPublication("12346");
-        intactPublication.getStatus().setIdentifier(CvPublicationStatusType.RELEASED.identifier());
-        intactPublication.getStatus().setShortLabel(CvPublicationStatusType.RELEASED.shortLabel());
+        PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
+
+        IntactPublication intactPublication = new IntactPublication("12345");
+        intactPublication.setStatus(LifeCycleStatus.RELEASED);
+        pubService.saveOrUpdate(intactPublication);
 
         imexStatusSynchronizerTest.synchronizePublicationStatusWithImexCentral(intactPublication, intactPub2);
 
-        Assert.assertEquals("RELEASED", intactPub2.getStatus());
+        Assert.assertEquals(PublicationStatus.RELEASED, intactPub2.getStatus());
     }
 }
