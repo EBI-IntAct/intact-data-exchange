@@ -134,7 +134,7 @@ public class IntactPublicationCollectorImplTest {
         pubService.saveOrUpdate(pubWithImex);
 
         // one publication without imex-primary, not eligible IMEx too old
-        IntactPublication pubWithoutImex = new IntactPublication("12345");
+        IntactPublication pubWithoutImex = new IntactPublication("12346");
         pubWithoutImex.setCurationDepth(CurationDepth.IMEx);
         Experiment exp2 = new IntactExperiment(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
@@ -179,7 +179,7 @@ public class IntactPublicationCollectorImplTest {
         pubWithImex.setCurationDepth(CurationDepth.IMEx);
         pubService.saveOrUpdate(pubWithImex);
         // one publication without imex-primary, not eligible IMEx no curation depth
-        IntactPublication pubWithoutImex = new IntactPublication("12345");
+        IntactPublication pubWithoutImex = new IntactPublication("12346");
         pubWithoutImex.setCurationDepth(CurationDepth.MIMIx);
         Experiment exp2 = new IntactExperiment(pubWithoutImex);
         pubWithoutImex.addExperiment(exp2);
@@ -312,6 +312,8 @@ public class IntactPublicationCollectorImplTest {
         interaction.setExperimentAndAddInteractionEvidence(exp2);
         interaction.getParticipants().add(new IntactParticipantEvidence(new DefaultNucleicAcid("test")));
         pubWithoutImex.getAnnotations().add(AnnotationUtils.createAnnotation("imex curation", null));
+        pubWithoutImex.setSource(new IntactSource("intact"));
+        pubWithoutImex.setCurationDepth(CurationDepth.IMEx);
         pubService.saveOrUpdate(pubWithoutImex);
 
         // reset collection
@@ -348,8 +350,8 @@ public class IntactPublicationCollectorImplTest {
         IntactPublication pubWithoutImexCuration = new IntactPublication("12346");
         Experiment exp2 = new IntactExperiment(pubWithoutImexCuration);
         pubWithoutImexCuration.addExperiment(exp2);
-        pubWithImex.setSource(new IntactSource("intact"));
-        pubWithImex.setCurationDepth(CurationDepth.MIMIx);
+        pubWithoutImexCuration.setSource(new IntactSource("intact"));
+        pubWithoutImexCuration.setCurationDepth(CurationDepth.MIMIx);
         pubWithoutImexCuration.assignImexId("IM-4");
         IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
         ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
@@ -388,15 +390,17 @@ public class IntactPublicationCollectorImplTest {
         pubWithImex.setSource(new IntactSource("intact"));
         pubWithImex.setCurationDepth(CurationDepth.IMEx);
         pubWithImex.assignImexId("Im-4");
+        pubWithImex.setStatus(LifeCycleStatus.ACCEPTED);
         pubService.saveOrUpdate(pubWithImex);
 
         // one publication with imex-primary, no PPI
         IntactPublication pubWithoutPPI = new IntactPublication("12346");
         Experiment exp2 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
-        pubWithImex.setSource(new IntactSource("intact"));
-        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithoutPPI.setSource(new IntactSource("intact"));
+        pubWithoutPPI.setCurationDepth(CurationDepth.IMEx);
         pubWithoutPPI.assignImexId("IM-5");
+        pubWithoutPPI.setStatus(LifeCycleStatus.ACCEPTED);
         pubService.saveOrUpdate(pubWithoutPPI);
 
         // reset collection
@@ -435,8 +439,8 @@ public class IntactPublicationCollectorImplTest {
         IntactPublication pubWithoutPPI = new IntactPublication("12346");
         Experiment exp2 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
-        pubWithImex.setSource(new IntactSource("intact"));
-        pubWithImex.setCurationDepth(CurationDepth.MIMIx);
+        pubWithoutPPI.setSource(new IntactSource("intact"));
+        pubWithoutPPI.setCurationDepth(CurationDepth.MIMIx);
         IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
         ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
         IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
@@ -480,8 +484,8 @@ public class IntactPublicationCollectorImplTest {
         IntactPublication pubWithoutPPI = new IntactPublication("12346");
         Experiment exp2 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
-        pubWithImex.setSource(new IntactSource("intact"));
-        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithoutPPI.setSource(new IntactSource("intact"));
+        pubWithoutPPI.setCurationDepth(CurationDepth.IMEx);
         IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
         ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
         IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
@@ -526,8 +530,8 @@ public class IntactPublicationCollectorImplTest {
         IntactPublication pubWithoutPPI = new IntactPublication("12346");
         Experiment exp2 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
-        pubWithImex.setSource(new IntactSource("intact"));
-        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithoutPPI.setSource(new IntactSource("intact"));
+        pubWithoutPPI.setCurationDepth(CurationDepth.IMEx);
         IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
         ev4.addParticipant(new IntactParticipantEvidence(new IntactNucleicAcid("test")));
         exp2.addInteractionEvidence(ev4);
@@ -572,12 +576,12 @@ public class IntactPublicationCollectorImplTest {
         IntactPublication pubWithoutPPI = new IntactPublication("12346");
         Experiment exp2 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp2);
-        pubWithImex.setSource(new IntactSource("intact"));
-        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithoutPPI.setSource(new IntactSource("intact"));
+        pubWithoutPPI.setCurationDepth(CurationDepth.IMEx);
         IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
         ev4.addParticipant(new IntactParticipantEvidence(new IntactNucleicAcid("test")));
         exp2.addInteractionEvidence(ev4);
-        pubWithImex.setStatus(LifeCycleStatus.RELEASED);
+        pubWithoutPPI.setStatus(LifeCycleStatus.RELEASED);
         pubService.saveOrUpdate(pubWithoutPPI);
 
         // reset collection

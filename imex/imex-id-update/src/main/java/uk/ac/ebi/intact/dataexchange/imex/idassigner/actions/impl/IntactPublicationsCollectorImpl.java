@@ -285,9 +285,9 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         String datasetQuery = "select distinct p.ac from IntactPublication p join p.cvStatus as s " +
                 "where s.shortName = :released or s.shortName = :accepted or s.shortName= :readyForRelease";
         Query query = manager.createQuery(datasetQuery);
-        query.setParameter("released", LifeCycleStatus.RELEASED.toString());
-        query.setParameter("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.toString());
-        query.setParameter("accepted", LifeCycleStatus.ACCEPTED.toString());
+        query.setParameter("released", LifeCycleStatus.RELEASED.name().toLowerCase());
+        query.setParameter("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.name().toLowerCase());
+        query.setParameter("accepted", LifeCycleStatus.ACCEPTED.name().toLowerCase());
 
         return query.getResultList();
     }
@@ -338,7 +338,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     public List<Object[]> collectPublicationsHavingProteinsOrPeptides() {
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
-        String proteinQuery = "select p2.ac, i.ac, count(distinct c.ac) from IntactInteractionEvidence as i join i.experiments as e " +
+        String proteinQuery = "select p2.ac, i.ac, count(distinct c.ac) from IntactInteractionEvidence as i join i.dbExperiments as e " +
                 "join e.publication as p2 join i.participants as c join c.interactor as interactor " +
                 "where i.ac in " +
                 "(select distinct i2.ac from IntactParticipantEvidence c2 join c2.dbParentInteraction as i2 join c2.interactor as interactor " +
@@ -357,7 +357,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
         String datasetQuery = "select distinct p2.ac from IntactParticipantEvidence c join c.dbParentInteraction as i " +
-                "join i.experiments as e " +
+                "join i.dbExperiments as e " +
                 "join e.publication as p2 " +
                 "join c.interactor as interactor " +
                 "where (interactor.interactorType.identifier = :protein " +
@@ -378,7 +378,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
 
-        String imexInteractionQuery = "select distinct p3.ac from IntactInteractionEvidence i join i.experiments as e " +
+        String imexInteractionQuery = "select distinct p3.ac from IntactInteractionEvidence i join i.dbExperiments as e " +
                 "join e.publication as p3 join i.dbXrefs as x " +
                 "where x.database.identifier = :imex and x.qualifier.identifier = :imexPrimary";
 
@@ -394,7 +394,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         EntityManager manager = intactDao.getEntityManager();
 
         String imexExperimentQuery = "select distinct p4.ac from IntactExperiment e2 join e2.publication as p4 join e2.xrefs as x2 " +
-                "where x2.database.identifier = :imex and x2.database.identifier = :imexPrimary";
+                "where x2.database.identifier = :imex and x2.qualifier.identifier = :imexPrimary";
 
         Query query = manager.createQuery(imexExperimentQuery);
         query.setParameter("imex", Xref.IMEX_MI);
@@ -408,7 +408,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         EntityManager manager = intactDao.getEntityManager();
 
         String imexPublicationQuery = "select distinct p5.ac from IntactPublication p5 join p5.dbXrefs as x3 " +
-                "where x3.database.identifier = :imex and x3.database.identifier = :imexPrimary";
+                "where x3.database.identifier = :imex and x3.qualifier.identifier = :imexPrimary";
 
         Query query = manager.createQuery(imexPublicationQuery);
         query.setParameter("imex", Xref.IMEX_MI);
@@ -449,7 +449,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsAcceptedForRelease;
     }
 
-    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsNeedingAnImexId() {
 
         if (!isInitialised){
@@ -471,7 +471,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsToBeAssignedFiltered;
     }
 
-    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsHavingIMExIdToUpdate() {
 
         if (!isInitialised){
@@ -487,7 +487,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithIMExIdToUpdateFiltered;
     }
 
-    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsHavingIMExIdAndNotImexCurationLevel() {
 
         if (!isInitialised){
@@ -500,7 +500,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithImexAndNotImexCurationLevel;
     }
 
-    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsHavingImexCurationLevelButAreNotEligibleImex() {
 
         if (!isInitialised){
@@ -522,7 +522,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsNotEligibleForImexWithImexCurationLevel;
     }
 
-    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsWithoutImexButWithExperimentImex() {
 
         if (!isInitialised){
@@ -535,7 +535,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithExperimentImexButNoImexId;
     }
 
-    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsWithoutImexButWithInteractionImex() {
 
         if (!isInitialised){
@@ -548,7 +548,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publicationsWithInteractionImexButNoImexId;
     }
 
-    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsHavingIMExIdAndNoPPI() {
         if (!isInitialised){
             initialise();
@@ -559,7 +559,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return CollectionUtils.intersection(publicationsNoPPI, publicationsAcceptedForRelease);
     }
 
-    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public Collection<String> getPublicationsHavingIMExCurationLevelAndUniprotDrExportNo() {
         if (!isInitialised){
             initialise();
@@ -570,7 +570,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return CollectionUtils.intersection(publicationsWithoutImexButImexCurationLevel, publicationsHavingUniprotDRExportNo);
     }
 
-    @Transactional(value = "jamiTransactionmanager", propagation = Propagation.REQUIRED, readOnly = true)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public void initialise() {
         if (publicationsHavingImexId == null){
             publicationsHavingImexId = collectPublicationsHavingImexIds();
