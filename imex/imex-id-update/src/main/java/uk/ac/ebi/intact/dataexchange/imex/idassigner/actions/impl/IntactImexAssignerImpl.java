@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.jami.bridges.imex.ImexCentralClient;
+import psidev.psi.mi.jami.bridges.imex.mock.MockImexCentralClient;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.imex.actions.impl.ImexAssignerImpl;
 import psidev.psi.mi.jami.model.Experiment;
@@ -44,10 +45,13 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
 
     private static final Log log = LogFactory.getLog(IntactImexAssignerImpl.class);
 
+    public IntactImexAssignerImpl(){
+        super(new MockImexCentralClient());
+    }
+
     public IntactImexAssignerImpl(ImexCentralClient client) {
         super(client);
     }
-
 
     @Override
     public void resetPublicationContext(IntactPublication pub, String imexId) {
