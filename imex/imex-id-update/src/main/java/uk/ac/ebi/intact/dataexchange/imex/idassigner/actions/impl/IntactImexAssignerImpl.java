@@ -58,7 +58,7 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
         setCurrentIndex(getNextImexChunkNumberAndFilterValidImexIdsFrom(pub));
     }
 
-    @Transactional(value = "jamiTransationManager", propagation = Propagation.REQUIRED)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     public void assignImexIdentifierToExperiments(Collection<String> expAcs, String imexId, ImexCentralManager imexCentralManager,
                                                   Set<String> updatedExpAcs) throws PublicationImexUpdaterException {
         if (expAcs != null && !expAcs.isEmpty() && imexId != null){
@@ -66,7 +66,7 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
             // fetch all experiments
             Map<String, Object> parameters = new HashMap<String, Object>(1);
             parameters.put("acs", expAcs);
-            List<Experiment> experiments = expService.fetchIntactObjects("select e from IntactExperiment e where e.ac in (acs)",
+            List<Experiment> experiments = expService.fetchIntactObjects("select e from IntactExperiment e where e.ac in (:acs)",
                     parameters, 0, Integer.MAX_VALUE);
 
             for (Experiment exp : experiments){
@@ -104,7 +104,7 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
         }
     }
 
-    @Transactional(value = "jamiTransationManager", propagation = Propagation.REQUIRED)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     public List<String> collectExistingInteractionImexIdsForPublication(IntactPublication intactPublication){
         InteractionEvidenceService intService = ApplicationContextProvider.getBean("interactionEvidenceService");
         // fetch all interaction evidences
@@ -138,7 +138,7 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
     }
 
     @Override
-    @Transactional(value = "jamiTransationManager", propagation = Propagation.REQUIRED)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     public int getNextImexChunkNumberAndFilterValidImexIdsFrom(Publication publication){
         if (publication instanceof IntactPublication){
             int number = 0;
@@ -167,7 +167,7 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
         }
     }
 
-    @Transactional(value = "jamiTransationManager", propagation = Propagation.REQUIRED)
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     public void assignImexIdentifierToInteractions(Collection<String> interactionAcs, String imexId, ImexCentralManager imexCentralManager,
                                                    Set<String> updatedInteractionAcs) throws PublicationImexUpdaterException {
         if (interactionAcs != null && !interactionAcs.isEmpty() && imexId != null){
@@ -239,8 +239,9 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
                     "where e.publication.ac = :pubAc and (e.ac not in " +
                     "(select e2.ac from IntactExperiment e2 join e2.xrefs as x2 where e2.publication.ac = :pubAc and x2.database.identifier = :imex " +
                     "and x2.qualifier.identifier = :imexPrimary and x2.id = :imexId) or " +
-                    "e.ac in (select e3.ac from IntactExperiment e3 join e3.xrefs as x3 where e3.publication.ac = :pubAc and x3.database.identifier = :imex " +
-                    "and x3.qualifier.identifier = :imexPrimary and x3.id <> :imexId))";
+                    "e.ac in (select e3.ac from IntactExperiment e3 join e3.xrefs as x3 where e3.publication.ac = :pubAc " +
+                    "and x3.database.identifier = :imex and x3.qualifier.identifier = :imexPrimary and x3.id = :imexId " +
+                    "group by e3.ac having count (distinct x3.ac) > 1))";
 
             Query query = manager.createQuery(datasetQuery);
             query.setParameter("pubAc", ((IntactPublication)pub).getAc());
@@ -268,7 +269,8 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
                     "and x2.database.identifier = :imexPrimary and x2.id like :imexId) or " +
                     "i.ac in (select i3.ac from IntactInteractionEvidence i3 join i3.dbXrefs as x3 join i3.experiments as e3 " +
                     "where e3.publication.ac = :pubAc and x3.database.identifier = :imex " +
-                    "and x3.qualifier.identifier = :imexPrimary and x3.id not like :imexId))";
+                    "and x3.qualifier.identifier = :imexPrimary and x3.id like :imexId " +
+                    "group by i3.ac having count (distinct x3.ac) > 1))";
 
             Query query = manager.createQuery(datasetQuery);
             query.setParameter("pubAc", pub.getAc());

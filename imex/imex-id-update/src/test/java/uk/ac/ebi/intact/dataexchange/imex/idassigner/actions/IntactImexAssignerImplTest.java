@@ -84,14 +84,18 @@ public class IntactImexAssignerImplTest{
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         IntactPublication intactPub = new IntactPublication("12345");
+        intactPub.setSource(new IntactSource("intact"));
 
         Experiment exp1 = new IntactExperiment(intactPub);
+        exp1.setHostOrganism(new IntactOrganism(9606));
         intactPub.addExperiment(exp1);
 
         Experiment exp2 = new IntactExperiment(intactPub);
+        exp2.setHostOrganism(new IntactOrganism(9607));
         intactPub.addExperiment(exp2);
 
         Experiment exp3 = new IntactExperiment(intactPub);
+        exp3.setHostOrganism(new IntactOrganism(9608));
         intactPub.addExperiment(exp3);
 
         pubService.saveOrUpdate(intactPub);
@@ -123,15 +127,19 @@ public class IntactImexAssignerImplTest{
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         IntactPublication intactPub = new IntactPublication("12345");
+        intactPub.setSource(new IntactSource("intact"));
 
         Experiment exp1 = new IntactExperiment(intactPub);
+        exp1.setHostOrganism(new IntactOrganism(9606));
         intactPub.addExperiment(exp1);
 
         Experiment exp2 = new IntactExperiment(intactPub);
+        exp2.setHostOrganism(new IntactOrganism(9607));
         intactPub.addExperiment(exp2);
 
         Experiment exp3 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp3);
+        exp3.setHostOrganism(new IntactOrganism(9608));
         exp3.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-3", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
 
         pubService.saveOrUpdate(intactPub);
@@ -154,15 +162,19 @@ public class IntactImexAssignerImplTest{
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         IntactPublication intactPub = new IntactPublication("12345");
+        intactPub.setSource(new IntactSource("intact"));
 
         IntactExperiment exp1 = new IntactExperiment(intactPub);
+        exp1.setHostOrganism(new IntactOrganism(9606));
         intactPub.addExperiment(exp1);
         exp1.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-1", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
 
         IntactExperiment exp2 = new IntactExperiment(intactPub);
+        exp2.setHostOrganism(new IntactOrganism(9607));
         intactPub.addExperiment(exp2);
 
         IntactExperiment exp3 = new IntactExperiment(intactPub);
+        exp3.setHostOrganism(new IntactOrganism(9608));
         intactPub.addExperiment(exp3);
 
         pubService.saveOrUpdate(intactPub);
@@ -200,18 +212,22 @@ public class IntactImexAssignerImplTest{
             SynchronizerException, PersisterException, FinderException {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
-
         IntactPublication intactPub = new IntactPublication("12345");
+        intactPub.setSource(new IntactSource("intact"));
 
         IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
+        exp1.setHostOrganism(new IntactOrganism(9606));
         exp1.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-1", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
         exp1.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-1", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
 
         IntactExperiment exp2 = new IntactExperiment(intactPub);
+        exp2.setHostOrganism(new IntactOrganism(9607));
         intactPub.addExperiment(exp2);
 
         IntactExperiment exp3 = new IntactExperiment(intactPub);
+        exp3.setHostOrganism(new IntactOrganism(9608));
+        exp3.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.INTERPRO, Xref.INTERPRO_MI, "test"));
         intactPub.addExperiment(exp3);
 
         pubService.saveOrUpdate(intactPub);
@@ -220,7 +236,7 @@ public class IntactImexAssignerImplTest{
 
         List<String> expAcs = assignerTest.collectExperimentsToUpdateFrom(intactPub, "IM-1");
         // only two experiments updated
-        Assert.assertEquals(2, expAcs.size());
+        Assert.assertEquals(3, expAcs.size());
 
         Set<String> expAcsUpdated = new HashSet<String>(expAcs.size());
         assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null, expAcsUpdated);
@@ -237,7 +253,7 @@ public class IntactImexAssignerImplTest{
                 Xref.IMEX_MI, Xref.IMEX, "IM-1", Xref.IMEX_PRIMARY_MI, Xref.IMEX_PRIMARY).isEmpty());
 
         Experiment exp3Reloaded = dao.getExperimentDao().getByAc(exp3.getAc());
-        Assert.assertEquals(1, exp3Reloaded.getXrefs().size());
+        Assert.assertEquals(2, exp3Reloaded.getXrefs().size());
         Assert.assertFalse(XrefUtils.collectAllXrefsHavingDatabaseQualifierAndId(exp3Reloaded.getXrefs(),
                 Xref.IMEX_MI, Xref.IMEX, "IM-1", Xref.IMEX_PRIMARY_MI, Xref.IMEX_PRIMARY).isEmpty());
     }
@@ -251,6 +267,7 @@ public class IntactImexAssignerImplTest{
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         IntactPublication intactPub = new IntactPublication("12345");
+        intactPub.setSource(new IntactSource("intact"));
 
         IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
@@ -296,6 +313,7 @@ public class IntactImexAssignerImplTest{
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         IntactPublication intactPub = new IntactPublication("12345");
+        intactPub.setSource(new IntactSource("intact"));
 
         IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
@@ -362,6 +380,7 @@ public class IntactImexAssignerImplTest{
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         IntactPublication intactPub = new IntactPublication("12345");
+        intactPub.setSource(new IntactSource("intact"));
 
         IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
@@ -404,6 +423,7 @@ public class IntactImexAssignerImplTest{
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         IntactPublication intactPub = new IntactPublication("12345");
+        intactPub.setSource(new IntactSource("intact"));
 
         IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
@@ -471,6 +491,7 @@ public class IntactImexAssignerImplTest{
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
 
         IntactPublication intactPub = new IntactPublication("12345");
+        intactPub.setSource(new IntactSource("intact"));
 
         IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
