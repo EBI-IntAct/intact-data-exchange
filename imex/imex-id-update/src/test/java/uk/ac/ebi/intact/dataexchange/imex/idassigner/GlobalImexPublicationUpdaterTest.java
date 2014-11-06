@@ -102,8 +102,8 @@ public class GlobalImexPublicationUpdaterTest{
         IntactPublication pubWithoutCurationDepth = new IntactPublication("12346");
         Experiment exp2 = new IntactExperiment(pubWithoutCurationDepth);
         pubWithoutCurationDepth.addExperiment(exp2);
-        pubWithImex.setSource(new IntactSource("intact"));
-        pubWithImex.setCurationDepth(CurationDepth.MIMIx);
+        pubWithoutCurationDepth.setSource(new IntactSource("intact"));
+        pubWithoutCurationDepth.setCurationDepth(CurationDepth.MIMIx);
         IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
         ev4.addParticipant(new IntactParticipantEvidence(new IntactProtein("test")));
         exp2.addInteractionEvidence(ev4);
@@ -114,8 +114,8 @@ public class GlobalImexPublicationUpdaterTest{
         IntactPublication pubWithoutPPI = new IntactPublication("12347");
         Experiment exp3 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp3);
-        pubWithImex.setSource(new IntactSource("intact"));
-        pubWithImex.setCurationDepth(CurationDepth.IMEx);
+        pubWithoutPPI.setSource(new IntactSource("intact"));
+        pubWithoutPPI.setCurationDepth(CurationDepth.IMEx);
         IntactInteractionEvidence ev5 = new IntactInteractionEvidence();
         ev5.addParticipant(new IntactParticipantEvidence(new IntactNucleicAcid("test")));
         exp3.addInteractionEvidence(ev5);
@@ -226,16 +226,16 @@ public class GlobalImexPublicationUpdaterTest{
         // publication not elligible imex (no journal, no datasets, no IMEx id) but imex curation level -> not updated but reported
         IntactPublication pub2 = new IntactPublication("12349");
         Experiment exp2 = new IntactExperiment(pub2);
-        pubWithImex.addExperiment(exp2);
+        pub2.addExperiment(exp2);
         IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
         ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
         IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
         ev4.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
         exp2.addInteractionEvidence(ev1);
         exp2.addInteractionEvidence(ev2);
-        pubWithImex.setSource(new IntactSource("intact"));
-        pubWithImex.setCurationDepth(CurationDepth.IMEx);
-        pubWithImex.setStatus(LifeCycleStatus.ACCEPTED);
+        pub2.setSource(new IntactSource("intact"));
+        pub2.setCurationDepth(CurationDepth.IMEx);
+        pub2.setStatus(LifeCycleStatus.ACCEPTED);
         Calendar cal = GregorianCalendar.getInstance();
         cal.set(2005, 12, 31);
         pub2.setCreated(cal.getTime());
@@ -251,7 +251,7 @@ public class GlobalImexPublicationUpdaterTest{
         interWithImex.assignImexId("IM-4-1");
         exp3.addInteractionEvidence(interWithImex);
         pubWithoutImex.setSource(new IntactSource("intact"));
-        pubWithImex.setStatus(LifeCycleStatus.ACCEPTED);
+        pubWithoutImex.setStatus(LifeCycleStatus.ACCEPTED);
         pubService.saveOrUpdate(pubWithoutImex);
 
         // publication without imex id but experiment does have IMEx -> not updated but reported

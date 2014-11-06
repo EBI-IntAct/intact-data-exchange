@@ -93,6 +93,7 @@ public class ImexCentralManagerTest {
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
         IntactPublication intactPublication = new IntactPublication("12345");
         intactPublication.assignImexId("IM-3");
+        intactPublication.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(intactPublication);
 
         imexManagerTest.updateIntactPublicationHavingIMEx(intactPublication.getAc());
@@ -109,6 +110,7 @@ public class ImexCentralManagerTest {
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
         IntactPublication intactPub = new IntactPublication("12345");
         intactPub.assignImexId("IM-3");
+        intactPub.setSource(new IntactSource("intact"));
         intactPub.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-3", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
         pubService.saveOrUpdate(intactPub);
 
@@ -131,6 +133,8 @@ public class ImexCentralManagerTest {
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
         IntactPublication intactPub = new IntactPublication("12345");
         intactPub.assignImexId("IM-3");
+        intactPub.setSource(new IntactSource("intact"));
+
         intactPub.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-4", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
         pubService.saveOrUpdate(intactPub);
 
@@ -151,6 +155,7 @@ public class ImexCentralManagerTest {
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
         IntactPublication intactPublication = new IntactPublication("12345");
         intactPublication.assignImexId("IM-3");
+        intactPublication.setSource(new IntactSource("intact"));
 
         Experiment exp1 = new IntactExperiment(intactPublication);
         intactPublication.addExperiment(exp1);
@@ -251,6 +256,7 @@ public class ImexCentralManagerTest {
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
         IntactPublication intactPublication = new IntactPublication("12345");
         intactPublication.assignImexId("IM-3");
+        intactPublication.setSource(new IntactSource("intact"));
         intactPublication.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-4", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
 
         Experiment exp1 = new IntactExperiment(intactPublication);
@@ -300,6 +306,7 @@ public class ImexCentralManagerTest {
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
         IntactPublication intactPublication = new IntactPublication("12345");
         intactPublication.assignImexId("IM-5");
+        intactPublication.setSource(new IntactSource("intact"));
 
         Experiment exp1 = new IntactExperiment(intactPublication);
         intactPublication.addExperiment(exp1);
@@ -348,6 +355,7 @@ public class ImexCentralManagerTest {
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
         IntactPublication intactPublication = new IntactPublication("unassigned604");
         intactPublication.assignImexId("IM-4");
+        intactPublication.setSource(new IntactSource("intact"));
 
         Experiment exp1 = new IntactExperiment(intactPublication);
         intactPublication.addExperiment(exp1);
