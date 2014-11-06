@@ -25,7 +25,10 @@ import uk.ac.ebi.intact.jami.synchronizer.FinderException;
 import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
 import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Unit tester for IntactImexAssignerImpl
@@ -297,10 +300,9 @@ public class IntactImexAssignerImplTest{
         List<String> imexIds = assignerTest.collectExistingInteractionImexIdsForPublication(intactPub);
         Assert.assertEquals(3, imexIds.size());
 
-        Iterator<String> imexIdsIterator = imexIds.iterator();
-        Assert.assertEquals("IM-1", imexIdsIterator.next());
-        Assert.assertEquals("IM-1-1", imexIdsIterator.next());
-        Assert.assertEquals("IM-1-2", imexIdsIterator.next());
+        Assert.assertTrue(imexIds.contains("IM-1-1"));
+        Assert.assertTrue(imexIds.contains("IM-1-2"));
+        Assert.assertTrue(imexIds.contains("IM-1"));
     }
 
     @Test
@@ -492,15 +494,13 @@ public class IntactImexAssignerImplTest{
 
         IntactPublication intactPub = new IntactPublication("12345");
         intactPub.setSource(new IntactSource("intact"));
-
         IntactExperiment exp1 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp1);
         IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
         ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        ev1.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-1-1", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
         ev1.assignImexId("IM-1-1");
-        ev1.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-1", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
         exp1.addInteractionEvidence(ev1);
-
         IntactExperiment exp2 = new IntactExperiment(intactPub);
         intactPub.addExperiment(exp2);
         IntactInteractionEvidence ev2 = new IntactInteractionEvidence();

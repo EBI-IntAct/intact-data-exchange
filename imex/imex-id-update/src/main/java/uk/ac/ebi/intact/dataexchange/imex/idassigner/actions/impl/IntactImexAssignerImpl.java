@@ -115,16 +115,14 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
 
         // collect all interaction evidences attached to this publication and having an IMEx id
         Iterator<InteractionEvidence> interactionsIterator = intService.iterateAll(
-                "select count(distinct i.ac) from IntactInteractionEvidence i join i.dbXrefs as x join i.experiments as e join e.publication as p " +
+                "select count(distinct i.ac) from IntactInteractionEvidence i join i.dbXrefs as x join i.dbExperiments as e join e.publication as p " +
                         "where p.ac = :publicationAc " +
                         "and x.database.identifier = :imex " +
-                        "and x.qualifier.identifier = :imexPrimary " +
-                        "order by x.id",
-                "select distinct i from IntactInteractionEvidence i join i.dbXrefs as x join i.experiments as e join e.publication as p " +
+                        "and x.qualifier.identifier = :imexPrimary ",
+                "select distinct i from IntactInteractionEvidence i join i.dbXrefs as x join i.dbExperiments as e join e.publication as p " +
                         "where p.ac = :publicationAc " +
                         "and x.database.identifier = :imex " +
-                        "and x.qualifier.identifier = :imexPrimary " +
-                        "order by x.id",
+                        "and x.qualifier.identifier = :imexPrimary ",
                 parameters);
 
         List<String> imexIds = new ArrayList<String>();
@@ -262,12 +260,12 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
             IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
             EntityManager manager = intactDao.getEntityManager();
 
-            String datasetQuery = "select distinct i.ac from IntactInteractionEvidence i join i.experiments as e " +
+            String datasetQuery = "select distinct i.ac from IntactInteractionEvidence i join i.dbExperiments as e " +
                     "where e.publication.ac = :pubAc and (i.ac not in " +
-                    "(select i2.ac from IntactInteractionEvidence i2 join i2.dbXrefs as x2 join i2.experiments as e2 " +
+                    "(select i2.ac from IntactInteractionEvidence i2 join i2.dbXrefs as x2 join i2.dbExperiments as e2 " +
                     "where e2.publication.ac = :pubAc and x2.database.identifier = :imex " +
-                    "and x2.database.identifier = :imexPrimary and x2.id like :imexId) or " +
-                    "i.ac in (select i3.ac from IntactInteractionEvidence i3 join i3.dbXrefs as x3 join i3.experiments as e3 " +
+                    "and x2.qualifier.identifier = :imexPrimary and x2.id like :imexId) or " +
+                    "i.ac in (select i3.ac from IntactInteractionEvidence i3 join i3.dbXrefs as x3 join i3.dbExperiments as e3 " +
                     "where e3.publication.ac = :pubAc and x3.database.identifier = :imex " +
                     "and x3.qualifier.identifier = :imexPrimary and x3.id like :imexId " +
                     "group by i3.ac having count (distinct x3.ac) > 1))";
