@@ -239,7 +239,7 @@ public class GlobalImexPublicationUpdaterTest{
         Calendar cal = GregorianCalendar.getInstance();
         cal.set(2005, 12, 31);
         pub2.setCreated(cal.getTime());
-        pubService.saveOrUpdate(pubWithImex);
+        pubService.saveOrUpdate(pub2);
 
         // publication without imex id but interaction does have IMEx -> not updated but reported
         // one publication without imex-primary ref but interaction with imex primary ref

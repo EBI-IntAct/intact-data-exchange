@@ -346,7 +346,6 @@ public class IntactImexAssignerImplTest{
 
         Set<String> intUpdated = new HashSet<String>(interactionAcs.size());
         assignerTest.assignImexIdentifierToInteractions(interactionAcs, "IM-1", null, intUpdated);
-
         InteractionEvidence int1Reloaded = dao.getInteractionDao().getByAc(ev1.getAc());
         Assert.assertEquals(1, int1Reloaded.getXrefs().size());
         Xref ref = int1Reloaded.getXrefs().iterator().next();
