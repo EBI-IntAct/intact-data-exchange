@@ -351,8 +351,8 @@ public class IntactPublicationCollectorImplTest {
         Experiment exp2 = new IntactExperiment(pubWithoutImexCuration);
         pubWithoutImexCuration.addExperiment(exp2);
         pubWithoutImexCuration.setSource(new IntactSource("intact"));
-        pubWithoutImexCuration.setCurationDepth(CurationDepth.MIMIx);
         pubWithoutImexCuration.assignImexId("IM-4");
+        pubWithoutImexCuration.setCurationDepth(CurationDepth.MIMIx);
         IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
         ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
         IntactInteractionEvidence ev4 = new IntactInteractionEvidence();

@@ -97,7 +97,6 @@ public class ImexCentralManagerTest {
         pubService.saveOrUpdate(intactPublication);
 
         imexManagerTest.updateIntactPublicationHavingIMEx(intactPublication.getAc());
-
         Assert.assertEquals(1, dao.getPublicationDao().getByAc(intactPublication.getAc()).getXrefs().size());
         Assert.assertEquals("IM-3", dao.getPublicationDao().getByAc(intactPublication.getAc()).getImexId());
     }
@@ -117,7 +116,6 @@ public class ImexCentralManagerTest {
         Assert.assertEquals(2, intactPub.getXrefs().size());
 
         imexManagerTest.updateIntactPublicationHavingIMEx(intactPub.getAc());
-
         IntactPublication intactPubReloaded = dao.getPublicationDao().getByAc(intactPub.getAc());
 
         Assert.assertEquals(1, intactPubReloaded.getXrefs().size());
