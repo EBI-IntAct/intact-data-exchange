@@ -497,7 +497,7 @@ public class ImexCentralManagerTest {
         Assert.assertEquals(1, imexPublication.getCurators().size());
         Assert.assertEquals("phantom", imexPublication.getCurators().iterator().next());
         // status released
-        Assert.assertEquals("NEW", imexPublication.getStatus());
+        Assert.assertEquals(PublicationStatus.NEW, imexPublication.getStatus());
 
         // assigned IMEx
         Assert.assertNotNull(imexPublication.getImexId());
