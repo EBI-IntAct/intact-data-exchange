@@ -103,11 +103,11 @@ public class GlobalImexPublicationUpdaterTest{
         Experiment exp2 = new IntactExperiment(pubWithoutCurationDepth);
         pubWithoutCurationDepth.addExperiment(exp2);
         pubWithoutCurationDepth.setSource(new IntactSource("intact"));
-        pubWithoutCurationDepth.setCurationDepth(CurationDepth.MIMIx);
         IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
         ev4.addParticipant(new IntactParticipantEvidence(new IntactProtein("test")));
         exp2.addInteractionEvidence(ev4);
         pubWithoutCurationDepth.assignImexId("IM-4");
+        pubWithoutCurationDepth.setCurationDepth(CurationDepth.MIMIx);
         pubService.saveOrUpdate(pubWithoutCurationDepth);
 
         // publication with imex id and no PPI -> not updated but reported
@@ -115,11 +115,11 @@ public class GlobalImexPublicationUpdaterTest{
         Experiment exp3 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp3);
         pubWithoutPPI.setSource(new IntactSource("intact"));
-        pubWithoutPPI.setCurationDepth(CurationDepth.IMEx);
         IntactInteractionEvidence ev5 = new IntactInteractionEvidence();
         ev5.addParticipant(new IntactParticipantEvidence(new IntactNucleicAcid("test")));
         exp3.addInteractionEvidence(ev5);
         pubWithoutPPI.assignImexId("IM-5");
+        pubWithoutPPI.setCurationDepth(CurationDepth.IMEx);
         pubService.saveOrUpdate(pubWithoutPPI);
 
         // update existing publications
@@ -214,9 +214,11 @@ public class GlobalImexPublicationUpdaterTest{
         pubWithImex.addExperiment(exp1);
         IntactInteractionEvidence ev1 = new IntactInteractionEvidence();
         ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
-        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
-        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        ev1.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
         exp1.addInteractionEvidence(ev1);
+        IntactInteractionEvidence ev2 = new IntactInteractionEvidence();
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12357")));
+        ev2.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12348")));
         exp1.addInteractionEvidence(ev2);
         pubWithImex.setSource(new IntactSource("intact"));
         pubWithImex.setCurationDepth(CurationDepth.IMEx);
@@ -229,10 +231,8 @@ public class GlobalImexPublicationUpdaterTest{
         pub2.addExperiment(exp2);
         IntactInteractionEvidence ev3 = new IntactInteractionEvidence();
         ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
-        IntactInteractionEvidence ev4 = new IntactInteractionEvidence();
-        ev4.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
-        exp2.addInteractionEvidence(ev1);
-        exp2.addInteractionEvidence(ev2);
+        ev3.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp2.addInteractionEvidence(ev3);
         pub2.setSource(new IntactSource("intact"));
         pub2.setCurationDepth(CurationDepth.IMEx);
         pub2.setStatus(LifeCycleStatus.ACCEPTED);
@@ -258,7 +258,7 @@ public class GlobalImexPublicationUpdaterTest{
         IntactPublication pubWithoutImex2 = new IntactPublication("12351");
         Experiment exp4 = new IntactExperiment(pubWithoutImex2);
         pubWithoutImex2.addExperiment(exp4);
-        exp2.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-4", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
+        exp4.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-4", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
         pubWithoutImex2.setSource(new IntactSource("intact"));
         pubWithoutImex2.setStatus(LifeCycleStatus.ACCEPTED);
         pubService.saveOrUpdate(pubWithoutImex2);
@@ -268,11 +268,15 @@ public class GlobalImexPublicationUpdaterTest{
         pubWithoutImex3.setCurationDepth(CurationDepth.IMEx);
         Experiment exp5 = new IntactExperiment(pubWithoutImex3);
         pubWithoutImex3.addExperiment(exp5);
-        exp3.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-5", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
+        exp5.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-5", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
+        IntactInteractionEvidence ev5 = new IntactInteractionEvidence();
+        ev5.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12345")));
+        ev5.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
+        exp5.addInteractionEvidence(ev5);
         pubWithoutImex3.setSource(new IntactSource("intact"));
         pubWithoutImex3.setStatus(LifeCycleStatus.ACCEPTED);
 
-        pubService.saveOrUpdate(pubWithoutImex2);
+        pubService.saveOrUpdate(pubWithoutImex3);
 
         // update existing publications
         globalImexUpdaterTest.assignNewImexIdsToPublications();
@@ -316,7 +320,7 @@ public class GlobalImexPublicationUpdaterTest{
                 Assert.assertEquals(1, inter.getXrefs().size());
 
                 ref = inter.getXrefs().iterator().next();
-                Assert.assertTrue(ref.getId().startsWith("IM-3-"));
+                Assert.assertTrue(ref.getId().startsWith(intactPubReloaded.getImexId()+"-"));
                 Assert.assertEquals(Xref.IMEX_MI, ref.getDatabase().getMIIdentifier());
                 Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref.getQualifier().getMIIdentifier());
 
@@ -341,7 +345,7 @@ public class GlobalImexPublicationUpdaterTest{
         }
 
         // pub 3 is not updated because error
-        IntactPublication intactPubReloaded3 = dao.getPublicationDao().getByAc(pubWithImex.getAc());
+        IntactPublication intactPubReloaded3 = dao.getPublicationDao().getByAc(pubWithoutImex.getAc());
 
         Assert.assertEquals(0, intactPubReloaded3.getXrefs().size());
         Assert.assertEquals(0, intactPubReloaded3.getAnnotations().size());
@@ -400,7 +404,7 @@ public class GlobalImexPublicationUpdaterTest{
             Assert.assertEquals(1, exp.getXrefs().size());
 
             Xref ref = exp.getXrefs().iterator().next();
-            Assert.assertEquals("IM-3", ref.getId());
+            Assert.assertNotNull(ref.getId());
             Assert.assertEquals(Xref.IMEX_MI, ref.getDatabase().getMIIdentifier());
             Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref.getQualifier().getMIIdentifier());
 

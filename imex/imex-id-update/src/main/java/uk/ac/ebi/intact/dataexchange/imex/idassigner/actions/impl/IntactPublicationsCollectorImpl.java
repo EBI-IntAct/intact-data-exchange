@@ -191,7 +191,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
             String pubAc = pubEntry.getKey();
 
             for (String interactionAc : interactionsAcs){
-                if (mapOfNumberParticipants.containsKey(interactionAc) && mapOfNumberParticipants.get(interactionAc) > 1){
+                if (mapOfNumberParticipants.containsKey(interactionAc) && mapOfNumberParticipants.get(interactionAc) > 0){
                     publications.add(pubAc);
                     break;
                 }
@@ -340,9 +340,9 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         EntityManager manager = intactDao.getEntityManager();
         String proteinQuery = "select p2.ac, i.ac, count(distinct c.ac) from IntactInteractionEvidence as i join i.dbExperiments as e " +
                 "join e.publication as p2 join i.participants as c join c.interactor as interactor " +
-                "where i.ac in " +
-                "(select distinct i2.ac from IntactParticipantEvidence c2 join c2.dbParentInteraction as i2 join c2.interactor as interactor " +
-                " where interactor.interactorType.identifier <> :protein and interactor.interactorType.identifier <> :peptide)" +
+                "where i.ac not in " +
+                "(select distinct i2.ac from IntactParticipantEvidence c2 join c2.dbParentInteraction as i2 join c2.interactor as interactor2 " +
+                " where interactor2.interactorType.identifier <> :protein and interactor2.interactorType.identifier <> :peptide)" +
                 "group by p2.ac, i.ac, interactor.interactorType.identifier having (interactor.interactorType.identifier = :protein " +
                 "or interactor.interactorType.identifier = :peptide) order by p2.ac, i.ac";
 
