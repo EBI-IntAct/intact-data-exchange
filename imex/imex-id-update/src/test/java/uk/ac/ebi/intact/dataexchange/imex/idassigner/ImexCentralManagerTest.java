@@ -434,7 +434,7 @@ public class ImexCentralManagerTest {
                 Assert.assertEquals(1, inter.getXrefs().size());
 
                 ref = inter.getXrefs().iterator().next();
-                Assert.assertTrue(ref.getId().startsWith("IM-3-"));
+                Assert.assertTrue(ref.getId().startsWith("IM-4-"));
                 Assert.assertEquals(Xref.IMEX_MI, ref.getDatabase().getMIIdentifier());
                 Assert.assertEquals(Xref.IMEX_PRIMARY_MI, ref.getQualifier().getMIIdentifier());
 
@@ -449,12 +449,15 @@ public class ImexCentralManagerTest {
     @DirtiesContext
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager")
     public void assign_imex_register_update_publication() throws PublicationImexUpdaterException, BridgeFailedException, SynchronizerException, PersisterException, FinderException, EnricherException {
+        User user = new User("default", "default", "default", "default@ebi.ac.uk");
 
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
+        dao.getUserDao().persist(user);
         IntactPublication intactPublication = new IntactPublication("12346");
         intactPublication.setCurationDepth(CurationDepth.IMEx);
         intactPublication.setSource(new IntactSource("intact"));
+        intactPublication.setCurrentOwner(user);
 
         Experiment exp1 = new IntactExperiment(intactPublication);
         intactPublication.addExperiment(exp1);
@@ -489,7 +492,7 @@ public class ImexCentralManagerTest {
         // valid pubmed so whould have synchronized admin group, admin user and status
         // admin group INTACT
         Assert.assertEquals(1, imexPublication.getSources().size());
-        Assert.assertEquals("INTACT", imexPublication.getSources().iterator().next());
+        Assert.assertEquals("INTACT", imexPublication.getSources().iterator().next().getShortName().toUpperCase());
         // admin user phantom because curator is not known in imex central
         Assert.assertEquals(1, imexPublication.getCurators().size());
         Assert.assertEquals("phantom", imexPublication.getCurators().iterator().next());
