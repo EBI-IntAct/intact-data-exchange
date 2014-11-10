@@ -584,10 +584,6 @@ public class ImexCentralManagerTest {
         pubService.saveOrUpdate(intactPublication);
 
         imexManagerTest.assignImexAndUpdatePublication(intactPublication.getAc());
-        ImexPublication imexPublication = (ImexPublication)imexManagerTest.getImexCentralRegister().getExistingPublicationInImexCentral("12347", "pubmed");
-
-        // did not create imex record because conflict with imex
-        Assert.assertNull(imexPublication);
 
         IntactPublication intactPubReloaded = dao.getPublicationDao().getByAc(intactPublication.getAc());
 
@@ -643,7 +639,7 @@ public class ImexCentralManagerTest {
         ImexPublication imexPublication = (ImexPublication)imexManagerTest.getImexCentralRegister().getExistingPublicationInImexCentral("12348", "pubmed");
 
         // did not create imex record because conflict with imex
-        Assert.assertNull(imexPublication);
+        Assert.assertNull(imexPublication.getImexId());
 
         IntactPublication intactPubReloaded = dao.getPublicationDao().getByAc(intactPublication.getAc());
 
