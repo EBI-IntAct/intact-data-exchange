@@ -45,6 +45,9 @@ public class IntactPublicationImexEnricherListener
         ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_imex_conflict, pubId, null, null, null,
                 "Publication " + pubId + " cannot be updated because of IMEx identifier conflicts.");
         getImexCentralManager().fireOnImexError(errorEvt);
+
+        // do not update experiments and interactions
+        getImexCentralManager().setEnableExperimentsAndInteractionsUpdate(false);
     }
 
     @Override
@@ -57,6 +60,9 @@ public class IntactPublicationImexEnricherListener
         ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.no_IMEX_id, pubId, null, null, null, "Publication "
                 + ((IntactPublication)intactPublication).getAc() + " does not have a valid IMEx id and is ignored.");
         imexCentralManager.fireOnImexError(errorEvt);
+
+        // do not update experiments and interactions
+        getImexCentralManager().setEnableExperimentsAndInteractionsUpdate(false);
     }
 
     @Override
@@ -91,6 +97,9 @@ public class IntactPublicationImexEnricherListener
                 pubId, imex, null, null, "It is not possible to assign a valid IMEx id to the publication " + pubId
                 + " because it already registered in IMEx central with another institution");
         getImexCentralManager().fireOnImexError(evt);
+
+        // do not update experiments and interactions
+        getImexCentralManager().setEnableExperimentsAndInteractionsUpdate(false);
     }
 
     @Override
@@ -117,6 +126,9 @@ public class IntactPublicationImexEnricherListener
                     "It is not possible to register the publication " + pubId + " in IMEx central.");
             getImexCentralManager().fireOnImexError(evt);
         }
+        // do not update experiments and interactions
+        getImexCentralManager().setEnableExperimentsAndInteractionsUpdate(false);
+
     }
 
     @Override
@@ -145,6 +157,9 @@ public class IntactPublicationImexEnricherListener
         ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.imex_not_recognized, pubId, imex, null, null,
                 "Publication " + ((IntactPublication)intactPublication).getAc() + " is not matching any record in IMEx central with id " + imex);
         getImexCentralManager().fireOnImexError(errorEvt);
+
+        // do not update experiments and interactions
+        getImexCentralManager().setEnableExperimentsAndInteractionsUpdate(false);
     }
 
     @Override

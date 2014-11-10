@@ -42,17 +42,11 @@
         <constructor-arg ref="imexCentralClient"/>
     </bean>
 
-    <!-- listener -->
-    <bean id="imexPublicationListener" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.IntactPublicationImexEnricherListener">
-        <constructor-arg ref="imexCentralManager"/>
-    </bean>
-
     <!-- enricher -->
     <bean id="intactPublicationRegister" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.enrichers.IntactImexPublicationRegister">
         <constructor-arg ref="imexCentralClient"/>
         <property name="adminUserSynchronizer" ref="intactImexAdminUserSynchronizer"/>
         <property name="adminGroupSynchronizer" ref="intactImexAdminGroupSynchronizer"/>
-        <property name="publicationEnricherListener" ref="imexPublicationListener"/>
         <property name="publicationRegister" ref="imexCentralRegister"/>
         <property name="statusSynchronizer" ref="intactImexStatusSynchronizer"/>
     </bean>
@@ -60,14 +54,12 @@
         <constructor-arg ref="imexCentralClient"/>
         <property name="adminUserSynchronizer" ref="intactImexAdminUserSynchronizer"/>
         <property name="adminGroupSynchronizer" ref="intactImexAdminGroupSynchronizer"/>
-        <property name="publicationEnricherListener" ref="imexPublicationListener"/>
         <property name="identifierSynchronizer" ref="publicationIdentifierSynchronizer"/>
         <property name="statusSynchronizer" ref="intactImexStatusSynchronizer"/>
     </bean>
     <bean id="intactPublicationAssigner" class="uk.ac.ebi.intact.dataexchange.imex.idassigner.enrichers.IntactImexPublicationAssigner">
         <constructor-arg ref="imexCentralClient"/>
         <property name="publicationUpdater" ref="intactPublicationUpdater"/>
-        <property name="publicationEnricherListener" ref="imexPublicationListener"/>
         <property name="publicationRegister" ref="imexCentralRegister"/>
         <property name="imexAssigner" ref="intactImexAssigner"/>
     </bean>

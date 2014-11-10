@@ -23,6 +23,8 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.PublicationImexUpda
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 import uk.ac.ebi.intact.jami.model.extension.*;
+import uk.ac.ebi.intact.jami.model.lifecycle.LifeCycleStatus;
+import uk.ac.ebi.intact.jami.model.user.User;
 import uk.ac.ebi.intact.jami.service.PublicationService;
 import uk.ac.ebi.intact.jami.synchronizer.FinderException;
 import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
@@ -149,11 +151,17 @@ public class ImexCentralManagerTest {
     @DirtiesContext
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager")
     public void update_publication_having_imex() throws PublicationImexUpdaterException, BridgeFailedException, SynchronizerException, PersisterException, FinderException, EnricherException {
+        User user = new User("default", "default", "default", "default@ebi.ac.uk");
+
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
+        dao.getUserDao().persist(user);
+
         IntactPublication intactPublication = new IntactPublication("12345");
+        intactPublication.setStatus(LifeCycleStatus.NEW);
         intactPublication.assignImexId("IM-3");
         intactPublication.setSource(new IntactSource("intact"));
+        intactPublication.setCurrentOwner(user);
 
         Experiment exp1 = new IntactExperiment(intactPublication);
         intactPublication.addExperiment(exp1);
@@ -352,6 +360,7 @@ public class ImexCentralManagerTest {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
         IntactPublication intactPublication = new IntactPublication("unassigned604");
+        intactPublication.setStatus(LifeCycleStatus.NEW);
         intactPublication.assignImexId("IM-4");
         intactPublication.setSource(new IntactSource("intact"));
 

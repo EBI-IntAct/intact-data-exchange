@@ -25,6 +25,7 @@ import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.ImexErrorType;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.IntactUpdateEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.events.NewAssignedImexEvent;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ImexUpdateListener;
+import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.IntactPublicationImexEnricherListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.LoggingImexUpdateListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.listener.ReportWriterListener;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.report.FileImexUpdateReportHandler;
@@ -87,6 +88,7 @@ public class ImexCentralManager {
 
     public static final String INTACT_CURATOR = "intact";
     private boolean hasUpdatedAnnotations = false;
+    private boolean enableExperimentsAndInteractionsUpdate = true;
 
     public ImexCentralManager(){
         experimentAcsChunk = new ArrayList<String>();
@@ -109,12 +111,14 @@ public class ImexCentralManager {
         IntactPublication intactPublication = pubDao.getByAc(publicationAc);
         // reset updated annotations
         hasUpdatedAnnotations = false;
+        enableExperimentsAndInteractionsUpdate = true;
 
         // the publication does exist in IntAct
         if (intactPublication != null){
 
             // first update publication using enricher
             getPublicationUpdater().enrich(intactPublication);
+
             // synchronize pub
             try {
                 pubDao.update(intactPublication);
@@ -148,7 +152,9 @@ public class ImexCentralManager {
             }
 
             // update experiments and interactions
-            assignAndUpdateIntactExperimentsAndInteractions(intactPublication);
+            if (enableExperimentsAndInteractionsUpdate){
+                assignAndUpdateIntactExperimentsAndInteractions(intactPublication);
+            }
         }
         // publication does not exist in IntAct
         else {
@@ -174,6 +180,7 @@ public class ImexCentralManager {
         IntactPublication intactPublication = pubDao.getByAc(publicationAc);
         // reset updated annotations
         hasUpdatedAnnotations = false;
+        enableExperimentsAndInteractionsUpdate = true;
 
         // the publication does exist in IntAct
         if (intactPublication != null){
@@ -214,7 +221,9 @@ public class ImexCentralManager {
             }
 
             // update experiments and interactions
-            assignAndUpdateIntactExperimentsAndInteractions(intactPublication);
+            if (enableExperimentsAndInteractionsUpdate){
+                assignAndUpdateIntactExperimentsAndInteractions(intactPublication);
+            }
         }
         // the publication does not exist in Intact
         else {
@@ -232,6 +241,7 @@ public class ImexCentralManager {
         IntactPublication intactPublication = pubDao.getByAc(publicationAc);
         // reset updated annotations
         hasUpdatedAnnotations = false;
+        enableExperimentsAndInteractionsUpdate = true;
 
         // the publication does exist in IntAct
         if (intactPublication != null){
@@ -290,6 +300,7 @@ public class ImexCentralManager {
         IntactPublication intactPublication = pubDao.getByAc(publicationAc);
         // reset updated annotations
         hasUpdatedAnnotations = false;
+        enableExperimentsAndInteractionsUpdate = true;
 
         // the publication does exist in IntAct
         if (intactPublication != null){
@@ -600,6 +611,7 @@ public class ImexCentralManager {
                 throw new IllegalArgumentException("A IntactImexPublicationUpdater bean with name 'intactPublicationUpdater' is expected and cannot be found in the spring application context");
             }
         }
+        publicationUpdater.setPublicationEnricherListener(new IntactPublicationImexEnricherListener(this));
         return publicationUpdater;
     }
 
@@ -610,6 +622,7 @@ public class ImexCentralManager {
                 throw new IllegalArgumentException("A ImexPublicationRegister bean with name 'intactPublicationRegister' is expected and cannot be found in the spring application context");
             }
         }
+        publicationRegister.setPublicationEnricherListener(new IntactPublicationImexEnricherListener(this));
         return publicationRegister;
     }
 
@@ -620,6 +633,7 @@ public class ImexCentralManager {
                 throw new IllegalArgumentException("A IntactImexPublicationAssigner bean with name 'intactPublicationAssigner' is expected and cannot be found in the spring application context");
             }
         }
+        publicationImexAssigner.setPublicationEnricherListener(new IntactPublicationImexEnricherListener(this));
         return publicationImexAssigner;
     }
 
@@ -633,5 +647,9 @@ public class ImexCentralManager {
 
     public void setPublicationImexAssigner(IntactImexPublicationAssigner publicationImexAssigner) {
         this.publicationImexAssigner = publicationImexAssigner;
+    }
+
+    public void setEnableExperimentsAndInteractionsUpdate(boolean enableExperimentsAndInteractionsUpdate) {
+        this.enableExperimentsAndInteractionsUpdate = enableExperimentsAndInteractionsUpdate;
     }
 }
