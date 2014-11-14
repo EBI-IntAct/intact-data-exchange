@@ -19,8 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import psidev.psi.mi.jami.enricher.*;
+import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.PublicationEnricher;
+import psidev.psi.mi.jami.enricher.SourceEnricher;
+import psidev.psi.mi.jami.enricher.listener.CvTermEnricherListener;
+import psidev.psi.mi.jami.enricher.listener.impl.log.SourceEnricherLogger;
 import psidev.psi.mi.jami.model.CvTerm;
 import psidev.psi.mi.jami.model.Source;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.MiCvObjectFetcher;
@@ -47,5 +50,13 @@ public class InstitutionEnricher extends AbstractCvObjectEnricher<Source> implem
     @Override
     public PublicationEnricher getPublicationEnricher() {
         return null;
+    }
+
+    @Override
+    public CvTermEnricherListener<Source> getCvTermEnricherListener() {
+        if (super.getCvTermEnricherListener() == null){
+            super.setCvTermEnricherListener(new SourceEnricherLogger());
+        }
+        return super.getCvTermEnricherListener();
     }
 }

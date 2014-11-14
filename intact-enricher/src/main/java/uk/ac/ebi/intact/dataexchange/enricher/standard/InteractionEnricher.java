@@ -19,6 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.enricher.listener.InteractionEnricherListener;
+import psidev.psi.mi.jami.enricher.listener.impl.log.InteractionEnricherLogger;
 import psidev.psi.mi.jami.model.Interaction;
 import psidev.psi.mi.jami.model.InteractionEvidence;
 import psidev.psi.mi.jami.model.ModelledInteraction;
@@ -55,5 +57,11 @@ public class InteractionEnricher<T extends Interaction> extends AbstractInteract
         }
     }
 
-
+    @Override
+    public InteractionEnricherListener<T> getInteractionEnricherListener() {
+        if (super.getInteractionEnricherListener() == null){
+            super.setInteractionEnricherListener(new InteractionEnricherLogger<T>());
+        }
+        return super.getInteractionEnricherListener();
+    }
 }

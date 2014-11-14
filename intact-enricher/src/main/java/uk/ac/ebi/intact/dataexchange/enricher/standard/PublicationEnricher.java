@@ -24,6 +24,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.full.FullPublicationEnricher;
+import psidev.psi.mi.jami.enricher.listener.PublicationEnricherListener;
+import psidev.psi.mi.jami.enricher.listener.impl.log.PublicationEnricherLogger;
 import psidev.psi.mi.jami.model.Annotation;
 import psidev.psi.mi.jami.model.Publication;
 import psidev.psi.mi.jami.model.Xref;
@@ -235,5 +237,13 @@ public class PublicationEnricher extends FullPublicationEnricher {
                         add(XrefUtils.createXrefWithQualifier(Xref.DOI, Xref.DOI_MI, doi.getId(), Xref.PRIMARY, Xref.PRIMARY_MI));
             }
         }
+    }
+
+    @Override
+    public PublicationEnricherListener getPublicationEnricherListener() {
+        if (super.getPublicationEnricherListener() == null){
+            super.setPublicationEnricherListener(new PublicationEnricherLogger());
+        }
+        return super.getPublicationEnricherListener();
     }
 }

@@ -25,6 +25,8 @@ import psidev.psi.mi.jami.enricher.OrganismEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.CompositeInteractorEnricher;
 import psidev.psi.mi.jami.enricher.impl.full.FullInteractorPoolEnricher;
+import psidev.psi.mi.jami.enricher.listener.InteractorEnricherListener;
+import psidev.psi.mi.jami.enricher.listener.impl.log.InteractorPoolEnricherLogger;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
@@ -182,5 +184,13 @@ public class InteractorPoolEnricher extends FullInteractorPoolEnricher {
             super.setInteractorEnricher((CompositeInteractorEnricher)ApplicationContextProvider.getBean("intactCompositeInteractorEnricher"));
         }
         return super.getInteractorEnricher();
+    }
+
+    @Override
+    public InteractorEnricherListener<InteractorPool> getListener() {
+        if (super.getListener() == null){
+            super.setListener(new InteractorPoolEnricherLogger());
+        }
+        return super.getListener();
     }
 }

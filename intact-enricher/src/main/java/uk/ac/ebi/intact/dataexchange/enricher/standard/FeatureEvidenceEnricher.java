@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.minimal.MinimalFeatureEvidenceEnricher;
+import psidev.psi.mi.jami.enricher.listener.FeatureEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.FeatureEvidenceEnricherListener;
+import psidev.psi.mi.jami.enricher.listener.impl.log.FeatureEvidenceEnricherLogger;
 import psidev.psi.mi.jami.enricher.util.EnricherUtils;
 import psidev.psi.mi.jami.model.CvTerm;
 import psidev.psi.mi.jami.model.FeatureEvidence;
@@ -108,5 +110,13 @@ public class FeatureEvidenceEnricher extends MinimalFeatureEvidenceEnricher {
             super.setCvTermEnricher((CvTermEnricher<CvTerm>) ApplicationContextProvider.getBean("intactCvObjectEnricher"));
         }
         return super.getCvTermEnricher();
+    }
+
+    @Override
+    public FeatureEnricherListener<FeatureEvidence> getFeatureEnricherListener() {
+        if (super.getFeatureEnricherListener() == null){
+            super.setFeatureEnricherListener(new FeatureEvidenceEnricherLogger());
+        }
+        return super.getFeatureEnricherListener();
     }
 }

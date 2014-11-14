@@ -28,8 +28,10 @@ import psidev.psi.mi.jami.enricher.ParticipantEnricher;
 import psidev.psi.mi.jami.enricher.SourceEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.listener.ComplexEnricherListener;
+import psidev.psi.mi.jami.enricher.listener.InteractionEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.InteractorEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.ModelledInteractionEnricherListener;
+import psidev.psi.mi.jami.enricher.listener.impl.log.ComplexEnricherLogger;
 import psidev.psi.mi.jami.model.Complex;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.utils.IntactUtils;
@@ -203,5 +205,13 @@ public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implem
             super.setParticipantEnricher((ParticipantEnricher) ApplicationContextProvider.getBean("intactModelledParticipantEnricher"));
         }
         return super.getParticipantEnricher();
+    }
+
+    @Override
+    public InteractionEnricherListener<Complex> getInteractionEnricherListener() {
+        if (super.getInteractionEnricherListener() == null){
+            super.setInteractionEnricherListener(new ComplexEnricherLogger());
+        }
+        return super.getInteractionEnricherListener();
     }
 }

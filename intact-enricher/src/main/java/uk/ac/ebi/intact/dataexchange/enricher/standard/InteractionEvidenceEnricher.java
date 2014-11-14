@@ -21,9 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import psidev.psi.mi.jami.enricher.*;
+import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.full.FullInteractionEvidenceEnricher;
+import psidev.psi.mi.jami.enricher.listener.InteractionEnricherListener;
+import psidev.psi.mi.jami.enricher.listener.impl.log.InteractionEvidenceEnricherLogger;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
@@ -143,5 +145,13 @@ public class InteractionEvidenceEnricher extends FullInteractionEvidenceEnricher
             super.setCvTermEnricher((CvTermEnricher<CvTerm>) ApplicationContextProvider.getBean("miCvObjectEnricher"));
         }
         return super.getCvTermEnricher();
+    }
+
+    @Override
+    public InteractionEnricherListener<InteractionEvidence> getInteractionEnricherListener() {
+        if (super.getInteractionEnricherListener() == null){
+            super.setInteractionEnricherListener(new InteractionEvidenceEnricherLogger());
+        }
+        return super.getInteractionEnricherListener();
     }
 }

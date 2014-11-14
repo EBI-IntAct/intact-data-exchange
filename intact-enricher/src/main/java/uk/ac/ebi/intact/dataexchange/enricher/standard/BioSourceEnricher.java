@@ -22,6 +22,8 @@ import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.full.FullOrganismEnricher;
+import psidev.psi.mi.jami.enricher.listener.OrganismEnricherListener;
+import psidev.psi.mi.jami.enricher.listener.impl.log.OrganismEnricherLogger;
 import psidev.psi.mi.jami.model.Alias;
 import psidev.psi.mi.jami.model.CvTerm;
 import psidev.psi.mi.jami.model.Organism;
@@ -160,5 +162,13 @@ public class BioSourceEnricher extends FullOrganismEnricher {
             super.setCvTermEnricher((CvTermEnricher<CvTerm>)ApplicationContextProvider.getBean("intactCvObjectEnricher"));
         }
         return super.getCvTermEnricher();
+    }
+
+    @Override
+    public OrganismEnricherListener getOrganismEnricherListener() {
+        if (super.getOrganismEnricherListener() == null){
+            super.setOrganismEnricherListener(new OrganismEnricherLogger());
+        }
+        return super.getOrganismEnricherListener();
     }
 }
