@@ -19,13 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.OrganismEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.full.FullParticipantEvidenceEnricher;
-import psidev.psi.mi.jami.model.Confidence;
-import psidev.psi.mi.jami.model.FeatureEvidence;
-import psidev.psi.mi.jami.model.Parameter;
-import psidev.psi.mi.jami.model.ParticipantEvidence;
+import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
@@ -184,5 +182,13 @@ public class ComponentEnricher extends FullParticipantEvidenceEnricher<Participa
             super.setFeatureEnricher((FeatureEvidenceEnricher) ApplicationContextProvider.getBean("intactFeatureEvidenceEnricher"));
         }
         return super.getFeatureEnricher();
+    }
+
+    @Override
+    public CvTermEnricher<CvTerm> getCvTermEnricher() {
+        if (super.getCvTermEnricher() == null){
+            super.setCvTermEnricher((CvTermEnricher<CvTerm>) ApplicationContextProvider.getBean("miCvObjectEnricher"));
+        }
+        return super.getCvTermEnricher();
     }
 }

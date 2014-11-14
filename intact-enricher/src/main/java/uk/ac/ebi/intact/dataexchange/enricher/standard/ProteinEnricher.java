@@ -193,7 +193,7 @@ public class ProteinEnricher extends FullProteinEnricher {
         if (label == null){
            return null;
         }
-        label = label.replaceAll("-", "");
+        label = label.replaceAll("-", "").toLowerCase();
         return label;
     }
 

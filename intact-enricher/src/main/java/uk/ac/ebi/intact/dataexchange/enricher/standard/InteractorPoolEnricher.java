@@ -156,7 +156,7 @@ public class InteractorPoolEnricher extends FullInteractorPoolEnricher {
         if (label == null){
             return null;
         }
-        label = label.replaceAll("-", "");
+        label = label.replaceAll("-", "").toLowerCase();
         return label;
     }
 

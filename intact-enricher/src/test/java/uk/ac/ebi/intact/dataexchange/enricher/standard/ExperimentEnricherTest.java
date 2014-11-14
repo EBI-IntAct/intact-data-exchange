@@ -41,7 +41,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
 public class ExperimentEnricherTest extends EnricherBasicTestCase {
 
     @Autowired
-    @Qualifier("intactExperiment")
+    @Qualifier("intactExperimentEnricher")
     private ExperimentEnricher enricher;
 
     @Test
@@ -83,7 +83,7 @@ public class ExperimentEnricherTest extends EnricherBasicTestCase {
 
         enricher.enrich(experiment);
 
-        Assert.assertEquals("strain k12", experiment.getHostOrganism().getCommonName());
+        Assert.assertEquals("ecoli", experiment.getHostOrganism().getCommonName());
     }
 
     @Test

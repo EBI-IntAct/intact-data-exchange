@@ -21,8 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import psidev.psi.mi.jami.enricher.CvTermEnricher;
-import psidev.psi.mi.jami.enricher.ExperimentEnricher;
+import psidev.psi.mi.jami.enricher.*;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.full.FullInteractionEvidenceEnricher;
 import psidev.psi.mi.jami.model.*;
@@ -133,7 +132,7 @@ public class InteractionEvidenceEnricher extends FullInteractionEvidenceEnricher
     @Override
     public psidev.psi.mi.jami.enricher.ParticipantEnricher getParticipantEnricher() {
         if (super.getParticipantEnricher() == null){
-            super.setParticipantEnricher((ParticipantEnricher) ApplicationContextProvider.getBean("intactParticipantEvidenceEnricher"));
+            super.setParticipantEnricher((psidev.psi.mi.jami.enricher.ParticipantEnricher) ApplicationContextProvider.getBean("intactParticipantEvidenceEnricher"));
         }
         return super.getParticipantEnricher();
     }

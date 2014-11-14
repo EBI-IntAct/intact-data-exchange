@@ -104,7 +104,7 @@ public class ProteinEnricherTest extends EnricherBasicTestCase {
         Assert.assertEquals("atf6a_human", protein.getShortName());
         Assert.assertEquals("Cyclic AMP-dependent transcription factor ATF-6 alpha", protein.getFullName());
         Assert.assertNotNull(protein.getSequence());
-        Assert.assertEquals("9606", protein.getOrganism().getTaxId());
+        Assert.assertEquals(9606, protein.getOrganism().getTaxId());
         Assert.assertEquals("human", protein.getOrganism().getCommonName());
     }
 }

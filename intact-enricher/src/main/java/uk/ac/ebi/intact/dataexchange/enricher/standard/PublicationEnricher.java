@@ -114,7 +114,7 @@ public class PublicationEnricher extends FullPublicationEnricher {
         if((fetched.getJournal() != null && !fetched.getJournal().equals(publicationToEnrich.getJournal()))
                 || (fetched.getJournal() == null && publicationToEnrich.getJournal() != null)) {
             String oldJournal = publicationToEnrich.getJournal();
-            publicationToEnrich.setTitle(fetched.getJournal());
+            publicationToEnrich.setJournal(fetched.getJournal());
             if(getPublicationEnricherListener() != null)
                 getPublicationEnricherListener().onJournalUpdated(publicationToEnrich, oldJournal);
         }

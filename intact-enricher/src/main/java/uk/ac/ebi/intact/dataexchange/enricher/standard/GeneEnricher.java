@@ -176,7 +176,7 @@ public class GeneEnricher extends FullGeneEnricher {
         if (label == null){
             return null;
         }
-        label = label.replaceAll("-", "");
+        label = label.replaceAll("-", "").toLowerCase();
         return label;
     }
 

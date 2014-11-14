@@ -34,7 +34,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 public class InteractionEnricherTest extends EnricherBasicTestCase {
 
     @Autowired
-    @Qualifier("intactInteractionEvidence")
+    @Qualifier("intactInteractionEvidenceEnricher")
     private InteractionEvidenceEnricher enricher;
 
     @Autowired
@@ -59,7 +59,7 @@ public class InteractionEnricherTest extends EnricherBasicTestCase {
         enricher.enrich(interaction);
 
         Assert.assertEquals("myInteraction", interaction.getShortName());
-        Assert.assertEquals("83333", interactor1.getOrganism().getTaxId());
+        Assert.assertEquals(83333, interactor1.getOrganism().getTaxId());
         Assert.assertEquals("strain k12", interactor1.getOrganism().getCommonName());
         Assert.assertEquals("tusd_ecoli", interactor2.getShortName());
     }
@@ -85,7 +85,7 @@ public class InteractionEnricherTest extends EnricherBasicTestCase {
         enricher.enrich(interaction);
 
         Assert.assertEquals("tusc-tusd", interaction.getShortName());
-        Assert.assertEquals("83333", interactor2.getOrganism().getTaxId());
+        Assert.assertEquals(83333, interactor2.getOrganism().getTaxId());
         Assert.assertEquals("strain k12", interactor2.getOrganism().getCommonName());
         Assert.assertEquals("tusc_ecoli", interactor1.getShortName());
     }
@@ -110,7 +110,7 @@ public class InteractionEnricherTest extends EnricherBasicTestCase {
         enricher.enrich(interaction);
 
         Assert.assertEquals("tusc-ebi_12345", interaction.getShortName());
-        Assert.assertEquals("83333", interactor2.getOrganism().getTaxId());
+        Assert.assertEquals(83333, interactor2.getOrganism().getTaxId());
         Assert.assertEquals("strain k12", interactor2.getOrganism().getCommonName());
         Assert.assertEquals("tusc_ecoli", interactor1.getShortName());
     }
