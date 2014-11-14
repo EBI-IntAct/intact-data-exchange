@@ -109,7 +109,7 @@ public class InteractionEnricherTest extends EnricherBasicTestCase {
 
         enricher.enrich(interaction);
 
-        Assert.assertEquals("tusc-ebi_12345", interaction.getShortName());
+        Assert.assertEquals("ebi12345-tusc", interaction.getShortName());
         Assert.assertEquals(83333, interactor2.getOrganism().getTaxId());
         Assert.assertEquals("ecoli", interactor2.getOrganism().getCommonName());
         Assert.assertEquals("tusc_ecoli", interactor1.getShortName());
