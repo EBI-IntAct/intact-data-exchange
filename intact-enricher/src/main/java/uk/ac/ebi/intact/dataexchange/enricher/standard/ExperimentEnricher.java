@@ -15,26 +15,25 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import uk.ac.ebi.intact.bridges.citexplore.exceptions.InvalidPubmedException;
-import uk.ac.ebi.intact.bridges.citexplore.exceptions.PublicationNotFoundException;
-import uk.ac.ebi.intact.bridges.citexplore.exceptions.UnexpectedException;
-import uk.ac.ebi.intact.bridges.citexplore.util.ExperimentAutoFill;
-import uk.ac.ebi.intact.dataexchange.cvutils.CvUtils;
-import uk.ac.ebi.intact.dataexchange.enricher.fetch.CvObjectFetcher;
-import uk.ac.ebi.intact.dataexchange.enricher.fetch.ExperimentFetcher;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
-import uk.ac.ebi.intact.model.util.ExperimentUtils;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.enricher.CvTermEnricher;
+import psidev.psi.mi.jami.enricher.OrganismEnricher;
+import psidev.psi.mi.jami.enricher.PublicationEnricher;
+import psidev.psi.mi.jami.enricher.exception.EnricherException;
+import psidev.psi.mi.jami.enricher.impl.full.FullExperimentEnricher;
+import psidev.psi.mi.jami.model.*;
+import psidev.psi.mi.jami.utils.AnnotationUtils;
+import psidev.psi.mi.jami.utils.XrefUtils;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
+import uk.ac.ebi.intact.jami.utils.IntactUtils;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * TODO comment this
@@ -42,8 +41,9 @@ import java.util.Set;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
-public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
+@Component(value = "intactExperimentEnricher")
+@Lazy
+public class ExperimentEnricher extends FullExperimentEnricher {
 
     /**
      * Sets up a logger for that class.
@@ -51,282 +51,177 @@ public class ExperimentEnricher extends AnnotatedObjectEnricher<Experiment> {
     private static final Log log = LogFactory.getLog(ExperimentEnricher.class);
 
     @Autowired
-    private CvObjectFetcher cvObjectFetcher;
-
-    @Autowired
-    private ExperimentFetcher experimentFetcher;
-
-    @Autowired
-    private CvObjectEnricher cvObjectEnricher;
-
-    @Autowired
-    private BioSourceEnricher bioSourceEnricher;
+    private EnricherContext enricherContext;
 
     public ExperimentEnricher() {
+        super();
     }
 
-    public void enrich(Experiment objectToEnrich) {
-        if (getEnricherContext().getConfig().isUpdateOrganisms()){
-            bioSourceEnricher.enrich(objectToEnrich.getBioSource());
+    @Override
+    protected void processOtherProperties(Experiment experimentToEnrich) throws EnricherException {
+        super.processOtherProperties(experimentToEnrich);
+
+        processXrefs(experimentToEnrich, null);
+        processAnnotations(experimentToEnrich, null);
+        processVariableParameters(experimentToEnrich, null);
+    }
+
+    @Override
+    protected void processOtherProperties(Experiment experimentToEnrich, Experiment objectSource) throws EnricherException {
+        super.processOtherProperties(experimentToEnrich, objectSource);
+    }
+
+    @Override
+    protected void processXrefs(Experiment objectToEnrich, Experiment objectSource) throws EnricherException {
+        if (objectSource != null){
+            super.processXrefs(objectToEnrich, objectSource);
         }
 
-        if (getEnricherContext().getConfig().isUpdateCvTerms()) {
-            if (objectToEnrich.getCvInteraction() != null){
-                cvObjectEnricher.enrich(objectToEnrich.getCvInteraction());
-            }
-
-            // add the participant detection method to the experiment if missing
-            if (objectToEnrich.getCvIdentification() == null) {
-                String detMethodMi = calculateParticipantDetMethod(objectToEnrich);
-
-                if (detMethodMi != null) {
-                    CvIdentification detMethod = cvObjectFetcher.fetchByTermId(CvIdentification.class, detMethodMi);
-                    objectToEnrich.setCvIdentification(detMethod);
-                }
-            }
-
-            if (objectToEnrich.getCvIdentification() != null) {
-                cvObjectEnricher.enrich(objectToEnrich.getCvIdentification());
-            }
-        }
-
+        // for backward compatibility, check publication primary ref
         if (objectToEnrich.getPublication() != null){
-            final Collection<PublicationXref> primaryRefs =
-                    AnnotatedObjectUtils.searchXrefsByQualifier( objectToEnrich.getPublication(), CvXrefQualifier.PRIMARY_REFERENCE_MI_REF );
+            Publication publication = objectToEnrich.getPublication();
 
-            if( primaryRefs.isEmpty() ){
-                // fix wrong xref qualifiers in pubmed xrefs if necessary
-                fixPubmedXrefIfNecessary(objectToEnrich.getPublication());
+            Collection<Xref> primaryRefs = XrefUtils.collectAllXrefsHavingQualifier(publication.getIdentifiers(), Xref.PRIMARY_MI, Xref.PRIMARY);
+
+            for (Xref primary : primaryRefs){
+                Collection<Xref> primaryExp = XrefUtils.collectAllXrefsHavingDatabaseAndQualifier(objectToEnrich.getXrefs(),
+                        primary.getDatabase().getMIIdentifier(),
+                        primary.getDatabase().getShortName(),
+                        Xref.PRIMARY_MI, Xref.PRIMARY);
+                objectToEnrich.getXrefs().removeAll(primaryExp);
+
+                objectToEnrich.getXrefs().add(primary);
             }
         }
 
-        final Collection<ExperimentXref> primaryRefs =
-                AnnotatedObjectUtils.searchXrefsByQualifier( objectToEnrich, CvXrefQualifier.PRIMARY_REFERENCE_MI_REF );
-
-        if( primaryRefs.isEmpty() ){
-            // fix wrong xref qualifiers in pubmed xrefs if necessary
-            fixPubmedXrefIfNecessary(objectToEnrich);
-        }
-        
-        // populate the experiment using the pubmed id
-        if (getEnricherContext().getConfig().isUpdateExperiments()) {
-            String pubmedId = ExperimentUtils.getPubmedId(objectToEnrich);
-            // enrich
-            if (pubmedId != null){
-                try {
-                    Long.parseLong(pubmedId);
-                    populateExperiment(objectToEnrich, pubmedId);
-
-                } catch (InvalidPubmedException pe) {
-                    log.error("Experiment with invalid pubmed id cannot be enriched from citeXplore: "+pubmedId);
-                    populateExperiment(objectToEnrich, null);
-                } catch (NumberFormatException nfe) {
-                    log.error("Experiment with invalid pubmed (not a number) cannot be enriched from citeXplore: "+pubmedId);
-                    populateExperiment(objectToEnrich, null);
-                } catch (Exception e) {
-                    log.error("An error occured while enriching experiment with PMID: "+pubmedId, e);
-                    populateExperiment(objectToEnrich, null);
+        if (enricherContext.getConfig().isUpdateCvInXrefsAliasesAnnotations() && getCvTermEnricher() != null){
+            for (Object obj : objectToEnrich.getXrefs()) {
+                Xref xref = (Xref)obj;
+                if (xref.getQualifier()!= null) {
+                    getCvTermEnricher().enrich(xref.getQualifier());
                 }
-            }
-            // check author-list and publication date
-            else {
-                populateExperiment(objectToEnrich, null);
+                getCvTermEnricher().enrich(xref.getDatabase());
             }
         }
-
-        super.enrich(objectToEnrich);
     }
 
-    protected void populateExperiment(Experiment experiment, String pubmedId) {
-        ExperimentAutoFill autoFill = null;
-        String shortLabel = null;
-        if (pubmedId != null){
-            autoFill = experimentFetcher.fetchByPubmedId(pubmedId);
-            try {
-                shortLabel = AnnotatedObjectUtils.prepareShortLabel(autoFill.getShortlabel());
-            } catch (UnexpectedException e) {
-                log.error(e);
-            } catch (PublicationNotFoundException e) {
-                log.error(e);
-            }
+    @Override
+    protected void processAnnotations(Experiment objectToEnrich, Experiment objectSource) throws EnricherException {
+        if (objectSource != null){
+            super.processAnnotations(objectToEnrich, objectSource);
         }
 
-        if (autoFill != null) {
-            if (experiment.getShortLabel() == null || !ExperimentUtils.matchesSyncedLabel(experiment.getShortLabel())) {
-                experiment.setShortLabel(shortLabel);
-            }
-
-            String authorList = autoFill.getAuthorList();
-            String pubYear = String.valueOf(autoFill.getYear());
-            String contactEmail = autoFill.getAuthorEmail();
-            String journal = autoFill.getJournal();
-
-            fillPublicationDetails(experiment, authorList, pubYear, contactEmail, journal, autoFill.getFullname());
-            if (experiment.getPublication() != null){
-                fillPublicationDetails(experiment.getPublication(), authorList, pubYear, contactEmail, journal, autoFill.getFullname());
-            }
-        } else {
-            if (log.isWarnEnabled()) log.warn("Couldn't use ExperimentAutoFill for experiment with pubmed: "+pubmedId+". Will look at existing author list and publication date");
-
-            String authorList = null;
-            String pubYear = null;
-
-            for (Annotation annot : experiment.getAnnotations()) {
-                if (CvTopic.AUTHOR_LIST_MI_REF.equals(annot.getCvTopic().getIdentifier())) {
-                    if (authorList == null){
-                        authorList = annot.getAnnotationText();
-                    }
-                }
-                else if (CvTopic.PUBLICATION_YEAR_MI_REF.equals(annot.getCvTopic().getIdentifier())){
-                    if (pubYear == null){
-                        pubYear = annot.getAnnotationText();
-                    }
-                }
-            }
-
-            if (authorList != null && pubYear != null){
-                String authorLastName = null;
-                if (authorList.contains(",")){
-                    String[] authors = authorList.split(",");
-                    String lastAuthor = authors[0];
-                    if (lastAuthor.contains(" ")){
-                        authorLastName = lastAuthor.substring(0,lastAuthor.indexOf(" ")).toLowerCase().trim();
-                    }
-                    else{
-                        authorLastName = lastAuthor.toLowerCase().trim();
-                    }
-                }
-                else if (authorList.contains(" ")){
-                    authorLastName = authorList.substring(0,authorList.indexOf(" ")).toLowerCase().trim();
+        // for backward compatibility, check publication annotations
+        if (objectToEnrich.getPublication() != null){
+            Publication publication = objectToEnrich.getPublication();
+            if (publication.getPublicationDate() != null) {
+                Annotation pubYear = AnnotationUtils.collectFirstAnnotationWithTopic(objectToEnrich.getAnnotations(),
+                        Annotation.PUBLICATION_YEAR_MI, Annotation.PUBLICATION_YEAR);
+                if (pubYear != null){
+                    pubYear.setValue(IntactUtils.YEAR_FORMAT.format(publication.getPublicationDate()));
                 }
                 else{
-                    authorLastName = authorList.toLowerCase().trim();
+                    pubYear = AnnotationUtils.createAnnotation(Annotation.PUBLICATION_YEAR, Annotation.PUBLICATION_YEAR_MI,
+                            IntactUtils.YEAR_FORMAT.format(publication.getPublicationDate()));
+                    objectToEnrich.getAnnotations().add(pubYear);
                 }
-
-                shortLabel = AnnotatedObjectUtils.prepareShortLabel(authorLastName+"-"+pubYear);
-            }
-            else {
-                shortLabel = AnnotatedObjectUtils.prepareShortLabel(experiment.getShortLabel());
             }
 
-            if (experiment.getShortLabel() == null || !ExperimentUtils.matchesSyncedLabel(experiment.getShortLabel())) {
-                experiment.setShortLabel(shortLabel);
+            if (!publication.getAuthors().isEmpty()) {
+                Annotation pubAuthors = AnnotationUtils.collectFirstAnnotationWithTopic(objectToEnrich.getAnnotations(),
+                        Annotation.AUTHOR_MI, Annotation.AUTHOR);
+                if (pubAuthors != null){
+                    pubAuthors.setValue(StringUtils.join(publication.getAuthors(), ", "));
+                }
+                else{
+                    pubAuthors = AnnotationUtils.createAnnotation(Annotation.AUTHOR, Annotation.AUTHOR_MI,
+                            StringUtils.join(publication.getAuthors(), ", "));
+                    objectToEnrich.getAnnotations().add(pubAuthors);
+                }
+            }
+
+            if (publication.getJournal() != null) {
+                Annotation pubJournal = AnnotationUtils.collectFirstAnnotationWithTopic(objectToEnrich.getAnnotations(),
+                        Annotation.PUBLICATION_JOURNAL_MI, Annotation.PUBLICATION_JOURNAL);
+                if (pubJournal != null){
+                    pubJournal.setValue(publication.getJournal());
+                }
+                else{
+                    pubJournal = AnnotationUtils.createAnnotation(Annotation.PUBLICATION_JOURNAL, Annotation.PUBLICATION_JOURNAL_MI,
+                            publication.getJournal());
+                    objectToEnrich.getAnnotations().add(pubJournal);
+                }
+            }
+        }
+
+        if (enricherContext.getConfig().isUpdateCvTerms() && getCvTermEnricher() != null){
+            for (Object obj : objectToEnrich.getAnnotations()) {
+                Annotation annotation = (Annotation)obj;
+                getCvTermEnricher().enrich(annotation.getTopic());
             }
         }
     }
 
-    private void fillPublicationDetails(AnnotatedObject object, String authorList, String pubYear, String contactEmail, String journal, String title) {
-        if (title != null){
-            object.setFullName(title);
+    @Override
+    protected void processVariableParameters(Experiment experimentToEnrich, Experiment objectSource) throws EnricherException {
+        if (objectSource != null){
+            super.processVariableParameters(experimentToEnrich, objectSource);
         }
 
-        boolean hasAuthor = false;
-        boolean hasPublicationYear = false;
-        boolean hasContactEmail = false;
-        boolean hasJournal = false;
-
-        // fill experiments annotations
-        for (Annotation annot : object.getAnnotations()) {
-            if (CvTopic.AUTHOR_LIST_MI_REF.equals(annot.getCvTopic().getIdentifier())) {
-                hasAuthor = true;
-                if (annot.getAnnotationText() == null || (annot.getAnnotationText() != null && authorList != null && !authorList.equalsIgnoreCase(annot.getAnnotationText()))){
-                    annot.setAnnotationText(authorList);
+        if (enricherContext.getConfig().isUpdateCvTerms() && getCvTermEnricher() != null){
+            for (VariableParameter parameter : experimentToEnrich.getVariableParameters()) {
+                if (parameter.getUnit() != null){
+                    getCvTermEnricher().enrich(parameter.getUnit());
                 }
             }
-            else if (CvTopic.PUBLICATION_YEAR_MI_REF.equals(annot.getCvTopic().getIdentifier())){
-                hasPublicationYear = true;
-                if (annot.getAnnotationText() == null || (annot.getAnnotationText() != null && pubYear != null && !pubYear.equalsIgnoreCase(annot.getAnnotationText()))){
-                    annot.setAnnotationText(pubYear);
-                }
-            }
-            else if (CvTopic.CONTACT_EMAIL_MI_REF.equals(annot.getCvTopic().getIdentifier())){
-                hasContactEmail = true;
-                if (annot.getAnnotationText() == null || (annot.getAnnotationText() != null && contactEmail != null && !contactEmail.equalsIgnoreCase(annot.getAnnotationText()))){
-                    annot.setAnnotationText(contactEmail);
-                }
-            }
-            else if (CvTopic.JOURNAL_MI_REF.equals(annot.getCvTopic().getIdentifier())){
-                hasJournal = true;
-                if (annot.getAnnotationText() == null || (annot.getAnnotationText() != null && journal != null && !journal.equalsIgnoreCase(annot.getAnnotationText()))){
-                    annot.setAnnotationText(journal);
-                }
-            }
-        }
-
-        if (!hasPublicationYear && pubYear != null) {
-            CvTopic publicationYearTopic = CvObjectUtils.createCvObject(object.getOwner(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
-            object.addAnnotation(new Annotation(object.getOwner(), publicationYearTopic, pubYear));
-        }
-
-        if (!hasAuthor && authorList != null) {
-            CvTopic authorListTopic = CvObjectUtils.createCvObject(object.getOwner(), CvTopic.class, CvTopic.AUTHOR_LIST_MI_REF, CvTopic.AUTHOR_LIST);
-            object.addAnnotation(new Annotation(object.getOwner(), authorListTopic, authorList));
-        }
-
-        if (!hasContactEmail && contactEmail != null) {
-            CvTopic authorEmail = CvObjectUtils.createCvObject(object.getOwner(), CvTopic.class, CvTopic.CONTACT_EMAIL_MI_REF, CvTopic.CONTACT_EMAIL);
-            object.addAnnotation(new Annotation(object.getOwner(), authorEmail, contactEmail));
-        }
-
-        if (!hasJournal && journal != null) {
-            CvTopic journalTopic = CvObjectUtils.createCvObject(object.getOwner(), CvTopic.class, CvTopic.JOURNAL_MI_REF, CvTopic.JOURNAL);
-            object.addAnnotation(new Annotation(object.getOwner(), journalTopic, journal));
         }
     }
 
-    private boolean experimentAnnotationsContainTopic(Experiment experiment, String miIdentifier) {
-        for (Annotation annot : experiment.getAnnotations()) {
-            if (miIdentifier.equals(annot.getCvTopic().getIdentifier())) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    protected void processOrganism(Experiment experimentToEnrich) throws EnricherException {
+        if( enricherContext.getConfig().isUpdateOrganisms()
+                && getOrganismEnricher() != null
+                && experimentToEnrich.getHostOrganism() != null )
+            getOrganismEnricher().enrich(experimentToEnrich.getHostOrganism());
     }
 
-    private String calculateParticipantDetMethod(Experiment experiment) {
-        Set<String> detMethodMis = new HashSet<String>();
-
-        if (experiment.getCvIdentification() != null && experiment.getCvIdentification().getIdentifier() != null){
-           detMethodMis.add(experiment.getCvIdentification().getIdentifier());
-        }
-
-        for (Interaction interaction : experiment.getInteractions()) {
-            for (Component component : interaction.getComponents()) {
-                for (CvIdentification partDetMethod : component.getParticipantDetectionMethods()) {
-                    if (partDetMethod.getIdentifier() != null) {
-                        detMethodMis.add(partDetMethod.getIdentifier());
-                    }
-                }
-            }
-        }
-
-        if (detMethodMis.size() == 1) {
-            return detMethodMis.iterator().next();
-        } else if (detMethodMis.size() > 1) {
-            List<CvDagObject> ontology = getEnricherContext().getIntactOntology();
-
-            return CvUtils.findLowestCommonAncestor(ontology, detMethodMis.toArray(new String[detMethodMis.size()]));
-        }
-
-        log.error("No participant detection methods found for components in experiment");
-
-        return null;
+    @Override
+    protected void processInteractionDetectionMethod(Experiment experimentToEnrich) throws EnricherException {
+        if( enricherContext.getConfig().isUpdateCvTerms()
+                && getCvTermEnricher() != null
+                && experimentToEnrich.getInteractionDetectionMethod() != null )
+            getCvTermEnricher().enrich(experimentToEnrich.getInteractionDetectionMethod());
     }
 
-    protected void fixPubmedXrefIfNecessary(AnnotatedObject<? extends Xref, ? extends Alias> annotatedObject) {
-        for (Xref xref : annotatedObject.getXrefs()) {
-            if (CvDatabase.PUBMED_MI_REF.equals(xref.getCvDatabase().getIdentifier())) {
-                if ( xref.getCvXrefQualifier() == null ) {
-                    log.warn( "Fixing pubmed xref with no xref qualifier: "+xref.getPrimaryId() );
+    @Override
+    protected void processPublication(Experiment experimentToEnrich) throws EnricherException {
+        if( enricherContext.getConfig().isUpdateExperiments()
+                && getPublicationEnricher() != null
+                && experimentToEnrich.getPublication() != null )
+            getPublicationEnricher().enrich(experimentToEnrich.getPublication());
+    }
 
-                    CvXrefQualifier primaryRef = CvObjectUtils.createCvObject(annotatedObject.getOwner(),
-                                                                              CvXrefQualifier.class,
-                                                                              CvXrefQualifier.PRIMARY_REFERENCE_MI_REF,
-                                                                              CvXrefQualifier.PRIMARY_REFERENCE);
-                    cvObjectEnricher.enrich(primaryRef);
-                    xref.setCvXrefQualifier(primaryRef);
-                }
-            }
+    @Override
+    public CvTermEnricher getCvTermEnricher() {
+        if (super.getCvTermEnricher() == null){
+            super.setCvTermEnricher((CvTermEnricher<CvTerm>) ApplicationContextProvider.getBean("miCvObjectEnricher"));
         }
+        return super.getCvTermEnricher();
+    }
+
+    @Override
+    public PublicationEnricher getPublicationEnricher() {
+        if (super.getPublicationEnricher() == null){
+            super.setPublicationEnricher((PublicationEnricher) ApplicationContextProvider.getBean("intactPublicationEnricher"));
+        }
+        return super.getPublicationEnricher();
+    }
+
+    @Override
+    public OrganismEnricher getOrganismEnricher() {
+        if (super.getOrganismEnricher() == null){
+            super.setOrganismEnricher((OrganismEnricher) ApplicationContextProvider.getBean("intactBioSourceEnricher"));
+        }
+        return super.getOrganismEnricher();
     }
 }

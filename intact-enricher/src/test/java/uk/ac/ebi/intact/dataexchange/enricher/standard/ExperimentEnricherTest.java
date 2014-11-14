@@ -18,9 +18,18 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import psidev.psi.mi.jami.enricher.exception.EnricherException;
+import psidev.psi.mi.jami.model.Annotation;
+import psidev.psi.mi.jami.model.Experiment;
+import psidev.psi.mi.jami.model.Publication;
+import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.model.impl.DefaultExperiment;
+import psidev.psi.mi.jami.model.impl.DefaultOrganism;
+import psidev.psi.mi.jami.model.impl.DefaultPublication;
+import psidev.psi.mi.jami.model.impl.DefaultSource;
+import psidev.psi.mi.jami.utils.AnnotationUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
  * TODO comment this
@@ -32,39 +41,35 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 public class ExperimentEnricherTest extends EnricherBasicTestCase {
 
     @Autowired
+    @Qualifier("intactExperiment")
     private ExperimentEnricher enricher;
 
     @Test
-    public void enrich_pub() {
+    public void enrich_pub() throws EnricherException{
         final String pubmedId = "15733859";
 
-        Publication publication = getMockBuilder().createPublication(pubmedId);
-        Experiment experiment = getMockBuilder().createExperimentEmpty();
-        experiment.setShortLabel("lalalssla");
-        experiment.setPublication(publication);
-        publication.getXrefs().add(getMockBuilder().createPrimaryReferenceXref(publication, pubmedId));
+        Publication publication = new DefaultPublication(pubmedId);
+        Experiment experiment = new DefaultExperiment(publication);
 
-        experiment.setOwner(new Institution("ucla"));
+        publication.setSource(new DefaultSource("ucla"));
 
         enricher.enrich(experiment);
 
-        Assert.assertEquals("kang-2005", experiment.getShortLabel());
-        Assert.assertEquals("The flexible loop of Bcl-2 is required for molecular interaction with immunosuppressant FK-506 binding protein 38 (FKBP38).", experiment.getFullName());
+        Assert.assertEquals("The flexible loop of Bcl-2 is required for molecular interaction with immunosuppressant FK-506 binding protein 38 (FKBP38).",
+                publication.getTitle());
         Assert.assertEquals(3, experiment.getAnnotations().size());
 
-        Assert.assertEquals("ucla", experiment.getOwner().getShortLabel());
+        Assert.assertEquals("ucla", publication.getSource().getShortName());
     }
 
     @Test
-    public void enrich_pub_repeatedAnnots() {
+    public void enrich_pub_repeatedAnnots() throws EnricherException{
         final String pubmedId = "15733859";
 
-        Publication publication = getMockBuilder().createPublication(pubmedId);
-        Experiment experiment = getMockBuilder().createExperimentEmpty("lala", pubmedId);
-        experiment.setPublication(publication);
+        Publication publication = new DefaultPublication(pubmedId);
+        Experiment experiment = new DefaultExperiment(publication);
 
-        CvTopic publicationYearTopic = CvObjectUtils.createCvObject(experiment.getOwner(), CvTopic.class, CvTopic.PUBLICATION_YEAR_MI_REF, CvTopic.PUBLICATION_YEAR);
-        experiment.addAnnotation(new Annotation(experiment.getOwner(), publicationYearTopic,"2005"));
+        experiment.getAnnotations().add(AnnotationUtils.createAnnotation(Annotation.PUBLICATION_YEAR, Annotation.PUBLICATION_YEAR_MI, "2005"));
 
         enricher.enrich(experiment);
 
@@ -72,60 +77,33 @@ public class ExperimentEnricherTest extends EnricherBasicTestCase {
     }
 
     @Test
-    public void enrich_hostOrganism() {
-        Experiment experiment = getMockBuilder().createExperimentEmpty();
-        experiment.getBioSource().setTaxId("83333");
+    public void enrich_hostOrganism() throws EnricherException{
+        Experiment experiment = new DefaultExperiment(null);
+        experiment.setHostOrganism(new DefaultOrganism(83333));
 
         enricher.enrich(experiment);
 
-        Assert.assertEquals("strain k12", experiment.getBioSource().getShortLabel());
+        Assert.assertEquals("strain k12", experiment.getHostOrganism().getCommonName());
     }
 
     @Test
-    public void enrich_noDetectionMethod() {
-        Experiment experiment = getMockBuilder().createExperimentRandom(2);
-        experiment.getBioSource().setTaxId("83333");
-        experiment.setCvIdentification(null);
-
-        Assert.assertNull(experiment.getCvIdentification());
+    public void enrich_noDetectionMethod() throws EnricherException{
+        Experiment experiment = new DefaultExperiment(null);
+        experiment.setHostOrganism(new DefaultOrganism(83333));
 
         enricher.enrich(experiment);
 
-        Assert.assertNotNull(experiment.getCvIdentification());
-        Assert.assertEquals(CvIdentification.PREDETERMINED_MI_REF, experiment.getCvIdentification().getMiIdentifier());
+        Assert.assertNotNull(experiment.getInteractionDetectionMethod());
+        Assert.assertEquals(Experiment.UNSPECIFIED_METHOD_MI, experiment.getInteractionDetectionMethod().getMIIdentifier());
     }
 
     @Test
-    public void enrich_wrongPubmedXrefQual() {
-        Experiment experiment = getMockBuilder().createExperimentEmpty();
-        experiment.setShortLabel("lalalssla");
-        experiment.getBioSource().setTaxId("83333");
-        experiment.setPublication(null);
-        experiment.getXrefs().clear();
-
-        CvDatabase pubmed = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.PUBMED_MI_REF, CvDatabase.PUBMED);
-        final ExperimentXref aXref = getMockBuilder().createIdentityXref( experiment, "15733859", pubmed );
-        aXref.setCvXrefQualifier( null );
-        experiment.addXref( aXref );
+    public void enrich_wrongPubmedXrefQual() throws EnricherException{
+        Experiment experiment = new DefaultExperiment(new DefaultPublication("15733859"));
+        experiment.setHostOrganism(new DefaultOrganism(83333));
 
         enricher.enrich(experiment);
 
-        Assert.assertEquals("kang-2005", experiment.getShortLabel());
-        Assert.assertEquals(CvXrefQualifier.PRIMARY_REFERENCE_MI_REF, experiment.getXrefs().iterator().next().getCvXrefQualifier().getIdentifier());
-    }
-
-    @Test
-    public void enrich_alreadySyncedLabel() {
-        Experiment experiment = getMockBuilder().createExperimentEmpty();
-        experiment.setShortLabel("lala-2010-1");
-
-        CvDatabase pubmed = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.PUBMED_MI_REF, CvDatabase.PUBMED);
-        final ExperimentXref aXref = getMockBuilder().createIdentityXref( experiment, "15733859", pubmed );
-        aXref.setCvXrefQualifier( null );
-        experiment.addXref( aXref );
-
-        enricher.enrich(experiment);
-
-        Assert.assertEquals("lala-2010-1", experiment.getShortLabel());
+        Assert.assertEquals(Xref.PRIMARY_MI, experiment.getXrefs().iterator().next().getQualifier().getMIIdentifier());
     }
 }

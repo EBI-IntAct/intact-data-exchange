@@ -18,10 +18,12 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Participant;
+import psidev.psi.mi.jami.model.impl.DefaultCvTerm;
+import psidev.psi.mi.jami.utils.CvTermUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
-import uk.ac.ebi.intact.model.CvBiologicalRole;
-import uk.ac.ebi.intact.model.CvIdentification;
-import uk.ac.ebi.intact.model.util.CvObjectUtils;
 
 /**
  * TODO comment this
@@ -32,48 +34,40 @@ import uk.ac.ebi.intact.model.util.CvObjectUtils;
 public class CvObjectEnricherTest extends EnricherBasicTestCase {
 
     @Autowired
-    private CvObjectEnricher enricher;
+    @Qualifier("miCvObjectEnricher")
+    private MiCvObjectEnricher enricher;
 
     @Test
     public void enrich_noShortLabel() throws Exception {
-        CvBiologicalRole bioRole = getMockBuilder().createCvObject(CvBiologicalRole.class, CvBiologicalRole.UNSPECIFIED_PSI_REF, null);
+        CvTerm bioRole = CvTermUtils.createUnspecifiedRole();
         bioRole.setFullName("unspecified role");
-
-        Assert.assertNull(bioRole.getShortLabel());
+        bioRole.setShortName("test");
 
         enricher.enrich(bioRole);
 
-        Assert.assertNotNull(bioRole.getShortLabel());
-        Assert.assertEquals(CvBiologicalRole.UNSPECIFIED, bioRole.getShortLabel());
+        Assert.assertEquals(Participant.UNSPECIFIED_ROLE, bioRole.getShortName());
     }
 
     @Test
     public void enrich_noShortLabel_cropped() throws Exception {
 
-        CvIdentification cvIdentification = getMockBuilder().createCvObject(CvIdentification.class, CvIdentification.PREDETERMINED_MI_REF, null);
+        CvTerm cvIdentification = new DefaultCvTerm("test", "MI:0396");
         cvIdentification.setFullName("predetermined participant");
-
-        Assert.assertNull(cvIdentification.getShortLabel());
 
         enricher.enrich(cvIdentification);
 
-        Assert.assertNotNull(cvIdentification.getShortLabel());
-        Assert.assertEquals(CvIdentification.PREDETERMINED, cvIdentification.getShortLabel());
+        Assert.assertEquals("predetermined", cvIdentification.getShortName());
     }
 
     @Test
     public void enrich_noXrefs() throws Exception {
-        CvBiologicalRole cvBiologicalRole = getMockBuilder().createCvObject(CvBiologicalRole.class, CvBiologicalRole.ENZYME_PSI_REF, CvBiologicalRole.ENZYME);
-        cvBiologicalRole.getXrefs().clear();
-
-        Assert.assertNull(CvObjectUtils.getPsiMiIdentityXref(cvBiologicalRole));
+        CvTerm cvBiologicalRole = new DefaultCvTerm(Participant.ENZYME_ROLE);
 
         enricher.enrich(cvBiologicalRole);
 
-        Assert.assertNotNull(cvBiologicalRole.getShortLabel());
         Assert.assertNotNull(cvBiologicalRole.getFullName());
-        Assert.assertEquals(CvBiologicalRole.ENZYME, cvBiologicalRole.getShortLabel());
-        Assert.assertEquals(CvBiologicalRole.ENZYME_PSI_REF, CvObjectUtils.getPsiMiIdentityXref(cvBiologicalRole).getPrimaryId());
+        Assert.assertEquals(Participant.ENZYME_ROLE, cvBiologicalRole.getShortName());
+        Assert.assertEquals(Participant.ENZYME_ROLE_MI, Participant.ENZYME_ROLE_MI);
     }
 
 }

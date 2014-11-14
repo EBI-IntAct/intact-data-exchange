@@ -13,29 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.ebi.intact.dataexchange.enricher;
+package uk.ac.ebi.intact.dataexchange.enricher.fetch;
+
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
+import psidev.psi.mi.jami.bridges.ols.OlsCvTermFetcher;
+import psidev.psi.mi.jami.model.CvTerm;
 
 /**
- * TODO comment this
+ * Intact ols fetcher
  *
- * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id$
  */
-public class EnricherException extends RuntimeException {
+@Component(value = "intactOlsCvObjectFetcher")
+@Lazy
+public class OlsCvObjectFetcher extends AbstractCvObjectFetcher<CvTerm>{
 
-    public EnricherException() {
-        super();
+
+    public OlsCvObjectFetcher() {
     }
 
-    public EnricherException(Throwable cause) {
-        super(cause);
-    }
-
-    public EnricherException(String message) {
-        super(message);
-    }
-
-    public EnricherException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    protected void initialiseDefaultFetcher() throws BridgeFailedException {
+        super.setOboFetcher(new OlsCvTermFetcher());
     }
 }

@@ -18,20 +18,9 @@ package uk.ac.ebi.intact.dataexchange.enricher;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.obo.dataadapter.OBOParseException;
-import org.obo.datamodel.OBOSession;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
-import uk.ac.ebi.intact.dataexchange.cvutils.PsiLoaderException;
-import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCacheManager;
-import uk.ac.ebi.intact.model.CvDagObject;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
 
 /**
  * TODO comment this
@@ -50,7 +39,6 @@ public class EnricherContext implements DisposableBean {
     private EnricherCacheManager enricherCacheManager;
 
     private EnricherConfig config;
-    private List<CvDagObject> ontology;
 
     public EnricherContext(EnricherConfig enricherConfig) {
         this.config = enricherConfig;
@@ -68,46 +56,11 @@ public class EnricherContext implements DisposableBean {
         return enricherCacheManager;
     }
 
-    public List<CvDagObject> getIntactOntology() {
-        if (ontology == null) {
-            try {
-                ontology = loadOntology();
-            } catch (PsiLoaderException e) {
-                throw new EnricherException(e);
-            }
-        }
-
-        return ontology;
-    }
-
-    private List<CvDagObject> loadOntology() throws PsiLoaderException {
-        final URL url;
-        try {
-            url = new URL(getConfig().getOboUrl());
-        } catch (MalformedURLException e) {
-            throw new EnricherException(e);
-        }
-
-        OBOSession oboSession = null;
-        try {
-            oboSession = OboUtils.createOBOSession(url);
-        } catch (IOException e) {
-            throw new EnricherException("Problem reading OBO file from URL: "+url, e);
-        } catch (OBOParseException e) {
-            throw new EnricherException("Problem parsing OBO file: "+url);
-        }
-
-        CvObjectOntologyBuilder builder = new CvObjectOntologyBuilder(oboSession);
-
-
-        return builder.getAllCvs();
-    }
-
     public void close() {
         try {
             destroy();
         } catch (Exception e) {
-            throw new EnricherException(e);
+            throw new IllegalStateException("Cannot destroy enricher context", e);
         }
     }
 

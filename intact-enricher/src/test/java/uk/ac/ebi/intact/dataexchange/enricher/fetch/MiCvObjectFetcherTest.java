@@ -17,47 +17,45 @@ package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Qualifier;
+import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Participant;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
-import uk.ac.ebi.intact.model.CvExperimentalRole;
-import uk.ac.ebi.intact.model.CvInteraction;
-import uk.ac.ebi.intact.model.CvInteractorType;
-import uk.ac.ebi.intact.model.CvObject;
 
 /**
- * CvObjectFetcher Tester.
+ * MiCvObjectFetcher Tester.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public class CvObjectFetcherTest extends EnricherBasicTestCase {
+public class MiCvObjectFetcherTest extends EnricherBasicTestCase {
 
     @Autowired
-    private CvObjectFetcher fetcher;
+    @Qualifier("miCvObjectFetcher")
+    private MiCvObjectFetcher fetcher;
 
     @Test
-    public void fetchByTermId_short() {
-        CvObject term = fetcher.fetchByTermId(CvInteractorType.class, "MI:0326");
-        Assert.assertEquals("protein", term.getShortLabel());
+    public void fetchByTermId_short() throws BridgeFailedException {
+        CvTerm term = fetcher.fetchByIdentifier("MI:0326", CvTerm.PSI_MI);
+        Assert.assertEquals("protein", term.getShortName());
     }
 
     @Test
-    public void fetchByTermId_long() {
-        CvObject term = fetcher.fetchByTermId(CvInteraction.class, "MI:0001");
+    public void fetchByTermId_long() throws BridgeFailedException {
+        CvTerm term = fetcher.fetchByIdentifier("MI:0001", CvTerm.PSI_MI);
         Assert.assertNotNull(term);
-        Assert.assertEquals("interaction detect", term.getShortLabel());
+        Assert.assertEquals("interaction detect", term.getShortName());
         Assert.assertEquals("interaction detection method", term.getFullName());
     }
 
     @Test
-    public void fetchByTermShortLabel() {
-        CvObject term = fetcher.fetchByShortLabel(CvExperimentalRole.class, CvExperimentalRole.UNSPECIFIED);
+    public void fetchByTermShortLabel() throws BridgeFailedException {
+        CvTerm term = fetcher.fetchByName(Participant.UNSPECIFIED_ROLE, CvTerm.PSI_MI);
         Assert.assertNotNull(term);
-        Assert.assertEquals(CvExperimentalRole.UNSPECIFIED, term.getShortLabel());
+        Assert.assertEquals(Participant.UNSPECIFIED_ROLE, term.getShortName());
         Assert.assertEquals("unspecified role", term.getFullName());
-        Assert.assertEquals(CvExperimentalRole.UNSPECIFIED_PSI_REF, term.getIdentifier());
+        Assert.assertEquals(Participant.UNSPECIFIED_ROLE_MI, term.getMIIdentifier());
     }
 }

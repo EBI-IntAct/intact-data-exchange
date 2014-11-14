@@ -18,37 +18,54 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.OrganismEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
-import psidev.psi.mi.jami.enricher.impl.full.FullInteractorBaseEnricher;
+import psidev.psi.mi.jami.enricher.impl.full.FullBioactiveEntityEnricher;
+import psidev.psi.mi.jami.enricher.util.EnricherUtils;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
+import uk.ac.ebi.intact.dataexchange.enricher.fetch.BioactiveEntityFetcher;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 /**
  * This class enriches ie adds additional information to the Interactor by utilizing the webservices from UniProt and Chebi.
  *
- * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id$
  */
-@Component(value = "intactInteractorEnricher")
+@Component(value = "intactBioactiveEntityEnricher")
 @Lazy
-public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
+public class BioActiveEntityEnricher extends FullBioactiveEntityEnricher {
 
-    private static final Log log = LogFactory.getLog(InteractorEnricher.class);
+    private static final Log log = LogFactory.getLog(BioActiveEntityEnricher.class);
 
     @Autowired
     private EnricherContext enricherContext;
 
-    public InteractorEnricher() {
-        super();
+    @Autowired
+    public BioActiveEntityEnricher(@Qualifier("intactBioactiveEntityFetcher") BioactiveEntityFetcher intactBioactiveEntityFetcher) {
+        super(intactBioactiveEntityFetcher);
     }
 
     @Override
-    protected void processOrganism(Interactor entityToEnrich) throws EnricherException {
+    protected void onEnrichedVersionNotFound(BioactiveEntity objectToEnrich) throws EnricherException {
+
+        objectToEnrich.setShortName(replaceLabelInvalidChars(objectToEnrich.getShortName()));
+
+        processInteractorType(objectToEnrich);
+        processOrganism(objectToEnrich);
+        processXrefs(objectToEnrich, null);
+        processAliases(objectToEnrich, null);
+        processIdentifiers(objectToEnrich, null);
+        processAnnotations(objectToEnrich, null);
+
+        super.onEnrichedVersionNotFound(objectToEnrich);
+    }
+
+    @Override
+    protected void processOrganism(BioactiveEntity entityToEnrich) throws EnricherException {
         if (enricherContext.getConfig().isUpdateOrganisms()
                 && entityToEnrich.getOrganism() != null
                 && getOrganismEnricher() != null){
@@ -57,7 +74,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processInteractorType(Interactor entityToEnrich) throws EnricherException {
+    protected void processInteractorType(BioactiveEntity entityToEnrich) throws EnricherException {
         if (enricherContext.getConfig().isUpdateCvTerms()
                 && getCvTermEnricher() != null
                 && entityToEnrich.getInteractorType() != null)
@@ -65,7 +82,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processAnnotations(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    protected void processAnnotations(BioactiveEntity objectToEnrich, BioactiveEntity objectSource) throws EnricherException {
         if (objectSource != null){
             super.processAnnotations(objectToEnrich, objectSource);
         }
@@ -79,7 +96,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processShortLabel(Interactor objectToEnrich, Interactor fetched) {
+    protected void processShortLabel(BioactiveEntity objectToEnrich, BioactiveEntity fetched) {
         if(!fetched.getShortName().equalsIgnoreCase(objectToEnrich.getShortName())){
             String oldValue = objectToEnrich.getShortName();
             objectToEnrich.setShortName(fetched.getShortName());
@@ -91,9 +108,10 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    public void processAliases(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    public void processAliases(BioactiveEntity objectToEnrich, BioactiveEntity objectSource) throws EnricherException {
         if (objectSource != null){
-            super.processAliases(objectToEnrich, objectSource);
+            EnricherUtils.mergeAliases(objectToEnrich, objectToEnrich.getAliases(), objectSource.getAliases(), true,
+                    getListener());
         }
         if (enricherContext.getConfig().isUpdateCvInXrefsAliasesAnnotations() && getCvTermEnricher() != null){
             for (Object obj : objectToEnrich.getAliases()) {
@@ -106,9 +124,10 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processIdentifiers(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    protected void processIdentifiers(BioactiveEntity objectToEnrich, BioactiveEntity objectSource) throws EnricherException {
         if (objectSource != null){
-            super.processIdentifiers(objectToEnrich, objectSource);
+            EnricherUtils.mergeXrefs(objectToEnrich, objectToEnrich.getIdentifiers(), objectSource.getIdentifiers(), true, true,
+                    getListener(), getListener());
         }
 
         if (enricherContext.getConfig().isUpdateCvInXrefsAliasesAnnotations() && getCvTermEnricher() != null){
@@ -123,7 +142,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    public void processFullName(Interactor bioactiveEntityToEnrich, Interactor fetched) throws EnricherException {
+    public void processFullName(BioactiveEntity bioactiveEntityToEnrich, BioactiveEntity fetched) throws EnricherException {
         if((fetched.getFullName() != null && !fetched.getFullName().equalsIgnoreCase(bioactiveEntityToEnrich.getFullName())
                 || (fetched.getFullName() == null && bioactiveEntityToEnrich.getFullName() != null))){
             String oldValue = bioactiveEntityToEnrich.getFullName();
@@ -134,14 +153,25 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processChecksums(Interactor bioactiveEntityToEnrich, Interactor fetched) throws EnricherException {
-        // nothing to do here
+    protected void processChecksums(BioactiveEntity objectToEnrich, BioactiveEntity objectSource) throws EnricherException {
+        if (objectSource != null){
+            EnricherUtils.mergeChecksums(objectToEnrich, objectToEnrich.getChecksums(), objectSource.getChecksums(), true,
+                    getListener());
+        }
+
+        if (enricherContext.getConfig().isUpdateCvInXrefsAliasesAnnotations() && getCvTermEnricher() != null){
+            for (Object obj : objectToEnrich.getIdentifiers()) {
+                Checksum check = (Checksum)obj;
+                getCvTermEnricher().enrich(check.getMethod());
+            }
+        }
     }
 
     @Override
-    protected void processXrefs(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    protected void processXrefs(BioactiveEntity objectToEnrich, BioactiveEntity objectSource) throws EnricherException {
         if (objectSource != null){
-            super.processXrefs(objectToEnrich, objectSource);
+            EnricherUtils.mergeXrefs(objectToEnrich, objectToEnrich.getXrefs(), objectSource.getXrefs(), true, false,
+                    getListener(), getListener());
         }
 
         if (enricherContext.getConfig().isUpdateCvInXrefsAliasesAnnotations() && getCvTermEnricher() != null){

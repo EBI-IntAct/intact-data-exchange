@@ -15,31 +15,29 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import psidev.psi.mi.jami.enricher.CvTermEnricher;
-import psidev.psi.mi.jami.model.CvTerm;
-import uk.ac.ebi.intact.dataexchange.enricher.fetch.OlsCvObjectFetcher;
+import psidev.psi.mi.jami.model.ModelledFeature;
+import psidev.psi.mi.jami.model.ModelledParticipant;
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 /**
- * CvObject enricher.
+ * Modelled participant enricher
  *
- * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id: MiCvObjectEnricher.java 13941 2010-01-04 14:01:28Z samuel.kerrien $
+ * @version $Id$
  */
-@Component(value = "intactCvObjectEnricher")
+@Component(value = "intactModelledParticipantEnricher")
 @Lazy
-public class CvObjectEnricher extends AbstractCvObjectEnricher<CvTerm> {
+public class ModelledComponentEnricher extends ParticipantEnricher<ModelledParticipant, ModelledFeature>{
 
-    @Autowired
-    public CvObjectEnricher(@Qualifier("olsCvObjectFetcher") OlsCvObjectFetcher intactCvObjectFetcher) {
-        super(intactCvObjectFetcher);
+    public ModelledComponentEnricher() {
     }
 
     @Override
-    protected CvTermEnricher<CvTerm> getCvEnricher() {
-        return this;
+    public psidev.psi.mi.jami.enricher.FeatureEnricher<ModelledFeature> getFeatureEnricher() {
+        if (super.getFeatureEnricher() == null){
+            super.setFeatureEnricher((ModelledFeatureEnricher) ApplicationContextProvider.getBean("intactModelledFeatureEnricher"));
+        }
+        return super.getFeatureEnricher();
     }
 }

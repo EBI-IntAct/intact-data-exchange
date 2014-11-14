@@ -23,32 +23,29 @@ import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.OrganismEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
-import psidev.psi.mi.jami.enricher.impl.full.FullInteractorBaseEnricher;
+import psidev.psi.mi.jami.enricher.impl.CompositeInteractorEnricher;
+import psidev.psi.mi.jami.enricher.impl.full.FullInteractorPoolEnricher;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 /**
- * This class enriches ie adds additional information to the Interactor by utilizing the webservices from UniProt and Chebi.
- *
- * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id$
  */
-@Component(value = "intactInteractorEnricher")
+@Component(value = "intactInteractorPoolEnricher")
 @Lazy
-public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
+public class InteractorPoolEnricher extends FullInteractorPoolEnricher {
 
-    private static final Log log = LogFactory.getLog(InteractorEnricher.class);
+    private static final Log log = LogFactory.getLog(InteractorPoolEnricher.class);
 
     @Autowired
     private EnricherContext enricherContext;
 
-    public InteractorEnricher() {
+    public InteractorPoolEnricher() {
         super();
     }
 
     @Override
-    protected void processOrganism(Interactor entityToEnrich) throws EnricherException {
+    protected void processOrganism(InteractorPool entityToEnrich) throws EnricherException {
         if (enricherContext.getConfig().isUpdateOrganisms()
                 && entityToEnrich.getOrganism() != null
                 && getOrganismEnricher() != null){
@@ -57,7 +54,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processInteractorType(Interactor entityToEnrich) throws EnricherException {
+    protected void processInteractorType(InteractorPool entityToEnrich) throws EnricherException {
         if (enricherContext.getConfig().isUpdateCvTerms()
                 && getCvTermEnricher() != null
                 && entityToEnrich.getInteractorType() != null)
@@ -65,7 +62,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processAnnotations(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    protected void processAnnotations(InteractorPool objectToEnrich, InteractorPool objectSource) throws EnricherException {
         if (objectSource != null){
             super.processAnnotations(objectToEnrich, objectSource);
         }
@@ -79,7 +76,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processShortLabel(Interactor objectToEnrich, Interactor fetched) {
+    protected void processShortLabel(InteractorPool objectToEnrich, InteractorPool fetched) {
         if(!fetched.getShortName().equalsIgnoreCase(objectToEnrich.getShortName())){
             String oldValue = objectToEnrich.getShortName();
             objectToEnrich.setShortName(fetched.getShortName());
@@ -91,7 +88,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    public void processAliases(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    public void processAliases(InteractorPool objectToEnrich, InteractorPool objectSource) throws EnricherException {
         if (objectSource != null){
             super.processAliases(objectToEnrich, objectSource);
         }
@@ -106,7 +103,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processIdentifiers(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    protected void processIdentifiers(InteractorPool objectToEnrich, InteractorPool objectSource) throws EnricherException {
         if (objectSource != null){
             super.processIdentifiers(objectToEnrich, objectSource);
         }
@@ -123,7 +120,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    public void processFullName(Interactor bioactiveEntityToEnrich, Interactor fetched) throws EnricherException {
+    public void processFullName(InteractorPool bioactiveEntityToEnrich, InteractorPool fetched) throws EnricherException {
         if((fetched.getFullName() != null && !fetched.getFullName().equalsIgnoreCase(bioactiveEntityToEnrich.getFullName())
                 || (fetched.getFullName() == null && bioactiveEntityToEnrich.getFullName() != null))){
             String oldValue = bioactiveEntityToEnrich.getFullName();
@@ -134,12 +131,12 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processChecksums(Interactor bioactiveEntityToEnrich, Interactor fetched) throws EnricherException {
+    protected void processChecksums(InteractorPool bioactiveEntityToEnrich, InteractorPool fetched) throws EnricherException {
         // nothing to do here
     }
 
     @Override
-    protected void processXrefs(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    protected void processXrefs(InteractorPool objectToEnrich, InteractorPool objectSource) throws EnricherException {
         if (objectSource != null){
             super.processXrefs(objectToEnrich, objectSource);
         }
@@ -177,5 +174,13 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
             super.setCvTermEnricher((CvTermEnricher<CvTerm>) ApplicationContextProvider.getBean("miCvObjectEnricher"));
         }
         return super.getCvTermEnricher();
+    }
+
+    @Override
+    public CompositeInteractorEnricher getInteractorEnricher() {
+        if (super.getInteractorEnricher() == null){
+            super.setInteractorEnricher((CompositeInteractorEnricher)ApplicationContextProvider.getBean("intactCompositeInteractorEnricher"));
+        }
+        return super.getInteractorEnricher();
     }
 }

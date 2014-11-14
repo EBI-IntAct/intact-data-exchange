@@ -20,7 +20,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 
 /**
  * TODO comment that class header
@@ -28,7 +27,10 @@ import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-public abstract class EnricherBasicTestCase extends IntactBasicTestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath*:/META-INF/intact-enricher-spring-test.xml",
+        "classpath*:/META-INF/intact-jami-test.spring.xml"})
+public abstract class EnricherBasicTestCase {
 
     @Autowired
     private EnricherContext enricherContext;

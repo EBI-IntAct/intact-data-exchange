@@ -20,45 +20,43 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.bridges.chebi.ChebiFetcher;
 import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
-import psidev.psi.mi.jami.bridges.uniprot.taxonomy.UniprotTaxonomyFetcher;
-import psidev.psi.mi.jami.model.Organism;
+import psidev.psi.mi.jami.model.BioactiveEntity;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 
-/**
- * TODO comment this
- *
- * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id$
- */
-@Component(value = "intactBioSourceFetcher")
-@Lazy
-public class BioSourceFetcher extends UniprotTaxonomyFetcher{
+import java.util.Collection;
 
-    /**
-     * Sets up a logger for that class.
-     */
-    public static final Log log = LogFactory.getLog(BioSourceFetcher.class);
+/**
+ * Bioactive entity Fetcher.
+ *
+ * @version $Id: InteractorFetcher.java 16883 2011-07-28 13:22:38Z mdumousseau@yahoo.com $
+ */
+@Component(value = "intactBioactiveEntityFetcher")
+@Lazy
+public class BioactiveEntityFetcher extends ChebiFetcher{
+
+    private static final Log log = LogFactory.getLog(BioactiveEntityFetcher.class);
 
     @Autowired
     private EnricherContext enricherContext;
 
-    public BioSourceFetcher() {
+    public BioactiveEntityFetcher() {
+        super();
     }
 
     @Override
-    public Organism fetchByTaxID(int taxID) throws BridgeFailedException {
+    public Collection<BioactiveEntity> fetchByIdentifier(String identifier) throws BridgeFailedException {
+        EnricherCache entityCache = enricherContext.getCacheManager().getCache("BioactiveEntity");
 
-        EnricherCache bioSourceCache = enricherContext.getCacheManager().getCache("BioSource");
-
-        if (bioSourceCache.isKeyInCache(taxID)) {
-            return (Organism) bioSourceCache.get(taxID);
+        if (entityCache.isKeyInCache(identifier)) {
+            return (Collection<BioactiveEntity>) entityCache.get(identifier);
         }
         else{
-            Organism term = super.fetchByTaxID(taxID);
-            bioSourceCache.put(taxID, term);
-            return term;
+            Collection<BioactiveEntity> terms = super.fetchByIdentifier(identifier);
+            entityCache.put(identifier, terms);
+            return terms;
         }
     }
 }

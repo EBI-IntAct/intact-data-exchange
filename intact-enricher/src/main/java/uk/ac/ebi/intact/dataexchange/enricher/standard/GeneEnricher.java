@@ -18,37 +18,51 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.OrganismEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
-import psidev.psi.mi.jami.enricher.impl.full.FullInteractorBaseEnricher;
+import psidev.psi.mi.jami.enricher.impl.full.FullGeneEnricher;
+import psidev.psi.mi.jami.enricher.util.EnricherUtils;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 /**
- * This class enriches ie adds additional information to the Interactor by utilizing the webservices from UniProt and Chebi.
- *
- * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id$
  */
-@Component(value = "intactInteractorEnricher")
+@Component(value = "intactGeneEnricher")
 @Lazy
-public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
+public class GeneEnricher extends FullGeneEnricher {
 
-    private static final Log log = LogFactory.getLog(InteractorEnricher.class);
+    private static final Log log = LogFactory.getLog(GeneEnricher.class);
 
     @Autowired
     private EnricherContext enricherContext;
 
-    public InteractorEnricher() {
-        super();
+    @Autowired
+    public GeneEnricher(@Qualifier("intactGeneFetcher") uk.ac.ebi.intact.dataexchange.enricher.fetch.GeneFetcher proteinFetcher) {
+        super(proteinFetcher);
     }
 
     @Override
-    protected void processOrganism(Interactor entityToEnrich) throws EnricherException {
+    protected void onEnrichedVersionNotFound(Gene objectToEnrich) throws EnricherException {
+
+        objectToEnrich.setShortName(replaceLabelInvalidChars(objectToEnrich.getShortName()));
+
+        processInteractorType(objectToEnrich);
+        processOrganism(objectToEnrich);
+        processXrefs(objectToEnrich, null);
+        processAliases(objectToEnrich, null);
+        processIdentifiers(objectToEnrich, null);
+        processAnnotations(objectToEnrich, null);
+
+        super.onEnrichedVersionNotFound(objectToEnrich);
+    }
+
+    @Override
+    protected void processOrganism(Gene entityToEnrich) throws EnricherException {
         if (enricherContext.getConfig().isUpdateOrganisms()
                 && entityToEnrich.getOrganism() != null
                 && getOrganismEnricher() != null){
@@ -57,7 +71,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processInteractorType(Interactor entityToEnrich) throws EnricherException {
+    protected void processInteractorType(Gene entityToEnrich) throws EnricherException {
         if (enricherContext.getConfig().isUpdateCvTerms()
                 && getCvTermEnricher() != null
                 && entityToEnrich.getInteractorType() != null)
@@ -65,7 +79,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processAnnotations(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    protected void processAnnotations(Gene objectToEnrich, Gene objectSource) throws EnricherException {
         if (objectSource != null){
             super.processAnnotations(objectToEnrich, objectSource);
         }
@@ -79,7 +93,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processShortLabel(Interactor objectToEnrich, Interactor fetched) {
+    protected void processShortLabel(Gene objectToEnrich, Gene fetched) {
         if(!fetched.getShortName().equalsIgnoreCase(objectToEnrich.getShortName())){
             String oldValue = objectToEnrich.getShortName();
             objectToEnrich.setShortName(fetched.getShortName());
@@ -91,9 +105,10 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    public void processAliases(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    public void processAliases(Gene objectToEnrich, Gene objectSource) throws EnricherException {
         if (objectSource != null){
-            super.processAliases(objectToEnrich, objectSource);
+            EnricherUtils.mergeAliases(objectToEnrich, objectToEnrich.getAliases(), objectSource.getAliases(), true,
+                    getListener());
         }
         if (enricherContext.getConfig().isUpdateCvInXrefsAliasesAnnotations() && getCvTermEnricher() != null){
             for (Object obj : objectToEnrich.getAliases()) {
@@ -106,9 +121,10 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processIdentifiers(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    protected void processIdentifiers(Gene objectToEnrich, Gene objectSource) throws EnricherException {
         if (objectSource != null){
-            super.processIdentifiers(objectToEnrich, objectSource);
+            EnricherUtils.mergeXrefs(objectToEnrich, objectToEnrich.getIdentifiers(), objectSource.getIdentifiers(), true, true,
+                    getListener(), getListener());
         }
 
         if (enricherContext.getConfig().isUpdateCvInXrefsAliasesAnnotations() && getCvTermEnricher() != null){
@@ -123,7 +139,7 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    public void processFullName(Interactor bioactiveEntityToEnrich, Interactor fetched) throws EnricherException {
+    public void processFullName(Gene bioactiveEntityToEnrich, Gene fetched) throws EnricherException {
         if((fetched.getFullName() != null && !fetched.getFullName().equalsIgnoreCase(bioactiveEntityToEnrich.getFullName())
                 || (fetched.getFullName() == null && bioactiveEntityToEnrich.getFullName() != null))){
             String oldValue = bioactiveEntityToEnrich.getFullName();
@@ -134,14 +150,15 @@ public class InteractorEnricher extends FullInteractorBaseEnricher<Interactor> {
     }
 
     @Override
-    protected void processChecksums(Interactor bioactiveEntityToEnrich, Interactor fetched) throws EnricherException {
+    protected void processChecksums(Gene bioactiveEntityToEnrich, Gene fetched) throws EnricherException {
         // nothing to do here
     }
 
     @Override
-    protected void processXrefs(Interactor objectToEnrich, Interactor objectSource) throws EnricherException {
+    protected void processXrefs(Gene objectToEnrich, Gene objectSource) throws EnricherException {
         if (objectSource != null){
-            super.processXrefs(objectToEnrich, objectSource);
+            EnricherUtils.mergeXrefs(objectToEnrich, objectToEnrich.getXrefs(), objectSource.getXrefs(), true, false,
+                    getListener(), getListener());
         }
 
         if (enricherContext.getConfig().isUpdateCvInXrefsAliasesAnnotations() && getCvTermEnricher() != null){

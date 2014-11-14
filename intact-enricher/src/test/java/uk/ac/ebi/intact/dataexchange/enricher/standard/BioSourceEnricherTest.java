@@ -18,10 +18,12 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Organism;
+import psidev.psi.mi.jami.model.impl.DefaultCvTerm;
+import psidev.psi.mi.jami.model.impl.DefaultOrganism;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
-import uk.ac.ebi.intact.model.BioSource;
-import uk.ac.ebi.intact.model.CvCellType;
 
 /**
  * TODO comment this
@@ -32,59 +34,44 @@ import uk.ac.ebi.intact.model.CvCellType;
 public class BioSourceEnricherTest extends EnricherBasicTestCase {
 
     @Autowired
+    @Qualifier("intactBioSourceEnricher")
     private BioSourceEnricher enricher;
 
     @Test
     public void enrich_default() throws Exception {
-        BioSource human = getMockBuilder().createBioSource(9606, "unknown");
+        Organism human = new DefaultOrganism(9606, "unknown");
 
         enricher.enrich(human);
 
-        Assert.assertEquals("human", human.getShortLabel());
+        Assert.assertEquals("human", human.getCommonName());
     }
 
     @Test
     public void enrich_noCommonName() throws Exception {
-        BioSource unculturedBacterium = getMockBuilder().createBioSource(77133, "unknown");
+        Organism unculturedBacterium = new DefaultOrganism(77133, "unknown");
 
         enricher.enrich(unculturedBacterium);
 
-        Assert.assertEquals("uncultured bacterium", unculturedBacterium.getShortLabel());
-    }
-
-    @Test
-    public void enrich_noNewtXref() throws Exception {
-        BioSource unculturedBacterium = getMockBuilder().createBioSource(77133, "unknown");
-        unculturedBacterium.getXrefs().clear();
-
-        enricher.enrich(unculturedBacterium);
-
-        Assert.assertEquals(0, unculturedBacterium.getXrefs().size());
-    }
-
-    @Test (expected = EnricherException.class)
-    public void enrich_invalidTaxid() throws Exception {
-        BioSource invalidBioSource = getMockBuilder().createBioSource(0, "NONE");
-         enricher.enrich(invalidBioSource);
+        Assert.assertEquals("uncultured bacterium", unculturedBacterium.getCommonName());
     }
 
     @Test
     public void enrich_longShortLabel() throws Exception {
-        BioSource organism = getMockBuilder().createBioSource(224325, "Unknown");
+        Organism organism = new DefaultOrganism(224325, "Unknown");
         enricher.enrich(organism);
 
-        Assert.assertEquals("strain atcc 49558 / vc-16 / dsm 4304 / jcm 9628 / nbrc 100126", organism.getShortLabel());
-        Assert.assertEquals("Archaeoglobus fulgidus", organism.getFullName());
+        Assert.assertEquals("arcfu", organism.getCommonName());
+        Assert.assertEquals("Archaeoglobus fulgidus (strain ATCC 49558 / VC-16 / DSM 4304 / JCM 9628 / NBRC 100126)", organism.getScientificName());
     }
 
     @Test
     public void enrich_withCellType() throws Exception {
-        BioSource human = getMockBuilder().createBioSource(9606, "human_custom");
-        CvCellType cellType = getMockBuilder().createCvObject(CvCellType.class, "customId", "custom_cellType");
-        human.setCvCellType(cellType);
+        Organism human = new DefaultOrganism(9606, "human_custom");
+        CvTerm cellType = new DefaultCvTerm("customId", "custom_cellType", (String)null);
+        human.setCellType(cellType);
 
         enricher.enrich(human);
 
-        Assert.assertEquals("human_custom", human.getShortLabel());
+        Assert.assertEquals("human-customid", human.getCommonName());
     }
 }

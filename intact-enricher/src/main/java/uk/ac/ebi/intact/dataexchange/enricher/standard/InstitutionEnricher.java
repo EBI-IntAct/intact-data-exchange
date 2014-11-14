@@ -16,64 +16,36 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Controller;
-import uk.ac.ebi.intact.model.Alias;
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.InstitutionXref;
-import uk.ac.ebi.intact.model.util.XrefUtils;
-
-import java.util.Collection;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.enricher.*;
+import psidev.psi.mi.jami.enricher.PublicationEnricher;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Source;
+import uk.ac.ebi.intact.dataexchange.enricher.fetch.MiCvObjectFetcher;
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 /**
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
-public class InstitutionEnricher extends AnnotatedObjectEnricher<Institution>{
+@Component(value = "intactInstitutionEnricher")
+@Lazy
+public class InstitutionEnricher extends AbstractCvObjectEnricher<Source> implements SourceEnricher{
 
     @Autowired
-    private ApplicationContext applicationContext;
-
-    public InstitutionEnricher() {
+    public InstitutionEnricher(@Qualifier("miCvObjectFetcher") MiCvObjectFetcher intactCvObjectFetcher) {
+        super(intactCvObjectFetcher);
     }
 
-    public void enrich(Institution objectToEnrich) {
-        if (objectToEnrich == null) return;
-
-        Collection<Institution> availableInstitutions = applicationContext.getBeansOfType(Institution.class).values();
-
-        InstitutionXref psiMiIdentity = XrefUtils.getPsiMiIdentityXref(objectToEnrich);
-
-        for (Institution referenceInstitution : availableInstitutions) {
-            if (psiMiIdentity != null) {
-               InstitutionXref id = XrefUtils.getPsiMiIdentityXref(referenceInstitution);
-                if (psiMiIdentity.equals(id)) {
-                    enrichInstitutionFromReference(objectToEnrich, referenceInstitution);
-                    break;
-                }
-            } else {
-                if (objectToEnrich.getShortLabel().equalsIgnoreCase(referenceInstitution.getShortLabel())) {
-                    enrichInstitutionFromReference(objectToEnrich, referenceInstitution);
-                    break;
-                } else {
-                    for (Alias alias : referenceInstitution.getAliases()) {
-                        if (objectToEnrich.getShortLabel().equals(alias.getName())) {
-                            enrichInstitutionFromReference(objectToEnrich, referenceInstitution);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
+    @Override
+    protected CvTermEnricher<CvTerm> getCvEnricher() {
+        return ApplicationContextProvider.getBean("miCvObjectEnricher");
     }
 
-    protected void enrichInstitutionFromReference(Institution institutionToEnrich, Institution reference) {
-        institutionToEnrich.setShortLabel(reference.getShortLabel());
-        institutionToEnrich.setFullName(reference.getFullName());
-        institutionToEnrich.setXrefs(reference.getXrefs());
-        institutionToEnrich.setAliases(reference.getAliases());
-        institutionToEnrich.setAnnotations(reference.getAnnotations());
+    @Override
+    public PublicationEnricher getPublicationEnricher() {
+        return null;
     }
 }

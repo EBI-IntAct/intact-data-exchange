@@ -18,10 +18,11 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import psidev.psi.mi.jami.enricher.exception.EnricherException;
+import psidev.psi.mi.jami.model.Source;
+import psidev.psi.mi.jami.model.impl.DefaultSource;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.util.XrefUtils;
 
 /**
  * TODO comment this
@@ -33,36 +34,37 @@ import uk.ac.ebi.intact.model.util.XrefUtils;
 public class InstitutionEnricherTest extends EnricherBasicTestCase {
 
     @Autowired
+    @Qualifier("intactInstitutionEnricher")
     private InstitutionEnricher enricher;
 
     @Test
-    public void enrich_intact() {
-        Institution ebi = new Institution("ebi");
+    public void enrich_intact() throws EnricherException {
+        Source ebi = new DefaultSource("intact");
 
         enricher.enrich(ebi);
 
-        Assert.assertEquals("intact", ebi.getShortLabel());
-        Assert.assertEquals(CvDatabase.INTACT_MI_REF, XrefUtils.getPsiMiIdentityXref(ebi).getPrimaryId());
+        Assert.assertEquals("intact", ebi.getShortName());
+        Assert.assertEquals("MI:0469", ebi.getMIIdentifier());
     }
 
     @Test
-    public void enrich_mint() {
-        Institution mint = new Institution("mint");
+    public void enrich_mint() throws EnricherException {
+        Source mint = new DefaultSource("mint");
 
         enricher.enrich(mint);
 
-        Assert.assertEquals("mint", mint.getShortLabel());
-        Assert.assertEquals(CvDatabase.MINT_MI_REF, XrefUtils.getPsiMiIdentityXref(mint).getPrimaryId());
+        Assert.assertEquals("mint", mint.getShortName());
+        Assert.assertEquals("MI:0471", mint.getMIIdentifier());
     }
     
     @Test
-    public void enrich_dip() {
-        Institution dip = new Institution("ucla");
+    public void enrich_dip() throws EnricherException {
+        Source dip = new DefaultSource("dip");
 
         enricher.enrich(dip);
 
-        Assert.assertEquals("dip", dip.getShortLabel());
-        Assert.assertEquals(CvDatabase.DIP_MI_REF, XrefUtils.getPsiMiIdentityXref(dip).getPrimaryId());
+        Assert.assertEquals("dip", dip.getShortName());
+        Assert.assertEquals("MI:0465", dip.getMIIdentifier());
     }
 
 }

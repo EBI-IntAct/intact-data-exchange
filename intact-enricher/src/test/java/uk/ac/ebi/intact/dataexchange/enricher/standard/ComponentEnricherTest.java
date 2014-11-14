@@ -19,8 +19,13 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import psidev.psi.mi.jami.model.*;
+import psidev.psi.mi.jami.model.impl.*;
+import psidev.psi.mi.jami.utils.CvTermUtils;
+import psidev.psi.mi.jami.utils.InteractorUtils;
+import psidev.psi.mi.jami.utils.RangeUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
-import uk.ac.ebi.intact.model.*;
 
 /**
  * TODO comment this
@@ -31,93 +36,79 @@ import uk.ac.ebi.intact.model.*;
 public class ComponentEnricherTest extends EnricherBasicTestCase {
 
     @Autowired
+    @Qualifier("intactParticipantEvidenceEnricher")
     private ComponentEnricher enricher;
 
     @Test
     public void enrich_default() throws Exception {
-        Component comp = getMockBuilder().createInteractionRandomBinary().getComponents().iterator().next();
-        comp.setExpressedIn(null);
+        ParticipantEvidence comp = new DefaultParticipantEvidence(InteractorUtils.createUnknownBasicInteractor());
+        comp.setExpressedInOrganism(null);
 
         enricher.enrich(comp);
 
-        Assert.assertNull(comp.getExpressedIn());
+        Assert.assertNull(comp.getExpressedInOrganism());
     }
 
     @Test
     public void enrich_expressedIn() throws Exception {
-        BioSource human = getMockBuilder().createBioSource(9606, "unknown");
-        Component comp = getMockBuilder().createInteractionRandomBinary().getComponents().iterator().next();
-        comp.setExpressedIn(human);
+        Organism human = new DefaultOrganism(9606, "unknown");
+        ParticipantEvidence comp = new DefaultParticipantEvidence(InteractorUtils.createUnknownBasicInteractor());
+        comp.setExpressedInOrganism(human);
 
         enricher.enrich(comp);
 
-        Assert.assertEquals("human", comp.getExpressedIn().getShortLabel());
+        Assert.assertEquals("human", comp.getExpressedInOrganism().getCommonName());
     }
 
     @Test
     public void enrich_cvs() throws Exception {
-        Component comp = getMockBuilder().createComponentRandom();
-        comp.getParticipantDetectionMethods().clear();
-        comp.getExperimentalPreparations().clear();
+        ParticipantEvidence comp = new DefaultParticipantEvidence(InteractorUtils.createUnknownBasicInteractor());
 
-        CvExperimentalPreparation cvExperimentalPrep = getMockBuilder().createCvObject(CvExperimentalPreparation.class, CvExperimentalPreparation.PURIFIED_REF, "nothing");
+        CvTerm cvExperimentalPrep = new DefaultCvTerm("nothing", "MI:0350");
         cvExperimentalPrep.setFullName("nothing");
-
         comp.getExperimentalPreparations().add(cvExperimentalPrep);
 
         enricher.enrich(comp);
 
-        CvExperimentalPreparation enrichedExperimentalPreparation = comp.getExperimentalPreparations().iterator().next();
-        Assert.assertEquals(CvExperimentalPreparation.PURIFIED, enrichedExperimentalPreparation.getShortLabel());
+        CvTerm enrichedExperimentalPreparation = comp.getExperimentalPreparations().iterator().next();
+        Assert.assertEquals("purified", enrichedExperimentalPreparation.getShortName());
     }
 
     @Test
     @Ignore
     public void enrich_range_nTerminal() throws Exception {
-        BioSource human = getMockBuilder().createBioSource(9606, "unknown");
-        Protein protein = getMockBuilder().createProtein("P18850", "unknownName", human);
+        Organism human = new DefaultOrganism(9606, "unknown");
+        Protein protein = new DefaultProtein("unknownName", human);
+        protein.setUniprotkb("P18850");
 
-        Component comp = getMockBuilder().createInteractionRandomBinary().getComponents().iterator().next();
-        comp.setInteractor(protein);
+        ParticipantEvidence comp = new DefaultParticipantEvidence(protein);
 
-        Feature feature = getMockBuilder().createFeature("aFeature",
-                getMockBuilder().createCvObject(CvFeatureType.class, CvFeatureType.EXPERIMENTAL_FEATURE_MI_REF, CvFeatureType.EXPERIMENTAL_FEATURE));
-        Range range = getMockBuilder().createRange(50,50, 60, 60);
-        range.setFromCvFuzzyType(getMockBuilder().createCvObject(CvFuzzyType.class, CvFuzzyType.N_TERMINAL_MI_REF, CvFuzzyType.N_TERMINAL));
-
-        feature.addRange(range);
-
-        comp.getBindingDomains().clear();
-        comp.addBindingDomain(feature);
+        FeatureEvidence feature = new DefaultFeatureEvidence("aFeature", null);
+        feature.setType(CvTermUtils.createMICvTerm("experimental feature detection","MI:0659"));
+        feature.getRanges().add(RangeUtils.createNTerminusRange());
 
         enricher.enrich(comp);
 
-        Assert.assertEquals(1, range.getFromIntervalStart());
-        Assert.assertEquals(1, range.getFromIntervalEnd());
+        Assert.assertEquals(1, feature.getRanges().iterator().next().getStart().getStart());
+        Assert.assertEquals(1, feature.getRanges().iterator().next().getEnd().getEnd());
     }
 
     @Test
     @Ignore
     public void enrich_range_cTerminal() throws Exception {
-        BioSource human = getMockBuilder().createBioSource(9606, "unknown");
-        Protein protein = getMockBuilder().createProtein("P18850", "unknownName", human);
+        Organism human = new DefaultOrganism(9606, "unknown");
+        Protein protein = new DefaultProtein("unknownName", human);
+        protein.setUniprotkb("P18850");
 
-        Component comp = getMockBuilder().createInteractionRandomBinary().getComponents().iterator().next();
-        comp.setInteractor(protein);
+        ParticipantEvidence comp = new DefaultParticipantEvidence(protein);
 
-        Feature feature = getMockBuilder().createFeature("aFeature",
-                getMockBuilder().createCvObject(CvFeatureType.class, CvFeatureType.EXPERIMENTAL_FEATURE_MI_REF, CvFeatureType.EXPERIMENTAL_FEATURE));
-        Range range = getMockBuilder().createRange(50,50, 60, 60);
-        range.setToCvFuzzyType(getMockBuilder().createCvObject(CvFuzzyType.class, CvFuzzyType.C_TERMINAL_MI_REF, CvFuzzyType.C_TERMINAL));
-
-        feature.addRange(range);
-
-        comp.getBindingDomains().clear();
-        comp.addBindingDomain(feature);
+        FeatureEvidence feature = new DefaultFeatureEvidence("aFeature", null);
+        feature.setType(CvTermUtils.createMICvTerm("experimental feature detection","MI:0659"));
+        feature.getRanges().add(RangeUtils.createCTerminusRange(50));
 
         enricher.enrich(comp);
 
-        Assert.assertEquals(670, range.getToIntervalStart());
-        Assert.assertEquals(670, range.getToIntervalEnd());
+        Assert.assertEquals(670, feature.getRanges().iterator().next().getStart().getStart());
+        Assert.assertEquals(670, feature.getRanges().iterator().next().getEnd().getEnd());
     }
 }

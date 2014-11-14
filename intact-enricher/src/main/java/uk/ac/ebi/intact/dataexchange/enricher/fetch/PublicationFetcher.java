@@ -20,21 +20,19 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.bridges.europubmedcentral.EuroPubmedCentralFetcher;
 import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
-import psidev.psi.mi.jami.bridges.uniprot.taxonomy.UniprotTaxonomyFetcher;
-import psidev.psi.mi.jami.model.Organism;
+import psidev.psi.mi.jami.model.Publication;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 
 /**
- * TODO comment this
+ * Intact extension of publication fetcher
  *
- * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id$
  */
-@Component(value = "intactBioSourceFetcher")
+@Component(value = "intactPublicationFetcher")
 @Lazy
-public class BioSourceFetcher extends UniprotTaxonomyFetcher{
+public class PublicationFetcher extends EuroPubmedCentralFetcher{
 
     /**
      * Sets up a logger for that class.
@@ -44,20 +42,20 @@ public class BioSourceFetcher extends UniprotTaxonomyFetcher{
     @Autowired
     private EnricherContext enricherContext;
 
-    public BioSourceFetcher() {
+    public PublicationFetcher() throws BridgeFailedException {
+        super();
     }
 
     @Override
-    public Organism fetchByTaxID(int taxID) throws BridgeFailedException {
-
-        EnricherCache bioSourceCache = enricherContext.getCacheManager().getCache("BioSource");
-
-        if (bioSourceCache.isKeyInCache(taxID)) {
-            return (Organism) bioSourceCache.get(taxID);
+    public Publication fetchByIdentifier(String id, String source) throws BridgeFailedException {
+        EnricherCache publicationCache = enricherContext.getCacheManager().getCache("Publication");
+        String key = id+"_"+source;
+        if (publicationCache.isKeyInCache(key)) {
+            return (Publication) publicationCache.get(key);
         }
         else{
-            Organism term = super.fetchByTaxID(taxID);
-            bioSourceCache.put(taxID, term);
+            Publication term = super.fetchByIdentifier(id, source);
+            publicationCache.put(key, term);
             return term;
         }
     }

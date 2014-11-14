@@ -18,12 +18,12 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import psidev.psi.mi.jami.enricher.exception.EnricherException;
+import psidev.psi.mi.jami.model.*;
+import psidev.psi.mi.jami.model.impl.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
-import uk.ac.ebi.intact.model.BioSource;
-import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Interactor;
 
 /**
  * TODO comment this
@@ -34,69 +34,84 @@ import uk.ac.ebi.intact.model.Interactor;
 public class InteractionEnricherTest extends EnricherBasicTestCase {
 
     @Autowired
-    private InteractionEnricher enricher;
+    @Qualifier("intactInteractionEvidence")
+    private InteractionEvidenceEnricher enricher;
 
     @Autowired
     private EnricherContext enricherContext;
     
     @Test
-    public void enrich_default() {
+    public void enrich_default() throws EnricherException {
         enricherContext.getConfig().setUpdateInteractionShortLabels(false);
 
-        BioSource ecoli = getMockBuilder().createBioSource(83333, "lala");
-        Interactor interactor1 = getMockBuilder().createProtein("P45531", "unk1", ecoli);
-        Interactor interactor2 = getMockBuilder().createProtein("P45532", "unk2", ecoli);
-        Experiment experiment = getMockBuilder().createExperimentEmpty("myExperiment");
+        Organism ecoli = new DefaultOrganism(83333, "lala");
+        Protein interactor1 = new DefaultProtein("unk1", ecoli);
+        interactor1.setUniprotkb("P45531");
+        Protein interactor2 = new DefaultProtein("unk2", ecoli);
+        interactor2.setUniprotkb("P45532");
+        Experiment experiment = new DefaultExperiment(null);
 
-        Interaction interaction = getMockBuilder().createInteraction("myInteraction", interactor1, interactor2, experiment);
+        InteractionEvidence interaction = new DefaultInteractionEvidence("myInteraction");
+        interaction.setExperiment(experiment);
+        interaction.addParticipant(new DefaultParticipantEvidence(interactor1));
+        interaction.addParticipant(new DefaultParticipantEvidence(interactor2));
 
         enricher.enrich(interaction);
 
-        Assert.assertEquals("myInteraction", interaction.getShortLabel());
-        Assert.assertEquals("83333", interactor1.getBioSource().getTaxId());
-        Assert.assertEquals("strain k12", interactor1.getBioSource().getShortLabel());
-        Assert.assertEquals("tusd_ecoli", interactor2.getShortLabel());
+        Assert.assertEquals("myInteraction", interaction.getShortName());
+        Assert.assertEquals("83333", interactor1.getOrganism().getTaxId());
+        Assert.assertEquals("strain k12", interactor1.getOrganism().getCommonName());
+        Assert.assertEquals("tusd_ecoli", interactor2.getShortName());
     }
 
     @Test
-    public void enrich_updateLabel() {
-        BioSource ecoli = getMockBuilder().createBioSource(83333, "lala");
-        
-        Interactor interactor1 = getMockBuilder().createProtein("P45531", "unk1", ecoli);
-        Interactor interactor2 = getMockBuilder().createProtein("P45532", "unk2", ecoli);
+    public void enrich_updateLabel() throws EnricherException {
+        Organism ecoli = new DefaultOrganism(83333, "lala");
 
-        Experiment experiment = getMockBuilder().createExperimentEmpty("myExperiment");
+        Protein interactor1 = new DefaultProtein("unk1", ecoli);
+        interactor1.setUniprotkb("P45531");
+        Protein interactor2 = new DefaultProtein("unk2", ecoli);
+        interactor2.setUniprotkb("P45532");
 
-        Interaction interaction = getMockBuilder().createInteraction("myInteraction", interactor1, interactor2, experiment);
+        Experiment experiment = new DefaultExperiment(null);
+
+        InteractionEvidence interaction = new DefaultInteractionEvidence("myInteraction");
+        interaction.setExperiment(experiment);
+        interaction.addParticipant(new DefaultParticipantEvidence(interactor1));
+        interaction.addParticipant(new DefaultParticipantEvidence(interactor2));
 
         enricherContext.getConfig().setUpdateInteractionShortLabels(true);
 
         enricher.enrich(interaction);
 
-        Assert.assertEquals("tusc-tusd", interaction.getShortLabel());
-        Assert.assertEquals("83333", interactor2.getBioSource().getTaxId());
-        Assert.assertEquals("strain k12", interactor2.getBioSource().getShortLabel());
-        Assert.assertEquals("tusc_ecoli", interactor1.getShortLabel());
+        Assert.assertEquals("tusc-tusd", interaction.getShortName());
+        Assert.assertEquals("83333", interactor2.getOrganism().getTaxId());
+        Assert.assertEquals("strain k12", interactor2.getOrganism().getCommonName());
+        Assert.assertEquals("tusc_ecoli", interactor1.getShortName());
     }
 
     @Test
-    public void enrich_updateLabel2() {
-        BioSource ecoli = getMockBuilder().createBioSource(83333, "lala");
+    public void enrich_updateLabel2() throws EnricherException {
+        Organism ecoli = new DefaultOrganism(83333, "lala");
 
-        Interactor interactor1 = getMockBuilder().createProtein("P45531", "unk1", ecoli);
-        Interactor interactor2 = getMockBuilder().createProtein("EBI-12345", "EBI-12345", ecoli);
+        Protein interactor1 = new DefaultProtein("unk1", ecoli);
+        interactor1.setUniprotkb("P45531");
+        Interactor interactor2 = new DefaultProtein("EBI-12345", ecoli);
 
-        Experiment experiment = getMockBuilder().createExperimentEmpty("myExperiment");
+        Experiment experiment = new DefaultExperiment(null);
 
-        Interaction interaction = getMockBuilder().createInteraction("myInteraction", interactor1, interactor2, experiment);
+        InteractionEvidence interaction = new DefaultInteractionEvidence("myInteraction");
+        interaction.setExperiment(experiment);
+        interaction.addParticipant(new DefaultParticipantEvidence(interactor1));
+        interaction.addParticipant(new DefaultParticipantEvidence(interactor2));
 
         enricherContext.getConfig().setUpdateInteractionShortLabels(true);
 
         enricher.enrich(interaction);
 
-        Assert.assertEquals("tusc-ebi_12345", interaction.getShortLabel());
-        Assert.assertEquals("83333", interactor2.getBioSource().getTaxId());
-        Assert.assertEquals("strain k12", interactor2.getBioSource().getShortLabel());
-        Assert.assertEquals("tusc_ecoli", interactor1.getShortLabel());
+        Assert.assertEquals("tusc-ebi_12345", interaction.getShortName());
+        Assert.assertEquals("83333", interactor2.getOrganism().getTaxId());
+        Assert.assertEquals("strain k12", interactor2.getOrganism().getCommonName());
+        Assert.assertEquals("tusc_ecoli", interactor1.getShortName());
     }
 }

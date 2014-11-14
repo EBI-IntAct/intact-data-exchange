@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <!-- only scan annotations in this package -->
+    <context:component-scan base-package="uk.ac.ebi.intact.jami"/>
+    <context:annotation-config/>
+
+    <!-- so the @Transactional annotations work -->
+    <tx:annotation-driven transaction-manager="jamiTransactionManager" proxy-target-class="true"/>
+
+    <!--
+        Post-processor to perform exception translation on @Repository classes
+        (from native exceptions such as JPA PersistenceExceptions to
+        Spring&rsquo;s DataAccessException hierarchy).
+    -->
+    <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+    <!--  BeanPostProcessor that processes PersistenceUnit and PersistenceContext annotations,
+    for injection of the corresponding JPA resources EntityManagerFactory and EntityManager.
+    Any such annotated fields or methods in any Spring-managed object will automatically be injected.
+    This post-processor will inject sub-interfaces of EntityManagerFactory and EntityManager if the annotated
+    fields or methods are declared as such. The actual type will be verified early, with the exception of
+    a shared ("transactional") EntityManager reference, where type mismatches might be detected as late as on
+    the first actual invocation. -->
+    <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
+
+    <!-- for autowired annotations to work propertly -->
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+
+    <!-- JPATransactionManager is not dependent on hibernate. It is a more global platform -->
+    <!-- We use entity manager because it is JPA and not just specific to hibernate -->
+    <bean id="jamiTransactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
+        <property name="dataSource" ref="jamiCoreDataSourceTest"/>
+        <qualifier value="jamiTransactionManager"/>
+    </bean>
+
+
+    <!-- The LocalContainerEntityManagerFactoryBean gives full control over EntityManagerFactory configuration
+    and is appropriate for environments where fine-grained customization is required-->
+    <bean id="intactEntityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceUnitName" value="intact-jami"/>
+        <property name="persistenceXmlLocation" value="classpath*:/META-INF/jami-persistence.xml"/>
+        <property name="dataSource" ref="jamiCoreDataSourceTest"/>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+                <!-- hibernate interceptor to clear the synchronizer caches after each transaction-->
+                <prop key="hibernate.ejb.interceptor.session_scoped">uk.ac.ebi.intact.jami.interceptor.IntactSynchronizerInterceptor</prop>
+            </props>
+        </property>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="databasePlatform" value="org.hibernate.dialect.H2Dialect"/>
+                <property name="showSql" value="false"/>
+                <property name="generateDdl" value="false"/>
+            </bean>
+        </property>
+    </bean>
+    <!-- Intact core basic datasource for testing -->
+    <bean id="jamiCoreDataSourceTest" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.h2.Driver"/>
+        <property name="url" value="jdbc:h2:mem:intactcore;DB_CLOSE_DELAY=-1;LOCK_MODE=0"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+    </bean>
+
+    <!-- INTACT more specific beans -->
+    <bean id="jamiUserContext" class="uk.ac.ebi.intact.jami.context.UserContext" scope="prototype">
+        <property name="userId" value="INTACT_TESTER"/>
+    </bean>
+
+    <bean id="intactJamiConfiguration" class="uk.ac.ebi.intact.jami.context.IntactConfiguration" scope="prototype">
+        <property name="acPrefix" value="EBI"/>
+        <property name="defaultInstitution" ref="sourceIntact"/>
+    </bean>
+
+    <!-- Default institutions -->
+    <bean id="sourceIntact" class="uk.ac.ebi.intact.jami.model.extension.IntactSource">
+        <constructor-arg index="0" value="intact"/>
+        <property name="fullName" value="European Bioinformatics Institute"/>
+        <property name="MIIdentifier" value="MI:0469"/>
+        <property name="url" value="http://www.ebi.ac.uk/intact/"/>
+        <property name="postalAddress" value="European Bioinformatics Institute; Wellcome Trust Genome Campus; Hinxton, Cambridge; CB10 1SD; United Kingdom"/>
+    </bean>
+
+    <bean id="sourceMint" class="uk.ac.ebi.intact.jami.model.extension.IntactSource">
+        <constructor-arg index="0" value="mint"/>
+        <property name="fullName" value="MINT, Dpt of Biology, University of Rome Tor Vergata"/>
+        <property name="MIIdentifier" value="MI:0471"/>
+        <property name="url" value="http://mint.bio.uniroma2.it/mint"/>
+    </bean>
+
+    <bean id="sourceDip" class="uk.ac.ebi.intact.jami.model.extension.IntactSource">
+        <constructor-arg index="0" value="dip"/>
+        <property name="fullName" value="Database of Interacting Proteins"/>
+        <property name="MIIdentifier" value="MI:0465"/>
+        <property name="url" value="http://dip.doe-mbi.ucla.edu/"/>
+        <property name="postalAddress" value="611 Young Drive East; Los Angeles CA 90095; USA"/>
+    </bean>
+
+    <bean id="sourceUndefined" class="uk.ac.ebi.intact.jami.model.extension.IntactSource">
+        <constructor-arg index="0" value="unknown"/>
+        <property name="fullName" value="Undefined institution"/>
+    </bean>
+
+</beans>

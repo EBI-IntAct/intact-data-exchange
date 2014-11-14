@@ -16,11 +16,18 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.CvExperimentalPreparation;
-import uk.ac.ebi.intact.model.CvExperimentalRole;
-import uk.ac.ebi.intact.model.CvIdentification;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.enricher.OrganismEnricher;
+import psidev.psi.mi.jami.enricher.exception.EnricherException;
+import psidev.psi.mi.jami.enricher.impl.full.FullParticipantEvidenceEnricher;
+import psidev.psi.mi.jami.model.Confidence;
+import psidev.psi.mi.jami.model.FeatureEvidence;
+import psidev.psi.mi.jami.model.Parameter;
+import psidev.psi.mi.jami.model.ParticipantEvidence;
+import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 /**
  * TODO comment this
@@ -28,44 +35,154 @@ import uk.ac.ebi.intact.model.CvIdentification;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
-public class ComponentEnricher extends AnnotatedObjectEnricher<Component>{
+@Component(value = "intactParticipantEvidenceEnricher")
+@Lazy
+public class ComponentEnricher extends FullParticipantEvidenceEnricher<ParticipantEvidence>{
 
     @Autowired
-    private BioSourceEnricher bioSourceEnricher;
+    private EnricherContext enricherContext;
 
     @Autowired
-    private InteractorEnricher interactorEnricher;
-
-    @Autowired
-    private CvObjectEnricher cvObjectEnricher;
+    @Qualifier("intactParticipantEnricher")
+    private ParticipantEnricher intactParticipantEnricher;
 
     public ComponentEnricher() {
     }
 
-    public void enrich(Component objectToEnrich) {
-        if (objectToEnrich.getExpressedIn() != null && getEnricherContext().getConfig().isUpdateOrganisms()) {
-            bioSourceEnricher.enrich(objectToEnrich.getExpressedIn());
+    @Override
+    public void enrich(ParticipantEvidence participantToEnrich) throws EnricherException {
+        // enrich full feature
+        intactParticipantEnricher.enrich(participantToEnrich);
+        // enrich other properties
+        super.enrich(participantToEnrich);
+    }
+
+    @Override
+    public void enrich(ParticipantEvidence objectToEnrich, ParticipantEvidence objectSource) throws EnricherException {
+        // enrich full feature
+        intactParticipantEnricher.enrich(objectToEnrich, objectSource);
+        // enrich other properties
+        super.enrich(objectToEnrich, objectSource);
+    }
+
+    @Override
+    public void processOtherProperties(ParticipantEvidence participantEvidenceToEnrich) throws EnricherException {
+        super.processOtherProperties(participantEvidenceToEnrich);
+        processConfidences(participantEvidenceToEnrich, null);
+        processParameters(participantEvidenceToEnrich, null);
+    }
+
+    @Override
+    protected void processExperimentalPreparations(ParticipantEvidence participantEvidenceToEnrich) throws EnricherException {
+        if (enricherContext.getConfig().isUpdateCvTerms()
+                && !participantEvidenceToEnrich.getExperimentalPreparations().isEmpty()
+                && getCvTermEnricher() != null){
+            getCvTermEnricher().enrich(participantEvidenceToEnrich.getExperimentalPreparations());
+        }
+    }
+
+    @Override
+    protected void processParameters(ParticipantEvidence participantEvidenceToEnrich, ParticipantEvidence objectSource) throws EnricherException {
+        if (objectSource != null){
+            super.processParameters(participantEvidenceToEnrich, objectSource);
         }
 
-        interactorEnricher.enrich(objectToEnrich.getInteractor());
-
-        if (getEnricherContext().getConfig().isUpdateCvTerms()) {
-            if (objectToEnrich.getCvBiologicalRole() != null){
-                cvObjectEnricher.enrich(objectToEnrich.getCvBiologicalRole());
-            }
-
-            for (CvExperimentalRole expRole : objectToEnrich.getExperimentalRoles()) {
-                cvObjectEnricher.enrich(expRole);
-            }
-            for (CvExperimentalPreparation experimentalPreparation : objectToEnrich.getExperimentalPreparations()) {
-                cvObjectEnricher.enrich(experimentalPreparation);
-            }
-            for (CvIdentification participantDetectionMethods : objectToEnrich.getParticipantDetectionMethods()) {
-                cvObjectEnricher.enrich(participantDetectionMethods);
+        if (enricherContext.getConfig().isUpdateCvTerms() && getCvTermEnricher() != null){
+            for (Parameter parameter : participantEvidenceToEnrich.getParameters()) {
+                getCvTermEnricher().enrich(parameter.getType());
+                if (parameter.getUnit() != null){
+                    getCvTermEnricher().enrich(parameter.getUnit());
+                }
             }
         }
+    }
 
-        super.enrich(objectToEnrich);
+    @Override
+    protected void processConfidences(ParticipantEvidence participantEvidenceToEnrich, ParticipantEvidence objectSource) throws EnricherException {
+        if (objectSource != null){
+            super.processConfidences(participantEvidenceToEnrich, objectSource);
+        }
+
+        if (enricherContext.getConfig().isUpdateCvTerms() && getCvTermEnricher() != null){
+            for (Confidence confidence : participantEvidenceToEnrich.getConfidences()) {
+                getCvTermEnricher().enrich(confidence.getType());
+            }
+        }
+    }
+
+    @Override
+    protected void processExpressedInOrganism(ParticipantEvidence participantEvidenceToEnrich) throws EnricherException {
+        if (enricherContext.getConfig().isUpdateOrganisms()
+                && participantEvidenceToEnrich.getExpressedInOrganism() != null
+                && getOrganismEnricher() != null){
+            getOrganismEnricher().enrich(participantEvidenceToEnrich.getExpressedInOrganism());
+        }
+    }
+
+    @Override
+    protected void processIdentificationMethods(ParticipantEvidence participantEvidenceToEnrich) throws EnricherException {
+        if (enricherContext.getConfig().isUpdateCvTerms()
+                && !participantEvidenceToEnrich.getIdentificationMethods().isEmpty()){
+            getCvTermEnricher().enrich(participantEvidenceToEnrich.getIdentificationMethods());
+        }
+    }
+
+    @Override
+    protected void processExperimentalRole(ParticipantEvidence participantEvidenceToEnrich) throws EnricherException {
+        if (enricherContext.getConfig().isUpdateCvTerms()
+                && participantEvidenceToEnrich.getExperimentalRole() != null){
+            getCvTermEnricher().enrich(participantEvidenceToEnrich.getExperimentalRole());
+        }
+    }
+
+    @Override
+    public void processInteractor(ParticipantEvidence objectToEnrich, ParticipantEvidence objectSource) throws EnricherException {
+        // nothing to do
+    }
+
+    @Override
+    public void processBiologicalRole(ParticipantEvidence objectToEnrich, ParticipantEvidence objectSource) throws EnricherException {
+        // nothing to do
+    }
+
+    @Override
+    protected void processAliases(ParticipantEvidence objectToEnrich, ParticipantEvidence objectSource) {
+        // nothing to do
+    }
+
+    @Override
+    protected void processBiologicalRole(ParticipantEvidence participantToEnrich) throws EnricherException {
+        // nothing to do
+    }
+
+    @Override
+    public void processFeatures(ParticipantEvidence objectToEnrich, ParticipantEvidence objectSource) throws EnricherException {
+        // nothing to do
+    }
+
+    @Override
+    protected void processFeatures(ParticipantEvidence participantToEnrich) throws EnricherException {
+        // nothing to do
+    }
+
+    @Override
+    protected void processInteractor(ParticipantEvidence participantToEnrich) throws EnricherException {
+        // nothing to do
+    }
+
+    @Override
+    public OrganismEnricher getOrganismEnricher() {
+        if (super.getOrganismEnricher() == null){
+            super.setOrganismEnricher((OrganismEnricher) ApplicationContextProvider.getBean("intactBioSourceEnricher"));
+        }
+        return super.getOrganismEnricher();
+    }
+
+    @Override
+    public psidev.psi.mi.jami.enricher.FeatureEnricher<FeatureEvidence> getFeatureEnricher() {
+        if (super.getFeatureEnricher() == null){
+            super.setFeatureEnricher((FeatureEvidenceEnricher) ApplicationContextProvider.getBean("intactFeatureEvidenceEnricher"));
+        }
+        return super.getFeatureEnricher();
     }
 }

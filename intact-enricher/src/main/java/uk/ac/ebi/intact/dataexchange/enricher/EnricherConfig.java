@@ -26,13 +26,16 @@ public class EnricherConfig {
     private boolean updateOrganisms = true;
     private boolean updateProteins = true;
     private boolean updateSmallMolecules = true;
+    private boolean updateComplexes = true;
+    private boolean updateInteractorPool = true;
+    private boolean updateGenes = true;
     private boolean updateExperiments = true;
     private boolean updateInteractionShortLabels = false;
     //private String oboUrl = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
     private String oboUrl = "http://psidev.cvs.sourceforge.net/viewvc/psidev/psi/mi/rel25/data/psi-mi25.obo";
-    private boolean updateSmallMoleculeChebiXrefs = true;
     private boolean updateCvTerms = true;
     private boolean updateCellTypesAndTissues = false;
+    private boolean updateCvInXrefsAliasesAnnotations = false;
 
     public EnricherConfig() {
     }
@@ -85,14 +88,6 @@ public class EnricherConfig {
         this.updateExperiments = updateExperiments;
     }
 
-    public boolean isUpdateSmallMoleculeChebiXrefs() {
-        return updateSmallMoleculeChebiXrefs;
-    }
-
-    public void setUpdateSmallMoleculeChebiXrefs( boolean updateSmallMoleculeChebiXrefs ) {
-        this.updateSmallMoleculeChebiXrefs = updateSmallMoleculeChebiXrefs;
-    }
-
     public boolean isUpdateCvTerms() {
         return updateCvTerms;
     }
@@ -107,5 +102,37 @@ public class EnricherConfig {
 
     public void setUpdateCellTypesAndTissues(boolean updateCellTypesAndTissues) {
         this.updateCellTypesAndTissues = updateCellTypesAndTissues;
+    }
+
+    public boolean isUpdateGenes() {
+        return updateGenes;
+    }
+
+    public void setUpdateGenes(boolean updateGenes) {
+        this.updateGenes = updateGenes;
+    }
+
+    public boolean isUpdateCvInXrefsAliasesAnnotations() {
+        return updateCvInXrefsAliasesAnnotations;
+    }
+
+    public void setUpdateCvInXrefsAliasesAnnotations(boolean updateCvInXrefsAliasesAnnotations) {
+        this.updateCvInXrefsAliasesAnnotations = updateCvInXrefsAliasesAnnotations;
+    }
+
+    public boolean isUpdateComplexes() {
+        return updateComplexes;
+    }
+
+    public void setUpdateComplexes(boolean updateComplexes) {
+        this.updateComplexes = updateComplexes;
+    }
+
+    public boolean isUpdateInteractorPool() {
+        return updateInteractorPool;
+    }
+
+    public void setUpdateInteractorPool(boolean updateInteractorPool) {
+        this.updateInteractorPool = updateInteractorPool;
     }
 }

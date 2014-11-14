@@ -21,44 +21,42 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
-import psidev.psi.mi.jami.bridges.uniprot.taxonomy.UniprotTaxonomyFetcher;
-import psidev.psi.mi.jami.model.Organism;
+import psidev.psi.mi.jami.bridges.uniprot.UniprotProteinFetcher;
+import psidev.psi.mi.jami.model.Protein;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 
+import java.util.Collection;
+
 /**
- * TODO comment this
+ * Protein Fetcher.
  *
- * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Component(value = "intactBioSourceFetcher")
+@Component(value = "intactProteinFetcher")
 @Lazy
-public class BioSourceFetcher extends UniprotTaxonomyFetcher{
+public class ProteinFetcher extends UniprotProteinFetcher{
 
-    /**
-     * Sets up a logger for that class.
-     */
-    public static final Log log = LogFactory.getLog(BioSourceFetcher.class);
+    private static final Log log = LogFactory.getLog(ProteinFetcher.class);
 
     @Autowired
     private EnricherContext enricherContext;
 
-    public BioSourceFetcher() {
+    public ProteinFetcher() {
+        super();
     }
 
     @Override
-    public Organism fetchByTaxID(int taxID) throws BridgeFailedException {
+    public Collection<Protein> fetchByIdentifier(String identifier) throws BridgeFailedException {
+        EnricherCache proteinCache = enricherContext.getCacheManager().getCache("Protein");
 
-        EnricherCache bioSourceCache = enricherContext.getCacheManager().getCache("BioSource");
-
-        if (bioSourceCache.isKeyInCache(taxID)) {
-            return (Organism) bioSourceCache.get(taxID);
+        if (proteinCache.isKeyInCache(identifier)) {
+            return (Collection<Protein>) proteinCache.get(identifier);
         }
         else{
-            Organism term = super.fetchByTaxID(taxID);
-            bioSourceCache.put(taxID, term);
-            return term;
+            Collection<Protein> terms = super.fetchByIdentifier(identifier);
+            proteinCache.put(identifier, terms);
+            return terms;
         }
     }
 }

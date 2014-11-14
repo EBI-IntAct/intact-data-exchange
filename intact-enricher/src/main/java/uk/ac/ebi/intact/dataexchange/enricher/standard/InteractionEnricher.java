@@ -17,15 +17,12 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
-import uk.ac.ebi.intact.dataexchange.enricher.EnricherException;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.InteractionUtils;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.model.Interaction;
+import psidev.psi.mi.jami.model.InteractionEvidence;
+import psidev.psi.mi.jami.model.ModelledInteraction;
+import uk.ac.ebi.intact.jami.utils.IntactUtils;
 
 /**
  * TODO comment this
@@ -33,55 +30,30 @@ import uk.ac.ebi.intact.model.util.InteractionUtils;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
-public class InteractionEnricher extends AnnotatedObjectEnricher<Interaction> {
+@Component(value = "intactInteractionEnricher")
+@Lazy
+public class InteractionEnricher<T extends Interaction> extends AbstractInteractionEnricher<T> {
 
     /**
      * Sets up a logger for that class.
      */
     private static final Log log = LogFactory.getLog(InteractionEnricher.class);
 
-    @Autowired
-    private EnricherContext enricherContext;
-
-    @Autowired
-    private CvObjectEnricher cvObjectEnricher;
-
-    @Autowired
-    private ExperimentEnricher experimentEnricher;
-
-    @Autowired
-    private ComponentEnricher componentEnricher;
-
     public InteractionEnricher() {
     }
 
-    public void enrich(Interaction objectToEnrich) {
-        for (Experiment experiment : objectToEnrich.getExperiments()) {
-            experimentEnricher.enrich(experiment);
+    @Override
+    protected String generateAutomaticShortlabel(T objectToEnrich) {
+        if (objectToEnrich instanceof InteractionEvidence){
+            return IntactUtils.generateAutomaticInteractionEvidenceShortlabelFor((InteractionEvidence)objectToEnrich, IntactUtils.MAX_SHORT_LABEL_LEN);
         }
-
-        if (objectToEnrich.getComponents() == null) {
-            throw new EnricherException("Interaction without components: "+objectToEnrich.getShortLabel());
+        else if (objectToEnrich instanceof ModelledInteraction){
+            return IntactUtils.generateAutomaticShortlabelForModelledInteraction((ModelledInteraction)objectToEnrich, IntactUtils.MAX_SHORT_LABEL_LEN);
         }
-
-        for (Component component : objectToEnrich.getComponents()) {
-             componentEnricher.enrich(component);
+        else{
+            return null;
         }
-        
-        if (getEnricherContext().getConfig().isUpdateCvTerms() && objectToEnrich.getCvInteractionType() != null) {
-            cvObjectEnricher.enrich(objectToEnrich.getCvInteractionType());
-        }
-
-        if (enricherContext.getConfig().isUpdateInteractionShortLabels()) {
-            try {
-                String label = InteractionUtils.calculateShortLabel(objectToEnrich);
-                objectToEnrich.setShortLabel(AnnotatedObjectUtils.prepareShortLabel(label));
-            } catch (Exception e) {
-                log.error("Label for interaction could not be calculated: "+objectToEnrich.getShortLabel(), e);
-            }
-        }
-
-        super.enrich(objectToEnrich);
     }
+
+
 }

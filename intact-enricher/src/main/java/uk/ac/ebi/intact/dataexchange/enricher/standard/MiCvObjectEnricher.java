@@ -16,31 +16,30 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import uk.ac.ebi.intact.model.IntactEntry;
-import uk.ac.ebi.intact.model.Interaction;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.enricher.CvTermEnricher;
+import psidev.psi.mi.jami.model.CvTerm;
+import uk.ac.ebi.intact.dataexchange.enricher.fetch.MiCvObjectFetcher;
 
 /**
- * TODO comment this
+ * CvObject enricher.
  *
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
-@Controller
-public class IntactEntryEnricher {
+@Component(value = "miCvObjectEnricher")
+@Lazy
+public class MiCvObjectEnricher extends AbstractCvObjectEnricher<CvTerm> {
 
     @Autowired
-    private InteractionEnricher interactionEnricher;
-
-    public IntactEntryEnricher() {
+    public MiCvObjectEnricher(@Qualifier("miCvObjectFetcher") MiCvObjectFetcher intactCvObjectFetcher) {
+        super(intactCvObjectFetcher);
     }
 
-    public void enrich(IntactEntry objectToEnrich) {
-        for (Interaction interaction : objectToEnrich.getInteractions()) {
-            interactionEnricher.enrich(interaction);
-        }
-    }
-
-    public void close() {
+    @Override
+    protected CvTermEnricher<CvTerm> getCvEnricher() {
+        return this;
     }
 }
