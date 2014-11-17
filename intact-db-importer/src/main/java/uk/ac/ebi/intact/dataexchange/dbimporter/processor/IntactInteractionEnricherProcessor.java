@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.processor;
+package uk.ac.ebi.intact.dataexchange.dbimporter.processor;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;

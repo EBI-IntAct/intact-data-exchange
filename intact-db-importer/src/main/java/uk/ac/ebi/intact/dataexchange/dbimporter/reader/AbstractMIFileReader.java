@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.reader;
+package uk.ac.ebi.intact.dataexchange.dbimporter.reader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

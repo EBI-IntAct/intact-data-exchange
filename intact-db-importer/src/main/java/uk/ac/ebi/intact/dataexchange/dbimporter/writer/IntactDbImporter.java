@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.writer;
+package uk.ac.ebi.intact.dataexchange.dbimporter.writer;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
