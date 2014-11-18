@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange;
+package uk.ac.ebi.intact.dataexchange.structuredabstract.model;
 
 /**
  * A sentence property contains a singular and plural verb, and an optional conjunction

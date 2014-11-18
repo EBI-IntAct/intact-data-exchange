@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange;
+package uk.ac.ebi.intact.dataexchange.structuredabstract.model;
 
 /**
  * The output type of the structured abstract

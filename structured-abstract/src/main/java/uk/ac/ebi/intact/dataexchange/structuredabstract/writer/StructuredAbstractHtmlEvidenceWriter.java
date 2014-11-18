@@ -1,6 +1,7 @@
-package uk.ac.ebi.intact.dataexchange;
+package uk.ac.ebi.intact.dataexchange.structuredabstract.writer;
 
-import uk.ac.ebi.intact.model.Xref;
+import psidev.psi.mi.jami.model.Xref;
+import uk.ac.ebi.intact.dataexchange.structuredabstract.utils.XrefLinkUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,25 +9,25 @@ import java.io.OutputStream;
 import java.io.Writer;
 
 /**
- * HTML writer of Structured abstract
+ * HTML writer of Structured abstract for interaction evidence
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>16/07/13</pre>
  */
 
-public class StructuredAbstractHtmlWriter extends AbstractStructuredAbstractWriter{
+public class StructuredAbstractHtmlEvidenceWriter extends AbstractStructuredAbstractEvidenceWriter{
 
 
-    public StructuredAbstractHtmlWriter(Writer writer) {
+    public StructuredAbstractHtmlEvidenceWriter(Writer writer) {
         super(writer);
     }
 
-    public StructuredAbstractHtmlWriter(OutputStream stream) {
+    public StructuredAbstractHtmlEvidenceWriter(OutputStream stream) {
         super(stream);
     }
 
-    public StructuredAbstractHtmlWriter(File file) throws IOException {
+    public StructuredAbstractHtmlEvidenceWriter(File file) throws IOException {
         super(file);
     }
 

@@ -1,9 +1,8 @@
-package uk.ac.ebi.intact.dataexchange;
+package uk.ac.ebi.intact.dataexchange.structuredabstract.utils;
 
-import uk.ac.ebi.intact.model.Annotation;
-import uk.ac.ebi.intact.model.Xref;
+import psidev.psi.mi.jami.model.Annotation;
+import psidev.psi.mi.jami.model.Xref;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,12 +44,12 @@ public class XrefLinkUtils {
         if (ac == null && xref == null){
             return null;
         }
-        else if (xref == null || (xref != null && xref.getPrimaryId() == null)){
+        else if (xref == null){
             return ourEmptyPidLink+ac;
         }
 
         // The short label of the database of the xref.
-        String dbname = xref.getCvDatabase().getShortLabel();
+        String dbname = xref.getDatabase().getShortName();
 
         // Set it to the value from the cache.
         String searchUrl = cvTermsUrlsCache.get(dbname);
@@ -60,15 +59,12 @@ public class XrefLinkUtils {
             // Not in the cache; create it and store in the cache.
 
             // Loop through annotations looking for search-url.
-            Collection<Annotation> annots = xref.getCvDatabase()
-                    .getAnnotations();
-            for (Annotation annot : annots) {
-                if (annot.getCvTopic() != null && annot.getCvTopic().getShortLabel().equalsIgnoreCase("search-url")) {
-                    // save searchUrl for future use
-                    searchUrl = annot.getAnnotationText();
-                    break;
-                }
+            Annotation searchUrlAnnot = psidev.psi.mi.jami.utils.AnnotationUtils.collectFirstAnnotationWithTopic(xref.
+                    getDatabase().getAnnotations(), Annotation.SEARCH_URL_MI, Annotation.SEARCH_URL);
+            if (searchUrlAnnot != null){
+                searchUrl = searchUrlAnnot.getValue();
             }
+
             if (searchUrl == null && ac != null) {
                 // The db has no annotation "search-url". Don't search again in
                 // the future.
@@ -81,7 +77,7 @@ public class XrefLinkUtils {
             cvTermsUrlsCache.put(dbname, searchUrl);
         }
         // Match against the spaces.
-        Matcher pidmatch = ourPrimaryIDPat.matcher(xref.getPrimaryId());
+        Matcher pidmatch = ourPrimaryIDPat.matcher(xref.getId());
 
         // The primary id after replacing spaces with %20 characters.
         String pid = pidmatch.replaceAll("%20");

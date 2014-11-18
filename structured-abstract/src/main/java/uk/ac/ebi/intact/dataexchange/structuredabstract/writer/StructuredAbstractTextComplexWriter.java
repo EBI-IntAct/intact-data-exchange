@@ -1,6 +1,6 @@
-package uk.ac.ebi.intact.dataexchange;
+package uk.ac.ebi.intact.dataexchange.structuredabstract.writer;
 
-import uk.ac.ebi.intact.model.Xref;
+import psidev.psi.mi.jami.model.Xref;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,23 +8,23 @@ import java.io.OutputStream;
 import java.io.Writer;
 
 /**
- * Text writer of the structured abstract
+ * Text writer of the structured abstract  for biological complex
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>16/07/13</pre>
  */
 
-public class StructuredAbstractTextWriter extends AbstractStructuredAbstractWriter{
-    public StructuredAbstractTextWriter(Writer writer) {
+public class StructuredAbstractTextComplexWriter extends AbstractStructuredAbstractComplexWriter{
+    public StructuredAbstractTextComplexWriter(Writer writer) {
         super(writer);
     }
 
-    public StructuredAbstractTextWriter(OutputStream stream) {
+    public StructuredAbstractTextComplexWriter(OutputStream stream) {
         super(stream);
     }
 
-    public StructuredAbstractTextWriter(File file) throws IOException {
+    public StructuredAbstractTextComplexWriter(File file) throws IOException {
         super(file);
     }
 

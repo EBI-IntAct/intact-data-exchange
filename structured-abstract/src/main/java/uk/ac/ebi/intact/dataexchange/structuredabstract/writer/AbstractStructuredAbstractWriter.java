@@ -1,8 +1,16 @@
-package uk.ac.ebi.intact.dataexchange;
+package uk.ac.ebi.intact.dataexchange.structuredabstract.writer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.model.*;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Interaction;
+import psidev.psi.mi.jami.model.Participant;
+import psidev.psi.mi.jami.model.Xref;
+import uk.ac.ebi.intact.dataexchange.structuredabstract.model.Sentence;
+import uk.ac.ebi.intact.dataexchange.structuredabstract.model.SentenceProperty;
+import uk.ac.ebi.intact.dataexchange.structuredabstract.model.SimpleInteractor;
+import uk.ac.ebi.intact.jami.model.IntactPrimaryObject;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractor;
 
 import java.io.*;
 import java.util.*;
@@ -15,7 +23,7 @@ import java.util.*;
  * @since <pre>15/07/13</pre>
  */
 
-public abstract class AbstractStructuredAbstractWriter {
+public abstract class AbstractStructuredAbstractWriter<I extends Interaction> {
     private static final Log log = LogFactory.getLog(AbstractStructuredAbstractWriter.class);
 
     /**
@@ -62,6 +70,10 @@ public abstract class AbstractStructuredAbstractWriter {
      * IntAct link to interaction details
      */
     public static final String INTACT_LINK = "http://www.ebi.ac.uk/intact/interaction/";
+    /**
+     * IntAct link to complex details
+     */
+    public static final String COMPLEX_LINK = "http://www.ebi.ac.uk/intact/complex/details";
 
     /**
      * The stringBuilder used to build strings
@@ -144,32 +156,6 @@ public abstract class AbstractStructuredAbstractWriter {
         this.sentencesPropertiesPath = sentencesPropertiesPath;
     }
 
-    /**
-     * Write structured abstract for publication
-     * @param publication
-     * @throws IOException
-     */
-    public void writeStructuredAbstract(Publication publication) throws IOException {
-        if (publication == null){
-            throw new IllegalArgumentException("The publication cannot be null");
-        }
-
-        // clear
-        clear();
-
-        //get all experiments
-        Collection<Experiment> experiments = publication.getExperiments();
-        for (Experiment exp : experiments) {
-            // read and collect abstract for each interaction
-            for (Interaction in : exp.getInteractions()) {
-                collectStructuredAbstractFrom(in);
-            }
-        }
-
-        // write all collected sentences
-        writeSentences();
-    }
-
     protected void writeSentences() throws IOException {
         Iterator<Sentence> sentenceIterator = this.sentenceMap.values().iterator();
         while (sentenceIterator.hasNext()) {
@@ -182,34 +168,13 @@ public abstract class AbstractStructuredAbstractWriter {
 
     protected abstract void writeLineSeparator() throws IOException;
 
-    /**
-     * Write structured abstract for experiment
-     * @param experiment
-     * @throws IOException
-     */
-    public void writeStructuredAbstract(Experiment experiment) throws IOException {
-        if (experiment == null){
-            throw new IllegalArgumentException("The experiment cannot be null");
-        }
-
-        // clear
-        clear();
-
-        // read and collect abstract for each interaction
-        for (Interaction in : experiment.getInteractions()) {
-            collectStructuredAbstractFrom(in);
-        }
-
-        // write all collected sentences
-        writeSentences();
-    }
 
     /**
      * Write structured abstract for interaction
      * @param interaction
      * @throws IOException
      */
-    public void writeStructuredAbstract(Interaction interaction) throws IOException {
+    public void writeStructuredAbstract(I interaction) throws IOException {
         if (interaction == null){
             throw new IllegalArgumentException("The publication cannot be null");
         }
@@ -224,7 +189,7 @@ public abstract class AbstractStructuredAbstractWriter {
         writeSentences();
     }
 
-    protected void collectStructuredAbstractFrom(Interaction interaction){
+    protected void collectStructuredAbstractFrom(I interaction){
 
         // build a key
         buildInteractionkey(interaction);
@@ -237,28 +202,21 @@ public abstract class AbstractStructuredAbstractWriter {
             sentence = this.sentenceMap.get(key);
         }
         // 2. else create it and put it in HashMap
-        else if (interaction.getCvInteractionType() != null
-                && !interaction.getExperiments().isEmpty()
-                && interaction.getExperiments().iterator().next().getCvInteraction() != null){
-            sentence = new Sentence(interaction.getCvInteractionType(), interaction.getExperiments().iterator().next().getCvInteraction());
+        else if (interaction.getInteractionType() != null){
+            sentence = new Sentence(interaction.getInteractionType(), extractInteractionDetectionMethodFrom(interaction));
 
-            if (interaction.getExperiments().size() > 1) {
-                log.warn("more than one experiment associated to interaction "+ interaction.getAc());}
-
-            for (Component component : interaction.getComponents()) {
-
-                if (targetMi.contains(component.getCvBiologicalRole()
-                        .getIdentifier())) {
+            for (Object obj : interaction.getParticipants()) {
+                Participant component = (Participant)obj;
+                if (targetMi.contains(component.getBiologicalRole()
+                        .getMIIdentifier())) {
                     sentence.addInteractorObject(component);
                 } else if (enzymeMi.contains(component
-                        .getCvBiologicalRole().getIdentifier())) {
+                        .getBiologicalRole().getMIIdentifier())) {
                     sentence.addInteractorSubject(component);
                 }
-                else if (false == component.getExperimentalRoles().isEmpty() && preyMi.contains(component.getExperimentalRoles().iterator().next()
-                        .getIdentifier())) {
+                else if (isParticipantPrey(component)) {
                     sentence.addInteractorObject(component);
-                } else if (false == component.getExperimentalRoles().isEmpty() && baitMi.contains(component.getExperimentalRoles().iterator().next()
-                        .getIdentifier())) {
+                } else if (isParticipantBait(component)) {
                     sentence.addInteractorSubject(component);
                 } else
                 {
@@ -272,16 +230,24 @@ public abstract class AbstractStructuredAbstractWriter {
             throw new IllegalArgumentException("The interaction must hav a non null interaction type and a non null interaction detection method");
         }
         // add interactionAc to sentence
-        sentence.addInteractionAc(interaction.getAc());
+        sentence.addInteractionAc(interaction instanceof IntactPrimaryObject ? ((IntactPrimaryObject)interaction).getAc() : interaction.getShortName());
     }
 
-    protected void buildInteractionkey(Interaction interaction) {
+    protected abstract boolean isParticipantBait(Participant component);
+
+    protected abstract boolean isParticipantPrey(Participant component);
+
+    protected abstract CvTerm extractInteractionDetectionMethodFrom(I interaction);
+
+    protected void buildInteractionkey(I interaction) {
         this.stringBuilder.setLength(0);
         this.interactorAcs.clear();
 
         // read ordered set of interactor acs
-        for (Component component : interaction.getComponents()) {
-            interactorAcs.add(component.getInteractor().getAc());
+        for (Object obj : interaction.getParticipants()) {
+            Participant component = (Participant)obj;
+            interactorAcs.add(component.getInteractor() instanceof IntactInteractor ?
+                    ((IntactInteractor) component.getInteractor()).getAc() : component.getInteractor().getShortName());
         }
 
         for (String prL : interactorAcs) {
@@ -290,12 +256,13 @@ public abstract class AbstractStructuredAbstractWriter {
         }
 
         // interaction type
-        stringBuilder.append(interaction.getCvInteractionType().getIdentifier());
+        stringBuilder.append(interaction.getInteractionType().getMIIdentifier());
 
         // experiment
-        if (!interaction.getExperiments().isEmpty()) {
+        CvTerm method = extractInteractionDetectionMethodFrom(interaction);
+        if (method != null) {
             stringBuilder.append("    ");
-            stringBuilder.append(interaction.getExperiments().iterator().next().getCvInteraction().getIdentifier());
+            stringBuilder.append(method.getMIIdentifier());
         }
     }
 
@@ -331,7 +298,8 @@ public abstract class AbstractStructuredAbstractWriter {
         this.writer.write(" by ");
 
         // write interaction detection method
-        writeMIOutput(sentence.getDetMethod().getIdentifier(), sentence.getDetMethod().getFullName() != null ? sentence.getDetMethod().getFullName() : sentence.getDetMethod().getShortLabel());
+        writeMIOutput(sentence.getDetMethod().getMIIdentifier(), sentence.getDetMethod().getFullName() != null ?
+                sentence.getDetMethod().getFullName() : sentence.getDetMethod().getShortName());
 
         // mintAcs linking as view interaction
         this.writer.write(" (");
@@ -491,33 +459,33 @@ public abstract class AbstractStructuredAbstractWriter {
 
     protected void initialiseTargets(){
         targetMi = new HashSet<String>(3);
-        targetMi.add(CvBiologicalRole.ENZYME_TARGET_PSI_REF);
-        targetMi.add(CvBiologicalRole.ELECTRON_ACCEPTOR_MI_REF);
-        targetMi.add(CvBiologicalRole.FLUROPHORE_ACCEPTOR_MI_REF);
+        targetMi.add(Participant.ENZYME_TARGET_ROLE_MI);
+        targetMi.add(Participant.ELECTRON_ACCEPTOR_ROLE_MI);
+        targetMi.add(Participant.FLUORESCENCE_ACCEPTOR_ROLE_MI);
     }
     protected void initialiseEnzymes() {
         enzymeMi = new HashSet<String>(3);
-        enzymeMi.add(CvBiologicalRole.ENZYME_PSI_REF);
-        enzymeMi.add(CvBiologicalRole.ELECTRON_DONOR_MI_REF);
-        enzymeMi.add(CvBiologicalRole.FLUROPHORE_DONOR_MI_REF);
+        enzymeMi.add(Participant.ENZYME_ROLE_MI);
+        enzymeMi.add(Participant.ELECTRON_DONOR_ROLE_MI);
+        enzymeMi.add(Participant.FLUORESCENCE_DONOR_ROLE_MI);
     }
 
     protected void initialiseBaits() {
         baitMi = new HashSet<String>(5);
-        baitMi.add(CvExperimentalRole.BAIT_PSI_REF);
-        baitMi.add(CvExperimentalRole.INHIBITED_PSI_REF);
-        baitMi.add(CvExperimentalRole.ELECTRON_ACCEPTOR_MI_REF);
-        baitMi.add(CvExperimentalRole.FLUROPHORE_ACCEPTOR_MI_REF);
-        baitMi.add(CvExperimentalRole.ENZYME_TARGET_PSI_REF);
+        baitMi.add(Participant.BAIT_ROLE_MI);
+        baitMi.add(Participant.INHIBITED_MI);
+        baitMi.add(Participant.ELECTRON_ACCEPTOR_ROLE_MI);
+        baitMi.add(Participant.FLUORESCENCE_ACCEPTOR_ROLE_MI);
+        baitMi.add(Participant.ENZYME_TARGET_ROLE_MI);
     }
 
     protected void initialisePreys() {
         preyMi = new HashSet<String>(5);
-        preyMi.add(CvExperimentalRole.PREY_PSI_REF);
-        preyMi.add(CvExperimentalRole.INHIBITOR_PSI_REF);
-        preyMi.add(CvExperimentalRole.ELECTRON_DONOR_MI_REF);
-        preyMi.add(CvExperimentalRole.FLUROPHORE_DONOR_MI_REF);
-        preyMi.add(CvExperimentalRole.ENZYME_PSI_REF);
+        preyMi.add(Participant.PREY_MI);
+        preyMi.add(Participant.INHIBITOR_MI);
+        preyMi.add(Participant.ELECTRON_DONOR_ROLE_MI);
+        preyMi.add(Participant.FLUORESCENCE_DONOR_ROLE_MI);
+        preyMi.add(Participant.ENZYME_ROLE_MI);
     }
 
     protected StringBuilder getStringBuilder() {
@@ -530,5 +498,25 @@ public abstract class AbstractStructuredAbstractWriter {
 
     protected Map<String, String> getCvTermUrls() {
         return cvTermUrls;
+    }
+
+    protected Set<String> getTargetMi() {
+        return targetMi;
+    }
+
+    protected Set<String> getEnzymeMi() {
+        return enzymeMi;
+    }
+
+    protected Set<String> getBaitMi() {
+        return baitMi;
+    }
+
+    protected Set<String> getPreyMi() {
+        return preyMi;
+    }
+
+    protected Map<Integer, Sentence> getSentenceMap() {
+        return sentenceMap;
     }
 }

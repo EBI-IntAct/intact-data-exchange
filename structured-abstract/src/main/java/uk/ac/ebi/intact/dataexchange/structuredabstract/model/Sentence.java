@@ -1,8 +1,7 @@
-package uk.ac.ebi.intact.dataexchange;
+package uk.ac.ebi.intact.dataexchange.structuredabstract.model;
 
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.CvInteraction;
-import uk.ac.ebi.intact.model.CvInteractionType;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Participant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,28 +19,28 @@ public class Sentence {
     private List<SimpleInteractor> interactorsObject;
     private List<SimpleInteractor> interactorsSubject;
     private String interactionTypeMI;
-    private CvInteraction detMethod;
+    private CvTerm detMethod;
     private List<String> interactionAcs;
 
-    public Sentence(CvInteractionType interactionType, CvInteraction detMethod){
-        if (interactionType == null || interactionType.getIdentifier() == null){
+    public Sentence(CvTerm interactionType, CvTerm detMethod){
+        if (interactionType == null || interactionType.getMIIdentifier() == null){
             throw new IllegalArgumentException("The interaction type cannot be null and must have a valid identifier.");
         }
-        if (detMethod == null || detMethod.getIdentifier() == null){
+        if (detMethod == null || detMethod.getMIIdentifier() == null){
             throw new IllegalArgumentException("The interaction detection method cannot be null and must have a valid identifier.");
         }
         interactorsObject = new ArrayList<SimpleInteractor>();
         interactorsSubject = new ArrayList<SimpleInteractor>();
         interactionAcs = new ArrayList<String>();
-        this.interactionTypeMI = interactionType.getIdentifier();
+        this.interactionTypeMI = interactionType.getMIIdentifier();
         this.detMethod = detMethod;
     }
 
-    public void addInteractorObject(Component participant) {
+    public void addInteractorObject(Participant participant) {
         interactorsObject.add(new SimpleInteractor(participant));
     }
 
-    public void addInteractorSubject(Component participant) {
+    public void addInteractorSubject(Participant participant) {
         interactorsSubject.add(new SimpleInteractor(participant));
     }
 
@@ -65,7 +64,7 @@ public class Sentence {
         return interactionTypeMI;
     }
 
-    public CvInteraction getDetMethod() {
+    public CvTerm getDetMethod() {
         return detMethod;
     }
 }
