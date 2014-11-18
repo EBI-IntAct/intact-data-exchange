@@ -7,9 +7,8 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import psidev.psi.mi.jami.datasource.FileSourceContext;
-import psidev.psi.mi.jami.enricher.InteractionEnricher;
+import psidev.psi.mi.jami.enricher.MIEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
-import psidev.psi.mi.jami.model.Interaction;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -17,22 +16,22 @@ import java.io.IOException;
 import java.io.Writer;
 
 /**
- * Spring batch processor that enriches the interactions
+ * Spring batch processor that enriches for IntAct
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>23/07/13</pre>
  */
 
-public class IntactInteractionEnricherProcessor<I extends Interaction> implements ItemProcessor<I, I>, ItemStream{
+public class IntactEnricherProcessor<I> implements ItemProcessor<I, I>, ItemStream{
 
     private Resource errorResource;
     private Writer errorWriter;
-    private InteractionEnricher<I> interactionEnricher;
+    private MIEnricher<I> enricher;
 
     public I process(I item) throws Exception {
-        if (this.interactionEnricher == null){
-            throw new IllegalStateException("The InteractionEnricherProcessor needs a non null InteractionEnricher.");
+        if (this.enricher == null){
+            throw new IllegalStateException("The IntactEnricherProcessor needs a non null MIEnricher.");
         }
         if (item == null){
             return null;
@@ -40,7 +39,7 @@ public class IntactInteractionEnricherProcessor<I extends Interaction> implement
 
         // enrich interaction
         try{
-            interactionEnricher.enrich(item);
+            enricher.enrich(item);
         }
         catch (EnricherException e){
             String source = item.toString();
@@ -50,14 +49,14 @@ public class IntactInteractionEnricherProcessor<I extends Interaction> implement
                     source = context.getSourceLocator().toString();
                 }
             }
-            errorWriter.write("Cannot enrich interaction " + source);
+            errorWriter.write("Cannot enrich object " + source);
         }
 
         return item;
     }
 
-    public void setInteractionEnricher(InteractionEnricher interactionEnricher) {
-        this.interactionEnricher = interactionEnricher;
+    public void setEnricher(MIEnricher<I> enricher) {
+        this.enricher = enricher;
     }
 
     public Resource getErrorResource() {
@@ -73,6 +72,10 @@ public class IntactInteractionEnricherProcessor<I extends Interaction> implement
 
         if (errorResource == null){
             throw new IllegalStateException("Error resource must be provided. ");
+        }
+
+        if (enricher == null){
+            throw new IllegalStateException("MI enricher must be provided. ");
         }
 
         File fileToRead = null;
