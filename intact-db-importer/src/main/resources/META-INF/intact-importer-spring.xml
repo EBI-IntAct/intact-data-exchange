@@ -11,162 +11,190 @@
 
     <context:component-scan base-package="uk.ac.ebi.intact.dataexchange.dbimporter" />
     <context:component-scan base-package="uk.ac.ebi.intact.dataexchange.enricher" />
+    <context:component-scan base-package="uk.ac.ebi.intact.jami" />
+
 
     <import resource="classpath*:/META-INF/psimi-batch-spring.xml"/>
     <import resource="classpath*:/META-INF/intact-jami-spring.xml"/>
-    <import resource="classpath*:/META-INF/intact-enricher-spring.xml"/>
 
-    <!-- reader -->
+    <!-- intact enricher config -->
+    <bean id="enricherConfig" class="uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig"/>
+
+    <bean id="enricherContext" class="uk.ac.ebi.intact.dataexchange.enricher.EnricherContext">
+        <constructor-arg ref="enricherConfig"/>
+    </bean>
+
+    <bean id="enricherCacheManager" class="uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCacheManager"/>
+
+    <!-- readers -->
     <bean id="miFileResource" class="org.springframework.core.io.FileSystemResource">
         <constructor-arg value="${mi.file}"/>
     </bean>
     <bean id="errorResource" class="org.springframework.core.io.FileSystemResource">
         <constructor-arg value="${error.file}"/>
     </bean>
-    <bean id="interactionEvidenceReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.InteractionEvidenceFileReader">
+    <bean id="interactionEvidenceReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.InteractionEvidenceFileReader" lazy-init="true">
         <property name="resource" ref="miFileResource"/>
     </bean>
-    <bean id="complexReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.ComplexFileReader">
+    <bean id="complexReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.ComplexFileReader" lazy-init="true">
+        <property name="resource" ref="miFileResource"/>
+    </bean>
+    <bean id="modelledInteractionReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.ModelledInteractionFileReader" lazy-init="true">
+        <property name="resource" ref="miFileResource"/>
+    </bean>
+    <bean id="interactionReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.InteractionFileReader" lazy-init="true">
         <property name="resource" ref="miFileResource"/>
     </bean>
 
-    <!-- tasklet -->
-    <bean id="closingListenersTasklet" class="psidev.psi.mi.enricher.batch.tasklet.ClosingListenersTasklet">
-        <property name="statisticsWriters">
-            <list>
-                <ref bean="cvTermListener"/>
-                <ref bean="sourceListener"/>
-                <ref bean="organismListener"/>
-                <ref bean="proteinListener"/>
-                <ref bean="polymerListener"/>
-                <ref bean="interactorPoolListener"/>
-                <ref bean="complexListener"/>
-                <ref bean="geneListener"/>
-                <ref bean="bioactiveEntityListener"/>
-                <ref bean="interactorListener"/>
-                <ref bean="featureListener"/>
-                <ref bean="participantListener"/>
-                <ref bean="interactionListener"/>
-                <ref bean="experimentListener"/>
-                <ref bean="publicationListener"/>
-            </list>
-        </property>
-        <property name="mapperStatisticsWriter" ref="proteinMapperListener"/>
+    <!-- processors -->
+    <bean id="interactionEvidenceProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
+          lazy-init="true">
+        <property name="errorResource" ref="errorResource"/>
+        <property name="enricher" ref="intactInteractionEvidenceEnricher"/>
+    </bean>
+    <bean id="complexProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
+          lazy-init="true">
+        <property name="errorResource" ref="errorResource"/>
+        <property name="enricher" ref="intactComplexEnricher"/>
+    </bean>
+    <bean id="modelledInteractionProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
+          lazy-init="true">
+        <property name="errorResource" ref="errorResource"/>
+        <property name="enricher" ref="intactModelledInteractionEnricher"/>
+    </bean>
+    <bean id="interactionProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
+          lazy-init="true">
+        <property name="errorResource" ref="errorResource"/>
+        <property name="enricher" ref="intactInteractionEnricher"/>
+    </bean>
+    <bean id="interactionMixProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactInteractionEnricherCompositeProcessor" lazy-init="true">
+        <property name="interactionEvidenceProcessor" ref="interactionEvidenceProcessor"/>
+        <property name="modelledInteractionProcessor" ref="modelledInteractionProcessor"/>
+        <property name="complexProcessor" ref="complexProcessor"/>
+        <property name="interactionProcessor" ref="interactionProcessor"/>
     </bean>
 
-    <!-- listeners -->
-    <bean id="cvTermListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.CvTermEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${cvTerm.logFile}"/>
+    <!-- writers -->
+    <bean id="interactionEvidenceImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactDbImporter"
+          lazy-init="true">
+        <property name="intactService" ref="interactionEvidenceService"/>
     </bean>
-
-    <bean id="sourceListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.SourceEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${source.logFile}"/>
+    <bean id="complexImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactDbImporter"
+          lazy-init="true">
+        <property name="intactService" ref="complexService"/>
     </bean>
-
-    <bean id="organismListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.OrganismEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${organism.logFile}"/>
+    <bean id="modelledInteractionImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactDbImporter"
+          lazy-init="true">
+        <property name="intactService" ref="modelledInteractionService"/>
     </bean>
+    <bean id="interactionMixImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactInteractionMixDbImporter" lazy-init="true"/>
 
-    <bean id="proteinListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.ProteinEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${protein.logFile}"/>
-    </bean>
+    <!-- Basic Step configuration -->
 
-    <bean id="polymerListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.PolymerEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${polymer.logFile}"/>
-    </bean>
+    <!-- Enricher Steps -->
+    <batch:step id="interactionEvidenceEnricherStep" parent="basicBatchStep">
+        <batch:tasklet transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
 
-    <bean id="interactorPoolListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.InteractorPoolEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${interactorpool.logFile}"/>
-    </bean>
+            <batch:chunk reader="interactionEvidenceReader"
+                         processor="interactionEvidenceProcessor"
+                         writer="interactionEvidenceImporter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="interactionEvidenceReader"/>
+                    <batch:stream ref="interactionEvidenceProcessor"/>
+                    <batch:stream ref="interactionEvidenceImporter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <batch:step id="modelledInteractionEnricherStep" parent="basicBatchStep">
+        <batch:tasklet transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
 
-    <bean id="complexListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.ComplexEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${complex.logFile}"/>
-    </bean>
+            <batch:chunk reader="modelledInteractionReader"
+                         processor="modelledInteractionProcessor"
+                         writer="modelledInteractionImporter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="modelledInteractionReader"/>
+                    <batch:stream ref="modelledInteractionProcessor"/>
+                    <batch:stream ref="modelledInteractionImporter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <batch:step id="complexEnricherStep" parent="basicBatchStep">
+        <batch:tasklet transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
 
-    <bean id="proteinMapperListener" class="psidev.psi.mi.jami.bridges.mapper.listener.ProteinMappingStatisticsWriter">
-        <constructor-arg value="${remap.logFile}"/>
-    </bean>
+            <batch:chunk reader="complexReader"
+                         processor="complexProcessor"
+                         writer="complexImporter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="complexReader"/>
+                    <batch:stream ref="complexProcessor"/>
+                    <batch:stream ref="complexImporter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <batch:step id="interactionEnricherStep" parent="basicBatchStep">
+        <batch:tasklet transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
 
-    <bean id="bioactiveEntityListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.BioactiveEntityEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${bioactiveentity.logFile}"/>
-    </bean>
+            <batch:chunk reader="interactionReader"
+                         processor="interactionMixProcessor"
+                         writer="interactionMixImporter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="interactionReader"/>
+                    <batch:stream ref="interactionMixImporter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
 
-    <bean id="geneListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.GeneEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${gene.logFile}"/>
-    </bean>
+    <!-- enricher job -->
+    <batch:job id="interactionEvidenceImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
 
-    <bean id="interactorListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.InteractorEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${interactor.logFile}"/>
-    </bean>
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
 
-    <bean id="featureListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.FeatureEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${feature.logFile}"/>
-    </bean>
+        <batch:step id="enrichEvidenceStep" parent="interactionEvidenceEnricherStep"/>
+    </batch:job>
+    <batch:job id="modelledInteractionImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
 
-    <bean id="featureEvidenceListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.FeatureEvidenceEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${featureEvidence.logFile}"/>
-    </bean>
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
 
-    <bean id="entityListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.EntityEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${entity.logFile}"/>
-    </bean>
+        <batch:step id="modelledEvidenceStep" parent="modelledEvidenceStep"/>
+    </batch:job>
+    <batch:job id="complexImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
 
-    <bean id="participantListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.ParticipantEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${participant.logFile}"/>
-    </bean>
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
 
-    <bean id="participantEvidenceListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.ParticipantEvidenceEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${participantEvidence.logFile}"/>
-    </bean>
+        <batch:step id="complexStep" parent="complexEnricherStep"/>
+    </batch:job>
+    <batch:job id="interactionMixImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
 
-    <bean id="participantPoolListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.ParticipantPoolEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${participantpool.logFile}"/>
-    </bean>
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
 
-    <bean id="experimentalParticipantPoolListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.ExperimentalParticipantPoolEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${participantEvidencepool.logFile}"/>
-    </bean>
-
-    <bean id="interactionListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.InteractionEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${interaction.logFile}"/>
-    </bean>
-
-    <bean id="interactionEvidenceListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.InteractionEvidenceEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${interactionEvidence.logFile}"/>
-    </bean>
-
-    <bean id="modelledInteractionListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.ModelledInteractionEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${modelledInteraction.logFile}"/>
-    </bean>
-
-    <bean id="experimentListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.ExperimentEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${experiment.logFile}"/>
-    </bean>
-
-    <bean id="publicationListener" class="psidev.psi.mi.jami.enricher.listener.impl.writer.PublicationEnricherStatisticsWriter">
-        <constructor-arg index="0" value="${publication.logFile}"/>
-    </bean>
-
-    <!-- remapper -->
-    <bean id="proteinMapper" class="psidev.psi.mi.jami.bridges.uniprot.mapping.CachedUniprotProteinMapper">
-        <property name="checkingEnabled" value="true"/>
-        <property name="priorityIdentifiers" value="false"/>
-        <property name="prioritySequence" value="true"/>
-        <property name="listener" ref="proteinMapperListener"/>
-    </bean>
-
-    <!-- fetchers -->
-    <bean id="cvTermFetcher" class="psidev.psi.mi.jami.bridges.ols.CachedOlsCvTermFetcher"/>
-    <bean id="sourceFetcher" class="psidev.psi.mi.jami.bridges.ols.OlsSourceFetcher"/>
-    <bean id="proteinFetcher" class="psidev.psi.mi.jami.bridges.uniprot.CachedUniprotProteinFetcher"/>
-    <bean id="bioactiveEntityFetcher" class="psidev.psi.mi.jami.bridges.chebi.CachedChebiFetcher"/>
-    <bean id="geneFetcher" class="psidev.psi.mi.jami.bridges.uniprot.CachedUniprotGeneFetcher"/>
-    <bean id="publicationFetcher" class="psidev.psi.mi.jami.bridges.europubmedcentral.CachedEuroPubmedCentralFetcher"/>
-    <bean id="organismFetcher" class="psidev.psi.mi.jami.bridges.uniprot.taxonomy.CachedUniprotTaxonomyFetcher"/>
-    <bean id="mockOrganismFetcher" class="psidev.psi.mi.jami.bridges.fetcher.mock.MockOrganismFetcher"/>
-
-    <!-- interaction writer -->
-    <bean id="miFileOutput" class="org.springframework.core.io.FileSystemResource">
-        <constructor-arg value="${mi.output}"/>
-    </bean>
+        <batch:step id="interactionMixStep" parent="interactionEnricherStep"/>
+    </batch:job>
 </beans>
