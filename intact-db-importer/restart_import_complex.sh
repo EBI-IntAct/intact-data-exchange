@@ -10,7 +10,8 @@ then
       echo "User: ${USER_ID}"
       echo "Job id: ${JOBID}"
       echo "Profile: ${PROFILE}"
-      mvn -U install -restart-import,${PROFILE} -Dmi.file=${INPUT_FILE} -Djami.user.context.id=${USER_ID} -Djob.name=complexImport -Djob.id=${JOBID} -Dmaven.test.skip
+      mvn -U install -restart-import,${PROFILE} -Dmi.file=${INPUT_FILE} -Djami.user.context.id=${USER_ID} -Djob.name=complexImport -Djob.id=${JOBID}
+      -Derror.file=import_errors.log -Dmaven.test.skip
 else
       echo ""
       echo "ERROR: wrong number of parameters ($#)."

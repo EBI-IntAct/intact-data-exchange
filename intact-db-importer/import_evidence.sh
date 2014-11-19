@@ -8,7 +8,8 @@ then
       echo "Input file: ${INPUT_FILE}"
       echo "User: ${USER_ID}"
       echo "Profile: ${PROFILE}"
-      mvn -U clean install -Pimport,${PROFILE} -Dmi.file=${INPUT_FILE} -Djami.user.context.id=${USER_ID} -Djob.name=interactionEvidenceImport -Dmaven.test.skip
+      mvn -U clean install -Pimport,${PROFILE} -Dmi.file=${INPUT_FILE} -Djami.user.context.id=${USER_ID} -Djob.name=interactionEvidenceImport
+      -Derror.file=import_errors.log -Dmaven.test.skip
 else
       echo ""
       echo "ERROR: wrong number of parameters ($#)."
