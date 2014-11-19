@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.psimi.xml;
+package uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements;
 
 import psidev.psi.mi.jami.model.*;
 import psidev.psi.mi.jami.xml.PsiXmlType;

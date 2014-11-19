@@ -5,7 +5,7 @@ import psidev.psi.mi.jami.xml.PsiXmlType;
 import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
 import psidev.psi.mi.jami.xml.io.writer.compact.CompactXmlEvidenceWriter;
 import psidev.psi.mi.jami.xml.io.writer.elements.*;
-import uk.ac.ebi.intact.dataexchange.psimi.xml.IntactPsiXmlElementWriterFactory;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.IntactPsiXmlElementWriterFactory;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
