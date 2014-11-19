@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.structuredabstract.model;
+package uk.ac.ebi.intact.dataexchange.structuredabstract;
 
 /**
  * The output type of the structured abstract
@@ -10,5 +10,5 @@ package uk.ac.ebi.intact.dataexchange.structuredabstract.model;
 
 public enum AbstractOutputType {
 
-    TXT_OUTPUT, HTML_OUTPUT, INTACT_HTML_OUTPUT
+    ABSTRACT_TXT_OUTPUT, ABSTRACT_HTML_OUTPUT
 }

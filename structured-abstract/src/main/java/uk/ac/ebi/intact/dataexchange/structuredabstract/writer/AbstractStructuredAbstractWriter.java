@@ -2,6 +2,9 @@ package uk.ac.ebi.intact.dataexchange.structuredabstract.writer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.jami.datasource.InteractionWriter;
+import psidev.psi.mi.jami.exception.MIIOException;
+import psidev.psi.mi.jami.factory.options.InteractionWriterOptions;
 import psidev.psi.mi.jami.model.CvTerm;
 import psidev.psi.mi.jami.model.Interaction;
 import psidev.psi.mi.jami.model.Participant;
@@ -23,7 +26,7 @@ import java.util.*;
  * @since <pre>15/07/13</pre>
  */
 
-public abstract class AbstractStructuredAbstractWriter<I extends Interaction> {
+public abstract class AbstractStructuredAbstractWriter<I extends Interaction> implements InteractionWriter<I>{
     private static final Log log = LogFactory.getLog(AbstractStructuredAbstractWriter.class);
 
     /**
@@ -86,61 +89,226 @@ public abstract class AbstractStructuredAbstractWriter<I extends Interaction> {
     private TreeSet<String> interactorAcs;
 
     private Map<String, String> cvTermUrls;
+    private boolean isInitialised = false;
 
-    public AbstractStructuredAbstractWriter(Writer writer) {
-        if (writer == null){
-            throw new IllegalArgumentException("The writer cannot be null");
-        }
+    public AbstractStructuredAbstractWriter() {
+        isInitialised = false;
         initialiseBaits();
         initialiseEnzymes();
         initialisePreys();
         initialiseTargets();
         sentenceMap = new HashMap<Integer, Sentence>();
-        this.writer = writer;
         this.sentencePropertiesMap = new HashMap<String, SentenceProperty>();
         this.stringBuilder = new StringBuilder(1024);
         this.interactorAcs = new TreeSet<String>();
         this.cvTermUrls = new HashMap<String, String>();
+    }
+
+    public AbstractStructuredAbstractWriter(Writer writer) {
+        initialiseWriter(writer);
+        initialiseBaits();
+        initialiseEnzymes();
+        initialisePreys();
+        initialiseTargets();
+        sentenceMap = new HashMap<Integer, Sentence>();
+        this.sentencePropertiesMap = new HashMap<String, SentenceProperty>();
+        this.stringBuilder = new StringBuilder(1024);
+        this.interactorAcs = new TreeSet<String>();
+        this.cvTermUrls = new HashMap<String, String>();
+
+        isInitialised = true;
     }
 
     public AbstractStructuredAbstractWriter(OutputStream stream) {
-        if (stream == null){
-            throw new IllegalArgumentException("The outputStream cannot be null");
-        }
+        initialiseOutputStream(stream);
         initialiseBaits();
         initialiseEnzymes();
         initialisePreys();
         initialiseTargets();
         sentenceMap = new HashMap<Integer, Sentence>();
-        this.writer = new OutputStreamWriter(stream);
         this.sentencePropertiesMap = new HashMap<String, SentenceProperty>();
         this.stringBuilder = new StringBuilder(1024);
         this.interactorAcs = new TreeSet<String>();
         this.cvTermUrls = new HashMap<String, String>();
+
+        isInitialised = true;
     }
 
     public AbstractStructuredAbstractWriter(File file) throws IOException {
-        if (file == null){
-            throw new IllegalArgumentException("The file cannot be null");
-        }
+        initialiseFile(file);
+
         initialiseBaits();
         initialiseEnzymes();
         initialisePreys();
         initialiseTargets();
         sentenceMap = new HashMap<Integer, Sentence>();
-        this.writer = new FileWriter(file);
         this.sentencePropertiesMap = new HashMap<String, SentenceProperty>();
         this.stringBuilder = new StringBuilder(1024);
         this.interactorAcs = new TreeSet<String>();
         this.cvTermUrls = new HashMap<String, String>();
+
+        isInitialised = true;
     }
 
-    public void close() throws IOException {
+    @Override
+    public void initialiseContext(Map<String, Object> options) {
+        if (options == null && !isInitialised){
+            throw new IllegalArgumentException("The options for the abstract writer should contain at least "+ InteractionWriterOptions.OUTPUT_OPTION_KEY
+                    + " to know where to write the interactions.");
+        }
+        else if (options == null){
+            return;
+        }
+        else if (options.containsKey(InteractionWriterOptions.OUTPUT_OPTION_KEY)){
+            Object output = options.get(InteractionWriterOptions.OUTPUT_OPTION_KEY);
+
+            if (output instanceof File){
+                try {
+                    initialiseFile((File) output);
+                } catch (IOException e) {
+                    throw new IllegalArgumentException("Impossible to open and write in output file " + ((File)output).getName(), e);
+                }
+            }
+            else if (output instanceof OutputStream){
+                initialiseOutputStream((OutputStream) output);
+            }
+            else if (output instanceof Writer){
+                initialiseWriter((Writer) output);
+            }
+            // suspect a file path
+            else if (output instanceof String){
+                try {
+                    initialiseFile(new File((String)output));
+                } catch (IOException e) {
+                    throw new IllegalArgumentException("Impossible to open and write in output file " + output, e);
+                }
+            }
+            else {
+                throw new IllegalArgumentException("Impossible to write in the provided output "+output.getClass().getName() + ", a File, OuputStream, Writer or file path was expected.");
+            }
+        }
+        else if (!isInitialised){
+            throw new IllegalArgumentException("The options for the abstract writer should contain at least "+ InteractionWriterOptions.OUTPUT_OPTION_KEY + " to know where to write the interactions.");
+        }
+
+        isInitialised = true;
+    }
+
+    @Override
+    public void start() throws MIIOException {
+        if (!isInitialised){
+            throw new IllegalStateException("The abstract writer has not been initialised. " +
+                    "The options for the abstract writer should contain at least "+ InteractionWriterOptions.OUTPUT_OPTION_KEY + " to know where to write " +
+                    "the interactions.");
+        }
         clear();
-        this.writer.close();
     }
 
-    public void clear() throws IOException {
+    @Override
+    public void end() throws MIIOException {
+        if (!isInitialised){
+            throw new IllegalStateException("The abstract writer has not been initialised. " +
+                    "The options for the abstract writer should contain at least "+ InteractionWriterOptions.OUTPUT_OPTION_KEY + " to know where to write " +
+                    "the interactions.");
+        }
+        clear();
+    }
+
+    @Override
+    public void write(I interaction) throws MIIOException {
+        if (!isInitialised){
+            throw new IllegalStateException("The abstract writer has not been initialised. " +
+                    "The options for the abstract writer should contain at least "+ InteractionWriterOptions.OUTPUT_OPTION_KEY + " to know where to write " +
+                    "the interactions.");
+        }
+
+        try {
+            writeStructuredAbstract(interaction);
+        } catch (IOException e) {
+            throw new MIIOException("Cannot write interaction "+interaction, e);
+        }
+    }
+
+    @Override
+    public void write(Collection<? extends I> interactions) throws MIIOException {
+        if (!isInitialised){
+            throw new IllegalStateException("The abstract writer has not been initialised. " +
+                    "The options for the abstract writer should contain at least "+ InteractionWriterOptions.OUTPUT_OPTION_KEY + " to know where to write " +
+                    "the interactions.");
+        }
+
+        try {
+            for (I interaction : interactions){
+                writeStructuredAbstract(interaction);
+            }
+        } catch (IOException e) {
+            throw new MIIOException("Cannot write interactions ", e);
+        }
+    }
+
+    @Override
+    public void write(Iterator<? extends I> interactions) throws MIIOException {
+        if (!isInitialised){
+            throw new IllegalStateException("The abstract writer has not been initialised. " +
+                    "The options for the abstract writer should contain at least "+ InteractionWriterOptions.OUTPUT_OPTION_KEY + " to know where to write " +
+                    "the interactions.");
+        }
+
+        try {
+            while (interactions.hasNext()){
+                writeStructuredAbstract(interactions.next());
+            }
+        } catch (IOException e) {
+            throw new MIIOException("Cannot write interactions ", e);
+        }
+    }
+
+    @Override
+    public void flush() throws MIIOException {
+        if (this.writer != null){
+            try {
+                this.writer.flush();
+            } catch (IOException e) {
+                throw new MIIOException("Cannot flush the writer", e);
+            }
+        }
+    }
+
+    @Override
+    public void reset() throws MIIOException {
+        if (isInitialised){
+
+            try {
+                flush();
+            }
+            finally {
+                isInitialised = false;
+                writer = null;
+                clear();
+            }
+        }
+    }
+
+    public void close() throws MIIOException {
+        if (isInitialised){
+
+            try {
+                flush();
+            }
+            finally {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    throw new MIIOException("Impossible to close the Abstract writer", e);
+                }
+            }
+            isInitialised = false;
+            writer = null;
+            clear();
+        }
+    }
+
+    public void clear() {
         this.sentenceMap.clear();
         this.sentencePropertiesMap.clear();
         this.stringBuilder.setLength(0);
@@ -174,7 +342,7 @@ public abstract class AbstractStructuredAbstractWriter<I extends Interaction> {
      * @param interaction
      * @throws IOException
      */
-    public void writeStructuredAbstract(I interaction) throws IOException {
+    protected void writeStructuredAbstract(I interaction) throws IOException {
         if (interaction == null){
             throw new IllegalArgumentException("The publication cannot be null");
         }
@@ -285,7 +453,7 @@ public abstract class AbstractStructuredAbstractWriter<I extends Interaction> {
 
         // load sentence properties if not done yet
         if (this.sentencePropertiesMap.isEmpty()){
-           loadSentenceProperties();
+            loadSentenceProperties();
         }
 
         // write interaction type
@@ -414,7 +582,7 @@ public abstract class AbstractStructuredAbstractWriter<I extends Interaction> {
             }
         }
         else {
-           // load a file
+            // load a file
             try {
                 prop.load(new FileInputStream(this.sentencesPropertiesPath));
                 loadProperties(prop);
@@ -432,7 +600,7 @@ public abstract class AbstractStructuredAbstractWriter<I extends Interaction> {
         for (Map.Entry<Object, Object> entry : prop.entrySet()){
             String[] values = extractValues((String) entry.getValue());
             if (values.length == 3){
-               this.sentencePropertiesMap.put((String)entry.getKey(), new SentenceProperty(values[0], values[1], values[2]));
+                this.sentencePropertiesMap.put((String)entry.getKey(), new SentenceProperty(values[0], values[1], values[2]));
             }
             else if (values.length == 2){
                 this.sentencePropertiesMap.put((String)entry.getKey(), new SentenceProperty(values[0], values[1], null));
@@ -518,5 +686,26 @@ public abstract class AbstractStructuredAbstractWriter<I extends Interaction> {
 
     protected Map<Integer, Sentence> getSentenceMap() {
         return sentenceMap;
+    }
+
+    protected void initialiseWriter(Writer writer) {
+        if (writer == null){
+            throw new IllegalArgumentException("The writer cannot be null");
+        }
+        this.writer = writer;
+    }
+
+    protected void initialiseOutputStream(OutputStream stream) {
+        if (stream == null){
+            throw new IllegalArgumentException("The outputStream cannot be null");
+        }
+        this.writer = new OutputStreamWriter(stream);
+    }
+
+    protected void initialiseFile(File file) throws IOException {
+        if (file == null){
+            throw new IllegalArgumentException("The file cannot be null");
+        }
+        this.writer = new FileWriter(file);
     }
 }
