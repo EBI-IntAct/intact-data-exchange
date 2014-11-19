@@ -2,29 +2,114 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:batch="http://www.springframework.org/schema/batch"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
 
     <context:component-scan base-package="uk.ac.ebi.intact.jami" />
+    <context:component-scan base-package="uk.ac.ebi.intact.dataexchange.cttv" />
 
     <import resource="classpath*:/META-INF/psimi-batch-spring.xml"/>
-    <import resource="classpath*:/META-INF/intact-jami-spring.xml"/>
+
+    <tx:annotation-driven proxy-target-class="true"/>
+
+    <!-- so the @Transactional annotations work -->
+    <tx:annotation-driven transaction-manager="jamiTransactionManager"/>
+
+    <!--
+        Post-processor to perform exception translation on @Repository classes
+        (from native exceptions such as JPA PersistenceExceptions to
+        Spring&rsquo;s DataAccessException hierarchy).
+    -->
+    <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+    <!--  BeanPostProcessor that processes PersistenceUnit and PersistenceContext annotations,
+    for injection of the corresponding JPA resources EntityManagerFactory and EntityManager.
+    Any such annotated fields or methods in any Spring-managed object will automatically be injected.
+    This post-processor will inject sub-interfaces of EntityManagerFactory and EntityManager if the annotated
+    fields or methods are declared as such. The actual type will be verified early, with the exception of
+    a shared ("transactional") EntityManager reference, where type mismatches might be detected as late as on
+    the first actual invocation. -->
+    <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
+
+    <!-- for autowired annotations to work propertly -->
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+
+    <!-- JPATransactionManager is not dependent on hibernate. It is a more global platform -->
+    <!-- We use entity manager because it is JPA and not just specific to hibernate -->
+    <bean id="jamiTransactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
+        <property name="dataSource" ref="${jami.db.datasource}"/>
+        <qualifier value="jamiTransactionManager"/>
+    </bean>
+
+
+    <!-- The LocalContainerEntityManagerFactoryBean gives full control over EntityManagerFactory configuration
+    and is appropriate for environments where fine-grained customization is required-->
+    <bean id="intactEntityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceUnitName" value="intact-jami"/>
+        <property name="persistenceXmlLocation" value="classpath*:/META-INF/jami-persistence.xml"/>
+        <property name="dataSource" ref="jamiCoreDataSource"/>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">${db.hbm2ddl}</prop>
+                <prop key="hibernate.connection.release_mode">after_transaction</prop>
+            </props>
+        </property>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="databasePlatform" value="${db.dialect}"/>
+                <property name="showSql" value="false"/>
+                <property name="generateDdl" value="false"/>
+            </bean>
+        </property>
+    </bean>
+    <!-- Intact core basic datasource -->
+    <bean id="jamiCoreDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${db.driver}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.user}"/>
+        <property name="password" value="${db.password}"/>
+    </bean>
+
+    <!-- INTACT more specific beans -->
+    <bean id="jamiUserContext" class="uk.ac.ebi.intact.jami.context.UserContext" scope="prototype">
+        <property name="userId" value="CTTVEXPORTER"/>
+    </bean>
+
+    <bean id="intactJamiConfiguration" class="uk.ac.ebi.intact.jami.context.IntactConfiguration" scope="prototype">
+        <property name="acPrefix" value="${ac.prefix}"/>
+        <property name="defaultInstitution" ref="sourceIntact"/>
+    </bean>
+
+    <!-- Default institutions -->
+    <bean id="sourceIntact" class="uk.ac.ebi.intact.jami.model.extension.IntactSource">
+        <constructor-arg index="0" value="intact"/>
+        <property name="fullName" value="European Bioinformatics Institute"/>
+        <property name="MIIdentifier" value="MI:0469"/>
+        <property name="url" value="http://www.ebi.ac.uk/intact/"/>
+        <property name="postalAddress" value="European Bioinformatics Institute; Wellcome Trust Genome Campus; Hinxton, Cambridge; CB10 1SD; United Kingdom"/>
+    </bean>
+
 
     <!-- Complex Reader -->
-    <bean id="curatedComplexReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+    <bean id="complexDiseaseReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
         <!--TODO: Create a proper JAMI HQL query to retrieve all the complexes-->
-        <property name="queryString" value="select i from InteractionImpl i join i.annotations as a where a.cvTopic.shortLabel = :curatedComplex order by i.created, i.ac"/>
+        <property name="queryString" value="select i from IntactComplex i join i.dbXrefs as x
+        where x.database.shortName = :efo or x.database.shortName = :orphanet order by i.created, i.ac"/>
         <property name="parameterValues">
             <map>
-                <entry key="curatedComplex" value="curated-complex"/>
+                <!--<entry key="curatedComplex" value="curated-complex"/>-->
+                <entry key="efo" value="efo"/>
+                <entry key="orphanet" value="orphanet"/>
             </map>
         </property>
         <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
     </bean>
 
     <!-- Complex Writer -->
-    <bean id="curatedComplexWriter" class="uk.ac.ebi.intact.dataexchange.cttv.write.IntactComplexDiseaseWriter">
+    <bean id="complexDiseaseWriter" class="uk.ac.ebi.intact.dataexchange.cttv.write.IntactComplexDiseaseWriter">
         <constructor-arg name="filename" value="${target_file}"/>
     </bean>
 
@@ -35,19 +120,19 @@
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
 
-            <batch:chunk reader="curatedComplexReader"
-                         writer="curatedComplexWriter"
+            <batch:chunk reader="complexDiseaseReader"
+                         writer="complexDiseaseWriter"
                          commit-interval="50">
                 <batch:streams>
-                    <batch:stream ref="curatedComplexReader"/>
-                    <batch:stream ref="curatedComplexWriter"/>
+                    <batch:stream ref="complexDiseaseReader"/>
+                    <batch:stream ref="complexDiseaseWriter"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
 
     <!-- Spring Batch Job -->
-    <batch:job id="complexJob" job-repository="basicBatchJobRepository" parent="basicBatchJob">
+    <batch:job id="cttvComplexExporterJob" job-repository="basicBatchJobRepository" parent="basicBatchJob">
         <batch:listeners>
             <batch:listener ref="basicJobLoggerListener"/>
         </batch:listeners>
