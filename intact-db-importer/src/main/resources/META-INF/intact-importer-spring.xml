@@ -16,6 +16,14 @@
     <context:component-scan base-package="uk.ac.ebi.intact.dataexchange.enricher" />
     <context:component-scan base-package="uk.ac.ebi.intact.jami" />
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath*:/dbimporter.properties</value>
+            </list>
+        </property>
+    </bean>
 
     <import resource="classpath*:/META-INF/psimi-batch-spring.xml"/>
     <context:annotation-config/>
