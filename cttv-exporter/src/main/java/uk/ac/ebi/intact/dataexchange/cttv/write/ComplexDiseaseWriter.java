@@ -6,6 +6,7 @@ import psidev.psi.mi.jami.exception.MIIOException;
 import psidev.psi.mi.jami.factory.options.InteractionWriterOptions;
 import psidev.psi.mi.jami.model.Complex;
 import uk.ac.ebi.intact.dataexchange.cttv.converter.ComplexCttvConverter;
+import uk.ac.ebi.intact.dataexchange.cttv.converter.DefaultComplexCttvConverter;
 
 import java.io.*;
 import java.util.*;
@@ -23,12 +24,13 @@ public class ComplexDiseaseWriter implements InteractionWriter<Complex> {
 
     public ComplexDiseaseWriter() {
         this.mapper = new ObjectMapper();
+        Map<String, Object> options= new HashMap<String, Object>();
+        options.put(ComplexDiseaseWriterOptions.OUTPUT_OPTION_KEY, "default_output_file.json");
+        options.put(ComplexDiseaseWriterOptions.COMPLEX_CTTV_CONVERTER, new DefaultComplexCttvConverter());
     }
 
-    public ComplexDiseaseWriter(String filename) {
-        this();
-        Map<String, Object> options = new HashMap<>();
-        options.put(ComplexDiseaseWriterOptions.OUTPUT_OPTION_KEY, filename);
+    public ComplexDiseaseWriter(Map<String, Object> options) {
+        this.mapper = new ObjectMapper();
         initialiseContext(options);
     }
 

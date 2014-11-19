@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.dataexchange.cttv.converter;
 
+import org.apache.commons.lang.StringUtils;
 import org.cttv.input.model.*;
 import psidev.psi.mi.jami.model.*;
 import psidev.psi.mi.jami.utils.XrefUtils;
@@ -23,7 +24,7 @@ public class DefaultComplexCttvConverter implements ComplexCttvConverter {
         //
         //Biological Subject
         //
-        List<String> about = new ArrayList<>(complex.getParticipants().size());
+        List<String> about = new ArrayList<String>(complex.getParticipants().size());
         for (Participant participant : complex.getParticipants()) {
             Interactor interactor = participant.getInteractor();
             if (interactor instanceof Protein) {
@@ -69,11 +70,11 @@ public class DefaultComplexCttvConverter implements ComplexCttvConverter {
                 biologicalObject.addAbout(this.identifiersUrl + "orphanet" + xref.getId());
             }
         }
-        Map<String, String> uniqueAssociationFields = new HashMap<>();
+        Map<String, String> uniqueAssociationFields = new HashMap<String, String>();
         uniqueAssociationFields.put("intact_id",this.identifiersUrl + "intact/" + complex.getPreferredIdentifier().getId());
-        uniqueAssociationFields.put("biological_subjects", biologicalSubject.getAbout().toString());
+        uniqueAssociationFields.put("biological_subjects", StringUtils.join(biologicalSubject.getAbout(), ","));
         if (biologicalObject != null)
-            uniqueAssociationFields.put("biological_objects", biologicalObject.getAbout().toString());
+            uniqueAssociationFields.put("biological_objects", StringUtils.join(biologicalObject.getAbout(), ","));
         return new EvidenceString(biologicalSubject, evidence, biologicalObject, uniqueAssociationFields);
     }
 }

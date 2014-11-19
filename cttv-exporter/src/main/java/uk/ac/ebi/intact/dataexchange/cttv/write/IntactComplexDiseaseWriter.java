@@ -7,9 +7,11 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import uk.ac.ebi.intact.dataexchange.cttv.converter.DefaultComplexCttvConverter;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 
@@ -17,7 +19,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by maitesin on 17/11/2014.
@@ -25,6 +29,7 @@ import java.util.List;
 public class IntactComplexDiseaseWriter implements ItemWriter<IntactComplex>, ItemStream {
 
     @Autowired
+    @Qualifier("intactDao")
     private IntactDao intactDao;
 
     private FileChannel fileChannel;
@@ -35,9 +40,16 @@ public class IntactComplexDiseaseWriter implements ItemWriter<IntactComplex>, It
 
     private static final Log log = LogFactory.getLog(IntactComplexDiseaseWriter.class);
 
+    public IntactComplexDiseaseWriter() throws FileNotFoundException {
+        this("default_output_file.json");
+    }
+
     public IntactComplexDiseaseWriter(String filename) throws FileNotFoundException {
         this.filename = filename;
-        this.writer = new ComplexDiseaseWriter(this.filename);
+        Map<String, Object> options = new HashMap<String, Object>();
+        options.put(ComplexDiseaseWriterOptions.OUTPUT_OPTION_KEY, filename);
+        options.put(ComplexDiseaseWriterOptions.COMPLEX_CTTV_CONVERTER, new DefaultComplexCttvConverter());
+        this.writer = new ComplexDiseaseWriter(options);
     }
 
     @Override

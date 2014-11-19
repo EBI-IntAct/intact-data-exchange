@@ -12,6 +12,12 @@
         <profile>
             <id>export</id>
             <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -34,7 +40,7 @@
                                 <classpath />
 
                                 <argument>psidev.psi.mi.jami.batch.MIBatchJobManager</argument>
-                                <argument>classpath*:/META-INF/spring-config.xml</argument>
+                                <argument>classpath*:spring-config.xml</argument>
                                 <argument>cttvComplexExporterJob</argument>
                             </arguments>
                         </configuration>
@@ -45,6 +51,12 @@
         <profile>
             <id>restart-export</id>
             <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -67,7 +79,7 @@
                                 <classpath />
 
                                 <argument>psidev.psi.mi.jami.batch.MIBatchJobManager</argument>
-                                <argument>classpath*:/META-INF/spring-config.xml</argument>
+                                <argument>classpath*:spring-config.xml</argument>
                                 <argument>cttvComplexExporterJob</argument>
                                 <argument>${job.id}</argument>
                             </arguments>
@@ -77,15 +89,6 @@
             </build>
         </profile>
     </profiles>
-
-    <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-    </build>
 
     <dependencies>
         <!--JAMI-->
