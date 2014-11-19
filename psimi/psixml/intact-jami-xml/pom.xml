@@ -23,8 +23,8 @@
       <!-- JAMI xml -->
       <dependency>
           <groupId>psidev.psi.mi.jami</groupId>
-          <artifactId>jami-xml</artifactId>
-          <version>1.0.1-SNAPSHOT</version>
+          <artifactId>jami-commons</artifactId>
+          <version>1.0.2-SNAPSHOT</version>
       </dependency>
 
       <!-- intact jami -->
