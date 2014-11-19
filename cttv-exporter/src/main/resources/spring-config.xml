@@ -119,7 +119,7 @@
     <!-- We use entity manager because it is JPA and not just specific to hibernate -->
     <bean id="jamiTransactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
-        <property name="dataSource" ref="basicBatchDataSource"/>
+        <property name="dataSource" ref="jamiCoreDataSource"/>
         <qualifier value="jamiTransactionManager"/>
     </bean>
 
@@ -172,9 +172,6 @@
         <property name="url" value="http://www.ebi.ac.uk/intact/"/>
         <property name="postalAddress" value="European Bioinformatics Institute; Wellcome Trust Genome Campus; Hinxton, Cambridge; CB10 1SD; United Kingdom"/>
     </bean>
-
-
-    <!--IntActDAO-->
 
 
     <!-- Complex Reader -->
