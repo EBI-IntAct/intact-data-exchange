@@ -20,7 +20,8 @@
     <modules>
         <module>psixml</module>
         <module>psimitab</module>
-    </modules>
+    <module>intact-psimi-exporter</module>
+  </modules>
 
     <build>
       <plugins>
