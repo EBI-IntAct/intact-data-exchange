@@ -126,6 +126,12 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>oracle-thin</artifactId>
+            <version>10.2.0.4</version>
+        </dependency>
     </dependencies>
 
     <repositories>
