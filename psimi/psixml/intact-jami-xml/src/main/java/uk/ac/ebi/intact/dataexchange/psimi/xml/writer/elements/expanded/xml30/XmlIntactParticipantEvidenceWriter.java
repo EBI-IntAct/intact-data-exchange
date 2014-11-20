@@ -1,8 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml30;
 
-import psidev.psi.mi.jami.model.Interactor;
-import psidev.psi.mi.jami.model.ParticipantEvidence;
-import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.model.*;
+import psidev.psi.mi.jami.utils.AnnotationUtils;
 import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
 import psidev.psi.mi.jami.xml.io.writer.elements.ExpandedPsiXmlElementWriter;
 import psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml30.XmlParticipantEvidenceWriter;
@@ -12,6 +11,8 @@ import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -94,5 +95,30 @@ public class XmlIntactParticipantEvidenceWriter extends XmlParticipantEvidenceWr
         getStreamWriter().writeAttribute("refTypeAc", Xref.IDENTITY_MI);
         // write end db ref
         getStreamWriter().writeEndElement();
+    }
+
+    @Override
+    protected void writeAttributes(ParticipantEvidence object) throws XMLStreamException {
+        // write attributes
+        Stoichiometry stc = object.getStoichiometry();
+        Collection<Annotation> noExportAnnotations = AnnotationUtils.collectAllAnnotationsHavingTopic(object.getAnnotations(),
+                null, "no-export");
+        Collection<Annotation> exportAnnotations = new ArrayList<Annotation>(object.getAnnotations());
+        exportAnnotations.removeAll(noExportAnnotations);
+        if (!exportAnnotations.isEmpty()){
+            // write start attribute list
+            getStreamWriter().writeStartElement("attributeList");
+            for (Object ann : exportAnnotations){
+                getAttributeWriter().write((Annotation)ann);
+            }
+            // write stoichiometry attribute if not null
+            writeOtherAttributes(object, false);
+            // write end attributeList
+            getStreamWriter().writeEndElement();
+        }
+        // write stoichiometry attribute if not null
+        else {
+            writeOtherAttributes(object, true);
+        }
     }
 }

@@ -56,10 +56,10 @@ public class IntactCompactXmlEvidenceWriter extends CompactXmlEvidenceWriter {
         // xref
         PsiXmlXrefWriter xrefWriter = getSubWritersFactory().createXrefWriter(getStreamWriter(), false, attributeWriter);
         // publication
-        PsiXmlPublicationWriter publicationWriter = getSubWritersFactory().createPublicationWriter(getStreamWriter(), false,
+        PsiXmlPublicationWriter publicationWriter = intactFactory.createPublicationWriter(getStreamWriter(), false,
                 attributeWriter, xrefWriter, getVersion());
         // open cv
-        PsiXmlVariableNameWriter<CvTerm> openCvWriter = getSubWritersFactory().createOpenCvWriter(getStreamWriter(), false, aliasWriter,
+        PsiXmlVariableNameWriter<CvTerm> openCvWriter = intactFactory.createOpenCvWriter(getStreamWriter(), false, aliasWriter,
                 attributeWriter, xrefWriter);
         // cv
         PsiXmlVariableNameWriter<CvTerm> cvWriter = getSubWritersFactory().createCvWriter(getStreamWriter(), false, aliasWriter, xrefWriter);
@@ -72,7 +72,7 @@ public class IntactCompactXmlEvidenceWriter extends CompactXmlEvidenceWriter {
         // checksum writer
         PsiXmlElementWriter<Checksum> checksumWriter = getSubWritersFactory().createChecksumWriter(getStreamWriter());
         // interactor writer
-        PsiXmlElementWriter<Interactor> interactorWriter = getSubWritersFactory().createInteractorWriter(getStreamWriter(), false, getElementCache(),
+        PsiXmlElementWriter<Interactor> interactorWriter = intactFactory.createInteractorWriter(getStreamWriter(), false, getElementCache(),
                 aliasWriter, attributeWriter, xrefWriter, cvWriter, organismWriter, checksumWriter);
         // experiment Writer
         PsiXmlExperimentWriter experimentWriter = intactFactory.createExperimentWriter(getStreamWriter(), false, getElementCache(),
@@ -81,7 +81,7 @@ public class IntactCompactXmlEvidenceWriter extends CompactXmlEvidenceWriter {
         // availability writer
         PsiXmlElementWriter<String> availabilityWriter = getSubWritersFactory().createAvailabilityWriter(getStreamWriter(), getElementCache());
         // initialise source
-        setSourceWriter(getSubWritersFactory().createSourceWriter(getStreamWriter(), false, getVersion(), aliasWriter, attributeWriter,
+        setSourceWriter(intactFactory.createSourceWriter(getStreamWriter(), false, getVersion(), aliasWriter, attributeWriter,
                 xrefWriter, publicationWriter));
         // initialise optional writers
         initialiseOptionalWriters(experimentWriter, availabilityWriter, interactorWriter);

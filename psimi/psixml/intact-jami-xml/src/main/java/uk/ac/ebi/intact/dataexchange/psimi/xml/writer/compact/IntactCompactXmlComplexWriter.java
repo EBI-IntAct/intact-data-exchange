@@ -6,7 +6,6 @@ import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
 import psidev.psi.mi.jami.xml.io.writer.compact.CompactXmlComplexWriter;
 import psidev.psi.mi.jami.xml.io.writer.elements.*;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.IntactPsiXmlElementWriterFactory;
-import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -47,24 +46,6 @@ public class IntactCompactXmlComplexWriter extends CompactXmlComplexWriter {
     }
 
     @Override
-    protected void registerExperiment(Complex interaction) {
-        if (interaction instanceof IntactComplex){
-            IntactComplex intactComplex = (IntactComplex)interaction;
-            Experiment exp = !intactComplex.getExperiments().isEmpty()? intactComplex.getExperiments().iterator().next():null;
-
-            if (exp != null){
-                getExperiments().add(exp);
-            }
-            else{
-                super.registerExperiment(interaction);
-            }
-        }
-        else{
-            super.registerExperiment(interaction);
-        }
-    }
-
-    @Override
     protected void initialiseSubWriters() {
         IntactPsiXmlElementWriterFactory intactFactory = IntactPsiXmlElementWriterFactory.getInstance();
 
@@ -76,10 +57,10 @@ public class IntactCompactXmlComplexWriter extends CompactXmlComplexWriter {
         // xref
         PsiXmlXrefWriter xrefWriter = getSubWritersFactory().createXrefWriter(getStreamWriter(), false, attributeWriter);
         // publication
-        PsiXmlPublicationWriter publicationWriter = getSubWritersFactory().createPublicationWriter(getStreamWriter(), false,
+        PsiXmlPublicationWriter publicationWriter = intactFactory.createPublicationWriter(getStreamWriter(), false,
                 attributeWriter, xrefWriter, getVersion());
         // open cv
-        PsiXmlVariableNameWriter<CvTerm> openCvWriter = getSubWritersFactory().createOpenCvWriter(getStreamWriter(), false, aliasWriter,
+        PsiXmlVariableNameWriter<CvTerm> openCvWriter = intactFactory.createOpenCvWriter(getStreamWriter(), false, aliasWriter,
                 attributeWriter, xrefWriter);
         // cv
         PsiXmlVariableNameWriter<CvTerm> cvWriter = getSubWritersFactory().createCvWriter(getStreamWriter(), false, aliasWriter, xrefWriter);
@@ -92,7 +73,7 @@ public class IntactCompactXmlComplexWriter extends CompactXmlComplexWriter {
         // checksum writer
         PsiXmlElementWriter<Checksum> checksumWriter = getSubWritersFactory().createChecksumWriter(getStreamWriter());
         // interactor writer
-        PsiXmlElementWriter<Interactor> interactorWriter = getSubWritersFactory().createInteractorWriter(getStreamWriter(), false, getElementCache(),
+        PsiXmlElementWriter<Interactor> interactorWriter = intactFactory.createInteractorWriter(getStreamWriter(), false, getElementCache(),
                 aliasWriter, attributeWriter, xrefWriter, cvWriter, organismWriter, checksumWriter);
         // experiment Writer
         PsiXmlExperimentWriter experimentWriter = intactFactory.createExperimentWriter(getStreamWriter(), false, getElementCache(),
@@ -101,7 +82,7 @@ public class IntactCompactXmlComplexWriter extends CompactXmlComplexWriter {
         // availability writer
         PsiXmlElementWriter<String> availabilityWriter = getSubWritersFactory().createAvailabilityWriter(getStreamWriter(), getElementCache());
         // initialise source
-        setSourceWriter(getSubWritersFactory().createSourceWriter(getStreamWriter(), false, getVersion(), aliasWriter, attributeWriter,
+        setSourceWriter(intactFactory.createSourceWriter(getStreamWriter(), false, getVersion(), aliasWriter, attributeWriter,
                 xrefWriter, publicationWriter));
         // initialise optional writers
         initialiseOptionalWriters(experimentWriter, availabilityWriter, interactorWriter);
