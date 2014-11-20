@@ -47,6 +47,11 @@
           <artifactId>jami-html</artifactId>
           <version>1.0.1-SNAPSHOT</version>
       </dependency>
+      <dependency>
+          <groupId>psidev.psi.mi.jami</groupId>
+          <artifactId>jami-interactionviewer-json</artifactId>
+          <version>1.0.1-SNAPSHOT</version>
+      </dependency>
 
       <!-- JAMI batch dependencies -->
       <dependency>
@@ -60,6 +65,12 @@
       <version>4.10</version>
       <scope>test</scope>
     </dependency>
+
+      <dependency>
+          <groupId>com.oracle</groupId>
+          <artifactId>oracle-thin</artifactId>
+          <version>10.2.0.4</version>
+      </dependency>
   </dependencies>
 
     <repositories>

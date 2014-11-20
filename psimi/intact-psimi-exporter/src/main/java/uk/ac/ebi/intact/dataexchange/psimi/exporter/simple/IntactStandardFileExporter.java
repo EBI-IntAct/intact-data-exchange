@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.psimi.exporter;
+package uk.ac.ebi.intact.dataexchange.psimi.exporter.simple;
 
 import psidev.psi.mi.jami.commons.PsiJami;
 import psidev.psi.mi.jami.factory.InteractionWriterFactory;
@@ -14,7 +14,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.IntactPsiXml;
  * @since <pre>17/11/14</pre>
  */
 
-public class IntactStandardFileExporter<I extends Interaction> extends AbstractIntactDbInteractionExporter<I> {
+public class IntactStandardFileExporter<I extends Interaction> extends AbstractIntactInteractionExporter<I> {
 
 
     @Override

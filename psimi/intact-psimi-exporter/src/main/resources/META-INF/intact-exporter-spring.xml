@@ -19,7 +19,7 @@
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
         <property name="locations">
             <list>
-                <value>classpath*:/dbimporter.properties</value>
+                <value>classpath*:/exporter.properties</value>
             </list>
         </property>
     </bean>
@@ -107,184 +107,152 @@
         <property name="postalAddress" value="European Bioinformatics Institute; Wellcome Trust Genome Campus; Hinxton, Cambridge; CB10 1SD; United Kingdom"/>
     </bean>
 
-    <!-- intact enricher config -->
-    <bean id="enricherConfig" class="uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig"/>
-
-    <bean id="enricherContext" class="uk.ac.ebi.intact.dataexchange.enricher.EnricherContext">
-        <constructor-arg ref="enricherConfig"/>
-    </bean>
-
-    <bean id="enricherCacheManager" class="uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCacheManager"/>
-
     <!-- readers -->
-    <bean id="miFileResource" class="org.springframework.core.io.FileSystemResource">
-        <constructor-arg value="${mi.file}"/>
+    <!-- simple interaction evidence reader -->
+    <bean id="intactInteractionEvidenceReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+        <property name="queryString" value="select i from IntactInteractionEvidence i
+        order by i.created, i.ac"/>
+        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
     </bean>
-    <bean id="errorResource" class="org.springframework.core.io.FileSystemResource">
-        <constructor-arg value="${error.file}"/>
+    <!-- simple negative interaction evidence reader -->
+    <bean id="intactNegativeInteractionEvidenceReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+        <property name="queryString" value="select i from IntactInteractionEvidence i
+        join i.dbAnnotations as a
+        where a.topic.shortName = :negative
+        order by i.created, i.ac"/>
+        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
+        <property name="parameterValues">
+            <map>
+                <entry key="negative" value="negative"/>
+            </map>
+        </property>
     </bean>
-    <bean id="interactionEvidenceReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.InteractionEvidenceFileReader" lazy-init="true">
-        <property name="resource" ref="miFileResource"/>
+    <!-- simple positive interaction evidence reader -->
+    <bean id="intactPositiveInteractionEvidenceReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+        <property name="queryString" value="select i from IntactInteractionEvidence i
+        where i.ac not in
+        (select distinct i2.ac from IntactInteractionEvidence i2
+        join i2.dbAnnotations as a
+        where a.topic.shortName = :negative)
+        order by i.created, i.ac"/>
+        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
+        <property name="parameterValues">
+            <map>
+                <entry key="negative" value="negative"/>
+            </map>
+        </property>
     </bean>
-    <bean id="complexReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.ComplexFileReader" lazy-init="true">
-        <property name="resource" ref="miFileResource"/>
+    <!-- simple complex reader -->
+    <bean id="intactComplexReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+        <property name="queryString" value="select i from IntactComplex i
+        order by i.created, i.ac"/>
+        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
     </bean>
-    <bean id="modelledInteractionReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.ModelledInteractionFileReader" lazy-init="true">
-        <property name="resource" ref="miFileResource"/>
+    <!-- simple publication reader -->
+    <bean id="intactPublicationReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+        <property name="queryString" value="select i from IntactPublication i
+        where i.shortLabel &lt;&gt; :intactPub
+        order by i.created, i.ac"/>
+        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
+        <property name="parameterValues">
+            <map>
+                <entry key="intactPub" value="14681455"/>
+            </map>
+        </property>
     </bean>
-    <bean id="interactionReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.InteractionFileReader" lazy-init="true">
-        <property name="resource" ref="miFileResource"/>
-    </bean>
+    <!-- reader returning publication label with publication ordered by species
+    <bean id="publicationOrderedBySpeciesReader" class="org.springframework.batch.item.database.JdbcCursorItemReader" lazy-init="true">
+        <property name="dataSource" ref="intactReleaseDataSource"/>
+        <property name="sql" value="select distinct p.shortlabel as pubid, EXTRACT (YEAR FROM p.created ) as year, b.shortlabel as species, e.shortlabel as experiment_label, v.count_interaction as total_interactions, greatest(2000, v.count_interaction)
+        from ia_publication p
+        join ia_experiment e on p.ac = e.publication_ac
+        join ia_int2exp ie on ie.experiment_ac = e.ac
+        join ia_component c on ie.interaction_ac = c.interaction_ac
+        join ia_interactor i on i.ac = c.interactor_ac
+        join ia_biosource b on b.ac = i.biosource_ac
+        join (select count(ie2.interaction_ac) as count_interaction, ie2.experiment_ac as experiment_ac
+        from ia_int2exp ie2 group by ie2.experiment_ac) v on v.experiment_ac = e.ac
+        where p.shortLabel != '14681455'
+        group by b.shortlabel, p.shortlabel, e.shortlabel, p.created, v.count_interaction
+        order by b.shortlabel, greatest(2000, v.count_interaction) DESC, p.shortlabel, v.count_interaction DESC, e.shortLabel"/>
+        <property name="rowMapper">
+            <bean class="uk.ac.ebi.intact.release.psixml.species.classification.PublicationSpeciesRowMapper"/>
+        </property>
+    </bean> -->
+    <!-- the reader will read publication shortlabel, publication created year and dataset. It will order the results first by dataset and then by publication id-->
+    <!--<bean id="publicationOrderedByDatasetReader" class="org.springframework.batch.item.database.JdbcCursorItemReader" lazy-init="true">
+        <property name="dataSource" ref="intactReleaseDataSource"/>
+        <property name="sql" value="select distinct p.shortlabel as pubid, EXTRACT ( YEAR FROM p.created ) as year, a.description as dataset
+        from ia_publication p
+        join ia_pub2annot pa on p.ac = pa.publication_ac
+        join ia_annotation a on pa.annotation_ac = a.ac
+        join ia_controlledvocab c on c.ac = a.topic_ac
+        where p.shortLabel != '14681455'
+        and c.shortlabel='dataset'
+        order by a.description, EXTRACT ( YEAR FROM p.created ), p.shortLabel"/>
+        <property name="rowMapper">
+            <bean class="uk.ac.ebi.intact.release.psixml.dataset.PublicationDatasetRowMapper"/>
+        </property>
+    </bean>-->
 
     <!-- processors -->
-    <bean id="interactionEvidenceProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
-          lazy-init="true">
-        <property name="errorResource" ref="errorResource"/>
-        <property name="enricher" ref="intactInteractionEvidenceEnricher"/>
-    </bean>
-    <bean id="complexProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
-          lazy-init="true">
-        <property name="errorResource" ref="errorResource"/>
-        <property name="enricher" ref="intactComplexEnricher"/>
-    </bean>
-    <bean id="modelledInteractionProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
-          lazy-init="true">
-        <property name="errorResource" ref="errorResource"/>
-        <property name="enricher" ref="intactModelledInteractionEnricher"/>
-    </bean>
-    <bean id="interactionProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
-          lazy-init="true">
-        <property name="errorResource" ref="errorResource"/>
-        <property name="enricher" ref="intactInteractionEnricher"/>
-    </bean>
-    <bean id="interactionMixProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactInteractionEnricherCompositeProcessor" lazy-init="true">
-        <property name="interactionEvidenceProcessor" ref="interactionEvidenceProcessor"/>
-        <property name="modelledInteractionProcessor" ref="modelledInteractionProcessor"/>
-        <property name="complexProcessor" ref="complexProcessor"/>
-        <property name="interactionProcessor" ref="interactionProcessor"/>
-    </bean>
 
     <!-- writers -->
-    <bean id="interactionEvidenceImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactDbImporter"
-          lazy-init="true">
-        <property name="intactService" ref="interactionEvidenceService"/>
+    <bean id="spokeExpansion" class="psidev.psi.mi.jami.binary.expansion.InteractionEvidenceSpokeExpansion"/>
+
+    <!-- interaction writer -->
+    <bean id="miFileOutput" class="org.springframework.core.io.FileSystemResource">
+        <constructor-arg value="${mi.output}"/>
     </bean>
-    <bean id="complexImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactDbImporter"
-          lazy-init="true">
-        <property name="intactService" ref="complexService"/>
+    <!-- interaction evidence html writer -->
+    <bean id="intactHtmlEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactHtmlExporter">
+        <property name="writerOptions">
+            <map>
+                <entry key="write_html_header_option_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="output_format_key" value="mi_html"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
     </bean>
-    <bean id="modelledInteractionImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactDbImporter"
-          lazy-init="true">
-        <property name="intactService" ref="modelledInteractionService"/>
+    <!-- complex html writer -->
+    <bean id="intactHtmlModelledWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactHtmlExporter">
+        <property name="writerOptions">
+            <map>
+                <entry key="write_html_header_option_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="output_format_key" value="mi_html"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="modelled"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
     </bean>
-    <bean id="interactionMixImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactInteractionMixDbImporter" lazy-init="true"/>
+    <!-- interaction evidence json writer -->
+    <bean id="intactJsonEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactInteractionViewerJsonExporter">
+        <property name="writerOptions">
+            <map>
+                <entry key="write_html_header_option_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="output_format_key" value="mi_html"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <!-- complex json writer -->
+    <bean id="intactJsonModelledWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactInteractionViewerJsonExporter">
+        <property name="writerOptions">
+            <map>
+                <entry key="write_html_header_option_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="output_format_key" value="interaction_viewer_json"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="modelled"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
 
     <!-- Basic Step configuration -->
 
-    <!-- Enricher Steps -->
-    <batch:step id="interactionEvidenceEnricherStep" parent="basicBatchStep">
-        <batch:tasklet transaction-manager="basicBatchTransactionManager">
-            <batch:listeners>
-                <batch:listener ref="basicChunkLoggerListener" />
-            </batch:listeners>
+    <!-- Export Steps -->
 
-            <batch:chunk reader="interactionEvidenceReader"
-                         processor="interactionEvidenceProcessor"
-                         writer="interactionEvidenceImporter"
-                         commit-interval="50">
-                <batch:streams>
-                    <batch:stream ref="interactionEvidenceReader"/>
-                    <batch:stream ref="interactionEvidenceProcessor"/>
-                    <batch:stream ref="interactionEvidenceImporter"/>
-                </batch:streams>
-            </batch:chunk>
-        </batch:tasklet>
-    </batch:step>
-    <batch:step id="modelledInteractionEnricherStep" parent="basicBatchStep">
-        <batch:tasklet transaction-manager="basicBatchTransactionManager">
-            <batch:listeners>
-                <batch:listener ref="basicChunkLoggerListener" />
-            </batch:listeners>
+    <!-- Export job -->
 
-            <batch:chunk reader="modelledInteractionReader"
-                         processor="modelledInteractionProcessor"
-                         writer="modelledInteractionImporter"
-                         commit-interval="50">
-                <batch:streams>
-                    <batch:stream ref="modelledInteractionReader"/>
-                    <batch:stream ref="modelledInteractionProcessor"/>
-                    <batch:stream ref="modelledInteractionImporter"/>
-                </batch:streams>
-            </batch:chunk>
-        </batch:tasklet>
-    </batch:step>
-    <batch:step id="complexEnricherStep" parent="basicBatchStep">
-        <batch:tasklet transaction-manager="basicBatchTransactionManager">
-            <batch:listeners>
-                <batch:listener ref="basicChunkLoggerListener" />
-            </batch:listeners>
-
-            <batch:chunk reader="complexReader"
-                         processor="complexProcessor"
-                         writer="complexImporter"
-                         commit-interval="50">
-                <batch:streams>
-                    <batch:stream ref="complexReader"/>
-                    <batch:stream ref="complexProcessor"/>
-                    <batch:stream ref="complexImporter"/>
-                </batch:streams>
-            </batch:chunk>
-        </batch:tasklet>
-    </batch:step>
-    <batch:step id="interactionEnricherStep" parent="basicBatchStep">
-        <batch:tasklet transaction-manager="basicBatchTransactionManager">
-            <batch:listeners>
-                <batch:listener ref="basicChunkLoggerListener" />
-            </batch:listeners>
-
-            <batch:chunk reader="interactionReader"
-                         processor="interactionMixProcessor"
-                         writer="interactionMixImporter"
-                         commit-interval="50">
-                <batch:streams>
-                    <batch:stream ref="interactionReader"/>
-                    <batch:stream ref="interactionMixImporter"/>
-                </batch:streams>
-            </batch:chunk>
-        </batch:tasklet>
-    </batch:step>
-
-    <!-- enricher job -->
-    <batch:job id="interactionEvidenceImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
-
-        <batch:listeners>
-            <batch:listener ref="basicJobLoggerListener"/>
-        </batch:listeners>
-
-        <batch:step id="enrichEvidenceStep" parent="interactionEvidenceEnricherStep"/>
-    </batch:job>
-    <batch:job id="modelledInteractionImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
-
-        <batch:listeners>
-            <batch:listener ref="basicJobLoggerListener"/>
-        </batch:listeners>
-
-        <batch:step id="modelledEvidenceStep" parent="modelledEvidenceStep"/>
-    </batch:job>
-    <batch:job id="complexImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
-
-        <batch:listeners>
-            <batch:listener ref="basicJobLoggerListener"/>
-        </batch:listeners>
-
-        <batch:step id="complexStep" parent="complexEnricherStep"/>
-    </batch:job>
-    <batch:job id="interactionMixImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
-
-        <batch:listeners>
-            <batch:listener ref="basicJobLoggerListener"/>
-        </batch:listeners>
-
-        <batch:step id="interactionMixStep" parent="interactionEnricherStep"/>
-    </batch:job>
 </beans>

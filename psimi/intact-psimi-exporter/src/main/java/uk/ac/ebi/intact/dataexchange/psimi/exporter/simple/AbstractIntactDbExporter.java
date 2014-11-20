@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.psimi.exporter;
+package uk.ac.ebi.intact.dataexchange.psimi.exporter.simple;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -9,11 +9,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.util.FileUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import psidev.psi.mi.jami.datasource.InteractionWriter;
-import psidev.psi.mi.jami.exception.MIIOException;
-import psidev.psi.mi.jami.factory.InteractionWriterFactory;
-import psidev.psi.mi.jami.factory.options.InteractionWriterOptions;
-import psidev.psi.mi.jami.model.Interaction;
 
 import java.io.*;
 import java.nio.channels.Channels;
@@ -29,7 +24,7 @@ import java.util.Map;
  * @since <pre>17/11/14</pre>
  */
 
-public abstract class AbstractIntactDbInteractionExporter<T extends Interaction> implements ItemWriter<T>,ItemStream{
+public abstract class AbstractIntactDbExporter<T> implements ItemWriter<T>,ItemStream{
 
     private Resource output;
 
@@ -39,11 +34,9 @@ public abstract class AbstractIntactDbInteractionExporter<T extends Interaction>
     private FileOutputStream os;
     private Map<String, Object> writerOptions;
 
-    private InteractionWriter interactionWriter;
-
     private final static String CURRENT_POSITION = "current_position";
 
-    private static final Log logger = LogFactory.getLog(AbstractIntactDbInteractionExporter.class);
+    private static final Log logger = LogFactory.getLog(AbstractIntactDbExporter.class);
 
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         Assert.notNull(executionContext, "ExecutionContext must not be null");
@@ -90,25 +83,15 @@ public abstract class AbstractIntactDbInteractionExporter<T extends Interaction>
     }
 
     public void close() throws ItemStreamException {
-        if (interactionWriter != null) {
+        if (fileChannel != null) {
             try {
-                interactionWriter.close();
-            } catch (MIIOException e) {
+                fileChannel.close();
+            } catch (IOException e) {
                 throw new ItemStreamException( "Impossible to close " + output.getDescription(), e );
-            }
-            finally {
-                if (fileChannel != null) {
-                    try {
-                        fileChannel.close();
-                    } catch (IOException e) {
-                        throw new ItemStreamException( "Impossible to close " + output.getDescription(), e );
-                    }
-                }
             }
         }
 
         this.currentPosition = 0;
-        this.interactionWriter = null;
         this.fileChannel = null;
         this.os = null;
     }
@@ -116,7 +99,7 @@ public abstract class AbstractIntactDbInteractionExporter<T extends Interaction>
     /**
      * Creates the buffered writer for the output file channel based on
      * configuration information.
-     * @throws IOException
+     * @throws java.io.IOException
      */
     private void initializeBufferedWriter(File file, boolean restarted, boolean shouldDeleteIfExists) throws IOException {
 
@@ -130,17 +113,7 @@ public abstract class AbstractIntactDbInteractionExporter<T extends Interaction>
 
         Assert.state(outputBufferedWriter != null);
 
-        // initialise writers
-        registerWriters();
-        // add mandatory options
-        this.writerOptions.put(InteractionWriterOptions.OUTPUT_OPTION_KEY, this.outputBufferedWriter);
-
-        InteractionWriterFactory writerFactory = InteractionWriterFactory.getInstance();
-        this.interactionWriter = writerFactory.getInteractionWriterWith(this.writerOptions);
-
-        if (this.interactionWriter == null){
-            throw new IllegalStateException("We cannot find a valid interaction writer with the given options.");
-        }
+        initialiseObjectWriter(restarted);
 
         // in case of restarting reset position to last committed point
         if (restarted) {
@@ -151,6 +124,8 @@ public abstract class AbstractIntactDbInteractionExporter<T extends Interaction>
         outputBufferedWriter.flush();
     }
 
+    protected abstract void initialiseObjectWriter(boolean restarted);
+
     protected abstract void registerWriters();
 
     /**
@@ -158,7 +133,7 @@ public abstract class AbstractIntactDbInteractionExporter<T extends Interaction>
      * is not smaller than the last saved commit point. If it is, then the
      * file has been damaged in some way and whole task must be started over
      * again from the beginning.
-     * @throws IOException if there is an IO problem
+     * @throws java.io.IOException if there is an IO problem
      */
     private void checkFileSize() throws IOException {
         long size = -1;
@@ -174,7 +149,7 @@ public abstract class AbstractIntactDbInteractionExporter<T extends Interaction>
     /**
      * Truncate the output at the last known good point.
      *
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public void truncate() throws IOException {
         fileChannel.truncate(currentPosition);
@@ -199,13 +174,7 @@ public abstract class AbstractIntactDbInteractionExporter<T extends Interaction>
 
     }
 
-    public void write(List<? extends T> items) throws Exception {
-        if (this.interactionWriter == null){
-            throw new IllegalStateException("The writer needs to be initialised before writing");
-        }
-
-        this.interactionWriter.write(items);
-    }
+    public abstract void write(List<? extends T> items) throws Exception;
 
     public void setWriterOptions(Map<String, Object> writerOptions) {
         this.writerOptions = writerOptions;
@@ -213,5 +182,13 @@ public abstract class AbstractIntactDbInteractionExporter<T extends Interaction>
 
     public void setOutput(Resource output) {
         this.output = output;
+    }
+
+    protected Map<String, Object> getWriterOptions() {
+        return writerOptions;
+    }
+
+    protected Writer getOutputBufferedWriter() {
+        return outputBufferedWriter;
     }
 }
