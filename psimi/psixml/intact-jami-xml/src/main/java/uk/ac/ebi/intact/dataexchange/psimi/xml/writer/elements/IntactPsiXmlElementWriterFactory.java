@@ -135,7 +135,7 @@ public class IntactPsiXmlElementWriterFactory {
                     confidenceWriter,interactorWriter,cvWriter,openCvWriter,parameterWriter);
         }
         else{
-            PsiXmlElementWriter[] featureWriters = elementWriterFactory.createFeatureWriter(streamWriter, extended, objectIndex, version, category, aliasWriter,
+            PsiXmlElementWriter[] featureWriters = createFeatureWriter(streamWriter, extended, objectIndex, version, category, aliasWriter,
                     attributeWriter, primaryRefWriter, cvWriter, parameterWriter);
             PsiXmlVariableNameWriter<CvTerm> experimentalCvWriter = elementWriterFactory.createExperimentalCvWriter(streamWriter, extended, objectIndex, aliasWriter,
                     primaryRefWriter);
@@ -298,6 +298,191 @@ public class IntactPsiXmlElementWriterFactory {
 
                                     return new PsiXmlParticipantWriter[]{writer2, modelledWriter3};
                             }
+                    }
+            }
+        }
+    }
+
+    public static PsiXmlVariableNameWriter<CvTerm> createOpenCvWriter(XMLStreamWriter streamWriter, boolean extended,
+                                                                      PsiXmlElementWriter<Alias> aliasWriter, PsiXmlElementWriter<Annotation> attributeWriter,
+                                                                      PsiXmlXrefWriter primaryRefWriter) {
+        PsiXmlElementWriterFactory elementWriterFactory = PsiXmlElementWriterFactory.getInstance();
+        if (extended){
+            return elementWriterFactory.createOpenCvWriter(streamWriter, extended, aliasWriter, attributeWriter, primaryRefWriter);
+        }
+        else{
+            IntactXmlOpenCvTermWriter cellTypeWriter = new IntactXmlOpenCvTermWriter(streamWriter);
+            cellTypeWriter.setAttributeWriter(attributeWriter);
+            cellTypeWriter.setAliasWriter(aliasWriter);
+            cellTypeWriter.setXrefWriter(primaryRefWriter);
+            return cellTypeWriter;
+        }
+    }
+
+    public static PsiXmlElementWriter<Interactor> createInteractorWriter(XMLStreamWriter streamWriter, boolean extended,
+                                                                         PsiXmlObjectCache objectIndex, PsiXmlElementWriter<Alias> aliasWriter,
+                                                                         PsiXmlElementWriter<Annotation> attributeWriter,
+                                                                         PsiXmlXrefWriter primaryRefWriter,
+                                                                         PsiXmlVariableNameWriter<CvTerm> interactorTypeWriter,
+                                                                         PsiXmlElementWriter<Organism> organismWriter,
+                                                                         PsiXmlElementWriter<Checksum> checksumWriter) {
+        PsiXmlElementWriterFactory elementWriterFactory = PsiXmlElementWriterFactory.getInstance();
+        if (extended){
+            return elementWriterFactory.createInteractorWriter(streamWriter, extended, objectIndex, aliasWriter, attributeWriter, primaryRefWriter,
+                    interactorTypeWriter, organismWriter, checksumWriter);
+        }
+        else{
+            IntactXmlInteractorWriter interactorWriter = new IntactXmlInteractorWriter(streamWriter, objectIndex);
+            interactorWriter.setAliasWriter(aliasWriter);
+            interactorWriter.setAttributeWriter(attributeWriter);
+            interactorWriter.setXrefWriter(primaryRefWriter);
+            interactorWriter.setInteractorTypeWriter(interactorTypeWriter);
+            interactorWriter.setOrganismWriter(organismWriter);
+            interactorWriter.setChecksumWriter(checksumWriter);
+            return interactorWriter;
+        }
+    }
+
+    public static PsiXmlSourceWriter createSourceWriter(XMLStreamWriter streamWriter, boolean extended,
+                                                        PsiXmlVersion version,
+                                                        PsiXmlElementWriter<Alias> aliasWriter, PsiXmlElementWriter<Annotation> attributeWriter,
+                                                        PsiXmlXrefWriter primaryRefWriter,
+                                                        PsiXmlPublicationWriter publicationWriter) {
+        PsiXmlElementWriterFactory elementWriterFactory = PsiXmlElementWriterFactory.getInstance();
+
+        if (extended){
+            return elementWriterFactory.createSourceWriter(streamWriter, extended, version, aliasWriter, attributeWriter, primaryRefWriter,
+                    publicationWriter);
+        }
+        else{
+            switch (version){
+                case v3_0_0:
+                    uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml30.XmlIntactSourceWriter sourceWriter =
+                            new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml30.XmlIntactSourceWriter(streamWriter);
+                    sourceWriter.setXrefWriter(primaryRefWriter);
+                    sourceWriter.setAttributeWriter(attributeWriter);
+                    sourceWriter.setAliasWriter(aliasWriter);
+                    sourceWriter.setPublicationWriter(publicationWriter);
+                    return sourceWriter;
+                default:
+                    uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml25.XmlIntactSourceWriter sourceWriter2 =
+                            new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml25.XmlIntactSourceWriter(streamWriter);
+                    sourceWriter2.setXrefWriter(primaryRefWriter);
+                    sourceWriter2.setAttributeWriter(attributeWriter);
+                    sourceWriter2.setAliasWriter(aliasWriter);
+                    sourceWriter2.setPublicationWriter(publicationWriter);
+                    return sourceWriter2;
+            }
+        }
+
+    }
+
+    public static PsiXmlPublicationWriter createPublicationWriter(XMLStreamWriter streamWriter, boolean extended,
+                                                                  PsiXmlElementWriter<Annotation> attributeWriter, PsiXmlXrefWriter primaryRefWriter,
+                                                                  PsiXmlVersion version) {
+        PsiXmlElementWriterFactory elementWriterFactory = PsiXmlElementWriterFactory.getInstance();
+
+        PsiXmlPublicationWriter publicationWriter;
+        if (extended){
+            return elementWriterFactory.createPublicationWriter(streamWriter, extended, attributeWriter, primaryRefWriter,
+                    version);
+        }
+        else{
+            switch (version){
+                case v3_0_0:
+                    publicationWriter = new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml30.XmlIntactPublicationWriter(streamWriter);
+                    ((uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml30.XmlIntactPublicationWriter)publicationWriter)
+                            .setAttributeWriter(attributeWriter);
+                    ((uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml30.XmlIntactPublicationWriter)publicationWriter)
+                            .setXrefWriter(primaryRefWriter);
+                    break;
+                default:
+                    publicationWriter = new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml25.XmlIntactPublicationWriter(streamWriter);
+                    ((uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml25.XmlIntactPublicationWriter)publicationWriter)
+                            .setAttributeWriter(attributeWriter);
+                    ((uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml25.XmlIntactPublicationWriter)publicationWriter)
+                            .setXrefWriter(primaryRefWriter);
+                    break;
+            }
+        }
+        return publicationWriter;
+    }
+
+    public static <F extends Feature> PsiXmlElementWriter<F>[] createFeatureWriter(XMLStreamWriter streamWriter, boolean extended,
+                                                                                   PsiXmlObjectCache objectIndex, PsiXmlVersion version,
+                                                                                   InteractionCategory category, PsiXmlElementWriter<Alias> aliasWriter,
+                                                                                   PsiXmlElementWriter<Annotation> attributeWriter,
+                                                                                   PsiXmlXrefWriter primaryRefWriter,
+                                                                                   PsiXmlVariableNameWriter<CvTerm> featureTypeWriter,
+                                                                                   PsiXmlParameterWriter parameterWriter){
+        PsiXmlElementWriterFactory elementWriterFactory = PsiXmlElementWriterFactory.getInstance();
+
+        PsiXmlElementWriter<Range> rangeWriter = elementWriterFactory.createRangeWriter(streamWriter, extended, objectIndex, version, primaryRefWriter,
+                featureTypeWriter);
+
+        if (extended){
+            return createFeatureWriter(streamWriter, extended, objectIndex, version, category, aliasWriter, attributeWriter, primaryRefWriter, featureTypeWriter,
+                    parameterWriter);
+        }
+        else{
+            switch (version){
+                case v3_0_0:
+                    uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml30.XmlIntactModelledFeatureWriter modelledWriter =
+                            new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml30.XmlIntactModelledFeatureWriter(streamWriter, objectIndex);
+                    modelledWriter.setAliasWriter(aliasWriter);
+                    modelledWriter.setAttributeWriter(attributeWriter);
+                    modelledWriter.setFeatureTypeWriter(featureTypeWriter);
+                    modelledWriter.setRangeWriter(rangeWriter);
+                    modelledWriter.setXrefWriter(primaryRefWriter);
+
+                    switch (category){
+                        case modelled:
+                            return new PsiXmlElementWriter[]{modelledWriter, modelledWriter};
+                        default:
+                            uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml30.XmlIntactFeatureEvidenceWriter writer =
+                                    new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml30.XmlIntactFeatureEvidenceWriter(streamWriter, objectIndex);
+                            writer.setAliasWriter(aliasWriter);
+                            writer.setAttributeWriter(attributeWriter);
+                            writer.setFeatureTypeWriter(featureTypeWriter);
+                            writer.setRangeWriter(rangeWriter);
+                            writer.setXrefWriter(primaryRefWriter);
+                            writer.setParameterWriter(parameterWriter);
+
+                            return new PsiXmlElementWriter[]{writer, modelledWriter};
+                    }
+
+                default:
+                    uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml25.XmlIntactModelledFeatureWriter modelledWriter2 =
+                            new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml25.XmlIntactModelledFeatureWriter(streamWriter, objectIndex);
+                    modelledWriter2.setAliasWriter(aliasWriter);
+                    modelledWriter2.setAttributeWriter(attributeWriter);
+                    modelledWriter2.setFeatureTypeWriter(featureTypeWriter);
+                    modelledWriter2.setRangeWriter(rangeWriter);
+                    modelledWriter2.setXrefWriter(primaryRefWriter);
+
+                    switch (category){
+                        case modelled:
+                            return new PsiXmlElementWriter[]{modelledWriter2, modelledWriter2};
+                        case basic:
+                            psidev.psi.mi.jami.xml.io.writer.elements.impl.xml25.XmlFeatureWriter writer3 =
+                                    new psidev.psi.mi.jami.xml.io.writer.elements.impl.xml25.XmlFeatureWriter(streamWriter, objectIndex);
+                            writer3.setAliasWriter(aliasWriter);
+                            writer3.setAttributeWriter(attributeWriter);
+                            writer3.setFeatureTypeWriter(featureTypeWriter);
+                            writer3.setRangeWriter(rangeWriter);
+                            writer3.setXrefWriter(primaryRefWriter);
+
+                            return new PsiXmlElementWriter[]{writer3, modelledWriter2};
+                        default:
+                            uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml25.XmlIntactFeatureEvidenceWriter writer2 =
+                                    new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml25.XmlIntactFeatureEvidenceWriter(streamWriter, objectIndex);
+                            writer2.setAliasWriter(aliasWriter);
+                            writer2.setAttributeWriter(attributeWriter);
+                            writer2.setFeatureTypeWriter(featureTypeWriter);
+                            writer2.setRangeWriter(rangeWriter);
+                            writer2.setXrefWriter(primaryRefWriter);
+
+                            return new PsiXmlElementWriter[]{writer2, modelledWriter2};
                     }
             }
         }

@@ -1,7 +1,9 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.xml30;
 
+import psidev.psi.mi.jami.model.Annotation;
 import psidev.psi.mi.jami.model.Experiment;
 import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.utils.AnnotationUtils;
 import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
 import psidev.psi.mi.jami.xml.io.writer.elements.impl.xml30.XmlExperimentWriter;
 import psidev.psi.mi.jami.xml.utils.PsiXmlUtils;
@@ -11,6 +13,8 @@ import uk.ac.ebi.intact.jami.model.extension.IntactExperiment;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -107,6 +111,33 @@ public class XmlIntactExperimentWriter extends XmlExperimentWriter {
             // write secondaryref
             getXrefWriter().write(ref,"secondaryRef");
 
+        }
+    }
+
+    @Override
+    protected void writeAttributes(Experiment object) throws XMLStreamException {
+        Collection<Annotation> noExportAnnotations = AnnotationUtils.collectAllAnnotationsHavingTopic(object.getAnnotations(),
+                null, "no-export");
+        Collection<Annotation> exportAnnotations = new ArrayList<Annotation>(object.getAnnotations());
+        exportAnnotations.removeAll(noExportAnnotations);
+
+        // write annotations from experiment first
+        if (!exportAnnotations.isEmpty()){
+            // write start attribute list
+            getStreamWriter().writeStartElement("attributeList");
+            for (Annotation ann : exportAnnotations){
+                getAttributeWriter().write(ann);
+            }
+
+            // write publication attributes if not done at the bibref level
+            writeOtherAttributes(object, false);
+
+            // write end attributeList
+            getStreamWriter().writeEndElement();
+        }
+        // write annotations from publication
+        else{
+            writeOtherAttributes(object, true);
         }
     }
 }
