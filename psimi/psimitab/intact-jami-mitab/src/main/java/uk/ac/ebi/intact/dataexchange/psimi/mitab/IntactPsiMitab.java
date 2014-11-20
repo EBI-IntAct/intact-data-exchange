@@ -7,7 +7,6 @@ import psidev.psi.mi.jami.model.ComplexType;
 import psidev.psi.mi.jami.model.InteractionCategory;
 import psidev.psi.mi.jami.tab.MitabVersion;
 import psidev.psi.mi.jami.tab.extension.factory.options.MitabWriterOptions;
-import psidev.psi.mi.jami.tab.io.writer.DefaultMitabWriter;
 
 import java.util.HashMap;
 import java.util.Map;
