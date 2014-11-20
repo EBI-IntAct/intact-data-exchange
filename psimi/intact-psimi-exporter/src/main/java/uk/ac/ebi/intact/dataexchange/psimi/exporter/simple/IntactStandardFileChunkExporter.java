@@ -9,13 +9,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import psidev.psi.mi.jami.commons.PsiJami;
 import psidev.psi.mi.jami.datasource.InteractionWriter;
 import psidev.psi.mi.jami.exception.MIIOException;
 import psidev.psi.mi.jami.factory.InteractionWriterFactory;
 import psidev.psi.mi.jami.factory.options.InteractionWriterOptions;
 import psidev.psi.mi.jami.model.Interaction;
-import psidev.psi.mi.jami.xml.io.writer.DefaultXmlWriter;
+import uk.ac.ebi.intact.dataexchange.psimi.mitab.IntactPsiMitab;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.IntactPsiXml;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 
@@ -89,10 +88,9 @@ public class IntactStandardFileChunkExporter<T extends Interaction> extends Abst
     @Override
     protected void registerWriters() {
         // register default MI writers
-        PsiJami.initialiseAllInteractionWriters();
+        IntactPsiMitab.initialiseAllIntactMitabWriters();
 
         // override writers for Intact xml
-        InteractionWriterFactory.getInstance().removeDataSourceWriter(DefaultXmlWriter.class);
         IntactPsiXml.initialiseAllIntactXmlWriters();
     }
 

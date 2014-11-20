@@ -198,14 +198,14 @@
     <!-- processors -->
 
     <!-- writers -->
-    <bean id="spokeExpansion" class="psidev.psi.mi.jami.binary.expansion.InteractionEvidenceSpokeExpansion"/>
+    <bean id="spokeExpansion" class="psidev.psi.mi.jami.binary.expansion.InteractionEvidenceSpokeExpansion" lazy-init="true"/>
 
     <!-- interaction writer -->
     <bean id="miFileOutput" class="org.springframework.core.io.FileSystemResource">
         <constructor-arg value="${mi.output}"/>
     </bean>
     <!-- interaction evidence html writer -->
-    <bean id="intactHtmlEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactHtmlExporter">
+    <bean id="intactHtmlEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactHtmlExporter" lazy-init="true">
         <property name="writerOptions">
             <map>
                 <entry key="write_html_header_option_key" value-type="java.lang.Boolean" value="true" />
@@ -216,7 +216,7 @@
         <property name="output" ref="miFileOutput"/>
     </bean>
     <!-- complex html writer -->
-    <bean id="intactHtmlModelledWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactHtmlExporter">
+    <bean id="intactHtmlComplexWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactHtmlExporter" lazy-init="true">
         <property name="writerOptions">
             <map>
                 <entry key="write_html_header_option_key" value-type="java.lang.Boolean" value="true" />
@@ -227,29 +227,247 @@
         <property name="output" ref="miFileOutput"/>
     </bean>
     <!-- interaction evidence json writer -->
-    <bean id="intactJsonEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactInteractionViewerJsonExporter">
+    <bean id="intactJsonEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactInteractionViewerJsonExporter" lazy-init="true">
         <property name="writerOptions">
             <map>
-                <entry key="write_html_header_option_key" value-type="java.lang.Boolean" value="true" />
-                <entry key="output_format_key" value="mi_html"/>
+                <entry key="interaction_viewer_json_type" value-type="psidev.psi.mi.jami.json.MIJsonType" value="n_ary_only" />
+                <entry key="output_format_key" value="interaction_viewer_json"/>
                 <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
             </map>
         </property>
         <property name="output" ref="miFileOutput"/>
     </bean>
     <!-- complex json writer -->
-    <bean id="intactJsonModelledWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactInteractionViewerJsonExporter">
+    <bean id="intactJsonComplexWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactInteractionViewerJsonExporter" lazy-init="true">
         <property name="writerOptions">
             <map>
-                <entry key="write_html_header_option_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="interaction_viewer_json_type" value-type="psidev.psi.mi.jami.json.MIJsonType" value="n_ary_only" />
                 <entry key="output_format_key" value="interaction_viewer_json"/>
                 <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="modelled"/>
             </map>
         </property>
         <property name="output" ref="miFileOutput"/>
     </bean>
-
-    <!-- Basic Step configuration -->
+    <!-- interaction evidence structured abstract writer -->
+    <bean id="intactStructuredAbstractEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStructuredAbstractExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="structured_abstract_type" value-type="uk.ac.ebi.intact.dataexchange.structuredabstract.AbstractOutputType" value="ABSTRACT_HTML_OUTPUT" />
+                <entry key="output_format_key" value="structured_abstract"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <!-- complex structured abstract writer -->
+    <bean id="intactStructuredAbstractComplexWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStructuredAbstractExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="structured_abstract_type" value-type="uk.ac.ebi.intact.dataexchange.structuredabstract.AbstractOutputType" value="ABSTRACT_HTML_OUTPUT" />
+                <entry key="output_format_key" value="structured_abstract"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="complex"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <!-- interaction evidence xml writers -->
+    <bean id="intactEvidenceXml25CompactWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="intactEvidenceXml25ExpandedWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="intactEvidenceXml30CompactWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="intactEvidenceXml30ExpandedWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="intactEvidenceXml25CompactChunkWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileChunkExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="intactEvidenceXml25ExpandedChunkWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileChunkExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="intactEvidenceXml30CompactChunkWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileChunkExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="intactEvidenceXml30ExpandedChunkWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileChunkExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <!-- complex xml writer -->
+    <bean id="intactComplexXml25CompactWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="complex"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="intactComplexXml25ExpandedWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="complex"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="intactComplexXml30CompactWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="complex"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="intactComplexXml30ExpandedWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psi25_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="complex"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <!-- mitab exporters -->
+    <bean id="mitabEvidence27Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="mitab_header_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="mitab_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="mitab_version_key" value-type="psidev.psi.mi.jami.tab.MitabVersion" value="v2_7"/>
+                <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
+                <entry key="output_format_key" value="mitab"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="mitabEvidence26Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="mitab_header_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="mitab_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="mitab_version_key" value-type="psidev.psi.mi.jami.tab.MitabVersion" value="v2_6"/>
+                <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
+                <entry key="output_format_key" value="mitab"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
+    <bean id="mitabEvidence25Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="mitab_header_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="mitab_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="mitab_version_key" value-type="psidev.psi.mi.jami.tab.MitabVersion" value="v2_5"/>
+                <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
+                <entry key="output_format_key" value="mitab"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miFileOutput"/>
+    </bean>
 
     <!-- Export Steps -->
 
