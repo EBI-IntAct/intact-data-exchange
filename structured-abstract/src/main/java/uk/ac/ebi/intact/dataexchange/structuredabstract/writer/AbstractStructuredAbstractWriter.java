@@ -88,6 +88,8 @@ public abstract class AbstractStructuredAbstractWriter<I extends Interaction> im
      */
     private TreeSet<String> interactorAcs;
 
+    boolean first = true;
+
     private Map<String, String> cvTermUrls;
     private boolean isInitialised = false;
 
@@ -284,6 +286,7 @@ public abstract class AbstractStructuredAbstractWriter<I extends Interaction> im
             finally {
                 isInitialised = false;
                 writer = null;
+                first = true;
                 clear();
             }
         }
@@ -304,6 +307,7 @@ public abstract class AbstractStructuredAbstractWriter<I extends Interaction> im
             }
             isInitialised = false;
             writer = null;
+            first = true;
             clear();
         }
     }
@@ -327,10 +331,13 @@ public abstract class AbstractStructuredAbstractWriter<I extends Interaction> im
     protected void writeSentences() throws IOException {
         Iterator<Sentence> sentenceIterator = this.sentenceMap.values().iterator();
         while (sentenceIterator.hasNext()) {
-            writeSentence(sentenceIterator.next());
-            if (sentenceIterator.hasNext()){
+            if (!first){
                 writeLineSeparator();
             }
+            else{
+                first = false;
+            }
+            writeSentence(sentenceIterator.next());
         }
     }
 
