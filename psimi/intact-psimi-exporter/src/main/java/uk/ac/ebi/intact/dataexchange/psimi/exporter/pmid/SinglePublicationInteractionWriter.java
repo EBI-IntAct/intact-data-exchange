@@ -81,6 +81,8 @@ public class SinglePublicationInteractionWriter implements ItemWriter<Collection
         }
 
         currentYear = null;
+
+        registerWriters();
     }
 
     @Override
@@ -96,6 +98,9 @@ public class SinglePublicationInteractionWriter implements ItemWriter<Collection
 
         parentFolder = null;
         currentYear = null;
+        if (this.psiWriter != null){
+           this.psiWriter.close();
+        }
         this.psiWriter = null;
     }
 
@@ -127,7 +132,7 @@ public class SinglePublicationInteractionWriter implements ItemWriter<Collection
 
                 // now can write a file per publication entry
                 for (PublicationFileEntry publicationEntry : publicationEntries){
-                    String fileName = publicationEntry.getEntryName() + ".xml";
+                    String fileName = publicationEntry.getEntryName() + fileExtension;
 
                     log.info("write publication entry : " + fileName);
 
@@ -140,9 +145,6 @@ public class SinglePublicationInteractionWriter implements ItemWriter<Collection
                     psiWriter.start();
                     psiWriter.write(publicationEntry.getInteractions());
                     psiWriter.end();
-
-                    // close writer after each entry
-                    psiWriter.close();
                 }
             }
         }
@@ -169,15 +171,19 @@ public class SinglePublicationInteractionWriter implements ItemWriter<Collection
     }
 
     protected void initialiseObjectWriter(File file) {
-        // initialise writers
-        registerWriters();
         // add mandatory options
         getWriterOptions().put(InteractionWriterOptions.OUTPUT_OPTION_KEY, file);
 
         addSupplementaryOptions();
 
-        InteractionWriterFactory writerFactory = InteractionWriterFactory.getInstance();
-        this.psiWriter = writerFactory.getInteractionWriterWith(getWriterOptions());
+        if (this.psiWriter == null){
+            InteractionWriterFactory writerFactory = InteractionWriterFactory.getInstance();
+            this.psiWriter = writerFactory.getInteractionWriterWith(getWriterOptions());
+        }
+        else{
+            this.psiWriter.close();
+            this.psiWriter.initialiseContext(this.writerOptions);
+        }
 
         if (this.psiWriter == null){
             throw new IllegalStateException("We cannot find a valid interaction writer with the given options.");

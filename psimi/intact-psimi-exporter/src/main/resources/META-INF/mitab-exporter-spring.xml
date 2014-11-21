@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+           http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
+
+    <import resource="classpath*:/META-INF/intact-exporter-base-spring.xml"/>
+
+    <!-- readers -->
+    <!-- simple negative interaction evidence reader -->
+    <bean id="intactNegativeInteractionEvidenceReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+        <property name="queryString" value="select i from IntactInteractionEvidence i
+        join i.dbAnnotations as a
+        where a.topic.shortName = :negative
+        order by i.created, i.ac"/>
+        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
+        <property name="parameterValues">
+            <map>
+                <entry key="negative" value="negative"/>
+            </map>
+        </property>
+    </bean>
+    <!-- simple positive interaction evidence reader -->
+    <bean id="intactPositiveInteractionEvidenceReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+        <property name="queryString" value="select i from IntactInteractionEvidence i
+        where i.ac not in
+        (select distinct i2.ac from IntactInteractionEvidence i2
+        join i2.dbAnnotations as a
+        where a.topic.shortName = :negative)
+        order by i.created, i.ac"/>
+        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
+        <property name="parameterValues">
+            <map>
+                <entry key="negative" value="negative"/>
+            </map>
+        </property>
+    </bean>
+    <!-- publication arcive reader -->
+    <bean id="publicationMitabArchiveReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.IndividualFileArchiveReader" lazy-init="true">
+        <property name="fileNameTruncation" ref="releaseFileNameTruncator"/>
+        <property name="directory" value="${release.folder}/psimitab/pmid"/>
+        <property name="extensions">
+            <list>
+                <value>txt</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- processors -->
+    <bean id="publicationMitabProcessor" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationExportProcessor" lazy-init="true">
+        <property name="publicationNameGenerator" ref="releaseFileNameGenerator"/>
+    </bean>
+
+    <!-- interaction writer -->
+    <bean id="miPositiveFileOutput" class="org.springframework.core.io.FileSystemResource">
+        <constructor-arg value="${release.folder}/mitab/intact.txt"/>
+    </bean>
+    <bean id="miNegativeFileOutput" class="org.springframework.core.io.FileSystemResource">
+        <constructor-arg value="${release.folder}/mitab/intact_negative.txt"/>
+    </bean>
+
+    <!-- mitab exporters -->
+    <bean id="intactMitabPositiveEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="mitab_header_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="mitab_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="mitab_version_key" value-type="psidev.psi.mi.jami.tab.MitabVersion" value="v2_7"/>
+                <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
+                <entry key="output_format_key" value="mitab"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miPositiveFileOutput"/>
+    </bean>
+    <bean id="intactMitabNegativeEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+        <property name="writerOptions">
+            <map>
+                <entry key="mitab_header_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="mitab_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="mitab_version_key" value-type="psidev.psi.mi.jami.tab.MitabVersion" value="v2_7"/>
+                <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
+                <entry key="output_format_key" value="mitab"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+        <property name="output" ref="miNegativeFileOutput"/>
+    </bean>
+    <!-- MITAB 2.7 publication writer -->
+    <bean id="intactPublicationMitab27Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.SinglePublicationInteractionXmlWriter" lazy-init="true">
+        <property name="parentFolderPaths" value="${release.folder}/psimitab/pmid"/>
+        <property name="fileExtension" value=".txt"/>
+        <property name="writerOptions">
+            <map>
+                <entry key="mitab_header_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="mitab_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="mitab_version_key" value-type="psidev.psi.mi.jami.tab.MitabVersion" value="v2_7"/>
+                <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
+                <entry key="output_format_key" value="mitab"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- Compressors -->
+    <bean id="zipCompressor" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.Compressor">
+        <property name="compression" value="zip"/>
+    </bean>
+
+    <!-- tasklet -->
+    <!-- tasklet for compressing mitab file -->
+    <bean id="compressGlobalMitabTasklet" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.CompressorTasklet">
+        <property name="outputFile" value="${mi.output.zip}"/>
+        <property name="compressor" ref="zipCompressor"/>
+        <property name="filesToCompress">
+            <list>
+                <value>${release.folder}/mitab/intact.txt</value>
+                <value>${release.folder}/mitab/intact_negative.txt</value>
+            </list>
+        </property>
+        <property name="deleteSourceFiles" value="false"/>
+    </bean>
+
+    <!-- Export Steps -->
+    <!-- export mitab 2.7 publication files -->
+    <batch:step id="mitab27.publicationStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactPublicationReader"
+                         processor="publicationMitabProcessor"
+                         writer="intactPublicationMitab27Writer"
+                         commit-interval="1">
+                <batch:streams>
+                    <batch:stream ref="intactPublicationReader"/>
+                    <batch:stream ref="publicationMitabProcessor"/>
+                    <batch:stream ref="intactPublicationMitab27Writer"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- MITAB 2.7 positive interactions export-->
+    <batch:step id="mitab27.positiveInteractionStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactPositiveInteractionEvidenceReader"
+                         writer="intactMitabPositiveEvidenceWriter"
+                         commit-interval="200">
+                <batch:streams>
+                    <batch:stream ref="intactPositiveInteractionEvidenceReader"/>
+                    <batch:stream ref="intactMitabPositiveEvidenceWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- MITAB 2.7 negative interactions export-->
+    <batch:step id="mitab27.negativeInteractionStep" job-repository="basicBatchJobRepository" >
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactNegativeInteractionEvidenceReader"
+                         writer="intactMitabNegativeEvidenceWriter"
+                         commit-interval="200">
+                <batch:streams>
+                    <batch:stream ref="intactNegativeInteractionEvidenceReader"/>
+                    <batch:stream ref="intactMitabNegativeEvidenceWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip global mitab file -->
+    <batch:step id="zip.globalMitabStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" ref="compressGlobalMitabTasklet" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+        </batch:tasklet>
+    </batch:step>
+
+    <!-- Export job -->
+    <!-- final job which will export binary interactions, cluster and score them and index in solr -->
+    <batch:job id="exportGlobalMitabJob" job-repository="basicBatchJobRepository">
+
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
+
+        <!-- split 1 : export positive and negative interactions in parallel -->
+        <batch:split id="psimitab.split" task-executor="asyncTaskExecutor" next="zip.globalMitab">
+            <!-- flow1 : export positive interactions -->
+            <batch:flow>
+                <batch:step id="exportPositiveMitab" parent="mitab27.positiveInteractionStep">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                </batch:step>
+            </batch:flow>
+
+            <!-- flow2: export negative interactions -->
+            <batch:flow>
+                <batch:step  id="exportNegativeMitab" parent="mitab27.negativeInteractionStep">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                </batch:step>
+            </batch:flow>
+        </batch:split>
+
+        <!-- zip mitab-->
+        <batch:step id="zip.globalMitab" parent="zip.globalMitabStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+        </batch:step>
+    </batch:job>
+</beans>

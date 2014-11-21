@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+           http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
+
+    <import resource="classpath*:/META-INF/intact-exporter-base-spring.xml"/>
+
+    <!-- readers -->
+    <!-- simple archive reader for xml25 -->
+    <bean id="publicationXml25ArchiveReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.IndividualFileArchiveReader" lazy-init="true">
+        <property name="fileNameTruncation" ref="releaseFileNameTruncator"/>
+        <property name="directory" value="${release.folder}/psi25/pmid"/>
+        <property name="extensions">
+            <list>
+                <value>xml</value>
+            </list>
+        </property>
+    </bean>
+    <!-- simple archive reader for xml30 -->
+    <bean id="publicationXml30ArchiveReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.IndividualFileArchiveReader" lazy-init="true">
+        <property name="fileNameTruncation" ref="releaseFileNameTruncator"/>
+        <property name="directory" value="${release.folder}/psi30/pmid"/>
+        <property name="extensions">
+            <list>
+                <value>xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- processors -->
+    <bean id="intactPublicationXmlProcessor" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationExportChunkProcessor" lazy-init="true">
+        <property name="largeScale" value="2000"/>
+        <property name="publicationNameGenerator" ref="releaseFileNameGenerator"/>
+    </bean>
+
+    <!-- writers -->
+    <!-- interaction writer -->
+    <bean id="miFileOutput" class="org.springframework.core.io.FileSystemResource">
+        <constructor-arg value="${mi.output}"/>
+    </bean>
+    <!-- XML 25 publication writer -->
+    <bean id="intactPublicationXml25Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.SinglePublicationInteractionXmlWriter" lazy-init="true">
+        <property name="parentFolderPaths" value="${release.folder}/psi25/pmid"/>
+        <property name="fileExtension" value=".xml"/>
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psimi_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+    </bean>
+    <!-- XML 30 publication writer -->
+    <bean id="intactPublicationXml30Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.SinglePublicationInteractionXmlWriter" lazy-init="true">
+        <property name="parentFolderPaths" value="${release.folder}/psi30/pmid"/>
+        <property name="fileExtension" value=".xml"/>
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psimi_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+    </bean>
+    <!-- composite publication writer -->
+    <bean id="intactPublicationCompositeXmlWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.SinglePublicationInteractionCompositeWriter"
+          lazy-init="true">
+        <property name="delegates">
+            <list>
+                <ref bean="intactPublicationXml25Writer"/>
+                <ref bean="intactPublicationXml30Writer"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Export Steps -->
+    <batch:step id="xml25.publicationStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactPublicationReader"
+                         processor="intactPublicationXmlProcessor"
+                         writer="intactPublicationXml25Writer"
+                         commit-interval="1">
+                <batch:streams>
+                    <batch:stream ref="intactPublicationReader"/>
+                    <batch:stream ref="intactPublicationXmlProcessor"/>
+                    <batch:stream ref="intactPublicationXml25Writer"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <batch:step id="xml30.publicationStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactPublicationReader"
+                         processor="intactPublicationXmlProcessor"
+                         writer="intactPublicationXml30Writer"
+                         commit-interval="1">
+                <batch:streams>
+                    <batch:stream ref="intactPublicationReader"/>
+                    <batch:stream ref="intactPublicationXmlProcessor"/>
+                    <batch:stream ref="intactPublicationXml30Writer"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <batch:step id="xml.publicationStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactPublicationReader"
+                         processor="intactPublicationXmlProcessor"
+                         writer="intactPublicationCompositeXmlWriter"
+                         commit-interval="1">
+                <batch:streams>
+                    <batch:stream ref="intactPublicationReader"/>
+                    <batch:stream ref="intactPublicationXmlProcessor"/>
+                    <batch:stream ref="intactPublicationXml25Writer"/>
+                    <batch:stream ref="intactPublicationXml30Writer"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+
+    <!-- Export job -->
+
+</beans>
