@@ -116,6 +116,17 @@
     </bean>
 
     <!-- tasklet -->
+    <!-- tasklet for compressing mitab publication files -->
+    <bean id="compressorTab27Tasklet" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.CompressorByFileExtensionsTasklet">
+        <property name="outputFile" value="${release.forlder}/mitab/pmidMITAB27.zip"/>
+        <property name="compressor" ref="zipCompressor"/>
+        <property name="directory" value="${release.forlder}/mitab/pmid"/>
+        <property name="extensions">
+            <list>
+                <value>txt</value>
+            </list>
+        </property>
+    </bean>
     <!-- tasklet for compressing mitab file -->
     <bean id="compressGlobalMitabTasklet" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.CompressorTasklet">
         <property name="outputFile" value="${mi.output.zip}"/>
@@ -191,9 +202,17 @@
             </batch:listeners>
         </batch:tasklet>
     </batch:step>
+    <!-- step to zip all mitab publication files -->
+    <batch:step id="zip.allPublicationTab27Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" ref="compressorTab27Tasklet" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+        </batch:tasklet>
+    </batch:step>
 
     <!-- Export job -->
-    <!-- final job which will export binary interactions, cluster and score them and index in solr -->
+    <!-- Job which will export binary interactions in MITAB 2.7 -->
     <batch:job id="exportGlobalMitabJob" job-repository="basicBatchJobRepository">
 
         <batch:listeners>
@@ -201,11 +220,12 @@
         </batch:listeners>
 
         <!-- split 1 : export positive and negative interactions in parallel -->
-        <batch:split id="psimitab.split" task-executor="asyncTaskExecutor" next="zip.globalMitab">
+        <batch:split id="psimitab.split1" task-executor="asyncTaskExecutor" next="zip.globalMitab">
             <!-- flow1 : export positive interactions -->
             <batch:flow>
                 <batch:step id="exportPositiveMitab" parent="mitab27.positiveInteractionStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
                 </batch:step>
             </batch:flow>
 
@@ -213,13 +233,94 @@
             <batch:flow>
                 <batch:step  id="exportNegativeMitab" parent="mitab27.negativeInteractionStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
                 </batch:step>
             </batch:flow>
+
+            <batch:end on="FAILED"/>
+            <batch:next on="*" to="zip.globalMitab"/>
         </batch:split>
 
         <!-- zip mitab-->
         <batch:step id="zip.globalMitab" parent="zip.globalMitabStep">
             <batch:tasklet task-executor="syncTaskExecutor"/>
         </batch:step>
+    </batch:job>
+    <!-- Job which will export binary interactions in MITAB 2.7 publication files -->
+    <batch:job id="exportPublicationMitabJob" job-repository="basicBatchJobRepository">
+
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
+
+        <!-- Export interactions per publication in MITAB 2.7 -->
+        <batch:step  id="exportPublicationMitab" parent="mitab27.publicationStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+            <batch:next on="*" to="zip.publicationMitab"/>
+        </batch:step>
+
+        <!-- zip mitab-->
+        <batch:step id="zip.publicationMitab" parent="zip.allPublicationTab27Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+        </batch:step>
+    </batch:job>
+
+    <!-- final job which will export all binary interactions in a global mitab file and per publication -->
+    <batch:job id="mitabExportJob" job-repository="basicBatchJobRepository">
+
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
+
+        <!-- split 1 : export positive and negative interactions in parallel of publication export -->
+        <batch:split id="psimitab.split" task-executor="asyncTaskExecutor">
+            <!-- flow1 : export positive and negative in big file interactions -->
+            <batch:flow>
+                <!-- split 2 : export positive and negative interactions in parallel -->
+                <batch:split id="psimitab.split3" task-executor="asyncTaskExecutor" next="zip.global.mitab">
+                    <!-- flow2 : export positive interactions -->
+                    <batch:flow>
+                        <batch:step id="export.positiveMitab" parent="mitab27.positiveInteractionStep">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:end on="FAILED"/>
+                        </batch:step>
+                    </batch:flow>
+
+                    <!-- flow3: export negative interactions -->
+                    <batch:flow>
+                        <batch:step  id="export.negativeMitab" parent="mitab27.negativeInteractionStep">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:end on="FAILED"/>
+                        </batch:step>
+                    </batch:flow>
+
+                    <batch:end on="FAILED"/>
+                    <batch:next on="*" to="zip.global.mitab"/>
+                </batch:split>
+
+                <!-- zip global mitab-->
+                <batch:step id="zip.global.mitab" parent="zip.globalMitabStep">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+
+            <!-- flow2: export interactions per publication -->
+            <batch:flow>
+                <!-- Export interactions per publication in MITAB 2.7 -->
+                <batch:step  id="export.publicationMitab" parent="mitab27.publicationStep">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                    <batch:next on="*" to="zip.publication.mitab"/>
+                </batch:step>
+
+                <!-- zip mitab-->
+                <batch:step id="zip.publication.mitab" parent="zip.allPublicationTab27Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+        </batch:split>
     </batch:job>
 </beans>
