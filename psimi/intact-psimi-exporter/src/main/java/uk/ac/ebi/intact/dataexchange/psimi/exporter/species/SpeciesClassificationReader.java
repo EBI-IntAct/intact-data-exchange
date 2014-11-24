@@ -88,7 +88,7 @@ public class SpeciesClassificationReader implements ItemReader<SpeciesInteractio
         // the current species file still contains lines
         if ((this.currentPositiveInteractionIterator != null && this.currentPositiveInteractionIterator.hasNext())
                 || (this.currentNegativeInteractionIterator != null && this.currentNegativeInteractionIterator.hasNext())){
-            // nothing to do
+            // reiterate through same files because must be very large
         }
         else if (this.speciesIterator.hasNext()){
             // we have read one more line
