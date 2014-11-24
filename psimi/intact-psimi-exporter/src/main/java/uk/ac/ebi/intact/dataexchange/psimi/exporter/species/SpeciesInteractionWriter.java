@@ -62,6 +62,8 @@ public class SpeciesInteractionWriter implements ItemWriter<SpeciesInteractionUn
     private FileChannel fileChannel;
     private FileOutputStream os;
 
+    private boolean appendToExistingFile = false;
+
     public SpeciesInteractionWriter(){
         super();
     }
@@ -169,9 +171,9 @@ public class SpeciesInteractionWriter implements ItemWriter<SpeciesInteractionUn
      * configuration information.
      * @throws java.io.IOException
      */
-    protected void initializeBufferedWriter(File file, boolean restarted, boolean shouldDeleteIfExists) throws IOException {
+    protected void initializeBufferedWriter(File file, boolean restarted) throws IOException {
 
-        FileUtils.setUpOutputFile(file, restarted, !shouldDeleteIfExists, shouldDeleteIfExists);
+        FileUtils.setUpOutputFile(file, restarted, isAppendToExistingFile(), !isAppendToExistingFile());
 
         os = new FileOutputStream(file.getAbsolutePath(), true);
         fileChannel = os.getChannel();
@@ -257,10 +259,10 @@ public class SpeciesInteractionWriter implements ItemWriter<SpeciesInteractionUn
 
             // we initialize the bufferWriter
             if (this.currentPosition > 0) {
-                initializeBufferedWriter(file, true, false);
+                initializeBufferedWriter(file, true);
             }
             else {
-                initializeBufferedWriter(file, false, false);
+                initializeBufferedWriter(file, false);
             }
         } catch (IOException e) {
             throw new ItemStreamException("Cannot open the output file", e);
@@ -408,6 +410,14 @@ public class SpeciesInteractionWriter implements ItemWriter<SpeciesInteractionUn
 
     public void setExtension(String extension) {
         this.extension = extension;
+    }
+
+    public boolean isAppendToExistingFile() {
+        return appendToExistingFile;
+    }
+
+    public void setAppendToExistingFile(boolean appendToExistingFile) {
+        this.appendToExistingFile = appendToExistingFile;
     }
 
     protected Writer getOutputBufferedWriter() {

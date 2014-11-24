@@ -60,10 +60,10 @@ public abstract class AbstractIntactDbExporter<T> implements ItemWriter<T>,ItemS
             // we initialize the bufferWriter
             if (executionContext.containsKey(CURRENT_POSITION)) {
                 this.currentPosition = executionContext.getLong(CURRENT_POSITION);
-                initializeBufferedWriter(outputFile, true, false);
+                initializeBufferedWriter(outputFile, true);
             }
             else {
-                initializeBufferedWriter(outputFile, false, false);
+                initializeBufferedWriter(outputFile, false);
             }
         } catch (IOException e) {
             throw new ItemStreamException("Cannot open the output file", e);
@@ -101,9 +101,9 @@ public abstract class AbstractIntactDbExporter<T> implements ItemWriter<T>,ItemS
      * configuration information.
      * @throws java.io.IOException
      */
-    protected void initializeBufferedWriter(File file, boolean restarted, boolean shouldDeleteIfExists) throws IOException {
+    protected void initializeBufferedWriter(File file, boolean restarted) throws IOException {
 
-        FileUtils.setUpOutputFile(file, restarted, !shouldDeleteIfExists, shouldDeleteIfExists);
+        FileUtils.setUpOutputFile(file, restarted, restarted, !restarted);
 
         os = new FileOutputStream(file.getAbsolutePath(), true);
         fileChannel = os.getChannel();
