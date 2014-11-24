@@ -1,6 +1,8 @@
 package uk.ac.ebi.intact.dataexchange.psimi.exporter.archive;
 
 import org.apache.commons.io.FileUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.FileUnit;
+import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.ReleaseUnitIterator;
 
 import java.io.File;
 import java.util.*;
@@ -12,7 +14,7 @@ import java.util.*;
  * @since <pre>17/10/11</pre>
  */
 
-public class FileWithCommonNameIterator implements ReleaseUnitIterator<FileUnit>{
+public class FileWithCommonNameIterator implements ReleaseUnitIterator<FileUnit> {
 
     protected NameTruncation fileNameTruncation;
     protected String[] extensions;

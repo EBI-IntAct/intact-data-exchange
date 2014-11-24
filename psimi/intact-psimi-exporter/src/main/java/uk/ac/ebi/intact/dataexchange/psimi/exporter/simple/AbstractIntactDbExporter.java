@@ -101,7 +101,7 @@ public abstract class AbstractIntactDbExporter<T> implements ItemWriter<T>,ItemS
      * configuration information.
      * @throws java.io.IOException
      */
-    private void initializeBufferedWriter(File file, boolean restarted, boolean shouldDeleteIfExists) throws IOException {
+    protected void initializeBufferedWriter(File file, boolean restarted, boolean shouldDeleteIfExists) throws IOException {
 
         FileUtils.setUpOutputFile(file, restarted, !shouldDeleteIfExists, shouldDeleteIfExists);
 
@@ -113,8 +113,6 @@ public abstract class AbstractIntactDbExporter<T> implements ItemWriter<T>,ItemS
 
         Assert.state(outputBufferedWriter != null);
 
-        initialiseObjectWriter(restarted);
-
         // in case of restarting reset position to last committed point
         if (restarted) {
             checkFileSize();
@@ -122,6 +120,8 @@ public abstract class AbstractIntactDbExporter<T> implements ItemWriter<T>,ItemS
         }
 
         outputBufferedWriter.flush();
+
+        initialiseObjectWriter(restarted);
     }
 
     protected abstract void initialiseObjectWriter(boolean restarted);
@@ -190,5 +190,13 @@ public abstract class AbstractIntactDbExporter<T> implements ItemWriter<T>,ItemS
 
     protected Writer getOutputBufferedWriter() {
         return outputBufferedWriter;
+    }
+
+    protected FileChannel getFileChannel() {
+        return fileChannel;
+    }
+
+    protected FileOutputStream getOs() {
+        return os;
     }
 }

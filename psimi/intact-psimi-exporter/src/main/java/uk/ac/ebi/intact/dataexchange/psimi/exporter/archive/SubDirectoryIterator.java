@@ -1,5 +1,8 @@
 package uk.ac.ebi.intact.dataexchange.psimi.exporter.archive;
 
+import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.FileUnit;
+import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.ReleaseUnitIterator;
+
 import java.io.File;
 import java.util.*;
 
@@ -11,7 +14,7 @@ import java.util.*;
  * @since <pre>18/10/11</pre>
  */
 
-public class SubDirectoryIterator implements ReleaseUnitIterator<FileUnit>{
+public class SubDirectoryIterator implements ReleaseUnitIterator<FileUnit> {
     protected File directory;
     protected boolean recursive;
 

@@ -1,4 +1,6 @@
-package uk.ac.ebi.intact.dataexchange.psimi.exporter.archive;
+package uk.ac.ebi.intact.dataexchange.psimi.exporter.util;
+
+import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.ReleaseUnit;
 
 import java.io.File;
 

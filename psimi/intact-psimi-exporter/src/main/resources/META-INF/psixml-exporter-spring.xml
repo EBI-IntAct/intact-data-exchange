@@ -14,6 +14,11 @@
 
     <import resource="classpath*:/META-INF/intact-exporter-base-spring.xml"/>
 
+    <bean id="releaseXmlPublicationFilter"  class="uk.ac.ebi.intact.dataexchange.psimi.exporter.util.PublicationFileFilter">
+        <property name="separator" value="_"/>
+        <property name="extension" value=".xml"/>
+    </bean>
+
     <!-- readers -->
     <!-- simple archive reader for xml25 -->
     <bean id="publicationXml25ArchiveReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.IndividualFileArchiveReader" lazy-init="true">
@@ -34,6 +39,12 @@
                 <value>xml</value>
             </list>
         </property>
+    </bean>
+    <!-- simple complex reader -->
+    <bean id="intactComplexOrderedBySpeciesReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+        <property name="queryString" value="select i from IntactComplex i
+        order by i.organism.ac, i.ac"/>
+        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
     </bean>
 
     <!-- processors -->

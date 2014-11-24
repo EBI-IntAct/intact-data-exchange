@@ -148,11 +148,7 @@
         order by i.created, i.ac"/>
         <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
     </bean>
-    <bean id="intactComplexOrderedBySpeciesReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
-        <property name="queryString" value="select i from IntactComplex i
-        order by i.organism.ac, i.ac"/>
-        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
-    </bean>
+
     <!-- simple publication reader -->
     <bean id="intactPublicationReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
         <property name="queryString" value="select i from IntactPublication i

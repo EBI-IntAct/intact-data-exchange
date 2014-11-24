@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.psimi.exporter.archive;
+package uk.ac.ebi.intact.dataexchange.psimi.exporter.util;
 
 import java.util.Iterator;
 

@@ -4,6 +4,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
+import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.FileUnit;
 
 import java.io.File;
 import java.io.FileWriter;

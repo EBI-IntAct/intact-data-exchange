@@ -14,6 +14,11 @@
 
     <import resource="classpath*:/META-INF/intact-exporter-base-spring.xml"/>
 
+    <bean id="releaseMitabPublicationFilter"  class="uk.ac.ebi.intact.dataexchange.psimi.exporter.util.PublicationFileFilter">
+        <property name="separator" value="_"/>
+        <property name="extension" value=".txt"/>
+    </bean>
+
     <!-- readers -->
     <!-- simple negative interaction evidence reader -->
     <bean id="intactNegativeInteractionEvidenceReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">

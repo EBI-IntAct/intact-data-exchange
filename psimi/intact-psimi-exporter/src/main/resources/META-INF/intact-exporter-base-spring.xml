@@ -121,6 +121,14 @@
         <property name="nameSeparator" value="_"/>
     </bean>
 
+    <bean id="releasePublicationFilter"  class="uk.ac.ebi.intact.dataexchange.psimi.exporter.util.PublicationFileFilter">
+        <property name="separator" value="_"/>
+    </bean>
+
+    <bean id="datasetNameTruncator" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.NameTruncation">
+        <property name="nameSeparator" value=" - "/>
+    </bean>
+
     <!-- readers -->
     <!-- simple publication reader -->
     <bean id="intactPublicationReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
@@ -133,6 +141,10 @@
                 <entry key="intactPub" value="14681455"/>
             </map>
         </property>
+    </bean>
+    <!-- reader of the publications, ordered by the species of the interactions, the large scale limit, the shortlabel of the publication and the shortlabel of the experiment-->
+    <bean id="publicationOrderedBySpeciesReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.classification.PublicationSpeciesReader" lazy-init="true">
+        <property name="dataSource" ref="jamiCoreDataSource"/>
     </bean>
 
 </beans>

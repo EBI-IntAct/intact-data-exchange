@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.exporter.archive;
 
 import org.springframework.batch.item.*;
 import org.springframework.util.Assert;
+import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.FileUnit;
 
 import java.io.File;
 
