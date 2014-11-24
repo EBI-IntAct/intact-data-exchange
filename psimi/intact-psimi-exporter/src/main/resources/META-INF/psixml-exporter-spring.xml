@@ -404,7 +404,7 @@
     </batch:step>
 
     <!-- Export job -->
-    <!-- Job which will export binary interactions in XML publication files -->
+    <!-- Job which will export interactions in XML publication files -->
     <batch:job id="exportPublicationXmlJob" job-repository="basicBatchJobRepository">
 
         <batch:listeners>
@@ -415,23 +415,54 @@
         <batch:step  id="exportPublicationXml" parent="xml.publicationStep">
             <batch:tasklet task-executor="syncTaskExecutor"/>
             <batch:end on="FAILED"/>
-            <batch:next on="*" to="zip.publicationXml"/>
+            <batch:next on="*" to="zip.publicationXml25"/>
         </batch:step>
 
         <!-- zip xml-->
-        <!-- split 2 : export positive and negative interactions in parallel -->
-        <batch:split id="zip.publicationXml" task-executor="asyncTaskExecutor">
-            <!-- flow1 : zip XML 2.5 -->
+        <batch:step id="zip.publicationXml25" parent="zip.allPublicationXml25Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+            <batch:next on="*" to="zip.allPublicationXml30Step"/>
+        </batch:step>
+
+        <batch:step  id="zip.publicationXml30" parent="zip.allPublicationXml30Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+        </batch:step>
+    </batch:job>
+    <!-- Job which will export interactions by species in XML publication files -->
+    <batch:job id="xml.speciesJob" restartable="true" job-repository="basicBatchJobRepository">
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
+
+        <batch:step id="p.createSpeciesClassification" parent="species.classificationStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+        </batch:step>
+
+        <batch:split id="species.split1" task-executor="asyncTaskExecutor">
+            <!-- flow1 : export xml 2.5 -->
             <batch:flow>
-                <batch:step id="zip.publicationXml25" parent="zip.allPublicationXml25Step">
+                <batch:step id="p25.createSpecies" parent="xml25.speciesStep">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                    <batch:next on="*" to="zip.species25"/>
+                </batch:step>
+                <batch:step id="zip.species25" parent="zip.singleSpeciesXml25Step">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
                     <batch:end on="FAILED"/>
                 </batch:step>
             </batch:flow>
 
-            <!-- flow2: zip XML 3.0 -->
+            <!-- flow2: export xml 3.0 -->
             <batch:flow>
-                <batch:step  id="zip.publicationXml30" parent="zip.allPublicationXml30Step">
+                <batch:step id="p30.createSpecies" parent="xml30.speciesStep">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                    <batch:next on="*" to="zip.species30"/>
+                </batch:step>
+                <batch:step id="zip.species30" parent="zip.singleSpeciesXml30Step">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
                     <batch:end on="FAILED"/>
                 </batch:step>
@@ -439,35 +470,5 @@
 
             <batch:end on="FAILED"/>
         </batch:split>
-    </batch:job>
-    <!-- Job which will export binary interactions in XML publication files -->
-    <batch:job id="exportPublicationXmlJob" job-repository="basicBatchJobRepository">
-
-        <batch:listeners>
-            <batch:listener ref="basicJobLoggerListener"/>
-        </batch:listeners>
-
-        <!-- Export interactions per publication in XML -->
-        <batch:step  id="exportPublicationXml" parent="xml.publicationStep">
-            <batch:tasklet task-executor="syncTaskExecutor"/>
-            <batch:end on="FAILED"/>
-            <batch:next on="*" to="zip.publicationMitab"/>
-        </batch:step>
-
-        <!-- zip mitab-->
-        <batch:step id="zip.publicationMitab" parent="zip.allPublicationTab27Step">
-            <batch:tasklet task-executor="syncTaskExecutor"/>
-        </batch:step>
-    </batch:job>
-    <batch:job id="xml.smallScaleSpeciesJob" restartable="true" job-repository="intactJobRepository">
-        <batch:listeners>
-            <batch:listener>
-                <bean class="uk.ac.ebi.intact.release.listener.ConsoleJobExecutionListener"/>
-            </batch:listener>
-        </batch:listeners>
-
-        <batch:step id="p.createSmallScaleSpecies" parent="xml.smallScaleSpeciesStep">
-            <batch:tasklet task-executor="syncTaskExecutor"/>
-        </batch:step>
     </batch:job>
 </beans>

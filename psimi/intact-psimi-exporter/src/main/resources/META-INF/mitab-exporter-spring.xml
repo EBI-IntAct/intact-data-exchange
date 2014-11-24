@@ -391,6 +391,27 @@
             <batch:end on="FAILED"/>
         </batch:split>
     </batch:job>
+    <!-- Job which will export interactions by species in mitab publication files -->
+    <batch:job id="mitab.speciesJob" restartable="true" job-repository="basicBatchJobRepository">
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
+
+        <batch:step id="p.createSpeciesClassification" parent="species.classificationStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+            <batch:next on="*" to="p.createSpecies"/>
+        </batch:step>
+        <batch:step id="p.createSpecies" parent="mitab27.speciesStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+            <batch:next on="*" to="zip.species"/>
+        </batch:step>
+        <batch:step id="zip.species" parent="zip.singleSpeciesMitabStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+        </batch:step>
+    </batch:job>
 
     <!-- final job which will export all binary interactions in a global mitab file and per publication -->
     <batch:job id="mitabExportJob" job-repository="basicBatchJobRepository">
