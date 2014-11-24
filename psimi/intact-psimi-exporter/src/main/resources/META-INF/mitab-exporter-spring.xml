@@ -58,6 +58,34 @@
             </list>
         </property>
     </bean>
+    <!-- publication file readers MITAB per species -->
+    <bean id="speciesClassificationMitabReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.SpeciesClassificationReader" lazy-init="true">
+        <property name="fileNameGenerator" ref="releaseFileNameGenerator"/>
+        <property name="publicationFilter" ref="releaseMitabPublicationFilter"/>
+        <property name="taxidSeparator" value=":"/>
+        <property name="extension" value="txt"/>
+        <property name="pmidFolderPath" value="${release.folder}/psimitab/pmid"/>
+        <property name="speciesFolderName" value="${release.buildFolder}/species"/>
+        <property name="errorLogName" value="${release.buildFolder}/species_readermitab_error.log"/>
+        <property name="dataSourceOptions">
+            <map>
+                <entry key="input_format_key" value="mitab"/>
+                <entry key="streaming_key" value-type="java.lang.Boolean" value="true"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="binary"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+            </map>
+        </property>
+    </bean>
+    <!-- species archive reader Mitab -->
+    <bean id="speciesMitabArchiveReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.IndividualFileArchiveReader" lazy-init="true">
+        <property name="fileNameTruncation" ref="releaseFileNameTruncator"/>
+        <property name="extensions">
+            <list>
+                <value>txt</value>
+            </list>
+        </property>
+        <property name="directory" value="${release.folder}/psimitab/species"/>
+    </bean>
 
     <!-- processors -->
     <bean id="publicationMitabProcessor" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationExportProcessor" lazy-init="true">
@@ -82,6 +110,7 @@
                 <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
                 <entry key="output_format_key" value="mitab"/>
                 <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
             </map>
         </property>
         <property name="output" ref="miPositiveFileOutput"/>
@@ -95,6 +124,7 @@
                 <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
                 <entry key="output_format_key" value="mitab"/>
                 <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
             </map>
         </property>
         <property name="output" ref="miNegativeFileOutput"/>
@@ -111,6 +141,25 @@
                 <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
                 <entry key="output_format_key" value="mitab"/>
                 <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
+            </map>
+        </property>
+    </bean>
+    <!-- MITAB species writer -->
+    <bean id="mitabSpeciesWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.SpeciesInteractionWriter" lazy-init="true">
+        <property name="parentFolderPaths" value="${release.folder}/psimitab/species"/>
+        <property name="fileNameGenerator" ref="releaseFileNameGenerator"/>
+        <property name="extension" value=".txt"/>
+        <property name="appendToExistingFile" value="true"/>
+        <property name="writerOptions">
+            <map>
+                <entry key="mitab_header_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="mitab_extended_key" value-type="java.lang.Boolean" value="false" />
+                <entry key="mitab_version_key" value-type="psidev.psi.mi.jami.tab.MitabVersion" value="v2_7"/>
+                <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
+                <entry key="output_format_key" value="mitab"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="binary"/>
             </map>
         </property>
     </bean>
@@ -123,9 +172,9 @@
     <!-- tasklet -->
     <!-- tasklet for compressing mitab publication files -->
     <bean id="compressorTab27Tasklet" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.CompressorByFileExtensionsTasklet">
-        <property name="outputFile" value="${release.forlder}/mitab/pmidMITAB27.zip"/>
+        <property name="outputFile" value="${release.forder}/mitab/pmidMITAB27.zip"/>
         <property name="compressor" ref="zipCompressor"/>
-        <property name="directory" value="${release.forlder}/mitab/pmid"/>
+        <property name="directory" value="${release.forder}/mitab/pmid"/>
         <property name="extensions">
             <list>
                 <value>txt</value>
@@ -215,6 +264,61 @@
             </batch:listeners>
         </batch:tasklet>
     </batch:step>
+    <!-- step to zip each publication -->
+    <batch:step id="zip.singlePublicationMitabStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="publicationMitabArchiveReader"
+                         writer="fileArchiveWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="publicationMitabArchiveReader"/>
+                    <batch:stream ref="fileArchiveWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip each species file -->
+    <batch:step id="zip.singleSpeciesMitabStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="speciesMitabArchiveReader"
+                         writer="mitabSpeciesWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="speciesMitabArchiveReader"/>
+                    <batch:stream ref="mitabSpeciesWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to export mitab by species -->
+    <batch:step id="mitab27.speciesStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="speciesClassificationMitabReader"
+                         writer="mitabSpeciesWriter"
+                         commit-interval="10" retry-limit="5">
+                <batch:streams>
+                    <batch:stream ref="speciesClassificationMitabReader"/>
+                    <batch:stream ref="mitabSpeciesWriter"/>
+                </batch:streams>
+
+                <batch:retryable-exception-classes>
+                    <batch:include class="org.springframework.batch.item.ItemStreamException"/>
+                </batch:retryable-exception-classes>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
 
     <!-- Export job -->
     <!-- Job which will export binary interactions in MITAB 2.7 -->
@@ -266,9 +370,26 @@
         </batch:step>
 
         <!-- zip mitab-->
-        <batch:step id="zip.publicationMitab" parent="zip.allPublicationTab27Step">
-            <batch:tasklet task-executor="syncTaskExecutor"/>
-        </batch:step>
+        <!-- zip mitab-->
+        <batch:split id="psimitab.zip" task-executor="asyncTaskExecutor" >
+            <!-- flow1: zip all individual mitab files -->
+            <batch:flow>
+                <batch:step id="zip.publicationMitab" parent="zip.singlePublicationMitabStep">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+
+            <!-- flow2: zip all files in one mitab archive -->
+            <batch:flow>
+                <batch:step id="zip.allPublicationMitab" parent="zip.allPublicationTab27Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+
+            <batch:end on="FAILED"/>
+        </batch:split>
     </batch:job>
 
     <!-- final job which will export all binary interactions in a global mitab file and per publication -->
@@ -317,13 +438,17 @@
                 <batch:step  id="export.publicationMitab" parent="mitab27.publicationStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
                     <batch:end on="FAILED"/>
-                    <batch:next on="*" to="zip.publication.mitab"/>
+                    <batch:next on="*" to="zip.publication.Mitab"/>
                 </batch:step>
 
                 <!-- zip mitab-->
-                <batch:step id="zip.publication.mitab" parent="zip.allPublicationTab27Step">
+                <batch:step id="zip.publication.Mitab" parent="zip.singlePublicationMitabStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
                     <batch:end on="FAILED"/>
+                    <batch:next on="*" to="zip.allPublication.Mitab"/>
+                </batch:step>
+                <batch:step id="zip.allPublication.Mitab" parent="zip.allPublicationTab27Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
                 </batch:step>
             </batch:flow>
         </batch:split>

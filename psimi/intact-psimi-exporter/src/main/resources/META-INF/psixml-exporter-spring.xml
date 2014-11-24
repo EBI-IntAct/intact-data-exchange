@@ -40,6 +40,64 @@
             </list>
         </property>
     </bean>
+    <!-- publication file readers XML 2.5 per species -->
+    <bean id="speciesClassificationXml25Reader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.SpeciesClassificationChunkReader" lazy-init="true">
+        <property name="fileNameGenerator" ref="releaseFileNameGenerator"/>
+        <property name="publicationFilter" ref="releaseXmlPublicationFilter"/>
+        <property name="taxidSeparator" value=":"/>
+        <property name="extension" value="txt"/>
+        <property name="pmidFolderPath" value="${release.folder}/psi25/pmid"/>
+        <property name="speciesFolderName" value="${release.buildFolder}/species"/>
+        <property name="errorLogName" value="${release.buildFolder}/species_reader25_error.log"/>
+        <property name="largeScale" value="2000"/>
+        <property name="dataSourceOptions">
+            <map>
+                <entry key="input_format_key" value="psimi_xml"/>
+                <entry key="streaming_key" value-type="java.lang.Boolean" value="true"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="mixed"/>
+            </map>
+        </property>
+    </bean>
+    <!-- publication file readers XML 3.0 per species -->
+    <bean id="speciesClassificationXml30Reader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.SpeciesClassificationChunkReader" lazy-init="true">
+        <property name="fileNameGenerator" ref="releaseFileNameGenerator"/>
+        <property name="publicationFilter" ref="releaseXmlPublicationFilter"/>
+        <property name="taxidSeparator" value=":"/>
+        <property name="extension" value="txt"/>
+        <property name="pmidFolderPath" value="${release.folder}/psi30/pmid"/>
+        <property name="speciesFolderName" value="${release.buildFolder}/species"/>
+        <property name="errorLogName" value="${release.buildFolder}/species_reader30_error.log"/>
+        <property name="largeScale" value="2000"/>
+        <property name="dataSourceOptions">
+            <map>
+                <entry key="input_format_key" value="psimi_xml"/>
+                <entry key="streaming_key" value-type="java.lang.Boolean" value="true"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="mixed"/>
+            </map>
+        </property>
+    </bean>
+    <!-- species archive reader xml 2.5-->
+    <bean id="speciesXml25ArchiveReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.IndividualFileArchiveReader" lazy-init="true">
+        <property name="fileNameTruncation" ref="releaseFileNameTruncator"/>
+        <property name="extensions">
+            <list>
+                <value>xml</value>
+            </list>
+        </property>
+        <property name="directory" value="${release.folder}/psi25/species"/>
+    </bean>
+    <!-- species archive reader xml 3.0-->
+    <bean id="speciesXml30ArchiveReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.IndividualFileArchiveReader" lazy-init="true">
+        <property name="fileNameTruncation" ref="releaseFileNameTruncator"/>
+        <property name="extensions">
+            <list>
+                <value>xml</value>
+            </list>
+        </property>
+        <property name="directory" value="${release.folder}/psi30/species"/>
+    </bean>
     <!-- simple complex reader -->
     <bean id="intactComplexOrderedBySpeciesReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
         <property name="queryString" value="select i from IntactComplex i
@@ -70,6 +128,7 @@
                 <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
                 <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
                 <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
             </map>
         </property>
     </bean>
@@ -85,6 +144,7 @@
                 <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
                 <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
                 <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
             </map>
         </property>
     </bean>
@@ -95,6 +155,69 @@
             <list>
                 <ref bean="intactPublicationXml25Writer"/>
                 <ref bean="intactPublicationXml30Writer"/>
+            </list>
+        </property>
+    </bean>
+    <!-- XML 2.5 species writer -->
+    <bean id="xml25SpeciesWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.SpeciesInteractionXmlWriter" lazy-init="true">
+        <property name="parentFolderPaths" value="${release.folder}/psi25/species"/>
+        <property name="fileNameGenerator" ref="releaseFileNameGenerator"/>
+        <property name="extension" value=".xml"/>
+        <property name="appendToExistingFile" value="false"/>
+        <property name="largeScale" value="2000"/>
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psimi_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
+            </map>
+        </property>
+
+    </bean>
+    <!-- XML 3.0 species writer -->
+    <bean id="xml30SpeciesWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.SpeciesInteractionXmlWriter" lazy-init="true">
+        <property name="parentFolderPaths" value="${release.folder}/psi30/species"/>
+        <property name="fileNameGenerator" ref="releaseFileNameGenerator"/>
+        <property name="extension" value=".xml"/>
+        <property name="appendToExistingFile" value="false"/>
+        <property name="largeScale" value="2000"/>
+        <property name="writerOptions">
+            <map>
+                <entry key="output_format_key" value="psimi_xml"/>
+                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
+                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
+                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
+                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="true" />
+                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- tasklet -->
+    <!-- tasklet for compressing xml 2.5 publication files -->
+    <bean id="compressorXml25Tasklet" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.CompressorByFileExtensionsTasklet">
+        <property name="outputFile" value="${release.folder}/psi25/pmidMIF25.zip"/>
+        <property name="compressor" ref="zipCompressor"/>
+        <property name="directory" value="${release.folder}/psi25/pmid"/>
+        <property name="extensions">
+            <list>
+                <value>txt</value>
+            </list>
+        </property>
+    </bean>
+    <!-- tasklet for compressing xml 3.0 publication files -->
+    <bean id="compressorXml30Tasklet" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.CompressorByFileExtensionsTasklet">
+        <property name="outputFile" value="${release.folder}/psi30/pmidMIF30.zip"/>
+        <property name="compressor" ref="zipCompressor"/>
+        <property name="directory" value="${release.folder}/psi30/pmid"/>
+        <property name="extensions">
+            <list>
+                <value>txt</value>
             </list>
         </property>
     </bean>
@@ -155,7 +278,196 @@
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
+    <batch:step id="zip.singlePublicationXml25Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="publicationXml25ArchiveReader"
+                         writer="fileArchiveWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="publicationXml25ArchiveReader"/>
+                    <batch:stream ref="fileArchiveWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <batch:step id="zip.singlePublicationXml30Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="publicationXml30ArchiveReader"
+                         writer="fileArchiveWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="publicationXml30ArchiveReader"/>
+                    <batch:stream ref="fileArchiveWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip each publication -->
+    <batch:step id="zip.singleSpeciesXml25Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="speciesXml25ArchiveReader"
+                         writer="xml25SpeciesWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="speciesXml25ArchiveReader"/>
+                    <batch:stream ref="xml25SpeciesWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip each species file -->
+    <batch:step id="zip.singleSpeciesXml30Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="speciesXml30ArchiveReader"
+                         writer="xml30SpeciesWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="speciesXml30ArchiveReader"/>
+                    <batch:stream ref="xml30SpeciesWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip all xml 2.5 publication files -->
+    <batch:step id="zip.allPublicationXml25Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" ref="compressorXml25Tasklet" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip all xml 3.0 publication files -->
+    <batch:step id="zip.allPublicationXml30Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" ref="compressorXml30Tasklet" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to export xml 2.5 by species -->
+    <batch:step id="xml25.speciesStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="speciesClassificationXml25Reader"
+                         writer="xml25SpeciesWriter"
+                         commit-interval="10" retry-limit="5">
+                <batch:streams>
+                    <batch:stream ref="speciesClassificationXml25Reader"/>
+                    <batch:stream ref="xml25SpeciesWriter"/>
+                </batch:streams>
+
+                <batch:retryable-exception-classes>
+                    <batch:include class="org.springframework.batch.item.ItemStreamException"/>
+                </batch:retryable-exception-classes>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to export xml 3.0 by species -->
+    <batch:step id="xml30.speciesStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="speciesClassificationXml30Reader"
+                         writer="xml30SpeciesWriter"
+                         commit-interval="10" retry-limit="5">
+                <batch:streams>
+                    <batch:stream ref="speciesClassificationXml30Reader"/>
+                    <batch:stream ref="xml30SpeciesWriter"/>
+                </batch:streams>
+
+                <batch:retryable-exception-classes>
+                    <batch:include class="org.springframework.batch.item.ItemStreamException"/>
+                </batch:retryable-exception-classes>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
 
     <!-- Export job -->
+    <!-- Job which will export binary interactions in XML publication files -->
+    <batch:job id="exportPublicationXmlJob" job-repository="basicBatchJobRepository">
 
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
+
+        <!-- Export interactions per publication in XML -->
+        <batch:step  id="exportPublicationXml" parent="xml.publicationStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+            <batch:next on="*" to="zip.publicationXml"/>
+        </batch:step>
+
+        <!-- zip xml-->
+        <!-- split 2 : export positive and negative interactions in parallel -->
+        <batch:split id="zip.publicationXml" task-executor="asyncTaskExecutor">
+            <!-- flow1 : zip XML 2.5 -->
+            <batch:flow>
+                <batch:step id="zip.publicationXml25" parent="zip.allPublicationXml25Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+
+            <!-- flow2: zip XML 3.0 -->
+            <batch:flow>
+                <batch:step  id="zip.publicationXml30" parent="zip.allPublicationXml30Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+
+            <batch:end on="FAILED"/>
+        </batch:split>
+    </batch:job>
+    <!-- Job which will export binary interactions in XML publication files -->
+    <batch:job id="exportPublicationXmlJob" job-repository="basicBatchJobRepository">
+
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
+
+        <!-- Export interactions per publication in XML -->
+        <batch:step  id="exportPublicationXml" parent="xml.publicationStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+            <batch:next on="*" to="zip.publicationMitab"/>
+        </batch:step>
+
+        <!-- zip mitab-->
+        <batch:step id="zip.publicationMitab" parent="zip.allPublicationTab27Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+        </batch:step>
+    </batch:job>
+    <batch:job id="xml.smallScaleSpeciesJob" restartable="true" job-repository="intactJobRepository">
+        <batch:listeners>
+            <batch:listener>
+                <bean class="uk.ac.ebi.intact.release.listener.ConsoleJobExecutionListener"/>
+            </batch:listener>
+        </batch:listeners>
+
+        <batch:step id="p.createSmallScaleSpecies" parent="xml.smallScaleSpeciesStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+        </batch:step>
+    </batch:job>
 </beans>

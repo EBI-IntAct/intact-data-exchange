@@ -392,6 +392,10 @@ public class SpeciesInteractionWriter implements ItemWriter<SpeciesInteractionUn
         this.parentFolderPaths = parentFolderPaths;
     }
 
+    public void setWriterOptions(Map<String, Object> writerOptions) {
+        this.writerOptions = writerOptions;
+    }
+
     protected Map<String, Object> getWriterOptions() {
         return writerOptions;
     }

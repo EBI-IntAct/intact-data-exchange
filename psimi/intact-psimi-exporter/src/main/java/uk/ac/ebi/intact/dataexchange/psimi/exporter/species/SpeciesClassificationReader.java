@@ -74,7 +74,6 @@ public class SpeciesClassificationReader implements ItemReader<SpeciesInteractio
 
     private String currentSpecies;
     private Map<String, Object> dataSourceOptions;
-    private String fileExtension;
 
     public SpeciesClassificationReader(){
         this.fileNameGenerator = new FileNameGenerator();
@@ -163,10 +162,6 @@ public class SpeciesClassificationReader implements ItemReader<SpeciesInteractio
 
         if (pmidFolderPath == null){
             throw new NullPointerException("A pmid folder is needed for the processor");
-        }
-
-        if (fileExtension == null){
-            throw new NullPointerException("A file extension is needed for the processor");
         }
 
         pmidFolder = new File(pmidFolderPath);
@@ -379,12 +374,8 @@ public class SpeciesClassificationReader implements ItemReader<SpeciesInteractio
         this.publicationFilter = publicationFilter;
     }
 
-    public String getFileExtension() {
-        return fileExtension;
-    }
-
-    public void setFileExtension(String fileExtension) {
-        this.fileExtension = fileExtension;
+    public void setDataSourceOptions(Map<String, Object> dataSourceOptions) {
+        this.dataSourceOptions = dataSourceOptions;
     }
 
     protected void registerDataSources() {
@@ -417,7 +408,8 @@ public class SpeciesClassificationReader implements ItemReader<SpeciesInteractio
         this.currentLine = 0;
 
         this.speciesIterator = new SpeciesClassificationIterator(this.currentSpeciesFile, this.taxidSeparator, this.currentSpecies,
-                this.positiveXmlInputs, this.negativeXmlInputs, this.publicationFilter, this.fileNameGenerator, this.pmidFolder, this.fileExtension);
+                this.positiveXmlInputs, this.negativeXmlInputs, this.publicationFilter, this.fileNameGenerator, this.pmidFolder,
+                this.publicationFilter.getExtension());
     }
 
     protected void readNextLine(){
